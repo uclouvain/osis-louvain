@@ -7,7 +7,7 @@
     """,
 
     'description': """
-        OSIS-Louvain is an extension of OSIS customized for the needs of the Université catholique de Louvain.
+        OSIS Louvain is an extension of OSIS customized for the needs of the Université catholique de Louvain.
     """,
 
     'author': "Université catholique de Louvain",
@@ -26,6 +26,7 @@
     'data': [
         # 'security/ir.model.access.csv',
         'templates.xml',
+        'views/menu.xml'
     ],
     # only loaded in demonstration mode
     'demo': [

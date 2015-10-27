@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+        <record model="ir.actions.act_window" id="encoding_notes_list_action">
+            <field name="name">Encoding notes</field>
+            <field name="res_model">osis.exam_enrollment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html"><p class="oe_view_nocontent_create">Create the first note</p></field>
+        </record>
+        <record model="ir.actions.act_window" id="offer_list_action">
+            <field name="name">Offers</field>
+            <field name="res_model">osis.offer</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html"><p class="oe_view_nocontent_create">Create the first offer</p></field>
+        </record>
+        <record model="ir.actions.act_window" id="attribution_list_action">
+            <field name="name">Attributions</field>
+            <field name="res_model">osis.attribution</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html"><p class="oe_view_nocontent_create">Create the first attribution</p></field>
+        </record>
+        <record model="ir.actions.act_window" id="offer_year_list_action">
+            <field name="name">Offer Year</field>
+            <field name="res_model">osis.offer_year</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="learning_unit_year_list_action">
+            <field name="name">Learning unit year</field>
+            <field name="res_model">osis.learning_unit_year</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="academic_year_list_action">
+            <field name="name">Academic year</field>
+            <field name="res_model">osis.academic_year</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="structure_list_action">
+            <field name="name">Structure</field>
+            <field name="res_model">osis.structure</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="learning_unit_list_action">
+            <field name="name">Learning units</field>
+            <field name="res_model">osis.learning_unit</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="tutor_list_action">
+            <field name="name">Tutors</field>
+            <field name="res_model">osis.tutor</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="exam_list_action">
+            <field name="name">Exams</field>
+            <field name="res_model">osis.exam</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="offer_enrollment_list_action">
+            <field name="name">Offer enrollments</field>
+            <field name="res_model">osis.offer_enrollment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="learning_unit_enrollment_list_action">
+            <field name="name">Learning unit enrollments</field>
+            <field name="res_model">osis.learning_unit_enrollment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="exam_enrollment_list_action">
+            <field name="name">Exam enrollments</field>
+            <field name="res_model">osis.exam_enrollment</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record model="ir.actions.act_window" id="student_list_action">
+            <field name="name">Students</field>
+            <field name="res_model">osis.student</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <menuitem id="students_main_menu" name="Students"/>
+        <menuitem id="routes_menu" name="Routes" parent="students_main_menu"/>
+        <menuitem id="learning_assessments_menu" name="Learning Assessments" parent="routes_menu"/>
+        <menuitem id="encoding_notes_menu" name="Encoding notes" parent="learning_assessments_menu" action="encoding_notes_list_action"/>
+        <menuitem id="enrollment_menu" name="Enrollments" parent="students_main_menu"/>
+        <menuitem id="offer_enrollment_menu" name="Offers" parent="enrollment_menu" action="offer_enrollment_list_action"/>
+        <menuitem id="learning_unit_enrollment_menu" name="Learning units" parent="enrollment_menu" action="learning_unit_enrollment_list_action"/>
+        <menuitem id="exam_enrollment_menu" name="Exams" parent="enrollment_menu" action="exam_enrollment_list_action"/>
+        <menuitem id="registrations_menu" name="Registrations" parent="students_main_menu"/>
+        <menuitem id="students_menu" name="Students" parent="registrations_menu" action="student_list_action"/>
+
+        <menuitem id="program_main_menu" name="Program"/>
+        <menuitem id="program_sub_menu" name="Program" parent="program_main_menu"/>
+        <menuitem id="offers_menu" name="Offers" parent="program_sub_menu" action="offer_list_action"/>
+        <menuitem id="learning_units_menu" name="Learning units" parent="program_sub_menu" action="learning_unit_list_action"/>
+
+        <menuitem id="academy_main_menu" name="Academy"/>
+        <menuitem id="academy_sub_menu" name="Academy" parent="academy_main_menu"/>
+        <menuitem id="attributions_menu" name="Attributions" parent="academy_sub_menu" action="attribution_list_action"/>
+        <menuitem id="tutors_menu" name="Tutors" parent="academy_sub_menu" action="tutor_list_action"/>
+
+        <menuitem id="institution_main_menu" name="Institution"/>
+        <menuitem id="academic_year_main_menu" parent="institution_main_menu" name="Academic Year"/>
+        <menuitem id="offer_year_menu" name="Offers" parent="academic_year_main_menu" action="offer_year_list_action"/>
+        <menuitem id="learning_unit_year_menu" name="Learning units" parent="academic_year_main_menu" action="learning_unit_year_list_action"/>
+        <menuitem id="exams_menu" name="Exams" parent="academic_year_main_menu" action="exam_list_action"/>
+        <menuitem id="academic_year_menu" name="Academic years" parent="academic_year_main_menu" action="academic_year_list_action"/>
+        <menuitem id="structure_main_menu" parent="institution_main_menu" name="Structure"/>
+        <menuitem id="structure_menu" parent="structure_main_menu" name="Structure" action="structure_list_action"/>
+
+    </data>
+</openerp>
