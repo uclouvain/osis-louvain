@@ -1,4 +1,4 @@
-# OSIS-Louvain Teste
+# OSIS-Louvain Testes
 
 OSIS-Louvain is an instance of [OSIS](https://github.com/uclouvain/OSIS) customized for the needs of the [Université catholique de Louvain](http://uclouvain.be). You can observe this project to figure out how to extend OSIS to your own institution.
 
