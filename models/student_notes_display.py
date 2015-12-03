@@ -50,7 +50,6 @@ class Student_notes_display(models.Model):
             )''')
 
 
-
     def submit_results(self, cr, uid, ids, context=None) :
         for rec in self.pool.get('osis.exam_enrollment').browse(cr, uid, ids, context=context):
 
@@ -100,6 +99,57 @@ class Student_notes_display(models.Model):
             'res_id': idd,
             'target': 'new',
         }
+
+
+    def remove_ir_values_button(self,cr,uid):
+            rec_id=self.pool.get('ir.values').search(cr,uid,[('name', 'ilike', 'Encoding notes')])
+            if rec_id:
+                self.pool.get('ir.values').unlink(cr,uid,rec_id)
+
+            rec_id=self.pool.get('ir.values').search(cr,uid,[('name', 'ilike', 'Submitting notes')])
+            if rec_id:
+                self.pool.get('ir.values').unlink(cr,uid,rec_id)
+
+
+    def fields_view_get(self, cr, uid, view_id=None, view_type=None, context=None, toolbar=False, submenu=False):
+
+        res = super(Student_notes_display,self).fields_view_get(cr, uid, view_id=view_id, view_type=view_type, context=context, toolbar=toolbar, submenu=submenu)
+
+        encoding = False
+        if context is None:
+            context = {}
+        if context.get('encoding') is not None:
+            encoding = context.get('encoding')
+
+            if encoding:
+                # on crée les 2 boutons
+                rec_id=self.pool.get('ir.values').search(cr,uid,[('name', 'ilike', 'Encoding notes')])
+                
+                if rec_id:
+                    self.remove_ir_values_button(cr,uid)
+
+                id_action_server=self.pool.get('ir.actions.server').search(cr,uid,[('name', 'ilike', 'Encoding notes')])
+                vals=dict({})
+                vals['id'] = "encoding_notes_more_item"
+                vals['key2'] = "client_action_multi"
+                vals['model'] = "osis.student_notes_display"
+                vals['name'] = "Encoding notes"
+                vals['value'] = "ir.actions.server,"+str(id_action_server[0])
+                self.pool.get('ir.values').create(cr,uid,vals,context)
+
+                id_action_server=self.pool.get('ir.actions.server').search(cr,uid,[('name', 'ilike', 'Submitting notes')])
+                vals=dict({})
+                vals['id'] = "submitting_more_item"
+                vals['key2'] = "client_action_multi"
+                vals['model'] = "osis.student_notes_display"
+                vals['name'] = "Submitting notes"
+                vals['value'] = "ir.actions.server,"+str(id_action_server[0])
+                self.pool.get('ir.values').create(cr,uid,vals,context)
+
+            else:
+                self.remove_ir_values_button(cr,uid)
+
+        return res
 
 
 class ExamResults(models.Model):

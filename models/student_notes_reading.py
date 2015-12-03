@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from openerp import models, fields, api, tools, _
+from lxml import etree
 
 class Student_notes_reading(models.Model):
     _name = 'osis.student_notes'
@@ -19,7 +20,7 @@ class Student_notes_reading(models.Model):
     tutor_name = fields.Char('Tutor name', compute='_get_tutors_names')
     id_student_notes  = fields.Integer('ID student notes')
 
-    @api.depends('learning_unit_id')
+
     @api.multi
     def _get_tutors_names(self):
         for r in self:
@@ -46,32 +47,9 @@ class Student_notes_reading(models.Model):
     #         operator = 'ilike'
     #     return [('tutor_name', operator, value)]
 
-    def init_old(self, cr):
-        cr.execute('''delete from osis_student_notes''',)
-        cr.execute('''INSERT INTO osis_student_notes  (status,title,year,session_name,session_exam_id, learning_unit_year_id, id_student_notes, acronym, learning_unit_id)
-                   select se.closed ,
-                          luy.title ,
-                          ay.year ,
-                          se.session_name ,
-                          se.id ,
-                          se.learning_unit_year_id ,
-                          se.id ,
-                          luy.acronym,
-                          lu.id
-                   from osis_session_exam se
-                        join osis_learning_unit_year luy on se.learning_unit_year_id = luy.id
-                        join osis_academic_year ay on luy.academic_year_id = ay.id
-                        join osis_learning_unit lu on luy.learning_unit_id = lu.id
-                    ''',)
-        cr.execute('''select learning_unit_id from osis_student_notes''',)
-        rows = cr.fetchall()
-        for row in rows:
-            print row[0]
-# cr.execute('select id from table_name where your_field=%s ', (patamerter1,))
 
     def init(self, cr):
-        # tools.sql.drop_view_if_exists(cr, 'osis_student_notes')
-
+        tools.sql.drop_view_if_exists(cr, 'osis_student_notes')
         cr.execute('''CREATE OR REPLACE VIEW osis_student_notes AS (
             select se.closed as status,
                    luy.title as title,
