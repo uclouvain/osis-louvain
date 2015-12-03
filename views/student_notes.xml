@@ -21,10 +21,17 @@
           </field>
       </record>
     <!-- Tree -->
+    <act_window
+     id="action_notes_items"
+     name="Student notes"
+     key2="client_action_multi"
+     src_model="osis.student_notes"
+     res_model="osis.student_notes_display"
+     domain="[('session_exam_id', '=', active_id)]"/>
+
     <record id="student_notes_tree_view" model="ir.ui.view">
       <field name="name">student_notes.tree.view</field>
       <field name="model">osis.student_notes</field>
-
       <field name="arch" type="xml">
 
         <tree colors="green:status==True;red:status!=True" create="false" delete="false" editable="false">
@@ -35,17 +42,11 @@
           <field name="session_name" string="Session"/>
           <field name="tutor_name" string="Tutor(s)"/>
         </tree>
+
       </field>
 
     </record>
 
-   <act_window
-    id="action_notes_items"
-    name="Student notes"
-    key2="client_action_multi"
-    src_model="osis.student_notes"
-    res_model="osis.student_notes_display"
-    domain="[('session_exam_id', '=', active_id)]"/>
 
   </data>
 </openerp>

@@ -12,8 +12,6 @@
           <field name="title"/>
           <field name="academic_year_id"/>
           <field name="learning_unit_id"/>
-          <field name="attribution_entity_id"/>
-          <field name="specifications_responsible_id"/>
           <field name="credits"/>
         </tree>
       </field>
@@ -31,8 +29,6 @@
             <field name="title"/>
             <field name="academic_year_id"/>
             <field name="learning_unit_id"/>
-            <field name="attribution_entity_id"/>
-            <field name="specifications_responsible_id"/>
             <field name="credits"/>
           </group>
         </form>

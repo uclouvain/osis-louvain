@@ -22,6 +22,8 @@ class Student_notes_display(models.Model):
     learning_unit_ref = fields.Integer('Learning unit id')
     learning_unit_enrollment_id = fields.Integer('Learning unit enrollment id')
     exam_enrollment_id = fields.Integer('Exam enrollment id')
+    offer_id = fields.Integer('Offer id')
+    offer_acronym = fields.Char('Offer acronym', compute = '_get_offer_title')
 
 
     def init(self, cr):
@@ -37,12 +39,15 @@ class Student_notes_display(models.Model):
                    ee.id as id,
                    luy.title as title_learning_unit,
                    ee.learning_unit_enrollment_id as learning_unit_enrollment_id,
-                   ee.id as exam_enrollment_id
+                   ee.id as exam_enrollment_id,
+                   oy.offer_id as offer_id
+
             from osis_session_exam se join osis_exam_enrollment ee on ee.session_exam_id = se.id
                  join osis_learning_unit_year luy on se.learning_unit_year_id = luy.id
                  join osis_academic_year ay on luy.academic_year_id = ay.id
                  join osis_learning_unit_enrollment lue on lue.id = ee.learning_unit_enrollment_id
                  join osis_offer_enrollment oo on lue.offer_enrollment_id = oo.id
+                 join osis_offer_year oy on oo.offer_year_id = oy.id
                  join osis_student s on s.id = oo.student_id
                  join osis_person p on s.person_id = p.id
                  join osis_learning_unit lu on luy.learning_unit_id = lu.id
@@ -118,13 +123,14 @@ class Student_notes_display(models.Model):
         encoding = False
         if context is None:
             context = {}
+
         if context.get('encoding') is not None:
             encoding = context.get('encoding')
 
             if encoding:
                 # on crée les 2 boutons
                 rec_id=self.pool.get('ir.values').search(cr,uid,[('name', 'ilike', 'Encoding notes')])
-                
+
                 if rec_id:
                     self.remove_ir_values_button(cr,uid)
 
@@ -151,6 +157,12 @@ class Student_notes_display(models.Model):
 
         return res
 
+    @api.multi
+    def _get_offer_title(self):
+        for r in self:
+            recs = self.env['osis.offer'].search([('id', '=', r.offer_id)])
+            for at in recs:
+                r.offer_acronym = at.acronym
 
 class ExamResults(models.Model):
     _name = 'osis.exam.result'
