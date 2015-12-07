@@ -12,8 +12,6 @@
           <field name="title"/>
           <field name="academic_year_id"/>
           <field name="learning_unit_id"/>
-          <field name="attribution_entity_id"/>
-          <field name="specifications_responsible_id"/>
           <field name="credits"/>
         </tree>
       </field>
@@ -31,9 +29,11 @@
             <field name="title"/>
             <field name="academic_year_id"/>
             <field name="learning_unit_id"/>
-            <field name="attribution_entity_id"/>
-            <field name="specifications_responsible_id"/>
             <field name="credits"/>
+              </group>
+            <group col="4">
+            <field name="learning_unit_enrollment_ids"  attrs="{'readonly':True}"/>
+
           </group>
         </form>
       </field>

@@ -42,6 +42,9 @@
             <field name="closed" string="Closed"/>
             <!-- <field name="exam_enrollment_ids" string="Exam enrollments"/> -->
           </group>
+          <!-- <group col="4">
+            <field name="student_notes_ids" />
+          </group> -->
         </form>
       </field>
     </record>

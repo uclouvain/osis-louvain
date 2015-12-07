@@ -43,5 +43,6 @@ class Learning_unit_enrollment(models.Model):
             year = u"%s" % record.learning_unit_year_id.academic_year_id.year
             title = u"%s" % record.learning_unit_year_id.title
             offer_acronym = u"%s" % record.offer_enrollment_id.offer_year_id.offer_id.acronym
-            result[record.id] = u"%s - %s - %s" % (year,title,offer_acronym)
+            student = u"%s" % record.offer_enrollment_id.student_id.person_id.name
+            result[record.id] = u"%s - %s - %s - %s" % (year,title,offer_acronym,student)
         return result.items()

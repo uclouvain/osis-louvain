@@ -1,13 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>
-        <record model="ir.actions.act_window" id="reading_student_notes_list_action">
+        <record model="ir.actions.act_window" id="encoding_student_notes_list_action">
             <field name="name">Encoding notes</field>
             <field name="res_model">osis.student_notes</field>
             <field name="view_type">form</field>
-            <field name="view_mode">tree,form</field>
+            <field name="view_mode">tree</field>
             <field name="view_id" eval="False"/>
+            <field name="context">{'encoding': True}</field>
         </record>
+        <record model="ir.actions.act_window" id="viewing_student_notes_list_action">
+            <field name="name">Viewing notes</field>
+            <field name="res_model">osis.student_notes</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree</field>
+            <field name="view_id" eval="False"/>
+            <field name="context">{'encoding': False}</field>
+        </record>
+        <!-- <record model="ir.ui.view" id="board_view_notes_form">
+              <field name="name">Notes dashboard</field>
+              <field name="model">board.board</field>
+              <field name="type">form</field>
+              <field name="arch" type="xml">
+                  <form string="Notes Dashboard">
+                      <hpaned>
+                          <child1>
+                              <action string="Dashboard notes" name="%(encoding_student_notes_list_action)d" colspan="2" />
+                          </child1>
+                      </hpaned>
+                  </form>
+              </field>
+        </record>
+        <record model="ir.actions.act_window" id="dashboard_notes_action">
+         <field name="name">Notes Dashboard</field>
+         <field name="res_model">board.board</field>
+         <field name="view_type">form</field>
+         <field name="view_mode">form</field>
+         <field name="usage">menu</field>
+         <field name="view_id" ref="board_view_notes_form" />
+       </record> -->
+       <!-- <record model="ir.actions.act_url" id="test_action">
+         <field name="name">Test URL</field>
+         <field name="url">/osis-louvain/test</field>
+         <field name="target">self</field>
+        </record> -->
+
         <record model="ir.actions.act_window" id="offer_list_action">
             <field name="name">Offers</field>
             <field name="res_model">osis.offer</field>
@@ -134,7 +171,10 @@
         <menuitem id="students_main_menu" name="Students"/>
         <menuitem id="routes_menu" name="Routes" parent="students_main_menu"/>
         <menuitem id="learning_assessments_menu" name="Learning Assessments" parent="routes_menu"/>
-        <menuitem id="encoding_student_notes_menu" name="Encoding notes" parent="learning_assessments_menu" action="reading_student_notes_list_action"/>
+        <menuitem id="encoding_student_notes_menu" name="Encoding notes" parent="learning_assessments_menu" action="encoding_student_notes_list_action"/>
+        <menuitem id="viewing_student_notes_menu" name="Reading notes" parent="learning_assessments_menu" action="viewing_student_notes_list_action"/>
+        <!-- <menuitem id="dashboard_notes_menu" name="Dashboard notes" parent="learning_assessments_menu" action="dashboard_notes_action"/>
+        <menuitem id="test_menu" name="Test" parent="learning_assessments_menu" action="test_action"/> -->
 
         <menuitem id="enrollment_menu" name="Enrollments" parent="students_main_menu"/>
         <menuitem id="offer_enrollment_menu" name="Offers" parent="enrollment_menu" action="offer_enrollment_list_action"/>

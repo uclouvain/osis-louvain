@@ -33,3 +33,5 @@ class Structure(models.Model):
     _rec_name='title'
 
     title = fields.Char('Title')
+
+    offer_year_ids = fields.One2many('osis.offer_year', 'structure_id', string='Offer year')

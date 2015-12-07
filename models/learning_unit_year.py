@@ -36,10 +36,12 @@ class Learning_unit_year(models.Model):
 
     academic_year_id = fields.Many2one('osis.academic_year', string='Academic year')
     learning_unit_id = fields.Many2one('osis.learning_unit', string='Learning unit')
-    attribution_entity_id = fields.Many2one('osis.structure', string='Attribution entity')
-    specifications_responsible_id = fields.Many2one('osis.structure', string='Specifications responsible entity')
 
     credits = fields.Float("Credits", default=0)
+    learning_unit_enrollment_ids = fields.One2many('osis.learning_unit_enrollment', 'learning_unit_year_id', string='Learning unit enrollment')
+    session_exam_ids = fields.One2many('osis.session_exam', 'learning_unit_year_id', string='Session exam')
+    
+
 
     def name_get(self,cr,uid,ids,context=None):
         result={}

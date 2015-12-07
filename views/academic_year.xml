@@ -27,6 +27,13 @@
             <field name="start_date"/>
             <field name="end_date"/>
           </group>
+          <group col="4">
+            <field name="offer_year_ids" title="Offers"/>
+          </group>
+          <group col="4">
+            <field name="learning_unit_year_ids" title="Learning unit year"/>
+          </group>
+
         </form>
       </field>
     </record>

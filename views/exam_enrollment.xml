@@ -8,11 +8,11 @@
       <field eval="16" name="priority"/>
       <field name="arch" type="xml">
         <tree colors="green:encoding_status=='SUBMITTED'" >
-          <field name="session_exam_id"/>
+          <field name="session_exam_id" string="Session"/>
           <field name="learning_unit_enrollment_id" />
           <field name="score" />
           <field name="encoding_status" readonly="1"/>
-          
+          <field name="justification"/>
         </tree>
       </field>
     </record>
@@ -23,10 +23,11 @@
       <field eval="8" name="priority"/>
       <field name="arch" type="xml">
         <tree colors="green:encoding_status=='SUBMITTED'" >
-          <field name="session_exam_id"/>
+          <field name="session_exam_id" string="Session"/>
           <field name="learning_unit_enrollment_id" />
           <field name="score" />
           <field name="encoding_status" readonly="1"/>
+          <field name="justification"/>
         </tree>
       </field>
 
@@ -43,6 +44,7 @@
             <field name="learning_unit_enrollment_id" />
             <field name="score" />
             <field name="encoding_status"/>
+            <field name="justification"/>
           </group>
         </form>
       </field>

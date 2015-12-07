@@ -1,51 +1,60 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
   <data>
+    <!-- Search -->
+      <record model="ir.ui.view" id="student_notes_display_search">
+          <field name="name">student_notes_display.search</field>
+          <field name="model">osis.student_notes_display</field>
+          <field name="arch" type="xml">
+              <search>
+                <field name="year" string="Year"/>
+                <field name="session_name" string="Session"/>
+                <group string="Group By">
+                      <filter name="group_by_offer" string="Offer" context="{'group_by': 'offer_acronym'}"/>
+                </group>
+              </search>
+          </field>
+      </record>
     <!-- Tree -->
     <record id="student_notes_display_tree_view" model="ir.ui.view">
       <field name="name">student_notes_display.tree.view</field>
       <field name="model">osis.student_notes_display</field>
       <field eval="16" name="priority"/>
       <field name="arch" type="xml">
-        <tree create="false" delete="false" editable="false">
-          <field name="title_learning_unit" string="Learning unit" attrs="{'readonly':True}"/>
-          <field name="year" attrs="{'readonly':True}"/>
-          <field name="session_name" string="Session" attrs="{'readonly':True}"/>
+        <tree create="false" delete="false" editable="false" colors="blue:color=='couleur1';red:color=='couleur2'" >
+          <field name="offer_acronym" string="Offer acronym" attrs="{'readonly':True}" />
+          <field name="student_registration_number" string="Registration number" attrs="{'readonly':True}" class="arbre"/>
           <field name="student_name" string="Student" attrs="{'readonly':True}"/>
-          <field name="score" attrs="{'readonly':True}"/>
+          <field name="score" attrs="{'readonly':True}" />
+          <field name="color" attrs="{'readonly':True}" />
         </tree>
       </field>
     </record>
-    <!-- ATTENTION Actuellement seul 2ième bouton apparait-->
+
     <!-- 1ier Bouton -->
     <record id="submitting_notes_more_item_action" model="ir.actions.server">
       <field name="name">Submitting notes</field>
       <field name="model_id" ref="model_osis_student_notes_display"/>
       <field name="code">action = self.submit_results(cr, uid, context.get('active_ids', []), context=context)</field>
-    </record>
 
-    <record id="test_more_item" model="ir.values">
+    </record>
+    <!-- <record id="submitting_more_item" model="ir.values">
         <field name="key2">client_action_multi</field>
         <field name="model">osis.student_notes_display</field>
         <field name="name">Submitting notes</field>
         <field eval="'ir.actions.server,%d'%submitting_notes_more_item_action" name="value"/>
-    </record>
+    </record> -->
     <!-- 2ieme Bouton -->
     <record id="encoding_notes_more_item_action" model="ir.actions.server">
           <field name="name">Encoding notes</field>
           <field name="model_id" ref="model_osis_student_notes_display"/>
           <field name="code">action = self.wizard_encode_results(cr, uid, context.get('active_ids', []), context=context)</field>
         </record>
-
-        <record id="encoding_notes_more_item" model="ir.values">
+        <!-- <record id="encoding_notes_more_item" model="ir.values">
             <field name="key2">client_action_multi</field>
             <field name="model">osis.student_notes_display</field>
             <field name="name">Encoding notes</field>
             <field eval="'ir.actions.server,%d'%encoding_notes_more_item_action" name="value"/>
-
-        </record>
-
-
-
+        </record> -->
   </data>
 </openerp>

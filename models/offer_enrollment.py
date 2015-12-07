@@ -41,6 +41,8 @@ class Offer_enrollment(models.Model):
         result={}
         for record in self.browse(cr,uid,ids,context=context):
             offer_acronym = u"%s" % record.offer_year_id.offer_id.acronym
-            offer_title = u"%s" % record.offer_year_id.offer_id.acronym
-            result[record.id] = u"%s - %s" % (offer_acronym,offer_title)
+            offer_title = u"%s" % record.offer_year_id.offer_id.title
+            offer_year = u"%s" % record.offer_year_id.academic_year_id.year
+            student = u"%s" % record.student_id.person_id.name
+            result[record.id] = u"%s - %s - %s - %s" % (offer_acronym,offer_title,offer_year,student)
         return result.items()

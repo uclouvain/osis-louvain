@@ -34,6 +34,8 @@ class Offer(models.Model):
 
     acronym  = fields.Char('Acronym', required = True)
     title = fields.Text('Title')
+    offer_year_ids = fields.One2many('osis.offer_year', 'offer_id', string='Offer year')
+
 
     @api.onchange('acronym')
     def _upper_acronym(self):

@@ -10,16 +10,14 @@ class Student_notes_reading(models.Model):
     acronym = fields.Char('Acronym', readonly=True)
     title = fields.Char('Title', readonly=True)
     year = fields.Integer('Year', readonly=True)
-    status = fields.Boolean('Status', readonly=True)
+    status = fields.Boolean('Statusss', readonly=True)
     session_name = fields.Char('Session name', readonly=True)
     session_exam_id = fields.Char('Exam id', readonly=True)
     learning_unit_year_id = fields.Integer('Learning Unit Year Id', readonly=True)
     learning_unit_id = fields.Integer('Learning Unit Id', readonly=True)
     # tutor_name = fields.Char('Tutor name', compute='_get_tutors_names' , search='_search_tutor_name')
     tutor_name = fields.Char('Tutor name', compute='_get_tutors_names')
-    id_student_notes  = fields.Integer('ID student notes')
 
-    @api.depends('learning_unit_id')
     @api.multi
     def _get_tutors_names(self):
         for r in self:
@@ -46,32 +44,9 @@ class Student_notes_reading(models.Model):
     #         operator = 'ilike'
     #     return [('tutor_name', operator, value)]
 
-    def init_old(self, cr):
-        cr.execute('''delete from osis_student_notes''',)
-        cr.execute('''INSERT INTO osis_student_notes  (status,title,year,session_name,session_exam_id, learning_unit_year_id, id_student_notes, acronym, learning_unit_id)
-                   select se.closed ,
-                          luy.title ,
-                          ay.year ,
-                          se.session_name ,
-                          se.id ,
-                          se.learning_unit_year_id ,
-                          se.id ,
-                          luy.acronym,
-                          lu.id
-                   from osis_session_exam se
-                        join osis_learning_unit_year luy on se.learning_unit_year_id = luy.id
-                        join osis_academic_year ay on luy.academic_year_id = ay.id
-                        join osis_learning_unit lu on luy.learning_unit_id = lu.id
-                    ''',)
-        cr.execute('''select learning_unit_id from osis_student_notes''',)
-        rows = cr.fetchall()
-        for row in rows:
-            print row[0]
-# cr.execute('select id from table_name where your_field=%s ', (patamerter1,))
 
     def init(self, cr):
-        # tools.sql.drop_view_if_exists(cr, 'osis_student_notes')
-
+        tools.sql.drop_view_if_exists(cr, 'osis_student_notes')
         cr.execute('''CREATE OR REPLACE VIEW osis_student_notes AS (
             select se.closed as status,
                    luy.title as title,
@@ -90,21 +65,69 @@ class Student_notes_reading(models.Model):
         )''',)
 
 
-    @api.multi
-    def display_students_notes(self):
-       print 'methode display_students_notes'
-       view_ref = self.env['ir.model.data'].get_object_reference('osis-louvain', 'student_notes_display_tree_view')
-       view_id = view_ref[1] if view_ref else False
+    # @api.model
+    # def default_get(self, fields_list):
+    #     print 'zut',default_get
+    #     # trigger view init hook
+    #     self.view_init(fields_list)
+    #
+    #     defaults = {}
+    #     parent_fields = defaultdict(list)
+    #
+    #     for name in fields_list:
+    #         print 'zut', name
+    #         # 1. look up context
+    #         key = 'default_' + name
+    #         if key in self._context:
+    #             defaults[name] = self._context[key]
+    #             continue
+    #
+    #         # 2. look up ir_values
+    #         #    Note: performance is good, because get_defaults_dict is cached!
+    #         ir_values_dict = self.env['ir.values'].get_defaults_dict(self._name)
+    #         if name in ir_values_dict:
+    #             defaults[name] = ir_values_dict[name]
+    #             continue
+    #
+    #         field = self._fields.get(name)
+    #
+    #         # 3. look up property fields
+    #         #    TODO: get rid of this one
+    #         if field and field.company_dependent:
+    #             defaults[name] = self.env['ir.property'].get(name, self._name)
+    #             continue
+    #
+    #         # 4. look up field.default
+    #         if field and field.default:
+    #             defaults[name] = field.default(self)
+    #             continue
+    #
+    #         # 5. delegate to parent model
+    #         if field and field.inherited:
+    #             field = field.related_field
+    #             parent_fields[field.model_name].append(field.name)
 
-       res = {
-           'type': 'ir.actions.act_window',
-           'name': _('Student notes'),
-           'res_model': 'osis.student_notes_display',
-           'view_type': 'tree',
-           'view_mode': 'tree',
-           'view_id': view_id,
-           'target': 'current',
-           'domain':[['exam_ref','=',self.session_exam_id]]
-       }
+    #
+    def fields_view_get(self, cr, uid, view_id=None, view_type=None, context=None, toolbar=False, submenu=False):
 
-       return res
+        res = super(Student_notes_reading,self).fields_view_get(cr, uid, view_id=view_id, view_type=view_type, context=context, toolbar=toolbar, submenu=submenu)
+        # print res
+        if context is None:
+            context = {}
+        # print 'zut res' ,res
+
+
+        # if view_type == 'tree':
+        #     print res
+        #     for field in res['fields']:
+        #         print 'zut field :',field
+        #         if field == 'acronym' :
+        #             print res['fields'][field]
+        #     doc = etree.XML(res['arch'])
+        #     print 'zut'  , etree
+        #     for node in doc.xpath("//field[@name='acronym']"):
+        #         print 'zut node' , node
+        #         node.set('invisible', '0')
+        #     res['arch'] = etree.tostring(doc)
+
+        return res
