@@ -21,13 +21,12 @@
       <field name="model">osis.student_notes_display</field>
       <field eval="16" name="priority"/>
       <field name="arch" type="xml">
-        <tree create="false" delete="false" editable="false">
-          <field name="offer_acronym" string="Offer acronym" attrs="{'readonly':True}"/>
-          <field name="title_learning_unit" string="Learning unit" attrs="{'readonly':True}"/>
-          <field name="year" attrs="{'readonly':True}"/>
-          <field name="session_name" string="Session" attrs="{'readonly':True}"/>
+        <tree create="false" delete="false" editable="false" colors="blue:color=='couleur1';red:color=='couleur2'" >
+          <field name="offer_acronym" string="Offer acronym" attrs="{'readonly':True}" />
+          <field name="student_registration_number" string="Registration number" attrs="{'readonly':True}" class="arbre"/>
           <field name="student_name" string="Student" attrs="{'readonly':True}"/>
-          <field name="score" attrs="{'readonly':True}"/>
+          <field name="score" attrs="{'readonly':True}" />
+          <field name="color" attrs="{'readonly':True}" />
         </tree>
       </field>
     </record>

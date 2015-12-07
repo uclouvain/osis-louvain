@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from openerp import models, fields, api, tools, _
-from lxml import etree
 
 class Student_notes_reading(models.Model):
     _name = 'osis.student_notes'
@@ -11,14 +10,13 @@ class Student_notes_reading(models.Model):
     acronym = fields.Char('Acronym', readonly=True)
     title = fields.Char('Title', readonly=True)
     year = fields.Integer('Year', readonly=True)
-    status = fields.Boolean('Status', readonly=True)
+    status = fields.Boolean('Statusss', readonly=True)
     session_name = fields.Char('Session name', readonly=True)
     session_exam_id = fields.Char('Exam id', readonly=True)
     learning_unit_year_id = fields.Integer('Learning Unit Year Id', readonly=True)
     learning_unit_id = fields.Integer('Learning Unit Id', readonly=True)
     # tutor_name = fields.Char('Tutor name', compute='_get_tutors_names' , search='_search_tutor_name')
     tutor_name = fields.Char('Tutor name', compute='_get_tutors_names')
-    id_student_notes  = fields.Integer('ID student notes')
 
     @api.multi
     def _get_tutors_names(self):
@@ -65,26 +63,6 @@ class Student_notes_reading(models.Model):
                  join osis_learning_unit lu on luy.learning_unit_id = lu.id
 
         )''',)
-
-
-    @api.multi
-    def display_students_notes(self):
-       print 'methode display_students_notes'
-       view_ref = self.env['ir.model.data'].get_object_reference('osis-louvain', 'student_notes_display_tree_view')
-       view_id = view_ref[1] if view_ref else False
-
-       res = {
-           'type': 'ir.actions.act_window',
-           'name': _('Student notes'),
-           'res_model': 'osis.student_notes_display',
-           'view_type': 'tree',
-           'view_mode': 'tree',
-           'view_id': view_id,
-           'target': 'current',
-           'domain':[['exam_ref','=',self.session_exam_id]]
-       }
-
-       return res
 
 
     # @api.model
@@ -139,17 +117,17 @@ class Student_notes_reading(models.Model):
         # print 'zut res' ,res
 
 
-        if view_type == 'tree':
-            print res
-            for field in res['fields']:
-                print 'zut field :',field
-                if field == 'acronym' :
-                    print res['fields'][field]
-            doc = etree.XML(res['arch'])
-            print 'zut'  , etree
-            for node in doc.xpath("//field[@name='acronym']"):
-                print 'zut node' , node
-                node.set('invisible', '1')
-            res['arch'] = etree.tostring(doc)
+        # if view_type == 'tree':
+        #     print res
+        #     for field in res['fields']:
+        #         print 'zut field :',field
+        #         if field == 'acronym' :
+        #             print res['fields'][field]
+        #     doc = etree.XML(res['arch'])
+        #     print 'zut'  , etree
+        #     for node in doc.xpath("//field[@name='acronym']"):
+        #         print 'zut node' , node
+        #         node.set('invisible', '0')
+        #     res['arch'] = etree.tostring(doc)
 
         return res

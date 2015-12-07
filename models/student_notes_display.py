@@ -4,6 +4,7 @@ from openerp import models, fields, api, tools, _
 import openerp.pooler as pooler
 import openerp
 from openerp import SUPERUSER_ID
+from lxml import etree
 
 class Student_notes_display(models.Model):
     _name = 'osis.student_notes_display'
@@ -19,40 +20,55 @@ class Student_notes_display(models.Model):
     student_name = fields.Char('Student name')
     score = fields.Char('Score')
     student_ref  = fields.Integer('Student ref')
+    student_registration_number = fields.Char('Registration number')
     learning_unit_ref = fields.Integer('Learning unit id')
     learning_unit_enrollment_id = fields.Integer('Learning unit enrollment id')
     exam_enrollment_id = fields.Integer('Exam enrollment id')
     offer_id = fields.Integer('Offer id')
     offer_acronym = fields.Char('Offer acronym', compute = '_get_offer_title')
-
+    color = fields.Char('Color', compute = '_get_color')
 
     def init(self, cr):
         tools.sql.drop_view_if_exists(cr, 'osis_student_notes_display')
+
         cr.execute('''CREATE OR REPLACE VIEW osis_student_notes_display AS (
-            select ay.year as year,
-                   se.session_name as session_name,
-                   ee.session_exam_id as session_exam_id,
+            select ee.session_exam_id as session_exam_id,
                    p.name as student_name,
                    ee.score as score,
-                   luy.learning_unit_id as learning_unit_ref,
-                   lue.student_id as student_ref,
+                   oe.student_id as student_ref,
                    ee.id as id,
-                   luy.title as title_learning_unit,
                    ee.learning_unit_enrollment_id as learning_unit_enrollment_id,
                    ee.id as exam_enrollment_id,
-                   oy.offer_id as offer_id
+                   oy.offer_id as offer_id,
+                   s.registration_number as student_registration_number,
+                   lue.learning_unit_year_id as learning_unit_ref
 
-            from osis_session_exam se join osis_exam_enrollment ee on ee.session_exam_id = se.id
-                 join osis_learning_unit_year luy on se.learning_unit_year_id = luy.id
-                 join osis_academic_year ay on luy.academic_year_id = ay.id
-                 join osis_learning_unit_enrollment lue on lue.id = ee.learning_unit_enrollment_id
-                 join osis_offer_enrollment oo on lue.offer_enrollment_id = oo.id
-                 join osis_offer_year oy on oo.offer_year_id = oy.id
-                 join osis_student s on s.id = oo.student_id
-                 join osis_person p on s.person_id = p.id
-                 join osis_learning_unit lu on luy.learning_unit_id = lu.id
-                 where ee.encoding_status != 'SUBMITTED'
+            from osis_exam_enrollment ee
+                 join osis_learning_unit_enrollment lue on  ee.learning_unit_enrollment_id=lue.id
+                 join osis_offer_enrollment oe on lue.offer_enrollment_id=oe.id
+                 join osis_student s on oe.student_id= s.id
+                 join osis_person p on  s.person_id=p.id
+                 join osis_offer_year oy on oe.offer_year_id=oy.id
+                 join osis_offer o on oy.offer_id = o.id
+                 where ee.encoding_status is null or ee.encoding_status != 'SUBMITTED'
             )''')
+
+
+    @api.multi
+    def _get_color(self):
+        old_offer_id  = None
+        cpt = 1
+        for r in self:
+
+            if old_offer_id is None:
+                old_offer_id=r.offer_id
+                r.color ="couleur%d" % (cpt,)
+            else:
+                if old_offer_id != r.offer_id:
+                    old_offer_id = r.offer_id
+                    cpt = cpt+1
+
+                r.color ="couleur%d" % (cpt,)
 
 
     def submit_results(self, cr, uid, ids, context=None) :
@@ -116,10 +132,23 @@ class Student_notes_display(models.Model):
                 self.pool.get('ir.values').unlink(cr,uid,rec_id)
 
 
+    def couleurs(self):
+        return "blue:student_registration_number=='ddd';red:student_registration_number!='ddd'"
+
     def fields_view_get(self, cr, uid, view_id=None, view_type=None, context=None, toolbar=False, submenu=False):
 
         res = super(Student_notes_display,self).fields_view_get(cr, uid, view_id=view_id, view_type=view_type, context=context, toolbar=toolbar, submenu=submenu)
+        if view_type == 'tree':
+            print res
 
+            doc =  etree.fromstring(res['arch'])
+            for node in doc.xpath("/tree/colors"):
+                print 'zut node' , node
+            #
+            # for node in doc.xpath("/tree/field[@name='score']"):
+            #     print 'zut node' , node
+
+            res['arch'] = etree.tostring(doc)
         encoding = False
         if context is None:
             context = {}
@@ -163,6 +192,27 @@ class Student_notes_display(models.Model):
             recs = self.env['osis.offer'].search([('id', '=', r.offer_id)])
             for at in recs:
                 r.offer_acronym = at.acronym
+
+
+    @api.multi
+    def _check_color(self):
+        cpt=0
+        for r in self:
+            r.color=cpt
+            cpt=cpt+1
+
+            # res = {}
+            # for record in self.browse(cr, uid, ids, context):
+            #     color = 0
+            #     if record.student_name == u'Roux Bertrand':
+            #         color = 4
+            #         print 'zut 4'
+            #     elif record.student_name == u'Segers Sophie':
+            #         color = 3
+            #         print 'zut 3'
+            #     res[record.id] = color
+            # return res
+
 
 class ExamResults(models.Model):
     _name = 'osis.exam.result'

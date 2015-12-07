@@ -39,6 +39,7 @@ class SessionExam(models.Model):
     date_session = fields.Date('Session date')
     closed = fields.Boolean('Status')
     session_name = fields.Char('Session Name',compute='_get_session_name', store=True)
+    student_notes_ids = fields.One2many('osis.student_notes','session_exam_id', string='Student notes')
 
     def name_get(self,cr,uid,ids,context=None):
         result={}

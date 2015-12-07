@@ -11,7 +11,6 @@
           <field name="offer_id"/>
           <field name="structure_id"/>
           <field name="academic_year_id"/>
-
         </tree>
       </field>
 

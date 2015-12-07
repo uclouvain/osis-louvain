@@ -33,6 +33,7 @@ class Exam_enrollment(models.Model):
 
     session_exam_id = fields.Many2one('osis.session_exam', string='Session exam')
     learning_unit_enrollment_id = fields.Many2one('osis.learning_unit_enrollment', string='Learning unit enrollment')
+
     score = fields.Float('Score')
     justification = fields.Selection([('ILL',_('Ill')),('ABSENT',_('Absent')),('JUSTIFIED_ABSENCE',_('Justified absence')),('CHEATING',_('Cheating')),('SCORE_MISSING',_('Score missing'))])
     encoding_status = fields.Selection([('SAVED','Saved'),('SUBMITTED','Submitted')])
