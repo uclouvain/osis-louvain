@@ -27,17 +27,23 @@
 
 from openerp import http
 
-# class Osis-louvain(http.Controller):
-#     @http.route('/osis-louvain/osis-louvain/', auth='public')
-#     def index(self, **kw):
-#         return "Hello, world"
-
-#     @http.route('/osis-louvain/osis-louvain/objects/', auth='public')
-#     def list(self, **kw):
-#         return http.request.render('osis-louvain.listing', {
-#             'root': '/osis-louvain/osis-louvain',
-#             'objects': http.request.env['osis-louvain.osis-louvain'].search([]),
-#         })
+class OsisLouvain(http.Controller):
+    @http.route('/osis-louvain/osis-louvain/', auth='public')
+    def index(self, **kw):
+        Student_notes  = http.request.env['osis.student_notes']
+        return http.request.render('osis-louvain.student_notes_listing', {
+            'student_notes': Student_notes.search([]),
+        })
+        # Offers  = http.request.env['osis.offer']
+        # return http.request.render('osis-louvain.offer', {
+        #     'offers': Offers.search([]),
+        # })
+    # @http.route('/osis-louvain/osis-louvain/objects/', auth='public')
+    # def list(self, **kw):
+    #     return http.request.render('osis-louvain.listing', {
+    #         'root': '/osis-louvain/osis-louvain',
+    #         'objects': http.request.env['osis-louvain.osis-louvain'].search([]),
+    #     })
 
 #     @http.route('/osis-louvain/osis-louvain/objects/<model("osis-louvain.osis-louvain"):obj>/', auth='public')
 #     def object(self, obj, **kw):

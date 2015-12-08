@@ -22,7 +22,8 @@
  *   see http://www.gnu.org/licenses/. -->
 <openerp>
     <data>
-        <!-- <template id="listing"> -->
+        <template id="listing">
+          <label>ffff</label>
         <!--   <ul> -->
         <!--     <li t-foreach="objects" t-as="object"> -->
         <!--       <a t-attf-href="#{ root }/objects/#{ object.id }"> -->
@@ -39,6 +40,57 @@
         <!--       <dd><t t-esc="object[field]"/></dd> -->
         <!--     </t> -->
         <!--   </dl> -->
-        <!-- </template> -->
+        </template>
+        <template id="student_notes_listing">
+          <div class="oe_structure">
+               <div class="container">
+                 <input type="button" value="ok"/>
+                 <table border="1">
+            <t t-foreach="student_notes" t-as="notes">
+
+              <tr>
+                <td><t t-esc="notes.status"/></td>
+                <td><t t-esc="notes.acronym"/></td>
+                <td><t t-esc="notes.title"/></td>
+                <td><t t-esc="notes.year"/></td>
+                <td><t t-esc="notes.session_name"/></td>
+                <td><t t-esc="notes.tutor_name"/></td>
+
+              </tr>
+
+            </t>
+          </table>
+          </div>
+         </div>
+        </template>
+        <template id="html_extra">
+          <label>extra</label>
+        </template>
+        <template id="offer" >
+          <div class="oe_structure">
+               <div class="container">
+                 <form>
+                   <input type="button" value="ok"/>
+                 <table t-name="ListView" class="oe_list_content">
+            <t t-foreach="offers" t-as="offer">
+
+              <tr>
+                <td class="oe_list_record_selector" width="1">
+
+                    <input type="checkbox" name="radiogroup"></input>
+
+                </td>
+                <td class="oe_list_field_cell oe_list_field_char   oe_readonly" ><t t-esc="offer.acronym"/></td>
+                <td><t t-esc="offer.title"/></td>
+
+
+              </tr>
+
+            </t>
+          </table>
+        </form>
+          </div>
+         </div>
+        </template>
     </data>
 </openerp>

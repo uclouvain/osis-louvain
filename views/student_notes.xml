@@ -33,7 +33,7 @@
           <field name="session_name" string="Session"/>
           <field name="tutor_name" string="Tutor(s)"/>
         </tree>
-
+<label>sdfsdfsdf</label>
       </field>
 
     </record>

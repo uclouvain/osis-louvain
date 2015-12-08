@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<openerp>
+  <data>
+
+    <template name="Services page" id="website.listing" page="True">
+      <t t-call="website.layout">
+    <div id="wrap">
+      <div class="container">
+        <h1>Our Services</h1>
+        <ul class="services">
+          <li>Cloud Hosting</li>
+          <li>Support</li>
+          <li>Unlimited space</li>
+        </ul>
+      </div>
+    </div>
+  </t>
+      </template>
+    </data>
+  </openerp>
