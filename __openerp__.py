@@ -18,11 +18,11 @@
 
     #'depends': ['base','board','website','web'],
     #'depends': ['base','web','website',],
-    'depends': ['base',],
+    'depends': ['base','web'],
 
     'data': [
         # 'security/ir.model.access.csv',
-        # 'views/osis-louvain.xml',
+        'views/osis-louvain.xml',
         'templates.xml',
 
         'views/person.xml',
@@ -40,9 +40,9 @@
         'views/learning_unit_enrollment.xml',
         'views/exam_enrollment.xml',
         'reports/student.xml',
-        'views/resultWizard.xml',
         'views/encoding_notes_filter.xml',
         'views/encoding_notes_session.xml',
+        'views/notesWizard.xml',
         'reports/learning_unit_enrollment.xml',
         'templates.xml',
         'views/menu.xml',
@@ -53,7 +53,7 @@
     'demo': [
         # 'demo.xml',
     ],
-    # 'css': ['static/src/css/mycss.css'],
+    'css': ['static/src/css/osis-louvain.css'],
     # 'js': ['static/src/js/resource.js'],
     # 'qweb': ['static/src/xml/resource.xml'],
 }

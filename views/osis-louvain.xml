@@ -5,7 +5,7 @@
       <xpath expr="." position="inside">
         <script src="/osis-louvain/static/src/js/osislouvain.js" type="text/javascript"></script>
 
-      <link href="/osis-louvain/static/src/css/mycss.css" rel="stylesheet"/>
+      <link href="/osis-louvain/static/src/css/osis-louvain.css" rel="stylesheet"/>
 
     </xpath>
   </template>

@@ -12,17 +12,26 @@
           <field name="academic_year"/>
           <field name="session_month_selection"/>
         </group>
+
         <separator string="Choose an activity"/>
-        <field name="session_exam_ids" >
+        <field name="session_exam_ids">
           <tree colors="green:closed==True;red:closed!=True" create="false" delete="false" editable="false" >
             <field name="closed" />
             <field name="learning_unit_acronym" />
             <field name="learning_unit_title" />
-            <button name="open_session_notes" string="Encoding notes" type="object"/>
-            <!-- comment faire pour avoir 2 colonnes acronym et title-->
-
+            <button name="open_session_notes" string="Notes" type="object"/>
           </tree>
         </field>
+        <div style="font-size:10pt;">
+          <table>
+            <tr>
+              <td class="legend"><input type="checkbox"/>Complètement encodé</td>
+              <td class="legend"><input type="checkbox" />Il manque encore des notes</td>
+              <td class="legend"><input type="checkbox" />Pas encore encodé</td>
+            </tr>
+          </table>
+        </div>
+
       </form>
     </field>
   </record>

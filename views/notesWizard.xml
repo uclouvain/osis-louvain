@@ -1,0 +1,80 @@
+<openerp>
+    <data>
+      <!-- form -->
+        <record model="ir.ui.view" id="resultswizard_form_view">
+            <field name="name">osis.wizard.notes.form</field>
+            <field name="model">osis.notes_wizard</field>
+            <field name="arch" type="xml">
+                <form string="Encode notes">
+                  <field name="acronym" readonly="1"/>
+
+                    <group col="1">
+                        <field name="line_ids" nolabel="1">
+                            <tree editable="bottom" create="false" delete="false" >
+                                <field name="student_name" readonly="1"/>
+                                <field name="score_1"  />
+                                <field name="justification_1"/>
+                            </tree>
+                        </field>
+                    </group>
+                    <footer>
+                        <button name="validate_results" type="object"
+                                string="Validate" class="oe_highlight"/>
+                        or
+                        <button special="cancel" string="Cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <!-- form -->
+          <record model="ir.ui.view" id="double_resultswizard_form_view">
+              <field name="name">osis.wizard.notes.form</field>
+              <field name="model">osis.notes_wizard</field>
+              <field name="arch" type="xml">
+                  <form string="Double Encode notes">
+                    <field name="acronym" readonly="1"/>
+                      <group col="1">
+                          <field name="line_ids" nolabel="1">
+                              <tree editable="bottom" create="false" delete="false" >
+                                  <field name="student_name" readonly="1"/>
+                                  <field name="score_2"  />
+                                  <field name="justification_2"/>
+                              </tree>
+                          </field>
+                      </group>
+                      <footer>
+                          <button name="validate_results" type="object"
+                                  string="Validate" class="oe_highlight"/>
+                          <button special="cancel" string="Cancel"/>
+                      </footer>
+                  </form>
+              </field>
+          </record>
+          <!-- form -->
+            <record model="ir.ui.view" id="compare_resultswizard_form_view">
+                <field name="name">osis.wizard.notes.form</field>
+                <field name="model">osis.notes_wizard</field>
+                <field name="arch" type="xml">
+                    <form string="Double Encode notes">
+                      <field name="acronym" readonly="1"/>
+                        <group col="1">
+                            <field name="line_ids" nolabel="1">
+                                <tree editable="bottom" create="false" delete="false" >
+                                    <field name="student_name" readonly="1"/>
+                                    <field name="score_1"  />
+                                    <field name="justification_1"/>
+                                    <field name="score_2"  />
+                                    <field name="justification_2"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <footer>
+                            <button name="validate_results" type="object"
+                                    string="Validate" class="oe_highlight"/>
+                            <button special="cancel" string="Cancel"/>
+                        </footer>
+                    </form>
+                </field>
+            </record>
+    </data>
+</openerp>

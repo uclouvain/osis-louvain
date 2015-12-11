@@ -25,16 +25,38 @@
 #
 ##############################################################################
 
-from openerp import models, fields, api
+from openerp import models, fields, api, _
 
 class Notes_encoding(models.Model):
         _name = 'osis.notes_encoding'
         _description = "Notes encoding"
 
         score_1 = fields.Float('Score 1')
+        justification_1 = fields.Selection([('ILL',_('Ill')),('ABSENT',_('Absent')),('JUSTIFIED_ABSENCE',_('Justified absence')),('CHEATING',_('Cheating')),('SCORE_MISSING',_('Score missing'))])
         score_2 = fields.Float('Score 2')
-
+        justification_2 = fields.Selection([('ILL',_('Ill')),('ABSENT',_('Absent')),('JUSTIFIED_ABSENCE',_('Justified absence')),('CHEATING',_('Cheating')),('SCORE_MISSING',_('Score missing'))])
+        notes_status = fields.Char(compute = '_get_notes_status')
         session_exam_id = fields.Many2one('osis.session_exam', string='Session exam')
         exam_enrollment_id =fields.Many2one('osis.exam_enrollment', string='Exam enrollment')
 
         student_name = fields.Char(related="exam_enrollment_id.learning_unit_enrollment_id.offer_enrollment_id.student_id.person_id.last_name")
+        student_registration_number = fields.Char(related="exam_enrollment_id.learning_unit_enrollment_id.offer_enrollment_id.student_id.registration_number")
+        offer = fields.Char(related="exam_enrollment_id.learning_unit_enrollment_id.offer_enrollment_id.offer_year_id.offer_id.acronym")
+
+        encoding_stage_1_done = fields.Boolean('Encoding stage 1 done', default = False)
+        double_encoding_done = fields.Boolean('Double encoding done', default = False)
+        # offer_id = fields.Integer(related="exam_enrollment_id.learning_unit_enrollment_id.offer_enrollment_id.offer_year_id.offer_id.id")
+        @api.multi
+        def _get_notes_status(self):
+            notes_status = 'NULL'
+            for record in self:
+                if record.score_1 and record.score_2:
+                    if record.score_1 != record.score_2:
+                        record.notes_status = 'DIFFERENT'
+                    else:
+                        record.notes_status = 'EQUAL'
+                if record.justification_1 and record.justification_2:
+                    if record.justification_1 != record.justification_2:
+                        record.notes_status = 'DIFFERENT'
+                    else:
+                        record.notes_status = 'EQUAL'
