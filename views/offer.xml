@@ -26,7 +26,7 @@
           <group col="4">
             <field name="title"/>
           </group>
-          <!-- Non demandé pour le moment 
+          <!-- Non demandé pour le moment
           <group col="4">
             <field name="offer_year_ids"/>
           </group> -->

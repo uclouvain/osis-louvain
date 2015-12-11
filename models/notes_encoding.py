@@ -25,20 +25,16 @@
 #
 ##############################################################################
 
-import academic_year
-import attribution
-import session_exam
-import exam_enrollment
-import learning_unit
-import learning_unit_enrollment
-import learning_unit_year
-import offer
-import offer_enrollment
-import offer_year
-import structure
-import person
-import student
-import tutor
-import resultsWizard
-import session_exam_encoding
-import notes_encoding
+from openerp import models, fields, api
+
+class Notes_encoding(models.Model):
+        _name = 'osis.notes_encoding'
+        _description = "Notes encoding"
+
+        score_1 = fields.Float('Score 1')
+        score_2 = fields.Float('Score 2')
+
+        session_exam_id = fields.Many2one('osis.session_exam', string='Session exam')
+        exam_enrollment_id =fields.Many2one('osis.exam_enrollment', string='Exam enrollment')
+
+        student_name = fields.Char(related="exam_enrollment_id.learning_unit_enrollment_id.offer_enrollment_id.student_id.person_id.last_name")

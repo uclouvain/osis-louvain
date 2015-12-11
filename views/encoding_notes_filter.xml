@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+  <data>
+    <!-- Form -->
+    <record id="encoding_notes_filter_form" model="ir.ui.view">
+      <field name="name">osis.view.encoding.notes.filter.form</field>
+      <field name="model">osis.session_exam_encoding</field>
+      <field name="arch" type="xml">
+      <form string="Encoding notes filter Form" edit="false">
+        <group>
+          <field name="tutor"/>
+          <field name="academic_year"/>
+          <field name="session_month_selection"/>
+        </group>
+        <separator string="Choose an activity"/>
+        <field name="session_exam_ids" >
+          <tree colors="green:closed==True;red:closed!=True" create="false" delete="false" editable="false" >
+            <field name="closed" />
+            <field name="learning_unit_acronym" />
+            <field name="learning_unit_title" />
+            <button name="open_session_notes" string="Encoding notes" type="object"/>
+            <!-- comment faire pour avoir 2 colonnes acronym et title-->
+
+          </tree>
+        </field>
+      </form>
+    </field>
+  </record>
+  </data>
+</openerp>

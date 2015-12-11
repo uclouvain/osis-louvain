@@ -24,7 +24,7 @@
         # 'security/ir.model.access.csv',
         # 'views/osis-louvain.xml',
         'templates.xml',
-        'views/menu.xml',
+
         'views/person.xml',
         'views/student.xml',
         'views/tutor.xml',
@@ -40,13 +40,12 @@
         'views/learning_unit_enrollment.xml',
         'views/exam_enrollment.xml',
         'reports/student.xml',
-        'views/student_notes.xml',
         'views/resultWizard.xml',
-        #'views/test.xml',
-        'views/student_notes_display.xml',
+        'views/encoding_notes_filter.xml',
+        'views/encoding_notes_session.xml',
         'reports/learning_unit_enrollment.xml',
-        'reports/student_notes.xml',
         'templates.xml',
+        'views/menu.xml',
 
 
     ],

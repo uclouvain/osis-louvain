@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+  <data>
+    <!-- Form -->
+    <record id="encoding_notes_session_form" model="ir.ui.view">
+      <field name="name">osis.view.encoding.notes.session.form</field>
+      <field name="model">osis.session_exam</field>
+      <field name="arch" type="xml">
+
+      <form string="Encoding notes session form" create="false" delete="false" editable="false" >
+        <header>
+          <group>
+            <button name="print_session_notes" string="Print" type="object"/>
+            <button name="encode_session_notes" string="Encoding" type="object"/>
+            <button name="xls_export_session_notes" string="Export xls" type="object"/>
+          </group>
+        </header>
+        <group>
+            <field name="learning_unit_acronym"/>
+            <field name="learning_unit_title"/>
+            <field name="session_name"/>
+          </group>
+
+        <separator string="Notes"/>
+        <group>
+          <field name="notes_encoding_ids">
+            <tree>
+              <field name="score_1"/>
+              <field name="score_2"/>
+              <field name="student_name"/>
+            </tree>
+          </field>
+        </group>
+
+      </form>
+    </field>
+  </record>
+  </data>
+</openerp>

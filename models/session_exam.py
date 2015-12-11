@@ -39,7 +39,14 @@ class SessionExam(models.Model):
     date_session = fields.Date('Session date')
     closed = fields.Boolean('Status')
     session_name = fields.Char('Session Name',compute='_get_session_name', store=True)
-    student_notes_ids = fields.One2many('osis.student_notes','session_exam_id', string='Student notes')
+
+    academic_year_id = fields.Many2one('osis.academic_year', related="learning_unit_year_id.academic_year_id")
+
+    learning_unit_acronym = fields.Char(related="learning_unit_year_id.acronym")
+    learning_unit_title = fields.Char(related="learning_unit_year_id.title")
+
+    notes_encoding_ids = fields.One2many('osis.notes_encoding','session_exam_id', string='Notes encoding')
+
 
     def name_get(self,cr,uid,ids,context=None):
         result={}
@@ -64,3 +71,22 @@ class SessionExam(models.Model):
             if r.date_session:
                 session_date = fields.Datetime.from_string(r.date_session)
                 r.session_name=session_date.strftime("%B")
+
+    @api.multi
+    def open_session_notes(self):
+        self.ensure_one()
+        for rec in self.exam_enrollment_ids:
+            rec_notes_encoding =  self.env['osis.notes_encoding'].search([('exam_enrollment_id' ,'=', rec.id)])
+            if rec_notes_encoding:
+                print 'kk'
+            else:
+                self.env['osis.notes_encoding'].create({'session_exam_id':self.id,'exam_enrollment_id':rec.id})
+
+        return {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'osis.session_exam',
+            'res_id': self.id,
+            'target': 'current',
+            'view_id' : self.env.ref('osis-louvain.encoding_notes_session_form').id
+        }

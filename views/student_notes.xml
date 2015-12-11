@@ -7,14 +7,14 @@
           <field name="model">osis.student_notes</field>
           <field name="arch" type="xml">
               <search>
-                <field name="year" string="Year"/>
+                <field name="year" string="Year" />
                 <field name="session_name" string="Session"/>
-                <field name="tutor_name" string="Tutor(s)"/>
+                <field name="tutor_name" string="Tutor(s)" />
                 <!-- <filter name="by_tutor_name" filter_domain="[('tutor_name', 'ilike', self)]" string="By tutor"/> Semble ne pas fonctionner-->
                 <filter name="by_januari_session" domain="[('session_name', '=', 'janvier')]" string="January session"/>
                 <filter name="by_june_session" domain="[('session_name', '=', 'juin')]" string="June session"/>
                 <filter name="by_september_session" domain="[('session_name', '=', 'september')]" string="September session"/>
-                <group string="Group By">
+                  <group string="Group By">
                       <filter name="group_by_session" string="Session" context="{'group_by': 'session_name'}"/>
                 </group>
               </search>
@@ -29,11 +29,11 @@
           <field name="status" string="Status"/>
           <field name="acronym" string="Acronym"/>
           <field name="title" string="Learning unit"/>
-          <field name="year"/>
-          <field name="session_name" string="Session"/>
+          <!-- <field name="year"/> -->
+          <!-- <field name="session_name" string="Session"/> -->
           <field name="tutor_name" string="Tutor(s)"/>
         </tree>
-<label>sdfsdfsdf</label>
+
       </field>
 
     </record>

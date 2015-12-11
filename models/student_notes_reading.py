@@ -16,7 +16,8 @@ class Student_notes_reading(models.Model):
     learning_unit_year_id = fields.Integer('Learning Unit Year Id', readonly=True)
     learning_unit_id = fields.Integer('Learning Unit Id', readonly=True)
     # tutor_name = fields.Char('Tutor name', compute='_get_tutors_names' , search='_search_tutor_name')
-    tutor_name = fields.Char('Tutor name', compute='_get_tutors_names')
+    tutor_name = fields.Char('Tutor name', compute='_get_tutors_names', search='_search_tutors')
+    # tutor_name = fields.Char('Tutor name', compute='_get_tutors_names')
 
     @api.multi
     def _get_tutors_names(self):
@@ -114,9 +115,6 @@ class Student_notes_reading(models.Model):
         # print res
         if context is None:
             context = {}
-        # print 'zut res' ,res
-
-
         # if view_type == 'tree':
         #     print res
         #     for field in res['fields']:
@@ -131,3 +129,9 @@ class Student_notes_reading(models.Model):
         #     res['arch'] = etree.tostring(doc)
 
         return res
+
+
+    def _search_tutors(self, operator, value):
+        if operator == 'like':
+            operator = 'ilike'
+        return [('tutor_name', operator, value)]
