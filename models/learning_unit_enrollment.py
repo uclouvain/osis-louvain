@@ -30,6 +30,8 @@ from openerp import models, fields, api
 class Learning_unit_enrollment(models.Model):
     _name = 'osis.learning_unit_enrollment'
     _description = "Learning unit enrollment"
+    _sql_constraints = [('learning_unit_enrollment_unique','unique(offer_enrollment_id,learning_unit_year_id)','A learning unit enrollment must be unique on offer enrollment/learning_unit_year_id')]
+
 
     learning_unit_year_id = fields.Many2one('osis.learning_unit_year', string='Learning unit year')
     date_enrollment = fields.Date('Enrollment date')

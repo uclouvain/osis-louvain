@@ -27,11 +27,13 @@
 
 from openerp import models, fields, api, _, exceptions
 import datetime
+import xlsxwriter, StringIO, base64
 
 
 class SessionExam(models.Model):
     _name = 'osis.session_exam'
     _description = "Session Exam"
+    _sql_constraints = [('session_exam_unique','unique(learning_unit_year_id,session_name)','A session must be unique on month/learning unit year')]
 
     learning_unit_year_id = fields.Many2one('osis.learning_unit_year', string='Learning unit year')
     exam_enrollment_ids = fields.One2many('osis.exam_enrollment','session_exam_id', string='Exam enrollment')
@@ -46,6 +48,7 @@ class SessionExam(models.Model):
     academic_year_id = fields.Many2one('osis.academic_year', related="learning_unit_year_id.academic_year_id")
 
     learning_unit_acronym = fields.Char(related="learning_unit_year_id.acronym")
+
     learning_unit_title = fields.Char(related="learning_unit_year_id.title")
 
     notes_encoding_ids = fields.One2many('osis.notes_encoding','session_exam_id', string='Notes encoding')
@@ -119,28 +122,6 @@ class SessionExam(models.Model):
             'target': 'current',
             'view_id' : self.env.ref('osis-louvain.encoding2_notes_session_form_primherit_view').id
         }
-
-    @api.multi
-    def double_encoding(self):
-        print 'ici double_encoding'
-        self.ensure_one()
-        for rec in self.exam_enrollment_ids:
-            rec_notes_encoding =  self.env['osis.notes_encoding'].search([('exam_enrollment_id' ,'=', rec.id)])
-            if rec_notes_encoding:
-                print 'kk'
-            else:
-                self.env['osis.notes_encoding'].create({'session_exam_id':self.id,'exam_enrollment_id':rec.id})
-        print 'ici avant vue double_encoding'
-        return {
-            'type': 'ir.actions.act_window',
-            'view_mode': 'form',
-            'res_model': 'osis.session_exam',
-            'res_id': self.id,
-            'target': 'current',
-            'view_id' : self.env.ref('osis-louvain.double_encoding_notes_session_form_primherit_view').id
-        }
-
-
 
     @api.multi
     def encode_session_notes(self):
@@ -248,8 +229,10 @@ class SessionExam(models.Model):
 
     @api.multi
     def open_session_notes(self):
+        print 'open_session_notes'
         self.ensure_one()
         for rec in self.exam_enrollment_ids:
+            print 'for open_session_notes'
             rec_notes_encoding =  self.env['osis.notes_encoding'].search([('exam_enrollment_id' ,'=', rec.id)])
             if rec_notes_encoding:
                 print 'kk'
@@ -312,6 +295,19 @@ class SessionExam(models.Model):
         for a in attribution_ids:
             self.tutor_ids |= a.tutor_id
 
+    def optimized_write_xlsx(self,info_to_write):
+        output = StringIO.StringIO()
+        workbook = xlsxwriter.Workbook(output, {'strings_to_urls': False})
+        worksheet = workbook.add_worksheet()
+        for i, row in enumerate(info_to_write):
+            new_row = []
+            for content in row:
+                if type(content) in (str, unicode) and ('\n' in content or '\r' in content):
+                    content = content.replace('\n',' ').replace('\r', '')
+                new_row.append(content)
+            worksheet.write_row('A' + str(i+1), new_row)
+        workbook.close()
+        return base64.encodestring(output.getvalue())
 
     @api.multi
     def xls_export_session_notes(self):
@@ -326,29 +322,25 @@ class SessionExam(models.Model):
         ids =[]
         ids.append(self.id)
 
-        field_names=[]
-        field_names.append('session_name')
+        field_names=['score_1',
+        'justification_1',
+        'student_name' ,
+        'student_registration_number',
+        'offer']
 
-        read= self.env['osis.session_exam'].export_data(ids, field_names)
-        result = False
-        for rec in read['datas']:
-            if rec[0]:
-                result = rec[0]
-                print rec[0]
-            else:
-            	result = (rec[1] or '') + ' - ' + (rec[2] or '')
-                print rec[1]
+        read = self.notes_encoding_ids.export_data(field_names)
+        body = [['Session Juin', '', ''],
+                ['', 'Line2']]
+        body += read['datas']
 
-        context['result']= result
+        import pprint; pprint.pprint(body)
+        res = self.optimized_write_xlsx(body)
+        rec_xls = self.env['osis.xls_print'].create({'content':res,'file_name':'session_notes.xlsx'})
+        return {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'osis.xls_print',
+            'res_id': rec_xls.id,
+            'target': 'new'
 
-        # if import_compat:
-        #     columns_headers = field_names
-        # else:
-        #     columns_headers = [val['label'].strip() for val in fields]
-        #
-        #
-        # return request.make_response(self.from_data(columns_headers, import_data),
-        #     headers=[('Content-Disposition',
-        #                     content_disposition(self.filename(model))),
-        #              ('Content-Type', self.content_type)],
-        #     cookies={'fileToken': token})
+        }

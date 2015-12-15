@@ -40,7 +40,11 @@ class Learning_unit(models.Model):
     def name_get(self,cr,uid,ids,context=None):
         result={}
         for record in self.browse(cr,uid,ids,context=context):
-            result[record.id] = u"%s - %s" % (record.start_year,record.end_year)
+            acronym=""
+            if record.learning_unit_year_ids:
+                acronym=record.learning_unit_year_ids[0].acronym
+
+            result[record.id] = u"%s - %s (%s)" % (record.start_year,record.end_year,acronym)
         return result.items()
 
 

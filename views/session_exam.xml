@@ -33,7 +33,7 @@
     <record id="session_exam_form" model="ir.ui.view">
       <field name="name">osis.view.session.exam.form</field>
       <field name="model">osis.session_exam</field>
-
+      <field name="priority" eval="1"/>
       <field name="arch" type="xml">
         <form string="Session Exam Form">
           <group col="4">

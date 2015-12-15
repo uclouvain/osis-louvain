@@ -90,12 +90,12 @@
       <field name="arch" type="xml">
         <xpath expr="//form/header" position="replace">
           <header>
-            <group>
+
               <button name="print_session_notes" string="Print" type="object" icon="gtk-print" attrs="{'invisible': [('notes_count','=', 0)]}"/>
               <button name="open_view_encode_session_notes" string="Encoding" type="object" invisible='1'/>
               <button name="encode_session_notes" string="Encoding" type="object" attrs="{'invisible': [('notes_count','=', 0)]}" />
               <button name="xls_export_session_notes" string="Export xls" type="object" attrs="{'invisible': [('notes_count','=', 0)]}"/>
-            </group>
+      
           </header>
         </xpath>
         <xpath expr="//field[@name='student_first_name']" position="after">

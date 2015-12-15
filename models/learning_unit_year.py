@@ -30,6 +30,9 @@ from openerp import models, fields, api
 class Learning_unit_year(models.Model):
     _name = 'osis.learning_unit_year'
     _description = "Learning unit year"
+    _order = "academic_year_id"
+    _sql_constraints = [('learning_unit_year_unique','unique(learning_unit_id,academic_year_id)','A learning unit year must be unique on academic year/learning unit year')]
+
 
     title = fields.Char('Title', required = True)
     acronym = fields.Char('Acronym', required = True)

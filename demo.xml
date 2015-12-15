@@ -205,27 +205,22 @@
         <record id="exam_math_2014_jan" model="osis.session_exam">
           <field name="learning_unit_year_id" ref="learning_unit_year_math_2014"/>
           <field name="date_session">12/01/2015</field>
-          <field name="closed" eval="True"/>
         </record>
         <record id="exam_math_2015_jan" model="osis.session_exam">
           <field name="learning_unit_year_id" ref="learning_unit_year_math_2015"/>
           <field name="date_session">12/01/2016</field>
-          <field name="closed" eval="False"/>
         </record>
         <record id="exam_math_2015_aout" model="osis.session_exam">
           <field name="learning_unit_year_id" ref="learning_unit_year_math_2015"/>
           <field name="date_session">12/08/2016</field>
-          <field name="closed" eval="False"/>
         </record>
         <record id="exam_programmation_2015_juin" model="osis.session_exam">
           <field name="learning_unit_year_id" ref="learning_unit_year_programmation_2015"/>
           <field name="date_session">15/06/2016</field>
-          <field name="closed" eval="False"/>
         </record>
         <record id="exam_programmation_2015_aout" model="osis.session_exam">
           <field name="learning_unit_year_id" ref="learning_unit_year_programmation_2015"/>
           <field name="date_session">15/08/2016</field>
-          <field name="closed" eval="False"/>
         </record>
 <!-- ACADEMY -->
         <record id="tutor_gran" model="osis.tutor">

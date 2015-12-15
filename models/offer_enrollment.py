@@ -31,6 +31,7 @@ class Offer_enrollment(models.Model):
     _name = 'osis.offer_enrollment'
     _description = 'Offer enrollment'
     _order = 'offer_year_id'
+    _sql_constraints = [('offer_enrollment','unique(offer_year_id,student_id)','An offer enrollment must be unique on offer year/student')]
 
     offer_year_id = fields.Many2one('osis.offer_year', string='Offer year')
     student_id = fields.Many2one('osis.student', string='Student')

@@ -46,8 +46,9 @@ class NotesWizard(models.TransientModel):
         return True
 
 
-    @api.one
+    @api.multi
     def double_encoding(self):
+        self.ensure_one()
         print 'double_encoding'
         print 'double_encode_session_notes'
         notes_encoding_ids =  []
@@ -77,6 +78,7 @@ class NotesWizard(models.TransientModel):
             'res_model': 'osis.notes_wizard',
             'res_id': wiz_id.id,
             'view_id' : self.env.ref('osis-louvain.double_resultswizard_form_view').id,
+            'target' : 'new'
         }
 
 

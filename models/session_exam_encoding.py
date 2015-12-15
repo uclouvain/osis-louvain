@@ -36,11 +36,12 @@ class SessionExamEncoding(models.TransientModel):
     @api.one
     def _set_session_list(self):
         if self.tutor and self.academic_year and self.session_month_selection:
-
+            print '_set_session_list if' + str(self.tutor.id) + ", " + str(self.academic_year.id) + ", " + self.session_month_selection
             self.session_exam_ids = self.env['osis.session_exam'].search([
                                                          ('learning_unit_year_id.learning_unit_id.attribution_ids.tutor_id', '=', self.tutor.id),
                                                          ('learning_unit_year_id.academic_year_id', '=', self.academic_year.id),
                                                          ('session_month', '=', self.session_month_selection)])
+
 
         else:
             self.session_exam_ids=None

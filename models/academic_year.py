@@ -32,6 +32,9 @@ class Academic_year(models.Model):
     _name = "osis.academic_year"
     _description = "Academic year"
     _rec_name = "year"
+    _order = "start_date desc"
+    _sql_constraints = [('academic_year','unique(year)','An academic year must be unique on year')]
+
 
     year = fields.Integer('Year', required = True)
     start_date = fields.Date('Start date')

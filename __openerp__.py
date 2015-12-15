@@ -48,12 +48,13 @@
         'reports/session_exam.xml',
         'templates.xml',
         'views/menu.xml',
+        'wizard/xls_print.xml'
 
 
     ],
 
     'demo': [
-        'demo.xml',
+        # 'demo.xml',
     ],
     'css': ['static/src/css/osis-louvain.css'],
     # 'js': ['static/src/js/resource.js'],

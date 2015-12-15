@@ -32,6 +32,8 @@ import datetime
 class Attribution(models.Model):
     _name = 'osis.attribution'
     _description = "Attribution"
+    _sql_constraints = [('attribution_unique','unique(tutor_id,function,learning_unit_id)','A attribution must be unique on tutor_id/learning unit/function')]
+
 
     learning_unit_id = fields.Many2one('osis.learning_unit', string='Learning unit')
     tutor_id = fields.Many2one('osis.tutor', string='Tutor')

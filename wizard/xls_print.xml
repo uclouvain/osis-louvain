@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+  <data>
+
+    <!-- Form -->
+    <record id="xls_print_form" model="ir.ui.view">
+      <field name="name">osis.xls_print.form</field>
+      <field name="model">osis.xls_print</field>
+
+      <field name="arch" type="xml">
+        <form string="Xls print form">
+
+            <field name="content" filename="file_name" readonly="1"/>
+            <field name="file_name" invisible="1"/>
+            <footer>
+              <button string="Close" special="cancel"/>
+            </footer>
+
+
+        </form>
+      </field>
+    </record>
+
+  </data>
+</openerp>

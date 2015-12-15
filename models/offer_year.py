@@ -30,6 +30,7 @@ from openerp import models, fields, api
 class Offer_year(models.Model):
     _name = 'osis.offer_year'
     _description = "Offer year"
+    _sql_constraints = [('offer_year','unique(academic_year_id,offer_id)','An offer year must be unique on academic year/offer')]
 
     offer_id = fields.Many2one('osis.offer', string='Offer')
     structure_id = fields.Many2one('osis.structure', string='Structure')
