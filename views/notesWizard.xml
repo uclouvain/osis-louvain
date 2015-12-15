@@ -21,6 +21,12 @@
                         <button name="validate_results" type="object"
                                 string="Validate" class="oe_highlight"/>
                         or
+                        <button name="submit_results" type="object"
+                                string="Submit" />
+                        or
+                        <button name="double_encoding" type="object"
+                                string="Double encoding" />
+                        or
                         <button special="cancel" string="Cancel"/>
                     </footer>
                 </form>
@@ -28,7 +34,7 @@
         </record>
         <!-- form -->
           <record model="ir.ui.view" id="double_resultswizard_form_view">
-              <field name="name">osis.wizard.notes.form</field>
+              <field name="name">osis.wizard.double.notes.form</field>
               <field name="model">osis.notes_wizard</field>
               <field name="arch" type="xml">
                   <form string="Double Encode notes">
@@ -52,7 +58,7 @@
           </record>
           <!-- form -->
             <record model="ir.ui.view" id="compare_resultswizard_form_view">
-                <field name="name">osis.wizard.notes.form</field>
+                <field name="name">osis.wizard.compare.notes.form</field>
                 <field name="model">osis.notes_wizard</field>
                 <field name="arch" type="xml">
                     <form string="Double Encode notes">

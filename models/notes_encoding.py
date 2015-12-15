@@ -43,7 +43,7 @@ class Notes_encoding(models.Model):
         student_first_name = fields.Char(related="exam_enrollment_id.learning_unit_enrollment_id.offer_enrollment_id.student_id.person_id.first_name")
         student_registration_number = fields.Char(related="exam_enrollment_id.learning_unit_enrollment_id.offer_enrollment_id.student_id.registration_number")
         offer = fields.Char(related="exam_enrollment_id.learning_unit_enrollment_id.offer_enrollment_id.offer_year_id.offer_id.acronym")
-
+        offer_id = fields.Many2one('osis.offer', related="exam_enrollment_id.learning_unit_enrollment_id.offer_enrollment_id.offer_year_id.offer_id")
         encoding_stage_1_done = fields.Boolean('Encoding stage 1 done', default = False)
         double_encoding_done = fields.Boolean('Double encoding done', default = False)
         # offer_id = fields.Integer(related="exam_enrollment_id.learning_unit_enrollment_id.offer_enrollment_id.offer_year_id.offer_id.id")

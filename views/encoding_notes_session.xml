@@ -16,6 +16,8 @@
             <field name="session_name"/>
             <field name="offer_filter_id" />
             <field name="offer_ids" invisible="1" />
+            <field name="notes_count" invisible='1'/>
+            <field name="registered_student_count" string="Number of registered student" invisible='1'/>
           </group>
         <separator string="Notes"/>
         <group>
@@ -29,6 +31,7 @@
           </field>
         </group>
         <div style="font-size:10pt;">
+          <div style="visibility:hidden">
           <table cellspacing="2" cellpadding="2" style="margin : 10px;">
             <tr>
               <td>Only one note encoded</td>
@@ -40,7 +43,7 @@
               <td class="different">2 notes different</td>
             </tr>
           </table>
-
+</div>
           <table style="margin : 10px;">
             <tr>
               <td>Note chiffrée :</td>
@@ -88,11 +91,10 @@
         <xpath expr="//form/header" position="replace">
           <header>
             <group>
-              <button name="print_session_notes" string="Print" type="object" icon="gtk-print"/>
-              <button name="encode_session_notes" string="Encoding" type="object"/>
-              <button name="double_encode_session_notes" type="object" string="Double encoding"/>
-              <button name="compare_session_notes" type="object" string="Compare notes"/>
-              <button name="xls_export_session_notes" string="Export xls" type="object"/>
+              <button name="print_session_notes" string="Print" type="object" icon="gtk-print" attrs="{'invisible': [('notes_count','=', 0)]}"/>
+              <button name="open_view_encode_session_notes" string="Encoding" type="object" invisible='1'/>
+              <button name="encode_session_notes" string="Encoding" type="object" attrs="{'invisible': [('notes_count','=', 0)]}" />
+              <button name="xls_export_session_notes" string="Export xls" type="object" attrs="{'invisible': [('notes_count','=', 0)]}"/>
             </group>
           </header>
         </xpath>
@@ -126,7 +128,30 @@
         </xpath>
       </field>
   </record>
-  <!-- Form pour le dougle encodage-->
+  <!-- Form pour l'encodage-->
+  <record model="ir.ui.view" id="encoding2_notes_session_form_primherit_view">
+      <field name="name">encoding2.form</field>
+      <field name="model">osis.session_exam</field>
+      <field name="mode">primary</field>
+      <field eval="16" name="priority"/>
+      <field name="inherit_id" ref="osis-louvain.common_encoding_notes_session_form"/>
+      <field name="arch" type="xml">
+        <xpath expr="//form/header" position="replace">
+          <header>
+            <group cols="4">
+              <button name="save_session_notes" string="Save" type="object"/>
+              <button name="submit_session_notes" string="Submit" type="object"/>
+              <button name="double_encoding" string="Double encoding" type="object"/>
+            </group>
+          </header>
+        </xpath>
+        <xpath expr="//field[@name='student_first_name']" position="after">
+          <field name="score_1"/>
+          <field name="justification_1"/>
+        </xpath>
+      </field>
+  </record>
+  <!-- Form pour le double encodage-->
   <record model="ir.ui.view" id="double_encoding_notes_session_form_primherit_view">
       <field name="sequence" eval="3"/>
       <field name="name">encoding.form</field>
@@ -135,6 +160,14 @@
 <field eval="16" name="priority"/>
       <field name="inherit_id" ref="osis-louvain.common_encoding_notes_session_form"/>
       <field name="arch" type="xml">
+        <xpath expr="//form/header" position="replace">
+          <header>
+            <group cols="4">
+              <button name="save_double_encoding_session_notes" string="Save" type="object"/>
+              <button name="compare_session_notes" string="Compare" type="object"/>
+            </group>
+          </header>
+        </xpath>
         <xpath expr="//field[@name='student_first_name']" position="after">
           <field name="score_1"/>
           <field name="justification_1"/>

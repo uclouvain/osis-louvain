@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <openerp>
     <data>
-        <record model="ir.actions.act_window" id="encoding_notes_filter_action">
+        <record model="ir.actions.server" id="encoding_notes_filter_action">
             <field name="name">Encoding notes</field>
-            <field name="res_model">osis.session_exam_encoding</field>
-            <field name="view_mode">form</field>
-            <field name="target">current</field>
-            <field name="view_id" ref="encoding_notes_filter_form" />
+            <field name="model_id" ref="osis-louvain.model_osis_session_exam_encoding"/>
+            <field name="state">code</field>
+            <field name="code">action = self.tutor_encoding_notes(cr, uid, context=context)</field>
         </record>
 
         <record model="ir.actions.act_window" id="offer_list_action">

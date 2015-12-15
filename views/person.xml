@@ -95,6 +95,8 @@
         <xpath expr="//notebook/page[@name='sales_purchases']" position="attributes">
           <attribute name="invisible">True</attribute>
         </xpath>
+
+
       </field>
     </record>
 

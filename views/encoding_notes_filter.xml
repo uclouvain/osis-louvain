@@ -6,7 +6,7 @@
       <field name="name">osis.view.encoding.notes.filter.form</field>
       <field name="model">osis.session_exam_encoding</field>
       <field name="arch" type="xml">
-      <form string="Encoding notes filter Form" edit="false">
+      <form string="Encoding notes filter Form" edit="false" create="false">
         <group>
           <field name="tutor" options="{'no_create': True,'no_open' : True}"/>
           <field name="academic_year"  options="{'no_create': True,'no_open' : True}" />
@@ -15,7 +15,8 @@
 
         <separator string="Choose an activity"/>
         <field name="session_exam_ids">
-          <tree colors="green:encoding_status=='COMPLETE';orange:encoding_status=='PARTIAL';red:encoding_status=='MISSING'" create="false" delete="false" editable="false" >
+          <tree colors="green:encoding_status=='COMPLETE';orange:encoding_status=='PARTIAL';red:encoding_status=='MISSING'"
+                options="{'no_create_edit': True}">
             <field name="encoding_status" />
             <field name="learning_unit_acronym" />
             <field name="learning_unit_title" />

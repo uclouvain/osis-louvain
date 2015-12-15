@@ -43,6 +43,7 @@
         'views/encoding_notes_filter.xml',
         'views/encoding_notes_session.xml',
         'views/notesWizard.xml',
+        'views/user.xml',
         'reports/learning_unit_enrollment.xml',
         'reports/session_exam.xml',
         'templates.xml',
@@ -52,7 +53,7 @@
     ],
 
     'demo': [
-        # 'demo.xml',
+        'demo.xml',
     ],
     'css': ['static/src/css/osis-louvain.css'],
     # 'js': ['static/src/js/resource.js'],

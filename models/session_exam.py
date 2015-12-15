@@ -56,6 +56,15 @@ class SessionExam(models.Model):
 
     tutor_ids = fields.Many2many('osis.tutor', compute='_get_all_tutor')
 
+    notes_count = fields.Integer(compute='_get_notes_count')
+
+    registered_student_count = fields.Integer()
+
+
+
+    def _get_notes_count(self):
+        self.notes_count = self.notes_encoding_ids.search_count([])
+
     def name_get(self,cr,uid,ids,context=None):
         result={}
         for record in self.browse(cr,uid,ids,context=context):
@@ -89,6 +98,49 @@ class SessionExam(models.Model):
             if r.date_session:
                 session_date = fields.Datetime.from_string(r.date_session)
                 r.session_month = session_date.strftime("%m")
+
+    @api.multi
+    def open_view_encode_session_notes(self):
+        print 'ici open_view_encode_session_notes'
+        self.ensure_one()
+        for rec in self.exam_enrollment_ids:
+            rec_notes_encoding =  self.env['osis.notes_encoding'].search([('exam_enrollment_id' ,'=', rec.id)])
+            if rec_notes_encoding:
+                print 'kk'
+            else:
+                if rec.encoding_status != 'SUBMITTED':
+                    self.env['osis.notes_encoding'].create({'session_exam_id':self.id,'exam_enrollment_id':rec.id})
+        print 'ici avant vue'
+        return {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'osis.session_exam',
+            'res_id': self.id,
+            'target': 'current',
+            'view_id' : self.env.ref('osis-louvain.encoding2_notes_session_form_primherit_view').id
+        }
+
+    @api.multi
+    def double_encoding(self):
+        print 'ici double_encoding'
+        self.ensure_one()
+        for rec in self.exam_enrollment_ids:
+            rec_notes_encoding =  self.env['osis.notes_encoding'].search([('exam_enrollment_id' ,'=', rec.id)])
+            if rec_notes_encoding:
+                print 'kk'
+            else:
+                self.env['osis.notes_encoding'].create({'session_exam_id':self.id,'exam_enrollment_id':rec.id})
+        print 'ici avant vue double_encoding'
+        return {
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'osis.session_exam',
+            'res_id': self.id,
+            'target': 'current',
+            'view_id' : self.env.ref('osis-louvain.double_encoding_notes_session_form_primherit_view').id
+        }
+
+
 
     @api.multi
     def encode_session_notes(self):
@@ -202,7 +254,8 @@ class SessionExam(models.Model):
             if rec_notes_encoding:
                 print 'kk'
             else:
-                self.env['osis.notes_encoding'].create({'session_exam_id':self.id,'exam_enrollment_id':rec.id})
+                if rec.encoding_status != 'SUBMITTED':
+                    self.env['osis.notes_encoding'].create({'session_exam_id':self.id,'exam_enrollment_id':rec.id})
 
         return {
             'type': 'ir.actions.act_window',
@@ -227,6 +280,13 @@ class SessionExam(models.Model):
             'report_name' : 'osis-louvain.report_session_exam_notes',
             'datas' : datas,
             }
+    @api.depends('offer_filter_id')
+    def _get_registered_student_count(self):
+        print 'zut _get_registered_student_count'
+        if offer_filter_id:
+            self.registered_student_count = self.env['osis.offer_enrollment'].search_count([('offer_year_id.offer_id', '=', self.offer_filter_id.id)])
+        else:
+            self.registered_student_count = -1
 
     @api.depends('learning_unit_year_id')
     def _get_all_offer(self):
@@ -237,6 +297,8 @@ class SessionExam(models.Model):
             # if self.offer_filter_id:
             enrol_ids.append(enrol.offer_enrollment_id.offer_year_id.offer_id.id)
             self.offer_ids |= enrol.offer_enrollment_id.offer_year_id.offer_id
+
+            self.registered_student_count = enrol.offer_enrollment_id.student_id
             # else:
             #     if self.offer_filter_id == enrol.offer_enrollment_id.offer_year_id.offer_id:
             #         enrol_ids.append(enrol.offer_enrollment_id.offer_year_id.offer_id.id)
