@@ -1,0 +1,74 @@
+<openerp>
+    <data>
+      <report
+            id="report_session_exam"
+            model="osis.session_exam"
+            string="Session exam notes report pdf"
+            name="osis-louvain.report_session_exam_notes"
+            file="osis-louvain.report_session_exam_notes"
+            report_type="qweb-pdf" />
+
+            <template id="report_session_exam_notes">
+              <t t-call="report.html_container">
+                <t t-call="report.external_layout">
+                  <div class="page">
+                    <h1>Session exam - Report</h1>
+                    <table class="table table-condensed" style="border: 1px solid #9999">
+                      <thead>
+                        <tr>
+                          <th colspan="2">Learning unit</th>
+                          <th>Date session</th>
+                          <th>Session exam</th>
+                          <th>Tutor(s)</th>
+                        </tr>
+                      </thead>
+                      <t t-as="doc" t-foreach="docs">
+                        <tr>
+                          <td><span t-field="doc.learning_unit_acronym"/></td>
+                          <td><span t-field="doc.learning_unit_title"/></td>
+                          <td><span t-field="doc.date_session"/></td>
+                          <td><span t-field="doc.session_name"/></td>
+                          <td>
+                            <table>
+                              <t t-as="tutor" t-foreach="docs.tutor_ids">
+                                <tr><td><span t-field="tutor.person_id.name"/>, <span t-field="tutor.attribution_ids.function"/></td></tr>
+                              </t>
+                            </table>
+                            </td>
+                        </tr>
+                        <tr>
+                          <table class="table" >
+                            <tr>
+                              <th>Offer</th>
+                              <th>Student</th>
+                              <th>Score 1</th>
+                              <th>Justification 1</th>
+                              <th>Score 2</th>
+                              <th>Justification 2</th>
+                            </tr>
+                          <t t-as="notes" t-foreach="docs.notes_encoding_ids">
+                            <tr>
+                              <td><span t-field="notes.offer"/></td>
+                              <td><span t-field="notes.student_name"/> <span t-field="notes.student_first_name"/></td>
+                              <td><span t-field="notes.score_1"/></td>
+                              <td><span t-field="notes.justification_1"/></td>
+                              <td><span t-field="notes.score_2"/></td>
+                              <td><span t-field="notes.justification_2"/></td>
+
+
+                            </tr>
+                          </t>
+                        </table>
+                        </tr>
+
+                      </t>
+                    </table>
+                  </div>
+                </t>
+
+              </t>
+            </template>
+
+
+    </data>
+</openerp>

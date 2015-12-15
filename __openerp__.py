@@ -44,6 +44,7 @@
         'views/encoding_notes_session.xml',
         'views/notesWizard.xml',
         'reports/learning_unit_enrollment.xml',
+        'reports/session_exam.xml',
         'templates.xml',
         'views/menu.xml',
 

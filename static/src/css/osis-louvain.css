@@ -13,3 +13,15 @@
 .equal{
   color:green
 }
+
+.complete{
+  color:green
+}
+
+.partial{
+  color:red
+}
+
+.missing{
+  color:black
+}

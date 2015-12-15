@@ -37,7 +37,8 @@ class SessionExam(models.Model):
     exam_enrollment_ids = fields.One2many('osis.exam_enrollment','session_exam_id', string='Exam enrollment')
 
     date_session = fields.Date('Session date')
-    closed = fields.Boolean('Status')
+    encoding_status = fields.Selection([('COMPLETE','Complete'),('PARTIAL','Partial'),('MISSING','Missing')])
+    # encoding_status = fields.Char()
     session_name = fields.Char('Session Name',compute='_get_session_name', store=True)
 
     session_month = fields.Char('Session month',compute='_get_session_month', store=True)#Utiliser dans le filtre pour l'encodage des notes
@@ -52,6 +53,8 @@ class SessionExam(models.Model):
     offer_filter_id = fields.Many2one('osis.offer', domain="[('id', 'in', offer_ids[0][2])]")
 
     offer_ids = fields.Many2many('osis.offer', compute='_get_all_offer')
+
+    tutor_ids = fields.Many2many('osis.tutor', compute='_get_all_tutor')
 
     def name_get(self,cr,uid,ids,context=None):
         result={}
@@ -193,7 +196,6 @@ class SessionExam(models.Model):
 
     @api.multi
     def open_session_notes(self):
-        print 'zut open_session_notes'
         self.ensure_one()
         for rec in self.exam_enrollment_ids:
             rec_notes_encoding =  self.env['osis.notes_encoding'].search([('exam_enrollment_id' ,'=', rec.id)])
@@ -212,6 +214,20 @@ class SessionExam(models.Model):
         }
 
 
+    @api.multi
+    def print_session_notes(self):
+        print 'print_session_notes'
+
+
+        datas = {
+        'ids': [self.id]
+        }
+        return{
+            'type' : 'ir.actions.report.xml',
+            'report_name' : 'osis-louvain.report_session_exam_notes',
+            'datas' : datas,
+            }
+
     @api.depends('learning_unit_year_id')
     def _get_all_offer(self):
         print "compute offer_ids"
@@ -225,3 +241,52 @@ class SessionExam(models.Model):
             #     if self.offer_filter_id == enrol.offer_enrollment_id.offer_year_id.offer_id:
             #         enrol_ids.append(enrol.offer_enrollment_id.offer_year_id.offer_id.id)
             #         self.offer_ids |= enrol.offer_enrollment_id.offer_year_id.offer_id
+
+    @api.depends('learning_unit_year_id')
+    def _get_all_tutor(self):
+
+        attribution_ids = self.env['osis.attribution'].search([('learning_unit_id', '=', self.learning_unit_year_id.learning_unit_id.id)])
+        attrib_ids = []
+        for a in attribution_ids:
+            self.tutor_ids |= a.tutor_id
+
+
+    @api.multi
+    def xls_export_session_notes(self):
+    #    @api.multi
+    #
+    #         :param fields_to_export: list of fields
+    #         :param raw_data: True to return value in native Python type
+    #         :rtype: dictionary with a *datas* matrix
+    # def export_data(self, fields_to_export, raw_data=False):
+        Model = self.env['osis.session_exam']
+
+        ids =[]
+        ids.append(self.id)
+
+        field_names=[]
+        field_names.append('session_name')
+
+        read= self.env['osis.session_exam'].export_data(ids, field_names)
+        result = False
+        for rec in read['datas']:
+            if rec[0]:
+                result = rec[0]
+                print rec[0]
+            else:
+            	result = (rec[1] or '') + ' - ' + (rec[2] or '')
+                print rec[1]
+
+        context['result']= result
+
+        # if import_compat:
+        #     columns_headers = field_names
+        # else:
+        #     columns_headers = [val['label'].strip() for val in fields]
+        #
+        #
+        # return request.make_response(self.from_data(columns_headers, import_data),
+        #     headers=[('Content-Disposition',
+        #                     content_disposition(self.filename(model))),
+        #              ('Content-Type', self.content_type)],
+        #     cookies={'fileToken': token})

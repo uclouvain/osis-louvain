@@ -12,7 +12,6 @@
         </header>
         <group>
             <field name="learning_unit_acronym" readonly="1" string="Learning unit"/>
-            <field name="learning_unit_acronym" readonly="1" string="Learning unit"/>
             <field name="learning_unit_title" attrs="{'readonly':True}" />
             <field name="session_name"/>
             <field name="offer_filter_id" />
@@ -25,6 +24,7 @@
               <field name="offer"/>
               <field name="student_registration_number"/>
               <field name="student_name"/>
+              <field name="student_first_name"/>
             </tree>
           </field>
         </group>
@@ -79,7 +79,6 @@
   </record>
   <!-- Form pour consultation notes -->
   <record model="ir.ui.view" id="consulting_notes_session_form_primherit_view">
-
       <field name="name">encoding.form</field>
       <field name="model">osis.session_exam</field>
       <field name="mode">primary</field>
@@ -88,9 +87,8 @@
       <field name="arch" type="xml">
         <xpath expr="//form/header" position="replace">
           <header>
-            <group class="oe_form_buttons_view">
-
-              <button name="print_session_notes" string="Print" type="object"/>
+            <group>
+              <button name="print_session_notes" string="Print" type="object" icon="gtk-print"/>
               <button name="encode_session_notes" string="Encoding" type="object"/>
               <button name="double_encode_session_notes" type="object" string="Double encoding"/>
               <button name="compare_session_notes" type="object" string="Compare notes"/>
@@ -98,7 +96,7 @@
             </group>
           </header>
         </xpath>
-        <xpath expr="//field[@name='student_name']" position="after">
+        <xpath expr="//field[@name='student_first_name']" position="after">
           <field name="score_1" string="Score"/>
           <field name="justification_1" string="Justification"/>
           <field name="notes_status" invisible="1"/>
@@ -122,7 +120,7 @@
             </group>
           </header>
         </xpath>
-        <xpath expr="//field[@name='student_name']" position="after">
+        <xpath expr="//field[@name='student_first_name']" position="after">
           <field name="score_1"/>
           <field name="justification_1"/>
         </xpath>
@@ -137,7 +135,7 @@
 <field eval="16" name="priority"/>
       <field name="inherit_id" ref="osis-louvain.common_encoding_notes_session_form"/>
       <field name="arch" type="xml">
-        <xpath expr="//field[@name='student_name']" position="after">
+        <xpath expr="//field[@name='student_first_name']" position="after">
           <field name="score_1"/>
           <field name="justification_1"/>
           <field name="score_2"/>

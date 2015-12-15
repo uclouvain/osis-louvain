@@ -40,6 +40,7 @@ class Notes_encoding(models.Model):
         exam_enrollment_id =fields.Many2one('osis.exam_enrollment', string='Exam enrollment')
 
         student_name = fields.Char(related="exam_enrollment_id.learning_unit_enrollment_id.offer_enrollment_id.student_id.person_id.last_name")
+        student_first_name = fields.Char(related="exam_enrollment_id.learning_unit_enrollment_id.offer_enrollment_id.student_id.person_id.first_name")
         student_registration_number = fields.Char(related="exam_enrollment_id.learning_unit_enrollment_id.offer_enrollment_id.student_id.registration_number")
         offer = fields.Char(related="exam_enrollment_id.learning_unit_enrollment_id.offer_enrollment_id.offer_year_id.offer_id.acronym")
 
@@ -60,3 +61,5 @@ class Notes_encoding(models.Model):
                         record.notes_status = 'DIFFERENT'
                     else:
                         record.notes_status = 'EQUAL'
+                if (record.justification_1 and not record.justification_2) or (record.justification_2 and not record.justification_1):
+                    record.notes_status = 'DIFFERENT'

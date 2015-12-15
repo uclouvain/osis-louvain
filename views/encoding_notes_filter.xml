@@ -8,15 +8,15 @@
       <field name="arch" type="xml">
       <form string="Encoding notes filter Form" edit="false">
         <group>
-          <field name="tutor"/>
-          <field name="academic_year"/>
-          <field name="session_month_selection"/>
+          <field name="tutor" options="{'no_create': True,'no_open' : True}"/>
+          <field name="academic_year"  options="{'no_create': True,'no_open' : True}" />
+          <field name="session_month_selection" options="{'no_create': True}"/>
         </group>
 
         <separator string="Choose an activity"/>
         <field name="session_exam_ids">
-          <tree colors="green:closed==True;red:closed!=True" create="false" delete="false" editable="false" >
-            <field name="closed" />
+          <tree colors="green:encoding_status=='COMPLETE';orange:encoding_status=='PARTIAL';red:encoding_status=='MISSING'" create="false" delete="false" editable="false" >
+            <field name="encoding_status" />
             <field name="learning_unit_acronym" />
             <field name="learning_unit_title" />
             <button name="open_session_notes" string="Notes" type="object"/>
@@ -25,9 +25,12 @@
         <div style="font-size:10pt;">
           <table>
             <tr>
-              <td class="legend"><input type="checkbox"/>Complètement encodé</td>
-              <td class="legend"><input type="checkbox" />Il manque encore des notes</td>
-              <td class="legend"><input type="checkbox" />Pas encore encodé</td>
+              <td class="complet">Complete</td>
+              <td class="complet">: encoding finished</td>
+              <td class="partial">Partial</td>
+              <td class="partial">: scores missing</td>
+              <td class="missing"></td>
+              <td class="missing">: not encoded yet</td>
             </tr>
           </table>
         </div>
