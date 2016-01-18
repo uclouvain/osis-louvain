@@ -16,32 +16,32 @@ body {
 }
 
 .color1{
-  background-color: #ffff99;
+  background-color: #F0F0F0;
 }
 .color2{
-  background-color: #ff9966;
+  background-color: #E0E0E0;
 }
 .color3{
-  background-color: #ff5050;
+  background-color: #D0D0D0;
 }
 .color4{
-  background-color: #99ffcc;
+  background-color: #C0C0C0;
 }
 .color5{
-  background-color: #99ccff;
+  background-color: #e6e6e6;
 }
 .color6{
-  background-color: #cccc00;
+  background-color: #d9d9d9;
 }
 .color7{
-  background-color: #9966ff;
+  background-color: #cccccc;
 }
 .color8{
-  background-color: #ccffff;
+  background-color: #bfbfbf;
 }
 .color9{
-  background-color: #00C28F;
+  background-color: #b3b3b3;
 }
 .color10{
-  background-color: #00BF3A;
+  background-color: #a6a6a6;
 }
