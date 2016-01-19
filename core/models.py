@@ -125,14 +125,26 @@ class AcademicYear(models.Model):
     def find_academic_year(id):
         return AcademicYear.objects.get(pk=id)
 
+EVENT_TYPE = (
+    ('ACADEMIC_YEAR', 'Academic Year'),
+    ('DISSERTATIONS_SUBMISSION_SESS_1', 'Submission of academic dissertations - exam session 1'),
+    ('DISSERTATIONS_SUBMISSION_SESS_2', 'Submission of academic dissertations - exam session 2'),
+    ('DISSERTATIONS_SUBMISSION_SESS_3', 'Submission of academic dissertations - exam session 3'),
+    ('EXAM_SCORES_SUBMISSION_SESS_1', 'Submission of exam scores - exam session 1'),
+    ('EXAM_SCORES_SUBMISSION_SESS_2', 'Submission of exam scores - exam session 2'),
+    ('EXAM_SCORES_SUBMISSION_SESS_3', 'Submission of exam scores - exam session 3'),
+    ('DELIBERATIONS_SESS_1', 'Deliberations - exam session 1'),
+    ('DELIBERATIONS_SESS_2', 'Deliberations - exam session 2'),
+    ('DELIBERATIONS_SESS_3', 'Deliberations - exam session 3'),
+    ('EXAM_SCORES_DIFFUSION_SESS_1', 'Diffusion of exam scores - exam session 1'),
+    ('EXAM_SCORES_DIFFUSION_SESS_2', 'Diffusion of exam scores - exam session 2'),
+    ('EXAM_SCORES_DIFFUSION_SESS_3', 'Diffusion of exam scores - exam session 3'),
+    ('EXAM_ENROLLMENTS_SESS_1', 'Exam enrollments - exam session 1'),
+    ('EXAM_ENROLLMENTS_SESS_2', 'Exam enrollments - exam session 2'),
+    ('EXAM_ENROLLMENTS_SESS_3', 'Exam enrollments - exam session 3'))
 
 class AcademicCalendar(models.Model):
-    EVENT_TYPE = (
-        ('academic_year', _('Academic Year')),
-        ('session_exam_1', _('Session Exams 1')),
-        ('session_exam_2', _('Session Exams 2')),
-        ('session_exam_3', _('Session Exams 3')))
-
+    external_id = models.CharField(max_length = 40,blank = True, null = True)
     academic_year = models.ForeignKey(AcademicYear, null = False)
     event_type    = models.CharField(max_length = 50, blank = False, null = False, choices = EVENT_TYPE)
     title         = models.CharField(max_length = 50, blank = True, null = True)
@@ -141,7 +153,7 @@ class AcademicCalendar(models.Model):
     end_date      = models.DateField(auto_now = False, blank = True, null = True, auto_now_add = False)
 
     def current_academic_year():
-        academic_calendar = AcademicCalendar.objects.filter(event_type='academic_year').filter(start_date__lte=timezone.now()).filter(end_date__gte=timezone.now()).first()
+        academic_calendar = AcademicCalendar.objects.filter(event_type='ACADEMIC_YEAR').filter(start_date__lte=timezone.now()).filter(end_date__gte=timezone.now()).first()
         return academic_calendar.academic_year
 
     def find_academic_calendar_by_event_type(academic_year_id, session_number):
@@ -192,12 +204,7 @@ class OfferEnrollment(models.Model):
 
 
 class OfferYearCalendar(models.Model):
-    EVENT_TYPE = (
-        ('session_exam_1',_('Session Exams 1')),
-        ('session_exam_2',_('Session Exams 2')),
-        ('session_exam_3',_('Session Exams 3')))
-
-    external_id = models.CharField(max_length = 40,blank = True, null = True)
+    external_id = models.CharField(max_length = 70,blank = True, null = True)
     academic_calendar = models.ForeignKey(AcademicCalendar, null = False)
     offer_year        = models.ForeignKey(OfferYear, null = True)
     event_type        = models.CharField(max_length = 50, blank = False, null = False, choices = EVENT_TYPE)
@@ -344,7 +351,7 @@ class ExamEnrollment(models.Model):
         ('SAVED',_('Saved')),
         ('SUBMITTED',_('Submitted')))
 
-    external_id = models.CharField(max_length = 40,blank = True, null = True)
+    external_id = models.CharField(max_length = 70,blank = True, null = True)
     score                    = models.DecimalField(max_digits = 4, decimal_places = 2, blank = True, null = True, validators=[MaxValueValidator(20), MinValueValidator(0)])
     justification            = models.CharField(max_length = 17, blank = True, null = True,choices = JUSTIFICATION_TYPES)
     encoding_status          = models.CharField(max_length = 9, blank = True, null = True,choices = ENCODING_STATUS)
