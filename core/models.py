@@ -206,7 +206,7 @@ class OfferEnrollment(models.Model):
 class OfferYearCalendar(models.Model):
     external_id = models.CharField(max_length = 70,blank = True, null = True)
     academic_calendar = models.ForeignKey(AcademicCalendar, null = False)
-    offer_year        = models.ForeignKey(OfferYear, null = False)
+    offer_year        = models.ForeignKey(OfferYear, null = True)
     event_type        = models.CharField(max_length = 50, blank = False, null = False, choices = EVENT_TYPE)
     start_date        = models.DateField(auto_now = False, blank = True, null = True, auto_now_add = False)
     end_date          = models.DateField(auto_now = False, blank = True, null = True, auto_now_add = False)
