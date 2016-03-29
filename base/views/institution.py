@@ -23,16 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import json
+import operator
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-import json
-
 from base import models as mdl
-
 from django.utils.translation import ugettext_lazy as _
-import operator
 from functools import reduce
 from django.db import models
+
 
 @login_required
 def institution(request):
@@ -41,36 +40,21 @@ def institution(request):
 
 @login_required
 def structures(request):
-    return render(request, "structures.html", {'init': "1"})
+    return render(request, "structures.html", {'init': "1",
+                                               'types': mdl.structure.ENTITY_TYPE})
 
 
 @login_required
 def structures_search(request):
-    acronym = request.GET['acronym']
-    title = request.GET['title']
-    criterias = []
-    criteria_present = False
-    query = mdl.structure.find_structures()
+    structure_type = None
+    if request.GET['type_choices']:
+        structure_type = request.GET['type_choices'] #otherwise type is a blank
+    entities = mdl.structure.search(acronym=request.GET['acronym'],
+                                    title=request.GET['title'],
+                                    type=structure_type)
 
-    if acronym and len(acronym) > 0:
-        criteria_present = True
-        criterias.append(models.Q(acronym__icontains=acronym))
-    if title and len(title) > 0:
-        criteria_present = True
-        criterias.append(models.Q(title__icontains=title))
-
-    structures = None
-    message = None
-    if criteria_present:
-        structures = mdl.structure.Structure.objects.filter(reduce(operator.and_, criterias))
-    else:
-        message = "%s" % _('You must choose at least one criteria!')
-
-    return render(request, "structures.html", {'title':      title,
-                                               'acronym':    acronym,
-                                               'init':       "0",
-                                               'structures': structures,
-                                               'message':    message})
+    return render(request, "structures.html", {'entities': entities,
+                                               'types': mdl.structure.ENTITY_TYPE})
 
 
 @login_required

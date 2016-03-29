@@ -1,4 +1,4 @@
-SUPPORTED_LANGUAGES = (('FR', 'Français'),
-                       ('EN', 'English'))
+SUPPORTED_LANGUAGES = (('fr', 'Français'),
+                       ('en', 'English'))
 
-DEFAULT_LANGUAGE = 'FR'
+DEFAULT_LANGUAGE = 'fr'

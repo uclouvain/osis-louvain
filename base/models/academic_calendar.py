@@ -37,7 +37,7 @@ class AcademicCalendarAdmin(admin.ModelAdmin):
 class AcademicCalendar(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
     changed = models.DateTimeField(null=True)
-    academic_year = models.ForeignKey(academic_year.AcademicYear)
+    academic_year = models.ForeignKey('AcademicYear')
     title = models.CharField(max_length=50, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     start_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)

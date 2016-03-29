@@ -34,7 +34,7 @@ class OrganizationAddressAdmin(admin.ModelAdmin):
 
 
 class OrganizationAddress(models.Model):
-    organization = models.ForeignKey(organization.Organization)
+    organization = models.ForeignKey('Organization')
     label        = models.CharField(max_length=20)
     location     = models.CharField(max_length=255)
     postal_code  = models.CharField(max_length=20)
@@ -43,7 +43,7 @@ class OrganizationAddress(models.Model):
 
 
 def find_by_organization(organization):
-    return OrganizationAddress.objects.filter(organization=organization)
+    return OrganizationAddress.objects.filter(organization=organization).order_by('label')
 
 
 def find_by_id(organization_address_id):

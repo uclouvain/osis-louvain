@@ -42,7 +42,7 @@ admin.site.register(InternshipEnrollment, InternshipEnrollmentAdmin)
 
 
 class InternshipMasterAdmin(admin.ModelAdmin):
-    list_display = ('organization', 'internship_offer', 'person', 'reference', 'civility', 'type_mastery', 'speciality')
-    fieldsets = ((None, {'fields': ('organization', 'internship_offer', 'person', 'reference', 'civility', 'type_mastery', 'speciality')}),)
+    list_display = ('reference', 'organization', 'internship_offer', 'person', 'civility', 'type_mastery', 'speciality')
+    fieldsets = ((None, {'fields': ('reference', 'organization', 'internship_offer', 'person', 'civility', 'type_mastery', 'speciality')}),)
 
 admin.site.register(InternshipMaster, InternshipMasterAdmin)

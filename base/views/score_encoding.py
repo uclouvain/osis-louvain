@@ -38,49 +38,56 @@ def scores_encoding(request):
 
     tutor = mdl.tutor.find_by_user(request.user)
     # In case the user is a tutor.
-    sessions = None
-    faculty = None
+    faculties = []
+    sessions_list = []
     if tutor:
         sessions = mdl.session_exam.find_sessions_by_tutor(tutor, academic_yr)
+        sessions_list.append(sessions)
     # In case the user is not a tutor we check whether it is a program manager for the offer.
     else:
-        program_mgr = mdl.program_manager.find_by_user(request.user)
-        if program_mgr.offer_year:
-            sessions = mdl.session_exam.find_sessions_by_faculty(program_mgr.offer_year.structure, academic_yr)
-            faculty = program_mgr.offer_year.structure
+        program_mgr_list = mdl.program_manager.find_by_user(request.user)
+        for program_mgr in program_mgr_list:
+            if program_mgr.offer_year:
+                sessions = mdl.session_exam.find_sessions_by_offer(program_mgr.offer_year, academic_yr)
+                sessions_list.append(sessions)
+                faculty = program_mgr.offer_year.structure
+                faculties.append(faculty)
 
     # Calculate the progress of all courses of the tutor.
     all_enrollments = []
     session = None
-    if sessions:
-        for session in sessions:
-            enrollments = list(mdl.exam_enrollment.find_exam_enrollments_by_session(session))
-            if enrollments:
-                all_enrollments = all_enrollments + enrollments
-            session.progress = mdl.exam_enrollment.calculate_session_exam_progress(session)
-        session = sessions.first()
+    sessions_offer =[]
+    if sessions_list:
+        for sessions in sessions_list:
+            for session in sessions:
+                enrollments = list(mdl.exam_enrollment.find_exam_enrollments_by_session(session))
+                if enrollments:
+                    all_enrollments = all_enrollments + enrollments
+                session.progress = mdl.exam_enrollment.calculate_session_exam_progress(session)
+            session = sessions.first()
+            sessions_offer.append(session)
 
     return render(request, "scores_encoding.html",
-                  {'section': 'scores_encoding',
-                   'tutor': tutor,
-                   'faculty': faculty,
-                   'academic_year': academic_yr,
-                   'sessions': sessions,
-                   'session': session})
+                  {'section':        'scores_encoding',
+                   'tutor':          tutor,
+                   'faculties':      faculties,
+                   'academic_year':  academic_yr,
+                   'sessions_list':  sessions_list,
+                   'session':        session,
+                   'sessions_offer': sessions_offer})
 
 
 @login_required
 def online_encoding(request, session_id):
     tutor = None
-    faculty = None
-    program_mgr = mdl.program_manager.find_by_user(request.user)
-    if not program_mgr.offer_year:
+    program_mgr_list = mdl.program_manager.find_by_user(request.user)
+    if not program_mgr_list:
         tutor = mdl.tutor.find_by_user(request.user)
-    else:
-        faculty = program_mgr.offer_year.structure
 
     academic_year = mdl.academic_year.current_academic_year()
     session = mdl.session_exam.find_session_by_id(session_id)
+    faculty = session.offer_year_calendar.offer_year.structure
+
     enrollments = mdl.exam_enrollment.find_exam_enrollments_by_session(session)
     progress = mdl.exam_enrollment.calculate_exam_enrollment_progress(enrollments)
     num_encoded_scores = mdl.exam_enrollment.count_encoded_scores(enrollments)
@@ -248,8 +255,7 @@ def notes_printing(request, session_exam_id, learning_unit_year_id):
     tutor = mdl.tutor.find_by_user(request.user)
     academic_year = mdl.academic_year.current_academic_year()
     session_exam = mdl.session_exam.find_session_by_id(session_exam_id)
-    sessions = mdl.session_exam.find_sessions_by_tutor(tutor, academic_year)
-    return pdf_utils.print_notes(request, tutor, academic_year, session_exam, sessions, learning_unit_year_id)
+    return pdf_utils.print_notes(request, tutor, academic_year, session_exam, learning_unit_year_id)
 
 
 @login_required
@@ -262,8 +268,7 @@ def notes_printing(request, session_exam_id, learning_unit_year_id):
     tutor = mdl.tutor.find_by_user(request.user)
     academic_year = mdl.academic_year.current_academic_year()
     session_exam = mdl.session_exam.find_session_by_id(session_exam_id)
-    sessions = mdl.session_exam.find_sessions_by_tutor(tutor, academic_year)
-    return pdf_utils.print_notes(request, tutor, academic_year, session_exam, sessions, learning_unit_year_id)
+    return pdf_utils.print_notes(request, tutor, academic_year, session_exam, learning_unit_year_id)
 
 
 @login_required

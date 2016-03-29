@@ -26,15 +26,15 @@
 from django.conf.urls import url
 from django.contrib.auth.views import login,logout_then_login
 
-from . import views
+from internship.views import home, internship, master, period, place, student
 
 urlpatterns = [
     # S'il vous plaît, organiser les urls par ordre alphabétique.
 
-    url(r'^studies/internships/$', views.internships, name='internships'),
-    url(r'^studies/internships/home/$', views.internships_home, name='internships_home'),
-    url(r'^studies/internships/interships_masters/$', views.interships_masters, name='interships_masters'),
-    url(r'^studies/internships/periods/$', views.internships_periods, name='internships_periods'),
-    url(r'^studies/internships/places/$', views.internships_places, name='internships_places'),
-    url(r'^studies/internships/students/$', views.internships_students, name='internships_students'),
+    url(r'^studies/internships/$', internship.internships, name='internships'),
+    url(r'^studies/internships/home/$', home.internships_home, name='internships_home'),
+    url(r'^studies/internships/interships_masters/$', master.interships_masters, name='interships_masters'),
+    url(r'^studies/internships/periods/$', period.internships_periods, name='internships_periods'),
+    url(r'^studies/internships/places$', place.internships_places, name='internships_places'),
+    url(r'^studies/internships/students/$', student.internships_students, name='internships_students'),
 ]

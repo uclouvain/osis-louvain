@@ -1,22 +1,27 @@
 body {
   padding-top: 70px;
 }
-/*todo peut-être moyen de changer ceci avec message_tags*/
+
 .info {
   color:blue;
 }
+
 .success {
   color:green;
 }
+
 .warning {
   color:orange;
 }
+
 .error {
   color:red;
 }
+
 .btn.btn-as-block {
   display: block;
 }
+
 .invisible{
   visibility: hidden;
 }

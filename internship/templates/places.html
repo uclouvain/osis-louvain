@@ -35,7 +35,31 @@
   <div class="page-header">
     <h2>{% trans 'Places' %}</h2>
   </div>
-
+  <div class="panel panel-default">
+        <table style="height:100%; width:100%;">
+            <thead>
+              <tr>
+                  <th style="text-align:center; width:50%;">{% trans 'City' %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <form action="{%url 'internships_places' %}" method="get">
+                <tr>
+                  <td style="text-align:center; width:50%;">
+                    <select name="city_sort" onChange="javascript: this.form.submit();">
+                      <option value="0">--</option>
+                      {% for address in all_addresses %}
+                        <option value="{{ address }}" {% if address == city_sort_get %}selected{%endif%}>
+                          {{ address }}
+                        </option>
+                      {% endfor %}
+                    </select>
+                  </td>
+                </tr>
+            </form>
+            </tbody>
+        </table>
+  </div>
   <div class="panel panel-default">
     <div class="tab-content">
       <div role="tabpanel" class="tab-pane fade in active" id="profile">
@@ -58,20 +82,28 @@
                     {{ organization.reference }}
                   </td>
                   <td>
-                    {{ organization.name }}
+                    <a href="{% url 'internships' %}?place_sort={{ organization.name }}">{{ organization.name }}</a>
                   </td>
-                  <td>
-                    {{ organization.address.location }}
-                  </td>
-                  <td>
-                    {{ organization.address.postal_code }}
-                  </td>
-                  <td>
-                    {{ organization.address.city }}
-                  </td>
-                  <td>
-                    {{ organization.address.country }}
-                  </td>
+                    <td>
+                      {% for address in organization.address %}
+                        {{address.location}} <br/>
+                      {% endfor %}
+                    </td>
+                    <td>
+                      {% for address in organization.address %}
+                        {{address.postal_code}} <br/>
+                      {% endfor %}
+                    </td>
+                    <td>
+                      {% for address in organization.address %}
+                        {{address.city}} <br/>
+                      {% endfor %}
+                    </td>
+                    <td>
+                      {% for address in organization.address %}
+                        {{address.country}} <br/>
+                      {% endfor %}
+                    </td>
                   <td>
                     {{ organization.website }}
                   </td>

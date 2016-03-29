@@ -3,87 +3,103 @@
 {% load i18n %}
 
 {% comment "License" %}
- * OSIS stands for Open Student Information System. It's an application
- * designed to manage the core business of higher education institutions,
- * such as universities, faculties, institutes and professional schools.
- * The core business involves the administration of students, teachers,
- * courses, programs and so on.
- *
- * Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * A copy of this license - GNU General Public License - is available
- * at the root of the source code of this program.  If not,
- * see http://www.gnu.org/licenses/.
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
 {% endcomment %}
 
 {% block breadcrumb %}
-  <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'Institution' %}</a></li>
-  <li class="active">{% trans 'Entities' %}</li>
+<li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'Institution' %}</a></li>
+<li class="active">{% trans 'Entities' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
-  <h2>{% trans 'Entities' %}</h2>
+    <h2>{% trans 'Entities' %}</h2>
 </div>
 <div class="panel panel-default">
-  <div class="panel-body">
-    <form  method="get" action="{% url 'structures_search'%}" >
-      <div class="row">
+    <div class="panel-body">
+        <form method="get" action="{% url 'structures_search'%}">
+            <div class="row">
+                <div class="col-md-3">
+                    <label for="txt_acronym">{% trans 'Acronym'%}</label>
+                    <input class="form-control" id="txt_acronym" placeholder="{% trans 'Acronym' %}" name="acronym"
+                           value="{{ request.GET.acronym }}" style="text-transform:uppercase">
+                </div>
+                <div class="col-md-2">
+                    <label for="txt_title">{% trans 'Title'%}</label>
+                    <input class="form-control" placeholder="{% trans 'Title' %}" id="txt_title" name="title"
+                           value="{{ request.GET.title }}" style="text-transform:uppercase">
+                </div>
+                 
+                <div class="col-md-2"> 
+                    <label for="slt_type">{% trans 'Type'%}</label>
+                    <select class="form-control" id="slt_type" name="type_choices"
+                            value="{{ type | default_if_none:'' }}"> 
+                        <option value="">Types...</option>
+                         {% for type in types %} 
+                            <option value="{{ type.0 }}" {% if request.GET.type_choices == type.0 %}selected{% endif %}>
+                                {{ type.1 }}
+                            </option>
+                         {% endfor %} 
+                    </select> 
+                </div>
+                <div class="col-md-4">
+                </div>
+                <div class="col-md-1">
+                    <br>
+                    <button type="submit" id="bt_submit_structure_search" class="btn btn-primary" role="button"
+                            title="{% trans 'Search for an entity' %}">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                    &nbsp;&nbsp;
+                </div>
+            </div>
 
-          <div class="col-md-3">
-              <label for="acronym">{% trans 'Acronym'%}</label>
-              <input class="form-control" id="txt_acronym" placeholder="{% trans 'Acronym' %}" name="acronym" value="{{ acronym }}" style="text-transform:uppercase">
-          </div>
-          <div class="col-md-2">
-              <label for="title" >{% trans 'Title'%}</label>
-              <input class="form-control" placeholder="{% trans 'Title' %}" id="txt_title" name="title" value="{{ title }}" style="text-transform:uppercase">
-          </div>
-          <div class="col-md-6">
-          </div>
-          <div class="col-md-1">
-            <br>
-              <button type="submit" id="bt_submit_structure_search" class="btn btn-primary" role="button"
-                      title="{% trans 'Search for an entity' %}">
-              <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-          </div>
-        </div>
-
-      </form>
-  </div>
-  {% if message %}
-      <div>
+        </form>
+    </div>
+    {% if message %}
+    <div>
         <label class="alert alert-warning" style="margin:5px">{{message}}</label>
-      </div>
-  {% else%}
-      <div >
-        {% if structures|length == 0 and init == "0" %}
-          <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
+    </div>
+    {% else%}
+    <div>
+        {% if entities|length == 0 %}
+            <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
+        {% else %}
+            <table class="table table-striped table-hover">
+                <thead>
+                <th>{% trans 'Acronym'%}</th>
+                <th>{% trans 'Title'%}</th>
+                <th>{% trans 'Type'%}</th>
+                </thead>
+                {% for entity in entities %}
+                <tr>
+                    <td><a href="{% url 'structure_read' entity.id %}" id="lnk_entity_read_{{entity.id}}">
+                        {{ entity.acronym }}</a></td>
+                    <td>{{ entity.title }}</td>
+                    <td>{% if entity.type != 'UNKNOWN'%}{{ entity.type|default_if_none:''}}{% endif %}</td>
+                </tr>
+                {% endfor %}
+            </table>
         {% endif %}
-        {% if structures|length > 0%}
-        <table class="table table-striped table-hover">
-          <thead>
-            <th>{% trans 'Acronym'%}</th>
-            <th>{% trans 'Title'%}</th>
-          </thead>
-          {% for structure in structures %}
-            <tr>
-              <td><a href="{% url 'structure_read' structure.id %}" id="lnk_structure_read_{{structure.id}}">{{ structure.acronym }}</a></td>
-              <td>{{ structure.title }}</td>
-            </tr>
-          {% endfor %}
-        </table>
-        {% endif %}
-
-        </div>
+    </div>
     {% endif %}
 </div>
 {% endblock %}

@@ -45,24 +45,28 @@
             <div id="tab_identification" class="tab-pane fade in active">
                 <br>
                 <div class="row">
-                    <div class="col-md-3">
+                    <div class="col-md-4">
                         <label>{% trans 'Acronym' %}</label><br>
                         {{ organization.acronym | default_if_none:'-' }}
                     </div>
-                    <div class="col-md-9">
+                    <div class="col-md-4">
                         <label>{% trans 'Name'%}</label><br>
                         {{ organization.name | default_if_none:'-' }}
+                    </div>
+                    <div class="col-md-4">
+                        <label>{% trans 'Reference'%}</label><br>
+                        {{ organization.reference | default_if_none:'-' }}
                     </div>
                 </div>
                 <br>
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-4">
                         <label>{% trans 'Website' %}</label><br>
                         {{ organization.website | default_if_none:'-' }}
                     </div>
-                    <div class="col-md-6">
-                        <label>{% trans 'Reference'%}</label><br>
-                        {{ organization.reference | default_if_none:'-' }}
+                    <div class="col-md-8">
+                        <label>{% trans 'Type' %}</label><br>
+                        {{ organization.type | default_if_none:'-' }}
                     </div>
                 </div>
                 <br>
@@ -132,4 +136,5 @@
             </div>
         </div>
     </div>
-    {% endblock %}
+</div>
+{% endblock %}

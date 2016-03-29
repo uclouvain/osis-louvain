@@ -1,591 +1,5011 @@
 [
-    {
-        "model": "base.tutor",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "person": 3
-        }
-    },
-    {
-        "model": "base.tutor",
-        "pk": 2,
-        "fields": {
-            "external_id": null,
-            "person": 2
-        }
-    },
-    {
-        "model": "base.tutor",
-        "pk": 3,
-        "fields": {
-            "external_id": null,
-            "person": 1
-        }
-    },
-    {
-        "model": "base.student",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "registration_id": "00000001",
-            "person": 4
-        }
-    },
-    {
-        "model": "base.student",
-        "pk": 2,
-        "fields": {
-            "external_id": null,
-            "registration_id": "00000002",
-            "person": 5
-        }
-    },
-    {
-        "model": "base.structure",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "acronym": "DRT",
-            "title": "Facult\u00e9 de Droit",
-            "organization": null,
-            "part_of": null
-        }
-    },
-    {
-        "model": "base.academicyear",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "year": 2016
-        }
-    },
-    {
-        "model": "base.academicyear",
-        "pk": 2,
-        "fields": {
-            "external_id": null,
-            "year": 2015
-        }
-    },
-    {
-        "model": "base.academiccalendar",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "academic_year": 2,
-            "title": "Ann\u00e9e acad\u00e9mique",
-            "description": "",
-            "start_date": "2015-09-01",
-            "end_date": "2016-08-31"
-        }
-    },
-    {
-        "model": "base.offer",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "title": "Bachelier en Droit"
-        }
-    },
-    {
-        "model": "base.offeryear",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "offer": 1,
-            "academic_year": 1,
-            "acronym": "DROIT1BA",
-            "title": "Bachelier en Droit",
-            "structure": 1
-        }
-    },
-    {
-        "model": "base.offeryear",
-        "pk": 2,
-        "fields": {
-            "external_id": null,
-            "offer": 1,
-            "academic_year": 2,
-            "acronym": "DROI1BA",
-            "title": "Introduction au droit",
-            "structure": 1
-        }
-    },
-    {
-        "model": "base.programmemanager",
-        "pk": 1,
-        "fields": {
-            "person": 6,
-            "offer_year": 1
-        }
-    },
-    {
-        "model": "base.offerenrollment",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "date_enrollment": "2015-09-01",
-            "offer_year": 1,
-            "student": 1
-        }
-    },
-    {
-        "model": "base.offerenrollment",
-        "pk": 2,
-        "fields": {
-            "external_id": null,
-            "date_enrollment": "2015-09-01",
-            "offer_year": 1,
-            "student": 2
-        }
-    },
-    {
-        "model": "base.offerenrollment",
-        "pk": 3,
-        "fields": {
-            "external_id": null,
-            "date_enrollment": "2015-09-01",
-            "offer_year": 2,
-            "student": 1
-        }
-    },
-    {
-        "model": "base.offerenrollment",
-        "pk": 4,
-        "fields": {
-            "external_id": null,
-            "date_enrollment": "2015-09-01",
-            "offer_year": 2,
-            "student": 2
-        }
-    },
-    {
-        "model": "base.offeryearcalendar",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "academic_calendar": 1,
-            "offer_year": 1,
-            "start_date": null,
-            "end_date": null
-        }
-    },
-    {
-        "model": "base.offeryearcalendar",
-        "pk": 2,
-        "fields": {
-            "external_id": null,
-            "academic_calendar": 1,
-            "offer_year": 2,
-            "start_date": "2015-08-31",
-            "end_date": "2016-08-31"
-        }
-    },
-    {
-        "model": "base.learningunit",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "acronym": "DROI1000",
-            "title": "Introduction au Droit",
-            "description": "",
-            "start_year": 2015,
-            "end_year": null
-        }
-    },
-    {
-        "model": "base.learningunit",
-        "pk": 2,
-        "fields": {
-            "external_id": null,
-            "acronym": "PHYS1000",
-            "title": "Introduction \u00e0 la physique",
-            "description": "",
-            "start_year": 2015,
-            "end_year": null
-        }
-    },
-    {
-        "model": "base.attribution",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "start_date": "2015-09-01",
-            "end_date": "2016-08-31",
-            "function": "PROFESSOR",
-            "learning_unit": 1,
-            "tutor": 1
-        }
-    },
-    {
-        "model": "base.attribution",
-        "pk": 2,
-        "fields": {
-            "external_id": null,
-            "start_date": "2015-09-01",
-            "end_date": "2016-08-31",
-            "function": "COORDINATOR",
-            "learning_unit": 1,
-            "tutor": 3
-        }
-    },
-    {
-        "model": "base.attribution",
-        "pk": 3,
-        "fields": {
-            "external_id": null,
-            "start_date": "2015-09-01",
-            "end_date": "2016-08-31",
-            "function": "PROFESSOR",
-            "learning_unit": 2,
-            "tutor": 2
-        }
-    },
-    {
-        "model": "base.attribution",
-        "pk": 4,
-        "fields": {
-            "external_id": null,
-            "start_date": "2015-09-01",
-            "end_date": "2016-08-31",
-            "function": "PROFESSOR",
-            "learning_unit": 2,
-            "tutor": 1
-        }
-    },
-    {
-        "model": "base.attribution",
-        "pk": 5,
-        "fields": {
-            "external_id": null,
-            "start_date": "2015-09-01",
-            "end_date": "2016-08-31",
-            "function": "COORDINATOR",
-            "learning_unit": 2,
-            "tutor": 3
-        }
-    },
-    {
-        "model": "base.learningunityear",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "acronym": "DROI1000",
-            "title": "Introduction au droit",
-            "credits": "0.10",
-            "decimal_scores": false,
-            "academic_year": 1,
-            "learning_unit": 1
-        }
-    },
-    {
-        "model": "base.learningunityear",
-        "pk": 2,
-        "fields": {
-            "external_id": null,
-            "acronym": "PHYS1000",
-            "title": "Introduction \u00e0 la Physique",
-            "credits": "1.00",
-            "decimal_scores": false,
-            "academic_year": 1,
-            "learning_unit": 2
-        }
-    },
-    {
-        "model": "base.learningunityear",
-        "pk": 3,
-        "fields": {
-            "external_id": null,
-            "acronym": "DROI1000",
-            "title": "Introduction au droit",
-            "credits": "10.00",
-            "decimal_scores": false,
-            "academic_year": 2,
-            "learning_unit": 1
-        }
-    },
-    {
-        "model": "base.learningunityear",
-        "pk": 4,
-        "fields": {
-            "external_id": null,
-            "acronym": "PHYS1000",
-            "title": "Phys1000",
-            "credits": "10.00",
-            "decimal_scores": false,
-            "academic_year": 2,
-            "learning_unit": 2
-        }
-    },
-    {
-        "model": "base.learningunitenrollment",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "date_enrollment": "2015-09-01",
-            "learning_unit_year": 1,
-            "offer_enrollment": 1
-        }
-    },
-    {
-        "model": "base.learningunitenrollment",
-        "pk": 2,
-        "fields": {
-            "external_id": null,
-            "date_enrollment": "2015-09-01",
-            "learning_unit_year": 2,
-            "offer_enrollment": 2
-        }
-    },
-    {
-        "model": "base.learningunitenrollment",
-        "pk": 3,
-        "fields": {
-            "external_id": null,
-            "date_enrollment": "2015-09-01",
-            "learning_unit_year": 2,
-            "offer_enrollment": 1
-        }
-    },
-    {
-        "model": "base.learningunitenrollment",
-        "pk": 4,
-        "fields": {
-            "external_id": null,
-            "date_enrollment": "2015-09-01",
-            "learning_unit_year": 4,
-            "offer_enrollment": 3
-        }
-    },
-    {
-        "model": "base.learningunitenrollment",
-        "pk": 5,
-        "fields": {
-            "external_id": null,
-            "date_enrollment": "2015-09-01",
-            "learning_unit_year": 3,
-            "offer_enrollment": 4
-        }
-    },
-    {
-        "model": "base.learningunitenrollment",
-        "pk": 6,
-        "fields": {
-            "external_id": null,
-            "date_enrollment": "2015-09-01",
-            "learning_unit_year": 3,
-            "offer_enrollment": 3
-        }
-    },
-    {
-        "model": "base.sessionexam",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "number_session": 1,
-            "status": "OPEN",
-            "learning_unit_year": 1,
-            "offer_year_calendar": 1
-        }
-    },
-    {
-        "model": "base.sessionexam",
-        "pk": 2,
-        "fields": {
-            "external_id": null,
-            "number_session": 1,
-            "status": "OPEN",
-            "learning_unit_year": 3,
-            "offer_year_calendar": 2
-        }
-    },
-    {
-        "model": "base.examenrollment",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "score_draft": null,
-            "score_reencoded": null,
-            "score_final": null,
-            "justification_draft": null,
-            "justification_reencoded": null,
-            "justification_final": null,
-            "encoding_status": null,
-            "session_exam": 1,
-            "learning_unit_enrollment": 1
-        }
-    },
-    {
-        "model": "base.examenrollment",
-        "pk": 2,
-        "fields": {
-            "external_id": null,
-            "score_draft": null,
-            "score_reencoded": null,
-            "score_final": null,
-            "justification_draft": null,
-            "justification_reencoded": null,
-            "justification_final": null,
-            "encoding_status": null,
-            "session_exam": 1,
-            "learning_unit_enrollment": 2
-        }
-    },
-    {
-        "model": "base.examenrollment",
-        "pk": 3,
-        "fields": {
-            "external_id": null,
-            "score_draft": null,
-            "score_reencoded": null,
-            "score_final": null,
-            "justification_draft": null,
-            "justification_reencoded": null,
-            "justification_final": null,
-            "encoding_status": null,
-            "session_exam": 2,
-            "learning_unit_enrollment": 4
-        }
-    },
-    {
-        "model": "base.examenrollment",
-        "pk": 4,
-        "fields": {
-            "external_id": null,
-            "score_draft": null,
-            "score_reencoded": null,
-            "score_final": null,
-            "justification_draft": null,
-            "justification_reencoded": null,
-            "justification_final": null,
-            "encoding_status": null,
-            "session_exam": 2,
-            "learning_unit_enrollment": 5
-        }
-    },
-    {
-        "model": "base.examenrollment",
-        "pk": 5,
-        "fields": {
-            "external_id": null,
-            "score_draft": null,
-            "score_reencoded": null,
-            "score_final": null,
-            "justification_draft": null,
-            "justification_reencoded": null,
-            "justification_final": null,
-            "encoding_status": null,
-            "session_exam": 2,
-            "learning_unit_enrollment": 6
-        }
-    },
-    {
-        "model": "auth.user",
-        "pk": 1,
-        "fields": {
-            "password": "pbkdf2_sha256$24000$77SWySS12ruQ$UsUBakPSpBMYF1zao1QZAwFiNCSkAo15E+xtq/waCrY=",
-            "last_login": "2016-02-09T16:52:17.376Z",
-            "is_superuser": true,
-            "username": "osis",
-            "first_name": "",
-            "last_name": "",
-            "email": "osi@uclouvain.be",
-            "is_staff": true,
-            "is_active": true,
-            "date_joined": "2016-02-09T13:52:02.286Z",
-            "groups": [],
-            "user_permissions": []
-        }
-    },
-    {
-        "model": "base.person",
-        "pk": 1,
-        "fields": {
-            "external_id": null,
-            "user": null,
-            "global_id": "",
-            "gender": "F",
-            "national_id": "",
-            "first_name": "Osis",
-            "middle_name": "",
-            "last_name": "Osis-Dev",
-            "email": null
-        }
-    },
-    {
-        "model": "base.person",
-        "pk": 2,
-        "fields": {
-            "external_id": null,
-            "user": null,
-            "global_id": "",
-            "gender": "M",
-            "national_id": "",
-            "first_name": "Prof1",
-            "middle_name": "",
-            "last_name": "Prof1",
-            "email": null
-        }
-    },
-    {
-        "model": "base.person",
-        "pk": 3,
-        "fields": {
-            "external_id": null,
-            "user": 1,
-            "global_id": "",
-            "gender": "U",
-            "national_id": "",
-            "first_name": "OsisProfUser",
-            "middle_name": "",
-            "last_name": "OsisProfUser",
-            "email": "OsisProfUser@uclouvain.be"
-        }
-    },
-    {
-        "model": "base.person",
-        "pk": 4,
-        "fields": {
-            "external_id": null,
-            "user": null,
-            "global_id": "",
-            "gender": "F",
-            "national_id": "",
-            "first_name": "Osis-Student-1",
-            "middle_name": "",
-            "last_name": "Osis-Student-1",
-            "email": "Osis-Student-1@uclouvain.be"
-        }
-    },
-    {
-        "model": "base.person",
-        "pk": 5,
-        "fields": {
-            "external_id": null,
-            "user": null,
-            "global_id": "",
-            "gender": "U",
-            "national_id": "",
-            "first_name": "Osis-Student-2",
-            "middle_name": "",
-            "last_name": "Osis-Student-2",
-            "email": "Osis-Student-2@uclouvain.be"
-        }
-    },
-    {
-        "model": "base.person",
-        "pk": 6,
-        "fields": {
-            "external_id": null,
-            "user": null,
-            "global_id": "",
-            "gender": "U",
-            "national_id": "",
-            "first_name": "Osis-Prog-Manager",
-            "middle_name": "",
-            "last_name": "Osis-Prog-Manager",
-            "email": "Osis-Prog-Manager@uclouvain.be"
-        }
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 1,
+    "fields": {
+      "app_label": "admin",
+      "model": "logentry"
     }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 2,
+    "fields": {
+      "app_label": "auth",
+      "model": "permission"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 3,
+    "fields": {
+      "app_label": "auth",
+      "model": "group"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 4,
+    "fields": {
+      "app_label": "auth",
+      "model": "user"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 5,
+    "fields": {
+      "app_label": "contenttypes",
+      "model": "contenttype"
+    }
+  },
+  {
+    "model": "contenttypes.contenttype",
+    "pk": 6,
+    "fields": {
+      "app_label": "sessions",
+      "model": "session"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "hm6tt1xx1875bd4kjbr9p9nm49om2eqd",
+    "fields": {
+      "session_data": "ZjBlYTA1Mjg2YzU2NmVmZGQ2M2UxODgwYTFhZmE4MWJkMTI3NjQzNDp7Il9hdXRoX3VzZXJfYmFja2VuZCI6ImRqYW5nby5jb250cmliLmF1dGguYmFja2VuZHMuTW9kZWxCYWNrZW5kIiwiX2F1dGhfdXNlcl9oYXNoIjoiODBmZTRmOWY2ODllZGNjYWYxM2Q4MTFjNDc1NGMxYTgxYmU0OTMwNyIsIl9hdXRoX3VzZXJfaWQiOiIxMiJ9",
+      "expire_date": "2016-03-23T09:04:30.662Z"
+    }
+  },
+  {
+    "model": "sessions.session",
+    "pk": "zx30n7jsm0igca5umnoswgre2xsuxf8s",
+    "fields": {
+      "session_data": "NzNhNTgwNzQyZGE0YmUxYjc4YWE5NDE5NzQ5OTdiYzU3ODU2YzFjMjp7Il9hdXRoX3VzZXJfaGFzaCI6IjgwZmU0ZjlmNjg5ZWRjY2FmMTNkODExYzQ3NTRjMWE4MWJlNDkzMDciLCJfYXV0aF91c2VyX2lkIjoiMTIiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCJ9",
+      "expire_date": "2016-03-28T09:19:44.779Z"
+    }
+  },
+  {
+    "model": "base.academicyear",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T20:51:43.875Z",
+      "year": 2015,
+      "start_date": "2015-09-14",
+      "end_date": "2016-09-16"
+    }
+  },
+  {
+    "model": "base.academicyear",
+    "pk": 2,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T20:53:07.789Z",
+      "year": 2016,
+      "start_date": "2016-09-19",
+      "end_date": "2017-09-15"
+    }
+  },
+  {
+    "model": "base.academiccalendar",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T23:38:17.483Z",
+      "academic_year": 1,
+      "title": "Encodage des notes - 1er session d'examen ",
+      "description": null,
+      "start_date": "2016-01-04",
+      "end_date": "2016-03-29",
+      "highlight_title": "Encodage des notes",
+      "highlight_description": "Il est temps d'encoder les notes de la premi\u00e8re session d'examen de l'ann\u00e9e.",
+      "highlight_shortcut": "studies/assessments/scores_encoding"
+    }
+  },
+  {
+    "model": "base.academiccalendar",
+    "pk": 2,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T23:45:33.562Z",
+      "academic_year": 1,
+      "title": "Encodage des notes - 2eme session d'examen ",
+      "description": null,
+      "start_date": "2016-06-06",
+      "end_date": "2016-06-27",
+      "highlight_title": null,
+      "highlight_description": null,
+      "highlight_shortcut": null
+    }
+  },
+  {
+    "model": "base.learningunit",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:33:47.209Z",
+      "acronym": "LDROI1003",
+      "title": "Fondements romains du droit",
+      "description": "",
+      "start_year": 2015,
+      "end_year": null
+    }
+  },
+  {
+    "model": "base.learningunit",
+    "pk": 2,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:34:11.410Z",
+      "acronym": "LDROI1004",
+      "title": "Histoire du droit",
+      "description": "",
+      "start_year": 2015,
+      "end_year": null
+    }
+  },
+  {
+    "model": "base.learningunit",
+    "pk": 3,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:43:27.924Z",
+      "acronym": "LCOPS1113",
+      "title": "Histoire moderne et contemporaine",
+      "description": "",
+      "start_year": 2015,
+      "end_year": null
+    }
+  },
+  {
+    "model": "base.tutor",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:18:33.160Z",
+      "person": 9
+    }
+  },
+  {
+    "model": "base.tutor",
+    "pk": 2,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:59:52.246Z",
+      "person": 4
+    }
+  },
+  {
+    "model": "base.tutor",
+    "pk": 3,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-09T09:45:58.817Z",
+      "person": 1
+    }
+  },
+  {
+    "model": "base.attribution",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:59:13.700Z",
+      "start_date": "2016-03-07",
+      "end_date": "2016-03-07",
+      "function": "PROFESSOR",
+      "learning_unit": 3,
+      "tutor": 1
+    }
+  },
+  {
+    "model": "base.attribution",
+    "pk": 2,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:00:19.272Z",
+      "start_date": "2016-03-07",
+      "end_date": "2016-03-07",
+      "function": "PROFESSOR",
+      "learning_unit": 2,
+      "tutor": 2
+    }
+  },
+  {
+    "model": "base.attribution",
+    "pk": 3,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-09T09:53:54.455Z",
+      "start_date": "2016-03-07",
+      "end_date": "2016-03-07",
+      "function": "PROFESSOR",
+      "learning_unit": 1,
+      "tutor": 3
+    }
+  },
+  {
+    "model": "base.offer",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T22:38:39.964Z",
+      "title": "Bachelier en sciences de l'ing\u00e9nieur"
+    }
+  },
+  {
+    "model": "base.offer",
+    "pk": 2,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T22:39:30.883Z",
+      "title": "Bachelier en droit"
+    }
+  },
+  {
+    "model": "base.offer",
+    "pk": 3,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T22:40:37.542Z",
+      "title": "Bachelier en sciences informatiques"
+    }
+  },
+  {
+    "model": "base.offer",
+    "pk": 4,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T22:42:32.504Z",
+      "title": "Bachelier en information et communication"
+    }
+  },
+  {
+    "model": "base.offer",
+    "pk": 5,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T22:43:16.381Z",
+      "title": "Bachelier en sciences biom\u00e9dicales"
+    }
+  },
+  {
+    "model": "base.offer",
+    "pk": 6,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T22:44:58.315Z",
+      "title": "Bachelier en histoire"
+    }
+  },
+  {
+    "model": "base.structure",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T23:21:19.801Z",
+      "acronym": "SST",
+      "title": "Sector sciences et technologies",
+      "organization": 1,
+      "part_of": null
+    }
+  },
+  {
+    "model": "base.structure",
+    "pk": 2,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T23:21:55.772Z",
+      "acronym": "SSS",
+      "title": "Secteur sciences de la sante",
+      "organization": 1,
+      "part_of": null
+    }
+  },
+  {
+    "model": "base.structure",
+    "pk": 3,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T23:22:27.363Z",
+      "acronym": "SSH",
+      "title": "Secteur sciences humaines",
+      "organization": 1,
+      "part_of": null
+    }
+  },
+  {
+    "model": "base.structure",
+    "pk": 4,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T23:24:07.733Z",
+      "acronym": "AGRO",
+      "title": "Facult\u00e9 des bioing\u00e9nieurs",
+      "organization": 1,
+      "part_of": 1
+    }
+  },
+  {
+    "model": "base.structure",
+    "pk": 5,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T23:29:19.544Z",
+      "acronym": "DRT",
+      "title": "Facult\u00e9 de droit et de criminologie",
+      "organization": 1,
+      "part_of": 3
+    }
+  },
+  {
+    "model": "base.structure",
+    "pk": 6,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T23:31:15.637Z",
+      "acronym": "EPL",
+      "title": "Ecole polytechnique de Louvain",
+      "organization": 1,
+      "part_of": 1
+    }
+  },
+  {
+    "model": "base.structure",
+    "pk": 7,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T23:32:18.291Z",
+      "acronym": "FASB",
+      "title": "Facult\u00e9 de pharmacie et sciences biom\u00e9dicales",
+      "organization": 1,
+      "part_of": 2
+    }
+  },
+  {
+    "model": "base.structure",
+    "pk": 8,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T23:33:46.017Z",
+      "acronym": "MEDE",
+      "title": "Facult\u00e9 de m\u00e9decine et m\u00e9decine dentaire",
+      "organization": 1,
+      "part_of": 2
+    }
+  },
+  {
+    "model": "base.structure",
+    "pk": 9,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:27:17.326Z",
+      "acronym": "ESPO",
+      "title": "Facult\u00e9 des sciences \u00e9conomiques, sociales, politiques et de communication",
+      "organization": 1,
+      "part_of": 3
+    }
+  },
+  {
+    "model": "base.structure",
+    "pk": 10,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T12:18:18.914Z",
+      "acronym": "TECO",
+      "title": "TECO",
+      "organization": 1,
+      "part_of": 3
+    }
+  },
+  {
+    "model": "base.structure",
+    "pk": 11,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T12:19:43.153Z",
+      "acronym": "FSP",
+      "title": "FSP",
+      "organization": 1,
+      "part_of": 2
+    }
+  },
+  {
+    "model": "base.structure",
+    "pk": 12,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T12:20:40.588Z",
+      "acronym": "LOCI",
+      "title": "LOCI",
+      "organization": 1,
+      "part_of": 1
+    }
+  },
+  {
+    "model": "base.offeryear",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-04T23:37:15.349Z",
+      "offer": 2,
+      "academic_year": 1,
+      "acronym": "DROI1BA",
+      "title": "Bachelier en droit",
+      "title_international": null,
+      "title_short": null,
+      "title_printable": null,
+      "structure": 5,
+      "parent": null,
+      "grade": null
+    }
+  },
+  {
+    "model": "base.offeryear",
+    "pk": 3,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:24:39.133Z",
+      "offer": 5,
+      "academic_year": 1,
+      "acronym": "SBIM1BA",
+      "title": "Bachelier en sciences biom\u00e9dicales",
+      "title_international": null,
+      "title_short": null,
+      "title_printable": null,
+      "structure": 7,
+      "parent": null,
+      "grade": null
+    }
+  },
+  {
+    "model": "base.offeryear",
+    "pk": 4,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:27:25.768Z",
+      "offer": 4,
+      "academic_year": 1,
+      "acronym": "COMU1BA",
+      "title": "Bachelier en information et communication",
+      "title_international": null,
+      "title_short": null,
+      "title_printable": null,
+      "structure": 9,
+      "parent": null,
+      "grade": null
+    }
+  },
+  {
+    "model": "base.offeryear",
+    "pk": 5,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:28:27.362Z",
+      "offer": 3,
+      "academic_year": 1,
+      "acronym": "SINF1BA",
+      "title": "Bachelier en sciences informatiques",
+      "title_international": null,
+      "title_short": null,
+      "title_printable": null,
+      "structure": 6,
+      "parent": null,
+      "grade": null
+    }
+  },
+  {
+    "model": "base.offeryear",
+    "pk": 6,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:31:36.397Z",
+      "offer": 1,
+      "academic_year": 1,
+      "acronym": "FSA1BA",
+      "title": "Orientation ing\u00e9nieur civil",
+      "title_international": null,
+      "title_short": null,
+      "title_printable": null,
+      "structure": 6,
+      "parent": null,
+      "grade": null
+    }
+  },
+  {
+    "model": "base.programmemanager",
+    "pk": 1,
+    "fields": {
+      "changed": "2016-03-04T23:40:31Z",
+      "person": 1,
+      "offer_year": 1
+    }
+  },
+  {
+    "model": "base.offeryearcalendar",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:48:47.728Z",
+      "academic_calendar": 1,
+      "offer_year": 4,
+      "start_date": "2016-03-01",
+      "end_date": "2016-03-31",
+      "customized": true
+    }
+  },
+  {
+    "model": "base.offeryearcalendar",
+    "pk": 2,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:48:14.316Z",
+      "academic_calendar": 1,
+      "offer_year": 1,
+      "start_date": "2016-03-01",
+      "end_date": "2016-03-31",
+      "customized": false
+    }
+  },
+  {
+    "model": "base.learningunityear",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:50:17.999Z",
+      "acronym": "LDROI1003",
+      "title": "Fondements romains du droit",
+      "credits": "5.00",
+      "decimal_scores": false,
+      "academic_year": 1,
+      "learning_unit": 1
+    }
+  },
+  {
+    "model": "base.learningunityear",
+    "pk": 2,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:31:15.430Z",
+      "acronym": "LDROI1004",
+      "title": "Histoire du droit",
+      "credits": "20.00",
+      "decimal_scores": true,
+      "academic_year": 1,
+      "learning_unit": 2
+    }
+  },
+  {
+    "model": "base.learningunityear",
+    "pk": 3,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:52:19.197Z",
+      "acronym": "LCOPS1113",
+      "title": "Histoire moderne et contemporaine",
+      "credits": "5.00",
+      "decimal_scores": false,
+      "academic_year": 1,
+      "learning_unit": 3
+    }
+  },
+  {
+    "model": "base.sessionexam",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:30:21.259Z",
+      "number_session": 1,
+      "status": "OPEN",
+      "learning_unit_year": 3,
+      "offer_year_calendar": 1
+    }
+  },
+  {
+    "model": "base.sessionexam",
+    "pk": 2,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:30:21.259Z",
+      "number_session": 1,
+      "status": "OPEN",
+      "learning_unit_year": 2,
+      "offer_year_calendar": 2
+    }
+  },
+  {
+    "model": "base.sessionexam",
+    "pk": 3,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:30:21.259Z",
+      "number_session": 1,
+      "status": "OPEN",
+      "learning_unit_year": 1,
+      "offer_year_calendar": 2
+    }
+  },
+  {
+    "model": "base.student",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:16:03.026Z",
+      "registration_id": "321654",
+      "person": 19
+    }
+  },
+  {
+    "model": "base.student",
+    "pk": 2,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:16:13.735Z",
+      "registration_id": "123456",
+      "person": 18
+    }
+  },
+  {
+    "model": "base.student",
+    "pk": 3,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:16:24.782Z",
+      "registration_id": "123789",
+      "person": 17
+    }
+  },
+  {
+    "model": "base.student",
+    "pk": 4,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:16:34.887Z",
+      "registration_id": "789123",
+      "person": 16
+    }
+  },
+  {
+    "model": "base.student",
+    "pk": 5,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:16:48.925Z",
+      "registration_id": "741852",
+      "person": 15
+    }
+  },
+  {
+    "model": "base.student",
+    "pk": 6,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:17:07.411Z",
+      "registration_id": "963456",
+      "person": 14
+    }
+  },
+  {
+    "model": "base.student",
+    "pk": 7,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:17:18.684Z",
+      "registration_id": "951425",
+      "person": 13
+    }
+  },
+  {
+    "model": "base.student",
+    "pk": 8,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:17:29.513Z",
+      "registration_id": "965874",
+      "person": 12
+    }
+  },
+  {
+    "model": "base.student",
+    "pk": 9,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:17:45.016Z",
+      "registration_id": "369852",
+      "person": 11
+    }
+  },
+  {
+    "model": "base.student",
+    "pk": 10,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:17:56.324Z",
+      "registration_id": "985245",
+      "person": 10
+    }
+  },
+  {
+    "model": "base.student",
+    "pk": 11,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-09T10:25:42.928Z",
+      "registration_id": "956872",
+      "person": 1
+    }
+  },
+  {
+    "model": "base.offerenrollment",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:44:25.827Z",
+      "date_enrollment": "2016-03-07",
+      "offer_year": 1,
+      "student": 10
+    }
+  },
+  {
+    "model": "base.offerenrollment",
+    "pk": 2,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:44:37.317Z",
+      "date_enrollment": "2016-03-07",
+      "offer_year": 1,
+      "student": 9
+    }
+  },
+  {
+    "model": "base.offerenrollment",
+    "pk": 3,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:44:48.292Z",
+      "date_enrollment": "2016-03-07",
+      "offer_year": 1,
+      "student": 8
+    }
+  },
+  {
+    "model": "base.offerenrollment",
+    "pk": 4,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:44:59.963Z",
+      "date_enrollment": "2016-03-07",
+      "offer_year": 1,
+      "student": 7
+    }
+  },
+  {
+    "model": "base.offerenrollment",
+    "pk": 5,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:45:13.636Z",
+      "date_enrollment": "2016-03-07",
+      "offer_year": 1,
+      "student": 6
+    }
+  },
+  {
+    "model": "base.offerenrollment",
+    "pk": 6,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:45:29.143Z",
+      "date_enrollment": "2016-03-07",
+      "offer_year": 4,
+      "student": 5
+    }
+  },
+  {
+    "model": "base.offerenrollment",
+    "pk": 7,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:45:46.993Z",
+      "date_enrollment": "2016-03-07",
+      "offer_year": 4,
+      "student": 4
+    }
+  },
+  {
+    "model": "base.offerenrollment",
+    "pk": 9,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:46:10.762Z",
+      "date_enrollment": "2016-03-07",
+      "offer_year": 4,
+      "student": 3
+    }
+  },
+  {
+    "model": "base.offerenrollment",
+    "pk": 10,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:46:20.622Z",
+      "date_enrollment": "2016-03-07",
+      "offer_year": 4,
+      "student": 2
+    }
+  },
+  {
+    "model": "base.offerenrollment",
+    "pk": 11,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:46:29.661Z",
+      "date_enrollment": "2016-03-07",
+      "offer_year": 4,
+      "student": 1
+    }
+  },
+  {
+    "model": "base.offerenrollment",
+    "pk": 12,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-09T10:26:03.897Z",
+      "date_enrollment": "2016-03-09",
+      "offer_year": 5,
+      "student": 11
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:03:19.241Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 3,
+      "offer_enrollment": 11
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 2,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:03:33.593Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 3,
+      "offer_enrollment": 10
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 3,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:03:43.777Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 3,
+      "offer_enrollment": 9
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 4,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:03:59.260Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 3,
+      "offer_enrollment": 6
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 5,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:04:20.339Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 3,
+      "offer_enrollment": 7
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 6,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:04:45.229Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 3,
+      "offer_enrollment": 5
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 7,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:05:12.451Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 2,
+      "offer_enrollment": 5
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 8,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:05:23.106Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 2,
+      "offer_enrollment": 4
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 9,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:05:33.637Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 2,
+      "offer_enrollment": 3
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 10,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:05:44.973Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 2,
+      "offer_enrollment": 2
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 11,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:05:57.633Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 2,
+      "offer_enrollment": 1
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 12,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:07:04.356Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 2,
+      "offer_enrollment": 6
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 13,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:07:23.132Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 1,
+      "offer_enrollment": 11
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 14,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:07:39.174Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 1,
+      "offer_enrollment": 5
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 15,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:07:49.421Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 1,
+      "offer_enrollment": 4
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 16,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:07:59.596Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 1,
+      "offer_enrollment": 3
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 17,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:08:13.970Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 1,
+      "offer_enrollment": 2
+    }
+  },
+  {
+    "model": "base.learningunitenrollment",
+    "pk": 18,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T10:08:24.006Z",
+      "date_enrollment": "2016-03-07",
+      "learning_unit_year": 1,
+      "offer_enrollment": 1
+    }
+  },
+  {
+    "model": "base.examenrollment",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:28:33.388Z",
+      "score_draft": null,
+      "score_reencoded": null,
+      "score_final": null,
+      "justification_draft": null,
+      "justification_reencoded": null,
+      "justification_final": null,
+      "encoding_status": null,
+      "session_exam": 3,
+      "learning_unit_enrollment": 18
+    }
+  },
+  {
+    "model": "base.examenrollment",
+    "pk": 2,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:28:33.388Z",
+      "score_draft": null,
+      "score_reencoded": null,
+      "score_final": null,
+      "justification_draft": null,
+      "justification_reencoded": null,
+      "justification_final": null,
+      "encoding_status": null,
+      "session_exam": 3,
+      "learning_unit_enrollment": 17
+    }
+  },
+  {
+    "model": "base.examenrollment",
+    "pk": 3,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:28:33.388Z",
+      "score_draft": null,
+      "score_reencoded": null,
+      "score_final": null,
+      "justification_draft": null,
+      "justification_reencoded": null,
+      "justification_final": null,
+      "encoding_status": null,
+      "session_exam": 3,
+      "learning_unit_enrollment": 16
+    }
+  },
+  {
+    "model": "base.examenrollment",
+    "pk": 5,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:28:33.388Z",
+      "score_draft": null,
+      "score_reencoded": null,
+      "score_final": null,
+      "justification_draft": null,
+      "justification_reencoded": null,
+      "justification_final": null,
+      "encoding_status": null,
+      "session_exam": 3,
+      "learning_unit_enrollment": 15
+    }
+  },
+  {
+    "model": "base.examenrollment",
+    "pk": 6,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:28:33.388Z",
+      "score_draft": null,
+      "score_reencoded": null,
+      "score_final": null,
+      "justification_draft": null,
+      "justification_reencoded": null,
+      "justification_final": null,
+      "encoding_status": null,
+      "session_exam": 3,
+      "learning_unit_enrollment": 14
+    }
+  },
+  {
+    "model": "base.examenrollment",
+    "pk": 8,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:28:33.388Z",
+      "score_draft": null,
+      "score_reencoded": null,
+      "score_final": null,
+      "justification_draft": null,
+      "justification_reencoded": null,
+      "justification_final": null,
+      "encoding_status": null,
+      "session_exam": 2,
+      "learning_unit_enrollment": 12
+    }
+  },
+  {
+    "model": "base.examenrollment",
+    "pk": 9,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:28:33.388Z",
+      "score_draft": null,
+      "score_reencoded": null,
+      "score_final": null,
+      "justification_draft": null,
+      "justification_reencoded": null,
+      "justification_final": null,
+      "encoding_status": null,
+      "session_exam": 2,
+      "learning_unit_enrollment": 11
+    }
+  },
+  {
+    "model": "base.examenrollment",
+    "pk": 10,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:28:33.388Z",
+      "score_draft": null,
+      "score_reencoded": null,
+      "score_final": null,
+      "justification_draft": null,
+      "justification_reencoded": null,
+      "justification_final": null,
+      "encoding_status": null,
+      "session_exam": 2,
+      "learning_unit_enrollment": 10
+    }
+  },
+  {
+    "model": "base.examenrollment",
+    "pk": 11,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:28:33.388Z",
+      "score_draft": null,
+      "score_reencoded": null,
+      "score_final": null,
+      "justification_draft": null,
+      "justification_reencoded": null,
+      "justification_final": null,
+      "encoding_status": null,
+      "session_exam": 2,
+      "learning_unit_enrollment": 9
+    }
+  },
+  {
+    "model": "base.examenrollment",
+    "pk": 12,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:28:33.388Z",
+      "score_draft": null,
+      "score_reencoded": null,
+      "score_final": null,
+      "justification_draft": null,
+      "justification_reencoded": null,
+      "justification_final": null,
+      "encoding_status": null,
+      "session_exam": 2,
+      "learning_unit_enrollment": 8
+    }
+  },
+  {
+    "model": "base.examenrollment",
+    "pk": 13,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:28:33.388Z",
+      "score_draft": null,
+      "score_reencoded": null,
+      "score_final": null,
+      "justification_draft": null,
+      "justification_reencoded": null,
+      "justification_final": null,
+      "encoding_status": null,
+      "session_exam": 2,
+      "learning_unit_enrollment": 7
+    }
+  },
+  {
+    "model": "base.examenrollment",
+    "pk": 14,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:28:33.388Z",
+      "score_draft": null,
+      "score_reencoded": null,
+      "score_final": null,
+      "justification_draft": null,
+      "justification_reencoded": null,
+      "justification_final": null,
+      "encoding_status": null,
+      "session_exam": 3,
+      "learning_unit_enrollment": 13
+    }
+  },
+  {
+    "model": "base.organization",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-14T09:34:02.101Z",
+      "name": "Universit\u00e9 catholique de Louvain",
+      "acronym": "UCL",
+      "website": "http://www.uclouvain.be",
+      "reference": null
+    }
+  },
+  {
+    "model": "base.organizationaddress",
+    "pk": 2,
+    "fields": {
+      "organization": 1,
+      "label": "Principal",
+      "location": "1, Place de l'Universit\u00e9",
+      "postal_code": "1348",
+      "city": "Louvain-la-Neuve",
+      "country": "Belgium"
+    }
+  },
+  {
+    "model": "base.personaddress",
+    "pk": 1,
+    "fields": {
+      "person": 1,
+      "label": "Residential",
+      "location": "Place des Pentres 2/102",
+      "postal_code": "1348",
+      "city": "Louvain-la-Neuve",
+      "country": "Belgium"
+    }
+  },
+  {
+    "model": "base.personaddress",
+    "pk": 2,
+    "fields": {
+      "person": 1,
+      "label": "Work",
+      "location": "Rue de l'Universit\u00e9 1",
+      "postal_code": "1348",
+      "city": "Louvain-la-Neuve",
+      "country": "Belgium"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 1,
+    "fields": {
+      "name": "Can add log entry",
+      "content_type": 1,
+      "codename": "add_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 2,
+    "fields": {
+      "name": "Can change log entry",
+      "content_type": 1,
+      "codename": "change_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 3,
+    "fields": {
+      "name": "Can delete log entry",
+      "content_type": 1,
+      "codename": "delete_logentry"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 4,
+    "fields": {
+      "name": "Can add permission",
+      "content_type": 2,
+      "codename": "add_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 5,
+    "fields": {
+      "name": "Can change permission",
+      "content_type": 2,
+      "codename": "change_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 6,
+    "fields": {
+      "name": "Can delete permission",
+      "content_type": 2,
+      "codename": "delete_permission"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 7,
+    "fields": {
+      "name": "Can add group",
+      "content_type": 3,
+      "codename": "add_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 8,
+    "fields": {
+      "name": "Can change group",
+      "content_type": 3,
+      "codename": "change_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 9,
+    "fields": {
+      "name": "Can delete group",
+      "content_type": 3,
+      "codename": "delete_group"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 10,
+    "fields": {
+      "name": "Can add user",
+      "content_type": 4,
+      "codename": "add_user"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 11,
+    "fields": {
+      "name": "Can change user",
+      "content_type": 4,
+      "codename": "change_user"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 12,
+    "fields": {
+      "name": "Can delete user",
+      "content_type": 4,
+      "codename": "delete_user"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 13,
+    "fields": {
+      "name": "Can add content type",
+      "content_type": 5,
+      "codename": "add_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 14,
+    "fields": {
+      "name": "Can change content type",
+      "content_type": 5,
+      "codename": "change_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 15,
+    "fields": {
+      "name": "Can delete content type",
+      "content_type": 5,
+      "codename": "delete_contenttype"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 16,
+    "fields": {
+      "name": "Can add session",
+      "content_type": 6,
+      "codename": "add_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 17,
+    "fields": {
+      "name": "Can change session",
+      "content_type": 6,
+      "codename": "change_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 18,
+    "fields": {
+      "name": "Can delete session",
+      "content_type": 6,
+      "codename": "delete_session"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 19,
+    "fields": {
+      "name": "Can add academic year",
+      "content_type": 7,
+      "codename": "add_academicyear"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 20,
+    "fields": {
+      "name": "Can change academic year",
+      "content_type": 7,
+      "codename": "change_academicyear"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 21,
+    "fields": {
+      "name": "Can delete academic year",
+      "content_type": 7,
+      "codename": "delete_academicyear"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 22,
+    "fields": {
+      "name": "Can add academic calendar",
+      "content_type": 8,
+      "codename": "add_academiccalendar"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 23,
+    "fields": {
+      "name": "Can change academic calendar",
+      "content_type": 8,
+      "codename": "change_academiccalendar"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 24,
+    "fields": {
+      "name": "Can delete academic calendar",
+      "content_type": 8,
+      "codename": "delete_academiccalendar"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 25,
+    "fields": {
+      "name": "Can add learning unit",
+      "content_type": 9,
+      "codename": "add_learningunit"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 26,
+    "fields": {
+      "name": "Can change learning unit",
+      "content_type": 9,
+      "codename": "change_learningunit"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 27,
+    "fields": {
+      "name": "Can delete learning unit",
+      "content_type": 9,
+      "codename": "delete_learningunit"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 28,
+    "fields": {
+      "name": "Can add person",
+      "content_type": 10,
+      "codename": "add_person"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 29,
+    "fields": {
+      "name": "Can change person",
+      "content_type": 10,
+      "codename": "change_person"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 30,
+    "fields": {
+      "name": "Can delete person",
+      "content_type": 10,
+      "codename": "delete_person"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 31,
+    "fields": {
+      "name": "Can add tutor",
+      "content_type": 11,
+      "codename": "add_tutor"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 32,
+    "fields": {
+      "name": "Can change tutor",
+      "content_type": 11,
+      "codename": "change_tutor"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 33,
+    "fields": {
+      "name": "Can delete tutor",
+      "content_type": 11,
+      "codename": "delete_tutor"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 34,
+    "fields": {
+      "name": "Can add attribution",
+      "content_type": 12,
+      "codename": "add_attribution"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 35,
+    "fields": {
+      "name": "Can change attribution",
+      "content_type": 12,
+      "codename": "change_attribution"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 36,
+    "fields": {
+      "name": "Can delete attribution",
+      "content_type": 12,
+      "codename": "delete_attribution"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 37,
+    "fields": {
+      "name": "Can add offer",
+      "content_type": 13,
+      "codename": "add_offer"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 38,
+    "fields": {
+      "name": "Can change offer",
+      "content_type": 13,
+      "codename": "change_offer"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 39,
+    "fields": {
+      "name": "Can delete offer",
+      "content_type": 13,
+      "codename": "delete_offer"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 40,
+    "fields": {
+      "name": "Can add structure",
+      "content_type": 14,
+      "codename": "add_structure"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 41,
+    "fields": {
+      "name": "Can change structure",
+      "content_type": 14,
+      "codename": "change_structure"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 42,
+    "fields": {
+      "name": "Can delete structure",
+      "content_type": 14,
+      "codename": "delete_structure"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 43,
+    "fields": {
+      "name": "Can add offer year",
+      "content_type": 15,
+      "codename": "add_offeryear"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 44,
+    "fields": {
+      "name": "Can change offer year",
+      "content_type": 15,
+      "codename": "change_offeryear"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 45,
+    "fields": {
+      "name": "Can delete offer year",
+      "content_type": 15,
+      "codename": "delete_offeryear"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 46,
+    "fields": {
+      "name": "Can add programme manager",
+      "content_type": 16,
+      "codename": "add_programmemanager"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 47,
+    "fields": {
+      "name": "Can change programme manager",
+      "content_type": 16,
+      "codename": "change_programmemanager"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 48,
+    "fields": {
+      "name": "Can delete programme manager",
+      "content_type": 16,
+      "codename": "delete_programmemanager"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 49,
+    "fields": {
+      "name": "Can add offer year calendar",
+      "content_type": 17,
+      "codename": "add_offeryearcalendar"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 50,
+    "fields": {
+      "name": "Can change offer year calendar",
+      "content_type": 17,
+      "codename": "change_offeryearcalendar"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 51,
+    "fields": {
+      "name": "Can delete offer year calendar",
+      "content_type": 17,
+      "codename": "delete_offeryearcalendar"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 52,
+    "fields": {
+      "name": "Can add learning unit year",
+      "content_type": 18,
+      "codename": "add_learningunityear"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 53,
+    "fields": {
+      "name": "Can change learning unit year",
+      "content_type": 18,
+      "codename": "change_learningunityear"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 54,
+    "fields": {
+      "name": "Can delete learning unit year",
+      "content_type": 18,
+      "codename": "delete_learningunityear"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 55,
+    "fields": {
+      "name": "Can add session exam",
+      "content_type": 19,
+      "codename": "add_sessionexam"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 56,
+    "fields": {
+      "name": "Can change session exam",
+      "content_type": 19,
+      "codename": "change_sessionexam"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 57,
+    "fields": {
+      "name": "Can delete session exam",
+      "content_type": 19,
+      "codename": "delete_sessionexam"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 58,
+    "fields": {
+      "name": "Can add student",
+      "content_type": 20,
+      "codename": "add_student"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 59,
+    "fields": {
+      "name": "Can change student",
+      "content_type": 20,
+      "codename": "change_student"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 60,
+    "fields": {
+      "name": "Can delete student",
+      "content_type": 20,
+      "codename": "delete_student"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 61,
+    "fields": {
+      "name": "Can add offer enrollment",
+      "content_type": 21,
+      "codename": "add_offerenrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 62,
+    "fields": {
+      "name": "Can change offer enrollment",
+      "content_type": 21,
+      "codename": "change_offerenrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 63,
+    "fields": {
+      "name": "Can delete offer enrollment",
+      "content_type": 21,
+      "codename": "delete_offerenrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 64,
+    "fields": {
+      "name": "Can add learning unit enrollment",
+      "content_type": 22,
+      "codename": "add_learningunitenrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 65,
+    "fields": {
+      "name": "Can change learning unit enrollment",
+      "content_type": 22,
+      "codename": "change_learningunitenrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 66,
+    "fields": {
+      "name": "Can delete learning unit enrollment",
+      "content_type": 22,
+      "codename": "delete_learningunitenrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 67,
+    "fields": {
+      "name": "Can add exam enrollment",
+      "content_type": 23,
+      "codename": "add_examenrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 68,
+    "fields": {
+      "name": "Can change exam enrollment",
+      "content_type": 23,
+      "codename": "change_examenrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 69,
+    "fields": {
+      "name": "Can delete exam enrollment",
+      "content_type": 23,
+      "codename": "delete_examenrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 70,
+    "fields": {
+      "name": "Can add exam enrollment history",
+      "content_type": 24,
+      "codename": "add_examenrollmenthistory"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 71,
+    "fields": {
+      "name": "Can change exam enrollment history",
+      "content_type": 24,
+      "codename": "change_examenrollmenthistory"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 72,
+    "fields": {
+      "name": "Can delete exam enrollment history",
+      "content_type": 24,
+      "codename": "delete_examenrollmenthistory"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 73,
+    "fields": {
+      "name": "Can add organization",
+      "content_type": 25,
+      "codename": "add_organization"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 74,
+    "fields": {
+      "name": "Can change organization",
+      "content_type": 25,
+      "codename": "change_organization"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 75,
+    "fields": {
+      "name": "Can delete organization",
+      "content_type": 25,
+      "codename": "delete_organization"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 76,
+    "fields": {
+      "name": "Can add organization address",
+      "content_type": 26,
+      "codename": "add_organizationaddress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 77,
+    "fields": {
+      "name": "Can change organization address",
+      "content_type": 26,
+      "codename": "change_organizationaddress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 78,
+    "fields": {
+      "name": "Can delete organization address",
+      "content_type": 26,
+      "codename": "delete_organizationaddress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 79,
+    "fields": {
+      "name": "Can add person address",
+      "content_type": 27,
+      "codename": "add_personaddress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 80,
+    "fields": {
+      "name": "Can change person address",
+      "content_type": 27,
+      "codename": "change_personaddress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 81,
+    "fields": {
+      "name": "Can delete person address",
+      "content_type": 27,
+      "codename": "delete_personaddress"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 82,
+    "fields": {
+      "name": "Can add internship offer",
+      "content_type": 28,
+      "codename": "add_internshipoffer"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 83,
+    "fields": {
+      "name": "Can change internship offer",
+      "content_type": 28,
+      "codename": "change_internshipoffer"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 84,
+    "fields": {
+      "name": "Can delete internship offer",
+      "content_type": 28,
+      "codename": "delete_internshipoffer"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 85,
+    "fields": {
+      "name": "Can add internship enrollment",
+      "content_type": 29,
+      "codename": "add_internshipenrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 86,
+    "fields": {
+      "name": "Can change internship enrollment",
+      "content_type": 29,
+      "codename": "change_internshipenrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 87,
+    "fields": {
+      "name": "Can delete internship enrollment",
+      "content_type": 29,
+      "codename": "delete_internshipenrollment"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 88,
+    "fields": {
+      "name": "Can add internship master",
+      "content_type": 30,
+      "codename": "add_internshipmaster"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 89,
+    "fields": {
+      "name": "Can change internship master",
+      "content_type": 30,
+      "codename": "change_internshipmaster"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 90,
+    "fields": {
+      "name": "Can delete internship master",
+      "content_type": 30,
+      "codename": "delete_internshipmaster"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 91,
+    "fields": {
+      "name": "Can add message template",
+      "content_type": 31,
+      "codename": "add_messagetemplate"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 92,
+    "fields": {
+      "name": "Can change message template",
+      "content_type": 31,
+      "codename": "change_messagetemplate"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 93,
+    "fields": {
+      "name": "Can delete message template",
+      "content_type": 31,
+      "codename": "delete_messagetemplate"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 94,
+    "fields": {
+      "name": "Can add document file",
+      "content_type": 32,
+      "codename": "add_documentfile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 95,
+    "fields": {
+      "name": "Can change document file",
+      "content_type": 32,
+      "codename": "change_documentfile"
+    }
+  },
+  {
+    "model": "auth.permission",
+    "pk": 96,
+    "fields": {
+      "name": "Can delete document file",
+      "content_type": 32,
+      "codename": "delete_documentfile"
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 1,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$4KbYsf7KFKnx$St8/RGhg27002yq9O2wglhekQxSteOcHDbiPN5ZLrDE=",
+      "last_login": "2016-03-08T22:41:36.559Z",
+      "is_superuser": true,
+      "username": "osis",
+      "first_name": "",
+      "last_name": "",
+      "email": "osis@uclouvain.be",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:30:14.454Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 2,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$1oPDMvSF4iXl$Mg9s6SmklJVihtin/eMie+AmxDx+k1xOgm4VC47ZxEI=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "jean",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:31:34.097Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 3,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$O9FQLGtOHbz7$PXyPyIN1iXAJ2c7XYRcWvqennQzfG7PeGnCWq2eEDFE=",
+      "last_login": "2016-03-08T15:01:26.547Z",
+      "is_superuser": false,
+      "username": "benoit",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:32:02.438Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 4,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$oB7ABPPbzBG2$jTWJk3CZfws5cPjHH4tBR3c3pRYRy1mS4ToxxX3G03o=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "janini",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:32:40.953Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 5,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$vSqrhnD50ece$Ywlj4wU7GdmBbVXFW2iGdLMsMM1f06CidUnYm+1zh68=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "marie",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:33:22.469Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 6,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$IDClfdyR9k7r$5bTHOUwKXn1C14HfIPEzYImTnEbtT3Ns8ZppPvVdUuA=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "manuel",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:33:47.208Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 7,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$TKq9v6P8Bmro$qFhfqH5uvJ5Fp2WP77FOAekdqGCmSWYu1ORmiOZvCdQ=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "christine",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:34:11.554Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 8,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$Ou6W8QhfdgQl$vXUBSXJMZb6EVHZpmjRtLCKYR0euWdbqmCeo50VT7wU=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "philippe",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:34:32.527Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 9,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$9w5B9rqXPE3e$y3Om1RCLv4MlH3FU6tcXJnd+oRrZ2NGSlWMwtcCPJxk=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "joel",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:34:52.943Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 10,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$4aDdee0Q9fwf$ir13kYlMwzxishX3C34QqPcb7mqt4PqyunsJoZevb6U=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "antonin",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:35:16.182Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 11,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$hxOXhdWrVQqW$+GDC37iZe6MuvusWgJ4lTjllJ+xP06221sYIPyP4E0E=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "axel",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:35:32.222Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 12,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$OuTrYHSAEOAx$3yQ3tGANnM1Gdgrqq4iSYS/di5u4nPoURJ/nee1Z5zI=",
+      "last_login": "2016-03-14T09:19:44.776Z",
+      "is_superuser": true,
+      "username": "beto",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": true,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:35:58Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 13,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$qBfJu5HwEX9W$tni7tng0ofqh1PuqMSCKACUCJP6upbYfZIsGPmkbyk4=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "leila",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:36:14.882Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 14,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$2LLozGTj905G$bAH+avZSOwZKi04PggwocPOMsfu/ig00sPGYFHKrrpk=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "vick",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:36:43.665Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 15,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$X792PQu0lNSM$Sf9QCh6hq/na2JNax3N8Rzgqelixx1ujWtn/oM6Qxyk=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "lionel",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:37:03.514Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 16,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$2TbWjkxjZ9Ng$PvjgviAKiq5cPig6L6qUgtztAfewdvGGWrKVmkkDKgM=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "vincent",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:37:38.061Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 17,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$xAV4SPb1Bst4$EUjyPehfIT1OByK3NIc4M7xJOSvrXGTzPaXhHjtHXjw=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "damien",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:46:36.888Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 18,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$MPV7iiUlnTwt$1DiPFJcsEqppbqB+MTicCDYSuSOnIcsPSIFMC/eUnr8=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "simon",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:47:16.352Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 19,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$JWMN1W89bD42$LLg7UWjChe2cyB9EJJcVM1ixBvKHb1+5SQLLg6QGsuM=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "james",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:47:36.356Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "auth.user",
+    "pk": 20,
+    "fields": {
+      "password": "pbkdf2_sha256$24000$f6Rg8TpUpNRU$Z9zN1lxGVHa8B6UeXVdCu/dVmoUASPGO71GMoLiAjp0=",
+      "last_login": null,
+      "is_superuser": false,
+      "username": "lilou",
+      "first_name": "",
+      "last_name": "",
+      "email": "",
+      "is_staff": false,
+      "is_active": true,
+      "date_joined": "2016-03-04T20:48:12.108Z",
+      "groups": [],
+      "user_permissions": []
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 1,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-09T22:34:32.799Z",
+      "user": 12,
+      "global_id": "123456",
+      "gender": "M",
+      "national_id": "0987654321",
+      "first_name": "Hildeberto",
+      "middle_name": "",
+      "last_name": "Mendon\u00e7a Filho",
+      "email": "me@hildeberto.com",
+      "phone": "",
+      "phone_mobile": "0473177604",
+      "language": "FR"
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 2,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:06:16.804Z",
+      "user": 10,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Antonin",
+      "middle_name": "",
+      "last_name": "Dubois",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 3,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:07:01.339Z",
+      "user": 11,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Axel",
+      "middle_name": "",
+      "last_name": "Guerin",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 4,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:07:30.252Z",
+      "user": 3,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Benoit",
+      "middle_name": "",
+      "last_name": "Roussel",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 5,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:07:57.922Z",
+      "user": 7,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Christine",
+      "middle_name": "",
+      "last_name": "Legrand",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 6,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:08:29.225Z",
+      "user": 17,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Damien",
+      "middle_name": "",
+      "last_name": "Gauthier",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 7,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:08:58.949Z",
+      "user": 19,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "James",
+      "middle_name": "",
+      "last_name": "Robin",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 8,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:09:25.042Z",
+      "user": 4,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Janini",
+      "middle_name": "",
+      "last_name": "Lopez",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 9,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:09:51.984Z",
+      "user": 2,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Jean",
+      "middle_name": "",
+      "last_name": "Fournier",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 10,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:10:20.940Z",
+      "user": 9,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Joel",
+      "middle_name": "",
+      "last_name": "Fontaine",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 11,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:11:03.611Z",
+      "user": 13,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Leila",
+      "middle_name": "",
+      "last_name": "Martinez",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 12,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:11:56.769Z",
+      "user": 20,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Lilou",
+      "middle_name": "",
+      "last_name": "Garnier",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 13,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:12:22.678Z",
+      "user": 15,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Lionel",
+      "middle_name": "",
+      "last_name": "Girard",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 14,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:12:46.637Z",
+      "user": 6,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Manuel",
+      "middle_name": "",
+      "last_name": "Bertrand",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 15,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:13:36.001Z",
+      "user": 5,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Marie",
+      "middle_name": "",
+      "last_name": "Lefevre",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 16,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:14:22.292Z",
+      "user": 8,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Philippe",
+      "middle_name": "",
+      "last_name": "Couturier",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 17,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:14:46.522Z",
+      "user": 18,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Simon",
+      "middle_name": "",
+      "last_name": "Delaunay",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 18,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:15:04.752Z",
+      "user": 14,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Vick",
+      "middle_name": "",
+      "last_name": "Vaporub",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "base.person",
+    "pk": 19,
+    "fields": {
+      "external_id": null,
+      "changed": "2016-03-07T09:15:19.823Z",
+      "user": 16,
+      "global_id": "",
+      "gender": "U",
+      "national_id": "",
+      "first_name": "Vincent",
+      "middle_name": "",
+      "last_name": "Nicolas",
+      "email": "",
+      "phone": "",
+      "phone_mobile": "",
+      "language": null
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 1,
+    "fields": {
+      "action_time": "2016-03-04T20:31:34.119Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "2",
+      "object_repr": "jean",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 2,
+    "fields": {
+      "action_time": "2016-03-04T20:32:02.470Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "3",
+      "object_repr": "benoit",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 3,
+    "fields": {
+      "action_time": "2016-03-04T20:32:40.985Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "4",
+      "object_repr": "janini",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 4,
+    "fields": {
+      "action_time": "2016-03-04T20:33:22.495Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "5",
+      "object_repr": "marie",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 5,
+    "fields": {
+      "action_time": "2016-03-04T20:33:47.242Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "6",
+      "object_repr": "manuel",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 6,
+    "fields": {
+      "action_time": "2016-03-04T20:34:11.579Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "7",
+      "object_repr": "christine",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 7,
+    "fields": {
+      "action_time": "2016-03-04T20:34:32.557Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "8",
+      "object_repr": "philippe",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 8,
+    "fields": {
+      "action_time": "2016-03-04T20:34:52.973Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "9",
+      "object_repr": "joel",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 9,
+    "fields": {
+      "action_time": "2016-03-04T20:35:16.206Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "10",
+      "object_repr": "antonin",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 10,
+    "fields": {
+      "action_time": "2016-03-04T20:35:32.252Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "11",
+      "object_repr": "axel",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 11,
+    "fields": {
+      "action_time": "2016-03-04T20:35:58.733Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "12",
+      "object_repr": "beto",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 12,
+    "fields": {
+      "action_time": "2016-03-04T20:36:14.916Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "13",
+      "object_repr": "leila",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 13,
+    "fields": {
+      "action_time": "2016-03-04T20:36:43.687Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "14",
+      "object_repr": "vick",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 14,
+    "fields": {
+      "action_time": "2016-03-04T20:37:03.544Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "15",
+      "object_repr": "lionel",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 15,
+    "fields": {
+      "action_time": "2016-03-04T20:37:38.086Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "16",
+      "object_repr": "vincent",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 16,
+    "fields": {
+      "action_time": "2016-03-04T20:46:36.922Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "17",
+      "object_repr": "damien",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 17,
+    "fields": {
+      "action_time": "2016-03-04T20:47:16.379Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "18",
+      "object_repr": "simon",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 18,
+    "fields": {
+      "action_time": "2016-03-04T20:47:36.391Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "19",
+      "object_repr": "james",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 19,
+    "fields": {
+      "action_time": "2016-03-04T20:48:12.132Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "20",
+      "object_repr": "lilou",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 20,
+    "fields": {
+      "action_time": "2016-03-04T20:51:43.876Z",
+      "user": 1,
+      "content_type": 7,
+      "object_id": "1",
+      "object_repr": "2015-2016",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 21,
+    "fields": {
+      "action_time": "2016-03-04T20:53:07.790Z",
+      "user": 1,
+      "content_type": 7,
+      "object_id": "2",
+      "object_repr": "2016-2017",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 22,
+    "fields": {
+      "action_time": "2016-03-04T22:16:43.436Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "1",
+      "object_repr": "MENDON\u00c7A FILHO, Hildeberto ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 23,
+    "fields": {
+      "action_time": "2016-03-04T22:16:49.155Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "1",
+      "object_repr": "MENDON\u00c7A FILHO, Hildeberto ",
+      "action_flag": 2,
+      "change_message": "Aucun champ modifi\u00e9."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 24,
+    "fields": {
+      "action_time": "2016-03-04T22:38:39.966Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "1",
+      "object_repr": "BIR1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 25,
+    "fields": {
+      "action_time": "2016-03-04T22:39:30.884Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "2",
+      "object_repr": "DROI1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 26,
+    "fields": {
+      "action_time": "2016-03-04T22:40:37.544Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "3",
+      "object_repr": "SINF1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 27,
+    "fields": {
+      "action_time": "2016-03-04T22:42:32.506Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "4",
+      "object_repr": "COMU1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 28,
+    "fields": {
+      "action_time": "2016-03-04T22:43:16.382Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "5",
+      "object_repr": "SBIM1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 29,
+    "fields": {
+      "action_time": "2016-03-04T22:44:58.317Z",
+      "user": 1,
+      "content_type": 13,
+      "object_id": "6",
+      "object_repr": "HIST1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 30,
+    "fields": {
+      "action_time": "2016-03-04T23:19:55.434Z",
+      "user": 1,
+      "content_type": 25,
+      "object_id": "1",
+      "object_repr": "Universit\u00e9 catholique de Louvain",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 31,
+    "fields": {
+      "action_time": "2016-03-04T23:21:19.805Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "1",
+      "object_repr": "SST - Sector sciences et technologies",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 32,
+    "fields": {
+      "action_time": "2016-03-04T23:21:55.775Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "2",
+      "object_repr": "SSS - Secteur sciences de la sante",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 33,
+    "fields": {
+      "action_time": "2016-03-04T23:22:27.367Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "3",
+      "object_repr": "SSH - Secteur sciences humaines",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 34,
+    "fields": {
+      "action_time": "2016-03-04T23:24:07.742Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "4",
+      "object_repr": "AGRO - Facult\u00e9 des bioing\u00e9nieurs",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 35,
+    "fields": {
+      "action_time": "2016-03-04T23:29:19.548Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "5",
+      "object_repr": "DRT - Facult\u00e9 de droit et de criminologie",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 36,
+    "fields": {
+      "action_time": "2016-03-04T23:31:15.646Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "6",
+      "object_repr": "EPL - Ecole polytechnique de Louvain",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 37,
+    "fields": {
+      "action_time": "2016-03-04T23:32:18.298Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "7",
+      "object_repr": "FASB - Facult\u00e9 de pharmacie et sciences biom\u00e9dicales",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 38,
+    "fields": {
+      "action_time": "2016-03-04T23:33:46.022Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "8",
+      "object_repr": "MEDE - Facult\u00e9 de m\u00e9decine et m\u00e9decine dentaire",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 39,
+    "fields": {
+      "action_time": "2016-03-04T23:37:15.359Z",
+      "user": 1,
+      "content_type": 15,
+      "object_id": "1",
+      "object_repr": "2015-2016 - DROI1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 40,
+    "fields": {
+      "action_time": "2016-03-04T23:40:42.474Z",
+      "user": 1,
+      "content_type": 16,
+      "object_id": "1",
+      "object_repr": "MENDON\u00c7A FILHO, Hildeberto  - 2015-2016 - DROI1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 41,
+    "fields": {
+      "action_time": "2016-03-07T09:06:16.809Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "2",
+      "object_repr": "DUBOIS, Antonin ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 42,
+    "fields": {
+      "action_time": "2016-03-07T09:07:01.343Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "3",
+      "object_repr": "GUERIN, Axel ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 43,
+    "fields": {
+      "action_time": "2016-03-07T09:07:30.256Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "4",
+      "object_repr": "ROUSSEL, Benoit ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 44,
+    "fields": {
+      "action_time": "2016-03-07T09:07:57.926Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "5",
+      "object_repr": "LEGRAND, Christine ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 45,
+    "fields": {
+      "action_time": "2016-03-07T09:08:29.228Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "6",
+      "object_repr": "GAUTHIER, Damien ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 46,
+    "fields": {
+      "action_time": "2016-03-07T09:08:58.953Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "7",
+      "object_repr": "ROBIN, James ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 47,
+    "fields": {
+      "action_time": "2016-03-07T09:09:25.046Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "8",
+      "object_repr": "LOPEZ, Janini ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 48,
+    "fields": {
+      "action_time": "2016-03-07T09:09:51.988Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "9",
+      "object_repr": "FOURNIER, Jean ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 49,
+    "fields": {
+      "action_time": "2016-03-07T09:10:20.944Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "10",
+      "object_repr": "FONTAINE, Joel ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 50,
+    "fields": {
+      "action_time": "2016-03-07T09:11:03.615Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "11",
+      "object_repr": "MARTINEZ, Leila ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 51,
+    "fields": {
+      "action_time": "2016-03-07T09:11:56.773Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "12",
+      "object_repr": "GARNIER, Lilou ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 52,
+    "fields": {
+      "action_time": "2016-03-07T09:12:22.682Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "13",
+      "object_repr": "GIRARD, Lionel ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 53,
+    "fields": {
+      "action_time": "2016-03-07T09:12:46.642Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "14",
+      "object_repr": "BERTRAND, Manuel ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 54,
+    "fields": {
+      "action_time": "2016-03-07T09:13:36.007Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "15",
+      "object_repr": "LEFEVRE, Marie ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 55,
+    "fields": {
+      "action_time": "2016-03-07T09:14:22.298Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "16",
+      "object_repr": "COUTURIER, Philippe ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 56,
+    "fields": {
+      "action_time": "2016-03-07T09:14:46.526Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "17",
+      "object_repr": "DELAUNAY, Simon ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 57,
+    "fields": {
+      "action_time": "2016-03-07T09:15:04.756Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "18",
+      "object_repr": "VAPORUB, Vick ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 58,
+    "fields": {
+      "action_time": "2016-03-07T09:15:19.828Z",
+      "user": 1,
+      "content_type": 10,
+      "object_id": "19",
+      "object_repr": "NICOLAS, Vincent ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 59,
+    "fields": {
+      "action_time": "2016-03-07T09:16:03.030Z",
+      "user": 1,
+      "content_type": 20,
+      "object_id": "1",
+      "object_repr": "NICOLAS, Vincent  (321654)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 60,
+    "fields": {
+      "action_time": "2016-03-07T09:16:13.739Z",
+      "user": 1,
+      "content_type": 20,
+      "object_id": "2",
+      "object_repr": "VAPORUB, Vick  (123456)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 61,
+    "fields": {
+      "action_time": "2016-03-07T09:16:24.786Z",
+      "user": 1,
+      "content_type": 20,
+      "object_id": "3",
+      "object_repr": "DELAUNAY, Simon  (123789)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 62,
+    "fields": {
+      "action_time": "2016-03-07T09:16:34.891Z",
+      "user": 1,
+      "content_type": 20,
+      "object_id": "4",
+      "object_repr": "COUTURIER, Philippe  (789123)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 63,
+    "fields": {
+      "action_time": "2016-03-07T09:16:48.927Z",
+      "user": 1,
+      "content_type": 20,
+      "object_id": "5",
+      "object_repr": "LEFEVRE, Marie  (741852)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 64,
+    "fields": {
+      "action_time": "2016-03-07T09:17:07.413Z",
+      "user": 1,
+      "content_type": 20,
+      "object_id": "6",
+      "object_repr": "BERTRAND, Manuel  (963456)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 65,
+    "fields": {
+      "action_time": "2016-03-07T09:17:18.688Z",
+      "user": 1,
+      "content_type": 20,
+      "object_id": "7",
+      "object_repr": "GIRARD, Lionel  (951425)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 66,
+    "fields": {
+      "action_time": "2016-03-07T09:17:29.516Z",
+      "user": 1,
+      "content_type": 20,
+      "object_id": "8",
+      "object_repr": "GARNIER, Lilou  (965874)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 67,
+    "fields": {
+      "action_time": "2016-03-07T09:17:45.020Z",
+      "user": 1,
+      "content_type": 20,
+      "object_id": "9",
+      "object_repr": "MARTINEZ, Leila  (369852)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 68,
+    "fields": {
+      "action_time": "2016-03-07T09:17:56.329Z",
+      "user": 1,
+      "content_type": 20,
+      "object_id": "10",
+      "object_repr": "FONTAINE, Joel  (985245)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 69,
+    "fields": {
+      "action_time": "2016-03-07T09:18:33.163Z",
+      "user": 1,
+      "content_type": 11,
+      "object_id": "1",
+      "object_repr": "FOURNIER, Jean ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 70,
+    "fields": {
+      "action_time": "2016-03-07T09:24:39.144Z",
+      "user": 1,
+      "content_type": 15,
+      "object_id": "3",
+      "object_repr": "2015-2016 - SBIM1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 71,
+    "fields": {
+      "action_time": "2016-03-07T09:27:17.331Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "9",
+      "object_repr": "ESPO - Facult\u00e9 des sciences \u00e9conomiques, sociales, politiques et de communication",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 72,
+    "fields": {
+      "action_time": "2016-03-07T09:27:25.774Z",
+      "user": 1,
+      "content_type": 15,
+      "object_id": "4",
+      "object_repr": "2015-2016 - COMU1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 73,
+    "fields": {
+      "action_time": "2016-03-07T09:28:27.367Z",
+      "user": 1,
+      "content_type": 15,
+      "object_id": "5",
+      "object_repr": "2015-2016 - SINF1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 74,
+    "fields": {
+      "action_time": "2016-03-07T09:29:20.599Z",
+      "user": 1,
+      "content_type": 15,
+      "object_id": "6",
+      "object_repr": "2015-2016 - SINF1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 75,
+    "fields": {
+      "action_time": "2016-03-07T09:30:54.489Z",
+      "user": 1,
+      "content_type": 15,
+      "object_id": "6",
+      "object_repr": "2015-2016 - FSA1BA",
+      "action_flag": 2,
+      "change_message": "Modification de acronym."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 76,
+    "fields": {
+      "action_time": "2016-03-07T09:31:36.408Z",
+      "user": 1,
+      "content_type": 15,
+      "object_id": "6",
+      "object_repr": "2015-2016 - FSA1BA",
+      "action_flag": 2,
+      "change_message": "Modification de title."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 77,
+    "fields": {
+      "action_time": "2016-03-07T09:33:47.210Z",
+      "user": 1,
+      "content_type": 9,
+      "object_id": "1",
+      "object_repr": "LDROI1003 - Fondements romains du droit",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 78,
+    "fields": {
+      "action_time": "2016-03-07T09:34:11.411Z",
+      "user": 1,
+      "content_type": 9,
+      "object_id": "2",
+      "object_repr": "LDROI1004 - Histoire du droit",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 79,
+    "fields": {
+      "action_time": "2016-03-07T09:43:27.926Z",
+      "user": 1,
+      "content_type": 9,
+      "object_id": "3",
+      "object_repr": "LCOPS1113 - Histoire moderne et contemporaine",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 80,
+    "fields": {
+      "action_time": "2016-03-07T09:44:25.837Z",
+      "user": 1,
+      "content_type": 21,
+      "object_id": "1",
+      "object_repr": "FONTAINE, Joel  (985245) - 2015-2016 - DROI1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 81,
+    "fields": {
+      "action_time": "2016-03-07T09:44:37.324Z",
+      "user": 1,
+      "content_type": 21,
+      "object_id": "2",
+      "object_repr": "MARTINEZ, Leila  (369852) - 2015-2016 - DROI1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 82,
+    "fields": {
+      "action_time": "2016-03-07T09:44:48.299Z",
+      "user": 1,
+      "content_type": 21,
+      "object_id": "3",
+      "object_repr": "GARNIER, Lilou  (965874) - 2015-2016 - DROI1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 83,
+    "fields": {
+      "action_time": "2016-03-07T09:44:59.971Z",
+      "user": 1,
+      "content_type": 21,
+      "object_id": "4",
+      "object_repr": "GIRARD, Lionel  (951425) - 2015-2016 - DROI1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 84,
+    "fields": {
+      "action_time": "2016-03-07T09:45:13.643Z",
+      "user": 1,
+      "content_type": 21,
+      "object_id": "5",
+      "object_repr": "BERTRAND, Manuel  (963456) - 2015-2016 - DROI1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 85,
+    "fields": {
+      "action_time": "2016-03-07T09:45:29.150Z",
+      "user": 1,
+      "content_type": 21,
+      "object_id": "6",
+      "object_repr": "LEFEVRE, Marie  (741852) - 2015-2016 - COMU1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 86,
+    "fields": {
+      "action_time": "2016-03-07T09:45:47.002Z",
+      "user": 1,
+      "content_type": 21,
+      "object_id": "7",
+      "object_repr": "COUTURIER, Philippe  (789123) - 2015-2016 - COMU1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 87,
+    "fields": {
+      "action_time": "2016-03-07T09:45:57.572Z",
+      "user": 1,
+      "content_type": 21,
+      "object_id": "8",
+      "object_repr": "DELAUNAY, Simon  (123789) - 2015-2016 - COMU1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 88,
+    "fields": {
+      "action_time": "2016-03-07T09:46:10.770Z",
+      "user": 1,
+      "content_type": 21,
+      "object_id": "9",
+      "object_repr": "DELAUNAY, Simon  (123789) - 2015-2016 - COMU1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 89,
+    "fields": {
+      "action_time": "2016-03-07T09:46:20.627Z",
+      "user": 1,
+      "content_type": 21,
+      "object_id": "10",
+      "object_repr": "VAPORUB, Vick  (123456) - 2015-2016 - COMU1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 90,
+    "fields": {
+      "action_time": "2016-03-07T09:46:29.668Z",
+      "user": 1,
+      "content_type": 21,
+      "object_id": "11",
+      "object_repr": "NICOLAS, Vincent  (321654) - 2015-2016 - COMU1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 91,
+    "fields": {
+      "action_time": "2016-03-07T09:46:46.550Z",
+      "user": 1,
+      "content_type": 21,
+      "object_id": "8",
+      "object_repr": "DELAUNAY, Simon  (123789) - 2015-2016 - COMU1BA",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 92,
+    "fields": {
+      "action_time": "2016-03-07T09:48:14.324Z",
+      "user": 1,
+      "content_type": 17,
+      "object_id": "2",
+      "object_repr": "2015-2016 Encodage des notes - 1er session d'examen  - 2015-2016 - DROI1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 93,
+    "fields": {
+      "action_time": "2016-03-07T09:48:47.739Z",
+      "user": 1,
+      "content_type": 17,
+      "object_id": "1",
+      "object_repr": "2015-2016 Encodage des notes - 1er session d'examen  - 2015-2016 - COMU1BA",
+      "action_flag": 2,
+      "change_message": "Modification de offer_year, academic_calendar, start_date et end_date."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 94,
+    "fields": {
+      "action_time": "2016-03-07T09:50:18.003Z",
+      "user": 1,
+      "content_type": 18,
+      "object_id": "1",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 95,
+    "fields": {
+      "action_time": "2016-03-07T09:51:41.369Z",
+      "user": 1,
+      "content_type": 18,
+      "object_id": "2",
+      "object_repr": "2015-2016 - LDROI1004 - Histoire du droit",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 96,
+    "fields": {
+      "action_time": "2016-03-07T09:52:19.201Z",
+      "user": 1,
+      "content_type": 18,
+      "object_id": "3",
+      "object_repr": "2015-2016 - LCOPS1113 - Histoire moderne et contemporaine",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 97,
+    "fields": {
+      "action_time": "2016-03-07T09:59:13.706Z",
+      "user": 1,
+      "content_type": 12,
+      "object_id": "1",
+      "object_repr": "FOURNIER, Jean  - PROFESSOR",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 98,
+    "fields": {
+      "action_time": "2016-03-07T09:59:52.250Z",
+      "user": 1,
+      "content_type": 11,
+      "object_id": "2",
+      "object_repr": "ROUSSEL, Benoit ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 99,
+    "fields": {
+      "action_time": "2016-03-07T10:00:19.278Z",
+      "user": 1,
+      "content_type": 12,
+      "object_id": "2",
+      "object_repr": "ROUSSEL, Benoit  - PROFESSOR",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 100,
+    "fields": {
+      "action_time": "2016-03-07T10:00:31.199Z",
+      "user": 1,
+      "content_type": 12,
+      "object_id": "3",
+      "object_repr": "ROUSSEL, Benoit  - PROFESSOR",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 101,
+    "fields": {
+      "action_time": "2016-03-07T10:02:11.307Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "1",
+      "object_repr": "2015-2016 - LCOPS1113 - Histoire moderne et contemporaine - 1",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 102,
+    "fields": {
+      "action_time": "2016-03-07T10:02:26.725Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "2",
+      "object_repr": "2015-2016 - LDROI1004 - Histoire du droit - 1",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 103,
+    "fields": {
+      "action_time": "2016-03-07T10:02:38.471Z",
+      "user": 1,
+      "content_type": 19,
+      "object_id": "3",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - 1",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 104,
+    "fields": {
+      "action_time": "2016-03-07T10:03:19.251Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "1",
+      "object_repr": "2015-2016 - LCOPS1113 - Histoire moderne et contemporaine - NICOLAS, Vincent  (321654)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 105,
+    "fields": {
+      "action_time": "2016-03-07T10:03:33.602Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "2",
+      "object_repr": "2015-2016 - LCOPS1113 - Histoire moderne et contemporaine - VAPORUB, Vick  (123456)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 106,
+    "fields": {
+      "action_time": "2016-03-07T10:03:43.785Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "3",
+      "object_repr": "2015-2016 - LCOPS1113 - Histoire moderne et contemporaine - DELAUNAY, Simon  (123789)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 107,
+    "fields": {
+      "action_time": "2016-03-07T10:03:59.269Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "4",
+      "object_repr": "2015-2016 - LCOPS1113 - Histoire moderne et contemporaine - LEFEVRE, Marie  (741852)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 108,
+    "fields": {
+      "action_time": "2016-03-07T10:04:20.348Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "5",
+      "object_repr": "2015-2016 - LCOPS1113 - Histoire moderne et contemporaine - COUTURIER, Philippe  (789123)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 109,
+    "fields": {
+      "action_time": "2016-03-07T10:04:45.238Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "6",
+      "object_repr": "2015-2016 - LCOPS1113 - Histoire moderne et contemporaine - BERTRAND, Manuel  (963456)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 110,
+    "fields": {
+      "action_time": "2016-03-07T10:05:12.461Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "7",
+      "object_repr": "2015-2016 - LDROI1004 - Histoire du droit - BERTRAND, Manuel  (963456)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 111,
+    "fields": {
+      "action_time": "2016-03-07T10:05:23.115Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "8",
+      "object_repr": "2015-2016 - LDROI1004 - Histoire du droit - GIRARD, Lionel  (951425)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 112,
+    "fields": {
+      "action_time": "2016-03-07T10:05:33.646Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "9",
+      "object_repr": "2015-2016 - LDROI1004 - Histoire du droit - GARNIER, Lilou  (965874)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 113,
+    "fields": {
+      "action_time": "2016-03-07T10:05:44.982Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "10",
+      "object_repr": "2015-2016 - LDROI1004 - Histoire du droit - MARTINEZ, Leila  (369852)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 114,
+    "fields": {
+      "action_time": "2016-03-07T10:05:57.641Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "11",
+      "object_repr": "2015-2016 - LDROI1004 - Histoire du droit - FONTAINE, Joel  (985245)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 115,
+    "fields": {
+      "action_time": "2016-03-07T10:07:04.367Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "12",
+      "object_repr": "2015-2016 - LDROI1004 - Histoire du droit - LEFEVRE, Marie  (741852)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 116,
+    "fields": {
+      "action_time": "2016-03-07T10:07:23.140Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "13",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - NICOLAS, Vincent  (321654)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 117,
+    "fields": {
+      "action_time": "2016-03-07T10:07:39.186Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "14",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - BERTRAND, Manuel  (963456)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 118,
+    "fields": {
+      "action_time": "2016-03-07T10:07:49.429Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "15",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - GIRARD, Lionel  (951425)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 119,
+    "fields": {
+      "action_time": "2016-03-07T10:07:59.605Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "16",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - GARNIER, Lilou  (965874)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 120,
+    "fields": {
+      "action_time": "2016-03-07T10:08:13.979Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "17",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - MARTINEZ, Leila  (369852)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 121,
+    "fields": {
+      "action_time": "2016-03-07T10:08:24.015Z",
+      "user": 1,
+      "content_type": 22,
+      "object_id": "18",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - FONTAINE, Joel  (985245)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 122,
+    "fields": {
+      "action_time": "2016-03-07T10:10:44.348Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "1",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - 1 - 2015-2016 - LDROI1003 - Fondements romains du droit - FONTAINE, Joel  (985245)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 123,
+    "fields": {
+      "action_time": "2016-03-07T10:10:54.668Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "2",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - 1 - 2015-2016 - LDROI1003 - Fondements romains du droit - MARTINEZ, Leila  (369852)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 124,
+    "fields": {
+      "action_time": "2016-03-07T10:11:05.597Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "3",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - 1 - 2015-2016 - LDROI1003 - Fondements romains du droit - GARNIER, Lilou  (965874)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 125,
+    "fields": {
+      "action_time": "2016-03-07T10:11:21.389Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "4",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - 1 - 2015-2016 - LDROI1003 - Fondements romains du droit - GIRARD, Lionel  (951425)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 126,
+    "fields": {
+      "action_time": "2016-03-07T10:11:38.761Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "5",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - 1 - 2015-2016 - LDROI1003 - Fondements romains du droit - GIRARD, Lionel  (951425)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 127,
+    "fields": {
+      "action_time": "2016-03-07T10:11:45.653Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "4",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - 1 - 2015-2016 - LDROI1003 - Fondements romains du droit - GIRARD, Lionel  (951425)",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 128,
+    "fields": {
+      "action_time": "2016-03-07T10:12:02.324Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "6",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - 1 - 2015-2016 - LDROI1003 - Fondements romains du droit - BERTRAND, Manuel  (963456)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 129,
+    "fields": {
+      "action_time": "2016-03-07T10:12:22.845Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "7",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - 1 - 2015-2016 - LDROI1003 - Fondements romains du droit - NICOLAS, Vincent  (321654)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 130,
+    "fields": {
+      "action_time": "2016-03-07T10:21:12.029Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "8",
+      "object_repr": "2015-2016 - LDROI1004 - Histoire du droit - 1 - 2015-2016 - LDROI1004 - Histoire du droit - LEFEVRE, Marie  (741852)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 131,
+    "fields": {
+      "action_time": "2016-03-07T10:21:21.948Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "9",
+      "object_repr": "2015-2016 - LDROI1004 - Histoire du droit - 1 - 2015-2016 - LDROI1004 - Histoire du droit - FONTAINE, Joel  (985245)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 132,
+    "fields": {
+      "action_time": "2016-03-07T10:21:31.882Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "10",
+      "object_repr": "2015-2016 - LDROI1004 - Histoire du droit - 1 - 2015-2016 - LDROI1004 - Histoire du droit - MARTINEZ, Leila  (369852)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 133,
+    "fields": {
+      "action_time": "2016-03-07T10:21:42.673Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "11",
+      "object_repr": "2015-2016 - LDROI1004 - Histoire du droit - 1 - 2015-2016 - LDROI1004 - Histoire du droit - GARNIER, Lilou  (965874)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 134,
+    "fields": {
+      "action_time": "2016-03-07T10:21:53.467Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "12",
+      "object_repr": "2015-2016 - LDROI1004 - Histoire du droit - 1 - 2015-2016 - LDROI1004 - Histoire du droit - GIRARD, Lionel  (951425)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 135,
+    "fields": {
+      "action_time": "2016-03-07T10:22:05.905Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "13",
+      "object_repr": "2015-2016 - LDROI1004 - Histoire du droit - 1 - 2015-2016 - LDROI1004 - Histoire du droit - BERTRAND, Manuel  (963456)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 136,
+    "fields": {
+      "action_time": "2016-03-07T12:18:18.918Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "10",
+      "object_repr": "TECO - TECO",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 137,
+    "fields": {
+      "action_time": "2016-03-07T12:19:05.637Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "11",
+      "object_repr": "MEDE - MEDE",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 138,
+    "fields": {
+      "action_time": "2016-03-07T12:19:43.162Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "11",
+      "object_repr": "FSP - FSP",
+      "action_flag": 2,
+      "change_message": "Modification de acronym et title."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 139,
+    "fields": {
+      "action_time": "2016-03-07T12:20:40.593Z",
+      "user": 1,
+      "content_type": 14,
+      "object_id": "12",
+      "object_repr": "LOCI - LOCI",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 140,
+    "fields": {
+      "action_time": "2016-03-07T12:38:29.548Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "7",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - 1 - 2015-2016 - LDROI1003 - Fondements romains du droit - NICOLAS, Vincent  (321654)",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 141,
+    "fields": {
+      "action_time": "2016-03-07T12:41:05.184Z",
+      "user": 1,
+      "content_type": 23,
+      "object_id": "14",
+      "object_repr": "2015-2016 - LDROI1003 - Fondements romains du droit - 1 - 2015-2016 - LDROI1003 - Fondements romains du droit - NICOLAS, Vincent  (321654)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 142,
+    "fields": {
+      "action_time": "2016-03-08T22:44:11.921Z",
+      "user": 1,
+      "content_type": 31,
+      "object_id": "1",
+      "object_repr": "Accus\u00e9 de r\u00e9ception d'une demande d'admission (#{numDossier})",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 143,
+    "fields": {
+      "action_time": "2016-03-08T22:44:34.414Z",
+      "user": 1,
+      "content_type": 31,
+      "object_id": "1",
+      "object_repr": "Accus\u00e9 de r\u00e9ception d'une demande d'admission (#{numDossier})",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 144,
+    "fields": {
+      "action_time": "2016-03-09T09:04:02.632Z",
+      "user": 1,
+      "content_type": 4,
+      "object_id": "12",
+      "object_repr": "beto",
+      "action_flag": 2,
+      "change_message": "Modification de is_staff et is_superuser."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 145,
+    "fields": {
+      "action_time": "2016-03-09T09:45:58.822Z",
+      "user": 12,
+      "content_type": 11,
+      "object_id": "3",
+      "object_repr": "MENDON\u00c7A FILHO, Hildeberto ",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 146,
+    "fields": {
+      "action_time": "2016-03-09T09:53:54.465Z",
+      "user": 12,
+      "content_type": 12,
+      "object_id": "3",
+      "object_repr": "MENDON\u00c7A FILHO, Hildeberto  - PROFESSOR",
+      "action_flag": 2,
+      "change_message": "Modification de tutor."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 147,
+    "fields": {
+      "action_time": "2016-03-09T10:24:13.030Z",
+      "user": 12,
+      "content_type": 22,
+      "object_id": "19",
+      "object_repr": "2015-2016 - LCOPS1113 - Histoire moderne et contemporaine - LEFEVRE, Marie  (741852)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 148,
+    "fields": {
+      "action_time": "2016-03-09T10:24:49.027Z",
+      "user": 12,
+      "content_type": 22,
+      "object_id": "19",
+      "object_repr": "2015-2016 - LCOPS1113 - Histoire moderne et contemporaine - LEFEVRE, Marie  (741852)",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 149,
+    "fields": {
+      "action_time": "2016-03-09T10:25:42.932Z",
+      "user": 12,
+      "content_type": 20,
+      "object_id": "11",
+      "object_repr": "MENDON\u00c7A FILHO, Hildeberto  (956872)",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 150,
+    "fields": {
+      "action_time": "2016-03-09T10:26:03.905Z",
+      "user": 12,
+      "content_type": 21,
+      "object_id": "12",
+      "object_repr": "MENDON\u00c7A FILHO, Hildeberto  (956872) - 2015-2016 - SINF1BA",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 151,
+    "fields": {
+      "action_time": "2016-03-09T21:25:47.672Z",
+      "user": 12,
+      "content_type": 27,
+      "object_id": "1",
+      "object_repr": "PersonAddress object",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 152,
+    "fields": {
+      "action_time": "2016-03-09T21:27:43.442Z",
+      "user": 12,
+      "content_type": 27,
+      "object_id": "2",
+      "object_repr": "PersonAddress object",
+      "action_flag": 1,
+      "change_message": "Ajout."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 153,
+    "fields": {
+      "action_time": "2016-03-09T22:09:09.656Z",
+      "user": 12,
+      "content_type": 10,
+      "object_id": "1",
+      "object_repr": "MENDON\u00c7A FILHO, Hildeberto ",
+      "action_flag": 2,
+      "change_message": "Modification de language."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 154,
+    "fields": {
+      "action_time": "2016-03-14T09:24:08.344Z",
+      "user": 12,
+      "content_type": 24,
+      "object_id": "8",
+      "object_repr": "ExamEnrollmentHistory object",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 155,
+    "fields": {
+      "action_time": "2016-03-14T09:24:08.350Z",
+      "user": 12,
+      "content_type": 24,
+      "object_id": "7",
+      "object_repr": "ExamEnrollmentHistory object",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 156,
+    "fields": {
+      "action_time": "2016-03-14T09:24:08.352Z",
+      "user": 12,
+      "content_type": 24,
+      "object_id": "6",
+      "object_repr": "ExamEnrollmentHistory object",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 157,
+    "fields": {
+      "action_time": "2016-03-14T09:24:08.353Z",
+      "user": 12,
+      "content_type": 24,
+      "object_id": "5",
+      "object_repr": "ExamEnrollmentHistory object",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 158,
+    "fields": {
+      "action_time": "2016-03-14T09:24:08.355Z",
+      "user": 12,
+      "content_type": 24,
+      "object_id": "4",
+      "object_repr": "ExamEnrollmentHistory object",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 159,
+    "fields": {
+      "action_time": "2016-03-14T09:24:08.356Z",
+      "user": 12,
+      "content_type": 24,
+      "object_id": "3",
+      "object_repr": "ExamEnrollmentHistory object",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 160,
+    "fields": {
+      "action_time": "2016-03-14T09:24:08.358Z",
+      "user": 12,
+      "content_type": 24,
+      "object_id": "2",
+      "object_repr": "ExamEnrollmentHistory object",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 161,
+    "fields": {
+      "action_time": "2016-03-14T09:24:08.359Z",
+      "user": 12,
+      "content_type": 24,
+      "object_id": "1",
+      "object_repr": "ExamEnrollmentHistory object",
+      "action_flag": 3,
+      "change_message": ""
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 162,
+    "fields": {
+      "action_time": "2016-03-14T09:31:15.444Z",
+      "user": 12,
+      "content_type": 18,
+      "object_id": "2",
+      "object_repr": "2015-2016 - LDROI1004 - Histoire du droit",
+      "action_flag": 2,
+      "change_message": "Modification de credits et decimal_scores."
+    }
+  },
+  {
+    "model": "admin.logentry",
+    "pk": 163,
+    "fields": {
+      "action_time": "2016-03-14T09:37:27.382Z",
+      "user": 12,
+      "content_type": 27,
+      "object_id": "1",
+      "object_repr": "PersonAddress object",
+      "action_flag": 2,
+      "change_message": "Modification de location."
+    }
+  }
 ]

@@ -39,8 +39,8 @@ class OfferEnrollment(models.Model):
     external_id     = models.CharField(max_length=100, blank=True, null=True)
     changed         = models.DateTimeField(null=True)
     date_enrollment = models.DateField()
-    offer_year      = models.ForeignKey(offer_year.OfferYear)
-    student         = models.ForeignKey(student.Student)
+    offer_year      = models.ForeignKey('OfferYear')
+    student         = models.ForeignKey('Student')
 
     def __str__(self):
         return u"%s - %s" % (self.student, self.offer_year)

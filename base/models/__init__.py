@@ -26,6 +26,7 @@
 from base.models import academic_year
 from base.models import academic_calendar
 from base.models import attribution
+from base.models import document_file
 from base.models import exam_enrollment
 from base.models import learning_unit
 from base.models import learning_unit_enrollment

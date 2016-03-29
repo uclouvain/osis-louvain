@@ -36,8 +36,8 @@ class ProgrammeManagerAdmin(admin.ModelAdmin):
 
 class ProgrammeManager(models.Model):
     changed = models.DateTimeField(null=True)
-    person  = models.ForeignKey(person.Person)
-    offer_year = models.ForeignKey(offer_year.OfferYear, blank=True, null=True)
+    person  = models.ForeignKey('Person')
+    offer_year = models.ForeignKey('OfferYear', blank=True, null=True)
 
     @property
     def name(self):
@@ -45,14 +45,6 @@ class ProgrammeManager(models.Model):
 
     def __str__(self):
         return u"%s - %s" % (self.person, self.offer_year)
-
-
-def find_by_user(user):
-    programme_manager = ProgrammeManager.objects.filter(person__user=user).first()
-    if programme_manager:
-        return programme_manager
-    else:
-        return None
 
 
 def find_by_person(a_person):
@@ -73,3 +65,7 @@ def is_programme_manager(user, offer_yr):
 
 def find_by_offer_year(offer_yr):
     return ProgrammeManager.objects.filter(offer_year=offer_yr)
+
+
+def find_by_user(user):
+    return ProgrammeManager.objects.filter(person__user=user)

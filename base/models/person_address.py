@@ -34,7 +34,7 @@ class PersonAddressAdmin(admin.ModelAdmin):
 
 
 class PersonAddress(models.Model):
-    person      = models.ForeignKey(person.Person)
+    person      = models.ForeignKey('Person')
     label       = models.CharField(max_length=20)
     location    = models.CharField(max_length=255)
     postal_code = models.CharField(max_length=20)

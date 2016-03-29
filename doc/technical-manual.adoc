@@ -9,7 +9,7 @@ the project manager to commit directly to the repository without further
 bureaucracy. In fact, be accepted as a committer is a great recognition of the
 quality of your work as a programmer.
 
-== Preparing the Development Environment
+== Installing OSIS
 
 The first thing to do to start contributing to the project is to prepare the
 development environment. During this section, we explain in details how to do
@@ -32,10 +32,10 @@ the development environment in it. Follow the steps below:
 - <<installing-git>>
 - <<installing-postgresql>>
 - <<installing-django>>
-- <<installing-osis>>
+- <<installing-application>>
 
 [[installing-git]]
-== Installing and Configuring Git
+=== Installing and Configuring Git
 
 Git is a distributed version control system used to manage the source code of
 OSIS. The source code is necessary to develop and deploy OSIS and we start the
@@ -146,7 +146,7 @@ In this case, you should change the url to the ssh one:
 The automatic authentication should work after that.
 
 [[installing-postgresql]]
-== Installing and Configuring PostgreSQL
+=== Installing and Configuring PostgreSQL
 
 PostgreSQL is the only database supported by OSIS. In theory, the Django ORM
 would make the application database-independent, but we do not test OSIS with
@@ -166,7 +166,7 @@ Execute the following commands to install PostgreSQL:
 The first command installs PostgreSQL and creates a user named after the current
 logged OS user. The library libpq-dev is also installed for development purposes.
 
-== Creating the Database
+=== Creating the Database
 
 Before moving forward, make sure you installed PostgreSQL, as explained in the
 section <<installing-postgresql>>. Then, follow the steps below to create the
@@ -185,7 +185,7 @@ to PostgreSQL:
     $ sudo apt-get install python3-dev libpq-dev
 
 [[installing-django]]
-== Installing and Configuring Django
+=== Installing and Configuring Django
 
 Django is a modern and lightweight web framework to support our back office and
 front office applications. The choice for Django was made thanks to the
@@ -216,19 +216,24 @@ of the project:
     $ cd osis
     $ virtualenv --python=python3.4 venv
 
-[[installing-osis]]
-== Installing OSIS
+[[installing-application]]
+=== Installing the Application
 
 Start the virtual environment and install the dependencies:
 
     $ source venv/bin/activate
     (venv)$ pip install -r requirements.txt
 
-Before running the application, let's create the data structure in the database:
+Create the data structure in the database:
 
     (venv)$ python manage.py migrate
 
-And then a super user account to access the administration module:
+At this point we have two options:
+
+1. we create a super user and go on with an empty database or
+2. we load the demonstration data that already contains a superuser
+
+To create the super user and continue with an empty database:
 
     (venv)$ python manage.py createsuperuser
        Username (leave blank to use '[linux-user]'):
@@ -240,7 +245,20 @@ And then a super user account to access the administration module:
 You will need this user to login on OSIS for the first time and be able to
 create other users.
 
-Finally, run the application:
+To load the demonstration data that already contains a superuser:
+
+    (venv)$ python manage.py loaddata demo_data.json
+
+The demonstration data create a super user with the following credentials:
+
+    Username: osis
+    Password: osisosis
+
+The demonstration data also create several other users. The password for each
+user is the username typed twice (e.g. user: `antonin`  password:
+`antoninantonin`).
+
+Now, we can run the application:
 
     (venv)$ python manage.py runserver
 
@@ -252,7 +270,9 @@ virtual environment:
 
     (venv)$ deactivate
 
-== Following the Git Workflow
+== Contributing to the Project
+
+=== Following the Git Workflow
 
 The code repository is organized in three fixed branches:
 
@@ -265,12 +285,46 @@ The code repository is organized in three fixed branches:
   branch `master`, which is the one to be deployed in production.
 
 Developers should not commit directly to any of these branches. By convention,
-the source code can only be changed under the context of an issue created on the
-issue tracker tool.
+these branches can only be changed if there is an issue in the
+https://github.com/uclouvain/osis/issues[issue tracking tool] that justifies
+the creation of an exclusive branch for that issue. For instance: if the
+issue's number is `#234` then its respective branch is named `issue#234`,
+created to isolate the changes described in the issue. To create a new branch
+for the issue, perform the following commands:
+
+    $ git checkout dev
+    $ git pull origin dev
+    $ git checkout -b issue#234
+
+The first command enters in the branch `dev`, if the developer is not already in
+there. Within the branch `dev`, the latest commits in the remote branch
+`origin/dev` are downloaded and merged within the local branch `dev`. Then, the
+new branch `issue#234` is created from the local branch `dev`.
+
+The developer in charge of the issue `#234` changes the code within the branch
+`issue#234`. Two commands are very useful to keep track of what has been done:
+
+    $ git status
+    $ git diff models.py
+
+The first command shows all created, modified, removed and untracked files that
+are candidates to be committed. The second shows the changes in one of the
+modified files. When we are ready to commit, we should decide whether all
+changed files will be included in the commit or just a subset of them. To
+include all files:
+
+    $ git commit -a -m "New entities added."
+
+To include a subset of files, we have to add each file individually:
+
+    $ git add base/models/academic_year.py
+    $ git add base/models/academic_calendar.py
+    $ git add base/models/__init__.py
+    $ git commit -m "New entities added."
 
 image::images/git-state-diagram.png[Git State Diagram]
 
-== Creating and Working in a Branch
+=== Creating and Working in a Branch
 
 The issue tracker generates an incremental id that we can use to name branches.
 It helps to keep branches linked to issues. For example: considering an issue
@@ -288,25 +342,6 @@ correct branch. If the branch `dev` already exists in local, then instead of
 fetching it we should pull it:
 
     $ git pull origin dev
-
-As we work on the issue, two commands are very useful to keep track of what has
-been done:
-
-    $ git status
-    $ git diff models.py
-
-The first command shows all created, modified and removed files that are
-candidates to be committed. The second shows the changes in one of the modified
-files. When we are ready to commit, we should decide whether all changed files
-will be included in the commit or just a subset of them. To include all files:
-
-    $ git commit -a -m "New entities added."
-
-To include a subset of files, we have to add each file individually:
-
-    $ git add models.py
-    $ git add __init__.py
-    $ git commit -m "New entities added."
 
 Committing often is encouraged. All commits are done locally, thus there is no
 risk of conflicts until all commits are sent to the server. The `push` option
@@ -474,3 +509,5 @@ For HTML/Template files, we change just the comment syntax:
      * at the root of the source code of this program.  If not,
      * see http://www.gnu.org/licenses/.
     {% endcomment %}
+
+=== Making changes in the model

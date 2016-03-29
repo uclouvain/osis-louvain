@@ -47,8 +47,8 @@ class SessionExam(models.Model):
     changed             = models.DateTimeField(null=True)
     number_session      = models.IntegerField()
     status              = models.CharField(max_length=10,choices=SESSION_STATUS)
-    learning_unit_year  = models.ForeignKey(learning_unit_year.LearningUnitYear)
-    offer_year_calendar = models.ForeignKey(offer_year_calendar.OfferYearCalendar)
+    learning_unit_year  = models.ForeignKey('LearningUnitYear')
+    offer_year_calendar = models.ForeignKey('OfferYearCalendar')
     progress = None
 
     def __str__(self):
@@ -72,7 +72,7 @@ def find_sessions_by_tutor(tutor, academic_year):
         .filter(learning_unit_year__learning_unit__in=learning_units)
 
 
-def find_sessions_by_faculty(faculty, academic_year):
+def find_sessions_by_offer(offer_year, academic_year):
     return SessionExam.objects.filter(~models.Q(status='IDLE')) \
         .filter(offer_year_calendar__offer_year__academic_year=academic_year) \
-        .filter(offer_year_calendar__offer_year__structure=faculty)
+        .filter(offer_year_calendar__offer_year=offer_year)

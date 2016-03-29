@@ -35,7 +35,45 @@
   <div class="page-header">
     <h2>{% trans 'Internships Masters' %}</h2>
   </div>
-
+  <div class="panel panel-default">
+        <table style="height:100%; width:100%;">
+            <thead>
+              <tr>
+                  <th style="text-align:center; width:50%;">{% trans 'Speciality' %}</th>
+                  <th style="text-align:center; width:50%;">{% trans 'Organization' %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <form action="{%url 'interships_masters' %}" method="get">
+                <tr>
+                  <td style="text-align:center; width:50%;">
+                    <select name="speciality_sort" onChange="javascript: this.form.submit();">
+                     <option value="0">--</option>
+                     {% for spec in all_spec %}
+                        <option value="{{ spec }}"
+                        {% if spec == speciality_sort_value %}selected{% endif %}>
+                          {{ spec }}
+                        </option>
+                     {% endfor %}
+                    </select>
+                  </td>
+                  <td style="text-align:center; width:50%;">
+                    <select name="organization_sort" onChange="javascript: this.form.submit();">
+                     <option value="0">--</option>
+                     {% for organization in all_organizations %}
+                        <option value="{{ organization.name }}"
+                        {% if organization.name == organization_sort_value %}selected{% endif %}>
+                            {{ organization.name }}
+                        </option>
+                     {% endfor %}
+                    </select>
+                  </td>
+                  </td>
+                </tr>
+              </form>
+            </tbody>
+        </table>
+  </div>
   <div class="panel panel-default">
     <div class="tab-content">
       <div role="tabpanel" class="tab-pane fade in active" id="profile">
@@ -50,6 +88,7 @@
                   <th>{% trans 'Type' %}</th>
                   <th>{% trans 'Speciality' %}</th>
                   <th>{% trans 'Mail' %}</th>
+                  <th>{% trans 'Organization' %}</th>
               </tr>
             </thead>
             <tbody>
@@ -78,6 +117,9 @@
                   </td>
                   <td>
                     {{ master.person.email }}
+                  </td>
+                  <td>
+                    <a href="{% url 'internships' %}?organization_sort={{ master.organization }}">{{ master.organization }}</a>
                   </td>
               </tr>
               {% endfor %}

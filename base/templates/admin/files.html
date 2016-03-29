@@ -1,0 +1,107 @@
+{% extends "layout.html" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+  <li><a href="{% url 'storage' %}" id="lnk_stockage">{% trans 'Stockage'%}</a></li>
+  <li class="active">{% trans 'Files' %}</li>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h2>{% trans 'Files' %}</h2>
+</div>
+<div class="panel panel-default">
+  <div class="panel-body">
+    <form  method="get" action="{% url 'files_search'%}" >
+      <div class="row">
+          <div class="col-md-3">
+              <label for="user">{% trans 'User'%}</label>
+              <input class="form-control" id="txt_user" placeholder="{% trans 'User' %}" name="user" value="">
+          </div>
+          <div class="col-md-3">
+              <label for="registration_date" >{% trans 'Registration date'%}</label>
+              <div class='input-group date' id='datetimepicker2'>
+                <input type="text" class="form-control" placeholder="{% trans 'Registration date' %}" id="txt_registration_date" name="registration_date" value="">
+              </div>
+          </div>
+          <div class="col-md-6">
+              <button type="submit" id="bt_submit_document_files_search" class="btn btn-primary" role="button" title="{% trans 'Search for a file' %}"
+                      style="margin-top : 25px;">
+                <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+          </div>
+        </div>
+
+      </form>
+{% if message %}
+      <div>
+        <label class="alert alert-warning" style="margin:5px">{{message}}</label>
+      </div>
+  {% else %}
+      <div >
+        {% if files != None and files|length == 0 %}
+          <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
+        {% endif %}
+        {% if files|length > 0 %}
+        <table class="table table-striped table-hover">
+          <thead>
+            <th>{% trans 'Name'%}</th>
+            <th>{% trans 'Date'%}</th>
+            <th>{% trans 'Size'%}</th>
+            <th>{% trans 'Storage duration'%}</th>
+            <th>{% trans 'Description'%}</th>
+            <th>{% trans 'User'%}</th>
+          </thead>
+          {% for file in files %}
+            <tr>
+              <td><a href="{% url 'document_file_read' file.id %}" id="lnk_file_read_{{file.id}}">{{ file.name }}</a></td>
+              <!-- <td>{{ file.name }}</td> -->
+              <td>{{ file.creation_date }}</td>
+              <td>{{ file.size }}</td>
+              <td>{{ file.storage_duration }}</td>
+              <td>{{ file.description }}</td>
+              <td>{{ file.user }}</td>
+            </tr>
+          {% endfor %}
+        </table>
+        {% endif %}
+
+        </div>
+    {% endif %}
+  </div>
+
+</div>
+{% endblock %}
+{% block script %}
+<script src="{% static 'js/bootstrap-datepicker.min.js' %}"></script>
+<script>
+  $("#txt_registration_date").datepicker({
+      format: "yyyy-mm-dd",
+      autoclose: true,
+      orientation: "bottom auto"
+  });
+</script>
+{% endblock %}

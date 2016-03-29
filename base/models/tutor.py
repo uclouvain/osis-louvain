@@ -39,7 +39,7 @@ class TutorAdmin(admin.ModelAdmin):
 class Tutor(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
     changed     = models.DateTimeField(null=True)
-    person      = models.ForeignKey(person.Person)
+    person      = models.ForeignKey('Person')
 
     def __str__(self):
         return u"%s" % self.person

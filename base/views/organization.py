@@ -35,44 +35,18 @@ def organizations(request):
                            {'acronym': None,
                             'name': None,
                             'organizations': None,
+                            'type': mdl.organization.ORGANIZATION_TYPE,
                             'init': "1"})
 
 
 def organizations_search(request):
-    acronym = request.GET['acronym']
-    name = request.GET['name']
-    organizations_list = []
-    criteria_present = False
-
-    name = name.strip()
-    if len(name) <= 0:
-        name  =None
-    else:
-        criteria_present=True
-
-    acronym = acronym.strip()
-    if len(acronym) <= 0:
-        acronym = None
-    else:
-        criteria_present=True
-
-    message = None
-    if criteria_present:
-        if acronym is None and name:
-            organizations_list = mdl.organization.find_by_name(name)
-        if acronym and name is None:
-            organizations_list = mdl.organization.find_by_acronym(acronym)
-        if acronym and name:
-            organizations_list = mdl.organization.find_by_acronym_name(acronym, name)
-    else:
-         message = "%s" % _('You must choose at least one criteria!')
+    organizations = mdl.organization.search(acronym=request.GET['acronym'],
+                                            name=request.GET['name'],
+                                            type=request.GET['type_choices'])
 
     return render(request, "organizations.html",
-                           {'acronym':       acronym,
-                            'name':          name,
-                            'organizations': organizations_list,
-                            'init':          "0",
-                            'message':       message})
+                           {'organizations': organizations,
+                            'types': mdl.organization.ORGANIZATION_TYPE})
 
 
 def organization_read(request, organization_id):

@@ -46,8 +46,8 @@ GRADE_TYPES = (
 class OfferYear(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
     changed = models.DateTimeField(null=True)
-    offer = models.ForeignKey(offer.Offer)
-    academic_year = models.ForeignKey(academic_year.AcademicYear)
+    offer = models.ForeignKey('Offer')
+    academic_year = models.ForeignKey('AcademicYear')
     acronym = models.CharField(max_length=15)
     title = models.CharField(max_length=255)
     title_international = models.CharField(max_length=255, blank=True, null=True)

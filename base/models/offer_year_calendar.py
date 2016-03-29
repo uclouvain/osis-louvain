@@ -40,8 +40,8 @@ class OfferYearCalendarAdmin(admin.ModelAdmin):
 class OfferYearCalendar(models.Model):
     external_id       = models.CharField(max_length=100, blank=True, null=True)
     changed           = models.DateTimeField(null=True)
-    academic_calendar = models.ForeignKey(academic_calendar.AcademicCalendar)
-    offer_year        = models.ForeignKey(offer_year.OfferYear)
+    academic_calendar = models.ForeignKey('AcademicCalendar')
+    offer_year        = models.ForeignKey('OfferYear')
     start_date        = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
     end_date          = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
     customized        = models.BooleanField(default=False)

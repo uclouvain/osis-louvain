@@ -39,8 +39,8 @@ class LearningUnitEnrollment(models.Model):
     external_id        = models.CharField(max_length=100, blank=True, null=True)
     changed            = models.DateTimeField(null=True)
     date_enrollment    = models.DateField()
-    learning_unit_year = models.ForeignKey(learning_unit_year.LearningUnitYear)
-    offer_enrollment   = models.ForeignKey(offer_enrollment.OfferEnrollment)
+    learning_unit_year = models.ForeignKey('LearningUnitYear')
+    offer_enrollment   = models.ForeignKey('OfferEnrollment')
 
     @property
     def student(self):

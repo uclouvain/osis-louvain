@@ -37,15 +37,54 @@
   </div>
 
   <div class="panel panel-default">
+        <table style="height:100%; width:100%;">
+            <thead>
+              <tr>
+                  <th style="text-align:center; width:50%;">{% trans 'Learning Unit' %}</th>
+                  <th style="text-align:center; width:50%;">{% trans 'Organization' %}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <form action="{%url 'internships' %}" method="get">
+                <tr>
+                  <td style="text-align:center; width:50%;">
+                    <select name="learning_unit_year_sort" onChange="javascript: this.form.submit();">
+                     <option value="0">--</option>
+                     {% for learning_unit_year in all_learning_unit_year %}
+                        <option value="{{ learning_unit_year.title }}"
+                        {% if learning_unit_year.title == learning_unit_year_sort_value %}selected{%endif%}>
+                          {{ learning_unit_year.title }}
+                        </option>
+                     {% endfor %}
+                    </select>
+                  </td>
+                  <td style="text-align:center; width:50%;">
+                    <select name="organization_sort" onChange="javascript: this.form.submit();">
+                     <option value="0">--</option>
+                     {% for organization in all_organizations %}
+                        <option value="{{ organization.name }}"
+                        {% if organization.name == organization_sort_value %}selected{% endif %}>
+                            {{ organization.name }}
+                        </option>
+                     {% endfor %}
+                    </select>
+                  </td>
+                </tr>
+              </form>
+            </tbody>
+        </table>
+  </div>
+
+  <div class="panel panel-default">
     <div class="tab-content">
       <div role="tabpanel" class="tab-pane fade in active" id="profile">
         <table class="table table-hover">
             <thead>
               <tr>
                   <th>{% trans 'Name' %}</th>
-                  <th>{% trans 'Speciality' %}</th>
+                  <th>{% trans 'learning unit year' %}</th>
                   <th>{% trans 'Student max' %}</th>
-                  <th>{% trans 'Place' %}</th>
+                  <th>{% trans 'organization' %}</th>
                   <th>{% trans 'Preference' %}</th>
               </tr>
             </thead>
@@ -56,7 +95,7 @@
                     {{ internship.title }}
                   </td>
                   <td>
-
+                    {{ internship.learning_unit_year.title }}
                   </td>
                   <td>
                     {{ internship.maximum_enrollments }}

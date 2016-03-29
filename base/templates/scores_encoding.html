@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% load i18n %}
 {% load staticfiles %}
+{% load list %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -34,152 +35,155 @@
   <div class="page-header">
     <h2>{% trans 'Scores encoding' %}</h2>
   </div>
-  {% if sessions %}
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <div class="row">
-          <div class="col-md-4">
-            <div class="form-group">
-              {% if tutor %}
-                <label>{% trans 'Tutor' %}</label><br>{{ tutor }}
-              {% else %}
-                <label>{% trans 'Faculty' %}</label><br>{{ faculty }}
-              {% endif %}
+  {% if sessions_list%}
+      {% for sessions in sessions_list %}
+        <div class="panel panel-default">
+          <div class="panel-body">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  {% if tutor %}
+                    <label>{% trans 'Tutor' %}</label><br>{{ tutor }}
+                  {% else %}
+                    <label>{% trans 'Faculty' %}</label><br> {{ faculties|lookup:forloop.counter0  }}
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>{% trans 'Academic year' %}</label><br>
+                  {{ academic_year }}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>{% trans 'Session' %}</label><br>
+                  {{ session.number_session }}
+                </div>
+              </div>
             </div>
-          </div>
-          <div class="col-md-4">
-            <div class="form-group">
-              <label>{% trans 'Academic year' %}</label><br>
-              {{ academic_year }}
-            </div>
-          </div>
-          <div class="col-md-4">
-            <div class="form-group">
-              <label>{% trans 'Session' %}</label><br>
-              {{ session.number_session }}
+            <br>
+            <p><b>{% trans 'Select an encoding type' %}</b></p>
+            <div>
+              <ul class="nav nav-tabs" role="tablist">
+                <li role="presentation" class="active"><a href="#tab_profile_{{forloop.counter0}}" aria-controls="profile" role="tab" data-toggle="tab" id="lnk_online_{{forloop.counter0}}">{% trans 'Online' %}</a></li>
+                <li role="presentation"><a href="#tab_messages_{{forloop.counter0}}" aria-controls="messages" role="tab" data-toggle="tab" id="lnk_with_xls_{{forloop.counter0}}">{% trans 'With xls' %}</a></li>
+                <li role="presentation"><a href="#tab_home_{{forloop.counter0}}" aria-controls="home" role="tab" data-toggle="tab" id="lnk_via_paper_{{forloop.counter0}}">{% trans 'Via paper' %}</a></li>
+              </ul>
+
+              <div class="tab-content">
+                <div role="tabpanel" class="tab-pane fade in active" id="tab_profile_{{forloop.counter0}}">
+                  <table class="table table-hover">
+                      <thead>
+                        <tr>
+                            <th>{% trans 'Status' %}</th>
+                            <th>{% trans 'Code' %}</th>
+                            <th>{% trans 'Activity' %}</th>
+                            <th>{% trans 'Progress' %}</th>
+                            <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {% for session in sessions %}
+                        <tr>
+                          <td>{% if session.status == 'IDLE' %}
+                                <span style="color: orange" class="glyphicon glyphicon-time" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Idle"></span>
+                              {% elif session.status == 'OPEN' %}
+                                <span style="color: blue" class="glyphicon glyphicon-flag" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Open"></span>
+                              {% else %}
+                                <span style="color: green" class="glyphicon glyphicon-ok" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Closed"></span> {{ session.status|title }}</td>
+                              {% endif %}
+                          <td>{{ session.learning_unit_year.acronym }}</td>
+                          <td><a href="{% url 'online_encoding' session.id %}" id="lnk_{{ session.learning_unit_year.acronym }}" >{{ session.learning_unit_year.title }}</a></td>
+                          <td>{{ session.progress }}</td>
+                          <td>{% if session.status == 'OPEN' %}
+                                <a class="btn btn-default" href="{% url 'online_encoding_form' session.id %}" role="button" id="lnk_online_encoding_profile_{{session.id}}"><i class="fa fa-hashtag"></i> {% trans 'Encoding'%}</a>
+                              {% endif %}
+                          </td>
+
+                        </tr>
+                      {% endfor %}
+                      </tbody>
+                  </table>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="tab_messages_{{forloop.counter0}}">
+                  <table class="table table-hover">
+                      <thead>
+                        <tr>
+                            <th>{% trans 'Status' %}</th>
+                            <th>{% trans 'Code' %}</th>
+                            <th>{% trans 'Activity' %}</th>
+                            <th>{% trans 'Progress' %}</th>
+                            <th></th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      {% for session in sessions %}
+                        <tr>
+                          <td>{% if session.status == 'IDLE' %}
+                                <span style="color: orange" class="glyphicon glyphicon-time" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Idle"></span>
+                              {% elif session.status == 'OPEN' %}
+                                <span style="color: blue" class="glyphicon glyphicon-flag" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Open"></span>
+                              {% else %}
+                                <span style="color: green" class="glyphicon glyphicon-ok" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Closed"></span> {{ session.status|title }}</td>
+                              {% endif %}
+                          <td>{{ session.learning_unit_year.acronym }}</td>
+                          <td><a href="{% url 'online_encoding' session.id%}"title="Visualiser/charger les notes pour le cours" id="lnk_online_encoding_messages_{{session.id}}">{{ session.learning_unit_year.title }}</a></td>
+                          <td>{{ progress }}</td>
+                          <td>{% if session.status == 'OPEN' %}
+                                <a class="btn btn-default" href="{% url 'scores_encoding_download' session.id academic_year.id  %}" role="button" title="{% trans 'Create a xls file while activity\'s scores'%}" id="lnk_scores_encoding_download_{{session.id}}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span> {% trans 'Get xls'%}</a>
+                              {% endif %}
+                          </td>
+                        </tr>
+                      {% endfor %}
+                      </tbody>
+                  </table>
+                </div>
+                <div role="tabpanel" class="tab-pane fade" id="tab_home_{{forloop.counter0}}">
+                  {% if sessions %}
+                  <br>
+
+                  <a class="btn btn-default" href="{% url 'notes_printing_all' sessions_offer|lookup_session:forloop.counter0%}" role="button" id="lnk_notes_printing_all_{{session.id}}"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> {% trans 'Print scores for all activities' %}</a>
+                  <br><br>
+                  {% endif%}
+                  <table class="table table-hover">
+                    <thead>
+                        <tr>
+                          <th>{% trans 'Status' %}</th>
+                          <th>{% trans 'Code' %}</th>
+                          <th>{% trans 'Activity' %}</th>
+                          <th>{% trans 'Progress' %}</th>
+                          <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for session in sessions %}
+                      <tr>
+                        <td>{% if session.status == 'IDLE' %}
+                              <span style="color: orange" class="glyphicon glyphicon-time" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Idle"></span>
+                            {% elif session.status == 'OPEN' %}
+                              <span style="color: blue" class="glyphicon glyphicon-flag" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Open"></span>
+                            {% else %}
+                              <span style="color: green" class="glyphicon glyphicon-ok" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Closed"></span> {{ session.status|title }}</td>
+                            {% endif %}
+                        <td>{{ session.learning_unit_year.acronym }}</td>
+                        <td>{{ session.learning_unit_year.title }}</td>
+                        <td>{{ progress }}</td>
+                        <td>{% if session.status == 'OPEN' %}
+                                <a class="btn btn-default" href="{% url 'notes_printing' session.id session.learning_unit_year.id %}" role="button" id="lnk_notes_printing_{{session.id}}"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Imprimer</a>
+                            {% endif %}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>
-        <br>
-        <p><b>{% trans 'Select an encoding type' %}</b></p>
-        <div>
-          <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#tab_profile" aria-controls="profile" role="tab" data-toggle="tab" id="lnk_online">{% trans 'Online' %}</a></li>
-            <li role="presentation"><a href="#tab_messages" aria-controls="messages" role="tab" data-toggle="tab" id="lnk_with_xls">{% trans 'With xls' %}</a></li>
-            <li role="presentation"><a href="#tab_home" aria-controls="home" role="tab" data-toggle="tab" id="lnk_via_paper">{% trans 'Via paper' %}</a></li>
-          </ul>
-
-          <div class="tab-content">
-            <div role="tabpanel" class="tab-pane fade in active" id="tab_profile">
-              <table class="table table-hover">
-                  <thead>
-                    <tr>
-                        <th>{% trans 'Status' %}</th>
-                        <th>{% trans 'Code' %}</th>
-                        <th>{% trans 'Activity' %}</th>
-                        <th>{% trans 'Progress' %}</th>
-                        <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  {% for session in sessions %}
-                    <tr>
-                      <td>{% if session.status == 'IDLE' %}
-                            <span style="color: orange" class="glyphicon glyphicon-time" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Idle"></span>
-                          {% elif session.status == 'OPEN' %}
-                            <span style="color: blue" class="glyphicon glyphicon-flag" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Open"></span>
-                          {% else %}
-                            <span style="color: green" class="glyphicon glyphicon-ok" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Closed"></span> {{ session.status|title }}</td>
-                          {% endif %}
-                      <td>{{ session.learning_unit_year.acronym }}</td>
-                      <td><a href="{% url 'online_encoding' session.id %}" id="lnk_{{ session.learning_unit_year.acronym }}" >{{ session.learning_unit_year.title }}</a></td>
-                      <td>{{ session.progress }}</td>
-                      <td>{% if session.status == 'OPEN' %}
-                            <a class="btn btn-default" href="{% url 'online_encoding_form' session.id %}" role="button" id="lnk_online_encoding_profile_{{session.id}}"><i class="fa fa-hashtag"></i> {% trans 'Encoding'%}</a>
-                          {% endif %}
-                      </td>
-
-                    </tr>
-                  {% endfor %}
-                  </tbody>
-              </table>
-            </div>
-            <div role="tabpanel" class="tab-pane fade" id="tab_messages">
-              <table class="table table-hover">
-                  <thead>
-                    <tr>
-                        <th>{% trans 'Status' %}</th>
-                        <th>{% trans 'Code' %}</th>
-                        <th>{% trans 'Activity' %}</th>
-                        <th>{% trans 'Progress' %}</th>
-                        <th></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                  {% for session in sessions %}
-                    <tr>
-                      <td>{% if session.status == 'IDLE' %}
-                            <span style="color: orange" class="glyphicon glyphicon-time" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Idle"></span>
-                          {% elif session.status == 'OPEN' %}
-                            <span style="color: blue" class="glyphicon glyphicon-flag" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Open"></span>
-                          {% else %}
-                            <span style="color: green" class="glyphicon glyphicon-ok" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Closed"></span> {{ session.status|title }}</td>
-                          {% endif %}
-                      <td>{{ session.learning_unit_year.acronym }}</td>
-                      <td><a href="{% url 'online_encoding' session.id%}"title="Visualiser/charger les notes pour le cours" id="lnk_online_encoding_messages_{{session.id}}">{{ session.learning_unit_year.title }}</a></td>
-                      <td>{{ progress }}</td>
-                      <td>{% if session.status == 'OPEN' %}
-                            <a class="btn btn-default" href="{% url 'scores_encoding_download' session.id academic_year.id  %}" role="button" title="{% trans 'Create a xls file while activity\'s scores'%}" id="lnk_scores_encoding_download_{{session.id}}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span> {% trans 'Get xls'%}</a>
-                          {% endif %}
-                      </td>
-                    </tr>
-                  {% endfor %}
-                  </tbody>
-              </table>
-            </div>
-            <div role="tabpanel" class="tab-pane fade" id="tab_home">
-              {% if sessions %}
-              <br>
-              <a class="btn btn-default" href="{% url 'notes_printing_all' session.id %}" role="button" id="lnk_notes_printing_all"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> {% trans 'Print scores for all activities' %}</a>
-              <br><br>
-              {% endif %}
-              <table class="table table-hover">
-                <thead>
-                    <tr>
-                      <th>{% trans 'Status' %}</th>
-                      <th>{% trans 'Code' %}</th>
-                      <th>{% trans 'Activity' %}</th>
-                      <th>{% trans 'Progress' %}</th>
-                      <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                {% for session in sessions %}
-                  <tr>
-                    <td>{% if session.status == 'IDLE' %}
-                          <span style="color: orange" class="glyphicon glyphicon-time" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Idle"></span>
-                        {% elif session.status == 'OPEN' %}
-                          <span style="color: blue" class="glyphicon glyphicon-flag" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Open"></span>
-                        {% else %}
-                          <span style="color: green" class="glyphicon glyphicon-ok" aria-hidden="true" data-toggle="tooltip" data-placement="left" title="Closed"></span> {{ session.status|title }}</td>
-                        {% endif %}
-                    <td>{{ session.learning_unit_year.acronym }}</td>
-                    <td>{{ session.learning_unit_year.title }}</td>
-                    <td>{{ progress }}</td>
-                    <td>{% if session.status == 'OPEN' %}
-                            <a class="btn btn-default" href="{% url 'notes_printing' session.id session.learning_unit_year.id %}" role="button" id="lnk_notes_printing_{{session.id}}"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> Imprimer</a>
-                        {% endif %}
-                    </td>
-                  </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+      {% endfor %}
   {% else %}
-    <p class="text-info" style="font-size: 130%">Aucune session d'examen ouverte pour le moment.</p>
+         <p class="text-info" style="font-size: 130%">Aucune session d'examen ouverte pour le moment.</p>
   {% endif %}
 {% endblock %}
 {% block script %}
