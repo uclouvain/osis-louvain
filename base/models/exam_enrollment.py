@@ -45,7 +45,9 @@ class ExamEnrollmentAdmin(admin.ModelAdmin):
                                     'score_final','justification_final')}),)
     raw_id_fields = ('session_exam', 'learning_unit_enrollment')
     search_fields = ['learning_unit_enrollment__offer_enrollment__student__person__first_name',
-                     'learning_unit_enrollment__offer_enrollment__student__person__last_name']
+                     'learning_unit_enrollment__offer_enrollment__student__person__last_name',
+                     'learning_unit_enrollment__offer_enrollment__student__registration_id',
+                     'learning_unit_enrollment__learning_unit_year__acronym']
 
 
 class ExamEnrollment(models.Model):

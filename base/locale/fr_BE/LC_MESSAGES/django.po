@@ -50,7 +50,7 @@ msgstr "Absence justifiée"
 #: templates/assessments/online_encoding_form.html:133
 #: templates/assessments/online_encoding_form.html:147
 msgid "score_missing"
-msgstr "Encodage de notes"
+msgstr "Note manquante"
 
 #: models/exam_enrollment.py:53
 msgid "saved"
@@ -1066,7 +1066,7 @@ msgstr "Feuille de notes"
 
 #: utils/pdf_utils.py:108
 msgid "scores_transcript"
-msgstr "Transcription des notes"
+msgstr "Feuille de notes"
 
 #: utils/pdf_utils.py:110
 msgid "ucl_denom_location"
@@ -1085,7 +1085,7 @@ msgstr "Attention : décimales non autorisées pour ce cours"
 
 #: utils/pdf_utils.py:289
 msgid "phone"
-msgstr ""
+msgstr "Tél."
 
 #: utils/pdf_utils.py:293
 msgid "fax"

@@ -332,10 +332,10 @@ def online_encoding_submission(request, learning_unit_id):
 
 @login_required
 def notes_printing(request, session_exam_id, learning_unit_year_id):
-    tutor = mdl.tutor.find_by_user(request.user)
     academic_year = mdl.academic_year.current_academic_year()
     session_exam = mdl.session_exam.find_session_by_id(session_exam_id)
-    return pdf_utils.print_notes(request, tutor, academic_year, session_exam, learning_unit_year_id)
+    person = mdl.person.find_by_user(request.user)
+    return pdf_utils.print_notes(request.user, academic_year, session_exam, learning_unit_year_id)
 
 
 @login_required
@@ -364,7 +364,7 @@ def notes_printing(request, learning_unit_id=None, tutor_id=None, offer_id=None)
     else:
         sessions_list, faculties, notes_list = get_sessions(learning_unit_id, request, tutor, academic_year,None)
 
-    return pdf_utils.print_notes(request, tutor, academic_year, learning_unit_id, is_fac, sessions_list)
+    return pdf_utils.print_notes(request.user, academic_year, learning_unit_id, is_fac, sessions_list)
 
 
 @login_required

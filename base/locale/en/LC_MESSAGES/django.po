@@ -1080,11 +1080,11 @@ msgstr "Unauthorized decimal for this activity"
 
 #: utils/pdf_utils.py:289
 msgid "phone"
-msgstr ""
+msgstr "Phone"
 
 #: utils/pdf_utils.py:293
 msgid "fax"
-msgstr ""
+msgstr "Fax"
 
 #: utils/pdf_utils.py:339
 msgid "deliberation_date"

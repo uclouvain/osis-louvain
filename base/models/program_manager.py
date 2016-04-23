@@ -33,6 +33,7 @@ from django.core.exceptions import ObjectDoesNotExist
 class ProgramManagerAdmin(admin.ModelAdmin):
     list_display = ('person', 'offer_year')
     raw_id_fields = ('person', 'offer_year')
+    search_fields = ['person__first_name', 'person__last_name', 'offer_year__acronym']
 
 
 class ProgramManager(models.Model):
