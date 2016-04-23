@@ -50,7 +50,7 @@ msgstr "Absence justifiée"
 #: templates/assessments/online_encoding_form.html:133
 #: templates/assessments/online_encoding_form.html:147
 msgid "score_missing"
-msgstr "Notes manquante"
+msgstr "Note manquante"
 
 #: models/exam_enrollment.py:53
 msgid "saved"
