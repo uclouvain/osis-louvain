@@ -89,7 +89,7 @@
                                            id="lnk_{{ note_detail.learning_unit_year.acronym }}">{{ note_detail.learning_unit_year.title }}</a>
                                     {% endif %}
                                 </td>
-                                <td>{{ note_detail.exam_enrollments_encoded}}/{{ note_detail.total_exam_enrollments}}</td>
+                                <td id="txt_progress_{{ note_detail.learning_unit_year.acronym }}" >{{ note_detail.exam_enrollments_encoded}}/{{ note_detail.total_exam_enrollments}}</td>
                                 <td><a class="btn btn-default"
                                        href="{% url 'online_encoding_form' note_detail.learning_unit_year.id%}"
                                        role="button"

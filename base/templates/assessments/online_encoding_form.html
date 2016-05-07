@@ -111,7 +111,7 @@
                            {% else %}
                                 value="{{ enrollment.score_draft | score_display:enrollment.session_exam.learning_unit_year.decimal_scores }}"
                            {% endif %}
-                           {% if not is_program_manager and (enrollment.score_final or enrollment.justification_final) %}
+                           {% if not is_program_manager and enrollment.score_final or not is_program_manager and enrollment.justification_final %}
                                 disabled
                            {% endif %}
                            {% if enrollment.session_exam.learning_unit_year.decimal_scores %}
@@ -151,7 +151,7 @@
             </tbody>
         </table>
 
-        <button type="submit" class="btn btn-primary" id="bt_submit_online_encoding"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}</button>
+        <button type="submit" class="btn btn-primary" id="bt_save_online_encoding"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}</button>
         <a class="btn btn-default" href="{% url 'online_encoding' learning_unit_year.id %}" role="button" id="lnk_cancel_online_encoding"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans 'cancel' %}</a>
 
       </form>

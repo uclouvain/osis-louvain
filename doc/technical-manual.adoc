@@ -603,6 +603,24 @@ Some examples of use:
     <!-- Combobox field -->
     <select id="slt_academic_year">
 
+=== Launch tests locally
+[NOTE]
+====
+To run tests, the db_user must be granted with CREATEDB permission.
+====
+
+==== Create Firefox profile
+Open firefox with new prile path
+
+    $ firefox -P base/tests/selenium/firefox_profile
+
+Customise Firefox : delete history after closing
+
+Close Firefox
+
+==== Launch tests
+    (venv)$ python launch_tests.py -t selenium
+
 == Adding the license to the source code
 
 OSIS is an open source project licensed under GPL v3. As such, it must respect

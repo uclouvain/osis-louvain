@@ -1,0 +1,80 @@
+= Test Cases pour l'encodage des notes
+
+== Encodage en ligne
+=== Encodage
+==== En tant que professeur
+
+1. S'authentitifier en tant que professeur.
+2. Verifier que les cours donnés sont présents pour encodage.
+3. Choisir un cours.
+4. Encoder des notes ou justifications (pas toutes).
+5. Sauvergarder les notes.
+7. Impossible de soumettre les notes partielles
+6. Tant que les note encodées ne sont pas soumises ,on peut les modifier.
+7. Test avec un autre professeur du cours.
+8. On encode les notes restantes.
+9. Impossible de soumettre les notes complètes
+
+==== En tant que coordinateur
+1. S'authentitifier en tant que coordinateur.
+2. Verifier que les cours donnés sont présents pour encodage.
+3. Choisir un cours.
+4. Encoder des notes ou justifications (pas toutes).
+5. Sauvergarder les notes.
+6. Verifier qu'il est possible de soumettre les notes partielles et les soumettre.
+7. Les notes partielles ont été encodées pour ce cours , il n'est plus possible de les encoder.
+8. Les notes non soumises sont toujours encodables (vérification faite pour prof également).
+9. Il est possible de soumettre les note complètes encodée par un professeur
+10. Le cours n'est plus encodable après submission complète (Le bouton 'encoder' n'est plus clickable)
+
+
+==== En tant que gestionaire de programme
+
+=== Double Encodage
+1. S'authentitifier en tant que coordinateur.
+2. Choisir un cours.
+3. Encoder des notes ou justifications (pas toutes).
+4. Sauvergarder les notes.
+5. Soumettre les notes partielle.
+6. S'authentitifier en tant que professeur.
+7. Choisir le même cours.
+8. Choisr de double encoder.
+9. Verifier que seules les notes soumises peuvent être double encodées.
+10. Double encoder des notes
+11. Sauvergarder
+
+=== Divers
+
+===== Encodage et double encodage de notes avec décimales
+1. Choisir un cours qui ne permet pas les décimales
+2. Encoder une note décimale
+3. Sauvegarder et vérifier que ce n'est pas possible
+4. Modifier la note (pas de décimale)
+5. Sauvegarder
+6. Double encoder une note decimale
+7. Sauvegarder et vérifier que ce n'est pas possible
+8. Modifier la note (pas de décimale)
+9. Sauvegarder
+10. Choisir un cours qui premet les décimales
+11. Encoder une note décimale
+12. Sauvegarder
+13. Double encoder une note decimale
+14. Sauvegarder
+
+===== Envoi du message après soumission
+
+[NOTE]
+====
+On test  ici seulement l'envoi d'un message. +
+L'envoi spécifique d'un type de message (par ex emai) est un autre type de test. +
+Pour le moment on teste l'historique des message , le temp de mettre en place MyOsis. +
+====
+
+1. S'authentifier en tant que coordinateur.
+2. Encoder des notes.
+3. Soumettre l'encodage partiel.
+4. S'authentifier en tant qu'administrateur.
+5. Naviguer jusqu'à l'histopriques des messages.
+6. Vérifier que tous les professeurs du cours on reçu un message.
+
+===== Test du niveau de progression
