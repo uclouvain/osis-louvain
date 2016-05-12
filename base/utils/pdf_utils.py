@@ -39,6 +39,7 @@ from base import models as mdl
 PAGE_SIZE = A4
 MARGIN_SIZE = 20 * mm
 COLS_WIDTH = [25*mm,45*mm,45*mm,25*mm,25*mm]
+STUDENTS_PER_PAGE=24
 
 
 def add_header_footer(canvas, doc):
@@ -126,81 +127,148 @@ def list_notes_building(learning_unit_id, academic_year, list_exam_enrollment, s
     data = headers_table()
 
     old_offer_programme = None
-    current_learning_unit_year = None
-    cpt = 1
+    # current_learning_unit_year = None
+    students_printed = 0
     for rec_exam_enrollment in list_exam_enrollment:
-        if (int(rec_exam_enrollment.learning_unit_enrollment.learning_unit_year.id) == int(learning_unit_id)) \
-                or int(learning_unit_id) == -1:
+        offer_programme = rec_exam_enrollment.learning_unit_enrollment.offer
+        current_learning_unit_year = rec_exam_enrollment.learning_unit_enrollment.learning_unit_year
+        if not old_offer_programme:
+            # Case it is the very first sheet
+            # data = headers_table()
+            t = Table(data, COLS_WIDTH, repeatRows=1)
+            t.setStyle(TableStyle([
+                ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey)]))
 
-            student = rec_exam_enrollment.learning_unit_enrollment.student
-            offer_programme = rec_exam_enrollment.learning_unit_enrollment.offer
-            if old_offer_programme is None:
-                old_offer_programme = offer_programme
-                current_learning_unit_year = rec_exam_enrollment.learning_unit_enrollment.learning_unit_year
+            content.append(t)
+            old_offer_programme = offer_programme
+            main_data(academic_year,
+                      rec_exam_enrollment.session_exam,
+                      styles,
+                      current_learning_unit_year,
+                      offer_programme, content)
 
-            if offer_programme != old_offer_programme:
-                # Other programme - 1. manage criteria
-                main_data(academic_year,
-                          rec_exam_enrollment.session_exam,
-                          styles,
-                          current_learning_unit_year,
-                          old_offer_programme, content)
-                # Other programme - 2. write table
+        # if not learning_unit_year_id or \
+        #    (int(rec_exam_enrollment.learning_unit_enrollment.learning_unit_year.id) == int(learning_unit_year_id)):
+        # data = headers_table()
 
-                t = Table(data, COLS_WIDTH, repeatRows=1)
-                t.setStyle(TableStyle([
-                                   ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
-                                   ('BOX', (0,0), (-1,-1), 0.25, colors.black),
-                                   ('VALIGN',(0,0), (-1,-1), 'TOP'),
-                                   ('BACKGROUND', (0, 0), (-1, 0), colors.grey)]))
+        student = rec_exam_enrollment.learning_unit_enrollment.student
 
-                content.append(t)
-                # Other programme - 3. Write legend
-                end_date = ""
-                if rec_exam_enrollment.session_exam.offer_year_calendar.end_date:
-                    end_date = rec_exam_enrollment.session_exam.offer_year_calendar.end_date.strftime('%d/%m/%Y')
-                end_page_infos_building(content, end_date)
-                legend_building(current_learning_unit_year, content)
+        # if old_offer_programme is None:
+        #     old_offer_programme = offer_programme
+        #     current_learning_unit_year = rec_exam_enrollment.learning_unit_enrollment.learning_unit_year
+
+        # if offer_programme != old_offer_programme or students_printed == STUDENTS_PER_PAGE:
+        #     students_printed = 0
+        # Other programme - 1. manage criteria
+        person = mdl.person.find_by_id(student.person.id)
+        score = None
+        if not (rec_exam_enrollment.score_final is None):
+            if rec_exam_enrollment.session_exam.learning_unit_year.decimal_scores:
+                score = "{0:.2f}".format(rec_exam_enrollment.score_final)
+            else:
+                score = "{0:.0f}".format(rec_exam_enrollment.score_final)
+        justification = ""
+        if rec_exam_enrollment.justification_final:
+            justification = mdl.exam_enrollment.get_letter_justication_type(
+                rec_exam_enrollment.justification_final)
+        sc = ""
+        if score:
+            sc = "%s" % score
+        data.append([student.registration_id,
+                     Paragraph(person.last_name, styles['Normal']),
+                     Paragraph(person.first_name, styles['Normal']),
+                     sc,
+                     Paragraph(justification, styles['Normal'])])
+
+        # t = Table(data, COLS_WIDTH, repeatRows=1)
+        # t.setStyle(TableStyle([
+        #                    ('INNERGRID', (0,0), (-1,-1), 0.25, colors.black),
+        #                    ('BOX', (0,0), (-1,-1), 0.25, colors.black),
+        #                    ('VALIGN',(0,0), (-1,-1), 'TOP'),
+        #                    ('BACKGROUND', (0, 0), (-1, 0), colors.grey)]))
+        #
+        # content.append(t)
+            # Other programme - 3. Write legend
+            # end_date = ""
+            # if rec_exam_enrollment.session_exam.offer_year_calendar.end_date:
+            #     end_date = rec_exam_enrollment.session_exam.offer_year_calendar.end_date.strftime('%d/%m/%Y')
+            # end_page_infos_building(content, end_date)
+            # legend_building(current_learning_unit_year, content)
                 # Other programme - 4. page break
-                content.append(PageBreak())
-                data = headers_table()
-                old_offer_programme = offer_programme
-                current_learning_unit_year = rec_exam_enrollment.learning_unit_enrollment.learning_unit_year
+        if offer_programme != old_offer_programme or students_printed == STUDENTS_PER_PAGE:
+            t = Table(data, COLS_WIDTH, repeatRows=1)
+            t.setStyle(TableStyle([
+                ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+                ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+                ('BACKGROUND', (0, 0), (-1, 0), colors.grey)]))
+            content.append(t)
 
-            person = mdl.person.find_by_id(student.person.id)
-            score = None
-            if not (rec_exam_enrollment.score_final is None):
-                if rec_exam_enrollment.session_exam.learning_unit_year.decimal_scores:
-                    score = "{0:.2f}".format(rec_exam_enrollment.score_final)
-                else:
-                    score = "{0:.0f}".format(rec_exam_enrollment.score_final)
-            justification = ""
-            if rec_exam_enrollment.justification_final:
-                justification = mdl.exam_enrollment.get_letter_justication_type(rec_exam_enrollment.justification_final)
-            sc = ""
-            if score:
-                sc = "%s" % score
-            data.append([student.registration_id,
-                         Paragraph(person.last_name, styles['Normal']),
-                         Paragraph(person.first_name, styles['Normal']),
-                         sc,
-                         Paragraph(justification, styles['Normal'])])
-        cpt += 1
+            # Write Legend
+            end_date = ""
+            if rec_exam_enrollment.session_exam.offer_year_calendar.end_date:
+                end_date = rec_exam_enrollment.session_exam.offer_year_calendar.end_date.strftime('%d/%m/%Y')
+            end_page_infos_building(content, end_date)
+            legend_building(current_learning_unit_year, content)
 
-    if old_offer_programme :
-        main_data(academic_year, rec_exam_enrollment.session_exam, styles, current_learning_unit_year, old_offer_programme, content)
-        t = Table(data,COLS_WIDTH)
-        t.setStyle(TableStyle([('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-                               ('BOX', (0, 0), (-1,-1), 0.25, colors.black),
-                               ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-                               ('BACKGROUND', (0, 0), (-1, 0), colors.grey)]))
+            # New Page
+            content.append(PageBreak())
 
-        content.append(t)
-        end_date = ""
-        if rec_exam_enrollment.session_exam.offer_year_calendar.end_date:
-            end_date = rec_exam_enrollment.session_exam.offer_year_calendar.end_date.strftime('%d/%m/%Y')
-        end_page_infos_building(content, end_date)
-        legend_building(current_learning_unit_year, content)
+            # New table with headers (noma, firstname, lastname...)
+            data = headers_table()
+
+            # Write header
+            main_data(academic_year,
+                      rec_exam_enrollment.session_exam,
+                      styles,
+                      current_learning_unit_year,
+                      offer_programme, content)
+            old_offer_programme = offer_programme
+            students_printed = 0
+                # data = headers_table()
+                # old_offer_programme = offer_programme
+                # current_learning_unit_year = rec_exam_enrollment.learning_unit_enrollment.learning_unit_year
+        students_printed += 1
+            # if old_offer_programme is None:
+            #     old_offer_programme = offer_programme
+            #     current_learning_unit_year = rec_exam_enrollment.learning_unit_enrollment.learning_unit_year
+
+            # person = mdl.person.find_by_id(student.person.id)
+            # score = None
+            # if not (rec_exam_enrollment.score_final is None):
+            #     if rec_exam_enrollment.session_exam.learning_unit_year.decimal_scores:
+            #         score = "{0:.2f}".format(rec_exam_enrollment.score_final)
+            #     else:
+            #         score = "{0:.0f}".format(rec_exam_enrollment.score_final)
+            # justification = ""
+            # if rec_exam_enrollment.justification_final:
+            #     justification = mdl.exam_enrollment.get_letter_justication_type(rec_exam_enrollment.justification_final)
+            # sc = ""
+            # if score:
+            #     sc = "%s" % score
+            # data.append([student.registration_id,
+            #              Paragraph(person.last_name, styles['Normal']),
+            #              Paragraph(person.first_name, styles['Normal']),
+            #              sc,
+            #              Paragraph(justification, styles['Normal'])])
+
+    # if old_offer_programme:
+    #     main_data(academic_year, rec_exam_enrollment.session_exam, styles, current_learning_unit_year, old_offer_programme, content)
+    #     t = Table(data,COLS_WIDTH)
+    #     t.setStyle(TableStyle([('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+    #                            ('BOX', (0, 0), (-1,-1), 0.25, colors.black),
+    #                            ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+    #                            ('BACKGROUND', (0, 0), (-1, 0), colors.grey)]))
+    #
+    #     content.append(t)
+    #     end_date = ""
+    #     if rec_exam_enrollment.session_exam.offer_year_calendar.end_date:
+    #         end_date = rec_exam_enrollment.session_exam.offer_year_calendar.end_date.strftime('%d/%m/%Y')
+    #     end_page_infos_building(content, end_date)
+    #     legend_building(current_learning_unit_year, content)
 
 
 def legend_building(learning_unit_year, content):
@@ -356,10 +424,15 @@ def end_page_infos_building(content, end_date):
     p_signature.fontSize = 10
     p_signature.leftIndent = 330
     paragraph_signature = Paragraph('''
+<<<<<<< Updated upstream
                     <font size=10>%s ....................................</font>
                     <br/>
                     <font size=10>%s ..../..../........</font>
                     <br/>
+=======
+                    <font size=10>%s ...................................... , </font>
+                    <font size=10><pre>%s ..../..../..........                      </pre></font>
+>>>>>>> Stashed changes
                     <font size=10>%s</font>
                    ''' % (_('done_at'), _('the'), _('signature')), p_signature)
     content.append(paragraph_signature)
