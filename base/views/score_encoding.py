@@ -121,6 +121,8 @@ def online_double_encoding_form(request, learning_unit_year_id=None):
 
     # Case asking for a dubble encoding
     if request.method == 'GET':
+        for exam_enrol in exam_enrollments:
+            exam_enrol.clean_scores_reencoded()
         if len(exam_enrollments) > 0:
             return layout.render(request, "assessments/online_double_encoding_form.html", data)
         else:

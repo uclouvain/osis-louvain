@@ -69,6 +69,13 @@ class ExamEnrollment(models.Model):
     def student(self):
         return self.learning_unit_enrollment.student
 
+    def clean_scores_reencoded(self):
+        """
+        Set score_reencoded and justification_reencoded to None.
+        """
+        self.score_reencoded = None
+        self.justification_reencoded = None
+
     def __str__(self):
         return u"%s - %s" % (self.session_exam, self.learning_unit_enrollment)
 
