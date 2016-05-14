@@ -299,7 +299,7 @@ def notes_printing(request, learning_unit_year_id=None, tutor_id=None, offer_id=
                                                                  academic_year=academic_year,
                                                                  tutor_id=tutor_id,
                                                                  offer_year_id=offer_id)
-    return pdf_utils.print_notes(academic_year, learning_unit_year_id, exam_enrollments)
+    return pdf_utils.print_notes(academic_year, exam_enrollments)
 
 
 @login_required

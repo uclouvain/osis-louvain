@@ -62,11 +62,10 @@ def add_header_footer(canvas, doc):
     canvas.restoreState()
 
 
-def print_notes(academic_year, learning_unit_year_id, list_exam_enrollment):
+def print_notes(academic_year, list_exam_enrollment):
     """
     Create a multi-page document
     :param academic_year: An object AcademicYear
-    :param learning_unit_year_id: The id of the learning unit (from which to create the PDF notes sheet)
     :param list_exam_enrollment: List of examEnrollments to print on the PDF.
     """
     filename = "%s.pdf" % _('scores_sheet')
@@ -85,7 +84,7 @@ def print_notes(academic_year, learning_unit_year_id, list_exam_enrollment):
     styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
     content = []
 
-    list_notes_building(learning_unit_year_id, academic_year, list_exam_enrollment, styles, content)
+    list_notes_building(academic_year, list_exam_enrollment, styles, content)
 
     doc.build(content, onFirstPage=add_header_footer, onLaterPages=add_header_footer)
     pdf = buffer.getvalue()
@@ -119,101 +118,98 @@ def footer_building(canvas, doc, styles):
     footer.drawOn(canvas, doc.leftMargin, h)
 
 
-def list_notes_building(learning_unit_year_id, academic_year, list_exam_enrollment, styles, content):
+def _write_table_of_students(content, data):
+    t = Table(data, COLS_WIDTH, repeatRows=1)
+    t.setStyle(TableStyle([
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('BACKGROUND', (0, 0), (-1, 0), colors.grey)]))
+    content.append(t)
 
-    content.append(Paragraph('''
-                            <para spaceb=5>
-                                &nbsp;
-                            </para>
-                            ''', ParagraphStyle('normal')))
-    data = headers_table()
 
-    old_offer_programme = None
-    old_learning_unit_year = None
-    if learning_unit_year_id:
-        old_learning_unit_year = mdl.learning_unit_year.find_by_id(learning_unit_year_id)
-    students_printed = 0
-    total_student = len(list_exam_enrollment)
-    for rec_exam_enrollment in list_exam_enrollment:
-        offer_programme = rec_exam_enrollment.learning_unit_enrollment.offer
-        current_learning_unit_year = rec_exam_enrollment.learning_unit_enrollment.learning_unit_year
-        if not old_offer_programme:
-            # Case it is the very first sheet
-            old_offer_programme = offer_programme
-            main_data(academic_year,
-                      rec_exam_enrollment.session_exam,
-                      styles,
-                      current_learning_unit_year,
-                      offer_programme, content)
+def _write_legend(content, offer_year_calendar, learning_unit_year):
+    end_date = ""
+    if offer_year_calendar.end_date:
+        end_date = offer_year_calendar.end_date.strftime('%d/%m/%Y')
+    end_page_infos_building(content, end_date)
+    legend_building(learning_unit_year, content)
 
-        # 1. Getting informations from the student (noma, firstname, etc...)
-        student = rec_exam_enrollment.learning_unit_enrollment.student
-        person = mdl.person.find_by_id(student.person.id)
-        score = None
-        if not (rec_exam_enrollment.score_final is None):
-            if rec_exam_enrollment.session_exam.learning_unit_year.decimal_scores:
-                score = "{0:.2f}".format(rec_exam_enrollment.score_final)
-            else:
-                score = "{0:.0f}".format(rec_exam_enrollment.score_final)
-        justification = ""
-        if rec_exam_enrollment.justification_final:
-            justification = mdl.exam_enrollment.get_letter_justication_type(
-                rec_exam_enrollment.justification_final)
-        sc = ""
-        if score:
-            sc = "%s" % score
 
-        # 2. Adding this line to the table (data)
-        data.append([student.registration_id,
-                     Paragraph(person.last_name, styles['Normal']),
-                     Paragraph(person.first_name, styles['Normal']),
-                     sc,
-                     Paragraph(justification, styles['Normal'])])
-        students_printed += 1
-        total_student -= 1
+def _build_key(rec_exam_enrollment):
+    offer_year_id = rec_exam_enrollment.session_exam.offer_year_calendar.offer_year.id
+    learning_unit_year_id = rec_exam_enrollment.session_exam.learning_unit_year.id
+    return "%s %s" % (str(offer_year_id), str(learning_unit_year_id))
 
-        # If the exam_enrollment is in a different program/offer
-        # or if the examEnroll is in a different learningUnit
-        # or if we are at the maximum of lines to print in 1 sheet of paper
-        # or if we are at the last exam_enrollment
-        if offer_programme != old_offer_programme \
-                or current_learning_unit_year != old_learning_unit_year \
-                or students_printed == STUDENTS_PER_PAGE \
-                or total_student == 0:
-            # 3. Adding the complete table of examEnrollments to the PDF sheet
-            t = Table(data, COLS_WIDTH, repeatRows=1)
-            t.setStyle(TableStyle([
-                ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-                ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-                ('BACKGROUND', (0, 0), (-1, 0), colors.grey)]))
-            content.append(t)
 
-            # 4. Write Legend
-            end_date = ""
-            if rec_exam_enrollment.session_exam.offer_year_calendar.end_date:
-                end_date = rec_exam_enrollment.session_exam.offer_year_calendar.end_date.strftime('%d/%m/%Y')
-            end_page_infos_building(content, end_date)
-            legend_building(current_learning_unit_year, content)
+def list_notes_building(academic_year, list_exam_enrollment, styles, content):
+    # Will contain lists of examEnrollments splitted by learningUnitYear and by Offeryear
+    enrollments_by_learn_unit_and_offer = {} # {<learning_unit_year_id, offer_year_id> : <ExamEnrollment>}
+    for exam_enroll in list_exam_enrollment:
+        key = _build_key(exam_enroll)
+        if key not in enrollments_by_learn_unit_and_offer.keys():
+            enrollments_by_learn_unit_and_offer[key] = [exam_enroll]
+        else:
+            enrollments_by_learn_unit_and_offer[key].append(exam_enroll)
 
-            # 5. Changing learningUnit and OfferYear
-            old_learning_unit_year = current_learning_unit_year
-            old_offer_programme = offer_programme
-            students_printed = 0
+    # Sort by learningUnitYear.acronym then by Offeryear.acronym
+    list_exam_enrollments = sorted(enrollments_by_learn_unit_and_offer.values(),
+                                  key=lambda k: "%s %s" % (k[0].session_exam.learning_unit_year.acronym,
+                                                           k[0].session_exam.offer_year_calendar.offer_year.acronym))
 
-            if total_student != 0: # Not necessary to create an other page if there's no more ExamEnrollments to print
+    for exam_enrollments in list_exam_enrollments:
+        data = headers_table()
+        students_printed = 0
+        enrollments_to_print = len(exam_enrollments)
+        for exam_enroll in exam_enrollments:
+            # 1. Getting informations from the student (noma, firstname, etc...)
+            student = exam_enroll.learning_unit_enrollment.student
+            person = mdl.person.find_by_id(student.person.id)
+            score = None
+            if not (exam_enroll.score_final is None):
+                if exam_enroll.session_exam.learning_unit_year.decimal_scores:
+                    score = "{0:.2f}".format(exam_enroll.score_final)
+                else:
+                    score = "{0:.0f}".format(exam_enroll.score_final)
+            justification = ""
+            if exam_enroll.justification_final:
+                justification = mdl.exam_enrollment.get_letter_justication_type(
+                    exam_enroll.justification_final)
+            sc = ""
+            if score:
+                sc = "%s" % score
+
+            # 2. Append the examEnrollment to the table 'data'
+            data.append([student.registration_id,
+                         Paragraph(person.last_name, styles['Normal']),
+                         Paragraph(person.first_name, styles['Normal']),
+                         sc,
+                         Paragraph(justification, styles['Normal'])])
+
+            students_printed += 1
+            enrollments_to_print -= 1
+
+            if students_printed == STUDENTS_PER_PAGE or enrollments_to_print == 0:
+                students_printed = 0
+                offer_year_calendar = exam_enroll.session_exam.offer_year_calendar
+                # Print a complete PDF sheet
+                # 3. Write header
+                main_data(academic_year,
+                          exam_enroll.session_exam,
+                          styles,
+                          offer_year_calendar.offer_year, content)
+                # 4. Adding the complete table of examEnrollments to the PDF sheet
+                _write_table_of_students(content, data)
+
+                # 5. Write Legend
+                _write_legend(content, offer_year_calendar, exam_enroll.session_exam.learning_unit_year)
+
                 # 6. New Page
                 content.append(PageBreak())
 
-                # 7. New table in variable 'data' with headers ('noma', 'firstname', 'lastname'...)
+                # 7. New headers_table in variable 'data' with headers ('noma', 'firstname', 'lastname'...)
+                #    in case there's one more page after this one
                 data = headers_table()
-
-                # 8. Write header
-                main_data(academic_year,
-                          rec_exam_enrollment.session_exam,
-                          styles,
-                          current_learning_unit_year,
-                          offer_programme, content)
 
 
 def legend_building(learning_unit_year, content):
@@ -270,10 +266,12 @@ def get_data_coordinator(learning_unit_year, styles):
     return [[p_responsible], [p_coord_name], [p_coord_location], [p_coord_address]]
 
 
-def main_data(academic_year, session_exam, styles, learning_unit_year, offer, content):
+def main_data(academic_year, session_exam, styles, offer, content):
+    learning_unit_year = session_exam.learning_unit_year
+
     # We add first a blank line
     content.append(Paragraph('''
-        <para spaceb=10>
+        <para spaceb=20>
             &nbsp;
         </para>
         ''', ParagraphStyle('normal')))
