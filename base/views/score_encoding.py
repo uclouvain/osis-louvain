@@ -34,22 +34,14 @@ from . import layout
 
 
 @login_required
-def scores_encoding(request):
-    tutor = mdl.attribution.get_assigned_tutor(request.user)
-    academic_yr = mdl.academic_year.current_academic_year()
+def scores_encoding(request, learning_unt_year_id=None):
+    # In case the user is a program manager
+    if mdl.program_manager.is_program_manager(user=request.user):
+        return get_data_pgmer(request)
 
     # In case the user is a Tutor
-    if tutor:
-        scores_encodings = get_data(tutor)
-        return layout.render(request, "assessments/scores_encoding.html",
-                                      {'tutor': tutor,
-                                       'academic_year': academic_yr,
-                                       'notes_list': scores_encodings,
-                                       'number_session': mdl.session_exam.find_session_exam_number()})
-
-    # In case the user is a program manager
     else:
-        return get_data_pgmer(request)
+        return get_data(request)
 
 
 @login_required
@@ -334,9 +326,16 @@ def get_score_encoded(enrollments):
     return progress
 
 
-def get_data(tutor):
+def get_data(request, learning_unit_year_acronym=None):
+    academic_yr = mdl.academic_year.current_academic_year()
+    tutor = mdl.attribution.get_assigned_tutor(request.user)
+    learning_unit_year_ids = None
+    if learning_unit_year_acronym:
+        learning_unit_year_ids = mdl.learning_unit_year.search(acronym=learning_unit_year_acronym).values_list('id',
+                                                                                                               flat=True)
     exam_enrollments = mdl.exam_enrollment.find_for_score_encodings(mdl.session_exam.find_session_exam_number(),
-                                                                    tutor=tutor)
+                                                                    tutor=tutor,
+                                                                    learning_unit_year_ids=learning_unit_year_ids)
     # Grouping by learningUnitYear
     group_by_learn_unit_year = {}
     for exam_enrol in exam_enrollments:
@@ -355,7 +354,12 @@ def get_data(tutor):
                                                             'exam_enrollments_encoded': exam_enrollments_encoded,
                                                             'total_exam_enrollments': 1}
 
-    return group_by_learn_unit_year.values()
+    return layout.render(request, "assessments/scores_encoding.html",
+                         {'tutor': tutor,
+                          'academic_year': academic_yr,
+                          'notes_list': group_by_learn_unit_year.values(),
+                          'number_session': mdl.session_exam.find_session_exam_number(),
+                          'learning_unit_year_acronym': learning_unit_year_acronym})
 
 
 def get_data_online(learning_unit_year_id, request):
@@ -428,7 +432,6 @@ def get_data_online_double(learning_unit_year_id, request):
 
 def get_data_pgmer(request, offer_year_id=None, tutor_id=None):
     academic_yr = mdl.academic_year.current_academic_year()
-    offer_years_managed = mdl.offer_year.find_by_user(request.user, academic_yr=academic_yr)
 
     if not offer_year_id:
         scores_encodings = list(mdl.scores_encoding.search(request.user))
@@ -520,9 +523,15 @@ def get_data_pgmer(request, offer_year_id=None, tutor_id=None):
 
 
 def refresh_list(request):
-    return get_data_pgmer(request,
-                          offer_year_id=request.GET.get('offer', None),
-                          tutor_id=request.GET.get('tutor', None))
+    # In case the user is a program manager
+    if mdl.program_manager.is_program_manager(user=request.user):
+        return get_data_pgmer(request,
+                              offer_year_id=request.GET.get('offer', None),
+                              tutor_id=request.GET.get('tutor', None))
+
+    # In case the user is a Tutor
+    else:
+        return get_data(request, learning_unit_year_acronym=request.GET.get('learning_unit_year_acronym', None))
 
 
 def _sort_for_encodings(exam_enrollments):

@@ -42,23 +42,42 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label>{% trans 'tutor' %}</label><br>{{ tutor }}
                     </div>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label>{% trans 'academic_year' %}</label><br>
                         {{ academic_year }}
                     </div>
                 </div>
-                <div class="col-md-4">
-                <div class="form-group">
-                    <label>{% trans 'number_session' %}</label><br>
-                    {{ number_session }}
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>{% trans 'number_session' %}</label><br>
+                        {{ number_session }}
+                    </div>
                 </div>
-            </div>
+                <div class="col-md-4">
+                    <form method="get" action="{% url 'refresh_list' %}">
+                        <div class="col-md-10">
+                            <label for="txt_acronym">{% trans 'learning_unit'%}</label>
+                            <input class="form-control" id="txt_acronym" placeholder="{% trans 'acronym' %}"
+                                   name="learning_unit_year_acronym"
+                                   value="{{ learning_unit_year_acronym  | default_if_none:'' }}"
+                                   style="text-transform:uppercase" maxlength="15">
+                        </div>
+                        <div class="col-md-2">
+                            <br>
+                            <button type="submit" id="bt_submit_offer_search" class="btn btn-primary" role="button"
+                                    style="margin-top: 4px"
+                                    title="{% trans 'refresh_list' %}">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                            &nbsp;&nbsp;
+                        </div>
+                    </form>
+                </div>
             </div>
             <br>
             <p><b>{% trans 'select_an_encoding_type' %}</b></p>
