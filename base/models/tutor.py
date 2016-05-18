@@ -100,5 +100,5 @@ def find_by_learning_unit(learning_unit_id):
     :param learning_unit_id:
     :return: All tutors of the learningUnit passed in parameter.
     """
-    tutor_ids = attribution.search(learning_unit_id=learning_unit_id).values_list('tutor').distinct('tutor')
+    tutor_ids = attribution.search(learning_unit_id=learning_unit_id).values_list('tutor', flat=True).distinct('tutor')
     return Tutor.objects.filter(pk__in=tutor_ids).order_by('person__last_name', 'person__first_name')
