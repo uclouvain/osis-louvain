@@ -94,20 +94,21 @@ def online_encoding_form(request, learning_unit_year_id=None):
                 modification_possible = False
             if modification_possible:
                 new_score, new_justification = _truncate_decimals(score, justification, decimal_scores_authorized)
-                enrollment.score_reencoded = None
-                enrollment.justification_reencoded = None
+                if new_score is not None or new_justification:
+                    enrollment.score_reencoded = None
+                    enrollment.justification_reencoded = None
 
-                # Case it is the program manager who validates the dubble encoding
-                if data['is_program_manager']:
-                    enrollment.score_final = new_score
-                    enrollment.justification_final = new_justification
-                    mdl.exam_enrollment.create_exam_enrollment_historic(request.user, enrollment,
-                                                                        enrollment.score_final,
-                                                                        enrollment.justification_final)
-                else:  # Case it is the tutor who validates the dubble encoding
-                    enrollment.score_draft = new_score
-                    enrollment.justification_draft = new_justification
-                enrollment.save()
+                    # Case it is the program manager who validates the dubble encoding
+                    if data['is_program_manager']:
+                        enrollment.score_final = new_score
+                        enrollment.justification_final = new_justification
+                        mdl.exam_enrollment.create_exam_enrollment_historic(request.user, enrollment,
+                                                                            enrollment.score_final,
+                                                                            enrollment.justification_final)
+                    else:  # Case it is the tutor who validates the dubble encoding
+                        enrollment.score_draft = new_score
+                        enrollment.justification_draft = new_justification
+                    enrollment.save()
         data = get_data_online(learning_unit_year_id, request)
         return layout.render(request, "assessments/online_encoding.html", data)
 
@@ -137,9 +138,10 @@ def online_double_encoding_form(request, learning_unit_year_id=None):
             score_dubble_encoded, justification_dubble_encoded = _truncate_decimals(score_dubble_encoded,
                                                                                     justification_dubble_encoded,
                                                                                     decimal_scores_authorized)
-            exam_enrol.score_reencoded = score_dubble_encoded
-            exam_enrol.justification_reencoded = justification_dubble_encoded
-            exam_enrol.save()
+            if score_dubble_encoded is not None or justification_dubble_encoded:
+                exam_enrol.score_reencoded = score_dubble_encoded
+                exam_enrol.justification_reencoded = justification_dubble_encoded
+                exam_enrol.save()
 
         # Needs to filter by examEnrollments where the score_reencoded and justification_reencoded are not None
         exam_enrollments = [exam_enrol for exam_enrol in exam_enrollments
