@@ -86,7 +86,7 @@ class ExamEnrollment(models.Model):
 
 def get_letter_justication_type(justification_type):
     if JUSTIFICATION_TYPES[0][0] == justification_type:
-        return 'A'
+        return 'S'
     elif JUSTIFICATION_TYPES[1][0] == justification_type:
         return 'M'
     elif JUSTIFICATION_TYPES[2][0] == justification_type:

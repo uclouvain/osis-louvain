@@ -94,7 +94,7 @@ def build_pdf(document):
                              Paragraph(enrollment["last_name"], styles['Normal']),
                              Paragraph(enrollment["first_name"], styles['Normal']),
                              enrollment["score"],
-                             Paragraph(enrollment["justification"], styles['Normal'])])
+                             Paragraph(mdl.exam_enrollment.get_letter_justication_type(enrollment["justification"]), styles['Normal'])])
 
                 students_printed += 1
                 enrollments_to_print -= 1
