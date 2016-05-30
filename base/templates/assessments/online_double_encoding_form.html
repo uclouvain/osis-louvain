@@ -47,7 +47,7 @@
     </div>
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="form-group" id="pnl_responsable_name" >
                     <label>{% trans 'coordinator' %}</label><br>
                     {% if coordinator %}
@@ -55,15 +55,37 @@
                     {% else %}
                         {% trans 'none' %}
                     {% endif %}
+                    {% if tutors %}
+                        <a role="button" data-toggle="collapse" data-target="#tutors_by_course"
+                           aria-expanded="false"
+                           aria-controls="tutors_by_course"
+                           title="{% trans 'display_tutors' %}">
+                          <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                        </a>
+                    {% endif %}
+                    <div class="collapse" id="tutors_by_course">
+                        <label>{% trans 'tutors' %}</label><br>
+                        <ul>
+                            {% for prof in tutors %}
+                                <li>{{ prof }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="form-group">
                     <label>{% trans 'academic_year' %}</label><br>
                     {{ academic_year }}
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>{% trans 'number_session' %}</label><br>
+                    {{ number_session }}
+                </div>
+            </div>
+            <div class="col-md-3">
                 <div class="form-group">
                     <label>{% trans 'number_of_enrollments' %}</label><br>
                     {{ count_total_enrollments }}
@@ -111,7 +133,7 @@
                                   {% endifchanged %}">
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name }}</td>
+                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|title }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name }}</td>
                         <td>
                             {% if is_program_manager %}
@@ -134,13 +156,13 @@
                                    {% else %}
                                         step="1"
                                         oninvalid="invalidScoreMsg(this,false,'{% trans 'decimal_score_not_allowed' %}','{% trans 'scores_gt_0_lt_20' %}')"
-                                   {% endif %} >
+                                   {% endif %}>
                         </td>
                         <td>
                             {% if is_program_manager %}
-                                <input type="hidden" id="hdn_justification_draft_{{ enrollment.id }}" value="{{ enrollment.justification_final }}">
+                                <input type="hidden" id="hdn_justification_draft_{{ enrollment.id }}" value="{{ enrollment.justification_final | default_if_none:'' }}">
                             {% else %}
-                                <input type="hidden" id="hdn_justification_draft_{{ enrollment.id }}" value="{{ enrollment.justification_draft }}">
+                                <input type="hidden" id="hdn_justification_draft_{{ enrollment.id }}" value="{{ enrollment.justification_draft | default_if_none:''}}">
                             {% endif %}
                             <select class="form-control" name="justification_{{ enrollment.id }}" id="slt_double_justification_score_{{ enrollment.id }}"
                                    tabindex="{{ enrollments|length|sum:forloop.counter }}"
@@ -149,18 +171,18 @@
                                         disabled
                                     {% endif %}
                                    {% endif %}>
-                                <option value="None"></option>
+                                <option value=""></option>
                                 {% if is_program_manager %}
-                                    <option value="ABSENCE_UNJUSTIFIED">{% trans 'absence_unjustified' %}</option>
-                                    <option value="ABSENCE_JUSTIFIED">{% trans 'absence_justified' %}</option>
+                                    <option value="ABSENCE_UNJUSTIFIED">{% trans 'ABSENCE_UNJUSTIFIED' %}</option>
+                                    <option value="ABSENCE_JUSTIFIED">{% trans 'ABSENCE_JUSTIFIED' %}</option>
                                 {% else %}
                                     <option value="ABSENCE_UNJUSTIFIED">{% trans 'absent' %}</option>
                                 {% endif %}
-                                <option value="CHEATING">{% trans 'cheating' %}</option>
-                                <option value="SCORE_MISSING">{% trans 'score_missing' %}</option>
+                                <option value="CHEATING">{% trans 'CHEATING' %}</option>
+                                <option value="SCORE_MISSING">{% trans 'SCORE_MISSING' %}</option>
                             </select>
                         </td>
-                        <td>{{ enrollment.session_exam.offer_year_calendar.end_date | default_if_none:''|date:"j/m/Y" }}</td>
+                        <td>{{ enrollment.session_exam.deadline | default_if_none:''|date:"j/m/Y" }}</td>
                     </tr>
                 {% endfor %}
                 </tbody>
@@ -203,7 +225,7 @@
         var enrollmentId = id.substring(id.lastIndexOf("_") + 1);
 
         // Checks whether the object contains an id.
-        if(target.val() != "None") {
+        if(target.val() != "") {
             $("#num_double_score_" + enrollmentId).val('');
         }
     });
@@ -232,7 +254,7 @@
 
         console.log(justification_double + " = " + justification_draft);
 
-        if ((justification_double != null || justification_draft != "None") && justification_double != justification_draft) {
+        if ((justification_double != null || justification_draft != "") && justification_double != justification_draft) {
             double_justification_field.css("border", "1px solid #ff0000");
         } else {
             double_justification_field.css("border", "1px solid lightgrey");

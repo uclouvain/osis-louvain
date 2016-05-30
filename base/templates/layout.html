@@ -89,7 +89,7 @@
                     <ul class="dropdown-menu">
                         <li><a href="{% url 'organizations' %}" id="lnk_organizations">{% trans 'organizations'%}</a></li>
                         <li><a href="{% url 'structures' %}" id="lnk_dropdown_entities">{% trans 'entities' %}</a></li>
-                        <li><a href="{% url 'mandates' %}" id="lnk_dropdown_mandates">{% trans 'mandates' %}</a></li>
+                        <!--<li><a href="{% url 'mandates' %}" id="lnk_dropdown_mandates">{% trans 'mandates' %}</a></li>-->
                     </ul>
                 </li>
             </ul>
@@ -105,12 +105,10 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a href="{% url 'admin:index' %}" id="lnk_data" target="_blank">
+                                <li><a href="{% url 'data' %}" id="lnk_data">
                                         <span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span> {% trans 'data' %}
                                     </a>
                                 </li>
-                                <li><a href="{% url 'storage' %}" id="lnk_files">
-                                    <span class="glyphicon glyphicon-hdd" aria-hidden="true"></span> {% trans 'storage' %}</a></li>
                                 <li><a href="{% url 'messages' %}" id="lnk_messages">
                                     <span class="glyphicon glyphicon-envelope" aria-hidden="true"></span> {% trans 'messages' %}</a></li>
                             </ul>
@@ -126,10 +124,10 @@
                             <li><a href="{% url 'profile' %}" id="lnk_profile">
                                 <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
                                 {% trans 'profile' %}</a></li>
-                            <li role="separator" class="divider"></li>
+                            <!--<li role="separator" class="divider"></li>
                             <li><a href="{% url 'logout' %}?next=/" id="lnk_logout">
                                 <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
-                                {% trans 'logout' %}</a></li>
+                                {% trans 'logout' %}</a></li>-->
                         </ul>
                     </li>
                 {% else %}

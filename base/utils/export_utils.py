@@ -33,7 +33,7 @@ from base import models as mdl
 
 HEADER = [str(_('academic_year')),
           str(_('session')),
-          str(_('activity_code')),
+          str(_('learning_unit')),
           str(_('program')),
           str(_('registration_number')),
           str(_('lastname')),
@@ -66,10 +66,10 @@ def export_xls(academic_year_id, is_fac, exam_enrollments):
         offer = exam_enroll.learning_unit_enrollment.offer
         person = mdl.person.find_by_id(student.person.id)
 
-        if exam_enroll.session_exam.offer_year_calendar.end_date is None:
+        if exam_enroll.session_exam.deadline is None:
             end_date = "-"
         else:
-            end_date = exam_enroll.session_exam.offer_year_calendar.end_date.strftime('%d/%m/%Y')
+            end_date = exam_enroll.session_exam.deadline.strftime('%d/%m/%Y')
         score = None
         if exam_enroll.score_final is not None:
             if exam_enroll.session_exam.learning_unit_year.decimal_scores:
@@ -97,10 +97,10 @@ def export_xls(academic_year_id, is_fac, exam_enrollments):
     number_session = list(exam_enrollments)[0].session_exam.number_session
     learn_unit_acronym = list(exam_enrollments)[0].session_exam.learning_unit_year.acronym
 
-    filename = "session_%s_%s_%s.xls" % (str(academic_year.year),
+    filename = "session_%s_%s_%s.xlsx" % (str(academic_year.year),
                                          str(number_session),
                                          learn_unit_acronym)
-    response = HttpResponse(save_virtual_workbook(workbook), content_type='application/vnd.ms-excel')
+    response = HttpResponse(save_virtual_workbook(workbook), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
     return response
 

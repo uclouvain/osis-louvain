@@ -55,7 +55,7 @@ class InternshipChoiceAdmin(admin.ModelAdmin):
 admin.site.register(InternshipChoice, InternshipChoiceAdmin)
 
 class OrganizationAdmin(admin.ModelAdmin):
-    list_display = ('name', 'acronym', 'reference', 'type', 'changed')
+    list_display = ('name', 'acronym', 'reference', 'type')
     fieldsets = ((None, {'fields': ('name', 'acronym', 'reference', 'website', 'type')}),)
     search_fields = ['acronym']
 

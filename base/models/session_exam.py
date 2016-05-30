@@ -52,6 +52,7 @@ class SessionExam(models.Model):
     learning_unit_year = models.ForeignKey('LearningUnitYear')
     offer_year_calendar = models.ForeignKey('OfferYearCalendar')
     progress = None
+    deadline = models.DateField(null=True)
 
     def __str__(self):
         return u"%s - %d" % (self.learning_unit_year, self.number_session)

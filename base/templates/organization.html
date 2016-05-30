@@ -75,8 +75,10 @@
                         <label>{% trans 'address(ses)' %}</label>
                     </div>
                     <div class="col-md-1">
-                        <a href="{% url 'organization_address_create' organization.id %}" id="lnk_organization_address_create"
-                           class="btn btn-default" role="button" title="{% trans 'add_an_address_to_the_organization' %}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
+                        {% if request.user.is_superuser %}
+                            <a href="{% url 'organization_address_create' organization.id %}" id="lnk_organization_address_create"
+                               class="btn btn-default" role="button" title="{% trans 'add_an_address_to_the_organization' %}"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
+                        {% endif %}
                     </div>
                 </div>
                 <br>
@@ -94,26 +96,19 @@
                                     {{ address.country | default_if_none:'' }}
                                 </address>
                                 </p>
-
                             </a>
                             {%endfor%}
                         </div>
-
                     </div>
                 </div>
                 {%endif%}
 
-                <div class="row">
-                    <div class="col-md-4">
-                        <a href="{% url 'organization_edit' organization.id %}" title="{%trans 'edit'%}"
-                           class="btn btn-primary" role="button" id="bt_organization_edit">
-                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> {% trans 'edit'%}
-                        </a>
-                    </div>
-                    <div class="col-md-8">
-
-                    </div>
-                </div>
+                {% if request.user.is_superuser %}
+                    <a href="{% url 'organization_edit' organization.id %}" title="{%trans 'edit'%}"
+                       class="btn btn-primary" role="button" id="bt_organization_edit">
+                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> {% trans 'edit'%}
+                    </a>
+                {% endif %}
             </div>
             <div id="tab_structure" class="tab-pane fade">
                 <br>

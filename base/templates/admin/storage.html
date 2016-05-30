@@ -27,6 +27,8 @@
 {% endcomment %}
 
 {% block breadcrumb %}
+<li>{% trans 'administration' %}</li>
+<li><a href="{% url 'data' %}">{% trans 'data' %}</a></li>
 <li class="active">{% trans 'storage' %}</li>
 {% endblock %}
 {% block content %}

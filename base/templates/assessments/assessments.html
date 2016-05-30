@@ -31,19 +31,19 @@
   <li class="active">{% trans 'evaluations' %}</li>
 {% endblock %}
 {% block content %}
-  <div class="page-header">
+<div class="page-header">
     <h2>{% trans 'evaluations' %}</h2>
-  </div>
+</div>
 
-  <div class="panel panel-default">
+<div class="panel panel-default">
     <div class="panel-body">
-      <div class="row">
-        <div class="col-md-1"><i class="fa fa-hashtag" style="font-size: 400%; color: #6699FF;"></i></div>
-        <div class="col-md-11">
-          <h4 class="media-heading"><a href="{% url 'scores_encoding' %}" id="lnk_score_encoding">{% trans 'scores_encoding' %}</a></h4>
-          <p>{% trans 'desc_lnk_score_encoding' %}</p>
+        <div class="row">
+            <div class="col-md-1"><i class="fa fa-hashtag" style="font-size: 400%; color: #6699FF;"></i></div>
+            <div class="col-md-11">
+                <h4 class="media-heading"><a href="{% url 'scores_encoding' %}" id="lnk_score_encoding">{% trans 'scores_encoding' %}</a></h4>
+                <p>{% trans 'desc_lnk_score_encoding' %}</p>
+            </div>
         </div>
-      </div>
     </div>
-  </div>
+</div>
 {% endblock %}

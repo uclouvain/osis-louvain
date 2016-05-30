@@ -23,4 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-default_app_config = 'base.apps.BaseConfig'
+
+from backoffice.queue import queue_actions
+from backoffice.queue import queue

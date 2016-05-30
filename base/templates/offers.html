@@ -85,7 +85,7 @@
                     <td>{{ offer_year.academic_year}}</td>
                     <td><a href="{% url 'offer_read' offer_year.id %}" id="lnk_offer_{{offer_year.id}}">{{ offer_year.acronym }}</a></td>
                     <td>{{ offer_year.title }}</td>
-                    <td>{{ offer_year.structure }}</td>
+                    <td>{{ offer_year.entity_management }}</td>
                 </tr>
             {% endfor %}
         </table>

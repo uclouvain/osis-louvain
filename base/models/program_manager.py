@@ -50,19 +50,29 @@ class ProgramManager(models.Model):
     def __str__(self):
         return u"%s - %s" % (self.person, self.offer_year)
 
+    class Meta:
+        unique_together = ('person', 'offer_year',)
+
 
 def find_by_person(a_person):
+    """
+    Args:
+        a_person: an instance of models.person.Person
+
+    Returns: the managed programs by the person.
+    """
     programs_managed = ProgramManager.objects.filter(person=a_person)
     return programs_managed
 
 
 def is_program_manager(user, offer_year=None, learning_unit_year=None):
     """
+    Args:
+        user: an instance of auth.User
+        offer_year: an annual offer to check whether the user is its program manager.
+        learning_unit_year: an annual learning unit to check whether it is in the managed offers of the user.
 
-    :param user:
-    :param offer_year: Check if the user is program manager of this offerYear.
-    :param learning_unit_year: Check if the offer of this learningUnitYear is in the managed offers of the user.
-    :return: True if the user manage at least 1 offer.
+    Returns: True if the user manage an offer. False otherwise.
     """
     if offer_year:
         try:

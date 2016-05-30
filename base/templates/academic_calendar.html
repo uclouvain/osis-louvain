@@ -76,10 +76,11 @@
             {% endif %}
         </div>
 
-        <a href="{% url 'academic_calendar_edit' academic_calendar.id %}" title="{%trans 'edit'%}"
-           class="btn btn-primary" role="button" id="bt_academic_calendar_edit">
-            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> {% trans 'edit'%}
-        </a>
+        {% if request.user.is_superuser %}
+            <a href="{% url 'academic_calendar_edit' academic_calendar.id %}" title="{%trans 'edit'%}"
+               class="btn btn-primary" role="button" id="bt_academic_calendar_edit">
+                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> {% trans 'edit'%}</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

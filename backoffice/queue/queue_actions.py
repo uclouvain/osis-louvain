@@ -44,3 +44,16 @@ def send_message(queue_name, message):
                           body=json.dumps(message),
                           properties=pika.BasicProperties(content_type='application/json'))
     connection.close()
+
+
+def paper_sheet_queue():
+    QUEUE_NAME = 'paper_sheet_queue'
+
+    credentials = pika.PlainCredentials(QUEUE_USER, QUEUE_PASSWORD)
+    connection = pika.BlockingConnection(
+        pika.ConnectionParameters(QUEUE_URL, QUEUE_PORT, QUEUE_CONTEXT_ROOT, credentials))
+
+    channel = connection.channel()
+
+    channel.queue_declare(queue=QUEUE_NAME)
+

@@ -1,0 +1,69 @@
+{% extends "layout.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+<li>{% trans 'administration' %}</li>
+<li><a href="{% url 'data' %}">{% trans 'data' %}</a></li>
+<li class="active">{% trans 'data_maintenance' %}</li>
+{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>{% trans 'data_maintenance' %}</h2>
+</div>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form id="form_data_maintenance" method="post" action="{% url 'data_maintenance' %}" >
+            {% csrf_token %}
+            <div class="form-group">
+                <label for="txa_sql_command">{% trans 'sql_command' %}</label>
+                <textarea id="txa_sql_command" name="sql_command" class="form-control" rows="10">{{ sql_command | default_if_none:'' }}</textarea>
+            </div>
+            {% if request.user.is_superuser %}
+                <button type="submit" class="btn btn-primary" id="bt_execute_sql">
+                    <span class="glyphicon glyphicon-flash" aria-hidden="true"></span> {% trans 'execute' %}</button>
+                <button type="button" class="btn btn-default" id="bt_reset"><span class="glyphicon glyphicon-erase" aria-hidden="true"></span> {% trans 'reset' %}</button>
+            {% endif %}
+            {% if results %}
+                <br><br>
+                <div class="form-group">
+                    <label for="txa_result">{% trans 'result' %}</label>
+                    <textarea id="txa_result" class="form-control" rows="10">{% for result in results %}{{ result }}{% endfor %}</textarea>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+    $('#bt_reset').click(function() {
+        if(confirm('{% trans 'are_you_sure' %}')) {
+            $('#txa_sql_command').val('');
+        }
+    });
+</script>
+{% endblock %}

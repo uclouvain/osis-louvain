@@ -131,7 +131,11 @@ def find_by_id(offer_year_id):
     return OfferYear.objects.get(pk=offer_year_id)
 
 
-def search_root_offers(entity=None, academic_yr=None, acronym=None):
+def find_by_acronym(acronym):
+    return OfferYear.objects.filter(acronym=acronym).first()
+
+
+def search(entity=None, academic_yr=None, acronym=None):
     """
     Offers are organized hierarchically. This function returns only root offers.
     """
@@ -139,7 +143,7 @@ def search_root_offers(entity=None, academic_yr=None, acronym=None):
     queryset = OfferYear.objects
 
     if entity:
-        queryset = queryset.filter(entity_management__icontains=entity)
+        queryset = queryset.filter(entity_management__acronym__icontains=entity)
         has_criteria = True
 
     if academic_yr:
@@ -151,7 +155,7 @@ def search_root_offers(entity=None, academic_yr=None, acronym=None):
         has_criteria = True
 
     if has_criteria:
-        queryset = queryset.filter(parent=None)
+        queryset = queryset.order_by('acronym')
         return queryset
     else:
         return None

@@ -59,13 +59,13 @@ def search(tutor=None, learning_unit_id=None, function=None, learning_unit_ids=N
         queryset = queryset.filter(tutor=tutor)
 
     if learning_unit_id:
-        queryset = queryset.filter(learning_unit_id=learning_unit_id)
+        queryset = queryset.filter(learning_unit__id=learning_unit_id)
 
     if function:
         queryset = queryset.filter(function=function)
 
     if learning_unit_ids:
-        queryset = queryset.filter(learning_unit_id__in=learning_unit_ids)
+        queryset = queryset.filter(learning_unit__id__in=learning_unit_ids)
 
     return queryset
 
@@ -76,3 +76,32 @@ def get_assigned_tutor(user):
         return attribution.tutor
     else:
         return None
+
+
+def find_responsible(a_learning_unit):
+    # If there are more than 1 coordinator, we take the first in alphabetic order
+    attribution_list = Attribution.objects.filter(learning_unit=a_learning_unit)\
+                                                      .filter(function='COORDINATOR')
+
+    if attribution_list and len(attribution_list) > 0:
+        if len(attribution_list) == 1:
+            return attribution_list[0].tutor
+        else:
+            for lu_attribution in attribution_list:
+                if lu_attribution.function == 'COORDINATOR':
+                    return lu_attribution.tutor
+            return attribution_list[0].tutor
+    return None
+
+
+def is_coordinator(user, learning_unit_id):
+    """
+    :param user:
+    :param learning_unit_id:
+    :return: True is the user is coordinator for the learningUnit passed in parameter.
+    """
+    attributions = Attribution.objects.filter(learning_unit_id=learning_unit_id)\
+                                      .filter(function='COORDINATOR')\
+                                      .filter(tutor__person__user=user)\
+                                      .count()
+    return attributions > 0

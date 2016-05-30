@@ -45,7 +45,7 @@
 </div>
 <div class="panel panel-default">
     <div class="panel-body">
-        <form id="form">
+        <form id="form" method="POST" action="{% url 'offer_read' offer_year.id %}">
             <ul class="nav nav-tabs" id="tabs">
                 <li class="active"><a data-toggle="tab" role="tab" href="#tab_identification" id="lnk_identification_tab">{% trans 'identification'%}</a></li>
                 <li><a data-toggle="tab" role="tab" href="#tab_academic_calendar" id="lnk_academic_calendar">{% trans 'academic_calendar'%}</a></li>
@@ -66,7 +66,7 @@
                         </div>
                         <div class="col-md-6">
                             <label>{% trans 'structure' %}</label><br>
-                            {{ offer_year.structure }}
+                            {{ offer_year.entity_management }}
                         </div>
                     </div>
 
@@ -135,6 +135,10 @@
                 <div id="tab_scores_encoding" class="tab-pane fade">
                     <br>
                     <p>{% trans 'message_address_papersheet' %}.</p>
+                    <div class="alert alert-dismissible alert-warning">
+                      <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        <p>{% trans 'info_address_changed_for_papersheet' %}.</p>
+                    </div>
 
                     <label for="slt_related_entities">{% trans 'reuse_address_entity' %}...</label>
                     <select class="form-control" id="slt_related_entities" name="related_entity">
@@ -147,14 +151,14 @@
                     <div class="row">
                         <div class="col-md-6">
                             <label for="txt_score_encoding_recipient">{% trans 'recipient' %}</label>
-                            <input class="form-control" value="{{ offer_year.recipient }}"
+                            <input class="form-control" value="{{ offer_year.recipient | default_if_none:'' }}"
                                    name="score_encoding_recipient" id="txt_score_encoding_recipient"
-                                   maxlength="20">
+                                   maxlength="255">
                         </div>
                         <div class="col-md-6">
                             <label for="txt_score_encoding_location">{% trans 'location' %}</label>
-                            <input class="form-control" value="{{ offer_year.location }}" name="score_encoding_location"
-                                   id="txt_score_encoding_location" maxlength="255">
+                            <input class="form-control" value="{{ offer_year.location | default_if_none:'' }}"
+                                   name="score_encoding_location" id="txt_score_encoding_location" maxlength="255">
                         </div>
                     </div>
                     <br>
@@ -175,7 +179,7 @@
                             <select class="form-control" id="slt_score_encoding_country" name="score_encoding_country">
                                 <option value="">{% trans 'select' %}...</option>
                                 {% for country in countries %}
-                                    <option value="{{ country.id }}" {% if organization_address.country.id == country.id %}selected{% endif %}>{{ country.name }}</option>
+                                    <option value="{{ country.id }}" {% if offer_year.country.id == country.id %}selected{% endif %}>{{ country.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -197,6 +201,12 @@
 
                         </div>
                     </div>
+                    <br>
+                    {% if is_program_manager %}
+                        <button type="button" class="btn btn-primary" id="bt_save_score_encoding_address">
+                            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}</button>
+                    {% endif %}
+                    <span id="status_save"></span>
                 </div>
             </div>
             <input type="hidden" id="hdn_tab" value="{{ tab }}"/>
@@ -386,22 +396,26 @@
     $('#tabs a').click(function (e) {
         e.preventDefault();
         var href = $(this).prop('href');
-        var idTab = document.getElementById("form:tab");
+        var idTab = document.getElementById("form:hdn_tab");
         var hash = href.substring(href.indexOf("#"));
         window.location.hash = hash;
-        idTab.value = hash;
-        $(this).tab('show');
-    })
+        if(idTab != null) {
+            idTab.value = hash;
+            $(this).tab('show');
+        }
+    });
 
     function selectTab() {
         var url = window.location.toString();
         var hash = url.substring(url.indexOf("#"));
 
         if(hash.indexOf("#") < 0) {
-            var idTab = document.getElementById("form:tab");
-            hash = idTab.value;
-            if(hash === '') {
-                hash = '#tab_identification';
+            var idTab = document.getElementById("form:hdn_tab");
+            if(idTab != null) {
+                hash = idTab.value;
+                if(hash === '') {
+                    hash = '#tab_identification';
+                }
             }
         }
         $('#tabs a[href="'+ hash +'"]').tab('show');
@@ -410,11 +424,39 @@
     selectTab();
 
     $('#slt_related_entities').change(function(e) {
-        $.ajax({
-            url: "/structure/" + $("#slt_related_entities").val() + "/address";
-        }).then(function(data) {
-            console.log(data);
+        var related_entity = $('#slt_related_entities').val()
+        if(related_entity != "") {
+            var uri = "/structure/" + related_entity + "/address/"
+            $.ajax({ url: uri }).then(function(data) {
+                $('#txt_score_encoding_recipient').val(data.entity);
+                $('#txt_score_encoding_location').val(data.location);
+                $('#txt_score_encoding_postal_code').val(data.postal_code);
+                $('#txt_score_encoding_city').val(data.city);
+                $('#slt_score_encoding_country').val(data.country);
+                $('#txt_score_encoding_phone').val(data.phone);
+                $('#txt_score_encoding_fax').val(data.fax);
+            });
         }
-    })
+    });
+
+    $('#bt_save_score_encoding_address').click(function() {
+        $('#bt_save_score_encoding_address').prop('disabled', true);
+        $('#status_save').text('{% trans 'saving' %}...').fadeIn(100);
+        $.post("/offers/{{ offer_year.id }}/score_encoding",
+            {
+                recipient: $("#txt_score_encoding_recipient").val(),
+                location: $("#txt_score_encoding_location").val(),
+                postal_code: $("#txt_score_encoding_postal_code").val(),
+                city: $("#txt_score_encoding_city").val(),
+                country: $("#slt_score_encoding_country").val(),
+                phone: $("#txt_score_encoding_phone").val(),
+                fax: $("#txt_score_encoding_fax").val()
+            },
+            function(data, status) {
+                console.log("Data: " + data + "\nStatus: " + status);
+                $('#bt_save_score_encoding_address').prop('disabled', false);
+                $('#status_save').text('{% trans 'saved' %}').css('color', 'green').fadeOut(2000);
+            });
+    });
 </script>
 {% endblock %}

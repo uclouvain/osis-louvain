@@ -25,41 +25,43 @@
 
 {% as_messages_info as messages_info %}
 
-{%if messages_info %}
-<div class="alert alert-success" role="alert">
-    <ul>
-        {% for message in messages %}
-            {% if 'info' in message.tags %}
-                <li {% if message.tags%}{% endif %}>{{ message }}</li>
-            {% endif %}
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
+{% block messages %}
+    {%if messages_info %}
+    <div class="alert alert-success" role="alert">
+        <ul>
+            {% for message in messages %}
+                {% if 'info' in message.tags %}
+                    <li {% if message.tags%}{% endif %}>{{ message }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
 
-{% as_messages_warning as messages_warning %}
+    {% as_messages_warning as messages_warning %}
 
-{% if messages_warning %}
-<div class="alert alert-warning" role="alert">
-    <ul>
-        {% for message in messages %}
-            {% if 'warning' in message.tags %}
-                <li {% if message.tags %}{% endif %}>{{ message }}</li>
-            {% endif %}
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
+    {% if messages_warning %}
+    <div class="alert alert-warning" role="alert">
+        <ul>
+            {% for message in messages %}
+                {% if 'warning' in message.tags %}
+                    <li {% if message.tags %}{% endif %}>{{ message }}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
 
-{% as_messages_error as messages_error %}
-{% if messages_error %}
-<div id="div_error_messages" class="alert alert-danger" role="alert">
-    <ul>
-        {% for message in messages %}
-            {% if 'error' in message.tags %}
-                <li {% if message.tags %}{% endif %}>{{ message }}</li>
-            {%endif%}
-        {% endfor %}
-    </ul>
-</div>
-{% endif %}
+    {% as_messages_error as messages_error %}
+    {% if messages_error %}
+    <div id="div_error_messages" class="alert alert-danger" role="alert">
+        <ul>
+            {% for message in messages %}
+                {% if 'error' in message.tags %}
+                    <li {% if message.tags %}{% endif %}>{{ message }}</li>
+                {%endif%}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+{% endblock %}

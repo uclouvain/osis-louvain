@@ -47,7 +47,8 @@ def upload_scores_file(request, learning_unit_year_id=None):
                 else:
                     learning_unit_year = mdl.learning_unit_year.find_by_id(learning_unit_year_id)
                     is_program_manager = mdl.program_manager.is_program_manager(request.user)
-                    __save_xls_scores(request, file_name, is_program_manager, request.user, learning_unit_year.learning_unit.id)
+                    __save_xls_scores(request, file_name, is_program_manager, request.user,
+                                      learning_unit_year.learning_unit.id)
 
         return HttpResponseRedirect(reverse('online_encoding', args=[learning_unit_year_id, ]))
 

@@ -26,36 +26,42 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li class="active">{% trans 'institution' %}</li>
+<li>{% trans 'administration' %}</li>
+<li class="active">{% trans 'data' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'institution' %}</h2>
+    <h2>{% trans 'data' %}</h2>
 </div>
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-1"><i class="fa fa-university" style="font-size: 400%; color: #6699FF;"></i></div>
+            <div class="col-md-1"><i class="fa fa-cubes" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'organizations' %}" id="lnk_organizations">
-                    {% trans 'organizations'%}</a></h4>
-                <p>{% trans 'desc_lnk_organizations' %}</p>
+                <h4 class="media-heading"><a href="{% url 'admin:index' %}" id="lnk_data_management" target="_blank">
+                    {% trans 'data_management'%}</a></h4>
+                <p>{% trans 'desc_lnk_data_management' %}</p>
             </div>
-            <div class="col-md-1"><i class="fa fa-sitemap" style="font-size: 400%; color: #6699FF;"></i></div>
+            <div class="col-md-1"><i class="fa fa-database" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'structures' %}" id="lnk_entities">{% trans 'entities'%}</a></h4>
-                <p>{% trans 'desc_lnk_entities' %}</p>
+                <h4 class="media-heading"><a href="{% url 'data_maintenance' %}" id="lnk_data_maintenance">{% trans 'data_maintenance' %}</a></h4>
+                <p>{% trans 'desc_lnk_data_maintenance' %}</p>
             </div>
         </div>
-        <!--<br>
+        <br>
         <div class="row">
-            <div class="col-md-1"><i class="fa fa-sitemap" style="font-size: 400%; color: #6699FF;"></i></div>
+            <div class="col-md-1"><i class="fa fa-folder-open" style="font-size: 400%; color: #6699FF;"></i></div>
+            <div class="col-md-5">
+                <h4 class="media-heading"><a href="{% url 'storage' %}" id="lnk_storage">{% trans 'storage' %}</a></h4>
+                <p>{% trans 'desc_lnk_storage' %}</p>
+            </div>
+            <!--<div class="col-md-1"><i class="fa fa-sitemap" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-11">
                 <h4 class="media-heading"><a href="{% url 'mandates' %}" id="lnk_mandates">
                     {% trans 'mandates'%}</a></h4>
                 <p>{% trans 'desc_lnk_organizations' %}</p>
-            </div>
-        </div>-->
+            </div>-->
+        </div>
     </div>
 </div>
 {% endblock %}

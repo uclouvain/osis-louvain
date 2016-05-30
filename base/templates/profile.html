@@ -55,26 +55,30 @@
                     <label>{% trans 'global_identifiant' %}</label><br>
                     {{ person.global_id }}
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label>{% trans 'firstname' %}</label><br>
                     {{ person.first_name }} {{ person.middle_name }}
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label>{% trans 'lastname' %}</label><br>
                     {{ person.last_name }}
                 </div>
-                <div class="col-md-2">
+                <div class="col-md-1">
                     <label>{% trans 'gender' %}</label><br>
                     {{ person.gender }}
                 </div>
                 <div class="col-md-2">
+                    <label>{% trans 'birth_date' %}</label><br>
+                    {{ person.birth_date | default_if_none:'' | date:"j/m/Y" }}
+                </div>
+                <div class="col-md-3">
                     <label>{% trans 'national_register' %}</label><br>
                     {{ person.national_id }}
                 </div>
             </div>
             <br>
             <div class="row">
-                <div class="col-md-5">
+                <div class="col-md-4">
                     <label>{% trans 'email' %}</label><br>
                     {{ person.email | default_if_none:'-' }}
                 </div>

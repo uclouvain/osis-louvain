@@ -23,4 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-default_app_config = 'base.apps.BaseConfig'
+from django.db import connection
+from django.db import transaction
+
+
+@transaction.atomic
+def execute(sql_command):
+    results = []
+    if sql_command:
+        with connection.cursor() as cursor:
+            sql_commands = sql_command.split(";")
+            for count, command in enumerate(sql_commands):
+                if command.strip():
+                    try:
+                        cursor.execute(command.strip())
+                        results += [u'%d: %s\n> %s\n\n' % (count + 1, command.strip(), cursor.fetchall())]
+                    except Exception as e:
+                        results += [u'%d: %s\n> %s\n\n' % (count + 1, command.strip(), e)]
+    return results

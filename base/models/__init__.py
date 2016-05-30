@@ -37,6 +37,7 @@ from base.models import learning_unit_enrollment
 from base.models import learning_unit_year
 from base.models import message_history
 from base.models import message_template
+from base.models import native
 from base.models import scores_encoding
 from base.models import offer
 from base.models import offer_enrollment

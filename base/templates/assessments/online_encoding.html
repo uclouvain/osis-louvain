@@ -50,7 +50,11 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <label>{% trans 'coordinator' %}</label><br>
-                    {{ coordinator }}
+                    {% if coordinator %}
+                        {{ coordinator }}
+                    {% else %}
+                        {% trans 'none' %}
+                    {% endif %}
                     {% if tutors %}
                         <a role="button" data-toggle="collapse" data-target="#tutors_by_course"
                            aria-expanded="false"
@@ -77,14 +81,14 @@
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>{% trans 'number_of_enrollments' %}</label><br>
-                    {{ enrollments|length }}
+                    <label>{% trans 'number_session' %}</label><br>
+                    {{ number_session }}
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>{% trans 'number_session' %}</label><br>
-                    {{ number_session }}
+                    <label>{% trans 'number_of_enrollments' %}</label><br>
+                    {{ enrollments|length }}
                 </div>
             </div>
         </div>
@@ -96,16 +100,16 @@
                 </div>
             </div>
         </div>
-                <a class="btn btn-default" href="{% url 'online_encoding_form' learning_unit_year.id  %}"
-                   role="button" id="lnk_encode"
-                   data-toggle="tooltip" data-placement="bottom"
-                   {% if enrollments and progress == '100' and not is_program_manager %}
-                        disabled
-                        title="{% trans 'tooltip_encode_no_more_possible_for' %}"
-                   {% else %}
-                        title="{% trans 'tooltip_encode_for' %}"
-                   {% endif %}
-                ><i class="fa fa-hashtag"></i> {% trans 'encode' %}</a>
+            <a class="btn btn-default" href="{% url 'online_encoding_form' learning_unit_year.id  %}"
+               role="button" id="lnk_encode"
+               data-toggle="tooltip" data-placement="bottom"
+               {% if enrollments and progress == '100' and not is_program_manager %}
+                    disabled
+                    title="{% trans 'tooltip_encode_no_more_possible_for' %}"
+               {% else %}
+                    title="{% trans 'tooltip_encode_for' %}"
+               {% endif %}><i class="fa fa-hashtag"></i> {% trans 'encode' %}</a>
+            {% if is_program_manager %}
                 <a class="btn btn-default" href="{% url 'online_double_encoding_form' learning_unit_year.id %}"
                    role="button" id="lnk_online_double_encoding"
                    data-toggle="tooltip" data-placement="bottom"
@@ -114,13 +118,13 @@
                         title="{% trans 'tooltip_double_encode_no_more_possible_for' %}"
                    {% else %}
                         title="{% trans 'tooltip_double_encode_for' %}"
-                   {% endif %}
-                ><i class="fa fa-hashtag"></i><i class="fa fa-hashtag"></i> {% trans 'double_encoding' %}</a>
-                <a  id="lnk_score_printing" class="btn btn-default"
-                    href="{% url 'notes_printing' learning_unit_year_id=learning_unit_year.id %}"
-                    data-toggle="tooltip" data-placement="bottom"
-                    title="{% trans 'tooltip_print_scores' %}"
-                    role="button"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> {% trans 'print' %}</a>
+                   {% endif %}><i class="fa fa-hashtag"></i><i class="fa fa-hashtag"></i> {% trans 'double_encoding' %}</a>
+            {% endif %}
+            <a  id="lnk_score_printing" class="btn btn-default"
+                href="{% url 'notes_printing' learning_unit_year_id=learning_unit_year.id %}"
+                data-toggle="tooltip" data-placement="bottom"
+                title="{% trans 'tooltip_print_scores' %}"
+                role="button"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> {% trans 'print' %}</a>
             &nbsp;&nbsp;
             <a id="lnk_scores_excel" class="btn btn-default"
                href="{% url 'scores_encoding_download' learning_unit_year.id academic_year.id%}"
@@ -140,10 +144,10 @@
             {% if not is_program_manager %}
             <button type="button" class="btn btn-warning pull-right" data-toggle="modal" data-target="#pnl_submission_scores_modal"
                     title="{% trans 'definitive_save' %}"
-                    id="bt_score_submission_modal" {%if draft_scores_not_sumitted == 0 or not is_coordinator %} disabled{%endif%}><span class="glyphicon glyphicon-send" aria-hidden="true"></span> {% trans 'submission' %}</button>
+                    id="bt_score_submission_modal" {%if draft_scores_not_submitted == 0 or not is_coordinator %} disabled{%endif%}><span class="glyphicon glyphicon-send" aria-hidden="true"></span> {% trans 'submission' %}</button>
             {% endif %}
             <br><br>
-            {% if not is_program_manager and draft_scores_not_sumitted > 0 %}
+            {% if not is_program_manager and draft_scores_not_submitted > 0 %}
                 <div class="col-md-12">
                     <div class="form-group">
                         <div class="alert alert-dismissible alert-warning">
@@ -183,7 +187,7 @@
                             {% endif %}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name }}</td>
+                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|title }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name }}</td>
                         <td>{%if is_program_manager %}
                                 {{ enrollment.score_final | score_display:enrollment.session_exam.learning_unit_year.decimal_scores }}
@@ -210,7 +214,7 @@
                                 {% endif %}
                             {% endif %}
                         </td>
-                        <td>{{ enrollment.session_exam.offer_year_calendar.end_date | default_if_none:'' |date:"j/m/Y" }}</td>
+                        <td>{{ enrollment.session_exam.deadline | default_if_none:'' |date:"j/m/Y" }}</td>
                     </tr>
                 {% endfor %}
             </tbody>
@@ -252,7 +256,7 @@
                 <h4 class="modal-title" id="submissionScoresLabel">{% trans 'submission' %}</h4>
             </div>
             <div class="modal-body">
-                    <p class="help-block">{% trans 'help_submission_scores_label' as help_submission_scores_label %}{{ help_submission_scores_label | format:draft_scores_not_sumitted}}</p>
+                    <p class="help-block">{% trans 'help_submission_scores_label' as help_submission_scores_label %}{{ help_submission_scores_label | format:draft_scores_not_submitted}}</p>
             </div>
             <div class="modal-footer">
                 <a class="btn btn-warning" href="{% url 'online_encoding_submission' learning_unit_year.id %}"

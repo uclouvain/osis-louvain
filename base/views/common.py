@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from datetime import datetime
-
 import subprocess
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import login as django_login
@@ -81,6 +80,20 @@ def assessments(request):
 @login_required
 def catalog(request):
     return layout.render(request, "catalog.html", {'section': 'catalog'})
+
+
+@login_required
+def data(request):
+    return layout.render(request, "admin/data.html", {'section': 'data'})
+
+
+@login_required
+def data_maintenance(request):
+    sql_command = request.POST.get('sql_command')
+    results = mdl.native.execute(sql_command)
+    return layout.render(request, "admin/data_maintenance.html", {'section': 'data_maintenance',
+                                                                  'sql_command': sql_command,
+                                                                  'results': results})
 
 
 @login_required

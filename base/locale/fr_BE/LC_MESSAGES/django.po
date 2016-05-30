@@ -22,11 +22,35 @@ msgstr "Absent"
 msgid "absent_pdf_legend"
 msgstr "A=Absent"
 
-msgid "cheating"
+msgid "are_you_sure"
+msgstr "Êtes-vous sûr?"
+
+msgid "birth_date"
+msgstr "Date de naissance"
+
+msgid "CHEATING"
 msgstr "Tricherie"
 
 msgid "cheating_pdf_legend"
 msgstr "T=Tricherie"
+
+msgid "data_management"
+msgstr "Gestion de données"
+
+msgid "desc_lnk_data_management"
+msgstr "Gestion des données par entité du métier"
+
+msgid "data_maintenance"
+msgstr "Maintenance de données"
+
+msgid "desc_lnk_data_maintenance"
+msgstr "La maintenance de données avec la langage SQL"
+
+msgid "desc_lnk_storage"
+msgstr "Surveillance de la capacité de stockage"
+
+msgid "function"
+msgstr "Fonction"
 
 msgid "ill"
 msgstr "Malade"
@@ -34,26 +58,32 @@ msgstr "Malade"
 msgid "ill_pdf_legend"
 msgstr "M=Malade"
 
-msgid "absence_unjustified"
+msgid "ABSENCE_UNJUSTIFIED"
 msgstr "Absence injustifiée"
 
-msgid "absence_justified"
+msgid "ABSENCE_JUSTIFIED"
 msgstr "Absence justifiée"
 
-msgid "score_missing"
+msgid "SCORE_MISSING"
 msgstr "Note manquante"
 
 msgid "score_missing_pdf_legend"
 msgstr "?=Note manquante"
 
 msgid "score_already_submitted"
-msgstr "Note déjà soumis"
+msgstr "Note déjà soumise "
 
 msgid "presence_note_pdf_legend"
 msgstr "0=Cote de présence"
 
 msgid "empty_note_pdf_legend"
 msgstr "(vide)=Pas encore de note"
+
+msgid "saving"
+msgstr "Sauvegarde en cours"
+
+msgid "registration_id"
+msgstr "NOMA"
 
 msgid "saved"
 msgstr "Enregistré"
@@ -131,7 +161,7 @@ msgid "label_jumbotron_details_academic_cal"
 msgstr "Comme présenté sur la page d'accueil"
 
 msgid "go"
-msgstr "Avancer"
+msgstr "Continuer"
 
 msgid "edit"
 msgstr "Éditer"
@@ -229,7 +259,7 @@ msgid "number_of_enrollments"
 msgstr "Nombre d'inscrits"
 
 msgid "offer"
-msgstr "Offre"
+msgstr "Programme"
 
 msgid "registration_number"
 msgstr "Noma"
@@ -245,6 +275,9 @@ msgstr "Note"
 
 msgid "justification"
 msgstr "Justification"
+
+msgid "justifications"
+msgstr "Justifications"
 
 msgid "compare"
 msgstr "Comparer"
@@ -359,7 +392,12 @@ msgid "select"
 msgstr "Sélectionnez"
 
 msgid "message_address_papersheet"
-msgstr "Réutiliser l'adresse d'une entité liée au programme ou informez l'adresse d'affichage pour la feuille des notes"
+msgstr "Réutilisez l'adresse d'une entité liée au programme ou informez l'adresse d'affichage pour la feuille des notes"
+
+msgid "info_address_changed_for_papersheet"
+msgstr "Si vous choisissez de modifier un des champs de l'adresse ci-dessous, cela modifiera <b>uniquement</b> l'adresse "
+       "affichée sur la feuille de notes. Vous ne modifierez jamais l'adresse d'une entité/structure via ce formulaire. "
+       " La liste des entités ci-dessous n'est proposée que pour vous aider à remplir les champs"
 
 msgid "reuse_address_entity"
 msgstr "Réutiliser l'adresse de"
@@ -395,10 +433,10 @@ msgid "learning_unit"
 msgstr "Unité d'enseignement"
 
 msgid "offers"
-msgstr "Offres"
+msgstr "Programmes"
 
 msgid "desc_lnk_offers"
-msgstr "Gestion des offres qui composent le programme."
+msgstr "Gestion des programmes."
 
 msgid "learning_units"
 msgstr "Unités d'enseignement"
@@ -437,454 +475,327 @@ msgstr "Entités"
 msgid "desc_lnk_entities"
 msgstr "Gestion des la structure organisationnelle."
 
-#: templates/institution.html:55 templates/layout.html.py:93
-#: templates/mandates.html:30 templates/mandates.html.py:34
 msgid "mandates"
 msgstr "Mandates"
 
-#: templates/layout.html:83
 msgid "internships"
 msgstr "Stages"
 
-#: templates/layout.html:105
 msgid "administration"
 msgstr "Administration"
 
-#: templates/layout.html:110
 msgid "data"
 msgstr "Données"
 
-#: templates/layout.html:127
 msgid "logout"
 msgstr "Logout"
 
-#: templates/layout.html:130
 msgid "profile"
 msgstr "Profil"
 
-#: templates/layout.html:135
 msgid "login"
 msgstr "Login"
 
-#: templates/layout.html:175
 msgid "documentation"
 msgstr "Justification"
 
-#: templates/layout.html:176 templates/organization.html.py:64
-#: templates/organization_form.html:60
 msgid "website"
 msgstr "Site internet"
 
-#: templates/layout.html:177
 msgid "source_code"
 msgstr "Code source"
 
-#: templates/learning_unit.html:30 templates/learning_units.html.py:30
-#: templates/offer.html:33 templates/offer_year_calendar.html.py:30
-#: templates/offer_year_calendar_form.html:32
 msgid "catalogue"
 msgstr "Catalogue de formation"
 
-#: templates/learning_unit.html:41
 msgid "general_informations"
 msgstr "Informations générales"
 
 msgid "acronym"
 msgstr "Sigle"
 
-#: templates/learning_unit.html:56 templates/learning_units.html.py:81
 msgid "credits"
 msgstr "Crédits"
 
-#: templates/learning_units.html:64
 msgid "learning_unit_search"
 msgstr "Recherche d'unités d'enseignement"
 
-#: templates/mandates.html:42
 msgid "assistants"
 msgstr "Assistants"
 
-#: templates/mandates.html:43
 msgid "desc_assistants"
 msgstr "Processus visant à aider les enseignants pour l'encodage des notes."
 
-#: templates/offer.html:50 templates/organization.html.py:41
-#: templates/profile.html:37 templates/structure.html.py:49
 msgid "identification"
 msgstr "Identification"
 
-#: templates/offer.html:52
 msgid "program_managers"
 msgstr "Program managers"
 
-#: templates/offer.html:67 templates/organization.html.py:42
-#: templates/structure.html:53
 msgid "structure"
 msgstr "Structure"
 
-#: templates/offer.html:74
 msgid "international_title"
 msgstr "Titre international"
 
-#: templates/offer.html:81
 msgid "short_title"
 msgstr "Titre abrégé"
 
-#: templates/offer.html:88
 msgid "printable_title"
 msgstr "Titre imprimable"
 
-#: templates/offer.html:95
 msgid "grade"
 msgstr "Niveau"
 
-#: templates/offer.html:134
 msgid "person"
 msgstr ""
 
-#: templates/offer.html:161 templates/offer.html.py:243
 msgid "focuses"
 msgstr "Finalités"
 
-#: templates/offer.html:181 templates/offer.html.py:263
 msgid "other_sibling_offers"
 msgstr "Autres finalités associées"
 
-#: templates/offer.html:207 templates/offer.html.py:290
 msgid "other_sibling_orientations"
 msgstr "Autres orientations associées"
 
-#: templates/offer_year_calendar.html:32
-#: templates/offer_year_calendar_form.html:34
 msgid "offer_year_calendar"
-msgstr "Calendrier des offres"
+msgstr "Calendrier des programmes"
 
-#: templates/offers.html:51 templates/offers.html.py:52
-#: templates/offers.html:82 templates/structure.html.py:32
 msgid "entity"
 msgstr "Entité"
 
-#: templates/offers.html:66
 msgid "offer_year_search"
-msgstr "Recherche d'offres annualisées"
+msgstr "Recherche des programmes annualisés"
 
-#: templates/organization.html:32 templates/organization_address.html.py:32
-#: templates/organization_address_form.html:34
-#: templates/organization_form.html:34 templates/structure.html.py:71
 msgid "organization"
 msgstr "Organisation"
 
-#: templates/organization.html:57 templates/organization_form.html.py:64
 msgid "reference"
 msgstr "Référence"
 
-#: templates/organization.html:75
 msgid "address(ses)"
 msgstr "Adresse(s)"
 
-#: templates/organization.html:79
 msgid "add_an_address_to_the_organization"
 msgstr "Ajouter une adresse à l'organisation"
 
-#: templates/organization_address.html:33
-#: templates/organization_address_form.html:35
 msgid "organization_address"
 msgstr "Adresse de l'organisation"
 
-#: templates/organization_address.html:44
-#: templates/organization_address_form.html:52
 msgid "label"
 msgstr "Label"
 
-#: templates/organization_address.html:48
-#: templates/organization_address_form.html:56
 msgid "location"
 msgstr "Rue et numéro"
 
-#: templates/organization_address.html:54
-#: templates/organization_address_form.html:63
 msgid "postal_code"
 msgstr "Code postal"
 
-#: templates/organization_address.html:58
-#: templates/organization_address_form.html:67
 msgid "city"
 msgstr "Ville"
 
-#: templates/organization_address.html:62
-#: templates/organization_address_form.html:71
 msgid "country"
 msgstr "Pays"
 
-#: templates/organization_address.html:73
-#: templates/organization_address.html:75
 msgid "delete"
 msgstr "Supprimer"
 
-#: templates/organization_address.html:78
-#: templates/organization_address.html:79
 msgid "back"
 msgstr "Retour"
 
-#: templates/organization_form.html:70 templates/organizations.html.py:54
-#: templates/structures.html:56
 msgid "types"
 msgstr "Types"
 
-#: templates/organizations.html:65
 msgid "search_for_an_organization"
 msgstr "Recherche d'organisations"
 
-#: templates/organizations.html:69
 msgid "create_an_organization"
 msgstr "Créer une organisation"
 
-#: templates/page_not_found.html:34
 msgid "page_not_found"
 msgstr "Page inexistante"
 
-#: templates/profile.html:39
 msgid "attributions"
 msgstr "Attributions"
 
-#: templates/profile.html:42
 msgid "my_studies"
 msgstr "Mes études"
 
-#: templates/profile.html:45
 msgid "programs"
 msgstr "Programmes"
 
 msgid "program_s"
 msgstr "programme(s)"
 
-#: templates/profile.html:47
 msgid "preferences"
 msgstr "Préférences"
 
-#: templates/profile.html:55
 msgid "global_identifiant"
 msgstr "Identifiant global"
 
-#: templates/profile.html:67
 msgid "gender"
 msgstr "Genre"
 
-#: templates/profile.html:71
 msgid "national_register"
 msgstr "Numéro de registre nationnal"
 
-#: templates/profile.html:78
 msgid "email"
 msgstr "Email"
 
-#: templates/profile.html:82
 msgid "fixed_line_phone"
 msgstr "Téléphone fixe"
 
-#: templates/profile.html:86
 msgid "mobile_phone"
 msgstr "Téléphone mobile (GSM)"
 
-#: templates/profile.html:90
 msgid "language"
 msgstr "Langue"
 
-#: templates/profile.html:96
 msgid "addresses"
 msgstr "Adresses"
 
-#: templates/profile.html:157
 msgid "managed_programs"
 msgstr "Programmes gérés"
 
-#: templates/profile.html:174
 msgid "user_interface_language"
 msgstr "Langue de l'interface utilisateur"
 
-#: templates/registration/login.html:29
 msgid "log-in"
 msgstr "Log-in"
 
-#: templates/registration/login.html:32
 msgid "msg_error_username_password_not_matching"
 msgstr ""
 "La combinaison login/mot de passe entrée n'est pas valide. Veuillez "
 "réessayer."
 
-#: templates/registration/login.html:44
 msgid "password"
 msgstr "Mot de passe"
 
-#: templates/structure.html:85
 msgid "child_entities"
 msgstr "Entités 'enfant'"
 
-#: templates/structure_organogram.html:32
 msgid "OSIS"
 msgstr "OSIS"
 
-#: templates/structures.html:69
 msgid "search_for_an_entity"
 msgstr "Rechercher une entité"
 
-#: templates/studies.html:43
 msgid "desc_lnk_assessments"
 msgstr "Processus visant à aider les enseignants pour l'encodage des notes."
 
-#: templates/studies.html:47
 msgid "stages"
 msgstr "Stages"
 
-#: templates/studies.html:48
 msgid "desc_lnk_internships"
 msgstr "Gestion des stages des étudiants."
 
-#: utils/export_utils.py:36
 msgid "activity_code"
 msgstr "Activité"
 
-#: utils/export_utils.py:41 utils/pdf_utils.py:241
 msgid "numbered_score"
 msgstr "Note chiffrée"
 
-#: utils/export_utils.py:44
 msgid "ID"
 msgstr "ID"
 
-#: utils/export_utils.py:96
 msgid "Legend : values allowed for 'justification'"
 msgstr ""
 
-#: utils/pdf_utils.py:70
-#: utils/pdf_utils.py:121
 msgid "scores_sheet"
 msgstr "Feuille de notes"
 
-#: utils/pdf_utils.py:108
 msgid "scores_transcript"
 msgstr "Feuille de notes"
 
-#: utils/pdf_utils.py:110
 msgid "ucl_denom_location"
-msgstr ""
-"Université Catholique de Louvain\n"
-"Louvain-la-Neuve\n"
-"Belgique"
+msgstr "Université catholique de Louvain"
 
-#: utils/pdf_utils.py:226
 msgid "justification_legend"
 msgstr "Légende pour le champ 'Justification': %s"
 
 msgid "score_legend"
 msgstr "Légende pour le champ 'Note chiffrée': %s (0=Cote de présence)"
 
-#: utils/pdf_utils.py:228
 msgid "unauthorized_decimal_for_this_activity"
 msgstr "Attention : décimales non autorisées pour ce cours"
 
-#: utils/pdf_utils.py:289
 msgid "phone"
 msgstr "téléphone"
 
-#: utils/pdf_utils.py:293
 msgid "fax"
 msgstr ""
 
-#: utils/pdf_utils.py:339
 msgid "deliberation_date"
 msgstr "Date de délibération"
 
-#: utils/pdf_utils.py:340
 msgid "chair_of_the_exam_board"
 msgstr "Président du jury"
 
-#: utils/pdf_utils.py:341
 msgid "exam_board_secretary"
 msgstr "Secrétaire du jury"
 
-#: utils/pdf_utils.py:365
 msgid "return_doc_to_administrator"
 msgstr ""
 "Veuillez envoyer ce formulaire au secrétariat de l'entité gestionnaire avant le %s."
 
-#: utils/pdf_utils.py:381
 msgid "done_at"
 msgstr "Fait à"
 
-#: utils/pdf_utils.py:381
 msgid "the"
 msgstr "le"
 
-#: utils/pdf_utils.py:381
 msgid "signature"
 msgstr "Signature"
 
-#: utils/send_mail.py:43
 msgid "submission_of_scores_for"
 msgstr "Soumission des score pour {0}"
 
-#: utils/send_mail.py:92
 msgid "mister"
 msgstr "Monsieur"
 
-#: utils/send_mail.py:93
 msgid "miss"
 msgstr "Madame"
 
-#: utils/upload_xls_utils.py:48
 msgid "file_must_be_xls"
 msgstr "Le fichier doit être un XLS"
 
-#: utils/upload_xls_utils.py:55
 msgid "invalid_file"
 msgstr "Fichier invalide"
 
-#: utils/upload_xls_utils.py:87
 msgid "Line"
 msgstr "Ligne"
 
-#: utils/upload_xls_utils.py:89
 msgid "student_not_exist"
 msgstr "L'étudiant (%s) n'existe pas"
 
-#: utils/upload_xls_utils.py:93
 msgid "academic_year_not_exist"
 msgstr "L'année académique (%d) n'existe pas"
 
-#: utils/upload_xls_utils.py:97
 msgid "offer_year_not_exist"
-msgstr "L'offre annualisée (%s) (%d) - n'existe pas"
+msgstr "Le programme annualisé (%s) (%d) - n'existe pas"
 
-#: utils/upload_xls_utils.py:101
 msgid "offer_enrollment_not_exist"
-msgstr "L'inscription à cette offre n'existe pas"
+msgstr "Les inscriptions à ce programme n'existe pas"
 
-#: utils/upload_xls_utils.py:108
 msgid "activity_not_exit"
 msgstr "L'activité %s n'existe pas"
 
-#: utils/upload_xls_utils.py:112
 msgid "enrollment_activity_not_exist"
 msgstr "l'inscription à l'activité %s n'existe pas"
 
-#: utils/upload_xls_utils.py:118
 msgid "enrollment_exam_not_exists"
 msgstr "l'inscription à l'unité d'enseignement %s n'existe pas"
 
-#: utils/upload_xls_utils.py:129
 msgid "Note already submitted"
 msgstr ""
 
-#: utils/upload_xls_utils.py:140
 msgid "scores_gt_0_lt_20"
-msgstr "La note entrée est incorrecte (elle doit être entre 0 et 20 compris)"
+msgstr "La note encodée est incorrecte (elle doit être comprise entre 0 et 20)"
 
-#: utils/upload_xls_utils.py:144
 msgid "score_decimal_not_allowed"
-msgstr "La note entrée est incorrecte ; décimales NON autorisées"
+msgstr "La note encodée est incorrecte : décimales non autorisées"
 
-#: utils/upload_xls_utils.py:159
 msgid "constraint_score_other_score"
 msgstr "Vous ne pouvez pas remplir le champs 'Note chiffrée' e 'justification' tous les deux"
 
@@ -895,33 +806,29 @@ msgid_plural "%(count)d %(plural_name)s."
 msgstr[0] ""
 msgstr[1] ""
 
-#: utils/upload_xls_utils.py:231
 msgid "score_saved"
 msgstr "Notes"
 
 msgid "score_invalid"
 msgstr "Note invalide"
 
-#: utils/upload_xls_utils.py:232
 msgid "scores_saved"
 msgstr "note(s) enregistrée(s)"
 
-#: utils/upload_xls_utils.py:241
 msgid "the_coordinator_must_still_submit_scores"
 msgstr "Le coordinateur doit toujours soumettre les scores"
 
-#: utils/upload_xls_utils.py:244
 msgid "no_score_injected"
 msgstr "Aucune note injectée"
 
-#: views/academic_calendar.py:132 views/offer.py:109
 msgid "begin_date_lt_end_date"
 msgstr "La date de début doit etre égale ou inferieure à la date de fin"
 
 msgid "no_score_encoded_double_encoding_impossible"
-msgstr "Aucune nouvelle note encodée. Le double encodage nécessite de nouvelles notes."
+msgstr ""
+ "Aucune nouvelle note encodée. "
+ "Le double encodage n'est pas accessible car il n'y a pas de nouvelles notes encodés."
 
-#: views/common.py:162
 msgid "minimum_one_criteria"
 msgstr "Veuillez remplir au moins 1 critère"
 
@@ -1146,7 +1053,7 @@ msgid "validated_double_encoding_cannot_be_validated_anymore"
 msgstr "Un double encodage validé ne peut l'être une seconde fois"
 
 msgid "validation_dubble_encoding_mandatory"
-msgstr "Veuillez entrer une note finale pour toutes les différences détectées entre le premier encodage et le "
+msgstr "Veuillez sélectionner une note finale pour toutes les différences détectées entre le premier encodage et le "
        "double encodage (ci-dessous). Si vous choisissez d'annuler, votre double encodage sera perdu."
 
 msgid "after_submission_a_message_must_be_sent"
@@ -1176,8 +1083,14 @@ msgstr "Séclectionnez le fichier excel à soumettre"
 msgid "display_tutors"
 msgstr "Afficher tous les enseignants pour ce cours"
 
+msgid "no_score_to_encode"
+msgstr "Vous n'avez aucune note à encoder."
+
 msgid "tooltip_dowload_excel_file"
 msgstr "Télécharger le fichier excel"
 
 msgid "tooltip_print_scores"
 msgstr "Imprimer les notes"
+
+msgid "without_attribution"
+msgstr "Sans attribution"

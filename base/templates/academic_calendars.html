@@ -57,12 +57,12 @@
         <div class="col-md-8">
         </div>
         <div class="col-md-2">
-          <br>
-          <button type="submit" id="bt_submit_academic_calendar_search" class="btn btn-primary" role="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
-            &nbsp;&nbsp;
-          <a href="{% url 'academic_calendar_create' %}" id="lnk_academic_calendar_create" class="btn btn-default" role="button"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
-          </div>
-
+            <br>
+            <button type="submit" id="bt_submit_academic_calendar_search" class="btn btn-primary" role="button"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+            {% if request.user.is_superuser %}
+                <a href="{% url 'academic_calendar_create' %}" id="lnk_academic_calendar_create" class="btn btn-default" role="button"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
+            {% endif %}
+        </div>
       </form>
     </div>
       <br>

@@ -42,16 +42,48 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label>{% trans 'tutor' %}</label><br>{{ tutor }}
                     </div>
                 </div>
-                <div class="col-md-8">
+                <div class="col-md-3">
                     <div class="form-group">
                         <label>{% trans 'academic_year' %}</label><br>
                         {{ academic_year }}
                     </div>
+                </div>
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <label>{% trans 'number_session' %}</label><br>
+                        {{ number_session }}
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <form method="get" action="{% url 'refresh_list' %}" id="form_search_scores_by_offer">
+                        <div class="col-md-10">
+                            <div class="form-group">
+                                <label>{% trans 'offer' %}</label><br>
+                                <select id="slt_offer_list_selection" name="offer_year_id" class="form-control">
+                                    <option value="">{% trans 'all'%}</option>
+                                    {% for offer_year in offer_year_list %}
+                                    <option value="{{offer_year.id}}"
+                                            {%if offer_year_id == offer_year.id %}selected{%endif%}>
+                                        {{offer_year.acronym}}
+                                    </option>
+                                    {%endfor%}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <br>
+                            <button type="submit" id="bt_submit_scores_by_offer" class="btn btn-primary" role="button"
+                                    style="margin-top: 4px"
+                                    title="{% trans 'refresh_list' %}">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                            &nbsp;&nbsp;
+                        </div>
+                    </form>
                 </div>
             </div>
             <br>
@@ -92,8 +124,7 @@
                                         title="{% trans 'tooltip_encode_no_more_possible_for' %}"
                                        {% else %}
                                         title="{% trans 'tooltip_encode_for' %}"
-                                       {% endif %}
-                                    >
+                                       {% endif %}>
                                     <i class="fa fa-hashtag"></i> {% trans 'encode' %}
                                 </a></td>
                             </tr>
@@ -180,7 +211,7 @@
     </div>
 {% else %}
     <div class="alert alert-warning">
-      <p class="text-info" style="font-size: 130%">{% trans 'no_exam_session_opened_for_the_moment' %} </p>
+      <p class="text-info" style="font-size: 130%">{% trans 'no_score_to_encode' %} </p>
     </div>
 {% endif %}
 {% endblock %}

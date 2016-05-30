@@ -65,6 +65,9 @@ def learning_units_search(request):
                                                           'init': "0"})
 
 
-def learning_unit_read(request, learning_unit_id):
-    learning_unit_year = mdl.learning_unit_year.find_by_id(learning_unit_id)
-    return layout.render(request, "learning_unit.html", {'learning_unit_year': learning_unit_year})
+def learning_unit_read(request, learning_unit_year_id):
+    learning_unit_year = mdl.learning_unit_year.find_by_id(learning_unit_year_id)
+    attributions = mdl.attribution.search(learning_unit_id=learning_unit_year.learning_unit.id)
+
+    return layout.render(request, "learning_unit.html", {'learning_unit_year': learning_unit_year,
+                                                         'attributions': attributions})

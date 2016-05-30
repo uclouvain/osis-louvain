@@ -47,10 +47,30 @@
     </div>
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <div class="form-group">
                     <label>{% trans 'coordinator' %}</label><br>
-                    {{ coordinator }}
+                    {% if coordinator %}
+                        {{ coordinator }}
+                    {% else %}
+                        {% trans 'none' %}
+                    {% endif %}
+                    {% if tutors %}
+                        <a role="button" data-toggle="collapse" data-target="#tutors_by_course"
+                           aria-expanded="false"
+                           aria-controls="tutors_by_course"
+                           title="{% trans 'display_tutors' %}">
+                          <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                        </a>
+                    {% endif %}
+                    <div class="collapse" id="tutors_by_course">
+                        <label>{% trans 'tutors' %}</label><br>
+                        <ul>
+                            {% for prof in tutors %}
+                                <li>{{ prof }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
                 </div>
             </div>
             <div class="col-md-3">
@@ -59,7 +79,13 @@
                     {{ academic_year }}
                 </div>
             </div>
-            <div class="col-md-5">
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label>{% trans 'number_session' %}</label><br>
+                    {{ number_session }}
+                </div>
+            </div>
+            <div class="col-md-3">
                 <div class="form-group">
                     <label>{%trans 'number_of_enrollments' %}</label><br>
                     {{ count_total_enrollments }}
@@ -100,7 +126,7 @@
                                     {% endifchanged %}">
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name }}</td>
+                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|title }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name }}</td>
 
                         {% if is_program_manager %}
@@ -132,19 +158,23 @@
                             </td>
                         {% endif %}
                         {% if is_program_manager %}
-                                <td>{% if enrollment.score_final != enrollment.score_reencoded or enrollment.justification_final != enrollment.justification_reencoded%}
-                                        <button type="button" id="bt_take_draft_{{ enrollment.id }}" class="btn btn-default btn-sm">
-                                            <span class="glyphicon glyphicon-ok" id="span_take_draft_{{ enrollment.id }}" style="color: black" aria-hidden="true"></span>
-                                        </button>
-                                    {% endif %}
-                                </td>
+                            <td>{% if enrollment.score_final != enrollment.score_reencoded or enrollment.justification_final != enrollment.justification_reencoded %}
+                                    <button type="button" id="bt_take_draft_{{ enrollment.id }}" class="btn btn-default btn-sm">
+                                        <span class="glyphicon glyphicon-ok" id="span_take_draft_{{ enrollment.id }}" style="color: black" aria-hidden="true"></span>
+                                    </button>
+                                {% endif %}
+                            </td>
                         {% else %}
-                                <td>{% if enrollment.score_draft != enrollment.score_reencoded or enrollment.justification_draft != enrollment.justification_reencoded%}
-                                        <button type="button" id="bt_take_draft_{{ enrollment.id }}" class="btn btn-default btn-sm">
-                                            <span class="glyphicon glyphicon-ok" id="span_take_draft_{{ enrollment.id }}" style="color: black" aria-hidden="true"></span>
-                                        </button>
-                                    {% endif %}
-                                </td>
+                            <td>{% if enrollment.score_draft != enrollment.score_reencoded and not enrollment.justification_draft %}
+                                    <button type="button" id="bt_take_draft_{{ enrollment.id }}" class="btn btn-default btn-sm">
+                                        <span class="glyphicon glyphicon-ok" id="span_take_draft_{{ enrollment.id }}" style="color: black" aria-hidden="true"></span>
+                                    </button>
+                                {% elif enrollment.justification_draft != enrollment.justification_reencoded and not enrollment.score_draft and enrollment.score_draft != 0 %}
+                                    <button type="button" id="bt_take_draft_{{ enrollment.id }}" class="btn btn-default btn-sm">
+                                        <span class="glyphicon glyphicon-ok" id="span_take_draft_{{ enrollment.id }}" style="color: black" aria-hidden="true"></span>
+                                    </button>
+                                {% endif %}
+                            </td>
                         {% endif %}
                         <td><input type="hidden" id="hdn_score_reencoded_{{ enrollment.id }}"
                                    value="{{ enrollment.score_reencoded | score_display:enrollment.session_exam.learning_unit_year.decimal_scores}}"/>
@@ -157,14 +187,22 @@
                             </div>
                         </td>
                         {% if is_program_manager %}
-                            <td>{% if enrollment.score_final != enrollment.score_reencoded or enrollment.justification_final != enrollment.justification_reencoded%}
+                            <td>{% if enrollment.score_final != enrollment.score_reencoded and not enrollment.justification_final %}
+                                    <button type="button" id="bt_take_reencoded_{{ enrollment.id }}" class="btn btn-default btn-sm">
+                                        <span class="glyphicon glyphicon-ok" id="span_take_reencoded_{{ enrollment.id }}" style="color: black" aria-hidden="true"></span>
+                                    </button>
+                                {% elif enrollment.justification_final != enrollment.justification_reencoded and not enrollment.score_final and enrollment.score_final != 0 %}
                                     <button type="button" id="bt_take_reencoded_{{ enrollment.id }}" class="btn btn-default btn-sm">
                                         <span class="glyphicon glyphicon-ok" id="span_take_reencoded_{{ enrollment.id }}" style="color: black" aria-hidden="true"></span>
                                     </button>
                                 {% endif %}
                             </td>
                         {% else %}
-                            <td>{% if enrollment.score_draft != enrollment.score_reencoded or enrollment.justification_draft != enrollment.justification_reencoded%}
+                            <td>{% if enrollment.score_draft != enrollment.score_reencoded and not enrollment.justification_draft %}
+                                    <button type="button" id="bt_take_reencoded_{{ enrollment.id }}" class="btn btn-default btn-sm">
+                                        <span class="glyphicon glyphicon-ok" id="span_take_reencoded_{{ enrollment.id }}" style="color: black" aria-hidden="true"></span>
+                                    </button>
+                                {% elif enrollment.justification_draft != enrollment.justification_reencoded and not enrollment.score_draft and enrollment.score_draft != 0 %}
                                     <button type="button" id="bt_take_reencoded_{{ enrollment.id }}" class="btn btn-default btn-sm">
                                         <span class="glyphicon glyphicon-ok" id="span_take_reencoded_{{ enrollment.id }}" style="color: black" aria-hidden="true"></span>
                                     </button>
@@ -174,20 +212,32 @@
                         {% if is_program_manager %}
                             <td>
                                 <input type="hidden" name="score_{{ enrollment.id }}" id="hdn_score_final_{{ enrollment.id }}"
-                                value="{% if enrollment.score_final == enrollment.score_reencoded and enrollment.justification_final == enrollment.justification_reencoded and enrollment.score_final != None %}{{enrollment.score_final}}{%endif%}"/>
+                                value="{% if not enrollment.justification_final %}
+                                         {% if enrollment.score_final == enrollment.score_reencoded and enrollment.score_final != None %}
+                                           {{enrollment.score_final}}
+                                         {%endif%}
+                                       {%endif%}"/>
                                 <div id="pnl_score_final_show_{{ enrollment.id }}" style="font-weight: bold; color: blue;">
-                                {% if enrollment.score_final == enrollment.score_reencoded and enrollment.justification_final == enrollment.justification_reencoded and enrollment.score_final != None %}
-                                    {{enrollment.score_final|score_display:enrollment.session_exam.learning_unit_year.decimal_scores}}
+                                {% if not enrollment.justification_final %}
+                                    {% if enrollment.score_final == enrollment.score_reencoded and enrollment.score_final != None %}
+                                        {{enrollment.score_final|score_display:enrollment.session_exam.learning_unit_year.decimal_scores}}
+                                    {%endif%}
                                 {%endif%}
                                 </div>
                             </td>
                         {% else %}
                             <td>
                                 <input type="hidden" name="score_{{ enrollment.id }}" id="hdn_score_final_{{ enrollment.id }}"
-                                value="{% if enrollment.score_draft == enrollment.score_reencoded and enrollment.justification_draft == enrollment.justification_reencoded and enrollment.score_draft != None %}{{enrollment.score_draft}}{%endif%}"/>
+                                value="{% if not enrollment.justification_draft %}
+                                           {% if enrollment.score_draft == enrollment.score_reencoded and enrollment.score_draft != None %}
+                                               {{enrollment.score_draft}}
+                                           {%endif%}
+                                       {%endif%}"/>
                                 <div id="pnl_score_final_show_{{ enrollment.id }}" style="font-weight: bold; color: blue;">
-                                {% if enrollment.score_draft == enrollment.score_reencoded and enrollment.justification_draft == enrollment.justification_reencoded and enrollment.score_draft != None %}
-                                    {{enrollment.score_draft|score_display:enrollment.session_exam.learning_unit_year.decimal_scores}}
+                                {% if not enrollment.justification_draft %}
+                                    {% if enrollment.score_draft == enrollment.score_reencoded and enrollment.score_draft != None %}
+                                        {{enrollment.score_draft|score_display:enrollment.session_exam.learning_unit_year.decimal_scores}}
+                                    {%endif%}
                                 {%endif%}
                                 </div>
                             </td>

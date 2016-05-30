@@ -25,9 +25,10 @@
 ##############################################################################
 from django.db import models
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
-from base.models import person, learning_unit_year
+from django.utils.translation import ugettext as _
+from base.models import person, learning_unit_year, attribution, person_address, offer_year_calendar
 from django.utils import timezone
+import datetime
 
 
 class ExamEnrollmentAdmin(admin.ModelAdmin):
@@ -50,10 +51,10 @@ class ExamEnrollmentAdmin(admin.ModelAdmin):
 #    'CHEATING'            => 'T'
 #    'SCORE_MISSING'       => '?'
 JUSTIFICATION_TYPES = (
-    ('ABSENCE_UNJUSTIFIED', _('absence_unjustified')),  # A -> S
-    ('ABSENCE_JUSTIFIED', _('absence_justified')),      # M
-    ('CHEATING', _('cheating')),                        # T
-    ('SCORE_MISSING', _('score_missing')))              # ?
+    ('ABSENCE_UNJUSTIFIED', _('ABSENCE_UNJUSTIFIED')),  # A -> S
+    ('ABSENCE_JUSTIFIED', _('ABSENCE_JUSTIFIED')),      # M
+    ('CHEATING', _('CHEATING')),                        # T
+    ('SCORE_MISSING', _('SCORE_MISSING')))              # ?
 
 
 class ExamEnrollment(models.Model):
@@ -194,7 +195,9 @@ def find_exam_enrollments_by_session_learningunit(session_exm, learning_unt):
 def find_for_score_encodings(session_exam_number,
                              learning_unit_year_id=None,
                              learning_unit_year_ids=None,
-                             tutor=None, offers_year=None,
+                             tutor=None,
+                             offer_year_id=None,
+                             offers_year=None,
                              with_justification_or_score_final=False,
                              with_justification_or_score_draft=False):
     """
@@ -202,29 +205,32 @@ def find_for_score_encodings(session_exam_number,
     :param learning_unit_year_id: Filter OfferEnrollments by learning_unit_year.
     :param learning_unit_year_ids: Filter OfferEnrollments by a list of learning_unit_year.
     :param tutor: Filter OfferEnrollments by Tutor.
+    :param offer_year_id: Filter OfferEnrollments by Offer year ids
     :param offers_year: Filter OfferEnrollments by OfferYear.
     :param with_justification_or_score_final: If True, only examEnrollments with a score_final or a justification_final
                                               are returned.
     :param with_justification_or_score_draft: If True, only examEnrollments with a score_draft or a justification_draft
                                               are returned.
-    :return: All examEnrollments filtered.
+    :return: All filtered examEnrollments.
     """
     queryset = ExamEnrollment.objects.filter(session_exam__number_session=session_exam_number)
 
     if learning_unit_year_id:
-        queryset = queryset.filter(session_exam__learning_unit_year_id=learning_unit_year_id)
+        queryset = queryset.filter(learning_unit_enrollment__learning_unit_year_id=learning_unit_year_id)
     elif learning_unit_year_ids:
-        queryset = queryset.filter(session_exam__learning_unit_year_id__in=learning_unit_year_ids)
+        queryset = queryset.filter(learning_unit_enrollment__learning_unit_year_id__in=learning_unit_year_ids)
 
     if tutor:
         # Filter by Tutor is like filter by a list of learningUnits
         # It's not necessary to add a filter if learningUnitYear or learningUnitYearIds are already defined
         if not learning_unit_year_id and not learning_unit_year_ids:
             learning_unit_year_ids = learning_unit_year.find_by_tutor(tutor).values_list('id')
-            queryset = queryset.filter(session_exam__learning_unit_year_id__in=learning_unit_year_ids)
+            queryset = queryset.filter(learning_unit_enrollment__learning_unit_year_id__in=learning_unit_year_ids)
 
-    if offers_year:
-        queryset = queryset.filter(session_exam__offer_year_calendar__offer_year__in=offers_year)
+    if offer_year_id:
+        queryset = queryset.filter(learning_unit_enrollment__offer_enrollment__offer_year_id=offer_year_id)
+    elif offers_year:
+        queryset = queryset.filter(learning_unit_enrollment__offer_enrollment__offer_year_id__in=offers_year)
 
     if with_justification_or_score_final:
         queryset = queryset.exclude(score_final=None, justification_final=None)
@@ -234,4 +240,126 @@ def find_for_score_encodings(session_exam_number,
 
     now = timezone.now()
     return queryset.filter(session_exam__offer_year_calendar__start_date__lte=now)\
-                   .filter(session_exam__offer_year_calendar__end_date__gte=now)
+                   .filter(session_exam__offer_year_calendar__end_date__gte=now)\
+                   .select_related('learning_unit_enrollment__offer_enrollment__offer_year')\
+                   .select_related('session_exam__offer_year_calendar')
+
+
+def scores_sheet_data(exam_enrollments, tutor=None):
+    exam_enrollments = sort_for_encodings(exam_enrollments)
+    data = {'tutor_global_id': tutor.person.global_id if tutor else ''}
+    now = datetime.datetime.now()
+    data['publication_date'] = '%s/%s/%s' % (now.day, now.month, now.year)
+    data['institution'] = str(_('ucl_denom_location'))
+    data['link_to_regulation'] = str(_('link_to_RGEE'))
+
+    # Will contain lists of examEnrollments splitted by learningUnitYear
+    enrollments_by_learn_unit = {}  # {<learning_unit_year_id> : [<ExamEnrollment>]}
+    for exam_enroll in exam_enrollments:
+        key = exam_enroll.session_exam.learning_unit_year.id
+        if key not in enrollments_by_learn_unit.keys():
+            enrollments_by_learn_unit[key] = [exam_enroll]
+        else:
+            enrollments_by_learn_unit[key].append(exam_enroll)
+
+    learning_unit_years = []
+    for exam_enrollments in enrollments_by_learn_unit.values():
+        # exam_enrollments contains all ExamEnrollment for a learningUnitYear
+        learn_unit_year_dict = {}
+        # We can take the first element of the list 'exam_enrollments' to get the learning_unit_yr
+        # because all exam_enrollments have the same learningUnitYear
+        session_exam = exam_enrollments[0].session_exam
+        learning_unit_yr = session_exam.learning_unit_year
+        coordinator = attribution.find_responsible(learning_unit_yr.learning_unit.id)
+        coordinator_address = None
+        if coordinator:
+            coordinator_address = person_address.find_by_person_label(coordinator.person, 'PROFESSIONAL')
+
+        learn_unit_year_dict['academic_year'] = str(learning_unit_yr.academic_year)
+        learn_unit_year_dict['coordinator'] = {'first_name': coordinator.person.first_name if coordinator else '',
+                                               'last_name': coordinator.person.last_name if coordinator else ''}
+
+        learn_unit_year_dict['coordinator']['address'] = {'location': coordinator_address.location
+                                                                      if coordinator_address else '',
+                                                          'postal_code': coordinator_address.postal_code
+                                                                         if coordinator_address else '',
+                                                          'city': coordinator_address.city
+                                                                  if coordinator_address else ''}
+        learn_unit_year_dict['session_number'] = session_exam.number_session
+        learn_unit_year_dict['acronym'] = learning_unit_yr.acronym
+        learn_unit_year_dict['title'] = learning_unit_yr.title
+        learn_unit_year_dict['decimal_scores'] = learning_unit_yr.decimal_scores
+
+        programs = []
+
+        # Will contain lists of examEnrollments by offerYear (=Program)
+        enrollments_by_program = {}  # {<offer_year_id> : [<ExamEnrollment>]}
+        for exam_enroll in exam_enrollments:
+            key = exam_enroll.learning_unit_enrollment.offer_enrollment.offer_year.id
+            if key not in enrollments_by_program.keys():
+                enrollments_by_program[key] = [exam_enroll]
+            else:
+                enrollments_by_program[key].append(exam_enroll)
+
+        for list_enrollments in enrollments_by_program.values():  # exam_enrollments by OfferYear
+            exam_enrollment = list_enrollments[0]
+            offer_year = exam_enrollment.learning_unit_enrollment.offer_enrollment.offer_year
+
+            deliberation_date = offer_year_calendar.find_deliberation_date(offer_year,
+                                                                           exam_enrollment.session_exam.number_session)
+            if deliberation_date:
+                deliberation_date = deliberation_date.strftime("%d/%m/%Y")
+            else:
+                deliberation_date = '-'
+            deadline = ""
+            if session_exam.deadline:
+                deadline = session_exam.deadline.strftime('%d/%m/%Y')
+
+            program = {'acronym': exam_enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+                       'deliberation_date': deliberation_date,
+                       'deadline': deadline,
+                       'address': {'recipient': offer_year.recipient,
+                                   'location': offer_year.location,
+                                   'postal_code': offer_year.postal_code,
+                                   'city': offer_year.city,
+                                   'phone': offer_year.phone,
+                                   'fax': offer_year.fax}}
+            enrollments = []
+            for exam_enrol in list_enrollments:
+                student = exam_enrol.learning_unit_enrollment.student
+                enrollments.append({
+                    "registration_id": student.registration_id,
+                    "last_name": student.person.last_name,
+                    "first_name": student.person.first_name,
+                    "score": str(exam_enrol.score_final) if exam_enrol.score_final else '',
+                    "justification": _(exam_enrol.justification_final) if exam_enrol.justification_final else ''
+                })
+            program['enrollments'] = enrollments
+            programs.append(program)
+            programs = sorted(programs, key=lambda k: k['acronym'])
+        learn_unit_year_dict['programs'] = programs
+        learning_unit_years.append(learn_unit_year_dict)
+    learning_unit_years = sorted(learning_unit_years, key=lambda k: k['acronym'])
+    data['learning_unit_years'] = learning_unit_years
+    return data
+
+
+def sort_for_encodings(exam_enrollments):
+    """
+    Sort the list by
+     1. offerYear.acronym
+     2. student.lastname
+     3. sutdent.firstname
+    :param exam_enrollments: List of examEnrollments to sort
+    :return:
+    """
+    def _sort(key):
+        off_enroll = key.learning_unit_enrollment.offer_enrollment
+        acronym = off_enroll.offer_year.acronym
+        last_name = off_enroll.student.person.last_name
+        first_name = off_enroll.student.person.first_name
+        return "%s %s %s" %(acronym if acronym else '',
+                            last_name.upper() if last_name else '',
+                            first_name.upper() if first_name else '')
+
+    return sorted(exam_enrollments, key=lambda k: _sort(k))
