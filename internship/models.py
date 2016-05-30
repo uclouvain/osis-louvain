@@ -56,6 +56,17 @@ class InternshipOffer(models.Model):
         internships = InternshipOffer.objects.filter(organization__name=organization)
         return internships
 
+    @staticmethod
+    def find_intership_by_id(id):
+        internship = InternshipOffer.objects.all()
+        for i in internship:
+            if int(i.id) == int(id):
+                return i
+
+        internship = InternshipChoice.objects.all()
+        for i in internship:
+            if int(i.id) == int(id):
+                return i
 
 class InternshipEnrollment(models.Model):
     learning_unit_enrollment = models.ForeignKey('base.LearningUnitEnrollment')
@@ -128,7 +139,7 @@ class InternshipChoice(models.Model):
         return internships
 
     @staticmethod
-    def find_by(s_organization=None, s_learning_unit_year=None, s_organization_ref=None):
+    def find_by(s_organization=None, s_learning_unit_year=None, s_organization_ref=None, s_choice=None):
         has_criteria = False
         queryset = InternshipChoice.objects
 
@@ -144,6 +155,12 @@ class InternshipChoice(models.Model):
             queryset = queryset.filter(organization__reference=s_organization_ref).order_by('choice')
             has_criteria = True
 
+        if s_choice:
+            if s_choice == 1 :
+                queryset = queryset.filter(choice=s_choice)
+            else :
+                queryset = queryset.exclude(choice=1)
+            has_criteria = True
         if has_criteria:
             return queryset
         else:

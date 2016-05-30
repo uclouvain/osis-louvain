@@ -63,7 +63,7 @@
               </select>
             </td>
             <td style="text-align:center;">
-              <select name="title">
+              <select name="learning_unit_year">
                {% for learning_unit_year in all_learning_unit_year %}
                   <option value={{ learning_unit_year.title }}>
                       {{ learning_unit_year.title }}
@@ -79,11 +79,17 @@
   </table>
   <br/>
       <button type="submit" class="btn btn-primary" title="{% trans 'Save'%}" id="bt_interships_new">
-          <span class="glyphicon glyphicon-save" aria-hidden="true"></span> {% trans 'Save'%}
+          <span class="glyphicon glyphicon-save" aria-hidden="true"/> {% trans 'Save'%}
       </button>
     </form>
-    <a href="{% url 'place_create' %}" id="lnk_organization_create" class="btn btn-default"
-       role="button" title="{% trans 'create_an_organization'%}">{% trans 'add_a_hospital' %}
-       <span class="glyphicon glyphicon-plus" aria-hidden="true"></span></a>
+    <a href="{% url 'place_create' %}" class="btn btn-info" title="{% trans 'create_an_organization'%}"
+      id="lnk_organization_create">{% trans 'add_a_hospital' %}
+      <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+    </a>
+    <br><br>
+    <a href="{% url 'internships' %}" class="btn btn-default" title="{% trans 'return'%}"
+      id="lnk_internships" >{% trans 'return' %}
+      <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"/>
+    </a>
   </div>
 {% endblock %}

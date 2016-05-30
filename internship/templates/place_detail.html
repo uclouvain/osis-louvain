@@ -50,7 +50,7 @@
       <ul>
         {% for choice in organization_choice %}
           {% if choice.learning_unit_year.title == "Stage en Gériatrie" %}
-            <li> {% trans 'Etudiant' %} : {{ choice.student }} | Choix : {{ choice.choice }}
+            <li> {{ choice.student }} | Choix : {{ choice.choice }}
           {% endif %}
         {% endfor %}
       </ul>
@@ -58,7 +58,7 @@
       <ul>
         {% for choice in organization_choice %}
           {% if choice.learning_unit_year.title == "Stage en Gynécologie-Obstétrique" %}
-            <li> {% trans 'Etudiant' %} : {{ choice.student }} | Choix : {{ choice.choice }}
+            <li> {{ choice.student }} | Choix : {{ choice.choice }}
           {% endif %}
         {% endfor %}
       </ul>
@@ -66,7 +66,7 @@
       <ul>
         {% for choice in organization_choice %}
           {% if choice.learning_unit_year.title == "Stage en Médecine interne" %}
-            <li> {% trans 'Etudiant' %} : {{ choice.student }} | Choix : {{ choice.choice }}
+            <li> {{ choice.student }} | Choix : {{ choice.choice }}
           {% endif %}
         {% endfor %}
       </ul>
@@ -74,7 +74,7 @@
       <ul>
         {% for choice in organization_choice %}
           {% if choice.learning_unit_year.title == "Stage en Pédiatrie" %}
-            <li> {% trans 'Etudiant' %} : {{ choice.student }} | Choix : {{ choice.choice }}
+            <li> {{ choice.student }} | Choix : {{ choice.choice }}
           {% endif %}
         {% endfor %}
       </ul>
@@ -82,7 +82,7 @@
       <ul>
         {% for choice in organization_choice %}
           {% if choice.learning_unit_year.title == "Stage en Urgence" %}
-            <li> {% trans 'Etudiant' %} : {{ choice.student }} | Choix : {{ choice.choice }}
+            <li> {{ choice.student }} | Choix : {{ choice.choice }}
           {% endif %}
         {% endfor %}
       </ul>

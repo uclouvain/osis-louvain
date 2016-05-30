@@ -46,7 +46,7 @@
           <tr>
             <td style="text-align:center; width:50%;">
               <select name="organization_sort" onChange="javascript: this.form.submit();">
-               <option value="0">--</option>
+               <option value="0">{% trans 'choose_a_hospital' %}</option>
                {% for organization in all_organizations %}
                   <option value="{{ organization.name }}"
                   {% if organization.name == organization_sort_value %}selected{% endif %}>
@@ -68,14 +68,8 @@
             <li><a data-toggle="tab" href="#tab_PED">{% trans 'Stage en Médecine interne'%}</a></li>
             <li><a data-toggle="tab" href="#tab_URG">{% trans 'Stage en Pédiatrie'%}</a></li>
             <li><a data-toggle="tab" href="#tab_GER">{% trans 'Stage en Urgence'%}</a></li>
-            <li><a data-toggle="tab" href="#tab_CHOIX1">{% trans 'Stage au choix 1'%}</a></li>
-            <li><a data-toggle="tab" href="#tab_CHOIX2">{% trans 'Stage au choix 2'%}</a></li>
-            <li><a data-toggle="tab" href="#tab_CHOIX2">{% trans 'Stage au choix 3'%}</a></li>
-            <li><a data-toggle="tab" href="#tab_CHOIX2">{% trans 'Stage au choix 4'%}</a></li>
-            <li><a data-toggle="tab" href="#tab_CHOIX2">{% trans 'Stage au choix 5'%}</a></li>
-            <li><a data-toggle="tab" href="#tab_CHOIX2">{% trans 'Stage au choix 6'%}</a></li>
+            <li><a data-toggle="tab" href="#tab_CHOIX1">{% trans 'Stage au choix'%}</a></li>
         </ul>
-        <form  method="post" action="{% url 'internships_save' %}" >
         <input type="hidden" name="organization_sort" value="{{ organization.name }}"/>
         {% csrf_token %}
         <div class="tab-content">
@@ -86,50 +80,36 @@
                     <table class="table table-hover">
                         <thead>
                           <tr>
-                              <th>{% trans 'name' %}</th>
-                              <th>{% trans 'student_max' %}</th>
-                              <th>{% trans 'Étudiants inscrits' %}</th>
-                              <th>{% trans 'organization' %}</th>
-                              <th>{% trans 'preference' %}</th>
+                            <th align="center">{% trans 'organization' %}</th>
+                            <th align="center">{% trans 'student_max' %}</th>
+                            <th align="center">{% trans 'Nombre de 1er choix' %}</th>
+                            <th align="center">{% trans 'Nombre d\'autres choix fait' %}</th>
+                            <th align="center">{% trans 'Détails' %}</th>
                           </tr>
                         </thead>
                         <tbody>
                           {% for internship in all_internships %}
                           {% if internship.learning_unit_year.title = "Stage en Chirurgie"%}
                             <tr>
-                                <td>
-                                  <input type="hidden" name="learning_unit_year"
-                                  value="{{ internship.learning_unit_year.title }}"/>
-                                    {{ internship.learning_unit_year.title }}
-                                </td>
-                                <td>
-                                  {{ internship.maximum_enrollments }}
-                                </td>
-                                <td>
-                                  {{ internship.number }}
-                                </td>
-                                <td>
-                                  <input type="hidden" name="organization"
-                                  value="{{ internship.organization.reference }}"/>
-                                    {{ internship.organization.reference }} - {{ internship.organization }}
-                                </td>
-                                <td>
-                                  <select name="preference">
-                                   <option value=0>0</option>
-                                   <option value=1 {% if internship.choice == 1 %} selected{%endif%}>
-                                     Choix préféré
-                                   </option>
-                                   <option value=2 {% if internship.choice == 2 %} selected{%endif%}>
-                                     2ème choix
-                                   </option>
-                                   <option value=3 {% if internship.choice == 3 %} selected{%endif%}>
-                                     3ème choix
-                                   </option>
-                                   <option value=4 {% if internship.choice == 4 %} selected{%endif%}>
-                                     4ème choix
-                                   </option>
-                                  </select>
-                                </td>
+                              <td>
+                                {{ internship.organization.reference }} - {{ internship.organization }}
+                              </td>
+                              <td align="center">
+                                {{ internship.maximum_enrollments }}
+                              </td>
+                              <td align="center">
+                                {{ internship.number_first_choice }}
+                              </td>
+                              <td align="center">
+                                {{ internship.number_other_choice }}
+                              </td>
+                              <td align="center">
+                                <a class="btn btn-primary" target="_blank" id="lnk_students_choice{{internship.id}}"
+                                  href="{% url 'internship_detail_student_choice' internship.id %}">
+                                  <span class="glyphicon glyphicon-search" aria-hidden="true">
+                                  </span>
+                                </a>
+                              </td>
                             </tr>
                           {% endif %}
                           {% endfor %}
@@ -146,51 +126,37 @@
                     <table class="table table-hover">
                         <thead>
                           <tr>
-                              <th>{% trans 'Name' %}</th>
-                              <th>{% trans 'Student max' %}</th>
-                              <th>{% trans 'Étudiants inscrits' %}</th>
-                              <th>{% trans 'organization' %}</th>
-                              <th>{% trans 'Preference' %}</th>
+                            <th align="center">{% trans 'organization' %}</th>
+                            <th align="center">{% trans 'student_max' %}</th>
+                            <th align="center">{% trans 'Nombre de 1er choix' %}</th>
+                            <th align="center">{% trans 'Nombre d\'autres choix fait' %}</th>
+                            <th align="center">{% trans 'Détails' %}</th>
                           </tr>
                         </thead>
                         <tbody>
                           {% for internship in all_internships %}
                           {% if internship.learning_unit_year.title = "Stage en Gériatrie"%}
-                          <tr>
+                            <tr>
                               <td>
-                                <input type="hidden" name="learning_unit_year"
-                                value="{{ internship.learning_unit_year.title }}"/>
-                                  {{ internship.learning_unit_year.title }}
+                                {{ internship.organization.reference }} - {{ internship.organization }}
                               </td>
-                              <td>
+                              <td align="center">
                                 {{ internship.maximum_enrollments }}
                               </td>
-                              <td>
-                                {{ internship.number }}
+                              <td align="center">
+                                {{ internship.number_first_choice }}
                               </td>
-                              <td>
-                                <input type="hidden" name="organization"
-                                value="{{ internship.organization.reference }}"/>
-                                  {{ internship.organization.reference }} - {{ internship.organization }}
+                              <td align="center">
+                                {{ internship.number_other_choice }}
                               </td>
-                              <td>
-                                <select name="preference">
-                                 <option value=0>0</option>
-                                 <option value=1 {% if internship.choice == 1 %} selected{%endif%}>
-                                   Choix préféré
-                                 </option>
-                                 <option value=2 {% if internship.choice == 2 %} selected{%endif%}>
-                                   2ème choix
-                                 </option>
-                                 <option value=3 {% if internship.choice == 3 %} selected{%endif%}>
-                                   3ème choix
-                                 </option>
-                                 <option value=4 {% if internship.choice == 4 %} selected{%endif%}>
-                                   4ème choix
-                                 </option>
-                                </select>
+                              <td align="center">
+                                <a class="btn btn-primary" target="_blank" id="lnk_students_choice{{internship.id}}"
+                                  href="{% url 'internship_detail_student_choice' internship.id %}">
+                                  <span class="glyphicon glyphicon-search" aria-hidden="true">
+                                  </span>
+                                </a>
                               </td>
-                          </tr>
+                            </tr>
                           {% endif %}
                           {% endfor %}
                         </tbody>
@@ -206,51 +172,37 @@
                     <table class="table table-hover">
                         <thead>
                           <tr>
-                              <th>{% trans 'Name' %}</th>
-                              <th>{% trans 'Student max' %}</th>
-                              <th>{% trans 'Étudiants inscrits' %}</th>
-                              <th>{% trans 'organization' %}</th>
-                              <th>{% trans 'Preference' %}</th>
+                            <th align="center">{% trans 'organization' %}</th>
+                            <th align="center">{% trans 'student_max' %}</th>
+                            <th align="center">{% trans 'Nombre de 1er choix' %}</th>
+                            <th align="center">{% trans 'Nombre d\'autres choix fait' %}</th>
+                            <th align="center">{% trans 'Détails' %}</th>
                           </tr>
                         </thead>
                         <tbody>
                           {% for internship in all_internships %}
-                          {% if internship.learning_unit_year.title = "Stage en Gynécologie-Obsétrique"%}
-                          <tr>
+                          {% if internship.learning_unit_year.title = "Stage de Gynécologie-Obstétrique"%}
+                            <tr>
                               <td>
-                                <input type="hidden" name="learning_unit_year"
-                                value="{{ internship.learning_unit_year.title }}"/>
-                                  {{ internship.learning_unit_year.title }}
+                                {{ internship.organization.reference }} - {{ internship.organization }}
                               </td>
-                              <td>
+                              <td align="center">
                                 {{ internship.maximum_enrollments }}
                               </td>
-                              <td>
-                                {{ internship.number }}
+                              <td align="center">
+                                {{ internship.number_first_choice }}
                               </td>
-                              <td>
-                                <input type="hidden" name="organization"
-                                value="{{ internship.organization.reference }}"/>
-                                  {{ internship.organization.reference }} - {{ internship.organization }}
+                              <td align="center">
+                                {{ internship.number_other_choice }}
                               </td>
-                              <td>
-                                <select name="preference">
-                                 <option value=0>0</option>
-                                 <option value=1 {% if internship.choice == 1 %} selected{%endif%}>
-                                   Choix préféré
-                                 </option>
-                                 <option value=2 {% if internship.choice == 2 %} selected{%endif%}>
-                                   2ème choix
-                                 </option>
-                                 <option value=3 {% if internship.choice == 3 %} selected{%endif%}>
-                                   3ème choix
-                                 </option>
-                                 <option value=4 {% if internship.choice == 4 %} selected{%endif%}>
-                                   4ème choix
-                                 </option>
-                                </select>
+                              <td align="center">
+                                <a class="btn btn-primary" target="_blank" id="lnk_students_choice{{internship.id}}"
+                                  href="{% url 'internship_detail_student_choice' internship.id %}">
+                                  <span class="glyphicon glyphicon-search" aria-hidden="true">
+                                  </span>
+                                </a>
                               </td>
-                          </tr>
+                            </tr>
                           {% endif %}
                           {% endfor %}
                         </tbody>
@@ -266,51 +218,37 @@
                     <table class="table table-hover">
                         <thead>
                           <tr>
-                            <th>{% trans 'Name' %}</th>
-                              <th>{% trans 'Student max' %}</th>
-                              <th>{% trans 'Étudiants inscrits' %}</th>
-                              <th>{% trans 'organization' %}</th>
-                              <th>{% trans 'Preference' %}</th>
+                            <th align="center">{% trans 'organization' %}</th>
+                            <th align="center">{% trans 'student_max' %}</th>
+                            <th align="center">{% trans 'Nombre de 1er choix' %}</th>
+                            <th align="center">{% trans 'Nombre d\'autres choix fait' %}</th>
+                            <th align="center">{% trans 'Détails' %}</th>
                           </tr>
                         </thead>
                         <tbody>
                           {% for internship in all_internships %}
                           {% if internship.learning_unit_year.title = "Stage en Médecine interne"%}
-                          <tr>
+                            <tr>
                               <td>
-                                <input type="hidden" name="learning_unit_year"
-                                value="{{ internship.learning_unit_year.title }}"/>
-                                  {{ internship.learning_unit_year.title }}
+                                {{ internship.organization.reference }} - {{ internship.organization }}
                               </td>
-                              <td>
+                              <td align="center">
                                 {{ internship.maximum_enrollments }}
                               </td>
-                              <td>
-                                {{ internship.number }}
+                              <td align="center">
+                                {{ internship.number_first_choice }}
                               </td>
-                              <td>
-                                <input type="hidden" name="organization"
-                                value="{{ internship.organization.reference }}"/>
-                                  {{ internship.organization.reference }} - {{ internship.organization }}
+                              <td align="center">
+                                {{ internship.number_other_choice }}
                               </td>
-                              <td>
-                                <select name="preference">
-                                 <option value=0>0</option>
-                                 <option value=1 {% if internship.choice == 1 %} selected{%endif%}>
-                                   Choix préféré
-                                 </option>
-                                 <option value=2 {% if internship.choice == 2 %} selected{%endif%}>
-                                   2ème choix
-                                 </option>
-                                 <option value=3 {% if internship.choice == 3 %} selected{%endif%}>
-                                   3ème choix
-                                 </option>
-                                 <option value=4 {% if internship.choice == 4 %} selected{%endif%}>
-                                   4ème choix
-                                 </option>
-                                </select>
+                              <td align="center">
+                                <a class="btn btn-primary" target="_blank" id="lnk_students_choice{{internship.id}}"
+                                  href="{% url 'internship_detail_student_choice' internship.id %}">
+                                  <span class="glyphicon glyphicon-search" aria-hidden="true">
+                                  </span>
+                                </a>
                               </td>
-                          </tr>
+                            </tr>
                           {% endif %}
                           {% endfor %}
                         </tbody>
@@ -326,51 +264,37 @@
                     <table class="table table-hover">
                         <thead>
                           <tr>
-                              <th>{% trans 'Name' %}</th>
-                              <th>{% trans 'Student max' %}</th>
-                              <th>{% trans 'Étudiants inscrits' %}</th>
-                              <th>{% trans 'organization' %}</th>
-                              <th>{% trans 'Preference' %}</th>
+                            <th align="center">{% trans 'organization' %}</th>
+                            <th align="center">{% trans 'student_max' %}</th>
+                            <th align="center">{% trans 'Nombre de 1er choix' %}</th>
+                            <th align="center">{% trans 'Nombre d\'autres choix fait' %}</th>
+                            <th align="center">{% trans 'Détails' %}</th>
                           </tr>
                         </thead>
                         <tbody>
                           {% for internship in all_internships %}
                           {% if internship.learning_unit_year.title = "Stage en Pédiatrie"%}
-                          <tr>
+                            <tr>
                               <td>
-                                <input type="hidden" name="learning_unit_year"
-                                value="{{ internship.learning_unit_year.title }}"/>
-                                  {{ internship.learning_unit_year.title }}
+                                {{ internship.organization.reference }} - {{ internship.organization }}
                               </td>
-                              <td>
+                              <td align="center">
                                 {{ internship.maximum_enrollments }}
                               </td>
-                              <td>
-                                {{ internship.number }}
+                              <td align="center">
+                                {{ internship.number_first_choice }}
                               </td>
-                              <td>
-                                <input type="hidden" name="organization"
-                                value="{{ internship.organization.reference }}"/>
-                                  {{ internship.organization.reference }} - {{ internship.organization }}
+                              <td align="center">
+                                {{ internship.number_other_choice }}
                               </td>
-                              <td>
-                                <select name="preference">
-                                 <option value=0>0</option>
-                                 <option value=1 {% if internship.choice == 1 %} selected{%endif%}>
-                                   Choix préféré
-                                 </option>
-                                 <option value=2 {% if internship.choice == 2 %} selected{%endif%}>
-                                   2ème choix
-                                 </option>
-                                 <option value=3 {% if internship.choice == 3 %} selected{%endif%}>
-                                   3ème choix
-                                 </option>
-                                 <option value=4 {% if internship.choice == 4 %} selected{%endif%}>
-                                   4ème choix
-                                 </option>
-                                </select>
+                              <td align="center">
+                                <a class="btn btn-primary" target="_blank" id="lnk_students_choice{{internship.id}}"
+                                  href="{% url 'internship_detail_student_choice' internship.id %}">
+                                  <span class="glyphicon glyphicon-search" aria-hidden="true">
+                                  </span>
+                                </a>
                               </td>
-                          </tr>
+                            </tr>
                           {% endif %}
                           {% endfor %}
                         </tbody>
@@ -386,51 +310,37 @@
                     <table class="table table-hover">
                         <thead>
                           <tr>
-                              <th>{% trans 'Name' %}</th>
-                              <th>{% trans 'Student max' %}</th>
-                              <th>{% trans 'Étudiants inscrits' %}</th>
-                              <th>{% trans 'organization' %}</th>
-                              <th>{% trans 'Preference' %}</th>
+                            <th align="center">{% trans 'organization' %}</th>
+                            <th align="center">{% trans 'student_max' %}</th>
+                            <th align="center">{% trans 'Nombre de 1er choix' %}</th>
+                            <th align="center">{% trans 'Nombre d\'autres choix fait' %}</th>
+                            <th align="center">{% trans 'Détails' %}</th>
                           </tr>
                         </thead>
                         <tbody>
                           {% for internship in all_internships %}
                           {% if internship.learning_unit_year.title = "Stage en Urgence"%}
-                          <tr>
+                            <tr>
                               <td>
-                                <input type="hidden" name="learning_unit_year"
-                                value="{{ internship.learning_unit_year.title }}"/>
-                                  {{ internship.learning_unit_year.title }}
+                                {{ internship.organization.reference }} - {{ internship.organization }}
                               </td>
-                              <td>
+                              <td align="center">
                                 {{ internship.maximum_enrollments }}
                               </td>
-                              <td>
-                                {{ internship.number }}
+                              <td align="center">
+                                {{ internship.number_first_choice }}
                               </td>
-                              <td>
-                                <input type="hidden" name="organization"
-                                value="{{ internship.organization.reference }}"/>
-                                  {{ internship.organization.reference }} - {{ internship.organization }}
+                              <td align="center">
+                                {{ internship.number_other_choice }}
                               </td>
-                              <td>
-                                <select name="preference">
-                                 <option value=0>0</option>
-                                 <option value=1 {% if internship.choice == 1 %} selected{%endif%}>
-                                   Choix préféré
-                                 </option>
-                                 <option value=2 {% if internship.choice == 2 %} selected{%endif%}>
-                                   2ème choix
-                                 </option>
-                                 <option value=3 {% if internship.choice == 3 %} selected{%endif%}>
-                                   3ème choix
-                                 </option>
-                                 <option value=4 {% if internship.choice == 4 %} selected{%endif%}>
-                                   4ème choix
-                                 </option>
-                                </select>
+                              <td align="center">
+                                <a class="btn btn-primary" target="_blank" id="lnk_students_choice{{internship.id}}"
+                                  href="{% url 'internship_detail_student_choice' internship.id %}">
+                                  <span class="glyphicon glyphicon-search" aria-hidden="true">
+                                  </span>
+                                </a>
                               </td>
-                          </tr>
+                            </tr>
                           {% endif %}
                           {% endfor %}
                         </tbody>
@@ -446,101 +356,47 @@
                     <table class="table table-hover">
                         <thead>
                           <tr>
-                              <th>{% trans 'Name' %}</th>
-                              <th>{% trans 'learning unit year' %}</th>
-                              <th>{% trans 'Student max' %}</th>
-                              <th>{% trans 'organization' %}</th>
-                              <th>{% trans 'Preference' %}</th>
+                            <th align="center">{% trans 'organization' %}</th>
+                            <th align="center">{% trans 'student_max' %}</th>
+                            <th align="center">{% trans 'Nombre de 1er choix' %}</th>
+                            <th align="center">{% trans 'Nombre d\'autres choix fait' %}</th>
+                            <th align="center">{% trans 'Détails' %}</th>
                           </tr>
                         </thead>
                         <tbody>
                           {% for internship in all_internships %}
                           {% if internship.learning_unit_year.title = "Stage au choix"%}
-                          <tr>
+                            <tr>
                               <td>
-                                {{ internship.title }}
+                                {{ internship.organization.reference }} - {{ internship.organization }}
                               </td>
-                              <td>
-                                <input type="hidden" name="learning_unit_year" value="{{ internship.learning_unit_year.title }}"/>{{ internship.learning_unit_year.title }}</label>
-                              </td>
-                              <td>
+                              <td align="center">
                                 {{ internship.maximum_enrollments }}
                               </td>
-                              <td>
-                                <input type="hidden" name="organization" value="{{ internship.organization.reference }}"/>{{ internship.organization }}</input>
+                              <td align="center">
+                                {{ internship.number_first_choice }}
                               </td>
-                              <td>
-                                <select name="preference">
-                                 <option value=0>0</option>
-                                 <option value=1>Choix préféré</option>
-                                 <option value=2>2ème choix</option>
-                                 <option value=3>3ème choix</option>
-                                 <option value=4>4ème choix</option>
-                                </select>
-                              <td>
-                          </tr>
+                              <td align="center">
+                                {{ internship.number_other_choice }}
+                              </td>
+                              <td align="center">
+                                <a class="btn btn-primary" target="_blank" id="lnk_students_choice{{internship.id}}"
+                                  href="{% url 'internship_detail_student_choice' internship.id %}">
+                                  <span class="glyphicon glyphicon-search" aria-hidden="true">
+                                  </span>
+                                </a>
+                              </td>
+                            </tr>
                           {% endif %}
-                        {% endfor %}
+                          {% endfor %}
                         </tbody>
                     </table>
                   </div>
                 </div>
               </div>
             </div>
-            <div id="tab_CHOIX2" class="tab-pane fade">
-              <div class="panel panel-default">
-              <div class="tab-content">
-                  <div role="tabpanel" class="tab-pane fade in active" id="profile">
-                    <table class="table table-hover">
-                        <thead>
-                          <tr>
-                              <th>{% trans 'Name' %}</th>
-                              <th>{% trans 'learning unit year' %}</th>
-                              <th>{% trans 'Student max' %}</th>
-                              <th>{% trans 'organization' %}</th>
-                              <th>{% trans 'Preference' %}</th>
-                          </tr>
-                      </thead>
-                        <tbody>
-                          {% for internship in all_internships %}
-                          {% if internship.learning_unit_year.title = "Stage au choix"%}
-                          <tr>
-                              <td>
-                                {{ internship.title }}
-                              </td>
-                              <td>
-                                <input type="hidden" name="learning_unit_year" value="{{ internship.learning_unit_year.title }}"/>{{ internship.learning_unit_year.title }}</label>
-                              </td>
-                              <td>
-                                {{ internship.maximum_enrollments }}
-                              </td>
-                              <td>
-                                <input type="hidden" name="organization" value="{{ internship.organization.reference }}"/>{{ internship.organization }}</input>
-                              </td>
-                              <td>
-                                <select name="preference">
-                                 <option value=0>0</option>
-                                 <option value=1>Choix préféré</option>
-                                 <option value=2>2ème choix</option>
-                                 <option value=3>3ème choix</option>
-                                 <option value=4>4ème choix</option>
-                                </select>
-                              <td>
-                          </tr>
-                          {% endif %}
-                          {% endfor %}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
           </div>
-          <button type="submit" class="btn btn-primary" title="{% trans 'Save'%}" id="bt_interships_save">
-              <span class="glyphicon glyphicon-save" aria-hidden="true"></span> {% trans 'Save'%}
-          </button>
         </div>
-        </form>
   </div>
   <a href="{% url 'internships_create' %}" id="lnk_organization_create" class="btn btn-default"
      role="button" title="{% trans 'create_an_organization'%}">{% trans 'Ajouter un stage' %}

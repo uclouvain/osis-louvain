@@ -25,8 +25,14 @@
 ##############################################################################
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-
+from base import models as mdl
 
 @login_required
 def internships_home(request):
-    return render(request, "internships_home.html", {'section': 'internship'})
+    student = mdl.student.find_by(person_username=request.user)
+
+    for s in student:
+        noma = s.registration_id
+    return render(request, "internships_home.html", {'section': 'internship',
+                                                        'noma' : noma,
+                                                    })

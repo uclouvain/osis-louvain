@@ -29,7 +29,6 @@
 {% block breadcrumb %}
   <li><a href="{% url 'studies' %}">{% trans 'Studies' %}</a></li>
   <li><a href="{% url 'internships_home' %}">Stages</a></li>
-  <li><a href="{% url 'internships_student_resume' %}">{% trans 'Students' %}</a></li>
   <li class="active">{{ student.person.last_name }} {{ student.person.first_name }}</li>
 {% endblock %}
 {% block content %}
