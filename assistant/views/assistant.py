@@ -23,19 +23,34 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
-from assistant.views import mandate, home, assistant
-from assistant.views import mandates_list
-from assistant.models import assistant_mandate
+from django.core.urlresolvers import reverse
+from base.models import person, academic_year
+from assistant.models import academic_assistant, assistant_mandate
+from django.http.response import HttpResponseRedirect
+from django.views.generic.list import ListView
 
-urlpatterns = [
-    # S'il vous plaît, organiser les urls par ordre alphabétique.
-    url(r'^assistant/$', assistant.assistant_check, name='assistant_check'),
-    url(r'^assistant/mandates/$', login_required(assistant.AssistantMandatesListView.as_view()), name='assistant_mandates'),
-    url(r'^home$', home.assistant_home , name='assistants_home'),
-    url(r'^manager/mandates/(?P<mandate_id>\d+)/edit/$', mandate.mandate_edit, name='mandate_read'),
-    url(r'^manager/mandates/(?P<mandate_id>\d+)/save/$', mandate.mandate_save, name='mandate_save'),
-    url(r'^manager/mandates/load/$', mandate.load_mandates, name='load_mandates'),
-    url(r'^manager/mandates/$', login_required(mandates_list.MandatesListView.as_view()), name='mandates_list'),
-]
+@login_required
+def assistant_check(request):
+    try: 
+        academic_assistant.find_by_person(person.find_by_user(request.user))
+        return HttpResponseRedirect(reverse('assistant_mandates'))
+    except:
+        return HttpResponseRedirect(reverse('assistants_home'))
+
+class AssistantMandatesListView(ListView): 
+    context_object_name = 'assistant_mandates_list'
+    template_name = 'assistant_mandates.html'
+
+    def get_queryset(self):
+        assistant = academic_assistant.find_by_person(person.find_by_user(self.request.user))
+        this_academic_year = academic_year.current_academic_year()
+        return assistant_mandate.find_mandate_by_assistant_for_academic_year(assistant, this_academic_year)
+        
+    def get_context_data(self, **kwargs):
+        context = super(AssistantMandatesListView, self).get_context_data(**kwargs)
+        context['assistant'] = academic_assistant.find_by_person(person.find_by_user(self.request.user))
+        return context
+        
+       
+    

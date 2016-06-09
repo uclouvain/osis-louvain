@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% load staticfiles %}
 {% load i18n %}
+{
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -25,19 +26,69 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock %}
+    
 {% block breadcrumb %}
 <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
 <li><a href="{% url 'mandates' %}" id="lnk_mandates">{% trans 'mandates' %}</a></li>
-<li class="active">{% trans 'assistants' %}</li>
+<li class="active">{% trans 'mandates_list' %}</li>
+
 {% endblock %}
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'assistants' %}</h2>
+    <h2>{% trans 'assistants_mandates_renewal' %}</h2>
 </div>
 <div class="panel panel-default">
     <div class="panel-body">
-        
-    </div>
+	<h3>{{ assistant.person }}</h3>
+	<div class="table-responsive">  
+<table id="myTable" class="table table-hover" cellspacing="0" width="100%">
+<thead>
+      <tr>
+      <th>{% trans 'academic_year' %}</th>
+        <th>{% trans 'faculty' %}</th>
+        <th>{% trans 'institute' %}</th>
+        <th>{% trans 'position_id' %}</th>
+        <th>{% trans 'state' %}</th>
+        <th>{% trans 'action' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+{% for mandate in object_list %}
+
+<td>{{ mandate.academic_year }}</td>	
+{% if mandate.mandatestructure_set.all %}
+	{% for structure in mandate.mandatestructure_set.all|dictsort:"structure.type" %}
+		{% if mandate.mandatestructure_set.all.count == 1 %}
+			<td>{{ structure.structure.acronym }}</td><td></td>
+		{% elif mandate.mandatestructure_set.all.count == 2 %}
+			<td>{{ structure.structure.acronym }}</td>
+		{% endif %}
+	{% endfor %}
+{% else %}
+	<td></td><td></td>
+{% endif %}	
+<td>{{ mandate.position_id }}</td>	
+<td>{{ mandate.state }}</td>	
+<td>Edit</td>	
+</tr>
+{% endfor %}
+</tbody>
+  </table>
+</div>
 </div>
 {% endblock %}
+{% block script %}
+
+{% endblock %}
+
+
+
+
+
+
+
+
