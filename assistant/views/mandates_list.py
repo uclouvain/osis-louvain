@@ -32,14 +32,14 @@ from django.views.generic import ListView
 class MandatesListView(ListView):
     context_object_name = 'mandates_list'
     template_name = 'mandates_list.html'
-    this_academic_year = academic_year.current_academic_year()
-    queryset = assistant_mandate.AssistantMandate.objects.filter(academic_year=this_academic_year)
     
     def get_context_data(self, **kwargs):
         context = super(MandatesListView, self).get_context_data(**kwargs)
         return context
     
- 
+    def get_queryset(self):
+        this_academic_year = academic_year.current_academic_year()
+        return assistant_mandate.AssistantMandate.objects.filter(academic_year=this_academic_year)
 
 
 
