@@ -27,9 +27,8 @@ from django import forms
 from django.db.models import Q
 from django.forms import ModelForm, Textarea
 from assistant import models as mdl
-from base.models import structure 
+from base.models import structure, academic_year
 from django.forms.models import inlineformset_factory
-
 
 
 
@@ -89,3 +88,10 @@ StructureInLineFormSet = inlineformset_factory(mdl.assistant_mandate.AssistantMa
                                                max_num=2)  
     
 
+class MandatesArchivesForm(ModelForm):
+    academic_year=forms.ModelChoiceField(queryset=academic_year.AcademicYear.objects.all(),
+                                         widget=forms.Select(attrs={"onChange":'submit()'}))
+    
+    class Meta:
+        model = mdl.assistant_mandate.AssistantMandate
+        fields = ('academic_year',)
