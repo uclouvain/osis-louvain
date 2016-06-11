@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
 from django.db import IntegrityError
 import csv, codecs
 from assistant.forms import MandateForm, StructureInLineFormSet
@@ -89,6 +90,9 @@ def load_mandates(request):
                     if person:
                         assistant = academic_assistant.AcademicAssistant()
                         assistant.person = person
+                        if person.user_id:
+                            g = Group.objects.get(name='academic_assistants') 
+                            g.user_set.add(person.user_id)
                         fte = columns[8].strip().replace(",", ".");
                         this_academic_year = mdl.academic_year.current_academic_year()
                         position_id = columns[3].strip()
