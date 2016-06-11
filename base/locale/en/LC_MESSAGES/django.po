@@ -320,13 +320,13 @@ msgid "select_a_xls_file_from_which_to_inject_scores"
 msgstr ""
 
 msgid "inject_xls_file"
-msgstr "Submit XLS file"
+msgstr "Inject XLS file"
 
 msgid "message_address_papersheet"
 msgstr "Reuse the address of an entity linked to the program or inform the posting address for the papersheet."
 
 msgid "info_address_changed_for_papersheet"
-msgstr "If you customize one of the field below, it only change the address displayed on the scores' encodings sheets. "
+msgstr "If you customize one of the field below, it only change the address displayed on the scores' encodings sheets for the program %s. "
        "It will never change the address of any Structure. The structure's list below is to help you to pre-fill in the form"
 
 msgid "reuse_address_entity"
@@ -369,7 +369,7 @@ msgid "inject"
 msgstr "Inject"
 
 msgid "help_submission_scores_label"
-msgstr "You will submit %s notes."
+msgstr "You will submit %s notes to faculty(ies). Warning : submitted scores <b>can't be modified anymore.</b>"
 
 msgid "decimal_values_accepted"
 msgstr "Decimal values in scores are accepted."
@@ -751,11 +751,17 @@ msgstr "Mister"
 msgid "miss"
 msgstr "Miss"
 
-msgid "file_must_be_xls"
-msgstr "The file must be a XLS"
+msgid "file_must_be_xlsx"
+msgstr "The file must be a valid 'XLSX' excel file"
 
 msgid "invalid_file"
 msgstr "Invalid file"
+
+msgid "server_error"
+msgstr "A server error occured."
+
+msgid "server_error_message"
+msgstr "We will fix this as soon as possible"
 
 msgid "Line"
 msgstr "Row"
@@ -904,6 +910,12 @@ msgstr "Undefined"
 
 msgid "messages"
 msgstr "Messages"
+
+msgid "by_specific_criteria"
+msgstr "By Specific Criteria"
+
+msgid "by_learning_unit"
+msgstr "By Learning Unit"
 
 msgid "messages_templates"
 msgstr "Messages templates"
@@ -1077,6 +1089,9 @@ msgstr "You haven't any score to encode."
 msgid "tooltip_dowload_excel_file"
 msgstr "Download the excel file"
 
+msgid "no_file_submitted"
+msgstr "You have to select a file to upload."
+
 msgid "tooltip_print_scores"
 msgstr "Print the scores"
 
@@ -1110,9 +1125,29 @@ msgstr "This student has multiple enrollments for a same exam. "
 msgid "justification_invalid"
 msgstr "Invalid justification"
 
+msgid "outside_scores_encodings_period"
+msgstr "You're out of the period of scores' encodings : the last exams' session is closed since %s."
+
+msgid "offer_year_calendar_academic_calendar_start_date_error"
+msgstr "The start date of your program can't be lower than the opening's date of scores' encodings in the academic calendar"
+
+msgid "offer_year_calendar_academic_calendar_end_date_error"
+msgstr "The end date of your program can't be greater than the closure's date of scores' encodings in the academic calendar"
+
+msgid "academic_calendar_offer_year_calendar_start_date_error"
+msgstr "The opening's date of scores' encodings of the academic calendar can't be greater than %s "
+       "(start date of scores' encodings of the program '%s')"
+
+msgid "academic_calendar_offer_year_calendar_end_date_error"
+msgstr "The closure's date of scores' encodings of the academic calendar can't be lower than %s "
+       "(end date of scores' encodings of the program '%s')"
+
 msgid "more_than_one_learning_unit_error"
 msgstr "You encoded scores for more than 1 learning unit in your excel file (column 'Learning unit'). "
        "Please make one excel file by learning unit."
+
+msgid "user_is_not_program_manager"
+msgstr "You're not a program manager. Therefore you dont have access to this page."
 
 msgid "enrollments"
 msgstr "Enrollments"

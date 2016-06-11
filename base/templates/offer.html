@@ -4,6 +4,7 @@
 {% load i18n %}
 {% load full_width %}
 {% load offer_year_calendar_display %}
+{% load format %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -37,10 +38,10 @@
 {% block content %}
 <div class="page-header">
     {% if offer_year.parent %}
-        <h3>{{ offer_year.parent.title }}</h3>
-        <h2>{{ offer_year.title }}</h2>
+        <h3>{{ offer_year.parent.acronym }} - {{ offer_year.parent.title }}</h3>
+        <h2>{{ offer_year.acronym }} - {{ offer_year.title }}</h2>
     {%else%}
-        <h2>{{ offer_year.title }}</h2>
+        <h2>{{ offer_year.acronym }} - {{ offer_year.title }}</h2>
     {%endif%}
 </div>
 <div class="panel panel-default">
@@ -137,7 +138,7 @@
                     <p>{% trans 'message_address_papersheet' %}.</p>
                     <div class="alert alert-dismissible alert-warning">
                       <button type="button" class="close" data-dismiss="alert">&times;</button>
-                        <p>{% trans 'info_address_changed_for_papersheet' %}.</p>
+                        <p>{% trans 'info_address_changed_for_papersheet' as info_address_changed_for_papersheet %}{{ info_address_changed_for_papersheet | format:offer_year.acronym}}.</p>
                     </div>
 
                     <label for="slt_related_entities">{% trans 'reuse_address_entity' %}...</label>

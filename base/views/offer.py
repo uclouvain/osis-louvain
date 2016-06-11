@@ -31,6 +31,7 @@ from . import layout
 from datetime import datetime
 from base.forms import OfferYearCalendarForm
 from django.utils.translation import ugettext_lazy as _
+from django.contrib import messages
 
 
 def offers(request):
@@ -104,7 +105,7 @@ def offer_year_calendar_read(request, id):
     offer_year_calendar = mdl.offer_year_calendar.find_by_id(id)
     is_programme_manager = mdl.program_manager.is_program_manager(request.user, offer_year=offer_year_calendar.offer_year)
     return layout.render(request, "offer_year_calendar.html", {'offer_year_calendar':   offer_year_calendar,
-                                                               'is_programme_manager' : is_programme_manager})
+                                                               'is_programme_manager': is_programme_manager})
 
 
 def offer_year_calendar_save(request, id):
@@ -119,7 +120,7 @@ def offer_year_calendar_save(request, id):
     validation = True
     if form.is_valid():
         academic_calendar = mdl.academic_calendar.find_academic_calendar_by_id(request.POST['academic_calendar'])
-        offer_year_calendar.academic_calendar=academic_calendar
+        offer_year_calendar.academic_calendar = academic_calendar
         if request.POST['start_date']:
             offer_year_calendar.start_date = datetime.strptime(request.POST['start_date'], '%d/%m/%Y')
         else:
@@ -131,6 +132,17 @@ def offer_year_calendar_save(request, id):
             offer_year_calendar.end_date = None
 
         if offer_year_calendar.start_date and offer_year_calendar.end_date:
+            if academic_calendar.start_date > offer_year_calendar.start_date.date():
+                validation = False
+                messages.add_message(request,
+                                     messages.ERROR,
+                                     "%s (%s)." % (_('offer_year_calendar_academic_calendar_start_date_error'),
+                                                   academic_calendar.start_date.strftime('%d/%m/%Y')))
+            if academic_calendar.end_date < offer_year_calendar.end_date.date():
+                validation = False
+                messages.add_message(request, messages.ERROR,
+                                     "%s (%s)." % (_('offer_year_calendar_academic_calendar_end_date_error'),
+                                                   academic_calendar.end_date.strftime('%d/%m/%Y')))
             if offer_year_calendar.start_date > offer_year_calendar.end_date:
                 form.errors['start_date'] = _('begin_date_lt_end_date')
                 validation = False

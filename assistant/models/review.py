@@ -38,6 +38,7 @@ class Review(models.Model):
         ('DONE', _('Done')))
 
     mandate = models.ForeignKey('AssistantMandate')
+    reviewer = models.ForeignKey('Reviewer')
     advice = models.CharField(max_length=20, choices=ADVICE_CHOICES)
     status = models.CharField(max_length=10, choices=REVIEW_STATUS, null=True)
     justification = models.TextField(null=True, blank=True)

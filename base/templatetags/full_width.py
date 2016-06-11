@@ -27,11 +27,13 @@ from django import template
 
 register = template.Library()
 
+
 @register.assignment_tag(takes_context=True)
 def full_width(context):
-
+    """
+    :return: True only if there is no offer_year.orientation_sibling OR
+             when both the offer_year.offer_year_children and fer_year.offer_year_sibling are empty
+    """
     offer_year = context['offer_year']
-    if (not offer_year.orientation_sibling is None and len(list(offer_year.orientation_sibling))>0)  and ((not offer_year.offer_year_children is None and len(list(offer_year.offer_year_children))>0)  or (not offer_year.offer_year_sibling is None and len(list(offer_year.offer_year_sibling))>0 )):
-        return False
-
-    return True
+    return not offer_year.orientation_sibling or (
+        not offer_year.offer_year_children and not offer_year.offer_year_sibling)

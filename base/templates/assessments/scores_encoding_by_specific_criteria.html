@@ -1,0 +1,210 @@
+{% extends "assessments/scores_encoding_mgr_layout.html" %}
+{% load i18n %}
+{% load staticfiles %}
+{% load list %}
+{% load get_at_index %}
+{% load dictionnary %}
+{% load sum %}
+{% load score_display %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block scores_encoding_tabs %}
+
+{% if is_program_manager %}
+<ul class="nav nav-tabs nav-justified" id="tabs">
+    <li><a href="{% url 'scores_encoding' %}" id="lnk_scores_encoding">{% trans 'by_learning_unit' %}</a></li>
+    <li class="active"><a data-toggle="tab" role="tab" href="#tab_justifications" id="lnk_justifications">{% trans 'by_specific_criteria' %}</a></li>
+</ul>
+<div class="tab-content">
+    <div id="tab_scores_encoding" class="tab-pane fade">
+    </div>
+    <div id="tab_justifications" class="tab-pane fade in active">
+        <form id="form_justification" action="{% url 'search_by_specific_criteria' %}"  method="post">
+            {% csrf_token %}
+            <br>
+            <div class="row">
+                <div class="col-md-2">
+                    <label>{% trans 'registration_id' %}</label>
+                    <input type="text" class="form-control" id="txt_registration_id" name="registration_id" placeholder="{% trans 'registration_id' %}" value="{{registration_id | default_if_none:''}}">
+                </div>
+                <div class="col-md-2">
+                    <label>{% trans 'lastname' %}</label>
+                    <input type="text" class="form-control" id="txt_last_name" name="last_name" placeholder="{% trans 'lastname' %}" value="{{last_name | default_if_none:''}}">
+                </div>
+                <div class="col-md-2">
+                    <label>{% trans 'firstname' %}</label>
+                    <input type="text" class="form-control" id="txt_first_name" name="first_name" placeholder="{% trans 'firstname' %}" value="{{first_name | default_if_none:''}}">
+                </div>
+                <div class="col-md-3">
+                    <label>{% trans 'justification' %}</label>
+                    <select class="form-control" name="justification" id="slt_justification">
+                        <option value="">{% trans 'all' %}</option>
+                        <option {% if justification == "ABSENCE_JUSTIFIED" %} selected {% endif %} value="ABSENCE_JUSTIFIED">{% trans 'ABSENCE_JUSTIFIED' %}</option>
+                        <option {% if justification == "ABSENCE_UNJUSTIFIED" %} selected {% endif %} value="ABSENCE_UNJUSTIFIED">{% trans 'ABSENCE_UNJUSTIFIED' %}</option>
+                        <option {% if justification == "CHEATING" %} selected {% endif %} value="CHEATING">{% trans 'CHEATING' %}</option>
+                        <option {% if justification == "SCORE_MISSING" %} selected {% endif %} value="SCORE_MISSING">{% trans 'SCORE_MISSING' %}</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label>{% trans 'offer' %}</label><br>
+                    <select id="slt_program" name="program" class="form-control">
+                        <option value="">{% trans 'all'%}</option>
+                        {% for o in offer_list %}
+                            <option value="{{o.id}}" {%if offer_year_id == o.id %}selected{%endif%}>{{o.acronym}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <br>
+                    <button type="submit" id="bt_submit_offer_year_search" class="btn btn-primary" role="button"
+                        title="{% trans 'offer_year_search' %}"
+                        style="margin-top:4px">
+                        <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+                </div>
+            </div>
+            <br>
+
+            {% include "template_messages.html" %}
+            
+            {% if exam_enrollments %}
+            <button class="btn btn-primary" id="bt_save_online_encoding_up" onclick="submit_encoding()">
+                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}</button>
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>{% trans 'learning_unit' %}</th>
+                        <th>{% trans 'offer' %}</th>
+                        <th>{% trans 'registration_id' %}</th>
+                        <th>{% trans 'lastname' %}</th>
+                        <th>{% trans 'firstname' %}</th>
+                        <th>{% trans 'score' %}</th>
+                        <th>{% trans 'justification' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for enrol in exam_enrollments %}
+                    <tr>
+                        <td>{{ enrol.learning_unit_enrollment.learning_unit_year.acronym }}</td>
+                        <td>{{ enrol.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
+                        <td>{{ enrol.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
+                        <td>{{ enrol.learning_unit_enrollment.offer_enrollment.student.person.last_name }}</td>
+                        <td>{{ enrol.learning_unit_enrollment.offer_enrollment.student.person.first_name }}</td>
+                        <td>
+                            <input type="number" min="0" max="20" name="score_{{ enrol.id }}"
+                                id="num_score_{{ enrol.id }}" tabindex="{{ forloop.counter }}"
+                                class="form-control"
+                                value="{{ enrol.score_final | score_display:enrol.learning_unit_enrollment.learning_unit_year.decimal_scores}}"
+                                {% if enrol.learning_unit_enrollment.learning_unit_year.decimal_scores %}
+                                    step="any"
+                                    oninvalid="invalidScoreMsg(this,true,'{% trans 'decimal_score_not_allowed' %}','{% trans 'scores_gt_0_lt_20' %}')"
+                                {% else %}
+                                    step="1"
+                                    oninvalid="invalidScoreMsg(this,false,'{% trans 'decimal_score_not_allowed' %}','{% trans 'scores_gt_0_lt_20' %}')"
+                                {% endif %}>
+                        </td>
+                        <td>
+                            <select class="form-control" name="justification_{{ enrol.id }}" id="slt_justification_score_{{ enrol.id }}"
+                                   tabindex="{{ exam_enrollments|length|sum:forloop.counter }}">
+                                <option value=""></option>
+                                <option {% if enrol.justification_final == "ABSENCE_JUSTIFIED" %} selected {% endif %} value="ABSENCE_JUSTIFIED">{% trans 'ABSENCE_JUSTIFIED' %}</option>
+                                <option {% if enrol.justification_final == "ABSENCE_UNJUSTIFIED" %} selected {% endif %} value="ABSENCE_UNJUSTIFIED">{% trans 'ABSENCE_UNJUSTIFIED' %}</option>
+                                <option {% if enrol.justification_final == "CHEATING" %} selected {% endif %} value="CHEATING">{% trans 'CHEATING' %}</option>
+                                <option {% if enrol.justification_final == "SCORE_MISSING" %} selected {% endif %} value="SCORE_MISSING">{% trans 'SCORE_MISSING' %}</option>
+                            </select>
+                            <input type="hidden" id="hdn_score_changed_{{ enrol.id }}" name="score_changed_{{ enrol.id }}"></td>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <button class="btn btn-primary" id="bt_save_online_encoding_down" onclick="submit_encoding()">
+                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}</button>
+            {% endif %}
+        </form>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block script %}
+<script>
+    function submit_encoding(){
+        var form = document.forms["form_justification"];
+        form.setAttribute("method", "post");
+        form.setAttribute("action", "/studies/assessments/scores_encoding/specific_criteria/submission/");
+        form.submit();
+    }
+
+    var values = [
+        {% for enrollment in exam_enrollments %}
+            {% if is_program_manager %}
+                ['{{ enrollment.id }}', '{{ enrollment.score_final | default_if_none:'-1' }}','{{ enrollment.justification_final | default_if_none:'' }}'],
+            {% else %}
+                ['{{ enrollment.id }}', '{{ enrollment.score_draft | default_if_none:'-1' }}','{{ enrollment.justification_draft | default_if_none:'' }}'],
+            {% endif %}
+        {% endfor %}
+        ['', '', '']];
+
+    $("input[id^='num_score_']" ).change(function(event) {
+        // Get the object that received the event.
+        var target = $(event.target);
+        var id = target.attr("id");
+        if (typeof id == 'undefined') {
+            target = target.parent();
+            id = target.attr("id");
+        }
+        var enrollmentId = id.substring(id.lastIndexOf("_") + 1);
+
+        if(target.val() != "") {
+            $("#slt_justification_score_" + enrollmentId).val('');
+        }
+        this.setCustomValidity('');
+
+        $("#hdn_score_changed_"+ enrollmentId).val(originalValueChanged(values, enrollmentId,
+                                                                        $("#num_score_"+ enrollmentId).val(),
+                                                                        $("#slt_justification_score_" + enrollmentId).val()));
+    });
+
+    $("select[id^='slt_justification_score_']" ).change(function(event) {
+        // Get the object that received the event.
+        var target = $(event.target);
+        var id = target.attr("id");
+        if (typeof id == 'undefined') {
+            target = target.parent();
+            id = target.attr("id");
+        }
+
+        var enrollmentId = id.substring(id.lastIndexOf("_") + 1);
+        $("#num_score_" + enrollmentId).val('');
+
+        $("#hdn_score_changed_"+ enrollmentId).val(originalValueChanged(values, enrollmentId,
+                                                                        $("#num_score_"+ enrollmentId).val(),
+                                                                        $("#slt_justification_score_" + enrollmentId).val()));
+    });
+
+</script>
+{% endblock %}

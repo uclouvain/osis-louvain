@@ -95,8 +95,8 @@
         <div class="form-group">
             <label>{% trans 'progress' %}</label><br>
             <div class="progress">
-                <div class="progress-bar" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress }}%;">
-                   {{ exam_enrollments_encoded}}/{{ total_exam_enrollments }}
+                <div class="progress-bar {% if progress == '100' %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress }}%;">
+                    <span>{{ exam_enrollments_encoded }} / {{ total_exam_enrollments }}</span>
                 </div>
             </div>
         </div>

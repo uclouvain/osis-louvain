@@ -120,3 +120,17 @@ def find_deliberation_date(offer_year, session_number):
     if len(queryset) == 1:
         return queryset[0].get('start_date')
     return None
+
+
+def get_min_start_date(academic_calendar_id):
+    return OfferYearCalendar.objects.filter(academic_calendar_id=academic_calendar_id) \
+                                    .filter(customized=True) \
+                                    .filter(start_date__isnull=False)\
+                                    .earliest('start_date')
+
+
+def get_max_end_date(academic_calendar_id):
+    return OfferYearCalendar.objects.filter(academic_calendar_id=academic_calendar_id) \
+                                    .filter(customized=True) \
+                                    .filter(end_date__isnull=False) \
+                                    .latest('end_date')

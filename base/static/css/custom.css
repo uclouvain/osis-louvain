@@ -31,3 +31,18 @@ input[type=number] {
     -moz-appearance:textfield;
     -webkit-appearance: none;
 }
+
+/**
+ * Progress bars with centered text
+ */
+
+.progress {
+    position: relative;
+}
+
+.progress span {
+    position: absolute;
+    display: block;
+    width: 100%;
+    color: black;
+ }

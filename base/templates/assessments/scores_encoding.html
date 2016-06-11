@@ -113,7 +113,13 @@
                                 <td><a href="{% url 'online_encoding' note_detail.learning_unit_year.id %}"
                                            id="lnk_{{ note_detail.learning_unit_year.acronym }}">{{ note_detail.learning_unit_year.title }}</a>
                                 </td>
-                                <td id="txt_progress_{{ note_detail.learning_unit_year.acronym }}" >{{ note_detail.exam_enrollments_encoded}}/{{ note_detail.total_exam_enrollments}}</td>
+                                <td id="txt_progress_{{ note_detail.learning_unit_year.acronym }}" >
+                                    <div class="progress">
+                                        <div class="progress-bar {% if note_detail.progress == '100' %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" aria-valuenow="{{ note_detail.progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ note_detail.progress }}%;">
+                                            <span>{{ note_detail.exam_enrollments_encoded }} / {{ note_detail.total_exam_enrollments }}</span>
+                                        </div>
+                                    </div>
+                                </td>
                                 <td><a class="btn btn-default"
                                        href="{% url 'online_encoding_form' note_detail.learning_unit_year.id%}"
                                        role="button"
@@ -157,7 +163,13 @@
                                         title="Visualiser/charger les notes pour le cours"
                                         id="lnk_paper_encoding_messages_{{note_detail.learning_unit_year.id}}">{{ note_detail.learning_unit_year.title }}</a>
                                 </td>
-                                <td>{{ note_detail.exam_enrollments_encoded}}/{{ note_detail.total_exam_enrollments}}</td>
+                                <td>
+                                    <div class="progress">
+                                        <div class="progress-bar {% if note_detail.progress == '100' %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" aria-valuenow="{{ note_detail.progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ note_detail.progress }}%;">
+                                            <span>{{ note_detail.exam_enrollments_encoded }} / {{ note_detail.total_exam_enrollments }}</span>
+                                        </div>
+                                    </div>
+                                </td>
                                 <td>
                                     <a class="btn btn-default"
                                        href="{% url 'notes_printing' note_detail.learning_unit_year.id %}"
@@ -190,7 +202,13 @@
                                         title="Visualiser/charger les notes pour le cours"
                                         id="lnk_online_encoding_messages_{{note_detail.learning_unit_year.id}}">{{ note_detail.learning_unit_year.title }}</a>
                                 </td>
-                                <td>{{ note_detail.exam_enrollments_encoded}}/{{ note_detail.total_exam_enrollments}}</td>
+                                <td>
+                                    <div class="progress">
+                                        <div class="progress-bar {% if note_detail.progress == '100' %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" aria-valuenow="{{ note_detail.progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ note_detail.progress }}%;">
+                                            <span>{{ note_detail.exam_enrollments_encoded }} / {{ note_detail.total_exam_enrollments }}</span>
+                                        </div>
+                                    </div>
+                                </td>
                                 <td><a class="btn btn-default"
                                        href="{% url 'scores_encoding_download' note_detail.learning_unit_year.id academic_year.id%}"
                                        role="button"

@@ -37,11 +37,15 @@ from django.utils.translation import ugettext_lazy as _
 
 
 def page_not_found(request):
-    return layout.render(request, 'page_not_found.html')
+    return layout.render(request, 'page_not_found.html', {})
 
 
 def access_denied(request):
-    return layout.render(request, 'access_denied.html')
+    return layout.render(request, 'access_denied.html', {})
+
+
+def server_error(request):
+    return layout.render(request, 'server_error.html', {})
 
 
 def login(request):

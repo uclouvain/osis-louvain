@@ -210,7 +210,11 @@ def find_for_score_encodings(session_exam_number,
                              offer_year_id=None,
                              offers_year=None,
                              with_justification_or_score_final=False,
-                             with_justification_or_score_draft=False):
+                             with_justification_or_score_draft=False,
+                             registration_id=None,
+                             student_last_name=None,
+                             student_first_name=None,
+                             justification=None):
     """
     :param session_exam_number: Integer represents the number_session of the Session_exam (1,2,3,4 or 5).
     :param learning_unit_year_id: Filter OfferEnrollments by learning_unit_year.
@@ -249,11 +253,42 @@ def find_for_score_encodings(session_exam_number,
     if with_justification_or_score_draft:
         queryset = queryset.exclude(score_draft=None, justification_draft=None)
 
+    if registration_id:
+        queryset = queryset.filter(learning_unit_enrollment__offer_enrollment__student__registration_id=registration_id)
+
+    if justification:
+        queryset = queryset.filter(justification_final=justification)
+
+    if student_last_name:
+        queryset = queryset.filter(
+            learning_unit_enrollment__offer_enrollment__student__person__last_name__icontains=student_last_name)
+
+    if student_first_name:
+        queryset = queryset.filter(
+            learning_unit_enrollment__offer_enrollment__student__person__first_name__icontains=student_first_name)
+
     now = timezone.now()
     return queryset.filter(session_exam__offer_year_calendar__start_date__lte=now)\
                    .filter(session_exam__offer_year_calendar__end_date__gte=now)\
                    .select_related('learning_unit_enrollment__offer_enrollment__offer_year')\
-                   .select_related('session_exam__offer_year_calendar')
+                   .select_related('session_exam__offer_year_calendar') \
+                   .select_related('learning_unit_enrollment__offer_enrollment__student__person')
+
+
+def group_by_learning_unit_year_id(exam_enrollments):
+    """
+
+    :param exam_enrollments: List of examEnrollments to regroup by earningunitYear.id
+    :return: A dictionary where the key is LearningUnitYear.id and the value is a list of examEnrollment
+    """
+    enrollments_by_learn_unit = {}  # {<learning_unit_year_id> : [<ExamEnrollment>]}
+    for exam_enroll in exam_enrollments:
+        key = exam_enroll.session_exam.learning_unit_year.id
+        if key not in enrollments_by_learn_unit.keys():
+            enrollments_by_learn_unit[key] = [exam_enroll]
+        else:
+            enrollments_by_learn_unit[key].append(exam_enroll)
+    return enrollments_by_learn_unit
 
 
 def scores_sheet_data(exam_enrollments, tutor=None):
@@ -265,13 +300,7 @@ def scores_sheet_data(exam_enrollments, tutor=None):
     data['link_to_regulation'] = str(_('link_to_RGEE'))
 
     # Will contain lists of examEnrollments splitted by learningUnitYear
-    enrollments_by_learn_unit = {}  # {<learning_unit_year_id> : [<ExamEnrollment>]}
-    for exam_enroll in exam_enrollments:
-        key = exam_enroll.session_exam.learning_unit_year.id
-        if key not in enrollments_by_learn_unit.keys():
-            enrollments_by_learn_unit[key] = [exam_enroll]
-        else:
-            enrollments_by_learn_unit[key].append(exam_enroll)
+    enrollments_by_learn_unit = group_by_learning_unit_year_id(exam_enrollments)  # {<learning_unit_year_id> : [<ExamEnrollment>]}
 
     learning_unit_years = []
     for exam_enrollments in enrollments_by_learn_unit.values():
@@ -338,11 +367,17 @@ def scores_sheet_data(exam_enrollments, tutor=None):
             enrollments = []
             for exam_enrol in list_enrollments:
                 student = exam_enrol.learning_unit_enrollment.student
+                score = ''
+                if exam_enrol.score_final is not None:
+                    if learning_unit_yr.decimal_scores:
+                        score = str(exam_enrol.score_final)
+                    else:
+                        score = str(int(exam_enrol.score_final))
                 enrollments.append({
                     "registration_id": student.registration_id,
                     "last_name": student.person.last_name,
                     "first_name": student.person.first_name,
-                    "score": str(exam_enrol.score_final) if exam_enrol.score_final else '',
+                    "score": score,
                     "justification": _(exam_enrol.justification_final) if exam_enrol.justification_final else ''
                 })
             program['enrollments'] = enrollments
@@ -366,9 +401,25 @@ def _normalize_string(string):
     return ''.join((c for c in unicodedata.normalize('NFD', string) if unicodedata.category(c) != 'Mn'))
 
 
+def sort_by_last_name_first_name(exam_enrollments):
+    def _sort(key):
+        off_enroll = key.learning_unit_enrollment.offer_enrollment
+        last_name = off_enroll.student.person.last_name
+        first_name = off_enroll.student.person.first_name
+        last_name = _normalize_string(last_name) if last_name else None
+        first_name = _normalize_string(first_name) if first_name else None
+        learn_unit_acronym = key.learning_unit_enrollment.learning_unit_year.acronym
+        return "%s %s %s" % (last_name.upper() if last_name else '',
+                             first_name.upper() if first_name else '',
+                             learn_unit_acronym if learn_unit_acronym else '')
+
+    return sorted(exam_enrollments, key=lambda k: _sort(k))
+
+
 def sort_for_encodings(exam_enrollments):
     """
     Sort the list by
+     0. LearningUnitYear.acronym
      1. offerYear.acronym
      2. student.lastname
      3. sutdent.firstname
@@ -376,14 +427,16 @@ def sort_for_encodings(exam_enrollments):
     :return:
     """
     def _sort(key):
+        learn_unit_acronym = key.learning_unit_enrollment.learning_unit_year.acronym
         off_enroll = key.learning_unit_enrollment.offer_enrollment
         acronym = off_enroll.offer_year.acronym
         last_name = off_enroll.student.person.last_name
         first_name = off_enroll.student.person.first_name
         last_name = _normalize_string(last_name) if last_name else None
         first_name = _normalize_string(first_name) if first_name else None
-        return "%s %s %s" % (acronym if acronym else '',
-                             last_name.upper() if last_name else '',
-                             first_name.upper() if first_name else '')
+        return "%s %s %s %s" % (learn_unit_acronym if learn_unit_acronym else '',
+                                acronym if acronym else '',
+                                last_name.upper() if last_name else '',
+                                first_name.upper() if first_name else '')
 
     return sorted(exam_enrollments, key=lambda k: _sort(k))

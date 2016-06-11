@@ -26,7 +26,6 @@
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.utils.translation import ungettext
 from openpyxl import load_workbook
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
@@ -43,6 +42,8 @@ col_registration_id = 4
 col_score = 7
 col_justification = 8
 
+REGISTRATION_ID_SIZE = 8 # Size of all registration ids (convention)
+
 
 @login_required
 def upload_scores_file(request, learning_unit_year_id=None):
@@ -51,14 +52,13 @@ def upload_scores_file(request, learning_unit_year_id=None):
         if form.is_valid():
             file_name = request.FILES['file']
             if file_name is not None:
-                if ".xls" not in str(file_name):
-                    messages.add_message(request, messages.INFO, _('file_must_be_xls'))
-                else:
-                    learning_unit_year = mdl.learning_unit_year.find_by_id(learning_unit_year_id)
-                    is_program_manager = mdl.program_manager.is_program_manager(request.user)
-                    __save_xls_scores(request, file_name, is_program_manager, request.user,
-                                      learning_unit_year.id)
-
+                learning_unit_year = mdl.learning_unit_year.find_by_id(learning_unit_year_id)
+                is_program_manager = mdl.program_manager.is_program_manager(request.user)
+                __save_xls_scores(request, file_name, is_program_manager, request.user,
+                                  learning_unit_year.id)
+        else:
+            for error_msg in [error_msg for error_msgs in form.errors.values() for error_msg in error_msgs]:
+                messages.add_message(request, messages.ERROR, "{}".format(error_msg))
         return HttpResponseRedirect(reverse('online_encoding', args=[learning_unit_year_id, ]))
 
 
@@ -110,7 +110,11 @@ def _get_all_data(worksheet):
 
 
 def __save_xls_scores(request, file_name, is_program_manager, user, learning_unit_year_id):
-    workbook = load_workbook(file_name, read_only=True)
+    try:
+        workbook = load_workbook(file_name, read_only=True)
+    except KeyError:
+        messages.add_message(request, messages.ERROR, _('file_must_be_xlsx'))
+        return False
     worksheet = workbook.active
     new_scores_number = 0
     learning_unit_year = mdl.learning_unit_year.find_by_id(learning_unit_year_id)
@@ -173,6 +177,7 @@ def __save_xls_scores(request, file_name, is_program_manager, user, learning_uni
             # If there's no score/justification encoded for this line, not necessary to make all checks below
             continue
         xls_registration_id = str(row[col_registration_id].value)
+        xls_registration_id = xls_registration_id.zfill(REGISTRATION_ID_SIZE)
         xls_offer_year_acronym = row[col_offer].value
         xls_learning_unit_acronym = row[col_learning_unit].value
         info_line = "%s %d (NOMA %s):" % (_('Line'), count + 1, xls_registration_id)

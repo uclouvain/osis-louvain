@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% load staticfiles %}
 {% load i18n %}
-{% load full_width %}
 {% load dictionnary %}
 
 {% comment "License" %}
@@ -42,6 +41,9 @@
     <h2>{{ academic_calendar.title }}</h2>
     {% endif %}
 </div>
+
+{% include "template_messages.html" %}
+
 <div class="panel panel-default">
     <div class="panel-body">
         <form method="post" action="{% if academic_calendar.id%}{% url 'academic_calendar_save' academic_calendar.id %}{%else%}{% url 'academic_calendar_save_new' %}{%endif%}">

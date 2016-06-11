@@ -322,7 +322,7 @@ msgid "select_a_xls_file_from_which_to_inject_scores"
 msgstr ""
 
 msgid "inject_xls_file"
-msgstr "Soumettre fichier excel"
+msgstr "Injecter fichier excel"
 
 msgid "submission"
 msgstr "Soumettre"
@@ -361,7 +361,7 @@ msgid "inject"
 msgstr "Injecter"
 
 msgid "help_submission_scores_label"
-msgstr "Vous êtes sur le point de soumettre %s note(s)."
+msgstr "Vous êtes sur le point de soumettre %s note(s) à la (aux) faculté(s). Attention : les notes soumises <b>ne peuvent plus être modifiées.</b>"
 
 msgid "decimal_values_accepted"
 msgstr "Les notes de ce cours peuvent recevoir des valeurs décimales."
@@ -395,9 +395,9 @@ msgid "message_address_papersheet"
 msgstr "Réutilisez l'adresse d'une entité liée au programme ou informez l'adresse d'affichage pour la feuille des notes"
 
 msgid "info_address_changed_for_papersheet"
-msgstr "Si vous choisissez de modifier un des champs de l'adresse ci-dessous, cela modifiera <b>uniquement</b> l'adresse "
-       "affichée sur la feuille de notes. Vous ne modifierez jamais l'adresse d'une entité/structure via ce formulaire. "
-       " La liste des entités ci-dessous n'est proposée que pour vous aider à remplir les champs"
+msgstr "Si vous choisissez de modifier un des champs de l'adresse ci-dessous, cela modifiera uniquement l'adresse "
+       "affichée sur la feuille de notes pour le programme %s. Vous ne modifierez jamais l'adresse d'une entité/structure "
+       "via ce formulaire. La liste des entités ci-dessous n'est proposée que pour vous aider à remplir les champs"
 
 msgid "reuse_address_entity"
 msgstr "Réutiliser l'adresse de"
@@ -760,11 +760,14 @@ msgstr "Monsieur"
 msgid "miss"
 msgstr "Madame"
 
-msgid "file_must_be_xls"
-msgstr "Le fichier doit être un XLS"
+msgid "file_must_be_xlsx"
+msgstr "Le fichier doit être un fichier excel valide au format 'XLSX'"
 
 msgid "invalid_file"
 msgstr "Fichier invalide"
+
+msgid "no_file_submitted"
+msgstr "Vous n'avez pas selectionné de fichier excel à soumettre."
 
 msgid "Line"
 msgstr "Ligne"
@@ -792,6 +795,12 @@ msgstr "L'inscription à l'unité d'enseignement %s n'existe pas"
 
 msgid "Note already submitted"
 msgstr ""
+
+msgid "server_error"
+msgstr "Une erreur innatendue s'est produite"
+
+msgid "server_error_message"
+msgstr "Nous mettons tout en oeuvre pour résoudre ce problème."
 
 msgid "scores_gt_0_lt_20"
 msgstr "La note encodée est incorrecte (elle doit être comprise entre 0 et 20)"
@@ -827,7 +836,7 @@ msgstr ""
  "Le double encodage n'est pas accessible car il n'y a pas de nouvelles notes encodés."
 
 msgid "minimum_one_criteria"
-msgstr "Veuillez remplir au moins 1 critère"
+msgstr "Veuillez remplir au moins 1 critère de recherche"
 
 msgid "get_excel_file"
 msgstr "Produire le fichier Excel"
@@ -904,6 +913,12 @@ msgstr "Centre de recherche"
 
 msgid "technologic_platform"
 msgstr "Plateforme technologique"
+
+msgid "by_specific_criteria"
+msgstr "Par critère spécifique"
+
+msgid "by_learning_unit"
+msgstr "Par unité d'enseignement"
 
 msgid "undefined"
 msgstr "Non défini"
@@ -1120,9 +1135,31 @@ msgstr "Cet étudiant possède plusieurs inscriptions au même examen "
 msgid "justification_invalid"
 msgstr "Justification invalide"
 
+msgid "outside_scores_encodings_period"
+msgstr "Vous êtes en dehors de la période d'encodage de notes: la dernière session d'examens est fermée depuis le %s."
+
+msgid "offer_year_calendar_academic_calendar_start_date_error"
+msgstr "La date de début de l'encodage des notes de votre programme ne peut pas être antérieure à la date d'ouverture "
+       "de l'encodage des notes du calendrier académique"
+
+msgid "offer_year_calendar_academic_calendar_end_date_error"
+msgstr "La date de fin de l'encodage des notes de votre programme ne peut pas être ultérieure à la date de fermeture "
+       "de l'encodage des notes du calendrier académique"
+
+msgid "academic_calendar_offer_year_calendar_start_date_error"
+msgstr "La date d'ouverture de l'encodage des notes du calendrier académique ne peut pas être supérieure au %s "
+       "(date de début de l'encodage des notes du programme '%s')"
+
+msgid "academic_calendar_offer_year_calendar_end_date_error"
+msgstr "La date de fermeture de l'encodage des notes du calendrier académique ne peut pas être inférieure au %s "
+       "(date de fin de l'encodage des notes du programme '%s')"
+
 msgid "more_than_one_learning_unit_error"
 msgstr "Vous avez encodé des notes pour plusieurs unités d'enseignements dans votre fichier excel "
        "(colonne 'Unité d'enseignement'). Veillez à ne faire qu'un seul fichier excel par unité d'enseignement."
+
+msgid "user_is_not_program_manager"
+msgstr "Vous n'êtes pas un gestionnaire de programme. Par conséquent, vous n'avez pas accès à cette interface."
 
 msgid "enrollments"
 msgstr "Inscriptions"

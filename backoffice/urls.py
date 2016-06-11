@@ -41,6 +41,7 @@ urlpatterns = [
 
 handler404 = 'base.views.common.page_not_found'
 handler403 = 'base.views.common.access_denied'
+handler500 = 'base.views.common.server_error'
 
 admin.site.site_header = 'OSIS'
 admin.site.site_title  = 'OSIS'

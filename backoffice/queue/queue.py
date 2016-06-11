@@ -27,6 +27,7 @@
 import pika
 from backoffice.settings import QUEUE_URL, QUEUE_USER, QUEUE_PASSWORD, QUEUE_PORT, QUEUE_CONTEXT_ROOT
 import threading
+from pika.exceptions import AMQPConnectionError
 
 
 def listen_queue(queue_name, callback):
@@ -85,7 +86,10 @@ class ConsumerThread(threading.Thread):
             'routing_key' : self._routing_key,
         }
         example = ExampleConsumer(connection_parameters=connection_parameters, callback=self.callback_func)
-        example.run()
+        try:
+            example.run()
+        except AMQPConnectionError :
+            print("Messaging System not available! OSIS cannot communicate with OSIS Portal.")
 
 
 class ExampleConsumer(object):

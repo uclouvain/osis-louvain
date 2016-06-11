@@ -23,9 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from django.db import models
 from django.utils import timezone
 from django.contrib import admin
+from base.models import session_exam
 
 
 class AcademicCalendarAdmin(admin.ModelAdmin):
@@ -71,3 +73,9 @@ def find_academic_calendar_by_academic_year_with_dates(academic_year_id):
 
 def find_academic_calendar_by_id(academic_calendar_id):
     return AcademicCalendar.objects.get(pk=academic_calendar_id)
+
+
+def get_scores_encoding_calendars():
+    academic_calendar_ids = session_exam.SessionExam.objects.values_list('offer_year_calendar__academic_calendar', flat=True)\
+                                                            .distinct('offer_year_calendar__academic_calendar')
+    return AcademicCalendar.objects.filter(pk__in=academic_calendar_ids)

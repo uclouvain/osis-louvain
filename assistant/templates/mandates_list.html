@@ -41,8 +41,16 @@
 <div class="page-header">
     <h2>{% trans 'assistants_mandates_renewal' %}</h2>
 </div>
+
 <div class="panel panel-default">
     <div class="panel-body">
+ <div class="row">
+	<div class="col-md-12 text-right"> 
+ <form action=" {% url 'mandates_list' %} " method="GET">  
+    
+    {{ form }}
+</form></br> 
+</div></div>
 <div class="table-responsive">  
 <table id="myTable" class="table table-hover table-condensed table-bordered" cellspacing="0" width="100%">
 <thead>

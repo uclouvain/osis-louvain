@@ -27,6 +27,7 @@ from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.forms import ModelForm
 from base import models as mdl
+from django.utils.translation import ugettext_lazy as _
 
 
 class LoginForm(forms.Form):
@@ -35,7 +36,15 @@ class LoginForm(forms.Form):
 
 
 class ScoreFileForm(forms.Form):
-    file = forms.FileField()
+    file = forms.FileField(error_messages={'required': _('no_file_submitted')})
+
+    def clean_file(self):
+        file = self.cleaned_data['file']
+        content_type = file.content_type.split('/')[1]
+        valid_content_type = 'vnd.openxmlformats-officedocument.spreadsheetml.sheet' in content_type
+        if ".xlsx" not in file.name or not valid_content_type:
+            self.add_error('file', forms.ValidationError(_('file_must_be_xlsx'), code='invalid'))
+        return file
 
 
 class OrganizationForm(ModelForm):

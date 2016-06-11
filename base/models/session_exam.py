@@ -30,11 +30,11 @@ from django.utils import timezone
 
 
 class SessionExamAdmin(admin.ModelAdmin):
-    list_display = ('learning_unit_year', 'offer_year_calendar', 'number_session', 'changed')
+    list_display = ('learning_unit_year', 'offer_year_calendar', 'number_session', 'changed', 'deadline')
     list_filter = ('number_session',)
     raw_id_fields = ('learning_unit_year', 'offer_year_calendar')
     fieldsets = ((None, {'fields': ('learning_unit_year', 'number_session', 'offer_year_calendar')}),)
-    search_fields = ['learning_unit_year__acronym']
+    search_fields = ['learning_unit_year__acronym', 'offer_year_calendar__offer_year__acronym']
 
 
 class SessionExam(models.Model):

@@ -61,10 +61,13 @@ urlpatterns = [
 
     url(r'^studies/$', common.studies, name='studies'),
     url(r'^studies/assessments/$', common.assessments, name='assessments'),
+    url(r'^studies/assessments/outside_scores_encodings_period/$', score_encoding.outside_scores_encodings_period, name='outside_scores_encodings_period'),
     url(r'^studies/assessments/scores_encoding/$', score_encoding.scores_encoding, name='scores_encoding'),
     url(r'^studies/assessments/scores_encoding/online/(?P<learning_unit_year_id>[0-9]+)/$', score_encoding.online_encoding, name='online_encoding'),
     url(r'^studies/assessments/scores_encoding/search/$', score_encoding.refresh_list, name='refresh_list'),
-
+    url(r'^studies/assessments/scores_encoding/specific_criteria/$', score_encoding.specific_criteria, name='specific_criteria'),
+    url(r'^studies/assessments/scores_encoding/specific_criteria/submission/$', score_encoding.specific_criteria_submission, name='specific_criteria_submission'),
+    url(r'^studies/assessments/scores_encoding/search_specific_criteria/$', score_encoding.search_by_specific_criteria, name='search_by_specific_criteria'),
 
     url(r'^studies/assessments/scores_encoding/online/(?P<learning_unit_year_id>[0-9]+)/form$', score_encoding.online_encoding_form, name='online_encoding_form'),
     url(r'^studies/assessments/scores_encoding/online/([0-9]+)/submission$', score_encoding.online_encoding_submission, name='online_encoding_submission'),

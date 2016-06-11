@@ -27,65 +27,53 @@ from django import forms
 from django.db.models import Q
 from django.forms import ModelForm, Textarea
 from assistant import models as mdl
-from base.models import structure 
+from base.models import structure, academic_year
 from django.forms.models import inlineformset_factory
 
 
-
-
 class MandateForm(ModelForm):
-    comment = forms.CharField(
-        required = False,
-        widget = Textarea(attrs={'rows': '3', 'cols': '50'}))
-    absences = forms.CharField(
-        required = False, 
-        widget = Textarea(attrs={'rows': '3', 'cols': '50'}))
-    other_status = forms.CharField(
-        required = False)
-    renewal_type=forms.ChoiceField(choices= mdl.assistant_mandate.AssistantMandate.RENEWAL_TYPE_CHOICES)
-    assistant_type=forms.ChoiceField(choices= mdl.assistant_mandate.AssistantMandate.ASSISTANT_TYPE_CHOICES)
-    sap_id = forms.CharField(
-        required = True,
-        max_length=12,
-        strip = True)
-    contract_duration = forms.CharField(
-        required = True,
-        max_length=30,
-        strip = True)
-    
-    contract_duration_fte = forms.CharField(
-        required = True,
-        max_length=30,
-        strip = True)
+    comment = forms.CharField(required=False, widget=Textarea(attrs={'rows': '3', 'cols': '50'}))
+    absences = forms.CharField(required=False, widget=Textarea(attrs={'rows': '3', 'cols': '50'}))
+    other_status = forms.CharField(required=False)
+    renewal_type=forms.ChoiceField(choices=mdl.assistant_mandate.AssistantMandate.RENEWAL_TYPE_CHOICES)
+    assistant_type=forms.ChoiceField(choices=mdl.assistant_mandate.AssistantMandate.ASSISTANT_TYPE_CHOICES)
+    sap_id = forms.CharField(required=True, max_length=12, strip=True)
+    contract_duration = forms.CharField(required=True, max_length=30, strip=True)
+    contract_duration_fte = forms.CharField(required=True, max_length=30, strip=True)
+
     class Meta:
         model = mdl.assistant_mandate.AssistantMandate
-        fields = ('comment','absences','other_status','renewal_type','assistant_type','sap_id','contract_duration','contract_duration_fte')
+        fields = ('comment', 'absences', 'other_status', 'renewal_type', 'assistant_type', 'sap_id',
+                  'contract_duration', 'contract_duration_fte')
 
     
 class MandateStructureForm(ModelForm):
-    #structure = forms.ChoiceField(choices = structure.Structure.objects.filter(type="SECTOR"))
     class Meta:
         model = mdl.mandate_structure.MandateStructure
-        #exclude = ['assistant_mandate']
-        fields = ('structure','assistant_mandate')
+        fields = ('structure', 'assistant_mandate')
 
         
 def get_field_qs(field, **kwargs):
         if field.name == 'structure':
-            return forms.ModelChoiceField(queryset=structure.Structure.objects.filter(
-                                                                                   Q(type = 'INSTITUTE') |
-                                                                                   Q(type = 'FACULTY'))
-                                          )
+            return forms.ModelChoiceField(queryset=structure.Structure.objects.filter(Q(type='INSTITUTE') |
+                                                                                      Q(type='FACULTY')))
         return field.formfield(**kwargs)
 
     
 StructureInLineFormSet = inlineformset_factory(mdl.assistant_mandate.AssistantMandate, 
                                                mdl.mandate_structure.MandateStructure,
                                                formfield_callback=get_field_qs,
-                                               fields=('structure','assistant_mandate'),
+                                               fields=('structure', 'assistant_mandate'),
                                                extra=2,
                                                can_delete=True,
                                                min_num=1,
-                                               max_num=2)  
-    
+                                               max_num=2)
 
+
+class MandatesArchivesForm(ModelForm):
+    academic_year = forms.ModelChoiceField(queryset=academic_year.AcademicYear.objects.all(),
+                                           widget=forms.Select(attrs={"onChange": 'submit()'}))
+
+    class Meta:
+        model = mdl.assistant_mandate.AssistantMandate
+        fields = ('academic_year',)
