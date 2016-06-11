@@ -23,24 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.urlresolvers import reverse
 from base.models import person, academic_year
 from assistant.models import academic_assistant, assistant_mandate
-from django.http.response import HttpResponseRedirect
 from django.views.generic.list import ListView
 
-@login_required
-def assistant_check(request):
-    try: 
-        academic_assistant.find_by_person(person.find_by_user(request.user))
-        return HttpResponseRedirect(reverse('assistant_mandates'))
-    except:
-        return HttpResponseRedirect(reverse('assistants_home'))
 
-class AssistantMandatesListView(ListView): 
+class AssistantMandatesListView(LoginRequiredMixin, UserPassesTestMixin, ListView): 
     context_object_name = 'assistant_mandates_list'
     template_name = 'assistant_mandates.html'
+
+    def test_func(self):
+        return self.request.user.groups.filter(name='academic_assistants')
+    
+    def get_login_url(self):
+        return reverse('access_denied')
 
     def get_queryset(self):
         assistant = academic_assistant.find_by_person(person.find_by_user(self.request.user))

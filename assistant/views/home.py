@@ -25,8 +25,16 @@
 ##############################################################################
 from django.contrib.auth.decorators import login_required
 from base.views import layout
+from django.http.response import HttpResponseRedirect
+from django.core.urlresolvers import reverse
 
 
 @login_required
 def assistant_home(request):
-    return layout.render(request, "assistants.html", {'section': 'assistants'})
+    if request.user.groups.filter(name='academic_assistants'):
+        return HttpResponseRedirect(reverse('assistant_mandates'))
+    elif request.user.groups.filter(name='hr_department'):
+        return HttpResponseRedirect(reverse('mandates_list'))
+
+def access_denied(request):
+    return layout.render(request, "access_denied.html")
