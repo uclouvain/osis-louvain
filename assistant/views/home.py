@@ -24,8 +24,8 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
-from base.views import layout
-from django.http.response import HttpResponseRedirect
+from django.shortcuts import render
+from django.http.response import HttpResponseRedirect, HttpResponse
 from django.core.urlresolvers import reverse
 
 
@@ -35,6 +35,8 @@ def assistant_home(request):
         return HttpResponseRedirect(reverse('assistant_mandates'))
     elif request.user.groups.filter(name='hr_department'):
         return HttpResponseRedirect(reverse('mandates_list'))
+    else:
+        return HttpResponseRedirect(reverse('access_denied'))
 
 def access_denied(request):
-    return layout.render(request, "access_denied.html")
+    return render(request, "access_denied.html")
