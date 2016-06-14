@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.models import Group
 from django.db import IntegrityError
 import csv, codecs
 from assistant.forms import MandateForm, StructureInLineFormSet

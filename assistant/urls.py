@@ -25,13 +25,15 @@
 ##############################################################################
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
-from assistant.views import mandate, home
+from assistant.views import mandate, home, assistant
 from assistant.views import mandates_list
-from assistant.models import assistant_mandate
 
 urlpatterns = [
     # S'il vous plaît, organiser les urls par ordre alphabétique.
-    url(r'^home$', home.assistant_home , name='assistants_home'),
+    url(r'^assistant/access_denied$', home.access_denied, name='access_denied'),
+    url(r'^assistant/mandates/$', assistant.AssistantMandatesListView.as_view(), name='assistant_mandates'),
+    url(r'^assistant/mandate/(?P<mandate_id>\d+)/state/$', assistant.mandate_change_state, name='mandate_change_state'),
+    url(r'^$', home.assistant_home , name='assistants_home'),
     url(r'^manager/mandates/(?P<mandate_id>\d+)/edit/$', mandate.mandate_edit, name='mandate_read'),
     url(r'^manager/mandates/(?P<mandate_id>\d+)/save/$', mandate.mandate_save, name='mandate_save'),
     url(r'^manager/mandates/load/$', mandate.load_mandates, name='load_mandates'),

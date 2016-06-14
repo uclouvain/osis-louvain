@@ -1,0 +1,126 @@
+{% extends "layout.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock %}
+    
+{% block breadcrumb %}
+<li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
+<li><a href="{% url 'mandates' %}" id="lnk_mandates">{% trans 'mandates' %}</a></li>
+<li class="active">{% trans 'mandates_list' %}</li>
+
+{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2>{% trans 'assistants_mandates_renewal' %}</h2>
+</div>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+	<h3>{{ assistant.person }}</h3>
+	<div class="table-responsive">  
+<table id="myTable" class="table table-hover" cellspacing="0" width="100%">
+<thead>
+      <tr>
+      <th>{% trans 'academic_year' %}</th>
+        <th>{% trans 'faculty' %}</th>
+        <th>{% trans 'institute' %}</th>
+        <th>{% trans 'position_id' %}</th>
+        <th>{% trans 'state' %}</th>
+        <th>{% trans 'action' %}</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+{% for mandate in object_list %}
+<form method="post" action=" {% url 'mandate_change_state' mandate.id %} ">
+	{% csrf_token %}
+<td>{{ mandate.academic_year }}</td>	
+{% if mandate.mandatestructure_set.all %}
+	{% for structure in mandate.mandatestructure_set.all|dictsort:"structure.type" %}
+		{% if mandate.mandatestructure_set.all.count == 1 %}
+			<td>{{ structure.structure.acronym }}</td><td></td>
+		{% elif mandate.mandatestructure_set.all.count == 2 %}
+			<td>{{ structure.structure.acronym }}</td>
+		{% endif %}
+	{% endfor %}
+{% else %}
+	<td></td><td></td>
+{% endif %}	
+<td>{{ mandate.position_id }}</td>	
+{% if mandate.state == "TO_DO" %}
+	<td>{% trans 'pending' %}</td>
+{% elif mandate.state == "DECLINED" %}
+	<td>{% trans 'declined' %}</td>
+{% elif mandate.state == "TRTS" %}
+	<td>{% trans 'assistant' %}</td>
+{% elif mandate.state == "PHD_SUPERVISOR" %}
+	<td>{% trans 'phd_supervisor' %}</td>
+{% elif mandate.state == "RESEARCH" %}
+	<td>{% trans 'research' %}</td>
+{% elif mandate.state == "SUPERVISION" %}
+	<td>{% trans 'supervision' %}</td>
+{% elif mandate.state == "VICE_RECTOR" %}
+	<td>{% trans 'sector_vice_rector' %}</td>
+{% endif %}
+<td align="center">
+{% if mandate.state == "TO_DO" %}
+	<button type="submit" class="btn btn-success" title="{% trans 'accept'%}" id="bt_mandate_accept" name="bt_mandate_accept"
+	onclick="return confirm('{% trans 'confirm_accept' %}')">
+	<span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span> {% trans 'accept'%}</button>
+	<button type="submit" class="btn btn-danger" title="{% trans 'decline'%}" id="bt_mandate_decline" name="bt_mandate_decline"
+	onclick="return confirm('{% trans 'confirm_decline' %}')">
+	<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> {% trans 'decline'%}</button>
+{% elif mandate.state == "TRTS" %}
+	<button type="submit" class="btn btn-primary" title="{% trans 'edit'%}" id="bt_mandate_edit" name="bt_mandate_edit">
+	<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> {% trans 'edit'%}</button>
+
+{% endif %}
+
+</td>	
+</tr>
+</form>
+{% endfor %}
+</tbody>
+  </table>
+</div>
+</div>
+
+{% endblock %}
+{% block script %}
+
+{% endblock %}
+
+
+
+
+
+
+
+
