@@ -34,7 +34,7 @@ from django.views.generic.edit import FormMixin
 from django.http.response import HttpResponseRedirect
 
 
-class AssistantMandatesListView(LoginRequiredMixin, UserPassesTestMixin, ListView, FormMixin): 
+class AssistantMandatesListView(LoginRequiredMixin, UserPassesTestMixin, ListView, FormMixin):
     context_object_name = 'assistant_mandates_list'
     template_name = 'assistant_mandates.html'
     form_class = forms.Form
@@ -44,29 +44,29 @@ class AssistantMandatesListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
             return academic_assistant.AcademicAssistant.objects.get(person=self.request.user.person)
         except ObjectDoesNotExist:
             return False
-    
-    
+
     def get_login_url(self):
         return reverse('access_denied')
 
     def get_queryset(self):
-        assistant = academic_assistant.find_by_person(person.find_by_user(self.request.user))
+        assistant = academic_assistant.find_by_person(
+            person.find_by_user(self.request.user))
         this_academic_year = academic_year.current_academic_year()
         return assistant_mandate.find_mandate_by_assistant_for_academic_year(assistant, this_academic_year)
-        
+
     def get_context_data(self, **kwargs):
-        context = super(AssistantMandatesListView, self).get_context_data(**kwargs)
-        context['assistant'] = academic_assistant.find_by_person(person.find_by_user(self.request.user))
+        context = super(AssistantMandatesListView,
+                        self).get_context_data(**kwargs)
+        context['assistant'] = academic_assistant.find_by_person(
+            person.find_by_user(self.request.user))
         return context
-        
+
+
 def mandate_change_state(request, mandate_id):
     mandate = assistant_mandate.find_mandate_by_id(mandate_id)
     if 'bt_mandate_accept' in request.POST:
-        mandate.state='TRTS'
+        mandate.state = 'TRTS'
     elif 'bt_mandate_decline' in request.POST:
-        mandate.state='DECLINED'
+        mandate.state = 'DECLINED'
     mandate.save()
     return HttpResponseRedirect(reverse('assistant_mandates'))
-    
-    
-    
