@@ -26,6 +26,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.urlresolvers import reverse
 from base.models import person, academic_year
+from django.core.exceptions import ObjectDoesNotExist
 from assistant.models import academic_assistant, assistant_mandate
 from django.views.generic.list import ListView
 
@@ -35,7 +36,11 @@ class AssistantMandatesListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
     template_name = 'assistant_mandates.html'
 
     def test_func(self):
-        return self.request.user.groups.filter(name='academic_assistants')
+        try:
+            return academic_assistant.AcademicAssistant.objects.get(person=self.request.user.person)
+        except ObjectDoesNotExist:
+            return False
+    
     
     def get_login_url(self):
         return reverse('access_denied')
