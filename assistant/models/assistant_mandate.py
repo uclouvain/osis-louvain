@@ -40,7 +40,8 @@ class AssistantMandate(models.Model):
         ('PHD_SUPERVISOR', _('PhD supervisor')),
         ('RESEARCH', _('Research')),
         ('SUPERVISION', _('Supervision')),
-        ('VICE_RECTOR', _('Vice rector')))
+        ('VICE_RECTOR', _('Vice rector')),
+        ('DONE', _('Done')))
 
     APPEAL_CHOICES = (
         ('NONE', _('N/A')),

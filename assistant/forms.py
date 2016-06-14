@@ -77,3 +77,4 @@ class MandatesArchivesForm(ModelForm):
     class Meta:
         model = mdl.assistant_mandate.AssistantMandate
         fields = ('academic_year',)
+    

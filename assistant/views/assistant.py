@@ -25,15 +25,19 @@
 ##############################################################################
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.urlresolvers import reverse
+from django.forms import forms
 from base.models import person, academic_year
 from django.core.exceptions import ObjectDoesNotExist
 from assistant.models import academic_assistant, assistant_mandate
 from django.views.generic.list import ListView
+from django.views.generic.edit import FormMixin
+from django.http.response import HttpResponseRedirect
 
 
-class AssistantMandatesListView(LoginRequiredMixin, UserPassesTestMixin, ListView): 
+class AssistantMandatesListView(LoginRequiredMixin, UserPassesTestMixin, ListView, FormMixin): 
     context_object_name = 'assistant_mandates_list'
     template_name = 'assistant_mandates.html'
+    form_class = forms.Form
 
     def test_func(self):
         try:
@@ -55,5 +59,14 @@ class AssistantMandatesListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
         context['assistant'] = academic_assistant.find_by_person(person.find_by_user(self.request.user))
         return context
         
-       
+def mandate_change_state(request, mandate_id):
+    mandate = assistant_mandate.find_mandate_by_id(mandate_id)
+    if 'bt_mandate_accept' in request.POST:
+        mandate.state='TRTS'
+    elif 'bt_mandate_decline' in request.POST:
+        mandate.state='DECLINED'
+    mandate.save()
+    return HttpResponseRedirect(reverse('assistant_mandates'))
+    
+    
     

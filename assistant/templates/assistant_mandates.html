@@ -40,6 +40,7 @@
 <div class="page-header">
     <h2>{% trans 'assistants_mandates_renewal' %}</h2>
 </div>
+
 <div class="panel panel-default">
     <div class="panel-body">
 	<h3>{{ assistant.person }}</h3>
@@ -58,7 +59,8 @@
     <tbody>
       <tr>
 {% for mandate in object_list %}
-
+<form method="post" action=" {% url 'mandate_change_state' mandate.id %} ">
+	{% csrf_token %}
 <td>{{ mandate.academic_year }}</td>	
 {% if mandate.mandatestructure_set.all %}
 	{% for structure in mandate.mandatestructure_set.all|dictsort:"structure.type" %}
@@ -72,14 +74,44 @@
 	<td></td><td></td>
 {% endif %}	
 <td>{{ mandate.position_id }}</td>	
-<td>{{ mandate.state }}</td>	
-<td></td>	
+{% if mandate.state == "TO_DO" %}
+	<td>{% trans 'pending' %}</td>
+{% elif mandate.state == "DECLINED" %}
+	<td>{% trans 'declined' %}</td>
+{% elif mandate.state == "TRTS" %}
+	<td>{% trans 'assistant' %}</td>
+{% elif mandate.state == "PHD_SUPERVISOR" %}
+	<td>{% trans 'phd_supervisor' %}</td>
+{% elif mandate.state == "RESEARCH" %}
+	<td>{% trans 'research' %}</td>
+{% elif mandate.state == "SUPERVISION" %}
+	<td>{% trans 'supervision' %}</td>
+{% elif mandate.state == "VICE_RECTOR" %}
+	<td>{% trans 'sector_vice_rector' %}</td>
+{% endif %}
+<td align="center">
+{% if mandate.state == "TO_DO" %}
+	<button type="submit" class="btn btn-success" title="{% trans 'accept'%}" id="bt_mandate_accept" name="bt_mandate_accept"
+	onclick="return confirm('{% trans 'confirm_accept' %}')">
+	<span class="glyphicon glyphicon-ok-circle" aria-hidden="true"></span> {% trans 'accept'%}</button>
+	<button type="submit" class="btn btn-danger" title="{% trans 'decline'%}" id="bt_mandate_decline" name="bt_mandate_decline"
+	onclick="return confirm('{% trans 'confirm_decline' %}')">
+	<span class="glyphicon glyphicon-remove-circle" aria-hidden="true"></span> {% trans 'decline'%}</button>
+{% elif mandate.state == "TRTS" %}
+	<button type="submit" class="btn btn-primary" title="{% trans 'edit'%}" id="bt_mandate_edit" name="bt_mandate_edit">
+	<span class="glyphicon glyphicon-edit" aria-hidden="true"></span> {% trans 'edit'%}</button>
+
+{% endif %}
+
+</td>	
 </tr>
+</form>
 {% endfor %}
 </tbody>
   </table>
 </div>
 </div>
+
 {% endblock %}
 {% block script %}
 
