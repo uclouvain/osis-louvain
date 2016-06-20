@@ -37,7 +37,7 @@
 </div>
 <div class="panel panel-default">
   <div class="panel-body">
-  <form method="post" action="{% url 'pst_form_part1_save' mandate.id %}">
+  <form method="post" action="{% url 'form_part1_save' mandate.id %}">
       {% csrf_token %}
   <div class="row">
     <div class="col-xs-6 col-sm-3">
@@ -47,7 +47,7 @@
     </div>
     <div class="col-xs-6 col-sm-6">
       <b>{{assistant.person}}</b><p>
-      {{birthday}}<p>
+      {{assistant.person.birth_date}}<p>
       {% for address in addresses %}
       	{{address.location}} - {{address.postal_code}} {{address.city}}<br>{{address.country}}
       {% endfor %}
@@ -62,16 +62,21 @@
   <b>{% trans 'contract' %}</b><p>
   <div class="row">
     <div class="col-xs-6 col-sm-3">
-      {% trans 'faculty_institute' %} :<br>
+    {% trans 'faculty' %} :<br>
+      {% trans 'institute' %} :<br>
       {% trans 'full_time_equivalent' %} :<br>
       {% trans 'date_of_first_nomination' %} :<br>
       {% trans 'field' %} :<br>
       {% trans 'grade' %} :<br>
     </div>
     <div class="col-xs-6 col-sm-9">
-      {% for course in courses.all|slice:"1" %}
-        {{ course.offer_year.entity_administration }}<br>
-      {% endfor %}  
+      {% for structure in mandate.mandatestructure_set.all|dictsort:"structure.type" %}
+      	{% if mandate.mandatestructure_set.all.count == 1 %}
+      		{{structure.structure.acronym}}<br><br>
+      	{% elif mandate.mandatestructure_set.all.count == 2 %}
+      		{{structure.structure.acronym}}<br>
+      	{% endif %}
+      {% endfor %}
       {{mandate.fulltime_equivalent}}<br>
       {{mandate.entry_date}}<br>
       {{mandate.assistant_type}}<br>

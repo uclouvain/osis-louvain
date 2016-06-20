@@ -75,7 +75,7 @@ class HorizontalRadioRenderer(forms.RadioSelect.renderer):
         return u'\n'.join([u'%s\n' % w for w in self])
 
 
-class AssistantFormPart1(forms.Form):
+class AssistantFormPart1(ModelForm):
     inscription = forms.ChoiceField(
             choices=mdl.academic_assistant.AcademicAssistant.PHD_INSCRIPTION_CHOICES,
             widget=forms.RadioSelect(renderer=HorizontalRadioRenderer))
@@ -96,6 +96,11 @@ class AssistantFormPart1(forms.Form):
     external_functions = forms.CharField(widget=forms.Textarea(attrs={'cols': '40', 'rows': '2'}))
     external_contract = forms.CharField(widget=forms.Textarea(attrs={'cols': '40', 'rows': '2'}))
     justification = forms.CharField(widget=forms.Textarea(attrs={'cols': '40', 'rows': '2'}))
+    
+    class Meta:
+        model = mdl.academic_assistant.AcademicAssistant
+        fields = ('inscription','expected_phd_date','phd_inscription_date',
+                   'confirmation_test_date', 'thesis_date','supervisor')
 
 
 class MandatesArchivesForm(ModelForm):
