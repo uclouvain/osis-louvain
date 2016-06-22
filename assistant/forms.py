@@ -94,7 +94,8 @@ class AssistantFormPart1(ModelForm):
                                         attrs={'placeholder': 'dd/mm/yyyy'}),
                                         input_formats=['%d/%m/%Y'])
     supervisor = forms.ModelChoiceField(required=False,queryset=person.Person.objects.all(),
-                                        widget=forms.Select(attrs={"onChange": 'submit()'}))
+                                        to_field_name="global_id",
+                                        widget=forms.Select(attrs={"onChange": 'update_photo()'}))
     
     external_functions = forms.CharField(required=False,widget=forms.Textarea(attrs={'cols': '40', 'rows': '2'}))
     
