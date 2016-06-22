@@ -27,7 +27,7 @@ from django import forms
 from django.db.models import Q
 from django.forms import ModelForm, Textarea
 from assistant import models as mdl
-from base.models import structure, academic_year
+from base.models import structure, academic_year, person
 from django.forms.models import inlineformset_factory
 
 
@@ -76,31 +76,42 @@ class HorizontalRadioRenderer(forms.RadioSelect.renderer):
 
 
 class AssistantFormPart1(ModelForm):
-    inscription = forms.ChoiceField(
+    inscription = forms.ChoiceField(required=True,widget=forms.RadioSelect(renderer=HorizontalRadioRenderer,
+                                                                           attrs={"onChange":'Hide()'}),
             choices=mdl.academic_assistant.AcademicAssistant.PHD_INSCRIPTION_CHOICES,
-            widget=forms.RadioSelect(renderer=HorizontalRadioRenderer))
-    expected_phd_date = forms.DateField(widget=forms.DateInput(format='%d/%m/%Y',
+            )
+    expected_phd_date = forms.DateField(required=False,widget=forms.DateInput(format='%d/%m/%Y',
                                         attrs={'placeholder': 'dd/mm/yyyy'}),
-                                        input_formats='%d/%m/%Y')
-    phd_inscription_date = forms.DateField(widget=forms.DateInput(format='%d/%m/%Y',
-                                           attrs={'placeholder':'dd/mm/yyyy'}),
-                                           input_formats='%d/%m/%Y')
-    confirmation_test_date = forms.DateField(widget=forms.DateInput(format='%d/%m/%Y',
-                                             attrs={'placeholder': 'dd/mm/yyyy'}),
-                                             input_formats='%d/%m/%Y')
-    thesis_date = forms.DateField(widget=forms.DateInput(format='%d/%m/%Y',
-                                  attrs={'placeholder': 'dd/mm/yyyy'}),
-                                  input_formats='%d/%m/%Y')
-    supervisor = forms.CharField(widget=forms.TextInput(
-                                 attrs={'placeholder': 'firstname.lastname@uclouvain.be', 'size': '30'}))
-    external_functions = forms.CharField(widget=forms.Textarea(attrs={'cols': '40', 'rows': '2'}))
-    external_contract = forms.CharField(widget=forms.Textarea(attrs={'cols': '40', 'rows': '2'}))
-    justification = forms.CharField(widget=forms.Textarea(attrs={'cols': '40', 'rows': '2'}))
+                                        input_formats=['%d/%m/%Y'])
+    
+    phd_inscription_date = forms.DateField(required=False,widget=forms.DateInput(format='%d/%m/%Y',
+                                        attrs={'placeholder': 'dd/mm/yyyy'}),
+                                        input_formats=['%d/%m/%Y'])
+    confirmation_test_date = forms.DateField(required=False,widget=forms.DateInput(format='%d/%m/%Y',
+                                        attrs={'placeholder': 'dd/mm/yyyy'}),
+                                        input_formats=['%d/%m/%Y'])
+    thesis_date = forms.DateField(required=False,widget=forms.DateInput(format='%d/%m/%Y',
+                                        attrs={'placeholder': 'dd/mm/yyyy'}),
+                                        input_formats=['%d/%m/%Y'])
+    supervisor = forms.ModelChoiceField(required=False,queryset=person.Person.objects.all(),
+                                        widget=forms.Select(attrs={"onChange": 'submit()'}))
+    
+    external_functions = forms.CharField(required=False,widget=forms.Textarea(attrs={'cols': '40', 'rows': '2'}))
     
     class Meta:
-        model = mdl.academic_assistant.AcademicAssistant
+        model = mdl.assistant_mandate.AssistantMandate
         fields = ('inscription','expected_phd_date','phd_inscription_date',
                    'confirmation_test_date', 'thesis_date','supervisor')
+
+class AssistantFormPart1b(ModelForm):
+    
+    external_functions = forms.CharField(required=False,widget=forms.Textarea(attrs={'cols': '40', 'rows': '2'}))
+    external_contract = forms.CharField(required=False,widget=forms.Textarea(attrs={'cols': '40', 'rows': '2'}))
+    justification = forms.CharField(required=False,widget=forms.Textarea(attrs={'cols': '40', 'rows': '2'}))
+    
+    class Meta:
+        model = mdl.assistant_mandate.AssistantMandate
+        fields = ('external_functions','external_contract','justification')
 
 
 class MandatesArchivesForm(ModelForm):
