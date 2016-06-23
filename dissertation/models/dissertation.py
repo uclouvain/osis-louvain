@@ -68,22 +68,23 @@ class Dissertation(models.Model):
     def __str__(self):
         return self.title
 
-    def search(terms=None):
-        queryset = Dissertation.objects.all()
-        if terms:
-            queryset = queryset.filter(
-                Q(author__person__first_name__icontains=terms) |
-                Q(author__person__middle_name__icontains=terms) |
-                Q(author__person__last_name__icontains=terms) |
-                Q(description__icontains=terms) |
-                Q(proposition_dissertation__title__icontains=terms) |
-                Q(proposition_dissertation__author__person__first_name__icontains=terms) |
-                Q(proposition_dissertation__author__person__middle_name__icontains=terms) |
-                Q(proposition_dissertation__author__person__last_name__icontains=terms) |
-                Q(status__icontains=terms) |
-                Q(title__icontains=terms)
-            ).distinct()
-        return queryset
-
     class Meta:
         ordering = ["author__person__last_name", "author__person__middle_name", "author__person__first_name", "title"]
+
+
+def search_dissertation(terms=None):
+    queryset = Dissertation.objects.all()
+    if terms:
+        queryset = queryset.filter(
+            Q(author__person__first_name__icontains=terms) |
+            Q(author__person__middle_name__icontains=terms) |
+            Q(author__person__last_name__icontains=terms) |
+            Q(description__icontains=terms) |
+            Q(proposition_dissertation__title__icontains=terms) |
+            Q(proposition_dissertation__author__person__first_name__icontains=terms) |
+            Q(proposition_dissertation__author__person__middle_name__icontains=terms) |
+            Q(proposition_dissertation__author__person__last_name__icontains=terms) |
+            Q(status__icontains=terms) |
+            Q(title__icontains=terms)
+        ).distinct()
+    return queryset

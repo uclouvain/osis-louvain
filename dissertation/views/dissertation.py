@@ -29,7 +29,7 @@ from django.db import IntegrityError
 from django.db.models import Q
 from base import models as mdl
 from dissertation.models.adviser import Adviser, find_by_person
-from dissertation.models.dissertation import Dissertation
+from dissertation.models.dissertation import Dissertation, search_dissertation
 from dissertation.models.dissertation_role import DissertationRole
 from dissertation.models.dissertation_update import DissertationUpdate
 from dissertation.models.faculty_adviser import FacultyAdviser
@@ -195,7 +195,7 @@ def manager_dissertations_list(request):
 @login_required
 @user_passes_test(is_manager)
 def manager_dissertations_print(request):
-    dissertations = Dissertation.search(terms=request.GET['search']).filter(Q(active=True))
+    dissertations = search_dissertation(terms=request.GET['search']).filter(Q(active=True))
     wb = Workbook(encoding='utf-8')
 
     dest_filename = 'IMPORT_dissertaion_.xlsx'
@@ -240,7 +240,7 @@ def manager_dissertations_new(request):
 @login_required
 @user_passes_test(is_manager)
 def manager_dissertations_search(request):
-    dissertations = Dissertation.search(terms=request.GET['search']).filter(Q(active=True))
+    dissertations = search_dissertation(terms=request.GET['search']).filter(Q(active=True))
     person = mdl.person.find_by_user(request.user)
     adviser = find_by_person(person)
     faculty_adviser = FacultyAdviser.find_by_adviser(adviser)
@@ -563,7 +563,7 @@ def dissertations_list(request):
 def dissertations_search(request):
     person = mdl.person.find_by_user(request.user)
     adviser = find_by_person(person)
-    dissertations = Dissertation.search(terms=request.GET['search']).filter(
+    dissertations = search_dissertation(terms=request.GET['search']).filter(
         Q(proposition_dissertation__author=adviser) & Q(active=True))
 
     return render(request, "dissertations_list.html",
