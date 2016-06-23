@@ -27,7 +27,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from dissertation.models.adviser import Adviser, find_by_person, search_adviser
 from dissertation.models.dissertation_role import DissertationRole
-from dissertation.models.faculty_adviser import FacultyAdviser
+from dissertation.models.faculty_adviser import find_faculty_adviser_by_adviser
 from base import models as mdl
 from dissertation.forms import AdviserForm, ManagerAdviserForm, ManagerAddAdviserForm
 from django.contrib.auth.decorators import user_passes_test
@@ -213,7 +213,7 @@ def manager_informations_search(request):
 def manager_informations_list_request(request):
     person = mdl.person.find_by_user(request.user)
     adviser = find_by_person(person)
-    faculty_adviser = FacultyAdviser.find_by_adviser(adviser)
+    faculty_adviser = find_faculty_adviser_by_adviser(adviser)
     queryset = DissertationRole.objects.all()
     advisers_need_request = queryset.filter(Q(status='PROMOTEUR') &
                                             Q(dissertation__status='DIR_SUBMIT') &
@@ -229,7 +229,7 @@ def manager_informations_list_request(request):
 def manager_informations_detail_list(request, pk):
     person = mdl.person.find_by_user(request.user)
     adviser_co = find_by_person(person)
-    faculty_adviser = FacultyAdviser.find_by_adviser(adviser_co)
+    faculty_adviser = find_faculty_adviser_by_adviser(adviser_co)
     adviser = get_object_or_404(Adviser, pk=pk)
     queryset = DissertationRole.objects.all()
     adviser_list_dissertations = queryset.filter(Q(status='PROMOTEUR') &
