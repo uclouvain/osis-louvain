@@ -25,7 +25,7 @@
 ##############################################################################
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from dissertation.models.adviser import Adviser, find_by_person
+from dissertation.models.adviser import Adviser, find_by_person, search_adviser
 from dissertation.models.dissertation_role import DissertationRole
 from dissertation.models.faculty_adviser import FacultyAdviser
 from base import models as mdl
@@ -204,7 +204,7 @@ def manager_informations_edit(request, pk):
 @login_required
 @user_passes_test(is_manager)
 def manager_informations_search(request):
-    advisers = Adviser.search(terms=request.GET['search'])
+    advisers = search_adviser(terms=request.GET['search'])
     return render(request, "manager_informations_list.html", {'advisers': advisers})
 
 
