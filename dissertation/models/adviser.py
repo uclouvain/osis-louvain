@@ -58,10 +58,6 @@ class Adviser(models.Model):
             last_name = self.person.last_name + ","
         return u"%s %s %s" % (last_name.upper(), first_name, middle_name)
 
-    def find_by_person(a_person):
-        adviser = Adviser.objects.get(person=a_person)
-        return adviser
-
     def search(terms):
         queryset = Adviser.objects.all().filter(type='PRF')
         if terms:
@@ -72,3 +68,8 @@ class Adviser(models.Model):
 
     class Meta:
         ordering = ["person__last_name", "person__middle_name", "person__first_name"]
+
+
+def find_by_person(a_person):
+    adviser = Adviser.objects.get(person=a_person)
+    return adviser

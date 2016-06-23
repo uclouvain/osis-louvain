@@ -25,7 +25,7 @@
 ##############################################################################
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from dissertation.models.adviser import Adviser
+from dissertation.models.adviser import Adviser, find_by_person
 from dissertation.models.dissertation_role import DissertationRole
 from dissertation.models.faculty_adviser import FacultyAdviser
 from base import models as mdl
@@ -38,14 +38,14 @@ from django.db.models import Q
 # Used by decorator @user_passes_test(is_manager) to secure manager views
 def is_manager(user):
     person = mdl.person.find_by_user(user)
-    adviser = Adviser.find_by_person(person)
+    adviser = find_by_person(person)
     return adviser.type == 'MGR'
 
 
 # Used by decorator @user_passes_test(is_manager) to secure manager views
 def is_teacher(user):
     person = mdl.person.find_by_user(user)
-    adviser = Adviser.find_by_person(person)
+    adviser = find_by_person(person)
     return adviser.type == 'PRF'
 
 ##########################
@@ -61,7 +61,7 @@ def informations(request):
         adviser = Adviser(person=person, available_by_email=False, available_by_phone=False, available_at_office=False)
         adviser.save()
     except IntegrityError:
-        adviser = Adviser.find_by_person(person)
+        adviser = find_by_person(person)
 
     return render(request, "informations.html", {'adviser': adviser})
 
@@ -74,7 +74,7 @@ def informations_detail_stats(request):
         adviser = Adviser(person=person, available_by_email=False, available_by_phone=False, available_at_office=False)
         adviser.save()
     except IntegrityError:
-        adviser = Adviser.find_by_person(person)
+        adviser = find_by_person(person)
 
     queryset = DissertationRole.objects.all()
     count_advisers = queryset.filter(Q(adviser=adviser) & Q(dissertation__active=True)).count()
@@ -141,7 +141,7 @@ def informations_detail_stats(request):
 @user_passes_test(is_teacher)
 def informations_edit(request):
     person = mdl.person.find_by_user(request.user)
-    adviser = Adviser.find_by_person(person)
+    adviser = find_by_person(person)
     if request.method == "POST":
         form = AdviserForm(request.POST, instance=adviser)
         if form.is_valid():
@@ -212,7 +212,7 @@ def manager_informations_search(request):
 @user_passes_test(is_manager)
 def manager_informations_list_request(request):
     person = mdl.person.find_by_user(request.user)
-    adviser = Adviser.find_by_person(person)
+    adviser = find_by_person(person)
     faculty_adviser = FacultyAdviser.find_by_adviser(adviser)
     queryset = DissertationRole.objects.all()
     advisers_need_request = queryset.filter(Q(status='PROMOTEUR') &
@@ -228,7 +228,7 @@ def manager_informations_list_request(request):
 @user_passes_test(is_manager)
 def manager_informations_detail_list(request, pk):
     person = mdl.person.find_by_user(request.user)
-    adviser_co = Adviser.find_by_person(person)
+    adviser_co = find_by_person(person)
     faculty_adviser = FacultyAdviser.find_by_adviser(adviser_co)
     adviser = get_object_or_404(Adviser, pk=pk)
     queryset = DissertationRole.objects.all()
