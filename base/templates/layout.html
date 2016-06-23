@@ -44,9 +44,6 @@
     {% block style %}
     {% endblock %}
     <style>
-        #osis_with_js {
-            display: none;
-        }
         #alert_wrong_version {
             display: none;
         }
@@ -56,10 +53,6 @@
     </style>
 </head>
 <body>
-<div id="osis_without_js">
-    {% include "please_enable_javascript.html" %}
-</div>
-<div id="osis_with_js">
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container">
             <!-- Brand and toggle get grouped for better mobile display -->
@@ -206,6 +199,5 @@
     <script src="{% static 'js/osis.js' %}?version={{ js }}"></script>
     {% block script %}
     {% endblock %}
-</div>
 </body>
 </html>

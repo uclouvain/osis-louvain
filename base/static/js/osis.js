@@ -1,7 +1,5 @@
 $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip();
-    $("#osis_without_js").hide();
-    $("#osis_with_js").show();
     check_browser();
 });
 
