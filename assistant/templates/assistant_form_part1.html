@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% load staticfiles %}
 {% load i18n %}
+{% load l10n %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -31,160 +32,270 @@
 <li class="active">{% trans 'assistants' %}</li>
 {% endblock %}
 {% block content %}
-<div class="container">
-<div class="page-header">
-    <h2>{% trans 'assistantship_mandate_renewal_part1' %}</h2>
-</div>
+<ul class="nav nav-tabs ">
+<li><a href="#">{% trans 'my_mandates' %}</a></li>
+<li class="active"><a href="#">{% trans 'assistant_form_part1' %}</a></li>
+<li><a href="#">{% trans 'assistant_form_part2' %}</a></li>
+</ul>
 <div class="panel panel-default">
-  <div class="panel-body">
-  <form method="post" action="{% url 'pst_form_part1_save' mandate.id %}">
-      {% csrf_token %}
-  <div class="row">
-    <div class="col-xs-6 col-sm-3">
-    <label>{% trans 'name_firstname' %}</label> :<p>
-    <label>{% trans 'birthdate' %}</label> :<p>
-    <label>{% trans 'address' %}</label> :<p>
-    </div>
-    <div class="col-xs-6 col-sm-6">
-      <b>{{assistant.person}}</b><p>
-      {{birthday}}<p>
-      {% for address in addresses %}
-      	{{address.location}} - {{address.postal_code}} {{address.city}}<br>{{address.country}}
-      {% endfor %}
-      <p>
-    </div>
-    <div class="col-xs-6 col-sm-3" align="right">
-    <label>{% trans 'type_of_renewal' %}</label> : {{mandate.renewal_type}}<p>
-    </div>
-  </div>
-
-  <hr>
-  <b>{% trans 'contract' %}</b><p>
-  <div class="row">
-    <div class="col-xs-6 col-sm-3">
-      {% trans 'faculty_institute' %} :<br>
-      {% trans 'full_time_equivalent' %} :<br>
-      {% trans 'date_of_first_nomination' %} :<br>
-      {% trans 'field' %} :<br>
-      {% trans 'grade' %} :<br>
-    </div>
-    <div class="col-xs-6 col-sm-9">
-      {% for course in courses.all|slice:"1" %}
-        {{ course.offer_year.entity_administration }}<br>
-      {% endfor %}  
-      {{mandate.fulltime_equivalent}}<br>
-      {{mandate.entry_date}}<br>
-      {{mandate.assistant_type}}<br>
-      {{mandate.grade}}</p>
-    </div>
-   </div>
-  <hr>
-  <b>{% trans 'doctorate' %}</b><p>
-    
-    <div class="form-group">
-      <div class="row">
-        <div class="col-xs-6 col-sm-5">
-          {% trans 'registered_phd' %} :
-          <label class="radio-inline">
-          <input type="radio" name="inscription" id="id_inscription_0" value="{{assistant.inscription}}" onChange="disablefield();">{% trans 'yes' %}
-          </label>
-          <label class="radio-inline">
-          <input type="radio" name="inscription" id="id_inscription_1" value="{{assistant.inscription}}" onChange="disablefield();">{% trans 'no' %}
-          </label>
-          <label class="radio-inline">
-          <input type="radio" name="inscription" id="id_inscription_2" value="{{assistant.inscription}}" onChange="disablefield();">{% trans 'in_progress' %}
-          </label>                 
-        </div>
-        <div class="col-xs-6 col-sm-7">
-          {% trans 'expected_registering_date' %} : 
-          {{ form.expected_phd_date }}
-        </div>
-      </div>
-      <div class="row"> 
-        <div class="col-xs-6 col-sm-3">
-           {% trans 'supervisor_email_address' %} :
-        </div>
-        <div class="col-xs-6 col-sm-4">
-          <input  type="text" id="supervisor_email" name="supervisor" placeholder="{% trans 'firstname' %}.{% trans 'lastname' %}@uclouvain.be" size="30" value="{{assistant.supervisor}}">&nbsp;
-        </div>
-        <div class="col-xs-6 col-sm-3">
-          <label class="checkbox-inline">
-            <input type="checkbox" value="nosupervisor" id="no_supervisor" onChange="disablefield();">{% trans 'no_supervisor' %}
-          </label>
-        </div>        
-      </div>
-      <div class="row">  
-        <div class="col-xs-6 col-sm-3"> 
-          {% trans 'phd_inscription_date' %} :<br>&nbsp;
-        </div>
-        <div class="col-sm-6">     
-          {{ form.phd_inscription_date }}
-        </div>  
-      </div>
-      <div class="row">  
-        <div class="col-xs-6 col-sm-3"> 
-          {% trans 'confirmatory_test_date ' %} <br><font size="1">{% trans '2nd_renewal' %}</font> :        
-        </div>     
-        <div class="col-sm-6">     
-          {{ form.confirmation_test_date }}
-        </div>
-          </div>
-      <div class="row">      
-        <div class="col-xs-6 col-sm-3"> 
-          {% trans 'thesis_defence_date' %} :        
-        </div>
-        <div class="col-sm-6">     
-          {{ form.thesis_date }}
-        </div>
-      </div>  
-    </div>
-    <hr>
-    <b>{% trans 'various' %}</b>
-    <p>{% trans 'function_outside_university' %} :  
-    {{ form.external_functions }}</p>
-    <p>{% trans 'external_post' %} :
-    {{ form.external_contract }}</p>
-    <div class="col-sm-6"> 
-      <font size ="1">{% trans 'exceptional_justification' %} :
-      </font>
-    </div>
-    <div class="col-sm-4">    
-      {{ form.justification }}
-    </div>
-     <div class="col-sm-10">
-      <button type="submit" class="btn btn-default">{% trans 'next_part' %}</button>
-    </div>
-    </form>
-</div>
+ 	<div class="panel-body">
+ 		<form method="POST" action="{% url 'form_part1_save' mandate.id %}">
+ 		{% csrf_token %}
+ 		{{ form.non_field_errors }}
+ 		<div class="panel-primary">
+  			<div class="panel-heading">
+  				<font size="4">{% trans 'contact_details' %}</font>
+  			</div>
+  		</div><p>
+ 		<div class="form-group">
+    		<div class="row">
+      			<div class="col-md-3">
+      				<label for="txt_name">{% trans 'name' %}</label>
+      			</div>
+      			<div class="col-md-3">
+    				<div class="controls">{{assistant.person}}</div>
+    			</div>
+    		</div>
+    		<div class="row">
+      			<div class="col-md-3">
+      				<label for="txt_birth_date">{% trans 'birth_date' %}</label>
+      			</div>
+      			<div class="col-md-3">
+    				<div class="controls">{{assistant.person.birth_date}}</div>
+    			</div>
+    		</div>
+    		<div class="row">
+      			<div class="col-md-3">
+      				<label for="txt_address">{% trans 'address' %}</label>
+      			</div>
+      			<div class="col-md-3">
+    				<div class="controls">{% for address in addresses %}
+      				{{address.location}} - {{address.postal_code}} {{address.city}}<br>{{address.country}}
+      				{% endfor %}
+      				</div>
+    			</div>
+    		</div>
+    	</div>
+		<hr>
+  		<div class="panel-info">
+  			<div class="panel-heading">
+  				<font size="4">{% trans 'contract' %}</font>
+  			</div>
+  		</div>
+  		<p>
+  		<div class="form-group">
+      		<div class="row">
+      			<div class="col-md-3">
+      			<label for="txt_renewal_type">{% trans 'renewal_type' %}</label>
+      			</div>
+      			<div class="controls">
+      				{{mandate.renewal_type}}
+      			</div>
+      		</div>
+    		{% for structure in mandate.mandatestructure_set.all|dictsort:"structure.type" %}
+      			<div class="row">
+      				<div class="col-md-3">
+      				<label for="txt_structure">{% trans structure.structure.type|lower %}</label>
+      				</div>
+      				<div class="controls">
+      					{{structure.structure.acronym}}
+      				</div>
+      			</div>
+      		{% endfor %}
+    		<div class="row">
+      			<div class="col-md-3">
+      			<label for="txt_full_time_equivalent">{% trans 'full_time_equivalent' %}</label>
+      			</div>
+      			<div class="controls">
+      				{{mandate.fulltime_equivalent}}
+      			</div>
+      		</div>
+      		<div class="row">
+      			<div class="col-md-3">
+      				<label for="txt_date_of_first_nomination">{% trans 'date_of_first_nomination' %}</label>
+      			</div>
+      			<div class="controls">
+      				{{mandate.entry_date}}
+      			</div>
+      		</div>
+      		<div class="row">
+      			<div class="col-md-3">
+      				<label for="txt_field">{% trans 'field' %}</label>
+      			</div>
+      			<div class="controls">
+      				{{mandate.assistant_type}}
+      			</div>
+      		</div>
+      		<div class="row">
+      			<div class="col-md-3">
+      				<label for="txt_grade">{% trans 'grade' %}</label>
+      			</div>
+      			<div class="controls">
+      				{{mandate.grade}}
+      			</div>
+      		</div>
+      	</div>
+  		<hr>
+  		<div class="panel-danger">
+  			<div class="panel-heading">
+  				<font size="4">{% trans 'doctorate' %}</font>
+    		</div>
+    	</div><p>
+    	<div class="form-group">
+      		<div class="row">
+      			<div class="col-md-3">
+      				<label for="txt_registered_phd">{% trans 'registered_phd' %}</label>
+      			</div>
+      			<div class="col-md-3">
+    				<div class="controls">{{ form.inscription }}<font class="error">{{ form.inscription.errors }}</font></div>
+    			</div>
+      			<div class="col-md-3" align="right">
+          		<label for="txt_expected_phd_date">{% trans 'expected_registering_date' %}</label>
+        		</div>
+        		<div class="col-md-3" align="left">
+          			<div class="controls">{{ form.expected_phd_date }}
+          				<font class="error">{{ form.expected_phd_date.errors }}</font>
+          			</div>
+        		</div>
+      		</div>
+			<div class="row"> 
+        		<div class="col-md-3">
+        			<label for="txt_supervisor">{% trans 'supervisor' %}</label>
+        		</div>
+        		<div class="col-md-3">
+     				<div class="controls" onChange="disablefield();">{{ form.supervisor }}</div>
+     					<font class="error">{{ form.supervisor.errors }}</font>
+     					
+        			</div>
+        			<div class="col-md-3">
+          				<label class="checkbox-inline">
+            			<input type="checkbox" value="nosupervisor" id="id_no_supervisor" onChange="disablefield();">{% trans 'no_supervisor' %}
+          				</label>
+        			</div>        
+      			</div></p><p>
+      		<div class="row" align="right">  
+        		<div class="col-md-6">
+        		<img id="picture" src="" "height="10%" width="10%">
+        		</div>
+        	</div><p>	
+      		<div class="row">  
+        		<div class="col-md-3">
+          			<label for="txt_phd_inscription_date">{% trans 'phd_inscription_date' %}</label>
+        		</div>
+        		<div class="col-md-3">
+          			<div class="controls">{{ form.phd_inscription_date }}</div>
+          			<font class="error">{{ form.phd_inscription_date.errors }}</font>
+        		</div>  
+      		</div></p><p>
+      		<div class="row">  
+        		<div class="col-md-3">
+          			<label for="txt_confirmatory_test_date">{% trans 'confirmatory_test_date' %}<br><font size="1">{% trans '2nd_renewal' %}</font></label>      
+        		</div>     
+        		<div class="col-md-3">     
+          			<div class="controls">{{ form.confirmation_test_date }}</div>
+          			<font class="error">{{ form.confirmation_test_date.errors }}</font>
+        		</div>
+          	</div></p><p>
+      		<div class="row">      
+        		<div class="col-md-3">
+          			<label for="txt_thesis_defence_date">{% trans 'thesis_defence_date' %}</label>    
+        		</div>
+        		<div class="col-md-3">
+          			<div class="controls">{{ form.thesis_date }}</div>
+          			<font class="error">{{ form.thesis_date.errors }}</font>
+        		</div></p>
+      		</div>  
+    	</div>
+    	<hr>
+    	<div class="panel-warning">
+  			<div class="panel-heading">
+  				<font size="4">{% trans 'various' %}</font>
+    		</div>
+    	</div><p>
+    	<div class="form-group">
+    		<div class="row">      
+        		<div class="col-md-3">
+   					<label for="txt_function_outside_university">{% trans 'function_outside_university' %}</label> 
+   				</div>
+   				<div class="col-md-3">
+    				<div class="controls">{{ form2.external_functions }}</div>
+    				<font class="error">{{ form.errors.external_functions }}</font>
+    			</div>
+    			<div class="col-md-2" align="right">
+    				<label for="txt_external_post">{% trans 'external_post' %}</label>
+  				</div>  
+  				<div class="col-md-4">
+    				<div class="controls">{{ form2.external_contract }}</div>
+    				<font class="error">{{ form.errors.external_contract }}</font>
+    			</div>
+    		</div></p><p>
+    		{% if mandate.renewal_type == 'EXCEPTIONAL' %}
+    		<div class="row"> 
+    			<div class="col-md-3">
+      				<label for="txt_exceptional_justification">{% trans 'exceptional_justification' %}</label>
+    			</div>
+    			<div class="col-md-3">
+    				<div class="controls">{{ form2.justification }}</div>
+      				<font class="error">{{ form.errors.justification }}</font>
+    			</div>  
+   			</div>
+   			{% endif %}
+   			</p>
+     		<div class="col-md-12" align="right">
+     			<button type="submit" class="btn btn-primary" title="{% trans 'save'%}" id="bt_pstform_part1_save"><span class="glyphicon glyphicon-save" aria-hidden="true"></span> {% trans 'save'%}</button>
+    		</div>
+    	</form>
+	</div>
 </div>
 {% endblock %}
-
 {% block script %}
-  <script type="text/javascript">
-    function disablefield(){
-      if (document.getElementById('id_inscription_0').checked == 1){
-        document.getElementById('id_expected_phd_date').disabled='disabled';
-        document.getElementById('id_expected_phd_date').value='';
-      }
-      if (document.getElementById('id_inscription_1').checked == 1){
-        document.getElementById('id_expected_phd_date').disabled='disabled';
-        document.getElementById('id_expected_phd_date').value='';
-      }
-      if (document.getElementById('id_inscription_2').checked == 1){
-        document.getElementById('id_expected_phd_date').disabled='';
-        document.getElementById('id_expected_phd_date').value='{{assistant.expected_phd_date}}';
-      }  
-      if (document.getElementById('no_supervisor').checked == 1){
-        document.getElementById('supervisor_email').disabled='disabled';
-        document.getElementById('supervisor_email').value='';
-      }    
-      if (document.getElementById('no_supervisor').checked == 0){
-        document.getElementById('supervisor_email').disabled='';
-        document.getElementById('supervisor_email').request='request';
-        document.getElementById('supervisor_email').value='';
-      }          
+<script>
+function update_photo()
+{
+	var fgs = document.getElementById("id_assistant_part-supervisor");
+	var part_ref=fgs.value.substring(fgs.value.length-4,fgs.value.length-2);
+	var ref = "http://ultra16.sipr.ucl.ac.be/photos/photos_cp/photos/image".concat(part_ref);
+	ref += "/"
+	for (i = 0; i < 8-fgs.value.length; i++) { 
+    	ref += "0";
     }
-  </script>
+	ref += fgs.value + ".jpg";
+	document.getElementById('picture').setAttribute('src',ref)
+}
+
+function Hide() {
+	if(document.getElementById('id_assistant_part-inscription_0').checked == true)
+     {
+         document.getElementById('id_assistant_part-expected_phd_date').style.display = 'none';
+         document.getElementById('id_assistant_part-expected_phd_date').value='';
+    } else if(document.getElementById('id_assistant_part-inscription_1').checked == true)
+     {
+         document.getElementById('id_assistant_part-expected_phd_date').style.display = 'none';
+         document.getElementById('id_assistant_part-expected_phd_date').value='';
+    } else {
+ 		document.getElementById('id_assistant_part-expected_phd_date').style.display ='';
+    }
+}
+
+function disablefield(){
+	if(document.getElementById('id_no_supervisor').checked == true)
+     {
+		document.getElementById('id_assistant_part-supervisor').disabled= true;
+		document.getElementById('id_assistant_part-supervisor').style.display = '';
+        document.getElementById('id_assistant_part-supervisor').value='---------';
+     }
+    else {
+    	document.getElementById('id_assistant_part-supervisor').disabled= false;
+		document.getElementById('id_assistant_part-supervisor').style.display = '';
+        
+    }
+}
+
+window.onload = function() {
+    Hide();
+};
+</script>
+ 
 {% endblock %}
 
 {% block style %}
