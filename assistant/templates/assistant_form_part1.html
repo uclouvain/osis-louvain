@@ -173,11 +173,7 @@
           				</label>
         			</div>        
       			</div></p><p>
-      		<div class="row" align="right">  
-        		<div class="col-md-6">
-        		<img id="picture" src="" "height="10%" width="10%">
-        		</div>
-        	</div><p>	
+      		
       		<div class="row">  
         		<div class="col-md-3">
           			<label for="txt_phd_inscription_date">{% trans 'phd_inscription_date' %}</label>
@@ -250,18 +246,7 @@
 {% endblock %}
 {% block script %}
 <script>
-function update_photo()
-{
-	var fgs = document.getElementById("id_assistant_part-supervisor");
-	var part_ref=fgs.value.substring(fgs.value.length-4,fgs.value.length-2);
-	var ref = "http://ultra16.sipr.ucl.ac.be/photos/photos_cp/photos/image".concat(part_ref);
-	ref += "/"
-	for (i = 0; i < 8-fgs.value.length; i++) { 
-    	ref += "0";
-    }
-	ref += fgs.value + ".jpg";
-	document.getElementById('picture').setAttribute('src',ref)
-}
+
 
 function Hide() {
 	if(document.getElementById('id_assistant_part-inscription_0').checked == true)
