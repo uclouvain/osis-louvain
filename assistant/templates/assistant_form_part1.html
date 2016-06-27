@@ -38,7 +38,7 @@
 <li><a href="#">{% trans 'assistant_form_part2' %}</a></li>
 </ul>
 <div class="panel panel-default">
- 	<div class="panel-body">
+	<div class="panel-body">
  		<form method="POST" action="{% url 'form_part1_save' mandate.id %}">
  		{% csrf_token %}
  		{{ form.non_field_errors }}

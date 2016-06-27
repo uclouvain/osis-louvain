@@ -104,8 +104,8 @@ class AssistantFormPart1(ModelForm):
         fields = ('inscription','expected_phd_date','phd_inscription_date',
                    'confirmation_test_date', 'thesis_date','supervisor')
 
+
 class AssistantFormPart1b(ModelForm):
-    
     external_functions = forms.CharField(required=False,widget=forms.Textarea(attrs={'cols': '40', 'rows': '2'}))
     external_contract = forms.CharField(required=False,widget=forms.Textarea(attrs={'cols': '40', 'rows': '2'}))
     justification = forms.CharField(required=False,widget=forms.Textarea(attrs={'cols': '40', 'rows': '2'}))
