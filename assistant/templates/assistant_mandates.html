@@ -51,7 +51,7 @@
       <th>{% trans 'academic_year' %}</th>
         <th>{% trans 'faculty' %}</th>
         <th>{% trans 'institute' %}</th>
-        <th>{% trans 'position_id' %}</th>
+        <th>{% trans 'fulltime_equivalent' %}</th>
         <th>{% trans 'state' %}</th>
         <th>{% trans 'action' %}</th>
       </tr>
@@ -73,7 +73,7 @@
 {% else %}
 	<td></td><td></td>
 {% endif %}	
-<td>{{ mandate.position_id }}</td>	
+<td>{{ mandate.fulltime_equivalent }}</td>	
 {% if mandate.state == "TO_DO" %}
 	<td>{% trans 'pending' %}</td>
 {% elif mandate.state == "DECLINED" %}
@@ -89,7 +89,7 @@
 {% elif mandate.state == "VICE_RECTOR" %}
 	<td>{% trans 'sector_vice_rector' %}</td>
 {% endif %}
-<td align="center">
+<td align="left">
 {% if mandate.state == "TO_DO" %}
 	<button type="submit" class="btn btn-success" title="{% trans 'accept'%}" id="bt_mandate_accept" name="bt_mandate_accept"
 	onclick="return confirm('{% trans 'confirm_accept' %}')">

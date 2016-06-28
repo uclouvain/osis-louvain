@@ -61,12 +61,12 @@ class AssistantMandatesListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
             person.find_by_user(self.request.user))
         return context
 
-
 def mandate_change_state(request, mandate_id):
     mandate = assistant_mandate.find_mandate_by_id(mandate_id)
     if 'bt_mandate_accept' in request.POST:
         mandate.state = 'TRTS'
     elif 'bt_mandate_decline' in request.POST:
         mandate.state = 'DECLINED'
+    #elif 'bt_mandate_edit' in request.POST:
     mandate.save()
     return HttpResponseRedirect(reverse('assistant_mandates'))
