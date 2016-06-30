@@ -31,6 +31,7 @@ from dissertation.models.faculty_adviser import find_faculty_adviser_by_adviser
 from dissertation.models.offer_proposition import OfferProposition
 from dissertation.forms import ManagerOfferPropositionForm
 from django.contrib.auth.decorators import user_passes_test
+from base.views import layout
 
 
 # Used by decorator @user_passes_test(is_manager) to secure manager views
@@ -47,14 +48,14 @@ def manager_offer_parameters(request):
     adviser = find_by_person(person)
     faculty_adviser = find_faculty_adviser_by_adviser(adviser)
     offer_propositions = OfferProposition.objects.distinct().filter(offer=faculty_adviser).order_by('offer')
-    return render(request, 'manager_offer_parameters.html', {'offer_propositions': offer_propositions})
+    return layout.render(request, 'manager_offer_parameters.html', {'offer_propositions': offer_propositions})
 
 
 @login_required
 @user_passes_test(is_manager)
 def manager_offer_parameters_detail(request, pk):
     offer_proposition = get_object_or_404(OfferProposition, pk=pk)
-    return render(request, 'manager_offer_parameters_detail.html', {'offer_proposition': offer_proposition})
+    return layout.render(request, 'manager_offer_parameters_detail.html', {'offer_proposition': offer_proposition})
 
 
 @login_required
@@ -69,4 +70,4 @@ def manager_offer_parameters_edit(request, pk):
             return redirect('manager_offer_parameters')
     else:
         form = ManagerOfferPropositionForm(instance=offer)
-    return render(request, "manager_offer_parameters_edit.html", {'offer': offer, 'form': form})
+    return layout.render(request, "manager_offer_parameters_edit.html", {'offer': offer, 'form': form})
