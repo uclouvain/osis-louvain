@@ -79,9 +79,12 @@
       </button>
     </form>
     <br><br>
-    <a href="{% url 'internships' %}" class="btn btn-default" title="{% trans 'return'%}"
-      id="lnk_internships" >{% trans 'return' %}
-      <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"/>
-    </a>
+    <form action="{%url 'internships' %}" method="get">
+      <input type="hidden" name="organization_sort" value="{{organization_sorted}}">
+      <button type="submit" class="btn btn-default" title="{% trans 'return'%}"
+        id="lnk_internships" >
+        {% trans 'return' %}
+      </button>
+    </form>
   </div>
 {% endblock %}

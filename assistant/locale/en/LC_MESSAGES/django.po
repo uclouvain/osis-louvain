@@ -1,0 +1,251 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-04-22 15:14+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "institution"
+msgstr "Institution"
+
+msgid "mandates"
+msgstr "Mandates"
+
+msgid "mandate"
+msgstr "Mandate"
+
+msgid "assistants"
+msgstr "Assistants"
+
+msgid "assistantship_mandate_renewal_part1"
+msgstr "Assistantship mandate renewal - Part 1"
+
+msgid "assistant_form_part1"
+msgstr "Assistantship form - Part 1"
+
+msgid "name_firstame"
+msgstr "Name & First name"
+
+msgid "birthdate"
+msgstr "Birth date"
+
+msgid "address"
+msgstr "Address"
+
+msgid "type_of_renewal"
+msgstr "Type of renewal"
+
+msgid "contract"
+msgstr "Contract"
+
+msgid "faculty"
+msgstr "Faculty"
+
+msgid "institute"
+msgstr "Institute"
+
+msgid "full_time_equivalent"
+msgstr "Full time equivalent"
+
+msgid "field"
+msgstr "Field"
+
+msgid "grade"
+msgstr "Grade"
+
+msgid "doctorate"
+msgstr "Doctorate"
+
+msgid "registered_phd"
+msgstr "Registered Ph.D."
+
+msgid "yes"
+msgstr "Yes"
+
+msgid "no"
+msgstr "No"
+
+msgid "in_progress"
+msgstr "In progress"
+
+msgid "expected_registering_date"
+msgstr "Expected registering date"
+
+msgid "supervisor_email_address"
+msgstr "Supervisor email address"
+
+msgid "firstname"
+msgstr "First name"
+
+msgid "lastname"
+msgstr "Last name"
+
+msgid "no_supervisor"
+msgstr "No supervisor"
+
+msgid "supervisor"
+msgstr "Supervisor"
+
+msgid "phd_inscription_date"
+msgstr "Ph.D. Inscription date"
+
+msgid "phd_inscription"
+msgstr "Ph.D. Inscription"
+
+msgid "confirmatory_test_date"
+msgstr "Confirmatory test date"
+
+msgid "2nd_renewal"
+msgstr "(for the 2nd renewal)"
+
+msgid "thesis_defence_date"
+msgstr "Thesis defence date"
+
+msgid "various"
+msgstr "Various"
+
+msgid "function_outside_university"
+msgstr "Current function held outside the university and % of time spent"
+
+msgid "external_post"
+msgstr "External post asked outside (FNRS, FRIA, ...)"
+
+msgid "exceptional_justification"
+msgstr "To the extent that you no longer meet the conditions for a 'normal' renewal, can you clarify the circumstances justifying a request for an 'exceptional' renewal (art. 51 of the RAMCS)"
+
+msgid "next_part"
+msgstr "Next part"
+
+msgid "assistantship_mandate_renewal_part2"
+msgstr "Assistantship mandate renewal - Part 2"
+
+msgid "period_covered"
+msgstr "Period covered"
+
+msgid "supervision"
+msgstr "Supervision"
+
+msgid "academic_year"
+msgstr "Academic year"
+
+msgid "course"
+msgstr "Course"
+
+msgid "course_code"
+msgstr "Course code"
+
+msgid "exercises_tp"
+msgstr "Exercises, practicals, seminars - associated with volume 2 hours, you assume personally"
+
+msgid "sessions_number"
+msgstr "Number of sessions scheduled for this course"
+
+msgid "sessions_duration"
+msgstr "Duration of one session"
+
+msgid "series_number"
+msgstr "Number of series"
+
+msgid "face_to_face"
+msgstr "Number presential sessions hours"
+
+msgid "attendees"
+msgstr "Number of students per serie"
+
+msgid "exams_supervision_duration"
+msgstr "Preparation, coordination and evaluation"
+
+msgid "others_delivery"
+msgstr "Other types of activities associated with this course"
+
+msgid "previous_part"
+msgstr "Back to previous part"
+
+msgid "next_course"
+msgstr "Encode another course"
+
+msgid "save"
+msgstr "Save"
+
+msgid "import"
+msgstr "Import"
+
+msgid "cancel"
+msgstr "Cancel"
+
+msgid "mandates_list"
+msgstr "Mandates list"
+
+msgid "assistant_mandates_renewal"
+msgstr "Assistantship mandate renewal"
+
+msgid "email"
+msgstr "Email"
+
+msgid "gender"
+msgstr "Gender"
+
+msgid "birth_date"
+msgstr "Birth date"
+
+msgid "assistant_type"
+msgstr "Assistant type"
+
+msgid "matricule_number"
+msgstr "Employee number"
+
+msgid "renewal_type"
+msgstr "Type of renewal"
+
+msgid "contract duration"
+msgstr "Contract duration"
+
+msgid "contract_duration_fte"
+msgstr "Contract full time equivalent"
+
+msgid "structures"
+msgstr "Structures"
+
+msgid "delete"
+msgstr "Delete"
+
+msgid "comment"
+msgstr "Comment"
+
+msgid "absences"
+msgstr "Absences"
+
+msgid "other_status"
+msgstr "Other status"
+
+msgid "renewal"
+msgstr "Renewal"
+
+msgid "research"
+msgstr "Research"
+
+msgid "svr"
+msgstr "SVR"
+
+msgid "no_answer"
+msgstr "did not respond"
+
+msgid "head_institute"
+msgstr "Head of institute"
+
+msgid "dean"
+msgstr "Dean of faculty"
+
+msgid "vice_rector"
+msgstr "Vice Rector"

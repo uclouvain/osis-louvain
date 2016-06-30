@@ -47,6 +47,10 @@ def server_error(request):
     return layout.render(request, 'server_error.html', {})
 
 
+def noscript(request):
+    return layout.render(request, 'noscript.html', {})
+
+
 def login(request):
     if request.method == 'POST':
         username = request.POST['username']

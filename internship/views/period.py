@@ -24,19 +24,21 @@
 #
 ##############################################################################
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from internship.forms import PeriodForm
 
+
 @login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def internships_periods(request):
     return render(request, "periods.html", {'section': 'internship'})
 
 
 @login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def period_create(request):
 
     f = PeriodForm(request.POST)
 
-    return render(request, "period_create.html", {'section': 'internship',
-                                                    'form' : f
-                                                    })
+    return render(request, "period_create.html", {'section':    'internship',
+                                                  'form':       f, })

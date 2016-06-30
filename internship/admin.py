@@ -42,8 +42,8 @@ admin.site.register(InternshipEnrollment, InternshipEnrollmentAdmin)
 
 
 class InternshipMasterAdmin(admin.ModelAdmin):
-    list_display = ('reference', 'organization', 'internship_offer', 'person', 'civility', 'type_mastery', 'speciality')
-    fieldsets = ((None, {'fields': ('reference', 'organization', 'internship_offer', 'person', 'civility', 'type_mastery', 'speciality')}),)
+    list_display = ('reference', 'organization', 'first_name', 'last_name', 'civility', 'type_mastery', 'speciality')
+    fieldsets = ((None, {'fields': ('reference', 'organization', 'first_name', 'last_name', 'civility', 'type_mastery', 'speciality')}),)
 
 admin.site.register(InternshipMaster, InternshipMasterAdmin)
 
@@ -53,6 +53,13 @@ class InternshipChoiceAdmin(admin.ModelAdmin):
     fieldsets = ((None, {'fields': ('student', 'organization', 'learning_unit_year', 'choice')}),)
 
 admin.site.register(InternshipChoice, InternshipChoiceAdmin)
+
+class PeriodInternshipPlacesAdmin(admin.ModelAdmin):
+    list_display = ('period', 'internship', 'number_places')
+    fieldsets = ((None, {'fields': ('period', 'internship', 'number_places')}),)
+
+admin.site.register(PeriodInternshipPlaces, PeriodInternshipPlacesAdmin)
+
 
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = ('name', 'acronym', 'reference', 'type')

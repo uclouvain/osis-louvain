@@ -24,11 +24,13 @@
 #
 ##############################################################################
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from internship.models import Organization, OrganizationAddress, InternshipChoice, InternshipOffer
 from internship.forms import OrganizationForm
 
+
 @login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def internships_places(request):
     # First get the value of the option for the sort
     if request.method == 'GET':
@@ -76,6 +78,7 @@ def internships_places(request):
                                            'all_addresses': organization_addresses,
                                            'city_sort_get': city_sort_get})
 
+@login_required
 def internships_places_stud(request):
     # First get the value of the option for the sort
     if request.method == 'GET':
@@ -123,6 +126,9 @@ def internships_places_stud(request):
                                            'all_addresses': organization_addresses,
                                            'city_sort_get': city_sort_get})
 
+
+@login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def place_save(request, organization_id, organization_address_id):
     print(organization_id)
     form = OrganizationForm(data=request.POST)
@@ -188,7 +194,7 @@ def place_save(request, organization_id, organization_address_id):
         organization_address.country = None
 
     if request.POST['organization_id']:
-        organization_address.organization = mdl.organization.find_by_id(int(request.POST['organization_id']))
+        organization_address.organization = Organization.find_by_id(int(request.POST['organization_id']))
 
     organization_address.save()
 
@@ -198,33 +204,43 @@ def place_save(request, organization_id, organization_address_id):
                                                 'message':"Hôpital correctement créé"
                                                 })
 
+
+@login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def organization_new(request):
     return place_save(request, None, None)
 
+
+@login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def organization_edit(request, organization_id):
     organization = Organization.find_by_id(organization_id)
     organization_address = OrganizationAddress.find_by_organization(organization)
     print(organization_address[0].id)
-    return render(request, "place_form.html", {'organization': organization,
-                                                'organization_address':organization_address[0],
-                                                })
+    return render(request, "place_form.html", {'organization':          organization,
+                                               'organization_address':  organization_address[0], })
 
+
+@login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def organization_create(request):
     organization = Organization()
     return render(request, "place_form.html", {'organization': organization})
 
+
+@login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def student_choice(request, reference):
     organization_choice = InternshipChoice.find_by(s_organization_ref=reference)
     organization = Organization.search(reference=reference)
     all_offers = InternshipOffer.find_interships_by_organization(organization[0])
 
     for al in all_offers:
-        number_first_choice = len(InternshipChoice.find_by(s_organization = al.organization,
-                                                            s_learning_unit_year=al.learning_unit_year,
-                                                            s_choice = 1))
+        number_first_choice = len(InternshipChoice.find_by(s_organization=al.organization,
+                                                           s_learning_unit_year=al.learning_unit_year,
+                                                           s_choice=1))
         al.number_first_choice = number_first_choice
 
-    return render(request, "place_detail.html", {'organization': organization[0],
-                                                'organization_choice':organization_choice,
-                                                'offers' : all_offers,
-                                                })
+    return render(request, "place_detail.html", {'organization':        organization[0],
+                                                 'organization_choice': organization_choice,
+                                                 'offers':              all_offers, })

@@ -32,7 +32,7 @@ class InternshipOffer(models.Model):
     learning_unit_year  = models.ForeignKey('base.LearningUnitYear')
     title = models.CharField(max_length=255)
     maximum_enrollments = models.IntegerField()
-    selectable          = models.BooleanField()
+    selectable          = models.BooleanField(default=True)
 
     def __str__(self):
         return self.title
@@ -69,6 +69,11 @@ class InternshipOffer(models.Model):
             if int(i.id) == int(id):
                 return i
 
+    class Meta:
+        permissions = (
+            ("is_internship_manager", "Is Internship Manager"),
+        )
+
 class InternshipEnrollment(models.Model):
     learning_unit_enrollment = models.ForeignKey('base.LearningUnitEnrollment')
     internship_offer = models.ForeignKey(InternshipOffer)
@@ -92,12 +97,13 @@ class InternshipMaster(models.Model):
                         ('GERIATRICS',_('Geriatrics')))
 
     organization     = models.ForeignKey('internship.Organization')
-    internship_offer = models.ForeignKey(InternshipOffer)
-    person = models.ForeignKey('base.Person')
+    #internship_offer = models.ForeignKey(InternshipOffer)
+    first_name = models.CharField(max_length=50, blank=True, null=True, db_index=True)
+    last_name = models.CharField(max_length=50, blank=True, null=True, db_index=True)
     reference = models.CharField(max_length=30, blank=True, null=True)
-    civility = models.CharField(max_length=20, blank=True, null=True, choices=CIVILITY_CHOICE)
-    type_mastery = models.CharField(max_length=20, blank=True, null=True, choices=TYPE_CHOICE)
-    speciality = models.CharField(max_length=20, blank=True, null=True, choices=SPECIALITY_CHOICE)
+    civility = models.CharField(max_length=20, blank=True, null=True)
+    type_mastery = models.CharField(max_length=20, blank=True, null=True)
+    speciality = models.CharField(max_length=20, blank=True, null=True)
 
     @staticmethod
     def find_masters():
@@ -121,6 +127,12 @@ class InternshipMaster(models.Model):
     def find_masters_by_organization(organization):
         masters = InternshipMaster.objects.filter(organization__name=organization)
         return masters
+
+    @staticmethod
+    def find_master_by_firstname_name(firstname, name):
+        master = InternshipMaster.objects.filter(first_name=firstname)\
+                                            .filter(last_name=name)
+        return master
 
 
 class InternshipChoice(models.Model):
@@ -193,6 +205,11 @@ class Period(models.Model):
     name = models.CharField(max_length=255)
     date_start = models.DateField()
     date_end = models.DateField()
+
+class PeriodInternshipPlaces(models.Model):
+    period = models.ForeignKey('internship.Period')
+    internship = models.ForeignKey('internship.InternshipOffer')
+    number_places = models.IntegerField(blank=None, null=False)
 
 class Organization(models.Model):
     name = models.CharField(max_length=255)

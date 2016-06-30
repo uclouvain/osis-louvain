@@ -28,6 +28,7 @@ from django.db import models
 
 class TutoringLearningUnitYear(models.Model):
     mandate = models.ForeignKey('AssistantMandate')
+    learning_unit_year = models.ForeignKey('base.LearningUnitYear')
     sessions_duration = models.PositiveIntegerField(null=True, blank=True)
     sessions_number = models.PositiveIntegerField(null=True, blank=True)
     series_number = models.PositiveIntegerField(null=True, blank=True)

@@ -56,7 +56,7 @@ ROLE_CHOICES = (
 
 class Reviewer(models.Model):
     person = models.ForeignKey('base.Person')
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES)
+    role = models.CharField(max_length=30, choices=ROLE_CHOICES)
     structure = models.ForeignKey('base.Structure', blank=True, null=True)
     delegate_of = models.ForeignKey('self', null=True, blank=True)
 

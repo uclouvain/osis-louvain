@@ -70,6 +70,8 @@ urlpatterns = [
     url(r'^my_osis/profile/$', my_osis.profile, name='profile'),
     url(r'^my_osis/profile/lang$', my_osis.profile_lang, name='profile_lang'),
 
+    url(r'^noscript/$', common.noscript, name='noscript'),
+
     url(r'^offers/$', offer.offers, name='offers'),
     url(r'^offers/search$', offer.offers_search, name='offers_search'),
     url(r'^offers/([0-9]+)/$', offer.offer_read, name='offer_read'),

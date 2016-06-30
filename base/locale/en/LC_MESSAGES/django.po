@@ -245,10 +245,10 @@ msgid "search_for_a_file"
 msgstr "Search for a file"
 
 msgid "javascript_is_disabled"
-msgstr "Javascript is disabled on browser"
+msgstr "JavaScript is disabled on your browser, but OSIS does not work without JavaScript."
 
 msgid "please_enable_javascript"
-msgstr "Please enable javascript to use this website"
+msgstr "Please <a href='http://enable-javascript.com' target='_blank'>enable JavaScript</a> to use this application."
 
 msgid "old_browser_warning"
 msgstr "Your browser is out of date. This can lead to unknown behaviour."
@@ -1045,6 +1045,9 @@ msgstr "Template reference of the message"
 
 msgid "btn_messages_history_search"
 msgstr "Search in the messages history"
+
+msgid "home"
+msgstr "Home page"
 
 msgid "none"
 msgstr "None"

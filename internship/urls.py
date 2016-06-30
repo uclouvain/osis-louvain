@@ -43,6 +43,7 @@ urlpatterns = [
     url(r'^internships/upload/$', upload_xls.upload_internships_file,name='upload_internship'),
 
     url(r'^internships_masters/$', master.interships_masters, name='interships_masters'),
+    url(r'^internships_masters/upload/$', upload_xls.upload_masters_file, name='upload_interships_masters'),
 
     url(r'^periods/$', period.internships_periods, name='internships_periods'),
     url(r'^periods/create/$', period.period_create, name='periods_create'),

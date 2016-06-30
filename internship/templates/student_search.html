@@ -90,14 +90,12 @@
                       <td>{{ student.registration_id }}</td>
                       <td>{{ student.person.last_name }}</td>
                       <td>{{ student.person.first_name }}</td>
-                      <td>
+                      <td colspan="2">
                         <a class="btn btn-primary" target="_blank" id="lnk_students_choice{{organization.reference}}"
                           href="{% url 'internships_student_read' student.registration_id %}">
                           <span class="glyphicon glyphicon-search" aria-hidden="true">
                           </span>
                         </a>
-                      </td>
-                      <td>
                       </td>
                   </tr>
                   {% endfor %}

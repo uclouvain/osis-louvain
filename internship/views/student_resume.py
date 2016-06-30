@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from base import models as mdl
 from internship.models import InternshipChoice
 
@@ -32,16 +32,17 @@ from django.utils.translation import ugettext_lazy as _
 
 
 @login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def internships_student_resume(request):
     students_list = InternshipChoice.find_by_all_student()
 
-    return render(request, "student_search.html", {'s_noma': None,
-                                                   's_name': None,
-                                                   'students':     students_list,
-                                                   })
+    return render(request, "student_search.html", {'s_noma':    None,
+                                                   's_name':    None,
+                                                   'students':  students_list, })
 
 
 @login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def internships_student_search(request):
     s_noma = request.GET['s_noma']
     s_name = request.GET['s_name']
@@ -71,7 +72,7 @@ def internships_student_search(request):
         students_list = mdl.student.find_by(registration_id=s_noma, person_name=s_name, person_first_name = s_firstname)
     else:
         students_list = InternshipChoice.find_by_all_student()
-        #message = "%s" % _('You must choose at least one criteria!')
+        # message = "%s" % _('You must choose at least one criteria!')
 
     return render(request, "student_search.html",
                            {'s_noma':       s_noma,
@@ -92,6 +93,5 @@ def internships_student_read(request, registration_id):
     internship_choice = InternshipChoice.find_by_student(student[0])
 
     return render(request, "student_resume.html",
-                            {'student': student[0],
-                             'internship_choice' : internship_choice,
-                            })
+                           {'student':             student[0],
+                            'internship_choice':   internship_choice, })

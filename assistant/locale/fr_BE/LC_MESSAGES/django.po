@@ -1,0 +1,254 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-04-22 15:14+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "institution"
+msgstr "Institution"
+
+msgid "mandates"
+msgstr "Mandats"
+
+msgid "mandate"
+msgstr "Mandat"
+
+msgid "assistants"
+msgstr "Assistants"
+
+msgid "assistantship_mandate_renewal_part1"
+msgstr "Renouvellement du mandat d'assistant - Partie 1"
+
+msgid "assistant_form_part1"
+msgstr "Formulaire assistant - Partie 1"
+
+msgid "assistant_form_part2"
+msgstr "Formulaire assistant - Partie 2"
+
+msgid "name_firstame"
+msgstr "Nom et prénom"
+
+msgid "birthdate"
+msgstr "Date de naissance"
+
+msgid "address"
+msgstr "Adresse"
+
+msgid "type_of_renewal"
+msgstr "Type de renouvellement"
+
+msgid "contract"
+msgstr "Contrat"
+
+msgid "faculty"
+msgstr "Faculté"
+
+msgid "institute"
+msgstr "Institut"
+
+msgid "full_time_equivalent"
+msgstr "Equivalent temps plein"
+
+msgid "field"
+msgstr "Filière"
+
+msgid "grade"
+msgstr "Grade"
+
+msgid "doctorate"
+msgstr "Doctorat"
+
+msgid "registered_phd"
+msgstr "Inscrit au doctorat"
+
+msgid "yes"
+msgstr "Oui"
+
+msgid "no"
+msgstr "Non"
+
+msgid "in_progress"
+msgstr "En cours"
+
+msgid "expected_registering_date"
+msgstr "Date prévue d'inscription"
+
+msgid "supervisor_email_address"
+msgstr "Adresse email du promoteur"
+
+msgid "firstname"
+msgstr "Prénom"
+
+msgid "lastname"
+msgstr "Nom"
+
+msgid "no_supervisor"
+msgstr "Pas de promoteur"
+
+msgid "supervisor"
+msgstr "Promoteur"
+
+msgid "phd_inscription_date"
+msgstr "Date d'inscription au doctorat"
+
+msgid "phd_inscription"
+msgstr "Inscription au doctorat"
+
+msgid "confirmatory_test_date"
+msgstr "Date de l'épreuve de confirmation"
+
+msgid "2nd_renewal"
+msgstr "(pour le 2ème renouvellement)"
+
+msgid "thesis_defence_date"
+msgstr "Date de défense de thèse"
+
+msgid "various"
+msgstr "Divers"
+
+msgid "function_outside_university"
+msgstr "Fonctions actuelles exercées en dehors de l'université et % de temps consacré"
+
+msgid "external_post"
+msgstr "Mandat demandé à l'extérieur (FNRS, FRIA, ...)"
+
+msgid "exceptional_justification"
+msgstr "Dans la mesure où vous ne rempliriez plus les conditions pour bénéficier d'un renouvellement 'normal', pouvez-vous préciser les circonstances justifiant une demande de renouvellement exceptionnel (art. 51 du RAMCS)"
+
+msgid "next_part"
+msgstr "Partie suivante"
+
+msgid "assistantship_mandate_renewal_part2"
+msgstr "Renouvellement du mandat d'assistant - Partie 2"
+
+msgid "period_covered"
+msgstr "Période couverte par le rapport (depuis le 1er engagement ou la précédente demande de renouvellement)"
+
+msgid "supervision"
+msgstr "Encadrement"
+
+msgid "academic_year"
+msgstr "Année académique"
+
+msgid "course"
+msgstr "Cours"
+
+msgid "course_code"
+msgstr "Code cours"
+
+msgid "exercises_tp"
+msgstr "Exercices, TP, séminaires - associés aux heures de volume 2, que vous assumez personnellement"
+
+msgid "sessions_number"
+msgstr "Nombre de séances prévues pour ce cours"
+
+msgid "sessions_duration"
+msgstr "Durée d'une séance"
+
+msgid "series_number"
+msgstr "Nombre de séries"
+
+msgid "face_to_face"
+msgstr "Nombre d'heures en présentiel"
+
+msgid "attendees"
+msgstr "Nombre d'étudiants par série"
+
+msgid "exams_supervision_duration"
+msgstr "Préparation, coordination et évaluation"
+
+msgid "others_delivery"
+msgstr "Autres types de prestations associées à ce cours"
+
+msgid "previous_part"
+msgstr "Retour à la partie précédente"
+
+msgid "next_course"
+msgstr "Encoder un autre cours"
+
+msgid "save"
+msgstr "Sauver"
+
+msgid "import"
+msgstr "Importer"
+
+msgid "cancel"
+msgstr "Annuler"
+
+msgid "mandates_list"
+msgstr "Liste des mandats"
+
+msgid "assistant_mandates_renewal"
+msgstr "Renouvellement du mandat d'assistant"
+
+msgid "email"
+msgstr "Email"
+
+msgid "gender"
+msgstr "Sexe"
+
+msgid "birth_date"
+msgstr "Date de naissance"
+
+msgid "assistant_type"
+msgstr "Type d'assistant"
+
+msgid "matricule_number"
+msgstr "Numéro de matricule"
+
+msgid "renewal_type"
+msgstr "Type de renouvellement"
+
+msgid "contract duration"
+msgstr "Durée du contrat"
+
+msgid "contract_duration_fte"
+msgstr "Equivalent temps plein"
+
+msgid "structures"
+msgstr "Structures"
+
+msgid "delete"
+msgstr "Supprimer"
+
+msgid "comment"
+msgstr "Commentaire"
+
+msgid "absences"
+msgstr "Absences"
+
+msgid "other_status"
+msgstr "Autre status"
+
+msgid "renewal"
+msgstr "Renouvellement"
+
+msgid "research"
+msgstr "Recherche"
+
+msgid "svr"
+msgstr "VRS"
+
+msgid "no_answer"
+msgstr "pas répondu"
+
+msgid "head_institute"
+msgstr "Président d'institut"
+
+msgid "dean"
+msgstr "Doyen de faculté"
+
+msgid "vice_rector"
+msgstr "Vice-recteur"

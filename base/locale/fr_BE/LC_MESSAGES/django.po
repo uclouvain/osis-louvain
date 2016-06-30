@@ -833,7 +833,7 @@ msgid "scores_saved"
 msgstr "note(s) enregistrée(s)"
 
 msgid "the_coordinator_must_still_submit_scores"
-msgstr "Le coordinateur doit toujours soumettre les scores"
+msgstr "Le coordinateur doit toujours soumettre les notes"
 
 msgid "no_score_injected"
 msgstr "Aucune note injectée (NB: les notes de votre fichier excel ne sont injectées que si elles sont différentes "
@@ -1054,13 +1054,16 @@ msgid "tooltip_to_my_messages"
 msgstr "Retourner à la liste des messages"
 
 msgid "javascript_is_disabled"
-msgstr "Javascript est désactivé"
+msgstr "JavaScript est désactivé dans votre navigateur, mais OSIS ne fonctionne pas sans JavaScript."
 
 msgid "please_enable_javascript"
-msgstr "Veuillez activer le javascript pour accèder à Osis."
+msgstr "Veuillez <a href='http://enable-javascript.com/fr/' target='_blank'>activer le JavaScript</a> pour utiliser l'application."
 
 msgid "old_browser_warning"
 msgstr "Votre navigateur n'est pas à jour. Certaines fonctionnalités peuvent ne pas fonctionner correctement."
+
+msgid "home"
+msgstr "Page d'accueil"
 
 msgid "none"
 msgstr "Aucun"

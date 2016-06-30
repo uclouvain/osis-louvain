@@ -305,7 +305,7 @@ def __save_xls_scores(request, file_name, is_program_manager, user, learning_uni
                                         if justification and exam_enrollment.justification_draft != justification:
                                             new_scores_number += 1
                                             exam_enrollment.justification_draft = justification
-                                        exam_enrollment.score_draft = None
+                                            exam_enrollment.score_draft = None
                                     exam_enrollment.save()
 
     if new_scores_number > 0:

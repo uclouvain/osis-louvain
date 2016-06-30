@@ -133,7 +133,8 @@ STATIC_URL = '/static/'
 
 # Authentication settings
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'home'
+LOGIN_URL = 'login'
 
 FIXTURE_DIRS = (
     '/base/fixtures/',

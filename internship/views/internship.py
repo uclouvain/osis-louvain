@@ -26,7 +26,7 @@
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from internship.models import InternshipOffer, InternshipChoice, Organization
 from internship.forms import InternshipChoiceForm, InternshipOfferForm
 from base import models as mdl
@@ -37,34 +37,37 @@ import unicodedata
 from xml.dom import minidom
 from math import sin, cos, radians, degrees, acos
 
+
 def geocode(addr):
     lat_long = [None]*2
-    #Transform the address for a good url and delete all accents
-    addr = addr.replace (" ", "+")
-    addr = addr.replace ("'", "\'")
+    # Transform the address for a good url and delete all accents
+    addr = addr.replace(" ", "+")
+    addr = addr.replace("'", "\'")
     addr = strip_accents(addr)
-    #get the complete url
-    url = "https://maps.googleapis.com/maps/api/geocode/xml?address=%s&key=AIzaSyCWeZdraxzqRTMxXxbXY3bncaD6Ijq_EvE" % (addr)
+    # get the complete url
+    url = "https://maps.googleapis.com/maps/api/geocode/xml?address=%s&key=AIzaSyCWeZdraxzqRTMxXxbXY3bncaD6Ijq_EvE" % addr
 
-    #using urllib get the xml
+    # using urllib get the xml
     req = urllib.request.Request(url)
     with urllib.request.urlopen(req) as response:
         data = response.read().decode('utf-8')
 
-    #Parse the xml to have the latitude and longitude of the address
+    # Parse the xml to have the latitude and longitude of the address
     xmldoc = minidom.parseString(data)
     lat = xmldoc.getElementsByTagName('location')
-    for l in lat :
+    for l in lat:
         c = l.getElementsByTagName('lat')[0].firstChild.data
         d = l.getElementsByTagName('lng')[0].firstChild.data
         lat_long[0] = c
         lat_long[1] = d
-    #return the value
+    # return the value
     return lat_long
 
+
 def strip_accents(s):
-   return ''.join(c for c in unicodedata.normalize('NFD', s)
-                  if unicodedata.category(c) != 'Mn')
+    return ''.join(c for c in unicodedata.normalize('NFD', s)
+                   if unicodedata.category(c) != 'Mn')
+
 
 def calc_dist(lat_a, long_a, lat_b, long_b):
     lat_a = radians(float(lat_a))
@@ -74,27 +77,30 @@ def calc_dist(lat_a, long_a, lat_b, long_b):
     long_diff = radians(long_a - long_b)
     distance = (sin(lat_a) * sin(lat_b) +
                 cos(lat_a) * cos(lat_b) * cos(long_diff))
-    #for distance in miles use this
-    #return (degrees(acos(distance)) * 69.09)
-    #for distance in kilometers use this
+    # for distance in miles use this
+    # return (degrees(acos(distance)) * 69.09)
+    # for distance in kilometers use this
     return (degrees(acos(distance)) * 69.09)/0.621371
 
 
 @login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def internships(request):
-    #First get the value of the option's value for the sort
+    # First get the value of the option's value for the sort
     if request.method == 'GET':
         organization_sort_value = request.GET.get('organization_sort')
 
-    #Then select Internship Offer depending of the option
+    # Then select Internship Offer depending of the option
     if organization_sort_value and organization_sort_value != "0":
         query = InternshipOffer.find_interships_by_organization(organization_sort_value)
-    else :
+    else:
         query = InternshipOffer.find_internships()
 
     for internship in query:
-        number_first_choice = len(InternshipChoice.find_by(internship.organization, internship.learning_unit_year, s_choice = 1))
-        number_other_choice = len(InternshipChoice.find_by(internship.organization, internship.learning_unit_year, s_choice = 2))
+        number_first_choice = len(InternshipChoice.find_by(internship.organization, internship.learning_unit_year,
+                                                           s_choice=1))
+        number_other_choice = len(InternshipChoice.find_by(internship.organization, internship.learning_unit_year,
+                                                           s_choice=2))
         internship.number_first_choice = number_first_choice
         internship.number_other_choice = number_other_choice
 
@@ -111,55 +117,56 @@ def internships(request):
         tab = luy.title.replace(" ", "")
         luy.tab = tab
 
-    return render(request, "internships.html", {'section': 'internship',
-                                                'all_internships' : query,
-                                                'all_organizations' : internship_organizations,
-                                                'all_learning_unit_year' : internship_learning_unit_year,
-                                                'organization_sort_value' : organization_sort_value,
-                                                 })
+    return render(request, "internships.html", {'section':                  'internship',
+                                                'all_internships':          query,
+                                                'all_organizations':        internship_organizations,
+                                                'all_learning_unit_year':   internship_learning_unit_year,
+                                                'organization_sort_value':  organization_sort_value, })
+
 
 @login_required
 def internships_stud(request):
     student = mdl.student.find_by(person_username=request.user)
-    #get in order descending to have the first choices in first lines in the insert (line 114)
+    # get in order descending to have the first choices in first lines in the insert (line 114)
     student_choice = InternshipChoice.find_by_student_desc(student)
-    #First get the value of the option's value for the sort
+    # First get the value of the option's value for the sort
     if request.method == 'GET':
         organization_sort_value = request.GET.get('organization_sort')
 
-    #Then select Internship Offer depending of the option
+    # Then select Internship Offer depending of the option
     if organization_sort_value and organization_sort_value != "0":
         query = InternshipOffer.find_interships_by_organization(organization_sort_value)
-    else :
+    else:
         query = InternshipOffer.find_internships()
 
-    #Change the query into a list
-    query=list(query)
-    #delete the internships in query when they are in the student's selection then rebuild the query
+    # Change the query into a list
+    query = list(query)
+    # delete the internships in query when they are in the student's selection then rebuild the query
     index = 0
     for choice in student_choice:
-        for internship in query :
+        for internship in query:
             if internship.organization == choice.organization and \
-                internship.learning_unit_year == choice.learning_unit_year :
-                    choice.maximum_enrollments =  internship.maximum_enrollments
-                    choice.selectable =  internship.selectable
+               internship.learning_unit_year == choice.learning_unit_year:
+                    choice.maximum_enrollments = internship.maximum_enrollments
+                    choice.selectable = internship.selectable
                     query[index] = 0
             index += 1
         query = [x for x in query if x != 0]
         index = 0
     query = [x for x in query if x != 0]
 
-    #insert the student choice into the global query, at first position,
-    #if they are in organization_sort_value (if it exist)
-    for choice in student_choice :
-        if organization_sort_value and organization_sort_value != "0" :
-            if choice.organization.name == organization_sort_value :
-                query.insert(0,choice)
-        else :
-            query.insert(0,choice)
+    # insert the student choice into the global query, at first position,
+    # if they are in organization_sort_value (if it exist)
+    for choice in student_choice:
+        if organization_sort_value and organization_sort_value != "0":
+            if choice.organization.name == organization_sort_value:
+                query.insert(0, choice)
+        else:
+            query.insert(0, choice)
 
     for internship in query:
-        number_first_choice = len(InternshipChoice.find_by(internship.organization, internship.learning_unit_year, s_choice = 1))
+        number_first_choice = len(InternshipChoice.find_by(internship.organization, internship.learning_unit_year,
+                                                           s_choice=1))
         internship.number_first_choice = number_first_choice
 
     # Create the options for the selected list, delete duplicated
@@ -174,26 +181,35 @@ def internships_stud(request):
     for choice in all_internships:
         all_learning_unit_year.append(choice.learning_unit_year)
     all_learning_unit_year = list(set(all_learning_unit_year))
-    for luy in all_learning_unit_year :
+    for luy in all_learning_unit_year:
         size = len(InternshipChoice.find_by(s_learning_unit_year=luy, s_student=student))
         luy.size = size
         tab = luy.title.replace(" ", "")
         luy.tab = tab
+
+    if len(query) > 0 :
+        if query[0].selectable:
+            selectable = True
+        else :
+            selectable = False
+    else :
+        selectable = True
 
     return render(request, "internships_stud.html", {'section': 'internship',
                                                 'all_internships' : query,
                                                 'all_organizations' : internship_organizations,
                                                 'organization_sort_value' : organization_sort_value,
                                                 'all_learning_unit_year' : all_learning_unit_year,
-                                                'selectable' : query[0].selectable,
+                                                'selectable' : selectable,
                                                  })
+
 
 @login_required
 def internships_save(request):
     student = mdl.student.find_by(person_username=request.user)
     InternshipChoice.objects.filter(student=student).delete()
     form = InternshipChoiceForm(data=request.POST)
-    preference_list= list()
+    preference_list = list()
     if request.POST['organization']:
         organization_list = request.POST.getlist('organization')
 
@@ -201,28 +217,28 @@ def internships_save(request):
         learning_unit_year_list = request.POST.getlist('learning_unit_year')
 
     if request.POST['preferenceCH']:
-        for pref in request.POST.getlist('preferenceCH') :
+        for pref in request.POST.getlist('preferenceCH'):
             preference_list.append(pref)
 
-    #Delete the comment when internship in Geriatrie will be imported
-    #if request.POST['preferenceGE']:
+    # Delete the comment when internship in Geriatrie will be imported
+    # if request.POST['preferenceGE']:
     #    for pref in request.POST.getlist('preferenceGE') :
     #        preference_list.append(pref)
 
     if request.POST['preferenceGO']:
-        for pref in request.POST.getlist('preferenceGO') :
+        for pref in request.POST.getlist('preferenceGO'):
             preference_list.append(pref)
 
     if request.POST['preferenceMI']:
-        for pref in request.POST.getlist('preferenceMI') :
+        for pref in request.POST.getlist('preferenceMI'):
             preference_list.append(pref)
 
     if request.POST['preferencePE']:
-        for pref in request.POST.getlist('preferencePE') :
+        for pref in request.POST.getlist('preferencePE'):
             preference_list.append(pref)
 
     if request.POST['preferenceUR']:
-        for pref in request.POST.getlist('preferenceUR') :
+        for pref in request.POST.getlist('preferenceUR'):
             preference_list.append(pref)
 
     index = 0
@@ -247,27 +263,32 @@ def internships_save(request):
         new_choice.choice = preference_list[x]
         new_choice.save()
 
-
     return HttpResponseRedirect(reverse('internships_stud'))
 
+
 @login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def internships_create(request):
-    #Select all the organisation (service partner)
+    # Select all the organisation (service partner)
     organizations = Organization.find_all_order_by_reference()
 
-    #select all the learning_unit_year which contain the word stage
+    # select all the learning_unit_year which contain the word stage
     learning_unit_years = mdl.learning_unit_year.search(title="Stage")
 
-    #Send them to the page
-    return render(request, "internships_create.html", {'section': 'internship',
-                                                        'all_learning_unit_year': learning_unit_years,
-                                                        'all_organization':organizations,
-                                                })
+    # Send them to the page
+    return render(request, "internships_create.html", {'section':                   'internship',
+                                                       'all_learning_unit_year':    learning_unit_years,
+                                                       'all_organization':          organizations, })
 
+
+@login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def internships_new(request):
     return internships_edit(request, None)
 
+
 @login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def internships_edit(request, internship_id):
     success = 0
     check_internship = 0
@@ -276,14 +297,14 @@ def internships_edit(request, internship_id):
     organization = Organization.search(reference=request.POST['organization'])
     learning_unit_year = mdl.learning_unit_year.search(title=request.POST['learning_unit_year'])
 
-    if internship_id :
+    if internship_id:
         internship = InternshipOffer.find_intership_by_id(internship_id)
-    else :
+    else:
         internship = InternshipOffer()
         check_internship = len(InternshipOffer.find_interships_by_learning_unit_organization(learning_unit_year[0].title,
-                                                                                            request.POST['organization']))
+                                                                                             request.POST['organization']))
 
-    if check_internship == 0 :
+    if check_internship == 0:
         if request.POST['organization']:
             internship.organization = organization[0]
 
@@ -297,54 +318,63 @@ def internships_edit(request, internship_id):
         internship.selectable = True
         internship.save()
         success = 1
-        if internship_id :
+        if internship_id:
             message = "%s" % _('Stage correctement modifié ! Vous pouvez cliquer sur le bouton Retour')
-        else :
+            organization_related = organization[0]
+        else:
             message = "%s" % _('Stage correctement créé !')
+            organization_related = None
 
-    else :
+    else:
         message = "%s" % _('Ce stage pour cet hôpital existe déjà !')
 
-    #Select all the organisation (service partner)
+    # Select all the organisation (service partner)
     organizations = Organization.find_all_order_by_reference()
-    #select all the learning_unit_year which contain the word stage
+    # select all the learning_unit_year which contain the word stage
     learning_unit_years = mdl.learning_unit_year.search(title="Stage")
 
-    #Send them to the page
-    return render(request, "internships_create.html", {'section': 'internship',
-                                                        'all_learning_unit_year': learning_unit_years,
-                                                        'all_organization':organizations,
-                                                        'select_organization' : organization[0].reference,
-                                                        'select_learning_unit_year' : learning_unit_year[0].title,
-                                                        'message': message,
-                                                        'success' : success
-                                                })
+    # Send them to the page
+    return render(request, "internships_create.html", {'section':                   'internship',
+                                                       'all_learning_unit_year':    learning_unit_years,
+                                                       'all_organization':          organizations,
+                                                       'select_organization':       organization[0].reference,
+                                                       'select_learning_unit_year': learning_unit_year[0].title,
+                                                       'message':                   message,
+                                                       'success':                   success,
+                                                       'organization_related':      organization_related, })
+
 
 @login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def student_choice(request, id):
     internship = InternshipOffer.find_intership_by_id(id)
-    students = InternshipChoice.find_by(s_organization = internship.organization, s_learning_unit_year = internship.learning_unit_year)
-    number_choices = [None]*(5)
+    students = InternshipChoice.find_by(s_organization=internship.organization,
+                                        s_learning_unit_year=internship.learning_unit_year)
+    number_choices = [None]*5
 
-    for index in range (1,5):
-        number_choices[index] = len (InternshipChoice.find_by(s_organization = internship.organization,
-                                                            s_learning_unit_year = internship.learning_unit_year,
-                                                            s_define_choice = index))
+    for index in range(1, 5):
+        number_choices[index] = len(InternshipChoice.find_by(s_organization=internship.organization,
+                                                             s_learning_unit_year=internship.learning_unit_year,
+                                                             s_define_choice=index))
 
-    return render(request, "internship_detail.html", {'section': 'internship',
-                                                        'internship': internship,
-                                                        'students' : students,
-                                                        'number_choices' : number_choices,
-                                                })
+    return render(request, "internship_detail.html", {'section':        'internship',
+                                                      'internship':     internship,
+                                                      'students':       students,
+                                                      'number_choices': number_choices, })
+
 
 @login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def internship_modification(request, internship_id):
     internship = InternshipOffer.find_intership_by_id(internship_id)
-    return render(request, "internship_modification.html", {'internship': internship,
-                                                            'internship_id' : internship_id
-    })
+    organization_sorted = request.POST['organization_sort']
+    return render(request, "internship_modification.html", {'internship':           internship,
+                                                            'internship_id':        internship_id,
+                                                            'organization_sorted':  organization_sorted, })
+
 
 @login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
 def internships_block(request, block):
     internships = InternshipOffer.find_internships()
 
@@ -354,9 +384,9 @@ def internships_block(request, block):
         edit_internship.learning_unit_year = internship.learning_unit_year
         edit_internship.title = internship.title
         edit_internship.maximum_enrollments = internship.maximum_enrollments
-        if block == '1' :
+        if block == '1':
             edit_internship.selectable = False
-        else :
+        else:
             edit_internship.selectable = True
         edit_internship.save()
 

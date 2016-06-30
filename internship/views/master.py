@@ -27,28 +27,29 @@ from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from internship.models import InternshipMaster
 
+
 @login_required
 def interships_masters(request):
-    #First get the value of the 2 options for the sort
+    # First get the value of the 2 options for the sort
     if request.method == 'GET':
         speciality_sort_value = request.GET.get('speciality_sort')
         organization_sort_value = request.GET.get('organization_sort')
 
-    #Then select Internship Master depending of the options
-    #If both exist / if just speciality exist / if just organization exist / if none exist
+    # Then select Internship Master depending of the options
+    # If both exist / if just speciality exist / if just organization exist / if none exist
     if speciality_sort_value and speciality_sort_value != "0":
         if organization_sort_value and organization_sort_value != "0":
             query = InternshipMaster.find_masters_by_speciality_and_organization(speciality_sort_value,
-                                                                                organization_sort_value)
+                                                                                 organization_sort_value)
         else:
             query = InternshipMaster.find_masters_by_speciality(speciality_sort_value)
     else:
         if organization_sort_value and organization_sort_value != "0":
             query = InternshipMaster.find_masters_by_organization(organization_sort_value)
-        else :
+        else:
             query = InternshipMaster.find_masters()
 
-    #Create the options for the selected list, delete dubblons
+    # Create the options for the selected list, delete dubblons
     query_master = InternshipMaster.find_masters()
     master_specs = []
     master_organizations = []
@@ -58,6 +59,9 @@ def interships_masters(request):
     master_specs = list(set(master_specs))
     master_organizations = list(set(master_organizations))
 
-    return render(request, "interships_masters.html", {'section': 'internship',
-                                                        'all_masters': query, 'all_spec' : master_specs, 'all_organizations' : master_organizations,
-                                                        'speciality_sort_value':speciality_sort_value, 'organization_sort_value':organization_sort_value})
+    return render(request, "interships_masters.html", {'section':                   'internship',
+                                                       'all_masters':               query,
+                                                       'all_spec':                  master_specs,
+                                                       'all_organizations':         master_organizations,
+                                                       'speciality_sort_value':     speciality_sort_value,
+                                                       'organization_sort_value':   organization_sort_value})
