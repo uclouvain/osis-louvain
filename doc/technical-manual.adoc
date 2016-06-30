@@ -351,6 +351,15 @@ strange beheviors, such as confusing "all" with "ill", and the translation files
 are changed much more than necessary, causing lots of conflicts when multiple
 developers contribute to the translations.
 
+To easily find all the `{% trans 'something' %}` to translate, you can use this
+command inside the directory of your module :
+
+    $ grep -ohr "{% trans '.*' %}" . | sort | uniq | cut -d"'" -f2 | sed 's/^/msgid \"/' | sed 's/$/"\nmsgstr \"\"\n/'
+
+Then you can add the output of this command directly to your `.po` files
+(check if everything is ok, just in case...)
+
+
 Once the translations are done, we finally compile the messages into `.mo`
 files:
 
