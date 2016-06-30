@@ -36,3 +36,4 @@ class AssistantDocument(models.Model):
     assistant = models.ForeignKey('AcademicAssistant')
     mandate = models.ForeignKey('AssistantMandate')
     doc_type = models.CharField(max_length=20, choices=DOC_TYPE_CHOICES)
+    file = models.FileField(upload_to='uploads/')

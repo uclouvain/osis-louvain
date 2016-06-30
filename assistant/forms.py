@@ -105,3 +105,34 @@ class MandatesArchivesForm(ModelForm):
     class Meta:
         model = mdl.assistant_mandate.AssistantMandate
         fields = ('academic_year',)
+
+class AssistantFormPart3(ModelForm):
+    phd_inscription_date = forms.DateField(required=False, widget=forms.DateInput(format='%d/%m/%Y',
+                                                                                  attrs={'placeholder': 'dd/mm/yyyy'}),
+                                           input_formats=['%d/%m/%Y'])
+    confirmation_test_date = forms.DateField(required=False, widget=forms.DateInput(format='%d/%m/%Y',
+                                                                                    attrs={'placeholder': 'dd/mm/yyyy'}),
+                                             input_formats=['%d/%m/%Y'])
+    thesis_title = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={'cols': '80', 'rows': '2'}))
+    
+    remark = forms.CharField(
+        required=False, widget=forms.Textarea(attrs={'cols': '80', 'rows': '4'}))
+
+    class Meta:
+        model = mdl.academic_assistant.AcademicAssistant
+        fields = ('phd_inscription_date', 'confirmation_test_date', 'thesis_title',
+                  'remark')
+
+  
+class UploadFileForm(ModelForm):
+    file = forms.FileField(required=False,widget=forms.ClearableFileInput(attrs={'multiple': True}))
+    mandate = forms.HiddenInput()
+    doc_type = forms.HiddenInput()
+    assistant = forms.HiddenInput()
+
+    class Meta:
+        model = mdl.assistant_document.AssistantDocument
+        fields = ('file','mandate','assistant','doc_type')
+    
+    
