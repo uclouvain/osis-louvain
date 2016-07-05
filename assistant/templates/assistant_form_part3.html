@@ -1,0 +1,123 @@
+{% extends "layout.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load l10n %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+{% block breadcrumb %}
+<li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
+<li><a href="{% url 'mandates' %}" id="lnk_mandates">{% trans 'mandates' %}</a></li>
+<li><a href="{% url 'assistant_mandates' %}" id="lnk_mandates">{% trans 'my_mandates' %}</a></li>
+<li class="active">{% trans 'renewal_form' %}</li>
+{% endblock %}
+{% block content %}
+
+<div class="panel panel-default">
+	<div class="panel-body">
+ 		<form method="POST" enctype="multipart/form-data" action="{% url 'form_part3_save' mandate.id %}">
+ 		{% csrf_token %}
+ 		{{ form.non_field_errors }}
+ 		<div class="panel-danger">
+  			<div class="panel-heading">
+  				<font size="4">{% trans 'doctorate' %}</font>
+    		</div>
+    	</div><p>
+    	<div class="form-group">
+      		<div class="row">  
+        		<div class="col-md-3">
+          			<label for="txt_phd_inscription_date">{% trans 'phd_inscription_date' %}</label>
+        		</div>
+        		<div class="col-md-3">
+          			<div class="controls">{{ form.phd_inscription_date }}</div>
+          			<font class="error">{{ form.phd_inscription_date.errors }}</font>
+        		</div>  
+      		</div><p>
+      		<div class="row">      
+        		<div class="col-md-3">
+          			<label for="txt_thesis_title">{% trans 'thesis_title' %}</label>    
+        		</div>
+        		<div class="col-md-3">
+          			<div class="controls">{{ form.thesis_title }}</div>
+          			<font class="error">{{ form.thesis_title.errors }}</font>
+        		</div>
+      		</div><p>
+      		<div class="row">  
+        		<div class="col-md-3">
+          			<label for="txt_confirmatory_test_date">{% trans 'confirmatory_test_date' %}<br>
+          			<font size="1">{% trans '2nd_renewal' %}</font></label>      
+        		</div>     
+        		<div class="col-md-3">     
+          			<div class="controls">{{ form.confirmation_test_date }}</div>
+          			<font class="error">{{ form.confirmation_test_date.errors }}</font>
+        		</div>
+          	</div><p>
+          	<div class="row">      
+        		<div class="col-md-3">
+          			<label for="txt_remark">{% trans 'doctorate_remark' %}</label>    
+        		</div>
+        		<div class="col-md-3">
+          			<div class="controls">{{ form.remark }}</div>
+          			<font class="error">{{ form.remark.errors }}</font>
+        		</div>
+      		</div><p>
+      	</div>
+    	<hr>
+    	<div class="panel-warning">
+  			<div class="panel-heading">
+  				<font size="4">{% trans 'supervisory_panel_reports_files' %}</font>
+    		</div>
+    	</div><p>
+    	{{ formset.management_form }}
+    	<div class="col-md-12" align="left">
+    		<button type="submit" class="btn btn-default btn-sm" name="add_file" title="{% trans 'add_file'%}" id="bt_pst_add_file">
+    		<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans 'add_file'%}</button>
+    	</div><p>
+    	<div class="col-md-12" align="left"><ul class="list-group">
+    		{% for form in formset %}<li class="list-group-item">
+        		{% for field in form %}
+        			{% if field.name != "doc_type" and  field.name != 'assistant' %}
+        				{% if field.name == "DELETE" %}
+							<div class="controls">{{ field }} {% trans 'delete' %}<font class="error">{{ field.errors }}</font></div>
+						{% else %}
+							<div class="controls">{{ field }}<font class="error">{{ field.errors }}</font></div>
+						{% endif %}
+        			{% else %}
+        				{{ field.as_hidden }}
+        			{% endif %}
+        		{% endfor %}</li>
+        	{% endfor %}</ul>
+		</div>
+		<div class="form-group"> 
+    		<div class="col-md-12 align="left">
+     			<button type="submit" class="btn btn-primary btn-block" title="{% trans 'save'%}" id="bt_pstform_part3_save">
+     			<span class="glyphicon glyphicon-save" aria-hidden="true"></span> {% trans 'save'%}</button>
+    		</div>
+		</div
+    	</form>
+	</div>
+</div>
+{% endblock %}
+{% block script %}
+{% endblock %}

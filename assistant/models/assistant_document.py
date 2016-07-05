@@ -24,7 +24,14 @@
 #
 ##############################################################################
 from django.db import models
+import os
 from django.utils.translation import ugettext_lazy as _
+from time import time
+
+def get_upload_file_name(instance, filename):
+    path = "uploaded_files/"
+    file = "%s_%s" % (str(time()).replace('.','_'), filename)
+    return os.path.join(path, file)
 
 
 class AssistantDocument(models.Model):
@@ -36,3 +43,4 @@ class AssistantDocument(models.Model):
     assistant = models.ForeignKey('AcademicAssistant')
     mandate = models.ForeignKey('AssistantMandate')
     doc_type = models.CharField(max_length=20, choices=DOC_TYPE_CHOICES)
+    file = models.FileField(upload_to=get_upload_file_name)

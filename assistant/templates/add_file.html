@@ -1,0 +1,73 @@
+{% extends "layout.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load l10n %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+{% block breadcrumb %}
+<li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
+<li><a href="{% url 'mandates' %}" id="lnk_mandates">{% trans 'mandates' %}</a></li>
+<li class="active">{% trans 'assistants' %}</li>
+{% endblock %}
+{% block content %}
+<ul class="nav nav-tabs ">
+<li><a href="{% url 'assistant_mandates' %}" id="lnk_mandates">{% trans 'my_mandates' %}</a></li>
+<li><a href="#">{% trans 'assistant_form_part1' %}</a></li>
+<li><a href="#">{% trans 'activities_report_supervision' %}</a></li>
+<li class="active"><a href="#">{% trans 'activities_report_doctorate' %}</a></li>
+
+</ul>
+<div class="panel panel-default">
+	<div class="panel-body">
+ 		<form enctype="multipart/form-data" method="POST" action="{% url 'pst_add_file' mandate.id %}">
+ 		{% csrf_token %}
+ 		<div class="panel-warning">
+  			<div class="panel-heading">
+  				<font size="4">{% trans 'supervisory_panel_reports' %}</font>
+    		</div>
+    	</div><p>
+    	
+    		<div class="row"> 
+    		<div class="col-md-12" align="left">
+    			{{ form.as_table }}
+        		
+        	</div></div><p>
+        	<div class="row">  
+     			<div class="col-md-12" align="left">
+     				<button type="submit" class="btn btn-primary" title="{% trans 'upload'%}" id="bt_upload_files_add">
+     				<span class="glyphicon glyphicon-upload" aria-hidden="true"></span> {% trans 'upload'%}</button>
+     				<a class="btn btn-default" id="lnk_mandate_cancel" href="{% url 'form_part3_edit' mandate.id %}">
+					<span class="glyphicon glyphicon-cancel" aria-hidden="true"></span> {% trans 'cancel'%}</a>
+    			</div>
+    		</div>
+    	
+    	</form>
+	</div>
+</div>
+
+{% endblock %}
+{% block script %}
+
+{% endblock %}
