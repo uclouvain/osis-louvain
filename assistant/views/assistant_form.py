@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import os
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required, user_passes_test
@@ -36,7 +37,7 @@ from assistant.models.academic_assistant import find_by_id
 from assistant.models.assistant_mandate import find_mandate_by_id,\
     find_mandate_by_academic_assistant
 from base.models.person import find_by_user
-from assistant.forms import UploadFileForm
+from assistant.forms import AssistantDocumentForm, FilesInLineFormSet
 
 
 def user_is_assistant(user):
@@ -146,33 +147,44 @@ def form_part3_edit(request, mandate_id):
                                        'thesis_title': assistant.thesis_title,
                                        'confirmation_test_date': assistant.confirmation_test_date,
                                        'remark': assistant.remark,
-                                       })
+                                       }, prefix='mand')
     
-    form2 = UploadFileForm(initial={'mandate': mandate,
-                                       'assistant': mandate.assistant,
-                                       'doc_type': 'PHD'})
+    formset = FilesInLineFormSet(instance=mandate,queryset =
+assistant_document.AssistantDocument.objects.filter(doc_type='PHD'), prefix='files',
+initial=[{'assistant': assistant, 'doc_type': 'PHD'}])
     
     return render(request, "assistant_form_part3.html", {'assistant': assistant,
                                                          'mandate': mandate,
                                                          'form': form,
-                                                         'form2': form2}) 
+                                                         'formset': formset}) 
 
 @user_passes_test(user_is_assistant, login_url='assistants_home')    
 def form_part3_save(request, mandate_id):
     """Use to save an assistant form part3."""
     mandate = assistant_mandate.find_mandate_by_id(mandate_id)
     assistant = mandate.assistant
-    form = AssistantFormPart3(data=request.POST, instance=assistant)
-    form2 = UploadFileForm(request.POST, request.FILES)
-    if form.is_valid() and form2.is_valid() :
-        form.save()
-        
-        form2.save()
-        return form_part3_edit(request, mandate.id)
-        
-    else:
-        return render(request, "assistant_form_part3.html", {'assistant': assistant,
+    person = request.user.person
+    if person != assistant.person:
+        return HttpResponseRedirect(reverse('assistant_mandates'))
+    elif request.method == 'POST':
+        if 'add_file' in request.POST:
+            form = AssistantDocumentForm(initial={'mandate': mandate,
+                                       'assistant': assistant,
+                                       'doc_type': 'PHD'
+                                       }, prefix='file')
+            return render(request, "add_file.html", {'assistant': assistant,
+                                                         'mandate': mandate,
+                                                         'form': form}) 
+        else:
+            form = AssistantFormPart3(data=request.POST, instance=assistant, prefix='mand')
+            formset = FilesInLineFormSet(request.POST, request.FILES, instance=mandate, prefix='files')
+            if form.is_valid() and formset.is_valid():
+                form.save()
+                formset.save()
+                return form_part3_edit(request, mandate.id)
+            else:
+                return render(request, "assistant_form_part3.html", {'assistant': assistant,
                                                              'mandate': mandate,
                                                              'form': form,
-                                                             'form2': form2}) 
+                                                             'formset': formset}) 
         

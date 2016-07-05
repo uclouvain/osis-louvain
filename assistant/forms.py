@@ -24,11 +24,15 @@
 #
 ##############################################################################
 from django import forms
+from django.utils.translation import ugettext as _
+from django.forms import BaseModelFormSet
 from django.db.models import Q
 from django.forms import ModelForm, Textarea
 from assistant import models as mdl
 from base.models import structure, academic_year
 from django.forms.models import inlineformset_factory
+from assistant.models import assistant_mandate, academic_assistant,\
+    assistant_document
 
 
 class MandateForm(ModelForm):
@@ -54,10 +58,10 @@ class MandateStructureForm(ModelForm):
 
         
 def get_field_qs(field, **kwargs):
-        if field.name == 'structure':
-            return forms.ModelChoiceField(queryset=structure.Structure.objects.filter(Q(type='INSTITUTE') |
-                                                                                      Q(type='FACULTY')))
-        return field.formfield(**kwargs)
+    if field.name == 'structure':
+        return forms.ModelChoiceField(queryset=structure.Structure.objects.filter(Q(type='INSTITUTE') |
+                                                                                  Q(type='FACULTY')))
+    return field.formfield(**kwargs)
 
     
 StructureInLineFormSet = inlineformset_factory(mdl.assistant_mandate.AssistantMandate, 
@@ -106,16 +110,24 @@ class MandatesArchivesForm(ModelForm):
         model = mdl.assistant_mandate.AssistantMandate
         fields = ('academic_year',)
 
+
+class PhdFilesFormSet(BaseModelFormSet):
+    def __init__(self, *args, **kwargs):
+        super(PhdFilesFormSet, self).__init__(*args, **kwargs)
+        self.queryset = assistant_document.AssistantDocument.objects.filter(doc_type='PHD')
+
+
 class AssistantFormPart3(ModelForm):
-    phd_inscription_date = forms.DateField(required=False, widget=forms.DateInput(format='%d/%m/%Y',
-                                                                                  attrs={'placeholder': 'dd/mm/yyyy'}),
-                                           input_formats=['%d/%m/%Y'])
-    confirmation_test_date = forms.DateField(required=False, widget=forms.DateInput(format='%d/%m/%Y',
-                                                                                    attrs={'placeholder': 'dd/mm/yyyy'}),
-                                             input_formats=['%d/%m/%Y'])
+    phd_inscription_date = forms.DateField(required=False, 
+                                           widget=forms.DateInput(format='%d/%m/%Y',
+                                                                  attrs={'placeholder': 'dd/mm/yyyy'}),
+                                                                  input_formats=['%d/%m/%Y'])
+    confirmation_test_date = forms.DateField(required=False, 
+                                             widget=forms.DateInput(format='%d/%m/%Y',
+                                                                    attrs={'placeholder': 'dd/mm/yyyy'}),
+                                                                    input_formats=['%d/%m/%Y'])
     thesis_title = forms.CharField(
         required=False, widget=forms.Textarea(attrs={'cols': '80', 'rows': '2'}))
-    
     remark = forms.CharField(
         required=False, widget=forms.Textarea(attrs={'cols': '80', 'rows': '4'}))
 
@@ -125,14 +137,39 @@ class AssistantFormPart3(ModelForm):
                   'remark')
 
   
-class UploadFileForm(ModelForm):
-    file = forms.FileField(required=False,widget=forms.ClearableFileInput(attrs={'multiple': True}))
-    mandate = forms.HiddenInput()
-    doc_type = forms.HiddenInput()
-    assistant = forms.HiddenInput()
+class AssistantDocumentForm(ModelForm):
+    file = forms.FileField(required=True, widget=forms.ClearableFileInput(attrs={'multiple': False}))
+    mandate = forms.ModelChoiceField(required=True,queryset=assistant_mandate.AssistantMandate.objects.all(),
+                                           widget=forms.HiddenInput())
+    doc_type = forms.ChoiceField(required=True,
+            choices=mdl.assistant_document.AssistantDocument.DOC_TYPE_CHOICES,
+            widget=forms.HiddenInput())
+    assistant = forms.ModelChoiceField(required=True,queryset=academic_assistant.AcademicAssistant.objects.all(),
+                                           widget=forms.HiddenInput())
 
     class Meta:
         model = mdl.assistant_document.AssistantDocument
         fields = ('file','mandate','assistant','doc_type')
     
+    def delete(self, *args, **kwargs):
+        self.file.delete()
+        super(AssistantDocumentForm, self).delete(*args, **kwargs)
+        
+    def clean_file(self):
+        file = self.cleaned_data['file']
+        try :
+            if  file.content_type != "application/pdf":
+                raise forms.ValidationError(_('must_upload_pdf') ,code='invalid')
+        except AttributeError:
+            pass   
+        return file
     
+FilesInLineFormSet = inlineformset_factory(mdl.assistant_mandate.AssistantMandate, 
+                                               mdl.assistant_document.AssistantDocument,
+                                               fields=('file','assistant','doc_type'),
+                                               can_delete=True,
+                                               extra=0,
+                                               max_num=5,
+                                               min_num=0,
+                                               form = AssistantDocumentForm
+                                               )  

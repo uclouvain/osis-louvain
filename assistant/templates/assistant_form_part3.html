@@ -29,23 +29,17 @@
 {% block breadcrumb %}
 <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
 <li><a href="{% url 'mandates' %}" id="lnk_mandates">{% trans 'mandates' %}</a></li>
-<li class="active">{% trans 'assistants' %}</li>
+<li><a href="{% url 'assistant_mandates' %}" id="lnk_mandates">{% trans 'my_mandates' %}</a></li>
+<li class="active">{% trans 'renewal_form' %}</li>
 {% endblock %}
 {% block content %}
-<ul class="nav nav-tabs ">
-<li><a href="{% url 'assistant_mandates' %}" id="lnk_mandates">{% trans 'my_mandates' %}</a></li>
-<li><a href="#">{% trans 'assistant_form_part1' %}</a></li>
-<li><a href="#">{% trans 'activities_report_supervision' %}</a></li>
-<li class="active"><a href="#">{% trans 'activities_report_doctorate' %}</a></li>
 
-</ul>
 <div class="panel panel-default">
 	<div class="panel-body">
- 		<form enctype="multipart/form-data" method="POST" action="{% url 'form_part3_save' mandate.id %}">
+ 		<form method="POST" enctype="multipart/form-data" action="{% url 'form_part3_save' mandate.id %}">
  		{% csrf_token %}
  		{{ form.non_field_errors }}
- 		
-  		<div class="panel-danger">
+ 		<div class="panel-danger">
   			<div class="panel-heading">
   				<font size="4">{% trans 'doctorate' %}</font>
     		</div>
@@ -88,32 +82,42 @@
           			<font class="error">{{ form.remark.errors }}</font>
         		</div>
       		</div><p>
-      		
-    	</div>
+      	</div>
     	<hr>
     	<div class="panel-warning">
   			<div class="panel-heading">
-  				<font size="4">{% trans 'supervisory_panel_reports' %}</font>
+  				<font size="4">{% trans 'supervisory_panel_reports_files' %}</font>
     		</div>
     	</div><p>
-    	<div class="row">      
-        		<div class="col-md-3">
-          			<label for="txt_remark">{% trans 'supervisory_panel_reports_files' %}</label>    
-        		</div>
-        		<div class="col-md-3">
-          			<div class="controls">{{ form2.file }}</div>
-          			<font class="error">{{ form2.file.errors }}</font>
-        		</div>
-      		</div><p>
-     		<div class="col-md-12" align="left">
-     			<button type="submit" class="btn btn-primary" title="{% trans 'save'%}" id="bt_pstform_part3_save">
+    	{{ formset.management_form }}
+    	<div class="col-md-12" align="left">
+    		<button type="submit" class="btn btn-default btn-sm" name="add_file" title="{% trans 'add_file'%}" id="bt_pst_add_file">
+    		<span class="glyphicon glyphicon-plus" aria-hidden="true"></span> {% trans 'add_file'%}</button>
+    	</div><p>
+    	<div class="col-md-12" align="left"><ul class="list-group">
+    		{% for form in formset %}<li class="list-group-item">
+        		{% for field in form %}
+        			{% if field.name != "doc_type" and  field.name != 'assistant' %}
+        				{% if field.name == "DELETE" %}
+							<div class="controls">{{ field }} {% trans 'delete' %}<font class="error">{{ field.errors }}</font></div>
+						{% else %}
+							<div class="controls">{{ field }}<font class="error">{{ field.errors }}</font></div>
+						{% endif %}
+        			{% else %}
+        				{{ field.as_hidden }}
+        			{% endif %}
+        		{% endfor %}</li>
+        	{% endfor %}</ul>
+		</div>
+		<div class="form-group"> 
+    		<div class="col-md-12 align="left">
+     			<button type="submit" class="btn btn-primary btn-block" title="{% trans 'save'%}" id="bt_pstform_part3_save">
      			<span class="glyphicon glyphicon-save" aria-hidden="true"></span> {% trans 'save'%}</button>
     		</div>
+		</div
     	</form>
 	</div>
 </div>
-
 {% endblock %}
 {% block script %}
-
 {% endblock %}
