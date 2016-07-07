@@ -35,22 +35,23 @@
   <div class="page-header">
     <h2>{% trans 'teachers_not_responding_to_request' %}</h2>
   </div>
+  <ul class="nav nav-tabs">
+    <li><a href={% url 'manager_informations' %}>{% trans 'all_advisers' %}</a></li>
+    <li class="active"><a href="{% url 'manager_informations_list_request' %}">{% trans 'manager_informations_list_request' %}</a></li>
+  </ul>
   <div class="panel panel-default">
     <div class="panel-body">
       <table class="table table-hover">
         <tr>
           <th>{% trans 'adviser_name'%}</th>
-          <th>{% trans 'adviser_type'%}</th>
-          <th>{% trans 'available_by_email'%}</th>
-          <th>{% trans 'available_by_phone'%}</th>
-          <th>{% trans 'available_at_office'%}</th>
+          <th>{% trans 'dissertation_title'%}</th>
+          <th>{% trans 'dissertation_status'%}</th>
+          <th>{% trans 'adviser_role'%}</th>
         </tr>
-
         {% for adviser_need_request in advisers_need_request %}
           <tr>
-            <td><a href="{% url 'manager_informations_detail' pk=adviser_need_request.adviser.pk %}">
+            <td><a href="{% url 'manager_informations_detail_list' pk=adviser_need_request.adviser.pk %}">
               {{ adviser_need_request.adviser }}</a></td>
-            <td>{{ adviser_need_request.adviser.person.name }}</td>
             <td>{{ adviser_need_request.dissertation.title }}</td>
             <td>{{ adviser_need_request.dissertation.status }}</td>
             <td>{{ adviser_need_request.status }}</td>

@@ -57,6 +57,24 @@ class OfferProposition(models.Model):
     # Is there a validation commission ?
     validation_commission_exists = models.BooleanField(default=False)
 
+    #################
+    # DATE PARAMETERS
+    #################
+    #   Start of visibility of proposition_dissertation
+    month_start_visibility_proposition = models.IntegerField(default=9)
+    day_of_month_start_visibility_proposition = models.IntegerField(default=1)
+
+    #   End of visibility of proposition_dissertation
+    month_end_visibility_proposition = models.IntegerField(default=8)
+    day_of_month_end_visibility_proposition = models.IntegerField(default=31)
+
+    #   Start of opening dissertation
+    month_start_visibility_dissertation = models.IntegerField(default=9)
+    day_of_month_start_visibility_dissertation = models.IntegerField(default=1)
+
+    #   End of oppening dissertation
+    month_end_visibility_dissertation = models.IntegerField(default=8)
+    day_of_month_end_visibility_dissertation = models.IntegerField(default=31)
+
     def __str__(self):
         return self.acronym
-

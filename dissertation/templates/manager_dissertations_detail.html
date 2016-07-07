@@ -36,6 +36,14 @@
 <div class="page-header">
     <h2>{{ dissertation.title }}</h2>
 </div>
+<ul class="nav nav-tabs">
+    <li class="active"><a href="#">{% trans 'main' %}</a></li>
+    <li>
+        <a href="{% url 'manager_dissertations_detail_updates' pk=dissertation.pk %}">
+            {% trans 'dissertation_updates' %}
+        </a>
+    </li>
+</ul>
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="panel panel-default">

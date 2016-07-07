@@ -37,14 +37,14 @@
   </div>
   <ul class="nav nav-tabs">
     <li><a href="{% url 'manager_dissertations_list' %}">{% trans 'all_dissertations' %}</a></li>
-    <li class="active"><a href="manager_dissertations_wait_list">{% trans 'waiting_dissertations' %}</a></li>
+    <li><a href="manager_dissertations_wait_list">{% trans 'waiting_dissertations' %}</a></li>
     {% if offer_proposition.validation_commission_exists == True %}
       <li><a href="{% url 'manager_dissertations_wait_comm_list' %}">{% trans 'waiting_commission' %}</a></li>
     {% endif %}
     {% if offer_proposition.evaluation_first_year == True %}
       <li><a href="{% url 'manager_dissertations_wait_eval_list' %}">{% trans 'waiting_evaluation' %}</a></li>
     {% endif %}
-    <li><a href="{% url 'manager_dissertations_wait_recep_list' %}">{% trans 'waiting_reception' %}</a></li>
+    <li class="active"><a href="{% url 'manager_dissertations_wait_recep_list' %}">{% trans 'waiting_reception' %}</a></li>
   </ul>
   <div class="panel panel-default">
     <div class="panel-body">
@@ -60,6 +60,7 @@
               <th>{% trans 'status'%}</th>
               <th>{% trans 'offer_year_start'%}</th>
               <th>{% trans 'proposition_dissertation'%}</th>
+              <th>{% trans 'action'%}</th>
             </tr>
             {% for dissertation in dissertations %}
               <tr>
@@ -104,6 +105,11 @@
                 </td>
                 <td>{{ dissertation.offer_year_start }}</td>
                 <td>{{ dissertation.proposition_dissertation }}</td>
+                <td><a href="{% url 'manager_dissertations_to_dir_submit_list' pk=dissertation.pk %}"
+                   id="manager_dissertations_to_dir_submit_list" class="btn btn-default"
+                   role="button" title="{% trans 'manager_dissertations_to_dir_submit_list'%}"><span
+                        class="glyphicon glyphicon-ok-circle"
+                        aria-hidden="true"></span> {% trans 'manager_reception_accept'%}</a></td>
               </tr>
             {% endfor %}
           </table>

@@ -45,6 +45,42 @@
           aria-hidden="true"></span></a>
         </div>
       </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-4">
+            <label>{% trans 'date_start_visibility_proposition'%}</label> :
+          </div>
+          <div class="col-md-2">
+            {{ offer_proposition.day_of_month_start_visibility_proposition }} / {{ offer_proposition.month_start_visibility_proposition }}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <label>{% trans 'date_end_visibility_proposition'%}</label> :
+          </div>
+          <div class="col-md-2">
+            {{ offer_proposition.day_of_month_end_visibility_proposition }} / {{ offer_proposition.month_end_visibility_proposition }}
+          </div>
+        </div>
+      </div>
+      <div class="panel-body">
+        <div class="row">
+          <div class="col-md-4">
+            <label>{% trans 'date_start_visibility_dissertation'%}</label> :
+          </div>
+          <div class="col-md-2">
+            {{ offer_proposition.day_of_month_start_visibility_dissertation }} / {{ offer_proposition.month_start_visibility_dissertation }}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4">
+            <label>{% trans 'date_end_visibility_dissertation'%}</label> :
+          </div>
+          <div class="col-md-2">
+            {{ offer_proposition.day_of_month_end_visibility_dissertation }} / {{ offer_proposition.month_end_visibility_dissertation }}
+          </div>
+        </div>
+      </div>
       <div class="row">
         <div class="col-md-4">
           <label>{% trans 'student_can_manage_readers' %}</label> :

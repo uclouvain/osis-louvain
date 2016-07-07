@@ -36,8 +36,15 @@
     <h2>{% trans 'dissertations' %}</h2>
   </div>
   <ul class="nav nav-tabs">
-    <li class="active"><a href="#">{% trans 'all_dissertations' %}</a></li>
+    <li class="active"><a href="{% url 'manager_dissertations_list' %}">{% trans 'all_dissertations' %}</a></li>
     <li><a href="{% url 'manager_dissertations_wait_list' %}">{% trans 'waiting_dissertations' %}</a></li>
+    {% if offer_proposition.validation_commission_exists == True %}
+      <li><a href="{% url 'manager_dissertations_wait_comm_list' %}">{% trans 'waiting_commission' %}</a></li>
+    {% endif %}
+    {% if offer_proposition.evaluation_first_year == True %}
+      <li><a href="{% url 'manager_dissertations_wait_eval_list' %}">{% trans 'waiting_evaluation' %}</a></li>
+    {% endif %}
+    <li><a href="{% url 'manager_dissertations_wait_recep_list' %}">{% trans 'waiting_reception' %}</a></li>
   </ul>
   <div class="panel panel-default">
     <div class="panel-body">

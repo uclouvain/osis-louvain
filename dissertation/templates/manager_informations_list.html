@@ -35,17 +35,14 @@
   <div class="page-header">
     <h2>{% trans 'teachers' %}</h2>
   </div>
+  <ul class="nav nav-tabs">
+    <li class="active"><a href={% url 'manager_informations' %}>{% trans 'all_advisers' %}</a></li>
+    <li><a href="{% url 'manager_informations_list_request' %}">{% trans 'manager_informations_list_request' %}</a></li>
+  </ul>
   <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
              <div class="col-md-12">
-                 <a href="{% url 'manager_informations' %}" id="lnk_manager_informations" class="btn btn-default"
-                   role="button" title="{% trans 'manager_informations'%}"><span class="glyphicon glyphicon-list"
-                   aria-hidden="true"></span> {% trans 'all_advisers'%}</a>
-                 <a href="{% url 'manager_informations_list_request' %}" id="lnk_manager_informations_list_request"
-                    class="btn btn-default" role="button" title="{% trans 'all_manager_informations_list_not_respond'%}">
-                    <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
-                    {% trans 'manager_information_list_not_respond'%}</a>
                   <a href="{% url 'manager_informations_add' %}" id="lnk_manager_informations_add" class="btn btn-default"
                     role="button" title="{% trans 'manager_informations_add'%}"><span class="glyphicon glyphicon-plus"
                     aria-hidden="true"></span> {% trans 'add_advisers'%}</a>

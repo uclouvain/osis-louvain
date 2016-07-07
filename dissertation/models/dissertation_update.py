@@ -25,17 +25,10 @@
 ##############################################################################
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from dissertation.models import proposition_dissertation
-from base.models import offer_year, student
-from django.db.models import Q
-from django.contrib import admin
+from dissertation.models import dissertation
 
 
-class DissertationAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'status', 'active')
-
-
-class Dissertation(models.Model):
+class DissertationUpdate(models.Model):
     STATUS_CHOICES = (
         ('DRAFT', _('Draft')),
         ('DIR_SUBMIT', _('Submitted to Director')),
@@ -55,36 +48,16 @@ class Dissertation(models.Model):
         ('ENDED_LOS', _('Ended Los')),
     )
 
-    title = models.CharField(max_length=200)
-    author = models.ForeignKey(student.Student)
-    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default='DRAFT')
-    offer_year_start = models.ForeignKey(offer_year.OfferYear)
-    proposition_dissertation = models.ForeignKey(proposition_dissertation.PropositionDissertation)
-    description = models.TextField(blank=True, null=True)
-    active = models.BooleanField(default=True)
-    creation_date = models.DateTimeField(auto_now_add=True, editable=False)
-    modification_date = models.DateTimeField(auto_now=True)
+    status_from = models.CharField(max_length=12, choices=STATUS_CHOICES, default='DRAFT')
+    status_to = models.CharField(max_length=12, choices=STATUS_CHOICES, default='DRAFT')
+    created = models.DateTimeField(auto_now_add=True)
+    justification = models.TextField(default=' ')
+
+    person = models.ForeignKey('base.Person')
+    dissertation = models.ForeignKey(dissertation.Dissertation)
 
     def __str__(self):
-        return self.title
+        desc = self.dissertation.title + ' / ' + self.status_from + ' >> ' + self.status_to \
+               + ' / ' + str(self.created)
 
-    class Meta:
-        ordering = ["author__person__last_name", "author__person__middle_name", "author__person__first_name", "title"]
-
-
-def search_dissertation(terms=None):
-    queryset = Dissertation.objects.all()
-    if terms:
-        queryset = queryset.filter(
-            Q(author__person__first_name__icontains=terms) |
-            Q(author__person__middle_name__icontains=terms) |
-            Q(author__person__last_name__icontains=terms) |
-            Q(description__icontains=terms) |
-            Q(proposition_dissertation__title__icontains=terms) |
-            Q(proposition_dissertation__author__person__first_name__icontains=terms) |
-            Q(proposition_dissertation__author__person__middle_name__icontains=terms) |
-            Q(proposition_dissertation__author__person__last_name__icontains=terms) |
-            Q(status__icontains=terms) |
-            Q(title__icontains=terms)
-        ).distinct()
-    return queryset
+        return desc
