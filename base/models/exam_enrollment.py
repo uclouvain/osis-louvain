@@ -31,6 +31,7 @@ from base.models import person, learning_unit_year, attribution, person_address,
 from django.utils import timezone
 import datetime
 import unicodedata
+import re
 
 
 class ExamEnrollmentAdmin(admin.ModelAdmin):
@@ -414,7 +415,7 @@ def _normalize_string(string):
     :param string: The string to normalize.
     :return: The normalized string
     """
-    string = string.replace(" ", "")
+    string = re.sub('[^0-9a-zA-Z]+', '', string) # Replace all non alphabetic character by an empty string
     return ''.join((c for c in unicodedata.normalize('NFD', string) if unicodedata.category(c) != 'Mn'))
 
 
