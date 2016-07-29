@@ -358,7 +358,8 @@ def export_xls(request, learning_unit_year_id, academic_year_id):
 
 
 def get_score_encoded(enrollments):
-    return len(filter(lambda e: e.is_final, enrollments))
+    return len(list(filter(lambda e: e.is_final, enrollments)))
+
 
 def get_data(request, offer_year_id=None):
     offer_year_id = int(offer_year_id) if offer_year_id else None
