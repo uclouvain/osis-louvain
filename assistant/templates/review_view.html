@@ -1,0 +1,162 @@
+{% extends "layout.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock %}
+{% block breadcrumb %}
+<li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
+<li><a href="{% url 'mandates' %}" id="lnk_mandates">{% trans 'mandates' %}</a></li>
+<li><a href="{% url 'reviewer_mandates_list' %}" id="lnk_reviewer_mandates_list">
+    {% trans 'reviewer_mandates_list' %}</a></li>
+<li class="active">{% trans 'mandate_edit' %}</li>
+{% endblock %}
+{% block content %}
+<ul class="nav nav-tabs">
+	<li><a href="#">{% trans 'assistant_form' %}</a></li>
+    {% if role == 'PHD_SUPERVISOR' %}
+        <li class="active"><a href="#">{% trans 'phd_supervisor_review' %}</a></li>
+	    <li class="disabled"><a href="#">{% trans 'research_review' %}</a></li>
+	    <li class="disabled"><a href="#">{% trans 'supervision_review' %}</a></li>
+	    <li class="disabled"><a href="#">{% trans 'sector_vice-rector_review' %}</a></li>
+    {% elif role == 'RESEARCH' %}
+        {% if links.0.0 %}
+            {% if links.0.1 %}
+                <li class="active"><a href="{% url 'review_view' review_id=links.0.0 %}">
+                {% trans 'phd_supervisor_review' %}</a></li>
+            {% else %}
+                <li><a href="{% url 'review_view' review_id=links.0.0 %}">
+                {% trans 'phd_supervisor_review' %}</a></li>
+            {% endif %}
+        {% endif %}
+	    <li><a href="{% url 'review_edit' mandate_id=mandate_id %}">{% trans 'research_review' %}</a></li>
+	    <li class="disabled"><a href="#">{% trans 'supervision_review' %}</a></li>
+	    <li class="disabled"><a href="#">{% trans 'sector_vice-rector_review' %}</a></li>
+    {% elif role == 'SUPERVISION' %}
+        {% if links.0.0 %}
+            {% if links.0.1 %}
+                <li class="active"><a href="{% url 'review_view' review_id=links.0.0 %}">
+                {% trans 'phd_supervisor_review' %}</a></li>
+            {% else %}
+                <li><a href="{% url 'review_view' review_id=links.0.0 %}">
+                {% trans 'phd_supervisor_review' %}</a></li>
+            {% endif %}
+        {% endif %}
+        {% if links.1.0 %}
+            {% if links.1.1 %}
+                <li class="active"><a href="{% url 'review_view' review_id=links.1.0 %}">
+                {% trans 'research_review' %}</a></li>
+	        {% else %}
+                <li><a href="{% url 'review_view' review_id=links.1.0 %}">{% trans 'research_review' %}</a></li>
+	        {% endif %}
+        {% endif %}
+        <li><a href="{% url 'review_edit' mandate_id=mandate_id %}">{% trans 'supervision_review' %}</a></li>
+	    <li class="disabled"><a href="#">{% trans 'sector_vice-rector_review' %}</a></li>
+    {% elif role == 'VICE_RECTOR' %}
+        {% if links.0.0 %}
+            {% if links.0.1 %}
+                <li class="active"><a href="{% url 'review_view' review_id=links.0.0 %}">
+                {% trans 'phd_supervisor_review' %}</a></li>
+            {% else %}
+                <li><a href="{% url 'review_view' review_id=links.0.0 %}">
+                {% trans 'phd_supervisor_review' %}</a></li>
+            {% endif %}
+        {% endif %}
+        {% if links.1.0 %}
+            {% if links.1.1 %}
+                <li class="active"><a href="{% url 'review_view' review_id=links.1.0 %}">
+                {% trans 'research_review' %}</a></li>
+	        {% else %}
+                <li><a href="{% url 'review_view' review_id=links.1.0 %}">{% trans 'research_review' %}</a></li>
+	        {% endif %}
+        {% endif %}
+        {% if links.2.0 %}
+            {% if links.2.1 %}
+                <li class="active"><a href="{% url 'review_view' review_id=links.2.0 %}">
+                {% trans 'research_review' %}</a></li>
+	        {% else %}
+                <li><a href="{% url 'review_view' review_id=links.2.0 %}">{% trans 'supervision_review' %}</a></li>
+	        {% endif %}
+        {% endif %}
+        <li><a href="{% url 'review_edit' mandate_id=mandate_id %}">
+        {% trans 'sector_vice-rector_review' %}</a></li>
+    {% endif %}
+</ul>
+<div class="page-header">
+    <h2>{% trans 'assistants_mandates_renewal' %} ({{ year }})</h2>
+</div>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2">
+                    <label for="txt_advice">{% trans 'advice' %}</label>
+                </div>
+                <div class="col-md-3">
+                    {{ review.advice }}
+                </div>
+            </div><p>
+        </div>
+        {% if review.advice == "CONDITIONAL" %}
+            <div class="form-group">
+                <div class="row">
+                    <div class="col-md-2">
+                        <label id="justification_label" for="txt_justification">{% trans 'justification' %}</label>
+                    </div>
+                    <div class="col-md-5">
+                        {{ review.justification }}
+                    </div>
+                </div>
+            </div><p>
+        {% endif %}
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2">
+                    <label for="txt_comment">{% trans 'remark' %}</label>
+                </div>
+                <div class="col-md-3">
+                    {{ review.remark }}
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2">
+                    <label for="txt_comment">{% trans 'confidential' %}</label>
+                </div>
+                <div class="col-md-3">
+                    {{ review.confidential }}
+                </div>
+            </div>
+            <p>
+        </div>
+	</div>
+</div>
+{% endblock %}
+{% block script %}
+{% endblock %}

@@ -1,0 +1,233 @@
+{% extends "layout.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/custom.css' %}">
+{% endblock %}
+    
+{% block breadcrumb %}
+<li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
+<li><a href="{% url 'mandates' %}" id="lnk_mandates">{% trans 'mandates' %}</a></li>
+<li><a href="{% url 'reviewer_mandates_list' %}" id="lnk_reviewer_mandates_list">
+    {% trans 'reviewer_mandates_list' %}</a></li>
+<li class="active">{% trans 'mandate_edit' %}</li>
+
+{% endblock %}
+{% block content %}
+<ul class="nav nav-tabs ">
+	<li><a href="#">{% trans 'assistant_form' %}</a></li>
+    {% if 'PHD_SUPERVISOR' in role %}
+        <li class="active"><a href="#">{% trans 'phd_supervisor_review' %}</a></li>
+	    <li class="disabled"><a href="#">{% trans 'research_review' %}</a></li>
+	    <li class="disabled"><a href="#">{% trans 'supervision_review' %}</a></li>
+	    <li class="disabled"><a href="#">{% trans 'sector_vice-rector_review' %}</a></li>
+    {% elif 'RESEARCH' in role %}
+        {% if links.0 %}
+            <li><a href="{% url 'review_view' review_id=links.0 %}">{% trans 'phd_supervisor_review' %}</a></li>
+        {% endif %}
+	    <li class="active"><a href="#">{% trans 'research_review' %}</a></li>
+	    <li class="disabled"><a href="#">{% trans 'supervision_review' %}</a></li>
+	    <li class="disabled"><a href="#">{% trans 'sector_vice-rector_review' %}</a></li>
+    {% elif 'SUPERVISION' in role %}
+        {% if links.0 %}
+            <li><a href="{% url 'review_view' review_id=links.0 %}">{% trans 'phd_supervisor_review' %}</a></li>
+        {% endif %}
+        {% if links.1 %}
+	        <li><a href="{% url 'review_view' review_id=links.1 %}">{% trans 'research_review' %}</a></li>
+        {% endif %}
+	    <li class="active"><a href="#">{% trans 'supervision_review' %}</a></li>
+	    <li class="disabled"><a href="#">{% trans 'sector_vice-rector_review' %}</a></li>
+    {% elif 'VICE_RECTOR' in role %}
+        {% if links.0 %}
+            <li><a href="{% url 'review_view' review_id=links.0 %}">{% trans 'phd_supervisor_review' %}</a></li>
+        {% endif %}
+	    {% if links.1 %}
+            <li><a href="{% url 'review_view' review_id=links.1 %}">{% trans 'research_review' %}</a></li>
+	    {% endif %}
+        {% if links.2 %}
+            <li><a href="{% url 'review_view' review_id=links.2 %}">{% trans 'supervision_review' %}</a></li>
+	    {% endif %}
+        <li class="active"><a href="#">{% trans 'sector_vice-rector_review' %}</a></li>
+    {% endif %}
+</ul>
+<div class="page-header">
+    <h2>{% trans 'assistants_mandates_renewal' %} ({{ year }})</h2>
+</div>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <form method="post" action=" {% url 'review_save' review_id=review.id mandate_id=mandate_id %} ">
+        {% csrf_token %}
+        {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+        <div class="form-group">
+            <div class="table-reponsive">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                    <th>{% trans 'absences' %}</th>
+                    <th>{% trans 'comment' %}</th>
+                    <th>{% trans 'previous_renewal_comment' %}</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>{{ absences }}</td>
+                        <td>{{ comment }}</td>
+                        <td><ul class="list-group">
+                            {% for object in previous_mandates %}
+                                <li class="list-group-item">{{ object.comment }}</li>
+                            {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2">
+                    <label for="txt_advice">{% trans 'advice' %}</label>
+                </div>
+                <div class="col-md-3">
+                    <div class="controls">{{ form.advice }}</div>
+                    <font class="error">{{ form.advice.errors }}</font>
+                </div>
+            </div><p>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2">
+                    <label id="justification_label" for="txt_justification">{% trans 'justification' %}</label>
+                </div>
+                <div class="col-md-5">
+                    <div class="controls">{{ form.justification }}</div>
+                    <font class="error">{{ form.justification.errors }}</font>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2"></div>
+                <div class="col-md-5" align="left">
+                <label id="justification_label_help_text" for="txt_justification_help_text">
+                    <font size="1">{{ form.justification.help_text }}</font></label>
+                </div>
+            </div>
+        </div><p>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2">
+                    <label for="txt_comment">{% trans 'remark' %}</label>
+                </div>
+                <div class="col-md-3">
+                    <div class="controls">{{ form.remark }}</div>
+                    <font class="error">{{ form.remark.errors }}</font>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2">
+                    <label for="txt_comment">{% trans 'confidential' %}</label>
+                </div>
+                <div class="col-md-3">
+                    <div class="controls">{{ form.confidential }}</div>
+                    <font class="error">{{ form.confidential.errors }}</font>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-2"></div>
+                <div class="col-md-5" align="left">
+                <label id="confidential_label_help_text" for="txt_confidential_help_text">
+                    <font size="1">{{ form.confidential.help_text }}</font></label>
+                </div>
+            </div>
+            <p>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-2 align="left">
+		            <button type="submit" class="btn btn-primary btn-block" title="{% trans 'save'%}"
+                    id="bt_mandate_save" name="save"><span class="glyphicon glyphicon-save" aria-hidden="true">
+                    </span> {% trans 'save'%}</button>
+                </div>
+                <div class="col-md-2 align="left">
+		            <a class="btn btn-default btn-block" id="lnk_mandate_cancel"
+                       href="{% url 'reviewer_mandates_list' %}">
+		            <span class="glyphicon glyphicon-cancel" aria-hidden="true"></span> {% trans 'cancel'%}</a>
+                </div>
+            </div>
+        </div>
+        {# un assistant de supervision ne peut valider la review #}
+        {% if "SUPERVISION_ASSISTANT" not in role %}
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-4 align="left">
+                    <button type="submit" class="btn btn-success btn-block" title="{% trans 'validate_and_submit'%}"
+                    id="bt_pstform_validate_and_submit" name="validate_and_submit"
+                    onclick="return confirm('{% trans 'confirm_validation' %}')">
+                    <span class="glyphicon glyphicon-saved" aria-hidden="true">
+                    </span> {% trans 'validate_and_submit'%}</button>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+		</form>
+
+	</div>
+</div>
+{% endblock %}
+{% block script %}
+<script>
+function Hide() {
+    if(document.getElementById('id_rev-advice_1').checked == true)
+     {
+         document.getElementById('id_rev-justification').style.display = '';
+         document.getElementById('justification_label').style.display = '';
+         document.getElementById('justification_label_help_text').style.display = '';
+    } else
+     {
+        document.getElementById('id_rev-justification').style.display = 'none';
+         document.getElementById('justification_label').style.display = 'none';
+         document.getElementById('justification_label_help_text').style.display = 'none';
+         document.getElementById('id_rev-justification').value='';
+    }
+}
+window.onload = function() {
+    Hide();
+};
+</script>
+{% endblock %}
+
+
+
+
+
+
+
+

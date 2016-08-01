@@ -25,7 +25,7 @@
 ##############################################################################
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-
+from django.utils import timezone
 
 class Review(models.Model):
     ADVICE_CHOICES = (
@@ -38,10 +38,16 @@ class Review(models.Model):
         ('DONE', _('Done')))
 
     mandate = models.ForeignKey('AssistantMandate')
-    reviewer = models.ForeignKey('Reviewer')
+    reviewer = models.ForeignKey('Reviewer', null=True)
     advice = models.CharField(max_length=20, choices=ADVICE_CHOICES)
-    status = models.CharField(max_length=10, choices=REVIEW_STATUS, null=True)
+    status = models.CharField(max_length=15, choices=REVIEW_STATUS, null=True)
     justification = models.TextField(null=True, blank=True)
     remark = models.TextField(null=True, blank=True)
     confidential = models.TextField(null=True, blank=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(default=timezone.now, null=True)
+
+def find_by_id(review_id):
+    return Review.objects.get(id=review_id)
+
+def find_by_mandate(mandate_id):
+    return Review.objects.filter(mandate=mandate_id)
