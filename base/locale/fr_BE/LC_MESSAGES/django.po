@@ -268,6 +268,9 @@ msgstr "La maintenance de données avec la langage SQL"
 msgid "desc_lnk_data_management"
 msgstr "Gestion des données par entité du métier"
 
+msgid "desc_lnk_dissertations_app"
+msgstr "Gestion des mémoires des étudiants."
+
 msgid "desc_lnk_entities"
 msgstr "Gestion des la structure organisationnelle."
 

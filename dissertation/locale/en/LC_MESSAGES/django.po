@@ -212,7 +212,7 @@ msgid "desc_lnk_informations"
 msgstr "My settings for the Dissertation application."
 
 msgid "desc_lnk_manager_dissertations"
-msgstr "List of the dissertation subjects"
+msgstr "List of the dissertation projects"
 
 msgid "desc_lnk_manager_informations"
 msgstr "List of teachers linked to the Dissertation application"
