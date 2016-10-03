@@ -187,7 +187,7 @@ def student_save_information_modification(request, registration_id):
     information.latitude = None
     information.longitude = None
     information.save()
-    messages.add_message(request, messages.SUCCESS, "Modification des informations réussie, vous pouvez fermer cet onglet")
+    messages.add_message(request, messages.SUCCESS, _('modification_done'))
 
     redirect_url = reverse('internship_student_information_modification', args=[registration_id])
     return HttpResponseRedirect(redirect_url)
@@ -241,7 +241,7 @@ def student_save_affectation_modification(request, registration_id):
                 messages.add_message(request, messages.ERROR, _('%s : %s-%s (%s)=> error') % (speciality.name, organization.reference, organization.name, period.name))
 
     if not check_error_present:
-        messages.add_message(request, messages.SUCCESS, "Modification des assignations réussie, vous pouvez fermer cet onglet")
+        messages.add_message(request, messages.SUCCESS, _('modification_done'))
         InternshipStudentAffectationStat.search(student=student).delete()
         index = len(period_list)
         for x in range(0, index):
