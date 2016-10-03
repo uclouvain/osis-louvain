@@ -106,7 +106,6 @@
                     <div class="col-md-5">
                         <h4 class="media-heading"><a href="{% url 'internship_affectation_sumup' %}">{% trans 'assignations_sumup' %}</a></h4>
                     </div>
-
                 </div>
                 <br>
             </div>
@@ -145,7 +144,13 @@
                 <div class="row">
                     <div class="col-md-1"><i class="fa fa-user" style="font-size: 400%; color: #6699FF;"></i></div>
                     <div class="col-md-5">
-                        <h4 class="media-heading"><a href="{% url 'internships_student_read' noma %}">{% trans 'summary_your_choices_and_affectation' %}</a></h4>
+                        <h4 class="media-heading">
+                            <form method="post" action="{% url 'internships_student_read'%}" target="_blank">
+                              {% csrf_token %}
+                              <input type="hidden" value={{ noma }} name="registration_id"/>
+                              <input type="submit" value={% trans 'summary_your_choices_and_affectation' %}
+                                     style="border: none; background: none; padding: 0; color: #6699FF;" />
+                            </form>
                     </div>
                     <div class="col-md-6"></div>
                 </div>

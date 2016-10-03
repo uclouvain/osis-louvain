@@ -30,8 +30,14 @@
     <li><a href="{% url 'studies' %}">{% trans 'studies' %}</a></li>
     <li><a href="{% url 'internships_home' %}">{% trans 'internships_managment' %}</a></li>
     <li><a href="{% url 'internships_student_resume' %}">{% trans 'student_sumup' %}</a></li>
-    <li class="active"><a href="{% url 'internships_student_read' student.id %}">
-        {{ student.person.last_name }} {{ student.person.first_name }}</a></li>
+    <li class="active">
+        <form method="post" action="{% url 'internships_student_read'%}">
+          {% csrf_token %}
+          <input type="hidden" value={{ student.registration_id }} name="registration_id"/>
+          <input type="submit" value="{{ student.person.last_name }} {{ student.person.first_name }}"
+                 style="border: none; color: #6699FF;" />
+        </form>
+    </li>
 {% endblock %}
 {% block content %}
     <div class="page-header">
