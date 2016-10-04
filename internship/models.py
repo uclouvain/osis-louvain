@@ -398,6 +398,7 @@ class InternshipStudentAffectationStat(models.Model):
     cost = models.IntegerField(blank=False, null=False)
     consecutive_month = models.BooleanField(default=False, null=False)
     type_of_internship = models.CharField(max_length=1, blank=False, null=False, default='N')
+    visible = models.BooleanField(default=False)
 
     @staticmethod
     def search(**kwargs):

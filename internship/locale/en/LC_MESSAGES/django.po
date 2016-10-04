@@ -353,3 +353,15 @@ msgstr  "Executions"
 
 msgid   "order_postion"
 msgstr  "Sorting position"
+
+msgid   "assignations_are_visible"
+msgstr  "The internships' affectations are visible."
+
+msgid   "mask_assignations"
+msgstr  "Mask the internships' affectations."
+
+msgid   "assignations_arent_visible"
+msgstr  "The internships' affectations are not visible."
+
+msgid   "display_assignations"
+msgstr  "Display the internships' affectations."

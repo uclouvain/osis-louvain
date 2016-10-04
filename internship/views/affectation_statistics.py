@@ -1182,7 +1182,9 @@ def internship_affectation_statistics(request):
     sol, table, stats, internship_errors = None, None, None, None
     data = InternshipStudentAffectationStat.objects.all().select_related("student", "organization", "speciality",
                                                                          "period")
+    visible = False
     if len(data) > 0:
+        visible = data[0].visible
         sol, table = load_solution(data)
         stats = compute_stats(sol)
         # Mange sort of the students
@@ -1195,7 +1197,8 @@ def internship_affectation_statistics(request):
                    'recap_sol': sol,
                    'stats': stats,
                    'organizations': table,
-                   'errors': internship_errors})
+                   'errors': internship_errors,
+                   'visible': visible})
 
 
 @login_required
@@ -1241,3 +1244,19 @@ def internship_affectation_sumup(request):
                    'organizations': informations,
                    'affectations': affectations,
                    })
+
+
+@login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
+def display_affectations(request):
+    affectations = InternshipStudentAffectationStat.search()
+    if affectations:
+        # Get the value of the first affectation in the DB
+        affectation_visible = affectations[0].visible
+    # For each affectation in the DB invert the selectable flag of the first affectation
+
+    for affectation in affectations:
+        edit_affectation = InternshipStudentAffectationStat.find_by_id(affectation.id)
+        edit_affectation.visible = not affectation_visible
+        edit_affectation.save()
+    return HttpResponseRedirect(reverse('internships_home'))

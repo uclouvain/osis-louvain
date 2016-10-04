@@ -88,9 +88,11 @@
     </div><!-- /.modal -->
     <div class="panel panel-default">
         <div class="panel-body">
-            <button type="submit" class="btn btn-primary" title="{% trans 'Send'%}" id="bt_interships_save" onclick="$('#generate').modal('show');">
-                <span class="glyphicon glyphicon-random" aria-hidden="true"></span>{% trans 'generate_solution' %}
-            </button>
+            {% if not visible %}
+                <button type="submit" class="btn btn-primary" title="{% trans 'Send'%}" id="bt_interships_save" onclick="$('#generate').modal('show');">
+                    <span class="glyphicon glyphicon-random" aria-hidden="true"></span>{% trans 'generate_solution' %}
+                </button>
+            {% endif %}
             <ul class="nav nav-tabs">
                 <li class="active"><a data-toggle="tab" href="#tab_hospitals">{% trans 'organizations' %}</a></li>
                 <li><a data-toggle="tab" href="#tab_students">{% trans 'students' %}</a></li>

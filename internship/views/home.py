@@ -26,7 +26,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required, permission_required
 from base import models as mdl
-from internship.models import InternshipOffer, InternshipStudentInformation, OrganizationAddress
+from internship.models import InternshipOffer, InternshipStudentInformation, OrganizationAddress, InternshipStudentAffectationStat
 
 @login_required
 @permission_required('internship.can_access_internship', raise_exception=True)
@@ -56,6 +56,17 @@ def internships_home(request):
     else:
         blockable = True
 
+    affectations = InternshipStudentAffectationStat.search()
+    # Check if there is an affectation in data base. If not, the affectations
+    # aren't visible, if there is, it depend of the visible fields
+    if len(affectations) > 0:
+        if affectations[0].visible:
+            affectation_visible = True
+        else:
+            affectation_visible = False
+    else:
+        affectation_visible = False
+
     #Find all informations about students and organisation and fin the latitude and longitude of the address
     student_informations = InternshipStudentInformation.search()
     organization_informations = OrganizationAddress.search()
@@ -64,5 +75,6 @@ def internships_home(request):
 
     return render(request, "internships_home.html", {'section': 'internship',
                                                      'noma': noma,
-                                                     'blockable': blockable
+                                                     'blockable': blockable,
+                                                     'affectation_visible': affectation_visible,
                                                      })

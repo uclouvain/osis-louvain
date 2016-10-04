@@ -125,7 +125,7 @@ def internships_student_read(request, registration_id):
     organizations = Organization.search()
     set_organization_address(organizations)
 
-    # Set the adress of the affactation
+    # Set the adress of the affectation
     for affectation in affectations:
         for organization in organizations:
             if affectation.organization == organization:
@@ -144,12 +144,21 @@ def internships_student_read(request, registration_id):
     else:
         selectable = True
 
+    if len(affectations) > 0:
+        if affectations[0].visible:
+            visible = True
+        else:
+            visible = False
+    else:
+        visible = False
+
     return render(request, "student_resume.html",
                            {'student': student,
                             'information': information[0],
                             'internship_choice': internship_choice,
                             'specialities': all_speciality,
                             'selectable': selectable,
+                            'visible"': visible,
                             'affectations': affectations,
                             'periods': periods,
                             })
@@ -229,6 +238,13 @@ def student_save_affectation_modification(request, registration_id):
     if request.POST.get('speciality'):
         speciality_list = request.POST.getlist('speciality')
 
+    # Get the all affectations, if there is an affectation, set the visible flag at the same value
+    # If there is no affectation, the affectation aren't visible
+    affectations = InternshipStudentAffectationStat.search()
+    visible = False
+    if affectations :
+        visible = affectations[0].visible
+
     check_error_present = False
     index = len(period_list)
     for x in range(0, index):
@@ -272,9 +288,10 @@ def student_save_affectation_modification(request, registration_id):
                 if not check_choice:
                     affectation_modif.choice = "I"
                     affectation_modif.cost = 10
-
+                affectation_modif.visible = visible
                 affectation_modif.save()
         redirect_url = reverse('internships_student_read', args=[student.registration_id])
     else:
         redirect_url = reverse('internship_student_affectation_modification', args=[student.id])
+
     return HttpResponseRedirect(redirect_url)

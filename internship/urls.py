@@ -33,6 +33,7 @@ urlpatterns = [
     # S'il vous plaît, organiser les urls par ordre alphabétique.
 
 	url(r'^affectation_result/$', affectation_statistics.internship_affectation_statistics, name='internship_affectation_statistics'),
+    url(r'^affectation_result/display/$', affectation_statistics.display_affectations, name='display_affectations'),
     url(r'^affectation_result/generate/$', affectation_statistics.internship_affectation_statistics_generate, name='internship_affectation_statistics_generate'),
     url(r'^affectation_result/sumup/$', affectation_statistics.internship_affectation_sumup, name='internship_affectation_sumup'),
 

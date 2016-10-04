@@ -104,7 +104,7 @@ admin.site.register(InternshipStudentInformation, InternshipStudentInformationAd
 
 
 class InternshipStudentAffectationStatAdmin(admin.ModelAdmin):
-    list_display = ('student', 'organization', 'speciality', 'period', 'choice', 'cost', 'consecutive_month', 'type_of_internship')
-    fieldsets = ((None, {'fields': ('student', 'organization', 'speciality', 'period', 'choice', 'cost', 'consecutive_month', 'type_of_internship')}),)
+    list_display = ('student', 'organization', 'speciality', 'period', 'choice', 'cost', 'consecutive_month', 'type_of_internship', 'visible')
+    fieldsets = ((None, {'fields': ('student', 'organization', 'speciality', 'period', 'choice', 'cost', 'consecutive_month', 'type_of_internship','visible')}),)
 
 admin.site.register(InternshipStudentAffectationStat, InternshipStudentAffectationStatAdmin)

@@ -353,3 +353,15 @@ msgstr  "Executions"
 
 msgid   "order_postion"
 msgstr  "Position de tri"
+
+msgid   "assignations_are_visible"
+msgstr  "Les assignations de stage sont visibles"
+
+msgid   "mask_assignations"
+msgstr  "Masquer les affectations des stages"
+
+msgid   "assignations_arent_visible"
+msgstr  "Les assignations de stage de sont pas visibles"
+
+msgid   "display_assignations"
+msgstr  "Afficher les affectations des stages"
