@@ -35,6 +35,7 @@
     <div class="page-header">
         <h2>{% trans 'internships' %}</h2>
     </div>
+    {% include "template_messages.html" %}
     <table style="height:100%; width:100%;">
         <thead>
         <tr>
@@ -100,9 +101,10 @@
                                         <tr>
                                             <th align="center">{% trans 'organization' %}</th>
                                             <th align="center">{% trans 'student_max' %}</th>
-                                            <th align="center">{% trans 'Nombre de 1er choix' %}</th>
-                                            <th align="center">{% trans 'Nombre d\'autres choix faits' %}</th>
-                                            <th align="center">{% trans 'Détails' %}</th>
+                                            <th align="center">{% trans 'number_first_choice' %}</th>
+                                            <th align="center">{% trans 'number_other_choice' %}</th>
+                                            <th align="center">{% trans 'details' %}</th>
+                                            <th align="center">{% trans 'internships_masters' %}</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -124,9 +126,16 @@
                                                     <td align="center">
                                                         <a class="btn btn-info" target="_blank" id="lnk_students_choice{{internship.id}}"
                                                            href="{% url 'internship_detail_student_choice' internship.id %}">
-                                  <span class="glyphicon glyphicon-search" aria-hidden="true">
-                                  </span>
+                                                          <span class="glyphicon glyphicon-search" aria-hidden="true">
+                                                          </span>
                                                         </a>
+                                                    </td>
+                                                    <td>
+                                                        {% if internship.internship_master != None %}
+                                                            {{ internship.internship_master }}
+                                                        {% else %}
+                                                            -
+                                                        {% endif %}
                                                     </td>
                                                 </tr>
                                             {% endif %}

@@ -294,6 +294,7 @@ def student_affectation(request, organization_id):
                                                              'affectations': affectations,
                                                              'specialities': all_speciality,
                                                              'periods': periods,
+                                                             'internships':internships,
                                                              })
 
 
@@ -314,7 +315,7 @@ def export_xls(request, organization_id, speciality_id):
         a.email = informations.email
         a.adress = informations.location + " " + informations.postal_code + " " + informations.city
         a.phone_mobile = informations.phone_mobile
-        a.master = offer.master
+        a.master = offer.internship_master
 
     return export_utils.export_xls(organization_id, affectations)
 

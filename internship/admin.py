@@ -30,8 +30,8 @@ from .models import InternshipOffer, InternshipEnrollment, InternshipMaster, Int
 
 
 class InternshipOfferAdmin(admin.ModelAdmin):
-    list_display = ('organization','speciality', 'title', 'maximum_enrollments', 'master', 'selectable')
-    fieldsets = ((None, {'fields': ('organization','speciality', 'title', 'maximum_enrollments', 'master', 'selectable')}),)
+    list_display = ('organization','speciality', 'title', 'maximum_enrollments', 'internship_master', 'selectable')
+    fieldsets = ((None, {'fields': ('organization','speciality', 'title', 'maximum_enrollments', 'internship_master', 'selectable')}),)
 
 admin.site.register(InternshipOffer, InternshipOfferAdmin)
 
@@ -44,8 +44,12 @@ admin.site.register(InternshipEnrollment, InternshipEnrollmentAdmin)
 
 
 class InternshipMasterAdmin(admin.ModelAdmin):
-    list_display = ('reference', 'organization', 'first_name', 'last_name', 'civility', 'type_mastery', 'speciality')
-    fieldsets = ((None, {'fields': ('reference', 'organization', 'first_name', 'last_name', 'civility', 'type_mastery', 'speciality')}),)
+    list_display = ('first_name', 'last_name', 'civility', 'sexe', 'speciality', 'organization', 'birth_date', \
+                    'email_professionnal', 'email_private', 'phone_professionnal', 'phone_private', \
+                    'cremec', 'date_start_activity', 'date_end_activity')
+    fieldsets = ((None, {'fields': ('first_name', 'last_name', 'civility', 'sexe', 'speciality', 'organization', 'birth_date', \
+                    'email_professionnal', 'email_private', 'phone_professionnal', 'phone_private', \
+                    'cremec', 'date_start_activity', 'date_end_activity')}),)
 
 admin.site.register(InternshipMaster, InternshipMasterAdmin)
 

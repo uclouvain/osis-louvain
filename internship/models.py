@@ -37,7 +37,7 @@ class InternshipOffer(models.Model):
     speciality          = models.ForeignKey('internship.InternshipSpeciality',null=True)
     title = models.CharField(max_length=255)
     maximum_enrollments = models.IntegerField()
-    master              = models.CharField(max_length=100, blank=True, null=True)
+    internship_master   = models.ForeignKey('internship.InternshipMaster', null=True)
     selectable          = models.BooleanField(default=True)
 
     def __str__(self):
@@ -98,37 +98,32 @@ class InternshipEnrollment(models.Model):
 
 
 class InternshipMaster(models.Model):
-    CIVILITY_CHOICE = (('PROFESSOR',_('Professor')),
-                       ('DOCTOR',_('Doctor')))
-    TYPE_CHOICE = (('SPECIALIST',_('Specialist')),
-                   ('GENERALIST',_('Generalist')))
-    SPECIALITY_CHOICE = (('INTERNAL_MEDICINE',_('Internal Medicine')),
-                         ('SURGERY',_('Surgery')),
-                         ('GYNEC_OBSTETRICS',_('Gynec-Obstetrics')),
-                         ('PEDIATRICS',_('Pediatrics')),
-                         ('EMERGENCY',_('Emergency')),
-                         ('GERIATRICS',_('Geriatrics')))
-
-    organization     = models.ForeignKey('internship.Organization', null=True)
-    #internship_offer = models.ForeignKey(InternshipOffer)
     first_name = models.CharField(max_length=50, blank=True, null=True, db_index=True)
     last_name = models.CharField(max_length=50, blank=True, null=True, db_index=True)
-    reference = models.CharField(max_length=50, blank=True, null=True)
     civility = models.CharField(max_length=50, blank=True, null=True)
-    type_mastery = models.CharField(max_length=50, blank=True, null=True)
+    sexe = models.CharField(max_length=50, blank=True, null=True)
     speciality = models.CharField(max_length=50, blank=True, null=True)
+    organization = models.ForeignKey('internship.Organization', null=True)
+    birth_date = models.DateField(blank=True, null=True)
+    email_professionnal = models.CharField(max_length=255, blank=True, null=True)
+    email_private = models.CharField(max_length=255, blank=True, null=True)
+    phone_professionnal = models.CharField(max_length=50, blank=True, null=True)
+    phone_private = models.CharField(max_length=50, blank=True, null=True)
+    cremec = models.CharField(max_length=50, blank=True, null=True)
+    date_start_activity = models.DateField(blank=True, null=True)
+    date_end_activity = models.DateField(blank=True, null=True)
 
     @staticmethod
     def find_masters():
-        return InternshipMaster.objects.all().select_related("organization")
+        return InternshipMaster.objects.all().select_related("organization").order_by("last_name", "first_name")
 
     def __str__(self):
-        return u"%s" % (self.reference)
+        return u"%s %s" % (self.civility, self.last_name)
 
     @staticmethod
     def search(**kwargs):
         kwargs = {k: v for k, v in kwargs.items() if v}
-        queryset = InternshipMaster.objects.filter(**kwargs).select_related("organization")
+        queryset = InternshipMaster.objects.filter(**kwargs).select_related("organization").order_by("last_name", "first_name")
         return queryset
 
 

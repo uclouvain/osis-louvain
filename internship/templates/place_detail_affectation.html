@@ -54,6 +54,13 @@
                                             <span class="glyphicon glyphicon-download" aria-hidden="true"></span> {% trans 'download_xls_file' %}
                                         </button>
                                     </a>
+                                    <div align="left">
+                                        {% for internship in internships %}
+                                            {% if internship.speciality.acronym == speciality.acronym %}
+                                                <h4>{{internship.internship_master}}</h4>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
                                     <table class="table table-hover">
                                         {% for period in periods %}
                                             <tr>

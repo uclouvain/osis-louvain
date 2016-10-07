@@ -190,10 +190,17 @@ def __save_xls_internships(request, file_name, user):
                 spec_value = row[col_spec].value
                 spec_value = spec_value.replace(" ","")
                 spec_value = spec_value.replace("*","")
-
-                master_value = row[col_master].value
-
                 speciality = InternshipSpeciality.search(acronym__icontains=spec_value)
+
+                master_value = None
+                masters = InternshipMaster.search(organization=organization)
+                for master in masters:
+                    if master.speciality.lower() in speciality[0].name.lower():
+                        master_value = master
+
+                if not master_value :
+                    messages.add_message(request, messages.WARNING, '%s (%s %s).' % \
+                    (_('no_master_existing'), _('line') , count+1))
 
                 number_place = 0
                 for x in range (3,15):
@@ -213,7 +220,7 @@ def __save_xls_internships(request, file_name, user):
                     internship.speciality = speciality[x]
                     internship.title = speciality[x].name
                     internship.maximum_enrollments = number_place
-                    internship.master = master_value
+                    internship.internship_master = master_value
                     internship.selectable = True
                     internship.save()
 
@@ -236,6 +243,9 @@ def __save_xls_internships(request, file_name, user):
                         else :
                             relation.number_places = int(row[x].value)
                         relation.save()
+            else :
+                messages.add_message(request, messages.WARNING, '%s : %s (%s %s).' % \
+                (_('no_organization_existing_reference'),row[col_reference].value, _('line') , count+1))
 
 @login_required
 def upload_masters_file(request):
@@ -254,14 +264,20 @@ def __save_xls_masters(request, file_name, user):
     workbook = load_workbook(file_name, read_only=True)
     worksheet = workbook.active
 
-    col_reference = 2
-    col_firstname = 3
-    col_lastname = 4
-    col_mail = 7
-    col_organization_reference = 6
-    col_civility = 0
-    col_mastery = 1
+    col_lastname = 1
+    col_firstname = 2
+    col_civility = 3
+    col_sexe = 4
     col_speciality = 5
+    col_organization_reference = 6
+    col_birht_date = 7
+    col_mail_pro = 8
+    col_mail_private = 9
+    col_phone_pro = 10
+    col_phone_private = 11
+    col_CREMEC = 12
+    col_date_start_activity = 13
+    col_date_end_activity = 14
 
     # Iterates over the lines of the spreadsheet.
     for count, row in enumerate(worksheet.rows):
@@ -285,46 +301,94 @@ def __save_xls_masters(request, file_name, user):
                 reference = ""
                 check_reference = row[col_organization_reference].value.strip(' ')
                 if check_reference != "":
-                    if check_reference[0][0] != "0":
-                        if int(check_reference) < 10 :
-                            reference = "0"+str(check_reference)
+                    if _is_registration_id( row[col_organization_reference].value):
+                        if check_reference[0][0] != "0":
+                            if int(check_reference) < 10 :
+                                reference = "0"+str(check_reference)
+                            else :
+                                reference = str(check_reference)
                         else :
                             reference = str(check_reference)
-                    else :
-                        reference = str(check_reference)
 
-                    organization = Organization.search(reference=reference)
-                    master.organization = organization[0]
+                        organization = Organization.search(reference=reference)
+                        if organization:
+                            master.organization = organization[0]
+                        else:
+                            master.organization = None
+                            messages.add_message(request, messages.WARNING, '%s : %s - %s %s (%s %s).' % \
+                            (_('no_organization_existing_reference'),reference, \
+                            row[col_firstname].value, row[col_lastname].value,_('line') , count+1))
+                    else:
+                        messages.add_message(request, messages.WARNING, '%s : %s - %s %s (%s %s).' % \
+                        (_('no_organization_existing_reference'),row[col_organization_reference].value, \
+                        row[col_firstname].value, row[col_lastname].value,_('line') , count+1))
+                        master.organization = None
                 else :
                     master.organization = None
-            if row[col_firstname].value:
-                master.first_name = row[col_firstname].value
-            else :
-                master.first_name = " "
 
             if row[col_lastname].value:
                 master.last_name = row[col_lastname].value
             else :
                 master.last_name = " "
 
-            if row[col_reference].value:
-                master.reference = row[col_reference].value
-            else:
-                master.reference = " "
+            if row[col_firstname].value:
+                master.first_name = row[col_firstname].value
+            else :
+                master.first_name = " "
 
             if row[col_civility].value:
                 master.civility = row[col_civility].value
-            else:
+            else :
                 master.civility = " "
 
-            if row[col_mastery].value:
-                master.type_mastery = row[col_mastery].value
-            else:
-                master.type_mastery = " "
+            if row[col_sexe].value:
+                master.sexe = row[col_sexe].value
+            else :
+                master.sexe = " "
 
             if row[col_speciality].value:
                 master.speciality = row[col_speciality].value
-            else:
+            else :
                 master.speciality = " "
+
+            if row[col_birht_date].value:
+                master.birth_date = row[col_birht_date].value
+            else :
+                master.birth_date = " "
+
+            if row[col_mail_pro].value:
+                master.email_professionnal = row[col_mail_pro].value
+            else :
+                master.email_professionnal = " "
+
+            if row[col_mail_private].value:
+                master.email_private = row[col_mail_private].value
+            else :
+                master.email_private = " "
+
+            if row[col_phone_pro].value:
+                master.phone_professionnal = row[col_phone_pro].value
+            else :
+                master.phone_professionnal = " "
+
+            if row[col_phone_private].value:
+                master.phone_private = row[col_phone_private].value
+            else :
+                master.phone_private = " "
+
+            if row[col_CREMEC].value:
+                master.cremec = row[col_CREMEC].value
+            else :
+                master.cremec = " "
+
+            if row[col_date_start_activity].value:
+                master.date_start_activity = row[col_date_start_activity].value
+            else :
+                master.date_start_activity = " "
+
+            if row[col_date_end_activity].value:
+                master.date_end_activity = row[col_date_end_activity].value
+            else :
+                master.date_end_activity = " "
 
             master.save()

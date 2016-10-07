@@ -35,6 +35,7 @@
     <div class="page-header">
         <h2>{% trans 'internships_masters' %}</h2>
     </div>
+    {% include "template_messages.html" %}
     <div class="panel panel-default">
         <table style="height:100%; width:100%;">
             <thead>
@@ -129,11 +130,15 @@
                                 {{ master.speciality }}
                             </td>
                             <td>
-                                {% if master.organization.website %}
-                                    <a href="{{ master.organization.website }}" target="blank">{{ master.organization }}</a>
+                                {% if master.organization != None %}
+                                    {% if master.organization.website %}
+                                        <a href="{{ master.organization.website }}" target="blank">{{ master.organization }}</a>
+                                    {% else %}
+                                        {{ master.organization }}
+                                    {%endif%}
                                 {% else %}
-                                    {{ master.organization }}
-                                {%endif%}
+                                    -
+                                {% endif %}
                             </td>
                         </tr>
                     {% endfor %}

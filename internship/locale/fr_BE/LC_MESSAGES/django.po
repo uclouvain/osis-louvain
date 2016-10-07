@@ -353,3 +353,21 @@ msgstr  "Executions"
 
 msgid   "order_postion"
 msgstr  "Position de tri"
+
+msgid   "no_organization_existing_reference"
+msgstr  "Aucune organisation existante avec la référence"
+
+msgid   "student_max"
+msgstr  "Nombre maximum d'étudiants"
+
+msgid   "number_first_choice"
+msgstr  "Nombre de 1er choix"
+
+msgid   "number_other_choice"
+msgstr  "Nombre d\'autres choix faits"
+
+msgid   "details"
+msgstr  "Détails"
+
+msgid   "no_master_existing"
+msgstr  "Pas de maître de stage existant"

@@ -353,3 +353,21 @@ msgstr  "Executions"
 
 msgid   "order_postion"
 msgstr  "Sorting position"
+
+msgid   "no_organization_existing_reference"
+msgstr  "No organization existing with reference"
+
+msgid   "student_max"
+msgstr  "Number maximum of student"
+
+msgid   "number_first_choice"
+msgstr  "Number of first choice"
+
+msgid   "number_other_choice"
+msgstr  "Number of other choice"
+
+msgid   "details"
+msgstr  "Details"
+
+msgid   "no_master_existing"
+msgstr  "No internship's master existing"
