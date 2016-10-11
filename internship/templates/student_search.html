@@ -95,11 +95,13 @@
                       <td>{{ student.person.first_name }}</td>
                       <td>
                         {% if student.registration_id %}
-                          <a class="btn btn-primary" target="_blank" id="lnk_students_choice{{organization.reference}}"
-                            href="{% url 'internships_student_read' student.registration_id %}">
-                            <span class="glyphicon glyphicon-search" aria-hidden="true">
-                            </span>
-                          </a>
+                          <form method="post" action="{% url 'internships_student_read'%}" target="_blank">
+                            {% csrf_token %}
+                            <input type="hidden" value={{ student.registration_id }} name="registration_id"/>
+                            <button type="submit" class="btn btn-primary">
+                              <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </button>
+                          </form>
                         {% endif %}
                       </td>
                       <td>

@@ -353,3 +353,6 @@ msgstr  "Executions"
 
 msgid   "order_postion"
 msgstr  "Position de tri"
+
+msgid   "modification_done"
+msgstr  "Modifications réussies, vous pouvez fermer cet onglet."

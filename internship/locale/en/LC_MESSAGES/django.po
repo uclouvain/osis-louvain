@@ -353,3 +353,6 @@ msgstr  "Executions"
 
 msgid   "order_postion"
 msgstr  "Sorting position"
+
+msgid   "modification_done"
+msgstr  "Modifications done. You can close this tab."

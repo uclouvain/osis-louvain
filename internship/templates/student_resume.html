@@ -29,7 +29,9 @@
 {% block breadcrumb %}
     <li><a href="{% url 'studies' %}">{% trans 'studies' %}</a></li>
     <li><a href="{% url 'internships_home' %}">{% trans 'internships_managment' %}</a></li>
-    <li><a href="{% url 'internships_student_resume' %}">{% trans 'student_sumup' %}</a></li>
+    {% if perms.internship.is_internship_manager %}
+        <li><a href="{% url 'internships_student_resume' %}">{% trans 'student_sumup' %}</a></li>
+    {% endif %}
     <li class="active">{{ student.person.last_name }} {{ student.person.first_name }}</li>
 {% endblock %}
 {% block content %}

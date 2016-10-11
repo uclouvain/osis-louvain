@@ -113,7 +113,8 @@ def internships_student_resume(request):
 @login_required
 @permission_required('internship.can_access_internship', raise_exception=True)
 @permission_required('internship.is_internship_manager', raise_exception=True)
-def internships_student_read(request, registration_id):
+def internships_student_read(request):
+    registration_id = request.POST.get('registration_id')
     student = mdl.student.find_by(registration_id=registration_id)
     student = student[0]
     information = InternshipStudentInformation.search(person = student.person)
@@ -170,6 +171,7 @@ def internship_student_information_modification(request, registration_id):
 @permission_required('internship.is_internship_manager', raise_exception=True)
 def student_save_information_modification(request, registration_id):
     student = mdl.student.find_by(registration_id=registration_id)
+
     information = InternshipStudentInformation.search(person = student[0].person)
     if not information:
         information = InternshipStudentInformation()
@@ -185,8 +187,9 @@ def student_save_information_modification(request, registration_id):
     information.latitude = None
     information.longitude = None
     information.save()
+    messages.add_message(request, messages.SUCCESS, _('modification_done'))
 
-    redirect_url = reverse('internships_student_read', args=[registration_id])
+    redirect_url = reverse('internship_student_information_modification', args=[registration_id])
     return HttpResponseRedirect(redirect_url)
 
 
@@ -242,6 +245,7 @@ def student_save_affectation_modification(request, registration_id):
                 messages.add_message(request, messages.ERROR, _('%s : %s-%s (%s)=> error') % (speciality.name, organization.reference, organization.name, period.name))
 
     if not check_error_present:
+        messages.add_message(request, messages.SUCCESS, _('modification_done'))
         InternshipStudentAffectationStat.search(student=student).delete()
         index = len(period_list)
         for x in range(0, index):
@@ -274,7 +278,7 @@ def student_save_affectation_modification(request, registration_id):
                     affectation_modif.cost = 10
 
                 affectation_modif.save()
-        redirect_url = reverse('internships_student_read', args=[student.registration_id])
+        redirect_url = reverse('internship_student_affectation_modification', args=[student.id])
     else:
         redirect_url = reverse('internship_student_affectation_modification', args=[student.id])
     return HttpResponseRedirect(redirect_url)

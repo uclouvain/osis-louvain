@@ -183,8 +183,14 @@
                                     </thead>
                                     {% for student, periods in recap_sol.items %}
                                         <tr id="student_{{student.id}}">
-                                            <td>
-                                                <a href="{% url 'internships_student_read' student.registration_id %}" target="_blank">{{student}}</a>
+                                            <td>{{student}}
+                                                <form method="post" action="{% url 'internships_student_read'%}" target="_blank">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" value={{ student.registration_id }} name="registration_id"/>
+                                                    <button type="submit" class="btn btn-primary btn-sm">
+                                                      <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                                    </button>
+                                                  </form>
                                             </td>
                                             {% for period, enrollment in periods.items %}
 
@@ -365,7 +371,15 @@
                         </tr>
                         {% for internship in errors %}
                             <tr>
-                                <td><a href="{% url 'internships_student_read' internship.student.registration_id %}" target="_blank">{{internship.student}}</a></td>
+                                <td>{{internship.student}}
+                                    <form method="post" action="{% url 'internships_student_read'%}" target="_blank">
+                                        {% csrf_token %}
+                                        <input type="hidden" value={{ internship.student.registration_id }} name="registration_id"/>
+                                        <button type="submit" class="btn btn-primary btn-sm">
+                                          <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                                        </button>
+                                      </form>
+                                </td>
                                 <td>{{internship.speciality}}</td>
                                 <td>{{internship.period}}</td>
                                 <td>{{internship.organization}}</td>
