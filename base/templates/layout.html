@@ -228,6 +228,17 @@
     <script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/osis.js' %}?version={{ js }}"></script>
+    <script src="{% static 'js/raven.min.js' %}"></script>
+    {% if environment == 'PROD' and request.sentry.id %}
+        <script>
+            Raven.showReportDialog({
+                eventId: '{{ request.sentry.id }}',
+
+                // use the public DSN (dont include your secret!)
+                dsn: '{{ sentry_dns }}'
+            });
+        </script>
+    {% endif %}
     {% block script %}
     {% endblock %}
 </body>

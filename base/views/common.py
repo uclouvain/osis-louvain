@@ -57,9 +57,11 @@ def noscript(request):
 def environnement_request_processor(request):
     try:
         env = settings.ENVIRONMENT
+        sentry_dns = settings.SENTRY_DNS
     except AttributeError:
         env = 'DEV'
-    return {'environment': env}
+        sentry_dns = ''
+    return {'environment': env, 'sentry_dns': sentry_dns}
 
 
 def login(request):
