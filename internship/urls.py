@@ -63,6 +63,7 @@ urlpatterns = [
     url(r'^places/create/$', place.organization_create, name='place_create'),
     url(r'^places/edit/([0-9]+)/$', place.organization_edit, name='place_edit'),
     #url(r'^places/exportpdf/([0-9]+)/([0-9]+)/$', place.export_pdf, name='affectation_download_pdf'),
+    url(r'^places/exportxls/([0-9]+)/$', place.export_specialisation_xls, name='all_affectation_download'),
     url(r'^places/exportxls/([0-9]+)/([0-9]+)/$', place.export_xls, name='affectation_download'),
     url(r'^places/save/([0-9]+)/([0-9]+)/$', place.place_save, name='place_save'),
     url(r'^places/save/$', place.organization_new, name='place_save_new'),

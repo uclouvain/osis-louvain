@@ -38,6 +38,12 @@
     </div>
     <div class="panel panel-default">
         <div class="panel-body">
+            <a href="{% url 'all_affectation_download' organization.id %}">
+                <button type="button" class="btn btn-default" style="float: right;">
+                    <span class="glyphicon glyphicon-download" aria-hidden="true"></span> {% trans 'download_xls_file' %}
+                </button>
+            </a>
+            <br/><br/><br/>
             <ul class="nav nav-tabs">
                 {% for speciality in specialities %}
                     <li {% if forloop.first %}class="active"{% endif %}><a data-toggle="tab" href="#tab_{{speciality.tab}}">{{speciality.name}}</a></li>

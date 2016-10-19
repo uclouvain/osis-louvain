@@ -300,9 +300,12 @@ def student_affectation(request, organization_id):
 @login_required
 @permission_required('internship.is_internship_manager', raise_exception=True)
 def export_xls(request, organization_id, speciality_id):
+    """
+        Function to export to a xls file all student affected to an organization and a speciality
+    """
     organization = Organization.find_by_id(organization_id)
     speciality = InternshipSpeciality.find_by_id(speciality_id)
-    affectations = InternshipStudentAffectationStat.search(organization=organization, speciality=speciality)
+    affectations = list(InternshipStudentAffectationStat.search(organization=organization, speciality__acronym=speciality.acronym))
 
     for a in affectations:
         a.email = ""
@@ -318,12 +321,41 @@ def export_xls(request, organization_id, speciality_id):
 
     return export_utils.export_xls(organization_id, affectations)
 
+
+@login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
+def export_specialisation_xls(request, organization_id):
+    """
+        Function to export to a xls file all student affected to the specialities present for this organization
+    """
+    organization = Organization.find_by_id(organization_id)
+    affectations = list(InternshipStudentAffectationStat.search(organization=organization))
+
+    for a in affectations:
+        a.email = ""
+        a.adress = ""
+        a.phone_mobile = ""
+        a.master = ""
+        informations = InternshipStudentInformation.search(person=a.student.person)[0]
+        offer = InternshipOffer.search(organization=a.organization, speciality = a.speciality)[0]
+        a.email = informations.email
+        a.adress = informations.location + " " + informations.postal_code + " " + informations.city
+        a.phone_mobile = informations.phone_mobile
+        a.master = offer.master
+
+    internships = InternshipOffer.search(organization = organization)
+    all_speciality = get_all_specialities(internships)
+    all_speciality = set_speciality_unique(all_speciality)
+
+    return export_utils.export_speciality_xls(organization_id, affectations, all_speciality)
+
+
 @login_required
 @permission_required('internship.is_internship_manager', raise_exception=True)
 def export_pdf(request, organization_id, speciality_id):
     organization = Organization.find_by_id(organization_id)
     speciality = InternshipSpeciality.find_by_id(speciality_id)
-    affectations = InternshipStudentAffectationStat.search(organization=organization, speciality=speciality)
+    affectations = InternshipStudentAffectationStat.search(organization=organization, speciality__acronym=speciality.acronym)
 
     for a in affectations:
         a.email = ""

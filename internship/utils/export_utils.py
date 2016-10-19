@@ -43,6 +43,9 @@ HEADER = [str(_('lastname')),
 
 
 def export_xls(organization_id, affectations):
+    """
+        Function to export to a xls file all student affected to an organization and a speciality
+    """
     organization = Organization.find_by_id(organization_id)
 
     if affectations :
@@ -50,6 +53,8 @@ def export_xls(organization_id, affectations):
 
         workbook = Workbook()
         worksheet = workbook.active
+        worksheet.orientation='landscape'
+        worksheet.title = affectations[0].organization.reference
 
         worksheet.append([str(affectations[0].organization.name)])
         worksheet.append([str(affectations[0].speciality.name)])
@@ -87,7 +92,7 @@ def export_xls(organization_id, affectations):
         filename_speciality = str(affectations[0].speciality.acronym).strip()
         filename = "affectation_%s_%s.xlsx" % (str(organization.reference),
                                               filename_speciality)
-        print(filename)
+
         response = HttpResponse(save_virtual_workbook(workbook), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
         response['Content-Disposition'] = 'attachment; filename=%s' % filename
         return response
@@ -95,6 +100,66 @@ def export_xls(organization_id, affectations):
         redirect_url = reverse('place_detail_student_affectation', args=[organization.reference])
         return HttpResponseRedirect(redirect_url)
 
+def export_speciality_xls(organization_id, affectations, specialities):
+    """
+        Function to export to a xls file all student affected to the specialities present for this organization
+    """
+    organization = Organization.find_by_id(organization_id)
+
+    if affectations :
+        periods = Period.search()
+
+        workbook = Workbook()
+        for speciality in specialities:
+            worksheet = workbook.create_sheet(title=speciality.acronym)
+            worksheet.orientation='landscape'
+            worksheet.append([str(affectations[0].organization.name)])
+            worksheet.append([str(speciality.name)])
+            worksheet.append([str('')])
+            printing_date = datetime.datetime.now()
+            printing_date = printing_date.strftime("%d/%m/%Y")
+            worksheet.append([str('%s: %s' % (_('file_production_date'), printing_date))])
+            worksheet.append([str('')])
+            #worksheet.append([str(affectations[0].master)])
+            worksheet.append([str('')])
+            worksheet.append([str('')])
+
+            __columns_resizing(worksheet)
+
+            row_number = 9
+            for period in periods:
+                worksheet.append([str(period.name), period.date_start.strftime("%d-%m-%Y"), period.date_end.strftime("%d-%m-%Y")])
+                __coloring_non_editable(worksheet, row_number)
+                row_number += 1
+                for affectation in affectations:
+                    if affectation.speciality.acronym == speciality.acronym:
+                        if affectation.period.name == period.name:
+                            student = affectation.student
+                            worksheet.append([str(student.person.last_name),
+                                              str(student.person.first_name),
+                                              student.registration_id,
+                                              affectation.email,
+                                              affectation.adress,
+                                              student.person.birth_date,
+                                              affectation.phone_mobile])
+                            row_number += 1
+
+                worksheet.append([str('')])
+                row_number += 1
+
+        ws = workbook.get_sheet_by_name("Sheet")
+        if ws is not None:
+            workbook.remove_sheet(ws)
+
+        filename_speciality = str(affectations[0].speciality.acronym).strip()
+        filename = "affectation_%s.xlsx" % (str(organization.reference))
+
+        response = HttpResponse(save_virtual_workbook(workbook), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        response['Content-Disposition'] = 'attachment; filename=%s' % filename
+        return response
+    else:
+        redirect_url = reverse('place_detail_student_affectation', args=[organization.reference])
+        return HttpResponseRedirect(redirect_url)
 
 def __columns_resizing(ws):
     """
