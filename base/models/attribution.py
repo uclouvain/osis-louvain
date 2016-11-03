@@ -66,7 +66,7 @@ def search(tutor=None, learning_unit_year=None, function=None, list_learning_uni
         queryset = queryset.filter(function=function)
 
     if list_learning_unit_year:
-        queryset = queryset.filter(learning_unit_yearin=list_learning_unit_year)
+        queryset = queryset.filter(learning_unit_year__in=list_learning_unit_year)
 
     return queryset.select_related('tutor', 'learning_unit_year')
 

@@ -30,7 +30,7 @@ from openpyxl import load_workbook
 from django.contrib import messages
 from django.utils.translation import ugettext as _
 
-from base.forms import ScoreFileForm
+from base.forms.score_file import ScoreFileForm
 from base import models as mdl
 
 

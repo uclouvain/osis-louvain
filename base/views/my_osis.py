@@ -33,7 +33,7 @@ from django.utils import translation
 from django.utils.translation import ugettext as _
 
 from base import models as mdl
-from base.forms import MyMessageActionForm, MyMessageForm
+from base.forms.my_message import MyMessageActionForm, MyMessageForm
 from base.utils import send_mail
 from base.views import layout
 from osis_common.models import message_history as message_history_mdl

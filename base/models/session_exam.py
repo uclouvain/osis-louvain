@@ -31,7 +31,7 @@ from django.utils import timezone
 
 class SessionExamAdmin(admin.ModelAdmin):
     list_display = ('learning_unit_year', 'offer_year_calendar', 'number_session', 'changed', 'deadline')
-    list_filter = ('number_session',)
+    list_filter = ('learning_unit_year__academic_year__year', 'number_session',)
     raw_id_fields = ('learning_unit_year', 'offer_year_calendar')
     fieldsets = ((None, {'fields': ('learning_unit_year', 'number_session', 'offer_year_calendar')}),)
     search_fields = ['learning_unit_year__acronym', 'offer_year_calendar__offer_year__acronym']
@@ -47,11 +47,11 @@ class SessionExam(models.Model):
     deadline = models.DateField(null=True)
 
     def __str__(self):
-        return u"%s - %d" % (self.learning_unit_year, self.number_session)
+        return u"%s - %s - %d" % (self.learning_unit_year, self.offer_year_calendar.offer_year, self.number_session)
 
 
 def current_session_exam():
-    offer_calendar = offer_year_calendar.offer_year_calendar_by_current_session_exam()
+    offer_calendar = offer_year_calendar.find_by_current_session_exam()
     session_exam = SessionExam.objects.filter(offer_year_calendar=offer_calendar).first()
     return session_exam
 

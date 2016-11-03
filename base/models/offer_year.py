@@ -35,6 +35,7 @@ class OfferYearAdmin(admin.ModelAdmin):
     fieldsets = ((None, {'fields': ('offer', 'academic_year', 'entity_administration', 'entity_administration_fac',
                                     'entity_management', 'entity_management_fac', 'acronym', 'title', 'parent',
                                     'title_international', 'title_short', 'title_printable', 'grade', 'campus')}),)
+    list_filter = ('academic_year__year',)
     raw_id_fields = ('offer', 'parent')
     search_fields = ['acronym']
 
@@ -123,7 +124,7 @@ class OfferYear(SerializableModel):
 
 
 def find_by_academic_year(academic_yr):
-    return OfferYear.objects.filter(academic_year=int(academic_yr))
+    return OfferYear.objects.filter(academic_year=academic_yr)
 
 
 def find_by_structure(struct):

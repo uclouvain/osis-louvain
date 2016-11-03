@@ -27,13 +27,13 @@ from django.contrib.auth.decorators import login_required, permission_required
 
 from django.http import HttpResponse
 from base import models as mdl
-from base.forms import OfferFormForm
-from base.forms import OfferQuestionForm
+from base.forms.offer_form import OfferFormForm
+from base.forms.offer_question import OfferQuestionForm
 from admission import models as admission
 from reference import models as mdl_ref
 from . import layout
 from datetime import datetime
-from base.forms import OfferYearCalendarForm
+from base.forms.offer_year_calendar import OfferYearCalendarForm
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
@@ -80,7 +80,7 @@ def offers_search(request):
 @permission_required('base.can_access_offer', raise_exception=True)
 def offer_read(request, offer_year_id):
     offer_yr = mdl.offer_year.find_by_id(offer_year_id)
-    offer_yr_events = mdl.offer_year_calendar.find_offer_year_calendar(offer_yr)
+    offer_yr_events = mdl.offer_year_calendar.find_by_offer_year(offer_yr)
     admission_form = admission.form.find_by_offer_year(offer_yr)
     program_managers = mdl.program_manager.find_by_offer_year(offer_yr)
     is_program_manager = mdl.program_manager.is_program_manager(request.user, offer_year=offer_yr)

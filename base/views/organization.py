@@ -25,7 +25,7 @@
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
 from base import models as mdl
-from base.forms import OrganizationForm
+from base.forms.organization import OrganizationForm
 from . import layout
 from reference import models as mdlref
 

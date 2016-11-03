@@ -23,17 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 from django.db import models
 from django.utils import timezone
-from django.contrib import admin
 from base.models import session_exam
 
-
-class AcademicCalendarAdmin(admin.ModelAdmin):
-    list_display = ('title', 'academic_year', 'start_date', 'end_date', 'changed')
-    fieldsets = ((None, {'fields': ('academic_year', 'title', 'description', 'start_date', 'end_date')}),)
-
+FUNCTIONS = 'functions'
 
 class AcademicCalendar(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
@@ -46,6 +40,14 @@ class AcademicCalendar(models.Model):
     highlight_title = models.CharField(max_length=255, blank=True, null=True)
     highlight_description = models.CharField(max_length=255, blank=True, null=True)
     highlight_shortcut = models.CharField(max_length=255, blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        if FUNCTIONS not in kwargs.keys():
+            raise ValueError('The kwarg "{0}" must be set.'.format(FUNCTIONS))
+        functions = kwargs.pop(FUNCTIONS)
+        super(AcademicCalendar, self).save(*args, **kwargs)
+        for function in functions:
+            function(self)
 
     def __str__(self):
         return u"%s %s" % (self.academic_year, self.title)

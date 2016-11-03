@@ -23,25 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
-from django.contrib import admin
-from osis_common.models.serializable_model import SerializableModel
+from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 
-class OfferYearDomainAdmin(admin.ModelAdmin):
-    list_display = ('domain', 'offer_year', 'changed')
-    fieldsets = ((None, {'fields': ('domain', 'offer_year')}),)
-    list_filter = ('offer_year__academic_year__year',)
-    raw_id_fields = ('domain', 'offer_year')
-    search_fields = ['domain__name', 'offer_year__acronym']
+class ScoreFileForm(forms.Form):
+    file = forms.FileField(error_messages={'required': _('no_file_submitted')})
 
-
-class OfferYearDomain(SerializableModel):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
-    domain = models.ForeignKey('reference.Domain', blank=True, null=True)
-    offer_year = models.ForeignKey('base.OfferYear', blank=True, null=True)
-
-    def __str__(self):
-        return u"%s - %s" % (self.domain, self.offer_year)
-
+    def clean_file(self):
+        file = self.cleaned_data['file']
+        content_type = file.content_type.split('/')[1]
+        valid_content_type = 'vnd.openxmlformats-officedocument.spreadsheetml.sheet' in content_type
+        if ".xlsx" not in file.name or not valid_content_type:
+            self.add_error('file', forms.ValidationError(_('file_must_be_xlsx'), code='invalid'))
+        return file

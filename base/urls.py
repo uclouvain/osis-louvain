@@ -38,10 +38,6 @@ urlpatterns = [
     url(r'^academic_calendars/$', academic_calendar.academic_calendars, name='academic_calendars'),
     url(r'^academic_calendars/search$', academic_calendar.academic_calendars_search, name='academic_calendars_search'),
     url(r'^academic_calendars/([0-9]+)/$', academic_calendar.academic_calendar_read, name='academic_calendar_read'),
-    url(r'^academic_calendars/edit/([0-9]+)/$', academic_calendar.academic_calendar_edit, name='academic_calendar_edit'),
-    url(r'^academic_calendars/save/([0-9]+)/$', academic_calendar.academic_calendar_save, name='academic_calendar_save'),
-    url(r'^academic_calendars/save/$', academic_calendar.academic_calendar_new, name='academic_calendar_save_new'),
-    url(r'^academic_calendars/create/$', academic_calendar.academic_calendar_create, name='academic_calendar_create'),
 
     url(r'^admin/data/$', common.data, name='data'),
     url(r'^admin/data/maintenance$', common.data_maintenance, name='data_maintenance'),
@@ -93,11 +89,7 @@ urlpatterns = [
     url(r'^academic_calendars/$', academic_calendar.academic_calendars, name='academic_calendars'),
     url(r'^academic_calendars/search$', academic_calendar.academic_calendars_search, name='academic_calendars_search'),
     url(r'^academic_calendars/([0-9]+)/$', academic_calendar.academic_calendar_read, name='academic_calendar_read'),
-    url(r'^academic_calendars/edit/([0-9]+)/$', academic_calendar.academic_calendar_edit, name='academic_calendar_edit'),
-    url(r'^academic_calendars/save/([0-9]+)/$', academic_calendar.academic_calendar_save, name='academic_calendar_save'),
-    url(r'^academic_calendars/save/$', academic_calendar.academic_calendar_new, name='academic_calendar_save_new'),
-    url(r'^academic_calendars/create/$', academic_calendar.academic_calendar_create, name='academic_calendar_create'),
-
+    url(r'^academic_calendars/form/(?:/(?P<academic_calendar_id>[0-9]+)/)?$', academic_calendar.academic_calendar_form, name='academic_calendar_form'),
     url(r'^offer_year_calendars/([0-9]+)/$', offer.offer_year_calendar_read, name='offer_year_calendar_read'),
     url(r'^offer_year_calendars/edit/([0-9]+)/$', offer.offer_year_calendar_edit, name='offer_year_calendar_edit'),
     url(r'^offer_year_calendars/save/([0-9]+)/$', offer.offer_year_calendar_save, name='offer_year_calendar_save'),

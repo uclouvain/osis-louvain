@@ -214,7 +214,7 @@
                 </div>
                     <div id="tab_dynamic_form" class="tab-pane fade  {% if displaytab == 'tab_dynamic_form' %} in active {%endif%}">
                     <br>
-                    {% if request.user.is_superuser %}
+                    {% if perms.admission.can_add_form %}
                         <a href="{% url 'offer_form_create' offer_year.id %}" id="lnk_form_create_{{offer_year.id}}" class="btn btn-default pull-right" role="button">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                         </a>

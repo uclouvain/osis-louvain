@@ -37,14 +37,15 @@ import unicodedata
 class ExamEnrollmentAdmin(admin.ModelAdmin):
     list_display = ('student', 'enrollment_state', 'session_exam', 'score_draft', 'justification_draft', 'score_final',
                     'justification_final', 'score_reencoded', 'justification_reencoded', 'changed')
-    list_filter = ('session_exam__number_session',)
+    list_filter = ('session_exam__number_session', 'session_exam__learning_unit_year__academic_year__year')
     fieldsets = ((None, {'fields': ('session_exam', 'enrollment_state', 'learning_unit_enrollment', 'score_draft', 'justification_draft',
                                     'score_final', 'justification_final')}),)
     raw_id_fields = ('session_exam', 'learning_unit_enrollment')
     search_fields = ['learning_unit_enrollment__offer_enrollment__student__person__first_name',
                      'learning_unit_enrollment__offer_enrollment__student__person__last_name',
                      'learning_unit_enrollment__offer_enrollment__student__registration_id',
-                     'learning_unit_enrollment__learning_unit_year__acronym']
+                     'learning_unit_enrollment__learning_unit_year__acronym',
+                     'session_exam__offer_year_calendar__offer_year__acronym']
 
 
 class ExamEnrollment(models.Model):
