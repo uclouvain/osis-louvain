@@ -275,6 +275,9 @@ msgstr "Maintenance of data with the SQL language"
 msgid "desc_lnk_data_management"
 msgstr "Management of data by entity"
 
+msgid "desc_lnk_dissertations_app"
+msgstr "Management of students' dissertations"
+
 msgid "desc_lnk_entities"
 msgstr "Management of organizational structure."
 

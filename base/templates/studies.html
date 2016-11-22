@@ -57,6 +57,17 @@
         </div>
         <br/>
         {% endif %}
+        {% if perms.dissertations.can_access_dissertations %}
+        <div class="row">
+
+                <div class="col-md-1"><i class="fa fa-book" style="font-size: 400%; color: #6699FF;"></i></div>
+                <div class="col-md-11">
+                    <h4 class="media-heading"><a href="{% url 'dissertations' %}" id="lnk_dissertations">{% trans 'dissertations' %}</a></h4>
+                    <p>{% trans 'desc_lnk_dissertations_app' %}</p>
+                </div>
+        </div>
+        <br/>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

@@ -116,6 +116,10 @@
                                 <li><a href="{% url 'internships_home' %}"
                                        id="lnk_dropdown_internships">{% trans 'internships' %}</a></li>
                                 {% endif %}
+                                {% if perms.dissertations.can_access_dissertations %}
+                                <li><a href="{% url 'dissertations' %}"
+                                       id="lnk_dropdown_dissertations">{% trans 'dissertations' %}</a></li>
+                                {% endif %}
                             </ul>
                         </li>
                         {% endif %}
