@@ -34,6 +34,7 @@ from datetime import datetime
 class OfferPropositionAdmin(admin.ModelAdmin):
     list_display = ('acronym', 'offer')
     raw_id_fields = ('offer',)
+    search_fields = ('uuid', 'acronym', 'offer')
 
 
 class OfferProposition(SerializableModel):

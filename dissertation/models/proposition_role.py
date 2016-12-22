@@ -32,12 +32,12 @@ from .enums import status_types
 class PropositionRoleAdmin(admin.ModelAdmin):
     list_display = ('adviser', 'status', 'proposition_dissertation')
     raw_id_fields = ('adviser', 'proposition_dissertation')
-    search_fields = ('proposition_dissertation__author__person__last_name',
+    search_fields = ('uuid',
+                     'proposition_dissertation__author__person__last_name',
                      'proposition_dissertation__author__person__first_name',
                      'proposition_dissertation__title',
                      'adviser__person__last_name',
-                     'adviser__person__first_name'
-                     )
+                     'adviser__person__first_name')
 
 
 class PropositionRole(SerializableModel):

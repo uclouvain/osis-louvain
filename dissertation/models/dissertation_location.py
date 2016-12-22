@@ -25,6 +25,12 @@
 ##############################################################################
 from osis_common.models.serializable_model import SerializableModel
 from django.db import models
+from django.contrib import admin
+
+
+class DissertationLocationAdmin(admin.ModelAdmin):
+    list_display = ('uuid', 'name')
+    search_fields = ('uuid', 'name')
 
 
 class DissertationLocation(SerializableModel):
