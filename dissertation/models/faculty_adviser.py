@@ -32,10 +32,10 @@ from . import adviser
 class FacultyAdviserAdmin(admin.ModelAdmin):
     list_display = ('offer', 'adviser', 'get_adviser_type')
     raw_id_fields = ('adviser', 'offer')
-    search_fields = ('adviser__person__last_name',
+    search_fields = ('uuid',
+                     'adviser__person__last_name',
                      'adviser__person__first_name',
-                     'offer__title'
-                     )
+                     'offer__title')
 
 
 class FacultyAdviser(models.Model):

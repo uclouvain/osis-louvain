@@ -25,6 +25,13 @@
 ##############################################################################
 from osis_common.models.serializable_model import SerializableModel
 from django.db import models
+from django.contrib import admin
+
+
+class DissertationDocumentFileAdmin(admin.ModelAdmin):
+    list_display = ('uuid', 'dissertation', 'document_file')
+    raw_id_fields = ('dissertation', 'document_file')
+    search_fields = ('uuid', 'dissertation', 'document_file')
 
 
 class DissertationDocumentFile(SerializableModel):

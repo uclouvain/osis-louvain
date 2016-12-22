@@ -32,11 +32,11 @@ from django.contrib import admin
 class PropositionOfferAdmin(admin.ModelAdmin):
     list_display = ('proposition_dissertation', 'offer_proposition')
     raw_id_fields = ('proposition_dissertation', 'offer_proposition')
-    search_fields = ('proposition_dissertation__title',
+    search_fields = ('uuid',
+                     'proposition_dissertation__title',
                      'offer_proposition__acronym',
                      'proposition_dissertation__author__person__last_name',
-                     'proposition_dissertation__author__person__first_name'
-                     )
+                     'proposition_dissertation__author__person__first_name')
 
 
 class PropositionOffer(SerializableModel):

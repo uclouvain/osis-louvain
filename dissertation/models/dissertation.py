@@ -41,13 +41,9 @@ from . import dissertation_location
 class DissertationAdmin(admin.ModelAdmin):
     list_display = ('title', 'author', 'status', 'active', 'proposition_dissertation', 'modification_date')
     raw_id_fields = ('author', 'offer_year_start', 'proposition_dissertation', 'location')
-    search_fields = ('title',
-                     'author__person__last_name',
-                     'author__person__first_name',
-                     'proposition_dissertation__title',
-                     'proposition_dissertation__author__person__last_name',
-                     'proposition_dissertation__author__person__first_name'
-                     )
+    search_fields = ('uuid', 'title', 'author__person__last_name', 'author__person__first_name',
+                     'proposition_dissertation__title', 'proposition_dissertation__author__person__last_name',
+                     'proposition_dissertation__author__person__first_name')
 
 STATUS_CHOICES = (
     ('DRAFT', _('draft')),
