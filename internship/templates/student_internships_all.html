@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% comment "License" %}
+ * OSIS stands for Open Student Information System. It's an application
+ * designed to manage the core business of higher education institutions,
+ * such as universities, faculties, institutes and professional schools.
+ * The core business involves the administration of students, teachers,
+ * courses, programs and so on.
+ *
+ * Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of this license - GNU General Public License - is available
+ * at the root of the source code of this program.  If not,
+ * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+  <li><a href="{% url 'studies' %}">{% trans 'studies' %}</a></li>
+  <li><a href="{% url 'internships_home' %}">{% trans 'internships_managment' %}</a></li>
+  <li class="active">{% trans 'student_list' %}</li>
+{% endblock %}
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/dataTables.bootstrap.min.css' %}">
+{% endblock %}
+{% block content %}
+  <style>
+      .dataTables_filter {
+          width: 50%;
+          float: center;
+          text-align: center;
+      }
+  </style>
+  <div class="page-header">
+    <h2>{% trans 'student_list' %}</h2>
+  </div>
+  <div class="panel panel-default">
+      <div>
+          {% if students|length == 0 %}
+              <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
+          {% else %}
+              <table class="table table-striped table-hover" id="order_student">
+                  <thead>
+                  <th>{% trans 'noma'%}</th>
+                  <th>{% trans 'name'%}</th>
+                  <th>{% trans 'firstname'%}</th>
+                  <th class="no-sort">{% trans 'address'%}</th>
+                  <th class="no-sort">{% trans 'phone'%}</th>
+                  </thead>
+                  {% for student in students %}
+                  <tr>
+                      <td>{{ student.registration_id }}</td>
+                      <td>{{ student.person.last_name }}</td>
+                      <td>{{ student.person.first_name }}</td>
+                      <td>{{ student.location }} {{ student.postal_code }} {{ student.city }} ({{ student.country }})</td>
+                      <td>{{ student.phone_mobile }}</td>
+                  </tr>
+                  {% endfor %}
+              </table>
+          {% endif %}
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dataTables.bootstrap.min.js' %}"></script>
+    <script>
+        $(document).ready(function() {
+            $('#order_student').DataTable( {
+                paging: false,
+                "columnDefs": [ {
+                            "targets": 'no-sort',
+                            "orderable": false,
+                        } ],
+                "order": [[ 1, "asc" ]]
+            } );
+        } );
+    </script>
+{% endblock %}

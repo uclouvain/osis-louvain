@@ -89,7 +89,7 @@ def internships_student_resume(request):
     # Get all stundents and the mandatory specialities
     students_list = InternshipChoice.find_by_all_student()
     specialities = InternshipSpeciality.search(mandatory=True)
-    student_informations = InternshipStudentInformation.find_all()
+    student_informations = list(InternshipStudentInformation.find_all())
 
     set_number_choices(student_informations)
 
@@ -290,3 +290,13 @@ def student_save_affectation_modification(request, registration_id):
     else:
         redirect_url = reverse('internship_student_affectation_modification', args=[student.id])
     return HttpResponseRedirect(redirect_url)
+
+
+@login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
+def internships_student_all(request):
+    student_informations = list(InternshipStudentInformation.find_all())
+    set_number_choices(student_informations)
+    return render(request, "student_internships_all.html",
+                  {'students':         student_informations,
+                   })
