@@ -90,7 +90,20 @@
                   </thead>
                   {% for student in students %}
                   <tr>
-                      <td>{{ student.registration_id }}</td>
+                      <td>
+                          {% if perms.internship.is_internship_manager %}
+                                <form method="post" action="{% url 'delete_student_choices' %}">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="registration" value={{ student.registration_id }}>
+                                    <button type="submit" class="btn btn-danger">
+                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                    </button>
+                                    {{ student.registration_id }}
+                                </form>
+                          {%else%}
+                              {{ student.registration_id }}
+                          {%endif%}
+                      </td>
                       <td>{{ student.person.last_name }}</td>
                       <td>{{ student.person.first_name }}</td>
                       <td>

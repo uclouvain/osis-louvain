@@ -224,7 +224,6 @@ def internship_student_affectation_modification(request, student_id):
                    })
 
 
-
 @login_required
 @permission_required('internship.is_internship_manager', raise_exception=True)
 def student_save_affectation_modification(request, registration_id):
@@ -285,3 +284,22 @@ def student_save_affectation_modification(request, registration_id):
     else:
         redirect_url = reverse('internship_student_affectation_modification', args=[student.id])
     return HttpResponseRedirect(redirect_url)
+
+@login_required
+@permission_required('internship.is_internship_manager', raise_exception=True)
+def delete_student_choices(request):
+    registration = request.POST.get("registration")
+    choices = InternshipChoice.search(student__registration_id=registration)
+    if choices:
+        student = choices[0].student
+        InternshipStudentInformation.search(person=student.person).delete()
+
+    choices.delete()
+
+    return HttpResponseRedirect(reverse('internships_student_resume'))
+
+def return_item(l, i):
+    try:
+        return l[i]
+    except:
+        return None

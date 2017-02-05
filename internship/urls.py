@@ -82,5 +82,6 @@ urlpatterns = [
     url(r'^students/([0-9]+)/resume/$', student_resume.internships_student_read, name='internships_student_read'),
     url(r'^students/([0-9]+)/save/information/modification/$', student_resume.student_save_information_modification, name='student_save_information_modification'),
     url(r'^students/([0-9]+)/save/affectation/modification/$', student_resume.student_save_affectation_modification, name='student_save_affectation_modification'),
+    url(r'^students/delete/$', student_resume.delete_student_choices, name='delete_student_choices'),
     url(r'^students/resume/$', student_resume.internships_student_resume, name='internships_student_resume'),
 ]
