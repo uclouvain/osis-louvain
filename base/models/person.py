@@ -124,6 +124,7 @@ def find_by_global_id(global_id):
 
 
 def find_by_last_name_or_email(query):
+    # FIXME: Why is there a limit ?
     return Person.objects.filter(Q(email__icontains=query) | Q(last_name__icontains=query))[:50]
 
 

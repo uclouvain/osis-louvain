@@ -12,5 +12,6 @@ selenium==2.53.2
 django-analytical==2.2.2
 django-localflavor==1.3
 django-statici18n==1.1.5
+factory_boy
 
 -r ./osis_common/requirements.txt
