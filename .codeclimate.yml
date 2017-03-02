@@ -25,6 +25,8 @@ exclude_paths:
   - "admission/migrations/**/*"
   - "internship/migrations/**/*"
   - "dissertation/migrations/**/*"
+  - "reference/migrations/**/*"
+  - "assistan/migrations/**/*"
   - "base/static/js/**/*"
   - "base/static/css/**/*"
   - "base/tests/**/*"
