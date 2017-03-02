@@ -29,6 +29,8 @@ exclude_paths:
   - "assistant/migrations/**/*"
   - "base/static/js/**/*"
   - "base/static/css/**/*"
+  - "!base/static/js/osis.js"
+  - "!base/static/css/osis.css"
   - "base/tests/**/*"
   - "admission/tests/**/*"
   - "attribution/tests/**/*"
