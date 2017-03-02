@@ -4,6 +4,12 @@ engines:
     enabled: true
   duplication:
     enabled: true
+    exclude_paths:
+      - "base/tests/**/*"
+      - "admission/tests/**/*"
+      - "attribution/tests/**/*"
+      - "dissertation/tests/**/*"
+      - "internship/tests/**/*"
     config:
       languages:
       - javascript
@@ -17,9 +23,9 @@ engines:
 ratings:
   paths:
   - "**.css"
-  - "**.inc"
   - "**.js"
-  - "**.jsx"
-  - "**.module"
   - "**.py"
-exclude_paths: []
+exclude_paths:
+  - "base/migrations/**/*"
+  - "base/static/js/**/*"
+  - "base/static/css/**/*"
