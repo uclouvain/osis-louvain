@@ -33,12 +33,15 @@ from django.views.generic.edit import FormMixin
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import ObjectDoesNotExist
 from assistant.models import settings
+from itertools import chain
 
 
 class MandatesListView(LoginRequiredMixin, UserPassesTestMixin, ListView, FormMixin):
     context_object_name = 'reviewer_mandates_list'
     template_name = 'reviewer_mandates_list.html'
     form_class = MandatesArchivesForm
+    is_only_supervisor_for_mandates = []
+    is_reviewer_for_mandates = []
 
     def test_func(self):
         if settings.access_to_procedure_is_open():
@@ -50,32 +53,38 @@ class MandatesListView(LoginRequiredMixin, UserPassesTestMixin, ListView, FormMi
     def get_login_url(self):
         return reverse('access_denied')
 
+
     def get_queryset(self):
         form_class = MandatesArchivesForm
         form = form_class(self.request.GET)
         current_reviewer =  reviewer.find_by_person(self.request.user.person)
-        structures_id = structure.Structure.objects.filter(Q(id=current_reviewer.structure.id) |
-                                                           Q(part_of_id=current_reviewer.structure.id)).\
-            values_list('id', flat=True)
-        mandates_id = mandate_structure.MandateStructure.objects.filter(structure__in=structures_id).\
-            values_list('assistant_mandate_id', flat=True).distinct()
+        current_reviewer_mandates = []
+        mandates_structures = []
         if form.is_valid():
             self.request.session['selected_academic_year'] = form.cleaned_data[
                 'academic_year'].id
-            queryset = assistant_mandate.AssistantMandate.objects.filter(
-                academic_year=form.cleaned_data['academic_year']).filter(id__in=mandates_id)
-        elif self.request.session.get('selected_academic_year'):
-            selected_academic_year = academic_year.AcademicYear.objects.get(
-                id=self.request.session.get('selected_academic_year'))
-            queryset = assistant_mandate.AssistantMandate.objects\
-                .filter(academic_year=selected_academic_year).filter(id__in=mandates_id)
         else:
-            selected_academic_year = academic_year.current_academic_year()
-            self.request.session[
-                'selected_academic_year'] = selected_academic_year.id
-            queryset = assistant_mandate.find_by_academic_year(
-                selected_academic_year).filter(id__in=mandates_id)
-        return queryset
+            self.request.session['selected_academic_year'] = academic_year.current_academic_year().id
+        if current_reviewer.is_phd_supervisor:
+            current_reviewer_mandates.extend\
+                (assistant_mandate.find_for_supervisor_for_academic_year(
+                    current_reviewer, self.request.session['selected_academic_year']))
+        for mandate in current_reviewer_mandates:
+            self.is_only_supervisor_for_mandates.append(mandate.id)
+        if current_reviewer.structure:
+            all_structures_for_current_reviewer = []
+            for structure in current_reviewer.structure.children:
+                all_structures_for_current_reviewer.append(structure)
+            all_structures_for_current_reviewer.append(current_reviewer.structure)
+            mandates_structures.extend(mandate_structure.find_by_structures_for_academic_year(
+                all_structures_for_current_reviewer, self.request.session['selected_academic_year']))
+            for mandate_struct in mandates_structures:
+                self.is_reviewer_for_mandates.append(mandate_struct.assistant_mandate.id)
+                if mandate_struct.assistant_mandate not in current_reviewer_mandates:
+                    current_reviewer_mandates.append(mandate_struct.assistant_mandate)
+        self.is_only_supervisor_for_mandates = list(set(self.is_only_supervisor_for_mandates) - \
+                                               set(self.is_reviewer_for_mandates))
+        return current_reviewer_mandates
 
     def get_context_data(self, **kwargs):
         context = super(MandatesListView, self).get_context_data(**kwargs)
@@ -91,16 +100,12 @@ class MandatesListView(LoginRequiredMixin, UserPassesTestMixin, ListView, FormMi
         context['research_list'] = research_list
         context['supervision_list'] = supervision_list
         context['vice_rector_list'] = vice_rector_list
+        context['is_only_supervisor_for_mandates'] = self.is_only_supervisor_for_mandates
         context['year'] = academic_year.find_academic_year_by_id(
             self.request.session.get('selected_academic_year')).year
         return context
 
     def get_initial(self):
-        if self.request.session.get('selected_academic_year'):
-            selected_academic_year = academic_year.find_academic_year_by_id(
-                self.request.session.get('selected_academic_year'))
-        else:
-            selected_academic_year = academic_year.current_academic_year()
-            self.request.session[
-                'selected_academic_year'] = selected_academic_year.id
-        return {'academic_year': selected_academic_year}
+        if 'selected_academic_year' not in self.request.session:
+            self.request.session['selected_academic_year'] = academic_year.current_academic_year()
+        return {'academic_year': self.request.session['selected_academic_year']}

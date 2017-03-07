@@ -26,9 +26,6 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-{% block style %}
-<link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
-{% endblock %}
 {% block breadcrumb %}
 	<li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
 	<li><a href="{% url 'mandates' %}" id="lnk_mandates">{% trans 'mandates' %}</a></li>
@@ -50,25 +47,24 @@
  		<form id="pst-form-part1" method="POST" action="{% url 'form_part1_save' mandate.id %}">
  		{% csrf_token %}
  		{{ form.non_field_errors }}
- 		<div class="panel-primary">
+ 		<div class="panel-default">
   			<div class="panel-heading">
-  				<font size="4">{% trans 'contact_details' %}</font>
+  				<h4>{% trans 'contact_details' %}</h4>
   			</div>
   		</div>
 		<div class="form-group" style="padding-top: 15px;">
     		<label style="padding-top: 5px" for="person">{% trans 'name' %}</label>
 			<div class="controls" id="person">{{assistant.person}}</div>
-    		<label  style="padding-top: 5px" for="adresses">{% trans 'address' %}</label>
+    		<label  style="padding-top: 15px" for="adresses">{% trans 'address' %}</label>
 			<div class="controls" id="adresses">
 				{% for address in addresses  %}
 					{{address.location}} - {{address.postal_code}} {{address.city}}<br>{{address.country}}
 				{% endfor %}
 			</div>
     	</div>
-		<hr>
-  		<div class="panel-info">
+		<div class="panel-default">
   			<div class="panel-heading">
-  				<font size="4">{% trans 'contract' %}</font>
+  				<h4>{% trans 'contract' %}</h4>
   			</div>
   		</div>
   		<div class="form-group" style="padding-top: 15px;">
@@ -82,17 +78,17 @@
 				{% endif %}
 			</div>
 			{% for structure in mandate.mandatestructure_set.all|dictsort:"structure.type" %}
-				<label style="padding-top: 5px" for="structures">
+				<label style="padding-top: 15px" for="structures">
 					{% trans structure.structure.type|lower %}</label>
 				<div class="controls" id="structures">{{structure.structure.acronym}}</div>
       		{% endfor %}
-			<label style="padding-top: 5px" for="full_time_equivalent">
+			<label style="padding-top: 15px" for="full_time_equivalent">
 				{% trans 'full_time_equivalent' %}</label>
 			<div class="controls" id="full_time_equivalent">{{mandate.fulltime_equivalent}}</div>
-      		<label style="padding-top: 5px" for="date_of_first_nomination">
+      		<label style="padding-top: 15px" for="date_of_first_nomination">
 				{% trans 'date_of_first_nomination' %}</label>
       		<div class="controls" id="date_of_first_nomination">{{mandate.entry_date}}</div>
-      		<label  style="padding-top: 5px" for="field">{% trans 'field' %}</label>
+      		<label  style="padding-top: 15px" for="field">{% trans 'field' %}</label>
 			<div class="controls" id="field">
 				{% if mandate.assistant_type == 'ASSISTANT' %}
 					{% trans 'assistant' %}
@@ -101,77 +97,30 @@
       				{% endif %}
 			</div>
       	</div>
-  		<hr>
-  		<div class="panel-danger">
+    	<div class="panel-default">
   			<div class="panel-heading">
-  				<font size="4">{% trans 'doctorate' %}</font>
-    		</div>
-    	</div>
-    	<div class="form-group" style="padding-top: 15px;">
-			<label style="padding-top: 5px" for="registered_phd">{% trans 'registered_phd' %}</label>
-			<div class="controls" id="registered_phd">{{ form.inscription }}
-				<font class="error">{{ form.inscription.errors }}</font>
-			</div>
-    		<label style="padding-top: 5px" for="expected_phd_date">
-				{% trans 'expected_registering_date' %}
-			</label>
-        	<div class="controls" id="expected_phd_date">{{ form.expected_phd_date }}
-				<font class="error">{{ form.expected_phd_date.errors }}</font>
-			</div>
-			{% if not supervisor %}
-			<label style="padding-top: 5px" for="search_persons">{% trans 'supervisor' %}</label>
-			<div class="ui-widget"><input id="search_persons" name="search_persons" size="100"
-										  placeholder="{% trans 'search_by_email_or_last_name' %}">
-			</div>
-			<input type="hidden" name="person_id" id="person_id">
-			{% else %}
-			<label style="padding-top: 5px">{% trans 'supervisor' %}</label>
-			<div class="form-group">
-				{{ supervisor }}
-			</div>
-			{% endif %}
-			<label style="padding-top: 5px" for="phd_inscription_date">{% trans 'phd_inscription_date' %}</label>
-			<div class="controls" id="phd_inscription_date">{{ form.phd_inscription_date }}
-				<font class="error">{{ form.phd_inscription_date.errors }}</font>
-			</div>
-			<label style="padding-top: 5px" for="confirmatory_test_date">
-				{% trans 'confirmatory_test_date' %}<br>
-				<font size="1">{% trans '2nd_renewal' %}</font>
-			</label>
-        	<div class="controls" id="confirmatory_test_date">{{ form.confirmation_test_date }}
-				<font class="error">{{ form.confirmation_test_date.errors }}</font>
-			</div>
- 			<label style="padding-top: 5px" for="thesis_defence_date">
-				{% trans 'thesis_defence_date' %}</label>
-			<div class="controls" id="thesis_defence_date">{{ form.thesis_date }}
-				<font class="error">{{ form.thesis_date.errors }}</font>
-			</div>
-    	</div>
-    	<hr>
-    	<div class="panel-warning">
-  			<div class="panel-heading">
-  				<font size="4">{% trans 'various' %}</font>
+  				<h4>{% trans 'various' %}</h4>
     		</div>
     	</div>
     	<div class="form-group">
 			<label style="padding-top: 5px" for="function_outside_university">
-				<font size="2">{% trans 'function_outside_university' %}</font>
+				{% trans 'function_outside_university' %}
 			</label>
-			<div class="controls" id="function_outside_university">{{ form2.external_functions }}
+			<div class="controls" id="function_outside_university">{{ form.external_functions }}
 				<font class="error">{{ form.errors.external_functions }}</font>
 			</div>
 			<label style="padding-top: 5px" for="external_post">
-				<font size="2">{% trans 'external_post' %}</font>
+				{% trans 'external_post' %}
 			</label>
-			<div class="controls" id="external_post">{{ form2.external_contract }}
+			<div class="controls" id="external_post">{{ form.external_contract }}
 				<font class="error">{{ form.errors.external_contract }}</font>
 			</div>
     		{% if mandate.renewal_type == 'EXCEPTIONAL' %}
 				<label for="exceptional_justification">
-      				<font size="1">{% trans 'exceptional_justification' %}</font>
+      				{% trans 'exceptional_justification' %}
 				</label>
-				<div class="controls" id="exceptional_justification">{{ form2.justification }}
-      				<font class="error">{{ form.errors.justification }}</font>
+				<div class="controls" id="exceptional_justification">{{ form.justification }}
+                    <font class="error">{{ form.errors.justification }}</font>
     			</div>  
    			{% endif %}
 			<hr>
@@ -189,56 +138,6 @@
 {% block script %}
 <script type="text/javascript" src="{% static 'js/jquery-ui.js' %}"></script>
 <script>
-window.onload = function() {
-    $('#person_id').empty();
-};
-$(function() {
-  $("#search_persons").autocomplete({
-	source: "/assistants/api/get_persons/",
-    minLength: 3,
-    delay: 100,
-    select: function(event, ui) {
-    	var person_id = ui.item.id;
-    	$( "#person_id" ).val(person_id);
-    	$( "#search_persons" ).val( ui.item.first_name + ', ' + ui.item.last_name + ' (' + ui.item.value + ')' );
-    	$('#id_phd_inscription_date').focus();
-    	return False;
-    	}
-  });
-});
-
-function Hide() {
-	if(document.getElementById('id_inscription_0').checked == true)
-     {
-         document.getElementById('id_expected_phd_date').style.display = 'none';
-         document.getElementById('id_expected_phd_date').value='';
-    } else if(document.getElementById('id_inscription_1').checked == true)
-     {
-         document.getElementById('id_expected_phd_date').style.display = 'none';
-         document.getElementById('id_expected_phd_date').value='';
-    } else {
- 		document.getElementById('id_expected_phd_date').style.display ='';
-    }
-}
-
-function disablefield(){
-	if(document.getElementById('id_no_supervisor').checked == true)
-     {
-		document.getElementById('id_supervisor').disabled= true;
-		document.getElementById('email_supervisor').innerHTML = '';
-		document.getElementById('id_supervisor').style.display = '';
-        document.getElementById('id_supervisor').value='---------';
-     }
-    else {
-    	document.getElementById('id_supervisor').disabled= false;
-		document.getElementById('id_supervisor').style.display = '';
-    }
-}
-
-window.onload = function() {
-    Hide();
-};
-
 $("#pst-form-part1 :input").change(function() {
    $("#pst-form-part1").data("changed",true);
 });

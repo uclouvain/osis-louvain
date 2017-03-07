@@ -56,3 +56,8 @@ def find_by_mandate_and_part_of_type(mandate, type):
 
 def find_by_mandate_and_part_of_struct(mandate, struct):
     return MandateStructure.objects.filter(assistant_mandate=mandate, structure__part_of=struct)
+
+
+def find_by_structures_for_academic_year(structures, academic_year):
+    return MandateStructure.objects.filter(structure__in=structures).\
+        filter(assistant_mandate__academic_year=academic_year).distinct()

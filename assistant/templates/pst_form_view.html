@@ -31,72 +31,32 @@
 {% block breadcrumb %}
 <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
 <li><a href="{% url 'mandates' %}" id="lnk_mandates">{% trans 'mandates' %}</a></li>
-{% if role != "PHD_SUPERVISOR" %}
-    <li><a href="{% url 'reviewer_mandates_list' %}" id="lnk_reviewer_mandates_list">
-        {% trans 'reviewer_mandates_list' %}</a></li>
-{% endif %}
-<li class="active">{% trans 'mandate_edit' %}</li>
+<li><a href="{% url 'reviewer_mandates_list' %}" id="lnk_reviewer_mandates_list">
+    {% trans 'reviewer_mandates_list' %}</a></li>
 {% endblock %}
 {% block content %}
 <ul class="nav nav-tabs">
-    {% if reviewer_id %}
-        <li class="active"><a href="{% url 'pst_form_view' reviewer_id=reviewer_id mandate_id=mandate_id %}">
-    	{% trans 'assistant_form' %}</a></li>
-    {% else %}
-        <li class="active"><a href="{% url 'pst_form_view' mandate_id=mandate_id %}">
-    	{% trans 'assistant_form' %}</a></li>
-    {% endif %}
-    {% if role == 'PHD_SUPERVISOR' %}
-        <li><a href="#">{% trans 'phd_supervisor_review' %}</a></li>
-        <li class="disabled"><a href="#">{% trans 'research_review' %}</a></li>
-        <li class="disabled"><a href="#">{% trans 'supervision_review' %}</a></li>
-        <li class="disabled"><a href="#">{% trans 'sector_vice-rector_review' %}</a></li>
-    {% else %}
-        {% if links.0.0 %}
-            <li><a href="{% url 'review_view' mandate_id=mandate_id %}">
-                {% trans 'phd_supervisor_review' %}</a></li>
-        {% endif %}
-        {% if 'RESEARCH' in role %}
-            {% if mandate_state == 'RESEARCH' %}
-                <li><a href="{% url 'review_edit' mandate_id=mandate_id %}">
-                    <strong>{% trans 'research_review' %}</strong></a></li>
-            {% else %}
-                <li><a href="{% url 'review_view' reviewer_id=links.1.0 mandate_id=mandate_id %}">
-                    <strong>{% trans 'research_review' %}</strong></a></li>
-            {% endif %}
-            <li class="disabled"><a href="#">{% trans 'supervision_review' %}</a></li>
-            <li class="disabled"><a href="#">{% trans 'sector_vice-rector_review' %}</a></li>
+    <li class="active"><a href="#">{% trans 'assistant_form' %}</a></li>
+    {% for dict in menu %}
+        <li class={{ dict.class}}>
+        {% if dict.action == 'edit' %}
+            <a href="{% url 'review_edit' mandate_id=mandate_id %}">
+        {% elif dict.action == 'view' %}
+            <a href="{% url 'review_view' mandate_id=mandate_id role=dict.item %}">
         {% else %}
-            {% if links.1.0 %}
-                <li><a href="{% url 'review_view' reviewer_id=links.1.0 mandate_id=mandate_id %}">
-                    {% trans 'research_review' %}</a></li>
-            {% endif %}
-            {% if 'SUPERVISION' in role %}
-                {% if mandate_state == 'SUPERVISION' %}
-                    <li><a href="{% url 'review_edit' mandate_id=mandate_id %}">
-                            <strong>{% trans 'supervision_review' %}</strong></a></li>
-                {% else %}
-                    <li><a href="{% url 'review_view' reviewer_id=links.2.0 mandate_id=mandate_id %}">
-                        <strong>{% trans 'supervision_review' %}</strong></a></li>
-                {% endif %}
-                <li class="disabled"><a href="#">{% trans 'sector_vice-rector_review' %}</a></li>
-            {% else %}
-                {% if links.2.0 %}
-                    <li><a href="{% url 'review_view' reviewer_id=links.2.0 mandate_id=mandate_id %}">
-                        {% trans 'supervision_review' %}</a></li>
-                {% endif %}
-                {% if 'VICE_RECTOR' in role %}
-                    {% if mandate_state == 'VICE_RECTOR' %}
-                        <li><a href="{% url 'review_edit' mandate_id=mandate.id %}">
-                            <strong>{% trans 'sector_vice-rector_review' %}</strong></a></li>
-                    {% else %}
-                        <li><a href="{% url 'review_view' reviewer_id=links.3.0 mandate_id=mandate.id %}">
-                            <strong>{% trans 'sector_vice-rector_review' %}</strong></a></li>
-                    {% endif %}
-                {% endif %}
-            {% endif %}
+            <a href="#">
         {% endif %}
-    {% endif %}
+        {% if dict.item == 'PHD_SUPERVISOR' %}
+            <strong>{% trans 'phd_supervisor_review' %}</strong></a>
+        {% elif dict.item == 'RESEARCH' %}
+            <strong>{% trans 'research_review' %}</strong></a>
+        {% elif dict.item == 'SUPERVISION' %}
+            <strong>{% trans 'supervision_review' %}</strong></a>
+        {% elif dict.item == 'VICE_RECTOR' %}
+            <strong>{% trans 'sector_vice_rector_review' %}</strong></a>
+        {% endif %}
+        </li>
+    {% endfor %}
 </ul>
 <div class="page-header">
     <h2>{% trans 'assistants_mandates_renewal' %} ({{ year }})</h2>
@@ -178,7 +138,7 @@
                     {% trans 'supervisor' %}
                 </div>
                 <div class="col-md-9">
-                    {{ assistant.supervisor }}
+                    {{ assistant.supervisor.person }}
                 </div>
             </div>
             <div class="row" style="padding-top: 2px;">

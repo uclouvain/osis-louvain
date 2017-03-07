@@ -97,43 +97,6 @@ class HorizontalRadioRenderer(forms.RadioSelect.renderer):
 
 
 class AssistantFormPart1(ModelForm):
-    inscription = forms.ChoiceField(required=True, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={
-        "onChange": 'Hide()'}), choices=mdl.academic_assistant.AcademicAssistant.PHD_INSCRIPTION_CHOICES)
-    expected_phd_date = forms.DateField(required=False, widget=forms.DateInput(format='%d/%m/%Y',
-                                                                               attrs={'placeholder': 'dd/mm/yyyy'}),
-                                        input_formats=['%d/%m/%Y'])
-    phd_inscription_date = forms.DateField(required=False, widget=forms.DateInput(format='%d/%m/%Y',
-                                                                                  attrs={'placeholder': 'dd/mm/yyyy'}),
-                                           input_formats=['%d/%m/%Y'])
-    confirmation_test_date = forms.DateField(required=False, widget=forms.DateInput(format='%d/%m/%Y',
-                                                                                    attrs={
-                                                                                        'placeholder': 'dd/mm/yyyy'}),
-                                             input_formats=['%d/%m/%Y'])
-    thesis_date = forms.DateField(required=False, widget=forms.DateInput(format='%d/%m/%Y',
-                                                                         attrs={'placeholder': 'dd/mm/yyyy'}),
-                                  input_formats=['%d/%m/%Y'])
-    supervisor = forms.ModelChoiceField(required=False, queryset=person.Person.objects.all(),
-                                        to_field_name="email",
-                                        widget=forms.Select(attrs={"onChange": 'print_email()'}))
-    external_functions = forms.CharField(
-        required=False, widget=forms.Textarea(attrs={'cols': '40', 'rows': '2'}))
-
-    class Meta:
-        model = mdl.assistant_mandate.AssistantMandate
-        fields = ('inscription', 'expected_phd_date', 'phd_inscription_date', 'confirmation_test_date',
-                  'thesis_date')
-        exclude = ['supervisor']
-
-    def clean(self):
-        super(AssistantFormPart1, self).clean()
-        inscription = self.cleaned_data.get("inscription")
-        expected_phd_date = self.cleaned_data.get('expected_phd_date')
-        if inscription == 'IN_PROGRESS' and not expected_phd_date:
-            msg = _("expected_phd_date_required_msg")
-            self.add_error('expected_phd_date', msg)
-
-
-class AssistantFormPart1b(ModelForm):
     external_functions = forms.CharField(
         required=False, widget=forms.Textarea(attrs={'cols': '60', 'rows': '4'}))
     external_contract = forms.CharField(
@@ -156,12 +119,20 @@ class MandatesArchivesForm(ModelForm):
 
 
 class AssistantFormPart3(ModelForm):
+    inscription = forms.ChoiceField(required=True, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={
+        "onChange": 'Hide()'}), choices=mdl.academic_assistant.AcademicAssistant.PHD_INSCRIPTION_CHOICES)
+    expected_phd_date = forms.DateField(required=False, widget=forms.DateInput(format='%d/%m/%Y',
+                                                                               attrs={'placeholder': 'dd/mm/yyyy'}),
+                                        input_formats=['%d/%m/%Y'])
+    thesis_date = forms.DateField(required=False, widget=forms.DateInput(format='%d/%m/%Y',
+                                                                         attrs={'placeholder': 'dd/mm/yyyy'}),
+                                  input_formats=['%d/%m/%Y'])
     phd_inscription_date = forms.DateField(required=False, widget=forms.DateInput(format='%d/%m/%Y',
                                                                                   attrs={'placeholder': 'dd/mm/yyyy'}),
                                            input_formats=['%d/%m/%Y'])
-    confirmation_test_date = forms.DateField(required=False, widget=forms.DateInput(format='%d/%m/%Y',
-                                                                                    attrs={
-                                                                                        'placeholder': 'dd/mm/yyyy'}),
+    confirmation_test_date = forms.DateField(required=False,
+                                             widget=forms.DateInput(format='%d/%m/%Y',
+                                                                    attrs={'placeholder': 'dd/mm/yyyy'}),
                                              input_formats=['%d/%m/%Y'])
 
     thesis_title = forms.CharField(
@@ -171,7 +142,10 @@ class AssistantFormPart3(ModelForm):
 
     class Meta:
         model = mdl.academic_assistant.AcademicAssistant
-        fields = ('phd_inscription_date', 'thesis_title', 'confirmation_test_date', 'remark')
+        fields = ('thesis_title', 'confirmation_test_date', 'remark', 'inscription',
+                  'expected_phd_date', 'phd_inscription_date', 'confirmation_test_date', 'thesis_date'
+                  )
+        exclude = ['supervisor']
 
 
 class AssistantFormPart4(ModelForm):

@@ -32,9 +32,8 @@
 {% block breadcrumb %}
 <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
 <li><a href="{% url 'mandates' %}" id="lnk_mandates">{% trans 'mandates' %}</a></li>
-<li><a href="{% url 'reviewer_mandates_list' %}" id="lnk_reviewer_delegation">{% trans 'reviewer_mandates_list' %}
-</a></li>
-<li class="active">{% trans 'reviewer_delegation' %}</li>
+<li class="active">{% trans 'reviewer_mandates' %}
+</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
@@ -42,7 +41,7 @@
 </div>
 <div class="panel panel-default">
     <ul class="nav nav-tabs">
-    <li><a href="{% url 'reviewer_mandates_list' %}">{% trans 'reviewer_mandates_list' %}</a></li>
+    <li><a href="{% url 'reviewer_mandates_list' %}">{% trans 'reviewer_mandates' %}</a></li>
     <li class="active"><a href="#">{% trans 'reviewer_delegation' %}</a></li>
     </ul>
     <div class="panel-body">

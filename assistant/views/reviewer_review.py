@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.http.response import HttpResponseRedirect
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import user_passes_test
 from django.shortcuts import render
 from assistant.models import assistant_mandate, review, mandate_structure, tutoring_learning_unit_year
 from assistant.models import reviewer
@@ -33,129 +33,70 @@ from assistant.forms import ReviewForm
 from django.core.urlresolvers import reverse
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
+from assistant.enums import reviewer_role
+from base.enums import structure_type
+import re
 
 
+def user_is_reviewer(user):
+    try:
+        if user.is_authenticated():
+            return reviewer.find_by_person(user.person)
+    except ObjectDoesNotExist:
+        return False
 
-@login_required
-def review_view(request, mandate_id, reviewer_id=None):
-    """
-    Ouvre en lecture une review pour consultation.
 
-    La variable links permet de gérer l'affichage d'une liste représentant l'avancement du workflow.
-    links[0] = superviseur de thèse.
-    links[1] = recherche (président d'institut ou délégué).
-    links[2] = supervision (doyen de faculté ou délégué).
-    links[3] = vice-recteur de secteur ou assistant du vice-recteur de secteur.
-
-    :param mandate_id: pk du mandat auquel la review est liée.
-    :param reviewer_id: pk du revieser considéré. Si None, c'est une review faite par un superviseur de thèse
-    :param request
-    """
+@user_passes_test(user_is_reviewer, login_url='assistants_home')
+def review_view(request, mandate_id, role):
     mandate = assistant_mandate.find_mandate_by_id(mandate_id)
-    this_reviewer = reviewer.find_by_person(person.find_by_user(request.user))
-    if reviewer_id is not None:
-        current_review = review.find_review_for_mandate_by_role(mandate, reviewer.find_by_id(reviewer_id).role)
-    else:
-        try:
-            current_review = review.find_done_by_supervisor_for_mandate(mandate)
-        except ObjectDoesNotExist:
-            current_review = None
-    reviews = review.find_by_mandate(mandate.id)
-    links = [[None, False], [None, False], [None, False], [None, False]]
-    for rev in reviews:
-        if rev.reviewer is None:
-            if reviewer_id is None:
-                links[0] = [True, True]
-            else:
-                links[0] = [True, False]
-        elif "RESEARCH" in rev.reviewer.role:
-            if rev == current_review:
-                links[1] = [rev.reviewer.id, True]
-            else:
-                links[1] = [rev.reviewer.id, False]
-        elif "SUPERVISION" in rev.reviewer.role:
-            if rev == current_review:
-                links[2] = [rev.reviewer.id, True]
-            else:
-                links[2] = [rev.reviewer.id, False]
-        elif "SECTOR_VICE_RECTOR" in rev.reviewer.role:
-            if rev == current_review:
-                links[3] = [rev.reviewer.id, True]
-            else:
-                links[3] = [rev.reviewer.id, False, rev.status]
+    current_reviewer = reviewer.find_by_person(request.user.person)
+    if reviewer.can_view_review(current_reviewer.id, mandate, role) == False:
+        return HttpResponseRedirect(reverse('access_denied'))
     assistant = mandate.assistant
+    if role == reviewer_role.PHD_SUPERVISOR:
+        current_review = review.find_done_by_supervisor_for_mandate(mandate)
+    else:
+        current_reviews = review.find_review_for_mandate_by_role(mandate, role, 'DONE')
+        current_review = current_reviews.reverse()[0]
+    menu = generate_reviewer_menu_tabs(reviewer.find_roles_for_mandates(current_reviewer, mandate), mandate, role)
     return render(request, 'review_view.html', {'review': current_review,
-                                                'role': this_reviewer.role,
-                                                'links': links,
+                                                'role': role,
                                                 'mandate_id': mandate.id,
+                                                'reviewer': current_reviewer,
                                                 'mandate_state': mandate.state,
                                                 'assistant': assistant,
+                                                'menu': menu,
                                                 'year': mandate.academic_year.year + 1
                                                 })
 
 
-
-@login_required
+@user_passes_test(user_is_reviewer, login_url='assistants_home')
 def review_edit(request, mandate_id):
-    """
-    Edition d'une review. Si elle n'existe pas encore, elle est crée avant édition.
-    Si l'utilisateur connecté ne peut pas éditer la review, on vérifie s'il est phd_supervisor.
-    Si oui et que l'état du mandat (state) le justifie, on édite la review ou une nouvelle est créée si
-    elle n'existe pas.
-
-    La variable links permet de gérer l'affichage d'une liste représentant l'avancement du workflow.
-    links[0] = superviseur de thèse.
-    links[1] = recherche (président d'institut ou délégué).
-    links[2] = supervision (doyen de faculté ou délégué).
-    links[3] = vice-recteur de secteur ou assistant du vice-recteur de secteur.
-
-    :param mandate_id: pk du mandat auquel la review est liée.
-    :param request
-    :return:
-    """
     mandate = assistant_mandate.find_mandate_by_id(mandate_id)
     current_reviewer = None
+    existing_review = None
     try:
         current_reviewer = reviewer.can_edit_review(reviewer.find_by_person(person.find_by_user(request.user)).
                                                     id, mandate_id)
-        delegate_role = current_reviewer.role + "_ASSISTANT"
-        existing_review = review.find_review_for_mandate_by_role(mandate, delegate_role)
-        if existing_review is None:
-            existing_review, created = review.Review.objects.get_or_create(
-                mandate=mandate,
-                reviewer=current_reviewer,
-                status='IN_PROGRESS'
-            )
-    except:
-        if mandate.assistant.supervisor == person.find_by_user(request.user) and mandate.state == "PHD_SUPERVISOR":
-            try:
-                review.find_done_by_supervisor_for_mandate(mandate)
-                return HttpResponseRedirect(reverse("assistants_home"))
-            except:
-                existing_review, created = review.Review.objects.get_or_create(
-                    mandate=mandate,
-                    reviewer=None,
-                    status='IN_PROGRESS'
-                )
-        else:
-            return HttpResponseRedirect(reverse('assistants_home'))
+    except ObjectDoesNotExist:
+        return HttpResponseRedirect(reverse('assistants_home'))
+    existing_reviews = review.find_review_for_mandate_by_role(mandate, current_reviewer.role, 'IN_PROGRESS')
+    if len(existing_reviews) > 0:
+        existing_review = existing_reviews.reverse()[0]
+    else:
+        existing_review, created = review.Review.objects.get_or_create(
+            mandate=mandate,
+            reviewer=current_reviewer,
+            status='IN_PROGRESS'
+        )
+    if current_reviewer.is_phd_supervisor and mandate.state == 'PHD_SUPERVISOR':
+        current_role = 'PHD_SUPERVISOR'
+    else:
+        current_role = current_reviewer.role
     previous_mandates = assistant_mandate.find_before_year_for_assistant(mandate.academic_year.year, mandate.assistant)
-    reviews = review.find_by_mandate(mandate).filter(status="DONE")
-    links = [None, None, None, None]
-    for rev in reviews:
-        if rev.reviewer is None:
-            links[0] = 'True'
-        elif "RESEARCH" in rev.reviewer.role:
-            links[1] = rev.reviewer.id
-        elif "SUPERVISION" in rev.reviewer.role:
-            links[2] = rev.reviewer.id
-        elif "SECTOR_VICE_RECTOR" in rev.reviewer.role:
-            links[3] = rev.reviewer.id
-    try:
-        role = current_reviewer.role
-    except:
-        role = "PHD_SUPERVISOR"
     assistant = mandate.assistant
+    menu = generate_reviewer_menu_tabs(reviewer.find_roles_for_mandates(current_reviewer, mandate),
+                                       mandate, current_role)
     form = ReviewForm(initial={'mandate': mandate,
                                'reviewer': existing_review.reviewer,
                                'status': existing_review.status,
@@ -165,26 +106,21 @@ def review_edit(request, mandate_id):
                                'remark': existing_review.remark
                                }, prefix="rev", instance=existing_review)
     return render(request, 'review_form.html', {'review': existing_review,
-                                                'role': role,
+                                                'role': current_role,
                                                 'year': mandate.academic_year.year + 1,
                                                 'absences': mandate.absences,
                                                 'comment': mandate.comment,
                                                 'mandate_id': mandate.id,
                                                 'previous_mandates': previous_mandates,
                                                 'assistant': assistant,
-                                                'links': links,
+                                                'mandate_state': mandate.state,
+                                                'reviewer': current_reviewer,
+                                                'menu': menu,
                                                 'form': form})
 
 
-@login_required
+@user_passes_test(user_is_reviewer, login_url='assistants_home')
 def review_save(request, review_id, mandate_id):
-    """
-    Sauvegarde de la review.
-    Si formulaire VALIDE par l'utilisateur, passage à l'étape suivante dans le workflow : mandate.state.
-    :param review_id: pk de la review à sauvegarder
-    :param mandate_id: pk du mandat auquel la review est liée
-    :param request
-    """
     rev = review.find_by_id(review_id)
     mandate = assistant_mandate.find_mandate_by_id(mandate_id)
     form = ReviewForm(data=request.POST, instance=rev, prefix='rev')
@@ -207,10 +143,7 @@ def review_save(request, review_id, mandate_id):
             elif mandate.state == "VICE_RECTOR":
                 mandate.state = "DONE"
             mandate.save()
-            if current_review.reviewer is not None:
-                return HttpResponseRedirect(reverse("reviewer_mandates_list"))
-            else:
-                return HttpResponseRedirect(reverse("review_view", kwargs={'mandate_id': mandate_id}))
+            return HttpResponseRedirect(reverse("reviewer_mandates_list"))
         elif 'save' in request.POST:
             current_review.status = "IN_PROGRESS"
             current_review.save()
@@ -222,57 +155,85 @@ def review_save(request, review_id, mandate_id):
                                                     'mandate_id': mandate.id, 'form': form})
 
 
-@login_required
-def pst_form_view(request, mandate_id, reviewer_id=None):
-    """
-    Ouvre en lecture le formulaire de l'assistant pour consultation.
-
-    La variable links permet de gérer l'affichage d'une liste représentant l'avancement du workflow.
-    links[0] = superviseur de thèse.
-    links[1] = recherche (président d'institut ou délégué).
-    links[2] = supervision (doyen de faculté ou délégué).
-    links[3] = vice-recteur de secteur ou assistant du vice-recteur de secteur.
-
-    :param mandate_id: pk du mandat auquel la review est liée.
-    :param reviewer_id: pk du reviewer considéré. Si None, c'est une review faite par un superviseur de thèse
-    :param request :
-    """
+@user_passes_test(user_is_reviewer, login_url='assistants_home')
+def pst_form_view(request, mandate_id):
     mandate = assistant_mandate.find_mandate_by_id(mandate_id)
-    this_reviewer = reviewer.find_by_person(person.find_by_user(request.user))
-    if reviewer_id is not None:
-        current_review = review.find_review_for_mandate_by_role(mandate, reviewer.find_by_id(reviewer_id).role)
-    else:
-        try:
-            current_review = review.find_done_by_supervisor_for_mandate(mandate)
-        except ObjectDoesNotExist:
-            current_review = None
-    reviews = review.find_by_mandate(mandate.id)
-    links = [[None, False], [None, False], [None, False], [None, False]]
-    for rev in reviews:
-        if rev.reviewer is None:
-            if reviewer_id is None:
-                links[0] = [True, True]
-            else:
-                links[0] = [True, False]
-        elif "RESEARCH" in rev.reviewer.role:
-            if rev == current_review:
-                links[1] = [rev.reviewer.id, True]
-            else:
-                links[1] = [rev.reviewer.id, False]
-        elif "SUPERVISION" in rev.reviewer.role:
-            if rev == current_review:
-                links[2] = [rev.reviewer.id, True]
-            else:
-                links[2] = [rev.reviewer.id, False]
-        elif "SECTOR_VICE_RECTOR" in rev.reviewer.role:
-            if rev == current_review:
-                links[3] = [rev.reviewer.id, True]
-            else:
-                links[3] = [rev.reviewer.id, False, rev.status]
+    current_reviewer = reviewer.find_by_person(person.find_by_user(request.user))
     learning_units = tutoring_learning_unit_year.find_by_mandate(mandate)
     assistant = mandate.assistant
-    return render(request, 'pst_form_view.html', {'review': current_review, 'role': this_reviewer.role, 'links': links,
+    menu = generate_reviewer_menu_tabs(reviewer.find_roles_for_mandates(current_reviewer, mandate), mandate, 'PST')
+    return render(request, 'pst_form_view.html', {'role': current_reviewer.role,
                                                   'mandate_id': mandate.id, 'mandate_state': mandate.state,
                                                   'assistant': assistant, 'mandate': mandate,
                                                   'learning_units': learning_units,
+                                                  'reviewer': current_reviewer,
+                                                  'menu': menu,
                                                   'year': mandate.academic_year.year + 1})
+
+
+def generate_reviewer_menu_tabs(reviewer_roles_for_mandate, mandate, active_item):
+    active_item = re.sub('_ASSISTANT', '', active_item)
+    menu = []
+    if mandate.assistant.supervisor:
+        if mandate.state == 'RESEARCH' or mandate.state == 'SUPERVISION' or \
+                        mandate.state == 'VICE_RECTOR' or mandate.state == 'DONE':
+            if active_item == 'PHD_SUPERVISOR':
+                menu.append({'item': 'PHD_SUPERVISOR', 'class': 'active', 'action': 'view'})
+            else:
+                menu.append({'item': 'PHD_SUPERVISOR', 'class': '', 'action': 'view'})
+        elif mandate.state == 'PHD_SUPERVISOR' and reviewer_role.PHD_SUPERVISOR in reviewer_roles_for_mandate:
+            if active_item == 'PHD_SUPERVISOR':
+                menu.append({'item': 'PHD_SUPERVISOR', 'class': 'active', 'action': 'edit'})
+            else:
+                menu.append({'item': 'PHD_SUPERVISOR', 'class': '', 'action': 'edit'})
+    if mandate_structure.find_by_mandate_and_type(mandate, structure_type.INSTITUTE):
+        if mandate.state == 'SUPERVISION' or mandate.state == 'VICE_RECTOR' or mandate.state == 'DONE':
+            if any(reviewer_role.RESEARCH in x for x in reviewer_roles_for_mandate) or \
+                    any(reviewer_role.SUPERVISION in x for x in reviewer_roles_for_mandate) or \
+                    any(reviewer_role.SECTOR_VICE_RECTOR in x for x in reviewer_roles_for_mandate):
+                if active_item == 'RESEARCH':
+                    menu.append({'item': 'RESEARCH', 'class': 'active', 'action': 'view'})
+                else:
+                    menu.append({'item': 'RESEARCH', 'class': '', 'action': 'view'})
+            else:
+                menu.append({'item': 'RESEARCH', 'class': 'disabled', 'action': ''})
+        elif mandate.state == 'RESEARCH' and any(reviewer_role.RESEARCH in x for x in reviewer_roles_for_mandate):
+            if active_item == 'RESEARCH':
+                menu.append({'item': 'RESEARCH', 'class': 'active', 'action': 'edit'})
+            else:
+                menu.append({'item': 'RESEARCH', 'class': '', 'action': 'edit'})
+        else:
+            menu.append({'item': reviewer_role.RESEARCH, 'class': 'disabled', 'action': ''})
+    if mandate.state == 'VICE_RECTOR' or mandate.state == 'DONE':
+        if any(reviewer_role.SUPERVISION in x for x in reviewer_roles_for_mandate) or \
+                any(reviewer_role.SECTOR_VICE_RECTOR in x for x in reviewer_roles_for_mandate):
+            if active_item == 'SUPERVISION':
+                menu.append({'item': 'SUPERVISION', 'class': 'active', 'action': 'view'})
+            else:
+                menu.append({'item': 'SUPERVISION', 'class': '', 'action': 'view'})
+        else:
+            menu.append({'item': 'SUPERVISION', 'class': 'disabled', 'action': ''})
+    elif mandate.state == 'SUPERVISION' and any(reviewer_role.SUPERVISION in x for x in reviewer_roles_for_mandate):
+        if active_item == 'SUPERVISION':
+            menu.append({'item': 'SUPERVISION', 'class': 'active', 'action': 'edit'})
+        else:
+            menu.append({'item': 'SUPERVISION', 'class': '', 'action': 'edit'})
+    else:
+        menu.append({'item': 'SUPERVISION', 'class': 'disabled', 'action': ''})
+    if mandate.state == 'DONE':
+        if any(reviewer_role.SECTOR_VICE_RECTOR in x for x in reviewer_roles_for_mandate):
+            if active_item == 'VICE_RECTOR':
+                menu.append({'item': 'VICE_RECTOR', 'class': 'active', 'action': 'view'})
+            else:
+                menu.append({'item': 'VICE_RECTOR', 'class': '', 'action': 'view'})
+        else:
+            menu.append({'item': 'VICE_RECTOR', 'class': 'disabled', 'action': ''})
+    elif mandate.state == 'VICE_RECTOR' and any(reviewer_role.SECTOR_VICE_RECTOR in x for x in
+                                                reviewer_roles_for_mandate):
+        if active_item == reviewer_role.SECTOR_VICE_RECTOR:
+            menu.append({'item': 'VICE_RECTOR', 'class': 'active', 'action': 'edit'})
+        else:
+            menu.append({'item': 'VICE_RECTOR', 'class': '', 'action': 'edit'})
+    else:
+        menu.append({'item': 'VICE_RECTOR', 'class': 'disabled', 'action': ''})
+    return menu

@@ -70,21 +70,7 @@
             {% endfor %}
             </ul> </td>
 			<td>{{ mandate.fulltime_equivalent }}</td>	
-			{% if mandate.state == "TO_DO" %}
-				<td>{% trans 'pending' %}</td>
-			{% elif mandate.state == "DECLINED" %}
-				<td>{% trans 'declined' %}</td>
-			{% elif mandate.state == "TRTS" %}
-				<td>{% trans 'assistant' %}</td>
-			{% elif mandate.state == "PHD_SUPERVISOR" %}
-				<td>{% trans 'phd_supervisor' %}</td>
-			{% elif mandate.state == "RESEARCH" %}
-				<td>{% trans 'research' %}</td>
-			{% elif mandate.state == "SUPERVISION" %}
-				<td>{% trans 'supervision' %}</td>
-			{% elif mandate.state == "VICE_RECTOR" %}
-				<td>{% trans 'sector_vice_rector' %}</td>
-			{% endif %}
+            <td>{% trans mandate.state %}</td>
 			<td align="left">
 			{% if mandate.state == "TO_DO" %}
 				<button type="submit" class="btn btn-success" title="{% trans 'accept'%}" id="bt_mandate_accept" 

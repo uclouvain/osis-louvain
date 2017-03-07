@@ -26,6 +26,9 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
+{% endblock %}
 {% block breadcrumb %}
 <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
 <li><a href="{% url 'mandates' %}" id="lnk_mandates">{% trans 'mandates' %}</a></li>
@@ -53,19 +56,43 @@
     		</div>
     	</div>
     	<div class="form-group">
-      			<label style="padding-top: 5px" for="phd_inscription_date">{% trans 'phd_inscription_date' %}</label>
-				<div class="controls" id="phd_inscription_date">{{ form.phd_inscription_date }}</div>
-				<font class="error">{{ form.phd_inscription_date.errors }}</font>
-				<label for="thesis_title" style="padding-top: 5px">{% trans 'thesis_title' %}</label>
-				<div class="controls" id="thesis_title">{{ form.thesis_title }}</div>
-				<font class="error">{{ form.thesis_title.errors }}</font>
-				<label for="confirmatory_test_date" style="padding-top: 5px">{% trans 'confirmatory_test_date' %}
-					{% trans '2nd_renewal' %}</label>
-				<div class="controls" id="confirmatory_test_date">{{ form.confirmation_test_date }}</div>
-				<font class="error">{{ form.confirmation_test_date.errors }}</font>
-                <label for="remark" style="padding-top: 5px">{% trans 'doctorate_remark' %}</label>
-                 <div class="controls" id="remark">{{ form.remark }}</div>
-                <font class="error">{{ form.remark.errors }}</font>
+			<label style="padding-top: 5px" for="registered_phd">{% trans 'registered_phd' %}</label>
+			<div class="controls" id="registered_phd">{{ form.inscription }}
+				<font class="error">{{ form.inscription.errors }}</font></div>
+			<label style="padding-top: 5px" id="label_for_expected_phd_date" for="expected_phd_date">
+                {% trans 'expected_registering_date' %}</label>
+			<div class="controls" id="expected_phd_date">{{ form.expected_phd_date }}
+				<font class="error">{{ form.expected_phd_date.errors }}</font>
+			</div>
+			{% if not supervisor %}
+				<label style="padding-top: 5px" for="search_persons">{% trans 'supervisor' %}</label>
+				<div class="ui-widget"><input id="search_persons" name="search_persons" size="100"
+											  placeholder="{% trans 'search_by_email_or_last_name' %}">
+				</div>
+				<input type="hidden" name="person_id" id="person_id">
+			{% else %}
+				<label style="padding-top: 15px">{% trans 'supervisor' %}</label>
+				<div class="form-group">
+				{{ supervisor.person }}
+				</div>
+			{% endif %}
+			<label style="padding-top: 5px" for="phd_inscription_date">{% trans 'phd_inscription_date' %}</label>
+			<div class="controls" id="phd_inscription_date">{{ form.phd_inscription_date }}</div>
+			<font class="error">{{ form.phd_inscription_date.errors }}</font>
+			<label for="thesis_title" style="padding-top: 5px">{% trans 'thesis_title' %}</label>
+			<div class="controls" id="thesis_title">{{ form.thesis_title }}</div>
+			<font class="error">{{ form.thesis_title.errors }}</font>
+			<label for="confirmatory_test_date" style="padding-top: 5px">{% trans 'confirmatory_test_date' %}
+				{% trans '2nd_renewal' %}</label>
+			<div class="controls" id="confirmatory_test_date">{{ form.confirmation_test_date }}</div>
+			<font class="error">{{ form.confirmation_test_date.errors }}</font>
+			<label style="padding-top: 5px" for="thesis_defence_date">{% trans 'thesis_defence_date' %}</label>
+			<div class="controls" id="thesis_defence_date">{{ form.thesis_date }}
+				<font class="error">{{ form.thesis_date.errors }}</font>
+			</div>
+			<label for="remark" style="padding-top: 5px">{% trans 'doctorate_remark' %}</label>
+			<div class="controls" id="remark">{{ form.remark }}</div>
+			<font class="error">{{ form.remark.errors }}</font>
         </div>
         <div class="panel-default">
   			<div class="panel-heading">
@@ -108,7 +135,49 @@
 {% include "new_document.html" %}
 {% endblock %}
 {% block script %}
-	<script>
+<script type="text/javascript" src="{% static 'js/jquery-ui.js' %}"></script>
+<script>
+window.onload = function() {
+    $('#person_id').empty();
+};
+$(function() {
+  $("#search_persons").autocomplete({
+	source: "/assistants/api/get_persons/",
+    minLength: 3,
+    delay: 100,
+    select: function(event, ui) {
+    	var person_id = ui.item.id;
+    	$( "#person_id" ).val(person_id);
+    	$( "#search_persons" ).val( ui.item.first_name + ', ' + ui.item.last_name + ' (' + ui.item.value + ')' );
+    	$('#id_phd_inscription_date').focus();
+    	return False;
+    	}
+  });
+});
+
+function Hide() {
+	if(document.getElementById('id_mand-inscription_0').checked == true)
+     {
+         document.getElementById('id_mand-expected_phd_date').style.display = 'none';
+         document.getElementById('id_mand-expected_phd_date').value='';
+         document.getElementById('label_for_expected_phd_date').style.display = 'none';
+
+
+    } else if(document.getElementById('id_mand-inscription_1').checked == true)
+     {
+         document.getElementById('id_mand-expected_phd_date').style.display = 'none';
+         document.getElementById('id_mand-expected_phd_date').value='';
+         document.getElementById('label_for_expected_phd_date').style.display = 'none';
+    } else {
+ 		document.getElementById('id_mand-expected_phd_date').style.display ='';
+ 		document.getElementById('label_for_expected_phd_date').style.display = 'block';
+    }
+}
+
+window.onload = function() {
+    Hide();
+};
+
 	$("#pst-form-part3 :input").change(function() {
    		$("#pst-form-part3").data("changed",true);
 	});
@@ -124,8 +193,6 @@
 			}
 		}
 	});
-</script>
-    <script>
     //***************************
     //File upload
     //***************************

@@ -24,10 +24,11 @@
 #
 ##############################################################################
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 from django.contrib import admin
 from base.models import structure
 from django.db.models import Q
-from assistant.models import mandate_structure, assistant_mandate
+from assistant.models import mandate_structure, assistant_mandate, review
 from assistant.enums import reviewer_role
 
 
@@ -49,6 +50,7 @@ class ReviewerAdmin(admin.ModelAdmin):
 class Reviewer(models.Model):
     person = models.ForeignKey('base.Person')
     role = models.CharField(max_length=30, choices=reviewer_role.ROLE_CHOICES)
+    is_phd_supervisor = models.BooleanField(default=False)
     structure = models.ForeignKey('base.Structure', blank=True, null=True)
 
     def __str__(self):
@@ -67,7 +69,38 @@ def find_by_person(person):
     return Reviewer.objects.get(person=person)
 
 
+def can_view_review(reviewer_id, mandate, role):
+    current_reviewer = find_by_id(reviewer_id)
+    if role == reviewer_role.PHD_SUPERVISOR:
+        try:
+            current_review = review.find_done_by_supervisor_for_mandate(mandate)
+        except ObjectDoesNotExist:
+            return False
+    else:
+        try:
+            current_review = review.find_review_for_mandate_by_role(mandate, role, 'DONE').reverse()[0]
+        except ObjectDoesNotExist:
+            return False
+    if reviewer_id == current_review.reviewer.id:
+        return True
+    else:
+        if can_edit_review(reviewer_id, mandate.id) is False:
+            return False
+        if reviewer_role.SUPERVISION in current_reviewer.role and role == 'VICE_RECTOR':
+            return False
+        elif reviewer_role.RESEARCH in current_reviewer.role and (role == 'SUPERVISION' or role == 'VICE_RECTOR'):
+            return False
+        elif current_reviewer.role == reviewer_role.PHD_SUPERVISOR and (role == 'SUPERVISION' or role == 'VICE_RECTOR'
+                                                                        or role == 'RESEARCH'):
+            return False
+        else:
+            return True
+
+
 def can_edit_review(reviewer_id, mandate_id):
+    if assistant_mandate.find_mandate_by_id(mandate_id).state == 'PHD_SUPERVISOR' and \
+                    assistant_mandate.find_mandate_by_id(mandate_id).assistant.supervisor == find_by_id(reviewer_id):
+        return find_by_id(reviewer_id)
     if assistant_mandate.find_mandate_by_id(mandate_id).state not in find_by_id(reviewer_id).role:
         return None
     if not mandate_structure.find_by_mandate_and_structure(
@@ -81,23 +114,33 @@ def can_edit_review(reviewer_id, mandate_id):
         return find_by_id(reviewer_id)
 
 
+def find_roles_for_mandates(reviewer, mandate):
+    roles = []
+    reviewer_structures = []
+    structures_for_mandate = []
+    if mandate.assistant.supervisor == reviewer:
+        roles.append('PHD_SUPERVISOR')
+    mandate_structures = mandate_structure.find_by_mandate(mandate)
+    for mandate_struct in mandate_structures:
+        structures_for_mandate.append(mandate_struct.structure)
+    reviewer_structures.append(reviewer.structure)
+    if reviewer_structures:
+        reviewer_structures.append(reviewer.structure.children)
+    if bool(set(structures_for_mandate) & set(reviewer_structures)):
+        roles.append(reviewer.role)
+    return roles
+
+
 def find_by_role(role):
     return Reviewer.objects.filter(role=role)
 
 
-def can_delegate_to_structure(reviewer, structure):
-    """
-    Détermine si le reviewer passé en argmument peut déléguer son rôle pour la structure.
-    Pour pouvoir déléguer :
-    - Le reviewer doit avoir un rôle de SUPERVISION ou de RESEARCH.
-    - Il doit avoir ce rôle pour la structure passée en argument ou cette dernière doit faire partie
-    d'une structure pour laquelle le reviewer a ce rôle.
-    """
+def can_delegate_for_structure(reviewer, a_structure):
     if reviewer.role != "SUPERVISION" and reviewer.role != "RESEARCH":
         return False
-    if structure == reviewer.structure:
+    if a_structure == reviewer.structure:
         return True
-    if structure.part_of == reviewer.structure:
+    if a_structure.part_of == reviewer.structure:
         return True
     else:
         return False

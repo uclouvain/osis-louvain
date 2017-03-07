@@ -78,15 +78,10 @@ def user_is_reviewer_and_can_delegate(user):
 
 @user_passes_test(user_is_reviewer_and_can_delegate, login_url='assistants_home')
 def add_reviewer_for_structure(request, structure_id):
-    """
-    Crée un reviewer pour une structure donnée.
-    structure_id est l'identifiant de la structure pour laquelle on ajoute un reviewer.
-    Si le rôle du reviewer créé dépend du rôle de l'utilisateur (reviewer) connecté.
-    """
     related_structure = structure.find_by_id(structure_id)
     year = academic_year.current_academic_year().year
     try:
-        reviewer.can_delegate_to_structure(reviewer.find_by_person(request.user.person), related_structure)
+        reviewer.can_delegate_for_structure(reviewer.find_by_person(request.user.person), related_structure)
     except:
         return redirect('assistants_home')
     if request.POST:

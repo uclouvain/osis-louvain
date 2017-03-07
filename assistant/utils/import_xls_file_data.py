@@ -107,6 +107,7 @@ def read_xls_mandates(request, file_name):
                 faculty = search_structure_by_acronym_and_type(current_record.get('FACULTY'), 'FACULTY')
                 if faculty:
                     link_mandate_to_structure(mandate, faculty)
+                    link_mandate_to_structure(mandate, faculty.part_of)
                 pole = search_structure_by_acronym_and_type(current_record.get('POLE'), 'POLE')
                 if pole:
                     link_mandate_to_structure(mandate, pole)

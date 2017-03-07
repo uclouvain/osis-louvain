@@ -34,7 +34,7 @@ class AcademicAssistant(models.Model):
         ('IN_PROGRESS', _('In progress')))
 
     person = models.ForeignKey('base.Person')
-    supervisor = models.ForeignKey('base.Person', blank=True, null=True, related_name='person_supervisor')
+    supervisor = models.ForeignKey('Reviewer', null=True)
     thesis_title = models.CharField(max_length=255, null=True, blank=True)
     phd_inscription_date = models.DateField(null=True, blank=True)
     confirmation_test_date = models.DateField(null=True, blank=True)
