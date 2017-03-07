@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,10 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+import contextlib
+
+import factory
+
 from django.test import TestCase
+from django.test import override_settings
+
 from base.models import person
 from base.enums import person_source_type
-from django.conf import settings
+from base.factories.person import PersonFactory, generate_person_email
 
 
 def create_person(first_name, last_name, email=None):
@@ -41,32 +48,48 @@ def create_person_with_user(user):
     return a_person
 
 
-class PersonTest(TestCase):
+class PersonTestCase(TestCase):
+    @contextlib.contextmanager
+    def assertDontRaises(self):
+        try:
+            yield
+        except AttributeError:
+            self.fail('Exception not excepted')
 
-    settings.INTERNAL_EMAIL_SUFIX = 'osis.org'
 
-    def test_person_from_external_source(self):
-        p = person.Person(email='matheus@osis.org',
-                          last_name='Nashtergeith',
-                          first_name='Matheus',
-                          source=person_source_type.DISSERTATION)
-        self.assertRaises(AttributeError, p.save)
+class PersonTest(PersonTestCase):
+    def test_find_by_id(self):
+        tmp_person = PersonFactory()
+        db_person = person.find_by_id(tmp_person.id)
+        self.assertIsNotNone(tmp_person.user)
+        self.assertEqual(db_person.id, tmp_person.id)
+        self.assertEqual(db_person.email, tmp_person.email)
 
+    @override_settings(INTERNAL_EMAIL_SUFIX='osis.org')
+    def test_person_from_extern_source(self):
+        person_email = functools.partial(generate_person_email, domain='osis.org')
+        p = PersonFactory.build(email=factory.LazyAttribute(person_email),
+                                user=None,
+                                source=person_source_type.DISSERTATION)
+        with self.assertRaises(AttributeError):
+            p.save()
+
+    @override_settings(INTERNAL_EMAIL_SUFIX='osis.org')
     def test_person_from_internal_source(self):
-        p = person.Person(email='matheus@osis.org',
-                          last_name='Nashtergeith',
-                          first_name='Matheus')
-        try:
-            p.save()
-        except AttributeError:
-            self.fail("Exception not expected")
+        person_email = functools.partial(generate_person_email, domain='osis.org')
 
-    def test_person_without_source(self):
-        p = person.Person(email='matheus@osis.org',
-                          last_name='Nashtergeith',
-                          first_name='Matheus',
-                          source=None)
-        try:
+        p = PersonFactory.build(email=factory.LazyAttribute(person_email),
+                                user=None)
+
+        with self.assertDontRaises():
             p.save()
-        except AttributeError:
-            self.fail("Exception not expected")
+
+    @override_settings(INTERNAL_EMAIL_SUFIX='osis.org')
+    def test_person_without_source(self):
+        person_email = functools.partial(generate_person_email, domain='osis.org')
+        p = PersonFactory.build(email=factory.LazyAttribute(person_email),
+                                user=None,
+                                source=None)
+
+        with self.assertDontRaises():
+            p.save()
