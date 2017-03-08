@@ -30,6 +30,7 @@ Now that you have a Debian-based Linux system available, you can start preparing
 the development environment in it. Follow the steps below:
 
 - <<installing-git>>
+- <<using-docker>>
 - <<installing-postgresql>>
 - <<installing-django>>
 - <<installing-application>>
@@ -145,6 +146,50 @@ In this case, you should change the url to the ssh one:
 
 The automatic authentication should work after that.
 
+[[using-docker]]
+=== Using Docker
+
+Docker is a containerization platform that you can use to compose an application
+made from several services. You can use docker in development to get started
+quickly, or read the following sections to install all dependencies manually.
+
+First you need to pull osis and its submodule osis-common:
+
+    $ git pull git@github.com:uclouvain/osis.git
+    $ cd osis
+    $ git submodule init
+    $ git submodule update
+
+Next, you have to define a few environment variables. The default ones should work
+with docker so simply copy the example file. They are used to setup the postgres
+and rabbitmq user, password and host for your local environment.
+
+    $ cp .env.example .env
+
+Then all you have to do is to use docker compose to build the necessary containers and run it.
+
+    $ docker-compose build
+    $ docker-compose up
+
+Once this is done, you can just seed the database using the information from <<seed-data>>.
+
+You can stop the whole application with:
+
+    $ docker-compose stop
+
+Or stop a single container with:
+
+    $ docker-compose backoffice stop
+
+Once the containers are started, for each command you want to run inside an container, you have to
+do something like:
+
+    $ docker run container_name your_command
+
+For instance, after the first docker start, you need to run the migrations like this:
+
+    $ docker run backoffice python manage.py migrate # this will execute the pending migrations
+
 [[installing-postgresql]]
 === Installing and Configuring PostgreSQL
 
@@ -233,6 +278,9 @@ Create the data structure in the database:
 
     (venv)$ python manage.py migrate
 
+[[seed-data]]
+=== Seed the database with data
+
 At this point we have two options:
 
 1. we create a super user and go on with an empty database or
@@ -263,7 +311,10 @@ The demonstration data also create several other users. The password for each
 user is the username typed twice (e.g. user: `antonin`  password:
 `antoninantonin`).
 
-Now, we can run the application:
+[[running-application]]
+=== Run the application
+
+We can run the application with:
 
     (venv)$ python manage.py runserver
 
@@ -517,12 +568,12 @@ referencing its identifier:
 
 ===== Reverting commits
 
-To revert the changes made in the last 4 commits and create a new commit with 
+To revert the changes made in the last 4 commits and create a new commit with
 the reverted changes:
 
     $ git revert HEAD~3
 
-To revert the changes made between the fifth and the third (included) last 
+To revert the changes made between the fifth and the third (included) last
 commits in the branch `master`, but not creating any commit for the reverted
 changes:
 
@@ -548,9 +599,9 @@ performed:
     $ git reset --hard <last_good_commit>
     $ git push --force
 
-It leaves the reflog intact locally and in the remote branch. The bad commits 
+It leaves the reflog intact locally and in the remote branch. The bad commits
 may disappear from the history and don't propagate further. The removed tree
-branch remains around temporarily and can be recoveredm but it's for Git 
+branch remains around temporarily and can be recoveredm but it's for Git
 experts.
 
 == Fixing the latest commit message

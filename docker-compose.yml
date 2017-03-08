@@ -1,0 +1,18 @@
+version: '2'
+services:
+  backoffice:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - rabbit
+  db:
+    image: postgres:9.4
+    environment:
+      POSTGRES_DB: osis_backend_dev
+  rabbit:
+    image: rabbitmq
