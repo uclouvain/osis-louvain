@@ -26,9 +26,9 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from attribution.models import attribution
-from base.models import person
 from osis_common.models import serializable_model
-
+from base.models import person
+from base import signals
 
 class TutorAdmin(serializable_model.SerializableModelAdmin):
     list_display = ('person', 'changed')
@@ -44,6 +44,17 @@ class Tutor(serializable_model.SerializableModel):
 
     def __str__(self):
         return u"%s" % self.person
+
+    def delete(self, *args, **kwargs):
+        super(Tutor, self).delete(*args, **kwargs)
+        if self.person.user:
+            signals.remove_user_from_group.send(sender=self.__class__, instance=self.person.user, group="tutors")
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super(Tutor, self).save(*args, **kwargs)
+        if is_new and self.person.user:
+            signals.add_user_to_group.send(sender=self.__class__, instance=self.person.user, group="tutors")
 
 
 def find_by_user(user):

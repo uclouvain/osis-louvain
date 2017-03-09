@@ -29,7 +29,7 @@ from django.db import models
 from django.contrib import admin
 from .learning_unit_enrollment import LearningUnitEnrollment
 from django.core.exceptions import ObjectDoesNotExist
-
+from base import signals
 
 class ProgramManagerAdmin(admin.ModelAdmin):
     list_display = ('person', 'offer_year')
@@ -54,6 +54,18 @@ class ProgramManager(models.Model):
 
     class Meta:
         unique_together = ('person', 'offer_year',)
+
+    def delete(self, *args, **kwargs):
+        super(ProgramManager, self).delete(*args, **kwargs)
+        if self.person.user:
+            signals.remove_user_from_group.send(sender=self.__class__, instance=self.person.user, group="program_managers")
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super(ProgramManager, self).save(*args, **kwargs)
+        if is_new and self.person.user:
+            signals.add_user_to_group.send(sender=self.__class__,instance=self.person.user, group="program_managers")
+
 
 
 def find_by_person(a_person):

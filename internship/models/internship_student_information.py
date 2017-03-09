@@ -27,6 +27,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 from django.utils.translation import ugettext_lazy as _
+from base import signals
 
 
 class InternshipStudentInformationAdmin(SerializableModelAdmin):
@@ -54,6 +55,17 @@ class InternshipStudentInformation(SerializableModel):
 
     def __str__(self):
         return '{}'.format(self.person)
+
+    def delete(self, *args, **kwargs):
+        super(InternshipStudentInformation, self).delete(*args, **kwargs)
+        if self.person.user:
+            signals.remove_user_from_group.send(sender=self.__class__, instance=self.person.user, group="internship_students")
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super(InternshipStudentInformation, self).save(*args, **kwargs)
+        if is_new and self.person.user:
+            signals.add_user_to_group.send(sender=self.__class__, instance=self.person.user, group="internship_students")
 
 
 def search(**kwargs):

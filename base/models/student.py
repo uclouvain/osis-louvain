@@ -26,7 +26,7 @@
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
-
+from base import signals
 
 class StudentAdmin(SerializableModelAdmin):
     list_display = ('person', 'registration_id', 'changed')
@@ -43,6 +43,18 @@ class Student(SerializableModel):
 
     def __str__(self):
         return u"%s (%s)" % (self.person, self.registration_id)
+
+    def delete(self, *args, **kwargs):
+        super(Student, self).delete(*args, **kwargs)
+        if self.person.user:
+            signals.remove_user_from_group.send(sender=self.__class__, instance=self.person.user, group="students")
+
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super(Student, self).save(*args, **kwargs)
+        if is_new and self.person.user:
+            signals.add_user_to_group.send(sender=self.__class__, instance=self.person.user, group="students")
+
 
 
 def find_by(registration_id=None, person_name=None, person_username=None, person_first_name=None, full_registration = None):

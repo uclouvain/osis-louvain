@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,14 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.apps import AppConfig
+from django.dispatch import Signal
+from django.contrib.auth.models import Group
+
+add_user_to_group = Signal(providing_args=["instance", "group", "kwargs"])
+remove_user_from_group = Signal(providing_args=["instance", "group", "kwargs"])
+
+def remove_user_from_group_handler(sender, instance, group, **kwargs):
+    group_obj = Group.objects.get(name=group)
+    instance.groups.remove(group_obj)
+
+def add_to_tutors_group_handler(sender, instance, group, **kwargs):
+    group_obj = Group.objects.get(name=group)
+    instance.groups.add(group_obj)
 
 
-class BaseConfig(AppConfig):
-    name = 'base'
-
-    def ready(self):
-        import base.signals
-        from base.views.score_encoding import get_json_data_scores_sheets
-        # if django.core.exceptions.AppRegistryNotReady: Apps aren't loaded yet.
-        # ===> This exception says that there is an error in the implementation of method ready(self) !!
+# Signals definition
+add_user_to_group.connect(add_to_tutors_group_handler)
+remove_user_from_group.connect(remove_user_from_group_handler)
