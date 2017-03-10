@@ -23,33 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db import models
+from django.contrib import admin
+from base.enums.entity_name import ENTITY_NAME
+from ckeditor.fields import RichTextField
 
 
-class StartDateHigherThanEndDateException(Exception):
-    def __init__(self, message=None, errors=None):
-        super(StartDateHigherThanEndDateException, self).__init__(message)
-        self.errors = errors
+class TranslatedTextAdmin(admin.ModelAdmin):
+    list_display = ('entity_name', 'reference', 'language', 'text_label', 'text', )
+    fieldsets = ((None, {'fields': ('entity_name', 'reference', 'language', 'text_label', 'text')}),)
+    search_fields = ['acronym']
 
 
-class FunctionArgumentMissingException(Exception):
-    def __init__(self, message=None, errors=None):
-        super(FunctionArgumentMissingException, self).__init__(message)
-        self.errors = errors
+class TranslatedText(models.Model):
+    entity_name = models.CharField(max_length=25, choices=ENTITY_NAME)
+    reference = models.CharField(max_length=50, db_index=True)
+    language = models.ForeignKey('reference.Language')
+    text_label = models.ForeignKey('TextLabel')
+    text = RichTextField()
 
 
-class TxtLabelOrderExitsException(Exception):
-    def __init__(self, message=None, errors=None):
-        super(TxtLabelOrderExitsException, self).__init__(message)
-        self.errors = errors
-
-
-class TxtLabelOrderMustExitsException(Exception):
-    def __init__(self, message=None, errors=None):
-        super(TxtLabelOrderMustExitsException, self).__init__(message)
-        self.errors = errors
-
-
-class JustificationValueException(Exception):
-    def __init__(self, message=None, errors=None):
-        super(JustificationValueException, self).__init__(message)
-        self.errors = errors
+def find_by_id(translated_text_id):
+    return TranslatedText.objects.get(pk=translated_text_id)

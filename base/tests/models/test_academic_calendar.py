@@ -27,7 +27,7 @@ import datetime
 from django.test import TestCase
 from base.models import academic_year
 from base.models import academic_calendar
-from base.models.exceptions import FunctionAgrumentMissingException, StartDateHigherThanEndDateException
+from base.models.exceptions import FunctionArgumentMissingException, StartDateHigherThanEndDateException
 
 start_date = datetime.datetime.now()
 end_date = start_date.replace(year=start_date.year + 1)
@@ -56,7 +56,7 @@ class AcademicCalendarTest(TestCase):
                                                           title="A calendar event",
                                                           start_date=start_date,
                                                           end_date=end_date)
-        self.assertRaises(FunctionAgrumentMissingException, academic_cal.save)
+        self.assertRaises(FunctionArgumentMissingException, academic_cal.save)
 
     def test_start_date_higher_than_end_date(self):
         wrong_end_date = datetime.datetime.now()

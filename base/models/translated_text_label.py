@@ -23,33 +23,39 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db import models
+from django.contrib import admin
 
 
-class StartDateHigherThanEndDateException(Exception):
-    def __init__(self, message=None, errors=None):
-        super(StartDateHigherThanEndDateException, self).__init__(message)
-        self.errors = errors
+class TranslatedTextLabelAdmin(admin.ModelAdmin):
+    list_display = ('label', 'language', 'text_label',)
+    fieldsets = ((None, {'fields': ('label', 'language', 'text_label')}),)
+    search_fields = ['acronym']
 
 
-class FunctionArgumentMissingException(Exception):
-    def __init__(self, message=None, errors=None):
-        super(FunctionArgumentMissingException, self).__init__(message)
-        self.errors = errors
+class TranslatedTextLabel(models.Model):
+    label = models.CharField(max_length=255)
+    language = models.ForeignKey('reference.Language')
+    text_label = models.ForeignKey('TextLabel')
+
+    def __str__(self):
+        return self.label
 
 
-class TxtLabelOrderExitsException(Exception):
-    def __init__(self, message=None, errors=None):
-        super(TxtLabelOrderExitsException, self).__init__(message)
-        self.errors = errors
+def find_by_id(translated_text_label_id):
+    return TranslatedTextLabel.objects.get(pk=translated_text_label_id)
 
 
-class TxtLabelOrderMustExitsException(Exception):
-    def __init__(self, message=None, errors=None):
-        super(TxtLabelOrderMustExitsException, self).__init__(message)
-        self.errors = errors
+def find_by_language(language_input):
+    queryset = TranslatedTextLabel.objects.filter(language__code=language_input)
+    return queryset
 
 
-class JustificationValueException(Exception):
-    def __init__(self, message=None, errors=None):
-        super(JustificationValueException, self).__init__(message)
-        self.errors = errors
+def search(acronym=None):
+    queryset = TranslatedTextLabel.objects
+
+    if acronym:
+        queryset = queryset.filter(acronym=acronym)
+
+    return queryset
+

@@ -23,33 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+LEARNING_UNIT_YEAR = "learning_unit_year"
+OFFER_YEAR = "offer_year"
 
 
-class StartDateHigherThanEndDateException(Exception):
-    def __init__(self, message=None, errors=None):
-        super(StartDateHigherThanEndDateException, self).__init__(message)
-        self.errors = errors
-
-
-class FunctionArgumentMissingException(Exception):
-    def __init__(self, message=None, errors=None):
-        super(FunctionArgumentMissingException, self).__init__(message)
-        self.errors = errors
-
-
-class TxtLabelOrderExitsException(Exception):
-    def __init__(self, message=None, errors=None):
-        super(TxtLabelOrderExitsException, self).__init__(message)
-        self.errors = errors
-
-
-class TxtLabelOrderMustExitsException(Exception):
-    def __init__(self, message=None, errors=None):
-        super(TxtLabelOrderMustExitsException, self).__init__(message)
-        self.errors = errors
-
-
-class JustificationValueException(Exception):
-    def __init__(self, message=None, errors=None):
-        super(JustificationValueException, self).__init__(message)
-        self.errors = errors
+ENTITY_NAME = ((LEARNING_UNIT_YEAR, LEARNING_UNIT_YEAR),
+               (OFFER_YEAR, OFFER_YEAR))

@@ -58,5 +58,7 @@ from base.models import structure
 from base.models import structure_address
 from base.models import student
 from base.models import synchronization
+from base.models import text_label
+from base.models import translated_text
+from base.models import translated_text_label
 from base.models import tutor
-

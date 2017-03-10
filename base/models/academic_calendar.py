@@ -26,7 +26,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils import timezone
-from base.models.exceptions import FunctionAgrumentMissingException, StartDateHigherThanEndDateException
+from base.models.exceptions import FunctionArgumentMissingException, StartDateHigherThanEndDateException
 from osis_common.models.serializable_model import SerializableModel
 
 FUNCTIONS = 'functions'
@@ -47,7 +47,7 @@ class AcademicCalendar(SerializableModel):
 
     def save(self, *args, **kwargs):
         if FUNCTIONS not in kwargs.keys():
-            raise FunctionAgrumentMissingException('The kwarg "{0}" must be set.'.format(FUNCTIONS))
+            raise FunctionArgumentMissingException('The kwarg "{0}" must be set.'.format(FUNCTIONS))
         functions = kwargs.pop(FUNCTIONS)
         if self.start_date and self.end_date and self.start_date >= self.end_date:
             raise StartDateHigherThanEndDateException('Start date must be lower than end date')
