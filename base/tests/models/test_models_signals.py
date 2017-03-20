@@ -37,7 +37,8 @@ from base.models import models_signals as mdl_signals, person as mdl_person
 
 
 def get_or_create_user(user_infos):
-    a_user, created = User.objects.get_or_create(username=user_infos.get('USERNAME'), password=user_infos.get('PASSWORD'))
+    a_user, created = User.objects.get_or_create(username=user_infos.get('USERNAME'),
+                                                 password=user_infos.get('PASSWORD'))
     if created:
         if user_infos.get('USER_FIRST_NAME'):
             a_user.first_name = user_infos.get('USER_FIRST_NAME')
@@ -69,13 +70,12 @@ def get_or_create_person(user=None, first_name=None, global_id=None):
 
 def assert_person_match_user_infos(test_case, person, user_infos):
     test_case.assertEqual(person.first_name, user_infos.get('USER_FIRST_NAME'))
-    test_case.assertEqual(person.last_name,user_infos.get('USER_LAST_NAME'))
+    test_case.assertEqual(person.last_name, user_infos.get('USER_LAST_NAME'))
     test_case.assertEqual(person.global_id, user_infos.get('USER_FGS'))
     test_case.assertEqual(person.email, user_infos.get('USER_EMAIL'))
 
 
 class CreateUpdatePerson(TestCase):
-
     def test_create_person_from_user(self):
         user_infos = {
             'USERNAME': 'user1',
@@ -104,7 +104,6 @@ class CreateUpdatePerson(TestCase):
 
 
 class UpdatePersonIfNecessary(TestCase):
-
     user_infos = {
         'USERNAME': 'user_test',
         'PASSWORD': 'pass_test',
@@ -137,12 +136,8 @@ class UpdatePersonIfNecessary(TestCase):
 
 
 class AddToGroupsSignalsTest(TestCase):
-
     def is_member(self, group):
         return self.user_foo.groups.filter(name=group).exists()
-
-    def create_test_student(self):
-        return Student.objects.create(registration_id=123456789, person=self.person_foo)
 
     def create_test_tutor(self):
         return Tutor.objects.create(person=self.person_foo)
@@ -159,15 +154,6 @@ class AddToGroupsSignalsTest(TestCase):
     def setUp(self):
         self.user_foo = User.objects.create_user('user_foo')
         self.person_foo = Person.objects.create(user=self.user_foo)
-
-    def test_add_to_students_group(self):
-        self.create_test_student()
-        self.assertTrue(self.is_member('students'), 'user_foo should be in students group')
-
-    def test_remove_from_students_group(self):
-        student_foo = self.create_test_student()
-        student_foo.delete()
-        self.assertFalse(self.is_member('students'), 'user_foo should not be in students group anymore')
 
     def test_add_to_tutors_group(self):
         self.create_test_tutor()

@@ -26,15 +26,16 @@
 from django.contrib.auth.models import Group
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver, Signal
-from base.models import student as mdl_student, person as mdl_person, tutor as mdl_tutor, program_manager as mdl_pgm_manager
+from base.models import student as mdl_student, person as mdl_person, tutor as mdl_tutor, \
+    program_manager as mdl_pgm_manager
 from osis_common.models.serializable_model import SerializableModel
 from internship.models import internship_student_information as mdl_internship
-
 
 person_created = Signal(providing_args=['person'])
 
 try:
     from osis_louvain_auth.authentication.shibboleth_auth import user_updated_signal, user_created_signal
+
 
     @receiver(user_created_signal)
     def update_person_after_user_creation(sender, **kwargs):
@@ -44,6 +45,7 @@ try:
         person = _create_update_person(user, person, user_infos)
         _add_person_to_group(person)
         return person
+
 
     @receiver(user_updated_signal)
     def update_person_after_user_update(sender, **kwargs):
@@ -57,11 +59,12 @@ try:
 except Exception:
     pass
 
+
 @receiver(post_save, sender=mdl_tutor.Tutor)
 def add_to_tutors_group(sender, instance, **kwargs):
     if kwargs.get('created', True) and instance.person.user:
-            tutors_group = Group.objects.get(name='tutors')
-            instance.person.user.groups.add(tutors_group)
+        tutors_group = Group.objects.get(name='tutors')
+        instance.person.user.groups.add(tutors_group)
 
 
 @receiver(post_delete, sender=mdl_tutor.Tutor)
@@ -69,20 +72,6 @@ def remove_from_tutor_group(sender, instance, **kwargs):
     if instance.person.user:
         tutors_group = Group.objects.get(name='tutors')
         instance.person.user.groups.remove(tutors_group)
-
-
-@receiver(post_save, sender=mdl_student.Student)
-def add_to_students_group(sender, instance, **kwargs):
-    if kwargs.get('created', True) and instance.person.user:
-            students_group = Group.objects.get(name='students')
-            instance.person.user.groups.add(students_group)
-
-
-@receiver(post_delete, sender=mdl_student.Student)
-def remove_from_student_group(sender, instance, **kwargs):
-    if instance.person.user:
-        students_group = Group.objects.get(name='students')
-        instance.person.user.groups.remove(students_group)
 
 
 @receiver(post_save, sender=mdl_pgm_manager.ProgramManager)
@@ -98,33 +87,14 @@ def remove_from_pgm_managers_group(sender, instance, **kwargs):
         pgm_managers_group = Group.objects.get(name='program_managers')
         instance.person.user.groups.remove(pgm_managers_group)
 
-@receiver(post_save, sender=mdl_internship.InternshipStudentInformation)
-def add_to_internship_students_group(sender, instance, **kwargs):
-    if kwargs.get('created', True) and instance.person.user:
-        internship_students_group = Group.objects.get(name='internship_students')
-        instance.person.user.groups.add(internship_students_group)
-
-
-@receiver(post_delete, sender=mdl_internship.InternshipStudentInformation)
-def remove_internship_students_group(sender, instance, **kwargs):
-    if instance.person.user:
-        internship_students_group = Group.objects.get(name='internship_students')
-        instance.person.user.groups.remove(internship_students_group)
-
 
 def _add_person_to_group(person):
-    # Check Student
-    if mdl_student.find_by_person(person):
-        _assign_group(person, "students")
     # Check tutor
     if mdl_tutor.find_by_person(person):
         _assign_group(person, "tutors")
     # Check PgmManager
     if mdl_pgm_manager.find_by_person(person):
         _assign_group(person, 'program_managers')
-    # Check if student is internship student
-    if mdl_internship.find_by_person(person):
-        _assign_group(person, 'internship_students')
 
 
 def _assign_group(person, group_name):
@@ -145,10 +115,10 @@ def _create_update_person(user, person, user_infos):
         person = mdl_person.find_by_user(user)
     if not person:
         person = mdl_person.Person(user=user,
-                        global_id=user_infos.get('USER_FGS'),
-                        first_name=user_infos.get('USER_FIRST_NAME'),
-                        last_name=user_infos.get('USER_LAST_NAME'),
-                        email=user_infos.get('USER_EMAIL'))
+                                   global_id=user_infos.get('USER_FGS'),
+                                   first_name=user_infos.get('USER_FIRST_NAME'),
+                                   last_name=user_infos.get('USER_LAST_NAME'),
+                                   email=user_infos.get('USER_EMAIL'))
         person.save()
         person_created.send(sender=None, person=person)
     else:

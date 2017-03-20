@@ -6,17 +6,6 @@ from django.core.management.sql import emit_post_migrate_signal
 from django.db import migrations
 
 
-def add_internship_access_to_student_group(apps, schema_editor):
-    db_alias = schema_editor.connection.alias
-    emit_post_migrate_signal(2, False, db_alias)
-    Group = apps.get_model('auth', 'Group')
-    Permission = apps.get_model('auth', 'Permission')
-    student_group = Group.objects.get(name='students')
-    # Add permissions to group
-    internships_perm = Permission.objects.get(codename='can_access_internship')
-    student_group.permissions.add(internships_perm)
-
-
 def add_init_internship_manager_group(apps, schema_editor):
     # create group
     db_alias = schema_editor.connection.alias
@@ -40,6 +29,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(add_internship_access_to_student_group),
         migrations.RunPython(add_init_internship_manager_group),
     ]

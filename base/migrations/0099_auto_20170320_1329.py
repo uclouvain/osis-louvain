@@ -6,7 +6,6 @@ from django.db import migrations
 
 
 def remove_groups(apps, schema_editor):
-    print(apps.get_models)
     Group = apps.get_model("auth", "Group")
     db_alias = schema_editor.connection.alias
     Group.objects.using(db_alias).filter(name="internship_students").delete()
