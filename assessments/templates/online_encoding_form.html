@@ -178,10 +178,10 @@
                                 {% endif %}
                                 {% if is_program_manager %}
                                     <option value="CHEATING" {% if enrollment.justification_final == 'CHEATING' %}selected{% endif %}>{% trans 'CHEATING' %}</option>
-                                    <option value="SCORE_MISSING" {% if enrollment.justification_final == 'SCORE_MISSING' %}selected{% endif %}>{% trans 'SCORE_MISSING' %}</option>
+                                    <option value="SCORE_MISSING" {% if enrollment.justification_final == 'SCORE_MISSING' or enrollment.is_score_missing %}selected{% endif %}>{% trans 'SCORE_MISSING' %}</option>
                                 {% else %}
                                     <option value="CHEATING" {% if enrollment.justification_draft == 'CHEATING' %}selected{% endif %}>{% trans 'CHEATING' %}</option>
-                                    <option value="SCORE_MISSING" {% if enrollment.justification_draft == 'SCORE_MISSING' %}selected{% endif %}>{% trans 'SCORE_MISSING' %}</option>
+                                    <option value="SCORE_MISSING" {% if enrollment.justification_draft == 'SCORE_MISSING' or enrollment.is_score_missing %}selected{% endif %}>{% trans 'SCORE_MISSING' %}</option>
                                 {% endif %}
                             </select>
                             <input type="hidden" id="hdn_score_changed_{{ enrollment.id }}" name="score_changed_{{ enrollment.id }}"></td>
@@ -213,27 +213,53 @@ var values = [
         {% endfor %}
         ['', '', '']];
 
+var is_valid_score = function(score) {
+    var is_decimal = '{{enrollment.session_exam.learning_unit_year.decimal_scores}}'
+    if (!is_decimal && score % 1 != 0){
+        return false
+    }else if( score > 20 || score < 0 ) {
+        return false
+    }
+    return true;
+}
+
+var validate_form = function() {
+    $("input[id^='num_score_']" ).each(function(){
+        var score_encoded = $(this).val();
+        if (is_valid_score(score_encoded)) {
+            $(this).css("border", "1px solid lightgrey");
+        } else {
+            $(this).css("border", "1px solid #ff0000");
+        }
+    });
+}
+
+$( document ).ready(function() {
+    validate_form()
+});
+
+
 $("input[id^='num_score_']" ).change(function(event) {
     // Get the object that received the event.
     var target = $(event.target);
     var id = target.attr("id");
-    var is_decimal = '{{enrollment.session_exam.learning_unit_year.decimal_scores}}'
     if (typeof id == 'undefined') {
         target = target.parent();
         id = target.attr("id");
     }
     var enrollmentId = id.substring(id.lastIndexOf("_") + 1);
-    if (!is_decimal && target.val() % 1 != 0){
+
+    var score_encoded = target.val();
+    if (is_valid_score(score_encoded)) {
+        target.css("border", "1px solid lightgrey");
+    } else {
         target.css("border", "1px solid #ff0000");
-    }else{
-        if (target.val() > 20 || (target.val() < 0)) {
-            target.css("border", "1px solid #ff0000");
-        } else {
-            target.css("border", "1px solid lightgrey");
-        }
     }
-    if(target.val() != "") {
+
+    if(score_encoded != "") {
         $("#slt_justification_score_" + enrollmentId).val('');
+    }else{
+        $("#slt_justification_score_" + enrollmentId).val('SCORE_MISSING');
     }
     this.setCustomValidity('');
 
@@ -280,6 +306,9 @@ $(target_justification).on('keypress',
 $(document).on('keypress', function(e) {
     disable_enter(e);
 });
+
+
+
 
 </script>
 {% endblock %}

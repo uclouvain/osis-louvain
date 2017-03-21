@@ -23,15 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 import factory
 import factory.fuzzy
 import string
-import datetime
+import operator
 from django.conf import settings
 from django.utils import timezone
+from base.models.offer_year_calendar import OfferYearCalendar
 
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.learning_unit import LearningUnitFactory
+from base.tests.factories.session_examen import SessionExamFactory
+from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollment as LearningUnitEnrollmentFactory
+
+from base.enums import exam_enrollment_justification_type as justification_types
+from base.enums import exam_enrollment_state as enrollment_states
 
 
 def _get_tzinfo():
@@ -40,21 +45,21 @@ def _get_tzinfo():
     else:
         return None
 
-class LearningUnitYearFactory(factory.django.DjangoModelFactory):
+
+class ExamEnrollmentFactory(factory.DjangoModelFactory):
     class Meta:
-        model = "base.LearningUnitYear"
+        model = 'base.ExamEnrollment'
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    academic_year = factory.SubFactory(AcademicYearFactory)
-    learning_unit = factory.SubFactory(LearningUnitFactory)
-    learning_container_year = None #factory.SubFactory(LearningContainerYearFactory)
     changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=_get_tzinfo()),
                                           datetime.datetime(2017, 3, 1, tzinfo=_get_tzinfo()))
-    acronym = factory.Sequence(lambda n: 'LUY-%d' % n)
-    title = factory.Sequence(lambda n: 'Learning unit year - %d' % n)
-    type = "C"
-    credits = factory.fuzzy.FuzzyDecimal(99)
-    decimal_scores = False
-    team = False
-    vacant = False
-    in_charge = False
+
+    score_draft = factory.fuzzy.FuzzyDecimal(99)
+    score_reencoded = factory.fuzzy.FuzzyDecimal(99)
+    score_final = factory.fuzzy.FuzzyDecimal(99)
+    justification_draft = factory.Iterator(justification_types.JUSTIFICATION_TYPES, getter=operator.itemgetter(0))
+    justification_reencoded = factory.Iterator(justification_types.JUSTIFICATION_TYPES, getter=operator.itemgetter(0))
+    justification_final = factory.Iterator(justification_types.JUSTIFICATION_TYPES, getter=operator.itemgetter(0))
+    session_exam = factory.SubFactory(SessionExamFactory)
+    learning_unit_enrollment = factory.SubFactory(LearningUnitEnrollmentFactory)
+    enrollment_state = factory.Iterator(enrollment_states.STATES, getter=operator.itemgetter(0))

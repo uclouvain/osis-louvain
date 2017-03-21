@@ -1004,6 +1004,9 @@ msgstr "note(s) enregistrée(s)"
 msgid "scores_saved_cannot_be_saved_anymore"
 msgstr "Notes sauvegardées, le bouton sauvegarder n'est plus présent"
 
+msgid "scores_must_be_between_0_and_20"
+msgstr "Les notes doivent être comprise entre 0 et 20"
+
 msgid "scores_sheet"
 msgstr "Feuille de notes"
 
@@ -1368,3 +1371,6 @@ msgstr "Les responsables de notes peuvent soumettre des encodages partiels"
 
 msgid "scores_responsible_must_still_submit_scores"
 msgstr "Le responsable de notes doit toujours soumettre les notes"
+
+msgid "submitted_scores"
+msgstr "notes soumises"

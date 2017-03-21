@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ from decimal import *
 from django.db import models
 from django.contrib import admin
 from django.utils.translation import ugettext as _
+from django.core.validators import MaxValueValidator, MinValueValidator
 from base.models import person, learning_unit_year, person_address, offer_year_calendar
 from attribution.models import attribution
 from base.enums import exam_enrollment_justification_type as justification_types
@@ -57,9 +58,12 @@ class ExamEnrollmentAdmin(admin.ModelAdmin):
 class ExamEnrollment(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
     changed = models.DateTimeField(null=True)
-    score_draft = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    score_reencoded = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    score_final = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    score_draft = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
+                                      validators=[MinValueValidator(0), MaxValueValidator(20)])
+    score_reencoded = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
+                                          validators=[MinValueValidator(0), MaxValueValidator(20)])
+    score_final = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
+                                      validators=[MinValueValidator(0), MaxValueValidator(20)])
     justification_draft = models.CharField(max_length=20, blank=True, null=True, choices=justification_types.JUSTIFICATION_TYPES)
     justification_reencoded = models.CharField(max_length=20, blank=True, null=True, choices=justification_types.JUSTIFICATION_TYPES)
     justification_final = models.CharField(max_length=20, blank=True, null=True, choices=justification_types.JUSTIFICATION_TYPES)
@@ -123,7 +127,10 @@ class ExamEnrollment(models.Model):
         if is_absence_justification(self.justification_draft):
             return JUSTIFICATION_ABSENT_FOR_TUTOR
         elif self.justification_draft:
-            return _(self.justification_draft)
+            if self.justification_draft == justification_types.SCORE_MISSING:
+                return "? ({0})".format(_(self.justification_draft))
+            else:
+                return _(self.justification_draft)
         else:
             return None
 
@@ -145,6 +152,21 @@ class ExamEnrollment(models.Model):
         else:
             return None
 
+    @property
+    def is_score_missing(self):
+        if self.justification_draft is None and self.score_draft is None and self.justification_final is None and self.score_final is None:
+            return True
+        return False
+
+    @property
+    def justification_final_display_as_program_manager(self):
+        if (self.justification_final is None and self.score_final is None) or self.justification_final == justification_types.SCORE_MISSING:
+            return "? ({0})".format(_(justification_types.SCORE_MISSING))
+        else:
+            if self.justification_final:
+                return _(self.justification_final)
+            else:
+                return "-"
 
 def is_absence_justification(justification):
     return justification in [justification_types.ABSENCE_UNJUSTIFIED, justification_types.ABSENCE_JUSTIFIED]
