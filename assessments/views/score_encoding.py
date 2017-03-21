@@ -25,6 +25,7 @@
 ##############################################################################
 import traceback
 from django.core.urlresolvers import reverse, reverse_lazy
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required, user_passes_test, permission_required
 from django.contrib import messages
@@ -173,13 +174,18 @@ def online_encoding_form(request, learning_unit_year_id=None):
     elif request.method == 'POST':
         decimal_scores_authorized = data['learning_unit_year'].decimal_scores
         is_program_manager = data['is_program_manager']
-        updated_enrollments = update_exam_enrollments(request, data["enrollments"], decimal_scores_authorized,
-                                                      is_program_manager)
-        data = get_data_online(learning_unit_year_id, request)
+        try:
+            updated_enrollments = update_exam_enrollments(request, data["enrollments"], decimal_scores_authorized,
+                                                          is_program_manager)
+            data = get_data_online(learning_unit_year_id, request)
 
-        send_messages_to_notify_encoding_progress(request, data["enrollments"], data["learning_unit_year"],
-                                                  is_program_manager, updated_enrollments)
-        return layout.render(request, "online_encoding.html", data)
+            send_messages_to_notify_encoding_progress(request, data["enrollments"], data["learning_unit_year"],
+                                                      is_program_manager, updated_enrollments)
+            return layout.render(request, "online_encoding.html", data)
+        except ValidationError:
+            messages.add_message(request, messages.ERROR, "%s" % _('scores_must_be_between_0_and_20') )
+            return layout.render(request, "online_encoding_form.html", data)
+
 
 
 def send_messages_to_notify_encoding_progress(request, all_enrollments, learning_unit_year, is_program_manager,
@@ -231,6 +237,8 @@ def set_score_and_justification_for_exam_enrollment(is_pgm, enrollment, new_just
         mdl.exam_enrollment.create_exam_enrollment_historic(user, enrollment,
                                                             enrollment.score_final,
                                                             enrollment.justification_final)
+    # Validate enrollment before save
+    enrollment.full_clean()
     enrollment.save()
 
 
@@ -243,24 +251,25 @@ def is_legible_for_modifying_exam_enrollment(score_changed, exam_enrollment):
 def has_modify_exam_enrollment(exam_enrollment, new_score, new_justification):
     return exam_enrollment.score_final != new_score or exam_enrollment.justification_final != new_justification
 
+def online_double_encoding_get_form(request, data=None, learning_unit_year_id=None):
+    if len(data['enrollments']) > 0:
+        return layout.render(request, "online_double_encoding_form.html", data)
+    else:
+        messages.add_message(request, messages.WARNING, "%s" % _('no_score_encoded_double_encoding_impossible'))
+        return online_encoding(request, learning_unit_year_id=learning_unit_year_id)
 
 @login_required
 @user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 def online_double_encoding_form(request, learning_unit_year_id=None):
     data = get_data_online_double(learning_unit_year_id, request)
-    encoded_exam_enrollments = data['enrollments']
 
-    # Case asking for a double encoding
     if request.method == 'GET':
-        if len(encoded_exam_enrollments) > 0:
-            return layout.render(request, "online_double_encoding_form.html", data)
-        else:
-            messages.add_message(request, messages.WARNING, "%s" % _('no_score_encoded_double_encoding_impossible'))
-            return online_encoding(request, learning_unit_year_id=learning_unit_year_id)
-
-    # Case asking for a comparison with scores double encoded
+        # Case asking for a double encoding
+        return online_double_encoding_get_form(request, data, learning_unit_year_id)
     elif request.method == 'POST':
+        encoded_exam_enrollments = data['enrollments']
+        # Case asking for a comparison with scores double encoded
         decimal_scores_authorized = data['learning_unit_year'].decimal_scores
 
         # Clean double encoded scores before dealing with a new double encoding.
@@ -279,7 +288,12 @@ def online_double_encoding_form(request, learning_unit_year_id=None):
                                                                                     decimal_scores_authorized)
             enrollment.score_reencoded = score_double_encoded
             enrollment.justification_reencoded = justification_double_encoded
-            enrollment.save()
+            try:
+                enrollment.full_clean()
+                enrollment.save()
+            except ValidationError:
+                messages.add_message(request, messages.ERROR, "%s" % _('scores_must_be_between_0_and_20'))
+                return online_double_encoding_get_form(request, data, learning_unit_year_id)
 
         # Needs to filter by examEnrollments where the score_reencoded and justification_reencoded are not None
         # encoded_exam_enrollments = [exam_enrol for exam_enrol in reencoded_exam_enrollments
@@ -311,11 +325,13 @@ def online_double_encoding_validation(request, learning_unit_year_id=None, tutor
                                       if exam_enrol.score_reencoded is not None or exam_enrol.justification_reencoded]
 
         decimal_scores_authorized = learning_unit_year.decimal_scores
-        updated_enrollments = update_exam_enrollments(request, exam_enrollments_reencoded, decimal_scores_authorized,
-                                                      is_program_manager)
-        send_messages_to_notify_encoding_progress(request, exam_enrollments, learning_unit_year, is_program_manager,
-                                                  updated_enrollments)
-
+        try:
+            updated_enrollments = update_exam_enrollments(request, exam_enrollments_reencoded, decimal_scores_authorized,
+                                                          is_program_manager)
+            send_messages_to_notify_encoding_progress(request, exam_enrollments, learning_unit_year, is_program_manager,
+                                                      updated_enrollments)
+        except ValidationError:
+            messages.add_message(request, messages.ERROR, "%s" % _('scores_must_be_between_0_and_20'))
         return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))
 
 
@@ -341,6 +357,7 @@ def online_encoding_submission(request, learning_unit_year_id):
                 exam_enroll.score_final = exam_enroll.score_draft
             if exam_enroll.justification_draft:
                 exam_enroll.justification_final = exam_enroll.justification_draft
+            exam_enroll.full_clean()
             exam_enroll.save()
             mdl.exam_enrollment.create_exam_enrollment_historic(request.user, exam_enroll,
                                                                 exam_enroll.score_final,
@@ -732,12 +749,16 @@ def specific_criteria_submission(request):
     for enrollment in data['exam_enrollments']:
         learning_unit_year = enrollment.learning_unit_enrollment.learning_unit_year
         decimal_scores_authorized = learning_unit_year.decimal_scores
-        updated_enrollments = update_exam_enrollments(request, [enrollment], decimal_scores_authorized,
+        try:
+            updated_enrollments = update_exam_enrollments(request, [enrollment], decimal_scores_authorized,
                                                       is_program_manager)
-        all_modified_exam_enrollments.extend(updated_enrollments)
-        scores_saved += len(updated_enrollments)
-        if len(updated_enrollments) != 0 and learning_unit_year not in learning_unit_years_changed:
-            learning_unit_years_changed.append(learning_unit_year)
+            all_modified_exam_enrollments.extend(updated_enrollments)
+            scores_saved += len(updated_enrollments)
+            if len(updated_enrollments) != 0 and learning_unit_year not in learning_unit_years_changed:
+                learning_unit_years_changed.append(learning_unit_year)
+        except ValidationError:
+            messages.add_message(request, messages.ERROR, "%s" % _('scores_must_be_between_0_and_20'))
+            return specific_criteria(request)
 
     # ExamEnrollments by learning_unit_year (only if examEnrollment of the learningUnitYear has changed)
     grouped_by_learning_unit_years_for_mails = {}

@@ -27,6 +27,7 @@ from decimal import *
 from django.db import models
 from django.contrib import admin
 from django.utils.translation import ugettext as _
+from django.core.validators import MaxValueValidator, MinValueValidator
 from base.models import person, learning_unit_year, person_address, offer_year_calendar
 from attribution.models import attribution
 from base.enums import exam_enrollment_justification_type as justification_types
@@ -57,9 +58,12 @@ class ExamEnrollmentAdmin(admin.ModelAdmin):
 class ExamEnrollment(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
     changed = models.DateTimeField(null=True)
-    score_draft = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    score_reencoded = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    score_final = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
+    score_draft = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
+                                      validators=[MinValueValidator(0), MaxValueValidator(20)])
+    score_reencoded = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
+                                          validators=[MinValueValidator(0), MaxValueValidator(20)])
+    score_final = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
+                                      validators=[MinValueValidator(0), MaxValueValidator(20)])
     justification_draft = models.CharField(max_length=20, blank=True, null=True, choices=justification_types.JUSTIFICATION_TYPES)
     justification_reencoded = models.CharField(max_length=20, blank=True, null=True, choices=justification_types.JUSTIFICATION_TYPES)
     justification_final = models.CharField(max_length=20, blank=True, null=True, choices=justification_types.JUSTIFICATION_TYPES)

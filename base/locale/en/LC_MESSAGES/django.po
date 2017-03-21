@@ -1016,6 +1016,9 @@ msgstr "score(s) saved"
 msgid "scores_saved_cannot_be_saved_anymore"
 msgstr "Sore saved, button save not available anymore"
 
+msgid "scores_must_be_between_0_and_20"
+msgstr "Scores must be between 0 and 20"
+
 msgid "scores_sheet"
 msgstr "Scores sheet"
 
