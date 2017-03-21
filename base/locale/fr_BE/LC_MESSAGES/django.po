@@ -1182,6 +1182,9 @@ msgstr "Enseignant(e)"
 msgid "tutors"
 msgstr "Enseignants"
 
+msgid "other_tutors"
+msgstr "Autres Enseignants"
+
 msgid "txt_message"
 msgstr "Message texte"
 

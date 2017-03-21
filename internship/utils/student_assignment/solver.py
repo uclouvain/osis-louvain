@@ -78,6 +78,21 @@ def save_assignments_to_db(assignments):
 
 
 class Solver:
+    """
+        Solver to assign internships to students.
+        It works by assigning first the priority students, then the generalists students and finally the specialists
+        ones.
+        For each group of students the solver must assign them 4 internships.
+        For priority students, it try first to assign one of the four choices submitted for the internship 1 by order of
+        preference. Then it does the same for all the others internships (2, 3, 4, 5 and 6) until 4 internships are
+        assigned to the student. If we have exhausted all the choices of the students, we assign the "hôpital erreur" to
+        the student for each internship not assigned.
+        For generalists and specialists students, it works differently, we first try to assign all the four choices,
+        if all choices cannot be assigned, we try to assign an internship of the same speciality of the choices. Also,
+        when all choices are exhausted, we try to assign all possible offers to fill the internships not assigned.
+        If with that, there is still internships not assigned, we assign at most one "stage personnel" to generalists
+        and two to specialists. Then we assign "hôpital erreur".
+    """
     def __init__(self):
         self.students_by_registration_id = dict()
         self.offers_by_organization_speciality = dict()
@@ -98,15 +113,15 @@ class Solver:
 
     def __classify_students(self, student_wrappers):
         for student_wrapper in student_wrappers.values():
-            if student_wrapper.has_priority:
+            if student_wrapper.has_priority():
                 self.priority_students.append(student_wrapper)
                 self.students_priority_lefts_to_assign.append(student_wrapper)
             elif is_generalist(student_wrapper):
-                self.specialists_students.append(student_wrapper)
-                self.specialists_students_lefts_to_assign.append(student_wrapper)
-            else:
                 self.generalists_students.append(student_wrapper)
                 self.generalists_students_lefts_to_assign.append(student_wrapper)
+            else:
+                self.specialists_students.append(student_wrapper)
+                self.specialists_students_lefts_to_assign.append(student_wrapper)
 
     def set_offers(self, internship_wrappers):
         self.offers_by_organization_speciality = internship_wrappers
@@ -205,9 +220,9 @@ class Solver:
         return False
 
     def __assign_first_possible_offer_to_student(self, student_wrapper):
-        if self.__assign_personal_offer(student_wrapper, 0):
+        if self.__assign_speciality(student_wrapper):
             return True
-        elif self.__assign_speciality(student_wrapper):
+        elif self.__assign_personal_offer(student_wrapper, 0):
             return True
         elif not is_generalist(student_wrapper) and self.__assign_personal_offer(student_wrapper, 1):
             return True

@@ -36,7 +36,7 @@ class StudentWrapper:
         self.assignments = dict()
         self.internship_assigned = []
         self.specialities_by_internship = dict()
-        self.internship_priorities = set()
+        self.priority = False
         self.enrollments = dict()
         self.cost = 0
         self.information = None
@@ -51,7 +51,9 @@ class StudentWrapper:
         self.information = information
 
     def get_contest(self):
-        return self.information.contest
+        if self.information:
+            return self.information.contest
+        return None
 
     def add_enrollment(self, enrollment):
         key = enrollment.internship_choice
@@ -59,11 +61,11 @@ class StudentWrapper:
         self.enrollments[key].append(enrollment)
 
     def has_priority(self):
-        return len(self.internship_priorities) > 0
+        return self.priority
 
     def __update_priority(self, choice):
         if choice.priority:
-            self.internship_priorities.add(choice.internship_choice)
+            self.priority = True
 
     def __update_specialities_by_internship(self, choice):
         self.specialities_by_internship[choice.internship_choice] = choice.speciality
