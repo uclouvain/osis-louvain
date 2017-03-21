@@ -97,7 +97,7 @@
             </div>
         </div>
         <div class="form-group">
-            <label>{% trans 'progress' %}</label><br>
+            <label>{% trans 'progress' %}{% if not is_program_manager %} ({% trans 'submitted_scores' %}){%endif%}</label><br>
             <div class="progress">
                 <div class="progress-bar {% if progress == '100' %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" aria-valuenow="{{ progress }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress }}%;">
                     <span>{{ exam_enrollments_encoded }} / {{ total_exam_enrollments }}</span>
@@ -204,16 +204,14 @@
                                 {%endif%}
                             {% endif%}</td>
                         <td>{%if is_program_manager %}
-                                {% if enrollment.justification_final%}
-                                    {% trans enrollment.justification_final %}
-                                {% else %}
-                                    -
-                                {% endif %}
+                                {{ enrollment.justification_final_display_as_program_manager }}
                             {% else %}
                                 {% if enrollment.justification_final %}
                                     {{ enrollment.justification_final_display_as_tutor }}
                                 {% elif enrollment.justification_draft and enrollment.score_final == None %}
                                     {{ enrollment.justification_draft_display }}
+                                {% elif enrollment.is_score_missing %}
+                                    ? ({% trans 'SCORE_MISSING'%})
                                 {% else %}
                                     -
                                 {% endif %}

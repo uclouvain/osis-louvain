@@ -1371,3 +1371,6 @@ msgstr "Les responsables de notes peuvent soumettre des encodages partiels"
 
 msgid "scores_responsible_must_still_submit_scores"
 msgstr "Le responsable de notes doit toujours soumettre les notes"
+
+msgid "submitted_scores"
+msgstr "notes soumises"

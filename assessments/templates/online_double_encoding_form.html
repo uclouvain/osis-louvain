@@ -182,7 +182,7 @@
                                     <option value="ABSENCE_UNJUSTIFIED">{% trans 'absent' %}</option>
                                 {% endif %}
                                 <option value="CHEATING">{% trans 'CHEATING' %}</option>
-                                <option value="SCORE_MISSING">{% trans 'SCORE_MISSING' %}</option>
+                                <option value="SCORE_MISSING" selected>{% trans 'SCORE_MISSING' %}</option>
                             </select>
                             <input type="hidden" id="hdn_score_changed_{{ enrollment.id }}" name="score_changed_{{ enrollment.id }}">
                         </td>

@@ -1378,3 +1378,6 @@ msgstr "Scores responsible can submit partial encoding"
 
 msgid "the_scores_responsible_must_still_submit_scores"
 msgstr "The scores responsible must still submit the scores"
+
+msgid "submitted_scores"
+msgstr "submitted scores"

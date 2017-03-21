@@ -178,10 +178,10 @@
                                 {% endif %}
                                 {% if is_program_manager %}
                                     <option value="CHEATING" {% if enrollment.justification_final == 'CHEATING' %}selected{% endif %}>{% trans 'CHEATING' %}</option>
-                                    <option value="SCORE_MISSING" {% if enrollment.justification_final == 'SCORE_MISSING' %}selected{% endif %}>{% trans 'SCORE_MISSING' %}</option>
+                                    <option value="SCORE_MISSING" {% if enrollment.justification_final == 'SCORE_MISSING' or enrollment.is_score_missing %}selected{% endif %}>{% trans 'SCORE_MISSING' %}</option>
                                 {% else %}
                                     <option value="CHEATING" {% if enrollment.justification_draft == 'CHEATING' %}selected{% endif %}>{% trans 'CHEATING' %}</option>
-                                    <option value="SCORE_MISSING" {% if enrollment.justification_draft == 'SCORE_MISSING' %}selected{% endif %}>{% trans 'SCORE_MISSING' %}</option>
+                                    <option value="SCORE_MISSING" {% if enrollment.justification_draft == 'SCORE_MISSING' or enrollment.is_score_missing %}selected{% endif %}>{% trans 'SCORE_MISSING' %}</option>
                                 {% endif %}
                             </select>
                             <input type="hidden" id="hdn_score_changed_{{ enrollment.id }}" name="score_changed_{{ enrollment.id }}"></td>
@@ -258,6 +258,8 @@ $("input[id^='num_score_']" ).change(function(event) {
 
     if(score_encoded != "") {
         $("#slt_justification_score_" + enrollmentId).val('');
+    }else{
+        $("#slt_justification_score_" + enrollmentId).val('SCORE_MISSING');
     }
     this.setCustomValidity('');
 
