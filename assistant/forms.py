@@ -33,6 +33,7 @@ from django.forms.models import inlineformset_factory
 from django.core.exceptions import ValidationError
 from django.forms import widgets
 from assistant.enums import reviewer_role
+from assistant.models.enums import review_advice_choices, review_status
 
 
 class MandateFileForm(forms.Form):
@@ -265,7 +266,7 @@ class ReviewForm(ModelForm):
     confidential = forms.CharField(help_text=_("information_not_provided_to_assistant"),
                                    required=False, widget=forms.Textarea(attrs={'cols': '80', 'rows': '5'}))
     advice = forms.ChoiceField(required=True, widget=forms.RadioSelect(renderer=HorizontalRadioRenderer, attrs={
-        "onChange": 'Hide()'}), choices=mdl.review.Review.ADVICE_CHOICES)
+        "onChange": 'Hide()'}), choices=review_advice_choices.REVIEW_ADVICE_CHOICES)
     reviewer = forms.ChoiceField(required=False)
 
     class Meta:
@@ -278,7 +279,7 @@ class ReviewForm(ModelForm):
         super(ReviewForm, self).clean()
         advice = self.cleaned_data.get("advice")
         justification = self.cleaned_data.get('justification')
-        if advice == 'CONDITIONAL' and not justification:
+        if advice == review_advice_choices.CONDITIONAL and not justification:
             msg = _("justification_required_if_conditional")
             self.add_error('justification', msg)
 

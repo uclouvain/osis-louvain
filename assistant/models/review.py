@@ -26,22 +26,14 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
+from assistant.models.enums import review_status, review_advice_choices
 
 
 class Review(models.Model):
-    ADVICE_CHOICES = (
-        ('FAVORABLE', _('Favorable')),
-        ('CONDITIONAL', _('Conditional')),
-        ('UNFAVOURABLE', _('Unfavourable')))
-
-    REVIEW_STATUS = (
-        ('IN_PROGRESS', _('In progress')),
-        ('DONE', _('Done')))
-
     mandate = models.ForeignKey('AssistantMandate')
     reviewer = models.ForeignKey('Reviewer', null=True)
-    advice = models.CharField(max_length=20, choices=ADVICE_CHOICES)
-    status = models.CharField(max_length=15, choices=REVIEW_STATUS, null=True)
+    advice = models.CharField(max_length=20, choices=review_advice_choices.REVIEW_ADVICE_CHOICES)
+    status = models.CharField(max_length=15, choices=review_status.REVIEW_STATUS_CHOICES, null=True)
     justification = models.TextField(null=True, blank=True)
     remark = models.TextField(null=True, blank=True)
     confidential = models.TextField(null=True, blank=True)

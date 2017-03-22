@@ -24,11 +24,11 @@
 #
 ##############################################################################
 from django.conf.urls import url
-from assistant.views import mandate, home, assistant_form, assistant
+from assistant.views import mandate, home, assistant_form, assistant, phd_supervisor_review
 from assistant.views import manager_settings, reviewers_management, upload_assistant_file
 from assistant.views import mandates_list, reviewer_mandates_list, reviewer_review, reviewer_delegation
 from assistant.utils import get_persons
-from assistant.views import messages
+from assistant.views import messages, phd_supervisor_assistants_list
 from assistant.utils import send_email, import_xls_file_data
 
 urlpatterns = [
@@ -51,6 +51,14 @@ urlpatterns = [
     url(r'^manager/reviewers/$', reviewers_management.ReviewersListView.as_view(), name='reviewers_list'),
     url(r'^manager/settings/edit/$', manager_settings.settings_edit, name='settings_edit'),
     url(r'^manager/settings/save/$', manager_settings.settings_save, name='settings_save'),
+    url(r'^phd_supervisor/assistants/$', phd_supervisor_assistants_list.AssistantsListView.as_view(),
+        name='phd_supervisor_assistants_list'),
+    url(r'^phd_supervisor/pst_form/view/(?P<mandate_id>\d+)/$', phd_supervisor_review.pst_form_view,
+        name='phd_supervisor_pst_form_view'),
+    url(r'^phd_supervisor/review/edit/(?P<mandate_id>\d+)/$', phd_supervisor_review.review_edit,
+        name='phd_supervisor_review_edit'),
+    url(r'^phd_supervisor/review/view/(?P<mandate_id>\d+)/$', phd_supervisor_review.review_view,
+        name='phd_supervisor_review_view'),
     url(r'^pst/access_denied$', home.access_denied, name='access_denied'),
     url(r'^pst/document_file/delete/(?P<mandate_id>\d+)/(?P<document_file_id>\d+)/(?P<url>[\w\-]+)/$',
         upload_assistant_file.delete,
@@ -82,8 +90,6 @@ urlpatterns = [
     url(r'^pst/mandate/tutoring_learning_units/(?P<mandate_id>\d+)/$',
         assistant.AssistantLearningUnitsListView.as_view(), name='mandate_learning_units'),
     url(r'^reviewer/delegation/$', reviewer_delegation.StructuresListView.as_view(), name='reviewer_delegation'),
-    url(r'^reviewer/pst_form/view/(?P<reviewer_id>\d+)/(?P<mandate_id>\d+)/$', reviewer_review.pst_form_view,
-        name='pst_form_view'),
     url(r'^reviewer/pst_form/view/(?P<mandate_id>\d+)/$', reviewer_review.pst_form_view, name='pst_form_view'),
     url(r'^reviewer/structure/(?P<structure_id>\d+)/add_reviewer$',
         reviewer_delegation.add_reviewer_for_structure, name='reviewer_delegation_add'),
@@ -91,7 +97,6 @@ urlpatterns = [
     url(r'^reviewer/review/edit/(?P<mandate_id>\d+)/$', reviewer_review.review_edit, name='review_edit'),
     url(r'^reviewer/review/save/(?P<review_id>\d+)/(?P<mandate_id>\d+)/$',
         reviewer_review.review_save, name='review_save'),
-    url(r'^reviewer/review/view/(?P<mandate_id>\d+)/$', reviewer_review.review_view, name='review_view'),
-    url(r'^reviewer/review/view/(?P<reviewer_id>\d+)/(?P<mandate_id>\d+)/$',
+    url(r'^reviewer/review/view/(?P<mandate_id>\d+)/(?P<role>[\w{}.-]{1,40})/$',
         reviewer_review.review_view, name='review_view'),
 ]

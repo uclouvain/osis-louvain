@@ -43,6 +43,9 @@
 <div class="panel panel-default">
     <ul class="nav nav-tabs">
     <li><a href="{% url 'reviewer_mandates_list' %}">{% trans 'reviewer_mandates_list' %}</a></li>
+    {% if is_supervisor %}
+        <li><a href="{% url 'phd_supervisor_assistants_list' %}">{% trans 'phd_supervisor_assistants_list' %}</a></li>
+    {% endif %}
     <li class="active"><a href="#">{% trans 'reviewer_delegation' %}</a></li>
     </ul>
     <div class="panel-body">

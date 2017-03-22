@@ -27,6 +27,7 @@ from decimal import *
 from django.db import models
 from django.contrib import admin
 from django.utils.translation import ugettext as _
+from django.core.validators import MaxValueValidator, MinValueValidator
 from base.models import person, learning_unit_year, person_address, offer_year_calendar
 from attribution.models import attribution
 from base.enums import exam_enrollment_justification_type as justification_types
@@ -34,7 +35,6 @@ from base.enums import exam_enrollment_state as enrollment_states
 import datetime
 import unicodedata
 from base.models.exceptions import JustificationValueException
-
 
 JUSTIFICATION_ABSENT_FOR_TUTOR = _('absent')
 
@@ -57,12 +57,18 @@ class ExamEnrollmentAdmin(admin.ModelAdmin):
 class ExamEnrollment(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
     changed = models.DateTimeField(null=True)
-    score_draft = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    score_reencoded = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    score_final = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True)
-    justification_draft = models.CharField(max_length=20, blank=True, null=True, choices=justification_types.JUSTIFICATION_TYPES)
-    justification_reencoded = models.CharField(max_length=20, blank=True, null=True, choices=justification_types.JUSTIFICATION_TYPES)
-    justification_final = models.CharField(max_length=20, blank=True, null=True, choices=justification_types.JUSTIFICATION_TYPES)
+    score_draft = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
+                                      validators=[MinValueValidator(0), MaxValueValidator(20)])
+    score_reencoded = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
+                                          validators=[MinValueValidator(0), MaxValueValidator(20)])
+    score_final = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
+                                      validators=[MinValueValidator(0), MaxValueValidator(20)])
+    justification_draft = models.CharField(max_length=20, blank=True, null=True,
+                                           choices=justification_types.JUSTIFICATION_TYPES)
+    justification_reencoded = models.CharField(max_length=20, blank=True, null=True,
+                                               choices=justification_types.JUSTIFICATION_TYPES)
+    justification_final = models.CharField(max_length=20, blank=True, null=True,
+                                           choices=justification_types.JUSTIFICATION_TYPES)
     session_exam = models.ForeignKey('SessionExam')
     learning_unit_enrollment = models.ForeignKey('LearningUnitEnrollment')
     enrollment_state = models.CharField(max_length=20,
@@ -152,7 +158,8 @@ def is_absence_justification(justification):
 
 def calculate_exam_enrollment_progress(enrollments):
     if enrollments:
-        progress = len([e for e in enrollments if e.score_final is not None or e.justification_final]) / len(enrollments)
+        progress = len([e for e in enrollments if e.score_final is not None or e.justification_final]) / len(
+            enrollments)
     else:
         progress = 0
     return progress * 100
@@ -214,9 +221,9 @@ def get_progress(session_exm_list, learning_unt):
             for e in enrollments:
                 if e.score_final is not None or e.justification_final is not None:
                     progress += 1
-            tot_progress = tot_progress+progress
+            tot_progress = tot_progress + progress
             tot_enrollments += len(enrollments)
-    return str(tot_progress)+"/"+str(tot_enrollments)
+    return str(tot_progress) + "/" + str(tot_enrollments)
 
 
 def find_exam_enrollments_by_session_learningunit(session_exm, a_learning_unit_year):
@@ -333,21 +340,22 @@ def scores_sheet_data(exam_enrollments, tutor=None):
         # We can take the first element of the list 'exam_enrollments' to get the learning_unit_yr
         # because all exam_enrollments have the same learningUnitYear
         learning_unit_yr = exam_enrollments[0].session_exam.learning_unit_year
-        coordinator = attribution.find_responsible(learning_unit_yr.id)
-        coordinator_address = None
-        if coordinator:
-            coordinator_address = person_address.find_by_person_label(coordinator.person, 'PROFESSIONAL')
+        scores_responsible = attribution.find_responsible(learning_unit_yr.id)
+        scores_responsible_address = None
+        if scores_responsible:
+            scores_responsible_address = person_address.find_by_person_label(scores_responsible.person, 'PROFESSIONAL')
 
         learn_unit_year_dict['academic_year'] = str(learning_unit_yr.academic_year)
-        learn_unit_year_dict['coordinator'] = {'first_name': coordinator.person.first_name if coordinator else '',
-                                               'last_name': coordinator.person.last_name if coordinator else ''}
+        learn_unit_year_dict['scores_responsible'] = {
+            'first_name': scores_responsible.person.first_name if scores_responsible else '',
+            'last_name': scores_responsible.person.last_name if scores_responsible else ''}
 
-        learn_unit_year_dict['coordinator']['address'] = {'location': coordinator_address.location
-                                                                      if coordinator_address else '',
-                                                          'postal_code': coordinator_address.postal_code
-                                                                         if coordinator_address else '',
-                                                          'city': coordinator_address.city
-                                                                  if coordinator_address else ''}
+        learn_unit_year_dict['scores_responsible']['address'] = {'location': scores_responsible_address.location
+                                                                 if scores_responsible_address else '',
+                                                                 'postal_code': scores_responsible_address.postal_code
+                                                                 if scores_responsible_address else '',
+                                                                 'city': scores_responsible_address.city
+                                                                 if scores_responsible_address else ''}
         learn_unit_year_dict['session_number'] = exam_enrollments[0].session_exam.number_session
         learn_unit_year_dict['acronym'] = learning_unit_yr.acronym
         learn_unit_year_dict['title'] = learning_unit_yr.title
@@ -434,9 +442,9 @@ def sort_by_offer_acronym_last_name_first_name(exam_enrollments):
         offer_year_acronym = key.learning_unit_enrollment.offer_enrollment.offer_year.acronym
         learn_unit_acronym = key.learning_unit_enrollment.learning_unit_year.acronym
         return "%s %s %s %s" % (offer_year_acronym if offer_year_acronym else '',
-                             last_name.upper() if last_name else '',
-                             first_name.upper() if first_name else '',
-                             learn_unit_acronym if learn_unit_acronym else '')
+                                last_name.upper() if last_name else '',
+                                first_name.upper() if first_name else '',
+                                learn_unit_acronym if learn_unit_acronym else '')
 
     return sorted(exam_enrollments, key=lambda k: _sort(k))
 
@@ -451,6 +459,7 @@ def sort_for_encodings(exam_enrollments):
     :param exam_enrollments: List of examEnrollments to sort
     :return:
     """
+
     def _sort(key):
         learn_unit_acronym = key.learning_unit_enrollment.learning_unit_year.acronym
         off_enroll = key.learning_unit_enrollment.offer_enrollment

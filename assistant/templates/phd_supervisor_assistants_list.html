@@ -32,31 +32,23 @@
 {% block breadcrumb %}
 <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
 <li><a href="{% url 'mandates' %}" id="lnk_mandates">{% trans 'mandates' %}</a></li>
-<li class="active">{% trans 'reviewer_mandates_list' %}</li>
+<li class="active">{% trans 'phd_supervisor_assistants_list' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
     <h3>{% trans 'assistantship_mandate_renewal' %} {{ year|add:1 }}</h3>
 </div>
 <div class="panel panel-default">
-    <ul class="nav nav-tabs">
-    <li class="active"><a href="#">{% trans 'reviewer_mandates_list' %}</a></li>
-    {% if is_supervisor %}
-        <li><a href="{% url 'phd_supervisor_assistants_list' %}">{% trans 'phd_supervisor_assistants_list' %}</a></li>
+    {% if is_reviewer %}
+        <ul class="nav nav-tabs">
+            <li><a href="{% url 'reviewer_mandates_list' %}">{% trans 'reviewer_mandates_list' %}</a></li>
+            <li class="active"><a href="#">{% trans 'phd_supervisor_assistants_list' %}</a></li>
+            {% if can_delegate %}
+            <li><a href="{% url 'reviewer_delegation' %}">{% trans 'reviewer_delegation' %}</a></li>
+            {% endif %}
+        </ul>
     {% endif %}
-    {% if can_delegate %}
-        <li><a href="{% url 'reviewer_delegation' %}">{% trans 'reviewer_delegation' %}</a></li>
-    {% endif %}
-    </ul>
-
     <div class="panel-body">
-        <div class="row">
-	        <div class="col-md-12 text-right">
-            <form action=" {% url 'reviewer_mandates_list' %} " method="GET">
-            {{ form }}
-            </form>
-            </div>
-        </div>
         <div class="table-responsive">
         <table id="myTable" class="table table-hover table-condensed table-bordered" cellspacing="0" width="100%">
         <thead>
@@ -89,27 +81,15 @@
             <td>{{ mandate.assistant_type }}</td>
             <td>{{ mandate.contract_duration }}</td>
             <td>{{ mandate.contract_duration_fte }}</td>
-            <td>{{ mandate.state }}</td>
-	        {% if mandate.state in reviewer.role %}
-                <td align="center"><a href="{% url 'review_edit' mandate.id %}">
+            <td>{% trans mandate.state %}</td>
+            {% if mandate.assistant.supervisor == request.user.person and mandate.state == "PHD_SUPERVISOR" %}
+                <td align="center"><a href="{% url 'phd_supervisor_review_edit' mandate.id %}">
                 <button type="button" class="btn btn-link btn-lg" title="{% trans 'edit'%}" id="bt_review_edit">
                 <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                 </button>{% trans 'edit'%}</a></td><td></td>
-            {% elif "RESEARCH" in reviewer.role and mandate.state in research_list %}
+            {% elif mandate.state != "TRTS" and mandate.state != "TO_DO" and mandate.state != "DECLINED" %}
                 <td></td><td align="center">
-                <a href="{% url 'review_view' mandate_id=mandate.id role=reviewer.role %}">
-                <button type="button" class="btn btn-link btn-lg" title="{% trans 'view'%}" id="bt_view_view">
-                <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
-                </button>{% trans 'view'%}</a></td>
-            {% elif "SUPERVISION" in reviewer.role and mandate.state in supervision_list %}
-                <td></td><td align="center">
-                <a href="{% url 'review_view' mandate_id=mandate.id role=reviewer.role %}">
-                <button type="button" class="btn btn-link btn-lg" title="{% trans 'view'%}" id="bt_view_view">
-                <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
-                </button>{% trans 'view'%}</a></td>
-            {% elif "VICE_RECTOR" in reviewer.role and mandate.state in vice_rector_list %}
-                <td></td><td align="center">
-                <a href="{% url 'review_view' mandate_id=mandate.id role=reviewer.role %}">
+                <a href="{% url 'phd_supervisor_review_view' mandate_id=mandate.id %}">
                 <button type="button" class="btn btn-link btn-lg" title="{% trans 'view'%}" id="bt_view_view">
                 <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
                 </button>{% trans 'view'%}</a></td>
