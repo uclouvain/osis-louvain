@@ -59,9 +59,6 @@ def load_internship_students():
                     except DataError:
                         error_counter += 1
                         print("Data error : {} - {}".format(str(person), columns[1].strip()))
-                    # if person.user :
-                    #     intern_students_group = Group.objects.get(name='internship_students')
-                    #     person.user.groups.add(intern_students_group)
                     imported_counter += 1
                 else:
                     error_counter += 1
