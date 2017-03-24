@@ -184,6 +184,7 @@
                                 <option value="CHEATING" {% if enrollment.post_justification_encoded == 'CHEATING' %}selected{% endif %}>{% trans 'CHEATING' %}</option>
                                 <option value="SCORE_MISSING" {% if enrollment.post_justification_encoded == 'SCORE_MISSING' %}selected{% endif %}>{% trans 'SCORE_MISSING' %}</option>
                             </select>
+                            <input type="hidden" id="hdn_score_changed_{{ enrollment.id }}" name="score_changed_{{ enrollment.id }}">
                         </td>
                         <td>{{ enrollment.session_exam.deadline | default_if_none:''|date:"j/m/Y" }}</td>
                     </tr>
@@ -200,6 +201,12 @@
 {% endblock %}
 {% block script %}
 <script>
+        var values = [
+        {% for enrollment in enrollments %}
+            ['{{ enrollment.id }}', '-1',''],
+        {% endfor %}
+        ['', '', '']];
+
     var is_valid_score = function(score) {
         var is_decimal = {% if learning_unit_year.decimal_scores %} true {% else %} false {% endif %};
         score = score.replace(',','.');
@@ -216,22 +223,38 @@
         }
         return true;
     }
+    var check_is_score_changed = function(enrollmentId, score, justification) {
+        is_changed = originalValueChanged(values, enrollmentId, score, justification)
+        $("#hdn_score_changed_" + enrollmentId).val(is_changed);
+    }
+    var disable_submit = function() {
+        $("#bt_compare_up").prop('disabled', true);
+        $("#bt_compare_down").prop('disabled', true);
+    }
+    var enable_submit = function() {
+        $("#bt_compare_up").prop('disabled', false);
+        $("#bt_compare_down").prop('disabled', false);
+    }
     var ensureOnlyOneInputCompleted = function(event) {
         if (!event || event == null) { return; }
 
         var self = $(this);
         var id = self.attr('id');
 
-        if ( id != undefined && self.val() != "" ){
+        if ( id != undefined ){
             var selfPrefix = id.substring(0, id.lastIndexOf("_"));
             var enrollmentId = id.substring(id.lastIndexOf("_") + 1); //Get enrollement id
 
-            //Empty the other input because we have set a value in [selfPrefix]
-            if (selfPrefix == "slt_double_justification_score") {
-                $("#num_double_score_" + enrollmentId).val("");
-            } else if (selfPrefix == "num_double_score") {
-                $("#slt_double_justification_score_" + enrollmentId).val("");
+            if (self.val() != "") {
+                //Empty the other input because we have set a value in [selfPrefix]
+                if (selfPrefix == "slt_double_justification_score") {
+                    $("#num_double_score_" + enrollmentId).val("");
+                } else if (selfPrefix == "num_double_score") {
+                    $("#slt_double_justification_score_" + enrollmentId).val("");
+                }
             }
+            check_is_score_changed(enrollmentId, $("#num_double_score_" + enrollmentId).val(),
+                                                 $("#slt_double_justification_score_" + enrollmentId).val());
         }
         validate_form();
     }
@@ -248,10 +271,12 @@
                 input.css("border", "1px solid #D3D3D3");
             }else if (!is_valid_score(score_encoded)) {
                 input.css("border", "1px solid #ff0000");
+                return false;
             }else if ( score_encoded != score_draft ) {
                 input.css("border", "2px solid #ff0000");
             }
         }
+        return true;
     }
     var validate_double_justification_score = function(enrollmentId) {
         var select = $("select[id^='slt_double_justification_score_" + enrollmentId + "']");
@@ -264,15 +289,17 @@
             }
         }
     }
-
     var validate_form = function() {
         //Validation of score
+        var has_error = false;
         $("input[id^='num_double_score_']").each(function(){
             var self = $(this)
             var id = self.attr("id");
             if(id != undefined) {
                 var enrollmentId = id.substring(id.lastIndexOf("_") + 1);
-                validate_num_double_score(enrollmentId)
+                if (!validate_num_double_score(enrollmentId)) {
+                    has_error = true;
+                }
             }
         });
         //Validation of justification
@@ -284,6 +311,11 @@
                 validate_double_justification_score(enrollmentId)
             }
         });
+        if(has_error) {
+            disable_submit();
+        }else{
+            enable_submit();
+        }
     }
 
     var target_score = '#form_online_double_encoding tbody tr td input';
@@ -305,6 +337,8 @@
     //Prevent enter key submit
     $(document).on('keypress', function(e) { disable_enter(e); });
     //Validate form
-    $( document ).ready(function() { validate_form() });
+    $( document ).ready(function() {
+        validate_form()
+    });
 </script>
 {% endblock %}

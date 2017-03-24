@@ -201,6 +201,11 @@ def online_encoding_form(request, learning_unit_year_id=None):
             score_encoded = request.POST.get('score_' + str(enrollment.id))
             justification_encoded = request.POST.get('justification_' + str(enrollment.id))
 
+            # Ignore all which are not changed
+            is_score_changed = request.POST.get('score_changed_' + str(enrollment.id))
+            if is_score_changed != 'true':
+                continue
+
             if not score_encoded:
                 score_encoded = None
             if not justification_encoded:
@@ -214,8 +219,11 @@ def online_encoding_form(request, learning_unit_year_id=None):
                     messages.add_message(request, messages.ERROR, _(e.args[0]))
                     continue
 
-            # Ignore those which are not modified
-            if score_encoded == enrollment.score_final and justification_encoded == enrollment.justification_final:
+            if is_program_manager and score_encoded == enrollment.score_final and \
+                            justification_encoded == enrollment.justification_final:
+                continue
+            if not is_program_manager and score_encoded == enrollment.score_draft and \
+                            justification_encoded == enrollment.justification_draft:
                 continue
 
             # Modification is possible only for program managers OR score has changed but justification/score final is NONE
@@ -291,10 +299,8 @@ def update_exam_enrollment(request, is_pgm, decimal_scores_authorized, enrollmen
 def set_score_and_justification_for_exam_enrollment(is_pgm, enrollment, new_justification, new_score, user):
     enrollment.score_reencoded = None
     enrollment.justification_reencoded = None
-
-    if new_score is not None or new_justification:
-        enrollment.score_draft = new_score
-        enrollment.justification_draft = new_justification
+    enrollment.score_draft = new_score
+    enrollment.justification_draft = new_justification
 
     if is_pgm:
         enrollment.score_final = new_score
@@ -342,6 +348,11 @@ def online_double_encoding_form(request, learning_unit_year_id=None):
         for enrollment in encoded_exam_enrollments:
             score_double_encoded = request.POST.get('score_' + str(enrollment.id))
             justification_double_encoded = request.POST.get('justification_' + str(enrollment.id))
+
+            # Ignore all which are not changed
+            is_score_changed = request.POST.get('score_changed_' + str(enrollment.id))
+            if is_score_changed != 'true':
+                continue
 
             if not score_double_encoded:
                 score_double_encoded = None
