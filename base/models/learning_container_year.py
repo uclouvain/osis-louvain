@@ -30,7 +30,7 @@ from base.models import academic_year
 
 
 class LearningContainerYearAdmin(admin.ModelAdmin):
-    list_display = ('learning_container', 'academic_year', 'language', 'acronym')
+    list_display = ('learning_container', 'academic_year', 'acronym', 'title')
     fieldsets = ((None, {'fields': ('learning_container', 'academic_year', 'acronym', 'title')}),)
     search_fields = ['acronym']
 

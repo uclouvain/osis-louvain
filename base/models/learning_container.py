@@ -26,11 +26,6 @@
 from django.db import models
 from django.contrib import admin
 
-
-class LearningContainerAdmin(admin.ModelAdmin):
-    list_display = ('title',)
-    fieldsets = ((None, {'fields': ('title',)}),)
-
 class LearningContainer(models.Model):
     title = models.CharField(max_length=255)
 

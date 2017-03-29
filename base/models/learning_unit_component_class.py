@@ -26,12 +26,6 @@
 from django.db import models
 from django.contrib import admin
 
-
-class LearningUnitComponentClassAdmin(admin.ModelAdmin):
-    list_display = ('learning_unit_component', 'learning_class_year')
-    fieldsets = ((None, {'fields': ('learning_unit_component', 'learning_class_year')}),)
-
-
 class LearningUnitComponentClass(models.Model):
     learning_unit_component = models.ForeignKey('LearningUnitComponent')
     learning_unit_year = models.ForeignKey('LearningClassYear')
@@ -40,7 +34,6 @@ class LearningUnitComponentClass(models.Model):
         permissions = (
             ("can_access_learningunitcomponentclass", "Can access learning unit component class"),
         )
-
 
 def find_by_id(learning_unit_component_class_id):
     return LearningUnitComponentClass.objects.get(pk=learning_unit_component_class_id)

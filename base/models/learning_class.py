@@ -26,11 +26,6 @@
 from django.db import models
 from django.contrib import admin
 
-
-class LearningClassAdmin(admin.ModelAdmin):
-    list_display = ('learning_component')
-    fieldsets = ((None, {'fields': ('learning_component')}),)
-
 class LearningClass(models.Model):
     learning_component = models.ForeignKey('LearningComponent')
 
