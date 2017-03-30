@@ -845,8 +845,14 @@ msgstr "Other sibling programs"
 msgid "other_sibling_orientations"
 msgstr "Other sibling orientations"
 
-msgid "outside_scores_encodings_period"
-msgstr "You're out of the period of scores' encodings : the last exams' session is closed since %s."
+msgid "score_encoding_period_not_open"
+msgstr "The period of scores' encoding is not opened"
+
+msgid "outside_scores_encodings_period_latest_session"
+msgstr "The period of scores' encoding %s is closed since %s"
+
+msgid "outside_scores_encodings_period_closest_session"
+msgstr "The period of scores' encoding %s will be open %s"
 
 msgid "page_not_found"
 msgstr "Page not found."
