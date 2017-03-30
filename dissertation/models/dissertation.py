@@ -25,9 +25,8 @@
 ##############################################################################
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 from dissertation.models.dissertation_role import get_promoteur_by_dissertation
-from dissertation.utils.emails_dissert import send_mail_dissert_accepted_by_teacher, \
-    send_mail_dissert_acknowledgement, send_mail_dissert_accepted_by_com, send_mail_dissert_refused_by_teacher, \
-    send_mail_dissert_refused_by_com, send_mail_to_teacher_new_dissert
+from dissertation.utils.emails_dissert import *
+from django.contrib import admin
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
@@ -100,25 +99,26 @@ class Dissertation(SerializableModel):
 
         next_status = get_next_status(self, "go_forward")
         if self.status == 'TO_RECEIVE' and next_status == 'TO_DEFEND':
-            send_mail_dissert_acknowledgement(self.author.person)
+            send_mail_dissert_acknowledgement(self)
         if (self.status == 'DRAFT' or self.status == 'DIR_KO')and next_status == 'DIR_SUBMIT':
-            send_mail_to_teacher_new_dissert(get_promoteur_by_dissertation(self))
+            send_mail_to_teacher_new_dissert(self)
         self.set_status(next_status)
 
     def accept(self):
         next_status = get_next_status(self, "accept")
         if self.status == 'DIR_SUBMIT':
-            send_mail_dissert_accepted_by_teacher(self.author.person)
+            send_mail_dissert_accepted_by_teacher(self)
         if self.status == 'COM_SUBMIT':
-            send_mail_dissert_accepted_by_com(self.author.person)
+            send_mail_dissert_accepted_by_com(self)
         self.set_status(next_status)
 
     def refuse(self):
         next_status = get_next_status(self, "refuse")
         if self.status == 'DIR_SUBMIT':
-            send_mail_dissert_refused_by_teacher(self.author.person)
+            send_mail_dissert_refused_by_teacher(self)
         if self.status == 'COM_SUBMIT':
-            send_mail_dissert_refused_by_com(self.author.person, get_promoteur_by_dissertation(self).person)
+            send_mail_dissert_refused_by_com_to_student(self)
+            send_mail_dissert_refused_by_com_to_teacher(self)
         self.set_status(next_status)
 
     class Meta:
