@@ -7,34 +7,7 @@ from django.db import migrations, models
 import django.db.models.deletion
 
 
-def remove_internship_access_to_student_group(apps, schema_editor):
-    db_alias = schema_editor.connection.alias
-    emit_post_migrate_signal(2, False, db_alias)
-    Group = apps.get_model('auth', 'Group')
-    Permission = apps.get_model('auth', 'Permission')
-    student_group = Group.objects.get(name='students')
-    # Add permissions to group
-    internships_perm = Permission.objects.get(codename='can_access_internship')
-    student_group.permissions.remove(internships_perm)
-
-
-def add_init_internship_student_group(apps, schema_editor):
-    # create group
-    db_alias = schema_editor.connection.alias
-    emit_post_migrate_signal(2, False, db_alias)
-    Group = apps.get_model('auth', 'Group')
-    Permission = apps.get_model('auth', 'Permission')
-    internship_students_group, created = Group.objects.get_or_create(name='internship_students')
-    if created:
-        # Add permissions to group
-        student_path_perm = Permission.objects.get(codename='can_access_student_path')
-        internships_perm = Permission.objects.get(codename='can_access_internship')
-        internship_students_group.permissions.add(student_path_perm, internships_perm)
-
-
-
 class Migration(migrations.Migration):
-
     dependencies = [
         ('internship', '0014_add_and_init_groups'),
     ]
@@ -45,7 +18,8 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=30)),
-                ('learning_unit', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningUnit')),
+                ('learning_unit',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningUnit')),
             ],
         ),
         migrations.AddField(
@@ -69,15 +43,15 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='internshipchoice',
             name='speciality',
-            field=models.ForeignKey(null=True, default=None, on_delete=django.db.models.deletion.CASCADE, to='internship.InternshipSpeciality'),
+            field=models.ForeignKey(null=True, default=None, on_delete=django.db.models.deletion.CASCADE,
+                                    to='internship.InternshipSpeciality'),
             preserve_default=False,
         ),
         migrations.AddField(
             model_name='internshipoffer',
             name='speciality',
-            field=models.ForeignKey(null=True, default=None, on_delete=django.db.models.deletion.CASCADE, to='internship.InternshipSpeciality'),
+            field=models.ForeignKey(null=True, default=None, on_delete=django.db.models.deletion.CASCADE,
+                                    to='internship.InternshipSpeciality'),
             preserve_default=False,
-        ),
-        migrations.RunPython(remove_internship_access_to_student_group),
-        migrations.RunPython(add_init_internship_student_group),
+        )
     ]
