@@ -21,7 +21,7 @@ def rollback_groups(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('base', '0098_auto_20170306_0953'),
+        ('base', '0099_auto_20170320_1114'),
     ]
 
     operations = [
