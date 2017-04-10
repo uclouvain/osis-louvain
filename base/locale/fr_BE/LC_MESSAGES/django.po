@@ -832,8 +832,14 @@ msgstr "Autres finalités associées"
 msgid "other_sibling_orientations"
 msgstr "Autres orientations associées"
 
-msgid "outside_scores_encodings_period"
-msgstr "Vous êtes en dehors de la période d'encodage de notes: la dernière session d'examens est fermée depuis le %s."
+msgid "score_encoding_period_not_open"
+msgstr "La période pour l'encodage des notes n'est pas encore ouverte"
+
+msgid "outside_scores_encodings_period_latest_session"
+msgstr "La période d'encodage des notes de la session %s est fermée depuis le %s"
+
+msgid "outside_scores_encodings_period_closest_session"
+msgstr "La période d'encodage des notes pour la session %s sera ouverte à partir du %s"
 
 msgid "page_not_found"
 msgstr "Page inexistante"

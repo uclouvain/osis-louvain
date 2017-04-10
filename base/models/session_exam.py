@@ -88,19 +88,35 @@ def is_inside_score_encoding(date=datetime.datetime.now().date()):
                                             offer_year_calendar__academic_calendar__isnull=True,
                                             offer_year_calendar__academic_calendar__start_date__isnull=True,
                                             offer_year_calendar__academic_calendar__end_date__isnull=True) \
-        .filter(offer_year_calendar__academic_calendar__start_date__lte=date,
-                offer_year_calendar__academic_calendar__end_date__gte=date) \
-        .distinct('offer_year_calendar__academic_calendar') \
-        .count()
+                                    .filter(offer_year_calendar__academic_calendar__start_date__lte=date,
+                                            offer_year_calendar__academic_calendar__end_date__gte=date) \
+                                    .distinct('offer_year_calendar__academic_calendar') \
+                                    .count()
     return bool(is_inside)
 
 
-# Return the latest session exam finised [end_date <= ARGS] according to the date passed in args.
+
 def get_latest_session_exam(date=datetime.datetime.now().date()):
+    """"Return the latest session exam finised [end_date < ARGS] according to the date passed in args"""
     latest_session_exam = SessionExam.objects.exclude(offer_year_calendar__isnull=True,
                                                       offer_year_calendar__academic_calendar__isnull=True,
                                                       offer_year_calendar__academic_calendar__end_date__isnull=True) \
-        .filter(offer_year_calendar__academic_calendar__end_date__lte=date) \
-        .order_by('-offer_year_calendar__academic_calendar__end_date') \
-        .first()
+                                             .filter(offer_year_calendar__academic_calendar__end_date__lte=date,
+                                                     offer_year_calendar__academic_calendar__academic_year__start_date__lte=date,
+                                                     offer_year_calendar__academic_calendar__academic_year__end_date__gte=date) \
+                                             .order_by('-offer_year_calendar__academic_calendar__end_date') \
+                                             .first()
     return latest_session_exam
+
+
+def get_closest_new_session_exam(date=datetime.datetime.now().date()):
+    """"Return the closest new session exam [start > ARGS] according to the date passed in args"""
+    closest_session_exam = SessionExam.objects.exclude(offer_year_calendar__isnull=True,
+                                                       offer_year_calendar__academic_calendar__isnull=True,
+                                                       offer_year_calendar__academic_calendar__start_date__isnull=True) \
+                                             .filter(offer_year_calendar__academic_calendar__start_date__gte=date,
+                                                     offer_year_calendar__academic_calendar__academic_year__start_date__lte=date,
+                                                     offer_year_calendar__academic_calendar__academic_year__end_date__gte=date) \
+                                             .order_by('offer_year_calendar__academic_calendar__start_date') \
+                                             .first()
+    return closest_session_exam

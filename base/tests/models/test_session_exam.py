@@ -79,41 +79,54 @@ class IsInsideScoreEncoding(TestCase):
 class GetLatestSessionExam(TestCase):
     def setUp(self):
         self.academic_year = AcademicYearFactory(year=1901,
-                                                 start_date=datetime.datetime(1901, 1, 1),
-                                                 end_date=datetime.datetime(1901, 12, 28))
-        self.academic_calendar = AcademicCalendarFactory.build(academic_year=self.academic_year,
-                                                               start_date=datetime.datetime(1901, 1, 1),
-                                                               end_date=datetime.datetime(1901, 6, 28))
+                                                 start_date=datetime.datetime(1901, 9, 15),
+                                                 end_date=datetime.datetime(1902, 9, 14))
+        self.learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
+
+
+        self.academic_calendar = AcademicCalendarFactory.build(title="Submission of exam scores - session 1",
+                                                               academic_year=self.academic_year,
+                                                               start_date=datetime.datetime(1901, 10, 15),
+                                                               end_date=datetime.datetime(1902, 3, 28))
         self.academic_calendar.save(functions=[])
-        self.academic_calendar_2 = AcademicCalendarFactory.build(academic_year=self.academic_year,
-                                                                 start_date=datetime.datetime(1901, 6, 29),
-                                                                 end_date=datetime.datetime(1901, 12, 30))
+        self.academic_calendar_2 = AcademicCalendarFactory.build(title="Submission of exam scores - session 2",
+                                                                 academic_year=self.academic_year,
+                                                                 start_date=datetime.datetime(1902, 5, 19),
+                                                                 end_date=datetime.datetime(1902, 10, 28))
         self.academic_calendar_2.save(functions=[])
         self.offer_year = OfferYearFactory(academic_year=self.academic_year)
+
         self.offer_year_calendar = OfferYearCalendarFactory(offer_year=self.offer_year,
                                                             academic_calendar=self.academic_calendar,
-                                                            start_date=datetime.datetime(1901, 1, 1),
-                                                            end_date=datetime.datetime(1901, 6, 28))
+                                                            start_date=datetime.datetime(1901, 10,15),
+                                                            end_date=datetime.datetime(1902, 3, 28))
+
         self.offer_year_calendar_2 = OfferYearCalendarFactory(offer_year=self.offer_year,
                                                               academic_calendar=self.academic_calendar_2,
-                                                              start_date=datetime.datetime(1901, 6, 29),
-                                                              end_date=datetime.datetime(1901, 12, 30))
-        self.learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
-        self.first_session = SessionExamFactory.build(number_session=1, learning_unit_year=self.learning_unit_year,
-                                                      offer_year_calendar=self.offer_year_calendar)
-        self.first_session.save()
-        self.second_session = SessionExamFactory.build(number_session=2, learning_unit_year=self.learning_unit_year,
-                                                       offer_year_calendar=self.offer_year_calendar_2)
-        self.second_session.save()
+                                                              start_date=None,
+                                                              end_date=None)
 
-    def test_get_none_session_exam(self):
+        self.first_session = SessionExamFactory(number_session=1, learning_unit_year=self.learning_unit_year,
+                                                offer_year_calendar=self.offer_year_calendar)
+        self.second_session = SessionExamFactory(number_session=2, learning_unit_year=self.learning_unit_year,
+                                                 offer_year_calendar=self.offer_year_calendar_2)
+
+    def test_is_inside_score_encoding(self):
+        is_inside = session_exam.is_inside_score_encoding(date=datetime.datetime(1901, 10, 16))
+        self.assertTrue(is_inside)
+
+    def test_is_not_inside_score_encoding(self):
+        is_inside = session_exam.is_inside_score_encoding(date=datetime.datetime(1902, 4, 1))
+        self.assertFalse(is_inside)
+
+    def test_get_latest_session_exam_result_none(self):
         latest = session_exam.get_latest_session_exam(date=datetime.datetime(1901, 1, 2))
         self.assertIsNone(latest)
 
-    def test_get_first_session(self):
-        latest = session_exam.get_latest_session_exam(date=datetime.datetime(1901, 6, 30))
+    def test_get_latest_session_exam_first_session(self):
+        latest = session_exam.get_latest_session_exam(date=datetime.datetime(1902, 3, 29))
         self.assertEqual(latest, self.first_session)
 
-    def test_second_session(self):
-        latest = session_exam.get_latest_session_exam(date=datetime.datetime(1902, 1, 1))
-        self.assertEqual(latest, self.second_session)
+    def test_get_closest_new_session_exam(self):
+         latest = session_exam.get_closest_new_session_exam(date=datetime.datetime(1902, 4, 1))
+         self.assertEqual(latest, self.second_session)

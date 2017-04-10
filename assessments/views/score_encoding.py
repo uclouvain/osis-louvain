@@ -72,12 +72,20 @@ def assessments(request):
 @user_passes_test(_is_not_inside_scores_encodings_period, login_url=reverse_lazy('scores_encoding'))
 def outside_period(request):
     latest_session_exam = mdl.session_exam.get_latest_session_exam()
+    closest_new_session_exam = mdl.session_exam.get_closest_new_session_exam()
+
     if latest_session_exam:
+        session_number = latest_session_exam.number_session
         str_date = latest_session_exam.offer_year_calendar.academic_calendar.end_date.strftime('%d/%m/%Y')
-    else:
-        str_date = ""
-    text = trans('outside_scores_encodings_period') % str_date
-    messages.add_message(request, messages.WARNING, text)
+        messages.add_message(request, messages.WARNING, _('outside_scores_encodings_period_latest_session') % (session_number,str_date))
+
+    if closest_new_session_exam:
+        session_number = closest_new_session_exam.number_session
+        str_date = closest_new_session_exam.offer_year_calendar.academic_calendar.start_date.strftime('%d/%m/%Y')
+        messages.add_message(request, messages.WARNING, _('outside_scores_encodings_period_closest_session') % (session_number,str_date))
+
+    if not messages.get_messages(request):
+        messages.add_message(request, messages.WARNING, _('score_encoding_period_not_open'))
     return layout.render(request, "outside_scores_encodings_period.html", {})
 
 
@@ -335,9 +343,6 @@ def set_score_and_justification_for_exam_enrollment(is_pgm, enrollment, new_just
         mdl.exam_enrollment.create_exam_enrollment_historic(user, enrollment,
                                                             enrollment.score_final,
                                                             enrollment.justification_final)
-    # Validate enrollment before save
-    enrollment.full_clean()
-    enrollment.save()
 
 
 def is_legible_for_modifying_exam_enrollment(score_changed, exam_enrollment):
