@@ -28,9 +28,9 @@
 
 {% block breadcrumb %}
     <li><a href="{% url 'studies' %}">{% trans 'studies' %}</a></li>
-    <li><a href="{% url 'internships_home' %}">{% trans 'internships_managment' %}</a></li>
+    <li><a href="{% url 'internships_home' cohort_id=cohort.id %}">{% trans 'internships_managment' %}</a></li>
     <li><a href="{% url 'internships_student_resume' cohort_id=cohort.id %}">{% trans 'student_sumup' %}</a></li>
-    <li class="active"><a href="{% url 'internships_student_read' information.student.id %}">
+    <li class="active"><a href="{% url 'internships_student_read' cohort_id=cohort.id student_id=information.student.id %}">
         {{ information.student.person.last_name }} {{ information.student.person.first_name }}
     </a>
     </li>
@@ -42,7 +42,7 @@
 
     {% include "template_messages.html" %}
 
-    <form method="post" action="{% url 'student_save_affectation_modification' information.student.registration_id %}">
+    <form method="post" action="{% url 'student_save_affectation_modification' cohort_id=cohort.id student_id=information.student_id %}">
         {% csrf_token %}
         <div align="right">
             <button type="submit" class="btn btn-primary" title="{% trans 'Save'%}" id="bt_interships_new">
