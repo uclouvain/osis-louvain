@@ -110,6 +110,10 @@ class ExamEnrollment(models.Model):
         return self.score_draft is not None or self.justification_draft
 
     @property
+    def is_score_missing_as_program_manager(self):
+        return not self.is_final
+
+    @property
     def to_validate_by_program_manager(self):
         sc_reencoded = None
         if self.score_reencoded is not None:
@@ -152,6 +156,9 @@ class ExamEnrollment(models.Model):
         else:
             return None
 
+    @property
+    def is_score_missing_as_tutor(self):
+        return not self.is_final and not self.is_draft
 
 def get_session_exam_deadline(enrollment):
     if hasattr(enrollment.learning_unit_enrollment.offer_enrollment, 'session_exam_deadlines') and\

@@ -50,7 +50,7 @@ msgid "Print scores for all activities"
 msgstr ""
 
 msgid "SCORE_MISSING"
-msgstr "Note manquante"
+msgstr "? (note manquante)"
 
 msgid "Save"
 msgstr ""

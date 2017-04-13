@@ -277,15 +277,15 @@ def __save_xls_scores(request, file_name, is_program_manager, user, learning_uni
                                 justification = justification.replace(" ", "") if type(justification) == str else justification
                                 if justification:
                                     justification = str(justification).strip().upper()
-                                    if justification in ['A', 'T', '?']:
+                                    if justification in ['A', 'T']:
                                         switcher = {'A': "ABSENCE_UNJUSTIFIED",
-                                                    'T': "CHEATING",
-                                                    '?': "SCORE_MISSING"}
+                                                    'T': "CHEATING"}
                                         justification = switcher.get(justification, None)
                                     else:
-
-                                        if justification=='M':
+                                        if justification == 'M':
                                             messages.add_message(request, messages.ERROR, "%s %s!" % (info_line, _('no_valid_m_justification_error')))
+                                        elif justification == '?':
+                                            continue
                                         else:
                                             messages.add_message(request, messages.ERROR, "%s %s!" % (info_line, _('justification_invalid')))
                                         continue
@@ -293,11 +293,8 @@ def __save_xls_scores(request, file_name, is_program_manager, user, learning_uni
                                     messages.add_message(request, messages.ERROR, "%s %s!" % (info_line, _('constraint_score_other_score')))
 
                                 elif score == 0 or score or justification:
-                                    print('ici')
-                                    print(justification)
                                     if (justification in [justification_types.ABSENCE_UNJUSTIFIED,
-                                                          justification_types.CHEATING,
-                                                          justification_types.SCORE_MISSING]) and \
+                                                          justification_types.CHEATING]) and \
                                                     exam_enrollment.justification_final == justification_types.ABSENCE_JUSTIFIED:
                                         messages.add_message(request, messages.ERROR, "%s %s!" % (info_line, _('abscence_justified_preserved')))
                                         justification = justification_types.ABSENCE_JUSTIFIED

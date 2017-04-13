@@ -149,7 +149,7 @@
                                 <option {% if enrollment.justification_final == "ABSENCE_UNJUSTIFIED" %} selected {% endif %} value="ABSENCE_UNJUSTIFIED">{% trans 'ABSENCE_UNJUSTIFIED' %}</option>
                                 <option {% if enrollment.justification_final == "ABSENCE_JUSTIFIED" %} selected {% endif %} value="ABSENCE_JUSTIFIED">{% trans 'ABSENCE_JUSTIFIED' %}</option>
                                 <option {% if enrollment.justification_final == "CHEATING" %} selected {% endif %} value="CHEATING">{% trans 'CHEATING' %}</option>
-                                <option {% if enrollment.justification_final == "SCORE_MISSING" %} selected {% endif %} value="SCORE_MISSING">{% trans 'SCORE_MISSING' %}</option>
+                                <option {% if enrollment.is_score_missing_as_program_manager %} selected {% endif %} value="SCORE_MISSING">{% trans 'SCORE_MISSING' %}</option>
                             </select>
                         </td>
                     </tr>

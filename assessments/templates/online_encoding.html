@@ -208,28 +208,39 @@
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|title }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name }}</td>
-                        <td>{%if is_program_manager %}
-                                {{ enrollment.score_final | score_display:enrollment.session_exam.learning_unit_year.decimal_scores }}
+                        <td>
+                            {% if is_program_manager %}
+                                {% if enrollment.is_score_missing_as_program_manager %}
+                                    -
+                                {% else %}
+                                    {{ enrollment.score_final | score_display:enrollment.session_exam.learning_unit_year.decimal_scores }}
+                                {% endif %}
                             {% else %}
-                                {% if enrollment.score_final != None %}
+                                {% if enrollment.is_score_missing_as_tutor %}
+                                    -
+                                {% elif enrollment.score_final %}
                                     {{ enrollment.score_final | score_display:enrollment.session_exam.learning_unit_year.decimal_scores }}
                                 {% elif not enrollment.justification_final %}
                                     {{ enrollment.score_draft | score_display:enrollment.session_exam.learning_unit_year.decimal_scores }}
                                 {%endif%}
-                            {% endif%}</td>
-                        <td>{%if is_program_manager %}
-                                {% if enrollment.justification_final%}
+                            {% endif%}
+                        </td>
+                        <td>
+                            {% if is_program_manager %}
+                                {% if enrollment.is_score_missing_as_program_manager %}
+                                    {% trans 'SCORE_MISSING' %}
+                                {% elif enrollment.justification_final %}
                                     {% trans enrollment.justification_final %}
                                 {% else %}
                                     -
                                 {% endif %}
                             {% else %}
-                                {% if enrollment.justification_final %}
+                                {% if enrollment.is_score_missing_as_tutor %}
+                                    {% trans 'SCORE_MISSING' %}
+                                {% elif enrollment.justification_final %}
                                     {{ enrollment.justification_final_display_as_tutor }}
-                                {% elif enrollment.justification_draft and enrollment.score_final == None %}
+                                {% elif enrollment.justification_draft and not enrollment.score_final %}
                                     {{ enrollment.justification_draft_display }}
-                                {% else %}
-                                    -
                                 {% endif %}
                             {% endif %}
                         </td>

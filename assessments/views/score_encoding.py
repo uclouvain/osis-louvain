@@ -44,6 +44,7 @@ from assessments import models as mdl_assess
 from assessments.views import export_utils
 from attribution import models as mdl_attr
 from base import models as mdl
+from base.enums import exam_enrollment_justification_type
 from base.enums.exam_enrollment_justification_type import JUSTIFICATION_TYPES
 from base.utils import send_mail
 from base.views import layout
@@ -53,7 +54,6 @@ from osis_common.models.queue_exception import QueueException
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 queue_exception_logger = logging.getLogger(settings.QUEUE_EXCEPTION_LOGGER)
-
 
 def _is_inside_scores_encodings_period(user):
     return mdl.session_exam_calendar.current_session_exam()
@@ -91,7 +91,7 @@ def outside_period(request):
     return layout.render(request, "outside_scores_encodings_period.html", {})
 
 
-def _truncate_decimals_new(score, decimal_scores_authorized):
+def _truncate_decimals(score, decimal_scores_authorized):
     score = score.strip().replace(',', '.')
 
     if not score.replace('.', '').isdigit():  # Case not empty string but have alphabetic values
@@ -109,20 +109,6 @@ def _truncate_decimals_new(score, decimal_scores_authorized):
             return Decimal(score).quantize(Decimal('1.'), context=Context(traps=[Inexact]))
         except:
             raise ValueError("decimal_score_not_allowed")
-
-
-def _truncate_decimals(new_score, new_justification, decimal_scores_authorized):
-    """
-    Truncate decimals of new scores if decimals are unauthorized.
-    """
-    try:
-        new_score = new_score.strip().replace(',', '.')
-        new_score = float(new_score)
-        if not decimal_scores_authorized:
-            new_score = int(new_score)
-    except:
-        new_score = None
-    return new_score, None if not new_justification else new_justification
 
 
 @login_required
@@ -222,33 +208,22 @@ def online_encoding_form(request, learning_unit_year_id=None):
         is_program_manager = data['is_program_manager']
 
         for enrollment in encoded_exam_enrollments:
+            if request.POST.get('score_changed_' + str(enrollment.id)) != "true":
+                continue
             score_encoded = request.POST.get('score_' + str(enrollment.id))
             justification_encoded = request.POST.get('justification_' + str(enrollment.id))
+            has_been_updated = False
 
-            # Try to convert str recevied to a INT / FLOAT [According to decimal authorized]
-            if score_encoded:
-                try:
-                    score_encoded = _truncate_decimals_new(score_encoded, decimal_scores_authorized)
-                except Exception as e:
-                    messages.add_message(request, messages.ERROR, _(e.args[0]))
-                    continue
-            else:
-                score_encoded = None  # Empty value as NONE
-            if not justification_encoded:
-                justification_encoded = None
+            try:
+                has_been_updated = update_enrollment(enrollment, request.user, score_encoded, justification_encoded,
+                                      decimal_scores_authorized, is_program_manager)
+            except ValidationError:
+                messages.add_message(request, messages.ERROR, _('scores_must_be_between_0_and_20'))
+            except Exception as e:
+                messages.add_message(request, messages.ERROR, _(e.args[0]))
 
-            # Ignore all enrollment which are not changed [Backend validation]
-            if not is_enrollment_changed(request, enrollment, score_encoded, justification_encoded, is_program_manager):
-                continue
-
-            if can_modify_exam_enrollment(enrollment, is_program_manager):
-                try:
-                    set_score_and_justification_for_exam_enrollment(is_program_manager, enrollment,
-                                                                    justification_encoded,
-                                                                    score_encoded, request.user)
-                    updated_enrollments.append(enrollment)
-                except ValidationError:
-                    messages.add_message(request, messages.ERROR, _('scores_must_be_between_0_and_20'))
+            if has_been_updated:
+                updated_enrollments.append(enrollment)
 
         if messages.get_messages(request):
             # Error case  [Preserve selection user experience]
@@ -267,17 +242,35 @@ def online_encoding_form(request, learning_unit_year_id=None):
             return layout.render(request, "online_encoding.html", data)
 
 
-def is_enrollment_changed(request, enrollment, score_encoded, justification_encoded, is_program_manager):
-    is_score_changed = request.POST.get('score_changed_' + str(enrollment.id))
-    if is_score_changed != "true":
-        return False
-
+def is_enrollment_changed(enrollment, score_encoded, justification_encoded, is_program_manager):
     if not is_program_manager and (not enrollment.score_final or enrollment.justification_final):
         return (enrollment.justification_draft != justification_encoded) or \
                (enrollment.score_draft != score_encoded)
     else:
         return (enrollment.justification_final != justification_encoded) or \
                (enrollment.score_final != score_encoded)
+
+
+def update_enrollment(enrollment, user, new_score, new_justification, is_decimal_scores_authorized,
+                          is_program_manager):
+    if new_score:
+        new_score = _truncate_decimals(new_score, is_decimal_scores_authorized)
+    else:
+        new_score = None # Empty value as None
+
+    if not new_justification:
+        new_justification = None
+    elif new_justification == exam_enrollment_justification_type.SCORE_MISSING:
+        new_justification = new_score = None
+
+    if is_enrollment_changed(enrollment, new_score, new_justification, is_program_manager) and \
+        can_modify_exam_enrollment(enrollment, is_program_manager):
+
+        set_score_and_justification_for_exam_enrollment(is_program_manager, enrollment,
+                                                        new_justification,
+                                                        new_score, user)
+        return True
+    return False
 
 
 def bulk_send_messages_to_notify_encoding_progress(request, updated_enrollments, is_program_manager):
@@ -305,39 +298,6 @@ def send_messages_to_notify_encoding_progress(request, all_enrollments, learning
             messages.add_message(request, messages.ERROR, "%s" % sent_error_message)
 
 
-def update_exam_enrollments(request, exam_enrollments, decimal_scores_authorized, is_program_manager):
-    validation_error = None
-    updated_enrollments = []
-    for enrollment in exam_enrollments:
-        try:
-            is_updated = update_exam_enrollment(request, is_program_manager, decimal_scores_authorized, enrollment)
-            if is_updated:
-                updated_enrollments.append(enrollment)
-        except ValidationError as e:
-            validation_error = e
-            pass
-
-    if validation_error is not None:
-        raise validation_error
-    return updated_enrollments
-
-
-def update_exam_enrollment(request, is_pgm, decimal_scores_authorized, enrollment):
-    score = request.POST.get('score_' + str(enrollment.id), None)
-    justification = request.POST.get('justification_' + str(enrollment.id), None)
-    score_changed = request.POST.get('score_changed_' + str(enrollment.id), None)
-    # modification is possible for program managers OR score has changed but nothing is final
-    if is_pgm or is_legible_for_modifying_exam_enrollment(score_changed, enrollment):
-        new_score, new_justification = _truncate_decimals(score, justification, decimal_scores_authorized)
-        exam_enrollment_has_been_modified = has_modify_exam_enrollment(enrollment, new_score, new_justification)
-        set_score_and_justification_for_exam_enrollment(is_pgm, enrollment, new_justification, new_score, request.user)
-
-        if exam_enrollment_has_been_modified:
-            return True
-
-    return False
-
-
 def set_score_and_justification_for_exam_enrollment(is_pgm, enrollment, new_justification, new_score, user):
     enrollment.score_reencoded = None
     enrollment.justification_reencoded = None
@@ -357,22 +317,13 @@ def set_score_and_justification_for_exam_enrollment(is_pgm, enrollment, new_just
                                                             enrollment.score_final,
                                                             enrollment.justification_final)
 
+
 def can_modify_exam_enrollment(enrollment, is_program_manager) :
     if is_program_manager:
         return not mdl.exam_enrollment.is_deadline_reached(enrollment)
     else:
         return not mdl.exam_enrollment.is_deadline_tutor_reached(enrollment) and \
                not enrollment.score_final and not enrollment.justification_final
-
-
-def is_legible_for_modifying_exam_enrollment(score_changed, exam_enrollment):
-    if score_changed is None:
-        return not exam_enrollment.score_final and not exam_enrollment.justification_final
-    return score_changed == "true" and not exam_enrollment.score_final and not exam_enrollment.justification_final
-
-
-def has_modify_exam_enrollment(exam_enrollment, new_score, new_justification):
-    return exam_enrollment.score_final != new_score or exam_enrollment.justification_final != new_justification
 
 
 def online_double_encoding_get_form(request, data=None, learning_unit_year_id=None):
@@ -403,7 +354,7 @@ def online_double_encoding_form(request, learning_unit_year_id=None):
             # Try to convert str recevied to a INT / FLOAT [According to decimal authorized]
             if score_double_encoded:
                 try:
-                    score_double_encoded = _truncate_decimals_new(score_double_encoded, decimal_scores_authorized)
+                    score_double_encoded = _truncate_decimals(score_double_encoded, decimal_scores_authorized)
                 except Exception as e:
                     messages.add_message(request, messages.ERROR, _(e.args[0]))
                     continue
@@ -415,14 +366,14 @@ def online_double_encoding_form(request, learning_unit_year_id=None):
             # Ignore all which are not changed
             is_score_changed = request.POST.get('score_changed_' + str(enrollment.id))
             if is_score_changed != 'true' or (score_double_encoded == enrollment.score_reencoded and
-                                                      justification_double_encoded == enrollment.justification_reencoded):
+                                              justification_double_encoded == enrollment.justification_reencoded):
                 continue
 
             enrollment.score_reencoded = score_double_encoded
             enrollment.justification_reencoded = justification_double_encoded
-            reencoded_exam_enrollments.append(enrollment)
             try:
                 enrollment.full_clean()
+                reencoded_exam_enrollments.append(enrollment)
             except ValidationError:
                 messages.add_message(request, messages.ERROR, "%s" % _('scores_must_be_between_0_and_20'))
 
@@ -438,7 +389,7 @@ def online_double_encoding_form(request, learning_unit_year_id=None):
             return online_encoding(request, learning_unit_year_id=learning_unit_year_id)
         else:
             # Save all value [Validation is OK]
-            for enrollment in encoded_exam_enrollments:
+            for enrollment in reencoded_exam_enrollments:
                 enrollment.save()
             data['enrollments'] = mdl.exam_enrollment.sort_for_encodings(reencoded_exam_enrollments)
             return layout.render(request, "online_double_encoding_validation.html", data)
@@ -450,29 +401,42 @@ def online_double_encoding_form(request, learning_unit_year_id=None):
 @permission_required('assessments.can_access_scoreencoding', raise_exception=True)
 def online_double_encoding_validation(request, learning_unit_year_id=None, tutor_id=None):
     learning_unit_year = mdl.learning_unit_year.find_by_id(learning_unit_year_id)
+    decimal_scores_authorized = learning_unit_year.decimal_scores
     academic_year = mdl.academic_year.current_academic_year()
     is_program_manager = mdl.program_manager.is_program_manager(request.user)
     exam_enrollments = _get_exam_enrollments(request.user,
                                              learning_unit_year_id=learning_unit_year_id,
                                              academic_year=academic_year,
                                              is_program_manager=is_program_manager)
-    # Case the user validate his choice between the first and the double encoding
-    if request.method == 'POST':
-        # Needs to filter by examEnrollments where the score_reencoded and justification_reencoded are not None
-        exam_enrollments_reencoded = [exam_enrol for exam_enrol in exam_enrollments
-                                      if exam_enrol.score_reencoded is not None or exam_enrol.justification_reencoded]
 
-        decimal_scores_authorized = learning_unit_year.decimal_scores
-        try:
-            updated_enrollments = update_exam_enrollments(request, exam_enrollments_reencoded,
-                                                          decimal_scores_authorized,
-                                                          is_program_manager)
-            send_messages_to_notify_encoding_progress(request, exam_enrollments, learning_unit_year, is_program_manager,
-                                                      updated_enrollments)
-        except ValidationError:
-            messages.add_message(request, messages.ERROR, "%s" % _('scores_must_be_between_0_and_20'))
+    if request.method == 'POST':
+        updated_enrollments = []
+        for enrollment in exam_enrollments:
+            if not have_reencoded_score_or_justification(enrollment):
+                continue
+
+            score_encoded = request.POST.get('score_' + str(enrollment.id), None)
+            justification_encoded = request.POST.get('justification_' + str(enrollment.id), None)
+            has_been_updated = False
+
+            try:
+                has_been_updated = update_enrollment(enrollment, request.user, score_encoded, justification_encoded,
+                                                     decimal_scores_authorized, is_program_manager)
+            except ValidationError:
+                messages.add_message(request, messages.ERROR, _('scores_must_be_between_0_and_20'))
+            except Exception as e:
+                messages.add_message(request, messages.ERROR, _(e.args[0]))
+
+            if has_been_updated:
+                updated_enrollments.append(enrollment)
+
+        send_messages_to_notify_encoding_progress(request, exam_enrollments, learning_unit_year, is_program_manager,
+                                                  updated_enrollments)
         return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))
 
+
+def have_reencoded_score_or_justification(enrollment):
+    return enrollment.score_reencoded is not None or enrollment.justification_reencoded
 
 @login_required
 @user_passes_test(_is_inside_scores_encodings_period, login_url=reverse_lazy('outside_scores_encodings_period'))
@@ -876,37 +840,27 @@ def specific_criteria(request):
 def specific_criteria_submission(request):
     data = get_data_specific_criteria(request)
 
-    updated_enrollments = []
     is_program_manager = data['is_program_manager']
+    updated_enrollments = []
     for enrollment in data['exam_enrollments']:
+        if request.POST.get('score_changed_' + str(enrollment.id)) != "true":
+            continue
         score_encoded = request.POST.get('score_' + str(enrollment.id))
         justification_encoded = request.POST.get('justification_' + str(enrollment.id))
         learning_unit_year = enrollment.learning_unit_enrollment.learning_unit_year
         decimal_scores_authorized = learning_unit_year.decimal_scores
+        has_been_updated = False
 
-        if score_encoded:
-            try:
-                score_encoded = _truncate_decimals_new(score_encoded, decimal_scores_authorized)
-            except Exception as e:
-                messages.add_message(request, messages.ERROR, _(e.args[0]))
-                continue
-        else:
-            score_encoded=None
-        if not justification_encoded:
-            justification_encoded=None
+        try:
+            has_been_updated = update_enrollment(enrollment, request.user, score_encoded, justification_encoded,
+                                                 decimal_scores_authorized, is_program_manager)
+        except ValidationError:
+            messages.add_message(request, messages.ERROR, _('scores_must_be_between_0_and_20'))
+        except Exception as e:
+            messages.add_message(request, messages.ERROR, _(e.args[0]))
 
-        # Ignore all enrollment changed
-        if not is_enrollment_changed(request, enrollment, score_encoded, justification_encoded, is_program_manager):
-            continue
-
-        if can_modify_exam_enrollment(enrollment, is_program_manager):
-            try:
-                set_score_and_justification_for_exam_enrollment(is_program_manager, enrollment,
-                                                                justification_encoded,
-                                                                score_encoded, request.user)
-                updated_enrollments.append(enrollment)
-            except ValidationError:
-                messages.add_message(request, messages.ERROR, "%s" % _('scores_must_be_between_0_and_20'))
+        if has_been_updated:
+            updated_enrollments.append(enrollment)
 
     if messages.get_messages(request):
         # Error case [Preserve selection]
