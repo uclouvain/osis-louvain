@@ -27,6 +27,13 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.conf import settings
 from base.views import common
+from django.views.i18n import javascript_catalog
+
+js_info_dict = {
+    'domain': 'djangojs',
+    'packages': ('assessments',),
+}
+
 
 urlpatterns = [
     url(r'^login/$', common.login, name='login'),
@@ -39,6 +46,7 @@ urlpatterns = [
     url(r'^internships/', include('internship.urls')),
     url(r'^dissertation/', include('dissertation.urls')),
     url(r'^assessments/', include('assessments.urls')),
+    url(r'^jsi18n/$', javascript_catalog, js_info_dict, name='javascript-catalog'),
 ]
 
 handler404 = 'base.views.common.page_not_found'

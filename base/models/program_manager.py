@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.models import Group
-
 from django.db import models
 from django.contrib import admin
 from .learning_unit_enrollment import LearningUnitEnrollment
@@ -57,7 +55,7 @@ class ProgramManager(models.Model):
 
 
 def find_by_person(a_person):
-    return ProgramManager.objects.filter(person=a_person)
+    return ProgramManager.objects.select_related("offer_year").filter(person=a_person)
 
 
 def is_program_manager(user, offer_year=None, learning_unit_year=None):
@@ -99,3 +97,55 @@ def find_by_user(user, academic_year=None):
         queryset = queryset.filter(offer_year__academic_year=academic_year)
 
     return queryset.filter(person__user=user)
+
+
+def find_by_id(an_id):
+    try:
+        return ProgramManager.objects.get(pk=an_id)
+    except ObjectDoesNotExist:
+        return None
+
+
+def find_by_entity_administration_fac(structure_faculty, academic_yr):
+    return ProgramManager.objects.filter(offer_year__entity_administration_fac=structure_faculty,
+                                         offer_year__academic_year=academic_yr).distinct('person')
+
+
+def delete_by_id(an_id):
+    pgm_manager = ProgramManager.objects.get(pk=an_id)
+    if pgm_manager:
+        pgm_manager.delete()
+
+
+def find_by_offer_year_list(offer_yr_list):
+    return ProgramManager.objects.select_related("person").filter(offer_year__in=offer_yr_list)\
+        .order_by('person__last_name', 'person__first_name')
+
+
+def find_by_offer_year_list_person(a_person, offer_yr_list):
+    return ProgramManager.objects.select_related("person").filter(person=a_person, offer_year__in=offer_yr_list)
+
+
+def find_by_person_exclude_offer_list(a_person, offer_yr_list):
+    return ProgramManager.objects.filter(person=a_person).exclude(offer_year__in=offer_yr_list)
+
+
+def find_by_person_academic_year(a_person=None, an_academic_yr=None, entity_list=None, a_grade_type=None):
+    queryset = ProgramManager.objects
+
+    if a_person:
+        queryset = queryset.filter(person=a_person)
+
+    if an_academic_yr:
+        queryset = queryset.filter(offer_year__academic_year=an_academic_yr)
+
+    if entity_list:
+        queryset = queryset.filter(offer_year__entity_administration__in=entity_list)
+
+    if a_grade_type:
+        queryset = queryset.filter(offer_year__grade_type=a_grade_type)
+
+    return queryset.select_related("offer_year")
+
+def find_by_offer_year_person(a_person, offer_yr):
+    return ProgramManager.objects.select_related("person").filter(person=a_person, offer_year=offer_yr)

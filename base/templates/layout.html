@@ -42,6 +42,7 @@
     <link rel="stylesheet" href="{% static 'css/osis.css' %}?version={{ js }}">
     <link rel="stylesheet" href="{% static 'css/font-awesome.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/tree.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dataTables.bootstrap.min.css' %}">
     {% block header %}
     <noscript>
       <meta http-equiv="refresh" content="0;url={% url 'noscript' %}">
@@ -131,8 +132,12 @@
                                        id="lnk_organizations">{% trans 'organizations' %}</a></li>
                                 {% endif %}
                                 {% if perms.base.can_access_structure  %}
-                                <li><a href="{% url 'structures' %}"
-                                       id="lnk_dropdown_entities">{% trans 'entities' %}</a></li>
+                                    <li><a href="{% url 'structures' %}"
+                                           id="lnk_dropdown_entities">{% trans 'entities' %}</a></li>
+                                {% endif %}
+                                {% if perms.base.is_faculty_administrator %}
+                                <li><a href="{% url 'academic_actors' %}"
+                                       id="lnk_dropdown_academic actors">{% trans 'academic_actors' %}</a></li>
                                 {% endif %}
                             </ul>
                         </li>
@@ -232,6 +237,8 @@
     <script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
     <script src="{% static 'js/osis.js' %}?version={{ js }}"></script>
+    <script type="text/javascript" src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dataTables.bootstrap.min.js' %}"></script>
     {% block script %}
     {% endblock %}
     {% analytical_body_bottom %}

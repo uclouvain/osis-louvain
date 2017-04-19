@@ -23,36 +23,61 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
-from assessments.views import score_encoding, upload_xls_utils
+from django.conf.urls import url, include
+from assessments.views import score_encoding, upload_xls_utils, pgm_manager_administration
+from django.views.i18n import javascript_catalog
+
+
+js_info_dict = {
+    'packages': ('assessments', )
+}
 
 urlpatterns = [
-    url(r'^scores_encoding/outside_period/$',
-        score_encoding.outside_period, name='outside_scores_encodings_period'),
-    url(r'^scores_encoding/$', score_encoding.scores_encoding, name='scores_encoding'),
-    url(r'^scores_encoding/online/(?P<learning_unit_year_id>[0-9]+)/$',
-        score_encoding.online_encoding, name='online_encoding'),
-    url(r'^scores_encoding/online/(?P<learning_unit_year_id>[0-9]+)/form$',
-        score_encoding.online_encoding_form, name='online_encoding_form'),
-    url(r'^scores_encoding/online/([0-9]+)/submission$',
-        score_encoding.online_encoding_submission, name='online_encoding_submission'),
-    url(r'^scores_encoding/online/(?P<learning_unit_year_id>[0-9]+)/double_form$',
-        score_encoding.online_double_encoding_form, name='online_double_encoding_form'),
-    url(r'^scores_encoding/online/(?P<learning_unit_year_id>[0-9]+)(?:/(?P<tutor_id>[0-9]+))?/double_validation$',
-        score_encoding.online_double_encoding_validation, name='online_double_encoding_validation'),
-    url(r'^scores_encoding/specific_criteria/$',
-        score_encoding.specific_criteria, name='specific_criteria'),
-    url(r'^scores_encoding/specific_criteria/submission/$',
-        score_encoding.specific_criteria_submission, name='specific_criteria_submission'),
-    url(r'^scores_encoding/specific_criteria/search/$',
-        score_encoding.search_by_specific_criteria, name='search_by_specific_criteria'),
-    url(r'^scores_encoding/notes_printing_all(?:/(?P<tutor_id>[0-9]+))?(?:/(?P<offer_id>[0-9]+))?/$',
-        score_encoding.notes_printing_all, name='notes_printing_all'),
-    url(r'^scores_encoding/notes_printing/(?P<learning_unit_year_id>[0-9]+)(?:/(?P<tutor_id>[0-9]+))?/$',
-        score_encoding.notes_printing, name='notes_printing'),
-    url(r'^scores_encoding/xlsdownload/([0-9]+)/$',
-        score_encoding.export_xls, name='scores_encoding_download'),
-    url(r'^scores_encoding/upload/(?P<learning_unit_year_id>[0-9]+)/$',
-        upload_xls_utils.upload_scores_file, name='upload_encoding'),
-    url(r'', score_encoding.assessments, name="assessments")
+
+    url(r'^scores_encoding/', include([
+        url(r'^outside_period/$',
+            score_encoding.outside_period, name='outside_scores_encodings_period'),
+        url(r'^$', score_encoding.scores_encoding, name='scores_encoding'),
+        url(r'^online/(?P<learning_unit_year_id>[0-9]+)/$',
+            score_encoding.online_encoding, name='online_encoding'),
+        url(r'^online/(?P<learning_unit_year_id>[0-9]+)/form$',
+            score_encoding.online_encoding_form, name='online_encoding_form'),
+        url(r'^online/([0-9]+)/submission$',
+            score_encoding.online_encoding_submission, name='online_encoding_submission'),
+        url(r'^online/(?P<learning_unit_year_id>[0-9]+)/double_form$',
+            score_encoding.online_double_encoding_form, name='online_double_encoding_form'),
+        url(r'^online/(?P<learning_unit_year_id>[0-9]+)(?:/(?P<tutor_id>[0-9]+))?/double_validation$',
+            score_encoding.online_double_encoding_validation, name='online_double_encoding_validation'),
+        url(r'^specific_criteria/$',
+            score_encoding.specific_criteria, name='specific_criteria'),
+        url(r'^specific_criteria/submission/$',
+            score_encoding.specific_criteria_submission, name='specific_criteria_submission'),
+        url(r'^specific_criteria/search/$',
+            score_encoding.search_by_specific_criteria, name='search_by_specific_criteria'),
+        url(r'^notes_printing_all(?:/(?P<tutor_id>[0-9]+))?(?:/(?P<offer_id>[0-9]+))?/$',
+            score_encoding.notes_printing_all, name='notes_printing_all'),
+        url(r'^notes_printing/(?P<learning_unit_year_id>[0-9]+)(?:/(?P<tutor_id>[0-9]+))?/$',
+            score_encoding.notes_printing, name='notes_printing'),
+        url(r'^xlsdownload/([0-9]+)/$',
+            score_encoding.export_xls, name='scores_encoding_download'),
+        url(r'^upload/(?P<learning_unit_year_id>[0-9]+)/$',
+            upload_xls_utils.upload_scores_file, name='upload_encoding'),
+    ])),
+
+    url(r'^jsi18n/', javascript_catalog, js_info_dict),
+
+    url(r'^pgm_manager/', include([
+        url(r'^$', pgm_manager_administration.pgm_manager_administration, name='pgm_manager'),
+        url(r'^search$', pgm_manager_administration.pgm_manager_search, name='pgm_manager_search'),
+        url(r'^delete', pgm_manager_administration.delete_manager, name='delete_manager'),
+        url(r'^person/list/search$', pgm_manager_administration.person_list_search),
+
+        url(r'^create$', pgm_manager_administration.create_manager, name='create_manager_person'),
+
+    ])),
+
+    url(r'^update_managers_list/$', pgm_manager_administration.update_managers_list),
+    url(r'^manager_pgm_list/$', pgm_manager_administration.manager_pgm_list),
+
+    url(r'^$', score_encoding.assessments, name="assessments"),
 ]

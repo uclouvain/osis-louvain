@@ -1,0 +1,71 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-03-28 11:56+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "pgm_type"
+msgstr "Program type"
+
+msgid "managers"
+msgstr "Managers"
+
+msgid "all_label"
+msgstr "All"
+
+msgid "pgm_mgr_administration"
+msgstr "Program managers administration"
+
+msgid "all_hierarchy"
+msgstr "All hierarchy of "
+
+msgid "remove_manager"
+msgstr "Remove the manager"
+
+msgid "add_manager"
+msgstr "Add a manager"
+
+msgid "select_all"
+msgstr "Select/deselect all"
+
+msgid "pgm_managers"
+msgstr "Program's managers"
+
+msgid "desc_lnk_pgm_managers"
+msgstr "Management of the program managers"
+
+msgid "person_search"
+msgstr "Person search"
+
+msgid "remove_manager_label"
+msgstr "Are you sure you want to remove the following manager?"
+
+msgid "stay_manager_label"
+msgstr "He will keep the following program's management : "
+
+msgid "confirm"
+msgstr "Confirm"
+
+msgid "no_structure_specified"
+msgstr "No entity associated to your faculty administrator's profil"
+
+msgid "already_program_mgr"
+msgstr "is already program manager for"
+
+
+
+
+

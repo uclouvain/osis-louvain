@@ -1,0 +1,88 @@
+{% load staticfiles %}
+{% load i18n %}
+<div class="modal fade" id="pnl_add_manager_modal" tabindex="-1" role="dialog" >
+    <div class="modal-dialog modal-lg" >
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="bt_close_add_manager_modal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title">{% trans 'person_search' %}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <form method="post">
+                        <div class="col-md-4">
+                            <label for="txt_name" >{% trans 'name'%}</label>
+                            <input type="text" id="txt_name" name="name" class="form-control" value="{{ lastname }}" >
+                        </div>
+                        <div class="col-md-4">
+                            <label for="txt_first_name" >{% trans 'first_name'%}</label>
+                            <input type="text" id="txt_first_name" name="firstname" class="form-control" value="{{ firstname }}" >
+                        </div>
+                        <div class="col-md-4">
+                            <button type="button" id="bt_submit_person_search" class="btn btn-primary pull-right" role="button">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <br>
+                <form method="post" action="{% url 'create_manager_person'%}" id="form_create_manager">
+                    {% csrf_token %}
+                    <input type="hidden" id="hdn_entity" name="entity" class="form-control" value="{{ entity | default_if_none:''}}" >
+                    <input type="hidden" id="hdn_pgm_type" name="pgm_type" class="form-control" value="{{ pgm_type | default_if_none:'' }}" >
+                    <input type="hidden" id="hdn_person" name="person" class="form-control" value="{{ person | default_if_none:''}}" >
+                    <input type="hidden" id="hdn_offers_checked" name="offers_checked" class="form-control" value="{{ offers_on | default_if_none:''}}" >
+                    <input type="hidden" id="hdn_pgms_id"  name="pgms_id" value="{{ pgms_id }}">
+                    <input type="hidden" id="hdn_person_id" name="person_id" value="">
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% if persons|length == 0 and init == "0" %}
+                            <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
+                            {% endif %}
+                            <div id="pnl_person_search_results" {% if persons|length > 0 %}style="visibility:visible"{%else%}style="visibility:hidden"{% endif %}>
+
+                                <table class="table table-striped table-hover" id="tb_persons">
+                                    <thead>
+                                    <th>{% trans 'lastname'%}</th>
+                                    <th>{% trans 'firstname'%}</th>
+                                    <th>{% trans 'middlename'%}</th>
+                                    <th>{% trans 'email'%}</th>
+                                    <th>{% trans 'username'%}</th>
+                                    </thead>
+                                    <tbody>
+                                    {% for person in persons %}
+                                        <tr>
+                                            <td>
+                                                <button type="submit" class="btn-link" id="lnk_add_manager_lastname_{{person.id}}">
+                                                    {{ person.last_name }}
+                                                </button>
+                                            </td>
+                                            <td>
+                                                <button type="submit" class="btn-link" id="lnk_add_manager_firstname_{{person.id}}">
+                                                    {{ person.first_name }}
+                                                </button>
+                                            </td>
+                                            <td>{{ person.middle_name | default_if_none:''  }}</td>
+                                            <td>{{ person.email | default_if_none:'' }}</td>
+                                            <td>{{ person.user | default_if_none:'' }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            <br>
+
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" id="bt_cancel_add_manager_modal">{% trans 'cancel' %}</button>
+            </div>
+
+        </div>
+    </div>
+</div>

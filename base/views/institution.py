@@ -92,3 +92,8 @@ def structure_address(request, structure_id):
     else:
         data = json.dumps({'entity': u'%s - %s' % (structure.acronym, structure.title)})
     return HttpResponse(data, content_type='application/json')
+
+
+@login_required
+def academic_actors(request):
+    return layout.render(request, "academic_actors.html", {})

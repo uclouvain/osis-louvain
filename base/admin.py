@@ -36,11 +36,17 @@ admin.site.register(application_notice.ApplicationNotice,
 admin.site.register(campus.Campus,
                     campus.CampusAdmin)
 
+admin.site.register(employee.Employee,
+                    employee.EmployeeAdmin)
+
 admin.site.register(exam_enrollment.ExamEnrollment,
                     exam_enrollment.ExamEnrollmentAdmin)
 
 admin.site.register(exam_enrollment.ExamEnrollmentHistory,
                     exam_enrollment.ExamEnrollmentHistoryAdmin)
+
+admin.site.register(faculty_administrator.FacultyAdministrator,
+                    faculty_administrator.FacultyAdministratorAdmin)
 
 admin.site.register(external_offer.ExternalOffer,
                     external_offer.ExternalOfferAdmin)

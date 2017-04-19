@@ -1,0 +1,421 @@
+{% extends "layout.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load check %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+<li id="lnk_institution">{% trans 'institution' %}</li>
+<li id="lnk_studies"><a href="{% url 'academic_actors' %}">{% trans 'academic_actors' %}</a></li>
+<li class="active" id="lnk_pgm_manager_management">{% trans 'pgm_mgr_administration' %}</li>
+{% endblock %}
+{% block content %}
+{% if manager_entity %}
+    <div class="page-header">
+        <h2>{% trans 'pgm_mgr_administration' %} <label>{{ manager_entity.acronym }} </label>({{ academic_year }})</h2>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <br>
+            <div class="row">
+                <form  method="get" action="{% url 'pgm_manager_search'%}" >
+                    <div class="col-md-3">
+                        <label for="slt_entity" >{% trans 'entity'%}</label>
+                        <select class="form-control" id="slt_entity" name="entity" >
+                            <option selected value="-">{% trans 'all_hierarchy' %} {{ manager_entity.acronym }}</option>
+                            {% for e in manager_entity.children %}
+                                {% if e.acronym == entity %}
+                                    <option selected value="{{ e.acronym }}">{{ e.acronym }}</option>
+                                {% else %}
+                                    <option value="{{ e.acronym }}">{{ e.acronym }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="slt_pgm_type" >{% trans 'pgm_type'%}</label>
+                        <select class="form-control" id="slt_pgm_type"  name="pgm_type">
+                            <option value="-">{% trans 'all_label' %}</option>
+                            {% for p in pgm_types %}
+                                {% if p.id|slugify == pgm_type %}
+                                    <option selected value="{{ p.id }}">{{ p }}</option>
+                                {% else %}
+                                    <option value="{{ p.id }}">{{ p }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label for="slt_manager" >{% trans 'managers'%}</label>
+                        <select class="form-control" id="slt_person"  name="person">
+                            <option value="-">{% trans 'all_label' %}</option>
+                            {% for mgr in managers %}
+                                <option value="{{ mgr.person.id }}" {%if person.id == mgr.person.id %}selected{% endif %} >{{ mgr.person }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-1">
+                        <br>
+                        <button type="submit" id="bt_submit_pgm_manager_search" class="btn btn-primary" role="button">
+                            <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <br>
+            {% if add_errors %}
+                <div class="alert-warning" id="pnl_errors">
+                    <ul>
+                    {% for error in add_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor%}
+                    </ul>
+                </div>
+            {% endif %}
+            <div>
+               <div class="row">
+                   <form method="post" >
+                       {% csrf_token %}
+                       <div class="col-md-6">
+                           {% if pgms|length == 0 and init == "0" %}
+                           <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
+                           {% endif %}
+                           <input type="hidden" id="hdn_entity" name="entity">
+                           <input type="hidden" id="hdn_pgm_type" name="pgm_type">
+                           <input type="hidden" id="hdn_offers_checked" name="offers_checked">
+                           <input type="hidden" id="hdn_manager" name="person">
+                           {% if pgms|length > 0 %}
+                               <table class="table table-striped table-hover" id="tb_pgms">
+                                   <thead>
+                                   <th class="no-sort"><input type="checkbox" id="chb_pgm_id_all" title="{% trans 'select_all' %}"></th>
+                                   <th>{% trans 'program'%}</th>
+                                   <th>{% trans 'type'%}</th>
+                                   <th>{% trans 'entity'%}</th>
+                                   </thead>
+                                   {% for pgm in pgms %}
+                                   <tr>
+                                       <td>
+                                           <input type="checkbox" id="chb_pgm_id_{{pgm.id}}" {% if offers_on%}{{offers_on|is_checked:pgm.id}}{%endif%}>
+                                           <input type="hidden" id="hdn_pgm_id_{{pgm.id}}" name="pgm_id_{{pgm.id}}">
+                                       </td>
+                                       <td>{{ pgm.acronym }}</td>
+                                       <td>{{ pgm.grade_type.name }}</td>
+                                       <td>{{ pgm.entity_management.acronym }}</td>
+                                   </tr>
+                                   {% endfor %}
+                               </table>
+                           {% endif %}
+                       </div>
+                       <div class="col-md-6" id="pnl_managers">
+                           {% if managers|length == 0 and init == "0" %}
+                            <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
+                           {% endif %}
+
+                           <table class="table table-striped table-hover" id="tb_managers" style="visibility:{% if pgms|length > 0 %}visibility{%else%}hidden{%endif%}">
+                               <thead>
+                                   <th>{% trans 'manager'%}</th>
+                                   <th></th>
+                               </thead>
+                               <tbody>
+
+                               </tbody>
+                           </table>
+                           <br>
+                           {% if pgms %}
+                           <button type="button" id="bt_add_pgm_manager" class="btn btn-primary pull-right" role="button"
+                                   title="{% trans 'add_manager' %}" data-toggle="modal" data-target="#pnl_add_manager_modal">
+                               <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                           </button>
+                           {% endif%}
+                   </form>
+               </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Remove manager modal -->
+    {% include 'admin/modal/remove_manager_confirm.html'%}
+    <!-- end - Remove manager modal -->
+    <!-- Add manager modal -->
+    {% include 'admin/modal/add_manager.html'%}
+    <!-- end - Add manager modal -->
+{% else %}
+    <div class="center-block"><h3>{% trans 'no_structure_specified' %}</h3></div>
+{% endif %}
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{% url 'javascript-catalog' %}"></script>
+<script>
+    $("#bt_add_pgm_manager").click(function(event) {
+        save_selected_values();
+    });
+
+    function save_selected_values(){
+        //Necessary to keep the list selection
+        $("#hdn_entity").val($('#slt_entity').val());
+        $("#hdn_pgm_type").val($('#slt_pgm_type').val());
+        $("#hdn_manager").val($('#slt_person').val());
+        var ch = get_offer_id_list_on();
+        $("#hdn_offers_checked").val(ch); // to keep the possibility to check the offers checked while starting the
+        // removal
+    }
+    function delete_manager(personId, acronym_on, acronym_off, person_off_last_name ,person_off_first_name,pgm_ids){
+
+        $("#hdn_to_be_removed_person").val(personId);
+        $("#hdn_to_be_removed_pgms").val(pgm_ids);
+        save_selected_values()    ;
+        //--------------------------------------------------------------
+        // To display information on the effects of the removal.
+        //--------------------------------------------------------------
+        clean_on_off_pannels(); // initialize
+        set_off_pannel(person_off_last_name,person_off_first_name, acronym_off);// name of the pgm manager
+                                                                               // offers removed from
+        set_on_pannel(personId, acronym_on);// offers still managed
+        //--------------------------------------------------------------
+
+    }
+
+    $("input[id^='chb_pgm_id_']").click(function(event) {
+        var target = $(event.target);
+        var id = target.attr("id");
+        if (typeof id === 'undefined') {
+            target = target.parent();
+            id = target.attr("id");
+        }
+        var managerId = id.substring(id.lastIndexOf("_") + 1);
+
+        if ($(event.target).prop("checked") == true) {
+            $("#hdn_pgm_id_" + managerId).val(managerId);
+        } else {
+            $("#hdn_pgm_id_" + managerId).val("");
+        }
+        var ch = get_offer_id_list_on();
+        update_manager_list(ch);
+    });
+
+    function get_offer_id_list_on(){
+        var ch = "";
+        $("input[id^='chb_pgm_id_']").each(function () {
+            if ($(this).prop("checked") == true) {
+                var id = $(this).attr("id");
+
+                var offerId = id.substring(id.lastIndexOf("_") + 1);
+                if (offerId) {
+                    if (ch == "") {
+                        ch = offerId;
+                    } else {
+                        ch = ch + "," + offerId;
+                    }
+                }
+            }
+        });
+        return ch;
+    }
+
+    function check_bt_add_manager_disabling(){
+        $('#bt_add_pgm_manager').attr("disabled", true);
+        $("input[id^='chb_pgm_id_']").each(function(){
+            if($(this).prop("checked") == true){
+                $('#bt_add_pgm_manager').attr("disabled", false);
+            }
+        });
+    }
+
+    $("input[id^='chb_pgm_id_']").change(function() {
+        check_bt_add_manager_disabling();
+    });
+
+    $("input[id='chb_pgm_id_all']").click(function(event) {
+
+        $("input[id^='chb_pgm_id_']").each(function(){
+            $(this).prop("checked",$("#chb_pgm_id_all").prop("checked") )
+        });
+
+    });
+
+    $(document).ready(function() {
+        data_table_init();
+
+        var ch = get_offer_id_list_on();
+        update_manager_list(ch);
+        check_bt_add_manager_disabling();
+    });
+
+    function data_table_init(){
+        $('#tb_pgms').DataTable( {
+            paging:   false,
+            searching: false,
+            stateSave: true,
+            info:false,
+            language: {
+                search: gettext('search'),
+                infoEmpty: gettext('no_record'),
+                zeroRecords: gettext('no_record'),
+
+            },
+            "columnDefs": [ {
+                "targets": 'no-sort',
+                "orderable": false,
+            } ]
+        } );
+    }
+
+    function update_manager_list(ch){
+        $('#tb_managers tbody > tr').remove();
+
+        if (ch != "") {
+            $.ajax({
+                url: "/assessments/update_managers_list?pgm_ids=" + ch
+            }).then(function (data) {
+                if (data.length > 0) {
+                    var trHTML = '';
+                    $.each(data, function (key, value) {
+                        var trHTML=''
+                        var id_person = value.person_id;
+                        var acronyms_on = value.offer_year_acronyms_on;
+                        var acronyms_off = value.offer_year_acronyms_off;
+                        var last_name = value.person_last_name;
+                        var first_name = value.person_first_name;
+                        var pgm_ids = value.programs;
+
+                        trHTML += '<tr>';
+                        trHTML += '<td>' + value.person_last_name + ',' + value.person_first_name +'</td>';
+                        trHTML += '<td>';
+                        trHTML += '<button type="button" class="btn btn-default pull-right" data-toggle="modal" data-target="#pnl_remove_manager_modal" ';
+                        trHTML += ' title="'+gettext('remove_manager')+'"';
+                        trHTML += ' id="btn_remove_manager_modal_' + value.person_id + '" ';
+                        trHTML += ' onclick="delete_manager('+id_person+',\''+acronyms_on+'\',\''+acronyms_off+'\',\''+last_name+'\',\''+first_name+'\',\''+pgm_ids+'\');" ';
+                        trHTML += '><span class="glyphicon glyphicon-minus" aria-hidden="true"></span>';
+                        trHTML += '</button>';
+                        trHTML += '</td>';
+                        trHTML += '</tr>';
+                        $('#tb_managers tbody').append(trHTML);
+                    });
+
+                }
+            });
+        }
+    }
+
+    function clean_on_off_pannels(){
+        $("#pnl_pgm_on").find("label")
+                .remove()
+                .end();
+
+        $("#pnl_pgm_off").find("label")
+                .remove()
+                .end();
+    }
+
+    function set_off_pannel(person_off, person_off_first_name, acronym_off){
+        $("#pnl_pgm_off").append("<label>"+person_off+" "+ person_off_first_name +"</label>");
+        $("#pnl_pgm_off").append("<br>");
+        $("#pnl_pgm_off").append(gettext('of_pgm'));
+        $("#pnl_pgm_off").append("<label>"+acronym_off+"</label>");
+        $("#pnl_pgm_off").append("<br>");
+    }
+
+    function set_on_pannel(managerId, acronym_on) {
+        if (acronym_on) {
+            $("#pnl_pgm_on").append("<label>" + acronym_on + "</label>");
+        }else{
+            $("#pnl_pgm_on").append("<label>-</label>");
+        }
+
+    }
+
+    $("#bt_submit_person_search").click(function(event) {
+
+        $('#tb_persons tbody > tr').remove();
+
+        $('#pnl_person_search_results').css('visibility', 'hidden');
+        $.ajax({
+            url: "/assessments/pgm_manager/person/list/search?name=" + $('#txt_name').val() + "&firstname=" + $('#txt_first_name').val()
+        }).then(function (data) {
+            if (data.length > 0) {
+                $('#pnl_person_search_results').css('visibility', 'visible');
+
+                var trHTML = '';
+                $.each(data, function (key, value) {
+                    var trHTML='';
+                    var id_person = value.id;
+                    var last_name = value.last_name;
+                    var first_name = value.first_name;
+
+                    trHTML += '<tr>';
+                    trHTML += '<td><button type="submit" class="btn-link" id="lnk_add_manager_last_name_' + id_person + '" onclick="submission('+ id_person+');">' + last_name +'</button></td>';
+                    trHTML += '<td><button type="submit" class="btn-link" id="lnk_add_manager_first_name_' + id_person + '" onclick="submission('+ id_person+');">' + first_name +'</button></td>';
+                    trHTML += '<td>';
+                    if(value.middle_name){
+                        trHTML += value.middle_name;
+                    }
+                    trHTML += '</td>';
+                    trHTML += '<td>';
+                    if(value.email){
+                        trHTML += value.email;
+                    }
+                    trHTML += '</td>';
+                    trHTML += '<td>'
+                    if(value.user){
+                        trHTML += value.user.username;
+                    }
+                    trHTML += '</td>';
+
+                    trHTML += '</tr>';
+                    $('#tb_persons tbody').append(trHTML);
+                });
+
+            }
+        });
+    });
+
+    function submission(id_person){
+        $("#hdn_person_id").val(id_person);
+        $("#hdn_pgms_id").val(get_offer_id_list_on());
+        $("#form_create_manager").submit();
+    }
+
+    function removal_submission(){
+        $("#hdn_pgms_id").val(get_offer_id_list_on());
+        //$('#form_remove_manager').submit();
+        $.ajax({
+            url: "/assessments/pgm_manager/delete?person=" + $('#hdn_to_be_removed_person').val() + "&pgms=" + get_offer_id_list_on()
+        })
+        //$('#form_remove_manager').submit();
+        $("#bt_close_remove_manager_modal").click();
+        var ch = get_offer_id_list_on();
+        update_manager_list(ch);
+        $("#pnl_errors").find("ul")
+                .remove()
+                .end();
+
+
+    }
+
+
+</script>
+{% endblock %}
+

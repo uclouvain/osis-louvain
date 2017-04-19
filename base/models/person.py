@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2016 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ from django.contrib.auth.models import User
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
-from base.enums import person_source_type
+from base.enums import person_source_type, person_status, person_type
 
 
 class PersonAdmin(SerializableModelAdmin):
@@ -131,3 +131,31 @@ def search_by_email(email):
 
 def count_by_email(email):
     return search_by_email(email).count()
+
+
+def find_by_lastname(a_name):
+    return Person.objects.filter(Q(last_name__icontains=a_name) | Q(first_name__icontains=a_name))
+
+
+def search(a_lastname_part, a_first_name, a_status, a_type_list):
+
+    out = None
+    queryset = Person.objects
+
+    if a_lastname_part:
+        queryset = queryset.filter(last_name__icontains=a_lastname_part)
+
+    if a_first_name:
+        queryset = queryset.filter(first_name__icontains=a_first_name)
+
+    #
+    # if a_status:
+    #     queryset = queryset.filter(working_status=a_status)
+    #
+    # if a_type_list:
+    #     queryset = queryset.filter(working_type__in=a_type_list)
+    if a_lastname_part or a_first_name or a_status or a_type_list:
+        out = queryset.order_by('last_name')
+
+    return out
+

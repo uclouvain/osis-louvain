@@ -16,5 +16,6 @@ factory_boy
 django-dotenv==1.4.1
 pendulum
 codeclimate-test-reporter
+djangorestframework==3.3.2
 
 -r ./osis_common/requirements.txt

@@ -26,9 +26,10 @@
 from django.contrib.auth.models import Group
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver, Signal
-from base.models import student as mdl_student, person as mdl_person, tutor as mdl_tutor, program_manager as mdl_pgm_manager
+from base.models import student as mdl_student, person as mdl_person, tutor as mdl_tutor, program_manager as mdl_pgm_manager, faculty_administrator as mdl_faculty_administrator
 from osis_common.models.serializable_model import SerializableModel
 from internship.models import internship_student_information as mdl_internship
+from django.contrib.auth.models import Permission
 
 
 person_created = Signal(providing_args=['person'])
@@ -177,3 +178,27 @@ def _update_person_if_necessary(person, user, global_id):
     if updated:
         super(SerializableModel, person).save()
     return updated, person
+
+
+def get_or_create_group():
+    faculty_administrators_group, created = Group.objects.get_or_create(name='faculty_administrators')
+    if created:
+        for perm in mdl_faculty_administrator._get_perms(mdl_faculty_administrator.FacultyAdministrator):
+            permission_codename = perm[0]
+            permission = Permission.objects.get(codename=permission_codename)
+            faculty_administrators_group.permissions.add(permission)
+    return faculty_administrators_group
+
+
+@receiver(post_save, sender=mdl_faculty_administrator.FacultyAdministrator)
+def add_to_faculty_administrator_group(sender, instance, **kwargs):
+    if kwargs.get('created', True) and instance.employee.person.user:
+        faculty_administrators_group = get_or_create_group()
+        instance.employee.person.user.groups.add(faculty_administrators_group)
+
+
+@receiver(post_delete, sender=mdl_faculty_administrator.FacultyAdministrator)
+def remove_from_faculty_administrator_group(sender, instance, **kwargs):
+    if instance.employee.person.user:
+        faculty_administrators_group = get_or_create_group()
+        instance.employee.person.user.groups.remove(faculty_administrators_group)

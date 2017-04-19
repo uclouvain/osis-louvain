@@ -103,5 +103,8 @@ urlpatterns = [
     url(r'^structure/([0-9]+)/diagram/$', institution.structure_diagram, name='structure_diagram'),
     url(r'^structure/([0-9]+)/address/$', institution.structure_address, name='structure_address'),
 
-    url(r'^studies/$', common.studies, name='studies')
+    url(r'^studies/$', common.studies, name='studies'),
+
+    url(r'^academic_actors/$', institution.academic_actors, name='academic_actors')
+
 ]

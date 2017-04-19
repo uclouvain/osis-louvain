@@ -29,8 +29,10 @@ from base.models import academic_calendar
 from base.models import academic_year
 from base.models import application_notice
 from base.models import campus
+from base.models import employee
 from base.models import exam_enrollment
 from base.models import external_offer
+from base.models import faculty_administrator
 from base.models import learning_class
 from base.models import learning_class_year
 from base.models import learning_component
