@@ -23,18 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from decimal import *
-from django.db import models
-from django.contrib import admin
-from django.utils.translation import ugettext as _
-from django.core.validators import MaxValueValidator, MinValueValidator
-from base.models import person, learning_unit_year, person_address, session_exam_calendar, session_exam_deadline, \
-                        academic_year as academic_yr
-from attribution.models import attribution
-from base.enums import exam_enrollment_justification_type as justification_types
-from base.enums import exam_enrollment_state as enrollment_states
 import datetime
 import unicodedata
+from decimal import *
+
+from django.contrib import admin
+from django.core.validators import MaxValueValidator, MinValueValidator
+from django.db import models
+from django.utils.translation import ugettext as _
+
+from attribution.models import attribution
+from base.utils import calendar_utils
+from base.enums import exam_enrollment_justification_type as justification_types, exam_enrollment_state as enrollment_states
+from base.models import person, learning_unit_year, person_address, session_exam_calendar, session_exam_deadline, \
+                        academic_year as academic_yr
 from base.models.exceptions import JustificationValueException
 
 JUSTIFICATION_ABSENT_FOR_TUTOR = _('absent')
@@ -444,16 +446,8 @@ def scores_sheet_data(exam_enrollments, tutor=None):
             else:
                 deliberation_date = _('not_passed')
 
-            # Compute deadline score encoding
-            deadline = get_deadline_tutor_computed(exam_enrollment)
-            if deadline:
-                deadline = deadline.strftime('%d/%m/%Y')
-            else:
-                deadline = ""
-
             program = {'acronym': exam_enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
                        'deliberation_date': deliberation_date,
-                       'deadline': deadline,
                        'address': {'recipient': offer_year.recipient,
                                    'location': offer_year.location,
                                    'postal_code': offer_year.postal_code,
@@ -470,12 +464,19 @@ def scores_sheet_data(exam_enrollments, tutor=None):
                         score = str(exam_enrol.score_final)
                     else:
                         score = str(int(exam_enrol.score_final))
+
+                # Compute deadline score encoding
+                deadline = get_deadline_tutor_computed(exam_enrol)
+                if deadline:
+                    deadline = deadline.strftime(calendar_utils.FORMAT)
+
                 enrollments.append({
                     "registration_id": student.registration_id,
                     "last_name": student.person.last_name,
                     "first_name": student.person.first_name,
                     "score": score,
-                    "justification": _(exam_enrol.justification_final) if exam_enrol.justification_final else ''
+                    "justification": _(exam_enrol.justification_final) if exam_enrol.justification_final else '',
+                    "deadline": deadline if deadline else ''
                 })
             program['enrollments'] = enrollments
             programs.append(program)
