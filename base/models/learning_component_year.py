@@ -103,7 +103,7 @@ class LearningComponentYear(models.Model):
                                 q_n = 'Q1&2'
                         return {'hourly_volume': self.hourly_volume_total,
                                 'quadrimester_volume': q_n,
-                                'vol_q1': '?',
+                                'vol_q1': self.hourly_volume_partial,
                                 'vol_q2': vol_q2}
 
 
