@@ -32,7 +32,8 @@ from base.models.enums import learning_component_year_type
 class LearningComponentYearAdmin(admin.ModelAdmin):
     list_display = ('learning_container_year', 'title', 'acronym', 'type', 'comment')
     fieldsets = ((None, {'fields': ('learning_container_year', 'title', 'acronym',
-                                    'type', 'comment', 'planned_classes', 'hourly_volume_total', 'hourly_volume_partial')}),)
+                                    'type', 'comment', 'planned_classes', 'hourly_volume_total',
+                                    'hourly_volume_partial')}),)
     search_fields = ['acronym']
 
 
@@ -68,6 +69,43 @@ class LearningComponentYear(models.Model):
                     return q2
         return None
 
+    @property
+    def volumes(self):
+        if self.hourly_volume_total is None or self.hourly_volume_total == 0:
+            return {'hourly_volume': '?',
+                    'quadrimester_volume': '?',
+                    'vol_q1': '?',
+                    'vol_q2': '?'}
+        else:
+            if self.hourly_volume_partial is None or self.hourly_volume_partial == 0:
+                return {'hourly_volume': self.hourly_volume_total,
+                        'quadrimester_volume': '?',
+                        'vol_q1': '?',
+                        'vol_q2': '?'}
+            else:
+                if self.hourly_volume_partial and self.hourly_volume_partial == -1:
+                    return {'hourly_volume': self.hourly_volume_total,
+                            'quadrimester_volume': 'Q1|2',
+                            'vol_q1': '({})'.format(self.hourly_volume_total),
+                            'vol_q2': '({})'.format(self.hourly_volume_total)}
+                else:
+                    if self.hourly_volume_partial and self.hourly_volume_partial != -1:
+                        vol_q2 = self.hourly_volume_total - self.hourly_volume_partial
+                        if vol_q2 == 0:
+                            vol_q2 = '-'
+
+                        if self.hourly_volume_partial == self.hourly_volume_total:
+                            q_n = 'Q1'
+                        else:
+                            if self.hourly_volume_partial == 0:
+                                q_n = 'Q2'
+                            else:
+                                q_n = 'Q1&2'
+                        return {'hourly_volume': self.hourly_volume_total,
+                                'quadrimester_volume': q_n,
+                                'vol_q1': '?',
+                                'vol_q2': vol_q2}
+
 
 def find_by_id(learning_component_year_id):
     return LearningComponentYear.objects.get(pk=learning_component_year_id)
@@ -75,4 +113,4 @@ def find_by_id(learning_component_year_id):
 
 def find_by_learning_container_year(a_learning_container_year):
     return LearningComponentYear.objects.filter(learning_container_year=a_learning_container_year)\
-                                         .order_by('type','acronym')
+                                        .order_by('type', 'acronym')
