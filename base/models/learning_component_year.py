@@ -29,6 +29,9 @@ from django.contrib import admin
 from base.models.enums import learning_component_year_type
 
 
+VOLUME_FOR_UNKNOWN_QUADRIMESTER = -1
+
+
 class LearningComponentYearAdmin(admin.ModelAdmin):
     list_display = ('learning_container_year', 'title', 'acronym', 'type', 'comment')
     fieldsets = ((None, {'fields': ('learning_container_year', 'title', 'acronym',
@@ -71,40 +74,48 @@ class LearningComponentYear(models.Model):
 
     @property
     def volumes(self):
-        if self.hourly_volume_total is None or self.hourly_volume_total == 0:
-            return {'hourly_volume': '?',
+        if not self.hourly_volume_total:
+            return dict.fromkeys(['hourly_volume', 'quadrimester_volume', 'vol_q1', 'vol_q2'], '?')
+
+        if not self.hourly_volume_partial:
+            return {'hourly_volume': self.hourly_volume_total,
                     'quadrimester_volume': '?',
                     'vol_q1': '?',
                     'vol_q2': '?'}
-        else:
-            if self.hourly_volume_partial is None or self.hourly_volume_partial == 0:
-                return {'hourly_volume': self.hourly_volume_total,
-                        'quadrimester_volume': '?',
-                        'vol_q1': '?',
-                        'vol_q2': '?'}
-            else:
-                if self.hourly_volume_partial and self.hourly_volume_partial == -1:
-                    return {'hourly_volume': self.hourly_volume_total,
-                            'quadrimester_volume': 'Q1|2',
-                            'vol_q1': '({})'.format(self.hourly_volume_total),
-                            'vol_q2': '({})'.format(self.hourly_volume_total)}
-                else:
-                    if self.hourly_volume_partial and self.hourly_volume_partial != -1:
-                        vol_q2 = self.hourly_volume_total - self.hourly_volume_partial
-                        if vol_q2 == 0:
-                            vol_q2 = '-'
 
-                        if self.hourly_volume_partial == self.hourly_volume_total:
-                            q_n = 'Q1'
-                        else:
-                            if self.hourly_volume_partial == 0:
-                                q_n = 'Q2'
-                            else:
-                                q_n = 'Q1&2'
-                        return {'hourly_volume': self.hourly_volume_total,
-                                'quadrimester_volume': q_n,
-                                'vol_q1': self.hourly_volume_partial,
-                                'vol_q2': vol_q2}
+        if self.unknown_quadrimester():
+            return {'hourly_volume': self.hourly_volume_total,
+                    'quadrimester_volume': 'Q1|2',
+                    'vol_q1': '({})'.format(self.hourly_volume_total),
+                    'vol_q2': '({})'.format(self.hourly_volume_total)}
+
+        return {'hourly_volume': self.hourly_volume_partial,
+                'quadrimester_volume': self.format_nominal_quadrimester(),
+                'vol_q1': self.hourly_volume_partial,
+                'vol_q2': self.format_volq2()}
+
+
+    def unknown_quadrimester(self):
+        if self.hourly_volume_partial == VOLUME_FOR_UNKNOWN_QUADRIMESTER:
+            return True
+        return False
+
+
+    def format_nominal_quadrimester(self):
+        if self.hourly_volume_total == self.hourly_volume_partial:
+            return 'Q1'
+        else:
+            if hourly_volume_partial == 0:
+                return 'Q2'
+            else:
+                return 'Q1&2'
+        return None
+
+    def format_volq2(self):
+        vol_q2 = self.hourly_volume_total - self.hourly_volume_partial
+        if vol_q2 == 0:
+            return '-'
+        return vol_q2
 
 
 def find_by_id(learning_component_year_id):
