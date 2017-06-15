@@ -42,9 +42,10 @@
                     <thead>
                         <th>{% trans 'components'%}</th>
                         <th>{% trans 'code'%}</th>
-                        <th>Volume</th>
-                        <th>Vol. q1</th>
-                        <th>Vol. q2</th>
+                        <th>{% trans 'nominal_volume' %}</th>
+                        <th>{% trans 'nominal_quater' %}</th>
+                        <th>Vol. Q1</th>
+                        <th>Vol. Q2</th>
                         <th>{% trans 'planned_classrooms'%}</th>
                     </thead>
                     <tbody>
@@ -60,9 +61,10 @@
                                 {% endif %}
                             </td>
                             <td>/{{ component.learning_component_year.acronym  | default_if_none:'' }}</td>
-                            <td>{{ component.learning_component_year.hourly_volume_total| default_if_none:'0' }}</td>
-                            <td>{{ component.learning_component_year.hourly_volume_partial| default_if_none:'-' }}</td>
-                            <td>{{ component.learning_component_year.hourly_volume_partial_q2 | default_if_none:'-' }}</td>
+                            <td>{{ component.learning_component_year.volumes.hourly_volume}}</td>
+                            <td>{{ component.learning_component_year.volumes.quadrimester_volume}}</td>
+                            <td>{{ component.learning_component_year.volumes.vol_q1}}</td>
+                            <td>{{ component.learning_component_year.volumes.vol_q2}}</td>
                             <td>{{ component.learning_component_year.planned_classes| default_if_none:'0' }}</td>
                         </tr>
                         {% if component.classes %}
