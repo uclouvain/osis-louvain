@@ -36,7 +36,7 @@ class CampusAdmin(SerializableModelAdmin):
 
 class Campus(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     name = models.CharField(max_length=100, blank=True, null=True)
     organization = models.ForeignKey('Organization')
 

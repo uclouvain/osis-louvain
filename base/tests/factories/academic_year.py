@@ -56,6 +56,7 @@ class AcademicYearFactory(DjangoModelFactory):
 class AcademicYearFakerFactory(DjangoModelFactory):
     class Meta:
         model = "base.AcademicYear"
+        django_get_or_create = ('year',)
 
     external_id = factory.Sequence(lambda n: '10000000%02d' % n)
     changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=_get_tzinfo())

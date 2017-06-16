@@ -37,7 +37,7 @@ class StructureAdmin(admin.ModelAdmin):
 
 class Structure(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     acronym = models.CharField(max_length=15)
     title = models.CharField(max_length=255)
     organization = models.ForeignKey('Organization', null=True)
@@ -78,7 +78,10 @@ def find_structures():
 
 
 def find_by_id(structure_id):
-    return Structure.objects.get(pk=structure_id)
+    try:
+        return Structure.objects.get(pk=structure_id)
+    except:
+        return None
 
 
 def search(acronym=None, title=None, type=None):

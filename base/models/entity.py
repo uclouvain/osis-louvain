@@ -26,67 +26,30 @@
 from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from django.utils import timezone
-from base.models.entity_link import EntityLink
-from base.models.entity_version import EntityVersion
 
 
 class EntityAdmin(admin.ModelAdmin):
-    list_display = ('id', 'most_recent_acronym', 'external_id', 'organization')
-    search_fields = ['external_id', 'entityversion__acronym']
-    readonly_fields = ('organization', 'external_id', 'most_recent_acronym', 'find_direct_children', 'find_descendants',
-                       'find_versions')
+    list_display = ('id', 'external_id', 'organization')
+    search_fields = ['external_id', 'entityversion__acronym', 'organization__acronym', 'organization__name']
+    readonly_fields = ('organization', 'external_id')
 
 
 class Entity(models.Model):
-    organization = models.ForeignKey('Organization', null=True)
+    organization = models.ForeignKey('Organization', blank=True, null=True)
     external_id = models.CharField(max_length=255, unique=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
+
+    location = models.CharField(max_length=255, blank=True, null=True)
+    postal_code = models.CharField(max_length=20, blank=True, null=True)
+    city = models.CharField(max_length=255, blank=True, null=True)
+    country = models.CharField(max_length=255, blank=True, null=True)
+    website = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "entities"
 
     def __str__(self):
-        return "{0} ({1} - {2})".format(self.id, self.most_recent_acronym(), self.external_id)
-
-    def _direct_children(self, date=None):
-        if date is None:
-            date = timezone.now()
-
-        return EntityLink.objects.filter(parent=self,
-                                         start_date__lte=date,
-                                         end_date__gte=date
-                                         )
-
-    def find_direct_children(self, date=None):
-        qs = self._direct_children(date).select_related("child")
-        return [entity_link.child for entity_link in qs]
-
-    def count_direct_children(self, date=None):
-        return self._direct_children(date).count()
-
-    def find_descendants(self, date=None):
-        if date is None:
-            date = timezone.now()
-
-        descendants = []
-        if self.count_direct_children(date) > 0:
-            direct_children = self.find_direct_children(date)
-            descendants.extend(direct_children)
-            for child in direct_children:
-                descendants.extend(child.find_descendants(date))
-
-        return descendants
-
-    def most_recent_acronym(self):
-        last_version = EntityVersion.objects.filter(entity=self).order_by('-start_date').first()
-        if last_version:
-            return last_version.acronym
-        return None
-
-    def find_versions(self):
-        versions = EntityVersion.objects.filter(entity=self).order_by('start_date')
-        return versions
+        return "{0} - {1}".format(self.id, self.external_id)
 
 
 def search(**kwargs):
@@ -107,15 +70,13 @@ def search(**kwargs):
 
 def get_by_internal_id(internal_id):
     try:
-        entity = Entity.objects.get(id__exact=internal_id)
+        return Entity.objects.get(id__exact=internal_id)
     except ObjectDoesNotExist:
         return None
-    return entity
 
 
 def get_by_external_id(external_id):
     try:
-        entity = Entity.objects.get(external_id__exact=external_id)
+        return Entity.objects.get(external_id__exact=external_id)
     except ObjectDoesNotExist:
         return None
-    return entity

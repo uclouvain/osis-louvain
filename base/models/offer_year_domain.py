@@ -37,7 +37,7 @@ class OfferYearDomainAdmin(SerializableModelAdmin):
 
 class OfferYearDomain(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     domain = models.ForeignKey('reference.Domain', blank=True, null=True)
     offer_year = models.ForeignKey('base.OfferYear', blank=True, null=True)
 

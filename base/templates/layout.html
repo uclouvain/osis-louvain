@@ -26,6 +26,10 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
+
+{% get_current_language as LANGUAGE_CODE %}
+{% get_available_languages as LANGUAGES %}
+
 <html lang="en">
 <head>
     {% analytical_head_top %}
@@ -89,15 +93,15 @@
                                     class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 {% if perms.base.can_access_offer %}
-                                <li><a href="{% url 'offers' %}" id="lnk_dropdown_offers">{% trans 'offers' %}</a></li>
+                                    <li><a href="{% url 'offers' %}" id="lnk_dropdown_offers">{% trans 'offers' %}</a></li>
                                 {% endif %}
                                 {% if perms.base.can_access_learningunit %}
-                                <li><a href="{% url 'learning_units' %}"
-                                       id="lnk_dropdown_learning_units">{% trans 'learning_units' %}</a></li>
+                                    <li><a href="{% url 'learning_units' %}"
+                                           id="lnk_dropdown_learning_units">{% trans 'learning_units' %}</a></li>
                                 {% endif %}
                                 {%  if perms.base.can_access_academicyear %}
-                                <li><a href="{% url 'academic_year' %}"
-                                       id="lnk_dropdown_academic_year">{% trans 'academic_year' %}</a></li>
+                                    <li><a href="{% url 'academic_year' %}"
+                                           id="lnk_dropdown_academic_year">{% trans 'academic_year' %}</a></li>
                                 {% endif %}
                             </ul>
                         </li>
@@ -110,12 +114,12 @@
                                     class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 {% if 'assessments' in installed_apps and perms.base.can_access_evaluation %}
-                                <li><a href="{% url 'assessments' %}"
-                                       id="lnk_dropdown_evaluations">{% trans 'evaluations' %}</a></li>
+                                    <li><a href="{% url 'assessments' %}"
+                                           id="lnk_dropdown_evaluations">{% trans 'evaluations' %}</a></li>
                                 {% endif %}
                                 {% if 'internship' in installed_apps and perms.internship.can_access_internship %}
-                                <li><a href="{% url 'internship' %}"
-                                       id="lnk_dropdown_internships">{% trans 'internships' %}</a></li>
+                                    <li><a href="{% url 'internship' %}"
+                                           id="lnk_dropdown_internships">{% trans 'internships' %}</a></li>
                                 {% endif %}
                             </ul>
                         </li>
@@ -128,16 +132,13 @@
                                     class="caret"></span></a>
                             <ul class="dropdown-menu">
                                 {% if perms.base.can_access_organization %}
-                                <li><a href="{% url 'organizations' %}"
-                                       id="lnk_organizations">{% trans 'organizations' %}</a></li>
+                                    <li><a href="{% url 'organizations' %}" id="lnk_organizations">{% trans 'organizations' %}</a></li>
                                 {% endif %}
                                 {% if perms.base.can_access_structure  %}
-                                    <li><a href="{% url 'structures' %}"
-                                           id="lnk_dropdown_entities">{% trans 'entities' %}</a></li>
+                                    <li><a href="{% url 'entities' %}" id="lnk_dropdown_entities">{% trans 'entities' %}</a></li>
                                 {% endif %}
                                 {% if perms.base.is_entity_manager %}
-                                <li><a href="{% url 'academic_actors' %}"
-                                       id="lnk_dropdown_academic actors">{% trans 'academic_actors' %}</a></li>
+                                    <li><a href="{% url 'academic_actors' %}" id="lnk_dropdown_academic actors">{% trans 'academic_actors' %}</a></li>
                                 {% endif %}
                             </ul>
                         </li>
@@ -151,6 +152,20 @@
                                     <span class="glyphicon glyphicon-tower" aria-hidden="true"></span>
                                     {% trans 'administration' %}</a></li>
                         {% endif %}
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
+                               aria-haspopup="true"
+                               aria-expanded="false"
+                               id="lnk_my_dropdow_language">{{ LANGUAGE_CODE }}<span
+                                    class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                {% for lang in LANGUAGES%}
+                                    {% if lang.0 != LANGUAGE_CODE%}
+                                        <li><a href="{% url 'lang_edit' lang.0 %}">{{ lang.0 }}</a></li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        </li>
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
                                aria-expanded="false" id="bt_user">
@@ -233,7 +248,7 @@
                    id="lnk_osis_source_code">{% trans 'source_code' %}
                 </a></p>
 
-            <p class="navbar-text pull-right"><span class="glyphicon glyphicon-copyright-mark"></span> {% now "Y" %} <a
+            <p class="navbar-text pull-right"><span class="glyphicon glyphicon-copyright-mark"></span>  {% now "Y" %}  <a
                     href="http://www.uclouvain.be" target="_blank" id="lnk_ucl">Université catholique de Louvain</a></p>
         </div>
     </nav>

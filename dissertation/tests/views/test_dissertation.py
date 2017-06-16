@@ -50,10 +50,10 @@ class DissertationViewTestCase(TestCase):
         offer_proposition = OfferPropositionFactory(offer=offer)
         FacultyAdviserFactory(adviser=self.manager, offer=offer)
 
-        roles = ['PROMOTEUR', 'CO_PROMOTEUR', 'READER', 'PROMOTEUR', 'ACCOMPANIST']
-        status = ['DRAFT', 'COM_SUBMIT', 'EVA_SUBMIT', 'TO_RECEIVE', 'DIR_SUBMIT']
+        roles = ['PROMOTEUR', 'CO_PROMOTEUR', 'READER', 'PROMOTEUR', 'ACCOMPANIST', 'PRESIDENT']
+        status = ['DRAFT', 'COM_SUBMIT', 'EVA_SUBMIT', 'TO_RECEIVE', 'DIR_SUBMIT', 'DIR_SUBMIT']
 
-        for x in range(0, 5):
+        for x in range(0, 6):
             proposition_dissertation = PropositionDissertationFactory(author=self.teacher,
                                                                       creator=a_person_teacher,
                                                                       title='Proposition {}'.format(x)
@@ -79,12 +79,13 @@ class DissertationViewTestCase(TestCase):
         self.assertEqual(response.context[-1]['adviser_list_dissertations_copro'].count(), 1)
         self.assertEqual(response.context[-1]['adviser_list_dissertations_reader'].count(), 1)
         self.assertEqual(response.context[-1]['adviser_list_dissertations_accompanist'].count(), 1)
+        self.assertEqual(response.context[-1]['adviser_list_dissertations_president'].count(), 1)
 
     def test_get_dissertations_list_for_manager(self):
         self.client.force_login(self.manager.person.user)
         url = reverse('manager_dissertations_list')
         response = self.client.get(url)
-        self.assertEqual(response.context[-1]['dissertations'].count(), 5)
+        self.assertEqual(response.context[-1]['dissertations'].count(), 6)
 
     def test_search_dissertations_for_manager(self):
         self.client.force_login(self.manager.person.user)
@@ -104,16 +105,16 @@ class DissertationViewTestCase(TestCase):
 
         response = self.client.get(url, data={"search": "Dissertation"})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context[-1]['dissertations'].count(), 5)
+        self.assertEqual(response.context[-1]['dissertations'].count(), 6)
 
         response = self.client.get(url, data={"search": "test_offer"})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context[-1]['dissertations'].count(), 5)
+        self.assertEqual(response.context[-1]['dissertations'].count(), 6)
 
         response = self.client.get(url, data={"search": "Durant"})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context[-1]['dissertations'].count(), 5)
+        self.assertEqual(response.context[-1]['dissertations'].count(), 6)
 
         response = self.client.get(url, data={"search": "Dupont"})
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.context[-1]['dissertations'].count(), 5)
+        self.assertEqual(response.context[-1]['dissertations'].count(), 6)

@@ -96,6 +96,7 @@ urlpatterns = [
             url(r'^(?P<mandate_id>\d+)/save/$', mandate.mandate_save, name='mandate_save'),
             url(r'^load/$', mandate.load_mandates, name='load_mandates'),
             url(r'^upload/$', import_xls_file_data.upload_mandates_file, name='upload_mandates_file'),
+            url(r'^export/$', mandate.export_mandates, name='export_mandates'),
         ])),
         url(r'^messages/', include([
             url(r'^history/$', messages.show_history, name='messages_history'),

@@ -35,7 +35,7 @@ class OfferAdmin(SerializableModelAdmin):
 
 class Offer(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     title = models.CharField(max_length=255)
 
     def __str__(self):

@@ -325,7 +325,7 @@ msgstr "Visualiser/charger les notes pour le cours"
 msgid "display_tutors"
 msgstr "Afficher tous les enseignants pour ce cours"
 
-msgid "doctoral_commission"
+msgid "DOCTORAL_COMMISSION"
 msgstr "Commision doctorale"
 
 msgid "documentation"
@@ -400,7 +400,7 @@ msgstr "Secrétaire du jury"
 msgid "execute"
 msgstr "Exécuter"
 
-msgid "faculty"
+msgid "FACULTY"
 msgstr "Faculté"
 
 msgid "female"
@@ -502,7 +502,7 @@ msgstr "Injecter"
 msgid "inject_xls_file"
 msgstr "Injecter fichier excel"
 
-msgid "institute"
+msgid "INSTITUTE"
 msgstr "Institut"
 
 msgid "institution"
@@ -582,7 +582,7 @@ msgid "lnk_message_history_read_title"
 msgstr "Afficher le message"
 
 msgid "location"
-msgstr "Rue et numéro"
+msgstr "Localité"
 
 msgid "log-in"
 msgstr "Log-in"
@@ -794,8 +794,8 @@ msgstr "Seules les notes soumises peuvent être double encodées"
 msgid "open"
 msgstr "Ouvert"
 
-msgid "organization"
-msgstr "Organisation"
+msgid "campus"
+msgstr "Campus"
 
 msgid "organization_address"
 msgstr "Adresse de l'organisation"
@@ -845,7 +845,7 @@ msgstr "Plain et HTML"
 msgid "please_enable_javascript"
 msgstr "Veuillez <a href='http://enable-javascript.com/fr/' target='_blank'>activer le JavaScript</a> pour utiliser l'application."
 
-msgid "pole"
+msgid "POLE"
 msgstr "Pole"
 
 msgid "postal_code"
@@ -999,7 +999,7 @@ msgstr "Rechercher une entité"
 msgid "search_for_an_organization"
 msgstr "Recherche d'organisations"
 
-msgid "sector"
+msgid "SECTOR"
 msgstr "Secteur"
 
 msgid "select"
@@ -1356,10 +1356,34 @@ msgid "COURSE"
 msgstr "Cours"
 
 msgid "MASTER_THESIS"
+msgstr "Thèse"
+
+msgid "DISSERTATION"
 msgstr "Mémoire"
 
 msgid "INTERNSHIP"
 msgstr "Stage"
+
+msgid "OTHER_COLLECTIVE"
+msgstr "Autre collectif"
+
+msgid "OTHER_INDIVIDUAL"
+msgstr "Autre individuel"
+
+msgid "EXTERNAL"
+msgstr "Externe"
+
+msgid "TEACHING_INTERNSHIP"
+msgstr "Stage d'enseignement"
+
+msgid "CLINICAL_INTERNSHIP"
+msgstr "Stage clinique"
+
+msgid "PROFESSIONAL_INTERNSHIP"
+msgstr "Stage socio-professionnel"
+
+msgid "RESEARCH_INTERNSHIP"
+msgstr "Stage de recherche"
 
 msgid "LU_ERRORS_REQUIRED"
 msgstr "Ce champ est requis."
@@ -1368,7 +1392,7 @@ msgid "LU_ERRORS_INVALID"
 msgstr "'Entrez une valeur valide."
 
 msgid "LU_ERRORS_INVALID_SEARCH"
-msgstr "Recherche invalide - Veuillez ajouter des informations avant d'exécuter une recherche."
+msgstr "Recherche invalide - Veuillez remplir mininum 2 filtres lors de vos recherches."
 
 msgid "LU_ERRORS_ACADEMIC_YEAR_REQUIRED"
 msgstr "Veuillez préciser une année académique."
@@ -1547,3 +1571,13 @@ msgstr "Cours Magistraux"
 
 msgid "PRACTICAL_EXERCISES"
 msgstr "Travaux pratiques"
+
+msgid "SCHOOL"
+msgstr "Ecole"
+
+msgid "PLATFORM"
+msgstr "Plateforme"
+
+msgid "LOGISTICS_ENTITY"
+msgstr "Entitée logistique"
+

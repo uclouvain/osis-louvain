@@ -24,10 +24,10 @@
 #
 ##############################################################################
 import json
-from django.http import HttpResponse
+
 from django.contrib.auth.decorators import login_required, permission_required
 from base import models as mdl
-from base.models.enums import structure_type
+from base.models.enums import structure_type, entity_type
 from . import layout
 
 
@@ -44,58 +44,38 @@ def mandates(request):
 
 
 @login_required
-def structures(request):
-    return layout.render(request, "structures.html", {'init': "1",
-                                                      'types': structure_type.TYPES})
-
-
-@login_required
-def structures_search(request):
-    struct_type = None
-    if request.GET['type_choices']:
-        struct_type = request.GET['type_choices']  #otherwise type is a blank
-    entities = mdl.structure.search(acronym=request.GET['acronym'],
-                                    title=request.GET['title'],
-                                    type=struct_type)
-
-    return layout.render(request, "structures.html", {'entities': entities,
-                                                      'types': structure_type.TYPES})
-
-
-@login_required
-def structure_read(request, structure_id):
-    structure = mdl.structure.find_by_id(structure_id)
-    offers_years = mdl.offer_year.find_by_structure(structure)
-    return layout.render(request, "structure.html", {'structure': structure,
-                                                     'offers_years': offers_years})
-
-
-@login_required
-def structure_diagram(request, structure_id):
-    structure = mdl.structure.find_by_id(structure_id)
-    return layout.render(request, "structure_organogram.html", {'structure': structure,
-                                                                'structure_as_json': json.dumps(structure.serializable_object())})
-
-
-@login_required
-def structure_address(request, structure_id):
-    structure = mdl.structure.find_by_id(structure_id)
-    struct_address = mdl.structure_address.find_structure_address(structure)
-    if struct_address:
-        data = json.dumps({'entity': u'%s - %s' % (structure.acronym, structure.title),
-                           'location': struct_address.location,
-                           'city': struct_address.city,
-                           'postal_code': struct_address.postal_code,
-                           'country': struct_address.country.id,
-                           'phone': struct_address.phone,
-                           'fax': struct_address.fax,
-                           'email': struct_address.email})
-    else:
-        data = json.dumps({'entity': u'%s - %s' % (structure.acronym, structure.title)})
-    return HttpResponse(data, content_type='application/json')
-
-
-@login_required
 def academic_actors(request):
     return layout.render(request, "academic_actors.html", {})
 
+
+@login_required
+def entities(request):
+    return layout.render(request, "entities.html", {'init': "1",
+                                                    'types': entity_type.ENTITY_TYPES})
+
+
+@login_required
+def entities_search(request):
+    entities_version = mdl.entity_version.search_entities(acronym=request.GET.get('acronym'),
+                                                          title=request.GET.get('title'),
+                                                          type=request.GET.get('type_choices'))
+    return layout.render(request, "entities.html", {'entities_version': entities_version,
+                                                    'types': structure_type.TYPES})
+
+
+@login_required
+def entity_read(request, entity_version_id):
+    entity_version = mdl.entity_version.find_by_id(entity_version_id)
+    entity_parent = entity_version.get_parent_version()
+    if entity_parent:
+        return layout.render(request, "entity.html", {'entity_version': entity_version,
+                                                      'entity_parent': entity_parent})
+    else:
+        return layout.render(request, "entity.html", {'entity_version': entity_version})
+
+
+@login_required
+def entity_diagram(request, entity_version_id):
+    entity_version = mdl.entity_version.find_by_id(entity_version_id)
+    return layout.render(request, "entity_organogram.html", {'entity_version': entity_version,
+                                                             'entities_version_as_json': json.dumps(entity_version.serializable_object())})

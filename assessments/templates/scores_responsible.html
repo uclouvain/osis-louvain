@@ -66,68 +66,87 @@
                 </div>
             </div>
         </form>
-        <form method="get" action="{% url 'scores_responsible_management'%}">
-            {% if dict_attribution|length == 0 and init == "1" %}
-                <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
-            {% endif %}
-            <div {% if dict_attribution|length > 0 %}style="visibility:visible;display:block;"{%else%}style="visibility:hidden;display:none;"{% endif %}>
-                <table class="table table-hover">
-                    <thead>
+        {% if dict_attribution|length == 0 and init == "1" %}
+            <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
+        {% endif %}
+        <div {% if dict_attribution|length > 0 %}style="visibility:visible;display:block;"{%else%}style="visibility:hidden;display:none;"{% endif %}>
+            <table class="table table-hover" id="tb_responsibles">
+                <thead>
+                    <tr>
+                        <th>{% trans 'entity' %}</th>
+                        <th>{% trans 'course_code' %}</th>
+                        <th>{% trans 'learning_unit_title' %}</th>
+                        <th>{% trans 'tutor' %}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for key, value_list in dict_attribution.items %}
                         <tr>
-                            <th>{% trans 'entity' %}</th>
-                            <th>{% trans 'course_code' %}</th>
-                            <th>{% trans 'learning_unit_title' %}</th>
-                            <th>{% trans 'tutor' %}</th>
-                            <th></th>
+                            <td>{{ value_list.1 }}</td>
+                            <td>{{ value_list.2 }}</td>
+                            <td>{{ value_list.3 }}</td>
+                            <td>
+                                {% if value_list.4 %}
+                                    {% for value in value_list.4 %}
+                                        {% if forloop.first %}
+                                            <p {% if value.1 == True %} style="font-weight:bold;" {% endif %}>
+                                                - {{ value.0 }}
+                                                {% if value_list.4|length > 1 %}
+                                                    <a role="button" data-toggle="collapse" data-target="#list_{{ value_list.2 }}"
+                                                       aria-expanded="false"
+                                                       aria-controls="tutors_by_course"
+                                                       title="{% trans 'display_tutors' %}">
+                                                        <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
+                                                    </a>
+                                                {% endif %}
+                                            </p>
+                                            <div id="list_{{ value_list.2 }}" class="panel-collapse collapse">
+                                        {% else %}
+                                            <p {% if value.1 == True %} style="font-weight:bold;" {% endif %}>
+                                                - {{ value.0 }}
+                                            </p>
+                                        {% endif %}
+                                    {% endfor %}
+                                    </div>
+                                {% else %}
+                                    {% trans 'without_attribution' %}
+                                {% endif %}
+                            </td>
+                            <td>
+                                <a href="{% url 'scores_responsible_management'%}?course_code={{ course_code }}&learning_unit_title={{ learning_unit_title }}&tutor={{ tutor }}&scores_responsible={{ scores_responsible }}&learning_unit_year=learning_unit_year_{{ value_list.0 }}">
+                                    <span class="glyphicon glyphicon-edit"></span>
+                                </a>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        {% for key, value_list in dict_attribution.items %}
-                            <tr>
-                                <td>{{ value_list.1 }}</td>
-                                <td>{{ value_list.2 }}</td>
-                                <td>{{ value_list.3 }}</td>
-                                <td>
-                                    {% if value_list.4 %}
-                                        {% for value in value_list.4 %}
-                                            {% if forloop.first %}
-                                                <p {% if value.1 == True %} style="font-weight:bold;" {% endif %}>
-                                                    - {{ value.0 }}
-                                                    {% if value_list.4|length > 1 %}
-                                                        <a role="button" data-toggle="collapse" data-target="#list_{{ value_list.2 }}"
-                                                           aria-expanded="false"
-                                                           aria-controls="tutors_by_course"
-                                                           title="{% trans 'display_tutors' %}">
-                                                            <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
-                                                        </a>
-                                                    {% endif %}
-                                                </p>
-                                                <div id="list_{{ value_list.2 }}" class="panel-collapse collapse">
-                                            {% else %}
-                                                <p {% if value.1 == True %} style="font-weight:bold;" {% endif %}>
-                                                    - {{ value.0 }}
-                                                </p>
-                                            {% endif %}
-                                        {% endfor %}
-                                        </div>
-                                    {% else %}
-                                        {% trans 'without_attribution' %}
-                                    {% endif %}
-                                </td>
-                                <td>
-                                    <button type="submit" id="bt_submit_edit" class="btn btn-default pull-right" role="button"
-                                        title="{% trans 'edit' %}" name="learning_unit_year" value="learning_unit_year_{{ value_list.0 }}"><span class="glyphicon glyphicon-edit"></span></button>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        <input type="hidden" id="hdn_course_code" name="course_code" value="{{ course_code }}">
-                        <input type="hidden" id="hdn_learning_unit_title" name="learning_unit_title" value="{{ learning_unit_title }}">
-                        <input type="hidden" id="hdn_tutor" name="tutor" value="{{ tutor }}">
-                        <input type="hidden" id="hdn_scores_responsible" name="scores_responsible" value="{{ scores_responsible }}">
-                    </tbody>
-                </table>
-            </div>
-        </form>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
+{% endblock %}
+{% block script %}
+<script>
+    $(document).ready(function()
+    {
+        $('#tb_responsibles').DataTable(
+            {
+                stateSave: true,
+                "aoColumnDefs": [
+                    { 'bSortable': false, 'aTargets': [ 4 ] }
+                ],
+                "paging" : false,
+                "ordering" : true,
+                "info"  : false,
+                "searching" : false,
+                "language":
+                {"oAria":{
+                    "sSortAscending":  "{% trans 'datatable_sortascending'%}",
+                    "sSortDescending": "{% trans 'datatable_sortdescending'%}",
+                    }
+                }
+            })
+    ;});
+</script>
 {% endblock %}

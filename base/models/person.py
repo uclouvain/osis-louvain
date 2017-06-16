@@ -52,7 +52,7 @@ class Person(SerializableModel):
         ('U', _('unknown')))
 
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
     global_id = models.CharField(max_length=10, blank=True, null=True, db_index=True)
     gender = models.CharField(max_length=1, blank=True, null=True, choices=GENDER_CHOICES, default='U')

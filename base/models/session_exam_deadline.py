@@ -40,7 +40,7 @@ class SessionExamDeadlineAdmin(admin.ModelAdmin):
 
 class SessionExamDeadline(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     deadline = models.DateField()
     deadline_tutor = models.IntegerField(null=True, blank=True)  # Delta day(s)
     number_session = models.IntegerField(choices=number_session.NUMBERS_SESSION)

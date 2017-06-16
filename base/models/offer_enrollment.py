@@ -38,7 +38,7 @@ class OfferEnrollmentAdmin(SerializableModelAdmin):
 
 class OfferEnrollment(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     date_enrollment = models.DateField()
     offer_year = models.ForeignKey('OfferYear')
     student = models.ForeignKey('Student')

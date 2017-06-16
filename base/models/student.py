@@ -38,7 +38,7 @@ class StudentAdmin(SerializableModelAdmin):
 
 class Student(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     registration_id = models.CharField(max_length=10, unique=True, db_index=True)
     person = models.ForeignKey('Person')
 
@@ -86,7 +86,8 @@ def find_by_person(a_person):
 
 
 def find_by_offer(offers):
-    return Student.objects.filter(offerenrollment__offer_year__offer__in=offers)
+    return Student.objects.filter(offerenrollment__offer_year__offer__in=offers)\
+                          .order_by('person__last_name', 'person__first_name').distinct()
 
 
 def find_by_offer_year(offer_y):

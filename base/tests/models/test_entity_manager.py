@@ -40,7 +40,6 @@ class EntityManagerTest(TestCase):
         self.user = User.objects.create_user("username", "test@test.com", "passtest",
                                              first_name='first_name', last_name='last_name')
         self.user.save()
-        add_permission(self.user, "is_entity_manager")
 
     def test_no_entity_manager_for_the_user(self):
         self.assertIsNone(entity_manager.find_entity_manager_by_user(self.user))

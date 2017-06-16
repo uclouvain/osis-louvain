@@ -36,7 +36,7 @@ class ExternalOfferAdmin(SerializableModelAdmin):
 
 class ExternalOffer(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     name = models.CharField(max_length=150, unique=True)
     adhoc = models.BooleanField(default=True)  # If False == Official/validated, if True == Not Official/not validated
     domain = models.ForeignKey('reference.Domain', on_delete=models.CASCADE)

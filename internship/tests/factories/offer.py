@@ -42,4 +42,4 @@ class OfferFactory(factory.django.DjangoModelFactory):
     title = factory.Faker('sentence', nb_words=6, variable_nb_words=True)
     maximum_enrollments = factory.Faker('random_int', min=3, max=8)
     master = factory.Faker('name')
-    selectable = factory.Faker('boolean', chance_of_getting_true=50)
+    selectable = factory.Faker('random_element', elements=(True, False))

@@ -60,7 +60,7 @@ class ExamEnrollmentAdmin(admin.ModelAdmin):
 
 class ExamEnrollment(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     score_draft = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
                                       validators=[MinValueValidator(0,message="scores_must_be_between_0_and_20"),
                                                   MaxValueValidator(20, message="scores_must_be_between_0_and_20")])

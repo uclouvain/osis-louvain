@@ -1,6 +1,6 @@
 ##############################################################################
 #
-# OSIS stands for Open Student Information System. It's an application
+#    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
 #    such as universities, faculties, institutes and professional schools.
 #    The core business involves the administration of students, teachers,
@@ -24,16 +24,19 @@
 #
 ##############################################################################
 import factory
-from base.tests.factories.entity import EntityFactory
+from django.utils import timezone
 
-
-class EntityAddressFactory(factory.DjangoModelFactory):
+class SettingsFactory(factory.DjangoModelFactory):
     class Meta:
-        model = 'base.EntityAddress'
+        model = 'assistant.Settings'
 
-    entity = factory.SubFactory(EntityFactory)
-    label = factory.Faker('text', max_nb_chars=20)
-    location = factory.Faker('street_address')
-    postal_code = factory.Faker('zipcode')
-    city = factory.Faker('city')
-    country = factory.Faker('country')
+    starting_date = factory.fuzzy.FuzzyDate((timezone.now() - timezone.timedelta(days=10)).date(),
+                                            (timezone.now() - timezone.timedelta(days=5)).date())
+    ending_date = factory.fuzzy.FuzzyDate((timezone.now() + timezone.timedelta(days=90)).date(),
+                                          (timezone.now() + timezone.timedelta(days=100)).date())
+    assistants_starting_date = factory.fuzzy.FuzzyDate((timezone.now() - timezone.timedelta(days=10)).date(),
+                                                       (timezone.now() - timezone.timedelta(days=5)).date())
+    assistants_ending_date = factory.fuzzy.FuzzyDate((timezone.now() + timezone.timedelta(days=90)).date(),
+                                          (timezone.now() + timezone.timedelta(days=100)).date())
+
+

@@ -44,17 +44,17 @@
         </style>
     </head>
     <body>
-    {% if structure%}
+    {% if entity_version%}
         <div class="tree" id="organogram" style="width:3000px; margin-top:-80px;"></div>
         <br><br>
         <script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
         <script>
-            function show_nodes(super_node, structure) {
+            function show_nodes(super_node, entity_version) {
                 var sub_nodes =$("<ul></ul>");
-                var children = structure.children;
+                var children = entity_version.children;
                 for(var i = 0, len = children.length ;i < len; i++) {
                     var child = children[i];
-                    var url="/structures/" + child.id;
+                    var url="/entities/" + child.id;
                     if(Array.isArray(children) && children.length > 0) {
                        var sub_nodes = $("<ul class='vertical'></ul>");
 
@@ -72,21 +72,21 @@
                 }
             }
 
-            function show_organogram(structure_as_json) {
+            function show_organogram(entities_version_as_json) {
                 var sub_nodes = $("<ul></ul>");
-                var json_data = JSON.parse(structure_as_json);
+                var json_data = JSON.parse(entities_version_as_json);
                 show_nodes(sub_nodes, json_data);
-                var escaped_structure = "{{ structure }}".replace(/&#39;/g, "'");
+                var escaped_structure = "{{ entity_version.acronym }} - {{ entity_version.title }}";
                 $('#organogram').append($("<ul></ul>")
                                           .append($("<li></li>")
-                                             .append($("<a></a>").attr("href","{% url 'structure_read' structure.id %}")
+                                             .append($("<a></a>").attr("href","{% url 'entity_read' entity_version.id %}")
                                                                  .attr("target","_parent")
                                                                  .text(escaped_structure))
                                              .append(sub_nodes)));
             }
 
             $(document).ready(function() {
-                show_organogram('{{structure_as_json | safe}}');
+                show_organogram('{{entities_version_as_json | safe}}');
             });
         </script>
     {% endif %}

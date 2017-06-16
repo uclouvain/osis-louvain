@@ -25,7 +25,6 @@
 ##############################################################################
 from django.test import TestCase, RequestFactory
 from django.core.urlresolvers import reverse
-from django.utils import timezone
 from django.contrib.auth.models import User
 from base.models.person import Person
 from base.models.academic_year import AcademicYear
@@ -34,7 +33,7 @@ from datetime import date
 from assistant.views.assistant_form import form_part4_edit
 from assistant.models.academic_assistant import AcademicAssistant
 from assistant.models.assistant_mandate import AssistantMandate
-from assistant.models.settings import Settings
+from assistant.tests.factories.settings import SettingsFactory
 
 
 class AssistantFormViewTestCase(TestCase):
@@ -63,9 +62,7 @@ class AssistantFormViewTestCase(TestCase):
                                                                  state='TRTS'
                                                                  )
         self.assistant_mandate.save()
-        self.settings = Settings.objects.create(starting_date=timezone.now() - timezone.timedelta(days=100),
-                                                ending_date=timezone.now() + timezone.timedelta(days=100))
-        self.settings.save()
+        self.settings = SettingsFactory()
 
     def test_assistant_form_part4_edit_view_basic(self):
         request = self.factory.get(reverse('form_part4_edit', kwargs={'mandate_id': self.assistant_mandate.id}))

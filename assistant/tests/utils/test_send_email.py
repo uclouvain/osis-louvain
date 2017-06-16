@@ -34,11 +34,10 @@ from assistant.models.reviewer import Reviewer
 from base.models.academic_year import AcademicYear
 from base.models import academic_year
 from datetime import date
-from django.utils import timezone
 from osis_common.models import message_template
 from unittest.mock import patch
 from django.core.mail.message import EmailMultiAlternatives
-from assistant.models.settings import Settings
+from assistant.tests.factories.settings import SettingsFactory
 
 
 class SendEmailTestCase(TestCase):
@@ -79,9 +78,7 @@ class SendEmailTestCase(TestCase):
         self.phd_supervisor.save()
         self.academic_assistant.supervisor = self.phd_supervisor
         self.academic_assistant.save()
-        self.settings = Settings.objects.create(starting_date=timezone.now(),
-                                                ending_date=timezone.now() + timezone.timedelta(days=100))
-        self.settings.save()
+        self.settings = SettingsFactory()
         self.user = User.objects.create_user(
             username='reviewer', email='laurent.buset@uclouvain.be', password='reviewer'
         )

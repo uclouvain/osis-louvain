@@ -23,10 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 import json
-from base.tests.factories.entity import EntityFactory
-from base.tests.factories.organization import OrganizationFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.user import UserFactory
 from django.core.urlresolvers import reverse
 from rest_framework import status
@@ -39,35 +37,31 @@ from rest_framework.test import APITestCase
 class EntityViewTestCase(APITestCase):
 
     def setUp(self):
-        self.entities = [EntityFactory() for x in range(3)]
         user = UserFactory()
         token = Token.objects.create(user=user)
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
 
     def test_create_valid_entity(self):
-        organization = OrganizationFactory()
-        parent = EntityFactory()
+        entity_version = EntityVersionFactory.build()
         valid_entity = {
-            'organization': organization.id,
-            'external_id': "01234567",
-            'link_to_parent': [
-                {
-                    "parent": parent.id,
-                    "start_date": datetime.date(2015, 1, 1).isoformat(),
-                    "end_date": datetime.date(2015, 12, 31).isoformat()
-                },
-            ],
-            'entityaddress_set': [],
+            'organization': entity_version.entity.organization.id,
+            'external_id': entity_version.entity.external_id,
             'entityversion_set': [
                 {
-                    "title": "test",
-                    "acronym": "TST",
-                    "entity_type": "FACULTY",
-                    "start_date": datetime.date(2015, 1, 1).isoformat(),
-                    "end_date": datetime.date(2015, 12, 31).isoformat()
+                    "title": entity_version.title,
+                    "acronym": entity_version.acronym,
+                    "entity_type": entity_version.entity_type,
+                    "parent": entity_version.parent.id,
+                    "start_date": entity_version.start_date,
+                    "end_date": entity_version.end_date
                 }
-            ]
+            ],
+            'location': entity_version.entity.location,
+            'postal_code': entity_version.entity.postal_code,
+            'city': entity_version.entity.city,
+            'country': entity_version.entity.country,
+            'website': entity_version.entity.website
         }
         response = self.client.post(
             reverse('post_entities'),

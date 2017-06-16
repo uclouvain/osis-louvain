@@ -84,7 +84,7 @@
                     <button type="button" class="btn btn-link btn-lg" title="{% trans 'edit'%}" id="bt_mandate_edit">
                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                     </button>{% trans 'edit'%}</a>
-            {% elif mandate.state == "DONE" %}
+            {% elif mandate.state == "DONE"  and can_see_file %}
                 <a href="{% url 'assistant_mandate_reviews' mandate.id %}">
                 <button type="button" class="btn btn-link btn-lg" title="{% trans 'view'%}" id="bt_view_view">
                 <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>

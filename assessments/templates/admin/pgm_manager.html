@@ -380,8 +380,9 @@
                     html_to_append += "<label>"+ acronym_on[i] +"</label>";
                 }
             }
+            $('#pnl_pgm_on').css('visibility', 'visible').css('display', 'block');
         }else{
-            html_to_append += "<label>-</label>"
+            $('#pnl_pgm_on').css('visibility', 'hidden').css('display', 'none');
         }
         $("#pnl_pgm_on").append(html_to_append)
     }
@@ -456,7 +457,7 @@
             });
 
     }
-
+    // Written this way because it's a button created dynamically.
     $(function() {
         $(document).on("click", "button[id^='btn_remove_manager_modal_']", function(e) {
             var id = $(this).attr("id");
@@ -482,12 +483,9 @@
                         //--------------------------------------------------------------
                         $('#pnl_remove_manager_modal').modal('show');
                     });
-
-
             });
         });
     });
-
 </script>
 {% endblock %}
 

@@ -32,6 +32,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from base import models as mdl
 from attribution import models as mdl_attr
+from base.models.enums import learning_container_year_types
 from cms import models as mdl_cms
 from cms.enums import entity_name
 from base.forms.learning_units import LearningUnitYearForm
@@ -70,7 +71,10 @@ def learning_unit_identification(request, learning_unit_year_id):
     context = _get_common_context_learning_unit_year(learning_unit_year_id)
     learning_unit_year = context['learning_unit_year']
     context['learning_container_year_partims'] = _get_partims_related(learning_unit_year)
+    context['organization'] = _get_organization_from_learning_unit_year(learning_unit_year)
+    context['campus'] = _get_campus_from_learning_unit_year(learning_unit_year)
     context['experimental_phase'] = True
+    context['show_subtype'] = _show_subtype(learning_unit_year)
     return layout.render(request, "learning_unit/identification.html", context)
 
 
@@ -84,11 +88,11 @@ def learning_unit_formations(request, learning_unit_year_id):
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def learning_unit_components(request, learning_unit_year_id):
-    learning_unit_year = mdl.learning_unit_year.find_by_id(learning_unit_year_id)
-    components = get_components(learning_unit_year.learning_container_year)
-    tab_active = 'components'
-    experimental_phase = True
-    return layout.render(request, "learning_unit/components.html", locals())
+    context = _get_common_context_learning_unit_year(learning_unit_year_id)
+    context['components'] = get_components(context['learning_unit_year'].learning_container_year)
+    context['tab_active'] = 'components'
+    context['experimental_phase'] = True
+    return layout.render(request, "learning_unit/components.html", context)
 
 
 @login_required
@@ -180,7 +184,8 @@ def _get_common_context_learning_unit_year(learning_unit_year_id):
     learning_unit_year = mdl.learning_unit_year.find_by_id(learning_unit_year_id)
 
     context = {
-        'learning_unit_year': learning_unit_year
+        'learning_unit_year': learning_unit_year,
+        'current_academic_year': mdl.academic_year.current_academic_year()
     }
     return context
 
@@ -201,3 +206,24 @@ def _get_partims_related(learning_unit_year):
     learning_container_year = learning_unit_year.learning_container_year
     return mdl.learning_container_year.find_all_partims(learning_container_year)
 
+
+def _show_subtype(learning_unit_year):
+    learning_container_year = learning_unit_year.learning_container_year
+
+    if learning_container_year:
+        return learning_container_year.container_type == learning_container_year_types.COURSE or \
+             learning_container_year.container_type == learning_container_year_types.INTERNSHIP
+    return False
+
+
+def _get_campus_from_learning_unit_year(learning_unit_year):
+    if learning_unit_year.learning_container_year:
+        return learning_unit_year.learning_container_year.campus
+    return None
+
+
+def _get_organization_from_learning_unit_year(learning_unit_year):
+    campus = _get_campus_from_learning_unit_year(learning_unit_year)
+    if campus:
+        return campus.organization
+    return None

@@ -38,7 +38,7 @@ class SessionExamAdmin(admin.ModelAdmin):
 
 class SessionExam(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     number_session = models.IntegerField(choices=number_session.NUMBERS_SESSION)
     learning_unit_year = models.ForeignKey('LearningUnitYear')
     offer_year = models.ForeignKey('OfferYear', blank=True, null=True)

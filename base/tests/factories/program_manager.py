@@ -42,6 +42,8 @@ def _get_tzinfo():
 class ProgramManagerFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.ProgramManager"
+        django_get_or_create = ('person', 'offer_year')
+
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=_get_tzinfo()),

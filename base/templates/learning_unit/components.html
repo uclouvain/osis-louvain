@@ -59,24 +59,28 @@
                                     {% trans component.learning_component_year.type %}
                                 {% endif %}
                             </td>
-                            <td>/{{component.learning_component_year.acronym  | default_if_none:''}}</td>
-                            <td>{{ component.learning_component_year.hourly_volume_total| default_if_none:'0'}}</td>
-                            <td>{{ component.learning_component_year.hourly_volume_partial| default_if_none:'-'}}</td>
-                            <td>{{ component.learning_component_year.hourly_volume_partial_q2 | default_if_none:'-'}}</td>
-                            <td>{{ component.learning_component_year.planned_classes| default_if_none:'0'}}</td>
+                            <td>/{{ component.learning_component_year.acronym  | default_if_none:'' }}</td>
+                            <td>{{ component.learning_component_year.hourly_volume_total| default_if_none:'0' }}</td>
+                            <td>{{ component.learning_component_year.hourly_volume_partial| default_if_none:'-' }}</td>
+                            <td>{{ component.learning_component_year.hourly_volume_partial_q2 | default_if_none:'-' }}</td>
+                            <td>{{ component.learning_component_year.planned_classes| default_if_none:'0' }}</td>
                         </tr>
-                        {% if component.classes%}
+                        {% if component.classes %}
                         <tr>
                             <td colspan="4">
                                 <div style="margin-left: 25px;">
-                                    <table class="table" style="background-color: #caeced; ">
-                                        <thead>
-                                        <th>{% trans 'classes'%}</th>
+                                    <table class="table">
+                                        <thead class="classes_background">
+                                            <th>{% trans 'classes'%}</th>
+                                            <th>{% trans 'description'%}</th>
                                         </thead>
-                                        <tbody>
+                                        <tbody class="classes_background">
                                         {% for classe in component.classes %}
                                         <tr>
-                                            <td>/{{classe.acronym}}</td>
+                                            <td>/{% if component.learning_component_year.type_letter_acronym %}
+                                                    {{component.learning_component_year.type_letter_acronym}}
+                                                 {% endif %}{{classe.acronym}}</td>
+                                            <td>{{classe.description | default_if_none:''}}</td>
                                         </tr>
                                         {% endfor %}
                                         </tbody>

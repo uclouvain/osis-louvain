@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 import factory
 from django.conf import settings
 from django.utils import timezone
@@ -45,5 +46,6 @@ class EntityVersionFactory(factory.DjangoModelFactory):
     title = factory.Faker('text', max_nb_chars=255)
     acronym = factory.Faker('text', max_nb_chars=20)
     entity_type = factory.Iterator(entity_type.ENTITY_TYPES, getter=lambda c: c[0])
-    start_date = factory.Faker('date_time_this_decade', before_now=True, after_now=False, tzinfo=_get_tzinfo())
-    end_date = factory.Faker('date_time_this_decade', before_now=False, after_now=True, tzinfo=_get_tzinfo())
+    parent = factory.SubFactory(EntityFactory)
+    start_date = datetime.date(2015, 1, 1).isoformat()
+    end_date = datetime.date(2015, 12, 31).isoformat()

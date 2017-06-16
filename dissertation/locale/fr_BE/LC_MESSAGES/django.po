@@ -91,6 +91,9 @@ msgstr "Mémoires encadrés en tant qu'accompagnateur"
 msgid "adviser_list_dissertations_internship"
 msgstr "Mémoires encadrés en tant que maître de stage"
 
+msgid "adviser_list_dissertations_president"
+msgstr "Mémoires encadrés en tant que président"
+
 msgid "adviser_profile"
 msgstr "Profil enseignant"
 

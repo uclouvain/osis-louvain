@@ -91,6 +91,9 @@ msgstr "Dissertations as accompanist"
 msgid "adviser_list_dissertations_internship"
 msgstr "Dissertations as internship master"
 
+msgid "adviser_list_dissertations_president"
+msgstr "Dissertations as president"
+
 msgid "adviser_profile"
 msgstr "Teacher profile"
 

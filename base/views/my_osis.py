@@ -38,6 +38,7 @@ from base.forms.my_message import MyMessageActionForm, MyMessageForm
 from base.utils import send_mail
 from base.views import layout
 from osis_common.models import message_history as message_history_mdl
+from django.shortcuts import redirect
 
 
 @login_required
@@ -121,6 +122,13 @@ def profile_lang(request):
     translation.activate(ui_language)
     request.session[translation.LANGUAGE_SESSION_KEY] = ui_language
     return profile(request)
+
+@login_required
+def profile_lang_edit(request, ui_language):
+    mdl.person.change_language(request.user, ui_language)
+    translation.activate(ui_language)
+    request.session[translation.LANGUAGE_SESSION_KEY] = ui_language
+    return redirect(request.META['HTTP_REFERER'])
 
 
 @login_required

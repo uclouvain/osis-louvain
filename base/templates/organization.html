@@ -39,7 +39,6 @@
     <div class="panel-body">
         <ul class="nav nav-tabs">
             <li class="active"><a data-toggle="tab" href="#tab_identification">{% trans 'identification'%}</a></li>
-            <li><a data-toggle="tab" href="#tab_structure">{% trans 'structure'%}</a></li>
         </ul>
         <div class="tab-content">
             <div id="tab_identification" class="tab-pane fade in active">
@@ -108,25 +107,6 @@
                        class="btn btn-primary" role="button" id="bt_organization_edit">
                         <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> {% trans 'edit'%}
                     </a>
-                {% endif %}
-            </div>
-            <div id="tab_structure" class="tab-pane fade">
-                <br>
-                {% if structures %}
-                    <ul class="nav nav-tabs">
-                        {% for structure in structures %}
-                            <li {% if forloop.first%}class="active"{% endif %}><a data-toggle="tab" href="#tab_{{structure.acronym}}">{{structure.acronym}}</a></li>
-                        {% endfor %}
-                    </ul>
-                    <div class="tab-content">
-                        {% for structure in structures %}
-                            <div id="tab_{{structure.acronym}}" class="tab-pane fade {% if forloop.first %}in active{% endif %}">
-                                <iframe src="{%url 'structure_diagram' structure_id=structure.id %}" width="1100px"
-                                        height="600px"
-                                        frameborder="0"></iframe>
-                            </div>
-                        {% endfor %}
-                    </div>
                 {% endif %}
             </div>
         </div>

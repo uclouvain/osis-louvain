@@ -55,7 +55,7 @@ class AcademicCalendarAdmin(SerializableModelAdmin):
 
 class AcademicCalendar(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     academic_year = models.ForeignKey('AcademicYear')
     title = models.CharField(max_length=50, blank=True, null=True)
     description = models.TextField(blank=True, null=True)

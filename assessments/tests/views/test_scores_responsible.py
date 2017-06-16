@@ -30,6 +30,7 @@ from assessments.views import scores_responsible
 from attribution.models import attribution
 from attribution.tests.models import test_attribution
 from base import models as mdl_base
+import base.models.entity_manager
 from base.tests.factories import academic_year, entity_manager, learning_unit_year, structure, tutor, user
 from base.tests.models.test_person import create_person_with_user
 
@@ -59,7 +60,7 @@ class ScoresResponsibleViewTestCase(TestCase):
                                                                         score_responsible=True)
 
     def test_is_faculty_admin(self):
-        entities_manager = scores_responsible.is_faculty_admin(self.user)
+        entities_manager = base.models.entity_manager.is_entity_manager(self.user)
         self.assertTrue(entities_manager)
 
     def test_scores_responsible(self):

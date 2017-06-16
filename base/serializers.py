@@ -25,50 +25,27 @@
 ##############################################################################
 from rest_framework import serializers
 from base.models.entity import Entity
-from base.models.entity_address import EntityAddress
-from base.models.entity_link import EntityLink
 from base.models.entity_version import EntityVersion
-
-
-class EntityAddressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EntityAddress
-        fields = ('label', 'location', 'postal_code', 'city', 'country')
-
-
-class EntityLinkSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = EntityLink
-        fields = ('parent', 'start_date', 'end_date')
 
 
 class EntityVersionSerializer(serializers.ModelSerializer):
     class Meta:
         model = EntityVersion
-        fields = ('acronym', 'title', 'entity_type', 'start_date', 'end_date',)
+        fields = ('acronym', 'title', 'entity_type', 'parent', 'start_date', 'end_date',)
 
 
 class EntitySerializer(serializers.ModelSerializer):
-    entityaddress_set = EntityAddressSerializer(many=True)
-    link_to_parent = EntityLinkSerializer(many=True)
     entityversion_set = EntityVersionSerializer(many=True)
 
     class Meta:
         model = Entity
-        fields = ('id', 'organization', 'external_id', 'entityaddress_set', 'link_to_parent', 'entityversion_set')
+        fields = ('id', 'organization', 'external_id', 'website', 'entityversion_set',
+                  'location', 'postal_code', 'city', 'country')
 
     def create(self, validated_data):
-        addresses_data = validated_data.pop('entityaddress_set')
-        link_to_parent_data = validated_data.pop('link_to_parent')
         versions_data = validated_data.pop('entityversion_set')
 
         entity = Entity.objects.create(**validated_data)
-
-        for address_data in addresses_data:
-            EntityAddress.objects.create(entity=entity, **address_data)
-
-        for link_data in link_to_parent_data:
-            EntityLink.objects.create(child=entity, **link_data)
 
         for version_data in versions_data:
             EntityVersion.objects.create(entity=entity, **version_data)

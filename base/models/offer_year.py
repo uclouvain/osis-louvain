@@ -50,7 +50,7 @@ GRADE_TYPES = (
 
 class OfferYear(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     offer = models.ForeignKey('Offer')
     academic_year = models.ForeignKey('AcademicYear')
     acronym = models.CharField(max_length=15, db_index=True)

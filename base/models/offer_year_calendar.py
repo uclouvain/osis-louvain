@@ -42,7 +42,7 @@ class OfferYearCalendarAdmin(admin.ModelAdmin):
 
 class OfferYearCalendar(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     academic_calendar = models.ForeignKey('AcademicCalendar')
     offer_year = models.ForeignKey('OfferYear')
     start_date = models.DateField(blank=True, null=True, db_index=True)

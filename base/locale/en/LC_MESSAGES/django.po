@@ -329,7 +329,7 @@ msgstr "Display scores for this learning unit"
 msgid "display_tutors"
 msgstr "Display all tutors for this learning unit"
 
-msgid "doctoral_commission"
+msgid "DOCTORAL_COMMISSION"
 msgstr "Doctoral commmission"
 
 msgid "documentation"
@@ -404,7 +404,7 @@ msgstr "Exam board secretary"
 msgid "execute"
 msgstr "Execute"
 
-msgid "faculty"
+msgid "FACULTY"
 msgstr "Faculty"
 
 msgid "female"
@@ -504,7 +504,7 @@ msgstr "Inject"
 msgid "inject_xls_file"
 msgstr "Inject XLS file"
 
-msgid "institute"
+msgid "INSTITUTE"
 msgstr "Institute"
 
 msgid "institution"
@@ -783,8 +783,8 @@ msgstr "Only submitted scores can be bouble encoded"
 msgid "open"
 msgstr "Open"
 
-msgid "organization"
-msgstr "Organization"
+msgid "campus"
+msgstr "Campus"
 
 msgid "organization_address"
 msgstr "Organization address"
@@ -834,7 +834,7 @@ msgstr "Plain and HTML"
 msgid "please_enable_javascript"
 msgstr "Please <a href='http://enable-javascript.com' target='_blank'>enable JavaScript</a> to use this application."
 
-msgid "pole"
+msgid "POLE"
 msgstr "Pole"
 
 msgid "postal_code"
@@ -987,7 +987,7 @@ msgstr "Search for an entity"
 msgid "search_for_an_organization"
 msgstr "Search for an organization"
 
-msgid "sector"
+msgid "SECTOR"
 msgstr "Sector"
 
 msgid "select"
@@ -1344,6 +1344,27 @@ msgstr "Master thesis"
 msgid "INTERNSHIP"
 msgstr "Internship"
 
+msgid "OTHER_COLLECTIVE"
+msgstr "Other collective"
+
+msgid "OTHER_INDIVIDUAL"
+msgstr "Other individual"
+
+msgid "EXTERNAL"
+msgstr "External"
+
+msgid "TEACHING_INTERNSHIP"
+msgstr "Teaching internship"
+
+msgid "CLINICAL_INTERNSHIP"
+msgstr "Clinical internship"
+
+msgid "PROFESSIONAL_INTERNSHIP"
+msgstr "Professional internship"
+
+msgid "RESEARCH_INTERNSHIP"
+msgstr "Research internship"
+
 msgid "ANNUAL"
 msgstr "Annual"
 
@@ -1360,7 +1381,7 @@ msgid "LU_ERRORS_INVALID"
 msgstr "'Enter a valid value."
 
 msgid "LU_ERRORS_INVALID_SEARCH"
-msgstr "Invalid search - Please fill some information before executing a search."
+msgstr "Please, inform at least two filters in your searches"
 
 msgid "LU_ERRORS_ACADEMIC_YEAR_REQUIRED"
 msgstr "Please specify an academic year"
@@ -1548,3 +1569,16 @@ msgstr "(Part 1, common with partims)"
 
 msgid "title_in_english_2"
 msgstr "(Part 2, specific to each partim)"
+
+msgid "scores_responsibles"
+msgstr "Scores responsibles"
+
+msgid "SCHOOL"
+msgstr "Ecole"
+
+msgid "PLATFORM"
+msgstr "Platform"
+
+msgid "LOGISTICS_ENTITY"
+msgstr "Logistics entity"
+

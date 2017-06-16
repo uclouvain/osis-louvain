@@ -59,6 +59,7 @@ class AssistantMandatesListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
     def get_context_data(self, **kwargs):
         context = super(AssistantMandatesListView, self).get_context_data(**kwargs)
         context['assistant'] = academic_assistant.find_by_person(person.find_by_user(self.request.user))
+        context['can_see_file'] = settings.assistants_can_see_file()
         return context
 
 

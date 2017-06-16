@@ -48,7 +48,7 @@ class AttributionAdmin(SerializableModelAdmin):
 
 class Attribution(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     start_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
     end_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
     start_year = models.IntegerField(blank=True, null=True)

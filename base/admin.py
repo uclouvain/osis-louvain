@@ -42,12 +42,6 @@ admin.site.register(campus.Campus,
 admin.site.register(entity.Entity,
                     entity.EntityAdmin)
 
-admin.site.register(entity_address.EntityAddress,
-                    entity_address.EntityAddressAdmin)
-
-admin.site.register(entity_link.EntityLink,
-                    entity_link.EntityLinkAdmin)
-
 admin.site.register(entity_manager.EntityManager,
                     entity_manager.EntityManagerAdmin)
 

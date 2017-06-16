@@ -158,9 +158,9 @@ def organization_address_new(request):
 
 @login_required
 @permission_required('base.can_access_organization', raise_exception=True)
-def organization_address_create(request, organization_id):
+def organization_address_create(request, organization_address_id):
     organization_address = mdl.organization_address.OrganizationAddress()
-    organization = mdl.organization.find_by_id(organization_id)
+    organization = mdl.organization.find_by_id(organization_address_id)
     countries = mdlref.country.find_all()
     return layout.render(request, "organization_address_form.html", {'organization_address': organization_address,
                                                                      'organization_id': organization.id,

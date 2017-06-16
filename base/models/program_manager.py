@@ -39,7 +39,7 @@ class ProgramManagerAdmin(admin.ModelAdmin):
 
 class ProgramManager(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     person = models.ForeignKey('Person')
     offer_year = models.ForeignKey('OfferYear')
 

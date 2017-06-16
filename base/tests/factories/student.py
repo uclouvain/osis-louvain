@@ -42,6 +42,7 @@ def _get_tzinfo():
 class StudentFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.Student'
+        django_get_or_create = ('registration_id', )
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=_get_tzinfo()),

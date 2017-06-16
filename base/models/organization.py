@@ -43,7 +43,7 @@ ORGANIZATION_TYPE = (('MAIN', 'Main'),
 
 class Organization(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True)
+    changed = models.DateTimeField(null=True, auto_now=True)
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=50, blank=True, null=True)
     acronym = models.CharField(max_length=20, blank=True, null=True)

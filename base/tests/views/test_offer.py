@@ -109,14 +109,18 @@ class OfferViewTestCase(TestCase):
         mock_decorators.login_required = lambda x: x
         mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
 
-        offer_year = OfferYearFactory()
+        today = datetime.date.today()
+        academic_year = AcademicYearFactory(start_date=today,
+                                            end_date=today.replace(year=today.year + 1),
+                                            year=today.year)
+        offer_year = OfferYearFactory(academic_year=academic_year)
 
         AcademicCalendar.save = save
-        academic_calendar = AcademicCalendarFactory()
+        academic_calendar = AcademicCalendarFactory(academic_year=academic_year)
 
         offer_year_calendar = OfferYearCalendarFactory(offer_year=offer_year,
                                                        academic_calendar=academic_calendar)
-        program_manager = ProgramManagerFactory(offer_year=offer_year)
+        ProgramManagerFactory(offer_year=offer_year)
 
         request = mock.Mock(method='GET')
 

@@ -29,12 +29,10 @@ from base.models import academic_year
 from base.models import application_notice
 from base.models import campus
 from base.models import entity
-from base.models import entity_address
-from base.models import entity_link
+from base.models import entity_manager
 from base.models import entity_version
 from base.models import exam_enrollment
 from base.models import external_offer
-from base.models import entity_manager
 from base.models import learning_class_year
 from base.models import learning_component_year
 from base.models import learning_container

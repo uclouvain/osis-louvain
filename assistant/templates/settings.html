@@ -47,32 +47,31 @@
  		    {% for hidden in form.hidden_fields %}
 			    {{ hidden }}
 		    {% endfor %}
-	    <div class="panel-danger">
+	    <div class="panel-default">
 		    <div class="panel-heading">
                 <h4>{% trans 'dates' %}</h4>
 		    </div>
 	    </div><p>
-	    <div class="form-group">
-            <div class="row">
-                <div class="col-md-3">
-                    <label for="txt_starting_date">{% trans 'starting_date' %}</label>
-                </div>
-                <div class="col-md-3">
-                    <div class="controls">{{ form.starting_date }}
-                        <span class="error">{{ form.starting_date.errors }}</span>
-                    </div>
-                </div>
-            </div><p>
-            <div class="row">
-                <div class="col-md-3">
-                    <label for="txt_ending_date">{% trans 'ending_date' %}</label>
-                </div>
-                <div class="col-md-3">
-                    <div class="controls">{{ form.ending_date }}
-                        <span class="error">{{ form.ending_date.errors }}</span>
-                    </div>
-                </div>
-            </div><p>
+        <div class="form-group" style="padding-top: 5px;">
+            {{ form.starting_date.label_tag }}
+            <div class="controls">{{ form.starting_date }}</div>
+            <span class="error">{{ form.starting_date.errors }}</span>
+        </div>
+        <div class="form-group" style="padding-top: 5px;">
+            {{ form.ending_date.label_tag }}
+            <div class="controls">{{ form.ending_date }}</div>
+            <span class="error">{{ form.ending_date.errors }}</span>
+        </div>
+        <div class="form-group" style="padding-top: 5px;">
+            {{ form.assistants_starting_date.label_tag }}
+            <div class="controls">{{ form.assistants_starting_date }}</div>
+            <span class="error">{{ form.assistants_starting_date.errors }}</span>
+        </div>
+        <div class="form-group" style="padding-top: 5px;">
+            {{ form.assistants_ending_date.label_tag }}
+            <div class="controls">{{ form.assistants_ending_date }}</div>
+            <span class="error">{{ form.assistants_ending_date.errors }}</span>
+        </div>
             <button type="submit" class="btn btn-primary" title="{% trans 'save'%}" id="bt_settings_save">
             <span class="glyphicon glyphicon-save" aria-hidden="true"></span> {% trans 'save'%}</button>
             <a class="btn btn-default" id="lnk_cancel" href="{% url 'manager_home' %}">

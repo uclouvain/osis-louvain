@@ -30,21 +30,21 @@
   <li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'student_path' %}</a></li>
   <li><a href="{% url 'dissertations' %}" id="lnk_dissertations">{% trans 'dissertations' %}</a></li>
   <li><a href="{% url 'manager_informations' %}" id="lnk_teachers">{% trans 'teachers' %}</a></li>
-  <li class="active">{{ adviser.person.last_name }}, {{ adviser.person.first_name }}</li>
+  <li class="active">{{ adv.person.last_name }}, {{ adv.person.first_name }}</li>
 {% endblock %}
 {% block content %}
   <div class="page-header">
-    <h2>{{ adviser.person.last_name }}, {{ adviser.person.first_name }}</h2>
+    <h2>{{ adv.person.last_name }}, {{ adv.person.first_name }}</h2>
   </div>
   <ul class="nav nav-tabs">
-    <li><a href="{% url 'manager_informations_detail' pk=adviser.pk %}">{% trans 'adviser_profile' %}</a></li>
-    <li class="active"><a href="{% url 'manager_informations_detail' pk=adviser.pk %}">{% trans 'adviser_dissertations' %}</a></li>
-    <li><a href="{% url 'manager_informations_detail_list_wait' pk=adviser.pk %}">{% trans 'adviser_dissertations_wait' %}</a></li>
-    <li><a href="{% url 'manager_informations_detail_stats' pk=adviser.pk %}">{% trans 'adviser_stats' %}</a></li>
+    <li><a href="{% url 'manager_informations_detail' pk=adv.pk %}">{% trans 'adviser_profile' %}</a></li>
+    <li class="active"><a href="{% url 'manager_informations_detail' pk=adv.pk %}">{% trans 'adviser_dissertations' %}</a></li>
+    <li><a href="{% url 'manager_informations_detail_list_wait' pk=adv.pk %}">{% trans 'adviser_dissertations_wait' %}</a></li>
+    <li><a href="{% url 'manager_informations_detail_stats' pk=adv.pk %}">{% trans 'adviser_stats' %}</a></li>
   </ul>
   <div class="panel panel-default">
     <div class="panel-body">
-      {% if adviser_list_dissertations %}
+      {% if adv_list_disserts_pro %}
           <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">{% trans 'dissertation_adviser_promoteur' %}</h3>
@@ -56,7 +56,7 @@
                   <th>{% trans 'status'%}</th>
                   <th>{% trans 'offer_year_start'%}</th>
                 </tr>
-                {% for adviser_list_dissertation in adviser_list_dissertations %}
+                {% for adviser_list_dissertation in adv_list_disserts_pro %}
                   <tr>
                     <td><a href="{% url 'manager_dissertations_detail' pk=adviser_list_dissertation.dissertation.pk %}">{{ adviser_list_dissertation.dissertation.title }}</a></td>
                     <td>{{ adviser_list_dissertation.dissertation.author }}</td>
@@ -67,7 +67,7 @@
               </table>
           </div>
       {% endif %}
-      {% if adviser_list_dissertations_copro %}
+      {% if adv_list_disserts_copro %}
           <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">{% trans 'dissertation_adviser_copromoteur' %}</h3>
@@ -79,7 +79,7 @@
                   <th>{% trans 'status'%}</th>
                   <th>{% trans 'offer_year_start'%}</th>
                 </tr>
-                {% for adviser_list_dissertation in adviser_list_dissertations_copro %}
+                {% for adviser_list_dissertation in adv_list_disserts_copro %}
                   <tr>
                     <td><a href="{% url 'manager_dissertations_detail' pk=adviser_list_dissertation.dissertation.pk %}">{{ adviser_list_dissertation.dissertation.title }}</a></td>
                     <td>{{ adviser_list_dissertation.dissertation.author }}</td>
@@ -90,7 +90,7 @@
               </table>
           </div>
       {% endif %}
-      {% if adviser_list_dissertations_reader %}
+      {% if adv_list_disserts_reader %}
           <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">{% trans 'dissertation_adviser_reader' %}</h3>
@@ -102,7 +102,7 @@
                   <th>{% trans 'status'%}</th>
                   <th>{% trans 'offer_year_start'%}</th>
                 </tr>
-                {% for adviser_list_dissertation in adviser_list_dissertations_reader %}
+                {% for adviser_list_dissertation in adv_list_disserts_reader %}
                   <tr>
                     <td><a href="{% url 'manager_dissertations_detail' pk=adviser_list_dissertation.dissertation.pk %}">{{ adviser_list_dissertation.dissertation.title }}</a></td>
                     <td>{{ adviser_list_dissertation.dissertation.author }}</td>
@@ -113,7 +113,7 @@
               </table>
           </div>
       {% endif %}
-      {% if adviser_list_dissertations_accompanist %}
+      {% if adv_list_disserts_accompanist %}
           <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">{% trans 'adviser_list_dissertations_accompanist' %}</h3>
@@ -125,7 +125,7 @@
                   <th>{% trans 'status'%}</th>
                   <th>{% trans 'offer_year_start'%}</th>
                 </tr>
-                {% for adviser_list_dissertation in adviser_list_dissertations_accompanist %}
+                {% for adviser_list_dissertation in adv_list_disserts_accompanist %}
                   <tr>
                     <td><a href="{% url 'manager_dissertations_detail' pk=adviser_list_dissertation.dissertation.pk %}">{{ adviser_list_dissertation.dissertation.title }}</a></td>
                     <td>{{ adviser_list_dissertation.dissertation.author }}</td>
@@ -136,7 +136,7 @@
               </table>
           </div>
       {% endif %}
-      {% if adviser_list_dissertations_internship %}
+      {% if adv_list_disserts_internship %}
           <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">{% trans 'adviser_list_dissertations_internship' %}</h3>
@@ -148,7 +148,30 @@
                   <th>{% trans 'status'%}</th>
                   <th>{% trans 'offer_year_start'%}</th>
                 </tr>
-                {% for adviser_list_dissertation in adviser_list_dissertations_internship %}
+                {% for adviser_list_dissertation in adv_list_disserts_internship %}
+                  <tr>
+                    <td><a href="{% url 'manager_dissertations_detail' pk=adviser_list_dissertation.dissertation.pk %}">{{ adviser_list_dissertation.dissertation.title }}</a></td>
+                    <td>{{ adviser_list_dissertation.dissertation.author }}</td>
+                    <td>{{ adviser_list_dissertation.dissertation.get_status_display }}</td>
+                    <td>{{ adviser_list_dissertation.dissertation.offer_year_start }}</td>
+                  </tr>
+                {% endfor %}
+              </table>
+          </div>
+      {% endif %}
+      {% if adv_list_disserts_president %}
+          <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">{% trans 'adviser_list_dissertations_president' %}</h3>
+            </div>
+              <table class="table table-hover">
+                <tr>
+                  <th>{% trans 'dissertation_title'%}</th>
+                  <th>{% trans 'author'%}</th>
+                  <th>{% trans 'status'%}</th>
+                  <th>{% trans 'offer_year_start'%}</th>
+                </tr>
+                {% for adviser_list_dissertation in adv_list_disserts_president %}
                   <tr>
                     <td><a href="{% url 'manager_dissertations_detail' pk=adviser_list_dissertation.dissertation.pk %}">{{ adviser_list_dissertation.dissertation.title }}</a></td>
                     <td>{{ adviser_list_dissertation.dissertation.author }}</td>

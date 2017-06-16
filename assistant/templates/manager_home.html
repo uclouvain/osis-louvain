@@ -71,6 +71,14 @@
             </div>
         </div><HR>
         <div class="row">
+            <div class="col-md-1"><i class="fa fa-upload" style="font-size: 400%; color: #6699FF;"></i></div>
+            <div class="col-md-11">
+                <h4 class="media-heading"><a href="{% url 'export_mandates' %}" id="lnk_upload_mandates">
+                    {% trans 'export_mandates' %}</a></h4>
+                <p>{% trans 'desc_lnk_export_mandates' %}</p>
+            </div>
+        </div><HR>
+        <div class="row">
             <div class="col-md-1"><i class="fa fa-gears" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-11">
                 <h4 class="media-heading"><a href="{% url 'settings_edit' %}" id="lnk_settings">{% trans 'settings' %}</a></h4>
