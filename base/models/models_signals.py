@@ -163,6 +163,6 @@ def remove_from_entity_manager_group(sender, instance, **kwargs):
 
 @receiver(post_delete, sender=mdl.program_manager.ProgramManager)
 def remove_from_pgm_managers_group(sender, instance, **kwargs):
-    if instance.person.user:
+    if instance.person.user and not mdl.program_manager.find_by_user(instance.person.user):
         pgm_managers_group = Group.objects.get(name='program_managers')
         instance.person.user.groups.remove(pgm_managers_group)
