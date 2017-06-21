@@ -44,7 +44,7 @@
                            value="{{ request.GET.acronym }}" style="text-transform:uppercase">
                 </div>
                 <div class="col-md-4">
-                    <label for="txt_name">{% trans 'name'%}</label>
+                    <label for="txt_name">{% trans 'organization_name'%}</label>
                     <input class="form-control" placeholder="{% trans 'name' %}" id="txt_name" name="name"
                            value="{{ request.GET.name }}" style="text-transform:uppercase">
                 </div>
@@ -64,21 +64,12 @@
                     <button type="submit" id="bt_submit_organization_search" class="btn btn-primary" role="button"
                             title="{% trans 'search_for_an_organization' %}"><span class="glyphicon glyphicon-search"
                                                                                    aria-hidden="true"></span></button>
-
-                    <a href="{% url 'organization_create' %}" id="lnk_organization_create" class="btn btn-default"
-                       role="button" title="{% trans 'create_an_organization'%}"><span class="glyphicon glyphicon-plus"
-                                                                                       aria-hidden="true"></span></a>
                 </div>
             </div>
         </form>
     </div>
 
-    {% if message %}
-    <div>
-        <label class="alert alert-warning" style="margin:5px">{{message}}</label>
-    </div>
-    {% else%}
-    {% if dict_attribution|length == 0 and init == "1" %}
+    {% if organizations|length == 0 and init == "1" %}
         <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
     {% endif %}
     <div {% if organizations|length > 0 %}style="visibility:visible;display:block;"{%else%}style="visibility:hidden;display:none;"{% endif %}>
@@ -86,7 +77,7 @@
             <thead>
                 <tr>
                     <th>{% trans 'acronym'%}</th>
-                    <th>{% trans 'name'%}</th>
+                    <th>{% trans 'organization_name'%}</th>
                     <th>{% trans 'type'%}</th>
                 </tr>
             </thead>
@@ -94,7 +85,7 @@
                 {% for organization in organizations %}
                     <tr>
                         <td><a href="{% url 'organization_read' organization_id=organization.id %}"
-                               id="lnk_organization_read_{{organization.id}}">{{ organization.acronym }}</a></td>
+                               id="lnk_organization_read_{{organization.id}}">{{ organization.acronym | default_if_none:'-' }}</a></td>
                         <td>{{ organization.name }}</td>
                         <td>{% if organization.type %}  {% trans organization.type %} {% else %} - {% endif %}</td>
                     </tr>
@@ -102,6 +93,6 @@
             </tbody>
         </table>
     </div>
-    {% endif %}
+
 </div>
 {% endblock %}

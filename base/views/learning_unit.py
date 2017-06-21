@@ -38,6 +38,7 @@ from cms.enums import entity_name
 from base.forms.learning_units import LearningUnitYearForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm
+from base.models.enums import learning_unit_year_subtypes
 
 from . import layout
 
@@ -204,7 +205,10 @@ def get_components(a_learning_container_yr):
 
 def _get_partims_related(learning_unit_year):
     learning_container_year = learning_unit_year.learning_container_year
-    return mdl.learning_container_year.find_all_partims(learning_container_year)
+    if learning_container_year:
+        return mdl.learning_unit_year.search(learning_container_year_id=learning_container_year,
+                                             subtype=learning_unit_year_subtypes.PARTIM)\
+            .exclude(learning_container_year__isnull=True).order_by('acronym')
 
 
 def _show_subtype(learning_unit_year):

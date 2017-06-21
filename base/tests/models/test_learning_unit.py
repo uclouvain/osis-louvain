@@ -25,7 +25,13 @@
 ##############################################################################
 from django.test import TestCase
 from base.models import learning_unit
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.models.enums import learning_unit_year_subtypes
+import datetime
+
 
 def create_learning_unit(acronym, title):
     return LearningUnitFactory(acronym=acronym, title=title, start_year=2010)
@@ -55,3 +61,29 @@ class LearningUnitTest(TestCase):
         LearningUnitFactory()
         LearningUnitFactory()
         self.assertEqual(1, len(learning_unit.search(acronym="LT49786")))
+
+    def test_get_partims_related(self):
+        from base.views.learning_unit import _get_partims_related
+        current_year = datetime.date.today().year
+        academic_year = AcademicYearFactory(year=current_year)
+        l_container_year = LearningContainerYearFactory(academic_year=academic_year)
+        l_container_year_2 = LearningContainerYearFactory(academic_year=academic_year)
+        # Create learning unit year attached to learning container year
+        learning_unit_year_1 = LearningUnitYearFactory(academic_year=academic_year,
+                                                       learning_container_year=l_container_year,
+                                                       subtype=learning_unit_year_subtypes.FULL)
+        LearningUnitYearFactory(academic_year=academic_year,
+                                learning_container_year=l_container_year,
+                                subtype=learning_unit_year_subtypes.PARTIM)
+        LearningUnitYearFactory(academic_year=academic_year,
+                                learning_container_year=l_container_year,
+                                subtype=learning_unit_year_subtypes.PARTIM)
+        learning_unit_year_2 = LearningUnitYearFactory(academic_year=academic_year,
+                                                       learning_container_year=l_container_year_2,
+                                                       subtype=learning_unit_year_subtypes.FULL)
+        LearningUnitYearFactory(academic_year=academic_year, learning_container_year=None)
+
+        all_partims_container_year_1 = _get_partims_related(learning_unit_year_1)
+        self.assertEqual(len(all_partims_container_year_1), 2)
+        all_partims_container_year_2 = _get_partims_related(learning_unit_year_2)
+        self.assertEqual(len(all_partims_container_year_2), 0)

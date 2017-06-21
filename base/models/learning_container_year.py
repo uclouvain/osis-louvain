@@ -61,8 +61,3 @@ class LearningContainerYear(models.Model):
 def find_by_id(learning_container_year_id):
     return LearningContainerYear.objects.get(pk=learning_container_year_id)
 
-
-def find_all_partims(learning_container_year):
-    return learning_unit_year.search(learning_container_year_id=learning_container_year,
-                                     subtype=learning_unit_year_subtypes.PARTIM)\
-                             .exclude(learning_container_year__isnull=True).order_by('acronym')

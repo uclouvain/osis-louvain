@@ -85,6 +85,7 @@
                 <th>{% trans 'acronym'%}</th>
                 <th>{% trans 'title'%}</th>
                 <th>{% trans 'type'%}</th>
+                <th>{% trans 'organization'%}</th>
             </thead>
             <tbody>
                 {% for entity_version in entities_version.all %}
@@ -93,6 +94,7 @@
                             {{ entity_version.acronym }}</a></td>
                         <td>{{ entity_version.title }}</td>
                         <td>{% if entity_version.entity_type != 'UNKNOWN' and entity_version.entity_type %}{% trans entity_version.entity_type %}{% else %}-{% endif %}</td>
+                        <td>{{ entity_version.entity.organization }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

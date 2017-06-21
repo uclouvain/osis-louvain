@@ -99,7 +99,7 @@ class LearningUnitViewTestCase(TestCase):
         mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
         mock_program_manager.return_value = True
 
-        learning_unit_year = LearningUnitYearFactory()
+        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year)
 
         request_factory = RequestFactory()
         request = request_factory.get(reverse('learning_unit', args=[learning_unit_year.id]))

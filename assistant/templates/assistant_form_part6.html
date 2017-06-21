@@ -39,8 +39,8 @@
 <li><a href="{% url 'mandate_learning_units' mandate.id %}">{% trans 'assistant_form_part2' %}</a></li>
 {% if mandate.assistant_type == "ASSISTANT" %}
     <li><a href="{% url 'form_part3_edit' mandate.id %}">{% trans 'assistant_form_part3' %}</a></li>
+    <li><a href="{% url 'form_part4_edit' mandate.id %}">{% trans 'assistant_form_part4' %}</a></li>
 {% endif %}
-<li><a href="{% url 'form_part4_edit' mandate.id %}">{% trans 'assistant_form_part4' %}</a></li>
 <li><a href="{% url 'form_part5_edit' mandate.id %}">{% trans 'assistant_form_part5' %}</a></li>
 <li class="active"><a href="{% url 'form_part6_edit' mandate.id %}">{% trans 'assistant_form_part6' %}</a></li>
 </ul>
@@ -65,10 +65,14 @@
                 {% trans 'tutoring_percent' %}</label>
             <div class="controls">{{ form.tutoring_percent }}</div>
             <span class="error">{{ form.tutoring_percent.errors }}</span>
-            <label style="padding-top: 5px" for="{{ form.research_percent.id_for_label }}">
-                {% trans 'research_percent' %}</label>
-            <div class="controls">{{ form.research_percent }}</div>
-            <span class="error">{{ form.research_percent.errors }}</span>
+            {% if mandate.assistant_type == "ASSISTANT" %}
+                <label style="padding-top: 5px" for="{{ form.research_percent.id_for_label }}">
+                    {% trans 'research_percent' %}</label>
+                <div class="controls">{{ form.research_percent }}</div>
+                <span class="error">{{ form.research_percent.errors }}</span>
+            {% else %}
+                {{ form.research_percent.as_hidden }}
+            {% endif %}
             <label style="padding-top: 5px" for="{{ form.service_activities_percent.id_for_label }}">
                 {% trans 'service_activities_percent' %}</label>
             <div class="controls">{{ form.service_activities_percent }}</div>

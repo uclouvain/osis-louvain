@@ -117,7 +117,7 @@ class EntityVersion(models.Model):
             for child in direct_children:
                 descendants.extend(child.find_descendants(date))
 
-        return descendants
+        return sorted(descendants, key=lambda an_entity: an_entity.acronym)
 
     def get_parent_version(self, date=None):
         if date is None:
@@ -208,3 +208,32 @@ def search_entities(acronym=None, title=None, type=None):
 
 def find_by_id(entity_version_id):
     return EntityVersion.objects.get(pk=entity_version_id)
+
+
+def count_identical_versions(same_entity, version):
+    return count(entity=same_entity,
+                 title=version.get('title'),
+                 acronym=version.get('acronym'),
+                 entity_type=version.get('entity_type'),
+                 parent=version.get('parent'),
+                 start_date=version.get('start_date'),
+                 end_date=version.get('end_date')
+                 )
+
+
+def find_update_candidates_versions(entity, version):
+    to_update_versions = search(entity=entity,
+                                title=version.get('title'),
+                                acronym=version.get('acronym'),
+                                entity_type=version.get('entity_type'),
+                                parent=version.get('parent'),
+                                start_date=version.get('start_date')
+                                )
+    return [v for v in to_update_versions if not _match_dates(v.end_date, version.get('end_date'))]
+
+
+def _match_dates(osis_date, esb_date):
+    if osis_date is None:
+        return esb_date is None
+    else:
+        return osis_date.strftime('%Y-%m-%d') == esb_date

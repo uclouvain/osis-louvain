@@ -65,10 +65,10 @@ def search(acronym=None, name=None, type=None, prefix=None):
     queryset = Organization.objects
 
     if acronym:
-        queryset = queryset.filter(acronym=acronym)
+        queryset = queryset.filter(acronym__iexact=acronym)
 
     if name:
-        queryset = queryset.filter(name=name)
+        queryset = queryset.filter(name__icontains=name)
 
     if type:
         queryset = queryset.filter(type=type)

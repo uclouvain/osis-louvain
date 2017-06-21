@@ -257,11 +257,10 @@ class ReviewForm(ModelForm):
     confidential = forms.CharField(help_text=_("information_not_provided_to_assistant"),
                                    required=False, widget=forms.Textarea(attrs={'cols': '80', 'rows': '5'}))
     advice = forms.ChoiceField(choices=review_advice_choices.REVIEW_ADVICE_CHOICES, **RADIO_SELECT_REQUIRED)
-    reviewer = forms.ChoiceField(required=False)
 
     class Meta:
         model = mdl.review.Review
-        fields = ('mandate', 'reviewer', 'advice', 'status', 'justification', 'remark', 'confidential', 'changed')
+        fields = ('mandate', 'advice', 'status', 'justification', 'remark', 'confidential', 'changed')
         widgets = {'mandate': forms.HiddenInput(), 'reviewer': forms.HiddenInput, 'status': forms.HiddenInput,
                    'changed': forms.HiddenInput}
 
@@ -328,8 +327,8 @@ class ReviewerReplacementForm(ModelForm):
 
     class Meta:
         model = mdl.reviewer.Reviewer
-        fields = ('person', 'id')
-        exclude = ('structure', 'role')
+        fields = ('id',)
+        exclude = ('person', 'structure', 'role')
 
 
 class ReviewersFormset(ModelForm):

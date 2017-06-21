@@ -34,10 +34,7 @@
 {% block content %}
 <div class="page-header">
     {% if entity_parent %}
-        <h3>
-            <a href="{% url 'entity_read' entity_version_id=entity_parent.id %}" id="lnk_entity_read_{{ entity_parent.id }}"
-               title="{{ entity_parent.acronym }}">{{ entity_parent.acronym }} - {{ entity_parent.title }}</a>
-        </h3>
+        <h3>{{ entity_parent.acronym }} - {{ entity_parent.title }}</h3>
         <h2>{{ entity_version.acronym }} - {{ entity_version.title }}</h2>
     {% else %}
         <h3>{{ entity_version.title }}</h3>
@@ -75,13 +72,13 @@
                     {% if entity_parent %}
                         <div class="col-md-4">
                             <label>{% trans 'attached_to' %}</label><br>
-                            {{ entity_parent.acronym }} - {{ entity_parent.title }}
+                            <a href="{% url 'entity_read' entity_version_id=entity_parent.id %}">{{ entity_parent.acronym }} - {{ entity_parent.title }}</a>
                         </div>
                     {% endif %}
                     {% if entity_version.entity.organization %}
                         <div class="col-md-6">
                             <label>{% trans 'organization'%}</label><br>
-                            {{ entity_version.entity.organization | default_if_none:'' }}
+                            <a href="{% url 'organization_read' organization_id=entity_version.entity.organization.id %}">{{ entity_version.entity.organization | default_if_none:'' }}</a>
                         </div>
                     {% endif %}
                 </div>
@@ -99,6 +96,7 @@
                                     <thead>
                                         <th>{% trans 'acronym'%}</th>
                                         <th>{% trans 'title'%}</th>
+                                        <th>{% trans 'type'%}</th>
                                     </thead>
                                     <tbody>
                                         {% for entity in entity_version.find_descendants %}
@@ -106,6 +104,11 @@
                                             <td><a href="{% url 'entity_read' entity_version_id=entity.id %}" id="lnk_entity_read_{{entity.id}}">
                                                 {{ entity.acronym }}</a></td>
                                             <td>{{ entity.title }}</td>
+                                            <td>
+                                                {% if entity.entity_type %}
+                                                    {% trans entity.entity_type %}
+                                                {% endif %}
+                                            </td>
                                         </tr>
                                         {% endfor %}
                                     </tbody>
