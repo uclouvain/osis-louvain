@@ -1,5 +1,5 @@
 coverage
-Django==1.9
+Django==1.11.2
 et-xmlfile==1.0.1
 jdcal==1.2
 pika==0.10.0
