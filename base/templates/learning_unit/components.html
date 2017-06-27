@@ -78,18 +78,25 @@
                             <div style="margin-left: 25px;">
                                 <table class="table">
                                     <thead class="classes_background">
-                                    <th>{% trans 'classes'%}</th>
-                                    <th>{% trans 'description'%}</th>
+                                        <th>{% trans 'classes'%}</th>
+                                        <th>{% trans 'description'%}</th>
+                                        <th>{% trans 'using_by_learning_unit'%}</th>
                                     </thead>
                                     <tbody class="classes_background">
-                                    {% for classe in component.classes %}
-                                    <tr>
-                                        <td>/{% if component.learning_component_year.type_letter_acronym %}
-                                            {{component.learning_component_year.type_letter_acronym}}
-                                            {% endif %}{{classe.acronym}}</td>
-                                        <td>{{classe.description | default_if_none:''}}</td>
-                                    </tr>
-                                    {% endfor %}
+                                        {% for key, classe in component.classes.items %}
+                                            <tr>
+                                                <td>/{% if component.learning_component_year.type_letter_acronym %}
+                                                    {{component.learning_component_year.type_letter_acronym}}
+                                                    {% endif %}{{key.acronym}}</td>
+                                                <td>{{key.description | default_if_none:''}}</td>
+                                                <td>{% if classe.0.learning_unit_component.learning_unit_year.acronym == learning_unit_year.acronym %}
+                                                        {% trans 'yes'%}
+                                                    {% else %}
+                                                        {% trans 'no'%}
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
                             </div>

@@ -240,8 +240,12 @@ def get_components(a_learning_container_yr, get_classes):
         for learning_component_year in learning_component_year_list:
             if get_classes:
                 learning_class_year_list = mdl.learning_class_year.find_by_learning_component_year(learning_component_year)
+                learning_class_year_dict = dict()
+                for learning_class_year in learning_class_year_list:
+                    learning_unit_component_class = mdl.learning_unit_component_class.find_by_learning_class_year(learning_class_year)
+                    learning_class_year_dict[learning_class_year] = learning_unit_component_class
             else:
-                learning_class_year_list = None
+                learning_class_year_dict = None
             entity_container_yrs = mdl.entity_container_year.find_by_learning_container_year(learning_component_year.learning_container_year,
                                                                                             entity_container_year_link_type.REQUIREMENT_ENTITY)
             entity_component_yr = mdl.entity_component_year.find_by_entity_container_years(entity_container_yrs,
@@ -249,7 +253,7 @@ def get_components(a_learning_container_yr, get_classes):
             components.append({'learning_component_year': learning_component_year,
                                'entity_component_yr': entity_component_yr,
                                'volumes': volumes(entity_component_yr),
-                               'classes': learning_class_year_list})
+                               'classes': learning_class_year_dict})
     return components
 
 

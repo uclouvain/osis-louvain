@@ -1652,3 +1652,6 @@ msgstr "Quadri. de l'UE"
 
 msgid "composition"
 msgstr "Composition"
+
+msgid "using_by_learning_unit"
+msgstr "Utilisation par les UE"
