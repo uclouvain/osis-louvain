@@ -74,7 +74,7 @@ if hasattr(settings, 'QUEUES') and settings.QUEUES:
     if 'assessments' in settings.INSTALLED_APPS:
         from assessments.views.score_encoding import send_json_scores_sheets_to_response_queue
         try:
-            queue_listener.SynchronousConsumerThread(settings.QUEUES.get('QUEUES_NAME').get('SCORE_ENDCODING_PDF_REQUEST'),
+            queue_listener.SynchronousConsumerThread(settings.QUEUES.get('QUEUES_NAME').get('SCORE_ENCODING_PDF_REQUEST'),
                                                      send_json_scores_sheets_to_response_queue).start()
         except (ConnectionClosed, ChannelClosed, AMQPConnectionError, ConnectionError) as e:
             LOGGER.exception("Couldn't connect to the QueueServer")

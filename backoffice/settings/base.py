@@ -206,8 +206,8 @@ if not TESTING or not SKIP_QUEUES_TESTS:
             'MIGRATIONS_TO_PRODUCE': 'osis_portal',
             'MIGRATIONS_TO_CONSUME': 'osis',
             'PAPER_SHEET': 'paper_sheet',
-            'SCORE_ENDCODING_PDF_REQUEST': 'score_endcoding_pdf_request',
-            'SCORE_ENDCODING_PDF_RESPONSE': 'score_endcoding_pdf_response',
+            'SCORE_ENCODING_PDF_REQUEST': 'score_encoding_pdf_request',
+            'SCORE_ENCODING_PDF_RESPONSE': 'score_encoding_pdf_response',
         }
     }
 
