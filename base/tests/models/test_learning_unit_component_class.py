@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from django.test import TestCase
-
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
@@ -32,31 +31,31 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_component_class import LearningUnitComponentClassFactory
 from base import models as mdl
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class LearningunitComponentClassTest(TestCase):
 
     def setUp(self):
         self.academic_year = AcademicYearFactory(year=2016)
-        self.learning_container_year = LearningContainerYearFactory(academic_year=self.academic_year)
-        self.learning_component_year = LearningComponentYearFactory(learning_container_year=self.learning_container_year)
-        self.learning_component_year_2 = LearningComponentYearFactory(learning_container_year=self.learning_container_year)
-        self.learning_unit_component = LearningUnitComponentFactory(learning_component_year=self.learning_component_year)
-        self.learning_class_year = LearningClassYearFactory(learning_component_year=self.learning_component_year)
+        self.learning_unit_years = [LearningUnitYearFactory(academic_year=self.academic_year) for x in range(2)]
+        self.learning_container_years = [LearningContainerYearFactory(academic_year=self.academic_year) for x in range(2)]
+        self.learning_component_years = [LearningComponentYearFactory(learning_container_year=self.learning_container_years[x]) for x in range(2)]
+        self.learning_unit_components = [LearningUnitComponentFactory(learning_unit_year=self.learning_unit_years[x],
+                                                                      learning_component_year=self.learning_component_years[x]) for x in range(2)]
+        self.learning_class_years = [LearningClassYearFactory(learning_component_year=self.learning_component_years[x]) for x in range(2)]
 
-    def test_save_with_differents_learning_component_year(self):
+    def test_save_with_different_learning_component_year(self):
         with self.assertRaisesMessage(AttributeError, "Learning Component Year is different in Learning Unit Component and Learning Class Year"):
-            learning_unit_component = LearningUnitComponentFactory(learning_component_year=self.learning_component_year)
-            learning_class_year = LearningClassYearFactory(learning_component_year=self.learning_component_year_2)
             learning_unit_component_class = LearningUnitComponentClassFactory\
-                .build(learning_unit_component=learning_unit_component,
-                       learning_class_year=learning_class_year)
+                .build(learning_unit_component=self.learning_unit_components[0],
+                       learning_class_year=self.learning_class_years[1])
             learning_unit_component_class.save()
 
     def test_find_by_learning_class_year(self):
         learning_unit_component_class = LearningUnitComponentClassFactory\
-            .build(learning_unit_component=self.learning_unit_component,
-                   learning_class_year=self.learning_class_year)
+            .build(learning_unit_component=self.learning_unit_components[0],
+                   learning_class_year=self.learning_class_years[0])
         learning_unit_component_class.save()
-        self.assertEqual(mdl.learning_unit_component_class.find_by_learning_class_year(self.learning_class_year)[0],
+        self.assertEqual(mdl.learning_unit_component_class.find_by_learning_class_year(self.learning_class_years[0])[0],
                          learning_unit_component_class)

@@ -46,13 +46,13 @@ def scores_responsible(request):
 @user_passes_test(is_entity_manager)
 def scores_responsible_search(request):
     entities_manager = mdl_base.entity_manager.find_by_user(request.user)
-    learning_unit_years = mdl_base.learning_unit_year.find_all_structure_parents(entities_manager)
+    structures = mdl_base.structure.find_all_structure_parents(entities_manager)
     academic_year = mdl_base.academic_year.current_academic_year()
     if request.GET:
         attributions_searched = mdl_attr.attribution.search_scores_responsible(
             learning_unit_title=request.GET.get('learning_unit_title'),
             course_code=request.GET.get('course_code'),
-            learning_unit_years=learning_unit_years,
+            structures=structures,
             tutor=request.GET.get('tutor'),
             responsible=request.GET.get('scores_responsible'))
         dict_attribution = create_attributions_list(attributions_searched)
@@ -88,8 +88,8 @@ def scores_responsible_management(request):
     entities_manager = mdl_base.entity_manager.find_by_user(request.user)
     learning_unit_year_id = request.GET.get('learning_unit_year').strip('learning_unit_year_')
     a_learning_unit_year = mdl_base.learning_unit_year.find_by_id(learning_unit_year_id)
-    attributions = mdl_attr.attribution.find_all_distinct_parents(entities_manager)
-    entities_list = [attribution.learning_unit_year.structure.acronym for attribution in attributions]
+    structures = mdl_base.structure.find_all_structure_parents(entities_manager)
+    entities_list = [structure.acronym for structure in structures]
     if a_learning_unit_year.structure.acronym in entities_list:
         attributions = mdl_attr.attribution.find_all_responsible_by_learning_unit_year(a_learning_unit_year)
         academic_year = mdl_base.academic_year.current_academic_year()

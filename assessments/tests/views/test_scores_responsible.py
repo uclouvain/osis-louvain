@@ -86,8 +86,13 @@ class ScoresResponsibleViewTestCase(TestCase):
 
     def test_create_attributions_list(self):
         entities_manager = mdl_base.entity_manager.find_by_user(self.user)
-        attributions_list = attribution.find_all_distinct_parents(entities_manager)
-        dictionary = scores_responsible.create_attributions_list(attributions_list)
+        structures = mdl_base.structure.find_all_structure_parents(entities_manager)
+        attributions_searched = attribution.search_scores_responsible(learning_unit_title=None,
+                                                                      course_code=None,
+                                                                      structures=structures,
+                                                                      tutor=None,
+                                                                      responsible=None)
+        dictionary = scores_responsible.create_attributions_list(attributions_searched)
         self.assertIsNotNone(dictionary)
 
     def test_scores_responsible_management(self):

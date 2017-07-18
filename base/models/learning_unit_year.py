@@ -23,11 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from itertools import chain
-
 from django.db import models
-
-from base.models.academic_year import current_academic_years
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 from base.models.enums import learning_unit_year_activity_status, learning_unit_year_subtypes, learning_container_year_types
 
@@ -80,6 +76,7 @@ class LearningUnitYear(SerializableModel):
                                                       learning_container_year__container_type=learning_container_year_types.COURSE).first()
         return None
 
+
 def find_by_id(learning_unit_year_id):
     return LearningUnitYear.objects.select_related('learning_container_year__learning_container')\
                                    .get(pk=learning_unit_year_id)
@@ -122,32 +119,3 @@ def search(academic_year_id=None, acronym=None, learning_container_year_id=None,
         queryset = queryset.filter(learning_container_year__container_type=container_type)
 
     return queryset.select_related('learning_container_year')
-
-
-def find_all_structure_parents(entities_manager):
-    learning_unit_years_list = list()
-    for entity_manager in entities_manager:
-        learning_unit_years = LearningUnitYear.objects \
-            .filter(structure=entity_manager.structure) \
-            .filter(academic_year=current_academic_years()) \
-            .distinct("structure")
-        for learning_unit_year in learning_unit_years:
-            learning_unit_years = list(chain(learning_unit_years,
-                                             find_all_structure_children(learning_unit_year.structure)))
-        learning_unit_years_list = list(chain(learning_unit_years_list, learning_unit_years))
-    return learning_unit_years_list
-
-
-def find_all_structure_children(structure):
-    learning_unit_years = LearningUnitYear.objects \
-        .filter(structure__part_of=structure) \
-        .filter(academic_year=current_academic_years()) \
-        .distinct("structure")
-    for learning_unit_year in learning_unit_years:
-        if learning_unit_year.structure.part_of:
-            learning_unit_years = list(chain(learning_unit_years,
-                                             find_all_structure_children(learning_unit_year.structure)))
-    return learning_unit_years
-
-
-
