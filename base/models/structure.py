@@ -23,8 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from itertools import chain
+
 from django.db import models
 from django.contrib import admin
+
+from base.models.academic_year import current_academic_years
 from base.models.enums import structure_type
 
 
@@ -130,5 +134,25 @@ def find_first(acronym=None, title=None, type=None):
 
 def find_by_acronyms(acronym_list):
     return Structure.objects.filter(acronym__in=acronym_list).order_by("acronym")
+
+
+def find_all_structure_parents(entities_manager):
+    structures_list = list()
+    for entity_manager in entities_manager:
+        structures = Structure.objects.filter(acronym=entity_manager.structure.acronym)
+        for structure in structures:
+            family_list = list(chain(structures, find_all_structure_children(structure)))
+            structures_list = list(chain(structures_list, family_list))
+    return structures_list
+
+
+def find_all_structure_children(structure):
+    structures_list = list()
+    structures = Structure.objects.filter(part_of=structure)
+    for structure in structures:
+        if structure.part_of:
+            children_list = list(chain(structures, find_all_structure_children(structure)))
+            structures_list = list(chain(structures_list, children_list))
+    return structures_list
 
 

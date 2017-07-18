@@ -32,7 +32,6 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 from attribution.models import attribution_charge
-from base.models import learning_unit_component
 from base.models.enums import component_type
 
 
@@ -138,7 +137,7 @@ def is_score_responsible(user, learning_unit_year):
     return attributions > 0
 
 
-def search_scores_responsible(learning_unit_title, course_code, learning_unit_years, tutor, responsible):
+def search_scores_responsible(learning_unit_title, course_code, structures, tutor, responsible):
     queryset = Attribution.objects.filter(learning_unit_year__academic_year=current_academic_years())
     if learning_unit_title:
         queryset = queryset.filter(learning_unit_year__title__icontains=learning_unit_title)
@@ -164,39 +163,11 @@ def search_scores_responsible(learning_unit_title, course_code, learning_unit_ye
                 .filter(score_responsible=True, tutor__person__in=Person.objects
                         .filter(Q(first_name__icontains=responsible) |
                                 Q(last_name__icontains=responsible)))
-    if learning_unit_years:
-        entities_list = [learning_unit_year.structure.acronym for learning_unit_year in learning_unit_years]
+    if structures:
+        entities_list = [structure.acronym for structure in structures]
         queryset = queryset \
             .filter(learning_unit_year__structure__acronym__in=entities_list)
     return queryset.distinct("learning_unit_year")
-
-
-def find_all_distinct_parents(entities_manager):
-    attributions = list()
-    for entity_manager in entities_manager:
-        attributions_list = Attribution.objects \
-            .filter(learning_unit_year__structure=entity_manager.structure) \
-            .filter(learning_unit_year__academic_year=current_academic_years()) \
-            .select_related("learning_unit_year__structure") \
-            .distinct("learning_unit_year__structure")
-        for attribution in attributions_list:
-            attributions_list = list(chain(attributions_list,
-                                           find_all_distinct_children(attribution.learning_unit_year.structure)))
-        attributions = list(chain(attributions, attributions_list))
-    return attributions
-
-
-def find_all_distinct_children(structure):
-    attributions_list = Attribution.objects \
-        .filter(learning_unit_year__structure__part_of=structure) \
-        .filter(learning_unit_year__academic_year=current_academic_years()) \
-        .select_related("learning_unit_year__structure") \
-        .distinct("learning_unit_year__structure")
-    for attribution in attributions_list:
-        if attribution.learning_unit_year.structure.part_of:
-            attributions_list = list(chain(attributions_list,
-                                           find_all_distinct_children(attribution.learning_unit_year.structure)))
-    return attributions_list
 
 
 def find_all_responsible_by_learning_unit_year(learning_unit_year):

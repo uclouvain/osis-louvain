@@ -370,10 +370,11 @@ def get_ordered_roles(dissert):
 @login_required
 @user_passes_test(adviser.is_manager)
 def manager_dissertations_search(request):
-    disserts = dissertation.search(terms=request.GET['search'], active=True)
     person = mdl.person.find_by_user(request.user)
     adv = adviser.search_by_person(person)
     offers = faculty_adviser.search_by_adviser(adv)
+    disserts = dissertation.search(terms=request.GET['search'], active=True)
+    disserts = disserts.filter(offer_year_start__offer__in=offers)
     offer_props = offer_proposition.search_by_offer(offers)
     show_validation_commission = offer_proposition.show_validation_commission(offer_props)
     show_evaluation_first_year = offer_proposition.show_evaluation_first_year(offer_props)
