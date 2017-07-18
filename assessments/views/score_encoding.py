@@ -646,7 +646,7 @@ def send_json_scores_sheets_to_response_queue(global_id):
     try:
         connect = pika.BlockingConnection(rabbit_settings)
         channel = connect.channel()
-        queue_name = settings.QUEUES.get('QUEUES_NAME').get('SCORE_ENDCODING_PDF_RESPONSE')
+        queue_name = settings.QUEUES.get('QUEUES_NAME').get('SCORE_ENCODING_PDF_RESPONSE')
         send_message(queue_name, data, connect, channel)
     except (RuntimeError, pika.exceptions.ConnectionClosed, pika.exceptions.ChannelClosed, pika.exceptions.AMQPError):
         logger.exception('Could not send back scores_sheets json in response queue for global_id {}'.format(global_id))
