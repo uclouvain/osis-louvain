@@ -27,6 +27,9 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 from django.test.utils import override_settings
 from django.contrib.auth.models import User, Permission
+from git import Repo
+from base.views.common import get_current_version
+
 
 class ErrorViewTestCase(TestCase):
     def setUp(self):
@@ -39,3 +42,12 @@ class ErrorViewTestCase(TestCase):
         self.client.login(username='tmp', password='tmp')
         response = self.client.get(reverse('academic_calendar_read', args=[46898]), follow=True)
         self.assertEqual(response.status_code, 404)
+
+    def test_get_current_version(self):
+        repo = Repo('.')
+        heads = repo.heads
+        response = get_current_version(self)
+        if hasattr(heads, 'master'):
+            self.assertIsNot(response['latest_tag'], None)
+        else:
+            self.assertIs(response['latest_tag'], None)

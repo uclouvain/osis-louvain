@@ -33,6 +33,7 @@ from django.utils import translation
 from . import layout
 from base import models as mdl
 from base.models.utils import native
+from git import Repo
 
 
 def page_not_found(request):
@@ -174,3 +175,17 @@ def storage(request):
             row.append('')
 
     return layout.render(request, "admin/storage.html", {'table': table})
+
+
+def get_current_version(request):
+    latest_tag = None
+    repo = Repo('.')
+    tags = repo.tags
+    heads = repo.heads
+    if hasattr(heads, 'master'):
+        master = heads.master
+        for tag in tags:
+            if tag.commit == master.commit:
+                latest_tag = tag
+                break
+    return {'latest_tag': latest_tag}

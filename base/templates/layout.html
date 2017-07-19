@@ -247,8 +247,10 @@
                 <a href="http://uclouvain.github.io/osis/" target="_blank"
                    id="lnk_osis_website">{% trans 'website' %}</a> |
                 <a href="https://github.com/uclouvain/osis" target="_blank"
-                   id="lnk_osis_source_code">{% trans 'source_code' %}
-                </a></p>
+                   id="lnk_osis_source_code">{% trans 'source_code' %}</a> |
+                <a href="https://github.com/uclouvain/osis/releases/tag/{{ latest_tag }}" target="_blank"
+                   id="lnk_latest_tag">{{ latest_tag }}</a>
+            </p>
 
             <p class="navbar-text pull-right"><span class="glyphicon glyphicon-copyright-mark"></span>  {% now "Y" %}  <a
                     href="http://www.uclouvain.be" target="_blank" id="lnk_ucl">Université catholique de Louvain</a></p>
