@@ -25,21 +25,16 @@
 ##############################################################################
 import datetime
 import operator
+
 import factory
 import factory.fuzzy
 from django.conf import settings
 from django.utils import timezone
 
+from base.models.enums import learning_container_year_types
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
-from base.models.enums import learning_container_year_types
-
-
-def _get_tzinfo():
-    if settings.USE_TZ:
-        return timezone.get_current_timezone()
-    else:
-        return None
+from utils.helpers import get_tzinfo
 
 
 class LearningContainerYearFactory(factory.django.DjangoModelFactory):
@@ -52,5 +47,5 @@ class LearningContainerYearFactory(factory.django.DjangoModelFactory):
     container_type = factory.Iterator(learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES, getter=operator.itemgetter(0))
     title = factory.Sequence(lambda n: 'Learning container year - %d' % n)
     acronym = factory.Sequence(lambda n: 'LCY-%d' % n)
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=_get_tzinfo()),
-                                          datetime.datetime(2017, 3, 1, tzinfo=_get_tzinfo()))
+    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
+                                          datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))

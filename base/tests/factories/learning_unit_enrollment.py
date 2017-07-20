@@ -23,29 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
+import string
+
 import factory
 import factory.fuzzy
-import string
-import datetime
 from django.conf import settings
 from django.utils import timezone
+
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
+from utils.helpers import get_tzinfo
 
-
-def _get_tzinfo():
-    if settings.USE_TZ:
-        return timezone.get_current_timezone()
-    else:
-        return None
 
 class LearningUnitEnrollment(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.LearningUnitEnrollment"
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=_get_tzinfo()),
-                                          datetime.datetime(2017, 3, 1, tzinfo=_get_tzinfo()))
-    date_enrollment = datetime.datetime.now(tz=_get_tzinfo())
+    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
+                                          datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
+    date_enrollment = datetime.datetime.now(tz=get_tzinfo())
     learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
     offer_enrollment = factory.SubFactory(OfferEnrollmentFactory)

@@ -23,21 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import operator
 import datetime
+import operator
+
 import factory
 import factory.fuzzy
 from django.conf import settings
 from django.utils import timezone
+
 from base import models as mdl
 from base.tests.factories.user import UserFactory
-
-
-def _get_tzinfo():
-    if settings.USE_TZ:
-        return timezone.get_current_timezone()
-    else:
-        return None
+from utils.helpers import get_tzinfo
 
 
 def generate_person_email(person, domain=None):
@@ -52,7 +48,7 @@ class PersonFactory(factory.DjangoModelFactory):
 
     first_name = factory.Faker('first_name')
     last_name = factory.Faker('last_name')
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=_get_tzinfo()))
+    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()))
     email = factory.LazyAttribute(generate_person_email)
     phone = factory.Faker('phone_number')
     language = factory.Iterator(settings.LANGUAGES, getter=operator.itemgetter(0))

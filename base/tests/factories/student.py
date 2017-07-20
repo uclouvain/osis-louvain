@@ -24,19 +24,15 @@
 #
 ##############################################################################
 import datetime
+import string
+
 import factory
 import factory.fuzzy
-import string
-from base.tests.factories.person import PersonFactory
 from django.conf import settings
 from django.utils import timezone
 
-
-def _get_tzinfo():
-    if settings.USE_TZ:
-        return timezone.get_current_timezone()
-    else:
-        return None
+from base.tests.factories.person import PersonFactory
+from utils.helpers import get_tzinfo
 
 
 class StudentFactory(factory.DjangoModelFactory):
@@ -45,7 +41,7 @@ class StudentFactory(factory.DjangoModelFactory):
         django_get_or_create = ('registration_id', )
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=_get_tzinfo()),
-                                          datetime.datetime(2017, 3, 1, tzinfo=_get_tzinfo()))
+    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
+                                          datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
     registration_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     person = factory.SubFactory(PersonFactory)

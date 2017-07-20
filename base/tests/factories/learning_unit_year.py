@@ -34,19 +34,15 @@ from django.utils import timezone
 from factory.django import DjangoModelFactory
 from faker import Faker
 
-from base.models.enums import learning_unit_year_activity_status, learning_unit_year_subtypes
+from base.models.enums import learning_unit_year_activity_status
+from base.models.enums import learning_unit_year_subtypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.academic_year import AcademicYearFakerFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit import LearningUnitFakerFactory
+from utils.helpers import get_tzinfo
 
 fake = Faker()
-
-def _get_tzinfo():
-    if settings.USE_TZ:
-        return timezone.get_current_timezone()
-    else:
-        return None
 
 class LearningUnitYearFactory(DjangoModelFactory):
     class Meta:
@@ -56,8 +52,8 @@ class LearningUnitYearFactory(DjangoModelFactory):
     academic_year = factory.SubFactory(AcademicYearFactory)
     learning_unit = factory.SubFactory(LearningUnitFactory)
     learning_container_year = None #factory.SubFactory(LearningContainerYearFactory)
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=_get_tzinfo()),
-                                          datetime.datetime(2017, 3, 1, tzinfo=_get_tzinfo()))
+    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
+                                          datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
     acronym = factory.Sequence(lambda n: 'LUY-%d' % n)
     title = factory.Sequence(lambda n: 'Learning unit year - %d' % n)
     subtype = factory.Iterator(learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES, getter=operator.itemgetter(0))
@@ -77,7 +73,7 @@ class LearningUnitYearFakerFactory(DjangoModelFactory):
     academic_year = factory.SubFactory(AcademicYearFakerFactory)
     learning_unit = factory.SubFactory(LearningUnitFakerFactory)
     learning_container_year = None
-    changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=_get_tzinfo())
+    changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
     acronym = factory.Sequence(lambda n: 'LUY-%d' % n)
     title = factory.Sequence(lambda n: 'Learning unit year - %d' % n)
     subtype = factory.Iterator(learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES, getter=operator.itemgetter(0))

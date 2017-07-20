@@ -24,20 +24,18 @@
 #
 ##############################################################################
 import datetime
+import operator
+import string
+
 import factory
 import factory.fuzzy
-import string
-import operator
 from django.conf import settings
 from django.utils import timezone
-from reference.models.enums import grade_type_coverage, institutional_grade_type as enum_institutional_grade_type
 
-
-def _get_tzinfo():
-    if settings.USE_TZ:
-        return timezone.get_current_timezone()
-    else:
-        return None
+from reference.models.enums import \
+    institutional_grade_type as enum_institutional_grade_type
+from reference.models.enums import grade_type_coverage
+from utils.helpers import get_tzinfo
 
 
 class GradeTypeFactory(factory.DjangoModelFactory):

@@ -24,19 +24,15 @@
 #
 ##############################################################################
 import datetime
+import string
+
 import factory
 import factory.fuzzy
-import string
 from django.conf import settings
 from django.utils import timezone
+
 from base.models.learning_unit_year import LearningUnitYear
-
-
-def _get_tzinfo():
-    if settings.USE_TZ:
-        return timezone.get_current_timezone()
-    else:
-        return None
+from utils.helpers import get_tzinfo
 
 
 class SessionExamFactory(factory.DjangoModelFactory):
@@ -44,7 +40,7 @@ class SessionExamFactory(factory.DjangoModelFactory):
         model = 'base.SessionExam'
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=_get_tzinfo()),
-                                          datetime.datetime(2017, 3, 1, tzinfo=_get_tzinfo()))
+    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
+                                          datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
     number_session = factory.fuzzy.FuzzyInteger(1000)
     learning_unit_year = factory.SubFactory(LearningUnitYear)

@@ -24,18 +24,14 @@
 #
 ##############################################################################
 import datetime
+
 import factory
 from django.conf import settings
 from django.utils import timezone
+
 from base.models.enums import entity_type
 from base.tests.factories.entity import EntityFactory
-
-
-def _get_tzinfo():
-    if settings.USE_TZ:
-        return timezone.get_current_timezone()
-    else:
-        return None
+from utils.helpers import get_tzinfo
 
 
 class EntityVersionFactory(factory.DjangoModelFactory):

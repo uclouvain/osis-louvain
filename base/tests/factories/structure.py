@@ -24,20 +24,16 @@
 #
 ##############################################################################
 import datetime
+import operator
+import string
+
 import factory
 import factory.fuzzy
-import string
-import operator
 from django.conf import settings
 from django.utils import timezone
+
 from base.models.enums import structure_type
-
-
-def _get_tzinfo():
-    if settings.USE_TZ:
-        return timezone.get_current_timezone()
-    else:
-        return None
+from utils.helpers import get_tzinfo
 
 
 class StructureFactory(factory.DjangoModelFactory):
@@ -46,8 +42,8 @@ class StructureFactory(factory.DjangoModelFactory):
         #abstract = False
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=_get_tzinfo()),
-                                          datetime.datetime(2017, 3, 1, tzinfo=_get_tzinfo()))
+    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
+                                          datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
 
     acronym = acronym = factory.Sequence(lambda n: 'ACR-%d' % n)
     title = factory.Sequence(lambda n: 'TITLE-%d' % n)

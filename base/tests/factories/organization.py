@@ -26,15 +26,10 @@
 import factory
 from django.conf import settings
 from django.utils import timezone
+
 from base.models import organization
 from base.models.enums import organization_type
-
-
-def _get_tzinfo():
-    if settings.USE_TZ:
-        return timezone.get_current_timezone()
-    else:
-        return None
+from utils.helpers import get_tzinfo
 
 
 class OrganizationFactory(factory.DjangoModelFactory):
@@ -42,7 +37,7 @@ class OrganizationFactory(factory.DjangoModelFactory):
         model = 'base.Organization'
 
     external_id = factory.Faker('text', max_nb_chars=100)
-    changed = factory.Faker('date_time_this_month', tzinfo=_get_tzinfo())
+    changed = factory.Faker('date_time_this_month', tzinfo=get_tzinfo())
     name = factory.Faker('text', max_nb_chars=255)
     acronym = factory.Faker('text', max_nb_chars=15)
     website = factory.Faker('url')

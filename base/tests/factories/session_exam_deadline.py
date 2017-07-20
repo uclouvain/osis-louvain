@@ -23,21 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import operator
 import datetime
+import operator
+import string
+
 import factory
 import factory.fuzzy
-import string
 from django.conf import settings
 from django.utils import timezone
-from base.models.enums import number_session
-from .offer_enrollment import OfferEnrollmentFactory
 
-def _get_tzinfo():
-    if settings.USE_TZ:
-        return timezone.get_current_timezone()
-    else:
-        return None
+from base.models.enums import number_session
+from utils.helpers import get_tzinfo
+
+from .offer_enrollment import OfferEnrollmentFactory
 
 
 class SessionExamDeadlineFactory(factory.DjangoModelFactory):
@@ -45,10 +43,10 @@ class SessionExamDeadlineFactory(factory.DjangoModelFactory):
         model = "base.SessionExamDeadline"
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=_get_tzinfo()),
-                                          datetime.datetime(2017, 3, 1, tzinfo=_get_tzinfo()))
-    deadline = factory.fuzzy.FuzzyDate(datetime.datetime(2016, 1, 1, tzinfo=_get_tzinfo()),
-                                       datetime.datetime(2017, 3, 1, tzinfo=_get_tzinfo()))
+    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
+                                          datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
+    deadline = factory.fuzzy.FuzzyDate(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
+                                       datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
     deadline_tutor = factory.fuzzy.FuzzyInteger(10) # max 10 days delta
     number_session = factory.Iterator(number_session.NUMBERS_SESSION, getter=operator.itemgetter(0))
     offer_enrollment = factory.SubFactory(OfferEnrollmentFactory)
