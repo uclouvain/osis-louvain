@@ -168,7 +168,7 @@ def scores_encoding(request):
     elif mdl.tutor.is_tutor(request.user):
         tutor = mdl.tutor.find_by_user(request.user)
         score_encoding_progress_list = score_encoding_progress.get_scores_encoding_progress(user=request.user,
-                                                                                            offer_year_id=offer_year_id,
+                                                                                            offer_year_id=None,
                                                                                             number_session=number_session,
                                                                                             academic_year=academic_yr)
         all_offers = score_encoding_progress.find_related_offer_years(score_encoding_progress_list)
@@ -176,10 +176,10 @@ def scores_encoding(request):
         context.update({'tutor': tutor,
                         'offer_year_list': all_offers,
                         'offer_year_id': offer_year_id})
-
+    filtered_list = [a for a in score_encoding_progress_list if a.offer_year_id == offer_year_id]
     context.update({
         'notes_list': score_encoding_progress.group_by_learning_unit_year(score_encoding_progress_list)
-                      if not offer_year_id else score_encoding_progress_list
+        if not offer_year_id else filtered_list
     })
 
     return layout.render(request, template_name, context)
