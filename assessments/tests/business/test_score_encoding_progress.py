@@ -177,14 +177,8 @@ class ScoreEncodingProgressTest(TestCase):
         test_attribution.create_attribution(tutor=TutorFactory(), learning_unit_year=self.learning_unit_year_2)
         test_attribution.create_attribution(tutor=TutorFactory(), learning_unit_year=self.learning_unit_year_2)
 
-        progress_list = score_encoding_progress.get_scores_encoding_progress(
-            user=self.program_manager.person.user,
-            offer_year_id=None,
-            number_session=number_session.ONE,
-            academic_year=self.academic_year
-        )
-        progress_list = score_encoding_progress.append_related_tutors_and_score_responsibles(progress_list)
-        tutors = list(score_encoding_progress.find_related_tutors(progress_list))
+        tutors = list(score_encoding_progress.find_related_tutors(self.program_manager.person.user, self.academic_year,
+                                                                  number_session.ONE))
         self.assertEqual(len(tutors), 5)
 
     def test_get_scores_encoding_progress_tutor(self):

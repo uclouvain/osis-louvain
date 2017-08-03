@@ -123,14 +123,15 @@ def scores_encoding(request):
         if learning_unit_year_acronym:
             learning_unit_year_acronym = learning_unit_year_acronym.strip() if isinstance(learning_unit_year_acronym, str)\
                                          else learning_unit_year_acronym
-            learning_unit_year_ids = mdl.learning_unit_year.search(acronym=learning_unit_year_acronym) \
-                                                           .values_list('id', flat=True)
+            learning_unit_year_ids = list(mdl.learning_unit_year.search(academic_year_id=academic_yr.id,
+                                                                        acronym=learning_unit_year_acronym) \
+                                                                .values_list('id', flat=True))
         if tutor_id and tutor_id != NOBODY:
-            learning_unit_year_ids_filter_by_tutor = mdl_attr.attribution.search(tutor=tutor_id) \
-                .distinct('learning_unit_year') \
-                .values_list('learning_unit_year_id', flat=True)
-            learning_unit_year_ids = learning_unit_year_ids_filter_by_tutor if not learning_unit_year_ids else \
-                set(learning_unit_year_ids) & set(learning_unit_year_ids_filter_by_tutor)
+            learning_unit_year_ids_filter_by_tutor = \
+                mdl_attr.attribution.search(tutor=tutor_id, list_learning_unit_year=learning_unit_year_ids) \
+                                    .distinct('learning_unit_year') \
+                                    .values_list('learning_unit_year_id', flat=True)
+            learning_unit_year_ids = list(learning_unit_year_ids_filter_by_tutor)
 
         score_encoding_progress_list = score_encoding_progress.get_scores_encoding_progress(
             user=request.user,
@@ -150,7 +151,7 @@ def scores_encoding(request):
             score_encoding_progress_list = score_encoding_progress.\
                 filter_only_without_attribution(score_encoding_progress_list)
 
-        all_tutors = score_encoding_progress.find_related_tutors(score_encoding_progress_list)
+        all_tutors = score_encoding_progress.find_related_tutors(request.user, academic_yr, number_session)
 
         all_offers = mdl.offer_year.find_by_user(request.user, academic_yr=academic_yr)
 
