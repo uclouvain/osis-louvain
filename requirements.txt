@@ -14,5 +14,6 @@ factory_boy==2.8.1
 django-dotenv==1.4.1
 pendulum==1.2.0
 djangorestframework==3.3.2
+requests==2.18.3
 
 -r ./osis_common/requirements.txt

@@ -702,6 +702,9 @@ msgstr "Mes études"
 msgid "name"
 msgstr "Nom"
 
+msgid "full_name"
+msgstr "Nom complet"
+
 msgid "national_register"
 msgstr "Numéro de registre nationnal"
 
@@ -934,6 +937,10 @@ msgstr "Rechercher/mettre à jour la liste"
 
 msgid "registration_id"
 msgstr "NOMA"
+
+msgid "identification_number"
+msgstr "Matricule"
+
 
 msgid "registration_id_not_access_or_not_exist"
 msgstr "Étudiant non inscrit à l'examen"
@@ -1718,7 +1725,7 @@ msgid "used_by"
 msgstr "Utilisation par l'unité d'enseignement"
 
 msgid "offers_enrollments"
-msgstr "Inscriptions aux offres"
+msgstr "Inscriptions aux formations"
 
 msgid "learning_units_enrollments"
 msgstr "Inscription aux unités d'enseignement"

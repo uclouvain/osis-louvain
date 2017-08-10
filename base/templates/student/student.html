@@ -39,12 +39,16 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-5">
-                <label>{% trans 'name'%}</label><br>
+            <div class="col-md-2 text-center">
+                <img width="120" height="160" src="{% url 'student_picture' student_id=student.id %}" class="img-rounded">
+            </div>
+
+            <div class="col-md-4">
+                <label>{% trans 'full_name'%}</label><br>
                 {{ student.person }}
             </div>
-            <div class="col-md-3">
-                <label>{% trans 'registration_id'%}</label><br>
+            <div class="col-md-2">
+                <label>{% trans 'identification_number'%}</label><br>
                 {{ student.registration_id }}
             </div>
             <div class="col-md-2">

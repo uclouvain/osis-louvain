@@ -696,6 +696,9 @@ msgstr "My studies"
 msgid "name"
 msgstr "Name"
 
+msgid "full_name"
+msgstr "Full name"
+
 msgid "national_register"
 msgstr "National register's number"
 
@@ -923,6 +926,9 @@ msgstr "Search/update the list"
 
 msgid "registration_id"
 msgstr "Registration ID"
+
+msgid "identification_number"
+msgstr "Number ID"
 
 msgid "registration_id_not_access_or_not_exist"
 msgstr "Student not registered for exam"

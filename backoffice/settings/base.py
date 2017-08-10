@@ -296,3 +296,7 @@ REST_FRAMEWORK = {
     ),
     'TEST_REQUEST_DEFAULT_FORMAT': 'json'
 }
+
+#ESB Configuration
+ESB_AUTHORIZATION = os.environ.get('ESB_AUTHORIZATION')
+ESB_STUDENT_API = os.environ.get('ESB_STUDENT_API')
