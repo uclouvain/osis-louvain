@@ -447,13 +447,10 @@ def _learning_unit_usage(a_learning_component_year):
 
 
 def _learning_unit_usage_by_class(a_learning_class_year):
-    learning_unit_component_class = mdl.learning_unit_component_class.find_by_learning_class_year(a_learning_class_year)
-    ch = ""
-    separator = ""
-    for l in learning_unit_component_class:
-        ch = "{}{}{}".format(ch, separator, l.learning_unit_component.learning_unit_year.acronym)
-        separator = ", "
-    return ch
+    queryset = mdl.learning_unit_component_class.find_by_learning_class_year(a_learning_class_year)\
+                                            .order_by('learning_unit_component__learning_unit_year__acronym')\
+                                            .values_list('learning_unit_component__learning_unit_year__acronym', flat=True)
+    return ", ".join(list(queryset))
 
 
 def format_volume_zero(volume):

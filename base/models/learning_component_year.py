@@ -59,16 +59,12 @@ class LearningComponentYear(models.Model):
         )
 
     @property
-    def type_letter_acronym(self):
-        if self.learning_container_year.container_type == learning_container_year_types.COURSE:
-            if self.type == learning_component_year_type.LECTURING or self.type == learning_component_year_type.PRACTICAL_EXERCISES:
-                return self.acronym
-            return None
-        else:
-            return {
-                learning_container_year_types.INTERNSHIP: 'S',
-                learning_container_year_types.DISSERTATION: 'D',
-            }.get(self.learning_container_year.container_type)
+    def acronym_small(self):
+        if self.type == learning_component_year_type.LECTURING and self.acronym == 'CM1':
+            return 'CM'
+        elif self.type == learning_component_year_type.PRACTICAL_EXERCISES and self.acronym == 'TP1':
+            return 'TP'
+        return self.acronym
 
     @property
     def real_classes(self):

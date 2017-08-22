@@ -34,11 +34,11 @@
                 <button type="button" class="close" data-dismiss="modal" title="{% trans 'close'%}">×</button>
                 <h4>
                     {% trans 'classe'%}
-                    {% if learning_component_year.type_letter_acronym %}
-                        : {{ learning_component_year.type_letter_acronym }}
+                    {% if learning_component_year.acronym_small %}
+                        : {{ learning_component_year.acronym_small }}
                     {% endif %}
                     {% if form.instance.acronym %}
-                        {{ form.instance.acronym }}
+                       - {{ form.instance.acronym }}
                     {% endif %}
                 </h4>
             </div>
