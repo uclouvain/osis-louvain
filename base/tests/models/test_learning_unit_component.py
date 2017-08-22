@@ -25,6 +25,8 @@
 ##############################################################################
 import datetime
 from django.test import TestCase
+
+from base.models.enums import learning_component_year_type
 from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_component_year import LearningComponentYear
@@ -49,6 +51,30 @@ class LearningComponentYearTest(TestCase):
                                      start_date=datetime.datetime(now.year-1, now.month, 15),
                                      end_date=datetime.datetime(now.year + 2, now.month, 28))
         self.current_academic_year_different.save()
+
+    def test_learning_unit_component_acronym_small(self):
+        learning_container = LearningContainer()
+
+        learning_container_year = LearningContainerYear(academic_year=self.current_academic_year,
+                                                        learning_container=learning_container)
+        lcy = LearningComponentYear(learning_container_year=learning_container_year,
+                                    type=learning_component_year_type.LECTURING,
+                                    acronym="CM1")
+        self.assertEqual(lcy.acronym_small, "CM")
+
+        lcy = LearningComponentYear(learning_container_year=learning_container_year,
+                                    type=learning_component_year_type.LECTURING,
+                                    acronym="CM11")
+        self.assertEqual(lcy.acronym_small, "CM11")
+
+        lcy = LearningComponentYear(learning_container_year=learning_container_year,
+                                    type=learning_component_year_type.PRACTICAL_EXERCISES,
+                                    acronym="TP1")
+        self.assertEqual(lcy.acronym_small, "TP")
+        lcy = LearningComponentYear(learning_container_year=learning_container_year,
+                                    type=learning_component_year_type.PRACTICAL_EXERCISES,
+                                    acronym="TP11")
+        self.assertEqual(lcy.acronym_small, "TP11")
 
     def test_creation_learning_unit_component_class_with_different_year(self):
 
