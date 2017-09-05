@@ -1773,3 +1773,78 @@ msgstr "Build anonymized fixtures"
 
 msgid "desc_lnk_fixtures_build"
 msgstr "Build a json file with anonymized fixtures"
+
+msgid "NON_ACADEMIC"
+msgstr "Non academic"
+
+msgid "NON_ACADEMIC_CREF"
+msgstr "Non academic CREF"
+
+msgid "ACADEMIC"
+msgstr "Academic"
+
+msgid "ACTIVE"
+msgstr "Active"
+
+msgid "INACTIVE"
+msgstr "Inactive"
+
+msgid "RE_REGISTRATION"
+msgstr "Re-registration"
+
+msgid "OPTIONAL"
+msgstr "Optional"
+
+msgid "NO_PRINT"
+msgstr "No printing"
+
+msgid "IN_HEADING_2_OF_DIPLOMA"
+msgstr ""
+
+msgid "IN_EXPECTED_FORM"
+msgstr ""
+
+msgid "FEE_1"
+msgstr "Role"
+
+msgid "FEE_2"
+msgstr "Role + exam"
+
+msgid "FEE_3"
+msgstr "AESS, CAPAES or end-of-cycle"
+
+msgid "FEE_4"
+msgstr "School fees without any exam"
+
+msgid "FEE_5"
+msgstr "Full school fees"
+
+msgid "FEE_6"
+msgstr "University certificate"
+
+msgid "FEE_7"
+msgstr "Complementary master with medical specialization"
+
+msgid "FEE_8"
+msgstr "Admission exam"
+
+msgid "FEE_10"
+msgstr "CU 30 credits"
+
+msgid "FEE_11"
+msgstr "Medical skills certificate"
+
+msgid "FEE_12"
+msgstr "ISA offers: 12BA et 21MS"
+
+msgid "FEE_13"
+msgstr "ISA offers: 13BA et 22MS"
+
+msgid "DAILY"
+msgstr "Daily"
+
+msgid "SHIFTED"
+msgstr "Shifted"
+
+msgid "ADAPTED"
+msgstr "Adapted"

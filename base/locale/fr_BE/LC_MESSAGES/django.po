@@ -1777,3 +1777,78 @@ msgstr "Créer des fixtures anonymisées"
 
 msgid "desc_lnk_fixtures_build"
 msgstr "Crée un fichier json avec des fixtures anonymisées"
+
+msgid "NON_ACADEMIC"
+msgstr "Non academique autre"
+
+msgid "NON_ACADEMIC_CREF"
+msgstr "Non académique CREF"
+
+msgid "ACADEMIC"
+msgstr "Académique"
+
+msgid "ACTIVE"
+msgstr "Actif"
+
+msgid "INACTIVE"
+msgstr "Inactif"
+
+msgid "RE_REGISTRATION"
+msgstr "Ré-inscription"
+
+msgid "OPTIONAL"
+msgstr "Optionnel"
+
+msgid "NO_PRINT"
+msgstr "Pas d'impression"
+
+msgid "IN_HEADING_2_OF_DIPLOMA"
+msgstr "Dans rubrique 2 du diplôme"
+
+msgid "IN_EXPECTED_FORM"
+msgstr "Sous forme d'attendu"
+
+msgid "FEE_1"
+msgstr "Rôle"
+
+msgid "FEE_2"
+msgstr "Rôle + examen"
+
+msgid "FEE_3"
+msgstr "AESS, CAPAES ou fin de cycle"
+
+msgid "FEE_4"
+msgstr "Minerval sans examen"
+
+msgid "FEE_5"
+msgstr "Minerval complet"
+
+msgid "FEE_6"
+msgstr "certificat universitaire"
+
+msgid "FEE_7"
+msgstr "Master complémentaire spécialisation médicale"
+
+msgid "FEE_8"
+msgstr "Concours d’accès"
+
+msgid "FEE_10"
+msgstr "10 CU 30 crédits"
+
+msgid "FEE_11"
+msgstr "11 Certificat compétence méd"
+
+msgid "FEE_12"
+msgstr "12 Offres ISA : 12BA et 21MS"
+
+msgid "FEE_13"
+msgstr "13 Offres ISA : 13BA et 22MS"
+
+msgid "DAILY"
+msgstr "Horaire de jour"
+
+msgid "SHIFTED"
+msgstr "Horaire décalé"
+
+msgid "ADAPTED"
+msgstr "Horaire adapté"

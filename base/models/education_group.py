@@ -24,11 +24,16 @@
 #
 ##############################################################################
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
-from base.models import offer, program_manager, academic_year
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from django.contrib import admin
 
 
-class EducationGroup(SerializableModel):
+class EducationGroupAdmin(admin.ModelAdmin):
+    list_display = ('id','changed')
+
+
+class EducationGroup(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
     changed = models.DateTimeField(null=True, auto_now=True)
+
+    def __str__(self):
+        return "{}".format(self.id)

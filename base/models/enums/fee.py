@@ -23,25 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+FEE_1 = 'FEE_1'
+FEE_2 = 'FEE_2'
+FEE_3 = 'FEE_3'
+FEE_4 = 'FEE_4'
+FEE_5 = 'FEE_5'
+FEE_6 = 'FEE_6'
+FEE_7 = 'FEE_7'
+FEE_8 = 'FEE_8'
+FEE_10 = 'FEE_10'
+FEE_11 = 'FEE_11'
+FEE_12 = 'FEE_12'
+FEE_13 = 'FEE_13'
 
 
-class OfferYearDomainAdmin(SerializableModelAdmin):
-    list_display = ('domain', 'offer_year', 'changed')
-    fieldsets = ((None, {'fields': ('domain', 'offer_year')}),)
-    list_filter = ('offer_year__academic_year',)
-    raw_id_fields = ('domain', 'offer_year')
-    search_fields = ['domain__name', 'offer_year__acronym']
-
-
-class OfferYearDomain(SerializableModel):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
-    changed = models.DateTimeField(null=True, auto_now=True)
-    domain = models.ForeignKey('reference.Domain', blank=True, null=True)
-    offer_year = models.ForeignKey('base.OfferYear', blank=True, null=True)
-    education_group_year = models.ForeignKey('base.EducationGroupYear', blank=True, null=True)
-
-    def __str__(self):
-        return u"%s - %s" % (self.domain, self.offer_year)
-
+FEES = ((FEE_1, FEE_1),  ## Rôle
+         (FEE_2, FEE_2), ## rôle + examen
+         (FEE_3, FEE_3), ## AESS, CAPAES ou fin de cycle
+         (FEE_4, FEE_4), ## Minerval sans examen
+         (FEE_5, FEE_5), ## Minerval complet
+         (FEE_6, FEE_6), ## certificat universitaire
+         (FEE_7, FEE_7), ## Master complémentaire spécialisation médicale
+         (FEE_8, FEE_8), ## Concours d’accès
+         (FEE_10, FEE_10), ## CU 30 crédits
+         (FEE_11, FEE_11), ## Certificat compétence méd
+         (FEE_12, FEE_12), ## Offres ISA : 12BA et 21MS
+         (FEE_13, FEE_13)) ## Offres ISA : 13BA et 22MS
