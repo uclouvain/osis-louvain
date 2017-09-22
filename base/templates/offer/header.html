@@ -24,10 +24,7 @@
 {% endcomment %}
 
 <div class="page-header">
-    {% if offer_year.parent %}
-        <h3>{{ offer_year.parent.acronym }} - {{ offer_year.parent.title }}</h3>
-        <h2>{{ offer_year.acronym }} - {{ offer_year.title }}</h2>
-    {%else%}
-        <h2>{{ offer_year.acronym }} - {{ offer_year.title }}</h2>
-    {%endif%}
+    <h2>{{ offer_year.acronym }} - {{ offer_year.title }}
+        <small style="color:black;font-family:Verdana;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{{offer_year.academic_year}}</small>
+    </h2>
 </div>

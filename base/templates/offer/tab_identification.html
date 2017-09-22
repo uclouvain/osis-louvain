@@ -39,38 +39,204 @@
 
             <div class="tab-content" id="tab_content">
                 <div role="tabpanel" class="tab-pane active" id="identification">
-
                     <br>
                     <div class="row">
-                        <div class="col-md-3">
-                            <label>{% trans 'academic_year'%}</label><br>
-                            {{ offer_year.academic_year }}
-                        </div>
-                        <div class="col-md-3">
-                            <label>{% trans 'acronym' %}</label><br>
-                            {{ offer_year.acronym }}
+                        <div class="col-md-6">
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <label>{% trans 'title_in_french'%}</label><br>
+                                    {{ offer_year.title | default_if_none:'-' }}
+                                    <br><br>
+                                    <label>{% trans 'title_in_english'%}</label><br>
+                                    {{ offer_year.title_english | default_if_none:'' }}
+                                    <br><br>
+                                    <label>{% trans 'keywords'%}</label><br>
+                                    {{ offer_year.keywords | default_if_none:'' }}
+                                    <br>
+                                </div>
+                            </div>
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>{% trans 'training_type'%}</label><br>
+                                            {% if offer_year.education_group_type %}
+                                                {% trans offer_year.education_group_type.name %}
+                                            {%else%}
+                                                &nbsp;
+                                            {% endif %}
+                                            <br><br>
+                                            <label>{% trans 'academic_type'%}</label><br>
+                                            {% if offer_year.academic_type %}
+                                                {% trans offer_year.academic_type %}
+                                            {%else%}
+                                                &nbsp;
+                                            {% endif %}
+                                            <br><br>
+                                            <label>{% trans 'studies_domain'%}</label><br>
+                                            {{ offer_year.domains | default_if_none:''}}
+                                            <br><br>
+                                            <label>{% trans 'duration'%}</label><br>
+                                            {{ offer_year.duration | default_if_none:'' }}
+                                            {% if offer_year.duration %}
+                                                &nbsp;{% trans offer_year.duration_unit %}
+                                            {% endif %}
+                                            <br><br>
+                                            <label>{% trans 'primary_language'%}</label><br>
+                                            {{ offer_year.primary_language.name  | default_if_none:''}}
+                                            <br><br>
+                                            <label>{% trans 'other_language_activities'%}</label><br>
+                                            {% if offer_year.other_language_activities %}
+                                                {% trans offer_year.other_language_activities %}
+                                            {% else %}
+                                                &nbsp;
+                                            {% endif %}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <input type="checkbox"
+                                                   {% if offer_year.enrollment_enabled %}
+                                                    checked
+                                                   {% endif %}>
+                                            <label>{% trans 'enrollment_enabled' %}</label><br>
+                                            <input type="checkbox"
+                                                   {% if offer_year.partial_deliberation %}
+                                                        checked
+                                                   {% endif %}>
+                                            <label>{% trans 'partial_deliberation' %}</label><br>
+                                            <input type="checkbox"
+                                                   {% if offer_year.admission_exam %}
+                                                        checked
+                                                   {% endif %}>
+                                            <label>{% trans 'admission_exam' %}</label><br>
+                                            <input type="checkbox"
+                                                   {% if offer_year.university_certificate %}
+                                                        checked
+                                                   {% endif %}>
+                                            <label>{% trans 'university_certificate' %}</label><br>
+                                            <input type="checkbox"
+                                                   {% if offer_year.dissertation %}
+                                                        checked
+                                                   {% endif %}>
+                                            <label>{% trans 'dissertation' %}</label><br>
+                                            <input type="checkbox"
+                                                   {% if offer_year.internship %}
+                                                        checked
+                                                   {% endif %}>
+                                            <label>{% trans 'internship' %}</label><br>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                         <div class="col-md-6">
-                            <label>{% trans 'structure' %}</label><br>
-                            {{ offer_year.entity_management }}
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            {% if offer_year.active %}
+                                                <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:green;"
+                                                      title="{% trans  'active' %}"></span>
+                                            {% else %}
+                                                <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:gray;"
+                                                      title="{% trans  'inactive' %}"></span>
+                                            {% endif %}
+
+                                            &nbsp;<label>{% trans 'active_status'%}</label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>{% trans 'schedule_type'%}</label><br>
+                                            {% if offer_year.schedule_type %}
+                                                {% trans offer_year.schedule_type %}
+                                            {%else%}
+                                                &nbsp;
+                                            {%endif%}
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>{% trans 'enrollment_campus'%}</label><br>
+                                            {{ offer_year.enrollment_campus | default_if_none:'-' }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>{% trans 'learning_location'%}</label><br>
+                                            {{ offer_year.main_teaching_campus | default_if_none:'-' }}
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <label>{% trans 'other_campus_activities'%}</label><br>
+                                    {% if offer_year.other_campus_activities%}
+                                        {% trans offer_year.other_campus_activities %}
+                                    {%else%}
+                                        &nbsp;
+                                    {%endif%}<br>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>{% trans 'administration_entity'%}</label><br>
+                                            {% if offer_year.administration_entity %}
+                                                {{ offer_year.administration_entity.acronym}}
+                                            {% endif%}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>{% trans 'management_entity'%}</label><br>
+                                            {% if offer_year.management_entity %}
+                                                {{ offer_year.management_entity.acronym}}
+                                            {% endif%}
+                                        </div>
+                                    </div>
+                                    <br>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <label>{% trans 'start'%}</label><br>
+                                            {{ offer_year.education_group.start_year | default_if_none:'-' }}
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label>{% trans 'end'%}</label><br>
+                                            {% if offer_year.education_group.end_year and offer_year.education_group.end_year != 2099 %}
+                                                {{ offer_year.education_group.end_year }}
+                                            {% else%}
+                                                {% trans 'unspecified' %}
+                                            {% endif%}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="panel panel-default">
+                                <div class="panel-body">
+                                    <input type="checkbox"
+                                           {% if offer_year.funding %}
+                                           checked
+                                           {% endif %}>
+                                    <label>{% trans 'funding' %}</label>
+                                    <br><br>
+                                    <label>{% trans 'funding_direction' %}</label><br>
+                                    {% if offer_year.funding_direction %}
+                                        {% trans offer_year.funding_direction %}
+                                    {%else%}
+                                        &nbsp;
+                                    {%endif%}
+                                    <br>
+                                    <input type="checkbox"
+                                           {% if offer_year.funding_cud %}
+                                           checked
+                                           {% endif %}>
+                                    <label>{% trans 'funding_cud' %}</label>
+                                    <br><br>
+                                    <label>{% trans 'cud_funding_direction' %}</label><br>
+                                    {% if offer_year.funding_direction_cud %}
+                                        {% trans offer_year.funding_direction_cud %}
+                                    {%else%}
+                                        &nbsp;
+                                    {%endif%}
+
+                                </div>
+                            </div>
                         </div>
                     </div>
-
-                    <br>
-                    <label>{% trans 'international_title'%}</label><br>
-                    {{ offer_year.title_international | default_if_none:'-' }}
-
-                    <br>
-                    <label>{% trans 'short_title'%}</label><br>
-                    {{ offer_year.title_short | default_if_none:'-' }}
-
-                    <br>
-                    <label>{% trans 'printable_title'%}</label><br>
-                    {{ offer_year.title_printable | default_if_none:'-' }}
-
-                    <br>
-                    <label>{% trans 'grade'%}</label><br>
-                    {{ offer_year.get_grade_display | default_if_none:'-' }}
+                </div>
+            </div>
                 </div>
             </div>
         </div>

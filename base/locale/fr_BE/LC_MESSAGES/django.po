@@ -1896,6 +1896,7 @@ msgstr "Autre"
 msgid "new_learning_unit"
 msgstr "Nouvelle unité d'enseignement"
 
+
 msgid "previous"
 msgstr "Précédent"
 
@@ -2009,3 +2010,84 @@ msgstr "Les entités associées"
 
 msgid "LU_WARNING_INVALID_ACRONYM"
 msgstr "Si l'acronym est introduit, il doit au minimum faire 3 caractères"
+
+msgid "title_in_french"
+msgstr "Intitulé en français"
+
+msgid "schedule_type"
+msgstr "Type horaire"
+
+msgid "enrollment_campus"
+msgstr "Lieu d'inscription"
+
+msgid "other_campus_activities"
+msgstr "Activités sur d'autres sites"
+
+msgid "unspecified"
+msgstr "Indéterminé"
+
+msgid "university_certificate"
+msgstr "Certificat universitaire"
+
+msgid "studies_domain"
+msgstr "Domaine d'études"
+
+msgid "primary_language"
+msgstr "Langue principale"
+
+msgid "other_language_activities"
+msgstr "Activité dans d'autres langues"
+
+msgid "funding"
+msgstr "Finançable"
+
+msgid "funding_cud"
+msgstr "Financement CUD"
+
+msgid "funding_direction"
+msgstr "Orientation de financement"
+
+msgid "cud_funding_direction"
+msgstr "Orientation CUD"
+
+msgid "active_status"
+msgstr "Actif"
+
+msgid "partial_deliberation"
+msgstr "Sous-épreuve"
+
+msgid "admission_exam"
+msgstr "Concours"
+
+msgid "academic_type"
+msgstr "Nature"
+
+msgid "keywords"
+msgstr "Mots clés"
+
+msgid "training_type"
+msgstr "Type of training"
+
+msgid "QUADRIMESTER"
+msgstr "Quadrimestre(s)"
+
+msgid "TRIMESTER"
+msgstr "Trimestre(s)"
+
+msgid "MONTH"
+msgstr "Mois"
+
+msgid "WEEK"
+msgstr "Semaine(s)"
+
+msgid "DAY"
+msgstr "Jour(s)"
+
+msgid "administration_entity"
+msgstr "Entité d'administration"
+
+msgid "management_entity"
+msgstr "Entité académique"
+
+msgid "enrollment_enabled"
+msgstr "Inscriptible"

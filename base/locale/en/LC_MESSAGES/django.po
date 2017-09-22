@@ -2003,3 +2003,83 @@ msgstr "Associated entity"
 
 msgid "LU_WARNING_INVALID_ACRONYM"
 msgstr "The acronym, if it is entered, must at least count 3 characters"
+msgid "title_in_french"
+msgstr "Title in French"
+
+msgid "schedule_type"
+msgstr "Schedule type"
+
+msgid "enrollment_campus"
+msgstr "Enrollment campus"
+
+msgid "other_campus_activities"
+msgstr "Activities on other campus"
+
+msgid "unspecified"
+msgstr "Unspecified"
+
+msgid "university_certificate"
+msgstr "University certificate"
+
+msgid "studies_domain"
+msgstr "Studies domain"
+
+msgid "primary_language"
+msgstr "Primary language"
+
+msgid "other_language_activities"
+msgstr "Other languages activities"
+
+msgid "funding"
+msgstr "Funding"
+
+msgid "funding_cud"
+msgstr "Funding CUD"
+
+msgid "funding_direction"
+msgstr "Funding direction"
+
+msgid "cud_funding_direction"
+msgstr "Funding CUD direction"
+
+msgid "active_status"
+msgstr "Active"
+
+msgid "partial_deliberation"
+msgstr "Partial deliberation"
+
+msgid "admission_exam"
+msgstr "Admission exam"
+
+msgid "academic_type"
+msgstr "Academic type"
+
+msgid "keywords"
+msgstr "Keywords"
+
+msgid "training_type"
+msgstr "Type of training"
+
+msgid "QUADRIMESTER"
+msgstr "Quadrimester(s)"
+
+msgid "TRIMESTER"
+msgstr "Trimester(s)"
+
+msgid "MONTH"
+msgstr "Month(s)"
+
+msgid "WEEK"
+msgstr "Week(s)"
+
+msgid "DAY"
+msgstr "Day(s)"
+
+msgid "administration_entity"
+msgstr "Administration entity"
+
+msgid "management_entity"
+msgstr "Management entity"
+
+msgid "enrollment_enabled"
+msgstr "Enrollment enabled"

@@ -56,7 +56,7 @@ def offers_search(request):
     academic_years = mdl.academic_year.find_academic_years()
 
     offer_years = mdl.offer_year.search(entity=entity, academic_yr=academic_yr, acronym=acronym)
-
+    
     return layout.render(request, "offers.html", {'academic_year': academic_yr,
                                                   'entity_acronym': entity,
                                                   'code': acronym,
@@ -72,7 +72,7 @@ def offer_read(request, offer_year_id):
 
 
 def _offer_identification_tab(request, offer_year_id):
-    offer_year = mdl.offer_year.find_by_id(offer_year_id)
+    offer_year = mdl.education_group_year.find_by_id(offer_year_id)
     return layout.render(request, "offer/tab_identification.html", locals())
 
 
