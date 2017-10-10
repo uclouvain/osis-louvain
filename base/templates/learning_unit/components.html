@@ -88,8 +88,8 @@
                             </td>
                             <td>{{ component.volumes.VOLUME_TOTAL | default_if_none:'0'}}</td>
                             <td>{{ component.volumes.VOLUME_QUARTER | default_if_none:'0' }}</td>
-                            <td>{{ component.volumes.VOLUME_Q1 | default_if_none:'0' }}</td>
-                            <td>{{ component.volumes.VOLUME_Q2 | default_if_none:'0' }}</td>
+                            <td>{% if component.volumes.VOLUME_Q1 != -1%}{{ component.volumes.VOLUME_Q1 | default_if_none:'0' }}{% endif%}</td>
+                            <td>{% if component.volumes.VOLUME_Q2 != -1%}{{ component.volumes.VOLUME_Q2 | default_if_none:'0' }}{% endif%}</td>
                             <td>
                                 <span class="badge fixed_width {{ component.learning_component_year.planned_classes |get_css_class:component.learning_component_year.real_classes }}">
                                     {{ component.learning_component_year.real_classes| default_if_none:'0' }} /
