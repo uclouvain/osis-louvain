@@ -99,6 +99,7 @@ class LearningUnitYearForm(forms.Form):
                                              to_attr='entity_containers_year')
 
         clean_data['learning_container_year_id'] = _get_filter_learning_container_ids(clean_data)
+
         learning_units = mdl.learning_unit_year.search(**clean_data) \
             .select_related('academic_year', 'learning_container_year', 'learning_container_year__academic_year') \
             .prefetch_related(entity_container_prefetch) \

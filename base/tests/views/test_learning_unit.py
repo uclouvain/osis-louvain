@@ -28,6 +28,8 @@ from unittest import mock
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.test import TestCase, RequestFactory
+from django.test import override_settings
+
 from base.forms.learning_units import CreateLearningUnitYearForm
 from base.models import learning_unit_component
 from base.models import learning_unit_component_class
@@ -118,6 +120,7 @@ class LearningUnitViewTestCase(TestCase):
 
     @mock.patch('django.contrib.auth.decorators')
     @mock.patch('base.views.layout.render')
+    @override_settings(CACHE_ENABLED=False)
     def test_learning_units(self, mock_render, mock_decorators):
         mock_decorators.login_required = lambda x: x
         mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
@@ -140,6 +143,7 @@ class LearningUnitViewTestCase(TestCase):
 
     @mock.patch('django.contrib.auth.decorators')
     @mock.patch('base.views.layout.render')
+    @override_settings(CACHE_ENABLED=False)
     def test_learning_units_search(self, mock_render, mock_decorators):
         mock_decorators.login_required = lambda x: x
         mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
@@ -168,6 +172,7 @@ class LearningUnitViewTestCase(TestCase):
 
     @mock.patch('django.contrib.auth.decorators')
     @mock.patch('base.views.layout.render')
+    @override_settings(CACHE_ENABLED=False)
     def test_learning_units_search_with_acronym_filtering(self, mock_render, mock_decorators):
         mock_decorators.login_required = lambda x: x
         mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
@@ -189,6 +194,7 @@ class LearningUnitViewTestCase(TestCase):
 
     @mock.patch('django.contrib.auth.decorators')
     @mock.patch('base.views.layout.render')
+    @override_settings(CACHE_ENABLED=False)
     def test_learning_units_search_with_requirement_entity(self, mock_render, mock_decorators):
         mock_decorators.login_required = lambda x: x
         mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
@@ -209,6 +215,7 @@ class LearningUnitViewTestCase(TestCase):
 
     @mock.patch('django.contrib.auth.decorators')
     @mock.patch('base.views.layout.render')
+    @override_settings(CACHE_ENABLED=False)
     def test_learning_units_search_with_requirement_entity_and_subord(self, mock_render, mock_decorators):
         mock_decorators.login_required = lambda x: x
         mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
@@ -231,6 +238,7 @@ class LearningUnitViewTestCase(TestCase):
     @mock.patch('django.contrib.auth.decorators')
     @mock.patch('base.views.layout.render')
     @mock.patch('base.models.program_manager.is_program_manager')
+    @override_settings(CACHE_ENABLED=False)
     def test_learning_unit_read(self, mock_program_manager, mock_render, mock_decorators):
         mock_decorators.login_required = lambda x: x
         mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
@@ -276,6 +284,7 @@ class LearningUnitViewTestCase(TestCase):
     @mock.patch('django.contrib.auth.decorators')
     @mock.patch('base.views.layout.render')
     @mock.patch('base.models.program_manager.is_program_manager')
+    @override_settings(CACHE_ENABLED=False)
     def test_get_partims_identification_tabs(self, mock_program_manager, mock_render, mock_decorators):
         mock_decorators.login_required = lambda x: x
         mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func

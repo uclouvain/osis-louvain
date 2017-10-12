@@ -125,6 +125,27 @@ DATABASES = {
     },
 }
 
+CACHE_ENABLED = os.environ.get("CACHE_ENABLED", 'False').lower() == 'true'
+if CACHE_ENABLED:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": "redis://" + os.environ.get("REDIS_HOST", '127.0.0.1') + ":"
+                                   + os.environ.get("REDIS_PORT", '6379'),
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                "SERIALIZER": "django_redis.serializers.json.JSONSerializer",
+                "SOCKET_CONNECT_TIMEOUT": 2,
+                "SOCKET_TIMEOUT": 2,
+            },
+            "KEY_PREFIX": os.environ.get("REDIS_PREFIX", 'osis')
+        }
+    }
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache" if CACHE_ENABLED else \
+                        "django.contrib.sessions.backends.signed_cookies"
+
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
 # If you want to change the default settings,

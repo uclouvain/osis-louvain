@@ -38,6 +38,7 @@ from base import models as mdl
 from base.business import learning_unit_year_volumes
 from base.business import learning_unit_year_with_context
 from attribution import models as mdl_attr
+from base.decorators import cache_filter
 from base.business.learning_unit_year_with_context import volume_learning_component_year
 from base.models import entity_container_year
 from base.models.entity_component_year import EntityComponentYear
@@ -71,6 +72,7 @@ from django.http import JsonResponse
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
+@cache_filter()
 def learning_units(request):
     return learning_units_search(request, 1)
 
@@ -708,12 +710,14 @@ def check_acronym(request):
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
+@cache_filter()
 def learning_units_activity(request):
     return learning_units_search(request, 1)
 
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
+@cache_filter()
 def learning_units_service_course(request):
     return learning_units_search(request, 2)
 
