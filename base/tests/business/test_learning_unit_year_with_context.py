@@ -38,6 +38,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.tests.factories.organization import OrganizationFactory
 from reference.tests.factories.country import CountryFactory
+from decimal import Decimal
 
 
 class LearningUnitYearWithContextTestCase(TestCase):
@@ -68,7 +69,7 @@ class LearningUnitYearWithContextTestCase(TestCase):
 
         a_list = [17]
         self.assertEquals(learning_unit_year_with_context._get_floated_only_element_of_list(a_list), 17.0)
-        self.assertEquals(type(learning_unit_year_with_context._get_floated_only_element_of_list(a_list)), float)
+        self.assertEquals(type(learning_unit_year_with_context._get_floated_only_element_of_list(a_list)), Decimal)
 
         a_list = [1, 2]
         with self.assertRaisesMessage(ValueError, "The provided list should contain 0 or 1 elements"):

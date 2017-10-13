@@ -31,6 +31,8 @@ from django.db import models
 from base import models as mdl
 from base.models.enums import entity_container_year_link_type as entity_types
 from django.utils.translation import ugettext_lazy as _
+from decimal import Decimal
+
 
 UNDEFINED_VALUE = ''
 VOLUME_FOR_UNKNOWN_QUADRIMESTER = -1
@@ -121,7 +123,7 @@ def _append_components(learning_unit):
             vol_add_req_entity_1 = requirement_entities_volumes.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0) or 0
             vol_add_req_entity_2 = requirement_entities_volumes.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0) or 0
             volume_total_charge = vol_req_entity + vol_add_req_entity_1 + vol_add_req_entity_2
-            volume_partial = float(component.hourly_volume_partial) if component.hourly_volume_partial else 0
+            volume_partial = Decimal(component.hourly_volume_partial) if component.hourly_volume_partial else 0
             planned_classes = component.planned_classes or 1
             volume_total = volume_total_charge / planned_classes
 
@@ -156,7 +158,7 @@ def _get_floated_only_element_of_list(a_list, default=None):
     if not len_of_list:
         return default
     elif len_of_list == 1:
-        return float(a_list[0]) if a_list[0] else 0.0
+        return Decimal(a_list[0]) if a_list[0] else 0.0
     raise ValueError("The provided list should contain 0 or 1 elements")
 
 
