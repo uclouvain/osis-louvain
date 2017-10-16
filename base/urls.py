@@ -27,6 +27,10 @@ from django.conf.urls import url, include
 
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, education_group
+from django.conf import settings
+from django.conf.urls.static import static
+
+
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -176,3 +180,8 @@ urlpatterns = [
         ]))
     ])),
 ]
+
+if settings.DEBUG:
+    urlpatterns +=  static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+

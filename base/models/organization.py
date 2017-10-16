@@ -31,7 +31,7 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 class OrganizationAdmin(SerializableModelAdmin):
     list_display = ('name', 'acronym', 'prefix', 'type', 'changed')
-    fieldsets = ((None, {'fields': ('name', 'acronym', 'prefix', 'website', 'type')}),)
+    fieldsets = ((None, {'fields': ('name', 'acronym', 'prefix', 'website', 'type', 'logo')}),)
     search_fields = ['acronym']
 
 
@@ -46,6 +46,7 @@ class Organization(SerializableModel):
     start_date = models.DateTimeField(null=True)
     end_date = models.DateTimeField(null=True)
     prefix = models.CharField(max_length=30, blank=True, null=True)
+    logo = models.ImageField(upload_to='organization_logos', null=True, blank=True)
 
     def __str__(self):
         return self.name

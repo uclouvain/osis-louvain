@@ -33,12 +33,12 @@ from base.models.academic_year import current_academic_year
 from base.models.enums import entity_container_year_link_type
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models.auditable_serializable_model import AuditableSerializableModel, AuditableSerializableModelAdmin
 from attribution.models import attribution_charge
 from base.models.enums import component_type
 
 
-class AttributionAdmin(SerializableModelAdmin):
+class AttributionAdmin(AuditableSerializableModelAdmin):
     list_display = ('tutor', 'function', 'score_responsible', 'learning_unit_year', 'start_year', 'end_year', 'changed')
     list_filter = ('function', 'learning_unit_year__academic_year', 'score_responsible')
     fieldsets = ((None, {'fields': ('learning_unit_year', 'tutor', 'function', 'score_responsible', 'start_year',
@@ -48,7 +48,7 @@ class AttributionAdmin(SerializableModelAdmin):
                      'tutor__person__global_id']
 
 
-class Attribution(SerializableModel):
+class Attribution(AuditableSerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     start_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)

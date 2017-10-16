@@ -1,6 +1,6 @@
 [run]
 branch = True
-source = genericmodels
+source = .
 omit =
     */migrations/*
 

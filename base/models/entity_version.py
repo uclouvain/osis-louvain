@@ -288,6 +288,12 @@ def find_main_entities_version():
     return entities_version
 
 
+def find_last_faculty_entities_version():
+    entities_version = EntityVersion.objects.filter(entity_type=entity_type.FACULTY,
+                                                    entity__organization__type=MAIN).order_by('entity', '-start_date').distinct('entity')
+    return entities_version
+
+
 def find_first_latest_version_by_period(ent,start_date, end_date):
     return EntityVersion.objects.filter(Q(end_date__lte=end_date) | Q(end_date__isnull=True),
                                         start_date__gte=start_date, entity=ent) \
