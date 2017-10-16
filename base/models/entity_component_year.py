@@ -25,6 +25,8 @@
 ##############################################################################
 from django.db import models
 from django.contrib import admin
+from django.core.validators import ValidationError
+from decimal import Decimal
 
 
 class EntityComponentYearAdmin(admin.ModelAdmin):
@@ -40,14 +42,26 @@ class EntityComponentYear(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     entity_container_year = models.ForeignKey('EntityContainerYear')
     learning_component_year = models.ForeignKey('LearningComponentYear')
-    hourly_volume_total = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    hourly_volume_partial = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
+    hourly_volume_total = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)
+    hourly_volume_partial = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)
 
     def __str__(self):
         return u"%s - %s" % (self.entity_container_year, self.learning_component_year)
 
     class Meta:
         unique_together = ('entity_container_year', 'learning_component_year',)
+
+    def clean(self):
+        if self.hourly_volume_total:
+            validate_volume(self.hourly_volume_total)
+        if self.hourly_volume_partial:
+            validate_volume(self.hourly_volume_partial)
+
+
+def validate_volume(volume):
+    dec = Decimal(volume) % 1
+    if dec != Decimal(0) and dec != Decimal(0.5):
+        raise ValidationError("In hourly volumes (total or partial), the number after the decimal point can only by 0 or 5.")
 
 
 def find_by_learning_container_year(learning_container_yr):
