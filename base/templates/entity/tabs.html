@@ -32,7 +32,7 @@
     <li role="presentation" {% if request.path == url_identification %} class="active" {% endif %}>
         <a href="{{url_identification}}">{% trans 'identification'%}</a>
     </li>
-    {% if entity_version.find_descendants|length > 0 %}
+    {% if entity_version.descendants|length > 0 %}
         <li role="presentation" {% if request.path == url_organogram %} class="active" {% endif %}>
             <a href="{{url_organogram}}">{% trans 'organogram'%}</a>
         </li>

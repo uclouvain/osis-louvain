@@ -63,7 +63,7 @@ class LearningUnitTest(TestCase):
         self.assertEqual(1, len(learning_unit.search(acronym="LT49786")))
 
     def test_get_partims_related(self):
-        from base.views.learning_unit import _get_partims_related
+        from base.business.learning_unit import get_partims_related
         current_year = datetime.date.today().year
         academic_year = AcademicYearFactory(year=current_year)
         l_container_year = LearningContainerYearFactory(academic_year=academic_year)
@@ -83,7 +83,7 @@ class LearningUnitTest(TestCase):
                                                        subtype=learning_unit_year_subtypes.FULL)
         LearningUnitYearFactory(academic_year=academic_year, learning_container_year=None)
 
-        all_partims_container_year_1 = _get_partims_related(learning_unit_year_1)
+        all_partims_container_year_1 = get_partims_related(learning_unit_year_1)
         self.assertEqual(len(all_partims_container_year_1), 2)
-        all_partims_container_year_2 = _get_partims_related(learning_unit_year_2)
+        all_partims_container_year_2 = get_partims_related(learning_unit_year_2)
         self.assertEqual(len(all_partims_container_year_2), 0)

@@ -26,6 +26,9 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
+
+from base.business.entity_version import update_entity, create_versions_of_existing_entity, \
+    update_end_date_of_existing_versions
 from base.models import entity
 from base.models import entity_version
 from base.serializers import EntitySerializer
@@ -37,7 +40,6 @@ def post_entities(request):
 
     if existing_entity is None:
         return create_full_entity(request)
-
     else:
         return update_existing_entity(existing_entity, request)
 
@@ -66,53 +68,13 @@ def create_full_entity(request):
 
 
 def update_existing_entity(existing_entity, request):
-    _update_entity(existing_entity, request.data)
-    new_versions_count = create_versions_of_existing_entity(request, existing_entity)
-    updated_versions_count = update_end_date_of_existing_versions(request, existing_entity)
+    update_entity(existing_entity, request.data)
+    new_versions_count = create_versions_of_existing_entity(request.data.get('entityversion_set'),
+                                                            existing_entity)
+    updated_versions_count = update_end_date_of_existing_versions(request.data.get('entityversion_set'),
+                                                                  existing_entity)
     entity_serializer = EntitySerializer(existing_entity)
     data = entity_serializer.data
     data['new_versions_count'] = new_versions_count
     data['updated_versions_count'] = updated_versions_count
     return Response(data=data, status=status.HTTP_200_OK)
-
-
-def _update_entity(existing_entity, data):
-    fields_to_update = ['website', 'location', 'postal_code', 'city', 'country_id', 'phone', 'fax']
-    for f_name in fields_to_update:
-        value = data.get(f_name)
-        setattr(existing_entity, f_name, value)
-    existing_entity.save()
-
-
-def create_versions_of_existing_entity(request, same_entity):
-    new_versions_count = 0
-    entityversion_data = request.data.get('entityversion_set')
-    for version in entityversion_data:
-        identical_versions_count = entity_version.count_identical_versions(same_entity, version)
-        if not identical_versions_count:
-            parent = entity.get_by_internal_id(version.pop('parent'))
-            if create_version(version, same_entity, parent) is not None:
-                new_versions_count += 1
-
-    return new_versions_count
-
-
-def update_end_date_of_existing_versions(request, same_entity):
-    updated_versions_count = 0
-    entityversion_data = request.data.get('entityversion_set')
-    for version in entityversion_data:
-        to_update_versions = entity_version.find_update_candidates_versions(same_entity, version)
-        for to_update_version in to_update_versions:
-            to_update_version.end_date = version.get('end_date')
-            to_update_version.save()
-            updated_versions_count += 1
-
-    return updated_versions_count
-
-
-def create_version(version, same_entity, parent):
-        try:
-            new_version = entity_version.EntityVersion.objects.create(entity=same_entity, parent=parent, **version)
-        except AttributeError:
-            new_version = None
-        return new_version

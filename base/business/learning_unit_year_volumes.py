@@ -34,19 +34,6 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import entity_container_year_link_type as entity_types
 
 
-# List of key that a user can modify
-VALID_VOLUMES_KEYS = [
-    'VOLUME_TOTAL',
-    'VOLUME_Q1',
-    'VOLUME_Q2',
-    'PLANNED_CLASSES',
-    'VOLUME_' + entity_types.REQUIREMENT_ENTITY,
-    'VOLUME_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
-    'VOLUME_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2,
-    'VOLUME_TOTAL_REQUIREMENT_ENTITIES'
-]
-
-
 def update_volumes(learning_unit_year_id, updated_volumes):
     volumes_grouped_by_lunityear = get_volumes_grouped_by_lunityear(learning_unit_year_id, updated_volumes)
     errors = validate(volumes_grouped_by_lunityear)

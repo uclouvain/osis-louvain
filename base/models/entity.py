@@ -107,7 +107,7 @@ def _find_descendants(entity, date=None, with_entities=True):
     try:
         entity_vers = entity_version.get_last_version(entity, date=date)
         if with_entities:
-            entities_descendants.add(entity_vers.entity)
+                entities_descendants.add(entity_vers.entity)
         entities_descendants |= {entity_version_descendant.entity for entity_version_descendant in
                                  entity_vers.find_descendants(date=date)}
     finally:

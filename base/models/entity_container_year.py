@@ -52,16 +52,20 @@ class EntityContainerYear(models.Model):
     def __str__(self):
         return u"%s - %s - %s" % (self.entity, self.learning_container_year, self.type)
 
+    def get_latest_entity_version(self):
+        if self.entity.entity_versions:
+            return self.entity.entity_versions[-1]
+
 
 def find_last_entity_version_grouped_by_linktypes(learning_container_year, link_type=None):
     lcy_start_date = learning_container_year.academic_year.start_date
-    entity_container_years = search(learning_container_year=learning_container_year, link_type=link_type)\
+    entity_container_years = search(learning_container_year=learning_container_year, link_type=link_type) \
         .prefetch_related(
-            Prefetch('entity__entityversion_set',
+        Prefetch('entity__entityversion_set',
                  queryset=entity_version.find_latest_version(lcy_start_date),
                  to_attr="entity_versions")
-        )
-    return {ecy.type: _get_latest_entity_version(ecy) for ecy in entity_container_years}
+    )
+    return {ecy.type: ecy.get_latest_entity_version() for ecy in entity_container_years}
 
 
 def search(*args, **kwargs):
@@ -92,26 +96,22 @@ def search(*args, **kwargs):
     return queryset.select_related('learning_container_year__academic_year', 'entity')
 
 
-def _get_latest_entity_version(entity_container_year):
-    entity_version = None
-    if entity_container_year.entity.entity_versions:
-        entity_version = entity_container_year.entity.entity_versions[-1]
-    return entity_version
-
-
 def find_requirement_entity(learning_container_year):
-    results = find_last_entity_version_grouped_by_linktypes(learning_container_year, entity_container_year_link_type.REQUIREMENT_ENTITY)
+    results = find_last_entity_version_grouped_by_linktypes(learning_container_year,
+                                                            entity_container_year_link_type.REQUIREMENT_ENTITY)
     return next(iter(results.values()), None)
 
 
 def find_allocation_entity(learning_container_year):
-    results = find_last_entity_version_grouped_by_linktypes(learning_container_year, entity_container_year_link_type.ALLOCATION_ENTITY)
+    results = find_last_entity_version_grouped_by_linktypes(learning_container_year,
+                                                            entity_container_year_link_type.ALLOCATION_ENTITY)
     return next(iter(results.values()), None)
 
 
 def find_all_additional_requirement_entities(learning_container_year):
-    results = find_last_entity_version_grouped_by_linktypes(learning_container_year, [entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                                                                                      entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2])
+    results = find_last_entity_version_grouped_by_linktypes(learning_container_year, [
+        entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
+        entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2])
     return next(iter(results.values()), None)
 
 

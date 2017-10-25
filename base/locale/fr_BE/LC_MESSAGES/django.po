@@ -2183,6 +2183,3 @@ msgstr "Diplôme séparé"
 
 msgid "NOT_CONCERNED"
 msgstr "Non concerné"
-
-msgid "organization_address_save_error"
-msgstr "Impossible d'enregistrer l'adresse de l'organisation"

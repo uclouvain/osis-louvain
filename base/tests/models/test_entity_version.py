@@ -38,7 +38,6 @@ now = datetime.datetime.now()
 
 
 class EntityVersionTest(TestCase):
-
     def setUp(self):
         self.country = CountryFactory()
         self.entities = [EntityFactory(country=self.country) for x in range(3)]
@@ -51,15 +50,15 @@ class EntityVersionTest(TestCase):
                                                     datetime.date(2017, 12, 30)).fuzz()
 
         self.entity_versions = [EntityVersionFactory(
-                                entity=self.entities[x],
-                                acronym="ENTITY_V_"+str(x),
-                                title="This is the entity version "+str(x),
-                                entity_type="FACULTY",
-                                parent=self.parent,
-                                start_date=self.start_date,
-                                end_date=self.end_date
-                                )
-                                for x in range(3)]
+            entity=self.entities[x],
+            acronym="ENTITY_V_" + str(x),
+            title="This is the entity version " + str(x),
+            entity_type="FACULTY",
+            parent=self.parent,
+            start_date=self.start_date,
+            end_date=self.end_date
+        )
+            for x in range(3)]
         self.parent_entity_version = EntityVersionFactory(entity=self.parent,
                                                           acronym="ENTITY_PARENT",
                                                           title="This is the entity parent version",
@@ -73,7 +72,7 @@ class EntityVersionTest(TestCase):
                 entity=self.entities[0],
                 start_date=self.start_date,
                 end_date=self.end_date
-                )
+            )
 
     def test_create_entity_version_same_entity_overlapping_dates_end_date_in(self):
         with self.assertRaisesMessage(AttributeError, 'EntityVersion invalid parameters'):
@@ -83,7 +82,7 @@ class EntityVersionTest(TestCase):
                                                    datetime.date(2014, 12, 30)).fuzz(),
                 end_date=factory.fuzzy.FuzzyDate(datetime.date(2015, 1, 1),
                                                  datetime.date(2015, 12, 30)).fuzz()
-                )
+            )
 
     def test_create_entity_version_same_entity_overlapping_dates_start_date_in(self):
         with self.assertRaisesMessage(AttributeError, 'EntityVersion invalid parameters'):
@@ -93,7 +92,7 @@ class EntityVersionTest(TestCase):
                                                    datetime.date(2015, 12, 30)).fuzz(),
                 end_date=factory.fuzzy.FuzzyDate(datetime.date(2016, 1, 1),
                                                  datetime.date(2020, 12, 30)).fuzz()
-                )
+            )
 
     def test_create_entity_version_same_entity_overlapping_dates_both_dates_out(self):
         with self.assertRaisesMessage(AttributeError, 'EntityVersion invalid parameters'):
@@ -103,7 +102,7 @@ class EntityVersionTest(TestCase):
                                                    datetime.date(2014, 12, 30)).fuzz(),
                 end_date=factory.fuzzy.FuzzyDate(datetime.date(2016, 1, 1),
                                                  datetime.date(2020, 12, 30)).fuzz()
-                )
+            )
 
     def test_create_entity_version_same_entity_overlapping_dates_both_dates_in(self):
         with self.assertRaisesMessage(AttributeError, 'EntityVersion invalid parameters'):
@@ -113,7 +112,7 @@ class EntityVersionTest(TestCase):
                                                    datetime.date(2015, 6, 30)).fuzz(),
                 end_date=factory.fuzzy.FuzzyDate(datetime.date(2015, 7, 1),
                                                  datetime.date(2015, 12, 30)).fuzz()
-                )
+            )
 
     def test_create_entity_version_same_acronym_overlapping_dates_end_date_in(self):
         with self.assertRaisesMessage(AttributeError, 'EntityVersion invalid parameters'):
@@ -123,7 +122,7 @@ class EntityVersionTest(TestCase):
                                                    datetime.date(2014, 12, 30)).fuzz(),
                 end_date=factory.fuzzy.FuzzyDate(datetime.date(2015, 1, 1),
                                                  datetime.date(2015, 12, 30)).fuzz()
-                )
+            )
 
     def test_create_entity_version_same_acronym_overlapping_dates_start_date_in(self):
         with self.assertRaisesMessage(AttributeError, 'EntityVersion invalid parameters'):
@@ -133,7 +132,7 @@ class EntityVersionTest(TestCase):
                                                    datetime.date(2015, 12, 30)).fuzz(),
                 end_date=factory.fuzzy.FuzzyDate(datetime.date(2016, 1, 1),
                                                  datetime.date(2020, 12, 30)).fuzz()
-                )
+            )
 
     def test_create_entity_version_same_acronym_overlapping_dates_both_dates_out(self):
         with self.assertRaisesMessage(AttributeError, 'EntityVersion invalid parameters'):
@@ -143,7 +142,7 @@ class EntityVersionTest(TestCase):
                                                    datetime.date(2014, 12, 30)).fuzz(),
                 end_date=factory.fuzzy.FuzzyDate(datetime.date(2016, 1, 1),
                                                  datetime.date(2020, 12, 30)).fuzz()
-                )
+            )
 
     def test_create_entity_version_same_acronym_overlapping_dates_both_dates_in(self):
         with self.assertRaisesMessage(AttributeError, 'EntityVersion invalid parameters'):
@@ -153,7 +152,7 @@ class EntityVersionTest(TestCase):
                                                    datetime.date(2015, 6, 30)).fuzz(),
                 end_date=factory.fuzzy.FuzzyDate(datetime.date(2015, 7, 1),
                                                  datetime.date(2015, 12, 30)).fuzz()
-                )
+            )
 
     def test_find_entity_version(self):
         search_date = factory.fuzzy.FuzzyDate(datetime.date(2015, 1, 1),
@@ -161,6 +160,10 @@ class EntityVersionTest(TestCase):
         self.assertEqual(entity_version.find("ENTITY_V_0", search_date), self.entity_versions[0])
         self.assertEqual(entity_version.find("ENTITY_V_1", search_date), self.entity_versions[1])
         self.assertEqual(entity_version.find("NOT_EXISTING_ENTITY", search_date), None)
+        ev = entity_version.find_by_id(self.entity_versions[0].id)
+        self.assertEqual(ev, self.entity_versions[0])
+        self.assertEqual(str(ev), str(self.entity_versions[0]))
+        self.assertIsNone(entity_version.find_by_id(None))
 
     def test_search_matching_entity_version(self):
         self.assertCountEqual(
@@ -266,9 +269,8 @@ class EntityVersionTest(TestCase):
             end_date=end_date
         )
 
-        self.assertEqual(entity_version.find_parent_faculty_version(entity_school_version_level2, ac_yr),
+        self.assertEqual(entity_school_version_level2.find_parent_faculty_version(ac_yr),
                          entity_faculty_version)
-
 
     def test_find_parent_faculty_version_no_parent(self):
         start_date = datetime.datetime(now.year - 1, now.month, 16)
@@ -288,7 +290,7 @@ class EntityVersionTest(TestCase):
             end_date=end_date
         )
 
-        self.assertIsNone(entity_version.find_parent_faculty_version(entity_school_version_no_parent, ac_yr))
+        self.assertIsNone(entity_school_version_no_parent.find_parent_faculty_version(ac_yr))
 
     def test_find_parent_faculty_version_no_faculty_parent(self):
 
@@ -317,4 +319,4 @@ class EntityVersionTest(TestCase):
             start_date=start_date,
             end_date=end_date
         )
-        self.assertIsNone(entity_version.find_parent_faculty_version(entity_school_version_level1, ac_yr))
+        self.assertIsNone(entity_school_version_level1.find_parent_faculty_version(ac_yr))

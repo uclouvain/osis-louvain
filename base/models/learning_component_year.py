@@ -52,7 +52,7 @@ class LearningComponentYear(models.Model):
     deleted = models.BooleanField(default=False)
 
     def __str__(self):
-        return u"%s - %s - %s" % (self.acronym, self.learning_container_year.acronym , self.title)
+        return u"%s - %s" % (self.acronym, self.title)
 
     class Meta:
         permissions = (

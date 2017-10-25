@@ -23,26 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
-
-from osis_common.models.auditable_model import AuditableModel, AuditableModelAdmin
 
 
-class AttributionChargeNewAdmin(AuditableModelAdmin):
-    list_display = ('attribution', 'learning_component_year', 'allocation_charge')
-    raw_id_fields = ('attribution', 'learning_component_year')
-    search_fields = ['attribution__tutor__person__first_name', 'attribution__tutor__person__last_name',
-                     'attribution__tutor__person__global_id',
-                     'learning_component_year__learning_container_year__acronym',
-                     'attribution__function']
-    list_filter = ('learning_component_year__type', 'attribution__learning_container_year__academic_year')
+def get_clean_data(datas_to_clean):
+    return {key: treat_empty_or_str_none_as_none(value) for (key, value) in datas_to_clean.items()}
 
 
-class AttributionChargeNew(AuditableModel):
-    external_id = models.CharField(max_length=100, blank=True, null=True)
-    attribution = models.ForeignKey('AttributionNew')
-    learning_component_year = models.ForeignKey('base.LearningComponentYear')
-    allocation_charge = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)
-
-    def __str__(self):
-        return u"%s" % str(self.attribution)
+def treat_empty_or_str_none_as_none(data):
+    return None if not data or data == "NONE" else data

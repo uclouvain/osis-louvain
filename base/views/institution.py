@@ -32,8 +32,6 @@ from base import models as mdl
 from base.models import entity_version as entity_version_mdl
 from base.models.enums import entity_type
 from . import layout
-from django.contrib import messages
-from django.utils.translation import ugettext_lazy as _
 
 
 @login_required
@@ -63,7 +61,8 @@ def entities(request):
 def entities_search(request):
     entities_version = mdl.entity_version.search_entities(acronym=request.GET.get('acronym'),
                                                           title=request.GET.get('title'),
-                                                          type=request.GET.get('type_choices'))
+                                                          type=request.GET.get('type_choices'),
+                                                          with_entity=True)
     return layout.render(request, "entities.html", {'entities_version': entities_version,
                                                     'init': "1",
                                                     'types': entity_type.ENTITY_TYPES})
@@ -73,6 +72,7 @@ def entities_search(request):
 def entity_read(request, entity_version_id):
     entity_version = mdl.entity_version.find_by_id(entity_version_id)
     entity_parent = entity_version.get_parent_version()
+    descendants = entity_version.descendants
     return layout.render(request, "entity/identification.html", locals())
 
 

@@ -30,7 +30,6 @@ from django.contrib.staticfiles.storage import staticfiles_storage
 from django.http import Http404
 from django.http import HttpResponse
 from django.shortcuts import redirect
-from requests.exceptions import RequestException
 
 from backoffice.settings.base import ESB_STUDENT_API, ESB_AUTHORIZATION
 from base import models as mdl
@@ -82,7 +81,7 @@ def student_picture(request, student_id):
             result = response.json()
             if response.status_code == 200 and result.get('photo_url'):
                 return _get_image(result.get('photo_url'), student)
-        except (RequestException, ValueError):
+        finally:
             return _default_image(student)
     raise Http404()
 

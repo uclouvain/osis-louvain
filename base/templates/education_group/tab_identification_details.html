@@ -79,7 +79,8 @@
                         <br><br>
                         <label>{% trans 'primary_language'%}</label><br>
                             {% if education_group_languages %}
-                                {{ education_group_languages|join_with_spaces:education_group_year.language_association }}
+                                {% trans education_group_year.language_association|lower as comparator %}
+                                {{ education_group_languages|join_with_spaces:comparator }}
                             {% endif %}
                         <br><br>
                         <label>{% trans 'other_language_activities'%}</label><br>
