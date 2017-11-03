@@ -36,6 +36,7 @@ from osis_common.queue import queue_sender
 
 from attribution import models as mdl_attribution
 from base import models as mdl_base
+from base.models.enums import learning_unit_year_subtypes
 
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
@@ -69,7 +70,8 @@ def _get_all_attributions_with_charges(global_ids):
         .prefetch_related(
             Prefetch('learning_component_year__learningunitcomponent_set',
                      queryset=mdl_base.learning_unit_component.search()
-                        .filter(learning_unit_year__learning_container_year__in_charge=True),
+                        .filter(learning_unit_year__learning_container_year__in_charge=True)
+                        .exclude(learning_unit_year__subtype=learning_unit_year_subtypes.PARTIM),
                      to_attr='learning_unit_components')
     )
 

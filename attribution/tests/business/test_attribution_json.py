@@ -71,6 +71,7 @@ class AttributionJsonTest(TestCase):
         # Creation Attribution and Attributions Charges - Tutor 2 - Co-holder
         attribution_tutor_2 = AttributionNewFactory(learning_container_year=self.l_container, tutor=self.tutor_2,
                                                     function=function.CO_HOLDER)
+        _create_attribution_charge(self.academic_year, attribution_tutor_2, "LBIR1210", Decimal(7.5))
         _create_attribution_charge(self.academic_year, attribution_tutor_2, "LBIR1210B", Decimal(7.5))
 
     def test_build_attributions_json(self):
@@ -82,7 +83,7 @@ class AttributionJsonTest(TestCase):
             (attrib for attrib in attrib_list if attrib['global_id'] == self.tutor_1.person.global_id),
             None)
         self.assertTrue(attrib_tutor_1)
-        self.assertEqual(len(attrib_tutor_1['attributions']), 2)
+        self.assertEqual(len(attrib_tutor_1['attributions']), 1)
 
         #Check if attribution is correct
         attrib_tutor_2 = next(
@@ -90,7 +91,7 @@ class AttributionJsonTest(TestCase):
             None)
         self.assertTrue(attrib_tutor_2)
         self.assertEqual(len(attrib_tutor_2['attributions']), 1)
-        self.assertEqual(attrib_tutor_2['attributions'][0]['acronym'], "LBIR1210B")
+        self.assertEqual(attrib_tutor_2['attributions'][0]['acronym'], "LBIR1210")
         self.assertEqual(attrib_tutor_2['attributions'][0]['function'], function.CO_HOLDER)
         self.assertEqual(attrib_tutor_2['attributions'][0][learning_component_year_type.LECTURING], "7.5")
         self.assertRaises(KeyError, lambda: attrib_tutor_2['attributions'][0][learning_component_year_type.PRACTICAL_EXERCISES + '_CHARGE'])
@@ -121,14 +122,13 @@ class AttributionJsonTest(TestCase):
                  (attrib for attrib in attrib_list if attrib['global_id'] == self.tutor_1.person.global_id),
                   None
         )
-        self.assertEqual(len(attrib_tutor_1['attributions']), 3)
+        self.assertEqual(len(attrib_tutor_1['attributions']), 2)
 
     def test_with_specific_global_id(self):
         global_id = self.tutor_2.person.global_id
         attrib_list = attribution_json._compute_list(global_ids=[global_id])
         self.assertIsInstance(attrib_list, list)
         self.assertEqual(len(attrib_list), 1)
-
         attrib_tutor_2 = next(
             (attrib for attrib in attrib_list if attrib['global_id'] == global_id),
             None
