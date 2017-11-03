@@ -32,7 +32,7 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 class LearningComponentYearAdmin(SerializableModelAdmin):
     list_display = ('learning_container_year', 'title', 'acronym', 'type', 'comment')
-    fieldsets = ((None, {'fields': ('learning_container_year', 'title', 'acronym', 'volume_declared_vacant'
+    fieldsets = ((None, {'fields': ('learning_container_year', 'title', 'acronym', 'volume_declared_vacant',
                                     'type', 'comment', 'planned_classes', 'hourly_volume_partial')}),)
     search_fields = ['acronym', 'learning_container_year__acronym']
     raw_id_fields = ('learning_container_year',)
