@@ -28,6 +28,7 @@
 
 <div class="row page-header" style="margin-top:25px;">
     <div class="col-md-1">
+      {% if disabled_nav != True %}
         <ul class="pager">
             <li class="previous disabled" >
                 <a id="previousNavLink" data-toggle="tooltip" data-placement="top" title="">
@@ -35,11 +36,13 @@
                 </a>
             </li>
         </ul>
+      {% endif %}
     </div>
     <div class="col-md-10">
          <h2>{{ header_title|default_if_none:'' }}</h2>
     </div>
     <div class="col-md-1">
+      {% if disabled_nav != True %}
         <ul class="pager">
             <li class="next disabled">
                 <a id="nextNavLink" data-toggle="tooltip" data-placement="top" title="">
@@ -47,6 +50,7 @@
                 </a>
             </li>
         </ul>
+      {% endif %}
     </div>
 </div>
 

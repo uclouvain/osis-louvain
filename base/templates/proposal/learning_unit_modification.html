@@ -1,0 +1,324 @@
+{% extends "layout.html" %}
+{% load staticfiles %}
+{% load i18n %}
+{% load learning_unit %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a></li>
+<li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'learning_units' %}</a></li>
+<li><a href="{% url 'learning_unit' learning_unit_year.id %}" id="lnk_learning_units">{{learning_unit_year.acronym}}</a></li>
+<li class="active">{% trans 'proposal' %}</li>{% endblock %}
+
+{% block content %}
+
+{% with disabled_nav=True %}
+  {% include "learning_unit/header.html" %}
+{% endwith %}
+
+<div class="panel panel-default" >
+    <div class="panel-body" id="tabs" >
+
+      {% include "proposal/tabs.html" %}
+
+        <div class="tab-content" id="tab_content">
+            <div role="tabpanel" class="tab-pane active">
+                <br/>
+                <form method="post">
+                  {% csrf_token %}
+                  <div class="row">
+                      <div class="col-md-8">
+                          <div class="panel panel-default">
+                              <div class="panel-body">
+                                  <div class="row">
+
+                                      <div class="col-md-3" style="padding-left:0;">
+                                        <div class="col-md-12">
+                                          <label for"inputCode">{% trans 'acronym'%}*</label>
+                                        </div>
+                                        <div class="col-md-4" style="padding-right:0;">
+                                          <input type "text" class="form-control" id="inputLocationCode" readonly></input>
+                                        </div>
+                                        <div class="col-md-8" style="padding-left:0;">
+                                          <input type="text" class="form-control" id="inputCode"></input>
+                                        </div>
+                                      </div>
+
+                                      <div class="col-md-3">
+                                          <label>{% trans 'partims' %}</label>
+                                          <div>
+                                              {% for partim in learning_container_year_partims %}
+                                              {% if forloop.counter > 1 %}
+                                              ,
+                                              {% endif%}
+                                              {{ partim.subdivision}}
+                                              {% endfor %}
+                                          </div>
+                                      </div>
+
+                                      <div class="form_group col-md-3">
+                                          <label for="inputType">{% trans 'type' %}</label>
+                                          <select class="form-control" id="inputType">
+                                            <option>
+                                              TODO
+                                            </option>
+                                          </select>
+                                      </div>
+
+                                      <div class="col-md-3">
+                                          <label>{% trans 'internship_subtype' %}</label>
+                                          <select class="form-control" id="inputType" disabled>
+                                            <option>
+                                              TODO
+                                            </option>
+                                          </select>
+                                      </div>
+
+                                  </div>
+
+                                  <div class="row" style="margin-top:10px;">
+
+                                      <div class="from-group col-md-3">
+                                          <label for="inputCredits ">{% trans 'nominal_credits' %}</label>
+                                          <input type="text" class="form-control" id="inputCredits"></input>
+                                      </div>
+
+                                      <div class="form-group col-md-3">
+                                          <label for="inputPeriodicity">{% trans 'periodicity' %}</label>
+                                          <select class="form-control" id="inputPeriodicity">
+                                            <option>
+                                              TODO
+                                            </option>
+                                          </select>
+                                      </div>
+
+                                      <div class="form-group col-md-3">
+                                          <label for="inputStatus">{% trans 'status' %}</label>
+                                          <select class="form-control" id="inputStatus">
+                                            <option>
+                                              TODO
+                                            </option>
+                                          </select>
+                                      </div>
+
+                                  </div>
+
+                                  <br>
+
+                                  <div class="form-group">
+                                    <label input="inputTitleOfficial1">{% trans 'title_official' %} - {% trans 'part1' %}</label>
+                                    <input type="text" class="form-control" id="inputTitleOfficial1"></input>
+                                  </div>
+
+                                  <div class="form-group">
+                                    <label input="inputTitleOfficial2">{% trans 'title_official' %} - {% trans 'part2' %}</label>
+                                    <input type="text" class="form-control" id="inputTitleOfficial2"></input>
+                                  </div>
+
+                                  <div class="form-group">
+                                    <label input="inputTitleEnglish1">{% trans 'title_in_english' %} - {% trans 'part1' %}</label>
+                                    <input type="text" class="form-control" id="inputTitleEnglish1"></input>
+                                  </div>
+
+                                  <div class="form-group">
+                                    <label input="inputTitleEnglish2">{% trans 'title_in_english' %} - {% trans 'part2' %}</label>
+                                    <input type="text" class="form-control" id="inputTitleEnglish1"></input>
+                                  </div>
+
+                                  <div class="row">
+
+                                    <div class="form-group col-md-3">
+                                        <label for="inputLanguage">{% trans 'language' %}</label>
+                                        <select class="form-control" id="inputLanguage">
+                                          <option>
+                                            TODO
+                                          </option>
+                                        </select>
+                                    </div>
+
+                                    <div class="col-md-9">
+                                        <label>{% trans 'quadrimester' %}</label>
+                                        {{ learning_unit_year.quadrimester | default_if_none:'' }}
+                                    </div>
+
+                                  </div>
+                              </div>
+                          </div>
+
+                          {% if components %}
+                              {% include "learning_unit/components_identification.html" %}
+                          {% endif %}
+
+                      </div>
+
+                      <div class="col-md-4">
+                          <div class="panel panel-default">
+                              <div class="panel-body">
+
+                                  <label>{% trans 'institution'%}</label><br>
+                                   {% if organization %}
+                                      <a href="{% url 'organization_read' organization_id=organization.id %}">
+                                          {{ organization.name }}
+                                      </a>
+                                   {% endif %}
+                                   <br>
+
+                                  <div class="form-group">
+                                      <label for="inputLocalization">{% trans 'localization' %}</label>
+                                      <select class="form-control" id="inputLocalization">
+                                        <option>
+                                          TODO
+                                        </option>
+                                      </select>
+                                  </div>
+
+                                  <div class="form-group">
+                                      <label for="inputRequirementEntity">{% trans 'requirement_entity'%}</label>
+                                      <select class="form-control" id="inputRequirementEntity">
+                                        <option>
+                                          TODO
+                                        </option>
+                                      </select>
+                                  </div>
+
+                                  <div class="form-group">
+                                      <label for="inputAllocationEntity">{% trans 'allocation_entity'%}</label>
+                                      <select class="form-control" id="inputAllocationEntity">
+                                        <option>
+                                          TODO
+                                        </option>
+                                      </select>
+                                  </div>
+
+                                  <div class="form-group">
+                                      <label for="inputAdditionalRequirementEntity1">{% trans 'additional_requirement_entity' %} 1</label>
+                                      <select class="form-control" id="inputAdditionalRequirementEntity1">
+                                        <option>
+                                          TODO
+                                        </option>
+                                      </select>
+                                  </div>
+
+                                  <div class="form-group">
+                                      <label for="inputAdditionalRequirementEntity2">{% trans 'additional_requirement_entity' %} 2</label>
+                                      <select class="form-control" id="inputAdditionalRequirementEntity2">
+                                        <option>
+                                          TODO
+                                        </option>
+                                      </select>
+                                  </div>
+
+                                  <div class="form-group">
+                                    <label for="inputAcademicYear">{% trans 'academic_years'%}</label>
+                                    <select class="form-control" id="inputAcademicYear">
+                                      <option>
+                                        TODO
+                                      </option>
+                                    </select>
+                                  </div>
+
+                              </div>
+                          </div>
+
+                          <div class="panel panel-default">
+                              <div class="panel-body">
+                                <p>{% trans 'proposal_management' %}</p>
+                                <div class="row">
+
+                                  <div class="col-md-4">
+                                    <label for="inputTypeProposal">{% trans 'type' %}</label>
+                                  </div>
+                                  <div class="col-md-8">
+                                    <input type="text" class="form-control" id="inputTypeProposal" readonly></input>
+                                  </div>
+
+                                  <br><br>
+
+                                  <div class="col-md-4">
+                                    <label for="inputStatus">{% trans 'status' %}</label>
+                                  </div>
+                                  <div class="col-md-8">
+                                    <input type="text" class="form-control" id="inputStatus" readonly></input>
+                                  </div>
+
+                                  <br><br>
+
+                                  <div class="col-md-4">
+                                    <label for="inputFolder">{% trans 'folder' %}</label>
+                                  </div>
+                                  <div class="col-md-4">
+                                    <select class="form-control" id="inputEntityFolder">
+                                      <option>
+                                        TODO
+                                      </option>
+                                    </select>
+                                  </div>
+                                  <div class="col-md-4">
+                                    <input type="number" class="form-control" id="inputFolder" ></input>
+                                  </div>
+
+                                  <br><br>
+
+                                  <div class="col-md-4">
+                                    <b>{% trans 'introduced_by' %}</b>
+                                  </div>
+                                  <div class="col-md-8">
+                                    {{ person|default_if_none:request.user }}
+                                  </div>
+
+                                  <br><br>
+
+                                  <div class="col-md-4">
+                                    <b>{% trans 'the' %}</b>
+                                  </div>
+                                  <div class="col-md-8">
+                                    {% now "d/m/Y" %}
+                                  </div>
+
+                                </div>
+
+                              </div>
+                          </div>
+
+                      </div>
+
+                  </div>
+
+                  <div class="row">
+                    <div class="col-md-2 col-md-offset-8">
+                      <button type="submit" class="btn btn-primary">{% trans 'save' %}</button>
+                    </div>
+                    <div class="col-md-2">
+                      <a href="{% url 'learning_unit' learning_unit_year.id %}" class="btn btn-default" role="button">{% trans 'cancel' %}</a>
+                    </div>
+                  </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -24,7 +24,7 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% url 'learning_unit' learning_unit_year_id=learning_unit_year.id as url_identification %}
+{% url 'learning_unit_modification_proposal' learning_unit_year_id=learning_unit_year.id as url_proposal_identification %}
 {% url 'learning_unit_formations' learning_unit_year_id=learning_unit_year.id as url_formations %}
 {% url 'learning_unit_components' learning_unit_year_id=learning_unit_year.id as url_components %}
 {% url 'learning_unit_pedagogy' learning_unit_year_id=learning_unit_year.id as url_pedagogy %}
@@ -33,35 +33,46 @@
 
 
 
-<ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" {% if request.path == url_identification%} class="active" {% endif %}>
+<ul class="nav nav-tabs" role="tablist" id="learningUnitNav">
+    <li role="presentation" {% if request.path == url_proposal_identification %} class="active" {% endif %} data-toggle="tab">
         <a href="{{url_identification}}" role="tab">
 		        {% trans 'identification'%}
 	     </a>
     </li>
     <li role="presentation" {% if request.path == url_formations %} class="active" {% endif %}>
-        <a role="tab" >
+        <a role="tab" href="#">
 		{% trans 'trainings' %}
 	</a>
     </li>
-    <li role="presentation" {% if request.path == url_components %} class="active" {% endif %}>
+    <li role="presentation" {% if request.path == url_components %} class="active" {% endif %} data-toggle="tab">
         <a href="{{url_components}}"  role="tab">
 	 	{% trans 'components' %}
 	</a>
     </li>
-    <li role="presentation" {% if request.path == url_pedagogy %} class="active" {% endif %}>
+    <li role="presentation" {% if request.path == url_pedagogy %} class="active" {% endif %} data-toggle="tab">
         <a href="{{url_pedagogy}}" role="tab">
 		 {% trans 'educational_information' %}
 	</a>
     </li>
-    <li role="presentation" {% if request.path == url_specifications %} class="active" {% endif %}>
+    <li role="presentation" {% if request.path == url_specifications %} class="active" {% endif %} data-toggle="tab">
         <a href="{{url_specifications}}" role="tab">
             {% trans 'learning_unit_specifications' %}
         </a>
     </li>
-    <li role="presentation" {% if request.path == url_attributions %} class="active" {% endif %}>
+    <li role="presentation" {% if request.path == url_attributions %} class="active" {% endif %} data-toggle="tab">
         <a href="{% url 'learning_unit_attributions' learning_unit_year.id %}" role="tab">
 		 {% trans 'tutors' %}
 	</a>
     </li>
 </ul>
+
+<script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
+<script type="text/javascript">
+  $(function(){
+    $("#learningUnitNav").on("click", "a", function(e){
+      e.preventDefault();
+      const url = $(this).attr("href");
+      $("#tab_content").load(url + " #tab_content");
+    });
+  });
+</script>

@@ -2251,6 +2251,18 @@ msgstr "Vacant but do not publish"
 msgid "DO_NOT_ASSIGN"
 msgstr "Do not assign"
 
+msgid "folder"
+msgstr "Folder"
+
+msgid "introduced_by"
+msgstr "Introduced by"
+
+msgid "the"
+msgstr "The"
+
+msgid "proposal_management"
+msgstr "Proposal management"
+
 msgid "PRESIDENT"
 msgstr "President"
 
