@@ -815,7 +815,7 @@ class LearningUnitCreate(TestCase):
 
     def test_when_user_has_permission(self):
         content_type = ContentType.objects.get_for_model(LearningUnit)
-        permission = Permission.objects.get(codename="can_create_learningunit",
+        permission = Permission.objects.get(codename="can_access_learningunit",
                                             content_type=content_type)
         self.person.user.user_permissions.add(permission)
         response = self.client.get(self.url)
@@ -830,7 +830,7 @@ class LearningUnitYearAdd(TestCase):
     def setUp(self):
         self.person = PersonFactory()
         content_type = ContentType.objects.get_for_model(LearningUnit)
-        permission = Permission.objects.get(codename="can_create_learningunit",
+        permission = Permission.objects.get(codename="can_access_learningunit",
                                             content_type=content_type)
         self.person.user.user_permissions.add(permission)
         self.url = reverse('learning_unit_year_add')

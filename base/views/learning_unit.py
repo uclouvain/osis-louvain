@@ -312,7 +312,7 @@ def learning_class_year_edit(request, learning_unit_year_id):
 
 
 @login_required
-@permission_required('base.can_create_learningunit', raise_exception=True)
+@permission_required('base.can_access_learningunit', raise_exception=True)
 def learning_unit_create(request, academic_year):
     form = CreateLearningUnitYearForm(initial={'academic_year': academic_year,
                                                'subtype': FULL,
@@ -322,7 +322,7 @@ def learning_unit_create(request, academic_year):
 
 
 @login_required
-@permission_required('base.can_create_learningunit', raise_exception=True)
+@permission_required('base.can_access_learningunit', raise_exception=True)
 @require_POST
 def learning_unit_year_add(request):
     form = CreateLearningUnitYearForm(request.POST)

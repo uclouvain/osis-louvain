@@ -48,6 +48,11 @@ class LearningUnitComponent(AuditableSerializableModel):
     def __str__(self):
         return u"%s - %s" % (self.type, self.learning_unit_year)
 
+    class Meta:
+        permissions = (
+            ("can_access_learningunit", "Can access learning unit"),
+        )
+
 
 def find_by_learning_year_type(a_learning_unit_year=None, a_type=None):
     if a_learning_unit_year and a_type:

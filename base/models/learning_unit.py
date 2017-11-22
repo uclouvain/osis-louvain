@@ -67,8 +67,7 @@ class LearningUnit(AuditableSerializableModel):
             ("can_edit_learningunit_pedagogy", "Can edit learning unit pedagogy"),
             ("can_edit_learningunit_specification", "Can edit learning unit specification"),
             ("can_delete_learningunit", "Can delete learning unit"),
-            ("can_propose_learningunit", "Can propose learning unit "),
-            ("can_create_learningunit", "Can create learning unit"),
+            ("can_propose_learningunit", "Can propose learning unit ")
         )
 
 
