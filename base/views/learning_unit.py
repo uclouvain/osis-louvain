@@ -28,7 +28,7 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.views.decorators.http import require_http_methods, require_POST
 from django.http import JsonResponse
 from django.contrib import messages
@@ -54,6 +54,7 @@ from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm, Learning
 from base.forms.learning_unit_component import LearningUnitComponentEditForm
 from base.forms.learning_class import LearningClassEditForm
 from base.models.enums import learning_unit_year_subtypes
+from base.models.person import Person
 from cms.models import text_label
 from reference.models import language
 from . import layout
@@ -311,10 +312,11 @@ def learning_class_year_edit(request, learning_unit_year_id):
 @login_required
 @permission_required('base.can_create_learningunit', raise_exception=True)
 def learning_unit_create(request, academic_year):
-    form = CreateLearningUnitYearForm(initial={'academic_year': academic_year,
-                                               'subtype': FULL,
-                                               "container_type": EMPTY_FIELD,
-                                               'language': language.find_by_code('FR')})
+    person = get_object_or_404(Person, user=request.user)
+    form = CreateLearningUnitYearForm(person, initial={'academic_year': academic_year,
+                                                       'subtype': FULL,
+                                                       "container_type": EMPTY_FIELD,
+                                                       'language': language.find_by_code('FR')})
     return layout.render(request, "learning_unit/learning_unit_form.html", {'form': form})
 
 
@@ -322,7 +324,8 @@ def learning_unit_create(request, academic_year):
 @permission_required('base.can_create_learningunit', raise_exception=True)
 @require_POST
 def learning_unit_year_add(request):
-    form = CreateLearningUnitYearForm(request.POST)
+    person = get_object_or_404(Person, user=request.user)
+    form = CreateLearningUnitYearForm(person, request.POST)
     if form.is_valid():
         data = form.cleaned_data
         starting_academic_year = mdl.academic_year.starting_academic_year()

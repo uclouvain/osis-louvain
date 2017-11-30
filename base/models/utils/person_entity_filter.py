@@ -28,7 +28,6 @@ from base.models import person_entity
 
 def filter_by_attached_entities(person, queryset, default_field='entity'):
     entities_attached = person_entity.find_entities_by_person(person)
-    if entities_attached:
-        field_filter = "{}__in".format(default_field)
-        return queryset.filter(**{field_filter: entities_attached})
-    return queryset
+    field_filter = "{}__in".format(default_field)
+    return queryset.filter(**{field_filter: entities_attached})
+

@@ -43,10 +43,12 @@ class LearningUnitProposalModificationForm(CreateLearningUnitYearForm):
     folder_id = forms.IntegerField(min_value=0)
 
     def __init__(self, *args, **kwargs):
-        super(LearningUnitProposalModificationForm, self).__init__(*args, **kwargs)
+        super(LearningUnitProposalModificationForm, self).__init__(None, *args, **kwargs)
         self.fields["academic_year"].disabled = True
         self.fields["academic_year"].required = False
         self.fields["subtype"].required = False
+        # When we submit a proposal, we can select all requirement entity available
+        self.fields["requirement_entity"].queryset = find_main_entities_version()
 
     def clean(self):
         cleaned_data = super(CreateLearningUnitYearForm, self).clean()

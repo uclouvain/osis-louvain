@@ -60,6 +60,7 @@ from base.tests.factories.entity_container_year import EntityContainerYearFactor
 from base.models.enums import entity_container_year_link_type
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
+from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory
 from base.business import learning_unit as learning_unit_business
 from django.utils.translation import ugettext_lazy as _
@@ -122,6 +123,10 @@ class LearningUnitViewTestCase(TestCase):
         self.campus = CampusFactory(organization=self.organization, is_administration=True, code="L")
         self.language = LanguageFactory(code='FR')
         self.a_superuser = SuperUserFactory()
+        self.person = PersonFactory(user=self.a_superuser)
+        PersonEntityFactory(person=self.person, entity=self.entity)
+        PersonEntityFactory(person=self.person, entity=self.entity_2)
+        PersonEntityFactory(person=self.person, entity=self.entity_3)
         self.client.force_login(self.a_superuser)
 
     @mock.patch('django.contrib.auth.decorators')
@@ -638,8 +643,17 @@ class LearningUnitViewTestCase(TestCase):
         faultyDict["acronym"] = ""
         return faultyDict
 
+    def get_faulty_requirement_entity(self):
+        """We will create an entity + entity version that user cannot create on it"""
+        entity = EntityFactory(country=self.country, organization=self.organization)
+        entity_version = EntityVersionFactory(entity=entity, entity_type=entity_type.SCHOOL, end_date=None,
+                                              start_date=datetime.date.today())
+        faultydict = dict(self.get_valid_data())
+        faultydict['requirement_entity'] = entity_version.id
+        return faultydict
+
     def test_learning_unit_year_form(self):
-        form = CreateLearningUnitYearForm(data=self.get_valid_data())
+        form = CreateLearningUnitYearForm(person=self.person, data=self.get_valid_data())
         self.assertTrue(form.is_valid(), form.errors)
         url = reverse('learning_unit_year_add')
         response = self.client.post(url, data=self.get_base_form_data())
@@ -647,15 +661,21 @@ class LearningUnitViewTestCase(TestCase):
         count_learning_unit_year = LearningUnitYear.objects.all().count()
         self.assertEqual(count_learning_unit_year, 6)
 
+    def test_create_learning_unit_year_requirement_entity_not_allowed(self):
+        form = CreateLearningUnitYearForm(person=self.person, data=self.get_faulty_requirement_entity())
+        self.assertFalse(form.is_valid())
+        self.assertEqual(len(form.errors), 1)
+        self.assertTrue('requirement_entity' in form.errors)
+
     def test_learning_unit_acronym_form(self):
-        form = CreateLearningUnitYearForm(data=self.get_valid_data())
+        form = CreateLearningUnitYearForm(person=self.person, data=self.get_valid_data())
         self.assertTrue(form.is_valid(), form.errors)
 
-        form = CreateLearningUnitYearForm(data=self.get_empty_acronym())
+        form = CreateLearningUnitYearForm(person=self.person, data=self.get_empty_acronym())
         self.assertFalse(form.is_valid(), form.errors)
         self.assertEqual(form.errors['acronym'], [_('This field is required.')])
 
-        form = CreateLearningUnitYearForm(data=self.get_faulty_acronym())
+        form = CreateLearningUnitYearForm(person=self.person, data=self.get_faulty_acronym())
         self.assertFalse(form.is_valid(), form.errors)
         self.assertEqual(form.errors['acronym'], [_('invalid_acronym')])
 
