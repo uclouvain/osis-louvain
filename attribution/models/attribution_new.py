@@ -64,6 +64,12 @@ class AttributionNew(AuditableModel):
     class Meta:
         unique_together = ('learning_container_year', 'tutor', 'function')
 
+    class Meta:
+        permissions = (
+            ("can_access_attribution_application", "Can access attribution application"),
+        )
+
+
 
 def search(*args, **kwargs):
     qs = AttributionNew.objects.all()
