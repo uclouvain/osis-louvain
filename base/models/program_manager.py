@@ -59,12 +59,13 @@ def find_by_person(a_person):
     return ProgramManager.objects.select_related("offer_year").filter(person=a_person)
 
 
-def is_program_manager(user, offer_year=None, learning_unit_year=None):
+def is_program_manager(user, offer_year=None, learning_unit_year=None, education_group=None):
     """
     Args:
         user: an instance of auth.User
         offer_year: an annual offer to check whether the user is its program manager.
         learning_unit_year: an annual learning unit to check whether it is in the managed offers of the user.
+        education_group: equals to offer_year (will replace it)
 
     Returns: True if the user manage an offer. False otherwise.
     """
@@ -72,22 +73,15 @@ def is_program_manager(user, offer_year=None, learning_unit_year=None):
         return True
 
     if offer_year:
-        try:
-            programme_manager = ProgramManager.objects.filter(person__user=user, offer_year=offer_year)
-            if programme_manager:
-                return True
-        except ObjectDoesNotExist:
-            return False
+        return ProgramManager.objects.filter(person__user=user, offer_year=offer_year).exists()
     elif learning_unit_year:
         offers_user = ProgramManager.objects.filter(person__user=user).values('offer_year')
-        enrollments = LearningUnitEnrollment.objects.filter(learning_unit_year=learning_unit_year)\
-                                                    .filter(offer_enrollment__offer_year__in=offers_user)
-        if enrollments:
-            return True
-        else:
-            return False
+        return LearningUnitEnrollment.objects.filter(learning_unit_year=learning_unit_year)\
+            .filter(offer_enrollment__offer_year__in=offers_user).exists()
+    elif education_group:
+        return ProgramManager.objects.filter(person__user=user, education_group=education_group).exists()
     else:
-        return ProgramManager.objects.filter(person__user=user).count() > 0
+        return ProgramManager.objects.filter(person__user=user).exists()
 
 
 def find_by_offer_year(offer_yr):

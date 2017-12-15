@@ -26,8 +26,10 @@
 import datetime
 from unittest import mock
 
+from django.contrib.auth.models import Permission, Group
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.test import TestCase, RequestFactory
 
 from base.forms.education_groups import EducationGroupFilter
@@ -46,6 +48,8 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.offer import OfferFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.offer_year_entity import OfferYearEntityFactory
+from base.tests.factories.person import PersonFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.structure import StructureFactory
 from reference.tests.factories.country import CountryFactory
 
@@ -388,6 +392,31 @@ class EducationGroupViewTestCase(TestCase):
 
     @mock.patch('django.contrib.auth.decorators')
     @mock.patch('base.views.layout.render')
+    def test_education_edit_administrative_data(self,
+                                                mock_render,
+                                                mock_decorators):
+        mock_decorators.login_required = lambda x: x
+        mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
+        education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
+        from base.views.education_group import education_group_edit_administrative_data
+
+        request_factory = RequestFactory()
+        request = request_factory.get(reverse(education_group_edit_administrative_data, kwargs={
+            'education_group_year_id': education_group_year.id
+        }))
+        request.user = mock.Mock()
+
+        education_group_edit_administrative_data(request, education_group_year.id)
+        self.assertTrue(mock_render.called)
+        request, template, context = mock_render.call_args[0]
+        self.assertEqual(template, 'education_group/tab_edit_administrative_data.html')
+        self.assertEqual(context['education_group_year'], education_group_year)
+        self.assertEqual(context['f1'], False)
+        self.assertEqual(context['f2'], False)
+
+
+    @mock.patch('django.contrib.auth.decorators')
+    @mock.patch('base.views.layout.render')
     @mock.patch('base.models.education_group_year.find_by_id')
     def test_education_content(self,
                                mock_find_by_id,
@@ -479,3 +508,44 @@ class EducationGroupViewTestCase(TestCase):
                                education_group_year=ages_education_group_year,
                                type=offer_year_entity_type.ENTITY_MANAGEMENT)
 
+
+class EducationGroupEditAdministrativeData(TestCase):
+    def setUp(self):
+        self.person = PersonFactory()
+
+        self.permission = Permission.objects.get(codename='can_edit_offer_year_calendar')
+        self.person.user.user_permissions.add(self.permission)
+
+        self.education_group_year = EducationGroupYearFactory()
+        self.program_manager = ProgramManagerFactory(person=self.person,
+                                                     education_group=self.education_group_year.education_group)
+        self.url = reverse('education_group_edit_administrative', args=[self.education_group_year.id])
+        self.client.force_login(self.person.user)
+
+    def test_when_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    def test_user_has_not_permission(self):
+        Group.objects.get(name="program_managers").permissions.remove(self.permission)
+        self.person.user.user_permissions.remove(self.permission)
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, "access_denied.html")
+
+    def test_user_is_not_program_manager_of_education_group(self):
+        self.program_manager.delete()
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, "access_denied.html")
+
+    def test_education_group_non_existent(self):
+        self.education_group_year.delete()
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
+        self.assertTemplateUsed(response, "page_not_found.html")

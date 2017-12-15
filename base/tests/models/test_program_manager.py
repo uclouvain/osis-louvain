@@ -80,6 +80,12 @@ class FindByOfferYearTest(TestCase):
         ProgramManagerFactory(offer_year=self.offer_year, person=PersonFactory(user=user))
         self.assertTrue(program_manager.is_program_manager(user=user))
 
+    def test_is_program_manager_of_education_group(self):
+        user = UserFactory(username="PGRM_1")
+        an_education_group = EducationGroupFactory()
+        ProgramManagerFactory(education_group=an_education_group, person=PersonFactory(user=user))
+        self.assertTrue(program_manager.is_program_manager(user=user, education_group=an_education_group))
+
     def test_is_not_program_manager(self):
         user = UserFactory(username="NO_PGRM")
         self.assertFalse(program_manager.is_program_manager(user=user))

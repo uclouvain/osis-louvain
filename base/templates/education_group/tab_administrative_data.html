@@ -127,6 +127,7 @@
                                         </tr>
                                     </tbody>
                                 </table>
+                                <a class="btn btn-info pull-right {% if not can_edit_administrative_data %} disabled {% endif %}" href="{% url 'education_group_edit_administrative' education_group_year.id %}" >{% trans "edit" %}</a>
                             </div>
                         </div>
                         <br>

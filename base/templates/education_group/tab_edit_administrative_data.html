@@ -1,0 +1,178 @@
+{% extends "layout.html" %}
+{% load i18n %}
+{% load form_field %}
+{% load static %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+    {% include "education_group/breadcrumb.html" %}
+{% endblock %}
+
+
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/bootstrap-datetimepicker.min.css' %}" type='text/css'>
+    <link rel="stylesheet" href="{% static 'css/bootstrap-datepicker3.min.css' %}" type='text/css'>
+    <link rel="stylesheet" href="{% static 'css/daterangepicker.css' %}" type='text/css'>
+{% endblock style %}
+
+{% block content %}
+    {% include "education_group/header.html" %}
+
+<div class="panel panel-default">
+    <div class="panel-body" id="tabs">
+
+
+        <div class="tab-content" id="tab_content">
+            <form method="post">
+                {% csrf_token %}
+                <div role="tabpanel" class="tab-pane active" id="administrative_data">
+                    <div class="panel panel-default">
+                    <div class="panel-body">
+                        <div class="form-inline">
+
+                            {% for field in course_enrollment %}
+                            <label for="{{ field.id }}">{{ field.label_tag }}</label>
+                            {{ course_enrollment.non_field_errors }}
+                            <div class="form-group {% if field.errors %}has-error{% endif %}">
+                                {% if field.help_text %}
+                                    <span class="help-block">{{ field.help_text }}</span>
+                                {% endif %}
+                                {% if field.errors %}
+                                    <span class="help-block">{{ field.errors|join:"<br\>" }}</span>
+                                {% endif %}
+                                {{ field }}
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th><label>{% trans 'session_title' %} 1</label></th>
+                                    <th><label>{% trans 'session_title' %} 2</label></th>
+                                    <th><label>{% trans 'session_title' %} 3</label></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{ formset_session.management_form }}
+
+                                {% for field in formset_session.forms.0 %}
+                                   <tr>
+                                       <td><label>{{ field.label }}</label></td>
+                                       {% for form in formset_session %}
+                                            <td>
+                                                {% with form|select_field:field.name as current_field %}
+                                                <div class="form-group {% if current_field.errors %}has-error{% endif %}">
+                                                        {% if current_field.help_text %}
+                                                            <span class="help-block">{{ current_field.help_text }}</span>
+                                                        {% endif %}
+                                                        {% if current_field.errors %}
+                                                            <span class="help-block">{{ current_field.errors|join:"<br \>" }}</span>
+                                                        {% endif %}
+                                                        {{ current_field }}
+                                                </div>
+                                                {% endwith %}
+                                            </td>
+                                       {%  endfor %}
+                                   </tr>
+                                {%  endfor %}
+                            </tbody>
+                        </table>
+                        <br>
+                    </div>
+                </div>
+                <input type="submit" class="btn btn-primary  pull-right" value="Save">
+            </form>
+            <br>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'js/moment.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-datetimepicker.min.js' %}"></script>
+    <script src="{% static 'js/daterangepicker.js' %}"></script>
+
+    <script>
+        var format_date = "DD/MM/YYYY";
+        var format_time = "HH:mm";
+        var format_datetime = format_date + ' ' + format_time;
+
+        function set_min_max(config, input) {
+            config.minDate = input.data("mindate");
+            config.maxDate = input.data("maxdate");
+        }
+
+        $(document).ready(function() {
+
+            $('.datepicker').each(function () {
+                var config = {
+                    format: format_date,
+                    pickTime: false,
+                    language: '{{ LANGUAGE_CODE }}'
+                };
+
+                set_min_max(config, $(this))
+
+                $(this).datetimepicker(config);
+            });
+
+            $('.datetimepicker').each(function () {
+                var config = {
+                    format: format_datetime,
+                    language: '{{ LANGUAGE_CODE }}'
+                };
+                set_min_max(config, $(this))
+
+                $(this).datetimepicker(config);
+
+            });
+
+            $('.daterange').each(function () {
+                var config = {
+                    autoUpdateInput: false,
+                    locale: {
+                        format: format_date,
+                        language: '{{ LANGUAGE_CODE }}',
+                        cancelLabel: 'Clear'
+                    }
+                };
+                set_min_max(config, $(this))
+
+                $(this).daterangepicker(config);
+
+                $(this).on('apply.daterangepicker', function(ev, picker) {
+                    $(this).val(picker.startDate.format(format_date) + ' - ' + picker.endDate.format(format_date));
+                });
+                $(this).on('cancel.daterangepicker', function(ev, picker) {
+                    $(this).val('');
+                });
+            });
+        });
+    </script>
+{% endblock script %}

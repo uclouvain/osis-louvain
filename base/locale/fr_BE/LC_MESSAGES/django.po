@@ -2437,3 +2437,6 @@ msgstr "Entité académique"
 
 msgid "folder_number"
 msgstr "Dossier n°{}"
+
+msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
+msgstr "%(date)s doit être comprise entre %(start_date)s et %(end_date)s"

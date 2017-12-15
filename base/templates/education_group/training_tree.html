@@ -29,9 +29,11 @@
             <ul id="browser" class="filetree treeview-default">
                 <li>
                     <span class="folder">
+                        {% if parent.id %}
                         <a href="{% url 'education_group_read' education_group_year_id=parent.id %}?root={{ parent.id}}&tree=1">
                             {{ parent.acronym }}
                         </a>
+                        {% endif %}
                     </span>
                     {% for elem in parent.children_by_group_element_year %}
                         <ul>

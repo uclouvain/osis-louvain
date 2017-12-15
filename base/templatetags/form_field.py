@@ -23,21 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import forms
-from django.forms import ModelForm
+from django import template
+from django.forms import forms
 
-from base.forms.bootstrap import BootstrapModelForm
-from base.models import offer_year_calendar
+register = template.Library()
 
 
-class OfferYearCalendarForm(BootstrapModelForm):
-    start_date = forms.DateField(widget=forms.DateInput(format='%d/%m/%Y'),
-                                 input_formats=('%d/%m/%Y', ),
-                                 required=True)
-    end_date = forms.DateField(widget=forms.DateInput(format='%d/%m/%Y'),
-                               input_formats=('%d/%m/%Y', ),
-                               required=True)
+@register.filter
+def select_field(form, key):
+    key = str(key)
+    if key not in form.fields:
+        return None
 
-    class Meta:
-        model = offer_year_calendar.OfferYearCalendar
-        fields = ['offer_year', 'start_date', 'end_date', 'customized']
+    return forms.BoundField(form, form.fields[key], key)
+
