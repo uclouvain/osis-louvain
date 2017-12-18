@@ -29,10 +29,10 @@ from django.db.models import Prefetch
 
 from base.models import entity_version
 from base.models.enums import entity_container_year_link_type
-from osis_common.models.auditable_model import AuditableModel, AuditableModelAdmin
+from osis_common.models.auditable_serializable_model import AuditableSerializableModel, AuditableSerializableModelAdmin
 
 
-class EntityContainerYearAdmin(AuditableModelAdmin):
+class EntityContainerYearAdmin(AuditableSerializableModelAdmin):
     list_display = ('external_id', 'learning_container_year', 'entity', 'type')
     fieldsets = ((None, {'fields': ('entity', 'learning_container_year', 'type')}),)
     search_fields = ['learning_container_year__acronym', 'type']
@@ -40,7 +40,7 @@ class EntityContainerYearAdmin(AuditableModelAdmin):
     raw_id_fields = ('entity', 'learning_container_year')
 
 
-class EntityContainerYear(AuditableModel):
+class EntityContainerYear(AuditableSerializableModel):
     external_id = models.CharField(max_length=255, blank=True, null=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     entity = models.ForeignKey('Entity')

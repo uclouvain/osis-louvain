@@ -31,15 +31,16 @@ from django.utils import timezone
 
 from base.models import entity_version
 from base.models.enums import entity_type
+from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
-class EntityAdmin(admin.ModelAdmin):
+class EntityAdmin(SerializableModelAdmin):
     list_display = ('id', 'external_id', 'organization', 'location', 'postal_code', 'phone')
     search_fields = ['external_id', 'entityversion__acronym', 'organization__acronym', 'organization__name']
     readonly_fields = ('organization', 'external_id')
 
 
-class Entity(models.Model):
+class Entity(SerializableModel):
     organization = models.ForeignKey('Organization', blank=True, null=True)
     external_id = models.CharField(max_length=255, unique=True)
     changed = models.DateTimeField(null=True, auto_now=True)

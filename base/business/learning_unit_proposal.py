@@ -27,7 +27,8 @@ from base.models import proposal_learning_unit
 from base.models.academic_year import current_academic_year
 from base.models.entity_container_year import find_last_entity_version_grouped_by_linktypes, search
 from base.models.utils.person_entity_filter import filter_by_attached_entities
-from base.models.enums import entity_container_year_link_type, proposal_type, learning_unit_year_subtypes
+from base.models.enums import entity_container_year_link_type, proposal_type, learning_unit_year_subtypes, \
+    learning_container_year_types
 
 
 def compute_form_initial_data(learning_unit_year):
@@ -88,7 +89,12 @@ def is_eligible_for_modification_proposal(learning_unit_year, a_person):
     if learning_unit_year.academic_year.year < current_year:
         return False
 
-    if learning_unit_year.subtype != learning_unit_year_subtypes.FULL:
+    if learning_unit_year.learning_container_year.container_type not in (learning_container_year_types.COURSE,
+                                                                         learning_container_year_types.DISSERTATION,
+                                                                         learning_container_year_types.INTERNSHIP):
+        return False
+
+    if learning_unit_year.subtype == learning_unit_year_subtypes.PARTIM:
         return False
 
     if proposal:

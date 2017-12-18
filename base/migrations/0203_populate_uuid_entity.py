@@ -8,14 +8,16 @@ from django.db import migrations
 
 
 def set_uuid_field(apps, schema_editor):
-    utils.set_uuids_model(apps, "learningcontaineryear")
-    utils.set_uuids_model(apps, "learningcomponentyear")
+    utils.set_uuids_model(apps, "entity")
+    utils.set_uuids_model(apps, "entitycontaineryear")
+    utils.set_uuids_model(apps, "entitycomponentyear")
+    utils.set_uuids_model(apps, "entityversion")
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('base', '0173_auto_20171027_1646'),
+        ('base', '0202_auto_20171127_1302'),
     ]
 
     operations = [

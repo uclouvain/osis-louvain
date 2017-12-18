@@ -35,9 +35,10 @@ from base.models.academic_year import AcademicYear
 from base.models.enums import entity_type
 from base.models.enums.organization_type import MAIN
 from osis_common.utils.datetime import get_tzinfo
+from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
-class EntityVersionAdmin(admin.ModelAdmin):
+class EntityVersionAdmin(SerializableModelAdmin):
     list_display = ('id', 'entity', 'acronym', 'parent', 'title', 'entity_type', 'start_date', 'end_date',)
     search_fields = ['entity__id', 'entity__external_id', 'title', 'acronym', 'entity_type', 'start_date', 'end_date']
     raw_id_fields = ('entity', 'parent')
@@ -55,7 +56,7 @@ class EntityVersionQuerySet(models.QuerySet):
         return self.filter(entity=entity)
 
 
-class EntityVersion(models.Model):
+class EntityVersion(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     entity = models.ForeignKey('Entity')

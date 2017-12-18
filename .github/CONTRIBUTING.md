@@ -2,13 +2,14 @@
 - Séparation des classes: deux lignes vides
 - Séparation des methodes de class: une ligne vide
 - Séparation des fonctions: deux lignes vides
+- Le nom d'une fonction doit être explicite et claire sur ce qu'elle fait (un 'get_' renvoie un élément, un 'search_' renvoie une liste d'élements...)
 
 ### Documentation du code :
 - Documenter les fonctions (paramètres, fonctionnement, ce qu'elle renvoie)
 - Ne pas hésiter à laisser une ligne de commentaire dans le code, décrivant brièvement le fonctionnement d'algorithme plus compliqué/plus longs
 
-### Nomenclature :
-- Toutes les variables et msgid (traduction) sont écrites en minuscules avec un '_' (underscore) comme séparateur
+### Clés de traduction :
+- Toutes les variables et msgid (traduction) sont écrites en minuscules avec un '_' (underscore) comme séparateur 
 
 ### Réutilisation du code :
 - Ne pas créer de fonctions qui renvoient plus d'un seul paramètre (perte de contrôle sur ce que fait la fonction et perte de réutilisation du code)
@@ -25,16 +26,27 @@
 - Chaque fichier décrivant un modèle doit se trouver dans le répertoire *'models'*
 - Chaque fichier contenant une classe du modèle ne peut renvoyer que des instances du modèle qu'elle déclare. Autrement dit, un fichier my_model.py contient une classe MyModel() et des méthodes qui ne peuvent renvoyer que des records venant de MyModel
 - Un modèle ne peut pas avoir un champs de type "ManyToMany" ; il faut toujours construire une table de liaison, qui contiendra les FK vers les modèles composant la relation ManyToMany.
+- Lorsqu'un nouveau modèle est créé (ou que de nouveaux champs sont ajoutés), il faut penser à mettre à jour l'admin en conséquence (raw_id_fields, search_fields, list_filter...). 
+
+### Business :
+- Les fonctions propres à des fonctionnalités business (calculs de crédits ou volumes, etc.) doivent se trouver dans un fichier business. Ces fichiers sont utilisés par les Views et peuvent appeler des fonctions du modèle (et non l'inverse !). 
 
 ### Migration :
 - Ne pas utiliser le framework de persistence de Django lorsqu'il y a du code à exécuter dans les fichiers de migration. Il faut plutôt utiliser du SQL natif (voir https://docs.djangoproject.com/fr/1.10/topics/db/sql/ et https://docs.djangoproject.com/fr/1.10/ref/migration-operations/)
 
+### Dépendances entre applications : 
+- Ne pas faire de références des applications principales ("base" et "reference") vers des applications tierces (Internship, assistant...)
+
 ### Vue :
 - Ne pas faire appel à des méthodes de queryset dans les views (pas de MyModel.filter(...) ou MyModel.order_by() dans les vues). C'est la responsabilité du modèle d'appliquer des filtres et tris sur ses queryset. Il faut donc créer une fonction dans le modèle qui renvoie une liste de records filtrés sur base des paramètres entrés (find_by_(), search(), etc.).
 - Ajouter les annotations pour sécuriser les méthodes dans les vues (user_passes_tests, login_required, require_permission)
+- Les vues servent de "proxy" pour aller chercher les données nécessaires à la génération des pages html, qu'elles vont chercher dans la couche "business" ou directement dans la couche "modèle". Elles ne doivent donc pas contenir de logique business
 
 ### Formulaire :
 - Utiliser les objets Forms fournis par Django (https://docs.djangoproject.com/en/1.9/topics/forms/)
+
+### Template (HTML)
+- Utiliser le grid layout de bootstrap plutôt que des tags html table-tr-td...
 
 ### Sécurité :
 - Ne pas laisser de données sensibles/privées dans les commentaires/dans le code

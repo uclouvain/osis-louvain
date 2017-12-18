@@ -19,3 +19,4 @@ requests==2.18.3
 
 -r ./osis_common/requirements.txt
 -r ./internship/requirements.txt
+
