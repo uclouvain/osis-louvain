@@ -31,7 +31,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.models.exam_enrollment import ExamEnrollment
 
-from base.tests.factories.academic_year import AcademicYearFakerFactory
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.models.test_academic_calendar import create_academic_calendar
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.tutor import TutorFactory
@@ -45,7 +45,7 @@ from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollment
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 
 from base.models.enums import number_session, academic_calendar_type, exam_enrollment_justification_type
-
+from osis_common.utils.datetime import get_tzinfo
 
 OFFER_ACRONYM = "OSIS2MA"
 LEARNING_UNIT_ACRONYM = "LOSIS1211"
@@ -61,12 +61,11 @@ def _get_list_tag_and_content(messages):
 class TestUploadXls(TestCase):
     def setUp(self):
         today = datetime.datetime.today()
-        half_year = datetime.timedelta(days=180)
         twenty_days = datetime.timedelta(days=20)
 
-        an_academic_year = AcademicYearFakerFactory(year=today.year,
-                                                    start_date=today - half_year,
-                                                    end_date=today + half_year)
+        #Take same academic year as the one in the associated xls file
+        an_academic_year = AcademicYearFactory(year=2017)
+
         a_learning_unit_year = LearningUnitYearFakerFactory(academic_year=an_academic_year,
                                                             acronym=LEARNING_UNIT_ACRONYM)
 

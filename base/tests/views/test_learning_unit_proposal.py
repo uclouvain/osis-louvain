@@ -64,7 +64,7 @@ class TestLearningUnitModificationProposal(TestCase):
                                                                subtype=learning_unit_year_subtypes.FULL)
         self.learning_unit_year.academic_year.start_date = today - datetime.timedelta(days=15)
         self.learning_unit_year.academic_year.end_date = today + datetime.timedelta(days=15)
-        self.learning_unit_year.academic_year.year = today.year
+        self.learning_unit_year.academic_year.year = self.learning_unit_year.academic_year.start_date.year
         self.learning_unit_year.academic_year.save()
         self.learning_unit_year.learning_container_year.container_type = learning_container_year_types.COURSE
         self.learning_unit_year.learning_container_year.save()
@@ -283,7 +283,8 @@ class TestLearningUnitModificationProposal(TestCase):
         self.assertTemplateUsed(response, "access_denied.html")
 
     def test_academic_year_inferior_to_current(self):
-        today = datetime.date.today()
+        today = datetime.date(self.learning_unit_year.academic_year.year, 1, 1)
+
         self.learning_unit_year.academic_year = \
             AcademicYearFakerFactory(year=today.year-1, start_date=today.replace(day=1, year=today.year-1),
                                      end_date=today.replace(day=20, year=today.year-1))

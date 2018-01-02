@@ -57,12 +57,13 @@ from base.tests.factories.student import StudentFactory
 class OnlineEncodingTest(TestCase):
     def setUp(self):
         self.request_factory = RequestFactory()
-        academic_year = _get_academic_year()
+        academic_year = _get_academic_year(year=2017)
         academic_calendar = AcademicCalendarFactory.build(title="Submission of score encoding - 1",
                                                           start_date=academic_year.start_date,
                                                           end_date=academic_year.end_date,
                                                           academic_year=academic_year,
                                                           reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+
         academic_calendar.save(functions=[])
         SessionExamCalendarFactory(academic_calendar=academic_calendar, number_session=number_session.ONE)
 
@@ -321,10 +322,10 @@ class OutsideEncodingPeriodTest(TestCase):
         self.client.force_login(self.user)
 
         # Create context out of range
-        self.academic_year = _get_academic_year()
+        self.academic_year = _get_academic_year(2017)
         self.academic_calendar = AcademicCalendarFactory.build(title="Submission of score encoding - 1",
-                                                          academic_year=self.academic_year,
-                                                          reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+                                                               academic_year=self.academic_year,
+                                                               reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
         self.academic_calendar.save(functions=[])
         self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=self.academic_calendar,
                                                                 number_session=number_session.ONE)
@@ -354,13 +355,14 @@ class OutsideEncodingPeriodTest(TestCase):
 
         # Submission of score encoding - 1 [Two day before today]
         self.academic_calendar.end_date = timezone.now() - timedelta(days=2)
+        self.academic_calendar.start_date = timezone.now() - timedelta(days=20)
         self.academic_calendar.save(functions=[])
 
         # Create submission of score encoding - 2 [Start in 100 days]
         ac = AcademicCalendarFactory.build(title="Submission of score encoding - 2",
                                            academic_year=self.academic_year,
-                                           start_date=timezone.now() + timedelta(days=100),
-                                           end_date=timezone.now() + timedelta(days=130),
+                                           start_date=self.academic_calendar.end_date + timedelta(days=100),
+                                           end_date=self.academic_calendar.end_date + timedelta(days=130),
                                            reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
         ac.save(functions=[])
         SessionExamCalendarFactory(academic_calendar=ac, number_session=number_session.TWO)
@@ -386,7 +388,7 @@ class GetScoreEncodingViewProgramManagerTest(TestCase):
         self.client.force_login(self.user)
 
         # Set user as program manager of two offer
-        academic_year = _get_academic_year()
+        academic_year = _get_academic_year(2017)
         self.offer_year_bio2ma = OfferYearFactory(acronym="BIO2MA", title="Master en Biologie",
                                                   academic_year=academic_year)
         self.offer_year_bio2bac = OfferYearFactory(acronym="BIO2BAC", title="Bachelier en Biologie",
@@ -487,10 +489,13 @@ def prepare_exam_enrollment_for_double_encoding_validation(exam_enrollment):
     exam_enrollment.save()
 
 
-def _get_academic_year():
-    start_date = timezone.now() - timedelta(days=5)
+def _get_academic_year(year=None):
+    start_date = timezone.now()
     end_date = timezone.now() + timedelta(days=220)
-    return AcademicYearFactory(year=timezone.now().year, start_date=start_date, end_date=end_date)
+    if year:
+        return AcademicYearFactory(year=year)
+    else:
+        return AcademicYearFactory(year=timezone.now().year, start_date=start_date, end_date=end_date)
 
 
 def add_permission(user, codename):

@@ -29,7 +29,7 @@ from django.utils import timezone
 from base.models import academic_calendar
 from base.models.exceptions import FunctionArgumentMissingException, StartDateHigherThanEndDateException
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, AcademicYearFakerFactory
 
 start_date = timezone.now()
 end_date = start_date.replace(year=start_date.year + 1)
@@ -75,9 +75,8 @@ class AcademicCalendarTest(TestCase):
         self.assertEqual(db_academic_calendar, tmp_academic_calendar)
 
     def test_find_highlight_academic_calendar(self):
-        an_academic_year = AcademicYearFactory(year=timezone.now().year,
-                                               start_date=timezone.now() - datetime.timedelta(days=10),
-                                               end_date=timezone.now() + datetime.timedelta(days=10))
+        an_academic_year = AcademicYearFakerFactory(start_date=timezone.now() - datetime.timedelta(days=10),
+                                                    end_date=timezone.now() + datetime.timedelta(days=10))
 
         tmp_academic_calendar_1 = AcademicCalendarFactory.build(academic_year=an_academic_year,
                                                                 title="First calendar event")

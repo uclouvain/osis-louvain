@@ -159,7 +159,7 @@ class ScoreSheetDataTest(TestCase):
         # Should be a dictionary
         self.assertIsInstance(data_computed, dict)
         # Publication date should be today
-        self.assertEqual(data_computed['publication_date'], timezone.now().strftime("%-d/%m/%Y"))
+        self.assertEqual(data_computed['publication_date'], timezone.now().strftime("%-d/%-m/%Y"))
         self.assertEqual(len(data_computed['learning_unit_years']), 1)
         self.assertFalse(data_computed['learning_unit_years'][0]['decimal_scores'])
         # Check the score responsible and the address

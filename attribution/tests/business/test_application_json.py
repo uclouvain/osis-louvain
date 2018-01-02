@@ -26,6 +26,8 @@
 from datetime import date
 from unittest import mock
 from django.test import TestCase
+from django.test.utils import override_settings
+
 from attribution.business import application_json
 from attribution.tests.factories.tutor_application import TutorApplicationFactory
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -50,6 +52,7 @@ class AttributionJsonTest(TestCase):
                                                            learning_container_year=self.l_container_1)
 
     @mock.patch('osis_common.queue.queue_sender.send_message')
+    @override_settings(QUEUES={'QUEUES_NAME':{'APPLICATION_OSIS_PORTAL': 'dummy'}})
     def test_build_attributions_json(self,
                                      mock_send_message):
         application_list = application_json._compute_list()
