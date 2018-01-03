@@ -36,5 +36,3 @@ def get_entities_ids(requirement_entity_acronym, with_entity_subordinated):
             all_descendants = entity_version.find_descendants(entity_version.start_date)
             entities_ids |= {descendant.entity.id for descendant in all_descendants}
     return list(entities_ids)
-
-

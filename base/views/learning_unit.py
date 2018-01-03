@@ -49,7 +49,8 @@ from base.models.campus import Campus
 from base.models.enums import learning_container_year_types, learning_unit_year_subtypes
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.learning_container import LearningContainer
-from base.forms.learning_units import LearningUnitYearForm, CreateLearningUnitYearForm, EMPTY_FIELD
+from base.forms.learning_units import LearningUnitYearForm
+from base.forms.learning_unit_create import CreateLearningUnitYearForm, EMPTY_FIELD
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm, LearningUnitPedagogyEditForm
 from base.forms.learning_unit_component import LearningUnitComponentEditForm
@@ -405,19 +406,16 @@ def learning_units_service_course(request):
 
 
 def _learning_units_search(request, search_type):
+    service_course_search = search_type == SERVICE_COURSES_SEARCH
     if request.GET.get('academic_year_id'):
-        form = LearningUnitYearForm(request.GET)
+        form = LearningUnitYearForm(request.GET, service_course_search=service_course_search)
     else:
-        form = LearningUnitYearForm()
+        form = LearningUnitYearForm(service_course_search=service_course_search)
 
     found_learning_units = None
     try:
         if form.is_valid():
-
-            if search_type == SIMPLE_SEARCH:
-                found_learning_units = form.get_activity_learning_units()
-            elif search_type == SERVICE_COURSES_SEARCH:
-                found_learning_units = form.get_service_course_learning_units()
+            found_learning_units = form.get_activity_learning_units()
 
             _check_if_display_message(request, found_learning_units)
     except TooManyResultsException:
