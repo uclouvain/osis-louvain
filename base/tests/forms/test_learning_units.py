@@ -70,7 +70,7 @@ class TestLearningUnitForm(TestCase):
         learning_unit = found_learning_units[0]
         requirement_entity_version = learning_unit.entities.get(entity_container_year_link_type.REQUIREMENT_ENTITY)
         learning_container_year = learning_unit.learning_container_year
-        entity_parent = requirement_entity_version.find_parent_faculty_version(learning_container_year.academic_year)
+        entity_parent = requirement_entity_version.find_faculty_version(learning_container_year.academic_year)
 
         self.assertTrue(
             is_service_course(learning_unit.academic_year, requirement_entity_version, learning_container_year,
@@ -85,7 +85,7 @@ class TestLearningUnitForm(TestCase):
         learning_unit = found_learning_units[0]
         requirement_entity_version = learning_unit.entities.get(entity_container_year_link_type.REQUIREMENT_ENTITY)
         learning_container_year = learning_unit.learning_container_year
-        entity_parent = requirement_entity_version.find_parent_faculty_version(learning_container_year.academic_year)
+        entity_parent = requirement_entity_version.find_faculty_version(learning_container_year.academic_year)
 
         self.assertFalse(
             is_service_course(learning_unit.academic_year, requirement_entity_version, learning_container_year,
@@ -177,9 +177,9 @@ class TestLearningUnitForm(TestCase):
 
         form_data = {}
 
-        form = learning_units.LearningUnitYearForm(form_data)
+        form = learning_units.LearningUnitYearForm(form_data, service_course_search=True)
         form.is_valid()
-        self.assertEqual(form.get_service_course_learning_units(), self.list_lu_year)
+        self.assertEqual(form.get_activity_learning_units(), self.list_lu_year)
 
     def test_get_service_courses_by_requirement_acronym(self):
         self._setup_service_courses()
@@ -188,9 +188,9 @@ class TestLearningUnitForm(TestCase):
             "requirement_entity_acronym": self.list_entity_version[0].acronym
         }
 
-        form = learning_units.LearningUnitYearForm(form_data)
+        form = learning_units.LearningUnitYearForm(form_data, service_course_search=True)
         form.is_valid()
-        self.assertEqual(form.get_service_course_learning_units(), [self.list_lu_year[0]])
+        self.assertEqual(form.get_activity_learning_units(), [self.list_lu_year[0]])
 
     def test_get_service_courses_by_allocation_acronym(self):
         self._setup_service_courses()
@@ -199,9 +199,9 @@ class TestLearningUnitForm(TestCase):
             "allocation_entity_acronym": self.list_entity_version[1].acronym
         }
 
-        form = learning_units.LearningUnitYearForm(form_data)
+        form = learning_units.LearningUnitYearForm(form_data, service_course_search=True)
         form.is_valid()
-        self.assertEqual(form.get_service_course_learning_units(), [self.list_lu_year[0]])
+        self.assertEqual(form.get_activity_learning_units(), [self.list_lu_year[0]])
 
     def test_get_service_courses_by_requirement_and_allocation_acronym(self):
         self._setup_service_courses()
@@ -211,9 +211,9 @@ class TestLearningUnitForm(TestCase):
             "allocation_entity_acronym": self.list_entity_version[1].acronym
         }
 
-        form = learning_units.LearningUnitYearForm(form_data)
+        form = learning_units.LearningUnitYearForm(form_data, service_course_search=True)
         form.is_valid()
-        self.assertEqual(len(form.get_service_course_learning_units()), 1)
+        self.assertEqual(len(form.get_activity_learning_units()), 1)
 
     def test_get_service_courses_by_requirement_and_allocation_acronym_within_same_faculty(self):
         self._setup_service_courses()
@@ -223,9 +223,9 @@ class TestLearningUnitForm(TestCase):
             "allocation_entity_acronym": self.list_entity_version[3].acronym
         }
 
-        form = learning_units.LearningUnitYearForm(form_data)
+        form = learning_units.LearningUnitYearForm(form_data, service_course_search=True)
         form.is_valid()
-        self.assertEqual(form.get_service_course_learning_units(), [])
+        self.assertEqual(form.get_activity_learning_units(), [])
 
     def _setup_service_courses(self):
         self.academic_yr = AcademicYearFactory(year=timezone.now().year)

@@ -72,7 +72,7 @@ class EntityVersion(SerializableModel):
 
     _descendants = None
     _children = []
-    _parent_faculty_version = {}
+    _faculty_version = {}
 
     def __str__(self):
         return "{} ({} - {} - {} to {})".format(
@@ -161,19 +161,23 @@ class EntityVersion(SerializableModel):
 
         return sorted(descendants, key=lambda an_entity: an_entity.acronym)
 
-    def find_parent_faculty_version(self, academic_yr):
+    def find_faculty_version(self, academic_yr):
         if not isinstance(academic_yr, AcademicYear):
             return None
-        if not self._parent_faculty_version.get(academic_yr.id):
+
+        if self.entity_type == entity_type.FACULTY:
+            return self
+
+        else:
             parent_entity = getattr(self, "parent")
-            if parent_entity:
-                parent_entity_version = find_latest_version_by_entity(parent_entity, academic_yr.start_date)
-                if parent_entity_version:
-                    if parent_entity_version.entity_type == entity_type.FACULTY:
-                        self._parent_faculty_version[academic_yr.id] = parent_entity_version
-                    else:
-                        self._parent_faculty_version[academic_yr.id] = parent_entity_version.find_parent_faculty_version(academic_yr)
-        return self._parent_faculty_version.get(academic_yr.id)
+            if not parent_entity:
+                return None
+
+            parent_entity_version = find_latest_version_by_entity(parent_entity, academic_yr.start_date)
+            if not parent_entity_version:
+                return None
+
+            return parent_entity_version.find_faculty_version(academic_yr)
 
     def get_parent_version(self, date=None):
         if date is None:

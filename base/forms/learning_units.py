@@ -50,6 +50,10 @@ class LearningUnitYearForm(BootstrapForm):
         required=False)
     with_entity_subordinated = forms.BooleanField(required=False)
 
+    def __init__(self, *args, **kwargs):
+        self.service_course_search = kwargs.pop('service_course_search', False)
+        super().__init__(*args, **kwargs)
+
     def clean_acronym(self):
         data_cleaned = self.cleaned_data.get('acronym')
         data_cleaned = treat_empty_or_str_none_as_none(data_cleaned)
@@ -76,15 +80,21 @@ class LearningUnitYearForm(BootstrapForm):
         return data_cleaned
 
     def clean(self):
-        if self.cleaned_data and learning_unit_year.count_search_results(**self.cleaned_data) > MAX_RECORDS:
+        if not self.service_course_search \
+                and self.cleaned_data and learning_unit_year.count_search_results(**self.cleaned_data) > MAX_RECORDS:
             raise TooManyResultsException
         return get_clean_data(self.cleaned_data)
 
     def get_activity_learning_units(self):
-        return self.get_learning_units(False)
+        if self.service_course_search:
+            return self._get_service_course_learning_units()
+        else:
+            return self._get_learning_units()
 
-    def get_learning_units(self, service_course_search):
+    def _get_learning_units(self, service_course_search=None):
         clean_data = self.cleaned_data
+        if service_course_search is None:
+            service_course_search = self.service_course_search
 
         entity_version_prefetch = Prefetch('entity__entityversion_set',
                                            queryset=mdl_entity_version.search(),
@@ -107,12 +117,12 @@ class LearningUnitYearForm(BootstrapForm):
         return [append_latest_entities(learning_unit, service_course_search) for learning_unit in
                 learning_units]
 
-    def get_service_course_learning_units(self):
+    def _get_service_course_learning_units(self):
         service_courses = []
         allocation_entity_acronym = self.cleaned_data['allocation_entity_acronym']
         requirement_entity_acronym = self.cleaned_data['requirement_entity_acronym']
 
-        for learning_unit in self.get_learning_units(True):
+        for learning_unit in self._get_learning_units(True):
             if not learning_unit.entities.get(SERVICE_COURSE):
                 continue
 
@@ -137,12 +147,15 @@ def _get_filter_learning_container_ids(filter_data):
     allocation_entity_acronym = filter_data.get('allocation_entity_acronym')
     with_entity_subordinated = filter_data.get('with_entity_subordinated', False)
     entities_id_list = []
+
     if requirement_entity_acronym:
         entity_ids = get_entities_ids(requirement_entity_acronym, with_entity_subordinated)
+
         entities_id_list += list(
             mdl.entity_container_year.search(link_type=entity_container_year_link_type.REQUIREMENT_ENTITY,
                                              entity_id=entity_ids)
                 .values_list('learning_container_year', flat=True).distinct())
+
     if allocation_entity_acronym:
         entity_ids = get_entities_ids(allocation_entity_acronym, False)
         entities_id_list += list(
