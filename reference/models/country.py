@@ -25,6 +25,7 @@
 ##############################################################################
 from django.db import models
 from django.core import serializers
+from django.core.exceptions import ObjectDoesNotExist
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
@@ -59,6 +60,13 @@ def find_all():
 
 def find_by_id(country_id):
     return Country.objects.get(pk=country_id)
+
+
+def get_by_iso_code(iso_code):
+    try:
+        return Country.objects.get(iso_code=iso_code)
+    except ObjectDoesNotExist:
+        return None
 
 
 def find_all_for_sync():

@@ -27,25 +27,21 @@ from assistant.models import tutoring_learning_unit_year
 from base.models import entity_container_year
 from base.models import learning_unit_enrollment, learning_unit_component, learning_class_year, \
     learning_unit_year as learn_unit_year_model
-from base.models import person
+
 from base.models import person_entity
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
 from django.utils.translation import ugettext_lazy as _
 
-from internship.models import internship_speciality
-
 FACULTY_MANAGER_GROUP="faculty_managers"
 CENTRAL_MANAGER_GROUP="central_managers"
+
 
 def check_learning_unit_deletion(learning_unit):
     msg = {}
 
     for learning_unit_year in learn_unit_year_model.search(learning_unit=learning_unit).order_by('academic_year__year'):
         msg.update(check_learning_unit_year_deletion(learning_unit_year))
-
-    for speciality in internship_speciality.search(learning_unit=learning_unit):
-        msg.update(_check_internship_speciality(speciality))
 
     return msg
 
@@ -92,14 +88,6 @@ def _check_tutoring_learning_unit_year(tutoring):
                             'year': tutoring.learning_unit_year.academic_year}
 
     return msg
-
-
-def _check_internship_speciality(speciality):
-    msg = _("The learning unit %(acronym)s is related to the internship speciality %(speciality)s") % {
-        "acronym": speciality.learning_unit,
-        "speciality": speciality
-    }
-    return {speciality: msg}
 
 
 def _check_group_element_year_deletion(group_element_year):
