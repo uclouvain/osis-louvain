@@ -46,10 +46,6 @@ class ExportPdfTestCase(TestCase):
             confirmation_test_date=datetime.date(2017, 9, 25),
             remark="Deux co-promoteurs (l'application ne m'autorise à n'en renseigner qu'un)"
         )
-        self.review1 = ReviewFactory(
-            mandate=self.mandate
-        )
-
         self.mandate = AssistantMandateFactory(
             assistant=self.assistant,
             assistant_type=assistant_type.ASSISTANT,
@@ -66,7 +62,9 @@ class ExportPdfTestCase(TestCase):
             external_functions='',
         )
         self.styles = getSampleStyleSheet()
-
+        self.review1 = ReviewFactory(
+            mandate=self.mandate
+        )
 
     def test_get_administrative_data(self):
         assistant_type = "<strong>%s :</strong> %s<br />" % (_('assistant_type'), _(self.mandate.assistant_type))
