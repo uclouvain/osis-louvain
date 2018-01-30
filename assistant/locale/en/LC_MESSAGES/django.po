@@ -247,6 +247,12 @@ msgstr "Emails"
 msgid "end"
 msgstr "End"
 
+msgid "end_date_contract"
+msgstr "Contract end date"
+
+msgid "entry_date_contract"
+msgstr "Contract start date"
+
 msgid "eq_fte"
 msgstr "Duration of contract (FTE)"
 
@@ -556,6 +562,9 @@ msgstr "Delegation(s)"
 
 msgid "reviewer_mandates_list"
 msgstr "List of files"
+
+msgid "review"
+msgstr "Opinion"
 
 msgid "reviews"
 msgstr "Opinions"

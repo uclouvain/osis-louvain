@@ -29,6 +29,8 @@
 <link rel="stylesheet" href="{% static 'css/custom.css' %}">
 {% endblock %}
 {% block breadcrumb %}
+<li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
+<li><a href="{% url 'mandates' %}" id="lnk_mandates">{% trans 'mandates' %}</a></li>
 <li class="active">{% trans 'assistants' %}</li>
 {% endblock %}
 {% block content %}
@@ -62,6 +64,14 @@
                 <h4 class="media-heading"><a href="{% url 'export_mandates' %}" id="lnk_upload_mandates">
                     {% trans 'export_mandates' %}</a></h4>
                 <p>{% trans 'desc_lnk_export_mandates' %}</p>
+            </div>
+        </div>
+        <div class="row" style="padding-top: 10px;">
+            <div class="col-md-1"><i class="fa fa-upload" style="font-size: 400%; color: #6699FF;"></i></div>
+            <div class="col-md-11">
+                <h4 class="media-heading"><a href="{% url 'export_mandates_pdf' %}" id="lnk_export_mandates">
+                    {% trans 'export_mandates' %}</a></h4>
+                <p>{% trans 'desc_lnk_export_mandates_pdf' %}</p>
             </div>
         </div>
         <div class="row" style="padding-top: 10px;">

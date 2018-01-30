@@ -247,6 +247,12 @@ msgstr "Courriels"
 msgid "end"
 msgstr "Fin"
 
+msgid "end_date_contract"
+msgstr "Date de fin du contrat"
+
+msgid "entry_date_contract"
+msgstr "Date de début du contrat"
+
 msgid "eq_fte"
 msgstr "Durée contrat (ETP)"
 
@@ -504,7 +510,7 @@ msgid "refused"
 msgstr "Désisté"
 
 msgid "registered_phd"
-msgstr "Inscrit au doctorat"
+msgstr "Inscrit·e au doctorat"
 
 msgid "remark"
 msgstr "Remarque"
@@ -558,6 +564,9 @@ msgid "reviewer_mandates_list"
 msgstr "Liste des dossiers"
 
 msgid "reviews"
+msgstr "Avis"
+
+msgid "review"
 msgstr "Avis"
 
 msgid "reviewer"

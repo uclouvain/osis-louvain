@@ -23,74 +23,118 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import time
 from io import BytesIO
-from django.http import HttpResponse, HttpResponseRedirect
-from django.core.urlresolvers import reverse
-from django.conf import settings
+from django.contrib.auth.decorators import user_passes_test
+from django.http import HttpResponse
 from reportlab.lib.pagesizes import A4
-from reportlab.lib.enums import TA_JUSTIFY, TA_RIGHT, TA_CENTER, TA_LEFT
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Image, PageBreak, Table, TableStyle
+from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT
+from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Table, TableStyle
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.graphics.charts.piecharts import Pie
 from reportlab.graphics.shapes import Drawing
-from reportlab.graphics.barcode import qr
 from reportlab.lib.units import mm
 from reportlab.lib import colors
+from reportlab.lib.colors import black, HexColor
+from reportlab.graphics.charts.legends import Legend
 from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
-
-from base import models as mdl
-from internship.models.organization import Organization
+from base.models.entity import find_versions_from_entites
 from base.models import academic_year, entity_version
-from assistant.models import assistant_mandate, review
-from assistant.models.enums import review_status
+from assistant.utils import manager_access
+from assistant.models import assistant_mandate, review, tutoring_learning_unit_year
+from assistant.models.enums import review_status, assistant_type
 
 PAGE_SIZE = A4
 MARGIN_SIZE = 15 * mm
-COLS_WIDTH = [40*mm, 29.4*mm, 29.4*mm, 29.4*mm, 29.4*mm, 29.4*mm]
-STUDENTS_PER_PAGE = 24
+COLS_WIDTH = [35*mm, 20*mm, 70*mm, 30*mm, 30*mm]
+COLS_TUTORING_WIDTH = [40*mm, 15*mm, 15*mm, 15*mm, 15*mm, 15*mm, 15*mm, 15*mm, 40*mm]
+
 
 def add_header_footer(canvas, doc):
-    """
-    Add the page number
-    """
     styles = getSampleStyleSheet()
-    # Save the state of our canvas so we can draw on it
     canvas.saveState()
-
-    # Header
-    header_building(canvas, doc, styles)
-
-    # Footer
+    header_building(canvas, doc)
     footer_building(canvas, doc, styles)
-
-    # Release the canvas
     canvas.restoreState()
 
 
-def print_mandates(request):
+@user_passes_test(manager_access.user_is_manager, login_url='assistants_home')
+def export_mandates(request):
     mandates = assistant_mandate.find_by_academic_year(academic_year.current_academic_year())
     return build_pdf(mandates)
 
+
 def build_pdf(document):
-    filename = ('%s.pdf' % (_('assistants_mandates')))
+    filename = ('%s_%s.pdf' % (_('assistants_mandates'), time.strftime("%Y%m%d_%H%M")))
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
-
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer,
                             pagesize=PAGE_SIZE,
                             rightMargin=MARGIN_SIZE,
                             leftMargin=MARGIN_SIZE,
-                            topMargin=85,
-                            bottomMargin=18)
+                            topMargin=70,
+                            bottomMargin=25)
+    styles = add_customised_styles()
+    content = []
+    for mandate in document:
+        content.append(create_paragraph_and_add_data(mandate.assistant.person.first_name + " "
+                                                     + mandate.assistant.person.last_name,
+                                                     get_administrative_data(mandate),
+                                                     styles['StandardWithBorder']))
+        content.append(create_paragraph_and_add_data("%s" % (_('entities')), get_entities(mandate),
+                                                     styles['StandardWithBorder']))
+        content.append(create_paragraph_and_add_data("<strong>%s</strong>" % (_('absences')), get_absences(mandate),
+                                                     styles['StandardWithBorder']))
+        content.append(create_paragraph_and_add_data("<strong>%s</strong>" % (_('comment')), get_comment(mandate),
+                                                     styles['StandardWithBorder']))
+        content.append(PageBreak())
+        if mandate.assistant_type == assistant_type.ASSISTANT:
+            content.append(create_paragraph_and_add_data("%s" % (_('doctorate')), get_phd_data(mandate.assistant),
+                                                         styles['StandardWithBorder']))
+            content.append(create_paragraph_and_add_data("%s" % (_('research')), get_research_data(mandate),
+                                                         styles['StandardWithBorder']))
+            content.append(PageBreak())
+        content.append(create_paragraph_and_add_data("%s<br />" % (_('tutoring_learning_units')), '',
+                                                     styles["BodyText"]))
+        _write_table_of_tutoring_learning_units_year(content, get_tutoring_learning_unit_year(mandate, styles['Tiny']))
+        content.append(PageBreak())
+        content.append(create_paragraph_and_add_data("%s" % (_('representation_activities')),
+                                                     get_representation_activities(mandate),
+                                                     styles['StandardWithBorder'],
+                                                     " (%s)" % (_('hours_per_year'))))
+        content.append(create_paragraph_and_add_data("%s" % (_('service_activities')),
+                                                     get_service_activities(mandate),
+                                                     styles['StandardWithBorder'],
+                                                     " (%s)" % (_('hours_per_year'))))
+        content.append(create_paragraph_and_add_data("%s" % (_('formation_activities')),
+                                                     get_formation_activities(mandate),
+                                                     styles['StandardWithBorder']))
+        content.append(PageBreak())
+        content.append(create_paragraph_and_add_data("%s" % (_('summary')),
+                                                     get_summary(mandate),
+                                                     styles['StandardWithBorder']))
+        content += [draw_time_repartition(mandate)]
+        content.append(PageBreak())
+        content.append(create_paragraph_and_add_data("%s<br />" % (_('reviews')), '',
+                                                     styles["BodyText"]))
+        _write_table_of_reviews(content, get_reviews_for_mandate(mandate, styles))
+        content.append(PageBreak())
+    doc.build(content, onFirstPage=add_header_footer, onLaterPages=add_header_footer)
+    pdf = buffer.getvalue()
+    buffer.close()
+    response.write(pdf)
+    return response
 
+
+def add_customised_styles():
     styles = getSampleStyleSheet()
-    styles.add(ParagraphStyle(name='Justify', alignment=TA_JUSTIFY))
     styles.add(ParagraphStyle(
-        name = 'Tiny',
-        fontSize=8,
+        name='Tiny',
+        fontSize=6,
         font='Helvetica',
-        leading=12,
+        leading=8,
         leftIndent=0,
         rightIndent=0,
         firstLineIndent=0,
@@ -99,82 +143,306 @@ def build_pdf(document):
         spaceAfter=0,
         splitLongWords=1,
     ))
-    content = []
-
-    students_printed = 0
-
-    for mandate in document:
-        data = headers_table()
-
-        main_data(mandate, content)
-
-        # 1. Append the reviews to the table 'data'
-        reviews = review.find_by_mandate(mandate.id)
-        for rev in reviews:
-            if rev.status == review_status.IN_PROGRESS:
-                break
-            if rev.reviewer is None:
-                supervisor = "<br/>(%s)" % (str(_('supervisor')))
-                person = mandate.assistant.supervisor.first_name + " " + mandate.assistant.supervisor.last_name + \
-                          supervisor
-            else:
-                entity = entity_version.get_last_version(rev.reviewer.entity).acronym
-                person = rev.reviewer.person.first_name + " " + rev.reviewer.person.last_name + "<br/>(" + entity + ")"
-            data.append([Paragraph(person, styles['Tiny']),
-                         Paragraph(_(rev.advice), styles['Tiny']),
-                         Paragraph(rev.remark or '', styles['Tiny']),
-                         Paragraph(rev.justification or '', styles['Tiny']),
-                         Paragraph(rev.confidential or '', styles['Tiny'])])
+    styles.add(ParagraphStyle(
+        name='StandardWithBorder',
+        font='Helvetica',
+        leading=18,
+        leftIndent=10,
+        rightIndent=10,
+        firstLineIndent=0,
+        alignment=TA_JUSTIFY,
+        spaceBefore=25,
+        spaceAfter=5,
+        splitLongWords=1,
+        borderColor='#000000',
+        borderWidth=1,
+        borderPadding=10,
+    ))
+    return styles
 
 
-        # Print a complete PDF sheet
-        # 3. Write header
-
-        # 4. Adding the complete table of examEnrollments to the PDF sheet
-        p = Paragraph('''<para align=center>
-                                <font size=12>%s</font>
-                            </para>''' % (_('reviews')), styles["BodyText"])
-        content.append(p)
-        content.append(Paragraph('''
-                <para spaceb=1>
-                    &nbsp;
-                </para>
-                ''', ParagraphStyle('normal')))
-        _write_table_of_reviews(content, data)
-
-        #content.append(generate_qrcode(mandate))
-
-        # 5. Write Legend
-
-        # 6. New Page
-        content.append(PageBreak())
-
-        # 7. New headers_table in variable 'data' with headers ('noma', 'firstname', 'lastname'...)
-        #    in case there's one more page after this one
-        data = headers_table()
-
-    doc.build(content, onFirstPage=add_header_footer, onLaterPages=add_header_footer)
-    pdf = buffer.getvalue()
-    buffer.close()
-    response.write(pdf)
-    return response
+def create_paragraph_and_add_data(title, data, style, subtitle=''):
+    paragraph = Paragraph("<font size=14><strong>" + title + "</strong></font>" +
+                          subtitle + "<br />" + data, style)
+    return paragraph
 
 
-def generate_qrcode(mandate):
-    qr_code = qr.QrCodeWidget(
-        mandate.assistant.person.first_name + " " + mandate.assistant.person.last_name)
-
-    bounds = qr_code.getBounds()
-    width = bounds[2] - bounds[0]
-    height = bounds[3] - bounds[1]
-    c = Drawing(45, 45, transform=[60. / width, 0, 0, 60. / height, 0, 0])
-    c.add(qr_code)
-    return c
+def get_summary(mandate):
+    report_remark = "<strong>%s :</strong> %s<br />" % (_('activities_report_remark'), mandate.activities_report_remark) \
+        if mandate.activities_report_remark != 'None' and mandate.activities_report_remark else ''
+    return report_remark
 
 
-def header_building(canvas, doc, styles):
+def get_administrative_data(mandate):
+    assistant_type = "<strong>%s :</strong> %s<br />" % (_('assistant_type'), _(mandate.assistant_type))
+    matricule = "<strong>%s :</strong> %s<br />" % (_('matricule_number'), mandate.sap_id)
+    entry_date = "<strong>%s :</strong> %s<br />" % (_('entry_date_contract'), mandate.entry_date.strftime("%d-%m-%Y"))
+    end_date = "<strong>%s :</strong> %s<br />" % (_('end_date_contract'), mandate.end_date.strftime("%d-%m-%Y"))
+    contract_duration = "<strong>%s :</strong> %s<br />" % (_('contract_duration'), mandate.contract_duration)
+    contract_duration_fte = "<strong>%s :</strong> %s<br />" % (_('contract_duration_fte'),
+                                                                mandate.contract_duration_fte)
+    fulltime_equivalent = "<strong>%s :</strong> %s" % (_('fulltime_equivalent_percentage'),
+                                                        int(mandate.fulltime_equivalent * 100)) + "%<br />"
+    other_status = "<strong>%s :</strong> %s<br />" % (_('other_status'), mandate.other_status) \
+        if mandate.other_status else "<strong>%s :</strong><br />" % (_('other_status'))
+    renewal_type = "<strong>%s :</strong> %s<br />" % (_('renewal_type'), _(mandate.renewal_type))
+    justification = "<strong>%s :</strong> %s<br />" % (_('exceptional_justification'), mandate.justification) \
+        if mandate.justification else "<strong>%s :</strong><br />" % (_('exceptional_justification'))
+    external_contract = "<strong>%s :</strong> %s<br />" % (_('external_post'), mandate.external_contract) \
+        if mandate.external_contract else "<strong>%s :</strong><br />" % (_('external_post'))
+    external_functions = "<strong>%s :</strong> %s<br />" % (_('function_outside_university'),
+                                                             mandate.external_functions) \
+        if mandate.external_functions else "<strong>%s :</strong><br />" % (_('function_outside_university'))
+    return assistant_type + matricule + entry_date + end_date + contract_duration + contract_duration_fte \
+           + fulltime_equivalent + other_status + renewal_type + justification + external_contract + external_functions
 
-    canvas.line(doc.leftMargin,780,doc.width+doc.leftMargin,780)
+
+def get_entities(mandate):
+    start_date = academic_year.current_academic_year().start_date
+    entities_id = mandate.mandateentity_set.all().order_by('id').values_list('entity', flat=True)
+    entities = find_versions_from_entites(entities_id, start_date)
+    entities_data = ""
+    for entity in entities:
+        type = "%s" % (_(entity.entity_type))
+        entities_data += "<strong>" + type  + " :</strong> " + entity.acronym + "<br />"
+    return entities_data
+
+
+def get_absences(mandate):
+    return mandate.absences if mandate.absences else ""
+
+
+def get_comment(mandate):
+    return mandate.comment if mandate.comment else ""
+
+
+def get_phd_data(assistant):
+    thesis_title = "<strong>%s :</strong> %s<br />" % (_('thesis_title'), _(assistant.thesis_title)) \
+        if assistant.thesis_title else "<strong>%s :</strong><br />" % (_('thesis_title'))
+    phd_inscription_date = "<strong>%s :</strong> %s<br />" % (_('phd_inscription_date'),
+                                              assistant.phd_inscription_date.strftime("%d-%m-%Y")) \
+        if assistant.phd_inscription_date else "<strong>%s :</strong><br />" % (_('phd_inscription_date'))
+    confirmation_test_date = "<strong>%s :</strong> %s<br />" % (_('confirmatory_test_date'),
+                                          assistant.confirmation_test_date.strftime("%d-%m-%Y")) \
+        if assistant.confirmation_test_date else "<strong>%s :</strong><br />" % (_('confirmatory_test_date'))
+    thesis_date = "<strong>%s :</strong> %s<br />" % (_('thesis_defence_date'),
+                                                      assistant.thesis_date.strftime("%d-%m-%Y")) \
+        if assistant.thesis_date else "<strong>%s :</strong><br />" % (_('thesis_defence_date'))
+    expected_phd_date = "<strong>%s :</strong> %s<br />" % (_('expected_registering_date'),
+                                                            assistant.expected_phd_date.strftime("%d-%m-%Y")) \
+        if assistant.expected_phd_date else "<strong>%s :</strong><br />" % (_('expected_registering_date'))
+    inscription = "<strong>%s :</strong> %s<br />" % (_('registered_phd'), _(assistant.inscription)) \
+        if assistant.inscription else "<strong>%s :</strong><br />" % (_('registered_phd'))
+    remark = "<strong>%s :</strong> %s<br />" % (_('remark'), _(assistant.remark)) \
+        if assistant.remark else "<strong>%s :</strong><br />" % (_('remark'))
+    return inscription+ phd_inscription_date + expected_phd_date + confirmation_test_date + thesis_title \
+           + thesis_date + remark
+
+
+def get_research_data(mandate):
+    internships = "<strong>%s :</strong> %s<br />" % (_('scientific_internships'), _(mandate.internships)) \
+        if mandate.internships else "<strong>%s :</strong><br />" % (_('scientific_internships'))
+    conferences = "<strong>%s :</strong> %s<br />" % (_('conferences_contributor'), _(mandate.conferences)) \
+        if mandate.conferences else "<strong>%s :</strong><br />" % (_('conferences_contributor'))
+    publications = "<strong>%s :</strong> %s<br />" % (_('publications_in_progress'), _(mandate.publications)) \
+        if mandate.publications else "<strong>%s :</strong><br />" % (_('publications_in_progress'))
+    awards = "<strong>%s :</strong> %s<br />" % (_('awards'), _(mandate.awards)) \
+        if mandate.awards else "<strong>%s :</strong><br />" % (_('awards'))
+    framing = "<strong>%s :</strong> %s<br />" % (_('framing_participation'), _(mandate.framing)) \
+        if mandate.framing else "<strong>%s :</strong><br />" % (_('framing_participation'))
+    remark = "<strong>%s :</strong> %s<br />" % (_('remark'), _(mandate.remark)) \
+        if mandate.remark else "<strong>%s :</strong><br />" % (_('remark'))
+    return internships + conferences + publications + awards + framing + remark
+
+
+def get_tutoring_learning_unit_year(mandate, style):
+    data = headers_tutoring_learning_unit_year_table(style)
+    tutoring_learning_units_year = tutoring_learning_unit_year.find_by_mandate(mandate)
+    for this_tutoring_learning_unit_year in tutoring_learning_units_year:
+        academic_year = str(this_tutoring_learning_unit_year.learning_unit_year.academic_year)
+        data.append([Paragraph(this_tutoring_learning_unit_year.learning_unit_year.title + " (" +
+                               this_tutoring_learning_unit_year.learning_unit_year.acronym + ")", style),
+                     Paragraph(academic_year, style),
+                     Paragraph(str(this_tutoring_learning_unit_year.sessions_number), style),
+                     Paragraph(str(this_tutoring_learning_unit_year.sessions_duration), style),
+                     Paragraph(str(this_tutoring_learning_unit_year.series_number), style),
+                     Paragraph(str(this_tutoring_learning_unit_year.face_to_face_duration), style),
+                     Paragraph(str(this_tutoring_learning_unit_year.attendees), style),
+                     Paragraph(str(this_tutoring_learning_unit_year.exams_supervision_duration), style),
+                     Paragraph(this_tutoring_learning_unit_year.others_delivery or '', style)
+                     ])
+    return data
+
+
+def headers_tutoring_learning_unit_year_table(style):
+    data = [[Paragraph('''%s''' %(_('tutoring_learning_units')),style),
+             Paragraph('''%s''' % _('academic_year'),style),
+             Paragraph('''%s''' % _('sessions_number'),style),
+             Paragraph('''%s''' % _('sessions_duration'),style),
+             Paragraph('''%s''' % _('series_number'),style),
+             Paragraph('''%s''' % _('face_to_face_duration'),style),
+             Paragraph('''%s''' % _('attendees'),style),
+             Paragraph('''%s''' % _('exams_supervision_duration'),style),
+             Paragraph('''%s''' % _('others_delivery'),style)]]
+    return data
+
+
+def _write_table_of_tutoring_learning_units_year(content, data):
+    t = Table(data, COLS_TUTORING_WIDTH, repeatRows=1)
+    t.setStyle(TableStyle([
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('BACKGROUND', (0, 0), (-1, 0), HexColor("#f6f6f6"))]))
+    content.append(t)
+
+
+def get_representation_activities(mandate):
+    faculty_representation = "<strong>%s :</strong> %s<br />" % (_('faculty_representation'),
+                                                                 str(mandate.faculty_representation))
+    institute_representation = "<strong>%s :</strong> %s<br />" % (_('institute_representation'),
+                                                                   str(mandate.institute_representation))
+    sector_representation = "<strong>%s :</strong> %s<br />" % (_('sector_representation'),
+                                                                str(mandate.sector_representation))
+    governing_body_representation = "<strong>%s :</strong> %s<br />" % (_('governing_body_representation'),
+                                                                        str(mandate.governing_body_representation))
+    corsci_representation = "<strong>%s :</strong> %s<br />" % (_('corsci_representation'),
+                                                                str(mandate.corsci_representation))
+    return faculty_representation + institute_representation + sector_representation + governing_body_representation \
+           + corsci_representation
+
+
+def get_service_activities(mandate):
+    students_service = "<strong>%s :</strong> %s<br />" % (_('students_service'), str(mandate.students_service))
+    infrastructure_mgmt_service = "<strong>%s :</strong> %s<br />" % (_('infrastructure_mgmt_service'),
+                                                                      str(mandate.infrastructure_mgmt_service))
+    events_organisation_service = "<strong>%s :</strong> %s<br />" % (_('events_organisation_service'),
+                                                                      str(mandate.events_organisation_service))
+    publishing_field_service = "<strong>%s :</strong> %s<br />" % (_('publishing_field_service'),
+                                                                   str(mandate.publishing_field_service))
+    scientific_jury_service = "<strong>%s :</strong> %s<br />" % (_('scientific_jury_service'),
+                                                                  str(mandate.scientific_jury_service))
+    return students_service + infrastructure_mgmt_service + events_organisation_service + publishing_field_service + \
+           scientific_jury_service
+
+
+def get_formation_activities(mandate):
+    formations = "<strong>%s :</strong> %s<br />" % (_('formations'), mandate.formations)
+    return formations
+
+
+def get_reviews_for_mandate(mandate, styles):
+    data = headers_reviews_table()
+    reviews = review.find_by_mandate(mandate.id)
+    for rev in reviews:
+        if rev.status == review_status.IN_PROGRESS:
+            break
+        if rev.reviewer is None:
+            supervisor = "<br/>(%s)" % (str(_('supervisor')))
+            person = mandate.assistant.supervisor.first_name + " " + mandate.assistant.supervisor.last_name + \
+                     supervisor
+        else:
+            entity = entity_version.get_last_version(rev.reviewer.entity).acronym
+            person = rev.reviewer.person.first_name + " " + rev.reviewer.person.last_name + "<br/>(" + entity + ")"
+        data.append([Paragraph(person, styles['Tiny']),
+                     Paragraph(_(rev.advice), styles['Tiny']),
+                     Paragraph(rev.remark or '', styles['Tiny']),
+                     Paragraph(rev.justification or '', styles['Tiny']),
+                     Paragraph(rev.confidential or '', styles['Tiny'])])
+    return data
+
+
+def _write_table_of_reviews(content, data):
+    t = Table(data, COLS_WIDTH, repeatRows=1)
+    t.setStyle(TableStyle([
+        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
+        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
+        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
+        ('BACKGROUND', (0, 0), (-1, 0), HexColor("#f6f6f6"))]))
+    content.append(t)
+
+
+def headers_reviews_table():
+    data = [['''%s (%s)''' %(_('reviewer'), _('entity')),
+             '''%s''' % _('review'),
+             '''%s''' % _('remark'),
+             '''%s''' % _('justification'),
+             '''%s''' % _('confidential')]]
+    return data
+
+
+def set_items(n, obj, attr, values):
+    m = len(values)
+    i = m // n
+    for j in range(n):
+        setattr(obj[j],attr,values[j*i % m])
+
+
+def draw_time_repartition(mandate):
+    pdf_chart_colors = [
+        HexColor("#fa9d00"),
+        HexColor("#006884"),
+        HexColor("#00909e"),
+        HexColor("#ffd08d"),
+    ]
+    d = Drawing(width=180*mm, height=120*mm)
+    pc = Pie()
+    pc.x = 60*mm
+    pc.y = 35*mm
+    pc.width = 60*mm
+    pc.height = 60*mm
+    pc.data = []
+    pc.labels = []
+    titles = []
+    if mandate.research_percent != 0:
+        pc.data.append(mandate.research_percent)
+        pc.labels.append(str(mandate.research_percent) + "%")
+        titles.append(_('research_percent'))
+    if mandate.tutoring_percent != 0:
+        pc.data.append(mandate.tutoring_percent)
+        pc.labels.append(str(mandate.tutoring_percent) + "%")
+        titles.append(_('tutoring_percent'))
+    if mandate.service_activities_percent != 0:
+        pc.data.append(mandate.service_activities_percent)
+        pc.labels.append(str(mandate.service_activities_percent) + "%")
+        titles.append(_('service_activities_percent'))
+    if mandate.formation_activities_percent != 0:
+        pc.data.append(mandate.formation_activities_percent)
+        pc.labels.append(str(mandate.formation_activities_percent) + "%")
+        titles.append(_('formation_activities_percent'))
+    pc.slices.strokeWidth = 0.5
+    pc.slices.fontName = 'Helvetica'
+    pc.slices.fontSize = 8
+    if len(pc.data) > 0:
+        d.add(pc)
+        d.add(Legend(), name='legend')
+        d.legend.x = 90
+        d.legend.y = 50
+        d.legend.dx = 8
+        d.legend.dy = 8
+        d.legend.fontName = 'Helvetica'
+        d.legend.fontSize = 8
+        d.legend.boxAnchor = 'w'
+        d.legend.columnMaximum = 10
+        d.legend.strokeWidth = 1
+        d.legend.strokeColor = black
+        d.legend.deltax = 75
+        d.legend.deltay = 10
+        d.legend.autoXPadding = 5
+        d.legend.yGap = 0
+        d.legend.dxTextSpace = 5
+        d.legend.alignment = 'right'
+        d.legend.dividerOffsY = 5
+        d.legend.subCols.rpad = 30
+        n = len(pc.data)
+        set_items(n, pc.slices, 'fillColor', pdf_chart_colors)
+        d.legend.colorNamePairs = [(pc.slices[i].fillColor, (titles[i], '%0.f' % pc.data[i]+'%'))
+                                  for i in range(n)]
+    return d
+
+
+def header_building(canvas, doc):
+    canvas.line(doc.leftMargin,790,doc.width+doc.leftMargin,790)
     canvas.drawString(80, 800, "%s %s" % (_('assistant_mandates_renewals'), academic_year.current_academic_year()))
 
 
@@ -186,155 +454,6 @@ def footer_building(canvas, doc, styles):
     w, h = footer.wrap(doc.width, doc.bottomMargin)
     footer.drawOn(canvas, doc.leftMargin, h)
 
-
-def _write_table_of_reviews(content, data):
-    t = Table(data, COLS_WIDTH, repeatRows=1)
-    t.setStyle(TableStyle([
-        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('BACKGROUND', (0, 0), (-1, 0), colors.grey)]))
-    content.append(t)
-
-"""
-def legend_building(decimal_scores, content):
-    p = ParagraphStyle('legend')
-    p.textColor = 'grey'
-    p.borderColor = 'grey'
-    p.borderWidth = 1
-    p.alignment = TA_CENTER
-    p.fontSize = 8
-    p.borderPadding = 5
-
-    legend_text = _('justification_legend') % mdl.exam_enrollment.justification_label_authorized()
-    legend_text += "<br/>%s" % (str(_('score_legend') % "0 - 20"))
-    if decimal_scores:
-        legend_text += "<br/><font color=red>%s</font>" % _('authorized_decimal_for_this_activity')
-    else:
-        legend_text += "<br/><font color=red>%s</font>" % _('unauthorized_decimal_for_this_activity')
-
-    legend_text += '''<br/> %s : <a href="%s"><font color=blue><u>%s</u></font></a>''' \
-                   % (_("in_accordance_to_regulation"), _("link_to_RGEE"), _("link_to_RGEE"))
-    content.append(Paragraph('''
-                            <para>
-                                %s
-                            </para>
-                            ''' % legend_text, p))
-"""
-
-def headers_table():
-    data = [['''%s (%s)''' %(_('reviewer'), _('entity')),
-             '''%s''' % _('review'),
-             '''%s''' % _('remark'),
-             '''%s''' % _('justification'),
-             '''%s''' % _('confidential')]]
-    return data
-
-"""
-def get_data_coordinator(learning_unit_year, styles):
-    p_coord_location = Paragraph('''''', styles["Normal"])
-    p_coord_address = Paragraph('''''', styles["Normal"])
-    p_responsible = Paragraph('<b>%s :</b>' % _('learning_unit_responsible'), styles["Normal"])
-    coordinator = learning_unit_year["coordinator"]
-    if coordinator:
-        p_coord_name = Paragraph(
-            '%s %s' % (coordinator['last_name'], coordinator['first_name']), styles["Normal"])
-        address = coordinator['address']
-        if address:
-            p_coord_location = Paragraph('''%s''' % address['location'], styles["Normal"])
-            if address['postal_code'] or address['city']:
-                p_coord_address = Paragraph(
-                    '''%s %s''' % (address['postal_code'], address['city']),styles["Normal"])
-    else:
-        p_coord_name = Paragraph('%s' % _('none'), styles["Normal"])
-
-    return [[p_responsible], [p_coord_name], [p_coord_location], [p_coord_address]]
-"""
-def main_data(mandate, content):
-    # We add first a blank line
-    content.append(Paragraph('''
-            <para spaceb=20>
-                &nbsp;
-            </para>
-            ''', ParagraphStyle('normal')))
-
-    text_left_style = ParagraphStyle('structure_header')
-    text_left_style.alignment = TA_LEFT
-    text_left_style.fontSize = 10
-    
-
-"""
-def main_data(learning_unit_year, program, nb_students, styles, content):
-
-    # We add first a blank line
-    content.append(Paragraph('''
-        <para spaceb=20>
-            &nbsp;
-        </para>
-        ''', ParagraphStyle('normal')))
-
-    text_left_style = ParagraphStyle('structure_header')
-    text_left_style.alignment = TA_LEFT
-    text_left_style.fontSize = 10
-    struct_address = program['address']
-    p_struct_name = Paragraph('%s' % struct_address.get('recipient') if struct_address.get('recipient') else '',
-                              styles["Normal"])
-
-    p_struct_location = Paragraph('%s' % struct_address.get('location') if struct_address.get('location') else '',
-                                  styles["Normal"])
-    p_struct_address = Paragraph('%s %s' % (struct_address.get('postal_code') if struct_address.get('postal_code') else '',
-                                            struct_address.get('city') if struct_address.get('city') else ''),
-                                 styles["Normal"])
-    phone_fax_data = ""
-    if struct_address.get('phone'):
-        phone_fax_data += "%s : %s" % (_('phone'), struct_address.get('phone'))
-    if struct_address.get('fax'):
-        if struct_address.get('phone'):
-            phone_fax_data += " - "
-        phone_fax_data += "%s : %s" % (_('fax'), struct_address.get('fax'))
-    p_phone_fax_data = Paragraph('%s' % phone_fax_data,
-                                 styles["Normal"])
-
-    data_structure = [[p_struct_name],
-                      [p_struct_location],
-                      [p_struct_address],
-                      [p_phone_fax_data]]
-
-    header_coordinator_structure = [[get_data_coordinator(learning_unit_year, styles), data_structure]]
-    table_header = Table(header_coordinator_structure, colWidths='*')
-    table_header.setStyle(TableStyle([
-        ('LEFTPADDING', (0, 0), (-1, -1), 0),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 0),
-        ('VALIGN', (0, 0), (-1, -1), 'TOP')
-    ]))
-
-    content.append(table_header)
-
-    p = ParagraphStyle('right_page_header')
-    p.alignment = TA_RIGHT
-    p.fontSize = 10
-
-    deliberation_date = program['deliberation_date']
-
-    content.append(Paragraph('%s : %s' % (_('deliberation_date'), deliberation_date), styles["Normal"]))
-    content.append(Paragraph('%s : %s  - Session : %s' % (_('academic_year'),
-                                                          learning_unit_year['academic_year'],
-                                                          learning_unit_year['session_number']),
-                             text_left_style))
-    # content.append(Paragraph('Session : %d' % session_exam.number_session, text_left_style))
-    content.append(Paragraph("<strong>%s : %s</strong>" % (learning_unit_year['acronym'], learning_unit_year['title']),
-                             styles["Normal"]))
-    content.append(Paragraph('''<b>%s : %s </b>(%s %s)''' % (_('program'),
-                                                             program['acronym'],
-                                                             nb_students,
-                                                             _('students')),
-                             styles["Normal"]))
-    content.append(Paragraph('''
-        <para spaceb=2>
-            &nbsp;
-        </para>
-        ''', ParagraphStyle('normal')))
-"""
 
 def end_page_infos_building(content, end_date):
     p = ParagraphStyle('info')
@@ -353,7 +472,8 @@ def end_page_infos_building(content, end_date):
     p_signature.fontSize = 10
     paragraph_signature = Paragraph('''
                     <font size=10>%s ...................................... , </font>
-                    <font size=10>%s ..../..../.......... &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font>
+                    <font size=10>%s ..../..../.......... &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    y&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font>
                     <font size=10>%s</font>
                    ''' % (_('done_at'), _('the'), _('signature')), p_signature)
     content.append(paragraph_signature)
