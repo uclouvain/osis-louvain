@@ -29,6 +29,7 @@ from django.test import TestCase, RequestFactory
 from reportlab.lib.styles import getSampleStyleSheet
 from base.models.entity import find_versions_from_entites
 from assistant.utils import export_utils_pdf
+from assistant.utils.export_utils_pdf import format_data
 from assistant.tests.factories.academic_assistant import AcademicAssistantFactory
 from assistant.tests.factories.assistant_mandate import AssistantMandateFactory
 from assistant.tests.factories.review import ReviewFactory
@@ -66,28 +67,25 @@ class ExportPdfTestCase(TestCase):
             mandate=self.mandate
         )
 
+    def test_format_data(self):
+        data = 'good example of data.'
+        title = 'formations'
+        self.assertEqual("<strong>%s :</strong> %s<br />" % (_(title), data), export_utils_pdf.format_data(data, title))
+
+
     def test_get_administrative_data(self):
-        assistant_type = "<strong>%s :</strong> %s<br />" % (_('assistant_type'), _(self.mandate.assistant_type))
-        matricule = "<strong>%s :</strong> %s<br />" % (_('matricule_number'), self.mandate.sap_id)
-        entry_date = "<strong>%s :</strong> %s<br />" % (
-        _('entry_date_contract'), self.mandate.entry_date.strftime("%d-%m-%Y"))
-        end_date = "<strong>%s :</strong> %s<br />" % (_('end_date_contract'),
-                                                       self.mandate.end_date.strftime("%d-%m-%Y"))
-        contract_duration = "<strong>%s :</strong> %s<br />" % (_('contract_duration'), self.mandate.contract_duration)
-        contract_duration_fte = "<strong>%s :</strong> %s<br />" % (_('contract_duration_fte'),
-                                                                    self.mandate.contract_duration_fte)
-        fulltime_equivalent = "<strong>%s :</strong> %s" % (_('fulltime_equivalent_percentage'),
-                                                            int(self.mandate.fulltime_equivalent * 100)) + "%<br />"
-        other_status = "<strong>%s :</strong> %s<br />" % (_('other_status'), self.mandate.other_status) \
-            if self.mandate.other_status else "<strong>%s :</strong><br />" % (_('other_status'))
-        renewal_type = "<strong>%s :</strong> %s<br />" % (_('renewal_type'), _(self.mandate.renewal_type))
-        justification = "<strong>%s :</strong> %s<br />" % (_('exceptional_justification'), self.mandate.justification) \
-            if self.mandate.justification else "<strong>%s :</strong><br />" % (_('exceptional_justification'))
-        external_contract = "<strong>%s :</strong> %s<br />" % (_('external_post'), self.mandate.external_contract) \
-            if self.mandate.external_contract else "<strong>%s :</strong><br />" % (_('external_post'))
-        external_functions = "<strong>%s :</strong> %s<br />" % (_('function_outside_university'),
-                                                                 self.mandate.external_functions) \
-            if self.mandate.external_functions else "<strong>%s :</strong><br />" % (_('function_outside_university'))
+        assistant_type = format_data(_(self.mandate.assistant_type), 'assistant_type')
+        matricule = format_data(self.mandate.sap_id, 'matricule_number')
+        entry_date = format_data(self.mandate.entry_date, 'entry_date_contract')
+        end_date = format_data(self.mandate.end_date, 'end_date_contract')
+        contract_duration = format_data(self.mandate.contract_duration, 'contract_duration')
+        contract_duration_fte = format_data(self.mandate.contract_duration_fte, 'contract_duration_fte')
+        fulltime_equivalent = format_data(int(self.mandate.fulltime_equivalent * 100), 'fulltime_equivalent_percentage')
+        other_status = format_data(self.mandate.other_status, 'other_status')
+        renewal_type = format_data(_(self.mandate.renewal_type), 'renewal_type')
+        justification = format_data(self.mandate.justification, 'exceptional_justification')
+        external_contract = format_data(self.mandate.external_contract, 'external_post')
+        external_functions = format_data(self.mandate.external_functions, 'function_outside_university')
         self.assertEqual( assistant_type + matricule + entry_date + end_date + contract_duration + contract_duration_fte \
            + fulltime_equivalent + other_status + renewal_type + justification + external_contract + external_functions,
                           export_utils_pdf.get_administrative_data(self.mandate))
@@ -114,88 +112,61 @@ class ExportPdfTestCase(TestCase):
 
 
     def test_get_phd_data(self):
-        thesis_title = "<strong>%s :</strong> %s<br />" % (_('thesis_title'), _(self.assistant.thesis_title)) \
-            if self.assistant.thesis_title else "<strong>%s :</strong><br />" % (_('thesis_title'))
-        phd_inscription_date = "<strong>%s :</strong> %s<br />" % (_('phd_inscription_date'),
-                                                                   self.assistant.phd_inscription_date.strftime(
-                                                                       "%d-%m-%Y")) \
-            if self.assistant.phd_inscription_date else "<strong>%s :</strong><br />" % (_('phd_inscription_date'))
-        confirmation_test_date = "<strong>%s :</strong> %s<br />" % (_('confirmatory_test_date'),
-                                                                     self.assistant.confirmation_test_date.strftime(
-                                                                         "%d-%m-%Y")) \
-            if self.assistant.confirmation_test_date else "<strong>%s :</strong><br />" % (_('confirmatory_test_date'))
-        thesis_date = "<strong>%s :</strong> %s<br />" % (_('thesis_defence_date'),
-                                                          self.assistant.thesis_date.strftime("%d-%m-%Y")) \
-            if self.assistant.thesis_date else "<strong>%s :</strong><br />" % (_('thesis_defence_date'))
-        expected_phd_date = "<strong>%s :</strong> %s<br />" % (_('expected_registering_date'),
-                                                                self.assistant.expected_phd_date.strftime("%d-%m-%Y")) \
-            if self.assistant.expected_phd_date else "<strong>%s :</strong><br />" % (_('expected_registering_date'))
-        inscription = "<strong>%s :</strong> %s<br />" % (_('registered_phd'), _(self.assistant.inscription)) \
-            if self.assistant.inscription else "<strong>%s :</strong><br />" % (_('registered_phd'))
-        remark = "<strong>%s :</strong> %s<br />" % (_('remark'), _(self.assistant.remark)) \
-            if self.assistant.remark else "<strong>%s :</strong><br />" % (_('remark'))
+        thesis_title = format_data(self.assistant.thesis_title, 'thesis_title')
+        phd_inscription_date = format_data(self.assistant.phd_inscription_date, 'phd_inscription_date')
+        confirmation_test_date = format_data(self.assistant.confirmation_test_date, 'confirmatory_test_date')
+        thesis_date = format_data(self.assistant.thesis_date, 'thesis_defence_date')
+        expected_phd_date = format_data(self.assistant.expected_phd_date, 'expected_registering_date')
+        inscription = format_data(_(self.assistant.inscription) if self.assistant.inscription else None,
+                                  'registered_phd')
+        remark = format_data(self.assistant.remark, 'remark')
         self.assertEqual(inscription + phd_inscription_date + expected_phd_date + confirmation_test_date + thesis_title \
                + thesis_date + remark, export_utils_pdf.get_phd_data(self.assistant))
 
 
     def test_get_research_data(self):
-        internships = "<strong>%s :</strong> %s<br />" % (_('scientific_internships'), _(self.mandate.internships)) \
-            if self.mandate.internships else "<strong>%s :</strong><br />" % (_('scientific_internships'))
-        conferences = "<strong>%s :</strong> %s<br />" % (_('conferences_contributor'), _(self.mandate.conferences)) \
-            if self.mandate.conferences else "<strong>%s :</strong><br />" % (_('conferences_contributor'))
-        publications = "<strong>%s :</strong> %s<br />" % (_('publications_in_progress'), _(self.mandate.publications)) \
-            if self.mandate.publications else "<strong>%s :</strong><br />" % (_('publications_in_progress'))
-        awards = "<strong>%s :</strong> %s<br />" % (_('awards'), _(self.mandate.awards)) \
-            if self.mandate.awards else "<strong>%s :</strong><br />" % (_('awards'))
-        framing = "<strong>%s :</strong> %s<br />" % (_('framing_participation'), _(self.mandate.framing)) \
-            if self.mandate.framing else "<strong>%s :</strong><br />" % (_('framing_participation'))
-        remark = "<strong>%s :</strong> %s<br />" % (_('remark'), _(self.mandate.remark)) \
-            if self.mandate.remark else "<strong>%s :</strong><br />" % (_('remark'))
+        internships = format_data(self.mandate.internships, 'scientific_internships')
+        conferences = format_data(self.mandate.conferences, 'conferences_contributor')
+        publications = format_data(self.mandate.publications, 'publications_in_progress')
+        awards = format_data(self.mandate.awards, 'awards')
+        framing = format_data(self.mandate.framing, 'framing_participation')
+        remark = format_data(self.mandate.remark, 'remark')
         self.assertEqual(internships + conferences + publications + awards + framing + remark,
                          export_utils_pdf.get_research_data(self.mandate))
 
 
     def test_get_representation_activities(self):
-        faculty_representation = "<strong>%s :</strong> %s<br />" % (_('faculty_representation'),
-                                                                     str(self.mandate.faculty_representation))
-        institute_representation = "<strong>%s :</strong> %s<br />" % (_('institute_representation'),
-                                                                       str(self.mandate.institute_representation))
-        sector_representation = "<strong>%s :</strong> %s<br />" % (_('sector_representation'),
-                                                                    str(self.mandate.sector_representation))
-        governing_body_representation = "<strong>%s :</strong> %s<br />" \
-                                        % (_('governing_body_representation'),
-                                           str(self.mandate.governing_body_representation))
-        corsci_representation = "<strong>%s :</strong> %s<br />" % (_('corsci_representation'),
-                                                                    str(self.mandate.corsci_representation))
+        faculty_representation = format_data(str(self.mandate.faculty_representation), 'faculty_representation')
+        institute_representation = format_data(str(self.mandate.institute_representation), 'institute_representation')
+        sector_representation = format_data(str(self.mandate.sector_representation), 'sector_representation')
+        governing_body_representation = format_data(str(self.mandate.governing_body_representation),
+                                                    'governing_body_representation')
+        corsci_representation = format_data(str(self.mandate.corsci_representation), 'corsci_representation')
         self.assertEqual(faculty_representation + institute_representation + sector_representation +
                          governing_body_representation + corsci_representation,
                          export_utils_pdf.get_representation_activities(self.mandate))
 
 
     def test_get_summary(self):
-        report_remark = "<strong>%s :</strong> %s<br />" % (
-        _('activities_report_remark'), self.mandate.activities_report_remark) \
-            if self.mandate.activities_report_remark != 'None' and self.mandate.activities_report_remark else ''
+        report_remark = format_data(self.mandate.activities_report_remark, 'activities_report_remark')
         self.assertEqual(report_remark, export_utils_pdf.get_summary(self.mandate))
 
 
     def test_get_service_activities(self):
-        students_service = "<strong>%s :</strong> %s<br />" % (_('students_service'), str(self.mandate.students_service))
-        infrastructure_mgmt_service = "<strong>%s :</strong> %s<br />" % (_('infrastructure_mgmt_service'),
-                                                                          str(self.mandate.infrastructure_mgmt_service))
-        events_organisation_service = "<strong>%s :</strong> %s<br />" % (_('events_organisation_service'),
-                                                                          str(self.mandate.events_organisation_service))
-        publishing_field_service = "<strong>%s :</strong> %s<br />" % (_('publishing_field_service'),
-                                                                       str(self.mandate.publishing_field_service))
-        scientific_jury_service = "<strong>%s :</strong> %s<br />" % (_('scientific_jury_service'),
-                                                                      str(self.mandate.scientific_jury_service))
+        students_service = format_data(str(self.mandate.students_service), 'students_service')
+        infrastructure_mgmt_service = format_data(str(self.mandate.infrastructure_mgmt_service),
+                                                  'infrastructure_mgmt_service')
+        events_organisation_service = format_data(str(self.mandate.events_organisation_service),
+                                                  'events_organisation_service')
+        publishing_field_service = format_data(str(self.mandate.publishing_field_service), 'publishing_field_service')
+        scientific_jury_service = format_data(str(self.mandate.scientific_jury_service), 'scientific_jury_service')
         self.assertEqual(students_service + infrastructure_mgmt_service + events_organisation_service +
                          publishing_field_service + scientific_jury_service,
                          export_utils_pdf.get_service_activities(self.mandate))
 
 
     def test_get_formation_activities(self):
-        formations = "<strong>%s :</strong> %s<br />" % (_('formations'), self.mandate.formations)
+        formations = format_data(self.mandate.formations, 'formations')
         self.assertEqual(formations, export_utils_pdf.get_formation_activities(self.mandate))
 
 

@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import time
+import datetime
 from io import BytesIO
 from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponse
@@ -79,46 +80,34 @@ def build_pdf(document):
     styles = add_customised_styles()
     content = []
     for mandate in document:
-        content.append(create_paragraph_and_add_data(mandate.assistant.person.first_name + " "
-                                                     + mandate.assistant.person.last_name,
-                                                     get_administrative_data(mandate),
-                                                     styles['StandardWithBorder']))
-        content.append(create_paragraph_and_add_data("%s" % (_('entities')), get_entities(mandate),
-                                                     styles['StandardWithBorder']))
-        content.append(create_paragraph_and_add_data("<strong>%s</strong>" % (_('absences')), get_absences(mandate),
-                                                     styles['StandardWithBorder']))
-        content.append(create_paragraph_and_add_data("<strong>%s</strong>" % (_('comment')), get_comment(mandate),
-                                                     styles['StandardWithBorder']))
+        content.append(create_paragraph(mandate.assistant.person.first_name + " " + mandate.assistant.person.last_name,
+                                        get_administrative_data(mandate), styles['StandardWithBorder']))
+        content.append(create_paragraph("%s" % (_('entities')), get_entities(mandate), styles['StandardWithBorder']))
+        content.append(create_paragraph("<strong>%s</strong>" % (_('absences')), get_absences(mandate),
+                                        styles['StandardWithBorder']))
+        content.append(create_paragraph("<strong>%s</strong>" % (_('comment')), get_comment(mandate),
+                                        styles['StandardWithBorder']))
         content.append(PageBreak())
         if mandate.assistant_type == assistant_type.ASSISTANT:
-            content.append(create_paragraph_and_add_data("%s" % (_('doctorate')), get_phd_data(mandate.assistant),
-                                                         styles['StandardWithBorder']))
-            content.append(create_paragraph_and_add_data("%s" % (_('research')), get_research_data(mandate),
-                                                         styles['StandardWithBorder']))
+            content.append(create_paragraph("%s" % (_('doctorate')), get_phd_data(mandate.assistant),
+                                            styles['StandardWithBorder']))
+            content.append(create_paragraph("%s" % (_('research')), get_research_data(mandate),
+                                            styles['StandardWithBorder']))
             content.append(PageBreak())
-        content.append(create_paragraph_and_add_data("%s<br />" % (_('tutoring_learning_units')), '',
-                                                     styles["BodyText"]))
+        content.append(create_paragraph("%s<br />" % (_('tutoring_learning_units')), '', styles["BodyText"]))
         _write_table_of_tutoring_learning_units_year(content, get_tutoring_learning_unit_year(mandate, styles['Tiny']))
         content.append(PageBreak())
-        content.append(create_paragraph_and_add_data("%s" % (_('representation_activities')),
-                                                     get_representation_activities(mandate),
-                                                     styles['StandardWithBorder'],
-                                                     " (%s)" % (_('hours_per_year'))))
-        content.append(create_paragraph_and_add_data("%s" % (_('service_activities')),
-                                                     get_service_activities(mandate),
-                                                     styles['StandardWithBorder'],
-                                                     " (%s)" % (_('hours_per_year'))))
-        content.append(create_paragraph_and_add_data("%s" % (_('formation_activities')),
-                                                     get_formation_activities(mandate),
-                                                     styles['StandardWithBorder']))
+        content.append(create_paragraph("%s" % (_('representation_activities')), get_representation_activities(mandate),
+                                        styles['StandardWithBorder'], " (%s)" % (_('hours_per_year'))))
+        content.append(create_paragraph("%s" % (_('service_activities')), get_service_activities(mandate),
+                                        styles['StandardWithBorder'], " (%s)" % (_('hours_per_year'))))
+        content.append(create_paragraph("%s" % (_('formation_activities')), get_formation_activities(mandate),
+                                        styles['StandardWithBorder']))
         content.append(PageBreak())
-        content.append(create_paragraph_and_add_data("%s" % (_('summary')),
-                                                     get_summary(mandate),
-                                                     styles['StandardWithBorder']))
+        content.append(create_paragraph("%s" % (_('summary')), get_summary(mandate), styles['StandardWithBorder']))
         content += [draw_time_repartition(mandate)]
         content.append(PageBreak())
-        content.append(create_paragraph_and_add_data("%s<br />" % (_('reviews')), '',
-                                                     styles["BodyText"]))
+        content.append(create_paragraph("%s<br />" % (_('reviews')), '', styles["BodyText"]))
         _write_table_of_reviews(content, get_reviews_for_mandate(mandate, styles))
         content.append(PageBreak())
     doc.build(content, onFirstPage=add_header_footer, onLaterPages=add_header_footer)
@@ -161,38 +150,36 @@ def add_customised_styles():
     return styles
 
 
-def create_paragraph_and_add_data(title, data, style, subtitle=''):
+def format_data(data, title):
+    if isinstance(data, datetime.date):
+        data = data.strftime("%d-%m-%Y")
+    return "<strong>%s :</strong> %s<br />" % (_(title), data) \
+        if data and data != 'None' else "<strong>%s :</strong><br />" % (_(title))
+
+def create_paragraph(title, data, style, subtitle=''):
     paragraph = Paragraph("<font size=14><strong>" + title + "</strong></font>" +
                           subtitle + "<br />" + data, style)
     return paragraph
 
 
 def get_summary(mandate):
-    report_remark = "<strong>%s :</strong> %s<br />" % (_('activities_report_remark'), mandate.activities_report_remark) \
-        if mandate.activities_report_remark != 'None' and mandate.activities_report_remark else ''
+    report_remark = format_data(mandate.activities_report_remark, 'activities_report_remark')
     return report_remark
 
 
 def get_administrative_data(mandate):
-    assistant_type = "<strong>%s :</strong> %s<br />" % (_('assistant_type'), _(mandate.assistant_type))
-    matricule = "<strong>%s :</strong> %s<br />" % (_('matricule_number'), mandate.sap_id)
-    entry_date = "<strong>%s :</strong> %s<br />" % (_('entry_date_contract'), mandate.entry_date.strftime("%d-%m-%Y"))
-    end_date = "<strong>%s :</strong> %s<br />" % (_('end_date_contract'), mandate.end_date.strftime("%d-%m-%Y"))
-    contract_duration = "<strong>%s :</strong> %s<br />" % (_('contract_duration'), mandate.contract_duration)
-    contract_duration_fte = "<strong>%s :</strong> %s<br />" % (_('contract_duration_fte'),
-                                                                mandate.contract_duration_fte)
-    fulltime_equivalent = "<strong>%s :</strong> %s" % (_('fulltime_equivalent_percentage'),
-                                                        int(mandate.fulltime_equivalent * 100)) + "%<br />"
-    other_status = "<strong>%s :</strong> %s<br />" % (_('other_status'), mandate.other_status) \
-        if mandate.other_status else "<strong>%s :</strong><br />" % (_('other_status'))
-    renewal_type = "<strong>%s :</strong> %s<br />" % (_('renewal_type'), _(mandate.renewal_type))
-    justification = "<strong>%s :</strong> %s<br />" % (_('exceptional_justification'), mandate.justification) \
-        if mandate.justification else "<strong>%s :</strong><br />" % (_('exceptional_justification'))
-    external_contract = "<strong>%s :</strong> %s<br />" % (_('external_post'), mandate.external_contract) \
-        if mandate.external_contract else "<strong>%s :</strong><br />" % (_('external_post'))
-    external_functions = "<strong>%s :</strong> %s<br />" % (_('function_outside_university'),
-                                                             mandate.external_functions) \
-        if mandate.external_functions else "<strong>%s :</strong><br />" % (_('function_outside_university'))
+    assistant_type = format_data(_(mandate.assistant_type), 'assistant_type')
+    matricule = format_data(mandate.sap_id, 'matricule_number')
+    entry_date = format_data(mandate.entry_date, 'entry_date_contract')
+    end_date = format_data(mandate.end_date, 'end_date_contract')
+    contract_duration = format_data(mandate.contract_duration, 'contract_duration')
+    contract_duration_fte = format_data(mandate.contract_duration_fte, 'contract_duration_fte')
+    fulltime_equivalent = format_data(int(mandate.fulltime_equivalent * 100), 'fulltime_equivalent_percentage')
+    other_status = format_data(mandate.other_status, 'other_status')
+    renewal_type = format_data(_(mandate.renewal_type), 'renewal_type')
+    justification = format_data(mandate.justification, 'exceptional_justification')
+    external_contract = format_data(mandate.external_contract, 'external_post')
+    external_functions = format_data(mandate.external_functions, 'function_outside_university')
     return assistant_type + matricule + entry_date + end_date + contract_duration + contract_duration_fte \
            + fulltime_equivalent + other_status + renewal_type + justification + external_contract + external_functions
 
@@ -209,49 +196,32 @@ def get_entities(mandate):
 
 
 def get_absences(mandate):
-    return mandate.absences if mandate.absences else ""
+    return mandate.absences if mandate.absences and mandate.absences != 'None' else ""
 
 
 def get_comment(mandate):
-    return mandate.comment if mandate.comment else ""
+    return mandate.comment if mandate.comment and mandate.comment != 'None' else ""
 
 
 def get_phd_data(assistant):
-    thesis_title = "<strong>%s :</strong> %s<br />" % (_('thesis_title'), _(assistant.thesis_title)) \
-        if assistant.thesis_title else "<strong>%s :</strong><br />" % (_('thesis_title'))
-    phd_inscription_date = "<strong>%s :</strong> %s<br />" % (_('phd_inscription_date'),
-                                              assistant.phd_inscription_date.strftime("%d-%m-%Y")) \
-        if assistant.phd_inscription_date else "<strong>%s :</strong><br />" % (_('phd_inscription_date'))
-    confirmation_test_date = "<strong>%s :</strong> %s<br />" % (_('confirmatory_test_date'),
-                                          assistant.confirmation_test_date.strftime("%d-%m-%Y")) \
-        if assistant.confirmation_test_date else "<strong>%s :</strong><br />" % (_('confirmatory_test_date'))
-    thesis_date = "<strong>%s :</strong> %s<br />" % (_('thesis_defence_date'),
-                                                      assistant.thesis_date.strftime("%d-%m-%Y")) \
-        if assistant.thesis_date else "<strong>%s :</strong><br />" % (_('thesis_defence_date'))
-    expected_phd_date = "<strong>%s :</strong> %s<br />" % (_('expected_registering_date'),
-                                                            assistant.expected_phd_date.strftime("%d-%m-%Y")) \
-        if assistant.expected_phd_date else "<strong>%s :</strong><br />" % (_('expected_registering_date'))
-    inscription = "<strong>%s :</strong> %s<br />" % (_('registered_phd'), _(assistant.inscription)) \
-        if assistant.inscription else "<strong>%s :</strong><br />" % (_('registered_phd'))
-    remark = "<strong>%s :</strong> %s<br />" % (_('remark'), _(assistant.remark)) \
-        if assistant.remark else "<strong>%s :</strong><br />" % (_('remark'))
+    thesis_title = format_data(assistant.thesis_title, 'thesis_title')
+    phd_inscription_date = format_data(assistant.phd_inscription_date, 'phd_inscription_date')
+    confirmation_test_date = format_data(assistant.confirmation_test_date, 'confirmatory_test_date')
+    thesis_date = format_data(assistant.thesis_date, 'thesis_defence_date')
+    expected_phd_date = format_data(assistant.expected_phd_date, 'expected_registering_date')
+    inscription = format_data(_(assistant.inscription) if assistant.inscription else None, 'registered_phd')
+    remark = format_data(assistant.remark, 'remark')
     return inscription+ phd_inscription_date + expected_phd_date + confirmation_test_date + thesis_title \
            + thesis_date + remark
 
 
 def get_research_data(mandate):
-    internships = "<strong>%s :</strong> %s<br />" % (_('scientific_internships'), _(mandate.internships)) \
-        if mandate.internships else "<strong>%s :</strong><br />" % (_('scientific_internships'))
-    conferences = "<strong>%s :</strong> %s<br />" % (_('conferences_contributor'), _(mandate.conferences)) \
-        if mandate.conferences else "<strong>%s :</strong><br />" % (_('conferences_contributor'))
-    publications = "<strong>%s :</strong> %s<br />" % (_('publications_in_progress'), _(mandate.publications)) \
-        if mandate.publications else "<strong>%s :</strong><br />" % (_('publications_in_progress'))
-    awards = "<strong>%s :</strong> %s<br />" % (_('awards'), _(mandate.awards)) \
-        if mandate.awards else "<strong>%s :</strong><br />" % (_('awards'))
-    framing = "<strong>%s :</strong> %s<br />" % (_('framing_participation'), _(mandate.framing)) \
-        if mandate.framing else "<strong>%s :</strong><br />" % (_('framing_participation'))
-    remark = "<strong>%s :</strong> %s<br />" % (_('remark'), _(mandate.remark)) \
-        if mandate.remark else "<strong>%s :</strong><br />" % (_('remark'))
+    internships = format_data(mandate.internships, 'scientific_internships')
+    conferences = format_data(mandate.conferences, 'conferences_contributor')
+    publications = format_data(mandate.publications, 'publications_in_progress')
+    awards = format_data(mandate.awards, 'awards')
+    framing = format_data(mandate.framing, 'framing_participation')
+    remark = format_data(mandate.remark, 'remark')
     return internships + conferences + publications + awards + framing + remark
 
 
@@ -298,36 +268,28 @@ def _write_table_of_tutoring_learning_units_year(content, data):
 
 
 def get_representation_activities(mandate):
-    faculty_representation = "<strong>%s :</strong> %s<br />" % (_('faculty_representation'),
-                                                                 str(mandate.faculty_representation))
-    institute_representation = "<strong>%s :</strong> %s<br />" % (_('institute_representation'),
-                                                                   str(mandate.institute_representation))
-    sector_representation = "<strong>%s :</strong> %s<br />" % (_('sector_representation'),
-                                                                str(mandate.sector_representation))
-    governing_body_representation = "<strong>%s :</strong> %s<br />" % (_('governing_body_representation'),
-                                                                        str(mandate.governing_body_representation))
-    corsci_representation = "<strong>%s :</strong> %s<br />" % (_('corsci_representation'),
-                                                                str(mandate.corsci_representation))
+    faculty_representation = format_data(str(mandate.faculty_representation), 'faculty_representation')
+    institute_representation = format_data(str(mandate.institute_representation), 'institute_representation')
+    sector_representation = format_data(str(mandate.sector_representation), 'sector_representation')
+    governing_body_representation = format_data(str(mandate.governing_body_representation),
+                                                'governing_body_representation')
+    corsci_representation = format_data(str(mandate.corsci_representation), 'corsci_representation')
     return faculty_representation + institute_representation + sector_representation + governing_body_representation \
            + corsci_representation
 
 
 def get_service_activities(mandate):
-    students_service = "<strong>%s :</strong> %s<br />" % (_('students_service'), str(mandate.students_service))
-    infrastructure_mgmt_service = "<strong>%s :</strong> %s<br />" % (_('infrastructure_mgmt_service'),
-                                                                      str(mandate.infrastructure_mgmt_service))
-    events_organisation_service = "<strong>%s :</strong> %s<br />" % (_('events_organisation_service'),
-                                                                      str(mandate.events_organisation_service))
-    publishing_field_service = "<strong>%s :</strong> %s<br />" % (_('publishing_field_service'),
-                                                                   str(mandate.publishing_field_service))
-    scientific_jury_service = "<strong>%s :</strong> %s<br />" % (_('scientific_jury_service'),
-                                                                  str(mandate.scientific_jury_service))
+    students_service = format_data(str(mandate.students_service), 'students_service')
+    infrastructure_mgmt_service = format_data(str(mandate.infrastructure_mgmt_service), 'infrastructure_mgmt_service')
+    events_organisation_service = format_data(str(mandate.events_organisation_service), 'events_organisation_service')
+    publishing_field_service = format_data(str(mandate.publishing_field_service), 'publishing_field_service')
+    scientific_jury_service = format_data(str(mandate.scientific_jury_service), 'scientific_jury_service')
     return students_service + infrastructure_mgmt_service + events_organisation_service + publishing_field_service + \
            scientific_jury_service
 
 
 def get_formation_activities(mandate):
-    formations = "<strong>%s :</strong> %s<br />" % (_('formations'), mandate.formations)
+    formations = format_data(mandate.formations, 'formations')
     return formations
 
 

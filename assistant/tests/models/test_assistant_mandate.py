@@ -24,14 +24,24 @@
 #
 ##############################################################################
 import factory
+import datetime
 from django.test import TestCase
+from base.tests.factories.academic_year import AcademicYearFactory
 from assistant.tests.factories.assistant_mandate import AssistantMandateFactory
 from assistant.models import assistant_mandate
 
 class TestAssistantMandateFactory(TestCase):
 
     def setUp(self):
-        self.mandate = AssistantMandateFactory()
+        self.mandate = AssistantMandateFactory(
+            academic_year=factory.SubFactory(AcademicYearFactory, year=datetime.date.today().year - 1))
+        self.mandate2 = AssistantMandateFactory(
+            academic_year=factory.SubFactory(AcademicYearFactory, year=datetime.date.today().year))
+        self.researched_academic_year = self.mandate.academic_year
 
     def test_find_mandate_by_id(self):
         self.assertEqual(self.mandate, assistant_mandate.find_mandate_by_id(self.mandate.id))
+
+    def test_find_by_academic_year(self):
+        for current_mandate in assistant_mandate.find_by_academic_year(self.researched_academic_year):
+            self.assertEqual(self.researched_academic_year, current_mandate.academic_year)
