@@ -24,9 +24,11 @@
 #
 ##############################################################################
 import datetime
+import mimetypes
 from django.utils.translation import ugettext_lazy as _
 from django.test import TestCase, RequestFactory
-from reportlab.lib.styles import getSampleStyleSheet
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import Paragraph
 from base.models.entity import find_versions_from_entites
 from assistant.utils import export_utils_pdf
 from assistant.utils.export_utils_pdf import format_data
@@ -169,4 +171,6 @@ class ExportPdfTestCase(TestCase):
         formations = format_data(self.mandate.formations, 'formations')
         self.assertEqual(formations, export_utils_pdf.get_formation_activities(self.mandate))
 
-
+    def test_export_mandates(self):
+        file = export_utils_pdf.export_mandates
+        self.assertTrue(file)
