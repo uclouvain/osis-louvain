@@ -27,6 +27,7 @@ import factory
 
 from assistant.models.enums import reviewer_role
 from base.tests.factories.person import PersonFactory
+from base.tests.factories.entity import EntityFactory
 
 
 class ReviewerFactory(factory.DjangoModelFactory):
@@ -36,3 +37,4 @@ class ReviewerFactory(factory.DjangoModelFactory):
     role = factory.Iterator(reviewer_role.ROLE_CHOICES, getter=lambda c: c[0])
     person = factory.SubFactory(PersonFactory, first_name=factory.Sequence(lambda n: 'revfirstname{0}'.format(n)),
                                 last_name=factory.Sequence(lambda n: 'revlastname{0}'.format(n)))
+    entity = factory.SubFactory(EntityFactory)

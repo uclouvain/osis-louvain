@@ -116,7 +116,7 @@ def add_mandate_content(content, mandate, styles):
     content += [draw_time_repartition(mandate)]
     content.append(PageBreak())
     content.append(create_paragraph("%s<br />" % (_('reviews')), '', styles["BodyText"]))
-    _write_table_of_reviews(content, get_reviews_for_mandate(mandate, styles))
+    _write_table_of_reviews(content, get_reviews_for_mandate(mandate, styles['Tiny']))
     content.append(PageBreak())
 
 
@@ -151,8 +151,9 @@ def get_administrative_data(mandate):
     justification = format_data(mandate.justification, 'exceptional_justification')
     external_contract = format_data(mandate.external_contract, 'external_post')
     external_functions = format_data(mandate.external_functions, 'function_outside_university')
-    return assistant_type + matricule + entry_date + end_date + contract_duration + contract_duration_fte \
+    data = assistant_type + matricule + entry_date + end_date + contract_duration + contract_duration_fte \
            + fulltime_equivalent + other_status + renewal_type + justification + external_contract + external_functions
+    return data
 
 
 def get_entities(mandate):
@@ -242,9 +243,9 @@ def get_representation_activities(mandate):
     governing_body_representation = format_data(str(mandate.governing_body_representation),
                                                 'governing_body_representation')
     corsci_representation = format_data(str(mandate.corsci_representation), 'corsci_representation')
-    return faculty_representation + institute_representation + sector_representation \
-           + governing_body_representation + corsci_representation
-
+    data = faculty_representation + institute_representation + sector_representation + governing_body_representation \
+           + corsci_representation
+    return data
 
 def get_service_activities(mandate):
     students_service = format_data(str(mandate.students_service), 'students_service')
@@ -252,8 +253,9 @@ def get_service_activities(mandate):
     events_organisation_service = format_data(str(mandate.events_organisation_service), 'events_organisation_service')
     publishing_field_service = format_data(str(mandate.publishing_field_service), 'publishing_field_service')
     scientific_jury_service = format_data(str(mandate.scientific_jury_service), 'scientific_jury_service')
-    return students_service + infrastructure_mgmt_service + events_organisation_service \
-           + publishing_field_service + scientific_jury_service
+    data = students_service + infrastructure_mgmt_service + events_organisation_service + publishing_field_service \
+           + scientific_jury_service
+    return data
 
 
 def get_formation_activities(mandate):
@@ -261,9 +263,9 @@ def get_formation_activities(mandate):
     return formations
 
 
-def get_reviews_for_mandate(mandate, styles):
+def get_reviews_for_mandate(mandate, style):
     data = generate_headers([
-        'reviewer', 'review', 'remark', 'justification', 'confidential'], styles['Tiny'])
+        'reviewer', 'review', 'remark', 'justification', 'confidential'], style)
     reviews = review.find_by_mandate(mandate.id)
     for rev in reviews:
         if rev.status == review_status.IN_PROGRESS:
@@ -274,11 +276,11 @@ def get_reviews_for_mandate(mandate, styles):
         else:
             entity = entity_version.get_last_version(rev.reviewer.entity).acronym
             person = rev.reviewer.person.first_name + " " + rev.reviewer.person.last_name + "<br/>(" + entity + ")"
-        data.append([Paragraph(person, styles['Tiny']),
-                     Paragraph(_(rev.advice), styles['Tiny']),
-                     Paragraph(rev.remark or '', styles['Tiny']),
-                     Paragraph(rev.justification or '', styles['Tiny']),
-                     Paragraph(rev.confidential or '', styles['Tiny'])])
+        data.append([Paragraph(person, style),
+                     Paragraph(_(rev.advice), style),
+                     Paragraph(rev.remark or '', style),
+                     Paragraph(rev.justification or '', style),
+                     Paragraph(rev.confidential or '', style)])
     return data
 
 
@@ -362,7 +364,7 @@ def draw_time_repartition(mandate):
 
 
 def header_building(canvas, doc):
-    canvas.line(doc.leftMargin,790, doc.width+doc.leftMargin, 790)
+    canvas.line(doc.leftMargin, 790, doc.width+doc.leftMargin, 790)
     canvas.drawString(80, 800, "%s %s" % (_('assistant_mandates_renewals'), academic_year.current_academic_year()))
 
 

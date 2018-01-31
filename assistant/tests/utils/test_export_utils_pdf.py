@@ -24,18 +24,23 @@
 #
 ##############################################################################
 import datetime
-import mimetypes
 from django.utils.translation import ugettext_lazy as _
 from django.test import TestCase, RequestFactory
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import Paragraph
 from base.models.entity import find_versions_from_entites
+from base.models.entity_version import get_last_version
+from base.tests.factories.entity_version import EntityVersionFactory
+from assistant.models import  tutoring_learning_unit_year
+from assistant.models.review import find_by_mandate
 from assistant.utils import export_utils_pdf
 from assistant.utils.export_utils_pdf import format_data
 from assistant.tests.factories.academic_assistant import AcademicAssistantFactory
 from assistant.tests.factories.assistant_mandate import AssistantMandateFactory
+from assistant.tests.factories.mandate_entity import MandateEntityFactory
+from assistant.tests.factories.reviewer import ReviewerFactory
 from assistant.tests.factories.review import ReviewFactory
-from assistant.models.enums import assistant_type, assistant_mandate_renewal
+from assistant.models.enums import assistant_type, assistant_mandate_renewal, review_status
 
 
 
@@ -64,9 +69,18 @@ class ExportPdfTestCase(TestCase):
             external_contract='',
             external_functions='',
         )
+        self.entity_version = EntityVersionFactory()
+        self.mandate_entity = MandateEntityFactory(
+            assistant_mandate=self.mandate,
+            entity=self.entity_version.entity
+        )
+        self.reviewer = ReviewerFactory(
+            entity=self.mandate_entity.entity
+        )
         self.styles = getSampleStyleSheet()
         self.review1 = ReviewFactory(
-            mandate=self.mandate
+            mandate=self.mandate,
+            reviewer=self.reviewer
         )
 
     def test_format_data(self):
@@ -171,6 +185,51 @@ class ExportPdfTestCase(TestCase):
         formations = format_data(self.mandate.formations, 'formations')
         self.assertEqual(formations, export_utils_pdf.get_formation_activities(self.mandate))
 
+
     def test_export_mandates(self):
         file = export_utils_pdf.export_mandates
         self.assertTrue(file)
+
+
+    def test_get_tutoring_learning_unit_year(self):
+        style = self.styles['BodyText']
+        data = export_utils_pdf.generate_headers([
+            'tutoring_learning_units', 'academic_year', 'sessions_number', 'sessions_duration', 'series_number',
+            'face_to_face_duration', 'attendees', 'exams_supervision_duration', 'others_delivery'
+        ], style)
+        tutoring_learning_units_year = tutoring_learning_unit_year.find_by_mandate(self.mandate)
+        for this_tutoring_learning_unit_year in tutoring_learning_units_year:
+            academic_year = str(this_tutoring_learning_unit_year.learning_unit_year.academic_year)
+            data.append([Paragraph(this_tutoring_learning_unit_year.learning_unit_year.title + " (" +
+                                   this_tutoring_learning_unit_year.learning_unit_year.acronym + ")", style),
+                         Paragraph(academic_year, self.styles['Tiny']),
+                         Paragraph(str(this_tutoring_learning_unit_year.sessions_number), style),
+                         Paragraph(str(this_tutoring_learning_unit_year.sessions_duration), style),
+                         Paragraph(str(this_tutoring_learning_unit_year.series_number), style),
+                         Paragraph(str(this_tutoring_learning_unit_year.face_to_face_duration), style),
+                         Paragraph(str(this_tutoring_learning_unit_year.attendees), style),
+                         Paragraph(str(this_tutoring_learning_unit_year.exams_supervision_duration), style),
+                         Paragraph(this_tutoring_learning_unit_year.others_delivery or '', style)
+                         ])
+        self.assertEqual(len(data), len(export_utils_pdf.get_tutoring_learning_unit_year(self.mandate, style)))
+
+    def test_get_reviews_for_mandate(self):
+        style = self.styles['BodyText']
+        data = export_utils_pdf.generate_headers(['reviewer', 'review', 'remark', 'justification', 'confidential'],
+                                                 style)
+        reviews = find_by_mandate(self.mandate.id)
+        for rev in reviews:
+            if rev.status == review_status.IN_PROGRESS:
+                break
+            if rev.reviewer is None:
+                supervisor = "<br/>(%s)" % (str(_('supervisor')))
+                person = self.mandate.assistant.supervisor.first_name + " " + self.mandate.assistant.supervisor.last_name + supervisor
+            else:
+                entity = get_last_version(rev.reviewer.entity).acronym
+                person = rev.reviewer.person.first_name + " " + rev.reviewer.person.last_name + "<br/>(" + entity + ")"
+            data.append([Paragraph(person, style),
+                         Paragraph(_(rev.advice), style),
+                         Paragraph(rev.remark or '', style),
+                         Paragraph(rev.justification or '', style),
+                         Paragraph(rev.confidential or '', style)])
+        self.assertEqual(len(data), len(export_utils_pdf.get_reviews_for_mandate(self.mandate, style)))
