@@ -156,6 +156,7 @@ def format_data(data, title):
     return "<strong>%s :</strong> %s<br />" % (_(title), data) \
         if data and data != 'None' else "<strong>%s :</strong><br />" % (_(title))
 
+
 def create_paragraph(title, data, style, subtitle=''):
     paragraph = Paragraph("<font size=14><strong>" + title + "</strong></font>" +
                           subtitle + "<br />" + data, style)
@@ -191,7 +192,7 @@ def get_entities(mandate):
     entities_data = ""
     for entity in entities:
         type = "%s" % (_(entity.entity_type))
-        entities_data += "<strong>" + type  + " :</strong> " + entity.acronym + "<br />"
+        entities_data += "<strong>" + type + " :</strong>" + entity.acronym + "<br />"
     return entities_data
 
 
@@ -211,8 +212,8 @@ def get_phd_data(assistant):
     expected_phd_date = format_data(assistant.expected_phd_date, 'expected_registering_date')
     inscription = format_data(_(assistant.inscription) if assistant.inscription else None, 'registered_phd')
     remark = format_data(assistant.remark, 'remark')
-    return inscription+ phd_inscription_date + expected_phd_date + confirmation_test_date + thesis_title \
-           + thesis_date + remark
+    return inscription + phd_inscription_date + expected_phd_date + confirmation_test_date \
+           + thesis_title + thesis_date + remark
 
 
 def get_research_data(mandate):
@@ -245,15 +246,15 @@ def get_tutoring_learning_unit_year(mandate, style):
 
 
 def headers_tutoring_learning_unit_year_table(style):
-    data = [[Paragraph('''%s''' %(_('tutoring_learning_units')),style),
-             Paragraph('''%s''' % _('academic_year'),style),
-             Paragraph('''%s''' % _('sessions_number'),style),
-             Paragraph('''%s''' % _('sessions_duration'),style),
-             Paragraph('''%s''' % _('series_number'),style),
-             Paragraph('''%s''' % _('face_to_face_duration'),style),
-             Paragraph('''%s''' % _('attendees'),style),
-             Paragraph('''%s''' % _('exams_supervision_duration'),style),
-             Paragraph('''%s''' % _('others_delivery'),style)]]
+    data = [[
+        Paragraph('''%s''' %(_('tutoring_learning_units')), style),
+        Paragraph('''%s''' % _('sessions_number'), style),
+        Paragraph('''%s''' % _('sessions_duration'), style),
+        Paragraph('''%s''' % _('series_number'), style),
+        Paragraph('''%s''' % _('face_to_face_duration'), style),
+        Paragraph('''%s''' % _('attendees'), style),
+        Paragraph('''%s''' % _('exams_supervision_duration'), style),
+        Paragraph('''%s''' % _('others_delivery'), style)]]
     return data
 
 
@@ -274,8 +275,8 @@ def get_representation_activities(mandate):
     governing_body_representation = format_data(str(mandate.governing_body_representation),
                                                 'governing_body_representation')
     corsci_representation = format_data(str(mandate.corsci_representation), 'corsci_representation')
-    return faculty_representation + institute_representation + sector_representation + governing_body_representation \
-           + corsci_representation
+    return faculty_representation + institute_representation + sector_representation \
+           + governing_body_representation + corsci_representation
 
 
 def get_service_activities(mandate):
@@ -284,8 +285,8 @@ def get_service_activities(mandate):
     events_organisation_service = format_data(str(mandate.events_organisation_service), 'events_organisation_service')
     publishing_field_service = format_data(str(mandate.publishing_field_service), 'publishing_field_service')
     scientific_jury_service = format_data(str(mandate.scientific_jury_service), 'scientific_jury_service')
-    return students_service + infrastructure_mgmt_service + events_organisation_service + publishing_field_service + \
-           scientific_jury_service
+    return students_service + infrastructure_mgmt_service + events_organisation_service \
+           + publishing_field_service + scientific_jury_service
 
 
 def get_formation_activities(mandate):
@@ -301,8 +302,7 @@ def get_reviews_for_mandate(mandate, styles):
             break
         if rev.reviewer is None:
             supervisor = "<br/>(%s)" % (str(_('supervisor')))
-            person = mandate.assistant.supervisor.first_name + " " + mandate.assistant.supervisor.last_name + \
-                     supervisor
+            person = mandate.assistant.supervisor.first_name + " " + mandate.assistant.supervisor.last_name + supervisor
         else:
             entity = entity_version.get_last_version(rev.reviewer.entity).acronym
             person = rev.reviewer.person.first_name + " " + rev.reviewer.person.last_name + "<br/>(" + entity + ")"
@@ -325,11 +325,13 @@ def _write_table_of_reviews(content, data):
 
 
 def headers_reviews_table():
-    data = [['''%s (%s)''' %(_('reviewer'), _('entity')),
-             '''%s''' % _('review'),
-             '''%s''' % _('remark'),
-             '''%s''' % _('justification'),
-             '''%s''' % _('confidential')]]
+    data = [[
+        '''%s (%s)''' %(_('reviewer'), _('entity')),
+        '''%s''' % _('review'),
+        '''%s''' % _('remark'),
+        '''%s''' % _('justification'),
+        '''%s''' % _('confidential')
+    ]]
     return data
 
 
@@ -337,7 +339,7 @@ def set_items(n, obj, attr, values):
     m = len(values)
     i = m // n
     for j in range(n):
-        setattr(obj[j],attr,values[j*i % m])
+        setattr(obj[j], attr, values[j*i % m])
 
 
 def draw_time_repartition(mandate):
@@ -398,13 +400,12 @@ def draw_time_repartition(mandate):
         d.legend.subCols.rpad = 30
         n = len(pc.data)
         set_items(n, pc.slices, 'fillColor', pdf_chart_colors)
-        d.legend.colorNamePairs = [(pc.slices[i].fillColor, (titles[i], '%0.f' % pc.data[i]+'%'))
-                                  for i in range(n)]
+        d.legend.colorNamePairs = [(pc.slices[i].fillColor, (titles[i], '%0.f' % pc.data[i]+'%')) for i in range(n)]
     return d
 
 
 def header_building(canvas, doc):
-    canvas.line(doc.leftMargin,790,doc.width+doc.leftMargin,790)
+    canvas.line(doc.leftMargin,790, doc.width+doc.leftMargin, 790)
     canvas.drawString(80, 800, "%s %s" % (_('assistant_mandates_renewals'), academic_year.current_academic_year()))
 
 
@@ -423,13 +424,8 @@ def end_page_infos_building(content, end_date):
     p.alignment = TA_LEFT
     if not end_date:
         end_date = '(%s)' % _('date_not_passed')
-    content.append(Paragraph(_("return_doc_to_administrator") % end_date
-                             , p))
-    content.append(Paragraph('''
-                            <para spaceb=5>
-                                &nbsp;
-                            </para>
-                            ''', ParagraphStyle('normal')))
+    content.append(Paragraph(_("return_doc_to_administrator") % end_date, p))
+    content.append(Paragraph('''<para spaceb=5>&nbsp;</para>''', ParagraphStyle('normal')))
     p_signature = ParagraphStyle('info')
     p_signature.fontSize = 10
     paragraph_signature = Paragraph('''
@@ -439,8 +435,4 @@ def end_page_infos_building(content, end_date):
                     <font size=10>%s</font>
                    ''' % (_('done_at'), _('the'), _('signature')), p_signature)
     content.append(paragraph_signature)
-    content.append(Paragraph('''
-        <para spaceb=2>
-            &nbsp;
-        </para>
-        ''', ParagraphStyle('normal')))
+    content.append(Paragraph('''<para spaceb=2>&nbsp;</para>''', ParagraphStyle('normal')))
