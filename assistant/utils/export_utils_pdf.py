@@ -49,8 +49,8 @@ from assistant.models.enums import review_status, assistant_type
 
 PAGE_SIZE = A4
 MARGIN_SIZE = 15 * mm
-COLS_WIDTH = [35*mm, 20*mm, 70*mm, 30*mm, 30*mm]
-COLS_TUTORING_WIDTH = [40*mm, 15*mm, 15*mm, 15*mm, 15*mm, 15*mm, 15*mm, 15*mm, 40*mm]
+COLS_WIDTH_FOR_REVIEWS = [35*mm, 20*mm, 70*mm, 30*mm, 30*mm]
+COLS_WIDTH_FOR_TUTORING = [40*mm, 15*mm, 15*mm, 15*mm, 15*mm, 15*mm, 15*mm, 15*mm, 40*mm]
 
 
 def add_header_footer(canvas, doc):
@@ -103,7 +103,7 @@ def add_mandate_content(content, mandate, styles):
                                         styles['StandardWithBorder']))
         content.append(PageBreak())
     content.append(create_paragraph("%s<br />" % (_('tutoring_learning_units')), '', styles["BodyText"]))
-    _write_table_of_tutoring_learning_units_year(content, get_tutoring_learning_unit_year(mandate, styles['Tiny']))
+    write_table(content, get_tutoring_learning_unit_year(mandate, styles['Tiny']), COLS_WIDTH_FOR_TUTORING)
     content.append(PageBreak())
     content.append(create_paragraph("%s" % (_('representation_activities')), get_representation_activities(mandate),
                                     styles['StandardWithBorder'], " (%s)" % (_('hours_per_year'))))
@@ -116,7 +116,7 @@ def add_mandate_content(content, mandate, styles):
     content += [draw_time_repartition(mandate)]
     content.append(PageBreak())
     content.append(create_paragraph("%s<br />" % (_('reviews')), '', styles["BodyText"]))
-    _write_table_of_reviews(content, get_reviews_for_mandate(mandate, styles['Tiny']))
+    write_table(content, get_reviews_for_mandate(mandate, styles['Tiny']), COLS_WIDTH_FOR_REVIEWS)
     content.append(PageBreak())
 
 
@@ -151,9 +151,8 @@ def get_administrative_data(mandate):
     justification = format_data(mandate.justification, 'exceptional_justification')
     external_contract = format_data(mandate.external_contract, 'external_post')
     external_functions = format_data(mandate.external_functions, 'function_outside_university')
-    data = assistant_type + matricule + entry_date + end_date + contract_duration + contract_duration_fte \
+    return assistant_type + matricule + entry_date + end_date + contract_duration + contract_duration_fte \
            + fulltime_equivalent + other_status + renewal_type + justification + external_contract + external_functions
-    return data
 
 
 def get_entities(mandate):
@@ -163,7 +162,7 @@ def get_entities(mandate):
     entities_data = ""
     for entity in entities:
         type = "%s" % (_(entity.entity_type))
-        entities_data += "<strong>" + type + " :</strong>" + entity.acronym + "<br />"
+        entities_data += "<strong>" + type + " : </strong>" + entity.acronym + "<br />"
     return entities_data
 
 
@@ -222,18 +221,8 @@ def get_tutoring_learning_unit_year(mandate, style):
 def generate_headers(titles, style):
     data = []
     for title in titles:
-        data.append(Paragraph('''%s''' % _(title), style))
+        data.append(Paragraph("%s" % _(title), style))
     return [data]
-
-
-def _write_table_of_tutoring_learning_units_year(content, data):
-    t = Table(data, COLS_TUTORING_WIDTH, repeatRows=1)
-    t.setStyle(TableStyle([
-        ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
-        ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
-        ('VALIGN', (0, 0), (-1, -1), 'TOP'),
-        ('BACKGROUND', (0, 0), (-1, 0), HexColor("#f6f6f6"))]))
-    content.append(t)
 
 
 def get_representation_activities(mandate):
@@ -243,9 +232,9 @@ def get_representation_activities(mandate):
     governing_body_representation = format_data(str(mandate.governing_body_representation),
                                                 'governing_body_representation')
     corsci_representation = format_data(str(mandate.corsci_representation), 'corsci_representation')
-    data = faculty_representation + institute_representation + sector_representation + governing_body_representation \
+    return faculty_representation + institute_representation + sector_representation + governing_body_representation \
            + corsci_representation
-    return data
+
 
 def get_service_activities(mandate):
     students_service = format_data(str(mandate.students_service), 'students_service')
@@ -253,9 +242,8 @@ def get_service_activities(mandate):
     events_organisation_service = format_data(str(mandate.events_organisation_service), 'events_organisation_service')
     publishing_field_service = format_data(str(mandate.publishing_field_service), 'publishing_field_service')
     scientific_jury_service = format_data(str(mandate.scientific_jury_service), 'scientific_jury_service')
-    data = students_service + infrastructure_mgmt_service + events_organisation_service + publishing_field_service \
+    return students_service + infrastructure_mgmt_service + events_organisation_service + publishing_field_service \
            + scientific_jury_service
-    return data
 
 
 def get_formation_activities(mandate):
@@ -284,8 +272,8 @@ def get_reviews_for_mandate(mandate, style):
     return data
 
 
-def _write_table_of_reviews(content, data):
-    t = Table(data, COLS_WIDTH, repeatRows=1)
+def write_table(content, data, cols_width):
+    t = Table(data, cols_width, repeatRows=1)
     t.setStyle(TableStyle([
         ('INNERGRID', (0, 0), (-1, -1), 0.25, colors.black),
         ('BOX', (0, 0), (-1, -1), 0.25, colors.black),
@@ -302,65 +290,60 @@ def set_items(n, obj, attr, values):
 
 
 def draw_time_repartition(mandate):
-    pdf_chart_colors = [
-        HexColor("#fa9d00"),
-        HexColor("#006884"),
-        HexColor("#00909e"),
-        HexColor("#ffd08d"),
-    ]
-    d = Drawing(width=180*mm, height=120*mm)
-    pc = Pie()
-    pc.x = 60*mm
-    pc.y = 35*mm
-    pc.width = 60*mm
-    pc.height = 60*mm
-    pc.data = []
-    pc.labels = []
+    drawing = Drawing(width=180*mm, height=120*mm)
+    pdf_chart_colors = [HexColor("#fa9d00"), HexColor("#006884"), HexColor("#00909e"), HexColor("#ffd08d"),]
+    pie = Pie()
+    pie.x = 60*mm
+    pie.y = 35*mm
+    pie.width = 60*mm
+    pie.height = 60*mm
+    pie.slices.strokeWidth = 0.5
+    pie.slices.fontName = 'Helvetica'
+    pie.slices.fontSize = 8
+    pie.data = []
+    pie.labels = []
     titles = []
-    if mandate.research_percent != 0:
-        pc.data.append(mandate.research_percent)
-        pc.labels.append(str(mandate.research_percent) + "%")
-        titles.append(_('research_percent'))
-    if mandate.tutoring_percent != 0:
-        pc.data.append(mandate.tutoring_percent)
-        pc.labels.append(str(mandate.tutoring_percent) + "%")
-        titles.append(_('tutoring_percent'))
-    if mandate.service_activities_percent != 0:
-        pc.data.append(mandate.service_activities_percent)
-        pc.labels.append(str(mandate.service_activities_percent) + "%")
-        titles.append(_('service_activities_percent'))
-    if mandate.formation_activities_percent != 0:
-        pc.data.append(mandate.formation_activities_percent)
-        pc.labels.append(str(mandate.formation_activities_percent) + "%")
-        titles.append(_('formation_activities_percent'))
-    pc.slices.strokeWidth = 0.5
-    pc.slices.fontName = 'Helvetica'
-    pc.slices.fontSize = 8
-    if len(pc.data) > 0:
-        d.add(pc)
-        d.add(Legend(), name='legend')
-        d.legend.x = 90
-        d.legend.y = 50
-        d.legend.dx = 8
-        d.legend.dy = 8
-        d.legend.fontName = 'Helvetica'
-        d.legend.fontSize = 8
-        d.legend.boxAnchor = 'w'
-        d.legend.columnMaximum = 10
-        d.legend.strokeWidth = 1
-        d.legend.strokeColor = black
-        d.legend.deltax = 75
-        d.legend.deltay = 10
-        d.legend.autoXPadding = 5
-        d.legend.yGap = 0
-        d.legend.dxTextSpace = 5
-        d.legend.alignment = 'right'
-        d.legend.dividerOffsY = 5
-        d.legend.subCols.rpad = 30
-        n = len(pc.data)
-        set_items(n, pc.slices, 'fillColor', pdf_chart_colors)
-        d.legend.colorNamePairs = [(pc.slices[i].fillColor, (titles[i], '%0.f' % pc.data[i]+'%')) for i in range(n)]
-    return d
+    add_data_and_titles_to_pie(pie, titles, mandate.research_percent, 'research_percent')
+    add_data_and_titles_to_pie(pie, titles, mandate.tutoring_percent, 'tutoring_percent')
+    add_data_and_titles_to_pie(pie, titles, mandate.service_activities_percent, 'service_activities_percent')
+    add_data_and_titles_to_pie(pie, titles, mandate.formation_activities_percent, 'formation_activities_percent')
+    if len(pie.data) > 0:
+        drawing.add(pie)
+        add_legend_to_pie(drawing)
+        n = len(pie.data)
+        set_items(n, pie.slices, 'fillColor', pdf_chart_colors)
+        drawing.legend.colorNamePairs = \
+            [(pie.slices[i].fillColor, (titles[i], '%0.f' % pie.data[i] + '%')) for i in range(n)]
+    return drawing
+
+
+def add_legend_to_pie(drawing):
+    drawing.add(Legend(), name='legend')
+    drawing.legend.x = 90
+    drawing.legend.y = 50
+    drawing.legend.dx = 8
+    drawing.legend.dy = 8
+    drawing.legend.fontName = 'Helvetica'
+    drawing.legend.fontSize = 8
+    drawing.legend.boxAnchor = 'w'
+    drawing.legend.columnMaximum = 10
+    drawing.legend.strokeWidth = 1
+    drawing.legend.strokeColor = black
+    drawing.legend.deltax = 75
+    drawing.legend.deltay = 10
+    drawing.legend.autoXPadding = 5
+    drawing.legend.yGap = 0
+    drawing.legend.dxTextSpace = 5
+    drawing.legend.alignment = 'right'
+    drawing.legend.dividerOffsY = 5
+    drawing.legend.subCols.rpad = 30
+
+
+def add_data_and_titles_to_pie(pie, titles, data, title):
+    if data != 0:
+        pie.data.append(data)
+        pie.labels.append(str(data) + "%")
+        titles.append(_(title))
 
 
 def header_building(canvas, doc):
@@ -375,23 +358,3 @@ def footer_building(canvas, doc, styles):
     footer = Paragraph(''' <para align=right>Page %d - %s </para>''' % (doc.page, pageinfo), styles['Normal'])
     w, h = footer.wrap(doc.width, doc.bottomMargin)
     footer.drawOn(canvas, doc.leftMargin, h)
-
-
-def end_page_infos_building(content, end_date):
-    p = ParagraphStyle('info')
-    p.fontSize = 10
-    p.alignment = TA_LEFT
-    if not end_date:
-        end_date = '(%s)' % _('date_not_passed')
-    content.append(Paragraph(_("return_doc_to_administrator") % end_date, p))
-    content.append(Paragraph('''<para spaceb=5>&nbsp;</para>''', ParagraphStyle('normal')))
-    p_signature = ParagraphStyle('info')
-    p_signature.fontSize = 10
-    paragraph_signature = Paragraph('''
-                    <font size=10>%s ...................................... , </font>
-                    <font size=10>%s ..../..../.......... &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    y&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</font>
-                    <font size=10>%s</font>
-                   ''' % (_('done_at'), _('the'), _('signature')), p_signature)
-    content.append(paragraph_signature)
-    content.append(Paragraph('''<para spaceb=2>&nbsp;</para>''', ParagraphStyle('normal')))
