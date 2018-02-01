@@ -133,6 +133,8 @@ urlpatterns = [
 
     url(r'^reviewer/', include([
         url(r'^$', reviewer_mandates_list.MandatesListView.as_view(), name='reviewer_mandates_list'),
+        url(r'^todo/$', reviewer_mandates_list.MandatesListView.as_view(), { 'filter': True },
+            name='reviewer_mandates_list_todo'),
         url(r'^delegation/$', reviewer_delegation.StructuresListView.as_view(), name='reviewer_delegation'),
         url(r'^pst_form/$', reviewer_review.pst_form_view, name='pst_form_view'),
         url(r'^delegate/add/$', reviewer_delegation.add_reviewer_for_structure,
