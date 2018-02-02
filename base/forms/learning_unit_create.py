@@ -188,7 +188,6 @@ class CreatePartimForm(CreateLearningUnitYearForm):
         self.learning_unit_year_parent = learning_unit_year_parent
         super(CreatePartimForm, self).__init__(*args, **kwargs)
         self.fields['container_type'].choices = _create_learning_container_year_type_list()
-        self.fields['partial_title'].required = True
         # The credit of LUY partim cannot be greater than credit of full LUY
         self.fields['credits'].validators.append(MaxStrictlyValueValidator(learning_unit_year_parent.credits))
         self.set_read_only_fields()
