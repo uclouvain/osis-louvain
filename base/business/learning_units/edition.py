@@ -35,6 +35,7 @@ from base.business.learning_unit_deletion import delete_from_given_learning_unit
     check_learning_unit_year_deletion
 from base.models import entity_container_year, learning_component_year, learning_class_year, learning_unit_component
 from base.models.academic_year import AcademicYear
+from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_unit_periodicity, learning_unit_year_subtypes
 from base.models.learning_container_year import LearningContainerYear
@@ -64,8 +65,8 @@ def shorten_learning_unit(learning_unit_to_edit, new_academic_year):
 
     learning_unit_year_to_delete = LearningUnitYear.objects.filter(
         learning_unit=learning_unit_to_edit,
-        academic_year__year=new_academic_year.year + 1
-    ).order_by('academic_year__start_date').first()
+        academic_year__year__gte=new_academic_year.year + 1
+    ).order_by('academic_year').first()
 
     if not learning_unit_year_to_delete:
         return []
@@ -157,15 +158,22 @@ def _get_or_duplication_container(luy, new_academic_year, old_lcy_pk, old_luy_pk
 
 
 def _update_entity_container_year(old_lcy_pk, new_lcy, new_academic_year):
-    for row in entity_container_year.search(learning_container_year=old_lcy_pk):
-        entity_versions = EntityVersion.objects.entity(row.entity)
+    for entity_container_y in entity_container_year.search(learning_container_year=old_lcy_pk):
+        entity_versions = EntityVersion.objects.entity(entity_container_y.entity)
         if not entity_versions.current(new_academic_year.end_date).exists():
             raise IntegrityError(
                 _('Entity_not_exist') % {
                     'entity_acronym': entity_versions.last().acronym,
                     'academic_year': new_academic_year
                 })
-        _update_related_row(row, 'learning_container_year', new_lcy)
+        duplicate_ecy = _update_related_row(entity_container_y, 'learning_container_year', new_lcy)
+
+        _update_entity_component_year(duplicate_ecy, entity_container_y)
+
+
+def _update_entity_component_year(duplicate_ecy, entity_container_y):
+    for entity_component_year in EntityComponentYear.objects.filter(entity_container_year=entity_container_y):
+        _update_related_row(entity_component_year, 'entity_container_year', duplicate_ecy)
 
 
 def _update_learning_component_year(old_lcy_pk, new_lcy, old_luy_pk, luy):

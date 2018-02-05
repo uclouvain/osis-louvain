@@ -31,6 +31,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units.edition import edit_learning_unit_end_date
 from base.models import academic_year
+from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import learning_unit_year_subtypes, learning_unit_periodicity, learning_container_year_types, \
     attribution_procedure
@@ -40,10 +41,10 @@ from base.models.learning_unit_component import LearningUnitComponent
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.business.learning_units import LearningUnitsMixin
 from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_component_year import EntityComponentYearFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_class_year import LearningClassYearFactory
-from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 
 
@@ -538,6 +539,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         # check if the link with entity is correctly duplicated
         last_ecy = EntityContainerYear.objects.filter(learning_container_year=last_container).last()
         self.assertEqual(last_ecy.entity, self.entity)
+        last_e_component_year = EntityComponentYear.objects.filter(entity_container_year=last_ecy).last()
+        self.assertEqual(last_e_component_year.entity_container_year.entity, self.entity)
 
         # check if the classes are correctly duplicated
         component = LearningComponentYear.objects.filter(learning_container_year=last_container).last()
@@ -654,7 +657,9 @@ def _create_entity_container_years(learning_unit_years, entity=None):
         entity = EntityFactory()
 
     for lu in learning_unit_years:
-        EntityContainerYearFactory(learning_container_year=lu.learning_container_year, entity=entity)
+        entity_container_year = EntityContainerYearFactory(learning_container_year=lu.learning_container_year,
+                                                           entity=entity)
+        EntityComponentYearFactory(entity_container_year=entity_container_year)
 
 
 def _create_learning_component_years(learning_unit_years, number_classes=None):
