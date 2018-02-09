@@ -34,6 +34,7 @@ from base import models as mdl
 from base.business import learning_unit
 from base.forms.bootstrap import BootstrapForm
 from base.forms.utils.choice_field import add_blank
+from base.models.academic_year import current_academic_year
 from base.models.campus import find_main_campuses
 from base.models.entity_version import find_main_entities_version, find_main_entities_version_filtered_by_person
 from base.models.enums import entity_container_year_link_type
@@ -156,6 +157,8 @@ class CreateLearningUnitYearForm(LearningUnitYearForm):
     def __init__(self, person, *args, **kwargs):
         super(CreateLearningUnitYearForm, self).__init__(*args, **kwargs)
         # When we create a learning unit, we can only select requirement entity which are attached to the person
+        self.fields["academic_year"].queryset = mdl.academic_year.find_academic_years(end_year=
+                                                                                      current_academic_year().year+6)
         self.fields["requirement_entity"].queryset = find_main_entities_version_filtered_by_person(person)
         if person.user.groups.filter(name='faculty_managers').exists():
             self.fields["container_type"].choices = create_faculty_learning_container_type_list()
