@@ -34,6 +34,7 @@ from base import models as mdl
 from base.business import learning_unit
 from base.forms.bootstrap import BootstrapForm
 from base.forms.utils.choice_field import add_blank
+from base.models.academic_year import current_academic_year
 from base.models.campus import find_main_campuses
 from base.models.entity_version import find_main_entities_version, find_main_entities_version_filtered_by_person
 from base.models.enums import entity_container_year_link_type
@@ -52,7 +53,6 @@ PARTIM_FORM_READ_ONLY_FIELD = {'first_letter', 'acronym', 'common_title', 'commo
                                'allocation_entity', 'language', 'periodicity', 'campus', 'academic_year',
                                'container_type', 'internship_subtype',
                                'additional_requirement_entity_1', 'additional_requirement_entity_2'}
-
 
 def _create_first_letter_choices():
     return add_blank(LearningUnitManagementSite.choices())
@@ -81,7 +81,8 @@ class MaxStrictlyValueValidator(BaseValidator):
 
 class LearningUnitYearForm(BootstrapForm):
     acronym = forms.CharField(widget=forms.TextInput(attrs={'maxlength': "15", 'required': True}))
-    academic_year = forms.ModelChoiceField(queryset=mdl.academic_year.find_academic_years(), required=True)
+    academic_year = forms.ModelChoiceField(queryset=mdl.academic_year.find_academic_years(
+        end_year=current_academic_year().year+6), required=True)
     status = forms.BooleanField(required=False, initial=True)
     internship_subtype = forms.TypedChoiceField(
         choices=add_blank(mdl.enums.internship_subtypes.INTERNSHIP_SUBTYPES),
