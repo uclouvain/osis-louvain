@@ -54,6 +54,7 @@ PARTIM_FORM_READ_ONLY_FIELD = {'first_letter', 'acronym', 'common_title', 'commo
                                'container_type', 'internship_subtype',
                                'additional_requirement_entity_1', 'additional_requirement_entity_2'}
 
+
 def _create_first_letter_choices():
     return add_blank(LearningUnitManagementSite.choices())
 
@@ -81,8 +82,7 @@ class MaxStrictlyValueValidator(BaseValidator):
 
 class LearningUnitYearForm(BootstrapForm):
     acronym = forms.CharField(widget=forms.TextInput(attrs={'maxlength': "15", 'required': True}))
-    academic_year = forms.ModelChoiceField(queryset=mdl.academic_year.find_academic_years(
-        end_year=current_academic_year().year+6), required=True)
+    academic_year = forms.ModelChoiceField(queryset=mdl.academic_year.find_academic_years(), required=True)
     status = forms.BooleanField(required=False, initial=True)
     internship_subtype = forms.TypedChoiceField(
         choices=add_blank(mdl.enums.internship_subtypes.INTERNSHIP_SUBTYPES),
@@ -157,6 +157,8 @@ class CreateLearningUnitYearForm(LearningUnitYearForm):
     def __init__(self, person, *args, **kwargs):
         super(CreateLearningUnitYearForm, self).__init__(*args, **kwargs)
         # When we create a learning unit, we can only select requirement entity which are attached to the person
+        self.fields["academic_year"].queryset = mdl.academic_year.find_academic_years(end_year=
+                                                                                      current_academic_year().year+6)
         self.fields["requirement_entity"].queryset = find_main_entities_version_filtered_by_person(person)
         if person.user.groups.filter(name='faculty_managers').exists():
             self.fields["container_type"].choices = create_faculty_learning_container_type_list()
