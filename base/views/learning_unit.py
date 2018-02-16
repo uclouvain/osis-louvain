@@ -120,10 +120,12 @@ def learning_unit_formations(request, learning_unit_year_id):
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def learning_unit_components(request, learning_unit_year_id):
-    context = _get_common_context_learning_unit_year(learning_unit_year_id,
-                                                     get_object_or_404(Person, user=request.user))
+    person = get_object_or_404(Person, user=request.user)
+    context = _get_common_context_learning_unit_year(learning_unit_year_id, person)
     context['components'] = get_same_container_year_components(context['learning_unit_year'], True)
     context['tab_active'] = 'components'
+    context['can_manage_volume'] = business_perms.is_eligible_for_modification(context["learning_unit_year"],
+                                                                               person)
     context['experimental_phase'] = True
     return layout.render(request, "learning_unit/components.html", context)
 
@@ -140,7 +142,8 @@ def volumes_validation(request, learning_unit_year_id):
 
 
 @login_required
-@permission_required('base.can_access_learningunit', raise_exception=True)
+@permission_required('base.can_edit_learningunit', raise_exception=True)
+@perms.can_perform_learning_unit_modification
 def learning_unit_volumes_management(request, learning_unit_year_id):
     # FIXME : Use a formset instead !
     if request.method == 'POST':

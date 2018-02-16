@@ -65,7 +65,7 @@ from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
-from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
+from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear, GenerateContainerYear
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
@@ -897,9 +897,10 @@ class LearningUnitViewTestCase(TestCase):
             'PLANNED_CLASSES_{}_{}'.format(learning_unit_year.id, learning_component_year.id): [2]
         }
 
+    @mock.patch("base.business.learning_units.perms.is_eligible_for_modification", side_effect=lambda luy, pers: True)
     @mock.patch('base.views.layout.render')
     @mock.patch('base.models.program_manager.is_program_manager')
-    def test_get_learning_unit_volumes_management_get(self, mock_program_manager, mock_render):
+    def test_get_learning_unit_volumes_management_get(self, mock_program_manager, mock_render, mock_perm):
         mock_program_manager.return_value = True
 
         generated_container_year = GenerateContainer(
@@ -976,8 +977,9 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(len(msg), 1)
         self.assertIn(messages.SUCCESS, msg_level)
 
+    @mock.patch("base.business.learning_units.perms.is_eligible_for_modification", side_effect=lambda luy, pers: True)
     @mock.patch('base.models.program_manager.is_program_manager')
-    def test_get_learning_unit_volumes_management_post_wrong_values(self, mock_program_manager):
+    def test_get_learning_unit_volumes_management_post_wrong_values(self, mock_program_manager, mock_perm):
         mock_program_manager.return_value = True
 
         g = GenerateContainer(start_year=self.current_academic_year.year, end_year=self.current_academic_year.year)
@@ -1603,5 +1605,47 @@ class TestLearningUnitComponents(TestCase):
             volumes = component['volumes']
             self.assertEqual(volumes['VOLUME_Q1'], None)
             self.assertEqual(volumes['VOLUME_Q2'], None)
+
+
+class TestLearningUnitVolumesManagement(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+
+        cls.person = PersonFactory()
+
+        learning_unit_year = LearningUnitYearFactory(academic_year=create_current_academic_year())
+
+        edit_learning_unit_permission = Permission.objects.get(codename="can_edit_learningunit")
+        cls.person.user.user_permissions.add(edit_learning_unit_permission)
+
+        cls.url = reverse('learning_unit_volumes_management', args=[learning_unit_year.id])
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
+
+    def test_with_user_not_logged(self):
+        self.client.logout()
+        response = self.client.post(self.url)
+
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    def test_when_user_has_not_permission(self):
+        a_person = PersonFactory()
+        self.client.force_login(a_person.user)
+
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, 'access_denied.html')
+
+    @mock.patch("base.business.learning_units.perms.is_eligible_for_modification", side_effect=lambda luy, pers: False)
+    def test_view_decorated_with_can_perform_learning_unit_modification_permission(self, mock_permission):
+        response = self.client.post(self.url)
+
+        self.assertTrue(mock_permission.called)
+
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, 'access_denied.html')
+
 
 

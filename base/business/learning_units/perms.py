@@ -85,7 +85,9 @@ def is_eligible_for_modification_end_date(learn_unit_year, a_person):
 def is_eligible_for_modification(learn_unit_year, pers):
     if _learning_unit_year_is_past(learn_unit_year):
         return False
-    return not _learning_unit_year_is_on_proposal(learn_unit_year)
+    if _learning_unit_year_is_on_proposal(learn_unit_year):
+        return False
+    return is_person_linked_to_entity_in_charge_of_learning_unit(learn_unit_year, pers)
 
 
 def _can_faculty_manager_modify_end_date(learning_unit_year):
