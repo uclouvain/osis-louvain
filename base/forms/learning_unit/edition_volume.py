@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import OrderedDict
+
 from django import forms
 from django.db import transaction
 from django.db.models import Prefetch
@@ -249,7 +251,7 @@ class VolumeEditionFormsetContainer:
     Create and Manage a set of VolumeEditionFormsets
     """
     def __init__(self, request, learning_units):
-        self.formsets = {}
+        self.formsets = OrderedDict()
         self.learning_units = learning_units
         self.parent = self.learning_units[0]
         self.request = request
