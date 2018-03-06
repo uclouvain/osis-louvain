@@ -23,11 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from django.contrib.auth.models import Permission, Group
 from django.test import TestCase
-from django.utils import timezone
 
 from base.business.learning_units import perms
+from base.models.academic_year import AcademicYear
 from base.models.enums import proposal_state, proposal_type, learning_container_year_types
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.person import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP
@@ -57,7 +58,14 @@ ALL_TYPES = TYPES_PROPOSAL_NEEDED_TO_EDIT + TYPES_DIRECT_EDIT_PERMITTED
 
 class PermsTestCase(TestCase):
     def setUp(self):
-        self.academic_yr = AcademicYearFactory(year=timezone.now().year)
+        today = datetime.date.today()
+        self.academic_yr = AcademicYearFactory(start_date=today,
+                                               end_date=today.replace(year=today.year + 1),
+                                               year=today.year)
+        self.academic_year_6 = AcademicYearFactory.build(start_date=today.replace(year=today.year + 6),
+                                                         end_date=today.replace(year=today.year + 7),
+                                                         year=today.year + 6)
+        super(AcademicYear, self.academic_year_6).save()
 
     def test_can_faculty_manager_modify_end_date_partim(self):
         for container_type in ALL_TYPES:
@@ -67,7 +75,7 @@ class PermsTestCase(TestCase):
                                           learning_container_year=lunit_container_yr,
                                           subtype=PARTIM)
 
-            self.assertTrue(perms._can_faculty_manager_modify_learning_unit_year(luy))
+            self.assertTrue(luy.can_update_by_faculty_manager())
 
     def test_can_faculty_manager_modify_end_date_full(self):
         for direct_edit_permitted_container_type in TYPES_DIRECT_EDIT_PERMITTED:
@@ -77,7 +85,7 @@ class PermsTestCase(TestCase):
                                           learning_container_year=lunit_container_yr,
                                           subtype=FULL)
 
-            self.assertTrue(perms._can_faculty_manager_modify_learning_unit_year(luy))
+            self.assertTrue(luy.can_update_by_faculty_manager())
 
     def test_cannot_faculty_manager_modify_end_date_full(self):
         for proposal_needed_container_type in TYPES_PROPOSAL_NEEDED_TO_EDIT:
@@ -87,7 +95,17 @@ class PermsTestCase(TestCase):
                                           learning_container_year=lunit_container_yr,
                                           subtype=FULL)
 
-            self.assertFalse(perms._can_faculty_manager_modify_learning_unit_year(luy))
+            self.assertFalse(perms.is_eligible_for_modification_end_date(luy, self.get_person(FACULTY_MANAGER_GROUP)))
+
+    def test_cannot_faculty_manager_modify_full(self):
+        for proposal_needed_container_type in TYPES_PROPOSAL_NEEDED_TO_EDIT:
+            lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_year_6,
+                                                              container_type=proposal_needed_container_type)
+            luy = LearningUnitYearFactory(academic_year=self.academic_year_6,
+                                          learning_container_year=lunit_container_yr,
+                                          subtype=FULL)
+
+            self.assertFalse(perms.is_eligible_for_modification(luy, self.get_person(FACULTY_MANAGER_GROUP)))
 
     def test_cannot_faculty_manager_modify_end_date_no_container(self):
         luy = LearningUnitYearFactory(academic_year=self.academic_yr,

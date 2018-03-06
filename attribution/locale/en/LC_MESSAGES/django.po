@@ -29,6 +29,9 @@ msgstr "Manage educational information"
 msgid "manage_my_courses"
 msgstr "Manage my courses"
 
+msgid "no_attribution_summary_editable"
+msgstr "There is no course for which you can edit educational information."
+
 msgid "summary_responsible"
 msgstr "Summary responsible"
 

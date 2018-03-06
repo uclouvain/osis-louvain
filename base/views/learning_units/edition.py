@@ -93,10 +93,11 @@ def modify_learning_unit(request, learning_unit_year_id):
 
             display_success_messages(request, _("success_modification_learning_unit"))
 
-            return redirect("learning_unit", learning_unit_year_id=learning_unit_year.id)
+        except IntegrityError as e:
+            msg = "{} : {}".format(_("error_modification_learning_unit"),  e.args[0])
+            display_error_messages(request, msg)
 
-        except IntegrityError:
-            display_error_messages(request, _("error_modification_learning_unit"))
+        return redirect("learning_unit", learning_unit_year_id=learning_unit_year.id)
 
     context = {
         "learning_unit_year": learning_unit_year,

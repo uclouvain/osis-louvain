@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from base.models import entity_container_year, entity
-from base.models.enums import proposal_type, learning_container_year_types
+from base.models.enums import learning_container_year_types
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
 from base.models.enums.proposal_state import ProposalState
@@ -34,10 +34,10 @@ from base.models.utils.person_entity_filter import filter_by_attached_entities
 FACULTY_UPDATABLE_CONTAINER_TYPES = (learning_container_year_types.COURSE,
                                      learning_container_year_types.DISSERTATION,
                                      learning_container_year_types.INTERNSHIP)
-PROPOSAL_TYPE_ACCEPTED_FOR_UPDATE = (proposal_type.ProposalType.CREATION.name,
-                                     proposal_type.ProposalType.MODIFICATION.name,
-                                     proposal_type.ProposalType.TRANSFORMATION.name,
-                                     proposal_type.ProposalType.TRANSFORMATION_AND_MODIFICATION.name)
+PROPOSAL_TYPE_ACCEPTED_FOR_UPDATE = (ProposalType.CREATION.name,
+                                     ProposalType.MODIFICATION.name,
+                                     ProposalType.TRANSFORMATION.name,
+                                     ProposalType.TRANSFORMATION_AND_MODIFICATION.name)
 CANCELLABLE_PROPOSAL_TYPES = (ProposalType.MODIFICATION.name,
                               ProposalType.TRANSFORMATION.name,
                               ProposalType.TRANSFORMATION_AND_MODIFICATION.name,
@@ -102,7 +102,10 @@ def is_eligible_to_edit_proposal(proposal, a_person):
 def is_eligible_for_modification_end_date(learn_unit_year, person):
     if learn_unit_year.learning_unit.is_past():
         return False
-    return is_eligible_for_modification(learn_unit_year, person)
+    if not is_eligible_for_modification(learn_unit_year, person):
+        return False
+    container_type = learn_unit_year.learning_container_year.container_type
+    return container_type not in FACULTY_UPDATABLE_CONTAINER_TYPES or learn_unit_year.subtype == PARTIM
 
 
 def is_eligible_for_modification(learn_unit_year, person):
@@ -110,7 +113,7 @@ def is_eligible_for_modification(learn_unit_year, person):
         return False
     if learn_unit_year.is_in_proposal():
         return False
-    if person.is_faculty_manager() and not _can_faculty_manager_modify_learning_unit_year(learn_unit_year):
+    if person.is_faculty_manager() and not learn_unit_year.can_update_by_faculty_manager():
         return False
     return person.is_linked_to_entity_in_charge_of_learning_unit_year(learn_unit_year)
 

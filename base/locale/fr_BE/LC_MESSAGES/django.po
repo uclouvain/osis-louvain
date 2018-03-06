@@ -2488,9 +2488,6 @@ msgstr "Procédure"
 msgid "educational_information_management"
 msgstr "Gestion des informations pédagogiques"
 
-msgid "resume_edit"
-msgstr "Editer le résumé de cours"
-
 msgid "SUMMARY_COURSE_SUBMISSION"
 msgstr "Soumission des résumés de cours"
 
@@ -2629,11 +2626,14 @@ msgstr "Voulez-vous changer le statut de ces propositions?"
 msgid "are_you_sure_to_change_state_from"
 msgstr "Êtes-vous sûr de vouloir changer l'état de"
 
-msgid "by"
-msgstr "Par"
+msgid "learning_unit_in_proposal_cannot_save"
+msgstr "L'unité d'enseignement %(luy)s est en proposition, impossible de sauvegarder le changement à partir de l'année %(academic_year)s"
 
 msgid "in_proposal"
 msgstr "En proposition"
+
+msgid "by"
+msgstr "Par"
 
 msgid "summary_editable"
 msgstr "informations pédagogiques modifiables"

@@ -1,28 +1,34 @@
 {% load i18n %}
 
-{% regroup learning_unit_years_summary_editable by academic_year as luys_by_anac %}
+{% if learning_unit_years_summary_editable %}
+    {% regroup learning_unit_years_summary_editable by academic_year as luys_by_anac %}
 
-<table id="table_learning_units" class="table table-striped table-hover">
-    <thead>
-        <tr>
-            <th>{% trans 'academic_year_small'%}</th>
-            <th>{% trans 'courses'%}</th>
-            <th>{% trans 'title'%}</th>
-            <th>{% trans 'manage_educational_information'%}</th>
-        </tr>
-    </thead>
-    {% for anac in luys_by_anac %}
-        <tbody>
-            {% for luy in anac.list %}
-                <tr>
-                    {% if forloop.first %}
-                        <td rowspan="{{ anac.list|length }}">{{ anac.grouper }}</td>
-                    {% endif %}
-                    <td>{{ luy.acronym }}</td>
-                    <td>{{ luy.complete_title|default_if_none:'' }}</td>
-                    <td><a href="#">#</a></td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    {% endfor %}
-</table>
+    <table id="table_learning_units" class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>{% trans 'academic_year_small' %}</th>
+                <th>{% trans 'courses' %}</th>
+                <th>{% trans 'title' %}</th>
+                <th>{% trans 'manage_educational_information' %}</th>
+            </tr>
+        </thead>
+        {% for anac in luys_by_anac %}
+            <tbody>
+                {% for luy in anac.list %}
+                    <tr>
+                        {% if forloop.first %}
+                            <td rowspan="{{ anac.list|length }}">{{ anac.grouper }}</td>
+                        {% endif %}
+                        <td>{{ luy.acronym }}</td>
+                        <td>{{ luy.complete_title|default_if_none:'' }}</td>
+                        <td><a href="#">#</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        {% endfor %}
+    </table>
+{% else %}
+    <div id="no_attribution_warning_message" class="alert alert-warning" role="alert">
+        {% trans 'no_attribution_summary_editable' %}
+    </div>
+{% endif %}

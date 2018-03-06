@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
+from copy import copy
 
 
 def update_instance_model_from_data(instance, fields_to_update, exclude=()):
@@ -32,3 +34,19 @@ def update_instance_model_from_data(instance, fields_to_update, exclude=()):
         if hasattr(instance.__class__, field):
             setattr(instance, field, value)
     instance.save()
+
+
+def update_related_object(obj, attribute_name, new_value):
+    duplicated_obj = duplicate_object(obj)
+    setattr(duplicated_obj, attribute_name, new_value)
+    duplicated_obj.save()
+    return duplicated_obj
+
+
+def duplicate_object(obj):
+    new_obj = copy(obj)
+    new_obj.pk = None
+    new_obj.external_id = None
+    new_obj.uuid = uuid.uuid4()
+    new_obj.copied_from = obj
+    return new_obj

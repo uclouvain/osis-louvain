@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import uuid
-from copy import copy
 
 from django.db import IntegrityError, transaction
 from django.db.models import F
@@ -34,7 +32,7 @@ from base.business.learning_unit import compute_max_academic_year_adjournment
 from base.business.learning_unit_deletion import delete_from_given_learning_unit_year, \
     check_learning_unit_year_deletion
 from base.business.learning_unit_year_with_context import ENTITY_TYPES_VOLUME
-from base.business.utils.model import update_instance_model_from_data
+from base.business.utils.model import update_instance_model_from_data, update_related_object
 from base.models import entity_component_year
 from base.models import entity_container_year, learning_component_year, learning_class_year, learning_unit_component
 from base.models.academic_year import AcademicYear
@@ -103,9 +101,8 @@ def extend_learning_unit(learning_unit_to_edit, new_academic_year):
 
 
 def _check_extend_partim(last_learning_unit_year, new_academic_year):
-
     if not new_academic_year:  # If there is no selected academic_year, we take the maximal value
-        new_academic_year = AcademicYear.objects.get(year=compute_max_academic_year_adjournment()+1)
+        new_academic_year = AcademicYear.objects.get(year=compute_max_academic_year_adjournment() + 1)
 
     lu_parent = last_learning_unit_year.parent
     if last_learning_unit_year.subtype == 'PARTIM' and lu_parent:
@@ -113,7 +110,7 @@ def _check_extend_partim(last_learning_unit_year, new_academic_year):
             raise IntegrityError(
                 _('parent_greater_than_partim') % {'partim_end_year': new_academic_year,
                                                    'lu_parent': lu_parent.acronym}
-                                 )
+            )
 
 
 def _update_end_year_field(lu, year):
@@ -123,7 +120,7 @@ def _update_end_year_field(lu, year):
 
 
 def _duplicate_learning_unit_year(old_learn_unit_year, new_academic_year):
-    duplicated_luy = _update_related_object(old_learn_unit_year, 'academic_year', new_academic_year)
+    duplicated_luy = update_related_object(old_learn_unit_year, 'academic_year', new_academic_year)
     duplicated_luy.attribution_procedure = None
     duplicated_luy.learning_container_year = _duplicate_learning_container_year(duplicated_luy, new_academic_year)
     duplicated_luy.save()
@@ -144,8 +141,8 @@ def _get_or_create_container_year(new_learn_unit_year, new_academic_year):
     )
     # Sometimes, the container already exists, we can directly use it and its entitycontaineryear
     if not queryset.exists():
-        duplicated_lcy = _update_related_object(new_learn_unit_year.learning_container_year,
-                                                'academic_year', new_academic_year)
+        duplicated_lcy = update_related_object(new_learn_unit_year.learning_container_year,
+                                               'academic_year', new_academic_year)
         duplicated_lcy.is_vacant = False
         duplicated_lcy.type_declaration_vacant = None
 
@@ -165,12 +162,12 @@ def _duplicate_entity_container_year(new_lcy, new_academic_year):
                     'entity_acronym': entity_versions.last().acronym,
                     'academic_year': new_academic_year
                 })
-        _update_related_object(entity_container_y, 'learning_container_year', new_lcy)
+        update_related_object(entity_container_y, 'learning_container_year', new_lcy)
 
 
 def _duplicate_learning_component_year(new_learn_container_year, new_learn_unit_year):
     for old_component in learning_component_year.find_by_learning_container_year(new_learn_container_year.copied_from):
-        new_component = _update_related_object(old_component, 'learning_container_year', new_learn_container_year)
+        new_component = update_related_object(old_component, 'learning_container_year', new_learn_container_year)
         _duplicate_learning_class_year(new_component)
         _duplicate_learning_unit_component(new_component, new_learn_unit_year)
         _duplicate_entity_component_year(new_component)
@@ -186,9 +183,9 @@ def _duplicate_entity_component_year(new_component):
             type=old_entity_container.type
         )
 
-        new_entity_component_year = _update_related_object(old_entity_comp_year,
-                                                           'entity_container_year',
-                                                           new_entity_container_year)
+        new_entity_component_year = update_related_object(old_entity_comp_year,
+                                                          'entity_container_year',
+                                                          new_entity_container_year)
         new_entity_component_year.learning_component_year = new_component
         new_entity_component_year.save()
 
@@ -196,30 +193,14 @@ def _duplicate_entity_component_year(new_component):
 def _duplicate_learning_unit_component(new_component, new_learn_unit_year):
     for old_learn_unit_comp in learning_unit_component.search(a_learning_component_year=new_component.copied_from,
                                                               a_learning_unit_year=new_learn_unit_year.copied_from):
-        new_luc = _update_related_object(old_learn_unit_comp, 'learning_unit_year', new_learn_unit_year)
+        new_luc = update_related_object(old_learn_unit_comp, 'learning_unit_year', new_learn_unit_year)
         new_luc.learning_component_year = new_component
         new_luc.save()
 
 
 def _duplicate_learning_class_year(new_component):
     for old_learning_class in learning_class_year.find_by_learning_component_year(new_component.copied_from):
-        _update_related_object(old_learning_class, 'learning_component_year', new_component)
-
-
-def _update_related_object(obj, attribute_name, new_value):
-    duplicated_obj = _duplicate_object(obj)
-    setattr(duplicated_obj, attribute_name, new_value)
-    duplicated_obj.save()
-    return duplicated_obj
-
-
-def _duplicate_object(obj):
-    new_obj = copy(obj)
-    new_obj.pk = None
-    new_obj.external_id = None
-    new_obj.uuid = uuid.uuid4()
-    new_obj.copied_from = obj
-    return new_obj
+        update_related_object(old_learning_class, 'learning_component_year', new_component)
 
 
 def _check_shorten_partims(learning_unit_to_edit, new_academic_year):
@@ -265,6 +246,7 @@ def filter_biennial(queryset, periodicity):
 
 
 def update_learning_unit_year_with_report(luy_to_update, fields_to_update, with_report=True):
+
     _update_learning_unit_year(luy_to_update, fields_to_update)
 
     if with_report:
@@ -286,6 +268,12 @@ def _apply_report(method_of_update, base_luy, *args, **kwargs):
 
 
 def _update_learning_unit_year(luy_to_update, fields_to_update, fields_to_exclude=()):
+    if luy_to_update.is_in_proposal():
+        raise IntegrityError(
+            _("learning_unit_in_proposal_cannot_save") % {
+                'luy': luy_to_update.acronym,
+                'academic_year': luy_to_update.academic_year
+            })
     update_instance_model_from_data(luy_to_update.learning_unit, fields_to_update)
     update_instance_model_from_data(luy_to_update.learning_container_year, fields_to_update, exclude=fields_to_exclude)
     update_instance_model_from_data(luy_to_update, fields_to_update, exclude=fields_to_exclude)
@@ -317,7 +305,7 @@ def _update_entity_container_year(an_entity, learning_container_year, type_entit
 def _create_entity_component_year_if_not_exists(an_entity_container):
     """We must create an entity component year for each component (Full+Partim)"""
     learning_component_yr_list = learning_component_year.find_by_learning_container_year(
-       learning_container_year=an_entity_container.learning_container_year
+        learning_container_year=an_entity_container.learning_container_year
     )
     for learning_component_yr in learning_component_yr_list:
         entity_component_year.EntityComponentYear.objects.get_or_create(

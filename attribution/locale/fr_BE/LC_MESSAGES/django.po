@@ -29,6 +29,9 @@ msgstr "Gérer les informations pédagogiques"
 msgid "manage_my_courses"
 msgstr "Gérer mes cours"
 
+msgid "no_attribution_summary_editable"
+msgstr "Il n'existe aucun cours dont vous pouvez modifier les informations pédagogiques."
+
 msgid "summary_responsible"
 msgstr "Responsable des infos pédagogiques"
 

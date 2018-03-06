@@ -48,7 +48,32 @@
 - Utiliser les objets Forms fournis par Django (https://docs.djangoproject.com/en/1.9/topics/forms/)
 
 ### Template (HTML)
-- Utiliser le grid layout de bootstrap plutôt que des tags html table-tr-td...
+- Privilégier l'utilisation Django-Bootstrap3
+- Tendre un maximum vers la réutilisation des blocks ; structure :
+```
+[templates]templates                                  # Root structure
+├── [templates/blocks/]blocks                                # Common blocks used on all 
+│   ├── [templates/blocks/forms/]forms
+│   ├── [templates/blocks/list/]list
+│   └── [templates/blocks/modal/]modal
+├── [templates/layout.html]layout.html                      # Base layout 
+└── [templates/learning_unit/]learning_unit
+    ├── [templates/learning_unit/blocks/]blocks                        # Block common on learning unit
+    │   ├── [templates/learning_unit/blocks/forms/]forms
+    │   ├── [templates/learning_unit/blocks/list/]list
+    │   └── [templates/learning_unit/blocks/modal/]modal
+    ├── [templates/learning_unit/layout.html]layout.html               # Layout specific for learning unit
+    ├── [templates/learning_unit/proposal/]proposal
+    │   ├── [templates/learning_unit/proposal/create.html]create_***.html
+    │   ├── [templates/learning_unit/proposal/delete.html]delete_***.html
+    │   ├── [templates/learning_unit/proposal/list.html]list.html
+    │   └── [templates/learning_unit/proposal/update.html]update_***.html
+    └── [templates/learning_unit/simple/]simple
+        ├── [templates/learning_unit/simple/create.html]create_***.html
+        ├── [templates/learning_unit/simple/delete.html]delete_***.html
+        ├── [templates/learning_unit/simple/list.html]list.html
+        └── [templates/learning_unit/simple/update.html]update_***.html
+```
 
 ### Sécurité :
 - Ne pas laisser de données sensibles/privées dans les commentaires/dans le code

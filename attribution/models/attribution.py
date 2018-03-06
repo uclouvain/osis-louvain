@@ -37,7 +37,8 @@ from osis_common.models.auditable_serializable_model import AuditableSerializabl
 
 
 class AttributionAdmin(AuditableSerializableModelAdmin):
-    list_display = ('tutor', 'function', 'score_responsible', 'learning_unit_year', 'start_year', 'end_year', 'changed')
+    list_display = ('tutor', 'function', 'score_responsible', 'summary_responsible', 'learning_unit_year', 'start_year',
+                    'end_year', 'changed')
     list_filter = ('learning_unit_year__academic_year', 'function', 'score_responsible', 'summary_responsible')
     fieldsets = ((None, {'fields': ('learning_unit_year', 'tutor', 'function', 'score_responsible',
                                     'summary_responsible', 'start_year', 'end_year')}),)

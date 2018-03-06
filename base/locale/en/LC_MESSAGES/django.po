@@ -2482,9 +2482,6 @@ msgstr "Procedure"
 msgid "educational_information_management"
 msgstr "Management of educational information"
 
-msgid "resume_edit"
-msgstr "Edit course summary"
-
 msgid "SUMMARY_COURSE_SUBMISSION"
 msgstr "Summary course submission"
 
@@ -2622,6 +2619,9 @@ msgstr "Do you want to change the status of this proposals?"
 
 msgid "are_you_sure_to_change_state_from"
 msgstr "Are you sure to change the state from"
+
+msgid "learning_unit_in_proposal_cannot_save"
+msgstr "The learning unit %(luy)s is in proposal, can not save the change from the year %(academic_year)s"
 
 msgid "by"
 msgstr "By"

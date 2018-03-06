@@ -25,11 +25,9 @@
 ##############################################################################
 from django.db import models
 
-from base.models import academic_year
 from base.models.academic_year import current_academic_year
 from base.models.enums.learning_unit_periodicity import PERIODICITY_TYPES
 from osis_common.models.auditable_serializable_model import AuditableSerializableModel, AuditableSerializableModelAdmin
-
 
 LEARNING_UNIT_ACRONYM_REGEX_BASE = "^[BLMW][A-Z]{2,4}\d{4}"
 LETTER_OR_DIGIT = "[A-Z0-9]"

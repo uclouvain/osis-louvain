@@ -129,7 +129,6 @@
                     <thead>
                         <tr>
                             <th>{% trans 'learning_unit' %}</th>
-                            <th></th>
                         </tr>
                     </thead>
                     {% for attribution in attributions %}
@@ -141,14 +140,6 @@
                                     {{ attribution.learning_unit_year }} - {{ attribution.learning_unit_year.specific_title }}</a>
                                 {% else %}
                                     {{ attribution.learning_unit_year }} - {{ attribution.learning_unit_year.specific_title }}
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if attribution.summary_responsible and summary_submission_opened %}
-                                    <a href="{% url 'learning_unit_summary' learning_unit_year_id=attribution.learning_unit_year.id  %}"
-                                       title="{% trans 'resume_edit' %}">
-                                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                                    </a>
                                 {% endif %}
                             </td>
                         </tr>

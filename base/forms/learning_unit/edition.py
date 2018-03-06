@@ -29,6 +29,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_unit import compute_max_academic_year_adjournment
 from base.business.learning_units.edition import filter_biennial
+from base.business.learning_units.perms import FACULTY_UPDATABLE_CONTAINER_TYPES
 from base.forms.bootstrap import BootstrapForm
 from base.forms.learning_unit_create import LearningUnitYearForm, PARTIM_FORM_READ_ONLY_FIELD, \
     MaxStrictlyValueValidator, MinStrictlyValueValidator
@@ -137,7 +138,8 @@ class LearningUnitModificationForm(LearningUnitYearForm):
             self._set_min_credits(learning_unit_year_instance)
 
         if person.is_faculty_manager():
-            if initial.get("container_type") in [COURSE, INTERNSHIP, DISSERTATION]:
+            if initial.get("container_type") in FACULTY_UPDATABLE_CONTAINER_TYPES\
+                    and learning_unit_year_subtype == "FULL":
                 self._disabled_fields(FACULTY_READ_ONLY_FIELDS)
 
     def is_valid(self):

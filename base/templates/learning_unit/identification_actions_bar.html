@@ -27,8 +27,7 @@
 {% if "base" in perms %}
     <!-- Dropdown to select actions to apply on learning unit -->
     {% url "edit_proposal" learning_unit_year_id=learning_unit_year.id as url_edit_proposal %}
-
-    <div class="dropdown dropup">
+    <div class="dropdown {{ dropdirection }}">
         <button id="dLabel" class="btn btn-default" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {% trans 'actions' %}
             <span class="caret"></span>
@@ -69,9 +68,6 @@
             {% endif %}
             {% if "base.can_delete_learningunit" in perms %}
                 <li class="divider"></li>
-                <li {% if not can_delete %}class="disabled"{% endif %}>
-                    <a  {% if can_delete %} href="{% url 'learning_unit_delete' learning_unit_year_id=learning_unit_year.id %}" {% endif %} >{% trans 'Delete from this academic year' %}</a>
-                </li>
                 <li {% if not can_delete %}class="disabled"{% endif %}>
                     <a  {% if can_delete %} href="{% url 'learning_unit_delete_all' learning_unit_year_id=learning_unit_year.id %}" {% endif %}>{% trans 'Delete all the learning unit' %}</a>
                 </li>
