@@ -127,4 +127,3 @@ def get_messages_deletion_context(learning_unit_year, messages_deletion):
                      % {'learning_unit': learning_unit_year.acronym,
                         'year': learning_unit_year.academic_year},
             'messages_deletion': sorted(messages_deletion.values())}
-
