@@ -140,9 +140,6 @@ def delete_proposal_creation(request, learning_unit_proposal):
 
         context = get_learning_unit_identification_context(learning_unit_year.id, person)
         if messages_deletion:
-            context.update({'title': _("cannot_delete_learning_unit_year")
-                                     % {'learning_unit': learning_unit_year.acronym,
-                                        'year': learning_unit_year.academic_year},
-                            'messages_deletion': sorted(messages_deletion.values())})
+            context.update(get_messages_deletion_context(learning_unit_year, messages_deletion))
 
         return layout.render(request, "learning_unit/identification.html", context)
