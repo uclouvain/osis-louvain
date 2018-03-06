@@ -2631,3 +2631,15 @@ msgstr "Existing proposal"
 
 msgid "summary_editable"
 msgstr "educational information editable"
+
+msgid "get_back_to_initial"
+msgstr "Get back to initial data"
+
+msgid "do_you_want_to_get_back_to_initial"
+msgstr "Do you want to get back to initial data?"
+
+msgid "error_proposal_suppression_to_initial"
+msgstr "An error occured when getting back to initial state one of the selected proposal is not in SUPPRESSION type. Nothing has been done"
+
+msgid "error_proposal_no_data"
+msgstr "An error occured when getting back to initial state. No valid data to submit"

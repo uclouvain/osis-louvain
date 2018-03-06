@@ -2637,3 +2637,15 @@ msgstr "Par"
 
 msgid "summary_editable"
 msgstr "informations pédagogiques modifiables"
+
+msgid "get_back_to_initial"
+msgstr "Retour à l'état initial"
+
+msgid "do_you_want_to_get_back_to_initial"
+msgstr "Voulez-vous retourner à l'état initial?"
+
+msgid "error_proposal_suppression_to_initial"
+msgstr "Erreur lors du retour à l'initial. Une des propositions sélectionnées n'est pas de type SUPPRESSION. Rien n'a été fait"
+
+msgid "error_proposal_no_data"
+msgstr "Erreur lors du retour à l'initial. Aucune donnée sélectionnée valide"

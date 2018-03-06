@@ -33,15 +33,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from base.business.learning_unit_proposal import compute_proposal_type, reinitialize_data_before_proposal, \
-    delete_learning_unit_proposal
+from base.business.learning_unit_proposal import compute_proposal_type, cancel_proposal
 from base.forms.learning_unit_proposal import LearningUnitProposalModificationForm, LearningUnitProposalUpdateForm
-from base.forms.proposal.learning_unit_proposal import ProposalStateModelForm
 from base.models import proposal_learning_unit
 from base.models.enums import proposal_state
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
-from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.entity_version import find_latest_version_by_entity
 from base.views import layout
 from base.views.common import display_success_messages, display_error_messages
@@ -81,9 +78,7 @@ def propose_modification_of_learning_unit(request, learning_unit_year_id):
 @permission_required('base.can_propose_learningunit', raise_exception=True)
 def cancel_proposal_of_learning_unit(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, id=learning_unit_year_id)
-    learning_unit_proposal = get_object_or_404(ProposalLearningUnit, learning_unit_year=learning_unit_year)
-    reinitialize_data_before_proposal(learning_unit_proposal, learning_unit_year)
-    delete_learning_unit_proposal(learning_unit_proposal)
+    cancel_proposal(learning_unit_year)
     messages.add_message(request, messages.SUCCESS,
                          _("success_cancel_proposal").format(learning_unit_year.acronym))
     return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)

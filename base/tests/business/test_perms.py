@@ -88,7 +88,8 @@ class PermsTestCase(TestCase):
 
     def test_cannot_faculty_manager_modify_end_date_no_container(self):
         luy = LearningUnitYearFactory(academic_year=self.academic_yr,
-                                      learning_container_year=None)
+                                      learning_container_year=None,
+                                      subtype=FULL)
         self.assertFalse(perms._can_faculty_manager_modify_learning_unit_year(luy))
 
     def test_access_edit_learning_unit_proposal_as_central_manager(self):

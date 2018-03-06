@@ -37,6 +37,8 @@
             <input type="hidden" id="{{ proposal.state.auto_id }}" name="{{ proposal.state.html_name }}"
                    class="hidden-state" value={{ proposal.state.value }}>
         {% endif %}
+        <input type="hidden" id="id_form-{{ forloop.counter0  }}-action" name="form-{{ forloop.counter0  }}-action"
+               class="hidden-action">
     {% endfor %}
 {% endblock %}
 
@@ -64,6 +66,7 @@
         // one field to rule them all
         var forced_state = $( "#id_form-0-state" ).val();
         $(".hidden-state").val(forced_state);
+        $(".hidden-action").val('forced_state');
         $('form').submit()
     }
 

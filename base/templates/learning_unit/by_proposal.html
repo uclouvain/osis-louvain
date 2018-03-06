@@ -35,6 +35,11 @@
                  <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modalReport">
                     {% trans 'force_state' %}
                  </button>
+                <button type="button" class="btn btn-default" style="margin-left:10px;" id="btn_modal_get_back_to_initial"
+                        data-toggle="modal" data-target="#modalBackToInitial">
+                    {% trans 'get_back_to_initial' %}
+                </button>
+
                 {% bootstrap_formset_errors proposals %}
                 {{ proposals.management_form }}
                 <table id="table_learning_units" class="table table-striped table-hover">
@@ -68,6 +73,7 @@
                 </tbody>
             </table>
             {% include "learning_unit/blocks/modal/modal_force_state.html" %}
+            {% include "learning_unit/blocks/modal/modal_back_to_initial.html" %}
         {% endif %}
         </div>
     </form>
