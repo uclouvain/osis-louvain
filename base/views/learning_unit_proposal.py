@@ -131,15 +131,19 @@ def delete_proposal_creation(request, learning_unit_proposal):
 
     messages_deletion = check_other_than_proposal(learning_unit_year)
     if not messages_deletion:
-        delete_learning_unit_years(learning_unit_year, request)
-        delete_learning_unit_proposal(learning_unit_proposal)
-        messages.add_message(request, messages.SUCCESS,
-                             _("success_cancel_proposal").format(learning_unit_year.acronym))
-        return redirect('learning_unit_proposal_search')
+        return _cancel_creation_proposal(learning_unit_proposal, request)
     else:
-
         context = get_learning_unit_identification_context(learning_unit_year.id, person)
         if messages_deletion:
             context.update(get_messages_deletion_context(learning_unit_year, messages_deletion))
 
         return layout.render(request, "learning_unit/identification.html", context)
+
+
+def _cancel_creation_proposal(learning_unit_proposal, request):
+    learning_unit_year = learning_unit_proposal.learning_unit_year
+    delete_learning_unit_years(learning_unit_year, request)
+    delete_learning_unit_proposal(learning_unit_proposal)
+    messages.add_message(request, messages.SUCCESS,
+                         _("success_cancel_proposal").format(learning_unit_year.acronym))
+    return redirect('learning_unit_proposal_search')
