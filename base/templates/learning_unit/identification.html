@@ -38,7 +38,7 @@
 
 <div class="panel panel-default">
     <div class="panel-heading text-right">
-        {% include "learning_unit/identification_actions_bar.html" %}
+        {% include "learning_unit/identification_actions_bar.html" with dropdirection="dropdown"%}
     </div>
     <div class="panel-body" id="tabs" >
         {% include "learning_unit/tabs.html" %}
@@ -267,7 +267,7 @@
         </div>
     </div>
     <div class="panel-footer text-right">
-        {% include "learning_unit/identification_actions_bar.html" %}
+        {% include "learning_unit/identification_actions_bar.html"  with dropdirection="dropup" %}
     </div>
 </div>
 {% endblock %}
