@@ -118,6 +118,14 @@ class LearningUnitYear(AuditableSerializableModel):
         return entity_container_yr.entity if entity_container_yr else None
 
     @property
+    def requirement_entity(self):
+        entity_container_yr = entity_container_year.search(
+            link_type=entity_container_year_link_type.REQUIREMENT_ENTITY,
+            learning_container_year=self.learning_container_year
+        ).first()
+        return entity_container_yr.entity if entity_container_yr else None
+
+    @property
     def complete_title(self):
         common_tit = None
         if self.learning_container_year:
@@ -249,3 +257,8 @@ def check_if_acronym_regex_is_valid(acronym):
 
 def find_max_credits_of_related_partims(a_learning_unit_year):
     return a_learning_unit_year.get_partims_related().aggregate(max_credits=models.Max("credits"))["max_credits"]
+
+
+def find_by_learning_unit(a_learning_unit):
+    return LearningUnitYear.objects.filter(learning_unit=a_learning_unit)
+

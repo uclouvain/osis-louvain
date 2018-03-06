@@ -64,7 +64,7 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_folder import ProposalFolderFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from base.views.learning_unit_proposal import edit_learning_unit_proposal
+from base.views.learning_unit_proposal import edit_learning_unit_proposal, delete_proposal_creation
 from base.views.learning_units.search import PROPOSAL_SEARCH, learning_units_proposal_search
 from reference.tests.factories.language import LanguageFactory
 
@@ -580,7 +580,7 @@ class TestLearningUnitProposalCancellation(TestCase):
         self.assertTemplateUsed(response, "access_denied.html")
 
     def test_with_proposal_of_type_different_than_modification_or_transformation(self):
-        self.learning_unit_proposal.type = proposal_type.ProposalType.CREATION.name
+        self.learning_unit_proposal.type = proposal_type.ProposalType.SUPPRESSION.name
         self.learning_unit_proposal.save()
         response = self.client.get(self.url)
 

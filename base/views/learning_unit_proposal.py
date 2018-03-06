@@ -36,7 +36,6 @@ from django.utils.translation import ugettext_lazy as _
 from base.business.learning_unit_proposal import compute_proposal_type, reinitialize_data_before_proposal, \
     delete_learning_unit_proposal
 from base.forms.learning_unit_proposal import LearningUnitProposalModificationForm, LearningUnitProposalUpdateForm
-from base.forms.proposal.learning_unit_proposal import ProposalStateModelForm
 from base.models import proposal_learning_unit
 from base.models.enums import proposal_state
 from base.models.learning_unit_year import LearningUnitYear
@@ -45,8 +44,11 @@ from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.entity_version import find_latest_version_by_entity
 from base.views import layout
 from base.views.common import display_success_messages, display_error_messages
-from base.views.learning_unit import compute_form_initial_data
+from base.views.learning_unit import compute_form_initial_data, get_learning_unit_identification_context
 from base.views.learning_units import perms
+from base.models.enums import proposal_type
+from base.views.learning_unit_deletion import can_delete_learning_unit_year, delete_learning_unit_years
+from base.business.learning_unit_deletion import check_other_than_proposal
 
 
 @login_required
@@ -82,8 +84,11 @@ def propose_modification_of_learning_unit(request, learning_unit_year_id):
 def cancel_proposal_of_learning_unit(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, id=learning_unit_year_id)
     learning_unit_proposal = get_object_or_404(ProposalLearningUnit, learning_unit_year=learning_unit_year)
-    reinitialize_data_before_proposal(learning_unit_proposal, learning_unit_year)
-    delete_learning_unit_proposal(learning_unit_proposal)
+    if learning_unit_proposal.type == proposal_type.ProposalType.CREATION.name:
+        return delete_proposal_creation(request, learning_unit_proposal)
+    else:
+        reinitialize_data_before_proposal(learning_unit_proposal, learning_unit_year)
+        delete_learning_unit_proposal(learning_unit_proposal)
     messages.add_message(request, messages.SUCCESS,
                          _("success_cancel_proposal").format(learning_unit_year.acronym))
     return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
@@ -115,3 +120,29 @@ def edit_learning_unit_proposal(request, learning_unit_year_id):
         'person': user_person,
         'form': proposal_form,
         'experimental_phase': True})
+
+
+@login_required
+def delete_proposal_creation(request, learning_unit_proposal):
+    person = get_object_or_404(Person, user=request.user)
+    learning_unit_year = get_object_or_404(LearningUnitYear, id=learning_unit_proposal.learning_unit_year.id)
+    if not can_delete_learning_unit_year(learning_unit_year, person):
+        return HttpResponseForbidden()
+
+    messages_deletion = check_other_than_proposal(learning_unit_year)
+    if not messages_deletion:
+        delete_learning_unit_years(learning_unit_year, request)
+        delete_learning_unit_proposal(learning_unit_proposal)
+        messages.add_message(request, messages.SUCCESS,
+                             _("success_cancel_proposal").format(learning_unit_year.acronym))
+        return redirect('learning_unit_proposal_search')
+    else:
+
+        context = get_learning_unit_identification_context(learning_unit_year.id, person)
+        if messages_deletion:
+            context.update({'title': _("cannot_delete_learning_unit_year")
+                                     % {'learning_unit': learning_unit_year.acronym,
+                                        'year': learning_unit_year.academic_year},
+                            'messages_deletion': sorted(messages_deletion.values())})
+
+        return layout.render(request, "learning_unit/identification.html", context)

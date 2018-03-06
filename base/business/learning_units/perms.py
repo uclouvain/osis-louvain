@@ -40,7 +40,8 @@ PROPOSAL_TYPE_ACCEPTED_FOR_UPDATE = (proposal_type.ProposalType.CREATION.name,
                                      proposal_type.ProposalType.TRANSFORMATION_AND_MODIFICATION.name)
 CANCELLABLE_PROPOSAL_TYPES = (ProposalType.MODIFICATION.name,
                               ProposalType.TRANSFORMATION.name,
-                              ProposalType.TRANSFORMATION_AND_MODIFICATION.name)
+                              ProposalType.TRANSFORMATION_AND_MODIFICATION.name,
+                              ProposalType.CREATION.name)
 
 
 def is_person_linked_to_entity_in_charge_of_learning_unit(a_learning_unit_year, a_person):
@@ -70,8 +71,12 @@ def is_eligible_for_cancel_of_proposal(learning_unit_proposal, a_person):
     if learning_unit_proposal.type not in CANCELLABLE_PROPOSAL_TYPES:
         return False
 
-    initial_entity_requirement_id = learning_unit_proposal.initial_data["entities"][REQUIREMENT_ENTITY]
-    an_entity = entity.get_by_internal_id(initial_entity_requirement_id)
+    if learning_unit_proposal.type == ProposalType.CREATION.name:
+        an_entity = learning_unit_proposal.learning_unit_year.requirement_entity
+    else:
+        initial_entity_requirement_id = learning_unit_proposal.initial_data["entities"][REQUIREMENT_ENTITY]
+        an_entity = entity.get_by_internal_id(initial_entity_requirement_id)
+
     if an_entity in a_person.entities:
         return True
 
