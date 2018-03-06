@@ -35,7 +35,9 @@
 
 {% include "learning_unit/header.html" %}
 {% include "template_messages.html" %}
-
+{% if messages_deletion %}
+    {% include "learning_unit/deletion_msg.html" %}
+{% endif %}
 <div class="panel panel-default">
     <div class="panel-heading text-right">
         {% include "learning_unit/identification_actions_bar.html" with dropdirection="dropdown"%}

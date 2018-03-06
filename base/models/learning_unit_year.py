@@ -112,11 +112,11 @@ class LearningUnitYear(AuditableSerializableModel):
 
     @property
     def allocation_entity(self):
-        entity_container_yr = entity_container_year.search(
-            link_type=entity_container_year_link_type.ALLOCATION_ENTITY,
-            learning_container_year=self.learning_container_year
-        ).first()
-        return entity_container_yr.entity if entity_container_yr else None
+        return self.get_entity(entity_container_year_link_type.ALLOCATION_ENTITY)
+
+    @property
+    def requirement_entity(self):
+        return self.get_entity(entity_container_year_link_type.REQUIREMENT_ENTITY)
 
     @property
     def complete_title(self):
@@ -183,6 +183,13 @@ class LearningUnitYear(AuditableSerializableModel):
         elif self.learning_unit.periodicity != ANNUAL and year <= current_year + 2:
             result = True
         return result
+
+    def get_entity(self, entity_type):
+        entity_container_yr = entity_container_year.search(
+            link_type=entity_type,
+            learning_container_year=self.learning_container_year
+        ).first()
+        return entity_container_yr.entity if entity_container_yr else None
 
 
 def get_by_id(learning_unit_year_id):
@@ -265,3 +272,7 @@ def check_if_acronym_regex_is_valid(acronym):
 
 def find_max_credits_of_related_partims(a_learning_unit_year):
     return a_learning_unit_year.get_partims_related().aggregate(max_credits=models.Max("credits"))["max_credits"]
+
+
+def find_by_learning_unit(a_learning_unit):
+    return LearningUnitYear.objects.filter(learning_unit=a_learning_unit)

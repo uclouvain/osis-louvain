@@ -40,7 +40,8 @@ PROPOSAL_TYPE_ACCEPTED_FOR_UPDATE = (ProposalType.CREATION.name,
                                      ProposalType.TRANSFORMATION_AND_MODIFICATION.name)
 CANCELLABLE_PROPOSAL_TYPES = (ProposalType.MODIFICATION.name,
                               ProposalType.TRANSFORMATION.name,
-                              ProposalType.TRANSFORMATION_AND_MODIFICATION.name)
+                              ProposalType.TRANSFORMATION_AND_MODIFICATION.name,
+                              ProposalType.CREATION.name)
 
 
 def is_person_linked_to_entity_in_charge_of_learning_unit(a_learning_unit_year, a_person):
@@ -64,14 +65,12 @@ def is_eligible_to_create_modification_proposal(learn_unit_year, person):
 
 
 def is_eligible_for_cancel_of_proposal(learning_unit_proposal, a_person):
-    if not learning_unit_proposal or learning_unit_proposal.state != ProposalState.FACULTY.name:
+    if not learning_unit_proposal or learning_unit_proposal.state != ProposalState.FACULTY.name \
+            or learning_unit_proposal.type not in CANCELLABLE_PROPOSAL_TYPES:
         return False
 
-    if learning_unit_proposal.type not in CANCELLABLE_PROPOSAL_TYPES:
-        return False
+    an_entity = get_requirement_entity(learning_unit_proposal)
 
-    initial_entity_requirement_id = learning_unit_proposal.initial_data["entities"][REQUIREMENT_ENTITY]
-    an_entity = entity.get_by_internal_id(initial_entity_requirement_id)
     if an_entity in a_person.entities:
         return True
 
@@ -113,6 +112,14 @@ def is_eligible_for_modification(learn_unit_year, person):
     return person.is_linked_to_entity_in_charge_of_learning_unit_year(learn_unit_year)
 
 
+def _can_faculty_manager_modify_learning_unit_year(learning_unit_year):
+    if learning_unit_year.subtype == PARTIM:
+        return True
+    if not learning_unit_year.learning_container_year:
+        return False
+    return learning_unit_year.learning_container_year.container_type not in FACULTY_UPDATABLE_CONTAINER_TYPES
+
+
 def can_delete_learning_unit_year(learning_unit_year, person):
     if not _can_delete_learning_unit_year_according_type(learning_unit_year, person):
         return False
@@ -145,3 +152,12 @@ def learning_unit_proposal_permissions(proposal, person):
         'can_cancel_proposal': is_eligible_for_cancel_of_proposal(proposal, person),
         'can_edit_learning_unit_proposal': is_eligible_to_edit_proposal(proposal, person)
     }
+
+
+def get_requirement_entity(learning_unit_proposal):
+    if learning_unit_proposal.type == ProposalType.CREATION.name:
+        an_entity = learning_unit_proposal.learning_unit_year.requirement_entity
+    else:
+        initial_entity_requirement_id = learning_unit_proposal.initial_data["entities"][REQUIREMENT_ENTITY]
+        an_entity = entity.get_by_internal_id(initial_entity_requirement_id)
+    return an_entity

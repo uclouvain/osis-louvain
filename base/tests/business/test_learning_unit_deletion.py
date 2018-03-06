@@ -373,6 +373,12 @@ class LearningUnitYearDeletion(TestCase):
         self.assertTrue(
             base.business.learning_units.perms.can_delete_learning_unit_year(learning_unit_year, person))
 
+    def test_has_learning_unit_year(self):
+        luy = LearningUnitYearFactory()
+        lu = luy.learning_unit
+        self.assertTrue(learning_unit_deletion.has_learning_unit_year(lu))
+        luy.delete()
+        self.assertFalse(learning_unit_deletion.has_learning_unit_year(lu))
 
 def add_to_group(user, group_name):
     group, created = Group.objects.get_or_create(name=group_name)

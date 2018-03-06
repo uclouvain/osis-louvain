@@ -51,31 +51,7 @@ def check_learning_unit_year_deletion(learning_unit_year):
     msg = {}
 
     msg.update(_check_learning_unit_proposal(learning_unit_year))
-    enrollment_count = len(learning_unit_enrollment.find_by_learning_unit_year(learning_unit_year))
-    if enrollment_count > 0:
-        msg[learning_unit_year] = _("There is %(count)d enrollments in %(subtype)s %(acronym)s for the year %(year)s") \
-                                  % {'subtype': _str_partim_or_full(learning_unit_year),
-                                     'acronym': learning_unit_year.acronym,
-                                     'year': learning_unit_year.academic_year,
-                                     'count': enrollment_count}
-
-    if learning_unit_year.subtype == learning_unit_year_subtypes.FULL and learning_unit_year.learning_container_year:
-        msg.update(_check_related_partims_deletion(learning_unit_year.learning_container_year))
-
-    msg.update(_check_attribution_deletion(learning_unit_year))
-    for component in learning_unit_component.find_by_learning_unit_year(learning_unit_year):
-        msg.update(_check_learning_unit_component_deletion(component))
-
-    for group_element_year in learning_unit_year.find_list_group_element_year():
-        msg.update(_check_group_element_year_deletion(group_element_year))
-
-    for tutoring in tutoring_learning_unit_year.find_learning_unit_year(learning_unit_year=learning_unit_year):
-        msg.update(_check_tutoring_learning_unit_year(tutoring))
-
-    next_year = learning_unit_year.get_learning_unit_next_year()
-    if next_year:
-        msg.update(check_learning_unit_year_deletion(next_year))
-
+    msg.update(check_other_than_proposal(learning_unit_year))
     return msg
 
 
@@ -200,8 +176,7 @@ def delete_from_given_learning_unit_year(learning_unit_year):
                % {'subtype': _str_partim_or_full(learning_unit_year),
                   'acronym': learning_unit_year.acronym,
                   'year': learning_unit_year.academic_year})
-
-    _update_end_year_learning_unit(learning_unit_year.learning_unit, learning_unit_year.academic_year.year - 1)
+    manage_learning_unit(learning_unit_year)
 
     return msg
 
@@ -254,3 +229,44 @@ def _delete_cms_data(learning_unit_year):
                                                          reference=learning_unit_year.id,
                                                          text_labels_name=text_label_names):
         learning_unit_cms_data.delete()
+
+
+def check_other_than_proposal(learning_unit_year):
+    msg = {}
+    enrollment_count = len(learning_unit_enrollment.find_by_learning_unit_year(learning_unit_year))
+    if enrollment_count > 0:
+        msg[learning_unit_year] = _("There is %(count)d enrollments in %(subtype)s %(acronym)s for the year %(year)s") \
+                                  % {'subtype': _str_partim_or_full(learning_unit_year),
+                                     'acronym': learning_unit_year.acronym,
+                                     'year': learning_unit_year.academic_year,
+                                     'count': enrollment_count}
+    if learning_unit_year.subtype == learning_unit_year_subtypes.FULL and learning_unit_year.learning_container_year:
+        msg.update(_check_related_partims_deletion(learning_unit_year.learning_container_year))
+    msg.update(_check_attribution_deletion(learning_unit_year))
+    for component in learning_unit_component.find_by_learning_unit_year(learning_unit_year):
+        msg.update(_check_learning_unit_component_deletion(component))
+    for group_element_year in learning_unit_year.find_list_group_element_year():
+        msg.update(_check_group_element_year_deletion(group_element_year))
+    msg.update(check_tutorings_deletion(learning_unit_year))
+    next_year = learning_unit_year.get_learning_unit_next_year()
+    if next_year:
+        msg.update(check_learning_unit_year_deletion(next_year))
+    return msg
+
+
+def has_learning_unit_year(a_learning_unit):
+    return learn_unit_year_model.find_by_learning_unit(a_learning_unit).exists()
+
+
+def manage_learning_unit(learning_unit_year):
+    if has_learning_unit_year(learning_unit_year.learning_unit):
+        _update_end_year_learning_unit(learning_unit_year.learning_unit, learning_unit_year.academic_year.year - 1)
+    else:
+        learning_unit_year.learning_unit.delete()
+
+
+def check_tutorings_deletion(learning_unit_year):
+    msg = {}
+    for tutoring in tutoring_learning_unit_year.find_learning_unit_year(learning_unit_year=learning_unit_year):
+        msg.update(_check_tutoring_learning_unit_year(tutoring))
+    return msg
