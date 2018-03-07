@@ -100,10 +100,11 @@ def send_mail_after_the_learning_unit_year_deletion(managers, acronym, academic_
     return message_service.send_messages(message_content)
 
 
-def send_mail_after_the_learning_unit_proposal_cancellation(managers, learning_units):
+def send_mail_after_the_learning_unit_proposal_cancellation(managers, proposal_code, learning_units):
     """
-    Send email to the program managers after deletions made on a learning_unit_year or partials or classes
+    Send email to the program managers after cancellation on a proposal
     :param learning_units : the list of the messages detailing the deletion
+    :param proposal_code : code d'identification ou numéro de dossier ou une partie du numéro de dossier
     :return An error message if the template is not in the database
     """
 
@@ -112,10 +113,10 @@ def send_mail_after_the_learning_unit_proposal_cancellation(managers, learning_u
     #Something like this :
     #managers = learning_unit_year.get_managers_of_learning_unit_year(learning_unit_year)
 
-    html_template_ref = 'learning_unit_year_proposal_canceled_html'
-    txt_template_ref = 'learning_unit_year_proposal_canceled_txt'
+    html_template_ref = 'learning_unit_proposal_canceled_html'
+    txt_template_ref = 'learning_unit_proposal_canceled_txt'
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
-    suject_data = {}
+    suject_data = {'proposal_code': proposal_code}
     template_base_data = {'learning_units': learning_units}
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, suject_data, None)

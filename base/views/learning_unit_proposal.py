@@ -29,17 +29,18 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db import IntegrityError
 from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404, get_list_or_404
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
-from base.business.learning_unit_proposal import compute_proposal_type, cancel_proposal
+from base.business.learning_unit_proposal import compute_proposal_type, cancel_proposals
 from base.forms.learning_unit_proposal import LearningUnitProposalModificationForm, LearningUnitProposalUpdateForm
 from base.models import proposal_learning_unit
 from base.models.enums import proposal_state
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.entity_version import find_latest_version_by_entity
+from base.utils.send_mail import send_mail_after_the_learning_unit_proposal_cancellation
 from base.views import layout
 from base.views.common import display_success_messages, display_error_messages
 from base.views.learning_unit import compute_form_initial_data
@@ -77,10 +78,14 @@ def propose_modification_of_learning_unit(request, learning_unit_year_id):
 @perms.can_perform_cancel_proposal
 @permission_required('base.can_propose_learningunit', raise_exception=True)
 def cancel_proposal_of_learning_unit(request, learning_unit_year_id):
-    learning_unit_year = get_object_or_404(LearningUnitYear, id=learning_unit_year_id)
-    cancel_proposal(learning_unit_year)
+    proposal_as_list = get_list_or_404(LearningUnitYear, id=learning_unit_year_id)
+    learning_unit_year = proposal_as_list[0]
+    proposals = cancel_proposals(proposal_as_list)
     messages.add_message(request, messages.SUCCESS,
                          _("success_cancel_proposal").format(learning_unit_year.acronym))
+
+    send_mail_after_the_learning_unit_proposal_cancellation([], proposals)
+
     return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
 
 
