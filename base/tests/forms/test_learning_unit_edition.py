@@ -205,12 +205,6 @@ class TestLearningUnitModificationForm(TestCase):
                                             person=self.person, end_date=self.current_academic_year.end_date)
         self.assertFalse(form.is_valid())
 
-    def test_set_max_credits(self):
-        form = LearningUnitModificationForm(learning_unit_year_instance=self.learning_unit_year_partim_1,
-                                            person=self.person,
-                                            initial=self.initial_data)
-        self.assertEqual(form.fields["credits"].max_value, self.learning_unit_year.credits)
-
     def test_set_status_value(self):
         form = LearningUnitModificationForm(learning_unit_year_instance=self.learning_unit_year_partim_1,
                                             person=self.person,
@@ -225,11 +219,6 @@ class TestLearningUnitModificationForm(TestCase):
                                             person=self.person,
                                             initial=initial_data_with_subtype_partim)
         self.assertFalse(form.fields["periodicity"].disabled)
-
-    def test_set_minimum_credits_for_full_learning_unit_year(self):
-        form = LearningUnitModificationForm(person=self.person, learning_unit_year_instance=self.learning_unit_year,
-                                            initial=self.initial_data)
-        self.assertEqual(form.fields["credits"].min_value, self.learning_unit_year_partim_1.credits)
 
     def test_do_not_set_minimum_credits_for_full_learning_unit_year_if_no_partims(self):
         learning_unit_year_with_no_partims = LearningUnitYearFactory(academic_year=self.current_academic_year,

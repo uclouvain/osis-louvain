@@ -100,3 +100,14 @@ class LearningUnitTest(TestCase):
     def test_academic_year_tags(self):
         self.assertEqual(academic_year(2017), "2017-18")
         self.assertEqual(academic_year(None), "-")
+
+    def test_learning_unit_start_end_year_constraint(self):
+        # Case same year for start/end
+        LearningUnitFactory(start_year=2017, end_year=2017)
+
+        # Case end_year < start year
+        with self.assertRaises(AttributeError):
+            LearningUnitFactory(start_year=2017, end_year=2016)
+
+        # Case end year > start year
+        LearningUnitFactory(start_year=2017, end_year=2018)

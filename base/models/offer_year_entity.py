@@ -23,11 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import admin
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
 
 from base.models.enums import offer_year_entity_type
-from django.db import models
 from base.models.osis_model_admin import OsisModelAdmin
 
 
@@ -74,18 +73,14 @@ def search(**kwargs):
     return queryset
 
 
-def get_from_offer_year_and_type(offer_year, type):
+def get_from_offer_year_and_type(offer_year, education_group_type):
     try:
-        return OfferYearEntity.objects.get(offer_year=offer_year, type=type)
+        return OfferYearEntity.objects.get(offer_year=offer_year, type=education_group_type)
     except ObjectDoesNotExist:
         return None
 
 
-def find_by_education_group_year(education_group_yr, typ):
-    return OfferYearEntity.objects.filter(education_group_year=education_group_yr, type=typ)
-
-
-def find_by_education_group_year_first(education_group_yr, typ):
-    results = find_by_education_group_year(education_group_yr, typ)
+def find_by_education_group_year_first(education_group_yr, education_group_type):
+    results = search(education_group_year=education_group_yr, type=education_group_type)
     if results:
         return results.first()

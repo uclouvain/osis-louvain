@@ -37,7 +37,6 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.user import UserFactory
 
 
 class PersonEntityTest(TestCase):
@@ -62,7 +61,7 @@ class PersonEntityTest(TestCase):
         PersonEntityFactory(person=person, entity=self.root_entity, with_child=False)
         entities = person_entity.find_entities_by_person(person)
         self.assertIsInstance(entities, list)
-        self.assertEqual(len(entities), 1) # We take only root, no child
+        self.assertEqual(len(entities), 1)  # We take only root, no child
 
     def test_find_entities_by_person_with_child_true(self):
         person = PersonFactory()
@@ -104,28 +103,6 @@ class PersonEntityTest(TestCase):
         queryset = User.objects.all()
         with self.assertRaises(ObjectDoesNotExist):
             person_entity_filter.filter_by_attached_entities(person_2, queryset)
-
-    def test_find_entities_by_user_with_no_person(self):
-        user = UserFactory()
-        person = PersonFactory(user=user)
-        entities = person.entities
-        self.assertIsInstance(entities, list)
-        self.assertFalse(entities)
-
-    def test_find_entities_by_user_with_person_attached_no_entities_attached(self):
-        user = UserFactory()
-        person = PersonFactory(user=user)
-        entities = person.entities
-        self.assertIsInstance(entities, list)
-        self.assertFalse(entities)
-
-    def test_find_entities_by_user_with_person_attached_with_entities_attached(self):
-        user = UserFactory()
-        person = PersonFactory(user=user)
-        PersonEntityFactory(person=person, entity=self.root_entity, with_child=False)
-        entities = person.entities
-        self.assertIsInstance(entities, list)
-        self.assertEqual(len(entities), 1)
 
     def _create_entity_structure(self):
         self.organization = OrganizationFactory(name="Université catholique de Louvain", acronym="UCL")

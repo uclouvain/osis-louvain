@@ -29,19 +29,18 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_unit import compute_max_academic_year_adjournment
 from base.business.learning_units.edition import filter_biennial
+from base.business.learning_units.perms import FACULTY_UPDATABLE_CONTAINER_TYPES
 from base.forms.bootstrap import BootstrapForm
-from base.forms.learning_unit_create import LearningUnitYearForm, PARTIM_FORM_READ_ONLY_FIELD, \
-    MaxStrictlyValueValidator, MinStrictlyValueValidator
+from base.forms.learning_unit_create import LearningUnitYearForm, PARTIM_FORM_READ_ONLY_FIELD
 from base.forms.utils.choice_field import add_blank
 from base.models import academic_year
 from base.models.academic_year import AcademicYear
 from base.models.enums.attribution_procedure import AttributionProcedures
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
-from base.models.enums.learning_container_year_types import INTERNSHIP, DISSERTATION, COURSE
+from base.models.enums.learning_container_year_types import INTERNSHIP, DISSERTATION
 from base.models.enums.learning_unit_periodicity import ANNUAL
 from base.models.enums.learning_unit_year_subtypes import PARTIM
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
-from base.models.learning_unit_year import find_max_credits_of_related_partims
 
 FULL_READ_ONLY_FIELDS = {"first_letter", "acronym", "academic_year", "container_type", "subtype"}
 PARTIM_READ_ONLY_FIELDS = PARTIM_FORM_READ_ONLY_FIELD | {"is_vacant", "team", "type_declaration_vacant",
@@ -130,14 +129,12 @@ class LearningUnitModificationForm(LearningUnitYearForm):
         self._disabled_internship_subtype_field_if_not_internship_container_type(learning_container_type)
 
         if parent:
-            self._set_max_credits(parent)
             self._set_status_value(parent)
             self._enabled_periodicity(parent)
-        elif learning_unit_year_instance:
-            self._set_min_credits(learning_unit_year_instance)
 
         if person.is_faculty_manager():
-            if initial.get("container_type") in [COURSE, INTERNSHIP, DISSERTATION]:
+            if initial.get("container_type") in FACULTY_UPDATABLE_CONTAINER_TYPES\
+                    and learning_unit_year_subtype == "FULL":
                 self._disabled_fields(FACULTY_READ_ONLY_FIELDS)
 
     def is_valid(self):
@@ -189,17 +186,6 @@ class LearningUnitModificationForm(LearningUnitYearForm):
     def _disabled_fields(self, fields_to_disable):
         for field in fields_to_disable:
             self.fields[field].disabled = True
-
-    def _set_max_credits(self, parent):
-        max_credits = parent.credits
-        self.fields["credits"].max_value = max_credits
-        self.fields['credits'].validators.append(MaxStrictlyValueValidator(max_credits))
-
-    def _set_min_credits(self, instance):
-        min_credits = find_max_credits_of_related_partims(instance)
-        if min_credits is not None:
-            self.fields["credits"].min_value = min_credits
-            self.fields['credits'].validators.append(MinStrictlyValueValidator(min_credits))
 
     def _set_status_value(self, parent):
         if parent.status is False:

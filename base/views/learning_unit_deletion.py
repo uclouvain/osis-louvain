@@ -27,8 +27,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db.models.deletion import ProtectedError
 from django.http import HttpResponseForbidden
+from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
+from django.views.decorators.http import require_GET, require_POST
 
 import base.business.learning_units.perms
 from base import models as mdl
@@ -86,6 +88,7 @@ def delete_from_given_learning_unit_year(request, learning_unit_year_id):
 
 @login_required
 @permission_required('base.can_delete_learningunit', raise_exception=True)
+@require_POST
 def delete_all_learning_units_year(request, learning_unit_year_id):
     person = get_object_or_404(Person, user=request.user)
     learning_unit_year = mdl.learning_unit_year.get_by_id(learning_unit_year_id)
@@ -95,30 +98,20 @@ def delete_all_learning_units_year(request, learning_unit_year_id):
 
     learning_unit = learning_unit_year.learning_unit
     messages_deletion = learning_unit_deletion.check_learning_unit_deletion(learning_unit)
+    if messages_deletion:
+        for message_deletion in sorted(messages_deletion.values()):
+            messages.add_message(request, messages.ERROR, message_deletion)
+        return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
 
-    if not messages_deletion and request.method == 'POST':
-        try:
-            result = learning_unit_deletion.delete_learning_unit(learning_unit)
-            messages.add_message(request, messages.SUCCESS,
-                                 _("The learning unit %(acronym)s has been successfully deleted for all years.")
-                                 % {'acronym': learning_unit.acronym})
-            for message_deletion in sorted(result):
-                messages.add_message(request, messages.SUCCESS, message_deletion)
+    try:
+        result = learning_unit_deletion.delete_learning_unit(learning_unit)
+        messages.add_message(request, messages.SUCCESS,
+                             _("The learning unit %(acronym)s has been successfully deleted for all years.")
+                             % {'acronym': learning_unit.acronym})
+        for message_deletion in sorted(result):
+            messages.add_message(request, messages.SUCCESS, message_deletion)
 
-            send_mail_after_the_learning_unit_year_deletion([], learning_unit.acronym, None, result)
-
-        except ProtectedError as e:
-            messages.add_message(request, messages.ERROR, str(e))
-
-        return redirect('learning_units')
-
-    else:
-        if messages_deletion:
-            context = {'title': _('cannot_delete_learning_unit') % {'learning_unit': learning_unit.acronym},
-                       'messages_deletion': sorted(messages_deletion.values())}
-        else:
-            context = {'title': _('msg_warning_delete_learning_unit') % learning_unit,
-                       'learning_units_to_delete': learning_unit_year_mdl.search(learning_unit=learning_unit)
-                           .order_by('academic_year__year')}
-
-        return layout.render(request, "learning_unit/deletion.html", context)
+        send_mail_after_the_learning_unit_year_deletion([], learning_unit.acronym, None, result)
+    except ProtectedError as e:
+        messages.add_message(request, messages.ERROR, str(e))
+    return redirect('learning_units')

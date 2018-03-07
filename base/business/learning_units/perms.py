@@ -23,13 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models import entity_container_year, entity
+from base.models.entity import Entity
 from base.models.enums import learning_container_year_types
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
-from base.models.utils.person_entity_filter import filter_by_attached_entities
+from base.models.person_entity import is_attached_entities
 
 FACULTY_UPDATABLE_CONTAINER_TYPES = (learning_container_year_types.COURSE,
                                      learning_container_year_types.DISSERTATION,
@@ -44,11 +44,11 @@ CANCELLABLE_PROPOSAL_TYPES = (ProposalType.MODIFICATION.name,
 
 
 def is_person_linked_to_entity_in_charge_of_learning_unit(a_learning_unit_year, a_person):
-    entity_containers_year = entity_container_year.search(
-        learning_container_year=a_learning_unit_year.learning_container_year,
-        link_type=REQUIREMENT_ENTITY)
+    entity = Entity.objects.filter(
+        entitycontaineryear__learning_container_year=a_learning_unit_year.learning_container_year,
+        entitycontaineryear__type=REQUIREMENT_ENTITY)
 
-    return filter_by_attached_entities(a_person, entity_containers_year).exists()
+    return is_attached_entities(a_person, entity)
 
 
 def is_eligible_to_create_modification_proposal(learn_unit_year, person):
@@ -71,8 +71,7 @@ def is_eligible_for_cancel_of_proposal(learning_unit_proposal, a_person):
         return False
 
     initial_entity_requirement_id = learning_unit_proposal.initial_data["entities"][REQUIREMENT_ENTITY]
-    an_entity = entity.get_by_internal_id(initial_entity_requirement_id)
-    if an_entity in a_person.entities:
+    if is_attached_entities(a_person, Entity.objects.filter(pk=initial_entity_requirement_id)):
         return True
 
     return a_person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_proposal.learning_unit_year)
@@ -97,7 +96,10 @@ def is_eligible_to_edit_proposal(proposal, a_person):
 def is_eligible_for_modification_end_date(learn_unit_year, person):
     if learn_unit_year.learning_unit.is_past():
         return False
-    return is_eligible_for_modification(learn_unit_year, person)
+    if not is_eligible_for_modification(learn_unit_year, person):
+        return False
+    container_type = learn_unit_year.learning_container_year.container_type
+    return container_type not in FACULTY_UPDATABLE_CONTAINER_TYPES or learn_unit_year.subtype == PARTIM
 
 
 def is_eligible_for_modification(learn_unit_year, person):
@@ -105,17 +107,9 @@ def is_eligible_for_modification(learn_unit_year, person):
         return False
     if learn_unit_year.is_in_proposal():
         return False
-    if person.is_faculty_manager() and not _can_faculty_manager_modify_learning_unit_year(learn_unit_year):
+    if person.is_faculty_manager() and not learn_unit_year.can_update_by_faculty_manager():
         return False
     return person.is_linked_to_entity_in_charge_of_learning_unit_year(learn_unit_year)
-
-
-def _can_faculty_manager_modify_learning_unit_year(learning_unit_year):
-    if learning_unit_year.subtype == PARTIM:
-        return True
-    if not learning_unit_year.learning_container_year:
-        return False
-    return learning_unit_year.learning_container_year.container_type not in FACULTY_UPDATABLE_CONTAINER_TYPES
 
 
 def can_delete_learning_unit_year(learning_unit_year, person):

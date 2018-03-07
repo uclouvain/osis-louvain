@@ -194,21 +194,25 @@ def delete_from_given_learning_unit_year(learning_unit_year):
 
     _delete_cms_data(learning_unit_year)
 
+    _decrement_end_year_learning_unit(learning_unit_year)
+
     learning_unit_year.delete()
 
     msg.append(_("%(subtype)s %(acronym)s has been deleted for the year %(year)s")
                % {'subtype': _str_partim_or_full(learning_unit_year),
                   'acronym': learning_unit_year.acronym,
                   'year': learning_unit_year.academic_year})
-
-    _update_end_year_learning_unit(learning_unit_year.learning_unit, learning_unit_year.academic_year.year - 1)
-
     return msg
 
 
-def _update_end_year_learning_unit(learning_unit_to_edit, new_year):
-    learning_unit_to_edit.end_year = new_year
-    return learning_unit_to_edit.save()
+def _decrement_end_year_learning_unit(learning_unit_year):
+    learning_unit_to_edit = learning_unit_year.learning_unit
+
+    start_year = learning_unit_to_edit.start_year
+    new_end_year = learning_unit_year.academic_year.year - 1
+    if new_end_year >= start_year:
+        learning_unit_to_edit.end_year = new_end_year
+        learning_unit_to_edit.save()
 
 
 def _delete_learning_container_year(learning_unit_container):
