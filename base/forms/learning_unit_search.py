@@ -55,6 +55,12 @@ class SearchForm(forms.Form):
         label=_('code')
     )
 
+    tutor = forms.CharField(
+        max_length=20,
+        required=False,
+        label=_('tutor')
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['academic_year_id'].initial = current_academic_year()

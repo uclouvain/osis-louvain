@@ -53,17 +53,19 @@
         {% bootstrap_field form.status %}
     </div>
     <div class="col-md-2">
+        {% bootstrap_field form.tutor %}
+    </div>
+    <div class="col-md-2">
         {% bootstrap_field form.requirement_entity_acronym %}
     </div>
     {% if search_type == 1 %}
-        <div class="col-md-7">
+        <div class="col-md-2">
             {% bootstrap_field form.with_entity_subordinated %}
         </div>
     {% elif search_type == 2 %}
         <div class="col-md-2">
             {% bootstrap_field form.allocation_entity_acronym %}
         </div>
-        <div class="col-md-5"></div>
     {% endif %}
     <input type="hidden" id="xls_status" name="xls_status">
 

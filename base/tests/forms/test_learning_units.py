@@ -203,6 +203,7 @@ class TestLearningUnitForm(TestCase):
         self.assertTrue(form.is_valid())
         self.assertEqual(form.get_activity_learning_units(), [self.list_learning_unit_year[0]])
 
+
     def test_get_service_courses_by_allocation_acronym_with_no_faculty_as_parent(self):
         form_data = {
             "requirement_entity_acronym": self.list_entity_version[3].acronym,
@@ -241,4 +242,3 @@ class TestLearningUnitForm(TestCase):
         form = learning_units.LearningUnitYearForm(form_data, service_course_search=True)
         self.assertTrue(form.is_valid())
         self.assertEqual(form.get_activity_learning_units(), [])
-

@@ -30,6 +30,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
+from attribution.models import attribution_new
 from base.models import entity_container_year
 from base.models.academic_year import current_academic_year
 from base.models.enums import active_status
@@ -199,7 +200,7 @@ def _is_regex(acronym):
 
 
 def search(academic_year_id=None, acronym=None, learning_container_year_id=None, learning_unit=None,
-           title=None, subtype=None, status=None, container_type=None, *args, **kwargs):
+           title=None, subtype=None, status=None, container_type=None, tutor=None, *args, **kwargs):
     queryset = LearningUnitYear.objects
 
     if academic_year_id:
@@ -233,6 +234,9 @@ def search(academic_year_id=None, acronym=None, learning_container_year_id=None,
     if container_type:
         queryset = queryset.filter(learning_container_year__container_type=container_type)
 
+    if tutor:
+        queryset = queryset.filter(Q(attribution__tutor__person__first_name__icontains=tutor)
+                                   | Q(attribution__tutor__person__last_name__icontains=tutor))
     return queryset.select_related('learning_container_year', 'academic_year')
 
 
