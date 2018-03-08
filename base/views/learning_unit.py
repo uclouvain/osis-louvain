@@ -28,9 +28,7 @@ import re
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
-from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.core.urlresolvers import reverse_lazy
 from django.db.models import BLANK_CHOICE_DASH
 from django.forms import model_to_dict
 from django.http import HttpResponseRedirect
@@ -47,13 +45,13 @@ from base import models as mdl_base
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, get_components_identification, show_subtype, \
     get_organization_from_learning_unit_year, get_campus_from_learning_unit_year, \
-    get_all_attributions, SIMPLE_SEARCH, SERVICE_COURSES_SEARCH, is_summary_submission_opened, \
-    find_language_in_settings, \
+    get_all_attributions, SIMPLE_SEARCH, SERVICE_COURSES_SEARCH, find_language_in_settings, \
     initialize_learning_unit_pedagogy_form, compute_max_academic_year_adjournment, \
-    create_learning_unit_partim_structure, can_access_summary, CMS_LABEL_SPECIFICATIONS, \
-    CMS_LABEL_PEDAGOGY, CMS_LABEL_SUMMARY
+    create_learning_unit_partim_structure, CMS_LABEL_SPECIFICATIONS, \
+    CMS_LABEL_PEDAGOGY
 from base.business.learning_unit_proposal import _get_difference_of_proposal
 from base.business.learning_units import perms as business_perms
+from base.business.learning_units.perms import learning_unit_year_permissions, learning_unit_proposal_permissions
 from base.business.learning_units.simple.creation import create_learning_unit_year_structure, create_learning_unit
 from base.forms.learning_class import LearningClassEditForm
 from base.forms.learning_unit_component import LearningUnitComponentEditForm
@@ -70,7 +68,6 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.views.learning_units import perms
 from base.views.learning_units.common import show_success_learning_unit_year_creation_message
-from base.business.learning_units.perms import learning_unit_year_permissions, learning_unit_proposal_permissions
 from base.views.learning_units.search import _learning_units_search
 from cms.models import text_label
 from reference.models import language

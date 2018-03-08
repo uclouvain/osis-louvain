@@ -78,8 +78,6 @@ class Person(SerializableModel):
                               default=person_source_type.BASE)
     employee = models.BooleanField(default=False)
 
-    _link_to_luy = {}
-
     def save(self, **kwargs):
         # When person is created by another application this rule can be applied.
         if hasattr(settings, 'INTERNAL_EMAIL_SUFFIX'):
@@ -131,13 +129,7 @@ class Person(SerializableModel):
         )
 
     def is_linked_to_entity_in_charge_of_learning_unit_year(self, learning_unit_year):
-        result = self._link_to_luy.get(learning_unit_year.pk)
-        if not result:
-            result = is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, self)
-
-            # the result is cached in a dictionary
-            self._link_to_luy[learning_unit_year.pk] = result
-        return result
+        return is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, self)
 
     @cached_property
     def find_main_entities_version(self):
