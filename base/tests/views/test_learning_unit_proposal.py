@@ -391,7 +391,8 @@ class TestLearningUnitProposalSearch(TestCase):
 
     def test_learning_units_proposal_search(self):
         url = reverse(learning_units_proposal_search)
-        response = self.client.get(url, data={'acronym': self.proposals[0].learning_unit_year.acronym})
+        response = self.client.get(url, data={'acronym': self.proposals[0].learning_unit_year.acronym,
+                                              'tutor': self.person.first_name})
         formset = response.context['proposals']
 
         for form in formset:
