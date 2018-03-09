@@ -27,7 +27,7 @@ from django.test import TestCase
 from django.utils import timezone
 from unittest.mock import patch
 
-from attribution.tests.factories.attribution import AttributionNewFactory
+from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_year_with_context import is_service_course
 from base.forms.common import TooManyResultsException
 from base.tests.factories.academic_year import AcademicYearFactory
