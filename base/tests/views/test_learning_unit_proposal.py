@@ -69,12 +69,9 @@ from base.views.learning_units.search import PROPOSAL_SEARCH, learning_units_pro
 from reference.tests.factories.language import LanguageFactory
 from base.tests.factories.user import UserFactory
 from django.contrib.auth.models import Group
-
+from base.models.person import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 
 LABEL_VALUE_BEFORE_PROPROSAL = _('value_before_proposal')
-
-CENTRAL_MANAGER_GROUP = "central_managers"
-FACULTY_MANAGER_GROUP = "faculty_managers"
 
 
 class TestLearningUnitModificationProposal(TestCase):
