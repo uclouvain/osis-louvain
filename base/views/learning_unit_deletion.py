@@ -37,6 +37,7 @@ from base.models import learning_unit_year as learning_unit_year_mdl
 from base.models.person import Person
 from base.utils.send_mail import send_mail_after_the_learning_unit_year_deletion
 from base.views import layout
+from base.views.common import display_success_messages
 
 
 @login_required
@@ -112,8 +113,7 @@ def delete_learning_unit_years(learning_unit_year, request):
                          'year': learning_unit_year.academic_year}
         messages.add_message(request, messages.SUCCESS, success_msg)
 
-        for msg in sorted(result):
-            messages.add_message(request, messages.SUCCESS, msg)
+        display_success_messages(request, sorted(result))
 
         send_mail_after_the_learning_unit_year_deletion([], learning_unit_year.acronym,
                                                         learning_unit_year.academic_year, result)
