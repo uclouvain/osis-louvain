@@ -2644,12 +2644,11 @@ msgstr "An error occured when getting back to initial state one of the selected 
 msgid "error_proposal_no_data"
 msgstr "An error occured when getting back to initial state. No valid data to submit"
 
-msgid "summary_editable_field_successfuly_updated"
-msgstr "The possibility to edit educational information has been correctly updated."
-
-
 msgid "msg_confirm_delete_luy"
 msgstr "Are you certain that you want to delete the learning unit ?"
+
+msgid "summary_editable_field_successfuly_updated"
+msgstr "The possibility to edit educational information has been correctly updated."
 
 msgid "already_existing_acronym"
 msgstr "Existing acronym"
