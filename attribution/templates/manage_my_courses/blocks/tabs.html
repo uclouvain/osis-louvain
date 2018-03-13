@@ -1,5 +1,5 @@
-{% extends 'blocks/modal/generic_modal.html' %}
-{% load i18n bootstrap3 %}
+{% load staticfiles %}
+{% load i18n %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -23,28 +23,13 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-{% block modal_id %}modalBackToInitial{% endblock %}
 
-{% block modal_header %}
-    <h3>{% trans 'do_you_want_to_get_back_to_initial' %}</h3>
-    <div class='alert alert-warning' id="alert_warning" style="display: none;"></div>
-{% endblock %}
+{% url 'view_educational_information' learning_unit_year_id=learning_unit_year.id as url_educational_information %}
 
-{% block modal_body %}
-    {% trans 'do_you_want_to_get_back_to_initial' %}
-    <input type="hidden" id="action" name="action" class="action">
-{% endblock %}
-
-{% block modal_footer %}
-    <button type="button" class="btn btn-primary" onclick="submit_form_back();">{% trans 'yes' %}</button>
-    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "cancel" %}</button>
-
-    <script>
-        function submit_form_back(){
-            $(".action").val('back_to_initial');
-            $('form').submit()
-        }
-    </script>
-{% endblock %}
-
-
+<ul class="nav nav-tabs" role="tablist">
+    <li role="presentation" {% if request.path == url_educational_information %} class="active" {% endif %}>
+        <a href="{{url_educational_information}}" role="tab">
+		        {% trans 'educational_information'%}
+	     </a>
+    </li>
+</ul>

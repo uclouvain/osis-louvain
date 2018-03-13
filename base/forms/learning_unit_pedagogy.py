@@ -26,6 +26,8 @@
 from django import forms
 from django.utils.safestring import mark_safe
 from ckeditor.widgets import CKEditorWidget
+
+from base.models.learning_unit_year import LearningUnitYear
 from cms.enums import entity_name
 from cms.models import translated_text
 
@@ -82,3 +84,8 @@ class LearningUnitPedagogyEditForm(forms.Form):
         trans_text.text = cleaned_data.get('trans_text')
         trans_text.save()
 
+
+class SummaryEditableModelForm(forms.ModelForm):
+    class Meta:
+        model = LearningUnitYear
+        fields = ['summary_editable']

@@ -2225,7 +2225,7 @@ msgid "%(subtype)s %(acronym)s is assigned to the assistant %(assistant)s for th
 msgstr "%(subtype)s %(acronym)s est attribué(e) à l'assistant %(assistant)s l'année %(year)s"
 
 msgid "lu_included_in_group"
-msgstr "%(subtype)s %(acronym)s est repris dans le groupement %(group)s du programme %(program)s l’année %(year)s"
+msgstr "%(subtype)s %(acronym)s est repris dans le groupement %(group)s l’année %(year)s"
 
 msgid "The learning unit %(acronym)s is related to the internship speciality %(speciality)s"
 msgstr "L'unité d'enseignement %(acronym)s est liée à la spécialité de stage %(speciality)s"
@@ -2650,6 +2650,12 @@ msgstr "Erreur lors du retour à l'initial. Une des propositions sélectionnées
 msgid "error_proposal_no_data"
 msgstr "Erreur lors du retour à l'initial. Aucune donnée sélectionnée valide"
 
+msgid "summary_editable_field_successfuly_updated"
+msgstr "La possibilité de modifier les informations pédagogiques a été correctement mise à jour."
+
 msgid "msg_confirm_delete_luy"
 msgstr "Etes-vous certain de vouloir supprimer définitivement cette unité d'enseignement ?"
+
+msgid "already_existing_acronym"
+msgstr "Sigle déjà existant"
 

@@ -44,7 +44,7 @@ class DissertationUpdate(SerializableModel):
     status_from = models.CharField(max_length=12, choices=dissertation.STATUS_CHOICES, default='DRAFT')
     status_to = models.CharField(max_length=12, choices=dissertation.STATUS_CHOICES, default='DRAFT')
     created = models.DateTimeField(auto_now_add=True)
-    justification = models.TextField(default='')
+    justification = models.TextField(blank=True)
     person = models.ForeignKey('base.Person')
     dissertation = models.ForeignKey(dissertation.Dissertation)
 

@@ -90,7 +90,7 @@ class VolumeEditionForm(forms.Form):
         self.fields['volume_total_requirement_entities'] = VolumeField(
             label=_('vol_charge'), help_text=_('total_volume_charge'))
 
-        if self.is_faculty_manager:
+        if self.is_faculty_manager and self.learning_unit_year.is_full():
             self._disable_central_manager_fields()
 
     def _disable_central_manager_fields(self):

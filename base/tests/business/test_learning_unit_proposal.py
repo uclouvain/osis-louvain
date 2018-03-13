@@ -25,8 +25,6 @@
 ##############################################################################
 import datetime
 
-from django.test import TestCase
-
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -37,7 +35,7 @@ from django.test import TestCase
 
 from base.models.enums import organization_type, proposal_type, entity_type, \
     learning_container_year_types, entity_container_year_link_type, \
-    learning_unit_year_subtypes
+    learning_unit_year_subtypes, proposal_state
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
@@ -54,41 +52,6 @@ class TestLearningUnitProposal(TestCase):
         self.assertIsNone(lu_proposal_business._get_data_dict('key1', None))
         self.assertIsNone(lu_proposal_business._get_data_dict('key1', {'key2': 'nothing serious'}))
         self.assertEqual(lu_proposal_business._get_data_dict('key1', {'key1': 'nothing serious'}), 'nothing serious')
-
-
-class TestLearningUnitProposalChecks(TestCase):
-
-    def setUp(self):
-        today = datetime.date.today()
-        self.current_academic_year = AcademicYearFactory(start_date=today,
-                                                         end_date=today.replace(year=today.year + 1),
-                                                         year=today.year)
-
-        self.learning_unit_year_1 = LearningUnitYearFactory(academic_year=self.current_academic_year)
-        self.learning_unit_year_2 = LearningUnitYearFactory(academic_year=self.current_academic_year)
-        self.learning_unit_year_3 = LearningUnitYearFactory(academic_year=self.current_academic_year)
-
-        self.proposal_suppression = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year_1,
-                                                                type=proposal_type.ProposalType.SUPPRESSION.name)
-        self.proposal_creation = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year_2,
-                                                             type=proposal_type.ProposalType.CREATION.name)
-        self.proposal_modification = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year_3,
-                                                                 type=proposal_type.ProposalType.MODIFICATION.name)
-
-    def test_check_proposals_valid_to_get_back_to_initial(self):
-        self.assertTrue(lu_proposal_business.check_proposals_valid_to_get_back_to_initial([self.proposal_suppression]))
-
-    def test_check_proposals_invalid_to_get_back_to_initial(self):
-        self.assertFalse(lu_proposal_business.check_proposals_valid_to_get_back_to_initial([self.proposal_suppression,
-                                                                                            self.proposal_creation]))
-        self.assertFalse(lu_proposal_business.check_proposals_valid_to_get_back_to_initial([self.proposal_modification,
-                                                                                            self.proposal_creation]))
-
-    def test_get_valid_proposal_for_cancellation(self):
-        self.assertEqual(len(lu_proposal_business.get_valid_proposal_for_cancellation([self.proposal_suppression])), 1)
-        self.assertCountEqual(lu_proposal_business.get_valid_proposal_for_cancellation([self.proposal_suppression]),
-                              [self.proposal_suppression])
-        self.assertEqual(len(lu_proposal_business.get_valid_proposal_for_cancellation([self.proposal_creation])), 0)
 
 
 class TestLearningUnitProposalCancel(TestCase):
@@ -116,19 +79,21 @@ class TestLearningUnitProposalCancel(TestCase):
         self.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL, start_date=today,
                                                    end_date=today.replace(year=today.year + 1))
 
-    def test_cancel_proposal(self):
-        self._create_proposal()
+    def test_cancel_proposal_of_type_suppression(self):
+        self._create_proposal(prop_type=proposal_type.ProposalType.SUPPRESSION.name,
+                              prop_state=proposal_state.ProposalState.FACULTY.name)
         lu_proposal_business.cancel_proposal(self.learning_unit_year)
         self.assertCountEqual(list(mdl_base.proposal_learning_unit.ProposalLearningUnit.objects
                                    .filter(learning_unit_year=self.learning_unit_year)), [])
 
-    def test_cancel_proposals(self):
-        proposal = self._create_proposal()
+    def test_cancel_proposals_of_type_suppression(self):
+        proposal = self._create_proposal(prop_type=proposal_type.ProposalType.SUPPRESSION.name,
+                                         prop_state=proposal_state.ProposalState.FACULTY.name)
         lu_proposal_business.cancel_proposals([proposal])
         self.assertCountEqual(list(mdl_base.proposal_learning_unit.ProposalLearningUnit.objects
                                    .filter(learning_unit_year=self.learning_unit_year)), [])
 
-    def _create_proposal(self):
+    def _create_proposal(self, prop_type, prop_state):
         initial_data_expected = {
             "learning_container_year": {
                 "id": self.learning_unit_year.learning_container_year.id,
@@ -162,4 +127,6 @@ class TestLearningUnitProposalCancel(TestCase):
             }
         }
         return ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year,
-                                           initial_data=initial_data_expected)
+                                           initial_data=initial_data_expected,
+                                           type=prop_type,
+                                           state=prop_state)

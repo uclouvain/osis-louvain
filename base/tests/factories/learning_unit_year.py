@@ -88,6 +88,7 @@ class LearningUnitYearFakerFactory(DjangoModelFactory):
     credits = factory.fuzzy.FuzzyDecimal(MINIMUM_CREDITS, MAXIMUM_CREDITS)
     decimal_scores = False
     status = True
+    summary_editable = True
     session = factory.Iterator(learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION, getter=operator.itemgetter(0))
     quadrimester = factory.Iterator(learning_unit_year_quadrimesters.LEARNING_UNIT_YEAR_QUADRIMESTERS,
                                     getter=operator.itemgetter(0))

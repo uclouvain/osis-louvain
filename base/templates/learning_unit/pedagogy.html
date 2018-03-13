@@ -32,12 +32,14 @@
 
 {% block content %}
 {% include "learning_unit/header.html" %}
+{% include "template_messages.html" %}
 <div class="panel panel-default" >
     <div class="panel-body" id="tabs" >
         {% include "learning_unit/tabs.html" %}
         <div class="tab-content" id="tab_content">
             <div role="tabpanel" class="tab-pane active" id="pedagogy">
-                 {% url 'learning_unit_pedagogy_edit' learning_unit_year_id=learning_unit_year.id as post_url%}
+                {% url 'learning_unit_pedagogy_edit' learning_unit_year_id=learning_unit_year.id as post_url %}
+                {% include "learning_unit/blocks/panel_summary_editable_update.html" %}
                 {% include "learning_unit/blocks/panel_educational_informations.html" with can_edit_information=perms.base.can_edit_learningunit_pedagogy %}
             </div>
         </div>

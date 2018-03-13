@@ -26,7 +26,6 @@
 from base.models.entity import Entity
 from base.models.enums import learning_container_year_types
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
-from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.person_entity import is_attached_entities
@@ -52,7 +51,7 @@ def is_person_linked_to_entity_in_charge_of_learning_unit(a_learning_unit_year, 
 
 
 def is_eligible_to_create_modification_proposal(learn_unit_year, person):
-    if learn_unit_year.is_past() or learn_unit_year.subtype == PARTIM:
+    if learn_unit_year.is_past() or learn_unit_year.is_partim():
         return False
     if learn_unit_year.learning_container_year and \
             learn_unit_year.learning_container_year.container_type not in FACULTY_UPDATABLE_CONTAINER_TYPES:
@@ -99,7 +98,7 @@ def is_eligible_for_modification_end_date(learn_unit_year, person):
     if not is_eligible_for_modification(learn_unit_year, person):
         return False
     container_type = learn_unit_year.learning_container_year.container_type
-    return container_type not in FACULTY_UPDATABLE_CONTAINER_TYPES or learn_unit_year.subtype == PARTIM
+    return container_type not in FACULTY_UPDATABLE_CONTAINER_TYPES or learn_unit_year.is_partim()
 
 
 def is_eligible_for_modification(learn_unit_year, person):
@@ -121,10 +120,9 @@ def can_delete_learning_unit_year(learning_unit_year, person):
 def _can_delete_learning_unit_year_according_type(learning_unit_year, person):
     if not person.is_central_manager() and person.is_faculty_manager():
         container_type = learning_unit_year.learning_container_year.container_type
-        subtype = learning_unit_year.subtype
 
         return not (
-                container_type == learning_container_year_types.COURSE and subtype == FULL
+                container_type == learning_container_year_types.COURSE and learning_unit_year.is_full()
         ) and container_type not in [learning_container_year_types.DISSERTATION,
                                      learning_container_year_types.INTERNSHIP]
     return True

@@ -289,3 +289,7 @@ def initialize_learning_unit_pedagogy_form(learning_unit_year, language_code):
 
 def find_language_in_settings(language_code):
     return next((lang for lang in settings.LANGUAGES if lang[0] == language_code), None)
+
+
+def can_edit_summary_editable_field(person, is_person_linked_to_entity):
+    return person.is_faculty_manager() and is_person_linked_to_entity

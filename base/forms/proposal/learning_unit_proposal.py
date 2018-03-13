@@ -128,8 +128,6 @@ class LearningUnitProposalForm(SearchForm):
 
 
 class ProposalStateModelForm(forms.ModelForm):
-    action = forms.CharField(max_length=50, required=False)
-
     class Meta:
         model = ProposalLearningUnit
         fields = ['state']
@@ -137,10 +135,6 @@ class ProposalStateModelForm(forms.ModelForm):
 
 class ProposalRowForm(ProposalStateModelForm):
     check = forms.BooleanField(required=False)
-
-    @property
-    def proposal_type(self):
-        return _(self.instance.type)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -179,6 +173,10 @@ class ProposalRowForm(ProposalStateModelForm):
         return requirement_entity.acronym if requirement_entity else ''
 
     @property
+    def proposal_type(self):
+        return _(self.instance.type)
+
+    @property
     def proposal_state(self):
         return _(self.instance.state)
 
@@ -192,18 +190,12 @@ class ProposalRowForm(ProposalStateModelForm):
         if self.cleaned_data.get('check'):
             super().save(commit)
 
-    @staticmethod
-    def get_checked_proposals(form):
-        selected_proposals = []
-        for f in form:
-            selected_proposals.append(f.instance) if f.cleaned_data.get('check') else None
-        return selected_proposals
-
 
 class ProposalListFormset(forms.BaseFormSet):
 
     def __init__(self, *args, **kwargs):
         self.list_proposal_learning = kwargs.pop("list_proposal_learning")
+        self.action = kwargs.pop("action")
         super().__init__(*args, **kwargs)
 
     def get_form_kwargs(self, index):
@@ -215,3 +207,6 @@ class ProposalListFormset(forms.BaseFormSet):
         with transaction.atomic():
             for form in self.forms:
                 form.save()
+
+    def get_checked_proposals(self):
+        return [form.instance for form in self.forms if form.cleaned_data.get('check')]

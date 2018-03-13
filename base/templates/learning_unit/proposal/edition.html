@@ -23,6 +23,8 @@
 {% endblock proposal_management%}
 
 {% block script %}
+    <!--Warning append javascript method-->
+    {{ block.super }}
     <script>
         function showWarningIfInconsistentState(){
             var idSelect = '{{ form.state.auto_id }}';

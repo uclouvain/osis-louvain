@@ -37,7 +37,8 @@ from base.models import academic_year
 from base.models.academic_year import AcademicYear
 from base.models.enums.attribution_procedure import AttributionProcedures
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
-from base.models.enums.learning_container_year_types import INTERNSHIP, DISSERTATION
+from base.models.enums.learning_container_year_types import INTERNSHIP, DISSERTATION, MASTER_THESIS, \
+    LEARNING_CONTAINER_YEAR_TYPES_MUST_HAVE_SAME_ENTITIES
 from base.models.enums.learning_unit_periodicity import ANNUAL
 from base.models.enums.learning_unit_year_subtypes import PARTIM
 from base.models.enums.vacant_declaration_type import VacantDeclarationType
@@ -45,8 +46,8 @@ from base.models.enums.vacant_declaration_type import VacantDeclarationType
 FULL_READ_ONLY_FIELDS = {"first_letter", "acronym", "academic_year", "container_type", "subtype"}
 PARTIM_READ_ONLY_FIELDS = PARTIM_FORM_READ_ONLY_FIELD | {"is_vacant", "team", "type_declaration_vacant",
                                                          "attribution_procedure", "subtype"}
-FACULTY_READ_ONLY_FIELDS = {"common_title", "common_title_english", "specific_title", "specific_title_english",
-                            "faculty_remark", "other_remark", "campus", "status", "credits", "language",
+FACULTY_READ_ONLY_FIELDS = {"periodicity", "common_title", "common_title_english", "specific_title",
+                            "specific_title_english", "campus", "status", "credits", "language",
                             "requirement_entity", "allocation_entity", "additional_requirement_entity_2", "is_vacant",
                             "type_declaration_vacant", "attribution_procedure", "subtype"}
 
@@ -118,6 +119,7 @@ class LearningUnitModificationForm(LearningUnitYearForm):
         learning_unit_year_subtype = initial.get("subtype") if initial else None
         learning_container_type = initial.get("container_type") if initial else None
         parent = learning_unit_year_instance.parent if learning_unit_year_instance else None
+        self.learning_unit = learning_unit_year_instance.learning_unit if learning_unit_year_instance else None
 
         self.learning_unit_end_date = kwargs.pop("end_date", None)
 
@@ -136,6 +138,9 @@ class LearningUnitModificationForm(LearningUnitYearForm):
             if initial.get("container_type") in FACULTY_UPDATABLE_CONTAINER_TYPES\
                     and learning_unit_year_subtype == "FULL":
                 self._disabled_fields(FACULTY_READ_ONLY_FIELDS)
+
+        if learning_unit_year_instance:
+            self.learning_unit = learning_unit_year_instance.learning_unit
 
     def is_valid(self):
         if not BootstrapForm.is_valid(self):
@@ -171,7 +176,7 @@ class LearningUnitModificationForm(LearningUnitYearForm):
         return self.cleaned_data["requirement_entity"] == self.cleaned_data["allocation_entity"]
 
     def _can_requirement_and_allocation_entities_be_different(self):
-        return self.cleaned_data["container_type"] not in [INTERNSHIP, DISSERTATION]
+        return self.cleaned_data["container_type"] not in LEARNING_CONTAINER_YEAR_TYPES_MUST_HAVE_SAME_ENTITIES
 
     def _disabled_fields_base_on_learning_unit_year_subtype(self, subtype):
         if subtype == PARTIM:

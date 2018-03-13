@@ -97,7 +97,7 @@ class LearningUnitYear(AuditableSerializableModel):
 
     @property
     def parent(self):
-        if self.subdivision and self.subtype == learning_unit_year_subtypes.PARTIM:
+        if self.subdivision and self.is_partim():
             return LearningUnitYear.objects.filter(
                 subtype=learning_unit_year_subtypes.FULL,
                 learning_container_year=self.learning_container_year,
@@ -135,7 +135,7 @@ class LearningUnitYear(AuditableSerializableModel):
         return ''
 
     def get_partims_related(self):
-        if self.subtype == learning_unit_year_subtypes.FULL and self.learning_container_year:
+        if self.is_full() and self.learning_container_year:
             return self.learning_container_year.get_partims_related()
         return LearningUnitYear.objects.none()
 
@@ -184,6 +184,12 @@ class LearningUnitYear(AuditableSerializableModel):
             result = True
         return result
 
+    def is_full(self):
+        return self.subtype == learning_unit_year_subtypes.FULL
+
+    def is_partim(self):
+        return self.subtype == learning_unit_year_subtypes.PARTIM
+
 
 def get_by_id(learning_unit_year_id):
     return LearningUnitYear.objects.select_related('learning_container_year__learning_container') \
@@ -199,7 +205,7 @@ def _is_regex(acronym):
 
 
 def search(academic_year_id=None, acronym=None, learning_container_year_id=None, learning_unit=None,
-           title=None, subtype=None, status=None, container_type=None, *args, **kwargs):
+           title=None, subtype=None, status=None, container_type=None, tutor=None, *args, **kwargs):
     queryset = LearningUnitYear.objects
 
     if academic_year_id:
@@ -232,6 +238,11 @@ def search(academic_year_id=None, acronym=None, learning_container_year_id=None,
 
     if container_type:
         queryset = queryset.filter(learning_container_year__container_type=container_type)
+
+    if tutor:
+        queryset = queryset.\
+            filter(Q(attribution__tutor__person__first_name__icontains=tutor) |
+                   Q(attribution__tutor__person__last_name__icontains=tutor))
 
     return queryset.select_related('learning_container_year', 'academic_year')
 

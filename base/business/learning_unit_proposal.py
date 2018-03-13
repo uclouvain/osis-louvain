@@ -24,8 +24,9 @@
 #
 ##############################################################################
 from base.business.learning_units.edition import update_or_create_entity_container_year_with_components
-from base.models import entity_container_year, campus, entity, entity_version
+from base.models import entity_container_year, campus, entity
 from base.models.enums import proposal_type, entity_container_year_link_type
+from base.models.enums.proposal_type import ProposalType
 from base.models.proposal_learning_unit import find_by_folder, ProposalLearningUnit
 from reference.models import language
 from django.utils.translation import ugettext_lazy as _
@@ -257,25 +258,11 @@ def _get_old_value_when_not_foreign_key(initial_value, key):
 
 
 def _get_rid_of_blank_value(data):
-    clean_data = {}
-    for k, v in data.items():
-        clean_data.update({k: None}) if v == '' else clean_data.update({k: v})
+    clean_data = data.copy()
+    for key, value in clean_data.items():
+        if value == '':
+            clean_data[key] = None
     return clean_data
-
-
-def check_proposals_valid_to_get_back_to_initial(proposals_to_cancel):
-    for proposal in proposals_to_cancel:
-        if proposal.type != proposal_type.ProposalType.SUPPRESSION.name:
-            return False
-    return True
-
-
-def get_valid_proposal_for_cancellation(proposals):
-    valid_proposal_to_cancel = []
-    for proposal in proposals:
-        if proposal.type == proposal_type.ProposalType.SUPPRESSION.name:
-            valid_proposal_to_cancel.append(proposal)
-    return valid_proposal_to_cancel
 
 
 def cancel_proposal(learning_unit_year):

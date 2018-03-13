@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,11 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models import proposal_learning_unit
-from base.business.learning_units.proposal import common
+from django.core.exceptions import PermissionDenied
+
+import attribution.business.perms
 
 
-def create_learning_unit_proposal(data, folder):
-    proposal = common.proposal_common_populate(data, folder, proposal_learning_unit.ProposalLearningUnit())
-    proposal.initial_data = data.get('initial_data')
-    proposal.save()
+def tutor_can_edit_educational_information(view_func):
+    def f_tutor_can_edit_educational_information(request, learning_unit_year_id):
+        if not attribution.business.perms.can_user_edit_educational_information(request.user, learning_unit_year_id):
+            raise PermissionDenied("User cannot edit educational information")
+        return view_func(request, learning_unit_year_id)
+    return f_tutor_can_edit_educational_information

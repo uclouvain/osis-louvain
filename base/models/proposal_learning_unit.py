@@ -26,6 +26,7 @@
 from django.contrib.postgres.fields import JSONField
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
 
 from base.models.enums import proposal_type, proposal_state
@@ -73,7 +74,7 @@ def find_by_folder(a_folder):
 
 
 def search(academic_year_id=None, acronym=None, entity_folder_id=None, folder_id=None, proposal_type=None,
-           proposal_state=None, learning_container_year_id=None, *args, **kwargs):
+           proposal_state=None, learning_container_year_id=None, tutor=None, *args, **kwargs):
 
     queryset = ProposalLearningUnit.objects
 
@@ -100,6 +101,11 @@ def search(academic_year_id=None, acronym=None, entity_folder_id=None, folder_id
             queryset = queryset.filter(learning_unit_year__learning_container_year__in=learning_container_year_id)
         elif learning_container_year_id:
             queryset = queryset.filter(learning_unit_year__learning_container_year=learning_container_year_id)
+
+    if tutor:
+        queryset = queryset.\
+            filter(Q(learning_unit_year__attribution__tutor__person__first_name__icontains=tutor) |
+                   Q(learning_unit_year__attribution__tutor__person__last_name__icontains=tutor))
 
     return queryset.select_related('learning_unit_year')
 

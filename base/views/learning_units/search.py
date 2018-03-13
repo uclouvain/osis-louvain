@@ -39,8 +39,7 @@ from base.models.enums import learning_container_year_types, learning_unit_year_
 from base.utils.send_mail import send_mail_after_the_learning_unit_proposal_cancellation
 from base.views import layout
 from base.views.common import check_if_display_message, display_error_messages, display_success_messages
-from base.business.learning_unit_proposal import check_proposals_valid_to_get_back_to_initial, \
-    get_valid_proposal_for_cancellation, cancel_proposals
+from base.business import learning_unit_proposal as proposal_business
 
 PROPOSAL_SEARCH = 3
 
@@ -119,13 +118,18 @@ def _proposal_management(request, proposals):
     list_proposal_formset = formset_factory(form=ProposalRowForm, formset=ProposalListFormset,
                                             extra=len(proposals), max_num=MAX_RECORDS)
 
-    formset = list_proposal_formset(request.POST or None, list_proposal_learning=proposals)
+    formset = list_proposal_formset(request.POST or None,
+                                    list_proposal_learning=proposals,
+                                    action=request.POST.get('action') if request.POST else None)
+    return process_formset(formset, request)
+
+
+def process_formset(formset, request):
     if formset.is_valid():
-        if is_go_back_to_initial_action(formset):
+        if formset.action == 'back_to_initial':
             formset = _go_back_to_initial_data(formset, request)
         else:
             _force_state(formset, request)
-
     return formset
 
 
@@ -137,23 +141,19 @@ def is_go_back_to_initial_action(formset):
 
 
 def _go_back_to_initial_data(formset, request):
-    proposals_candidate_to_cancellation = ProposalRowForm.get_checked_proposals(formset)
+    proposals_candidate_to_cancellation = formset.get_checked_proposals()
     if proposals_candidate_to_cancellation:
-        if not check_proposals_valid_to_get_back_to_initial(proposals_candidate_to_cancellation):
-            display_error_messages(request, _("error_proposal_suppression_to_initial"))
-        else:
-            proposals_to_cancel = get_valid_proposal_for_cancellation(proposals_candidate_to_cancellation)
-            formset = cancel_list_of_proposal(formset, proposals_to_cancel, request)
+        formset = _cancel_list_of_proposal(formset, proposals_candidate_to_cancellation, request)
     else:
         _build_no_data_error_message(request)
     return formset
 
 
-def cancel_list_of_proposal(formset, proposals_to_cancel, request):
+def _cancel_list_of_proposal(formset, proposals_to_cancel, request):
     if proposals_to_cancel:
-        proposals = cancel_proposals(proposals_to_cancel)
+        proposal_business.cancel_proposals(proposals_to_cancel)
         display_success_messages(request, _("proposal_edited_successfully"))
-        send_mail_after_the_learning_unit_proposal_cancellation([], proposals)
+        send_mail_after_the_learning_unit_proposal_cancellation([], proposals_to_cancel)
         formset = None
     else:
         _build_no_data_error_message(request)

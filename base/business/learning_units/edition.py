@@ -105,7 +105,7 @@ def _check_extend_partim(last_learning_unit_year, new_academic_year):
         new_academic_year = AcademicYear.objects.get(year=compute_max_academic_year_adjournment() + 1)
 
     lu_parent = last_learning_unit_year.parent
-    if last_learning_unit_year.subtype == 'PARTIM' and lu_parent:
+    if last_learning_unit_year.is_partim() and lu_parent:
         if _get_actual_end_year(lu_parent.learning_unit) < new_academic_year.year:
             raise IntegrityError(
                 _('parent_greater_than_partim') % {'partim_end_year': new_academic_year,

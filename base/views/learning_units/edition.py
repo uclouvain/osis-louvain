@@ -79,8 +79,10 @@ def modify_learning_unit(request, learning_unit_year_id):
     learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     person = get_object_or_404(Person, user=request.user)
     initial_data = compute_learning_unit_modification_form_initial_data(learning_unit_year)
-    form = LearningUnitModificationForm(request.POST or None, learning_unit_year_instance=learning_unit_year,
-                                        person=person, initial=initial_data)
+    form = LearningUnitModificationForm(request.POST or None,
+                                        learning_unit_year_instance=learning_unit_year,
+                                        person=person,
+                                        initial=initial_data)
     if form.is_valid():
         entities_data = form.get_entities_data()
         lu_type_full_data = form.get_data_for_learning_unit()

@@ -23,21 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import json
+import datetime
 from unittest import mock
 
-import datetime
+from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.api import get_messages
-from django.contrib import messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.test import TestCase, RequestFactory
+from django.utils.translation import ugettext_lazy as _
 
-from base.business import learning_unit_deletion
 from base.models import person
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import entity_type
@@ -49,15 +48,13 @@ from base.models.person_entity import PersonEntity
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
-from django.utils.translation import ugettext_lazy as _
-
+from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
@@ -206,7 +203,7 @@ class LearningUnitDelete(TestCase):
                             'year': ly1.academic_year},
                          context['title'])
 
-        subtype = _('The partim') if ly1.subtype == learning_unit_year_subtypes.PARTIM else _('The learning unit')
+        subtype = _('The partim') if ly1.is_partim() else _('The learning unit')
         self.assertIn(_("There is %(count)d enrollments in %(subtype)s %(acronym)s for the year %(year)s")
                       % {'subtype': subtype,
                          'acronym': ly1.acronym,
@@ -240,7 +237,7 @@ class LearningUnitDelete(TestCase):
         self.assertIn(messages.ERROR, msg_level)
 
         # Check error message
-        subtype = _('The partim') if ly1.subtype == learning_unit_year_subtypes.PARTIM else _('The learning unit')
+        subtype = _('The partim') if ly1.is_partim() else _('The learning unit')
         self.assertIn(_("There is %(count)d enrollments in %(subtype)s %(acronym)s for the year %(year)s")
                       % {'subtype': subtype,
                          'acronym': ly1.acronym,
@@ -281,7 +278,7 @@ class LearningUnitDelete(TestCase):
                             'year': ly1.academic_year},
                          context['title'])
 
-        subtype = _('The partim') if ly1.subtype == learning_unit_year_subtypes.PARTIM else _('The learning unit')
+        subtype = _('The partim') if ly1.is_partim() else _('The learning unit')
         self.assertIn(_("There is %(count)d enrollments in %(subtype)s %(acronym)s for the year %(year)s")
                       % {'subtype': subtype,
                          'acronym': ly1.acronym,

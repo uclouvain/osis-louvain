@@ -26,6 +26,10 @@
  * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+{% block style %}
+    <link rel="stylesheet" href="{% static 'css/dataTables.bootstrap.min.css' %}">
+{% endblock %}
+
 {% block breadcrumb %}
   <li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'student_path' %}</a></li>
   <li><a href="{% url 'dissertations' %}" id="lnk_dissertations">{% trans 'dissertations' %}</a></li>
@@ -48,32 +52,90 @@
                     aria-hidden="true"></span> {% trans 'add_advisers' %}</a>
              </div>
         </div>
+        <br>
+        <div class="table-responsive">
+            <table class="table table-hover display responsive no-wrap" width="100%" id="table-advisers">
+                <thead>
+                    <tr>
+                        <th>{% trans 'adviser' %}</th>
+                        <th>{% trans 'number_of_dissertation_active_total' %}</th>
+                        <th>{% trans 'number_of_dissertation_pro' %}</th>
+                        <th>{% trans 'number_of_dissertation_copro' %}</th>
+                        <th>{% trans 'number_of_dissertation_reader' %}</th>
+                        <th>{% trans 'number_of_dissertation_need_request' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for adviser in advisers %}
+                        <tr>
+                            <td><a href="{% url 'manager_informations_detail' pk=adviser.pk %}">{{ adviser }}</a></td>
+
+                            {% with ad_stat=adviser.get_stat_dissertation_role %}
+
+                            <td>{{ad_stat.0.0}}</td>
+                            <td>{{ad_stat.0.1}}</td>
+                            <td>{{ad_stat.0.2}}</td>
+                            <td>{{ad_stat.0.3}}</td>
+                            <td>{{ad_stat.0.4}}</td>
+
+                            {% endwith %}
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-      <table class="table table-hover">
-        <tr>
-          <th>{% trans 'adviser' %}</th>
-          <th>{% trans 'number_of_dissertation_active_total' %}</th>
-          <th>{% trans 'number_of_dissertation_pro' %}</th>
-          <th>{% trans 'number_of_dissertation_copro' %}</th>
-          <th>{% trans 'number_of_dissertation_reader' %}</th>
-          <th>{% trans 'number_of_dissertation_need_request' %}</th>
-
-        </tr>
-        {% for adviser in advisers %}
-
-          <tr>
-            <td><a href="{% url 'manager_informations_detail' pk=adviser.pk %}">{{ adviser }}</a></td>
-            {% with ad_stat=adviser.get_stat_dissertation_role %}
-            <td>{{ad_stat.0.0}}</td>
-            <td>{{ad_stat.0.1}}</td>
-            <td>{{ad_stat.0.2}}</td>
-            <td>{{ad_stat.0.3}}</td>
-            <td>{{ad_stat.0.4}}</td>
-            {% endwith %}
-          </tr>
-
-        {% endfor %}
-      </table>
-
     </div>
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="{% static 'js/jquery.dataTables.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/dataTables.bootstrap.min.js' %}"></script>
+    <script>
+        $(document).ready(function()
+        {
+            $('#table-advisers').DataTable(
+            {
+                "pageLength": 50,
+                "paging" : true,
+                "ordering" : true,
+                "info"  : false,
+                "searching" : true,
+                "language":
+                {
+
+                    "sProcessing":     "{% trans 'datatable_processing'%}",
+                    "sSearch":         "{% trans 'datatable_search'%}",
+                    "sLengthMenu":     "&nbsp;&nbsp;&nbsp;_MENU_ &eacute;l&eacute;ments",
+                    "sInfo":           "{% trans 'datatable_info'%}",
+                    "sInfoEmpty":      "{% trans 'datatable_infoempty'%}",
+                    "sInfoFiltered":   "{% trans 'datatable_infofiltered'%}",
+                    "sInfoPostFix":    "{% trans 'datatable_infopostfix'%}",
+                    "sLoadingRecords": "{% trans 'datatable_loadingrecords'%}",
+                    "sZeroRecords":    "{% trans 'datatable_zerorecords'%}",
+                    "sEmptyTable":     "{% trans 'datatable_emptytable'%}",
+                    "oPaginate":
+                    {
+                        "sFirst":      "{% trans 'datatable_first'%}",
+                        "sPrevious":   "{% trans 'datatable_previous'%}",
+                        "sNext":       "{% trans 'datatable_next'%}",
+                        "sLast":       "{% trans 'datatable_last'%}"
+                    },
+                    "oAria":
+                    {
+                        "sSortAscending":  "{% trans 'datatable_sortascending'%}",
+                        "sSortDescending": "{% trans 'datatable_sortdescending'%}",
+                    }
+                },
+                "columns": [
+                    null,
+                    { "orderable": false },
+                    { "orderable": false },
+                    { "orderable": false },
+                    { "orderable": false },
+                    { "orderable": false }
+                ]
+            });
+        });
+    </script>
 {% endblock %}

@@ -9,7 +9,6 @@
                 <th>{% trans 'academic_year_small' %}</th>
                 <th>{% trans 'courses' %}</th>
                 <th>{% trans 'title' %}</th>
-                <th>{% trans 'manage_educational_information' %}</th>
             </tr>
         </thead>
         {% for anac in luys_by_anac %}
@@ -19,14 +18,18 @@
                         {% if forloop.first %}
                             <td rowspan="{{ anac.list|length }}">{{ anac.grouper }}</td>
                         {% endif %}
-                        <td>{{ luy.acronym }}</td>
+                        <td>
+                            <a href="{% url "view_educational_information" learning_unit_year_id=luy.id %}" title="{% trans 'manage_educational_information' %}">
+                                {{ luy.acronym }}
+                            </a>
+                        </td>
                         <td>{{ luy.complete_title|default_if_none:'' }}</td>
-                        <td><a href="#">#</a></td>
                     </tr>
                 {% endfor %}
             </tbody>
         {% endfor %}
     </table>
+
 {% else %}
     <div id="no_attribution_warning_message" class="alert alert-warning" role="alert">
         {% trans 'no_attribution_summary_editable' %}

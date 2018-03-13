@@ -30,7 +30,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
-from django.core.urlresolvers import reverse_lazy
 from django.db.models import BLANK_CHOICE_DASH
 from django.forms import model_to_dict
 from django.http import HttpResponseRedirect
@@ -47,19 +46,19 @@ from base import models as mdl_base
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, get_components_identification, show_subtype, \
     get_organization_from_learning_unit_year, get_campus_from_learning_unit_year, \
-    get_all_attributions, SIMPLE_SEARCH, SERVICE_COURSES_SEARCH, is_summary_submission_opened, \
-    find_language_in_settings, \
+    get_all_attributions, SIMPLE_SEARCH, SERVICE_COURSES_SEARCH, find_language_in_settings, \
     initialize_learning_unit_pedagogy_form, compute_max_academic_year_adjournment, \
-    create_learning_unit_partim_structure, can_access_summary, CMS_LABEL_SPECIFICATIONS, \
-    CMS_LABEL_PEDAGOGY, CMS_LABEL_SUMMARY
+    create_learning_unit_partim_structure, CMS_LABEL_SPECIFICATIONS, \
+    CMS_LABEL_PEDAGOGY, can_edit_summary_editable_field
 from base.business.learning_unit_proposal import _get_difference_of_proposal
 from base.business.learning_units import perms as business_perms
+from base.business.learning_units.perms import learning_unit_year_permissions, learning_unit_proposal_permissions
 from base.business.learning_units.simple.creation import create_learning_unit_year_structure, create_learning_unit
 from base.forms.learning_class import LearningClassEditForm
 from base.forms.learning_unit_component import LearningUnitComponentEditForm
 from base.forms.learning_unit_create import CreateLearningUnitYearForm, CreatePartimForm, \
     PARTIM_FORM_READ_ONLY_FIELD
-from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm
+from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm, SummaryEditableModelForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models import proposal_learning_unit, entity_container_year
 from base.models.enums import learning_unit_year_subtypes
@@ -68,9 +67,9 @@ from base.models.learning_container import LearningContainer
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_ALL, LEARNING_UNIT_ACRONYM_REGEX_FULL
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
+from base.views.common import display_success_messages, display_error_messages
 from base.views.learning_units import perms
 from base.views.learning_units.common import show_success_learning_unit_year_creation_message
-from base.business.learning_units.perms import learning_unit_year_permissions, learning_unit_proposal_permissions
 from base.views.learning_units.search import _learning_units_search
 from cms.models import text_label
 from reference.models import language
@@ -119,8 +118,8 @@ def learning_unit_components(request, learning_unit_year_id):
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def learning_unit_pedagogy(request, learning_unit_year_id):
-    context = get_common_context_learning_unit_year(learning_unit_year_id,
-                                                    get_object_or_404(Person, user=request.user))
+    user_person = get_object_or_404(Person, user=request.user)
+    context = get_common_context_learning_unit_year(learning_unit_year_id, user_person)
     learning_unit_year = context['learning_unit_year']
     user_language = mdl.person.get_user_interface_language(request.user)
     context['cms_labels_translated'] = get_cms_label_data(CMS_LABEL_PEDAGOGY, user_language)
@@ -128,20 +127,49 @@ def learning_unit_pedagogy(request, learning_unit_year_id):
     context['form_french'] = initialize_learning_unit_pedagogy_form(learning_unit_year, settings.LANGUAGE_CODE_FR)
     context['form_english'] = initialize_learning_unit_pedagogy_form(learning_unit_year, settings.LANGUAGE_CODE_EN)
     context['experimental_phase'] = True
+
+    can_user_edit_summary_editable_field = can_edit_summary_editable_field(user_person,
+                                                                           context['is_person_linked_to_entity'])
+    summary_editable_form = build_summary_editable_form(request,
+                                                        learning_unit_year,
+                                                        can_user_edit_summary_editable_field)
+
+    if summary_editable_form.is_valid():
+        if not can_user_edit_summary_editable_field:
+            raise PermissionDenied
+        try:
+            summary_editable_form.save()
+            display_success_messages(request, _("summary_editable_field_successfuly_updated"))
+            return HttpResponseRedirect(reverse('learning_unit_pedagogy', args=[learning_unit_year_id]))
+
+        except ValueError as e:
+            display_error_messages(request, e.args[0])
+
+    context['summary_editable_form'] = summary_editable_form
+    context['can_edit_summary_editable_field'] = can_user_edit_summary_editable_field
     return layout.render(request, "learning_unit/pedagogy.html", context)
+
+
+def build_summary_editable_form(request, learning_unit_year, can_user_edit_summary_editable_field):
+    summary_editable_form = SummaryEditableModelForm(request.POST or None, instance=learning_unit_year)
+    summary_editable_form.fields['summary_editable'].disabled = not can_user_edit_summary_editable_field
+    return summary_editable_form
 
 
 @login_required
 @permission_required('base.can_edit_learningunit_pedagogy', raise_exception=True)
 @require_http_methods(["GET", "POST"])
 def learning_unit_pedagogy_edit(request, learning_unit_year_id):
+    redirect_url = reverse("learning_unit_pedagogy", kwargs={'learning_unit_year_id': learning_unit_year_id})
+    return edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url)
+
+
+def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
     if request.method == 'POST':
         form = LearningUnitPedagogyEditForm(request.POST)
         if form.is_valid():
             form.save()
-        return HttpResponseRedirect(reverse("learning_unit_pedagogy",
-                                            kwargs={'learning_unit_year_id': learning_unit_year_id}))
-
+        return redirect(redirect_url)
     context = get_common_context_learning_unit_year(learning_unit_year_id,
                                                     get_object_or_404(Person, user=request.user))
     label_name = request.GET.get('label')
@@ -154,7 +182,6 @@ def learning_unit_pedagogy_edit(request, learning_unit_year_id):
     })
     form.load_initial()  # Load data from database
     context['form'] = form
-
     user_language = mdl.person.get_user_interface_language(request.user)
     context['text_label_translated'] = next((txt for txt in text_lb.translated_text_labels
                                              if txt.language == user_language), None)
@@ -364,55 +391,6 @@ def learning_units_activity(request):
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def learning_units_service_course(request):
     return _learning_units_search(request, SERVICE_COURSES_SEARCH)
-
-
-@login_required
-def learning_unit_summary(request, learning_unit_year_id):
-    if not is_summary_submission_opened():
-        return redirect(reverse_lazy('outside_summary_submission_period'))
-
-    learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
-    if not can_access_summary(request.user, learning_unit_year):
-        raise PermissionDenied("User is not summary responsible")
-
-    user_language = mdl.person.get_user_interface_language(request.user)
-    return layout.render(request, "my_osis/educational_information.html", {
-        'learning_unit_year': learning_unit_year,
-        'cms_labels_translated': get_cms_label_data(CMS_LABEL_SUMMARY, user_language),
-        'form_french': initialize_learning_unit_pedagogy_form(learning_unit_year, settings.LANGUAGE_CODE_FR),
-        'form_english': initialize_learning_unit_pedagogy_form(learning_unit_year, settings.LANGUAGE_CODE_EN)
-    })
-
-
-@login_required
-@require_http_methods(["GET", "POST"])
-def summary_edit(request, learning_unit_year_id):
-    if not is_summary_submission_opened():
-        return redirect(reverse_lazy("outside_summary_submission_period"))
-
-    learning_unit_year = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
-    if not can_access_summary(request.user, learning_unit_year):
-        raise PermissionDenied("User is not summary responsible")
-
-    if request.method == 'POST':
-        form = LearningUnitPedagogyEditForm(request.POST)
-        if form.is_valid():
-            form.save()
-        return redirect("learning_unit_summary", learning_unit_year_id=learning_unit_year_id)
-    label_name = request.GET.get('label')
-    lang = request.GET.get('language')
-    text_lb = text_label.find_root_by_name(label_name)
-    form = LearningUnitPedagogyEditForm(**{'learning_unit_year': learning_unit_year, 'language': lang,
-                                           'text_label': text_lb})
-    form.load_initial()
-    user_language = mdl.person.get_user_interface_language(request.user)
-    text_label_translated = next((txt for txt in text_lb.translated_text_labels if txt.language == user_language), None)
-    return layout.render(request, "my_osis/educational_information_edit.html", {
-        "learning_unit_year": learning_unit_year,
-        "form": form,
-        "language_translated": find_language_in_settings(lang),
-        "text_label_translated": text_label_translated
-    })
 
 
 @login_required

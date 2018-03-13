@@ -1,4 +1,3 @@
-{% extends "layout.html" %}
 {% load staticfiles %}
 {% load i18n %}
 {% comment "License" %}
@@ -25,21 +24,10 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block breadcrumb %}
-<li><a href="{% url 'my_osis' %}" id="lnk_my_osis">{% trans 'my_osis' %}</a></li>
-    <li ><a href="{% url 'profile' %}" id="lnk_profile">{% trans 'profile' %}</a></li>
-    <li class="active">{% trans 'educational_information' %}</li>
-{% endblock %}
-
-{% block content %}
-    <div class="panel panel-default">
-        <div class="panel-body">
-        {% url 'learning_unit_summary_edit' learning_unit_year_id=learning_unit_year.id as post_url%}
-        {% include "learning_unit/blocks/panel_educational_informations.html" with can_edit_information=True %}
-        </div>
+<div class="row">
+    <div class="col-md-8 col-md-offset-1">
+        <h2>{{ learning_unit_year.acronym|default_if_none:'' }} &mdash; {{ learning_unit_year.academic_year|default_if_none:'' }}</h2>
+        <h4 style="margin-top: 0;">{{ learning_unit_year.common_title|default_if_none:'' }}</h4>
+        <h4 style="margin-top: 0;">{{ learning_unit_year.specific_title|default_if_none:'' }}</h4>
     </div>
-    <div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
-{% endblock %}
-{% block script %}
-    <script src="{% static 'js/pedagogy_modal.js' %}"></script>
-{% endblock %}
+</div>

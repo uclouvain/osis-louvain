@@ -36,7 +36,6 @@ from base.forms.bootstrap import BootstrapForm
 from base.forms.utils.choice_field import add_blank
 from base.models.campus import find_main_campuses
 from base.models.entity_version import find_main_entities_version
-from base.models.enums import entity_container_year_link_type
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES, INTERNSHIP
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY
 from base.models.enums.learning_unit_management_sites import LearningUnitManagementSite
@@ -136,11 +135,21 @@ class LearningUnitYearForm(BootstrapForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        self._check_if_acronym_already_exists(cleaned_data)
+
         if 'internship_subtype' in self.fields \
                 and cleaned_data.get("container_type") == INTERNSHIP \
                 and not (cleaned_data['internship_subtype']):
             self.add_error('internship_subtype', _('field_is_required'))
         return cleaned_data
+
+    def _check_if_acronym_already_exists(self, cleaned_data):
+        if 'acronym' in cleaned_data and 'academic_year' in cleaned_data and cleaned_data['academic_year']:
+            acronym = cleaned_data['acronym']
+            academic_year = cleaned_data['academic_year']
+            learning_unit_years_list = self._get_existing_acronym_list(academic_year, acronym)
+            if acronym in learning_unit_years_list:
+                self.add_error('acronym', _('already_existing_acronym'))
 
     def clean_acronym(self, regex=LEARNING_UNIT_ACRONYM_REGEX_ALL):
         acronym = _merge_first_letter_and_acronym(self.cleaned_data.get('first_letter', ""),
@@ -148,6 +157,18 @@ class LearningUnitYearForm(BootstrapForm):
         if not re.match(regex, acronym):
             self.add_error('acronym', _('invalid_acronym'))
         return acronym
+
+    def __init__(self, *args, **kwargs):
+        self.learning_unit = kwargs.pop('learning_unit', None)
+        super(LearningUnitYearForm, self).__init__(*args, **kwargs)
+
+    def _get_existing_acronym_list(self, academic_year, acronym):
+        if self.learning_unit:
+            learning_unit_years = mdl.learning_unit_year.find_gte_year_acronym(academic_year, acronym) \
+                .exclude(learning_unit=self.learning_unit)
+        else:
+            learning_unit_years = mdl.learning_unit_year.find_gte_year_acronym(academic_year, acronym)
+        return [learning_unit_year.acronym for learning_unit_year in learning_unit_years]
 
 
 class CreateLearningUnitYearForm(LearningUnitYearForm):
@@ -159,17 +180,6 @@ class CreateLearningUnitYearForm(LearningUnitYearForm):
         if person.user.groups.filter(name='faculty_managers').exists():
             self.fields["container_type"].choices = _create_faculty_learning_container_type_list()
             self.fields.pop('internship_subtype')
-
-    def clean(self):
-        cleaned_data = super().clean()
-        if 'acronym' in cleaned_data and 'academic_year' in cleaned_data:
-            acronym = cleaned_data['acronym']
-            academic_year = cleaned_data['academic_year']
-            learning_unit_years = mdl.learning_unit_year.find_gte_year_acronym(academic_year, acronym)
-            learning_unit_years_list = [learning_unit_year.acronym for learning_unit_year in learning_unit_years]
-            if acronym in learning_unit_years_list:
-                self.add_error('acronym', _('existing_acronym'))
-        return cleaned_data
 
     def clean_academic_year(self):
         academic_year = self.cleaned_data['academic_year']

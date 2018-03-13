@@ -29,7 +29,7 @@ from django.db.models import BLANK_CHOICE_DASH
 from django.shortcuts import redirect, get_object_or_404
 
 from base import models as mdl_base
-from base.business.learning_units.proposal.creation import create_learning_unit_proposal
+from base.business.learning_units.proposal import edition
 from base.business.learning_units.simple.creation import create_learning_unit_year_structure, create_learning_unit
 from base.forms.learning_unit.proposal.creation import LearningUnitProposalCreationForm, LearningUnitProposalForm
 from base.models.enums import learning_unit_year_subtypes
@@ -67,9 +67,12 @@ def proposal_learning_unit_add(request):
         new_learning_unit_year = create_learning_unit_year_structure(data_learning_unit, new_learning_container,
                                                                      new_learning_unit, academic_year)
         data_proposal = proposal_form.cleaned_data
-        create_learning_unit_proposal(person, data_proposal['folder_entity'].entity, data_proposal['folder_id'],
-                                      new_learning_unit_year, ProposalState.FACULTY.name,
-                                      ProposalType.CREATION.name, {})
+        creation.create_learning_unit_proposal({'person': person,
+                                                'folder_entity': data_proposal['folder_entity'].entity,
+                                                'folder_id': data_proposal['folder_id'],
+                                                'learning_unit_year': new_learning_unit_year,
+                                                'state_proposal': ProposalState.FACULTY.name,
+                                                'type_proposal': ProposalType.CREATION.name})
         show_success_learning_unit_year_creation_message(request, new_learning_unit_year,
                                                          'proposal_learning_unit_successfuly_created')
         return redirect('learning_units')

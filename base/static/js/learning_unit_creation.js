@@ -140,7 +140,7 @@ $(document).ready(function() {
 
     showInternshipSubtype();
     document.getElementById('id_additional_requirement_entity_1').disabled = !isLearningUnitSubtypeFull() || isValueEmpty('id_requirement_entity') || isDisabledField('id_requirement_entity');
-    document.getElementById('id_additional_requirement_entity_2').disabled = !isLearningUnitSubtypeFull() || isValueEmpty('id_additional_requirement_entity_1');
+    document.getElementById('id_additional_requirement_entity_2').disabled = !isLearningUnitSubtypeFull() || isValueEmpty('id_additional_requirement_entity_1') || isDisabledField('id_additional_requirement_entity_1');
 
     $('#id_acronym').change(validate_acronym);
     $('#id_academic_year').change(validate_acronym);

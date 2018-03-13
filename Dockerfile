@@ -7,4 +7,4 @@ ADD . /code/
 WORKDIR /code
 RUN cp .env.docker .env
 RUN pip install -r requirements.txt
-RUN pip install -r requirements-dev.txt
+RUN pip install -r dev-requirements.txt

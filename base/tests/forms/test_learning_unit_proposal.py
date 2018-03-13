@@ -99,6 +99,7 @@ class TestSave(TestCase):
             "allocation_entity": self.entity_version.id,
             "folder_entity": self.entity_version.id,
             "folder_id": "1",
+            "state": proposal_state.ProposalState.CENTRAL.name
         }
 
     def test_invalid_form(self):

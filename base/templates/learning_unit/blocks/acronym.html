@@ -11,14 +11,10 @@
         {{ form.first_letter }}
         <span class="error">{{ form.first_letter.errors }}</span>
     </div>
-
     <div class="col-md-9" style="padding:0;">
         {{ form.acronym }}
         <span class='error' id="{{ form.acronym.name }}_message" for='{{ form.acronym.name }}' generated="true">
         {{ form.acronym.errors }}
         </span>
-        {% if form.acronym.errors %}
-        <label class='error' for='{{ form.acronym.name }}' generated="true">{{ form.acronym.errors|join:". " }}</label>
-        {% endif %}
     </div>
 </div>

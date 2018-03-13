@@ -198,7 +198,7 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         list_of_expected_learning_unit_years_full = []
         list_of_expected_learning_unit_years_partim = []
         for learning_unit_year_expected in list_of_learning_unit_years_annual:
-            if learning_unit_year_expected.subtype == learning_unit_year_subtypes.PARTIM:
+            if learning_unit_year_expected.is_partim():
                 list_of_expected_learning_unit_years_partim.append(learning_unit_year_expected.academic_year.year)
             else:
                 list_of_expected_learning_unit_years_full.append(learning_unit_year_expected.academic_year.year)
@@ -371,7 +371,7 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         list_of_expected_learning_unit_years_full = []
         list_of_expected_learning_unit_years_partim = []
         for learning_unit_year_expected in list_of_learning_unit_years_annual:
-            if learning_unit_year_expected.subtype == learning_unit_year_subtypes.PARTIM:
+            if learning_unit_year_expected.is_partim():
                 list_of_expected_learning_unit_years_partim.append(learning_unit_year_expected.academic_year.year)
             else:
                 list_of_expected_learning_unit_years_full.append(learning_unit_year_expected.academic_year.year)
