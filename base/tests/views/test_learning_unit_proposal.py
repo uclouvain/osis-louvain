@@ -64,7 +64,7 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_folder import ProposalFolderFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from base.views.learning_unit_proposal import edit_learning_unit_proposal, delete_proposal_creation, _cancel_creation_proposal
+from base.views.learning_unit_proposal import edit_learning_unit_proposal, _cancel_creation_proposal
 from base.views.learning_units.search import PROPOSAL_SEARCH, learning_units_proposal_search
 from reference.tests.factories.language import LanguageFactory
 from base.tests.factories.user import UserFactory
@@ -391,7 +391,6 @@ class TestLearningUnitProposalSearch(TestCase):
 
         self.proposals = [_create_proposal_learning_unit() for _ in range(3)]
 
-
     def test_learning_units_proposal_search(self):
         url = reverse(learning_units_proposal_search)
         response = self.client.get(url, data={'acronym': self.proposals[0].learning_unit_year.acronym})
@@ -420,7 +419,7 @@ class TestLearningUnitProposalSearch(TestCase):
             'form-0-state': ['SUSPENDED'],
             'form-1-state': ['SUSPENDED'],
             'form-2-state': ['SUSPENDED']
-         }
+        }
         request = request_factory.post(url, data=data)
 
         request.user = self.person.user
@@ -460,7 +459,7 @@ class TestLearningUnitProposalSearch(TestCase):
             'form-0-state': ['NOT_VALID'],
             'form-1-state': ['SUSPENDED'],
             'form-2-state': ['SUSPENDED']
-         }
+        }
         request = request_factory.post(url, data=data)
 
         request.user = self.person.user
@@ -498,7 +497,7 @@ class TestLearningUnitProposalSearch(TestCase):
             'form-0-state': ['SUSPENDED'],
             'form-1-state': ['SUSPENDED'],
             'form-2-state': ['SUSPENDED']
-         }
+        }
         request = request_factory.post(url, data=data)
         request.user = self.person.user
         setattr(request, 'session', 'session')
@@ -637,6 +636,20 @@ class TestLearningUnitProposalCancellation(TestCase):
 
         folder.refresh_from_db()
         self.assertTrue(folder)
+
+    def test_delete_proposal_creation_get_no_permission(self):
+        self.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+
+        self.learning_unit_proposal.type = proposal_type.ProposalType.CREATION.name
+        self.learning_unit_proposal.save()
+
+        self.learning_unit_year.learning_container_year.container_type = learning_container_year_types.COURSE
+        self.learning_unit_year.subtype = learning_unit_year_subtypes.FULL
+        self.learning_unit_year.save()
+        self.learning_unit_year.learning_container_year.save()
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
 
 def _test_attributes_equal(obj, attribute_values_dict):
@@ -1072,6 +1085,7 @@ class TestLearningUnitProposalDisplay(TestCase):
             .allocation_entity_container_year.entity
         return entity_version.get_last_version(other_entity)
 
+
 class TestCreationProposalCancel(TestCase):
 
     def setUp(self):
@@ -1089,7 +1103,7 @@ class TestCreationProposalCancel(TestCase):
 
         self.a_person_fac.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
 
-        an_organization = OrganizationFactory(type=organization_type.MAIN)
+        OrganizationFactory(type=organization_type.MAIN)
         self.current_academic_year = create_current_academic_year()
         self.learning_container_year = LearningContainerYearFactory(
             academic_year=self.current_academic_year,
@@ -1100,7 +1114,6 @@ class TestCreationProposalCancel(TestCase):
 
     @mock.patch('base.views.layout.render')
     def test_cancel_creation_proposal(self, mock_render):
-        print('test_cancel_creation_proposal')
         luy = LearningUnitYearFakerFactory(acronym="LOSIS1212",
                                            academic_year=self.current_academic_year,
                                            learning_container_year=self.learning_container_year)

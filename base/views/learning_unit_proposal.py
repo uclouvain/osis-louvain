@@ -49,6 +49,7 @@ from base.views.learning_units import perms
 from base.models.enums import proposal_type
 from base.views.learning_unit_deletion import can_delete_learning_unit_year, delete_learning_unit_years
 from base.business.learning_unit_deletion import check_other_than_proposal
+from django.http import HttpResponseForbidden
 
 
 @login_required

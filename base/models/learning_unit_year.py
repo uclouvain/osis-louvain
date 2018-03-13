@@ -40,7 +40,7 @@ from base.models.group_element_year import GroupElementYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from osis_common.models.auditable_serializable_model import AuditableSerializableModel, AuditableSerializableModelAdmin
 from django.utils.functional import cached_property
-from base.models.entity import Entity
+
 
 AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
@@ -187,8 +187,11 @@ class LearningUnitYear(AuditableSerializableModel):
         return result
 
     def get_entity(self, entity_type):
-        return Entity.objects.filter(entitycontaineryear__type=entity_type,
-                                     entitycontaineryear__learning_container_year=self.learning_container_year).first()
+        entity_container_yr = entity_container_year.search(
+            link_type=entity_type,
+            learning_container_year=self.learning_container_year
+        ).first()
+        return entity_container_yr.entity if entity_container_yr else None
 
 
 def get_by_id(learning_unit_year_id):
