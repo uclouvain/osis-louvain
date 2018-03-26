@@ -36,6 +36,7 @@ from base.models.entity_version import find_main_entities_version, get_last_vers
 from base.models.enums import learning_container_year_types
 from base.models.enums import proposal_state, proposal_type
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
+from base.models.enums.proposal_type import ProposalType
 from base.models.proposal_learning_unit import ProposalLearningUnit
 
 
@@ -116,8 +117,7 @@ class LearningUnitProposalModificationForm(LearningUnitYearForm):
                 'type_proposal': type_proposal, 'folder_entity': self.cleaned_data["entity"],
                 'folder_id': self.cleaned_data['folder_id']}
         if self.proposal:
-            if self.proposal.type in \
-                    (proposal_type.ProposalType.CREATION.value, proposal_type.ProposalType.SUPPRESSION.value):
+            if self.proposal.type in (ProposalType.CREATION.value, ProposalType.SUPPRESSION.value):
                 data["type_proposal"] = self.proposal.type
             edition.update_learning_unit_proposal(data, self.proposal)
         else:

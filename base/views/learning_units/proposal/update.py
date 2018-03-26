@@ -68,7 +68,9 @@ def learning_unit_modification_proposal(request, learning_unit_year_id):
 
     if form.is_valid():
         type_proposal = business_proposal.compute_proposal_type(initial_data, request.POST)
-        form.save(learning_unit_year, user_person, type_proposal, compute_proposal_state(user_person))
+        with transaction.atomic():
+            form.save(learning_unit_year, user_person, type_proposal, compute_proposal_state(user_person))
+            save_proposal_type(learning_unit_year.proposallearningunit, request)
 
         display_success_messages(request, _("success_modification_proposal").format(
             _(type_proposal), learning_unit_year.acronym))
@@ -76,10 +78,7 @@ def learning_unit_modification_proposal(request, learning_unit_year_id):
         return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
 
     return layout.render(request, 'learning_unit/proposal/create_modification_proposal.html', {
-        'learning_unit_year': learning_unit_year,
-        'person': user_person,
-        'form': form,
-        'experimental_phase': True})
+        'learning_unit_year': learning_unit_year, 'person': user_person, 'form': form, 'experimental_phase': True})
 
 
 @login_required

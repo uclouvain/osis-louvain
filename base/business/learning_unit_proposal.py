@@ -202,8 +202,7 @@ def _compare_model_with_initial_value(an_id, model_initial_data, mymodel):
     differences = {}
     qs = mymodel.objects.filter(pk=an_id).values()
     if len(qs) > 0:
-        differences.update(_check_differences(model_initial_data,
-                                              _get_rid_of_blank_value(qs[0])))
+        differences.update(_check_differences(model_initial_data, _get_rid_of_blank_value(qs[0])))
     return differences
 
 
