@@ -82,7 +82,6 @@ class LearningUnitProposalModificationForm(LearningUnitYearForm):
     entity = EntitiesVersionChoiceField(queryset=find_main_entities_version())
     folder_id = forms.IntegerField(min_value=0)
     state = forms.ChoiceField(choices=proposal_state.CHOICES, required=False, disabled=True)
-    type = forms.ChoiceField(choices=proposal_type.CHOICES, required=False, disabled=True)
 
     def __init__(self, data, person, *args, instance=None, **kwargs):
         super().__init__(data, *args, **kwargs)
