@@ -1,0 +1,119 @@
+= Open Student Information System : Gestion du renouvellement des mandats d'assistant
+Laurent Buset <laurent.buset@uclouvain.be>
+v0.1.0, 2018-03-28
+:doctype: book
+:encoding: utf-8
+:toc: left
+:toclevels: 4
+:numbered:
+:icons: font
+:lang: fr
+
+:sectnums!:
+
+== Introduction
+
+L'objectif de ce document est de décrire le fonctionnement de l'application développée dans le but de simplifier
+la gestion du renouvellement des mandats d'assistant.
+
+Le document est organisé en deux parties:
+
+1. la description de la procédure et la manière dont elle est couverte par l'application.
+
+2. la description technique de l'architecture logicielle, destinée aux developeurs qui prendrons en charge la maintenance
+technique de l'application.
+
+
+=== Le contexte
+
+Chaque année a lieu la procédure de renouvellement des mandats d'assistant. Chaque assistant, dont le mandat arrive
+à son terme, est invité à compléter son dossier de demande de renouvellement. Cette demande peut aussi être déclinée.
+
+Le dossier est divisé en cinq parties :
+
+1. Données administratives.
+
+2. L'enseignement.
+
+3. Le doctorat.
+
+4. La recherche.
+
+5. Les activités.
+
+IMPORTANT: Les parties liées au doctorat et à la recherche ne doivent pas être complétées par les assistants
+d'enseignement. Lorsque le dossier est complété et validé par l'assistant·e, les évaluateurs sont amenés à rédiger une évaluation.
+
+=== Les acteurs
+
+Les acteurs impliqué dans la gestion du renouvellement des mandats d'assistant sont:
+
+* **Le Service du Personnel** : les personnes qui gèrent la procédure d'un point de vue administratif et qui connaissent
+le mieux son fonctionnement.
+* **Les assistants** : ils sont amenés à constituer leur dossier qui servira de base aux évaluateurs.
+* **Les évaluateurs** : les personnes amenées à faire des évaluations liées aux dossiers des assistants.
+
+.Évaluateurs : niveau de supervision, délégation et droits
+[cols="<,<,^,^", options="header"]
+|===
+|Rôle|Niveau|Peut déléguer|Peut valider un avis
+|Superviseur de thèse|Thèse|Non|Oui
+|Président d'institut|Recherche|Oui|Oui
+|Délégué de président d'institut|Recherche|Non|Oui
+|Doyen de faculté|Enseignement|Oui|Oui
+|Délégué de doyen de faculté|Enseignement|Non|Non
+|DAF|Enseignement|Oui|Non
+|Délégué de DAF|Enseignement|Non|Non
+|Vice-recteur de secteur|Secteur|Oui|Non
+|DAS/CAS|Secteur|Oui|Non
+|===
+
+Les acteurs sont classés en trois rôles bien distincts:
+
+* **Assistant** : l'accès est limité à son dossier et aux évaluations durant une période limitée.
+* **Évaluateur** : l'accès est limité au dossier de l'assistant (en lecture) et aux évaluations.
+* **Administrateur** : l'accès à l'application est total.
+
+=== Le workflow
+La séquence du workflow est la suivante :
+
+[ditaa]
+----
+       +---------=------------------------------------------------------------+
+       |                                                                      |
+       |                                                                      V
+       |1                                            +-----------------------------------------------+
+3 +----+------+    +----------------------------+    |3.Recherche -> Président d'institut            |
++-+1.Assistant+--->|2.Thèse ->Promoteur de thèse+--->|               Délégué de président d’institut |
+| +----+------+    +----------------------------+    +------------------------+----------------------+
+|      |2                                                                     |
+|      :   +------------------------------------------------------------------+
+:      |   |
+|      V   V
+| +---------------------------------------------+
+| |4.Enseignement -> Doyen de faculté           |    +------------------------------------+
+| |                  Délégué de doyen de faculté|    |5.Secteur -> Vice recteur de secteur|    +-----+
+| |                  DAF                        +--->|             DAS/CAS                +--->|6.Fin|
+| |                  Délégué de DAF             |    +------------------------------------+    +-----+
+| +---------------------------------------------+                                                 ^
+|                                                                                                 |
++-------------------------------------------------------------------------------------------------+
+----
+[NOTE]
+====
+ * *La relation 1* illustre le cas d'un assistant qui n'a pas de promoteur de thèse.
+ * *La relation 2* montre le cas d'un assistant d'enseignement.
+ * *La relation 3* décrit le cas d'un assistant qui décline sa demande de renouvellement.
+====
+
+NOTE: Pour chaque mandat d'assistant, il y a *un seul avis* par niveau de supervision.
+
+IMPORTANT: une assistant qui complète une demande pour un renouvellement *exceptionnel* dois encoder la justification
+à cette demande.
+
+Le service du personnel supervise la procédure.
+
+include::features_fr.adoc[]
+
+
+
