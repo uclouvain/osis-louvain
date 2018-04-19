@@ -40,12 +40,20 @@
                     {{ achievement.code_name }}
                 </div>
                 <div id="collapsable_{{ forloop.counter0 }}" class="collapse in">
-                    <div class="col-md-5">{{ achievement.text|safe }}</div>
-                    <div class="col-md-6">
-                        {% if achievements_EN.forloop.counter0 %}
-                            {{ achievements_EN.forloop.counter0.text|safe }}
+                    <div class="col-md-4">{{ achievement.text|safe }}</div>
+                    <div class="col-md-5">
+                    {% for achievement_EN in achievements_EN %}
+                        {% if forloop.counter == forloop.parentloop.counter %}
+                            {{ achievement_EN.text|safe }}
                         {% endif %}
+                    {% endfor  %}
                     </div>
+                </div>
+                <div class="col-md-1 pull-right">
+                    <a href="{% url 'delete_lu_achievement' achievement.id %}"
+                       title="{% trans 'delete' %}">
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                    </a>
                 </div>
             </div>
         {% endfor %}

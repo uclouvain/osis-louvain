@@ -59,3 +59,14 @@ def find_by_learning_unit_year(learning_unit_yr):
     return LearningAchievements.objects.filter(learning_unit_year=learning_unit_yr)\
                                        .select_related('language')\
                                        .order_by('order', 'language__code')
+
+
+def search(learning_unit_yr=None, a_language_code=None, position=None):
+    queryset = LearningAchievements.objects
+    if learning_unit_yr:
+        queryset = queryset.filter(learning_unit_year=learning_unit_yr)
+    if a_language_code:
+        queryset = queryset.filter(language__code=a_language_code)
+    if position:
+        queryset = queryset.filter(order=position)
+    return queryset.select_related('language').order_by('order', 'language__code')

@@ -36,6 +36,7 @@ from base.tests.factories.learning_achievements import LearningAchievementsFacto
 A_CODE_NAME = 'AA 1'
 A2_CODE_NAME = 'AA 2'
 
+
 class LearningAchievementsTest(TestCase):
 
     def setUp(self):
