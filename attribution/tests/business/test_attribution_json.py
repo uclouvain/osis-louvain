@@ -155,7 +155,7 @@ def _create_learning_unit_year_with_components(academic_year, l_container, acron
 
     # Create component - CM - TP
     l_component_cm = LearningComponentYearFactory(learning_container_year=l_container,
-                                 type=learning_component_year_type.LECTURING, acronym="CM")
+                                 type=learning_component_year_type.LECTURING, acronym="PM")
     l_component_tp = LearningComponentYearFactory(learning_container_year=l_container,
                                  type=learning_component_year_type.PRACTICAL_EXERCISES, acronym="TP")
 
