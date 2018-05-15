@@ -30,6 +30,7 @@ from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm
+from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.utils.acronym_field import PartimAcronymField, AcronymField
 from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import learning_container_year_types
@@ -57,14 +58,6 @@ class TestLearningUnitYearModelFormInit(TestCase):
         self.central_manager.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
         self.faculty_manager = PersonFactory()
         self.faculty_manager.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
-
-    def test_internship_subtype_removed_when_user_is_faculty_manager(self):
-
-        self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=FULL)
-        self.assertIsInstance(self.form.fields.get('internship_subtype'), forms.TypedChoiceField)
-
-        self.form = LearningUnitYearModelForm(data=None, person=self.faculty_manager, subtype=FULL)
-        self.assertIsNone(self.form.fields.get('internship_subtype'))
 
     def test_acronym_field_case_partim(self):
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=PARTIM)
