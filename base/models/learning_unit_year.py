@@ -238,14 +238,7 @@ class LearningUnitYear(SerializableModel):
             learning_unit_years = learning_unit_years.exclude(learning_unit=self.learning_unit)
 
         self.clean_acronym(learning_unit_years)
-        self.clean_internship_subtype()
         self.clean_status()
-
-    def clean_internship_subtype(self):
-        if getattr(self, 'learning_container_year', None):
-            if (self.learning_container_year.container_type == learning_container_year_types.INTERNSHIP and
-                    not self.internship_subtype):
-                raise ValidationError({'internship_subtype': _('field_is_required')})
 
     def clean_acronym(self, learning_unit_years):
         if self.acronym in learning_unit_years.values_list('acronym', flat=True):

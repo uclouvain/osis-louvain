@@ -230,6 +230,9 @@ class FullForm(LearningUnitBaseForm):
         if self._is_update_action():
             self._disable_fields()
 
+        if not self.instance:
+            self.fields['internship_subtype'].disabled = True
+
     def _disable_fields(self):
         if self.person.is_faculty_manager():
             self._disable_fields_as_faculty_manager()

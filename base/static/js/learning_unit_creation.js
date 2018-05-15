@@ -37,8 +37,6 @@ function showInternshipSubtype(){
             $('#id_internship_subtype')[0].selectedIndex = 0;
             $('#lbl_internship_subtype_error').empty(); // Remove error message if exist
             labelElem.text(labelElem.text().replace('*','')) // Remove asterix in order to indicate field not required
-        } else {
-             labelElem.append('*'); // Add asterix in order to indicate field required
         }
     }
 }
@@ -144,7 +142,6 @@ $(document).ready(function() {
         max: trans_field_max
     });
 
-    showInternshipSubtype();
     document.getElementById('id_additional_requirement_entity_1').disabled = !isLearningUnitSubtypeFull()
         || isValueEmpty('id_requirement_entity')
         || isDisabledField('id_requirement_entity');

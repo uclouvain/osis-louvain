@@ -104,9 +104,6 @@ class LearningUnitYearModelForm(forms.ModelForm):
     def __init__(self, data, person, subtype, *args, **kwargs):
         super().__init__(data, *args, **kwargs)
 
-        if person.is_faculty_manager():
-            self.fields.pop('internship_subtype')
-
         self.instance.subtype = subtype
 
         acronym = self.initial.get('acronym')
