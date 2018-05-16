@@ -53,16 +53,13 @@ FACULTY_OPEN_FIELDS = {'quadrimester', 'session', 'team', "faculty_remark", "oth
 
 
 class LearningUnitBaseForm(metaclass=ABCMeta):
-
-    form_classes = [
+    form_cls_to_validate = [
         LearningUnitModelForm,
         LearningUnitYearModelForm,
         LearningContainerModelForm,
         LearningContainerYearModelForm,
         EntityContainerBaseForm
     ]
-
-    form_cls_to_validate = form_classes
 
     forms = OrderedDict()
     data = {}
