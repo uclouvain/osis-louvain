@@ -56,9 +56,9 @@ DEFAULT_ACRONYM_COMPONENT = {
 }
 
 
-def _get_default_components_type(component_type):
+def _get_default_components_type(container_type):
     """This function will return the default components type to create/update according to container type"""
-    if component_type in CONTAINER_TYPE_WITH_DEFAULT_COMPONENT:
+    if container_type in CONTAINER_TYPE_WITH_DEFAULT_COMPONENT:
         return [LECTURING, PRACTICAL_EXERCISES]
     return [None]
 
@@ -80,7 +80,7 @@ class LearningUnitModelForm(forms.ModelForm):
 
     def save(self, **kwargs):
         self.instance.learning_container = kwargs.pop('learning_container')
-        self.instance.start_year = kwargs.pop('academic_year').year
+        self.instance.start_year = kwargs.pop('start_year')
         return super(LearningUnitModelForm, self).save(**kwargs)
 
     class Meta:
@@ -92,6 +92,7 @@ class LearningUnitModelForm(forms.ModelForm):
         }
 
 
+# TODO Is it really useful ?
 class LearningContainerModelForm(forms.ModelForm):
     class Meta:
         model = LearningContainer
@@ -129,6 +130,7 @@ class LearningUnitYearModelForm(forms.ModelForm):
     # TODO :: Make these kwarg to args (learning_container_year, learning_unit, ... are required args)
     def save(self, **kwargs):
         self.instance.learning_container_year = kwargs.pop('learning_container_year')
+        self.instance.academic_year = self.instance.learning_container_year.academic_year
         self.instance.learning_unit = kwargs.pop('learning_unit')
         entity_container_years = kwargs.pop('entity_container_years')
         instance = super().save(**kwargs)
@@ -146,14 +148,13 @@ class LearningUnitYearModelForm(forms.ModelForm):
                     'learning_container_year': learning_unit_year.learning_container_year
                 }
             )
-            self._save_learning_unit_component(component, component_type, learning_unit_year)
+            self._save_learning_unit_component(component, learning_unit_year)
             self._save_entity_components_year(component, entity_container_years)
 
     @staticmethod
-    def _save_learning_unit_component(component, component_type, learning_unit_year):
+    def _save_learning_unit_component(component, learning_unit_year):
         return LearningUnitComponent.objects.get_or_create(learning_unit_year=learning_unit_year,
-                                                           learning_component_year=component,
-                                                           type=component_type)
+                                                           learning_component_year=component)
 
     @staticmethod
     def _save_entity_components_year(component, entity_container_years):
@@ -290,9 +291,9 @@ class EntityContainerBaseForm:
 
     def __init__(self, data=None, person=None, learning_container_year=None):
         self.forms = []
-        self.learning_container_year = learning_container_year
+        self.instance = learning_container_year
         for form in self.form_classes:
-            qs = EntityContainerYear.objects.filter(learning_container_year=learning_container_year,
+            qs = EntityContainerYear.objects.filter(learning_container_year=self.instance,
                                                     type=form.entity_type)
 
             instance = qs.get() if qs.exists() else None
@@ -304,7 +305,7 @@ class EntityContainerBaseForm:
 
     @property
     def errors(self):
-        return [form.errors for form in self.forms if form.errors]
+        return {form.prefix: form.errors for form in self.forms if form.errors}
 
     def get_clean_data_entity(self, key):
         try:

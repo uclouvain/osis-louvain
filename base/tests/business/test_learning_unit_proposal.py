@@ -52,7 +52,7 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory, LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
@@ -157,37 +157,37 @@ class TestLearningUnitProposalCancel(TestCase):
 
 class TestComputeProposalType(TestCase):
     def test_return_creation_type_when_creation_is_initial_proposal_type(self):
-        proposal = ProposalLearningUnitFactory(type=ProposalType.CREATION.name )
-        actual_proposal_type = compute_proposal_type(proposal)
+        proposal = ProposalLearningUnitFactory(type=ProposalType.CREATION.name)
+        actual_proposal_type = compute_proposal_type(proposal, proposal.learning_unit_year)
         self.assertEqual(proposal_type.ProposalType.CREATION.name, actual_proposal_type)
 
     def test_return_suppression_type_when_suppresion_is_initial_proposal_type(self):
         proposal = ProposalLearningUnitFactory(type=ProposalType.SUPPRESSION.name )
-        actual_proposal_type = compute_proposal_type(proposal)
+        actual_proposal_type = compute_proposal_type(proposal, proposal.learning_unit_year)
         self.assertEqual(proposal_type.ProposalType.SUPPRESSION.name, actual_proposal_type)
 
     def test_return_transformation_when_data_changed_consist_of_first_letter(self):
         proposal = ProposalLearningUnitFactory(type=ProposalType.MODIFICATION.name, initial_data={
-            'learning_unit_year':{'acronym': 'bibi'}} )
+            'learning_unit_year':{'acronym': 'bibi'}})
 
-        actual_proposal_type = compute_proposal_type(proposal)
+        actual_proposal_type = compute_proposal_type(proposal, proposal.learning_unit_year)
         self.assertEqual(proposal_type.ProposalType.TRANSFORMATION.name, actual_proposal_type)
 
     def test_return_modification_when_data_changed_consist_of_other_fields_than_first_letter_or_acronym(self):
         proposal = ProposalLearningUnitFactory(type=ProposalType.MODIFICATION.name, initial_data={
-            'learning_container_year':{'common_title': 'bibi'}} )
-        actual_proposal_type = compute_proposal_type(proposal)
+            'learning_container_year':{'common_title': 'bibi'}})
+        actual_proposal_type = compute_proposal_type(proposal, proposal.learning_unit_year)
         self.assertEqual(proposal_type.ProposalType.MODIFICATION.name, actual_proposal_type)
 
     def test_return_modification_when_no_data_changed(self):
-        proposal = ProposalLearningUnitFactory(type=ProposalType.MODIFICATION.name, initial_data={} )
-        actual_proposal_type = compute_proposal_type(proposal)
+        proposal = ProposalLearningUnitFactory(type=ProposalType.MODIFICATION.name, initial_data={})
+        actual_proposal_type = compute_proposal_type(proposal, proposal.learning_unit_year)
         self.assertEqual(proposal_type.ProposalType.MODIFICATION.name, actual_proposal_type)
 
     def test_return_transformation_and_modification_when_modifying_acronym_and_other_field(self):
         proposal = ProposalLearningUnitFactory(type=ProposalType.MODIFICATION.name, initial_data={
-            'learning_unit_year': {'acronym': 'bobo'}, 'learning_container_year':{'common_title': 'bibi'}} )
-        actual_proposal_type = compute_proposal_type(proposal)
+            'learning_unit_year': {'acronym': 'bobo'}, 'learning_container_year': {'common_title': 'bibi'}})
+        actual_proposal_type = compute_proposal_type(proposal, proposal.learning_unit_year)
         self.assertEqual(proposal_type.ProposalType.TRANSFORMATION_AND_MODIFICATION.name, actual_proposal_type)
 
 

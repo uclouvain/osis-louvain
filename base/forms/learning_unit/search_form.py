@@ -23,10 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-from collections import defaultdict
 
 import itertools
+
 from django import forms
 from django.core.exceptions import ValidationError
 from django.db.models import OuterRef, Subquery
@@ -44,7 +43,6 @@ from base.models.entity_container_year import EntityContainerYear
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
 from base.models.enums import entity_container_year_link_type, learning_container_year_types, \
     learning_unit_year_subtypes, active_status, entity_type
-from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import convert_status_bool
 from base.models.offer_year_entity import OfferYearEntity
 

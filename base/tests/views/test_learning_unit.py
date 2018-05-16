@@ -81,7 +81,8 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
-from base.views.learning_unit import learning_unit_components, learning_class_year_edit, learning_unit_specifications
+from base.views.learning_unit import learning_unit_components, learning_class_year_edit, learning_unit_specifications, \
+    create_partim_form
 from base.views.learning_unit import learning_unit_identification
 from base.views.learning_units.search import learning_units
 from base.views.learning_units.search import learning_units_service_course
@@ -133,13 +134,20 @@ class LearningUnitViewCreateFullTestCase(TestCase):
 
     @mock.patch('base.forms.learning_unit.learning_unit_create_2.FullForm.is_valid', side_effect=lambda *args: True)
     @mock.patch('base.forms.learning_unit.learning_unit_create_2.FullForm.save')
-    def test_create_partim_success_with_redirection(self, mock_save, mock_is_valid):
+    @mock.patch('base.forms.learning_unit.learning_unit_postponement.LearningUnitPostponementForm.__init__',
+                side_effect=lambda *args, **kwargs: None)
+    @mock.patch('base.forms.learning_unit.learning_unit_postponement.LearningUnitPostponementForm.is_valid',
+                side_effect=lambda *args: True)
+    @mock.patch('base.forms.learning_unit.learning_unit_postponement.LearningUnitPostponementForm.save')
+    def test_create_full_success_with_redirection(self, mock_postponement_save, mock_postponement_is_valid,
+                                                  mock_postponement_init, mock_full_form_save, mock_full_form_valid):
         a_full_learning_unit_year = LearningUnitYearFactory(
             academic_year=self.current_academic_year,
             learning_container_year__academic_year=self.current_academic_year,
             subtype=learning_unit_year_subtypes.FULL
         )
-        mock_save.return_value = [a_full_learning_unit_year]
+        mock_postponement_save.return_value = [a_full_learning_unit_year]
+        mock_full_form_save.return_value = a_full_learning_unit_year
         response = self.client.post(self.url, data={})
         url_to_redirect = reverse("learning_unit", kwargs={'learning_unit_year_id': a_full_learning_unit_year.id})
         self.assertRedirects(response, url_to_redirect)
@@ -213,7 +221,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
             learning_container_year__academic_year=self.current_academic_year,
             subtype=learning_unit_year_subtypes.FULL
         )
-        self.url = reverse('learning_unit_create_partim', kwargs={'learning_unit_year_id':
+        self.url = reverse(create_partim_form, kwargs={'learning_unit_year_id':
                                                                       self.learning_unit_year_full.id})
         self.user = UserFactory()
         self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
@@ -264,8 +272,14 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
                 side_effect=lambda *args: True)
     @mock.patch('base.forms.learning_unit.learning_unit_create_2.PartimForm.is_valid', side_effect=lambda *args: True)
     @mock.patch('base.forms.learning_unit.learning_unit_create_2.PartimForm.save')
-    def test_create_partim_success_with_redirection(self, mock_save, mock_is_valid,
-                                                    mock_is_pers_linked_to_entity_charge):
+    @mock.patch('base.forms.learning_unit.learning_unit_postponement.LearningUnitPostponementForm.__init__',
+                side_effect=lambda *args, **kwargs: None)
+    @mock.patch('base.forms.learning_unit.learning_unit_postponement.LearningUnitPostponementForm.is_valid',
+                side_effect=lambda *args: True)
+    @mock.patch('base.forms.learning_unit.learning_unit_postponement.LearningUnitPostponementForm.save')
+    def test_create_partim_success_with_redirection(self, mock_postponement_save, mock_postponement_is_valid,
+                                                    mock_postponement_init, mock_partim_form_save,
+                                                    mock_partim_form_is_valid, mock_is_pers_linked_to_entity_charge):
         learning_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year)
         LearningUnitYearFactory(
             academic_year=self.current_academic_year,
@@ -277,7 +291,8 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
             learning_container_year=learning_container_year,
             subtype=learning_unit_year_subtypes.PARTIM
         )
-        mock_save.return_value = [a_partim_learning_unit_year]
+        mock_postponement_save.return_value = [a_partim_learning_unit_year]
+        mock_partim_form_save.return_value = a_partim_learning_unit_year
         response = self.client.post(self.url, data={})
         url_to_redirect = reverse("learning_unit", kwargs={'learning_unit_year_id': a_partim_learning_unit_year.id})
         self.assertRedirects(response, url_to_redirect)
@@ -567,7 +582,8 @@ class LearningUnitViewTestCase(TestCase):
         learning_unit_year.learning_unit.save()
 
         person_entity = PersonEntityFactory(entity=entity_container.entity)
-        person_entity.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+        group, created = Group.objects.get_or_create(name=FACULTY_MANAGER_GROUP)
+        person_entity.person.user.groups.add(group)
         url = reverse("learning_unit", args=[learning_unit_year.id])
         self.client.force_login(person_entity.person.user)
 
@@ -588,7 +604,8 @@ class LearningUnitViewTestCase(TestCase):
         learning_unit_year.learning_unit.save()
 
         person_entity = PersonEntityFactory(entity=entity_container.entity)
-        person_entity.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+        group, created  = Group.objects.get_or_create(name=FACULTY_MANAGER_GROUP)
+        person_entity.person.user.groups.add(group)
         url = reverse("learning_unit", args=[learning_unit_year.id])
         self.client.force_login(person_entity.person.user)
 

@@ -39,7 +39,7 @@ from django.views.decorators.http import require_http_methods
 from attribution.business import attribution_charge_new
 from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
-    get_same_container_year_components, get_components_identification, get_organization_from_learning_unit_year,\
+    get_same_container_year_components, get_components_identification, get_organization_from_learning_unit_year, \
     get_campus_from_learning_unit_year, \
     get_all_attributions, find_language_in_settings, \
     CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language
@@ -48,7 +48,7 @@ from base.business.learning_units import perms as business_perms
 from base.business.learning_units.perms import learning_unit_year_permissions, learning_unit_proposal_permissions, \
     can_update_learning_achievement
 from base.forms.learning_class import LearningClassEditForm
-from base.forms.learning_unit.learning_unit_create_2 import PartimForm, FullForm
+from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
 from base.forms.learning_unit_component import LearningUnitComponentEditForm
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
@@ -281,16 +281,21 @@ def learning_class_year_edit(request, learning_unit_year_id):
 @permission_required('base.can_create_learningunit', raise_exception=True)
 def learning_unit_create(request, academic_year_id):
     person = get_object_or_404(Person, user=request.user)
-    learning_unit_form_container = FullForm(request.POST or None, person,
-                                            default_ac_year=get_object_or_404(AcademicYear, pk=academic_year_id))
+    if request.POST.get('academic_year'):
+        academic_year_id = request.POST.get('academic_year')
 
-    if learning_unit_form_container.is_valid():
-        new_luys = learning_unit_form_container.save()
+    academic_year = get_object_or_404(AcademicYear, pk=academic_year_id)
+    postponement_form = LearningUnitPostponementForm(
+        person=person,
+        start_postponement=academic_year,
+        data=request.POST or None
+    )
+    if postponement_form.is_valid():
+        new_luys = postponement_form.save()
         for luy in new_luys:
             show_success_learning_unit_year_creation_message(request, luy, 'learning_unit_successfuly_created')
         return redirect('learning_unit', learning_unit_year_id=new_luys[0].pk)
-
-    return render(request, "learning_unit/simple/creation.html", learning_unit_form_container.get_context())
+    return render(request, "learning_unit/simple/creation.html", postponement_form.get_context())
 
 
 @login_required
@@ -337,19 +342,20 @@ def outside_period(request):
 def create_partim_form(request, learning_unit_year_id):
     person = get_object_or_404(Person, user=request.user)
     learning_unit_year_full = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
-    learning_unit_form_container = PartimForm(
-        data=request.POST or None,
+
+    postponement_form = LearningUnitPostponementForm(
         person=person,
-        learning_unit_year_full=learning_unit_year_full
+        learning_unit_full_instance=learning_unit_year_full.learning_unit,
+        start_postponement=learning_unit_year_full.academic_year,
+        data=request.POST or None
     )
 
-    if learning_unit_form_container.is_valid():
-        new_luys = learning_unit_form_container.save()
+    if postponement_form.is_valid():
+        new_luys = postponement_form.save()
         for luy in new_luys:
             show_success_learning_unit_year_creation_message(request, luy, 'learning_unit_successfuly_created')
         return redirect('learning_unit', learning_unit_year_id=new_luys[0].pk)
-
-    return render(request, "learning_unit/simple/creation_partim.html", learning_unit_form_container.get_context())
+    return render(request, "learning_unit/simple/creation_partim.html", postponement_form.get_context())
 
 
 def get_learning_unit_identification_context(learning_unit_year_id, person):
@@ -371,7 +377,7 @@ def get_learning_unit_identification_context(learning_unit_year_id, person):
     context['proposal'] = proposal
     context['proposal_folder_entity_version'] = mdl.entity_version.get_by_entity_and_date(
         proposal.entity, None) if proposal else None
-    context['differences'] = get_difference_of_proposal(proposal) \
+    context['differences'] = get_difference_of_proposal(proposal.initial_data, learning_unit_year) \
         if proposal and proposal.learning_unit_year == learning_unit_year \
         else {}
     get_warnings_messages(context, learning_unit_year)

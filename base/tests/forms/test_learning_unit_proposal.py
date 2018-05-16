@@ -37,6 +37,7 @@ from base.models.enums import organization_type, proposal_type, proposal_state, 
     learning_container_year_types, learning_unit_year_quadrimesters, entity_container_year_link_type, \
     learning_unit_periodicity, internship_subtypes, learning_unit_year_subtypes
 from base.models.enums.proposal_state import ProposalState
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.campus import CampusFactory
@@ -70,17 +71,16 @@ class TestSave(TestCase):
                                                                academic_year=current_academic_year,
                                                                learning_container_year=learning_container_year)
 
+        today = datetime.date.today()
         an_entity = EntityFactory(organization=an_organization)
+        self.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL,
+                                                   start_date=today.replace(year=1900),
+                                                   end_date=None)
         self.entity_container_year = EntityContainerYearFactory(
             learning_container_year=self.learning_unit_year.learning_container_year,
             type=entity_container_year_link_type.REQUIREMENT_ENTITY,
-            entity=an_entity
+            entity=self.entity_version.entity
         )
-
-        today = datetime.date.today()
-        self.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL,
-                                                   start_date=today.replace(year=1900),
-                                                   end_date=today.replace(year=today.year + 1))
         PersonEntityFactory(person=self.person, entity=an_entity)
         self.language = LanguageFactory(code="EN")
         self.campus = CampusFactory(name="OSIS Campus", organization=OrganizationFactory(type=organization_type.MAIN),
@@ -134,24 +134,24 @@ class TestSave(TestCase):
         form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
-        self.learning_unit_year.refresh_from_db()
-        self._assert_acronym_has_changed_in_proposal()
-        self._assert_common_titles_stored_in_container()
-        self.assertFalse(self.learning_unit_year.status)
-        self.assertEqual(self.learning_unit_year.credits, Decimal(self.form_data['credits']))
-        self.assertEqual(self.learning_unit_year.quadrimester, self.form_data['quadrimester'])
-        self.assertEqual(self.learning_unit_year.specific_title, self.form_data["specific_title"])
-        self.assertEqual(self.learning_unit_year.specific_title_english, self.form_data["specific_title_english"])
+        learning_unit_year = LearningUnitYear.objects.get(pk=self.learning_unit_year.id)
+        self._assert_acronym_has_changed_in_proposal(learning_unit_year)
+        self._assert_common_titles_stored_in_container(learning_unit_year)
+        self.assertFalse(learning_unit_year.status)
+        self.assertEqual(learning_unit_year.credits, Decimal(self.form_data['credits']))
+        self.assertEqual(learning_unit_year.quadrimester, self.form_data['quadrimester'])
+        self.assertEqual(learning_unit_year.specific_title, self.form_data["specific_title"])
+        self.assertEqual(learning_unit_year.specific_title_english, self.form_data["specific_title_english"])
 
-    def _assert_acronym_has_changed_in_proposal(self):
-        self.assertEqual(self.learning_unit_year.acronym,
+    def _assert_acronym_has_changed_in_proposal(self, learning_unit_year):
+        self.assertEqual(learning_unit_year.acronym,
                          "{}{}".format(self.form_data['acronym_0'], self.form_data['acronym_1']))
 
-    def _assert_common_titles_stored_in_container(self):
-        self.assertNotEqual(self.learning_unit_year.specific_title, self.form_data['common_title'])
-        self.assertNotEqual(self.learning_unit_year.specific_title_english, self.form_data['common_title_english'])
-        self.assertEqual(self.learning_unit_year.learning_container_year.common_title, self.form_data['common_title'])
-        self.assertEqual(self.learning_unit_year.learning_container_year.common_title_english,
+    def _assert_common_titles_stored_in_container(self, learning_unit_year):
+        self.assertNotEqual(learning_unit_year.specific_title, self.form_data['common_title'])
+        self.assertNotEqual(learning_unit_year.specific_title_english, self.form_data['common_title_english'])
+        self.assertEqual(learning_unit_year.learning_container_year.common_title, self.form_data['common_title'])
+        self.assertEqual(learning_unit_year.learning_container_year.common_title_english,
                          self.form_data['common_title_english'])
 
     def test_learning_container_update(self):
@@ -159,10 +159,10 @@ class TestSave(TestCase):
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
-        self.learning_unit_year.refresh_from_db()
-        learning_container_year = self.learning_unit_year.learning_container_year
+        learning_unit_year = LearningUnitYear.objects.get(pk=self.learning_unit_year.id)
+        learning_container_year = learning_unit_year.learning_container_year
 
-        self.assertEqual(self.learning_unit_year.acronym, self.form_data['acronym_0'] + self.form_data['acronym_1'])
+        self.assertEqual(learning_unit_year.acronym, self.form_data['acronym_0'] + self.form_data['acronym_1'])
         self.assertEqual(learning_container_year.common_title, self.form_data['common_title'])
         self.assertEqual(learning_container_year.common_title_english, self.form_data['common_title_english'])
         self.assertEqual(learning_container_year.language, self.language)
@@ -179,11 +179,13 @@ class TestSave(TestCase):
     def test_with_all_entities_set(self):
         today = datetime.date.today()
         entity_1 = EntityFactory(organization=OrganizationFactory(type=organization_type.MAIN))
-        additional_entity_version_1 = EntityVersionFactory(entity_type=entity_type.SCHOOL, start_date=today,
+        additional_entity_version_1 = EntityVersionFactory(entity_type=entity_type.SCHOOL,
+                                                           start_date=today.replace(year=1900),
                                                            end_date=today.replace(year=today.year + 1),
                                                            entity=entity_1)
         entity_2 = EntityFactory(organization=OrganizationFactory(type=organization_type.MAIN))
-        additional_entity_version_2 = EntityVersionFactory(entity_type=entity_type.SCHOOL, start_date=today,
+        additional_entity_version_2 = EntityVersionFactory(entity_type=entity_type.SCHOOL,
+                                                           start_date=today.replace(year=1900),
                                                            end_date=today.replace(year=today.year + 1),
                                                            entity=entity_2)
         self.form_data["allocation_entity-entity"] = self.entity_version.id
@@ -191,7 +193,7 @@ class TestSave(TestCase):
         self.form_data["additional_requirement_entity_2-entity"] = additional_entity_version_2.id
 
         form = ProposalBaseForm(self.form_data, self.person, self.learning_unit_year)
-        form.is_valid()
+        self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
         entities_by_type = \

@@ -135,6 +135,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
 class TestEditLearningUnit(TestCase):
     @classmethod
     def setUpTestData(cls):
+        today = datetime.date.today()
         an_academic_year = create_current_academic_year()
         learning_container_year = LearningContainerYearFactory(
             academic_year=an_academic_year,
@@ -160,27 +161,27 @@ class TestEditLearningUnit(TestCase):
         cls.requirement_entity_container.entity.organization.save()
         cls.requirement_entity = EntityVersionFactory(entity=cls.requirement_entity_container.entity,
                                                       entity_type=entity_type.SCHOOL,
-                                                      start_date=an_academic_year.start_date,
+                                                      start_date=today.replace(year=1900),
                                                       end_date=None)
 
         cls.allocation_entity_container = EntityContainerYearFactory(
             learning_container_year=learning_container_year, type=entity_container_year_link_type.ALLOCATION_ENTITY)
         cls.allocation_entity = EntityVersionFactory(entity=cls.allocation_entity_container.entity,
-                                                     start_date=an_academic_year.start_date,
+                                                     start_date=today.replace(year=1900),
                                                      end_date=None)
 
         cls.additional_entity_container_1 = EntityContainerYearFactory(
             learning_container_year=learning_container_year,
             type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1)
         cls.additional_entity_1 = EntityVersionFactory(entity=cls.additional_entity_container_1.entity,
-                                                       start_date=an_academic_year.start_date,
+                                                       start_date=today.replace(year=1900),
                                                        end_date=None)
 
         cls.additional_entity_container_2 = EntityContainerYearFactory(
             learning_container_year=learning_container_year,
             type=entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2)
         cls.additional_entity_2 = EntityVersionFactory(entity=cls.additional_entity_container_2.entity,
-                                                       start_date=an_academic_year.start_date,
+                                                       start_date=today.replace(year=1900),
                                                        end_date=None)
 
         cls.person = PersonEntityFactory(entity=cls.requirement_entity_container.entity).person

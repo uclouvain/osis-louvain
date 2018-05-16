@@ -114,6 +114,7 @@ class LearningUnit(SerializableModel):
 
     @property
     def parent(self):
+        # TODO :: rename "parent" into "learning_unit_full"
         # TODO The subtype must move in learning_unit model !
         luy = self.learningunityear_set.last()
         if luy and luy.subtype == PARTIM:
@@ -124,6 +125,7 @@ class LearningUnit(SerializableModel):
 
     @property
     def children(self):
+        # TODO :: rename "children" into "partims"
         # TODO The subtype must move in learning_unit model !
         luy = self.learningunityear_set.last()
         if luy and luy.subtype == FULL:

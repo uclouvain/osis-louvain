@@ -43,11 +43,12 @@ class LearningUnitComponent(SerializableModel):
     changed = models.DateTimeField(null=True, auto_now=True)
     learning_unit_year = models.ForeignKey('LearningUnitYear')
     learning_component_year = models.ForeignKey('LearningComponentYear')
+    # FIXME :  Duplicate with learningComponentYear.type (check if used in OSIS-portal)
     type = models.CharField(max_length=25, blank=True, null=True, choices=component_type.COMPONENT_TYPES, db_index=True)
     duration = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
 
     def __str__(self):
-        return u"%s - %s" % (self.type, self.learning_unit_year)
+        return u"%s - %s" % (self.learning_component_year.type, self.learning_unit_year)
 
 
 def find_by_learning_year_type(a_learning_unit_year=None, a_type=None):

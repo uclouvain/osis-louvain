@@ -554,7 +554,7 @@ class LearningUnitEditionTestCase(TestCase):
                                    type=entity_container_year_link_type.REQUIREMENT_ENTITY,
                                    entity=an_entity)
 
-        error_list = business_edition.check_postponement_conflict(self.learning_unit_year, another_learning_unit_year)
+        error_list = business_edition._check_postponement_conflict(self.learning_unit_year, another_learning_unit_year)
         self.assertIsInstance(error_list, list)
         self.assertEqual(len(error_list), 6)
 

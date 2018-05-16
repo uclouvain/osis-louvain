@@ -2865,9 +2865,6 @@ msgstr "Recherche - Cours empruntés"
 msgid "add_another"
 msgstr "Ajouter un autre"
 
-msgid "The linked entity does not exist at the start date of the academic year linked to this learning unit"
-msgstr "L'entité liée n'existe pas à la date de début de l'année académique liée à cette unité d'enseignement"
-
 msgid "faculty_borrowing"
 msgstr "Faculté emprunteuse"
 
@@ -2894,6 +2891,9 @@ msgstr "Date proposition"
 
 msgid "search_type"
 msgstr "Type de recherche"
+
+msgid "The linked entity does not exist at the start date of the academic year linked to this learning unit"
+msgstr "L'entité liée n'existe pas à la date de début de l'année académique liée à cette unité d'enseignement"
 
 msgid "COURSE_ENROLLMENT"
 msgstr "Inscription aux cours"

@@ -32,8 +32,9 @@ from django.http import QueryDict
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
+from base.forms.learning_unit.learning_unit_create import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
-    LearningUnitModelForm, EntityContainerBaseForm, LearningContainerYearModelForm, LearningContainerModelForm
+    LearningUnitModelForm, LearningContainerYearModelForm, LearningContainerModelForm
 from base.forms.learning_unit.learning_unit_create_2 import PartimForm, PARTIM_FORM_READ_ONLY_FIELD
 from base.forms.utils import acronym_field
 from base.models.enums import learning_unit_year_subtypes
@@ -42,7 +43,6 @@ from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
-from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 
@@ -84,30 +84,29 @@ class LearningUnitPartimFormContextMixin(TestCase):
 
 class TestPartimFormInit(LearningUnitPartimFormContextMixin):
     """Unit tests for PartimForm.__init__()"""
-
     def test_subtype_is_partim(self):
-        form = _instanciate_form(self.learning_unit_year_full)
+        form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
+                                 academic_year=self.current_academic_year)
         self.assertEqual(form.subtype, learning_unit_year_subtypes.PARTIM)
 
-    def test_wrong_learning_unit_year_full_args(self):
-        wrong_luy_full = LearningUnitFactory()
+    def test_wrong_learning_unit_full_instance_args(self):
+        wrong_lu_full = LearningUnitYearFactory()
         with self.assertRaises(AttributeError):
-            _instanciate_form(learning_unit_year_full=wrong_luy_full)
-
-    def test_wrong_subtype_learning_unit_year_full_args(self):
-        self.learning_unit_year_full.subtype = learning_unit_year_subtypes.PARTIM
-        with self.assertRaises(AttributeError):
-            _instanciate_form(learning_unit_year_full=self.learning_unit_year_full)
+            _instanciate_form(learning_unit_full=wrong_lu_full, academic_year=self.current_academic_year)
 
     def test_wrong_instance_args(self):
-        wrong_instance = LearningUnitFactory()
+        wrong_instance = LearningUnitYearFactory()
         with self.assertRaises(AttributeError):
-            _instanciate_form(learning_unit_year_full=self.learning_unit_year_full,
+            _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
+                              academic_year=self.current_academic_year,
                               instance=wrong_instance)
 
     def test_model_forms_case_creation(self):
-        form = _instanciate_form(self.learning_unit_year_full)
-        for cls in PartimForm.form_classes:
+        form_classes_expected = [LearningUnitModelForm, LearningUnitYearModelForm, LearningContainerModelForm,
+                                 LearningContainerYearModelForm, EntityContainerBaseForm]
+        form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
+                                 academic_year=self.current_academic_year)
+        for cls in form_classes_expected:
             self.assertIsInstance(form.forms[cls], cls)
 
     def test_inherit_initial_values(self):
@@ -133,19 +132,25 @@ class TestPartimFormInit(LearningUnitPartimFormContextMixin):
                 'specific_title_english': self.learning_unit_year_full.specific_title_english
             }
         }
-        partim_form = _instanciate_form(self.learning_unit_year_full)
+        partim_form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
+                                        academic_year=self.current_academic_year)
         for form_class, initial in expected_initials.items():
             self.assertEqual(partim_form.forms[form_class].initial, initial)
 
     def test_instance_partim_values(self):
         partim = LearningUnitYearFactory(acronym='LBIR1200A', subtype=learning_unit_year_subtypes.PARTIM,
-                                         learning_container_year=self.learning_unit_year_full.learning_container_year)
-        partim_form = _instanciate_form(self.learning_unit_year_full, instance=partim)
+                                         learning_container_year=self.learning_unit_year_full.learning_container_year,
+                                         academic_year=self.learning_unit_year_full.academic_year)
+
+        partim_form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
+                                        academic_year=self.learning_unit_year_full.academic_year,
+                                        instance=partim.learning_unit)
         self.assertEqual(partim_form.forms[LearningUnitYearModelForm].initial['acronym'], ['L', 'BIR1200', 'A'])
 
     def test_disabled_fields(self):
         """This function will check if fields is disabled"""
-        partim_form = _instanciate_form(self.learning_unit_year_full)
+        partim_form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
+                                        academic_year=self.learning_unit_year_full.academic_year)
         expected_disabled_fields = {
             'common_title', 'common_title_english',
             'requirement_entity', 'allocation_entity',
@@ -160,7 +165,8 @@ class TestPartimFormInit(LearningUnitPartimFormContextMixin):
     def test_form_cls_to_validate(self):
         """This function will ensure that only LearningUnitModelForm/LearningUnitYearModelForm is present
            in form_cls_to_validate"""
-        partim_form = _instanciate_form(self.learning_unit_year_full)
+        partim_form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
+                                        academic_year=self.learning_unit_year_full.academic_year)
         expected_form_cls = [LearningUnitModelForm, LearningUnitYearModelForm]
         self.assertEqual(partim_form.form_cls_to_validate, expected_form_cls)
 
@@ -178,7 +184,9 @@ class TestPartimFormIsValid(LearningUnitPartimFormContextMixin):
             subtype=learning_unit_year_subtypes.PARTIM
         )
         post_data = get_valid_form_data(a_new_learning_unit_partim)
-        form = _instanciate_form(self.learning_unit_year_full, post_data=post_data)
+        form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
+                                 academic_year=self.learning_unit_year_full.academic_year,
+                                 post_data=post_data)
         # The form should be valid
         self.assertTrue(form.is_valid(), form.errors)
         # In partim, we can only modify LearningUnitYearModelForm / LearningUnitModelForm
@@ -273,7 +281,6 @@ class TestPartimFormIsValid(LearningUnitPartimFormContextMixin):
         self.assertEqual(form_instance.instance.periodicity,
                          self.learning_unit_year_full.learning_unit.periodicity)
 
-
     def _test_learning_unit_year_model_form_instance(self, partim_form, post_data):
         form_instance = partim_form.forms[LearningUnitYearModelForm]
         fields_to_validate = ['specific_title', 'specific_title_english', 'credits',
@@ -302,8 +309,7 @@ class TestPartimFormIsValid(LearningUnitPartimFormContextMixin):
         """ In this test, we ensure that the instance of learning container year model form inherit
             from full learning container year """
         formset_instance = partim_form.forms[EntityContainerBaseForm]
-        self.assertEqual(formset_instance.learning_container_year,
-                         self.learning_unit_year_full.learning_container_year)
+        self.assertEqual(formset_instance.instance, self.learning_unit_year_full.learning_container_year)
         # Test expected instance
         expected_instance_form = [
             self.generated_container_year.requirement_entity_container_year,
@@ -323,33 +329,19 @@ class TestPartimFormIsValid(LearningUnitPartimFormContextMixin):
             subtype=learning_unit_year_subtypes.PARTIM
         )
         post_data = get_valid_form_data(a_new_learning_unit_partim)
-        form = _instanciate_form(self.learning_unit_year_full, post_data=post_data)
+        form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
+                                 academic_year=self.learning_unit_year_full.academic_year,
+                                 post_data=post_data)
         self.assertFalse(form.is_valid())
 
 
-class TestPartimFormSaveInsert(LearningUnitPartimFormContextMixin):
-    """Unit tests for save() for insert"""
-    def test_is_update_action(self):
-        form = _instanciate_form(self.learning_unit_year_full, instance=None)
-        self.assertFalse(form._is_update_action())
-
-    @mock.patch('base.forms.learning_unit.learning_unit_create_2.LearningUnitBaseForm._update_with_postponement',
-                side_effect=None)
-    @mock.patch('base.forms.learning_unit.learning_unit_create_2.PartimForm._create', side_effect=None)
-    def test_save_call_create_method(self, mock_create_method, mock_update_method):
-        form = _instanciate_form(self.learning_unit_year_full, instance=None)
-        form.save()
-        self.assertTrue(mock_create_method.called)
-        self.assertFalse(mock_update_method.called)
-
+class TestPartimFormSave(LearningUnitPartimFormContextMixin):
+    """Unit tests for save() for save"""
     @mock.patch('base.forms.learning_unit.learning_unit_create.LearningUnitModelForm.save')
     @mock.patch('base.forms.learning_unit.learning_unit_create.LearningUnitYearModelForm.save')
-    @mock.patch('base.forms.learning_unit.learning_unit_create_2.PartimForm._create_with_postponement',
-                side_effect=lambda *args: [])
     @mock.patch('base.forms.learning_unit.learning_unit_create_2.PartimForm._get_entity_container_year',
                 side_effect=lambda *args: [])
-    def test_create_method(self, mock_get_entity_container_year,
-                           mock_create_with_postponement, mock_luy_form_save, mock_lu_form_save):
+    def test_save_method_mocked(self, mock_get_entity_container_year, mock_luy_form_save, mock_lu_form_save):
         learning_container_year_full = self.learning_unit_year_full.learning_container_year
         a_new_learning_unit_partim = LearningUnitYearFactory.build(
             academic_year=self.current_academic_year,
@@ -357,16 +349,20 @@ class TestPartimFormSaveInsert(LearningUnitPartimFormContextMixin):
             subtype=learning_unit_year_subtypes.PARTIM
         )
         post_data = get_valid_form_data(a_new_learning_unit_partim)
+        start_year = self.learning_unit_year_full.academic_year.year
+
         # Define return mock value
         mock_luy_form_save.return_value = a_new_learning_unit_partim
         mock_lu_form_save.return_value = a_new_learning_unit_partim.learning_unit
-        form = _instanciate_form(self.learning_unit_year_full, post_data=post_data, instance=None)
+        form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
+                                 academic_year=self.learning_unit_year_full.academic_year,
+                                 post_data=post_data, instance=None)
         self.assertTrue(form.is_valid())
-        form._create(commit=True, postponement=True)
+        form.save()
         # Ensure call to learning unit model form is done
         self.assertTrue(mock_lu_form_save.called)
         mock_lu_form_save.assert_called_once_with(
-            academic_year=self.learning_unit_year_full.academic_year,
+            start_year=start_year,
             learning_container=learning_container_year_full.learning_container,
             commit=True
         )
@@ -379,10 +375,8 @@ class TestPartimFormSaveInsert(LearningUnitPartimFormContextMixin):
             learning_unit=a_new_learning_unit_partim.learning_unit,
             commit=True
         )
-        # Ensure postponement is called
-        self.assertTrue(mock_create_with_postponement.called)
 
-    def test_save_method_creation(self):
+    def test_save_method_create_new_instance(self):
         partim_acronym = FULL_ACRONYM + 'C'
         a_new_learning_unit_partim = LearningUnitYearFactory.build(
             academic_year=self.current_academic_year,
@@ -390,33 +384,21 @@ class TestPartimFormSaveInsert(LearningUnitPartimFormContextMixin):
             subtype=learning_unit_year_subtypes.PARTIM
         )
         post_data = get_valid_form_data(a_new_learning_unit_partim)
-        form = _instanciate_form(self.learning_unit_year_full, post_data=post_data, instance=None)
+
+        form = _instanciate_form(
+            learning_unit_full=self.learning_unit_year_full.learning_unit,
+            academic_year=self.learning_unit_year_full.academic_year,
+            post_data=post_data, instance=None
+        )
         self.assertTrue(form.is_valid())
         form.save()
 
         # Check all related object is created
         self.assertEqual(LearningUnitYear.objects.filter(acronym=partim_acronym,
                                                          academic_year=self.current_academic_year).count(), 1)
-        self.assertEqual(LearningUnit.objects.filter(learningunityear__acronym=partim_acronym)
-                                             .distinct('id').count(), 1)
+        self.assertEqual(LearningUnit.objects.filter(learningunityear__acronym=partim_acronym).count(), 1)
 
-
-class TestPartimFormSaveUpdate(LearningUnitPartimFormContextMixin):
-    """Unit tests for save() for update"""
-    def test_is_update_action(self):
-        form = _instanciate_form(self.learning_unit_year_full, instance=self.learning_unit_year_partim)
-        self.assertTrue(form._is_update_action())
-
-    @mock.patch('base.forms.learning_unit.learning_unit_create_2.LearningUnitBaseForm._update_with_postponement',
-                side_effect=None)
-    @mock.patch('base.forms.learning_unit.learning_unit_create_2.PartimForm._create', side_effect=None)
-    def test_save_call_update_method(self, mock_create_method, mock_update_method):
-        form = _instanciate_form(self.learning_unit_year_full, instance=self.learning_unit_year_partim)
-        form.save()
-        self.assertTrue(mock_update_method.called)
-        self.assertFalse(mock_create_method.called)
-
-    def test_save_method_update(self):
+    def test_save_method_update_instance(self):
         post_data = get_valid_form_data(self.learning_unit_year_partim)
         update_fields_luy_model = {
             'credits': 2.5,
@@ -430,9 +412,13 @@ class TestPartimFormSaveUpdate(LearningUnitPartimFormContextMixin):
         }
         post_data.update(update_fields_lu_model)
 
-        form = _instanciate_form(self.learning_unit_year_full, post_data=post_data,
-                                 instance=self.learning_unit_year_partim)
-        self.assertTrue(form.is_valid())
+        form = _instanciate_form(
+            learning_unit_full=self.learning_unit_year_full.learning_unit,
+            academic_year=self.learning_unit_year_full.academic_year,
+            post_data=post_data,
+            instance=self.learning_unit_year_partim.learning_unit
+        )
+        self.assertTrue(form.is_valid(), msg=form.errors)
         form.save()
 
         # Refresh learning unit year
@@ -441,7 +427,9 @@ class TestPartimFormSaveUpdate(LearningUnitPartimFormContextMixin):
         learning_unit_year_dict = model_to_dict(self.learning_unit_year_partim)
         for field, value in update_fields_luy_model.items():
             self.assertEqual(learning_unit_year_dict[field], value)
+
         # Check learning unit update
+        self.learning_unit_year_partim.learning_unit.refresh_from_db()
         learning_unit_dict = model_to_dict(self.learning_unit_year_partim.learning_unit)
         for field, value in update_fields_lu_model.items():
             self.assertEqual(learning_unit_dict[field], value)
@@ -453,8 +441,10 @@ class TestPartimFormSaveUpdate(LearningUnitPartimFormContextMixin):
         post_data['acronym_2'] = partim_acronym[-1]
         post_data['credits'] = 2.5
 
-        form = _instanciate_form(self.learning_unit_year_full, post_data=post_data,
-                                 instance=self.learning_unit_year_partim)
+        form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
+                                 academic_year=self.learning_unit_year_full.academic_year,
+                                 post_data=post_data,
+                                 instance=self.learning_unit_year_partim.learning_unit)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
@@ -464,7 +454,9 @@ class TestPartimFormSaveUpdate(LearningUnitPartimFormContextMixin):
         self.assertEqual(self.learning_unit_year_partim.learning_container_year.acronym, parent_acronym)
 
     def test_disable_fields_partim(self):
-        form = _instanciate_form(self.learning_unit_year_full, instance=self.learning_unit_year_partim)
+        form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
+                                 academic_year=self.learning_unit_year_full.academic_year,
+                                 instance=self.learning_unit_year_partim.learning_unit)
         disabled_fields = {key for key, value in form.fields.items() if value.disabled == True}
         # acronym_0 and acronym_1 are disabled in the widget, not in the field
         disabled_fields.update({'acronym_0', 'acronym_1'})
@@ -494,6 +486,7 @@ def get_valid_form_data(learning_unit_year_partim):
     return qdict
 
 
-def _instanciate_form(learning_unit_year_full, post_data=None, instance=None):
+def _instanciate_form(learning_unit_full, academic_year, post_data=None, instance=None):
     person = PersonFactory()
-    return PartimForm(post_data, person, learning_unit_year_full, instance=instance)
+    return PartimForm(person, learning_unit_full, academic_year, data=post_data,
+                      learning_unit_instance=instance)

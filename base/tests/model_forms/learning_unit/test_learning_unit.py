@@ -65,7 +65,7 @@ class TestLearningUnitModelFormSave(TestCase):
         self.learning_container = LearningContainerFactory()
         self.form = LearningUnitModelForm(self.post_data)
         self.save_kwargs = {'learning_container': self.learning_container,
-                            'academic_year': self.current_academic_year}
+                            'start_year': self.current_academic_year.year}
 
     def test_case_missing_learning_container_kwarg(self):
         with self.assertRaises(KeyError):
