@@ -96,7 +96,7 @@ def get_valid_form_data(academic_year, person, learning_unit_year=None):
         'session': learning_unit_year.session,
         'quadrimester': learning_unit_year.quadrimester,
         'status': learning_unit_year.status,
-        'internship_subtype': learning_unit_year.internship_subtype,
+        'internship_subtype': None,
         'attribution_procedure': learning_unit_year.attribution_procedure,
 
         # Learning unit data model form
