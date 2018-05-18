@@ -165,6 +165,10 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
         form = FullForm(self.person, self.learning_unit_year.academic_year,
                         learning_unit_instance=self.learning_unit_year.learning_unit, proposal=True)
         self.assertEqual(form.fields['internship_subtype'].disabled, True)
+        self.post_data['container_type'] = INTERNSHIP
+        form_with_instance = _instanciate_form(self.current_academic_year, post_data=self.post_data,
+                                               start_year=self.current_academic_year.year)
+        self.assertEqual(form_with_instance.fields['internship_subtype'].disabled, False)
 
     def test_subtype_is_full(self):
         learn_unit_year = LearningUnitYearFactory(subtype=learning_unit_year_subtypes.FULL)
