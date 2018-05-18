@@ -981,7 +981,7 @@ msgid "reuse_address_entity"
 msgstr "Réutiliser l'adresse de"
 
 msgid "save"
-msgstr "Sauvegarder"
+msgstr "Enregistrer"
 
 msgid "saved"
 msgstr "Enregistré"

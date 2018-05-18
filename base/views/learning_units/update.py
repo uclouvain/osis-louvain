@@ -165,7 +165,7 @@ def update_learning_unit_pedagogy(request, learning_unit_year_id, context, templ
     person = get_object_or_404(Person, user=request.user)
     context.update(get_common_context_learning_unit_year(learning_unit_year_id, person))
     learning_unit_year = context['learning_unit_year']
-    perm_to_edit = int(request.user.has_perm('can_edit_learningunit_pedagogy'))
+    perm_to_edit = int(request.user.has_perm('base.can_edit_learningunit_pedagogy'))
 
     post = request.POST or None
     summary_form = SummaryModelForm(post, person, context['is_person_linked_to_entity'], instance=learning_unit_year)

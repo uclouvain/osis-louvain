@@ -89,7 +89,7 @@ class SummaryModelForm(forms.ModelForm):
         if not can_edit_summary_locked_field(person, is_person_linked_to_entity):
             self.fields["summary_locked"].disabled = True
 
-        if not person.user.has_perm('can_edit_learningunit_pedagogy'):
+        if not person.user.has_perm('base.can_edit_learningunit_pedagogy'):
             for field in self.fields.values():
                 field.disabled = True
 
@@ -102,6 +102,6 @@ class BibliographyModelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         person = kwargs.pop('person')
         super().__init__(*args, **kwargs)
-        if not person.user.has_perm('can_edit_learningunit_pedagogy'):
+        if not person.user.has_perm('base.can_edit_learningunit_pedagogy'):
             for field in self.fields.values():
                 field.disabled = True
