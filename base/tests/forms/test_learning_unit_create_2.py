@@ -42,7 +42,7 @@ from base.models.enums import learning_unit_year_subtypes, learning_container_ye
 from base.models.enums.entity_container_year_link_type import ADDITIONAL_REQUIREMENT_ENTITY_1, \
     ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.models.enums.entity_type import FACULTY
-from base.models.enums.learning_container_year_types import MASTER_THESIS
+from base.models.enums.learning_container_year_types import MASTER_THESIS, INTERNSHIP
 from base.models.enums.learning_unit_periodicity import ANNUAL
 from base.models.enums.organization_type import MAIN
 from base.models.learning_component_year import LearningComponentYear
@@ -160,6 +160,11 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
                         learning_unit_instance=self.learning_unit_year.learning_unit, proposal=True)
         disabled_fields = {key for key, value in form.fields.items() if value.disabled}
         self.assertEqual(disabled_fields, FULL_PROPOSAL_READ_ONLY_FIELDS)
+
+    def test_disable_internship_subtype(self):
+        form = FullForm(self.person, self.learning_unit_year.academic_year,
+                        learning_unit_instance=self.learning_unit_year.learning_unit, proposal=True)
+        self.assertEqual(form.fields['internship_subtype'].disabled, True)
 
     def test_subtype_is_full(self):
         learn_unit_year = LearningUnitYearFactory(subtype=learning_unit_year_subtypes.FULL)
