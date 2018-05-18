@@ -243,13 +243,11 @@ class TestLearningUnitModificationProposal(TestCase):
             list(messages_list))
 
     def test_initial_data_fields(self):
-        expected_initial_data_fields = {'learning_container_year': ["id", "acronym", "common_title",
-                                                                    "common_title_english", "container_type",
-                                                                    "campus", "language", "in_charge"],
-                                        'learning_unit': ["id", "periodicity", "end_year"],
-                                        'learning_unit_year': ["id", "acronym", "specific_title",
-                                                               "specific_title_english", "internship_subtype",
-                                                               "status", "credits"]}
+        expected_initial_data_fields = {'learning_container_year': ["id", "acronym", "common_title", "container_type",
+                                                   "campus", "language", "in_charge"],
+                       'learning_unit': ["id", "periodicity", "end_year"],
+                       'learning_unit_year': ["id", "acronym", "specific_title", "internship_subtype", "credits"]
+                       }
         self.assertEqual(expected_initial_data_fields, INITIAL_DATA_FIELDS)
 
     @transaction.atomic()

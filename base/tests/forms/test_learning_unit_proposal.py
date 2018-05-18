@@ -232,7 +232,6 @@ class TestSave(TestCase):
                 "id": self.learning_unit_year.learning_container_year.id,
                 "acronym": self.learning_unit_year.acronym,
                 "common_title": self.learning_unit_year.learning_container_year.common_title,
-                "common_title_english": self.learning_unit_year.learning_container_year.common_title_english,
                 "container_type": self.learning_unit_year.learning_container_year.container_type,
                 "campus": self.learning_unit_year.learning_container_year.campus.id,
                 "language": self.learning_unit_year.learning_container_year.language.pk,
@@ -242,10 +241,8 @@ class TestSave(TestCase):
                 "id": self.learning_unit_year.id,
                 "acronym": self.learning_unit_year.acronym,
                 "specific_title": self.learning_unit_year.specific_title,
-                "specific_title_english": self.learning_unit_year.specific_title_english,
                 "internship_subtype": self.learning_unit_year.internship_subtype,
-                "credits": self.learning_unit_year.credits,
-                "status": self.learning_unit_year.status
+                "credits": self.learning_unit_year.credits
             },
             "learning_unit": {
                 "id": self.learning_unit_year.learning_unit.id,
