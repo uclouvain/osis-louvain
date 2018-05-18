@@ -153,12 +153,14 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
         form = FullForm(self.person, self.learning_unit_year.academic_year,
                         learning_unit_instance=self.learning_unit_year.learning_unit)
         disabled_fields = {key for key, value in form.fields.items() if value.disabled}
+        FULL_READ_ONLY_FIELDS.add('internship_subtype')
         self.assertEqual(disabled_fields, FULL_READ_ONLY_FIELDS)
 
     def test_disable_fields_full_proposal(self):
         form = FullForm(self.person, self.learning_unit_year.academic_year,
                         learning_unit_instance=self.learning_unit_year.learning_unit, proposal=True)
         disabled_fields = {key for key, value in form.fields.items() if value.disabled}
+        FULL_PROPOSAL_READ_ONLY_FIELDS.add('internship_subtype')
         self.assertEqual(disabled_fields, FULL_PROPOSAL_READ_ONLY_FIELDS)
 
     def test_disable_internship_subtype(self):
