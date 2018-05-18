@@ -37,6 +37,7 @@ from base.forms.utils.acronym_field import split_acronym
 from base.models import learning_unit_year
 from base.models.campus import Campus
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums import learning_container_year_types
 from base.models.learning_unit import LearningUnit
 from reference.models import language
 
@@ -210,8 +211,8 @@ class FullForm(LearningUnitBaseForm):
         if self.instance:
             self._disable_fields()
 
-        if not self.instance:
-            self.fields['internship_subtype'].disabled = True
+        self.fields['internship_subtype'].disabled =\
+            not self.instance or self.instances_data["container_type"] != learning_container_year_types.INTERNSHIP
 
     def _disable_fields(self):
         if self.person.is_faculty_manager():
