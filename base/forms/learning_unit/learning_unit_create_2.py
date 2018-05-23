@@ -144,11 +144,6 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
             if key in fields_to_disable:
                 self._disable_field(value)
 
-    def disable_all_fields_except(self, fields_not_to_disable):
-        for key, value in self.fields.items():
-            if key not in fields_not_to_disable:
-                self._disable_field(value)
-
     @staticmethod
     def _disable_field(field):
         field.disabled = True
@@ -234,7 +229,7 @@ class FullForm(LearningUnitBaseForm):
         if self.proposal:
             self.disable_fields(FACULTY_OPEN_FIELDS)
         else:
-            self.disable_all_fields_except(FACULTY_OPEN_FIELDS)
+            self.disable_fields(self.fields.keys() - set(FACULTY_OPEN_FIELDS))
 
     def _disable_fields_as_central_manager(self):
         if self.proposal:
