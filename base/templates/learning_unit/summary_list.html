@@ -86,7 +86,7 @@
                                     {% if forloop.counter0 > 0 %}
                                         ,
                                     {% endif %}
-                                    {{responsible.tutor.person.last_name}} {{responsible.tutor.person.first_name}}
+                                    {{responsible.tutor.person.last_name}} {{responsible.tutor.person.first_name|default_if_none:'' }}
                                 {% endfor %}
                             </td>
                             <td>

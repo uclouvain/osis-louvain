@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import operator
 from collections import OrderedDict
 
 from django.db import transaction
@@ -30,10 +31,15 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.learning_unit_create_2 import PartimForm, FullForm
 from base.models import academic_year, learning_unit_year
-from base.models.enums import learning_unit_year_subtypes, entity_container_year_link_type
+from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_unit import LearningUnit
 
-FIELDS_TO_NOT_CHECK = ['academic_year']
+FIELDS_TO_NOT_POSTPONE = {
+    'is_vacant': 'learning_container_year.is_vacant',
+    'type_declaration_vacant': 'learning_container_year.type_declaration_vacant',
+    'attribution_procedure': 'attribution_procedure'
+}
+FIELDS_TO_NOT_CHECK = ['academic_year'] + list(FIELDS_TO_NOT_POSTPONE.keys())
 
 
 # @TODO: Use LearningUnitPostponementForm to manage END_DATE of learning unit year
@@ -106,10 +112,7 @@ class LearningUnitPostponementForm:
             luy_to_upsert_qs = luy_to_upsert_qs.filter(academic_year__year__lte=end_academic_year.year)
 
         # Learning unit base form with instance [TO UPDATE]
-        luy_base_forms_update = [self._get_learning_unit_base_form(luy_to_upsert.academic_year,
-                                                                   learning_unit_instance=luy_to_upsert.learning_unit,
-                                                                   data=data)
-                                 for luy_to_upsert in luy_to_upsert_qs]
+        luy_base_forms_update = self._get_forms_to_update(luy_to_upsert_qs, data)
 
         # Learning unit base form without instance [TO INSERT]
         lastest_luy = luy_to_upsert_qs.last()
@@ -118,6 +121,25 @@ class LearningUnitPostponementForm:
         luy_base_forms_insert = self._get_forms_to_insert(start_insert_year, end_year=end_insert_year, data=data)
 
         return luy_base_forms_update + luy_base_forms_insert
+
+    def _get_forms_to_update(self, luy_to_updates, data=None):
+        luy_base_forms_update = []
+        for index, luy_to_update in enumerate(luy_to_updates):
+            data_to_postpone = data if data is None or index == 0 else self._get_data_to_postpone(luy_to_update, data)
+            luy_base_form_update = self._get_learning_unit_base_form(
+                academic_year=luy_to_update.academic_year,
+                learning_unit_instance=luy_to_update.learning_unit,
+                data=data_to_postpone
+            )
+            luy_base_forms_update.append(luy_base_form_update)
+        return luy_base_forms_update
+
+    def _get_data_to_postpone(self, lunit_year, data):
+        """This function will return data form to postpone"""
+        data_to_postpone = {key: data[key] for key in data if key not in FIELDS_TO_NOT_POSTPONE.keys()}
+        for key, attr_path in FIELDS_TO_NOT_POSTPONE.items():
+            data_to_postpone[key] = operator.attrgetter(attr_path)(lunit_year)
+        return data_to_postpone
 
     def _get_forms_to_insert(self, start_insert_year, end_year=None, data=None):
         luy_base_form_insert = []
@@ -147,24 +169,8 @@ class LearningUnitPostponementForm:
             'data': data.copy() if data else None,
             'learning_unit_full_instance': self.learning_unit_full_instance
         }
-        if learning_unit_instance and data:
-            learning_unit_year_full_instance = learning_unit_year.search(academic_year_id=academic_year.id,
-                                                                         learning_unit=learning_unit_instance).get()
-            management_form_updated = self._get_entity_formset_management_form(data, learning_unit_year_full_instance)
-            form_kwargs['data'].update(management_form_updated)
-
         return FullForm(**form_kwargs) if self.subtype == learning_unit_year_subtypes.FULL else \
             PartimForm(**form_kwargs)
-
-    def _get_entity_formset_management_form(self, data, learning_unit_year_full_instance):
-        """This function will update specific key [related to learning container year]
-           of management form provided by formset"""
-        management_form = {}
-        for index, type in enumerate(entity_container_year_link_type.ENTITY_TYPE_LIST):
-            if data.get('entitycontaineryear_set-{}-learning_container_year'.format(index)):
-                management_form['entitycontaineryear_set-{}-learning_container_year'.format(index)] = \
-                    learning_unit_year_full_instance.learning_container_year.id
-        return management_form
 
     def is_valid(self):
         if any([not form_instance.is_valid() for form_instance in self._forms_to_upsert]):
@@ -253,7 +259,6 @@ class LearningUnitPostponementForm:
             )
 
     def _check_differences(self, current_form, next_form, ac_year):
-
         differences = [
             _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
                 'col_name': next_form.label_fields[col_name],

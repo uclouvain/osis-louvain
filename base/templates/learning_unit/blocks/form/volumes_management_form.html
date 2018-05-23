@@ -50,8 +50,8 @@
                     </th>
                 {% endfor %}
             </tr>
+            {{ formset.management_form }}
             {% for form in formset %}
-                {{ formset.management_form }}
                 <tr>{% bootstrap_formset_errors formset %}</tr>
                 <tr>
                     <td>
