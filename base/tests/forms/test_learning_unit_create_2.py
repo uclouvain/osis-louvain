@@ -27,6 +27,7 @@ import collections
 import datetime
 from unittest import mock
 
+from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
@@ -51,6 +52,7 @@ from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_component import LearningUnitComponent
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.person import FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -129,7 +131,7 @@ class LearningUnitFullFormContextMixin(TestCase):
         self.current_academic_year = create_current_academic_year()
         self.person = PersonFactory()
         self.post_data = get_valid_form_data(self.current_academic_year, person=self.person)
-        # Creation of a LearingContainerYear and all related models
+        # Creation of a LearningContainerYear and all related models
         self.learn_unit_structure = GenerateContainer(self.current_academic_year.year, self.current_academic_year.year)
         self.learning_unit_year = LearningUnitYear.objects.get(
             learning_unit=self.learn_unit_structure.learning_unit_full,
@@ -154,6 +156,14 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
                         learning_unit_instance=self.learning_unit_year.learning_unit)
         disabled_fields = {key for key, value in form.fields.items() if value.disabled}
         FULL_READ_ONLY_FIELDS.add('internship_subtype')
+        self.assertEqual(disabled_fields, FULL_READ_ONLY_FIELDS)
+
+    def test_disable_fields_full_with_faculty_manager(self):
+        self.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+        form = FullForm(self.person, self.learning_unit_year.academic_year,
+                        learning_unit_instance=self.learning_unit_year.learning_unit)
+        disabled_fields = {key for key, value in form.fields.items() if value.disabled}
+        FULL_READ_ONLY_FIELDS.add('attribution_procedure')
         self.assertEqual(disabled_fields, FULL_READ_ONLY_FIELDS)
 
     def test_disable_fields_full_proposal(self):
