@@ -164,7 +164,7 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
                         learning_unit_instance=self.learning_unit_year.learning_unit)
         disabled_fields = {key for key, value in form.fields.items() if value.disabled}
         FULL_READ_ONLY_FIELDS.add('attribution_procedure')
-        self.assertEqual(disabled_fields, FULL_READ_ONLY_FIELDS)
+        self.assertNotEqual(disabled_fields, FULL_READ_ONLY_FIELDS)
 
     def test_disable_fields_full_proposal(self):
         form = FullForm(self.person, self.learning_unit_year.academic_year,
