@@ -100,7 +100,7 @@ def get_valid_form_data(academic_year, person, learning_unit_year=None):
         'attribution_procedure': learning_unit_year.attribution_procedure,
 
         # Learning unit data model form
-        'periodicity': learning_unit_year.learning_unit.periodicity,
+        'periodicity': ANNUAL,
         'faculty_remark': learning_unit_year.learning_unit.faculty_remark,
         'other_remark': learning_unit_year.learning_unit.other_remark,
 
@@ -165,12 +165,13 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
 
     def test_disable_internship_subtype(self):
         form = FullForm(self.person, self.learning_unit_year.academic_year,
-                        learning_unit_instance=self.learning_unit_year.learning_unit, proposal=True)
+                        learning_unit_instance=self.learning_unit_year.learning_unit)
         self.assertEqual(form.fields['internship_subtype'].disabled, True)
-        self.post_data['container_type'] = INTERNSHIP
-        form_with_instance = _instanciate_form(self.current_academic_year, post_data=self.post_data,
-                                               start_year=self.current_academic_year.year)
-        self.assertEqual(form_with_instance.fields['internship_subtype'].disabled, False)
+        self.learning_unit_year.learning_container_year.container_type = INTERNSHIP
+        self.learning_unit_year.learning_container_year.save()
+        form_with_internship = FullForm(self.person, self.learning_unit_year.academic_year,
+                                        learning_unit_instance=self.learning_unit_year.learning_unit)
+        self.assertEqual(form_with_internship.fields['internship_subtype'].disabled, False)
 
     def test_subtype_is_full(self):
         learn_unit_year = LearningUnitYearFactory(subtype=learning_unit_year_subtypes.FULL)
