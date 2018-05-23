@@ -82,7 +82,11 @@ tr.class_year_head{
     font-weight: bold;
 }
 
-table.volumes tr td{
+table.volumes tbody tr td,th{
+    text-align: center;
+}
+
+table.volumes tbody tr td input{
     text-align: center;
 }
 
@@ -91,13 +95,12 @@ table.volumes tbody{
     border-bottom: 2px solid #c0c0c0;
 }
 
-table.volumes tbody tr td{
-    background-color: #f3fcfc;
-}
-
 table.volumes tbody tr td:nth-child(1),
-table.volumes tbody tr td:nth-child(9),
-table.volumes tbody tr td:nth-child(11){
+table.volumes tbody tr td:nth-child(8),
+table.volumes tbody tr td:nth-child(13),
+table.volumes tbody tr th:nth-child(1),
+table.volumes tbody tr th:nth-child(8),
+table.volumes tbody tr th:nth-child(13){
     background-color: #f3f3f3;
 }
 

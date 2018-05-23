@@ -203,7 +203,7 @@ class LearningUnitYear(SerializableModel):
             .order_by('academic_year__year')
 
     def is_past(self):
-        return self.academic_year.year < current_academic_year().year
+        return self.academic_year.is_past()
 
     def can_update_by_faculty_manager(self):
         result = False

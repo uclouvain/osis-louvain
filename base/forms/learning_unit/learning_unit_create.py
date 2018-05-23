@@ -168,7 +168,7 @@ class LearningUnitYearModelForm(forms.ModelForm):
     def warnings(self):
         if self._warnings is None and self.instance:
             parent = self.instance.parent or self.instance
-            children = self.instance.get_partims_related() or [self.instance]
+            children = parent.get_partims_related()
             self._warnings = [
                 _('The credits value of the partim %(acronym)s is greater or equal than the credits value of the '
                   'parent learning unit.') % {'acronym': child.acronym}

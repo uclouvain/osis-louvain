@@ -78,6 +78,9 @@ admin.site.register(exam_enrollment.ExamEnrollment,
 admin.site.register(exam_enrollment.ExamEnrollmentHistory,
                     exam_enrollment.ExamEnrollmentHistoryAdmin)
 
+admin.site.register(external_learning_unit_year.ExternalLearningUnitYear,
+                    external_learning_unit_year.ExternalLearningUnitYearAdmin)
+
 admin.site.register(external_offer.ExternalOffer,
                     external_offer.ExternalOfferAdmin)
 

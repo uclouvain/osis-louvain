@@ -32,14 +32,14 @@
         {% for learning_unit, formset in formsets.items %}
             <tbody>
             <tr>
-                <td>
+                <th>
                     <b>{{ learning_unit.acronym }}</b>
                     <abbr title="{% trans 'quadrimester' %} : {{ learning_unit.quadrimester }}">
                     ({{ learning_unit.quadrimester }})</abbr>
-                </td>
-                <td></td>
+                </th>
+                <th></th>
                 {% for field in formset.0 %}
-                    <td>
+                    <th>
                         {% if field.help_text %}
                         <abbr title="{{ field.help_text }}">
                             {{ field.label }}
@@ -47,7 +47,7 @@
                         {% else %}
                             {{ field.label }}
                         {% endif %}
-                    </td>
+                    </th>
                 {% endfor %}
             </tr>
             {% for form in formset %}

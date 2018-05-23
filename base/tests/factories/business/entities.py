@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from dateutil.utils import today
+from datetime import date
 
 from base.models.enums.entity_type import SECTOR, FACULTY
 from base.models.enums.organization_type import MAIN
@@ -35,7 +35,7 @@ from reference.tests.factories.country import CountryFactory
 
 def create_entities_hierarchy(organization_type=MAIN):
     country = CountryFactory()
-    start_date = today().replace(year=1900)
+    start_date = date.today().replace(year=1900)
     organization = OrganizationFactory(type=organization_type)
     root_entity = EntityFactory(country=country, organization=organization)
     root_entity_version = EntityVersionFactory(entity=root_entity,

@@ -41,6 +41,7 @@ from base.models.enums.internship_subtypes import PROFESSIONAL_INTERNSHIP
 from base.models.enums.learning_container_year_types import MASTER_THESIS, OTHER_INDIVIDUAL
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.learning_component_year import LearningComponentYear
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
@@ -211,3 +212,15 @@ class TestLearningUnitYearModelFormSave(TestCase):
         self.assertEqual(form.warnings, [_("The credits value of the partim %(acronym)s is greater or "
                                            "equal than the credits value of the parent learning unit.") % {
             'acronym':partim.acronym}])
+
+    def test_no_warnings_credit(self):
+        """ This test will ensure that no message warning message is displayed when no PARTIM attached to FULL"""
+        LearningUnitYear.objects.filter(
+            learning_container_year=self.learning_unit_year_to_update.learning_container_year,
+            subtype=PARTIM
+        ).delete()
+        self.post_data['credits'] = 60
+        form = LearningUnitYearModelForm(data=self.post_data, person=self.central_manager, subtype=FULL,
+                                         instance=self.learning_unit_year_to_update)
+        self.assertTrue(form.is_valid(), form.errors)
+        self.assertFalse(form.warnings)

@@ -1858,16 +1858,10 @@ msgid "planned_classes_pc"
 msgstr "P.C."
 
 msgid "total_volume"
-msgstr "Volume total"
-
-msgid "total_volume_charge"
-msgstr "Volume de charge total"
+msgstr "Volume total annual"
 
 msgid "total_volume_voltot"
 msgstr "Vol.tot"
-
-msgid "vol_charge"
-msgstr "Vol.charge"
 
 msgid "vol_tot_not_equal_to_q1_q2"
 msgstr "Vol.tot = Q1 + Q2"
@@ -1876,7 +1870,7 @@ msgid "vol_tot_req_entities_not_equal_to_entity"
 msgstr "Vol.tot requirement is not equals to sum of requirement volumes"
 
 msgid "vol_tot_req_entities_not_equal_to_vol_tot_mult_cp"
-msgstr "Vol.requirement = Vol.tot * C.P"
+msgstr "Vol.global = Vol.tot * C.P"
 
 msgid "vol_tot_full_must_be_greater_than_partim"
 msgstr "Vol.tot [Full] > Vol.tot [Partim]"
@@ -2892,8 +2886,23 @@ msgstr ""
 msgid "COURSE_ENROLLMENT"
 msgstr "Course enrollment"
 
+msgid "vol_global"
+msgstr "Vol.global"
+
+msgid "volume_global"
+msgstr "volume total global"
+
 msgid "missing_internship_subtype"
 msgstr "It is necessary to indicate the internship subtype"
 
 msgid "different_status_with_parent"
 msgstr "The learning unit's parent is inactive"
+
+msgid "Consistency error in %(academic_year)s : %(error)s"
+msgstr ""
+
+msgid "%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})"
+msgstr ""
+
+msgid "external_code"
+msgstr "External code"

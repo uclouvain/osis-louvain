@@ -126,6 +126,16 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
         return data
 
     @property
+    def label_fields(self):
+        """ Return a dictionary with the label of all fields """
+        data = {}
+        for form_instance in self.forms.values():
+            data.update({
+                key: field.label for key, field in form_instance.fields.items()
+            })
+        return data
+
+    @property
     def changed_data(self):
         return [form.changed_data for form in self.forms.values()]
 

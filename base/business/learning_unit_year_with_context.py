@@ -114,20 +114,20 @@ def _append_components(learning_unit):
             vol_req_entity = req_entities_volumes.get(entity_types.REQUIREMENT_ENTITY, 0) or 0
             vol_add_req_entity_1 = req_entities_volumes.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0) or 0
             vol_add_req_entity_2 = req_entities_volumes.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0) or 0
-            volume_total_charge = vol_req_entity + vol_add_req_entity_1 + vol_add_req_entity_2
+            volume_global = vol_req_entity + vol_add_req_entity_1 + vol_add_req_entity_2
             volume_partial_component = float(component.hourly_volume_partial) if component.hourly_volume_partial else 0
             planned_classes = component.planned_classes or 1
-            volume_total_component = volume_total_charge / planned_classes
+            volume_total = volume_global / planned_classes
 
             learning_unit.components[component] = {
-                'VOLUME_TOTAL': volume_total_component,
+                'VOLUME_TOTAL': volume_total,
                 'VOLUME_Q1': volume_partial_component,
-                'VOLUME_Q2': volume_total_component - volume_partial_component,
+                'VOLUME_Q2': volume_total - volume_partial_component,
                 'PLANNED_CLASSES': planned_classes,
                 'VOLUME_' + entity_types.REQUIREMENT_ENTITY: vol_req_entity,
                 'VOLUME_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1: vol_add_req_entity_1,
                 'VOLUME_' + entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2: vol_add_req_entity_2,
-                'VOLUME_TOTAL_REQUIREMENT_ENTITIES': volume_total_charge,
+                'VOLUME_TOTAL_REQUIREMENT_ENTITIES': volume_global,
             }
     return learning_unit
 

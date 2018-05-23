@@ -172,12 +172,16 @@ def prepare_xls_content(found_learning_units):
 
 
 def extract_xls_data_from_learning_unit(learning_unit_yr):
-    return [learning_unit_yr.academic_year.name, learning_unit_yr.acronym, learning_unit_yr.complete_title,
-            xls_build.translate(learning_unit_yr.learning_container_year.container_type),
-            xls_build.translate(learning_unit_yr.subtype),
-            get_entity_acronym(learning_unit_yr.entities.get('REQUIREMENT_ENTITY')),
-            get_entity_acronym(learning_unit_yr.entities.get('ALLOCATION_ENTITY')),
-            learning_unit_yr.credits, xls_build.translate(learning_unit_yr.status)]
+    return [
+        learning_unit_yr.academic_year.name, learning_unit_yr.acronym, learning_unit_yr.complete_title,
+        xls_build.translate(learning_unit_yr.learning_container_year.container_type)
+        # FIXME Condition to remove when the LearningUnitYear.learning_continer_year_id will be null=false
+        if learning_unit_yr.learning_container_year else "",
+        xls_build.translate(learning_unit_yr.subtype),
+        get_entity_acronym(learning_unit_yr.entities.get('REQUIREMENT_ENTITY')),
+        get_entity_acronym(learning_unit_yr.entities.get('ALLOCATION_ENTITY')),
+        learning_unit_yr.credits, xls_build.translate(learning_unit_yr.status)
+    ]
 
 
 def prepare_xls_parameters_list(user, workingsheets_data):
