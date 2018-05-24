@@ -526,14 +526,15 @@ class LearningUnitViewTestCase(TestCase):
                                                                container_type=learning_container_year_types.INTERNSHIP)
         parent = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                          learning_container_year=learning_container_year,
-                                         internship_subtype=internship_subtypes.TEACHING_INTERNSHIP,
                                          subtype=learning_unit_year_subtypes.FULL,
-                                         status=False)
+                                         status=False,
+                                         credits=10)
         partim_without_internship = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                             learning_container_year=learning_container_year,
                                                             internship_subtype=None,
                                                             subtype=learning_unit_year_subtypes.PARTIM,
-                                                            status=True)
+                                                            status=True,
+                                                            credits=2)
 
         request = self.create_learning_unit_request(partim_without_internship)
 
@@ -542,7 +543,6 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTrue(mock_render.called)
 
         request, template, context = mock_render.call_args[0]
-
         self.assertEqual(template, 'learning_unit/identification.html')
         self.assertEqual(len(context['warnings']), 2)
 
