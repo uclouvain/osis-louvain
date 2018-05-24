@@ -30,6 +30,7 @@ from django.views.decorators.http import require_http_methods
 from django.forms import forms
 
 import base.models.entity
+from base.models.academic_year import current_academic_year
 from base.models import person, academic_year
 from base.models.enums import entity_type
 from assistant.models import academic_assistant, assistant_mandate, assistant_document_file
@@ -62,6 +63,7 @@ class AssistantMandatesListView(LoginRequiredMixin, UserPassesTestMixin, ListVie
     def get_context_data(self, **kwargs):
         context = super(AssistantMandatesListView, self).get_context_data(**kwargs)
         context['assistant'] = academic_assistant.find_by_person(person.find_by_user(self.request.user))
+        context['current_academic_year'] = current_academic_year()
         context['can_see_file'] = settings.assistants_can_see_file()
         for mandate in context['object_list']:
             entities_id = mandate.mandateentity_set.all().order_by('id').values_list('entity', flat=True)

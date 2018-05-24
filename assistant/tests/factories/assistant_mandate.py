@@ -35,7 +35,6 @@ from assistant.tests.factories.academic_assistant import AcademicAssistantFactor
 class AssistantMandateFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'assistant.AssistantMandate'
-        django_get_or_create = ('assistant',)
 
     assistant = factory.SubFactory(AcademicAssistantFactory)
     if datetime.date.today() < datetime.date(datetime.date.today().year, 9, 15):

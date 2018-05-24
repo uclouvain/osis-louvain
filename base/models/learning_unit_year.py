@@ -231,6 +231,20 @@ class LearningUnitYear(SerializableModel):
                                                            learning_container_year=self.learning_container_year).get()
         return entity_container_yr.entity if entity_container_yr else None
 
+    @property
+    def warnings(self):
+        if self._warnings is None:
+            self._warnings = []
+            self._warnings.extend(self._check_partim_parent_credits())
+        return self._warnings
+
+    def _check_partim_parent_credits(self):
+        children = self.get_partims_related()
+        return [_('The credits value of the partim %(acronym)s is greater or equal than the credits value of the '
+                'parent learning unit.') % {'acronym': child.acronym}
+                for child in children if child.credits >= self.credits]
+
+
     def clean(self):
         learning_unit_years = find_gte_year_acronym(self.academic_year, self.acronym)
 

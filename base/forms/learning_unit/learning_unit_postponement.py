@@ -27,6 +27,7 @@ import operator
 from collections import OrderedDict
 
 from django.db import transaction
+from django.http import QueryDict
 from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.learning_unit_create_2 import PartimForm, FullForm
@@ -139,7 +140,8 @@ class LearningUnitPostponementForm:
 
     def _get_data_to_postpone(self, lunit_year, data):
         """This function will return data form to postpone"""
-        data_to_postpone = {key: data[key] for key in data if key not in FIELDS_TO_NOT_POSTPONE.keys()}
+        data_to_postpone = QueryDict('', mutable=True)
+        data_to_postpone.update({key: data[key] for key in data if key not in FIELDS_TO_NOT_POSTPONE.keys()})
         for key, attr_path in FIELDS_TO_NOT_POSTPONE.items():
             data_to_postpone[key] = operator.attrgetter(attr_path)(lunit_year)
         return data_to_postpone
@@ -265,11 +267,23 @@ class LearningUnitPostponementForm:
         differences = [
             _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
                 'col_name': next_form.label_fields[col_name],
-                'new_value': next_form.instances_data[col_name],
-                'current_value': value
+                'new_value': self._get_translated_value(next_form.instances_data[col_name]),
+                'current_value': self._get_translated_value(value)
             } for col_name, value in current_form.instances_data.items()
-            if next_form.instances_data[col_name] != value and col_name not in FIELDS_TO_NOT_CHECK
+            if self._get_cmp_value(next_form.instances_data[col_name]) != self._get_cmp_value(value) and
+            col_name not in FIELDS_TO_NOT_CHECK
         ]
 
         if differences:
             self.consistency_errors.setdefault(ac_year, []).extend(differences)
+
+    def _get_cmp_value(self, value):
+        """This function return comparable value. It consider empty string as null value"""
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
+
+    def _get_translated_value(self, value):
+        if isinstance(value, bool):
+            return _("yes") if value else _("no")
+        return value

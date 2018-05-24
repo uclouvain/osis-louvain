@@ -25,10 +25,12 @@
 ##############################################################################
 import datetime
 
+from django.utils import timezone
 from django.core.files import File
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 
+from base.models import academic_year
 from base.models import entity
 from base.models.enums import entity_type
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -36,20 +38,24 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonFactory
 
 from assistant.models.mandate_entity import find_by_mandate_and_entity
+from assistant.models.tutoring_learning_unit_year import find_by_mandate
 from assistant.tests.factories.academic_assistant import AcademicAssistantFactory
 from assistant.tests.factories.assistant_mandate import AssistantMandateFactory
 from assistant.tests.factories.manager import ManagerFactory
+from assistant.tests.factories.tutoring_learning_unit_year import TutoringLearningUnitYearFactory
 from assistant.utils.import_xls_file_data import check_date_format
 from assistant.utils.import_xls_file_data import check_file_format
 from assistant.utils.import_xls_file_data import create_academic_assistant_if_not_exists
 from assistant.utils.import_xls_file_data import create_assistant_mandate_if_not_exists
 from assistant.utils.import_xls_file_data import link_mandate_to_entity
 from assistant.utils.import_xls_file_data import read_xls_mandates
+from assistant.utils.import_xls_file_data import retrieve_learning_units_year_from_previous_mandate
 from assistant.utils.import_xls_file_data import search_entity_by_acronym_and_type
 from assistant.utils import import_xls_file_data
-from assistant.utils.import_xls_file_data import COLS_NUMBER, COLS_TITLES
+from assistant.utils.import_xls_file_data import COLS_TITLES
 
 HTTP_OK = 200
+
 
 class ExportImportXlsFile(TestCase):
     def setUp(self):
@@ -59,10 +65,9 @@ class ExportImportXlsFile(TestCase):
         self.manager = ManagerFactory()
         self.client.force_login(self.manager.person.user)
         self.request.user = self.manager.person.user
-        today = datetime.date.today()
-        self.current_academic_year = AcademicYearFactory(start_date=today,
-                                                         end_date=today.replace(year=today.year + 1),
-                                                         year=today.year)
+        now = timezone.now()
+        AcademicYearFactory.produce_in_past()
+        self.previous_academic_year = academic_year.find_academic_year_by_year(now.year - 2)
         self.person1 = PersonFactory(global_id='00201968')
         self.assistant1 = AcademicAssistantFactory(person=self.person1)
         self.record1 = {
@@ -92,7 +97,6 @@ class ExportImportXlsFile(TestCase):
             'CONTRACT_DURATION_FTE': '4', 'RENEWAL_TYPE': 'SPECIAL', 'ABSENCES': None, 'COMMENT': None,
             'OTHER_STATUS': None, 'EMAIL': None, 'FGS': None
         }
-        self.assistant_mandate1 = AssistantMandateFactory(assistant=self.assistant1)
         self.entity_version1 = EntityVersionFactory(entity_type=entity_type.SECTOR,
                                                     acronym='SST',
                                                     title='Secteur des Sciences et Technologies',
@@ -100,7 +104,9 @@ class ExportImportXlsFile(TestCase):
         self.entity_version2 = EntityVersionFactory(entity_type=entity_type.SECTOR,
                                                     acronym='SSH',
                                                     end_date=datetime.datetime(datetime.date.today().year + 1, 9, 14))
-
+        self.assistant_mandate1 = AssistantMandateFactory(
+            assistant=self.assistant1
+        )
 
     def test_upload_mandates_file(self):
         file = File(open('assistant/tests/resources/assistants_ok.xlsx', 'rb'))
@@ -110,21 +116,25 @@ class ExportImportXlsFile(TestCase):
         response2 = self.client.post('/assistants/manager/mandates/upload/', {'file': file2})
         self.assertEqual(response2.status_code, HTTP_OK)
 
-
     def test_read_xls_mandates(self):
         file = File(open('assistant/tests/resources/assistants_bad_date.xlsx', 'rb'))
-        uploaded_file = SimpleUploadedFile('new_excel.xlsx', file.read(),
-                                           content_type='vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        uploaded_file = SimpleUploadedFile(
+            'new_excel.xlsx', file.read(),
+            content_type='vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
         self.assertFalse(read_xls_mandates(self.request, uploaded_file))
         file2 = File(open('assistant/tests/resources/assistants_ok.xlsx', 'rb'))
-        uploaded_file2 = SimpleUploadedFile('new_excel.xlsx', file2.read(),
-                                           content_type='vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        uploaded_file2 = SimpleUploadedFile(
+            'new_excel.xlsx', file2.read(),
+            content_type='vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
         self.assertTrue(read_xls_mandates(self.request, uploaded_file2))
         file3 = File(open('assistant/tests/resources/assistants_bad_column.xlsx', 'rb'))
-        uploaded_file3 = SimpleUploadedFile('new_excel.xlsx', file3.read(),
-                                           content_type='vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        uploaded_file3 = SimpleUploadedFile(
+            'new_excel.xlsx', file3.read(),
+            content_type='vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
         self.assertFalse(read_xls_mandates(self.request, uploaded_file3))
-
 
     def test_dates_format_(self):
         self.assertFalse(check_date_format('12/2015/92'))
@@ -132,7 +142,6 @@ class ExportImportXlsFile(TestCase):
         self.assertTrue(check_date_format('12-05-2013'))
         self.assertFalse(check_date_format('34-14-2013'))
         self.assertFalse(check_date_format('34_14_2013 '))
-
 
     def test_check_file_format(self):
         cols = COLS_TITLES.copy()
@@ -143,7 +152,6 @@ class ExportImportXlsFile(TestCase):
         cols[0] = 'BAD_TITLE'
         cols[1] = 'ANOTHER_BAD_TITLE'
         self.assertFalse(check_file_format(self.request, cols))
-
 
     def test_create_academic_assistant_if_not_exists(self):
         nbr_assistant_updated = import_xls_file_data.ASSISTANTS_UPDATED
@@ -161,7 +169,6 @@ class ExportImportXlsFile(TestCase):
         self.assertEqual(import_xls_file_data.ASSISTANTS_IMPORTED, nbr_assistant_imported + 1)
         self.assertEqual(nbr_assistant_updated + 1, import_xls_file_data.ASSISTANTS_UPDATED)
         self.assertEqual(nbr_persons_not_found + 1, import_xls_file_data.PERSONS_NOT_FOUND)
-
 
     def test_create_assistant_mandate_if_not_exists(self):
         nbr_mandates_imported = import_xls_file_data.MANDATES_IMPORTED
@@ -191,6 +198,25 @@ class ExportImportXlsFile(TestCase):
         self.assertEqual(import_xls_file_data.MANDATES_IMPORTED, nbr_mandates_imported + 3)
         self.assertEqual(import_xls_file_data.MANDATES_UPDATED, nbr_mandates_updated + 1)
 
+    def test_retrieve_learning_units_year_from_previous_mandate(self):
+        self.assistant_mandate3 = AssistantMandateFactory(assistant=self.assistant2)
+        self.assistant_mandate2 = AssistantMandateFactory(
+            assistant=self.assistant1,
+            academic_year=self.previous_academic_year
+        )
+        self.tutoring_learning_unit_year1 = TutoringLearningUnitYearFactory(mandate=self.assistant_mandate2)
+        self.tutoring_learning_unit_year2 = TutoringLearningUnitYearFactory(mandate=self.assistant_mandate2)
+        self.assistant_mandate5 = AssistantMandateFactory(
+            assistant=self.assistant2
+        )
+        retrieve_learning_units_year_from_previous_mandate(self.assistant1, self.assistant_mandate1)
+        self.assertEqual(len(find_by_mandate(self.assistant_mandate1)), 2)
+
+        retrieve_learning_units_year_from_previous_mandate(self.assistant2, self.assistant_mandate5)
+        self.assertEqual(len(find_by_mandate(self.assistant_mandate5)), 0)
+
+        retrieve_learning_units_year_from_previous_mandate(self.assistant2, self.assistant_mandate3)
+        self.assertEqual(len(find_by_mandate(self.assistant_mandate3)), 0)
 
     def test_link_mandate_to_entity(self):
         self.assertEqual(
@@ -203,13 +229,11 @@ class ExportImportXlsFile(TestCase):
             find_by_mandate_and_entity(self.assistant_mandate1, self.entity_version2.entity)[0]
         )
 
-
     def test_search_entity_by_acronym_and_type(self):
         self.assertIsInstance(search_entity_by_acronym_and_type('SST', entity_type.SECTOR), entity.Entity)
         self.assertEqual(search_entity_by_acronym_and_type(None, entity_type.SECTOR), None)
         self.assertEqual(search_entity_by_acronym_and_type(None, entity_type.SECTOR), None)
         self.assertEqual(search_entity_by_acronym_and_type('SST', None), None)
-
 
 
 class FakeMessages:

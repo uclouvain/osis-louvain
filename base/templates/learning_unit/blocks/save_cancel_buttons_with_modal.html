@@ -1,26 +1,23 @@
 {% load bootstrap3 %}
 {% load i18n %}
-<div class="panel panel-default">
-    <div class="panel-heading">
-        <div class="row">
-            <div class="col-md-2 col-md-offset-8">
-                {# We do not need postponement for learning unit in the past #}
-                {% if learning_unit_year.is_past %}
-                    <button type="submit" class="btn btn-primary">
-                        <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}
-                    </button>
-                {% else %}
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalReport">
-                    <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}
-                </button>
-                {% endif %}
-            </div>
 
-            <div class="col-md-2">
-                <a href="{% url 'learning_unit' learning_unit_year.id %}" class="btn btn-default" role="button">
-                    {% trans 'cancel' %}
-                </a>
-            </div>
-        </div>
+<div class="row">
+    <div class="col-md-2 col-md-offset-8">
+        {# We do not need postponement for learning unit in the past #}
+        {% if learning_unit_year.is_past %}
+            <button type="submit" class="btn btn-primary">
+                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}
+            </button>
+        {% else %}
+        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalReport">
+            <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}
+        </button>
+        {% endif %}
+    </div>
+
+    <div class="col-md-2">
+        <a href="{% url 'learning_unit' learning_unit_year.id %}" class="btn btn-default" role="button">
+            {% trans 'cancel' %}
+        </a>
     </div>
 </div>
