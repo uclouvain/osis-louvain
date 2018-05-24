@@ -270,11 +270,18 @@ class LearningUnitPostponementForm:
                 'new_value': self._get_translated_value(next_form.instances_data[col_name]),
                 'current_value': self._get_translated_value(value)
             } for col_name, value in current_form.instances_data.items()
-            if next_form.instances_data[col_name] != value and col_name not in FIELDS_TO_NOT_CHECK
+            if self._get_cmp_value(next_form.instances_data[col_name]) != self._get_cmp_value(value) and
+            col_name not in FIELDS_TO_NOT_CHECK
         ]
 
         if differences:
             self.consistency_errors.setdefault(ac_year, []).extend(differences)
+
+    def _get_cmp_value(self, value):
+        """This function return comparable value. It consider empty string as null value"""
+        if isinstance(value, str) and not value.strip():
+            return None
+        return value
 
     def _get_translated_value(self, value):
         if isinstance(value, bool):

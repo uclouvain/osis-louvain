@@ -354,6 +354,23 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         expected_result = {}
         self.assertEqual(form.consistency_errors, expected_result)
 
+    def test_when_no_differences_found_empty_string_as_null(self):
+        # Set specific title to 'None' for current academic year
+        self.learning_unit_year_full.specific_title = None
+        self.learning_unit_year_full.save()
+        # Set specific title to '' for all next academic year
+        LearningUnitYear.objects.filter(academic_year__year__gt=self.learning_unit_year_full.academic_year.year,
+                                        learning_unit=self.learning_unit_year_full.learning_unit) \
+                                .update(specific_title='')
+
+        instance_luy_base_form = _instanciate_base_learning_unit_form(self.learning_unit_year_full, self.person)
+        form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
+                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
+                                              data=instance_luy_base_form.data)
+        self.assertTrue(form.is_valid())
+        expected_result = {}
+        self.assertEqual(form.consistency_errors, expected_result)
+
     def test_when_difference_found_on_boolean_field(self):
         next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 1)
         initial_status_value, new_status_value = self._change_status_value(next_academic_year)
