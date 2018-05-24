@@ -41,10 +41,10 @@ from assistant.tests.factories.review import ReviewFactory
 from assistant.tests.factories.reviewer import ReviewerFactory
 from assistant.tests.factories.settings import SettingsFactory
 from assistant.views.reviewer_review import generate_reviewer_menu_tabs
-from assistant.views.reviewer_review import user_is_reviewer_and_procedure_is_open
 from assistant.views.reviewer_review import validate_review_and_update_mandate
 
 HTTP_OK = 200
+
 
 class ReviewerReviewViewTestCase(TestCase):
 
@@ -61,33 +61,50 @@ class ReviewerReviewViewTestCase(TestCase):
         self.phd_supervisor = PersonFactory()
         self.assistant = AcademicAssistantFactory(supervisor=self.phd_supervisor)
 
-        self.assistant_mandate = AssistantMandateFactory(academic_year=self.current_academic_year,
-                                                         assistant=self.assistant,
-                                                         state=assistant_mandate_state.RESEARCH)
-        self.assistant_mandate2 = AssistantMandateFactory(academic_year=self.current_academic_year,
-                                                         assistant=self.assistant,
-                                                         state=assistant_mandate_state.RESEARCH)
-        self.phd_supervisor_review = ReviewFactory(reviewer=None, mandate=self.assistant_mandate,
-                                                     status=review_status.DONE)
+        self.assistant_mandate = AssistantMandateFactory(
+            academic_year=self.current_academic_year,
+            assistant=self.assistant,
+            state=assistant_mandate_state.RESEARCH
+        )
+        self.assistant_mandate2 = AssistantMandateFactory(
+            academic_year=self.current_academic_year,
+            assistant=self.assistant,
+            state=assistant_mandate_state.RESEARCH
+        )
+        self.phd_supervisor_review = ReviewFactory(
+            reviewer=None,
+            mandate=self.assistant_mandate,
+            status=review_status.DONE
+        )
         self.entity_version = EntityVersionFactory(entity_type=entity_type.INSTITUTE)
         self.entity_mandate = MandateEntityFactory(assistant_mandate=self.assistant_mandate,
                                                    entity=self.entity_version.entity)
-        self.entity_mandate2 = MandateEntityFactory(assistant_mandate=self.assistant_mandate2,
-                                                   entity=self.entity_version.entity)
+        self.entity_mandate2 = MandateEntityFactory(
+            assistant_mandate=self.assistant_mandate2,
+            entity=self.entity_version.entity
+        )
         self.reviewer = ReviewerFactory(role=reviewer_role.RESEARCH,
                                         entity=self.entity_version.entity)
         self.review = ReviewFactory(reviewer=self.reviewer, mandate=self.assistant_mandate,
                                     status=review_status.IN_PROGRESS)
         self.entity_version2 = EntityVersionFactory(entity_type=entity_type.FACULTY)
-        self.entity_mandate2 = MandateEntityFactory(assistant_mandate=self.assistant_mandate,
-                                                   entity=self.entity_version2.entity)
-        self.reviewer2 = ReviewerFactory(role=reviewer_role.SUPERVISION,
-                                        entity=self.entity_version2.entity)
+        self.entity_mandate2 = MandateEntityFactory(
+            assistant_mandate=self.assistant_mandate,
+            entity=self.entity_version2.entity
+        )
+        self.reviewer2 = ReviewerFactory(
+            role=reviewer_role.SUPERVISION,
+            entity=self.entity_version2.entity
+        )
         self.entity_version3 = EntityVersionFactory(entity_type=entity_type.SECTOR)
-        self.entity_mandate3 = MandateEntityFactory(assistant_mandate=self.assistant_mandate,
-                                                   entity=self.entity_version3.entity)
-        self.reviewer3 = ReviewerFactory(role=reviewer_role.VICE_RECTOR,
-                                        entity=self.entity_version3.entity)
+        self.entity_mandate3 = MandateEntityFactory(
+            assistant_mandate=self.assistant_mandate,
+            entity=self.entity_version3.entity
+        )
+        self.reviewer3 = ReviewerFactory(
+            role=reviewer_role.VICE_RECTOR,
+            entity=self.entity_version3.entity
+        )
 
     def test_pst_form_view(self):
         self.client.force_login(self.reviewer.person.user)
@@ -110,8 +127,10 @@ class ReviewerReviewViewTestCase(TestCase):
         validate_review_and_update_mandate(self.review, self.assistant_mandate)
         self.assertEqual(self.review.status, review_status.DONE)
         self.assertEqual(self.assistant_mandate.state, assistant_mandate_state.SUPERVISION)
-        self.review2 = ReviewFactory(reviewer=self.reviewer2, mandate=self.assistant_mandate,
-                                    status=review_status.IN_PROGRESS)
+        self.review2 = ReviewFactory(
+            reviewer=self.reviewer2, mandate=self.assistant_mandate,
+            status=review_status.IN_PROGRESS
+        )
         validate_review_and_update_mandate(self.review2, self.assistant_mandate)
         self.assertEqual(self.review2.status, review_status.DONE)
         self.assertEqual(self.assistant_mandate.state, assistant_mandate_state.VICE_RECTOR)
@@ -120,7 +139,6 @@ class ReviewerReviewViewTestCase(TestCase):
         validate_review_and_update_mandate(self.review3, self.assistant_mandate)
         self.assertEqual(self.review3.status, review_status.DONE)
         self.assertEqual(self.assistant_mandate.state, assistant_mandate_state.DONE)
-
 
     def test_review_view(self):
         self.client.force_login(self.reviewer.person.user)
@@ -131,7 +149,7 @@ class ReviewerReviewViewTestCase(TestCase):
                                                                           'role': reviewer_role.RESEARCH})
         self.assertEqual(response.status_code, HTTP_OK)
 
-    def test_generate_phd_supervisor_menu_tabs(self):
+    def test_generate_reviewer_menu_tabs(self):
         self.client.force_login(self.reviewer.person.user)
         self.assertEqual([{'action': 'view', 'class': '', 'item': 'PHD_SUPERVISOR'},
                           {'item': 'RESEARCH', 'class': '', 'action': 'edit'}],
@@ -140,8 +158,11 @@ class ReviewerReviewViewTestCase(TestCase):
         self.review.save()
         self.assistant_mandate.state = assistant_mandate_state.SUPERVISION
         self.assistant_mandate.save()
-        self.review2 = ReviewFactory(reviewer=self.reviewer2, mandate=self.assistant_mandate,
-                                    status=review_status.IN_PROGRESS)
+        self.review2 = ReviewFactory(
+            reviewer=self.reviewer2,
+            mandate=self.assistant_mandate,
+            status=review_status.IN_PROGRESS
+        )
         self.assertEqual([{'action': 'view', 'class': '', 'item': 'PHD_SUPERVISOR'},
                           {'item': 'RESEARCH', 'class': 'active', 'action': 'view'}],
                          generate_reviewer_menu_tabs(reviewer_role.RESEARCH, self.assistant_mandate,
@@ -150,5 +171,3 @@ class ReviewerReviewViewTestCase(TestCase):
                           {'item': 'RESEARCH', 'class': '', 'action': 'view'},
                           {'item': 'SUPERVISION', 'class': '', 'action': 'edit'}],
                          generate_reviewer_menu_tabs(reviewer_role.SUPERVISION, self.assistant_mandate, None))
-
-

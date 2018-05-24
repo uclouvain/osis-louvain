@@ -24,13 +24,10 @@
 #
 ##############################################################################
 from django import forms
-from django.utils.safestring import mark_safe
-from ckeditor.widgets import CKEditorWidget
 
 from base.forms.common import set_trans_txt
 from cms.enums import entity_name
 from cms.models import translated_text
-from cms import models as mdl_cms
 
 
 class EducationGroupGeneralInformationsForm(forms.Form):

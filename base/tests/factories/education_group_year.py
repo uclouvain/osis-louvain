@@ -41,7 +41,8 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
 
     education_group = factory.SubFactory(EducationGroupFactory)
     academic_year = factory.SubFactory(AcademicYearFactory)
-    acronym = factory.Sequence(lambda n: 'Education %d' % n)
-    partial_acronym = factory.Sequence(lambda n: 'SCS %d' % n)
+    acronym = factory.Sequence(lambda n: 'Education%d' % n)
+    partial_acronym = factory.Sequence(lambda n: 'SCS%d' % n)
     title = factory.LazyAttribute(generate_title)
+    title_english = factory.LazyAttribute(generate_title)
     education_group_type = factory.SubFactory(EducationGroupTypeFactory)

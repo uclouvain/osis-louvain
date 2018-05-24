@@ -71,6 +71,11 @@
             {% bootstrap_field form.faculty_borrowing_acronym %}
         </div>
     {% endif %}
+    {% if search_type == 1 or search_type == 5%}
+        <div class="col-md-2">
+            {% bootstrap_field form.allocation_entity_acronym %}
+        </div>
+    {% endif %}
     <input type="hidden" id="xls_status" name="xls_status">
 
 {% endblock %}

@@ -19,6 +19,9 @@ requests==2.18.3
 django-bootstrap3==9.1.0
 django-ordered-model==1.4.3
 django-waffle==0.14.0
+beautifulsoup4==4.6.0
+pypom==1.2.0
+selenium==3.11.0
 
 -r ./osis_common/requirements.txt
 -r ./internship/requirements.txt

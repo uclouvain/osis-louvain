@@ -2909,3 +2909,21 @@ msgstr "%(col_name)s a déjà été modifié. ({%(new_value)s} à la place de {%
 
 msgid "external_code"
 msgstr "Code local"
+
+msgid "Proposals"
+msgstr "Propositions"
+
+msgid "learning_units_and_attributions_filename"
+msgstr "unites_enseignements_et_attributions"
+
+msgid "attribution_list"
+msgstr "Liste d'attributions"
+
+msgid "List_proposals"
+msgstr "Liste de propositions"
+
+msgid "List_activities"
+msgstr "Liste d'activités"
+
+msgid "learning_units_filename"
+msgstr "unite_enseignements"

@@ -119,7 +119,7 @@
             {% if review.reviewer is None %}
                 {{ review.mandate.assistant.supervisor }}
             {% else %}
-                {{ review.reviewer.person }} - {{ review.reviewer.structure }}
+                {{ review.reviewer.person }} - {{ review.reviewer.entity.most_recent_acronym }}
             {% endif %}
         </h4>
         <div class="form-group">

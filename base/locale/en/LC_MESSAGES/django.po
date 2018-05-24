@@ -2903,3 +2903,21 @@ msgstr ""
 
 msgid "external_code"
 msgstr "External code"
+
+msgid "Proposals"
+msgstr ""
+
+msgid "learning_units_and_attributions_filename"
+msgstr "learning_units_and_attributions"
+
+msgid "attribution_list"
+msgstr "List of attributions"
+
+msgid "List_proposals"
+msgstr "List of proposals"
+
+msgid "List_activities"
+msgstr "List of activities"
+
+msgid "learning_units_filename"
+msgstr "learning_units"

@@ -26,6 +26,7 @@
 import datetime
 from unittest import mock
 
+import bs4
 from django.contrib.auth.models import Permission, Group
 from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
@@ -545,6 +546,25 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertEqual(list(form_french.text_labels_name), [self.cms_label_for_child.text_label.label])
         self.assertEqual(list(form_english.text_labels_name), [self.cms_label_for_child.text_label.label])
 
+    def test_user_has_link_to_edit_pedagogy(self):
+        self.user.user_permissions.add(Permission.objects.get(codename='can_edit_educationgroup_pedagogy'))
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+
+        soup = bs4.BeautifulSoup(response.content, 'html.parser')
+        self.assertEqual(len(soup.select('a.pedagogy-edit-btn')), 2)
+
+    def test_user_has_not_link_to_edit_pedagogy(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+
+        soup = bs4.BeautifulSoup(response.content, 'html.parser')
+        self.assertEqual(len(soup.select('a.pedagogy-edit-btn')), 0)
+
 
 class EducationGroupViewTestCase(TestCase):
     def setUp(self):
@@ -732,6 +752,56 @@ class EducationGroupAdministrativedata(TestCase):
         self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
 
         self.assertTrue(response.context["can_edit_administrative_data"])
+
+# class EducationGroupYearPedagogy(TestCase):
+#     def setUp(self):
+#         self.person = PersonFactory()
+#
+#         self.permission = Permission.objects.get(codename='can_edit_educationgroup_pedagogy')
+#         self.person.user.user_permissions.add(self.permission)
+#
+#         self.education_group_year = EducationGroupYearFactory()
+#
+#         self.url = reverse('education_group_pedagogy_edit', args=[self.education_group_year.id])
+#         self.client.force_login(self.person.user)
+
+
+class EducationGroupYearEditPedagogy(TestCase):
+    def setUp(self):
+        self.person = PersonFactory()
+
+        self.permission = Permission.objects.get(codename='can_edit_educationgroup_pedagogy')
+        self.person.user.user_permissions.add(self.permission)
+
+        self.education_group_year = EducationGroupYearFactory()
+
+        self.url = reverse('education_group_pedagogy_edit', args=[self.education_group_year.id])
+        self.client.force_login(self.person.user)
+
+    def test_when_not_logged(self):
+        self.client.logout()
+
+        response = self.client.get(self.url)
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    def test_user_has_not_permission(self):
+        self.person.user.user_permissions.remove(self.permission)
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, "access_denied.html")
+
+    def test_user_has_permission(self):
+        text_label = TextLabelFactory(entity=entity_name.OFFER_YEAR)
+
+        url = "{}?label={}&language={}".format(self.url, text_label.label, self.person.language)
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/pedagogy_edit.html")
+
+        soup = bs4.BeautifulSoup(response.content, 'html.parser')
+        self.assertEqual(soup.div.form['action'], self.url)
 
 
 class EducationGroupEditAdministrativeData(TestCase):

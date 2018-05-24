@@ -29,7 +29,7 @@ from django.test import TestCase
 from django.core.urlresolvers import reverse
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithoutUserFactory
 from base.tests.factories.offer import OfferFactory
 from base.tests.factories.student import StudentFactory
 from dissertation.tests.factories.adviser import AdviserManagerFactory, AdviserTeacherFactory
@@ -66,9 +66,8 @@ class DissertationViewTestCase(TestCase):
                                                  last_name='Millet',
                                                  email='laurent.dermine@uclouvain.be')
         self.teacher2 = AdviserTeacherFactory(person=a_person_teacher2)
-        a_person_student = PersonFactory.create(last_name="Durant",
-                                                user=None,
-                                                email='laurent.dermine@uclouvain.be')
+        a_person_student = PersonWithoutUserFactory.create(last_name="Durant",
+                                                           email='laurent.dermine@uclouvain.be')
         self.student = StudentFactory.create(person=a_person_student)
         self.offer1 = OfferFactory(title="test_offer1")
         self.offer2 = OfferFactory(title="test_offer2")
@@ -273,7 +272,7 @@ class DissertationViewTestCase(TestCase):
         a_person_teacher = PersonFactory.create(first_name='Pierre', last_name='Dupont')
         a_person_teacher2 = PersonFactory.create(first_name='Marco', last_name='Millet')
         teacher = AdviserTeacherFactory(person=a_person_teacher)
-        a_person_student = PersonFactory.create(last_name="Durant", user=None)
+        a_person_student = PersonWithoutUserFactory.create(last_name="Durant")
         student = StudentFactory.create(person=a_person_student)
         offer_year_start = OfferYearFactory(academic_year=self.academic_year1, acronym="test_offer2")
         offer_year_start2 = OfferYearFactory(acronym="test_offer3", academic_year=offer_year_start.academic_year)

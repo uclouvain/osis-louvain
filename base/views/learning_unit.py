@@ -362,7 +362,6 @@ def create_partim_form(request, learning_unit_year_id):
 
 def get_learning_unit_identification_context(learning_unit_year_id, person):
     context = get_common_context_learning_unit_year(learning_unit_year_id, person)
-
     learning_unit_year = context['learning_unit_year']
     if learning_unit_year.subtype == learning_unit_year_subtypes.FULL:
         context['warnings'] = FullForm(person, learning_unit_year.academic_year,
@@ -373,7 +372,6 @@ def get_learning_unit_identification_context(learning_unit_year_id, person):
                                          academic_year=learning_unit_year.academic_year,
                                          learning_unit_instance=learning_unit_year.learning_unit).warnings
     proposal = proposal_learning_unit.find_by_learning_unit(learning_unit_year.learning_unit)
-
     context['learning_container_year_partims'] = learning_unit_year.get_partims_related()
     context['organization'] = get_organization_from_learning_unit_year(learning_unit_year)
     context['campus'] = get_campus_from_learning_unit_year(learning_unit_year)

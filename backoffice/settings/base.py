@@ -206,10 +206,46 @@ QUEUES = {}
 # Add local path in your environment settings (ex: dev.py)
 LOCALE_PATHS = ()
 
+
+def define_style_sheet(name, class_name):
+    return {'name': name, 'element': 'div', 'attributes': {'class': class_name}}
+
+REDDOT_STYLES = [
+    define_style_sheet('Intro', 'reddot_intro'),
+    define_style_sheet('Teaser', 'reddot_teaser'),
+    define_style_sheet('Collapse', 'reddot_collapse'),
+    define_style_sheet('Extra', 'reddot_extra'),
+    define_style_sheet('Body', 'reddot_body'),
+    define_style_sheet('Part1', 'reddot_part1'),
+    define_style_sheet('Part2', 'reddot_part2'),
+    define_style_sheet('Contact Responsible', 'contacts_responsible'),
+    define_style_sheet('Contact Other Responsibles', 'contacts_responsibles'),
+    define_style_sheet('Contact Jury', 'contacts_jury'),
+    define_style_sheet('Contact Contact', 'contacts_contact'),
+]
+
 # Apps Settings
 CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
+    'reddot': {
+        "removePlugins": "stylesheetparser",
+        'allowedContent': True,
+        'extraAllowedContent': 'div(reddot_*,contacts_*)',
+        'extraPlugins': 'reddot',
+        'stylesSet': REDDOT_STYLES,
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList'],
+            ['Link', 'Unlink'],
+            ['CreateDiv'],
+        ]
+    },
     'default': {
+        "removePlugins": "stylesheetparser",
+        'allowedContent': True,
+        'extraAllowedContent': 'div(reddot_*,contacts_*)',
+        'extraPlugins': 'reddot',
         'toolbar': 'Custom',
         'toolbar_Custom': [
             {'name': 'basicstyles', 'items': ['Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat']},
@@ -226,6 +262,7 @@ CKEDITOR_CONFIGS = {
                        'HiddenField']},
             {'name': 'about', 'items': ['About']},
         ],
+        'stylesSet': REDDOT_STYLES,
     },
     'minimal': {
         'toolbar': 'Custom',

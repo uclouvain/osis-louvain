@@ -26,7 +26,7 @@
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithoutUserFactory
 from base.tests.factories.student import StudentFactory
 from dissertation.tests.factories.adviser import AdviserManagerFactory, AdviserTeacherFactory
 from dissertation.tests.factories.dissertation import DissertationFactory
@@ -42,7 +42,7 @@ class InformationViewTestCase(TestCase):
         self.manager = AdviserManagerFactory()
         a_person_teacher = PersonFactory(first_name='Pierre', last_name='Dupont')
         self.teacher = AdviserTeacherFactory(person=a_person_teacher)
-        a_person_student = PersonFactory(last_name="Durant", user=None)
+        a_person_student = PersonWithoutUserFactory(last_name="Durant")
         student = StudentFactory(person=a_person_student)
 
         offer_year_start = OfferYearFactory(acronym="test_offer")

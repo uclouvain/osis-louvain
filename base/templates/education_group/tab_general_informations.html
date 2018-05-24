@@ -32,7 +32,7 @@
 {% block content %}
 
 {% include "education_group/header.html" %}
-
+{% url 'education_group_pedagogy_edit' education_group_year_id=education_group_year.id as post_url %}
 <div class="panel panel-default">
     <div class="panel-body" id="tabs">
         <div class="tab-content" id="tab_content">
@@ -47,22 +47,36 @@
                                 <label> {% trans 'language'%} </label>
                             </div>
                             <div class="col-md-5">
-                                <label> {{ form_french.language.1 }} </label>
+                                <label> {{ form_french.language.1 }}</label>
                             </div>
                             <div class="col-md-5">
-                                <label> {{ form_english.language.1 }} </label>
+                                <label> {{ form_english.language.1 }}</label>
                             </div>
                         </div>
                         <hr/>
                         {% for label_key, label_translated in cms_labels_translated.items %}
                         <div class="row" style="margin-top:10px;">
                             <div class="col-md-2">
-                                <label> {{ label_translated }} </label>
+                                <label> {{ label_translated }}</label>
                             </div>
                             <div class="col-md-5">
+                                {% if can_edit_information %}
+                                    <a class="pedagogy-edit-btn pull-right" href="#"
+                                       data-form="{{post_url}}?language={{ form_french.language.0 }}&label={{ label_key|urlencode }}"
+                                       title="{% trans 'edit' %}">
+                                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                    </a>
+                                {% endif %}
                                 {{ form_french|getattr:label_key }}
                             </div>
                             <div class="col-md-5">
+                                {% if can_edit_information %}
+                                    <a class="pedagogy-edit-btn pull-right" href="#"
+                                       data-form="{{post_url}}?language={{ form_english.language.0 }}&label={{ label_key|urlencode }}"
+                                       title="{% trans 'edit' %}">
+                                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                                    </a>
+                                {% endif %}
                                 {{ form_english|getattr:label_key}}
                             </div>
                         </div>
@@ -74,7 +88,19 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
 {% endblock %}
 {% block script %}
     <script src="{% static 'js/education_group/education_group_tree.js' %}"></script>
+    <script>
+        $(".pedagogy-edit-btn").click(function(evt) {
+            evt.preventDefault();
+            var url = $(this).data("form");
+            var pedagogy_edit_modal = $("#pedagogy_edit");
+            pedagogy_edit_modal.load(url, function() {
+                $(this).modal('show');
+            });
+            return false;
+        });
+    </script>
 {% endblock %}

@@ -23,22 +23,59 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+import datetime
 
-from base.forms.learning_unit.search_form import filter_is_borrowed_learning_unit_year
-from base.models.entity_container_year import EntityContainerYear
-from base.models.entity_version import EntityVersion
-from base.models.enums import entity_container_year_link_type, entity_type
+from django.http import QueryDict
+from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
+
+from base.forms.learning_unit.search_form import filter_is_borrowed_learning_unit_year, SearchForm, LearningUnitYearForm
+from base.models.enums import entity_container_year_link_type, entity_type, learning_container_year_types
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
 from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_year_entity import OfferYearEntityFactory
 
+
+class TestSearchForm(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        current_year = datetime.date.today().year
+        cls.academic_years = GenerateAcademicYear(current_year - 2, current_year + 2).academic_years
+
+    def test_get_research_criteria(self):
+        data = QueryDict(mutable=True)
+        data.update({
+            "requirement_entity_acronym": "info",
+            "tutor": "Jean Marcel",
+            "academic_year_id": str(self.academic_years[0].id),
+        })
+        form = SearchForm(data)
+        self.assertTrue(form.is_valid())
+        expected_research_criteria = [(_('academic_year_small'), self.academic_years[0]),
+                                      (_('requirement_entity_small'), "INFO"),
+                                      (_('tutor'), "Jean Marcel")]
+        actual_research_criteria = form.get_research_criteria()
+        self.assertListEqual(expected_research_criteria, actual_research_criteria)
+
+    def test_get_research_criteria_with_choice_field(self):
+        data = QueryDict(mutable=True)
+        data.update({
+            "academic_year_id": str(self.academic_years[0].id),
+            "container_type": learning_container_year_types.COURSE
+        })
+        form = LearningUnitYearForm(data)
+        self.assertTrue(form.is_valid())
+        expected_research_criteria = [(_('academic_year_small'), self.academic_years[0]),
+                                      (_('type'), _(learning_container_year_types.COURSE))]
+        actual_research_criteria = form.get_research_criteria()
+        self.assertListEqual(expected_research_criteria, actual_research_criteria)
 
 class TestFilterIsBorrowedLearningUnitYear(TestCase):
     @classmethod

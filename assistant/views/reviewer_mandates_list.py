@@ -29,9 +29,9 @@ from django.views.generic import ListView
 from django.views.generic.edit import FormMixin
 
 from base.models import academic_year, entity_version
-from base.models.entity import find_versions_from_entites
 
 from assistant.business.users_access import user_is_reviewer_and_procedure_is_open
+from assistant.business.assistant_mandate import add_actions_to_mandates_list
 from assistant.business.mandate_entity import add_entities_version_to_mandates_list
 from assistant.models import assistant_mandate
 from assistant.models import reviewer, mandate_entity
@@ -85,26 +85,19 @@ class MandatesListView(LoginRequiredMixin, UserPassesTestMixin, ListView, FormMi
 
     def get_context_data(self, **kwargs):
         context = super(MandatesListView, self).get_context_data(**kwargs)
-        phd_list = ['RESEARCH', 'SUPERVISION', 'VICE_RECTOR', 'DONE']
-        research_list = ['SUPERVISION', 'VICE_RECTOR', 'DONE']
-        supervision_list = ['VICE_RECTOR', 'DONE']
-        vice_rector_list = ['VICE_RECTOR', 'DONE']
         current_reviewer = reviewer.find_by_person(self.request.user.person)
         can_delegate = reviewer.can_delegate(current_reviewer)
         context['can_delegate'] = can_delegate
         context['reviewer'] = current_reviewer
         entity = entity_version.get_last_version(current_reviewer.entity)
         context['entity'] = entity
-        context['phd_list'] = phd_list
-        context['research_list'] = research_list
-        context['supervision_list'] = supervision_list
-        context['vice_rector_list'] = vice_rector_list
         context['is_supervisor'] = self.is_supervisor
         context['review_status'] = review_status
         context['filter'] = self.kwargs.get("filter", None)
         context['year'] = academic_year.find_academic_year_by_id(
             self.request.session.get('selected_academic_year')).year
-        return add_entities_version_to_mandates_list(context)
+        context = add_entities_version_to_mandates_list(context)
+        return add_actions_to_mandates_list(context, current_reviewer)
 
     def get_initial(self):
         if self.request.session.get('selected_academic_year'):

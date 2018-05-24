@@ -51,6 +51,8 @@ if 'assessments' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^assessments/', include('assessments.urls')),)
 if 'attribution' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^attribution/', include('attribution.urls')),)
+if 'webservices' in settings.INSTALLED_APPS:
+    urlpatterns += (url(r'^api/', include('webservices.urls')),)
 
 handler404 = 'base.views.common.page_not_found'
 handler403 = 'base.views.common.access_denied'

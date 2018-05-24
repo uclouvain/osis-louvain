@@ -29,6 +29,10 @@ from django.utils.translation import ugettext_lazy as _
 from osis_common.document import xls_build
 from base.business.learning_unit import get_name_or_username, get_entity_acronym
 
+WORKSHEET_TITLE = 'Proposals'
+XLS_FILENAME = 'Proposals'
+XLS_DESCRIPTION = "List_proposals"
+
 PROPOSAL_TITLES = [str(_('requirement_entity_small')), str(_('code')), str(_('title')), str(_('type')),
                    str(_('proposal_type')), str(_('proposal_status')), str(_('folder_num')),
                    str(_('type_declaration_vacant')), str(_('periodicity')), str(_('credits')),
@@ -55,13 +59,13 @@ def extract_xls_data_from_proposal(proposal):
 
 
 def prepare_xls_parameters_list(user, working_sheets_data):
-    return {xls_build.LIST_DESCRIPTION_KEY: "Liste de propositions",
-            xls_build.FILENAME_KEY: 'Proposals',
+    return {xls_build.LIST_DESCRIPTION_KEY: _(XLS_DESCRIPTION),
+            xls_build.FILENAME_KEY: _(XLS_FILENAME),
             xls_build.USER_KEY: get_name_or_username(user),
             xls_build.WORKSHEETS_DATA:
                 [{xls_build.CONTENT_KEY: working_sheets_data,
                   xls_build.HEADER_TITLES_KEY: PROPOSAL_TITLES,
-                  xls_build.WORKSHEET_TITLE_KEY: 'Proposals',
+                  xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE),
                   }
                  ]}
 

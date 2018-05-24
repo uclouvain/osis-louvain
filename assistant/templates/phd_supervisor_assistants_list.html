@@ -63,8 +63,7 @@
         <th>{% trans 'contract_duration' %}</th>
         <th>{% trans 'eq_fte' %}</th>
         <th>{% trans 'state' %}</th>
-        <th>{% trans 'edit' %}</th>
-        <th>{% trans 'view' %}</th>
+        <th>{% trans 'action' %}</th>
         </tr>
         </thead>
         <tbody>
@@ -96,9 +95,7 @@
                         </button>
                     </form>
                 </td>
-                <td></td>
             {% elif mandate.state != "TRTS" and mandate.state != "TO_DO" and mandate.state != "DECLINED" %}
-                <td></td>
                 <td align="center">
                     <form method="POST" action="{% url 'phd_supervisor_review_view' %}">
                         {% csrf_token %}
@@ -110,8 +107,7 @@
                     </form>
                 </td>
             {% else %}
-                <td></td>
-                <td></td>
+                <td align="center"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span></td>
             {% endif %}
             </tr>
         {% endfor %}

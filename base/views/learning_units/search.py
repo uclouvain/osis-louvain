@@ -23,6 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import collections
+import itertools
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.messages import WARNING
@@ -159,31 +162,13 @@ def apply_action_on_proposals(proposals, author, post_data, research_criteria):
 
 
 def _get_filter(form, search_type):
-    form_data = form.cleaned_data
-
-    filter_data = {
-        form[key].label: _get_filter_value(form, key, value)
-        for key, value in form_data.items()
-        if value
-        }
-
-    if search_type:
-        filter_data.update({_('search_type'): _get_search_type_label(search_type)})
-    return filter_data
-
-
-def _get_filter_value(form, key, value):
-    value_translated = value
-    if form[key].field.__class__.__name__ == 'ChoiceField' and form[key].field.choices:
-        value_translated = dict(form.fields[key].choices)[value]
-    return value_translated
+    criterias = itertools.chain([(_('search_type'), _get_search_type_label(search_type))], form.get_research_criteria())
+    return collections.OrderedDict(criterias)
 
 
 def _get_search_type_label(search_type):
-    if search_type == PROPOSAL_SEARCH:
-        return _('proposals_search')
-    if search_type == SERVICE_COURSES_SEARCH:
-        return _('service_course_search')
-    if search_type == BORROWED_COURSE:
-        return _('borrowed_course_search')
-    return _('activity_search')
+    return {
+        PROPOSAL_SEARCH: _('proposals_search'),
+        SERVICE_COURSES_SEARCH: _('service_course_search'),
+        BORROWED_COURSE: _('borrowed_course_search')
+    }.get(search_type, _('activity_search'))

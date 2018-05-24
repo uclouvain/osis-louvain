@@ -31,7 +31,7 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.models.enums import entity_type
 
-from assistant.business.assistant_mandate import mandate_can_go_backward
+from assistant.business.assistant_mandate import mandate_can_go_backward, add_actions_to_mandates_list
 from assistant.models.enums import assistant_mandate_state
 from assistant.models.enums import assistant_type
 from assistant.models.enums import review_status
@@ -42,6 +42,7 @@ from assistant.tests.factories.manager import ManagerFactory
 from assistant.tests.factories.mandate_entity import MandateEntityFactory
 from assistant.tests.factories.review import ReviewFactory
 from assistant.tests.factories.reviewer import ReviewerFactory
+from assistant.tests.factories.settings import SettingsFactory
 
 
 class TestMandateEntity(TestCase):
@@ -50,6 +51,7 @@ class TestMandateEntity(TestCase):
         self.factory = RequestFactory()
         self.client = Client()
         self.manager = ManagerFactory()
+        self.settings = SettingsFactory()
         self.client.force_login(self.manager.person.user)
         self.assistant = AcademicAssistantFactory()
         self.assistant_mandate = AssistantMandateFactory(
@@ -184,3 +186,19 @@ class TestMandateEntity(TestCase):
         self.client.post(reverse('assistant_mandate_step_back'), {'mandate_id': self.assistant_mandate2.id})
         self.assistant_mandate2.refresh_from_db()
         self.assertEqual(self.assistant_mandate2.state, assistant_mandate_state.VICE_RECTOR)
+
+    def test_add_actions_to_mandates_list(self):
+        self.client.force_login(self.reviewer1.person.user)
+        response = self.client.get('/assistants/reviewer/')
+        context = add_actions_to_mandates_list(response.context, self.reviewer1)
+        for mandate in context['object_list']:
+            if mandate.id == self.assistant_mandate.id:
+                self.assertFalse(mandate.view)
+                self.assertFalse(mandate.edit)
+        self.client.force_login(self.reviewer2.person.user)
+        response = self.client.get('/assistants/reviewer/')
+        context = add_actions_to_mandates_list(response.context, self.reviewer2)
+        for mandate in context['object_list']:
+            if mandate.id == self.assistant_mandate2.id:
+                self.assertTrue(mandate.view)
+                self.assertTrue(mandate.edit)
