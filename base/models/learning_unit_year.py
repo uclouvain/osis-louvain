@@ -102,6 +102,8 @@ class LearningUnitYear(SerializableModel):
     mobility_modality = models.CharField(max_length=250, verbose_name=_('Modalities specific to IN and OUT mobility'),
                                          blank=True, null=True)
 
+    _warnings = None
+
     class Meta:
         unique_together = ('learning_unit', 'academic_year',)
 
@@ -243,7 +245,6 @@ class LearningUnitYear(SerializableModel):
         return [_('The credits value of the partim %(acronym)s is greater or equal than the credits value of the '
                 'parent learning unit.') % {'acronym': child.acronym}
                 for child in children if child.credits >= self.credits]
-
 
     def clean(self):
         learning_unit_years = find_gte_year_acronym(self.academic_year, self.acronym)

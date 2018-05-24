@@ -169,8 +169,9 @@ class LearningUnitYearModelForm(forms.ModelForm):
 
     @property
     def warnings(self):
-        if self._warnings is None and self.instance:
-            if hasattr(self.instance, 'warnings'):
+        if self._warnings is None:
+            self._warnings = []
+            if self.instance:
                 self._warnings = self.instance.warnings
         return self._warnings
 
