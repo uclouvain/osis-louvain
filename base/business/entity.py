@@ -49,9 +49,8 @@ def _get_distinct_entity_ids(entity_versions, with_entity_subordinated):
     return list(entities_ids)
 
 
-def get_entity_container_list(entities_id_list_param, entity_ids, entity_container_yr_link_type):
-    entities_id_list = entities_id_list_param
-    entities_id_list += list(
+def get_entity_container_list(entity_ids, entity_container_yr_link_type):
+    entities_id_list = list(
         mdl.entity_container_year.search(
             link_type=entity_container_yr_link_type,
             entity_id=entity_ids

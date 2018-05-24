@@ -371,6 +371,29 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         expected_result = {}
         self.assertEqual(form.consistency_errors, expected_result)
 
+    def test_when_difference_found_on_none_value(self):
+        # Set specific title to 'None' for learning unit next academic year
+        next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 1)
+        LearningUnitYear.objects.filter(academic_year=next_academic_year,
+                                        learning_unit=self.learning_unit_year_full.learning_unit) \
+                                .update(specific_title=None)
+        instance_luy_base_form = _instanciate_base_learning_unit_form(self.learning_unit_year_full, self.person)
+        form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
+                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
+                                              data=instance_luy_base_form.data)
+        self.assertTrue(form.is_valid())
+        result = form.consistency_errors
+        expected_result = OrderedDict({
+            next_academic_year: [
+                _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+                    'col_name': _('official_title_proper_to_UE'),
+                    'new_value': '-',
+                    'current_value': instance_luy_base_form.data['specific_title']
+                }
+            ]
+        })
+        self.assertEqual(expected_result[next_academic_year], result[next_academic_year])
+
     def test_when_difference_found_on_boolean_field(self):
         next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 1)
         initial_status_value, new_status_value = self._change_status_value(next_academic_year)
@@ -378,8 +401,8 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
             next_academic_year: [
                 _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
                     'col_name': _('active_title'),
-                    'current_value': _('yes') if initial_status_value else _('no'),
-                    'new_value': _('yes') if new_status_value else _('no')
+                    'new_value': _('yes') if new_status_value else _('no'),
+                    'current_value': _('yes') if initial_status_value else _('no')
                 }
             ]
         })

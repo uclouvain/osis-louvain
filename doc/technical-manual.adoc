@@ -3,40 +3,23 @@ Hildeberto Mendonça, PhD
 v0.1, 2016-02-29
 :toc: right
 
-This documentation explains how to contribute as a committer to OSIS project. A
-committer is an individual who is disciplined enough to gain the confidence of
-the project manager to commit directly to the repository without further
-bureaucracy. In fact, be accepted as a committer is a great recognition of the
-quality of your work as a programmer.
+This documentation explains how to contribute as a committer to OSIS project. A committer is an individual who is disciplined enough to gain the confidence of the project manager to commit directly to the repository without further bureaucracy. In fact, be accepted as a committer is a great recognition of the quality of your work as a programmer.
 
 == Installing OSIS
 
-The first thing to do to start contributing to the project is to prepare the
-development environment. During this section, we explain in details how to do
-that in a Debian-based distribution (Debian Linux, Ubuntu, Mint, etc.). This is
-the recommended operating system for development and deployment.
+The first thing to do to start contributing to the project is to prepare the development environment. During this section, we explain in details how to do that in a Debian-based distribution (Debian Linux, Ubuntu, Mint, etc.). This is the recommended operating system for development and deployment.
 
-Since we are going to install many things using the `apt-get` command, let's 
-update the package lists from remore repositories first:
+Since we are going to install many things using the `apt-get` command, let's update the package lists from remote repositories first:
 
     $ sudo apt-get update
 
-This command gets information about the newest versions of packages and their
-dependencies. This way, we make sure we are getting the latest version of
-whatever we need to install.
+This command gets information about the newest versions of packages and their dependencies. This way, we make sure we are getting the latest version of whatever we need to install.
 
-If your operating system is not based on Debian Linux then you can rely on a
-virtual machine as a development environment. For the virtual machine, we
-suggest  https://www.virtualbox.org[VirtualBox] as virtual runtime and
-https://ubuntu-mate.org[Ubuntu Mate] as operating system. Follow the
-installation instructions on their respective websites according to your own
-platform. When the Ubuntu virtual machine is created and running, execute the
-following command to make the operating system aware of the virtual runtime:
+If your operating system is not based on Debian Linux then you can rely on a virtual machine as a development environment. For the virtual machine, we suggest  https://www.virtualbox.org[VirtualBox] as virtual runtime and https://ubuntu-mate.org[Ubuntu Mate] as operating system. Follow the installation instructions on their respective websites according to your own platform. When the Ubuntu virtual machine is created and running, execute the following command to make the operating system aware of the virtual runtime:
 
     $ sudo apt-get install virtualbox-guest-dkms virtualbox-guest-x11
 
-Now that you have a Debian-based Linux system available, you can start preparing
-the development environment in it. Follow the steps below:
+Now that you have a Debian-based Linux system available, you can start preparing the development environment in it. Follow the steps below:
 
 - <<installing-git>>
 - <<installing-postgresql>>
@@ -46,10 +29,7 @@ the development environment in it. Follow the steps below:
 [[installing-git]]
 === Installing and Configuring Git
 
-Git is a distributed version control system used to manage the source code of
-OSIS. The source code is necessary to develop and deploy OSIS and we start the
-instructions by explaining how to install and configure it. We can use `apt-get`
-to install Git:
+Git is a distributed version control system used to manage the source code of OSIS. The source code is necessary to develop and deploy OSIS and we start the instructions by explaining how to install and configure it. We can use `apt-get` to install Git:
 
     $ sudo apt-get install git
 
@@ -64,42 +44,29 @@ The source code has some submodules that have to be cloned as well:
     $ git submodule init
     $ git submodule update
 
-Next, we add some personal information in the local Git installation to make
-sure you are well identified in all commits:
+Next, we add some personal information in the local Git installation to make sure you are well identified in all commits:
 
     $ git config --global user.name "[Firstname] [Lastname]"
     $ git config --global user.email "[firstname.lastname]@domain.com"
 
-Since version 2.0, Git has adopted a new behavior to pull and push commits while
-in a branch. When you execute `git push` or `git pull` Git will consider pushing
-or pulling just for the current branch. Before, these commands would push and
-pull all branches. But the change to this new behavior is voluntary, not
-automatically imposed. So, we have to explicitly say we have to move from the
-old behavior to the new one. To do that, execute the following command:
+Since version 2.0, Git has adopted a new behavior to pull and push commits while in a branch. When you execute `git push` or `git pull` Git will consider pushing or pulling just for the current branch. Before, these commands would push and pull all branches. But the change to this new behavior is voluntary, not automatically imposed. So, we have to explicitly say we have to move from the old behavior to the new one. To do that, execute the following command:
 
     $ git config --global push.default simple
 
 === Configuring Git to Simplify GitHub Authentication
 
-For the moment, every time we push code to GitHub the prompt asks for a username
-and password. We can bypass this step by registering a SSH key. To do that, we
-first check whether there is already an existing SSH key we can reuse:
+For the moment, every time we push code to GitHub the prompt asks for a username and password. We can bypass this step by registering a SSH key. To do that, we first check whether there is already an existing SSH key we can reuse:
 
     $ ls -al ~/.ssh
 
-If files with the extension `.pub` are listed then one of them can be reused to
-authenticate to GitHub. If not, then we can create one:
+If files with the extension `.pub` are listed then one of them can be reused to authenticate to GitHub. If not, then we can create one:
 
     $ ssh-keygen -t rsa -b 4096 -C "[firstname.lastname]@domain.com"
       Enter file in which to save the key (/Users/[user]/.ssh/id_rsa): [Press enter]
       Enter passphrase (empty for no passphrase): [Type a passphrase]
       Enter same passphrase again: [Type passphrase again]
 
-The next step is to add the new key - or an existing one - to the `ssh-agent`.
-This program runs the duration of a local login session, stores unencrypted keys
-in memory, and communicates with SSH clients using a Unix domain socket.
-Everyone who is able to connect to this socket also has access to the ssh-agent.
-First, we have to enable the ssh-agent:
+The next step is to add the new key - or an existing one - to the `ssh-agent`. This program runs the duration of a local login session, stores unencrypted keys in memory, and communicates with SSH clients using a Unix domain socket. Everyone who is able to connect to this socket also has access to the ssh-agent. First, we have to enable the ssh-agent:
 
     $ eval "$(ssh-agent -s)"
 
@@ -107,19 +74,15 @@ And add key to it:
 
     $ ssh-add ~/.ssh/id_rsa
 
-The next step is to make GitHub aware of the key. For that, we have to copy the
-exact content of the file `id_rsa.pub` and paste into GitHub. To make no mistake
-about the copy, install a program called `xclip`:
+The next step is to make GitHub aware of the key. For that, we have to copy the exact content of the file `id_rsa.pub` and paste into GitHub. To make no mistake about the copy, install a program called `xclip`:
 
-    $ sudo apt-get install xclip 
+    $ sudo apt-get install xclip
 
 And then copy the content of the file `id_rsa.pub` in the clipboard:
 
     $ xclip -sel clip < ~/.ssh/id_rsa.pub
 
-The command above is the equivalent of opening the file `~/.ssh/id_rsa.pub`,
-selecting the whole content and pressing `Ctrl+C`. This way, you can paste the
-content on GitHub when required in the next steps. On the GitHub side:
+The command above is the equivalent of opening the file `~/.ssh/id_rsa.pub`, selecting the whole content and pressing `Ctrl+C`. This way, you can paste the content on GitHub when required in the next steps. On the GitHub side:
 
  . Login at https://github.com
  . In the top right corner of the page, click on the profile photo and select
@@ -140,15 +103,12 @@ To make sure everything is working, lets test the connection:
       Hi [username]! You've successfully authenticated, but GitHub does not
       provide shell access.
 
-This configuration works only when we use a ssh connection to GitHub. To verify
-that, go to one of your local GitHub projects and check the url pointing to the
-server:
+This configuration works only when we use a ssh connection to GitHub. To verify that, go to one of your local GitHub projects and check the url pointing to the server:
 
     $ cd ~/python/projects/osis/osis
     $ git remote -v
 
-If the url starts with `https://` then you are using `https` instead of `ssh`.
-In this case, you should change the url to the ssh one:
+If the url starts with `https://` then you are using `https` instead of `ssh`. In this case, you should change the url to the ssh one:
 
     $ git remote set-url origin git@github.com:uclouvain/osis.git
 
@@ -157,14 +117,9 @@ The automatic authentication should work after that.
 [[installing-postgresql]]
 === Installing and Configuring PostgreSQL
 
-PostgreSQL is the only database supported by OSIS. In theory, the Django ORM
-would make the application database-independent, but we do not test OSIS with
-other databases, thus we cannot guarantee that it works on other databases such
-as MySQL or Oracle. Fortunately, PostgreSQL has a very good reputation, a large
-community and a generous documentation.
+PostgreSQL is the only database supported by OSIS. In theory, the Django ORM would make the application database-independent, but we do not test OSIS with other databases, thus we cannot guarantee that it works on other databases such as MySQL or Oracle. Fortunately, PostgreSQL has a very good reputation, a large community and a generous documentation.
 
-TIP: If you really need a database different from PostgreSQL then you could
-contribute to the project by testing OSIS on your favorite database.
+TIP: If you really need a database different from PostgreSQL then you could contribute to the project by testing OSIS on your favorite database.
 
 Execute the following commands to install PostgreSQL:
 
@@ -172,15 +127,11 @@ Execute the following commands to install PostgreSQL:
     $ sudo su - postgres -c "createuser -s $USER"
     $ sudo apt-get install python3-dev, libpq-dev
 
-The first command installs PostgreSQL and creates a user named after the current
-logged OS user. The libraries python3-dev and libpq-dev are also installed for
-development purposes.
+The first command installs PostgreSQL and creates a user named after the current logged OS user. The libraries python3-dev and libpq-dev are also installed for development purposes.
 
 === Creating the Database
 
-Before moving forward, make sure you installed PostgreSQL, as explained in the
-section <<installing-postgresql>>. Then, follow the steps below to create the
-backend database:
+Before moving forward, make sure you installed PostgreSQL, as explained in the section <<installing-postgresql>>. Then, follow the steps below to create the backend database:
 
     $ createdb osis_local
     $ createuser osis -P    // Inform the password 'osis' when asked for.
@@ -193,9 +144,7 @@ backend database:
 [[installing-django]]
 === Installing and Configuring Django
 
-Django is a modern and lightweight web framework to support our back office and
-front office applications. The choice for Django was made thanks to the
-following advantages:
+Django is a modern and lightweight web framework to support our back office and front office applications. The choice for Django was made thanks to the following advantages:
 
 - Very well documented.
 - The most popular web framework on the Python ecosystem. Largely supported by
@@ -206,14 +155,11 @@ following advantages:
 - Easily testable with Selenium.
 - In general, more productive than most of the alternatives.
 
-The repository `uclouvain/osis` is a Django application. We already cloned that 
-when <<installing-git>>. Now, we move forward installing the Python virtual 
-environment and other system dependencies:
+The repository `uclouvain/osis` is a Django application. We already cloned that when <<installing-git>>. Now, we move forward installing the Python virtual environment and other system dependencies:
 
     $ sudo apt-get install build-essential python3-venv libjpeg-dev libpng-dev gettext
 
-In the new repository, create a virtual environment to isolate all dependencies
-of the project:
+In the new repository, create a virtual environment to isolate all dependencies of the project:
 
     $ cd ~/python/projects/osis/osis
     $ python3 -m venv venv
@@ -230,10 +176,7 @@ Create a `.env` file based on `.env.example`:
 
     $ cp .env.example .env
 
-The `.env` file makes it simple to manage environment variables, but it already
-contains all the necessary values for development purpose. Therefore, it
-doesn't need to be changed, unless you are installing OSIS in other
-environments.
+The `.env` file makes it simple to manage environment variables, but it already contains all the necessary values for development purpose. Therefore, it doesn't need to be changed, unless you are installing OSIS in other environments.
 
 Create the data structure in the database:
 
@@ -248,16 +191,13 @@ To create the super user:
        Password (again):
        Superuser created successfully.
 
-You will need this user to login on OSIS for the first time and be able to
-create other users.
+You will need this user to login on OSIS for the first time and be able to create other users.
 
-Optionally, you can load the demonstration data to have some basis for
-development and testing:
+Optionally, you can load the demonstration data to have some basis for development and testing:
 
     (venv)$ python manage.py load_fixtures
 
-Before running the application we have a last step to do, which is compiling
-the translation files:
+Before running the application we have a last step to do, which is compiling the translation files:
 
     (venv)$ python manage.py compilemessages
 
@@ -265,11 +205,7 @@ Now, we can run the application:
 
     (venv)$ python manage.py runserver
 
-You can leave the server running while you are developing. It will take into
-account all changes in your code, except the changes in the model. In this case,
-we have to stop the server to execute the commands `makemigrations` and `migrate`
-as shown above. When we have finished your daily work, we can deactivate the
-virtual environment:
+You can leave the server running while you are developing. It will take into account all changes in your code, except the changes in the model. In this case, we have to stop the server to execute the commands `makemigrations` and `migrate` as shown above. When we have finished your daily work, we can deactivate the virtual environment:
 
     (venv)$ deactivate
 
@@ -278,19 +214,11 @@ virtual environment:
 [[installing-pycharm]]
 === Installing PyCharm IDE
 
-As the codebase grows and becomes more complex to navigate we face more issues
-with light weight Python editors. We decided to try out several tools in the
-project and we came to the conclusion that https://www.jetbrains.com/pycharm/[PyCharm]
-is the best Python IDE for our needs.
+As the codebase grows and becomes more complex to navigate we face more issues with light weight Python editors. We decided to try out several tools in the project and we came to the conclusion that https://www.jetbrains.com/pycharm/[PyCharm] is the best Python IDE for our needs.
 
-We would like to ask all contributors to use PyCharm - at least the community
-edition - to contribute to OSIS because it has a very good
-https://www.python.org/dev/peps/pep-0008/[PEP 8] code verification, auto
-completion, navigation and debugging, saving a lot of time in the process of
-pull requests evaluations.
+We would like to ask all contributors to use PyCharm - at least the community edition - to contribute to OSIS because it has a very good https://www.python.org/dev/peps/pep-0008/[PEP 8] code verification, auto completion, navigation and debugging, saving a lot of time in the process of pull requests evaluations.
 
-Please, follow the instructions on https://www.jetbrains.com/pycharm/[PyCharm's website]
-to install the IDE on your operating system.
+Please, follow the instructions on https://www.jetbrains.com/pycharm/[PyCharm's website] to install the IDE on your operating system.
 
 === Configuration of PyCharm to contribute to OSIS
 
@@ -326,11 +254,7 @@ This error is not present while debugging.
 
 ==== Internationalization
 
-OSIS has adopted a different approach when it comes to internationalization
-(I18N). Text messages within Python code and template files are keywords instead
-of text in plain English. Hardcoding keywords forces us to create a translation
-file for each supported language, instead of relying on hardcoded messages for
-the default language. For example, instead of:
+OSIS has adopted a different approach when it comes to internationalization (I18N). Text messages within Python code and template files are keywords instead of text in plain English. Hardcoding keywords forces us to create a translation file for each supported language, instead of relying on hardcoded messages for the default language. For example, instead of:
 
     <p>{% trans 'Hello World' %}</p>
 
@@ -348,59 +272,36 @@ which is translated into English and French respectively:
     msgid "hello_world"
     msgstr "Salut monde!"
 
-It is important to add that we add translations manually in the translation
-files instead of using `./manage.py makemessages`. We have noticed some
-strange beheviors, such as confusing "all" with "ill", and the translation files
-are changed much more than necessary, causing lots of conflicts when multiple
-developers contribute to the translations.
+It is important to add that we add translations manually in the translation files instead of using `./manage.py makemessages`. We have noticed some strange behaviors, such as confusing "all" with "ill", and the translation files are changed much more than necessary, causing lots of conflicts when multiple developers contribute to the translations.
 
-Once the translations are done, we finally compile the messages into `.mo`
-files:
+Once the translations are done, we finally compile the messages into `.mo` files:
 
     $ ./manage.py compilemessages
 
-Only `.po` files are committed to the repository. `.mo` files are ignored in the
-`.gitignore` file.
+Only `.po` files are committed to the repository. `.mo` files are ignored in the `.gitignore` file.
 
 === Following the Git Workflow
 
 The code repository is organized in three fixed branches:
 
-- *dev*: agregates developers' contributions that are intended to be in
-  production, but they still need to be validated.
-- *qa*: at the end of the sprint, when all features are frozen, the branch `dev`
-  is merged into `qa` to allow testers to validate the release before it gets
-  into production.
-- *master*: once the version in `qa` is fully validated, it is merged into the
-  branch `master`, which is the one to be deployed in production.
+- *dev*: agregates developers' contributions that are intended to be in production, but they still need to be validated.
+- *qa*: at the end of the sprint, when all features are frozen, the branch `dev` is merged into `qa` to allow testers to validate the release before it gets into production.
+- *master*: once the version in `qa` is fully validated, it is merged into the branch `master`, which is the one to be deployed in production.
 
-Developers should not commit directly to any of these branches. By convention,
-these branches can only be changed if there is an issue in the
-https://github.com/uclouvain/osis/issues[issue tracking tool] that justifies
-the creation of an exclusive branch for that issue. For instance: if the
-issue's number is `#234` then its respective branch is named `issue#234`,
-created to isolate the changes described in the issue. To create a new branch
-for the issue, perform the following commands:
+Developers should not commit directly to any of these branches. By convention, these branches can only be changed if there is an issue in the https://github.com/uclouvain/osis/issues[issue tracking tool] that justifies the creation of an exclusive branch for that issue. For instance: if the issue's number is `#234` then its respective branch is named `issue#234`, created to isolate the changes described in the issue. To create a new branch for the issue, perform the following commands:
 
     $ git checkout dev
     $ git pull origin dev
     $ git checkout -b issue#234
 
-The first command enters in the branch `dev`, if the developer is not already in
-there. Within the branch `dev`, the latest commits in the remote branch
-`origin/dev` are downloaded and merged within the local branch `dev`. Then, the
-new branch `issue#234` is created from the local branch `dev`.
+The first command enters in the branch `dev`, if the developer is not already in there. Within the branch `dev`, the latest commits in the remote branch `origin/dev` are downloaded and merged within the local branch `dev`. Then, the new branch `issue#234` is created from the local branch `dev`.
 
-The developer in charge of the issue `#234` changes the code within the branch
-`issue#234`. Two commands are very useful to keep track of what has been done:
+The developer in charge of the issue `#234` changes the code within the branch `issue#234`. Two commands are very useful to keep track of what has been done:
 
     $ git status
     $ git diff models.py
 
-The first command shows all created, modified, removed and untracked files that
-are candidates to be committed. The second shows the changes in one of the
-modified files. When we are ready to commit, we should decide whether all
-changed files will be included in the commit or just a subset of them. To
+The first command shows all created, modified, removed and untracked files that are candidates to be committed. The second shows the changes in one of the modified files. When we are ready to commit, we should decide whether all changed files will be included in the commit or just a subset of them. To
 include all files:
 
     $ git commit -a -m "New entities added."
@@ -416,41 +317,27 @@ image::images/git-state-diagram.png[Git State Diagram]
 
 === Creating and Working in a Branch
 
-The issue tracker generates an incremental id that we can use to name branches.
-It helps to keep branches linked to issues. For example: considering an issue
-with the id 260, we can create a local branch with the following commands:
+The issue tracker generates an incremental id that we can use to name branches. It helps to keep branches linked to issues. For example: considering an issue with the id 260, we can create a local branch with the following commands:
 
     $ git fetch origin dev
     $ git checkout dev
     $ git checkout -b issue#260
 
-The first command updates the branch `dev` with the last changes on the server.
-The second command moves from the branch we are at the moment to the branch
-`dev`. The last command creates the branch `issue#260` from `dev` and
-immediately moves to it. From this moment, every commit will be attached to the
-correct branch. If the branch `dev` already exists in local, then instead of
-fetching it we should pull it:
+The first command updates the branch `dev` with the last changes on the server. The second command moves from the branch we are at the moment to the branch `dev`. The last command creates the branch `issue#260` from `dev` and immediately moves to it. From this moment, every commit will be attached to the correct branch. If the branch `dev` already exists in local, then instead of fetching it we should pull it:
 
     $ git pull origin dev
 
-Committing often is encouraged. All commits are done locally, thus there is no
-risk of conflicts until all commits are sent to the server. The `push` option
-sends all commits in a local branch to the server, identified by `origin`.
+Committing often is encouraged. All commits are done locally, thus there is no risk of conflicts until all commits are sent to the server. The `push` option sends all commits in a local branch to the server, identified by `origin`.
 
     $ git push origin issue#260
 
 ==== Fixing Mistakes
 
-Version control doesn’t always happens smoothly. We will certainly face some
-problems and fortunately Git is very gentile on which concerns recovering from
-mistakes. These are some common situations we may face during development.
+Version control doesn’t always happens smoothly. We will certainly face some problems and fortunately Git is very gentile on which concerns recovering from mistakes. These are some common situations we may face during development.
 
 ===== Moving to another branch before finishing the work in the current branch
 
-Sometimes we are working in a branch and a more urgent problem arrives,
-requiring us to move to or create another branch. In this case, we have to
-commit all changes in the current branch before moving to another one, otherwise
-we risk to have our changes to the current branch committed in another branch.
+Sometimes we are working in a branch and a more urgent problem arrives, requiring us to move to or create another branch. In this case, we have to commit all changes in the current branch before moving to another one, otherwise we risk to have our changes to the current branch committed in another branch.
 So, first add your changes and commit:
 
     $ git commit -a -m "New entities added but still incomplete."
@@ -464,20 +351,15 @@ or create another branch from `dev`:
     $ git checkout dev
     $ git checkout -b issue#261
 
-It also happens that we start fixing an issue but we forget to move to its
-respective branch. In this case, we have to commit the files related to the
-current branch and leave in the workspace the changes related to another branch:
+It also happens that we start fixing an issue but we forget to move to its respective branch. In this case, we have to commit the files related to the current branch and leave in the workspace the changes related to another branch:
 
     $ git add calendar.py
     $ git commit -m "Sort algorithm started."
     $ git checkout issue#260
 
-The files that were not committed in the previous branch will be available for
-commit in the branch issue#260.
+The files that were not committed in the previous branch will be available for commit in the branch issue#260.
 
-This practical approach of moving from a branch to another while leaving some
-files uncommitted may not work if at least one of the files we have changed
-locally was also changed remotely. We may see a message like this:
+This practical approach of moving from a branch to another while leaving some files uncommitted may not work if at least one of the files we have changed locally was also changed remotely. We may see a message like this:
 
     From https://github.com/uclouvain/osis
     * branch            dev        -> FETCH_HEAD
@@ -488,41 +370,29 @@ locally was also changed remotely. We may see a message like this:
     Please, commit your changes or stash them before you can merge.
     Aborting
 
-In this case, we have to commit local changes before moving to another branch.
-But things can get worse because the current branch might be actually related to
-a closed issue, thus committing to it doesn't make sense anymore. In this case,
-we can use `git stash`. It moves all changes in the current workspace to a
-transit area that can be recovered later on. To move all changes to the stash
-area, simply type :
+In this case, we have to commit local changes before moving to another branch. But things can get worse because the current branch might be actually related to a closed issue, thus committing to it doesn't make sense anymore. In this case, we can use `git stash`. It moves all changes in the current workspace to a transit area that can be recovered later on. To move all changes to the stash area, simply type :
 
     $ git stash
 
-Now, if we type `git status` we find the working directory clean, which means we
-can move to another branch. To see the stashes we have stored we can use:
+Now, if we type `git status` we find the working directory clean, which means we can move to another branch. To see the stashes we have stored we can use:
 
     $ git stash list
 
-After moving to another branch, we can recover the changes from the stash are
-using:
+After moving to another branch, we can recover the changes from the stash are using:
 
     $ git stash apply
 
-but if there is more than one stash in the list we can apply a specific one by
-referencing its identifier:
+but if there is more than one stash in the list we can apply a specific one by referencing its identifier:
 
     $ git stash apply stash@{2}
 
-
 ===== Reverting commits
 
-To revert the changes made in the last 4 commits and create a new commit with 
-the reverted changes:
+To revert the changes made in the last 4 commits and create a new commit with the reverted changes:
 
     $ git revert HEAD~3
 
-To revert the changes made between the fifth and the third (included) last 
-commits in the branch `master`, but not creating any commit for the reverted
-changes:
+To revert the changes made between the fifth and the third (included) last commits in the branch `master`, but not creating any commit for the reverted changes:
 
     $ git revert -n master~5..master~2
 
@@ -532,40 +402,26 @@ To revert a sequence of commits using haches:
 
     $ git revert --no-edit ffffffff..12345678
 
-It applies reversed parches to the working directory in sequence, working
-backwards to the known good commit. With the `--no-edit` flag, the changes to
-the working directory are automatically committed after each reversed patch is
-applied.
+It applies reversed parches to the working directory in sequence, working backwards to the known good commit. With the `--no-edit` flag, the changes to the working directory are automatically committed after each reversed patch is applied.
 
 ===== DANGER ZONE
 
-In extreme cases, when on one has pushed to the target branch since the bad
-pushes or the remote branch is empty, then a `non-fast-forward` commit can be
-performed:
+In extreme cases, when on one has pushed to the target branch since the bad pushes or the remote branch is empty, then a `non-fast-forward` commit can be performed:
 
     $ git reset --hard <last_good_commit>
     $ git push --force
 
-It leaves the reflog intact locally and in the remote branch. The bad commits 
-may disappear from the history and don't propagate further. The removed tree
-branch remains around temporarily and can be recoveredm but it's for Git 
-experts.
+It leaves the reflog intact locally and in the remote branch. The bad commits may disappear from the history and don't propagate further.
 
 == Fixing the latest commit message
 
     $ git commit --amend -m "message"
 
-When we work with branches it’s very common to fool with the commits. There are
-many branches locally and sometimes we forget to switch to the branch related to
-the issue and we end up committing on the wrong branch. When it happens before
-pushing the commits to the server, we can undo the last commit done with the
-command:
+When we work with branches it’s very common to fool with the commits. There are many branches locally and sometimes we forget to switch to the branch related to the issue and we end up committing on the wrong branch. When it happens before pushing the commits to the server, we can undo the last commit done with the command:
 
     $ git reset --soft HEAD~1
 
-But if the commit was already pushed to the server, it is still possible to undo
-the push as long as other people have not pushed to the same branch after the
-wrong push. It is done with the following command:
+But if the commit was already pushed to the server, it is still possible to undo the push as long as other people have not pushed to the same branch after the wrong push. It is done with the following command:
 
     $ git push origin master -f
 
@@ -583,17 +439,9 @@ Deleting remote branches:
 
 === Testing The User Interface Using Selenium
 
-Selenium relies on HTML elements' ids to identify and interact with user
-interface elements. In other words, if an element doesn't have an id then
-Selenium cannot reference it in its test scripts. Therefore, it is important
-that every element the user interacts directly - such as text fields, links or
-buttons - must have an id.
+Selenium relies on HTML elements' ids to identify and interact with user interface elements. In other words, if an element doesn't have an id then Selenium cannot reference it in its test scripts. Therefore, it is important that every element the user interacts directly - such as text fields, links or buttons - must have an id.
 
-The amount of ids to be defined in a single page is not negligible. Since ids
-must not repeat in the same page, at some point we will lack creativity to think
-about more unique values to identify the elements. To help with this, we have
-defined a list of prefixes, one for each type of element, listed in the table
-below:
+The amount of ids to be defined in a single page is not negligible. Since ids must not repeat in the same page, at some point we will lack creativity to think about more unique values to identify the elements. To help with this, we have defined a list of prefixes, one for each type of element, listed in the table below:
 
 |===
 |Prefix|Element Type |Prefix|Element Type |Prefix|Element Type
@@ -665,12 +513,9 @@ Close Firefox
 
 == Adding the license to the source code
 
-OSIS is an open source project licensed under GPL v3. As such, it must respect
-certain rules of the license. The most important one is the addition of a
-license header in each one of the source files.
+OSIS is an open source project licensed under GPL v3. As such, it must respect certain rules of the license. The most important one is the addition of a license header in each one of the source files.
 
-For Python files, the following text should appear on the top of the file,
-before any Python code:
+For Python files, the following text should appear on the top of the file, before any Python code:
 
     # -*- coding: utf-8 -*-
     ############################################################################
@@ -724,5 +569,3 @@ For HTML/Template files, we change just the comment syntax:
      * at the root of the source code of this program.  If not,
      * see http://www.gnu.org/licenses/.
     {% endcomment %}
-
-=== Making changes in the model

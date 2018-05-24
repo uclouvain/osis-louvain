@@ -80,6 +80,11 @@ class SearchForm(forms.Form):
         label=_('summary_responsible')
     )
 
+    allocation_entity_acronym = forms.CharField(
+        max_length=20,
+        label=_('allocation_entity_small')
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['academic_year_id'].initial = current_academic_year()
@@ -89,6 +94,9 @@ class SearchForm(forms.Form):
 
     def clean_requirement_entity_acronym(self):
         return convert_to_uppercase(self.cleaned_data.get('requirement_entity_acronym'))
+
+    def clean_allocation_entity_acronym(self):
+        return convert_to_uppercase(self.cleaned_data.get('allocation_entity_acronym'))
 
 
 class LearningUnitYearForm(SearchForm):
@@ -229,21 +237,28 @@ def get_filter_learning_container_ids(filter_data):
     requirement_entity_acronym = filter_data.get('requirement_entity_acronym')
     allocation_entity_acronym = filter_data.get('allocation_entity_acronym')
     with_entity_subordinated = filter_data.get('with_entity_subordinated', False)
-    entities_id_list = []
+    entities_id_list_requirement = []
+    entities_id_list_allocation = []
 
     if requirement_entity_acronym:
         entity_ids = get_entities_ids(requirement_entity_acronym, with_entity_subordinated)
-        entities_id_list = get_entity_container_list(entities_id_list,
-                                                     entity_ids,
-                                                     entity_container_year_link_type.REQUIREMENT_ENTITY)
+        entities_id_list_requirement += get_entity_container_list(entity_ids,
+                                                                  entity_container_year_link_type.REQUIREMENT_ENTITY)
 
     if allocation_entity_acronym:
         entity_ids = get_entities_ids(allocation_entity_acronym, False)
-        entities_id_list = get_entity_container_list(entities_id_list,
-                                                     entity_ids,
-                                                     entity_container_year_link_type.ALLOCATION_ENTITY)
+        entities_id_list_allocation += get_entity_container_list(entity_ids,
+                                                                 entity_container_year_link_type.ALLOCATION_ENTITY)
 
-    return entities_id_list if entities_id_list else None
+    if requirement_entity_acronym and allocation_entity_acronym:
+        return _get_common_entities(entities_id_list_allocation, entities_id_list_requirement)
+    else:
+        return _get_entity_ids_list(allocation_entity_acronym, entities_id_list_allocation,
+                                    entities_id_list_requirement, requirement_entity_acronym)
+
+
+def _get_common_entities(entities_id_list_allocation, entities_id_list_requirement):
+    return list(set(entities_id_list_allocation).intersection(set(entities_id_list_requirement)))
 
 
 def filter_is_borrowed_learning_unit_year(learning_unit_year_qs, date, faculty_borrowing=None):
@@ -321,3 +336,13 @@ def __is_borrowed_learning_unit(luy, map_entity_faculty, map_luy_entity, map_luy
                 and map_entity_faculty.get(education_group_entity) is not None:
             return True
     return False
+
+
+def _get_entity_ids_list(allocation_entity_acronym, entities_id_list_allocation, entities_id_list_requirement,
+                         requirement_entity_acronym):
+    if requirement_entity_acronym:
+        return entities_id_list_requirement
+    elif allocation_entity_acronym:
+        return entities_id_list_allocation
+    else:
+        return None

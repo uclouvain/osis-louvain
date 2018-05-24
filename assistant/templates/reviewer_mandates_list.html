@@ -79,9 +79,7 @@
         <th>{% trans 'fulltime_equivalent_percentage' %}</th>
         <th>{% trans 'state' %}</th>
         <th>{% trans 'reviews' %}</th>
-        <th>{% trans 'edit' %}</th>
-        <th>{% trans 'view' %}</th>
-
+        <th>{% trans 'action' %}</th>
         </tr>
         </thead>
         <tbody>
@@ -131,7 +129,7 @@
                     {% endif %}
                 {% endfor %}
             </td>
-	        {% if mandate.state in reviewer.role %}
+	        {% if mandate.edit %}
                 <td align="center">
                     <form method="POST" action="{% url 'review_edit' %}">
                         {% csrf_token %}
@@ -142,37 +140,9 @@
                         </button>
                     </form>
                 </td>
-                <td></td>
-            {% elif "RESEARCH" in reviewer.role and mandate.state in research_list %}
-                <td></td>
+            {% elif mandate.view %}
                 <td align="center">
-                    <form method="POST" action="{% url 'review_view' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="mandate_id" value="{{ mandate.id }}">
-                        <input type="hidden" name="role" value="{{ reviewer.role }}">
-                        <button type="submit" class="btn btn-link" title="{% trans 'view'%}">
-                            <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
-                            {% trans 'view'%}
-                        </button>
-                    </form>
-                </td>
-            {% elif "SUPERVISION" in reviewer.role and mandate.state in supervision_list %}
-                <td></td>
-                <td align="center">
-                    <form method="POST" action="{% url 'review_view' %}">
-                        {% csrf_token %}
-                        <input type="hidden" name="mandate_id" value="{{ mandate.id }}">
-                        <input type="hidden" name="role" value="{{ reviewer.role }}">
-                        <button type="submit" class="btn btn-link" title="{% trans 'view'%}">
-                            <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
-                            {% trans 'view'%}
-                        </button>
-                    </form>
-                </td>
-            {% elif "VICE_RECTOR" in reviewer.role and mandate.state in vice_rector_list %}
-                <td></td>
-                <td align="center">
-                    <form method="POST" action="{% url 'review_view' %}">
+                    <form method="POST" action="{% url 'pst_form_view' %}">
                         {% csrf_token %}
                         <input type="hidden" name="mandate_id" value="{{ mandate.id }}">
                         <input type="hidden" name="role" value="{{ reviewer.role }}">
@@ -183,8 +153,7 @@
                     </form>
                 </td>
             {% else %}
-                <td></td>
-                <td></td>
+                <td align="center"><span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span></td>
             {% endif %}
             </tr>
         {% endfor %}

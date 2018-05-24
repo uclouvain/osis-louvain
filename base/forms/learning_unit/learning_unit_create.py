@@ -47,7 +47,7 @@ from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_component import LearningUnitComponent
-from base.models.learning_unit_year import LearningUnitYear
+from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
 
 DEFAULT_ACRONYM_COMPONENT = {
     LECTURING: "CM1",
@@ -126,8 +126,16 @@ class LearningUnitYearModelForm(forms.ModelForm):
         model = LearningUnitYear
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
                   'session', 'quadrimester', 'status', 'internship_subtype', 'attribution_procedure', )
-
         field_classes = {'acronym': AcronymField}
+        error_messages = {
+            'credits': {
+                # Override unwanted DecimalField standard error messages
+                'max_digits': _('Ensure this value is less than or equal to {max_value}.').format(
+                    max_value=MAXIMUM_CREDITS),
+                'max_whole_digits': _('Ensure this value is less than or equal to {max_value}.').format(
+                    max_value=MAXIMUM_CREDITS)
+            }
+        }
 
     # TODO :: Move assignment to self.instance from save into __init__
     # TODO :: Make these kwarg to args (learning_container_year, learning_unit, ... are required args)

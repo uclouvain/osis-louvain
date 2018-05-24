@@ -69,7 +69,9 @@ class TestLearningUnitYearModelFormInit(TestCase):
 
     def test_acronym_field_case_partim(self):
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=PARTIM)
-        self.assertIsInstance(self.form.fields.get('acronym'), PartimAcronymField, "should assert field is PartimAcronymField")
+        self.assertIsInstance(self.form.fields.get('acronym'),
+                              PartimAcronymField,
+                              "should assert field is PartimAcronymField")
 
     def test_acronym_field_case_full(self):
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=FULL)
@@ -102,8 +104,6 @@ class TestLearningUnitYearModelFormSave(TestCase):
                                                                     academic_year=self.current_academic_year,
                                                                     container_type=learning_container_year_types.COURSE)
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=FULL)
-        self.learning_unit_year_to_update = LearningUnitYearFactory(
-            learning_unit=self.learning_unit, learning_container_year=self.learning_container_year, subtype=FULL)
 
         self.post_data = {
             'acronym_0': 'L',
@@ -130,8 +130,8 @@ class TestLearningUnitYearModelFormSave(TestCase):
             type=ADDITIONAL_REQUIREMENT_ENTITY_2,
             learning_container_year=self.learning_container_year)
 
-        self.entity_container_years=[self.requirement_entity, self.allocation_entity,
-                                     self.additional_requirement_entity_1, self.additional_requirement_entity_2]
+        self.entity_container_years = [self.requirement_entity, self.allocation_entity,
+                                       self.additional_requirement_entity_1, self.additional_requirement_entity_2]
 
     def test_case_missing_required_learning_container_year_kwarg(self):
         with self.assertRaises(KeyError):
@@ -199,35 +199,44 @@ class TestLearningUnitYearModelFormSave(TestCase):
         self.assertEqual(qs_requirement_entity.count(), 2)
 
     def test_case_update_post_data_correctly_saved(self):
+        learning_unit_year_to_update = LearningUnitYearFactory(
+            learning_unit=self.learning_unit, learning_container_year=self.learning_container_year, subtype=FULL)
+
         form = LearningUnitYearModelForm(data=self.post_data, person=self.central_manager, subtype=FULL,
-                                         instance=self.learning_unit_year_to_update)
+                                         instance=learning_unit_year_to_update)
         self.assertTrue(form.is_valid(), form.errors)
         luy = form.save(learning_container_year=self.learning_container_year, learning_unit=self.learning_unit,
                         entity_container_years=self.entity_container_years)
 
-        self.assertEqual(luy, self.learning_unit_year_to_update)
+        self.assertEqual(luy, learning_unit_year_to_update)
 
     def test_warnings_credit(self):
+        learning_unit_year_to_update = LearningUnitYearFactory(
+            learning_unit=self.learning_unit, learning_container_year=self.learning_container_year, subtype=FULL)
+
         partim = LearningUnitYearFactory(learning_container_year=self.learning_container_year, subtype=PARTIM,
                                          credits=120)
 
         self.post_data['credits'] = 60
         form = LearningUnitYearModelForm(data=self.post_data, person=self.central_manager, subtype=FULL,
-                                         instance=self.learning_unit_year_to_update)
+                                         instance=learning_unit_year_to_update)
         self.assertTrue(form.is_valid(), form.errors)
 
         self.assertEqual(form.warnings, [_("The credits value of the partim %(acronym)s is greater or "
                                            "equal than the credits value of the parent learning unit.") % {
-            'acronym':partim.acronym}])
+            'acronym': partim.acronym}])
 
     def test_no_warnings_credit(self):
         """ This test will ensure that no message warning message is displayed when no PARTIM attached to FULL"""
+        learning_unit_year_to_update = LearningUnitYearFactory(
+            learning_unit=self.learning_unit, learning_container_year=self.learning_container_year, subtype=FULL)
+
         LearningUnitYear.objects.filter(
-            learning_container_year=self.learning_unit_year_to_update.learning_container_year,
+            learning_container_year=learning_unit_year_to_update.learning_container_year,
             subtype=PARTIM
         ).delete()
         self.post_data['credits'] = 60
         form = LearningUnitYearModelForm(data=self.post_data, person=self.central_manager, subtype=FULL,
-                                         instance=self.learning_unit_year_to_update)
+                                         instance=learning_unit_year_to_update)
         self.assertTrue(form.is_valid(), form.errors)
         self.assertFalse(form.warnings)
