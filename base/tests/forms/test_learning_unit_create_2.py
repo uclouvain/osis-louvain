@@ -25,17 +25,17 @@
 ##############################################################################
 import collections
 import datetime
-import factory.fuzzy
 from unittest import mock
 
+import factory.fuzzy
 from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningUnitModelForm, LearningContainerYearModelForm, LearningContainerModelForm, EntityContainerBaseForm
-from base.forms.learning_unit.learning_unit_create_2 import FullForm, FULL_READ_ONLY_FIELDS, \
-    FULL_PROPOSAL_READ_ONLY_FIELDS
+from base.forms.learning_unit.learning_unit_create_2 import FullForm, FULL_PROPOSAL_READ_ONLY_FIELDS, \
+    FACULTY_OPEN_FIELDS
 from base.models.academic_year import AcademicYear
 from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
@@ -53,8 +53,8 @@ from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_component import LearningUnitComponent
-from base.models.person import FACULTY_MANAGER_GROUP
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
+from base.models.person import FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -174,7 +174,7 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
         form = FullForm(self.person, self.learning_unit_year.academic_year,
                         learning_unit_instance=self.learning_unit_year.learning_unit)
         disabled_fields = {key for key, value in form.fields.items() if value.disabled}
-        self.assertEqual(disabled_fields, FULL_READ_ONLY_FIELDS)
+        self.assertTrue(FACULTY_OPEN_FIELDS not in disabled_fields)
 
     def test_disable_fields_full_proposal(self):
         form = FullForm(self.person, self.learning_unit_year.academic_year,
