@@ -77,7 +77,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
             self.current_academic_year,
             self.learning_unit,
             self.learning_container_year,
-            learning_unit_periodicity.ANNUAL
+            learning_unit_year_subtypes.FULL
         )
 
         self.a_superuser = SuperUserFactory()

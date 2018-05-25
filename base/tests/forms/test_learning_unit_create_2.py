@@ -35,7 +35,7 @@ from django.utils.translation import ugettext_lazy as _
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningUnitModelForm, LearningContainerYearModelForm, LearningContainerModelForm, EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create_2 import FullForm, FULL_PROPOSAL_READ_ONLY_FIELDS, \
-    FACULTY_OPEN_FIELDS
+    FACULTY_OPEN_FIELDS, FULL_READ_ONLY_FIELDS
 from base.models.academic_year import AcademicYear
 from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
@@ -179,8 +179,18 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
     def test_disable_fields_full_proposal(self):
         form = FullForm(self.person, self.learning_unit_year.academic_year,
                         learning_unit_instance=self.learning_unit_year.learning_unit, proposal=True)
-        disabled_fields = {key for key, value in form.fields.items() if value.disabled}
-        self.assertEqual(disabled_fields, FULL_PROPOSAL_READ_ONLY_FIELDS)
+        self.assertEqual(form.fields['academic_year'].disabled, True)
+        self.assertEqual(form.fields['container_type'].disabled, True)
+        self.assertEqual(form.fields['internship_subtype'].disabled, True)
+
+    def test_disable_fields_full_proposal_with_faculty_manager(self):
+        self.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+        form = FullForm(self.person, self.learning_unit_year.academic_year,
+                        learning_unit_instance=self.learning_unit_year.learning_unit, proposal=True)
+        for elem in FACULTY_OPEN_FIELDS:
+            self.assertEqual(form.fields[elem].disabled, True)
+        self.assertEqual(form.fields['academic_year'].disabled, True)
+        self.assertEqual(form.fields['internship_subtype'].disabled, True)
 
     def test_disable_internship_subtype(self):
         form = FullForm(self.person, self.learning_unit_year.academic_year,
