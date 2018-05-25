@@ -22,7 +22,7 @@ django-waffle==0.14.0
 beautifulsoup4==4.6.0
 pypom==1.2.0
 selenium==3.11.0
+python-magic==0.4.15
 
 -r ./osis_common/requirements.txt
 -r ./internship/requirements.txt
-

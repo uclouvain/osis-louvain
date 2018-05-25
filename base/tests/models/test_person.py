@@ -33,6 +33,7 @@ from django.test import TestCase
 from django.test import override_settings
 from base.models import person
 from base.models.enums import person_source_type
+from base.tests.factories.user import UserFactory
 from base.models.person import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, get_user_interface_language, \
     change_language
 from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory
@@ -127,20 +128,19 @@ class PersonTest(PersonTestCase):
         self.assertEqual(len(person.search_employee("{} {}".format(a_lastname, a_firstname))), 1)
 
     def test_change_to_invalid_language(self):
-        usr = user.UserFactory()
-        usr.save()
-        a_person = create_person_with_user(usr)
-        person.change_language(usr, 'ru')
-        self.assertNotEqual(a_person.language, "ru")
+        user = UserFactory()
+        user.save()
+        a_person = create_person_with_user(user)
+        person.change_language(user, 'ru')
+        self.assertNotEquals(a_person.language, "ru")
 
     def test_change_language(self):
-        usr = user.UserFactory()
-        usr.save()
-        create_person_with_user(usr)
-
-        person.change_language(usr, "en")
-        a_person = person.find_by_user(usr)
-        self.assertEqual(a_person.language, "en")
+        user = UserFactory()
+        user.save()
+        create_person_with_user(user)
+        person.change_language(user, "en")
+        a_person = person.find_by_user(user)
+        self.assertEquals(a_person.language, "en")
 
     def test_calculate_age(self):
         a_person = PersonFactory()

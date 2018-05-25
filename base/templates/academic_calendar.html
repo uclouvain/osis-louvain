@@ -42,19 +42,19 @@
         <div class="row">
             <div class="col-md-2">
                 <label>{% trans 'academic_year'%}</label><br>
-                {{ academic_calendar.academic_year }}
+                <span id="ac_academic_year">{{ academic_calendar.academic_year }}</span>
             </div>
             <div class="col-md-6">
                 <label>{% trans 'title' %}</label><br>
-                {{ academic_calendar.title }}
+                <span id="ac_title">{{ academic_calendar.title }}</span>
             </div>
             <div class="col-md-2">
                 <label>{% trans 'start_date'%}</label><br>
-                {{ academic_calendar.start_date| default_if_none:''|date_in_form_format }}
+                <span id="ac_start_date">{{ academic_calendar.start_date| default_if_none:''|date_in_form_format }}</span>
             </div>
             <div class="col-md-2">
                 <label>{% trans 'end_date' %}</label><br>
-                {{ academic_calendar.end_date| default_if_none:''|date_in_form_format }}
+                <span id="ac_end_date">{{ academic_calendar.end_date| default_if_none:''|date_in_form_format }}</span>
             </div>
         </div>
         <br>

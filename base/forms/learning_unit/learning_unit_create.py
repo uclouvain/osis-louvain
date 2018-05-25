@@ -324,6 +324,13 @@ class EntityContainerBaseForm:
             (ENTITY_TYPE_LIST[index].lower(), form.fields['entity']) for index, form in enumerate(self.forms)
         )
 
+    @property
+    def instances_data(self):
+        return OrderedDict(
+            (ENTITY_TYPE_LIST[index].lower(), getattr(form.instance, 'entity', None))
+            for index, form in enumerate(self.forms)
+        )
+
     def post_clean(self, container_type, academic_year):
         for form in self.forms:
             form.post_clean(academic_year.start_date)

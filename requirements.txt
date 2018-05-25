@@ -14,7 +14,7 @@ factory_boy==2.8.1
 django-dotenv==1.4.1
 pendulum==1.2.0
 djangorestframework==3.3.2
-gitpython
+gitpython==2.1.9
 requests==2.18.3
 django-bootstrap3==9.1.0
 django-ordered-model==1.4.3
@@ -22,6 +22,7 @@ django-waffle==0.14.0
 beautifulsoup4==4.6.0
 pypom==1.2.0
 selenium==3.11.0
+python-magic==0.4.15
 
 -r ./osis_common/requirements.txt
 -r ./internship/requirements.txt

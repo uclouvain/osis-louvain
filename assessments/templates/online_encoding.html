@@ -79,19 +79,19 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <label>{% trans 'academic_year' %}</label><br>
-                    {{ academic_year }}
+                    <span id="academic_year">{{ academic_year }}</span>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
                     <label>{% trans 'number_session' %}</label><br>
-                    {{ number_session }}
+                    <span id="number_session">{{ number_session }}</span>
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
                     <label>{% trans 'number_of_enrollments' %}</label><br>
-                    {{ enrollments|length }}
+                    <span id="number_of_enrollments">{{ enrollments|length }}</span>
                 </div>
             </div>
         </div>
@@ -100,7 +100,7 @@
             <div class="progress">
                 <div class="progress-bar {% if progress_int == 100 %} progress-bar-success {% else %} progress-bar-warning {% endif %}" role="progressbar" aria-valuenow="{{ progress_int }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ progress }}%;">
                     <span> 
-			<b> 
+			<b id="luy_progression">
 			  {{ exam_enrollments_encoded }} / {{ total_exam_enrollments }}
 			</b>
 		    </span>                
@@ -196,7 +196,7 @@
                                         {{ rowcolors }}
                                     {% endifchanged %}
                                {% endif %}">
-                        <td style="text-align:center;">
+                        <td style="text-align:center;" id="enrollment_status_{{ enrollment.id }}">
                             {% if enrollment.deadline_reached %}
                                 <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'deadline_reached' %}"></span>
                             {% elif enrollment.deadline_tutor_reached  and not is_program_manager %}
@@ -210,7 +210,7 @@
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|default_if_none:"" }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name|default_if_none:"" }}</td>
-                        <td>
+                        <td id="enrollment_note_{{ enrollment.id }}">
                             {% if is_program_manager %}
                                 {% if enrollment.score_final != None %}
                                     {{ enrollment.score_final | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores }}
@@ -227,7 +227,7 @@
                                 {% endif %}
                             {% endif%}
                         </td>
-                        <td>
+                        <td id="enrollment_justification_{{ enrollment.id }}">
                             {% if is_program_manager %}
                                 {% if enrollment.justification_final %}
                                     {% trans enrollment.justification_final %}
