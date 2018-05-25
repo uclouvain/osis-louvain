@@ -2901,9 +2901,6 @@ msgstr "volume total global"
 msgid "missing_internship_subtype"
 msgstr "Il est nécessaire d'indiquer le sous-type de stage"
 
-msgid "different_status_with_parent"
-msgstr "L'UE parent est inactif"
-
 msgid "Consistency error in %(academic_year)s : %(error)s"
 msgstr "Erreur de consistance en %(academic_year)s : %(error)s"
 
