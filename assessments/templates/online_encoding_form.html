@@ -90,17 +90,19 @@
             <div class="col-md-3">
                 <div class="form-group">
                     <label>{%trans 'number_of_enrollments' %}</label><br>
-                    {{ enrollments|length }}
+                    <span id="number_of_enrollments">{{ enrollments|length }}</span>
                 </div>
             </div>
         </div>
         <div class="alert alert-info">
             {% get_current_language as LANGUAGE_CODE %}
+            <span id="message_decimal_accepted">
             {% if enrollments.0.learning_unit_enrollment.learning_unit_year.decimal_scores %}
                 {% trans 'decimal_values_accepted' %}
             {% else %}
                 {% trans 'decimal_values_ignored' %}
             {% endif %}
+            </span>
         </div>
         <form class="form-inline" method="POST" action="{% url 'online_encoding_form' learning_unit_year.id %}?{{ request.GET.urlencode }}" id="form_online_encoding">
             {% csrf_token %}

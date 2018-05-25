@@ -27,6 +27,7 @@ import datetime
 from unittest import mock
 
 from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
 
 from base.models.enums import entity_container_year_link_type
 from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
@@ -110,12 +111,12 @@ class TestXlsBuild(TestCase):
 
 def _generate_xls_build_parameter(xls_data, user):
     return {
-        xls_build.LIST_DESCRIPTION_KEY: xls_build_attribution.XLS_DESCRIPTION,
-        xls_build.FILENAME_KEY: xls_build_attribution.XLS_FILENAME,
+        xls_build.LIST_DESCRIPTION_KEY: _(xls_build_attribution.XLS_DESCRIPTION),
+        xls_build.FILENAME_KEY: _(xls_build_attribution.XLS_FILENAME),
         xls_build.USER_KEY: user.username,
         xls_build.WORKSHEETS_DATA: [{
             xls_build.CONTENT_KEY: xls_data,
             xls_build.HEADER_TITLES_KEY: LEARNING_UNIT_TITLES + xls_build_attribution.ATTRIBUTION_TITLES,
-            xls_build.WORKSHEET_TITLE_KEY: xls_build_attribution.WORKSHEET_TITLE,
+            xls_build.WORKSHEET_TITLE_KEY: _(xls_build_attribution.WORKSHEET_TITLE),
         }]
     }

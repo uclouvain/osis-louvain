@@ -40,13 +40,13 @@
                 <div class="col-md-3">
                     <div class="form-group">
                         <label>{% trans 'academic_year' %}</label><br>
-                        {{ academic_year }}
+                        <span id="academic_year">{{ academic_year }}</span>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
                         <label>{% trans 'number_session' %}</label><br>
-                        {{ number_session }}
+                        <span id="number_session">{{ number_session }}</span>
                     </div>
                 </div>
                 <div class="col-md-6">
@@ -117,9 +117,9 @@
             </div>
             <div class="col-md-6">
                 <div class="pull-right">
-                    <b><span class="badge">{{ notes_list|length }}</span>
+                    <b><span class="badge" id="scores_encoding_learning_units">{{ notes_list|length }}</span>
                         {% trans 'learning_units_in' %}
-                        <span class="badge">{% if offer_year_id %} 1 {% else %} {{ offer_list|length }} {% endif %}</span>
+                        <span class="badge" id="scores_encoding_programs">{% if offer_year_id %} 1 {% else %} {{ offer_list|length }} {% endif %}</span>
                         {% trans 'program_s' %}.
                     </b>
                 </div>
@@ -207,7 +207,7 @@
                     <td>
                         <a class="btn btn-default"
                            href="{% url 'online_encoding_form' note_detail.learning_unit_year_id %}?{{ request.GET.urlencode }}"
-                           role="button" id="lnk_encode"
+                           role="button" id="lnk_encode_{{ note_detail.learning_unit_year_id }}"
                            data-toggle="tooltip" data-placement="right"
                            title="{% trans 'tooltip_encode_for' %}">
                             <i class="fa fa-hashtag"></i> {% trans 'encode' %}</a>

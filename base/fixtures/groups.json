@@ -3026,6 +3026,11 @@
                 "educationgroup"
             ],
             [
+                "can_edit_educationgroup_pedagogy",
+                "base",
+                "educationgroup"
+            ],
+            [
                 "change_educationgroup",
                 "base",
                 "educationgroup"

@@ -30,9 +30,9 @@ from osis_common.document import xls_build
 from attribution.business import attribution_charge_new
 from base.business.learning_unit import extract_xls_data_from_learning_unit, LEARNING_UNIT_TITLES, get_name_or_username
 
-WORKSHEET_TITLE = 'Learning_units'
-XLS_FILENAME = 'Learning_units_and_attributions'
-XLS_DESCRIPTION = "Liste d'attributions"
+WORKSHEET_TITLE = 'learning_units'
+XLS_FILENAME = 'learning_units_and_attributions_filename'
+XLS_DESCRIPTION = "attribution_list"
 
 ATTRIBUTION_TITLES = [str(_('tutor')), str(_('function')), str(_('substitute')), str(_('LECTURING')),
                       str(_('PRACTICAL_EXERCISES')), str(_('start_year')), str(_('duration'))]
@@ -55,13 +55,13 @@ def prepare_xls_content(found_learning_units):
 
 
 def prepare_xls_parameters_list(user, working_sheets_data):
-    return {xls_build.LIST_DESCRIPTION_KEY: XLS_DESCRIPTION,
-            xls_build.FILENAME_KEY: XLS_FILENAME,
+    return {xls_build.LIST_DESCRIPTION_KEY: _(XLS_DESCRIPTION),
+            xls_build.FILENAME_KEY: _(XLS_FILENAME),
             xls_build.USER_KEY: get_name_or_username(user),
             xls_build.WORKSHEETS_DATA:
                 [{xls_build.CONTENT_KEY: working_sheets_data,
                   xls_build.HEADER_TITLES_KEY: _prepare_titles(),
-                  xls_build.WORKSHEET_TITLE_KEY: WORKSHEET_TITLE,
+                  xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE),
                   }
                  ]}
 

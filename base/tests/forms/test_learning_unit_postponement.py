@@ -34,10 +34,9 @@ from base.forms.learning_unit.learning_unit_create_2 import PartimForm, FullForm
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm, FIELDS_TO_NOT_POSTPONE
 from base.models import entity_container_year
 from base.models.academic_year import AcademicYear
-from base.models.enums import attribution_procedure
-from base.models.enums import entity_container_year_link_type
-from base.models.enums import learning_unit_year_subtypes
-from base.models.enums import vacant_declaration_type
+from base.models.entity_container_year import EntityContainerYear
+from base.models.enums import attribution_procedure, entity_container_year_link_type, learning_unit_year_subtypes, \
+                              vacant_declaration_type
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -345,6 +344,19 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
             .update(status=new_status_value)
         return initial_status_value, new_status_value
 
+    def _change_requirement_entity_value(self, academic_year):
+        entity_version_by_type = entity_container_year.find_last_entity_version_grouped_by_linktypes(
+            self.learning_unit_year_full.learning_container_year
+        )
+        initial_status_value = entity_version_by_type.get(entity_container_year_link_type.REQUIREMENT_ENTITY).entity
+        new_entity_value = self.learn_unit_structure.entities[2]
+        EntityContainerYear.objects.filter(
+            learning_container_year__learning_container=self.learning_unit_year_full.learning_container_year.learning_container,
+            learning_container_year__academic_year=academic_year,
+            type=entity_container_year_link_type.REQUIREMENT_ENTITY
+        ).update(entity=new_entity_value)
+        return initial_status_value, new_entity_value
+
     def test_when_no_differences_found_in_future(self):
         instance_luy_base_form = _instanciate_base_learning_unit_form(self.learning_unit_year_full, self.person)
         form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
@@ -447,6 +459,26 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         result = form.consistency_errors
         self.assertIsInstance(result, OrderedDict) # Need to be ordered by academic_year
         self.assertEqual(expected_result[next_academic_year], result[next_academic_year])
+
+    def test_when_differences_found_on_entities(self):
+        next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 1)
+        initial_requirement_entity, new_requirement_entity = self._change_requirement_entity_value(next_academic_year)
+        expected_result = OrderedDict({
+            next_academic_year: [
+                _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
+                    'col_name': _('requirement_entity'),
+                    'current_value': initial_requirement_entity,
+                    'new_value': new_requirement_entity
+                }
+            ],
+        })
+        instance_luy_base_form = _instanciate_base_learning_unit_form(self.learning_unit_year_full, self.person)
+        form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
+                                              learning_unit_instance=instance_luy_base_form.learning_unit_instance,
+                                              data=instance_luy_base_form.data)
+        self.assertTrue(form.is_valid(), form.errors)
+        result = form.consistency_errors
+        self.assertEqual(result, expected_result)
 
     def test_postponement_with_proposal(self):
         next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 2)

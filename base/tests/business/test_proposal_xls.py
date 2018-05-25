@@ -26,7 +26,9 @@
 from unittest import mock
 
 from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
 
+from base.business.proposal_xls import XLS_DESCRIPTION, XLS_FILENAME, WORKSHEET_TITLE
 from base.models.enums import entity_container_year_link_type
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.entity import EntityFactory
@@ -105,12 +107,12 @@ class TestProposalXls(TestCase):
 
 def _generate_xls_build_parameter(xls_data, user):
     return {
-        xls_build.LIST_DESCRIPTION_KEY: "Liste de propositions",
-        xls_build.FILENAME_KEY: 'Proposals',
+        xls_build.LIST_DESCRIPTION_KEY: _(XLS_DESCRIPTION),
+        xls_build.FILENAME_KEY: _(XLS_FILENAME),
         xls_build.USER_KEY: user.username,
         xls_build.WORKSHEETS_DATA: [{
             xls_build.CONTENT_KEY: xls_data,
             xls_build.HEADER_TITLES_KEY: proposal_xls.PROPOSAL_TITLES,
-            xls_build.WORKSHEET_TITLE_KEY: 'Proposals',
+            xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE),
         }]
     }

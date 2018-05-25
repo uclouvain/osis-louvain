@@ -28,7 +28,7 @@ from django.test import TestCase
 from base.models.person import Person
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithoutUserFactory
 from base.tests.factories.offer import OfferFactory
 from base.tests.factories.student import StudentFactory
 from dissertation.models import adviser
@@ -69,9 +69,8 @@ class UtilsTestCase(TestCase):
         self.teacher2 = AdviserTeacherFactory(person=a_person_teacher2)
         self.teacher3 = AdviserTeacherFactory()
         self.teacher4 = AdviserTeacherFactory()
-        a_person_student = PersonFactory.create(last_name="Durant",
-                                                user=None,
-                                                email='laurent.dermine@uclouvain.be')
+        a_person_student = PersonWithoutUserFactory.create(last_name="Durant",
+                                                           email='laurent.dermine@uclouvain.be')
         self.student = StudentFactory.create(person=a_person_student)
         self.offer1 = OfferFactory(title="test_offer1")
         self.offer2 = OfferFactory(title="test_offer2")

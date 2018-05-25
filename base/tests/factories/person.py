@@ -43,12 +43,21 @@ class PersonFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.Person'
 
-    first_name = factory.Faker('first_name')
-    last_name = factory.Faker('last_name')
+    first_name = factory.LazyAttribute(lambda person:
+                                       person.user.first_name if person.user else factory.Faker('first_name'))
+    last_name = factory.LazyAttribute(lambda person:
+                                      person.user.last_name if person.user else factory.Faker('last_name'))
     changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()))
-    email = factory.LazyAttribute(generate_person_email)
+    email = factory.LazyAttribute(lambda person: person.user.email if person.user else None)
     phone = factory.Faker('phone_number')
     language = factory.Iterator(settings.LANGUAGES, getter=operator.itemgetter(0))
     gender = factory.Iterator(mdl.person.Person.GENDER_CHOICES, getter=operator.itemgetter(0))
     user = factory.SubFactory(UserFactory)
     global_id = None
+
+
+class PersonWithoutUserFactory(PersonFactory):
+    user = None
+    first_name = factory.Faker('first_name')
+    last_name = factory.Faker('last_name')
+    email = factory.LazyAttribute(generate_person_email)

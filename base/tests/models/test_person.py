@@ -33,9 +33,10 @@ from django.test import TestCase
 from django.test import override_settings
 from base.models import person
 from base.models.enums import person_source_type
+from base.tests.factories.user import UserFactory
 from base.models.person import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, get_user_interface_language, \
     change_language
-from base.tests.factories.person import PersonFactory, generate_person_email
+from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory
 from base.tests.factories import user
 
 
@@ -66,7 +67,7 @@ class PersonTest(PersonTestCase):
         self.user_for_person = user.UserFactory(username="user_with_person")
         self.person_with_user = PersonFactory(user=self.user_for_person, language="fr-be", first_name="John",
                                               last_name="Doe")
-        self.person_without_user = PersonFactory(user=None)
+        self.person_without_user = PersonWithoutUserFactory()
 
     def test_find_by_id(self):
         tmp_person = PersonFactory()
@@ -78,25 +79,23 @@ class PersonTest(PersonTestCase):
     @override_settings(INTERNAL_EMAIL_SUFFIX='osis.org')
     def test_person_from_extern_source(self):
         person_email = functools.partial(generate_person_email, domain='osis.org')
-        p = PersonFactory.build(email=factory.LazyAttribute(person_email),
-                                user=None,
-                                source=person_source_type.DISSERTATION)
+        p = PersonWithoutUserFactory.build(email=factory.LazyAttribute(person_email),
+                                           source=person_source_type.DISSERTATION)
         with self.assertRaises(AttributeError):
             p.save()
 
     @override_settings(INTERNAL_EMAIL_SUFFIX='osis.org')
     def test_person_from_internal_source(self):
         person_email = functools.partial(generate_person_email, domain='osis.org')
-        p = PersonFactory.build(email=factory.LazyAttribute(person_email), user=None)
+        p = PersonWithoutUserFactory.build(email=factory.LazyAttribute(person_email))
         with self.assertDontRaise():
             p.save()
 
     @override_settings(INTERNAL_EMAIL_SUFFIX='osis.org')
     def test_person_without_source(self):
         person_email = functools.partial(generate_person_email, domain='osis.org')
-        p = PersonFactory.build(email=factory.LazyAttribute(person_email),
-                                user=None,
-                                source=None)
+        p = PersonWithoutUserFactory.build(email=factory.LazyAttribute(person_email),
+                                           source=None)
         with self.assertDontRaise():
             p.save()
 
@@ -129,20 +128,19 @@ class PersonTest(PersonTestCase):
         self.assertEqual(len(person.search_employee("{} {}".format(a_lastname, a_firstname))), 1)
 
     def test_change_to_invalid_language(self):
-        usr = user.UserFactory()
-        usr.save()
-        a_person = create_person_with_user(usr)
-        person.change_language(usr, 'ru')
-        self.assertNotEqual(a_person.language, "ru")
+        user = UserFactory()
+        user.save()
+        a_person = create_person_with_user(user)
+        person.change_language(user, 'ru')
+        self.assertNotEquals(a_person.language, "ru")
 
     def test_change_language(self):
-        usr = user.UserFactory()
-        usr.save()
-        create_person_with_user(usr)
-
-        person.change_language(usr, "en")
-        a_person = person.find_by_user(usr)
-        self.assertEqual(a_person.language, "en")
+        user = UserFactory()
+        user.save()
+        create_person_with_user(user)
+        person.change_language(user, "en")
+        a_person = person.find_by_user(user)
+        self.assertEquals(a_person.language, "en")
 
     def test_calculate_age(self):
         a_person = PersonFactory()

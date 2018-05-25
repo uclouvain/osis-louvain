@@ -117,7 +117,7 @@ class Person(SerializableModel):
         if self.middle_name:
             middle_name = self.middle_name
         if self.last_name:
-            last_name = self.last_name + ","
+            last_name = "{},".format(self.last_name)
 
         return u"%s %s %s" % (last_name.upper(), first_name, middle_name)
 

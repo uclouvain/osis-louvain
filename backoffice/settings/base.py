@@ -206,10 +206,46 @@ QUEUES = {}
 # Add local path in your environment settings (ex: dev.py)
 LOCALE_PATHS = ()
 
+
+def define_style_sheet(name, class_name):
+    return {'name': name, 'element': 'div', 'attributes': {'class': class_name}}
+
+REDDOT_STYLES = [
+    define_style_sheet('Intro', 'reddot_intro'),
+    define_style_sheet('Teaser', 'reddot_teaser'),
+    define_style_sheet('Collapse', 'reddot_collapse'),
+    define_style_sheet('Extra', 'reddot_extra'),
+    define_style_sheet('Body', 'reddot_body'),
+    define_style_sheet('Part1', 'reddot_part1'),
+    define_style_sheet('Part2', 'reddot_part2'),
+    define_style_sheet('Contact Responsible', 'contacts_responsible'),
+    define_style_sheet('Contact Other Responsibles', 'contacts_responsibles'),
+    define_style_sheet('Contact Jury', 'contacts_jury'),
+    define_style_sheet('Contact Contact', 'contacts_contact'),
+]
+
 # Apps Settings
 CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
+    'reddot': {
+        "removePlugins": "stylesheetparser",
+        'allowedContent': True,
+        'extraAllowedContent': 'div(reddot_*,contacts_*)',
+        'extraPlugins': 'reddot',
+        'stylesSet': REDDOT_STYLES,
+        'toolbar': 'Custom',
+        'toolbar_Custom': [
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList'],
+            ['Link', 'Unlink'],
+            ['CreateDiv'],
+        ]
+    },
     'default': {
+        "removePlugins": "stylesheetparser",
+        'allowedContent': True,
+        'extraAllowedContent': 'div(reddot_*,contacts_*)',
+        'extraPlugins': 'reddot',
         'toolbar': 'Custom',
         'toolbar_Custom': [
             {'name': 'basicstyles', 'items': ['Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat']},
@@ -226,6 +262,7 @@ CKEDITOR_CONFIGS = {
                        'HiddenField']},
             {'name': 'about', 'items': ['About']},
         ],
+        'stylesSet': REDDOT_STYLES,
     },
     'minimal': {
         'toolbar': 'Custom',
@@ -305,6 +342,15 @@ ESB_AUTHORIZATION = os.environ.get('ESB_AUTHORIZATION')
 ESB_STUDENT_API = os.environ.get('ESB_STUDENT_API')
 
 RELEASE_TAG = os.environ.get('RELEASE_TAG')
+
+# Selenium Testing
+SELENIUM_SETTINGS = {
+    'WEB_BROWSER': os.environ.get('SELENIUM_WEB_BROWSER', 'FIREFOX'),
+    'GECKO_DRIVER': os.environ.get('SELENIUM_GECKO_DRIVER', os.path.join(BASE_DIR, "selenium/geckodriver")),
+    'VIRTUAL_DISPLAY': os.environ.get('SELENIUM_VIRTUAL_DISPLAY', 'True').lower() == 'true',
+    'SCREEN_WIDTH': int(os.environ.get('SELENIUM_SCREEN_WIDTH', 1920)),
+    'SCREEN_HIGH': int(os.environ.get('SELENIUM_SCREEN_HIGH', 1080))
+}
 
 # BOOTSTRAP3 Configuration
 BOOTSTRAP3 = {

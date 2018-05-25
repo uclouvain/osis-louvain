@@ -51,4 +51,5 @@ class EducationGroup(models.Model):
     class Meta:
         permissions = (
             ("can_access_education_group", "Can access education_group"),
+            ("can_edit_educationgroup_pedagogy", "Can edit education group pedagogy"),
         )

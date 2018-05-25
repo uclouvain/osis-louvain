@@ -1,16 +1,20 @@
 {% load bootstrap3 %}
 {% load i18n %}
 <div class="row">
-    <div class="col-md-2 col-md-offset-8">
-        <button type="submit" class="btn btn-primary">
+    <div class="col-md-4 col-md-offset-8">
+         <a href="{% url 'learning_unit' learning_unit_year.id %}" class="btn btn-default pull-right"
+            style="margin-left: 10px;" role="button">
+            {% trans 'cancel' %}
+        </a>
+
+        <button onclick="submit()" class="btn btn-primary pull-right">
             <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}
         </button>
     </div>
-
-    <div class="col-md-2">
-        <a href="{% url 'learning_unit' learning_unit_year.id %}" class="btn btn-default" role="button">
-            {% trans 'cancel' %}
-        </a>
-    </div>
 </div>
 
+<script>
+function submit(){
+    $('form').submit()
+}
+</script>

@@ -1398,8 +1398,8 @@ class TestCreateXls(TestCase):
 
 def _generate_xls_build_parameter(xls_data, user):
     return {
-        xls_build.LIST_DESCRIPTION_KEY: "Liste d'activités",
-        xls_build.FILENAME_KEY: 'Learning_units',
+        xls_build.LIST_DESCRIPTION_KEY: _(learning_unit_business.XLS_DESCRIPTION),
+        xls_build.FILENAME_KEY: _(learning_unit_business.XLS_FILENAME),
         xls_build.USER_KEY: user.username,
         xls_build.WORKSHEETS_DATA: [{
             xls_build.CONTENT_KEY: xls_data,
@@ -1412,7 +1412,7 @@ def _generate_xls_build_parameter(xls_data, user):
                                           str(_('allocation_entity_small')),
                                           str(_('credits')),
                                           str(_('active_title'))],
-            xls_build.WORKSHEET_TITLE_KEY: 'Learning_units',
+            xls_build.WORKSHEET_TITLE_KEY: _(learning_unit_business.WORKSHEET_TITLE),
         }]
     }
 

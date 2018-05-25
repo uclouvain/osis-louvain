@@ -37,9 +37,9 @@ js_info_dict = {
 urlpatterns = [
 
     url(r'^scores_encoding/', include([
+        url(r'^$', score_encoding.scores_encoding, name='scores_encoding'),
         url(r'^outside_period/$',
             score_encoding.outside_period, name='outside_scores_encodings_period'),
-        url(r'^$', score_encoding.scores_encoding, name='scores_encoding'),
         url(r'^online/(?P<learning_unit_year_id>[0-9]+)/$',
             score_encoding.online_encoding, name='online_encoding'),
         url(r'^online/(?P<learning_unit_year_id>[0-9]+)/form$',
