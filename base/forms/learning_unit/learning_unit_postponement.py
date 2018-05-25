@@ -74,8 +74,8 @@ class LearningUnitPostponementForm:
         if end_postponement is None:
             if self.learning_unit_instance and self.learning_unit_instance.end_year:
                 end_postponement = academic_year.find_academic_year_by_year(self.learning_unit_instance.end_year)
-        elif self.learning_unit_full_instance and self.learning_unit_full_instance.end_year:
-            end_postponement = academic_year.find_academic_year_by_year(self.learning_unit_full_instance.end_year)
+            elif self.learning_unit_full_instance and self.learning_unit_full_instance.end_year:
+                end_postponement = academic_year.find_academic_year_by_year(self.learning_unit_full_instance.end_year)
 
         self.end_postponement = end_postponement
         self._init_forms(data)
