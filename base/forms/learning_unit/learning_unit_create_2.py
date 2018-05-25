@@ -37,6 +37,7 @@ from base.forms.utils.acronym_field import split_acronym
 from base.models import learning_unit_year
 from base.models.campus import Campus
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums import learning_container_year_types
 from base.models.learning_unit import LearningUnit
 from reference.models import language
 
@@ -146,11 +147,6 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
             if key in fields_to_disable:
                 self._disable_field(value)
 
-    def disable_all_fields_except(self, fields_not_to_disable):
-        for key, value in self.fields.items():
-            if key not in fields_not_to_disable:
-                self._disable_field(value)
-
     @staticmethod
     def _disable_field(field):
         field.disabled = True
@@ -223,6 +219,9 @@ class FullForm(LearningUnitBaseForm):
         if self.instance:
             self._disable_fields()
 
+        self.fields['internship_subtype'].disabled =\
+            not self.instance or self.instances_data["container_type"] != learning_container_year_types.INTERNSHIP
+
     def _disable_fields(self):
         if self.person.is_faculty_manager():
             self._disable_fields_as_faculty_manager()
@@ -233,7 +232,7 @@ class FullForm(LearningUnitBaseForm):
         if self.proposal:
             self.disable_fields(FACULTY_OPEN_FIELDS)
         else:
-            self.disable_all_fields_except(FACULTY_OPEN_FIELDS)
+            self.disable_fields(self.fields.keys() - set(FACULTY_OPEN_FIELDS))
 
     def _disable_fields_as_central_manager(self):
         if self.proposal:

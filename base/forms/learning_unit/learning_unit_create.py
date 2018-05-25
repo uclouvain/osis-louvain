@@ -105,9 +105,6 @@ class LearningUnitYearModelForm(forms.ModelForm):
     def __init__(self, data, person, subtype, *args, **kwargs):
         super().__init__(data, *args, **kwargs)
 
-        if person.is_faculty_manager():
-            self.fields.pop('internship_subtype')
-
         self.instance.subtype = subtype
 
         acronym = self.initial.get('acronym')
@@ -177,14 +174,10 @@ class LearningUnitYearModelForm(forms.ModelForm):
 
     @property
     def warnings(self):
-        if self._warnings is None and self.instance:
-            parent = self.instance.parent or self.instance
-            children = parent.get_partims_related()
-            self._warnings = [
-                _('The credits value of the partim %(acronym)s is greater or equal than the credits value of the '
-                  'parent learning unit.') % {'acronym': child.acronym}
-                for child in children if child.credits >= parent.credits]
-
+        if self._warnings is None:
+            self._warnings = []
+            if self.instance:
+                self._warnings = self.instance.warnings
         return self._warnings
 
 
