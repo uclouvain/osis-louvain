@@ -4,6 +4,7 @@ import sys
 import dotenv
 
 if __name__ == "__main__":
+
     if 'test' in sys.argv:
         os.environ.setdefault('TESTING', 'True')
     dotenv.read_dotenv()
