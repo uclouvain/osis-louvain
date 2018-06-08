@@ -28,7 +28,7 @@ from django.test import TestCase, RequestFactory
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_unit_year_with_context import get_with_context
-from base.forms.learning_unit.edition_volume import VolumeEditionForm, VolumeEditionBaseFormset, ENTITY_TYPES_VOLUME, \
+from base.forms.learning_unit.edition_volume import VolumeEditionForm, VolumeEditionBaseFormset, \
     VolumeEditionFormsetContainer
 from base.models.entity_component_year import EntityComponentYear
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
@@ -89,8 +89,7 @@ class TestVolumeEditionForm(TestCase):
                 initial=component_values,
                 component=component,
                 entities=self.learning_unit_with_context.entities)
-            self.assertFalse(form.is_valid())
-            self.assertEqual(form.errors['volume_total'][0], _('vol_tot_not_equal_to_q1_q2'))
+            self.assertTrue(form.is_valid()) # Accept that vol_q1 + vol_q2 is not equal to vol_tot
 
     def test_post_volume_form_wrong_volume_tot_requirement(self):
         for component, component_values in self.learning_unit_with_context.components.items():
@@ -101,9 +100,7 @@ class TestVolumeEditionForm(TestCase):
                 initial=component_values,
                 component=component,
                 entities=self.learning_unit_with_context.entities)
-            self.assertFalse(form.is_valid())
-            self.assertEqual(form.errors['volume_total_requirement_entities'][0],
-                             _('vol_tot_req_entities_not_equal_to_vol_tot_mult_cp'))
+            self.assertTrue(form.is_valid()) # Accept that vol_tot * cp is not equal to vol_global
 
     def test_post_volume_form_wrong_vol_req_entity(self):
         for component, component_values in self.learning_unit_with_context.components.items():
@@ -114,12 +111,7 @@ class TestVolumeEditionForm(TestCase):
                 initial=component_values,
                 component=component,
                 entities=self.learning_unit_with_context.entities)
-            self.assertFalse(form.is_valid())
-
-            error_msg = ' + '.join([self.learning_unit_with_context.entities.get(t).acronym for t in ENTITY_TYPES_VOLUME
-                                    if self.learning_unit_with_context.entities.get(t)])
-            error_msg += ' = {}'.format(_('vol_global'))
-            self.assertEqual(form.errors['volume_total_requirement_entities'][0], error_msg)
+            self.assertTrue(form.is_valid()) # Accept that vol_global is not equal to sum of volumes of entities
 
     def test_post_volume_form_partim_q1(self):
         for component, component_values in self.learning_unit_with_context.components.items():
@@ -131,9 +123,6 @@ class TestVolumeEditionForm(TestCase):
                 component=component,
                 entities=self.learning_unit_with_context.entities)
             self.assertTrue(form.is_valid())
-            parent_data = _get_valid_data()
-            errors = form.validate_parent_partim_component(parent_data)
-            self.assertEqual(len(errors), 7)
 
     def test_get_entity_fields(self):
         for component, component_values in self.learning_unit_with_context.components.items():
