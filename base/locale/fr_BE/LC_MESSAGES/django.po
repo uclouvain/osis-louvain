@@ -2690,6 +2690,9 @@ msgstr "obligatoire"
 msgid "Bibliography"
 msgstr "Bibliographie"
 
+msgid "bibliography"
+msgstr "bibliographie"
+
 msgid "Teaching material"
 msgstr "Supports d'enseignement"
 

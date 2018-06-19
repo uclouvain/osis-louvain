@@ -23,6 +23,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='learningunityear',
             name='bibliography',
-            field=models.CharField(blank=True, max_length=250, null=True),
+            field=models.CharField(blank=True, max_length=250, null=True, verbose_name='bibliography'),
         ),
     ]
