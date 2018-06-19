@@ -23,10 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models import *
 from django.contrib import admin
 
-from base.models.bibliography import Bibliography, BibliographyAdmin
+from base.models import *
+from base.models.teaching_material import Bibliography, BibliographyAdmin
 
 admin.site.register(academic_calendar.AcademicCalendar,
                     academic_calendar.AcademicCalendarAdmin)

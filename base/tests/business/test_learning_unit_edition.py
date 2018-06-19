@@ -35,13 +35,14 @@ from django.utils.translation import ugettext_lazy as _
 from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report, \
     ConsistencyError
 from base.models import academic_year
-from base.models import bibliography as mdl_bibliography
 from base.models import learning_unit_year as mdl_luy
+from base.models import teaching_material as mdl_bibliography
 from base.models.academic_year import compute_max_academic_year_adjournment
 from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import learning_component_year_type
-from base.models.enums import learning_unit_year_subtypes, learning_unit_year_periodicity, learning_container_year_types, \
+from base.models.enums import learning_unit_year_subtypes, learning_unit_year_periodicity, \
+    learning_container_year_types, \
     attribution_procedure, internship_subtypes, learning_unit_year_session, learning_unit_year_quadrimesters, \
     vacant_declaration_type, entity_container_year_link_type
 from base.models.learning_class_year import LearningClassYear

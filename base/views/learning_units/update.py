@@ -42,10 +42,10 @@ from base.forms.learning_unit.edition_volume import VolumeEditionFormsetContaine
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
 from base.forms.learning_unit_pedagogy import SummaryModelForm, LearningUnitPedagogyForm, \
     BibliographyModelForm
-from base.models.bibliography import Bibliography
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
+from base.models.teaching_material import Bibliography
 from base.views import layout
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages
 from base.views.learning_unit import learning_unit_components

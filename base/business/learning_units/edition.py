@@ -218,7 +218,7 @@ def _duplicate_learning_class_year(new_component):
 
 
 def _duplicate_bibliography(duplicated_luy):
-    previous_bibliography = mdl_base.bibliography.find_by_learning_unit_year(duplicated_luy.copied_from)
+    previous_bibliography = mdl_base.teaching_material.find_by_learning_unit_year(duplicated_luy.copied_from)
     for bib in previous_bibliography:
         update_related_object(bib, 'learning_unit_year', duplicated_luy)
 

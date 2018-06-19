@@ -41,8 +41,8 @@ from django.test.utils import override_settings
 from django.utils.translation import ugettext_lazy as _
 
 import base.business.learning_unit
-from base.business import learning_unit as learning_unit_business
 import base.business.xls
+from base.business import learning_unit as learning_unit_business
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.forms.learning_unit.search_form import LearningUnitYearForm, LearningUnitSearchForm
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm, SummaryModelForm
@@ -50,7 +50,6 @@ from base.forms.learning_unit_specifications import LearningUnitSpecificationsFo
 from base.models import learning_unit_component
 from base.models import learning_unit_component_class
 from base.models.academic_year import AcademicYear
-from base.models.bibliography import Bibliography
 from base.models.enums import entity_container_year_link_type, active_status, education_group_categories
 from base.models.enums import entity_type
 from base.models.enums import internship_subtypes
@@ -62,6 +61,7 @@ from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_Y
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.person import FACULTY_MANAGER_GROUP
 from base.models.person_entity import PersonEntity
+from base.models.teaching_material import Bibliography
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
