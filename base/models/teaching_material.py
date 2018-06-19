@@ -44,9 +44,6 @@ class TeachingMaterial(models.Model):
     def __str__(self):
         return self.title
 
-    class Meta:
-        verbose_name_plural = 'bibliographies'
-
 
 def find_by_learning_unit_year(learning_unit_year):
     return TeachingMaterial.objects.filter(learning_unit_year=learning_unit_year)
