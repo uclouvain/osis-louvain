@@ -28,11 +28,12 @@ from collections import OrderedDict
 
 from django.db import transaction
 from django.http import QueryDict
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 
 from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.models import academic_year, learning_unit_year
+from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING
 from base.models.learning_component_year import LearningComponentYear
@@ -80,7 +81,8 @@ class LearningUnitPostponementForm:
         self.end_postponement = self._get_academic_end_year(end_postponement)
         self._compute_forms_to_insert_update_delete(data)
 
-    def check_input_instance(self, learning_unit_full_instance, learning_unit_instance):
+    @staticmethod
+    def check_input_instance(learning_unit_full_instance, learning_unit_instance):
         if learning_unit_instance and not isinstance(learning_unit_instance, LearningUnit):
             raise AttributeError('learning_unit_instance arg should be an instance of {}'.format(LearningUnit))
         if learning_unit_full_instance and not isinstance(learning_unit_full_instance, LearningUnit):
@@ -115,23 +117,23 @@ class LearningUnitPostponementForm:
         else:
             if self._is_update_action():
                 to_delete = [
-                    self._instanciate_base_form_as_update(luy, index=index)
+                    self._instantiate_base_form_as_update(luy, index_form=index)
                     for index, luy in enumerate(existing_learn_unit_years)
                     if luy.academic_year.year > max_postponement_year
                     ]
                 to_update = [
-                    self._instanciate_base_form_as_update(luy, index=index, data=data)
+                    self._instantiate_base_form_as_update(luy, index_form=index, data=data)
                     for index, luy in enumerate(existing_learn_unit_years)
                     if luy.academic_year.year <= max_postponement_year
                     ]
                 existing_ac_years = [luy.academic_year for luy in existing_learn_unit_years]
                 to_insert = [
-                    self._instanciate_base_form_as_insert(ac_year, data)
+                    self._instantiate_base_form_as_insert(ac_year, data)
                     for index, ac_year in enumerate(ac_year_postponement_range) if ac_year not in existing_ac_years
                     ]
             else:
                 to_insert = [
-                    self._instanciate_base_form_as_insert(ac_year, data)
+                    self._instantiate_base_form_as_insert(ac_year, data)
                     for index, ac_year in enumerate(ac_year_postponement_range)
                     ]
 
@@ -141,16 +143,16 @@ class LearningUnitPostponementForm:
     def _init_forms_in_past(self, luy_queryset, data):
         if self._is_update_action() and luy_queryset.exists():
             first_luy = luy_queryset.first()
-            return [self._instanciate_base_form_as_update(first_luy, data=data)]
+            return [self._instantiate_base_form_as_update(first_luy, data=data)]
         else:
-            return [self._instanciate_base_form_as_insert(self.start_postponement, data)]
+            return [self._instantiate_base_form_as_insert(self.start_postponement, data)]
 
-    def _instanciate_base_form_as_update(self, luy_to_update, index=0, data=None):
+    def _instantiate_base_form_as_update(self, luy_to_update, index_form=0, data=None):
 
         def is_first_form(index):
             return index == 0
 
-        if data is None or is_first_form(index):
+        if data is None or is_first_form(index_form):
             data_to_postpone = data
         else:
             data_to_postpone = self._get_data_to_postpone(luy_to_update, data)
@@ -162,7 +164,8 @@ class LearningUnitPostponementForm:
             data=data_to_postpone
         )
 
-    def _update_form_set_data(self, data_to_postpone, luy_to_update):
+    @staticmethod
+    def _update_form_set_data(data_to_postpone, luy_to_update):
         learning_component_years = LearningComponentYear.objects.filter(
             learningunitcomponent__learning_unit_year=luy_to_update)
         for learning_component_year in learning_component_years:
@@ -171,21 +174,22 @@ class LearningUnitPostponementForm:
             else:
                 data_to_postpone['form-1-id'] = learning_component_year.id
 
-    def _instanciate_base_form_as_insert(self, ac_year, data):
+    def _instantiate_base_form_as_insert(self, ac_year, data):
         return self._get_learning_unit_base_form(ac_year, data=data, start_year=self.start_postponement.year)
 
-    def _get_data_to_postpone(self, lunit_year, data):
+    @staticmethod
+    def _get_data_to_postpone(lunit_year, data):
         data_to_postpone = QueryDict('', mutable=True)
         data_to_postpone.update({key: data[key] for key in data if key not in FIELDS_TO_NOT_POSTPONE.keys()})
         for key, attr_path in FIELDS_TO_NOT_POSTPONE.items():
             data_to_postpone[key] = operator.attrgetter(attr_path)(lunit_year)
         return data_to_postpone
 
-    def _get_learning_unit_base_form(self, academic_year, learning_unit_instance=None, data=None, start_year=None):
+    def _get_learning_unit_base_form(self, ac_year, learning_unit_instance=None, data=None, start_year=None):
         form_kwargs = {
             'person': self.person,
             'learning_unit_instance': learning_unit_instance,
-            'academic_year': academic_year,
+            'academic_year': ac_year,
             'start_year': start_year,
             'data': data.copy() if data else None,
             'learning_unit_full_instance': self.learning_unit_full_instance
@@ -245,6 +249,7 @@ class LearningUnitPostponementForm:
         for ac_year in academic_years:
             next_form = self._get_learning_unit_base_form(ac_year, **form_kwargs)
             self._check_postponement_proposal_state(next_form.learning_unit_year_form.instance, ac_year)
+            self._check_postponement_repartition_volume(next_form.learning_unit_year_form.instance)
             self._check_differences(current_form, next_form, ac_year)
 
         return self.consistency_errors
@@ -275,27 +280,59 @@ class LearningUnitPostponementForm:
                 }
             )
 
+    def _check_postponement_repartition_volume(self, luy):
+        """ Check if the repartition volume foreach entities has been changed in the future
+
+        This volume is never edited in the form, so we have to load data separably
+        """
+        initial_learning_unit_year = self._forms_to_upsert[0].instance
+        initial_values = EntityComponentYear.objects.filter(
+            learning_component_year__learningunitcomponent__learning_unit_year=initial_learning_unit_year
+        ).values_list('repartition_volume', 'learning_component_year__type', 'entity_container_year__type')
+
+        for reparation_volume, component_type, entity_type in initial_values:
+            component = EntityComponentYear.objects.filter(
+                learning_component_year__type=component_type,
+                entity_container_year__type=entity_type,
+                learning_component_year__learningunitcomponent__learning_unit_year=luy
+            ).get()
+
+            if component.repartition_volume != reparation_volume:
+                name = component.learning_component_year.acronym + "-"\
+                       + component.entity_container_year.entity.most_recent_acronym
+
+                self.consistency_errors.setdefault(luy.academic_year, []).append(
+                    _("The repartition volume of %(col_name)s has been already modified. "
+                      "({%(new_value)s} instead of {%(current_value)s})") % {
+                        'col_name': name,
+                        'new_value': component.repartition_volume,
+                        'current_value': reparation_volume
+                    }
+                )
+
     def _check_differences(self, current_form, next_form, ac_year):
         differences = [
             _("%(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})") % {
-                'col_name': next_form.label_fields[col_name],
-                'new_value': self._get_translated_value(next_form.instances_data[col_name]),
+                'col_name': next_form.label_fields.get(col_name, col_name),
+                'new_value': self._get_translated_value(next_form.instances_data.get(col_name)),
                 'current_value': self._get_translated_value(value)
             } for col_name, value in current_form.instances_data.items()
-            if self._get_cmp_value(next_form.instances_data[col_name]) != self._get_cmp_value(value) and
+            if self._get_cmp_value(next_form.instances_data.get(col_name)) != self._get_cmp_value(value) and
             col_name not in FIELDS_TO_NOT_CHECK
         ]
 
         if differences:
             self.consistency_errors.setdefault(ac_year, []).extend(differences)
 
-    def _get_cmp_value(self, value):
+    @staticmethod
+    def _get_cmp_value(value):
         """This function return comparable value. It consider empty string as null value"""
         if isinstance(value, str) and not value.strip():
             return None
         return value
 
-    def _get_translated_value(self, value):
+    @staticmethod
+    def _get_translated_value(value):
         if isinstance(value, bool):
             return _("yes") if value else _("no")
         elif value is None:

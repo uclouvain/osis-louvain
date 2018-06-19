@@ -55,3 +55,6 @@ msgstr "Remove"
 
 msgid "confirm_achievement_delete"
 msgstr "Are you sure you want to delete the achievement?"
+
+msgid "The repartition volume of %(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})"
+msgstr ""

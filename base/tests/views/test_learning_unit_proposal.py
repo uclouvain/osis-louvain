@@ -107,7 +107,8 @@ class TestLearningUnitModificationProposal(TestCase):
             learning_container_year=learning_container_year,
             quadrimester=None,
             specific_title_english="title english",
-            campus = CampusFactory(organization=an_organization, is_administration=True)
+            campus=CampusFactory(organization=an_organization, is_administration=True),
+            internship_subtype=None
         )
 
         an_entity = EntityFactory(organization=an_organization)

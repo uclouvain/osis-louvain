@@ -229,17 +229,12 @@ class LearningUnitYear(SerializableModel):
 
     # FIXME move this method to business/perm file
     def can_update_by_faculty_manager(self):
-        result = False
-
         if not self.learning_container_year:
-            return result
+            return False
 
         current_year = current_academic_year().year
         year = self.academic_year.year
-
-        if year <= current_year + MAX_ACADEMIC_YEAR_FACULTY:
-            result = True
-        return result
+        return current_year <= year <= current_year + MAX_ACADEMIC_YEAR_FACULTY
 
     def is_full(self):
         return self.subtype == learning_unit_year_subtypes.FULL

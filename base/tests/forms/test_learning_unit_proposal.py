@@ -71,7 +71,8 @@ class TestSave(TestCase):
             academic_year=current_academic_year,
             learning_container_year=learning_container_year,
             campus=CampusFactory(organization=an_organization, is_administration=True),
-            periodicity=learning_unit_year_periodicity.ANNUAL
+            periodicity=learning_unit_year_periodicity.ANNUAL,
+            internship_subtype=None
         )
 
         today = datetime.date.today()

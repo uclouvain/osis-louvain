@@ -86,8 +86,16 @@ tr.class_year_head{
     font-weight: bold;
 }
 
-table.volumes tbody tr td,th{
+table.volumes tbody tr th{
     text-align: center;
+}
+
+table.volumes tbody tr td{
+    text-align: center;
+}
+
+table.volumes_read tbody tr td,th{
+    text-align: left;
 }
 
 table.volumes tbody tr td input{
@@ -101,10 +109,8 @@ table.volumes tbody{
 
 table.volumes tbody tr td:nth-child(1),
 table.volumes tbody tr td:nth-child(8),
-table.volumes tbody tr td:nth-child(13),
 table.volumes tbody tr th:nth-child(1),
-table.volumes tbody tr th:nth-child(8),
-table.volumes tbody tr th:nth-child(13){
+table.volumes tbody tr th:nth-child(8){
     background-color: #f3f3f3;
 }
 

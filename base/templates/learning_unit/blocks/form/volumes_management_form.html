@@ -31,42 +31,42 @@
     <table class="table volumes">
         {% for learning_unit, formset in formsets.items %}
             <tbody>
-            <tr>
-                <th>
-                    <b>{{ learning_unit.acronym }}</b>
-                    <abbr title="{% trans 'quadrimester' %} : {{ learning_unit.quadrimester }}">
-                    ({{ learning_unit.quadrimester }})</abbr>
-                </th>
-                <th></th>
-                {% for field in formset.0 %}
-                    <th>
-                        {% if field.help_text %}
-                        <abbr title="{{ field.help_text }}">
-                            {{ field.label }}
-                        </abbr>
-                        {% else %}
-                            {{ field.label }}
-                        {% endif %}
-                    </th>
-                {% endfor %}
-            </tr>
-            {{ formset.management_form }}
-            {% for form in formset %}
-                <tr>{% bootstrap_formset_errors formset %}</tr>
                 <tr>
-                    <td>
-                        <abbr title="{{ form.title_help }}">
-                            {{ form.title }}
-                        </abbr>
-                    </td>
-                    <td></td>{% bootstrap_form_errors form %}
-                    {% for field in form %}
-                        <td>
-                            {% bootstrap_field field show_label=False show_help=False%}
-                        </td>
+                    <th>
+                        <b>{{ learning_unit.acronym }}</b>
+                        <abbr title="{% trans 'quadrimester' %} : {{ learning_unit.quadrimester }}">
+                        ({{ learning_unit.quadrimester }})</abbr>
+                    </th>
+                    <th></th>
+                    {% for field in formset.0 %}
+                        <th>
+                            {% if field.help_text %}
+                            <abbr title="{{ field.help_text }}">
+                                {{ field.label }}
+                            </abbr>
+                            {% else %}
+                                {{ field.label }}
+                            {% endif %}
+                        </th>
                     {% endfor %}
                 </tr>
-            {% endfor %}
+                {{ formset.management_form }}
+                {% for form in formset %}
+                    <tr>{% bootstrap_formset_errors formset %}</tr>
+                    <tr>
+                        <td>
+                            <abbr title="{{ form.title_help }}">
+                                {{ form.title }}
+                            </abbr>
+                        </td>
+                        <td></td>{% bootstrap_form_errors form %}
+                        {% for field in form %}
+                            <td>
+                                {% bootstrap_field field show_label=False show_help=False%}
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
             </tbody>
         {% endfor %}
     </table>

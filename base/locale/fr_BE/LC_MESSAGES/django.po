@@ -2859,7 +2859,7 @@ msgid "COURSE_ENROLLMENT"
 msgstr "Inscription aux cours"
 
 msgid "vol_global"
-msgstr "Vol.global"
+msgstr "Vol. global"
 
 msgid "volume_global"
 msgstr "volume total global"
@@ -2928,7 +2928,7 @@ msgid "Vol_tot is not equal to vol_q1 + vol_q2"
 msgstr "Vol_tot n'est pas égal à vol_q1 + vol_q2"
 
 msgid "Vol_global is not equal to Vol_tot * planned_classes"
-msgstr "Vol_global n'est pas égal à Vol_tot * planned_classes"
+msgstr "Le volume global doit être égal au volume annuel multiplié par le nombre de classes"
 
 msgid "At least a partim volume value is greater than corresponding volume of parent"
 msgstr "Au moins une valeur de volume d'un partim est supérieure à celle du volume correspondant du parent"
@@ -2987,6 +2987,18 @@ msgstr "Produire un fichier Excel avec la liste des unités d'enseignement"
 msgid "produce_xls_attributions_desc"
 msgstr "Produire un fichier Excel avec la liste des unités d'enseignement et les attributions"
 
+msgid "hourly volume total annual"
+msgstr "volume horaire total annuel"
+
+msgid "hourly volume partial q1"
+msgstr "volume horaire partiel q1"
+
+msgid "hourly volume partial q2"
+msgstr "volume horaire partiel q2"
+
+msgid "volume declared vacant"
+msgstr "volume déclaré vacant"
+
 msgid "Xls with education groups"
 msgstr "Xls avec les formations"
 
@@ -3001,3 +3013,9 @@ msgstr "Q1 et Q2"
 
 msgid "Q1 or Q2"
 msgstr "Q1 ou Q2"
+
+msgid "The repartition volume of %(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})"
+msgstr "La répartition de volume de %(col_name)s a déjà été modifiée. ({%(new_value)s} a la place de {%(current_value)s})"
+
+msgid "untyped"
+msgstr "Non-typée"

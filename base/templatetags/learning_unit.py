@@ -104,8 +104,10 @@ def dl_tooltip(differences, key, **kwargs):
                                              "The value of this attribute is not annualized")
         value = get_style_of_value("font-style:italic", "The value of this attribute is not annualized", value)
 
-    return mark_safe("<dl><dt {difference}>{label_text}</dt><dd {difference}>{value}</dd></dl>".format(
-        difference=difference, label_text=label_text, value=_(str(value))))
+    html_id = "id='id_{}'".format(key.lower())
+
+    return mark_safe("<dl><dt {difference}>{label_text}</dt><dd {difference} {id}>{value}</dd></dl>".format(
+        difference=difference, id=html_id, label_text=label_text, value=_(str(value))))
 
 
 def get_style_of_value(style, title, value):

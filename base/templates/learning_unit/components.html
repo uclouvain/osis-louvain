@@ -41,17 +41,7 @@
     </div>
     <div class="panel-body" id="tabs">
         {% include "learning_unit/blocks/tabs.html" %}
-    <br>
-        <div class="row" style="padding-left: 43px">
-            <div class="col-md-2">
-                <label>{% trans 'quadrimester'%}</label><br>
-                {{ learning_unit_year.quadrimester }}
-            </div>
-            <div class="col-md-9">
-                <label>{% trans 'session_title'%}</label><br>
-                {{ learning_unit_year.session }}
-            </div>
-        </div>
+        <br>
         <div class="tab-content" id="tab_content">
             <div role="tabpanel" class="tab-pane active" id="components">
                 <table class="table volumes_read">
@@ -65,11 +55,16 @@
                             <th>
                                 <abbr title="{% trans 'Volume annual'%}">{% trans 'Vol. annual' %}</abbr>
                             </th>
-                            <th>{% trans 'real_on_planned_classrooms' %}</th>
-                            <th>{% trans 'lu_usage' %}</th>
+                            <th>
+                                <abbr title="{% trans 'real_on_planned_classrooms'%}">{% trans 'Classes' %}</abbr>
+                            </th>
+                            <th>
+                                <abbr title="{% trans 'Volume global'%}">{% trans 'Vol. global' %}</abbr>
+                            </th>
                             {% block additional_entities_titles %}
                                 {% include "learning_unit/blocks/additional_entities_titles.html" %}
                             {% endblock %}
+                            <th>{% trans 'lu_usage' %}</th>
                             <th></th>
                         </tr>
                     </thead>
@@ -108,10 +103,11 @@
                                         {{ component.learning_component_year.planned_classes| default_if_none:'0' }}
                                 </span>
                             </td>
-                            <td>{{ component.learning_unit_usage }}</td>
+                            <td>{{ component.volumes.VOLUME_GLOBAL | default_if_none:''}}</td>
                             {% block additional_requirement_entity_volumes %}
                                 {% include "learning_unit/blocks/additional_requirement_entity_volumes.html" %}
                             {% endblock %}
+                            <td>{{ component.learning_unit_usage }}</td>
                             <td></td>
                         </tr>
                         {% with component_number=forloop.counter0 classes_count=component.learning_component_year.classes|length|add:"1" %}

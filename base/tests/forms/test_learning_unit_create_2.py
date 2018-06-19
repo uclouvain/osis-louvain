@@ -599,9 +599,10 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
         self.assertEqual(LearningComponentYear.objects.filter(
             learning_container_year=saved_luy.learning_container_year
         ).count(), 1)
-        self.assertEqual(
-            LearningComponentYear.objects.get(
-                learning_container_year=saved_luy.learning_container_year, type=LECTURING).acronym, "PM1")
+        learning_component_year = LearningComponentYear.objects.get(
+                learning_container_year=saved_luy.learning_container_year, type=None)
+        self.assertEqual(learning_component_year.acronym, DEFAULT_ACRONYM_COMPONENT[None])
+        self.assertEqual(learning_component_year.type, None)
 
     def _assert_correctly_create_records_in_all_learning_unit_structure(self, initial_counts):
         # NUMBER_OF_POSTPONMENTS = 7

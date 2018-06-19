@@ -38,7 +38,8 @@ from base.forms.learning_unit.entity_form import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
     LearningContainerYearModelForm
 from base.models.entity_component_year import EntityComponentYear
-from base.models.enums import learning_unit_year_periodicity, learning_container_year_types, learning_unit_year_subtypes, \
+from base.models.enums import learning_unit_year_periodicity, learning_container_year_types, \
+    learning_unit_year_subtypes, \
     entity_container_year_link_type, vacant_declaration_type, attribution_procedure, entity_type, organization_type
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer, GenerateAcademicYear
@@ -151,7 +152,8 @@ class TestEditLearningUnit(TestCase):
             subtype=learning_unit_year_subtypes.FULL,
             attribution_procedure=attribution_procedure.INTERNAL_TEAM,
             credits=15,
-            campus=CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN))
+            campus=CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN)),
+            internship_subtype=None,
         )
 
         cls.partim_learning_unit = LearningUnitYearFactory(

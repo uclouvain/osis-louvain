@@ -25,7 +25,7 @@
 ##############################################################################
 from django.db import models
 from django.db.models import Sum
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _
 
 from base.models import learning_class_year
 from base.models.enums import learning_component_year_type, learning_container_year_types
@@ -47,10 +47,14 @@ class LearningComponentYear(SerializableModel):
                             blank=True, null=True)
     comment = models.CharField(max_length=255, blank=True, null=True)
     planned_classes = models.IntegerField(blank=True, null=True, default=1)
-    hourly_volume_total_annual = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    hourly_volume_partial_q1 = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    hourly_volume_partial_q2 = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True)
-    volume_declared_vacant = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)
+    hourly_volume_total_annual = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
+                                                     verbose_name=_("hourly volume total annual"))
+    hourly_volume_partial_q1 = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
+                                                   verbose_name=_("hourly volume partial q1"))
+    hourly_volume_partial_q2 = models.DecimalField(max_digits=6, decimal_places=2, blank=True, null=True,
+                                                   verbose_name=_("hourly volume partial q2"))
+    volume_declared_vacant = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True,
+                                                 verbose_name=_("volume declared vacant"))
 
     _warnings = None
 
