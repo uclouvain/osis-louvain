@@ -175,7 +175,7 @@ def update_learning_unit_pedagogy(request, learning_unit_year_id, context, templ
     summary_form = SummaryModelForm(post, person, context['is_person_linked_to_entity'], instance=learning_unit_year)
     TeachingMaterialFormset = inlineformset_factory(LearningUnitYear, TeachingMaterial, fields=('title', 'mandatory'),
                                                     max_num=10, extra=perm_to_edit, form=TeachingMaterialModelForm,
-                                                    can_delete=perm_to_edit)
+                                                    can_delete=perm_to_edit, labels={'title': ''})
     teaching_material_formset = TeachingMaterialFormset(post, instance=learning_unit_year,
                                                         form_kwargs={'person': person})
 
