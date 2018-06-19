@@ -37,6 +37,9 @@
             <th>
                 <abbr title="{% trans 'real_on_planned_classrooms'%}">{% trans 'Classes' %}</abbr>
             </th>
+            <th>
+                <abbr title="{% trans 'Volume global'%}">{% trans 'vol_global' %}</abbr>
+            </th>
             {% block additional_entities_titles %}
                 {% include "learning_unit/blocks/additional_entities_titles.html" %}
             {% endblock %}
@@ -61,6 +64,7 @@
                         {{ component.learning_component_year.planned_classes| default_if_none:'0' }}
                 </span>
             </td>
+            <td>{{ component.volumes.VOLUME_GLOBAL | default_if_none:'0'}}</td>
             {% block additional_requirement_entity_volumes %}
                 {% include "learning_unit/blocks/additional_requirement_entity_volumes.html" %}
             {% endblock %}

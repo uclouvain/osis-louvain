@@ -2856,7 +2856,7 @@ msgid "COURSE_ENROLLMENT"
 msgstr "Inscription aux cours"
 
 msgid "vol_global"
-msgstr "Vol.global"
+msgstr "Vol. global"
 
 msgid "volume_global"
 msgstr "volume total global"
