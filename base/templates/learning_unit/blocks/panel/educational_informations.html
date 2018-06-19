@@ -71,6 +71,7 @@
             </tbody>
         </table>
 
+        {% bootstrap_field summary_editable_form.bibliography %}
         {% include "learning_unit/blocks/panel/teaching_material.html" with formset=teaching_material_formset %}
         {% bootstrap_field summary_editable_form.mobility_modality %}
         {% buttons %}

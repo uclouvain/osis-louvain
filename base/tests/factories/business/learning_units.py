@@ -456,6 +456,7 @@ def _setup_classes(learning_component_year, number_classes=5):
 
 def _create_fixed_educational_information_for_luy(luy):
     luy.mobility_modality = factory.fuzzy.FuzzyText(length=150).fuzz()
+    luy.bibliography = factory.fuzzy.FuzzyText(length=150).fuzz()
     luy.save()
     _create_teaching_material_for_luy(luy)
     _create_cms_data_for_luy(luy)

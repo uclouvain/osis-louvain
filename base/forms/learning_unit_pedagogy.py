@@ -95,7 +95,7 @@ class SummaryModelForm(forms.ModelForm):
 
     class Meta:
         model = LearningUnitYear
-        fields = ["summary_locked", 'mobility_modality']
+        fields = ["summary_locked", 'bibliography', 'mobility_modality']
 
 
 class TeachingMaterialModelForm(forms.ModelForm):

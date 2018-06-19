@@ -721,6 +721,7 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         last_luy_teaching_material = \
             mdl_teaching_material.build_list_of_teaching_material_content_by_learning_unit_year(last_luy)
         last_luy_mobility_modalities = last_luy.mobility_modality
+        last_luy_bibliography = last_luy.bibliography
         last_luy_educational_information = translated_text.build_list_of_cms_content_by_reference(last_luy.id)
 
         edit_learning_unit_end_date(learning_unit_full_annual, academic_year_of_new_end_date)
@@ -729,10 +730,12 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         new_luy_teaching_material = \
             mdl_teaching_material.build_list_of_teaching_material_content_by_learning_unit_year(new_luy)
         new_luy_mobility_modalities = new_luy.mobility_modality
+        new_luy_bibliography = new_luy.bibliography
         new_luy_educational_information = translated_text.build_list_of_cms_content_by_reference(new_luy.id)
 
         self.assertCountEqual(last_luy_teaching_material, new_luy_teaching_material)
         self.assertEquals(last_luy_mobility_modalities, new_luy_mobility_modalities)
+        self.assertEquals(last_luy_bibliography, new_luy_bibliography)
         self.assertCountEqual(last_luy_educational_information, new_luy_educational_information)
 
 
