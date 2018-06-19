@@ -25,7 +25,7 @@
 ##############################################################################
 from django.db import models
 from django.db.models import Sum
-from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext_lazy as _
 
 from base.models import learning_class_year
 from base.models.enums import learning_component_year_type, learning_container_year_types
