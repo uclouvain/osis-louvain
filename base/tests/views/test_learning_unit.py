@@ -61,7 +61,7 @@ from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_Y
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.person import FACULTY_MANAGER_GROUP
 from base.models.person_entity import PersonEntity
-from base.models.teaching_material import Bibliography
+from base.models.teaching_material import TeachingMaterial
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -1320,7 +1320,7 @@ class LearningUnitViewTestCase(TestCase):
         url = reverse(learning_unit_pedagogy, args=[learning_unit_year.id])
         request_factory = RequestFactory()
 
-        data = self.data_bibliography_formset(learning_unit_year)
+        data = self.data_teachingmaterial_formset(learning_unit_year)
         data['summary_locked'] = True
         request = request_factory.post(url, data=data)
 
@@ -1348,7 +1348,7 @@ class LearningUnitViewTestCase(TestCase):
                                                      subtype=learning_unit_year_subtypes.FULL,
                                                      summary_locked=False)
 
-        data = self.data_bibliography_formset(learning_unit_year)
+        data = self.data_teachingmaterial_formset(learning_unit_year)
         data['summary_locked'] = True
 
         url = reverse(learning_unit_pedagogy, args=[learning_unit_year.id])
@@ -1363,7 +1363,7 @@ class LearningUnitViewTestCase(TestCase):
 
         learning_unit_year.refresh_from_db()
         self.assertFalse(learning_unit_year.summary_locked)
-        self.assertEqual(Bibliography.objects.filter(learning_unit_year=learning_unit_year).count(), 3)
+        self.assertEqual(TeachingMaterial.objects.filter(learning_unit_year=learning_unit_year).count(), 3)
 
     def test_learning_unit_pedagogy_without_permission(self):
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
@@ -1371,7 +1371,7 @@ class LearningUnitViewTestCase(TestCase):
                                                      subtype=learning_unit_year_subtypes.FULL,
                                                      summary_locked=False)
 
-        data = self.data_bibliography_formset(learning_unit_year)
+        data = self.data_teachingmaterial_formset(learning_unit_year)
         data['summary_locked'] = True
 
         url = reverse(learning_unit_pedagogy, args=[learning_unit_year.id])
@@ -1387,8 +1387,8 @@ class LearningUnitViewTestCase(TestCase):
 
         learning_unit_year.refresh_from_db()
         self.assertFalse(learning_unit_year.summary_locked)
-        self.assertEqual(Bibliography.objects.filter(learning_unit_year=learning_unit_year).count(), 0,
-                         'Bibliography cannot be updated')
+        self.assertEqual(TeachingMaterial.objects.filter(learning_unit_year=learning_unit_year).count(), 0,
+                         'Teaching material cannot be updated')
 
     @mock.patch('base.models.person.Person.is_faculty_manager')
     def test_learning_unit_pedagogy_summary_editable_cannot_update_not_faculty_manager(self, mock_faculty_manager):
@@ -1400,7 +1400,7 @@ class LearningUnitViewTestCase(TestCase):
                                                      summary_locked=False)
         url = reverse(learning_unit_pedagogy, args=[learning_unit_year.id])
         request_factory = RequestFactory()
-        data = self.data_bibliography_formset(learning_unit_year)
+        data = self.data_teachingmaterial_formset(learning_unit_year)
         data['summary_locked'] = True
         request = request_factory.post(url, data=data)
 
@@ -1490,21 +1490,21 @@ class LearningUnitViewTestCase(TestCase):
         return request
 
     @staticmethod
-    def data_bibliography_formset(learning_unit_year):
-        return {'bibliography_set-TOTAL_FORMS': ['3'],
-                'bibliography_set-INITIAL_FORMS': ['0'],
-                'bibliography_set-MIN_NUM_FORMS': ['0'],
-                'bibliography_set-MAX_NUM_FORMS': ['10'],
-                'bibliography_set-0-id': [''],
-                'bibliography_set-0-learning_unit_year': [learning_unit_year.pk],
-                'bibliography_set-0-title': ['Maître'],
-                'bibliography_set-0-DELETE': [''],
-                'bibliography_set-1-id': [''],
-                'bibliography_set-1-learning_unit_year': [''],
-                'bibliography_set-1-title': ['Chevalier'],
-                'bibliography_set-2-id': [''],
-                'bibliography_set-2-learning_unit_year': [''],
-                'bibliography_set-2-title': ['Padawan']}
+    def data_teachingmaterial_formset(learning_unit_year):
+        return {'teachingmaterial_set-TOTAL_FORMS': ['3'],
+                'teachingmaterial_set-INITIAL_FORMS': ['0'],
+                'teachingmaterial_set-MIN_NUM_FORMS': ['0'],
+                'teachingmaterial_set-MAX_NUM_FORMS': ['10'],
+                'teachingmaterial_set-0-id': [''],
+                'teachingmaterial_set-0-learning_unit_year': [learning_unit_year.pk],
+                'teachingmaterial_set-0-title': ['Maître'],
+                'teachingmaterial_set-0-DELETE': [''],
+                'teachingmaterial_set-1-id': [''],
+                'teachingmaterial_set-1-learning_unit_year': [''],
+                'teachingmaterial_set-1-title': ['Chevalier'],
+                'teachingmaterial_set-2-id': [''],
+                'teachingmaterial_set-2-learning_unit_year': [''],
+                'teachingmaterial_set-2-title': ['Padawan']}
 
 
 class TestCreateXls(TestCase):

@@ -30,15 +30,15 @@ from django.utils.translation import pgettext_lazy as _
 from base.models.learning_unit_year import LearningUnitYear
 
 
-class BibliographyAdmin(ModelAdmin):
+class TeachingMaterialAdmin(ModelAdmin):
     list_display = ('title', 'mandatory', 'learning_unit_year')
     search_fields = ['title', 'learning_unit_year']
     raw_id_fields = ('learning_unit_year',)
 
 
-class Bibliography(models.Model):
-    title = models.CharField(max_length=255, verbose_name=_('bibliography', 'title'))
-    mandatory = models.BooleanField(verbose_name=_('bibliography', 'mandatory'))
+class TeachingMaterial(models.Model):
+    title = models.CharField(max_length=255, verbose_name=_('teachingmaterial', 'title'))
+    mandatory = models.BooleanField(verbose_name=_('teachingmaterial', 'mandatory'))
     learning_unit_year = models.ForeignKey(LearningUnitYear, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -49,11 +49,11 @@ class Bibliography(models.Model):
 
 
 def find_by_learning_unit_year(learning_unit_year):
-    return Bibliography.objects.filter(learning_unit_year=learning_unit_year)
+    return TeachingMaterial.objects.filter(learning_unit_year=learning_unit_year)
 
 
-def build_list_of_bibliography_content_by_learning_unit_year(learning_unit_year):
+def build_list_of_teaching_material_content_by_learning_unit_year(learning_unit_year):
     return [
-        (bib.title, bib.mandatory)
-        for bib in find_by_learning_unit_year(learning_unit_year)
+        (material.title, material.mandatory)
+        for material in find_by_learning_unit_year(learning_unit_year)
     ]

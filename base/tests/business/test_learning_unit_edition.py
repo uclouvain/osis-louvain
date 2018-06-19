@@ -36,7 +36,7 @@ from base.business.learning_units.edition import edit_learning_unit_end_date, up
     ConsistencyError
 from base.models import academic_year
 from base.models import learning_unit_year as mdl_luy
-from base.models import teaching_material as mdl_bibliography
+from base.models import teaching_material as mdl_teaching_material
 from base.models.academic_year import compute_max_academic_year_adjournment
 from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
@@ -701,7 +701,7 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         self.assertEqual(list_of_years_learning_unit, list_of_expected_years)
         self.assertEqual(learning_unit_annual.end_year, excepted_end_year)
 
-    def test_postpone_end_date_with_cms_data_and_bibliography(self):
+    def test_postpone_end_date_with_cms_data_and_teaching_material(self):
         start_year_full = self.current_academic_year.year - 1
         end_year_full = self.current_academic_year.year + 1
         expected_end_year_full = end_year_full + 2
@@ -718,18 +718,20 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         self.setup_educational_information(luy_list)
 
         last_luy = mdl_luy.find_latest_by_learning_unit(learning_unit_full_annual)
-        last_luy_bibliography = mdl_bibliography.build_list_of_bibliography_content_by_learning_unit_year(last_luy)
+        last_luy_teaching_material = \
+            mdl_teaching_material.build_list_of_teaching_material_content_by_learning_unit_year(last_luy)
         last_luy_mobility_modalities = last_luy.mobility_modality
         last_luy_educational_information = translated_text.build_list_of_cms_content_by_reference(last_luy.id)
 
         edit_learning_unit_end_date(learning_unit_full_annual, academic_year_of_new_end_date)
 
         new_luy = mdl_luy.find_latest_by_learning_unit(learning_unit_full_annual)
-        new_luy_bibliography = mdl_bibliography.build_list_of_bibliography_content_by_learning_unit_year(new_luy)
+        new_luy_teaching_material = \
+            mdl_teaching_material.build_list_of_teaching_material_content_by_learning_unit_year(new_luy)
         new_luy_mobility_modalities = new_luy.mobility_modality
         new_luy_educational_information = translated_text.build_list_of_cms_content_by_reference(new_luy.id)
 
-        self.assertCountEqual(last_luy_bibliography, new_luy_bibliography)
+        self.assertCountEqual(last_luy_teaching_material, new_luy_teaching_material)
         self.assertEquals(last_luy_mobility_modalities, new_luy_mobility_modalities)
         self.assertCountEqual(last_luy_educational_information, new_luy_educational_information)
 
