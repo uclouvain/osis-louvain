@@ -2694,7 +2694,7 @@ msgid "bibliography"
 msgstr "bibliographie"
 
 msgid "Teaching material"
-msgstr "Supports d'enseignement"
+msgstr "Supports de cours"
 
 msgid "Modalities specific to IN and OUT mobility"
 msgstr "Modalités propres à la mobilité IN et OUT"
