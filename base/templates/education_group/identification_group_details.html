@@ -62,6 +62,9 @@
                             </strong>
                         {% endif %}
                         <br><br>
+                        <label>{% trans 'minimum credits'|capfirst %}</label><br>
+                            {{ education_group_year.min_credits|default_if_none:"" }}
+                        <br><br>
                         <label>{% trans 'primary_language' %}</label><br>
                         {% if education_group_languages %}
                             {{ education_group_languages|join_with_spaces:education_group_year.language_association }}
@@ -81,6 +84,9 @@
                         {% elif parent.credits %}
                             <strong class="text-primary">{{ parent.credits }}</strong>
                         {% endif %}
+                        <br><br>
+                        <label>{% trans 'maximum credits'|capfirst %}</label><br>
+                            {{ education_group_year.max_credits|default_if_none:"" }}
                         <br><br>
                         <label>{% trans 'other_language_activities'%}</label><br>
                         {% if education_group_year.other_language_activities %}

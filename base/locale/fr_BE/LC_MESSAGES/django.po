@@ -3017,8 +3017,23 @@ msgstr "Q1 et Q2"
 msgid "Q1 or Q2"
 msgstr "Q1 ou Q2"
 
+msgid "New Education Group"
+msgstr "Nouveau Groupement"
+
 msgid "The repartition volume of %(col_name)s has been already modified. ({%(new_value)s} instead of {%(current_value)s})"
 msgstr "La répartition de volume de %(col_name)s a déjà été modifiée. ({%(new_value)s} a la place de {%(current_value)s})"
 
 msgid "untyped"
 msgstr "Non-typée"
+
+msgid "validity"
+msgstr "validité"
+
+msgid "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfuly created."
+msgstr "Formation <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> créée avec succès."
+
+msgid "minimum credits"
+msgstr "crédits minimum"
+
+msgid "maximum credits"
+msgstr "crédits maximum"

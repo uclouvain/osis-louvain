@@ -23,14 +23,5 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-
-<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a></li>
-<li><a href="{% url 'education_groups' %}" id="lnk_formations">{% trans 'formations' %}</a></li>
-<li class="active">
-    {% if education_group_year.education_group_type.category == "TRAINING" %}
-        {{ education_group_year.acronym }}
-    {% else %}
-        {{ education_group_year.partial_acronym }}
-    {% endif %}
-</li>
-
+{% url 'education_groups' as cancel_url %}
+{% include "blocks/forms/create_cancel_buttons.html" %}

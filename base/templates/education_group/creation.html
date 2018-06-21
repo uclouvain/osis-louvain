@@ -1,4 +1,6 @@
+{% extends "layout.html" %}
 {% load i18n %}
+{% load staticfiles bootstrap3 %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -23,14 +25,18 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+{% block breadcrumb %}
+    <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a></li>
+    <li><a href="{% url 'education_groups' %}" id="lnk_formations">{% trans 'formations' %}</a></li>
+    <li class="active">{% trans 'New Education Group' %}</li>
+{% endblock %}
 
-<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a></li>
-<li><a href="{% url 'education_groups' %}" id="lnk_formations">{% trans 'formations' %}</a></li>
-<li class="active">
-    {% if education_group_year.education_group_type.category == "TRAINING" %}
-        {{ education_group_year.acronym }}
-    {% else %}
-        {{ education_group_year.partial_acronym }}
-    {% endif %}
-</li>
+{% block content %}
+    <div class="page-header">
+        <h2>{% block h2_title %}{% trans 'New Education Group' %}{% endblock %}</h2>
+    </div>
+
+    {% include "education_group/blocks/form/create_education_group_year.html" %}
+
+{% endblock %}
 

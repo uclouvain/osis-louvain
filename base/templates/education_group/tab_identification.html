@@ -34,6 +34,9 @@
     {% include "education_group/header.html" %}
 
     <div class="panel panel-default">
+        <div class="panel-heading text-right">
+            {% include "education_group/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown"%}
+        </div>
         <div class="panel-body" id="tabs">
             <div class="tab-content" id="tab_content">
                 <div role="tabpanel" class="tab-pane active" id="identification">
@@ -53,6 +56,9 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <div class="panel-footer text-right">
+            {% include "education_group/blocks/dropdown/identification_actions_bar.html"  with dropdirection="dropup" %}
         </div>
     </div>
 {% endblock %}

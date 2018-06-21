@@ -51,6 +51,7 @@ urlpatterns = [
                 name='assistant_file_download'),
             url(r'^upload/$', upload_assistant_file.save_uploaded_file, name='assistant_file_upload'),
         ])),
+        url(r'^export_pdf/$', export_utils_pdf.export_mandate, name='export_mandate_pdf'),
         url(r'^form/', include([
             url(r'^part1/', include([
                 url(r'^edit/$', assistant_form.form_part1_edit, name='form_part1_edit'),

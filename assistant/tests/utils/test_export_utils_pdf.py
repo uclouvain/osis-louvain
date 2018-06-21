@@ -44,6 +44,7 @@ from assistant.tests.factories.manager import ManagerFactory
 from assistant.tests.factories.mandate_entity import MandateEntityFactory
 from assistant.tests.factories.reviewer import ReviewerFactory
 from assistant.tests.factories.review import ReviewFactory
+from assistant.tests.factories.settings import SettingsFactory
 from assistant.tests.factories.tutoring_learning_unit_year import TutoringLearningUnitYearFactory
 from assistant.models.enums import assistant_type, assistant_mandate_renewal, review_status
 
@@ -55,6 +56,7 @@ HTTP_OK = 200
 class ExportPdfTestCase(TestCase):
     def setUp(self):
         self.client = Client()
+        self.settings = SettingsFactory()
         self.manager = ManagerFactory()
         self.factory = RequestFactory()
         self.supervisor = PersonFactory()
@@ -129,6 +131,11 @@ class ExportPdfTestCase(TestCase):
             mandate=self.mandate,
             reviewer=None
         )
+
+    def test_export_mandate(self):
+        self.client.force_login(self.assistant.person.user)
+        response = self.client.post('/assistants/assistant/export_pdf/', {'mandate_id': self.mandate.id})
+        self.assertEqual(HTTP_OK, response.status_code)
 
     def test_export_mandates(self):
         self.client.force_login(self.manager.person.user)

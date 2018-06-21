@@ -353,6 +353,9 @@ msgstr "Sexe"
 msgid "general_comment"
 msgstr "Commentaire général"
 
+msgid "generate_PDF"
+msgstr "Générer un fichier PDF"
+
 msgid "global_id"
 msgstr "Matricule"
 

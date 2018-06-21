@@ -36,6 +36,7 @@ from base.models.enums import education_group_categories
 from base.models.enums import offer_year_entity_type
 from base.models.exceptions import MaximumOneParentAllowedException
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from django.utils.translation import ugettext_lazy as _
 
 
 class EducationGroupYearAdmin(OsisModelAdmin):
@@ -49,12 +50,13 @@ class EducationGroupYearAdmin(OsisModelAdmin):
 class EducationGroupYear(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    acronym = models.CharField(max_length=40, db_index=True)
-    title = models.CharField(max_length=255)
-    title_english = models.CharField(max_length=240, blank=True, null=True)
-    academic_year = models.ForeignKey('AcademicYear')
+    acronym = models.CharField(max_length=40, db_index=True, verbose_name=_("acronym"))
+    title = models.CharField(max_length=255, verbose_name=_("title_in_french"))
+    title_english = models.CharField(max_length=240, blank=True, null=True, verbose_name=_("title_in_english"))
+    academic_year = models.ForeignKey('AcademicYear', verbose_name=_("validity"))
     education_group = models.ForeignKey('EducationGroup')
-    education_group_type = models.ForeignKey('EducationGroupType', blank=True, null=True)
+    education_group_type = models.ForeignKey('EducationGroupType', blank=True, null=True,
+                                             verbose_name=_("training_type"))
     active = models.CharField(max_length=20, choices=active_status.ACTIVE_STATUS_LIST, default=active_status.ACTIVE)
     partial_deliberation = models.BooleanField(default=False)
     admission_exam = models.BooleanField(default=False)
@@ -65,8 +67,10 @@ class EducationGroupYear(models.Model):
     academic_type = models.CharField(max_length=20, choices=academic_type.ACADEMIC_TYPES, blank=True, null=True)
     university_certificate = models.BooleanField(default=False)
     fee_type = models.CharField(max_length=20, choices=fee.FEES, blank=True, null=True)
-    enrollment_campus = models.ForeignKey('Campus', related_name='enrollment', blank=True, null=True)
-    main_teaching_campus = models.ForeignKey('Campus', blank=True, null=True, related_name='teaching')
+    enrollment_campus = models.ForeignKey('Campus', related_name='enrollment', blank=True, null=True,
+                                          verbose_name=_("enrollment_campus"))
+    main_teaching_campus = models.ForeignKey('Campus', blank=True, null=True, related_name='teaching',
+                                             verbose_name=_("learning_location"))
     dissertation = models.BooleanField(default=False)
     internship = models.CharField(max_length=20, choices=internship_presence.INTERNSHIP_PRESENCE, blank=True, null=True)
     schedule_type = models.CharField(max_length=20, choices=schedule_type.SCHEDULE_TYPES, default=schedule_type.DAILY)
@@ -96,11 +100,15 @@ class EducationGroupYear(models.Model):
                                      default=duration_unit.DurationUnits.QUADRIMESTER,
                                      blank=True, null=True)
     enrollment_enabled = models.BooleanField(default=False)
-    partial_acronym = models.CharField(max_length=15, db_index=True, null=True)
+    partial_acronym = models.CharField(max_length=15, db_index=True, null=True, verbose_name=_("code"))
     # TODO :: rename credits into expected_credits
-    credits = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
-    remark = models.TextField(blank=True, null=True)
-    remark_english = models.TextField(blank=True, null=True)
+    credits = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True, verbose_name=_("credits"))
+    remark = models.TextField(blank=True, null=True, verbose_name=_("remark"))
+    remark_english = models.TextField(blank=True, null=True, verbose_name=_("remark_english"))
+    min_credits = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True,
+                                      verbose_name=_("minimum credits"))
+    max_credits = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True,
+                                      verbose_name=_("maximum credits"))
 
     _coorganizations = None
 

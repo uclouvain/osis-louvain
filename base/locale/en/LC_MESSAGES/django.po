@@ -3018,5 +3018,20 @@ msgstr ""
 msgid "Q1 or Q2"
 msgstr ""
 
+msgid "New Education Group"
+msgstr ""
+
 msgid "untyped"
+msgstr ""
+
+msgid "validity"
+msgstr ""
+
+msgid "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfuly created."
+msgstr ""
+
+msgid "minimum credits"
+msgstr ""
+
+msgid "maximum credits"
 msgstr ""

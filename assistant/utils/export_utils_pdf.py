@@ -26,9 +26,13 @@
 import time
 import datetime
 from io import BytesIO
-from django.contrib.auth.decorators import user_passes_test
+
+from django.contrib.auth.decorators import user_passes_test, login_required
 from django.http import HttpResponse
-from django.db.models.query import QuerySet
+from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
+from django.views.decorators.http import require_http_methods
+
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.enums import TA_JUSTIFY, TA_LEFT
 from reportlab.platypus import SimpleDocTemplate, Paragraph, PageBreak, Table, TableStyle
@@ -39,11 +43,11 @@ from reportlab.lib.units import mm
 from reportlab.lib import colors
 from reportlab.lib.colors import black, HexColor
 from reportlab.graphics.charts.legends import Legend
-from django.utils.translation import ugettext_lazy as _
-from django.utils import timezone
+
 from base.models.entity import find_versions_from_entites
 from base.models import academic_year, entity_version
-from assistant.utils import manager_access
+
+from assistant.utils import assistant_access, manager_access
 from assistant.models import assistant_mandate, review, tutoring_learning_unit_year
 from assistant.models.enums import review_status, assistant_type
 
@@ -53,19 +57,10 @@ COLS_WIDTH_FOR_REVIEWS = [35*mm, 20*mm, 70*mm, 30*mm, 30*mm]
 COLS_WIDTH_FOR_TUTORING = [40*mm, 15*mm, 15*mm, 15*mm, 15*mm, 15*mm, 15*mm, 15*mm, 40*mm]
 
 
-def add_header_footer(canvas, doc):
-    styles = getSampleStyleSheet()
-    canvas.saveState()
-    header_building(canvas, doc)
-    footer_building(canvas, doc, styles)
-    canvas.restoreState()
-
-
-@user_passes_test(manager_access.user_is_manager, login_url='assistants_home')
-def export_mandates(mandates=None):
-    if not isinstance(mandates, QuerySet):
-        mandates = assistant_mandate.find_by_academic_year_by_excluding_declined(academic_year.current_academic_year())
-    filename = ('%s_%s.pdf' % (_('assistants_mandates'), time.strftime("%Y%m%d_%H%M")))
+@login_required
+def build_doc(request, mandates, show_reviews):
+    year = mandates[0].academic_year
+    filename = ('%s_%s_%s.pdf' % (_('assistants_mandates'), year, time.strftime("%Y%m%d_%H%M")))
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
     buffer = BytesIO()
@@ -73,23 +68,42 @@ def export_mandates(mandates=None):
                             bottomMargin=25)
     styles = getSampleStyleSheet()
     styles.add(ParagraphStyle(name='Tiny', fontSize=6, font='Helvetica', leading=8, leftIndent=0, rightIndent=0,
-                              firstLineIndent=0, alignment=TA_LEFT, spaceBefore=0, spaceAfter=0, splitLongWords=1,))
+                              firstLineIndent=0, alignment=TA_LEFT, spaceBefore=0, spaceAfter=0, splitLongWords=1, ))
     styles.add(ParagraphStyle(name='StandardWithBorder', font='Helvetica', leading=18, leftIndent=10, rightIndent=10,
                               firstLineIndent=0, alignment=TA_JUSTIFY, spaceBefore=25, spaceAfter=5, splitLongWords=1,
-                              borderColor='#000000', borderWidth=1, borderPadding=10,))
+                              borderColor='#000000', borderWidth=1, borderPadding=10, ))
     content = []
     for mandate in mandates:
-        add_mandate_content(content, mandate, styles)
-    doc.build(content, onFirstPage=add_header_footer, onLaterPages=add_header_footer)
+        add_mandate_content(content, mandate, styles, show_reviews)
+    doc.build(content, add_header_footer)
     pdf = buffer.getvalue()
     buffer.close()
     response.write(pdf)
     return response
 
 
-def add_mandate_content(content, mandate, styles):
-    content.append(create_paragraph(str(mandate.assistant.person), get_administrative_data(mandate),
-                                    styles['StandardWithBorder']))
+@require_http_methods(["POST"])
+@user_passes_test(assistant_access.user_is_assistant_and_procedure_is_open, login_url='access_denied')
+def export_mandate(request):
+    mandate_id = request.POST.get("mandate_id")
+    mandate = assistant_mandate.find_mandate_by_id(mandate_id)
+    return build_doc(request, mandates=[mandate], show_reviews=False)
+
+
+@user_passes_test(manager_access.user_is_manager, login_url='access_denied')
+def export_mandates(request):
+    mandates = assistant_mandate.find_by_academic_year_by_excluding_declined(academic_year.current_academic_year())
+    return build_doc(request, mandates, show_reviews=True)
+
+
+def add_mandate_content(content, mandate, styles, show_reviews):
+    content.append(
+        create_paragraph(
+            "%s (%s)" % (mandate.assistant.person, mandate.academic_year),
+            get_administrative_data(mandate),
+            styles['StandardWithBorder']
+        )
+    )
     content.append(create_paragraph("%s" % (_('entities')), get_entities(mandate), styles['StandardWithBorder']))
     content.append(create_paragraph("<strong>%s</strong>" % (_('absences')), get_absences(mandate),
                                     styles['StandardWithBorder']))
@@ -115,9 +129,10 @@ def add_mandate_content(content, mandate, styles):
     content.append(create_paragraph("%s" % (_('summary')), get_summary(mandate), styles['StandardWithBorder']))
     content += [draw_time_repartition(mandate)]
     content.append(PageBreak())
-    content.append(create_paragraph("%s<br />" % (_('reviews')), '', styles["BodyText"]))
-    write_table(content, get_reviews_for_mandate(mandate, styles['Tiny']), COLS_WIDTH_FOR_REVIEWS)
-    content.append(PageBreak())
+    if show_reviews:
+        content.append(create_paragraph("%s<br />" % (_('reviews')), '', styles["BodyText"]))
+        write_table(content, get_reviews_for_mandate(mandate, styles['Tiny']), COLS_WIDTH_FOR_REVIEWS)
+        content.append(PageBreak())
 
 
 def format_data(data, title):
@@ -351,9 +366,17 @@ def add_data_and_titles_to_pie(pie, titles, data, title):
         titles.append(_(title))
 
 
+def add_header_footer(canvas, doc):
+    styles = getSampleStyleSheet()
+    canvas.saveState()
+    header_building(canvas, doc)
+    footer_building(canvas, doc, styles)
+    canvas.restoreState()
+
+
 def header_building(canvas, doc):
     canvas.line(doc.leftMargin, 790, doc.width+doc.leftMargin, 790)
-    canvas.drawString(80, 800, "%s %s" % (_('assistant_mandates_renewals'), academic_year.current_academic_year()))
+    canvas.drawString(110, 800, "%s" % (_('assistant_mandates_renewals')))
 
 
 def footer_building(canvas, doc, styles):

@@ -353,6 +353,9 @@ msgstr "Sex"
 msgid "general_comment"
 msgstr "General comment"
 
+msgid "generate_PDF"
+msgstr "Generate a PDF file"
+
 msgid "global_id"
 msgstr "Registration number"
 
