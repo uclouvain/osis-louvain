@@ -235,3 +235,17 @@ def _prefetch_entity_version(queryset):
                      Prefetch('entity__entityversion_set', to_attr='entity_versions')
                  ), to_attr='entities_containers_year')
     )
+
+
+def filter_summary_responsible(entities, responsible):
+    queryset = Attribution.objects
+
+    if responsible:
+        queryset = queryset \
+            .filter(summary_responsible=True)
+    if entities:
+        queryset = filter_by_entities(queryset, entities)
+
+    queryset = _prefetch_entity_version(queryset)
+
+    return queryset.select_related('tutor__person').distinct("tutor__person")

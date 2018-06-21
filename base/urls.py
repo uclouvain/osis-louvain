@@ -45,8 +45,10 @@ from base.views.learning_units.external.search import filter_cities_by_country, 
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
 
+
 urlpatterns = [
     url(r'^$', common.home, name='home'),
+
 
     url(r'^academic_actors/$', institution.academic_actors, name='academic_actors'),
 

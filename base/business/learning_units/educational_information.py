@@ -23,6 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils import timezone
+from datetime import datetime
+from base.models.entity_version import find_latest_version_by_entity
+from base.models.entity_calendar import find_by_reference_and_entity
+from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
+from attribution.models.attribution import filter_summary_responsible
+from base.models.entity import Entity
+from base.utils.send_mail import send_mail_for_educational_information_update_period_opening
+from base.models.person import Person, find_by_id
+from base.models.academic_calendar import AcademicCalendar, get_by_reference_and_academic_year
+from base.models.academic_year import current_academic_year
+from base.models.enums.organization_type import MAIN
+
+
 LEARNING_UNIT_YEARS = 'learning_unit_years'
 PERSON = 'person'
 
@@ -72,3 +86,75 @@ def _is_new_responsible(responsible_and_learning_unit_yr_list, a_person):
         if record_responsible_learning_units.get(PERSON) == a_person:
             return False
     return True
+
+
+def _teacher_mailing_for_summary_opened():
+    entities = Entity.objects.filter(organization__type=MAIN)
+    send_mail_for_educational_information_update_period_opening(get_summary_responsibles_with_entities(entities))
+
+
+def get_summary_responsibles_with_entities(entities):
+    summary_responsibles = {}
+    for an_entity in entities:
+        opened_now = _is_updating_period_opening_today(an_entity)
+        if opened_now:
+            summary_responsibles = get_summary_responsible_list(an_entity, summary_responsibles)
+    return summary_responsibles
+
+
+def get_summary_responsible_list(an_entity, summary_responsibles_param):
+    summary_responsibles = summary_responsibles_param.copy()
+    summary_responsible_attributions = filter_summary_responsible([an_entity], True)
+
+    if summary_responsible_attributions:
+        for attribution in summary_responsible_attributions:
+            update_summary_responsibles_dict(an_entity, attribution, summary_responsibles)
+    return summary_responsibles
+
+
+def update_summary_responsibles_dict(an_entity, attribution, summary_responsibles_param):
+    summary_responsibles = summary_responsibles_param.copy()
+    id_person = attribution.tutor.person
+    if id_person not in summary_responsibles:
+        summary_responsibles.update({id_person: [an_entity]})
+    else:
+        entities_list = summary_responsibles.get(id_person)
+        entities_list.append(an_entity)
+        summary_responsibles.update({id_person: entities_list})
+    return summary_responsibles
+
+
+def _is_updating_period_opening_today(an_entity):
+    entity_calendar = find_by_reference_and_entity(SUMMARY_COURSE_SUBMISSION,
+                                                   an_entity)
+    if entity_calendar:
+        return True if entity_calendar.start_date.date() == timezone.now().date() else False
+    else:
+        opened_now = find_parent_calendar(an_entity)
+    return opened_now
+
+
+def find_parent_calendar(an_entity):
+    now_date = timezone.now().date()
+    an_entity_version = find_latest_version_by_entity(an_entity, now_date)
+    if an_entity_version:
+        if an_entity_version.parent:
+            return _check_entity_calendar(an_entity_version, now_date)
+        else:
+            return get_default_calendar()
+
+
+def _check_entity_calendar(an_entity_version, now_date):
+    entity_calendar = find_by_reference_and_entity(SUMMARY_COURSE_SUBMISSION,
+                                                   an_entity_version.parent)
+    if entity_calendar:
+        return True if entity_calendar.start_date.date() == now_date else False
+    else:
+        ent_vers_parent_up = find_latest_version_by_entity(an_entity_version.parent, now_date)
+        return find_parent_calendar(ent_vers_parent_up.entity) if ent_vers_parent_up else get_default_calendar()
+
+
+def get_default_calendar():
+    current_academic_yr = current_academic_year()
+    ac_cal = get_by_reference_and_academic_year(SUMMARY_COURSE_SUBMISSION, current_academic_yr)
+    return True if ac_cal and ac_cal.start_date == timezone.now().date() else False

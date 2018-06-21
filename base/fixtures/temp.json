@@ -1,0 +1,45 @@
+[{
+  "model": "osis_common.messagetemplate",
+  "pk": 13,
+  "fields": {
+    "reference": "educational_information_update_period_open_txt",
+    "subject": "Les informations pédagogiques peuvent désormais être mises à jour",
+    "template": "<p>Bonjour,</p>\r\n\r\n<p>Pourriez-vous valider ou compléter les informations pédagogiques relatives à l'entité suivante {{entities}}</p>\r\n\r\n<p>En vous remerciant,</p>\r\n\r\n<p>votre gestionnaire facultaire</p>",
+    "format": "PLAIN",
+    "language": "fr-be"
+  }
+},
+  {
+    "model": "osis_common.messagetemplate",
+    "pk": 14,
+    "fields": {
+      "reference": "educational_information_update_period_open_html",
+      "subject": "Les informations pédagogiques doivent être mises à jour",
+      "template": "<p>{% autoescape off %}</p><p>Bonjour,</p>\r\n\r\n<p>Pourriez-vous valider ou compléter les informations pédagogiques l'entité suivante {{entities}}.</p>\r\n\r\n<p>En vous remerciant,</p>votre gestionnaire facultaire</p><p>{% endautoescape %}</p>",
+      "format": "PLAIN",
+      "language": "fr-be"
+    }
+  },
+  {
+    "model": "osis_common.messagetemplate",
+    "pk": 15,
+    "fields": {
+      "reference": "educational_information_update_period_open_txt",
+      "subject": "Les informations pédagogiques peuvent désormais être mises à jour",
+      "template": "<p>Hello,</p>\r\n\r\n<p>Pourriez-vous valider ou compléter les informations pédagogiques relatives à l'entité suivante {{entities}}</p>\r\n\r\n<p>En vous remerciant,</p>\r\n\r\n<p>votre gestionnaire facultaire</p>",
+      "format": "PLAIN",
+      "language": "en"
+    }
+  },
+  {
+    "model": "osis_common.messagetemplate",
+    "pk": 16,
+    "fields": {
+      "reference": "educational_information_update_period_open_html",
+      "subject": "Les informations pédagogiques doivent être mises à jour",
+      "template": "<p>{% autoescape off %}</p><p>Hello,</p>\r\n\r\n<p>Pourriez-vous valider ou compléter les informations pédagogiques l'entité suivante {{entities}}.</p>\r\n\r\n<p>En vous remerciant,</p>votre gestionnaire facultaire</p><p>{% endautoescape %}</p>",
+      "format": "PLAIN",
+      "language": "en"
+    }
+  }
+]
