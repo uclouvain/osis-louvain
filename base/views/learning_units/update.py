@@ -46,13 +46,13 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.teaching_material import TeachingMaterial
+from base.models.tutor import find_all_summary_responsibles_by_learning_unit_year
 from base.views import layout
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages
 from base.views.learning_unit import learning_unit_components
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context, \
     get_common_context_learning_unit_year
-from base.models.tutor import find_all_summary_responsibles_by_learning_unit_year
 
 
 @login_required
@@ -184,7 +184,6 @@ def update_learning_unit_pedagogy(request, learning_unit_year_id, context, templ
         try:
             summary_form.save()
             teaching_material_formset.save()
-
             display_success_messages(request, _("success_modification_learning_unit"))
             # Redirection on the same page
             return HttpResponseRedirect(request.path_info)
