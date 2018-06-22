@@ -53,9 +53,7 @@ def list_my_attributions_summary_editable(request):
         )
         responsibles = find_all_summary_responsibles_by_learning_unit_year(learning_unit_year)
         context[learning_unit_year] = {"responsibles":responsibles, "entity_calendar":entity_calendar}
-    # FIXME : locals as context is not allowed
-    return layout.render(request,
-                         'manage_my_courses/list_my_courses_summary_editable.html', locals())
+    return layout.render(request, 'manage_my_courses/list_my_courses_summary_editable.html', {'context': context})
 
 
 @login_required
