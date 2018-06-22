@@ -36,6 +36,7 @@ from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm
 from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.tutor import TutorFactory
 
@@ -53,6 +54,8 @@ class ManageMyCoursesViewTestCase(TestCase):
         cls.academic_calendar = AcademicCalendarFactory(academic_year=create_current_academic_year(),
                                                         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
         cls.url = reverse(list_my_attributions_summary_editable)
+        cls.entity_container = EntityContainerYearFactory(
+            learning_container_year=cls.attribution.learning_unit_year.learning_container_year)
 
     def setUp(self):
         self.client.force_login(self.user)
@@ -79,9 +82,7 @@ class ManageMyCoursesViewTestCase(TestCase):
         self.assertTrue(mock_find_luys_summary_editable.called)
 
         context = response.context
-        self.assertCountEqual(context['learning_unit_years_summary_editable'], expected_luys_summary_editable)
-        self.assertDictEqual(context['submission_dates'], model_to_dict(self.academic_calendar,
-                                                                        fields=("start_date", "end_date")))
+        self.assertCountEqual(context['context'], expected_luys_summary_editable)
 
 
 class TestViewEducationalInformation(TestCase):
@@ -108,8 +109,9 @@ class TestViewEducationalInformation(TestCase):
 
     @mock.patch("attribution.views.manage_my_courses.can_user_edit_educational_information",
                 side_effect=lambda usr, luy_id: False)
-    @mock.patch("attribution.views.manage_my_courses.find_educational_information_submission_dates_of_learning_unit_year",
-                side_effect=lambda luy_id: {})
+    @mock.patch(
+        "attribution.views.manage_my_courses.find_educational_information_submission_dates_of_learning_unit_year",
+        side_effect=lambda luy_id: {})
     def test_template_used(self, mock_find_submission_dates, mock_can_edit):
         response = self.client.get(self.url)
 
