@@ -94,6 +94,14 @@ def find_all_responsibles_by_learning_unit_year(a_learning_unit_year):
     return [attribution.tutor for attribution in attribution_list]
 
 
+def find_all_summary_responsibles_by_learning_unit_year(a_learning_unit_year):
+    attribution_list = Attribution.objects.filter(learning_unit_year=a_learning_unit_year,
+                                                  summary_responsible=True) \
+        .distinct("tutor") \
+        .select_related("tutor")
+    return [attribution.tutor for attribution in attribution_list]
+
+
 def find_all_tutors_by_learning_unit_year(a_learning_unit_year, responsibles_order=""):
     attribution_list = Attribution.objects.filter(learning_unit_year=a_learning_unit_year) \
         .distinct("tutor").values_list('id', flat=True)

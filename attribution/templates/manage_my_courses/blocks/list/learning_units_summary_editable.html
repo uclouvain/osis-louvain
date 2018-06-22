@@ -1,18 +1,21 @@
 {% load i18n %}
 
 {% if learning_unit_years_summary_editable %}
-
     <table id="table_learning_units" class="table table-striped table-hover">
         <thead>
             <tr>
                 <th>{% trans 'academic_year_small' %}</th>
                 <th>{% trans 'courses' %}</th>
                 <th >{% trans 'title' %}</th>
+                <th >{% trans 'requirement_entity' %}</th>
+                <th >{% trans 'Educational information opening' %}</th>
+                <th >{% trans 'Educational information ending' %}</th>
+                <th >{% trans 'summary_responsible' %}</th>
             </tr>
         </thead>
         <tbody>
-            {% for luy in learning_unit_years_summary_editable %}
-                <tr data-id="{{luy.id}}" data-value="{{luy.acronym}}">
+            {% for luy, info in context.items %}
+                <tr data-id="{{luy.id}}" data-value="{{info.acronym}}">
                     <td>{{ luy.academic_year }}</td>
                     <td>
                         <a href="{% url "view_educational_information" learning_unit_year_id=luy.id %}" title="{% trans 'manage_educational_information' %}">
@@ -20,6 +23,14 @@
                         </a>
                     </td>
                     <td>{{ luy.complete_title|default_if_none:'' }}</td>
+                    <td>{{ luy.requirement_entity|default_if_none:'-' }}</td>
+                    <td>{{ info.entity_calendar.start_date|default:'-' }}</td>
+                    <td>{{ info.entity_calendar.end_date|default:'-' }}</td>
+                    <td>
+                        {% for responsible in info.responsibles %}
+                            {{ responsible|default_if_none:'-' }}
+                        {% endfor %}
+                    </td>
                 </tr>
             {% endfor %}
         </tbody>

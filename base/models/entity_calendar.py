@@ -55,3 +55,13 @@ def find_by_entity_and_reference_for_current_academic_year(entity_id, reference)
             .select_related('entity', 'academic_calendar__academic_year').get()
     except ObjectDoesNotExist:
         return None
+
+
+def find_by_entity_and_reference_for_academic_year(academic_year, entity, reference):
+    try:
+        return EntityCalendar.objects.filter(entity=entity,
+                                             academic_calendar__academic_year=academic_year,
+                                             academic_calendar__reference=reference)\
+            .select_related('entity', 'academic_calendar__academic_year').get()
+    except ObjectDoesNotExist:
+        return None

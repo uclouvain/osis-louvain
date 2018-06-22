@@ -30,8 +30,9 @@ from django.urls import reverse
 from attribution.business.manage_my_courses import find_learning_unit_years_summary_editable
 from attribution.business.perms import can_user_edit_educational_information, \
     find_educational_information_submission_dates_of_learning_unit_year
+from attribution.models.attribution import find_all_summary_responsibles_by_learning_unit_year
 from attribution.views.perms import tutor_can_edit_educational_information, tutor_can_view_educational_information
-from base.models import academic_calendar
+from base.models.entity_calendar import find_by_entity_and_reference_for_academic_year
 from base.models.enums import academic_calendar_type
 from base.models.tutor import Tutor
 from base.views import layout
@@ -43,8 +44,15 @@ from base.views.learning_units.update import update_learning_unit_pedagogy
 def list_my_attributions_summary_editable(request):
     learning_unit_years_summary_editable = find_learning_unit_years_summary_editable(
         tutor=get_object_or_404(Tutor, person__user=request.user))
-    submission_dates = academic_calendar.\
-        find_dates_for_current_academic_year(academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+    context = {}
+    for learning_unit_year in learning_unit_years_summary_editable:
+        entity_calendar = find_by_entity_and_reference_for_academic_year(
+            learning_unit_year.academic_year,
+            learning_unit_year.requirement_entity,
+            academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+        )
+        responsibles = find_all_summary_responsibles_by_learning_unit_year(learning_unit_year)
+        context[learning_unit_year] = {"responsibles":responsibles, "entity_calendar":entity_calendar}
     # FIXME : locals as context is not allowed
     return layout.render(request,
                          'manage_my_courses/list_my_courses_summary_editable.html', locals())
