@@ -33,7 +33,7 @@ from django.urls import reverse
 from attribution.tests.factories.attribution import AttributionFactory
 from attribution.views.manage_my_courses import list_my_attributions_summary_editable
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm
-from base.models.enums import academic_calendar_type
+from base.models.enums import academic_calendar_type, entity_container_year_link_type
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
@@ -54,8 +54,8 @@ class ManageMyCoursesViewTestCase(TestCase):
         cls.academic_calendar = AcademicCalendarFactory(academic_year=create_current_academic_year(),
                                                         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
         cls.url = reverse(list_my_attributions_summary_editable)
-        cls.entity_container = EntityContainerYearFactory(
-            learning_container_year=cls.attribution.learning_unit_year.learning_container_year)
+        EntityContainerYearFactory(learning_container_year=cls.attribution.learning_unit_year.learning_container_year,
+                                   type=entity_container_year_link_type.REQUIREMENT_ENTITY)
 
     def setUp(self):
         self.client.force_login(self.user)
