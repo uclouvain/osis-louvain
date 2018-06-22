@@ -28,6 +28,9 @@
 {% block breadcrumb %}
     <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a></li>
     <li><a href="{% url 'education_groups' %}" id="lnk_formations">{% trans 'formations' %}</a></li>
+    {% if parent %}
+    <li><a href="{% url 'education_group_read' education_group_year_id=parent.id %}" id="lnk_parent">{{ parent.partial_acronym }}</a></li>
+    {% endif %}
     <li class="active">{% trans 'New Education Group' %}</li>
 {% endblock %}
 

@@ -2918,6 +2918,11 @@
                 "educationgroup"
             ],
             [
+                "add_educationgroup",
+                "base",
+                "educationgroup"
+            ],
+            [
                 "change_learningclassyear",
                 "base",
                 "learningclassyear"
@@ -3042,6 +3047,11 @@
             ],
             [
                 "can_access_education_group",
+                "base",
+                "educationgroup"
+            ],
+            [
+                "add_educationgroup",
                 "base",
                 "educationgroup"
             ],

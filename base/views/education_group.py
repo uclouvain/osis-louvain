@@ -32,7 +32,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
 from django.db.models import Prefetch
-from django.forms import forms
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -42,6 +41,7 @@ from django.views.decorators.http import require_http_methods
 from base import models as mdl
 from base.business import education_group as education_group_business
 from base.business.education_group import assert_category_of_education_group_year
+from base.business.education_groups import perms
 from base.business.learning_unit import find_language_in_settings
 from base.forms.education_group_general_informations import EducationGroupGeneralInformationsForm
 from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
@@ -50,9 +50,9 @@ from base.forms.education_groups_administrative_data import CourseEnrollmentForm
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
+from base.models.person import Person
 from cms import models as mdl_cms
 from cms.enums import entity_name
-from cms.models import text_label
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
@@ -73,6 +73,7 @@ NUMBER_SESSIONS = 3
 @login_required
 @permission_required('base.can_access_education_group', raise_exception=True)
 def education_groups(request):
+    person = get_object_or_404(Person, user=request.user)
     if request.GET:
         form = EducationGroupFilter(request.GET)
     else:
@@ -91,7 +92,8 @@ def education_groups(request):
     context = {
         'form': form,
         'object_list': object_list,
-        'experimental_phase': True
+        'experimental_phase': True,
+        'can_create_education_group': perms.is_eligible_to_add_education_group(person)
     }
     return layout.render(request, "education_groups.html", context)
 
@@ -115,12 +117,14 @@ def _check_if_display_message(request, an_education_groups):
 @login_required
 @permission_required('base.can_access_education_group', raise_exception=True)
 def education_group_read(request, education_group_year_id):
+    person = get_object_or_404(Person, user=request.user)
     root = request.GET.get('root')
     education_group_year = get_object_or_404(EducationGroupYear, id=education_group_year_id)
     education_group_languages = [education_group_language.language.name for education_group_language in
                                  mdl.education_group_language.find_by_education_group_year(education_group_year)]
     enums = mdl.enums.education_group_categories
     parent = _get_education_group_root(root, education_group_year)
+    can_create_education_group = perms.is_eligible_to_add_education_group(person)
 
     return layout.render(request, "education_group/tab_identification.html", locals())
 

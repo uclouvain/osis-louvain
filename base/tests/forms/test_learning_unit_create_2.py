@@ -568,9 +568,13 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
         self.assertEqual(saved_luy.credits, 99)
         self.assertEqual(saved_luy.learning_container_year.container_type, INTERNSHIP)
         self.assertEqual(saved_luy.internship_subtype, TEACHING_INTERNSHIP)
-        self.assertEqual(LearningComponentYear.objects.filter(
+        learning_component_year_list = LearningComponentYear.objects.filter(
             learning_container_year=saved_luy.learning_container_year
-        ).count(), 2)
+        )
+        self.assertEqual(learning_component_year_list.count(), 2)
+        self.assertEqual(
+            EntityComponentYear.objects.filter(
+                learning_component_year__in=learning_component_year_list).count(), 2)
         self.assertEqual(
             LearningComponentYear.objects.get(
                 learning_container_year=saved_luy.learning_container_year, type=LECTURING).acronym, "PM1")
@@ -596,9 +600,13 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
 
         self.assertEqual(saved_luy.credits, 99)
         self.assertEqual(saved_luy.learning_container_year.container_type, DISSERTATION)
-        self.assertEqual(LearningComponentYear.objects.filter(
+        learning_component_year_list = LearningComponentYear.objects.filter(
             learning_container_year=saved_luy.learning_container_year
-        ).count(), 1)
+        )
+        self.assertEqual(learning_component_year_list.count(), 1)
+        self.assertEqual(
+            EntityComponentYear.objects.filter(
+                learning_component_year__in=learning_component_year_list).count(), 1)
         learning_component_year = LearningComponentYear.objects.get(
                 learning_container_year=saved_luy.learning_container_year, type=None)
         self.assertEqual(learning_component_year.acronym, DEFAULT_ACRONYM_COMPONENT[None])

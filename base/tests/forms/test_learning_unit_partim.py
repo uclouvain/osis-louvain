@@ -38,8 +38,11 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelF
 from base.forms.learning_unit.learning_unit_partim import PARTIM_FORM_READ_ONLY_FIELD, PartimForm, \
     LearningUnitPartimModelForm
 from base.forms.utils import acronym_field
+from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import learning_unit_year_subtypes, organization_type
+from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_periodicity import ANNUAL, BIENNIAL_EVEN
+from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year
@@ -303,6 +306,17 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
 
         self.assertIsInstance(saved_instance, LearningUnitYear)
         self.assertEqual(saved_instance.learning_container_year, learning_container_year_full)
+        learning_component_year_list = LearningComponentYear.objects.filter(
+            learning_container_year=saved_instance.learning_container_year
+        )
+        self.assertEqual(learning_component_year_list.count(), 6)
+        self.assertEqual(
+            EntityComponentYear.objects.filter(
+                learning_component_year__in=learning_component_year_list).count(), 18)
+        self.assertEqual(
+            learning_component_year_list.filter(type=LECTURING)[0].acronym, "PM1")
+        self.assertEqual(
+            learning_component_year_list.filter(type=PRACTICAL_EXERCISES )[0].acronym, "PP1")
 
     def test_save_method_create_new_instance(self):
         partim_acronym = FULL_ACRONYM + 'C'

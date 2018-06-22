@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import mock
+
 from django.test import TestCase
 from django.urls import reverse
 from django.http import HttpResponseForbidden
@@ -38,10 +40,16 @@ class TestCreate(TestCase):
         cls.parent_education_group_year = EducationGroupYearFactory()
         cls.url_without_parent = reverse("new_education_group")
         cls.url_with_parent = reverse("new_education_group", kwargs={"parent_id":cls.parent_education_group_year.id})
-        cls.person = PersonWithPermissionsFactory("add_educationgroup")
+        cls.person = PersonFactory()
 
     def setUp(self):
         self.client.force_login(self.person.user)
+        self.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_add_education_group",
+                                       side_effect=lambda person: True)
+        self.mocked_perm = self.perm_patcher.start()
+
+    def tearDown(self):
+        self.perm_patcher.stop()
 
     def test_login_required(self):
         self.client.logout()
@@ -50,12 +58,10 @@ class TestCreate(TestCase):
         self.assertRedirects(response, '/login/?next={}'.format(self.url_without_parent))
 
     def test_permission_required(self):
-        person_without_permission = PersonFactory()
-        self.client.force_login(person_without_permission.user)
-
         response = self.client.get(self.url_without_parent)
 
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.mocked_perm.assert_called_once_with(self.person)
+
 
     def test_template_used(self):
         response = self.client.get(self.url_without_parent)

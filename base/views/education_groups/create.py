@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -32,18 +32,19 @@ from base.forms.education_group.create import CreateEducationGroupYearForm, Crea
 from base.models.education_group_year import EducationGroupYear
 from base.views import layout
 from base.views.common import display_success_messages
+from base.views.education_groups.perms import can_create_education_group
 
 
 @login_required
-@permission_required('base.add_educationgroup', raise_exception=True)
+@can_create_education_group
 def create_education_group(request, parent_id=None):
     parent = get_object_or_404(EducationGroupYear, id=parent_id) if parent_id is not None else None
 
-    form_education_group_year = CreateEducationGroupYearForm(request.POST or None)
+    form_education_group_year = CreateEducationGroupYearForm(request.POST or None, parent=parent)
     form_offer_year_entity = CreateOfferYearEntityForm(request.POST or None)
 
     if form_offer_year_entity.is_valid() and form_education_group_year.is_valid():
-        education_group_year = form_education_group_year.save(parent)
+        education_group_year = form_education_group_year.save()
         form_offer_year_entity.save(education_group_year)
 
         success_msg = create_success_message_for_creation_education_group_year(education_group_year)
@@ -52,7 +53,8 @@ def create_education_group(request, parent_id=None):
 
     return layout.render(request, "education_group/creation.html", {
         "form_education_group_year": form_education_group_year,
-        "form_offer_year_entity": form_offer_year_entity
+        "form_offer_year_entity": form_offer_year_entity,
+        "parent": parent
     })
 
 

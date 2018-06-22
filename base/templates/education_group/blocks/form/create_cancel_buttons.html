@@ -23,5 +23,9 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% url 'education_groups' as cancel_url %}
+{% if parent %}
+    {% url 'education_group_read' education_group_year_id=parent.id as cancel_url %}
+{% else %}
+    {% url 'education_groups' as cancel_url %}
+{% endif %}
 {% include "blocks/forms/create_cancel_buttons.html" %}

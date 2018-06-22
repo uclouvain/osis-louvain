@@ -220,28 +220,9 @@
                 <br>
             </div>
         </div>
-        <div class="panel panel-default">
-            <div class="panel-body">
-                <div>
-                    <label>{% trans 'remark'%}</label><br>
-                    {% if education_group_year.remark %}
-                        {{ education_group_year.remark }}
-                    {% elif parent.remark %}
-                        <strong class="text-primary">{{ parent.remark }}</strong>
-                    {% endif %}
-                    <br><br>
-                    <label>{% trans 'remark_english'%}</label><br>
-                    {% if education_group_year.remark_english %}
-                        {{ education_group_year.remark_english }}
-                    {% elif parent.remark_english %}
-                        <strong class="text-primary">{{ parent.remark_english }}</strong>
-                    {% endif %}
-                    <br>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
+{% include 'education_group/blocks/remarks.html' %}
 <div class="panel panel-default">
     <div class="panel-body">
         <label>{% trans 'program_coorganization' %}</label>

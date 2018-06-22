@@ -2620,7 +2620,7 @@ msgid "by"
 msgstr "Par"
 
 msgid "summary_locked"
-msgstr "mise-à-jour bloquée"
+msgstr "mise-à-jour bloquée pour l'enseignant"
 
 msgid "get_back_to_initial"
 msgstr "Retour à l'état initial"
@@ -2696,8 +2696,8 @@ msgstr "bibliographie"
 msgid "Teaching material"
 msgstr "Supports de cours"
 
-msgid "Modalities specific to IN and OUT mobility"
-msgstr "Modalités propres à la mobilité IN et OUT"
+msgid "Mobility"
+msgstr "Mobilité"
 
 msgid "updated"
 msgstr "Mis à jour"
@@ -2928,7 +2928,7 @@ msgid "planned classes cannot be 0"
 msgstr "le nombre de classes prévues ne peut être 0"
 
 msgid "Vol_tot is not equal to vol_q1 + vol_q2"
-msgstr "Vol_tot n'est pas égal à vol_q1 + vol_q2"
+msgstr "Le volume total doit être égal à la somme des volumes de Q1 et de Q2"
 
 msgid "Vol_global is not equal to Vol_tot * planned_classes"
 msgstr "Le volume global doit être égal au volume annuel multiplié par le nombre de classes"
@@ -3037,3 +3037,22 @@ msgstr "crédits minimum"
 
 msgid "maximum credits"
 msgstr "crédits maximum"
+
+msgid "EDUCATION_GROUP_EDITION"
+msgstr "Edition programme"
+
+msgid "The learning unit %(acronym)s is not included in any education group"
+msgstr "L'unité d'enseignement %(acronym)s n'est incluse dans aucun groupement"
+
+msgid "No enrollment for this learning unit"
+msgstr "Il n'y a aucune inscription pour cette unité d'enseignement"
+
+msgid "Changed"
+msgstr "Modification apportée"
+
+msgid "Other teacher(s)"
+msgstr "Autre(s) enseignant(s)"
+
+msgid "Summary responsible(s)"
+msgstr "Responsable(s) des informations"
+

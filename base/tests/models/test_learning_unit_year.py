@@ -33,7 +33,7 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit_year import find_max_credits_of_related_partims
+from base.models.learning_unit_year import find_max_credits_of_related_partims, check_if_acronym_regex_is_valid
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
@@ -231,6 +231,13 @@ class LearningUnitYearTest(TestCase):
     def test_is_not_external(self):
         luy = LearningUnitYearFactory()
         self.assertFalse(luy.is_external())
+
+    def test_check_if_acronym_regex_is_valid(self):
+        self.assertTrue(check_if_acronym_regex_is_valid('TEST*'))
+        self.assertTrue(check_if_acronym_regex_is_valid('TE*ST'))
+        self.assertFalse(check_if_acronym_regex_is_valid('*TEST'))
+        self.assertFalse(check_if_acronym_regex_is_valid('?TEST'))
+        self.assertFalse(check_if_acronym_regex_is_valid(self.learning_unit_year))
 
 
 class LearningUnitYearWarningsTest(TestCase):

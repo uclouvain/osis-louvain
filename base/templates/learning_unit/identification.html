@@ -62,7 +62,7 @@
                                         {% if learning_unit_year.parent %}
                                             <a href="{% url 'learning_unit' learning_unit_year.parent.id%}" {{ differences|get_difference_css:'acronym' }}>{{ learning_unit_year.learning_container_year.acronym }}</a>{{learning_unit_year.subdivision}}
                                         {% else %}
-                                           <span {{ differences|get_difference_css:'acronym' }}>{{ learning_unit_year.acronym }}</span>
+                                           <span {{ differences|get_difference_css:'acronym' }} id="id_acronym">{{ learning_unit_year.acronym }}</span>
                                         {% endif%}
                                     </div>
                                     <div class="col-md-3">
@@ -167,23 +167,27 @@
                                     <div class="row">
                                         <div class="col-md-2">
                                             <label>{% trans 'vacant' %}</label><br>
-                                            {{ learning_unit_year.learning_container_year.is_vacant | yesno:_("yes,no") |title }}
+                                            <p id="id_is_vacant">{{ learning_unit_year.learning_container_year.is_vacant | yesno:_("yes,no") |title }}</p>
                                         </div>
                                         <div class="col-md-3">
                                             <label>{% trans 'team_management' %}</label><br>
-                                            {{ learning_unit_year.learning_container_year.team | yesno:_("yes,no") |title }}
+                                            <p id="id_team">{{ learning_unit_year.learning_container_year.team | yesno:_("yes,no") |title }}</p>
                                         </div>
                                         <div class="col-md-4">
                                             <label>{% trans 'type_declaration_vacant' %}</label><br>
-                                            {% if learning_unit_year.learning_container_year.type_declaration_vacant %}
-                                                {% trans learning_unit_year.learning_container_year.type_declaration_vacant %}
-                                            {% endif %}
+                                            <p id="id_type_declaration_vacant">
+                                                {% if learning_unit_year.learning_container_year.type_declaration_vacant %}
+                                                    {% trans learning_unit_year.learning_container_year.type_declaration_vacant %}
+                                                {% endif %}
+                                            </p>
                                         </div>
                                         <div class="col-md-3">
                                             <label>{% trans 'procedure' %}</label><br>
-                                            {% if learning_unit_year.attribution_procedure %}
+                                            <p id="id_attribution_procedure">
+                                                {% if learning_unit_year.attribution_procedure %}
                                                 {% trans learning_unit_year.attribution_procedure %}
                                             {% endif %}
+                                            </p>
                                         </div>
                                     </div>
                                 </div>

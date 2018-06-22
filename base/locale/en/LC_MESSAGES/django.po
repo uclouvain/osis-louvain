@@ -2618,7 +2618,7 @@ msgid "in_proposal"
 msgstr "Existing proposal"
 
 msgid "summary_locked"
-msgstr "blocked update"
+msgstr "blocked update for tutor"
 
 msgid "get_back_to_initial"
 msgstr "Get back to initial data"
@@ -2703,7 +2703,7 @@ msgstr ""
 msgid "Teaching material"
 msgstr ""
 
-msgid "Modalities specific to IN and OUT mobility"
+msgid "Mobility"
 msgstr ""
 
 msgid "The periodicity of the parent and the partims do not match"
@@ -3034,4 +3034,22 @@ msgid "minimum credits"
 msgstr ""
 
 msgid "maximum credits"
+msgstr ""
+
+msgid "EDUCATION_GROUP_EDITION"
+msgstr "Edition group edition"
+
+msgid "The learning unit %(acronym)s is not included in any education group"
+msgstr ""
+
+msgid "No enrollment for this learning unit"
+msgstr ""
+
+msgid "Changed"
+msgstr ""
+
+msgid "Other teacher(s)"
+msgstr ""
+
+msgid "Summary responsible(s)"
 msgstr ""

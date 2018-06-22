@@ -23,33 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-DELIBERATION = "DELIBERATION"
-DISSERTATION_SUBMISSION = "DISSERTATION_SUBMISSION"
-EXAM_ENROLLMENTS = "EXAM_ENROLLMENTS"
-SCORES_EXAM_DIFFUSION = "SCORES_EXAM_DIFFUSION"
-SCORES_EXAM_SUBMISSION = "SCORES_EXAM_SUBMISSION"
-TEACHING_CHARGE_APPLICATION = "TEACHING_CHARGE_APPLICATION"
-COURSE_ENROLLMENT = "COURSE_ENROLLMENT"
-SUMMARY_COURSE_SUBMISSION = "SUMMARY_COURSE_SUBMISSION"
-EDUCATION_GROUP_EDITION = "EDUCATION_GROUP_EDITION"
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
 
-ACADEMIC_CALENDAR_TYPES = (
-    (DELIBERATION, DELIBERATION),
-    (DISSERTATION_SUBMISSION, DISSERTATION_SUBMISSION),
-    (EXAM_ENROLLMENTS, EXAM_ENROLLMENTS),
-    (SCORES_EXAM_DIFFUSION, SCORES_EXAM_DIFFUSION),
-    (SCORES_EXAM_SUBMISSION, SCORES_EXAM_SUBMISSION),
-    (TEACHING_CHARGE_APPLICATION, TEACHING_CHARGE_APPLICATION),
-    (COURSE_ENROLLMENT, COURSE_ENROLLMENT),
-    (SUMMARY_COURSE_SUBMISSION, SUMMARY_COURSE_SUBMISSION),
-    (EDUCATION_GROUP_EDITION, EDUCATION_GROUP_EDITION),
-)
+from base.models import person
+from base.business.education_groups import perms as business_perms
 
-ACADEMIC_CALENDAR_TYPES_COLORS = {
-    DELIBERATION: '#d9534f',
-    DISSERTATION_SUBMISSION: '#5bc0de',
-    EXAM_ENROLLMENTS: '#5bc0de',
-    SCORES_EXAM_DIFFUSION: '#5cb85c',
-    SCORES_EXAM_SUBMISSION: '#f0ad4e',
-    TEACHING_CHARGE_APPLICATION: '#337ab7'
-}
+
+def can_create_education_group(view_func):
+    def f_can_create_education_group(request, *args, **kwargs):
+        pers = get_object_or_404(person.Person, user=request.user)
+        if not business_perms.is_eligible_to_add_education_group(pers):
+            raise PermissionDenied
+        return view_func(request, *args, **kwargs)
+    return f_can_create_education_group

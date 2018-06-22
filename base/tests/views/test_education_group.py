@@ -99,7 +99,7 @@ class EducationGroupSearch(TestCase):
                                    entity=oph_entity,
                                    type=offer_year_entity_type.ENTITY_MANAGEMENT)
 
-        cls.user = UserFactory()
+        cls.user = PersonFactory().user
         cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
         cls.url = reverse("education_groups")
 
@@ -287,7 +287,7 @@ class EducationGroupRead(TestCase):
         cls.education_group_language_child_1 = \
             EducationGroupLanguageFactory(education_group_year=cls.education_group_child_1)
 
-        cls.user = UserFactory()
+        cls.user = PersonFactory().user
         cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
         cls.url = reverse("education_group_read", args=[cls.education_group_child_1.id])
 

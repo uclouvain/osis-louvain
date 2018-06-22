@@ -102,8 +102,7 @@ class LearningUnitYear(SerializableModel):
                                              choices=attribution_procedure.ATTRIBUTION_PROCEDURES)
     summary_locked = models.BooleanField(default=False, verbose_name=_("summary_locked"))
     bibliography = models.CharField(max_length=250, blank=True, null=True, verbose_name=_("bibliography"))
-    mobility_modality = models.CharField(max_length=250, verbose_name=_('Modalities specific to IN and OUT mobility'),
-                                         blank=True, null=True)
+    mobility_modality = models.CharField(max_length=250, verbose_name=_('Mobility'), blank=True, null=True)
     professional_integration = models.BooleanField(default=False, verbose_name=_('professional_integration'))
 
     campus = models.ForeignKey('Campus', null=True)
@@ -414,8 +413,9 @@ def find_lt_year_acronym(academic_yr, acronym):
 
 
 def check_if_acronym_regex_is_valid(acronym):
-    if isinstance(acronym, str):
-        return re.fullmatch(REGEX_ACRONYM_CHARSET, acronym.upper())
+    return isinstance(acronym, str) and \
+           not acronym.startswith('*') and \
+           re.fullmatch(REGEX_ACRONYM_CHARSET, acronym.upper()) is not None
 
 
 def find_max_credits_of_related_partims(a_learning_unit_year):

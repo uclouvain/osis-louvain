@@ -29,6 +29,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from attribution.models import attribution
+from attribution.models.attribution import find_all_tutors_by_learning_unit_year
 from base import models as mdl_base
 from base.business.entity import get_entity_calendar
 from base.business.learning_unit_year_with_context import volume_learning_component_year
@@ -141,11 +142,11 @@ def get_components_identification(learning_unit_yr):
         learning_component_year_list = mdl_base.learning_component_year.find_by_learning_container_year(
             a_learning_container_yr)
 
-        for indx, learning_component_year in enumerate(learning_component_year_list):
+        for learning_component_year in learning_component_year_list:
             if mdl_base.learning_unit_component.search(learning_component_year, learning_unit_yr).exists():
                 entity_components_yr = EntityComponentYear.objects.filter(
                     learning_component_year=learning_component_year)
-                if indx == 0:
+                if not additionnal_entities:
                     additionnal_entities = _get_entities(entity_components_yr)
 
                 components.append({'learning_component_year': learning_component_year,
@@ -198,8 +199,9 @@ def create_xls(user, found_learning_units, filters):
 
 def is_summary_submission_opened():
     current_academic_year = mdl_base.academic_year.current_academic_year()
-    return mdl_base.academic_calendar.is_academic_calendar_opened(current_academic_year,
-                                                                  academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+    return mdl_base.academic_calendar.\
+        is_academic_calendar_opened_for_specific_academic_year(current_academic_year,
+                                                               academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
 
 
 def find_language_in_settings(language_code):
@@ -276,3 +278,8 @@ def get_achievements_group_by_language(learning_unit_year):
         key = 'achievements_{}'.format(achievement.language.code)
         achievement_grouped.setdefault(key, []).append(achievement)
     return achievement_grouped
+
+
+def get_no_summary_responsible_teachers(learning_unit_yr, summary_responsibles):
+    tutors = find_all_tutors_by_learning_unit_year(learning_unit_yr, "-summary_responsible")
+    return [tutor[0] for tutor in tutors if tutor[0] not in summary_responsibles]

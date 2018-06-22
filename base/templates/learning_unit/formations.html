@@ -37,84 +37,92 @@
     <div class="panel-body" id="tabs" >
         {% include "learning_unit/blocks/tabs.html" %}
         <br>
-        <div class="panel panel-default" >
-            <div class="panel-heading" >
-                {% blocktrans with acronym=learning_unit_year.acronym %}The learning unit {{ acronym }} is included in the following education groups{% endblocktrans %}
+        {% if group_elements_years %}
+            <div class="panel panel-default" >
+                <div class="panel-heading" >
+                    {% blocktrans with acronym=learning_unit_year.acronym %}The learning unit {{ acronym }} is included in the following education groups{% endblocktrans %}
+                </div>
+                <div class="panel-body" >
+                    <div class="tab-content" id="tab_content">
+                        <div role="tabpanel" class="tab-pane active" id="trainings">
+                            <table class="table">
+                                <thead>
+                                    <th>{% trans 'code' %}</th>
+                                    <th>{% trans 'title' %}</th>
+                                    <th>{% trans 'type_code_formation' %}</th>
+                                    <th>{% trans 'block' %}</th>
+                                    <th>{% trans 'trainings' %}</th>
+                                    <th class="text-nowrap text-center">{% trans 'absolute_and_relative_credits' %}</th>
+                                </thead>
+                                <tbody>
+                                    {% for group_element_year in group_elements_years %}
+                                        <tr>
+                                            <td>{{ group_element_year.parent.partial_acronym | default_if_none:'-' }}</td>
+                                            <td>{{ group_element_year.parent.title | default_if_none:'-' }}</td>
+                                            <td>{{ group_element_year.parent.education_group_type | default_if_none:'-' }}</td>
+                                            <td>{{ group_element_year.block | default_if_none:'-' }}</td>
+                                            <td>
+                                                <ul>
+                                                    {% for training in  formations_by_educ_group_year|get_item:group_element_year.parent_id %}
+                                                        <li>{{ training.acronym }} - {{ training.title }}</li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </td>
+                                            <td class="text-center">
+                                                {% if group_element_year.relative_credits == group_element_year.child_leaf.credits %}
+                                                    -
+                                                {% else %}
+                                                    {{ group_element_year.relative_credits | default_if_none:'-' }}
+                                                {% endif %}
+                                                    / {{ group_element_year.child_leaf.credits | default_if_none:'-' }}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="panel-body" >
-                <div class="tab-content" id="tab_content">
-                    <div role="tabpanel" class="tab-pane active" id="trainings">
-                        <table class="table">
-                            <thead>
-                                <th>{% trans 'code' %}</th>
-                                <th>{% trans 'title' %}</th>
-                                <th>{% trans 'type_code_formation' %}</th>
-                                <th>{% trans 'block' %}</th>
-                                <th>{% trans 'trainings' %}</th>
-                                <th class="text-nowrap text-center">{% trans 'absolute_and_relative_credits' %}</th>
-                            </thead>
-                            <tbody>
-                                {% for group_element_year in group_elements_years %}
+        {% else %}
+            <span>{% trans '' %}</span>
+            {% blocktrans with acronym=learning_unit_year.acronym %}The learning unit {{ acronym }} is not included in any education group{% endblocktrans %}
+            <br>
+        {% endif %}
+    <br>
+        {% if root_formations %}
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    {% trans 'Enrollments to learning unit' %}
+                </div>
+                <div class="panel-body">
+                    <div class="tab-content" id="tab_content">
+                        <div role="tabpanel" class="tab-pane active" id="learning_unit_enrollments">
+                            <table class="table">
+                                <thead>
                                     <tr>
-                                        <td>{{ group_element_year.parent.partial_acronym | default_if_none:'-' }}</td>
-                                        <td>{{ group_element_year.parent.title | default_if_none:'-' }}</td>
-                                        <td>{{ group_element_year.parent.education_group_type | default_if_none:'-' }}</td>
-                                        <td>{{ group_element_year.block | default_if_none:'-' }}</td>
-                                        <td>
-                                            <ul>
-                                                {% for training in  formations_by_educ_group_year|get_item:group_element_year.parent_id %}
-                                                    <li>{{ training.acronym }} - {{ training.title }}</li>
-                                                {% endfor %}
-                                            </ul>
-                                        </td>
-                                        <td class="text-center">
-                                            {% if group_element_year.relative_credits == group_element_year.child_leaf.credits %}
-                                                -
-                                            {% else %}
-                                                {{ group_element_year.relative_credits | default_if_none:'-' }}
-                                            {% endif %}
-                                                / {{ group_element_year.child_leaf.credits | default_if_none:'-' }}
-                                        </td>
+                                        <th>{% trans 'Training' %}</th>
+                                        <th>{% trans 'Enrollments to training' %}</th>
+                                        <th>{% trans 'Enrolled to learning unit' %}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for education_group_year in root_formations %}
+                                    <tr>
+                                        <td>{{ education_group_year.acronym }}</td>
+                                        <td>{{ education_group_year.count_formation_enrollments }}</td>
+                                        <td>{{ education_group_year.count_learning_unit_enrollments }}</td>
                                     </tr>
                                 {% endfor %}
-                            </tbody>
-                        </table>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-    <br>
-
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                {% trans 'Enrollments to learning unit' %}
-            </div>
-            <div class="panel-body">
-                <div class="tab-content" id="tab_content">
-                    <div role="tabpanel" class="tab-pane active" id="learning_unit_enrollments">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>{% trans 'Training' %}</th>
-                                    <th>{% trans 'Enrollments to training' %}</th>
-                                    <th>{% trans 'Enrolled to learning unit' %}</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                            {% for education_group_year in root_formations %}
-                                <tr>
-                                    <td>{{ education_group_year.acronym }}</td>
-                                    <td>{{ education_group_year.count_formation_enrollments }}</td>
-                                    <td>{{ education_group_year.count_learning_unit_enrollments }}</td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% else %}
+            {% trans 'No enrollment for this learning unit' %}
+        {% endif %}
 
     </div>
 </div>

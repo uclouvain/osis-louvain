@@ -32,7 +32,7 @@
         </button>
         <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
 
-            {% if perms.base.add_education_group %}
+            {% if can_create_education_group %}
                 <li >
                     <a href="{% url 'new_education_group' parent_id=education_group_year.id %}">
                         {% trans 'New Education Group' %}
