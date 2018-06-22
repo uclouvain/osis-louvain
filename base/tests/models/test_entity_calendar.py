@@ -25,7 +25,8 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.models.entity_calendar import find_by_entity_and_reference_for_current_academic_year
+from base.models.entity_calendar import find_by_entity_and_reference_for_current_academic_year, \
+    find_by_entity_and_reference_for_academic_year
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION, EXAM_ENROLLMENTS
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity_calendar import EntityCalendarFactory
@@ -35,13 +36,13 @@ class TestFindByReferenceForCurrentAcademicYear(TestCase):
     @classmethod
     def setUpTestData(cls):
         current_academic_year = create_current_academic_year()
-        previous_academic_year = AcademicYearFactory(year=current_academic_year.year-1)
+        cls.previous_academic_year = AcademicYearFactory(year=current_academic_year.year-1)
 
         cls.current_entity_calendar = EntityCalendarFactory(academic_calendar__academic_year=current_academic_year,
                                                         academic_calendar__reference=SUMMARY_COURSE_SUBMISSION)
-        previous_entity_calendar = EntityCalendarFactory(academic_calendar__academic_year=previous_academic_year,
-                                                         academic_calendar__reference=SUMMARY_COURSE_SUBMISSION,
-                                                         entity=cls.current_entity_calendar.entity)
+        cls.previous_entity_calendar = EntityCalendarFactory(academic_calendar__academic_year=cls.previous_academic_year,
+                                                             academic_calendar__reference=SUMMARY_COURSE_SUBMISSION,
+                                                             entity=cls.current_entity_calendar.entity)
 
     def test_when_no_data_match_criteria(self):
         entity_calendar_obj = find_by_entity_and_reference_for_current_academic_year(
@@ -53,4 +54,8 @@ class TestFindByReferenceForCurrentAcademicYear(TestCase):
             self.current_entity_calendar.entity.id, SUMMARY_COURSE_SUBMISSION)
         self.assertEqual(entity_calendar_obj, self.current_entity_calendar)
 
-
+    def test_find_for_academic_year(self):
+        entity_calendar_obj = find_by_entity_and_reference_for_academic_year(self.previous_academic_year,
+                                                                             self.current_entity_calendar.entity.id,
+                                                                             SUMMARY_COURSE_SUBMISSION)
+        self.assertEqual(entity_calendar_obj, self.previous_entity_calendar)
