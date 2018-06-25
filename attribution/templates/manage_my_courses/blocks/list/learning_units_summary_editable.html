@@ -1,6 +1,6 @@
 {% load i18n %}
 
-{% if context %}
+{% if learning_unit_years %}
     <table id="table_learning_units" class="table table-striped table-hover">
         <thead>
             <tr>
@@ -14,7 +14,7 @@
             </tr>
         </thead>
         <tbody>
-            {% for luy, info in context.items %}
+            {% for luy, info in learning_unit_years.items %}
                 <tr data-id="{{luy.id}}" data-value="{{info.acronym}}">
                     <td>{{ luy.academic_year }}</td>
                     <td>

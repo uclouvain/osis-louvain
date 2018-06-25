@@ -44,7 +44,7 @@ from base.views.learning_units.update import update_learning_unit_pedagogy
 def list_my_attributions_summary_editable(request):
     learning_unit_years_summary_editable = find_learning_unit_years_summary_editable(
         tutor=get_object_or_404(Tutor, person__user=request.user))
-    context = {}
+    learning_unit_years = {}
     for learning_unit_year in learning_unit_years_summary_editable:
         entity_calendar = find_by_entity_and_reference_for_academic_year(
             learning_unit_year.academic_year,
@@ -52,8 +52,9 @@ def list_my_attributions_summary_editable(request):
             academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
         responsibles = find_all_summary_responsibles_by_learning_unit_year(learning_unit_year)
-        context[learning_unit_year] = {"responsibles": responsibles, "entity_calendar": entity_calendar}
-    return layout.render(request, 'manage_my_courses/list_my_courses_summary_editable.html', {'context': context})
+        learning_unit_years[learning_unit_year] = {"responsibles": responsibles, "entity_calendar": entity_calendar}
+    return layout.render(request, 'manage_my_courses/list_my_courses_summary_editable.html',
+                         {'learning_unit_years': learning_unit_years})
 
 
 @login_required
