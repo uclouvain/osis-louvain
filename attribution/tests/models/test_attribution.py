@@ -94,7 +94,3 @@ class AttributionTest(TestCase):
 
     def test_is_score_responsible_without_attribution(self):
         self.assertFalse(attribution.is_score_responsible(self.user, self.learning_unit_year_without_attribution))
-
-    def test_find_summary_responsibles_by_learning_unit_year(self):
-        summary_responsibles = attribution.find_all_summary_responsibles_by_learning_unit_year(self.learning_unit_year)
-        self.assertEqual(summary_responsibles, [self.tutor])
