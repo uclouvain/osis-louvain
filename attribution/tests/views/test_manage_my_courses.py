@@ -83,7 +83,7 @@ class ManageMyCoursesViewTestCase(TestCase):
         self.assertTrue(mock_find_luys_summary_editable.called)
 
         context = response.context
-        self.assertCountEqual(context['context'], expected_luys_summary_editable)
+        self.assertCountEqual(context['learning_unit_years'], expected_luys_summary_editable)
 
 
 class TestViewEducationalInformation(TestCase):

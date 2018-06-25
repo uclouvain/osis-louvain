@@ -49,7 +49,8 @@ class EntityCalendarEducationalInformationForm(bootstrap.BootstrapModelForm):
     def __init__(self, entity_version, *args, **kwargs):
         entity_calendar_obj = entity_calendar.find_by_entity_and_reference_for_current_academic_year(
             entity_version.entity.id, academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
-        initial = {} if entity_calendar_obj else find_summary_course_submission_dates_for_entity_version(entity_version)
+        initial = {} if entity_calendar_obj \
+            else find_summary_course_submission_dates_for_entity_version(current_academic_year(), entity_version)
 
         super().__init__(*args, instance=entity_calendar_obj, initial=initial, **kwargs)
 

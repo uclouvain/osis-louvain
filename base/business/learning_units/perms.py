@@ -26,7 +26,7 @@
 import datetime
 
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
-from base.models import proposal_learning_unit
+from base.models import learning_unit_year, proposal_learning_unit
 from base.models.academic_year import current_academic_year, MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL
 from base.models.entity import Entity
 from base.models.entity_version import find_last_entity_version_by_learning_unit_year_id
@@ -35,7 +35,7 @@ from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.person import is_person_linked_to_entity_in_charge_of_learning_unit
+from base.models.person import is_person_linked_to_entity_in_charge_of_learning_unit, find_by_user
 from base.models.person_entity import is_attached_entities
 from osis_common.utils.datetime import get_tzinfo, convert_date_to_datetime
 
@@ -297,16 +297,18 @@ def can_user_edit_educational_information(user, learning_unit_year_id):
         return False
 
     now = datetime.datetime.now(tz=get_tzinfo())
+    person = find_by_user(user)
     return convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
-        convert_date_to_datetime(submission_dates["end_date"])
+        convert_date_to_datetime(submission_dates["end_date"]) or person.is_faculty_manager or person.is_central_manager
 
 
 def find_educational_information_submission_dates_of_learning_unit_year(learning_unit_year_id):
     entity_version = find_last_entity_version_by_learning_unit_year_id(learning_unit_year_id)
     if entity_version is None:
         return {}
+    luy = learning_unit_year.get_by_id(learning_unit_year_id)
 
-    return find_summary_course_submission_dates_for_entity_version(entity_version)
+    return find_summary_course_submission_dates_for_entity_version(luy.academic_year, entity_version)
 
 
 def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):

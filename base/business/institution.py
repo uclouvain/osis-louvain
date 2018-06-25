@@ -26,28 +26,29 @@
 from django.shortcuts import get_object_or_404
 
 from base.models import entity_calendar, academic_calendar, person_entity
-from base.models.academic_year import current_academic_year
+from base.models import academic_year as mdl_academic_year
 from base.models.entity import Entity
 from base.models.enums import academic_calendar_type
 from base.models.person import Person
 
 
-def find_summary_course_submission_dates_for_entity_version(entity_version):
-    current_calendar_instance = None
+def find_summary_course_submission_dates_for_entity_version(academic_year, entity_version):
+    academic_calendar_instance = None
     current_entity_version = entity_version
+    previous_academic_year = mdl_academic_year.find_academic_year_by_year(academic_year.year-1)
     while current_entity_version:
-        current_calendar_instance = entity_calendar.find_by_entity_and_reference_for_current_academic_year(
-            current_entity_version.entity.id, academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
-        if current_calendar_instance:
+        academic_calendar_instance = entity_calendar.find_by_entity_and_reference_for_academic_year(
+            previous_academic_year, current_entity_version.entity.id, academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+        if academic_calendar_instance:
             break
         current_entity_version = current_entity_version.get_parent_version()
 
-    if current_calendar_instance is None:
-        current_calendar_instance = academic_calendar.get_by_reference_and_academic_year(
-            academic_calendar_type.SUMMARY_COURSE_SUBMISSION, current_academic_year())
+    if academic_calendar_instance is None:
+        academic_calendar_instance = academic_calendar.get_by_reference_and_academic_year(
+            academic_calendar_type.SUMMARY_COURSE_SUBMISSION, previous_academic_year)
 
-    return {'start_date': current_calendar_instance.start_date,
-            'end_date': current_calendar_instance.end_date}
+    return {'start_date': academic_calendar_instance.start_date,
+            'end_date': academic_calendar_instance.end_date}
 
 
 def can_user_edit_educational_information_submission_dates_for_entity(a_user, an_entity):
