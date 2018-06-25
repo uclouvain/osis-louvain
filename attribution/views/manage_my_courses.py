@@ -28,13 +28,11 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
 from attribution.business.manage_my_courses import find_learning_unit_years_summary_editable
-from base.models.tutor import find_all_summary_responsibles_by_learning_unit_year
 from attribution.views.perms import tutor_can_edit_educational_information, tutor_can_view_educational_information
 from base.business.learning_units.perms import can_user_edit_educational_information, \
     find_educational_information_submission_dates_of_learning_unit_year
-from base.models.entity_calendar import find_by_entity_and_reference_for_academic_year
-from base.models.enums import academic_calendar_type
 from base.models.tutor import Tutor
+from base.models.tutor import find_all_summary_responsibles_by_learning_unit_year
 from base.views import layout
 from base.views.learning_units.pedagogy.update import update_learning_unit_pedagogy, edit_learning_unit_pedagogy
 
@@ -45,11 +43,7 @@ def list_my_attributions_summary_editable(request):
         tutor=get_object_or_404(Tutor, person__user=request.user))
     learning_unit_years = {}
     for learning_unit_year in learning_unit_years_summary_editable:
-        entity_calendar = find_by_entity_and_reference_for_academic_year(
-            learning_unit_year.academic_year,
-            learning_unit_year.requirement_entity,
-            academic_calendar_type.SUMMARY_COURSE_SUBMISSION
-        )
+        entity_calendar = find_educational_information_submission_dates_of_learning_unit_year(learning_unit_year.id)
         responsibles = find_all_summary_responsibles_by_learning_unit_year(learning_unit_year)
         learning_unit_years[learning_unit_year] = {"responsibles": responsibles, "entity_calendar": entity_calendar}
     return layout.render(request, 'manage_my_courses/list_my_courses_summary_editable.html',
