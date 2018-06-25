@@ -46,11 +46,11 @@
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
-                    {% if can_create_education_group %}
-                        <li>
-                            <a href="{% url "new_education_group" %}" id="lnk_create_education_group">{% trans 'New Education Group' %}</a>
+                        <li {% if not can_create_education_group %} class="disabled" {% endif %}>
+                            <a {% if can_create_education_group %} href="{% url "new_education_group" %}" {% endif %} id="lnk_create_education_group">
+                                {% trans 'New Education Group' %}
+                             </a>
                         </li>
-                    {% endif %}
                 </ul>
             </div>
         </div>

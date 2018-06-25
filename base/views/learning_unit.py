@@ -23,14 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import get_object_or_404
 from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
@@ -44,12 +43,11 @@ from base.business.learning_units import perms as business_perms
 from base.business.learning_units.perms import can_update_learning_achievement
 from base.forms.learning_class import LearningClassEditForm
 from base.forms.learning_unit_component import LearningUnitComponentEditForm
-from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models import education_group_year
 from base.models.person import Person
 from base.views.learning_units.common import get_learning_unit_identification_context, \
-    get_common_context_learning_unit_year
+    get_common_context_learning_unit_year, get_text_label_translated
 from cms.models import text_label
 from . import layout
 
@@ -108,39 +106,6 @@ def learning_unit_components(request, learning_unit_year_id):
                                                                                person)
     context['experimental_phase'] = True
     return layout.render(request, "learning_unit/components.html", context)
-
-
-@login_required
-@permission_required('base.can_edit_learningunit_pedagogy', raise_exception=True)
-@require_http_methods(["GET", "POST"])
-def learning_unit_pedagogy_edit(request, learning_unit_year_id):
-    redirect_url = reverse("learning_unit_pedagogy", kwargs={'learning_unit_year_id': learning_unit_year_id})
-    return edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url)
-
-
-def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
-    if request.method == 'POST':
-        form = LearningUnitPedagogyEditForm(request.POST)
-        if form.is_valid():
-            form.save()
-        return redirect(redirect_url)
-    context = get_common_context_learning_unit_year(learning_unit_year_id,
-                                                    get_object_or_404(Person, user=request.user))
-    label_name = request.GET.get('label')
-    language = request.GET.get('language')
-    text_lb = text_label.find_by_name(label_name)
-    form = LearningUnitPedagogyEditForm(**{
-        'learning_unit_year': context['learning_unit_year'],
-        'language': language,
-        'text_label': text_lb
-    })
-    form.load_initial()  # Load data from database
-    context['form'] = form
-    user_language = mdl.person.get_user_interface_language(request.user)
-    context['text_label_translated'] = next((txt for txt in text_lb.translated_text_labels
-                                             if txt.language == user_language), None)
-    context['language_translated'] = find_language_in_settings(language)
-    return layout.render(request, "learning_unit/pedagogy_edit.html", context)
 
 
 @login_required
@@ -205,8 +170,7 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
     context['form'] = form
 
     user_language = mdl.person.get_user_interface_language(request.user)
-    context['text_label_translated'] = next((txt for txt in text_lb.translated_text_labels
-                                             if txt.language == user_language), None)
+    context['text_label_translated'] = get_text_label_translated(text_lb, user_language)
     context['language_translated'] = find_language_in_settings(language)
     return layout.render(request, "learning_unit/specifications_edit.html", context)
 

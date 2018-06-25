@@ -3047,3 +3047,9 @@ msgstr ""
 
 msgid "Summary responsible(s)"
 msgstr ""
+
+msgid "The annual volume must be equal to the sum of the volumes Q1 and Q2"
+msgstr ""
+
+msgid "The global volume corresponding to the product of the annual volume and the number of planned classes must be equal to the sum of the volumes for each entity"
+msgstr ""

@@ -3050,3 +3050,8 @@ msgstr "Autre(s) enseignant(s)"
 msgid "Summary responsible(s)"
 msgstr "Responsable(s) des informations"
 
+msgid "The annual volume must be equal to the sum of the volumes Q1 and Q2"
+msgstr "Le volume annuel doit être égal à la somme des volumes Q1 et Q2"
+
+msgid "The global volume corresponding to the product of the annual volume and the number of planned classes must be equal to the sum of the volumes for each entity"
+msgstr "Le volume global correspondant au volume annuel multiplié par le nombre de classes doit être égal à la somme des volumes pour chaque entité"

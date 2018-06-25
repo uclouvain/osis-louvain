@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2018 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,23 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import PermissionDenied
+from django.contrib.auth.decorators import login_required, permission_required
 
-from base.business.learning_units.perms import can_user_view_educational_information, \
-    can_user_edit_educational_information
-
-
-def tutor_can_edit_educational_information(view_func):
-    def f_tutor_can_edit_educational_information(request, learning_unit_year_id):
-        if not can_user_edit_educational_information(request.user, learning_unit_year_id):
-            raise PermissionDenied("User cannot edit educational information")
-        return view_func(request, learning_unit_year_id)
-    return f_tutor_can_edit_educational_information
+from base.views.learning_units.pedagogy.update import update_learning_unit_pedagogy
 
 
-def tutor_can_view_educational_information(view_func):
-    def f_tutor_can_view_educational_information(request, learning_unit_year_id):
-        if not can_user_view_educational_information(request.user, learning_unit_year_id):
-            raise PermissionDenied("User cannot view educational information")
-        return view_func(request, learning_unit_year_id)
-    return f_tutor_can_view_educational_information
+@login_required
+@permission_required('base.can_access_learningunit', raise_exception=True)
+def learning_unit_pedagogy(request, learning_unit_year_id):
+    context = {'experimental_phase': True}
+    template = "learning_unit/pedagogy.html"
+    return update_learning_unit_pedagogy(request, learning_unit_year_id, context, template)

@@ -41,8 +41,9 @@ from django.test.utils import override_settings
 from django.utils.translation import ugettext_lazy as _
 
 import base.business.learning_unit
-from base.business import learning_unit as learning_unit_business
 import base.business.xls
+from attribution.tests.factories.attribution import AttributionFactory
+from base.business import learning_unit as learning_unit_business
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.forms.learning_unit.search_form import LearningUnitYearForm, LearningUnitSearchForm
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm, SummaryModelForm
@@ -62,6 +63,7 @@ from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_Y
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.person import FACULTY_MANAGER_GROUP
 from base.models.person_entity import PersonEntity
+from base.tests.factories.academic_calendar import AcademicCalendarSummaryCourseSubmissionFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -83,14 +85,15 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.views.learning_unit import learning_unit_components, learning_class_year_edit, learning_unit_specifications, \
     learning_unit_formations
 from base.views.learning_unit import learning_unit_identification
 from base.views.learning_units.create import create_partim_form
+from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.search import learning_units
 from base.views.learning_units.search import learning_units_service_course
-from base.views.learning_units.update import learning_unit_pedagogy
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
@@ -1363,7 +1366,49 @@ class LearningUnitViewTestCase(TestCase):
 
         learning_unit_year.refresh_from_db()
         self.assertFalse(learning_unit_year.summary_locked)
-        self.assertEqual(Bibliography.objects.filter(learning_unit_year=learning_unit_year).count(), 3)
+        self.assertEqual(Bibliography.objects.filter(learning_unit_year=learning_unit_year).count(), 0)
+
+    @mock.patch('base.models.person.Person.is_faculty_manager')
+    def test_learning_unit_pedagogy_summary_editable_as_tutor(self, mock_faculty_manager):
+        mock_faculty_manager.return_value = False
+
+        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
+                                                     learning_container_year=self.learning_container_yr,
+                                                     subtype=learning_unit_year_subtypes.FULL,
+                                                     summary_locked=False)
+
+        tutor = TutorFactory(person=self.person)
+        AttributionFactory(summary_responsible=True, learning_unit_year=learning_unit_year, tutor=tutor)
+
+        AcademicCalendarSummaryCourseSubmissionFactory(academic_year=create_current_academic_year())
+
+        url = reverse(learning_unit_pedagogy, args=[learning_unit_year.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.context["can_edit_information"])
+
+    @mock.patch('base.models.person.Person.is_faculty_manager')
+    def test_learning_unit_pedagogy_summary_editable_as_tutor_ouside_summary_period(self, mock_faculty_manager):
+        mock_faculty_manager.return_value = False
+
+        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
+                                                     learning_container_year=self.learning_container_yr,
+                                                     subtype=learning_unit_year_subtypes.FULL,
+                                                     summary_locked=False)
+
+        tutor = TutorFactory(person=self.person)
+        today = datetime.date.today()
+
+        AttributionFactory(summary_responsible=True, learning_unit_year=learning_unit_year, tutor=tutor)
+
+        AcademicCalendarSummaryCourseSubmissionFactory(academic_year=create_current_academic_year(),
+                                                       start_date=today.replace(year=1900),
+                                                       end_date=today.replace(year=1900))
+
+        url = reverse(learning_unit_pedagogy, args=[learning_unit_year.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.context["can_edit_information"])
 
     def test_learning_unit_pedagogy_without_permission(self):
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,

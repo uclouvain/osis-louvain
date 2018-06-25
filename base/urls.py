@@ -42,6 +42,8 @@ from base.views import learning_unit, offer, common, institution, organization, 
     my_osis, entity, student, education_group
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.external.search import filter_cities_by_country, filter_campus_by_city
+from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
+from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit
 from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
 
@@ -121,10 +123,9 @@ urlpatterns = [
             url(r'^$', learning_unit.learning_unit_identification, name='learning_unit'),
             url(r'^formations/$', learning_unit.learning_unit_formations, name="learning_unit_formations"),
             url(r'^components/$', learning_unit.learning_unit_components, name="learning_unit_components"),
-            url(r'^pedagogy/$', base.views.learning_units.update.learning_unit_pedagogy, name="learning_unit_pedagogy"),
-            url(r'^pedagogy/edit/$', learning_unit.learning_unit_pedagogy_edit, name="learning_unit_pedagogy_edit"),
-            url(r'^attributions/$', learning_unit.learning_unit_attributions,
-                name="learning_unit_attributions"),
+            url(r'^pedagogy/$', learning_unit_pedagogy, name="learning_unit_pedagogy"),
+            url(r'^pedagogy/edit/$', learning_unit_pedagogy_edit, name="learning_unit_pedagogy_edit"),
+            url(r'^attributions/$', learning_unit.learning_unit_attributions, name="learning_unit_attributions"),
             url(r'^proposal/', include([
                 url(r'^modification/$', update.learning_unit_modification_proposal,
                     name="learning_unit_modification_proposal"),

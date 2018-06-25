@@ -53,13 +53,17 @@
                             <th>{% trans 'volume_partial' %}</th>
                             <th>{% trans 'volume_remaining' %}</th>
                             <th>
-                                <abbr title="{% trans 'Volume annual'%}">{% trans 'Vol. annual' %}</abbr>
+                                <abbr title="{% trans 'The annual volume must be equal to the sum of the volumes Q1 and Q2'%}">
+                                    {% trans 'Vol. annual' %}
+                                </abbr>
                             </th>
                             <th>
                                 <abbr title="{% trans 'real_on_planned_classrooms'%}">{% trans 'Classes' %}</abbr>
                             </th>
                             <th>
-                                <abbr title="{% trans 'Volume global'%}">{% trans 'Vol. global' %}</abbr>
+                                <abbr title="{% trans 'The global volume corresponding to the product of the annual volume and the number of planned classes must be equal to the sum of the volumes for each entity'%}">
+                                    {% trans 'Vol. global' %}
+                                </abbr>
                             </th>
                             {% block additional_entities_titles %}
                                 {% include "learning_unit/blocks/additional_entities_titles.html" %}

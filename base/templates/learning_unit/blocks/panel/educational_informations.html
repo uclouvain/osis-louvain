@@ -34,18 +34,17 @@
             <div class="col-md-6">
                 <label>{% trans 'Summary responsible(s)' %} : </label>
                 {%  if summary_responsibles %}
-                    {% for summary_responsible in summary_responsibles %}
-                        {% if not forloop.first %}
-                            ;
-                        {% else %}
-                            {{ summary_responsible }}
-                        {% endif %}
-                    {% endfor %}
+                    <ul>
+                        {% for summary_responsible in summary_responsibles %}
+                            <li>{{ summary_responsible }}</li>
+                        {% endfor %}
+                    </ul>
                 {% else %}
-                    -
+                    <ul>
+                        <li>-</li>
+                    </ul>
                 {% endif %}
                 {% if other_teachers %}
-                    <br><br>
                     <label>{% trans 'Other teacher(s)' %} : </label>
                     <a role="button" data-toggle="collapse" href="#CollapseTeachers" aria-expanded="false"
                        aria-controls="collapse_classes" style="border:0;padding:0;">

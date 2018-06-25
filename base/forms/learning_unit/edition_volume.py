@@ -61,7 +61,8 @@ class VolumeEditionForm(forms.Form):
     add_field = EmptyField(label='+')
     volume_q2 = VolumeField(label=_('partial_volume_2Q'), help_text=_('partial_volume_2'))
     equal_field_1 = EmptyField(label='=')
-    volume_total = VolumeField(label=_('Vol. annual'), help_text=_('Volume annual'))
+    volume_total = VolumeField(label=_('Vol. annual'),
+                               help_text=_('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
     help_volume_total = "{} = {} + {}".format(_('Volume total annual'), _('partial_volume_1'), _('partial_volume_2'))
     closing_parenthesis_field = EmptyField(label=')')
     mult_field = EmptyField(label='*')
