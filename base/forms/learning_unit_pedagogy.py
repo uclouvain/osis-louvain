@@ -35,7 +35,7 @@ from cms.models import translated_text
 
 
 class LearningUnitPedagogyForm(forms.Form):
-    text_labels_name = ['resume', 'bibliography', 'teaching_methods', 'evaluation_methods',
+    text_labels_name = ['resume', 'teaching_material', 'teaching_methods', 'evaluation_methods',
                         'other_informations', 'online_resources']
 
     def __init__(self, *args, learning_unit_year=None, language_code=None, **kwargs):
@@ -95,10 +95,10 @@ class SummaryModelForm(forms.ModelForm):
 
     class Meta:
         model = LearningUnitYear
-        fields = ["summary_locked", 'mobility_modality']
+        fields = ["summary_locked", 'bibliography', 'mobility_modality']
 
 
-class BibliographyModelForm(forms.ModelForm):
+class TeachingMaterialModelForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         person = kwargs.pop('person')
         super().__init__(*args, **kwargs)

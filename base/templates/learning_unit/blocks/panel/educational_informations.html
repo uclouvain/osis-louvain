@@ -105,7 +105,8 @@
             </tbody>
         </table>
 
-        {% include "learning_unit/blocks/panel/bibliography.html" with formset=bibliography_formset %}
+        {% bootstrap_field summary_editable_form.bibliography %}
+        {% include "learning_unit/blocks/panel/teaching_material.html" with formset=teaching_material_formset %}
         {% bootstrap_field summary_editable_form.mobility_modality %}
         {% buttons %}
             {% if perms.base.can_edit_learningunit_pedagogy %}
@@ -126,7 +127,7 @@
         deleteText: gettext('remove'),
         addCssClass: 'btn btn-info btn-sm',
         deleteCssClass: 'btn btn-warning btn-sm',
-        prefix: 'bibliography_set'
+        prefix: 'teachingmaterial_set'
     });
     </script>
 {% endif %}

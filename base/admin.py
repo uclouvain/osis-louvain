@@ -23,18 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models import *
 from django.contrib import admin
 
-from base.models.bibliography import Bibliography, BibliographyAdmin
+from base.models import *
+from base.models.teaching_material import TeachingMaterial, TeachingMaterialAdmin
 
 admin.site.register(academic_calendar.AcademicCalendar,
                     academic_calendar.AcademicCalendarAdmin)
 
 admin.site.register(academic_year.AcademicYear,
                     academic_year.AcademicYearAdmin)
-
-admin.site.register(Bibliography, BibliographyAdmin)
 
 admin.site.register(campus.Campus,
                     campus.CampusAdmin)
@@ -185,6 +183,8 @@ admin.site.register(student.Student,
 
 admin.site.register(synchronization.Synchronization,
                     synchronization.SynchronizationAdmin)
+
+admin.site.register(TeachingMaterial, TeachingMaterialAdmin)
 
 admin.site.register(tutor.Tutor,
                     tutor.TutorAdmin)

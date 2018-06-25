@@ -28,9 +28,9 @@ import factory.fuzzy
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
-class BibliographyFactory(factory.DjangoModelFactory):
+class TeachingMaterialFactory(factory.DjangoModelFactory):
     class Meta:
-        model = 'base.Bibliography'
+        model = 'base.TeachingMaterial'
 
     title = factory.fuzzy.FuzzyText(length=200)
     mandatory = factory.Iterator([True, False])

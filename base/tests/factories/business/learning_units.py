@@ -38,7 +38,6 @@ from base.models.enums import learning_unit_year_quadrimesters
 from base.models.enums import learning_unit_year_session
 from base.models.enums import organization_type
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.bibliography import BibliographyFactory
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity_component_year import EntityComponentYearFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
@@ -50,6 +49,7 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.teaching_material import TeachingMaterialFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from reference.tests.factories.language import LanguageFactory
 
@@ -456,14 +456,15 @@ def _setup_classes(learning_component_year, number_classes=5):
 
 def _create_fixed_educational_information_for_luy(luy):
     luy.mobility_modality = factory.fuzzy.FuzzyText(length=150).fuzz()
+    luy.bibliography = factory.fuzzy.FuzzyText(length=150).fuzz()
     luy.save()
-    _create_bibliography_for_luy(luy)
+    _create_teaching_material_for_luy(luy)
     _create_cms_data_for_luy(luy)
 
 
-def _create_bibliography_for_luy(luy, quantity=10):
+def _create_teaching_material_for_luy(luy, quantity=10):
     for _ in range(quantity):
-        BibliographyFactory(learning_unit_year=luy)
+        TeachingMaterialFactory(learning_unit_year=luy)
 
 
 def _create_cms_data_for_luy(luy, quantity=10):

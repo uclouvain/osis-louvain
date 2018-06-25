@@ -26,7 +26,6 @@
 
 from base.models import academic_calendar
 from base.models import academic_year
-from base.models import bibliography
 from base.models import campus
 from base.models import education_group
 from base.models import education_group_language
@@ -35,14 +34,14 @@ from base.models import education_group_type
 from base.models import education_group_year
 from base.models import entity
 from base.models import entity_calendar
-from base.models import entity_container_year
 from base.models import entity_component_year
+from base.models import entity_container_year
 from base.models import entity_manager
 from base.models import entity_version
 from base.models import exam_enrollment
 from base.models import external_learning_unit_year
-from base.models import external_offer
 from base.models import external_learning_unit_year
+from base.models import external_offer
 from base.models import group_element_year
 from base.models import learning_achievement
 from base.models import learning_class_year
@@ -77,5 +76,5 @@ from base.models import structure
 from base.models import structure_address
 from base.models import student
 from base.models import synchronization
+from base.models import teaching_material
 from base.models import tutor
-

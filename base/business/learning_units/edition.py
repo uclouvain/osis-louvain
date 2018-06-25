@@ -135,7 +135,7 @@ def _duplicate_learning_unit_year(old_learn_unit_year, new_academic_year):
     duplicated_luy = update_related_object(old_learn_unit_year, 'academic_year', new_academic_year)
     duplicated_luy.attribution_procedure = None
     duplicated_luy.learning_container_year = _duplicate_learning_container_year(duplicated_luy, new_academic_year)
-    _duplicate_bibliography(duplicated_luy)
+    _duplicate_teaching_material(duplicated_luy)
     _duplicate_cms_data(duplicated_luy)
     duplicated_luy.save()
     return duplicated_luy
@@ -217,10 +217,10 @@ def _duplicate_learning_class_year(new_component):
         update_related_object(old_learning_class, 'learning_component_year', new_component)
 
 
-def _duplicate_bibliography(duplicated_luy):
-    previous_bibliography = mdl_base.bibliography.find_by_learning_unit_year(duplicated_luy.copied_from)
-    for bib in previous_bibliography:
-        update_related_object(bib, 'learning_unit_year', duplicated_luy)
+def _duplicate_teaching_material(duplicated_luy):
+    previous_teaching_material = mdl_base.teaching_material.find_by_learning_unit_year(duplicated_luy.copied_from)
+    for material in previous_teaching_material:
+        update_related_object(material, 'learning_unit_year', duplicated_luy)
 
 
 def _duplicate_cms_data(duplicated_luy):

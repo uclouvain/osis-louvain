@@ -23,13 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db import IntegrityError
+from django.forms import inlineformset_factory
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
+from base import models as mdl
 from base.business import learning_unit_year_with_context
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY, get_cms_label_data, get_no_summary_responsible_teachers
 from base.business.learning_unit_year_with_context import ENTITY_TYPES_VOLUME
@@ -37,16 +40,19 @@ from base.business.learning_units.edition import ConsistencyError
 from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit.edition_volume import VolumeEditionFormsetContainer
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
+from base.forms.learning_unit_pedagogy import SummaryModelForm, LearningUnitPedagogyForm, \
+    TeachingMaterialModelForm
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
+from base.models.teaching_material import TeachingMaterial
+from base.models.tutor import find_all_summary_responsibles_by_learning_unit_year
 from base.views import layout
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages
 from base.views.learning_unit import learning_unit_components
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context, \
     get_common_context_learning_unit_year
-from base.models.tutor import find_all_summary_responsibles_by_learning_unit_year
 
 
 @login_required
@@ -158,3 +164,56 @@ def _save_form_and_display_messages(request, form):
                           % {'year': e.last_instance_updated.academic_year})
         display_error_messages(request, e.error_list)
     return records
+
+
+def update_learning_unit_pedagogy(request, learning_unit_year_id, context, template):
+    person = get_object_or_404(Person, user=request.user)
+    context.update(get_common_context_learning_unit_year(learning_unit_year_id, person))
+    learning_unit_year = context['learning_unit_year']
+    perm_to_edit = int(request.user.has_perm('base.can_edit_learningunit_pedagogy'))
+
+    post = request.POST or None
+    summary_form = SummaryModelForm(post, person, context['is_person_linked_to_entity'], instance=learning_unit_year)
+    TeachingMaterialFormset = inlineformset_factory(LearningUnitYear, TeachingMaterial, fields=('title', 'mandatory'),
+                                                    max_num=10, extra=perm_to_edit, form=TeachingMaterialModelForm,
+                                                    can_delete=perm_to_edit, labels={'title': ''})
+    teaching_material_formset = TeachingMaterialFormset(post, instance=learning_unit_year,
+                                                        form_kwargs={'person': person})
+
+    if perm_to_edit and summary_form.is_valid() and teaching_material_formset.is_valid():
+        try:
+            summary_form.save()
+            teaching_material_formset.save()
+            display_success_messages(request, _("success_modification_learning_unit"))
+            # Redirection on the same page
+            return HttpResponseRedirect(request.path_info)
+        except ValueError as e:
+            display_error_messages(request, e.args[0])
+
+    context.update(get_cms_pedagogy_form(request, learning_unit_year))
+    context['summary_editable_form'] = summary_form
+    context['teaching_material_formset'] = teaching_material_formset
+    summary_responsibles = find_all_summary_responsibles_by_learning_unit_year(learning_unit_year)
+    context.update({'summary_responsibles': summary_responsibles})
+    context.update({'other_teachers': get_no_summary_responsible_teachers(learning_unit_year, summary_responsibles)})
+    return layout.render(request, template, context)
+
+
+# TODO Method similar with all cms forms
+def get_cms_pedagogy_form(request, learning_unit_year):
+    user_language = mdl.person.get_user_interface_language(request.user)
+    return {
+        'cms_labels_translated': get_cms_label_data(CMS_LABEL_PEDAGOGY, user_language),
+        'form_french': LearningUnitPedagogyForm(learning_unit_year=learning_unit_year,
+                                                language_code=settings.LANGUAGE_CODE_FR),
+        'form_english': LearningUnitPedagogyForm(learning_unit_year=learning_unit_year,
+                                                 language_code=settings.LANGUAGE_CODE_EN)
+        }
+
+
+@login_required
+@permission_required('base.can_access_learningunit', raise_exception=True)
+def learning_unit_pedagogy(request, learning_unit_year_id):
+    context = {'experimental_phase': True}
+    template = "learning_unit/pedagogy.html"
+    return update_learning_unit_pedagogy(request, learning_unit_year_id, context, template)

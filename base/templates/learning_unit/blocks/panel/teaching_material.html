@@ -1,7 +1,7 @@
 {% load i18n bootstrap3 %}
 
 <div class="panel">
-    <div class="panel-heading"><label>{% trans 'Bibliography' %}</label></div>
+    <div class="panel-heading"><label>{% trans 'Teaching material' %}</label></div>
 
     <div class="panel-body">
         {{ formset.management_form }}
@@ -9,7 +9,7 @@
             {% for form in formset %}
                 <tr class="link-formset">
                     {% for field in form.visible_fields %}
-                        <td>
+                        <td style="border: 0">
                             {# Include the hidden fields in the form #}
                             {% if forloop.first %}
                                 {% for hidden in form.hidden_fields %}

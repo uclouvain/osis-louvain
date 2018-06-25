@@ -2686,15 +2686,21 @@ msgstr "Unupdated"
 msgid "summary_list"
 msgstr "Education information status"
 
-msgctxt "bibliography"
+msgctxt "teachingmaterial"
 msgid "title"
 msgstr ""
 
-msgctxt "bibliography"
+msgctxt "teachingmaterial"
 msgid "mandatory"
 msgstr ""
 
 msgid "Bibliography"
+msgstr ""
+
+msgid "bibliography"
+msgstr ""
+
+msgid "Teaching material"
 msgstr ""
 
 msgid "Mobility"
