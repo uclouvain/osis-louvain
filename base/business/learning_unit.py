@@ -29,6 +29,7 @@ from django.conf import settings
 from django.utils.translation import ugettext_lazy as _
 
 from attribution.models import attribution
+from attribution.models.attribution import find_all_tutors_by_learning_unit_year
 from base import models as mdl_base
 from base.business.entity import get_entity_calendar
 from base.business.learning_unit_year_with_context import volume_learning_component_year
@@ -277,3 +278,8 @@ def get_achievements_group_by_language(learning_unit_year):
         key = 'achievements_{}'.format(achievement.language.code)
         achievement_grouped.setdefault(key, []).append(achievement)
     return achievement_grouped
+
+
+def get_no_summary_responsible_teachers(learning_unit_yr, summary_responsibles):
+    tutors = find_all_tutors_by_learning_unit_year(learning_unit_yr, "-summary_responsible")
+    return [tutor[0] for tutor in tutors if tutor[0] not in summary_responsibles]

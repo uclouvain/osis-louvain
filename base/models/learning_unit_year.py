@@ -414,8 +414,9 @@ def find_lt_year_acronym(academic_yr, acronym):
 
 
 def check_if_acronym_regex_is_valid(acronym):
-    if isinstance(acronym, str):
-        return re.fullmatch(REGEX_ACRONYM_CHARSET, acronym.upper())
+    return isinstance(acronym, str) and \
+           not acronym.startswith('*') and \
+           re.fullmatch(REGEX_ACRONYM_CHARSET, acronym.upper()) is not None
 
 
 def find_max_credits_of_related_partims(a_learning_unit_year):

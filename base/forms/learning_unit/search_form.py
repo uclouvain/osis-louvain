@@ -149,7 +149,7 @@ class LearningUnitYearForm(LearningUnitSearchForm):
     def clean_acronym(self):
         acronym = self.cleaned_data.get('acronym')
         acronym = treat_empty_or_str_none_as_none(acronym)
-        if acronym and learning_unit_year.check_if_acronym_regex_is_valid(acronym) is None:
+        if acronym and not learning_unit_year.check_if_acronym_regex_is_valid(acronym):
             raise ValidationError(_('LU_ERRORS_INVALID_REGEX_SYNTAX'))
         return acronym
 

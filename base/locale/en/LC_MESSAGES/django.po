@@ -3041,3 +3041,9 @@ msgstr ""
 
 msgid "Changed"
 msgstr ""
+
+msgid "Other teacher(s)"
+msgstr ""
+
+msgid "Summary responsible(s)"
+msgstr ""

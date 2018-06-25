@@ -50,6 +50,7 @@ class CreateEducationGroupYearForm(forms.ModelForm):
         self.fields["main_teaching_campus"].queryset = campus.find_main_campuses()
         self.fields["education_group_type"].queryset = \
             education_group_type.find_by_category(education_group_categories.GROUP)
+        self.fields["education_group_type"].required = True
 
         if self.parent_education_group_year:
             self.fields["academic_year"].initial = self.parent_education_group_year.academic_year.id

@@ -39,7 +39,8 @@ from base.forms.utils.emptyfield import EmptyField
 from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.enums.component_type import PRACTICAL_EXERCISES, LECTURING
-from base.models.enums.learning_container_year_types import CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
+from base.models.enums.learning_container_year_types import CONTAINER_TYPE_WITH_DEFAULT_COMPONENT, \
+    LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_component import LearningUnitComponent
 
@@ -92,7 +93,10 @@ class VolumeEditionForm(forms.Form):
             if i != len(entities_to_add) - 1:
                 self.fields["add" + key.lower()] = EmptyField(label='+')
 
-        if self.is_faculty_manager and self.learning_unit_year.is_full():
+        if self.is_faculty_manager \
+                and self.learning_unit_year.is_full() \
+                and self.learning_unit_year.learning_container_year.container_type \
+                in LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY:
             self._disable_central_manager_fields()
 
     def _disable_central_manager_fields(self):

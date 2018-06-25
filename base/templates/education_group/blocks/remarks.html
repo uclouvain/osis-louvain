@@ -1,7 +1,5 @@
-{% extends "layout.html" %}
 {% load staticfiles %}
 {% load i18n %}
-
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -26,12 +24,23 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block breadcrumbarea %}
-{% endblock %}
-{% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="center-block"><h3>{% trans 'acces_denied' %}</h3></div>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div>
+            <label>{% trans 'remark'%}</label><br>
+            {% if education_group_year.remark %}
+                {{ education_group_year.remark }}
+            {% elif parent.remark %}
+                <strong class="text-primary">{{ parent.remark }}</strong>
+            {% endif %}
+            <br><br>
+            <label>{% trans 'remark_english'%}</label><br>
+            {% if education_group_year.remark_english %}
+                {{ education_group_year.remark_english }}
+            {% elif parent.remark_english %}
+                <strong class="text-primary">{{ parent.remark_english }}</strong>
+            {% endif %}
+            <br>
         </div>
     </div>
-{% endblock %}
+</div>
