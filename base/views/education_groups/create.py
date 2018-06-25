@@ -31,7 +31,7 @@ from django.utils.translation import ugettext_lazy as _
 from base.forms.education_group.create import CreateEducationGroupYearForm, CreateOfferYearEntityForm
 from base.models.education_group_year import EducationGroupYear
 from base.views import layout
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, reverse_url_with_query_string
 from base.views.education_groups.perms import can_create_education_group
 
 
@@ -49,7 +49,10 @@ def create_education_group(request, parent_id=None):
 
         success_msg = create_success_message_for_creation_education_group_year(education_group_year)
         display_success_messages(request, success_msg, extra_tags='safe')
-        return redirect("education_group_read", education_group_year.id)
+        url = reverse_url_with_query_string("education_group_read",
+                                            args=[education_group_year.id],
+                                            query={"root": parent_id})
+        return redirect(url)
 
     return layout.render(request, "education_group/creation.html", {
         "form_education_group_year": form_education_group_year,

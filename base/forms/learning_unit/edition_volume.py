@@ -39,7 +39,8 @@ from base.forms.utils.emptyfield import EmptyField
 from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.enums.component_type import PRACTICAL_EXERCISES, LECTURING
-from base.models.enums.learning_container_year_types import CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
+from base.models.enums.learning_container_year_types import CONTAINER_TYPE_WITH_DEFAULT_COMPONENT, \
+    LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_component import LearningUnitComponent
 
@@ -60,7 +61,8 @@ class VolumeEditionForm(forms.Form):
     add_field = EmptyField(label='+')
     volume_q2 = VolumeField(label=_('partial_volume_2Q'), help_text=_('partial_volume_2'))
     equal_field_1 = EmptyField(label='=')
-    volume_total = VolumeField(label=_('Vol. annual'), help_text=_('Volume annual'))
+    volume_total = VolumeField(label=_('Vol. annual'),
+                               help_text=_('The annual volume must be equal to the sum of the volumes Q1 and Q2'))
     help_volume_total = "{} = {} + {}".format(_('Volume total annual'), _('partial_volume_1'), _('partial_volume_2'))
     closing_parenthesis_field = EmptyField(label=')')
     mult_field = EmptyField(label='*')
@@ -92,7 +94,10 @@ class VolumeEditionForm(forms.Form):
             if i != len(entities_to_add) - 1:
                 self.fields["add" + key.lower()] = EmptyField(label='+')
 
-        if self.is_faculty_manager and self.learning_unit_year.is_full():
+        if self.is_faculty_manager \
+                and self.learning_unit_year.is_full() \
+                and self.learning_unit_year.learning_container_year.container_type \
+                in LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY:
             self._disable_central_manager_fields()
 
     def _disable_central_manager_fields(self):
@@ -328,9 +333,10 @@ class SimplifiedVolumeFormset(forms.BaseModelFormSet):
     @property
     def instances_data(self):
         data = {}
-        for i, form_instance in enumerate(self.forms):
+        zip_form_and_initial_forms = zip(self.forms, self.initial_forms)
+        for form_instance, initial_form in zip_form_and_initial_forms:
             for col in ['hourly_volume_total_annual', 'hourly_volume_partial_q1', 'hourly_volume_partial_q2']:
-                value = getattr(form_instance.instance, col, None) or getattr(self.initial_forms[i].instance, col, None)
+                value = getattr(form_instance.instance, col, None) or getattr(initial_form.instance, col, None)
                 data[_(form_instance.instance.type) + ' (' + self.label_fields[col].lower() + ')'] = value
         return data
 

@@ -34,9 +34,11 @@ from django.db.models.functions import Concat, Lower
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
-from base.business.learning_units.perms import is_person_linked_to_entity_in_charge_of_learning_unit
+from base.models.entity import Entity
 from base.models.entity_version import find_main_entities_version
 from base.models.enums import person_source_type
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
+from base.models.person_entity import is_attached_entities
 from base.models.utils.person_entity_filter import filter_by_attached_entities
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
@@ -213,3 +215,11 @@ def calculate_age(person):
 
 def find_by_firstname_or_lastname(name):
     return Person.objects.filter(Q(first_name__icontains=name) | Q(last_name__icontains=name))
+
+
+def is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person):
+    entity = Entity.objects.filter(
+        entitycontaineryear__learning_container_year=learning_unit_year.learning_container_year,
+        entitycontaineryear__type=REQUIREMENT_ENTITY)
+
+    return is_attached_entities(person, entity)

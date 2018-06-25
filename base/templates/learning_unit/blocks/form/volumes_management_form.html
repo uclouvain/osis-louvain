@@ -34,8 +34,10 @@
                 <tr>
                     <th>
                         <b>{{ learning_unit.acronym }}</b>
-                        <abbr title="{% trans 'quadrimester' %} : {{ learning_unit.quadrimester }}">
-                        ({{ learning_unit.quadrimester }})</abbr>
+                        <br>
+                        <abbr title="{% trans 'quadrimester' %} : {% trans learning_unit.quadrimester %}">
+                            ({% trans learning_unit.quadrimester %})
+                        </abbr>
                     </th>
                     <th></th>
                     {% for field in formset.0 %}

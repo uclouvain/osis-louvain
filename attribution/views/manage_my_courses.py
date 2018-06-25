@@ -28,15 +28,14 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 
 from attribution.business.manage_my_courses import find_learning_unit_years_summary_editable
-from attribution.business.perms import can_user_edit_educational_information, \
-    find_educational_information_submission_dates_of_learning_unit_year
 from attribution.views.perms import tutor_can_edit_educational_information, tutor_can_view_educational_information
+from base.business.learning_units.perms import can_user_edit_educational_information, \
+    find_educational_information_submission_dates_of_learning_unit_year
 from base.models import academic_calendar
 from base.models.enums import academic_calendar_type
 from base.models.tutor import Tutor
 from base.views import layout
-from base.views import learning_unit as view_learning_unit
-from base.views.learning_units.update import update_learning_unit_pedagogy
+from base.views.learning_units.pedagogy.update import update_learning_unit_pedagogy, edit_learning_unit_pedagogy
 
 
 @login_required
@@ -65,5 +64,5 @@ def view_educational_information(request, learning_unit_year_id):
 @login_required
 @tutor_can_edit_educational_information
 def edit_educational_information(request, learning_unit_year_id):
-    redirect_url = reverse("view_educational_information", kwargs={'learning_unit_year_id': learning_unit_year_id})
-    return view_learning_unit.edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url)
+    redirect_url = reverse(view_educational_information, kwargs={'learning_unit_year_id': learning_unit_year_id})
+    return edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url)

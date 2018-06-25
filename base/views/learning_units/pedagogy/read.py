@@ -23,39 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
-from base.models import entity_version
+from django.contrib.auth.decorators import login_required, permission_required
 
-class MandateEntity(models.Model):
-    assistant_mandate = models.ForeignKey('AssistantMandate')
-    entity = models.ForeignKey('base.Entity')
-
-    @property
-    def name(self):
-        return self.__str__()
-
-    def __str__(self):
-        version = entity_version.get_by_entity_and_date(self.entity, self.assistant_mandate.academic_year.start_date)
-        if version is None:
-            version = entity_version.get_last_version(self.entity)
-        return u"%s - %s" % (self.assistant_mandate.assistant, version[0].acronym)
+from base.views.learning_units.pedagogy.update import update_learning_unit_pedagogy
 
 
-def find_by_mandate(mandate):
-    return MandateEntity.objects.filter(assistant_mandate=mandate)
-
-
-def find_by_mandate_and_entity(mandate, entity):
-    return MandateEntity.objects.filter(assistant_mandate=mandate, entity=entity)
-
-
-def find_by_mandate_and_type(mandate, type):
-    return MandateEntity.objects.filter(assistant_mandate=mandate, entity__entityversion__entity_type=type)
-
-
-def find_by_mandate_and_part_of_entity(mandate, entity):
-    return MandateEntity.objects.filter(assistant_mandate=mandate, entity__entityversion__parent=entity)
-
-
-def find_by_entity(entity):
-    return MandateEntity.objects.filter(entity=entity)
+@login_required
+@permission_required('base.can_access_learningunit', raise_exception=True)
+def learning_unit_pedagogy(request, learning_unit_year_id):
+    context = {'experimental_phase': True}
+    template = "learning_unit/pedagogy.html"
+    return update_learning_unit_pedagogy(request, learning_unit_year_id, context, template)

@@ -119,3 +119,8 @@ def get_common_context_learning_unit_year(learning_unit_year_id, person):
         'is_person_linked_to_entity': person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year),
         'experimental_phase': True
     }
+
+
+def get_text_label_translated(text_lb, user_language):
+    return next((txt for txt in text_lb.translated_text_labels
+                 if txt.language == user_language), None)

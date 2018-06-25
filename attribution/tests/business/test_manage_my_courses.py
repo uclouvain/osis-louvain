@@ -29,8 +29,8 @@ from unittest import mock
 from django.test import TestCase
 
 from attribution.business.manage_my_courses import find_learning_unit_years_summary_editable
-from attribution.business.perms import can_user_edit_educational_information
 from attribution.tests.factories.attribution import AttributionFactory
+from base.business.learning_units.perms import can_user_edit_educational_information
 from base.models.enums import entity_container_year_link_type
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -41,7 +41,7 @@ from osis_common.utils.datetime import get_tzinfo
 
 class TestUserCanEditEducationalInformation(TestCase):
     def setUp(self):
-        patcher = mock.patch('attribution.business.perms.find_summary_course_submission_dates_for_entity_version')
+        patcher = mock.patch('base.business.learning_units.perms.find_summary_course_submission_dates_for_entity_version')
         self.MockClass = patcher.start()
 
         today = datetime.datetime.now(tz=get_tzinfo())
@@ -49,7 +49,6 @@ class TestUserCanEditEducationalInformation(TestCase):
         self.tomorrow = today + datetime.timedelta(days=1)
         self.MockClass.return_value = {"start_date": self.yesterday,
                                        "end_date": self.tomorrow}
-
 
         self.addCleanup(patcher.stop)
 

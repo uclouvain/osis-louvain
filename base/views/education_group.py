@@ -51,6 +51,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
 from base.models.person import Person
+from base.views.learning_units.common import get_text_label_translated
 from cms import models as mdl_cms
 from cms.enums import entity_name
 from cms.models.text_label import TextLabel
@@ -380,8 +381,7 @@ def education_group_year_pedagogy_edit(request, education_group_year_id):
     form.load_initial()
     context['form'] = form
     user_language = mdl.person.get_user_interface_language(request.user)
-    context['text_label_translated'] = next((txt for txt in text_lb.translated_text_labels
-                                             if txt.language == user_language), None)
+    context['text_label_translated'] = get_text_label_translated(text_lb, user_language)
     context['language_translated'] = find_language_in_settings(language)
 
     return layout.render(request, 'education_group/pedagogy_edit.html', context)
