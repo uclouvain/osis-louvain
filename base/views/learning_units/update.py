@@ -187,7 +187,6 @@ def update_learning_unit_pedagogy(request, learning_unit_year_id, context, templ
             display_success_messages(request, _("success_modification_learning_unit"))
             # Redirection on the same page
             return HttpResponseRedirect(request.path_info)
-
         except ValueError as e:
             display_error_messages(request, e.args[0])
 
