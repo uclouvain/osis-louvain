@@ -300,7 +300,8 @@ def can_user_edit_educational_information(user, learning_unit_year_id):
     now = datetime.datetime.now(tz=get_tzinfo())
     person = find_by_user(user)
     return convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
-        convert_date_to_datetime(submission_dates["end_date"]) or person.is_faculty_manager or person.is_central_manager
+        convert_date_to_datetime(submission_dates["end_date"]) or person.is_faculty_manager() \
+           or person.is_central_manager()
 
 
 def find_educational_information_submission_dates_of_learning_unit_year(learning_unit_year_id):

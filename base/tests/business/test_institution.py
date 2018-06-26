@@ -74,19 +74,23 @@ class FindSummaryCourseSubmissionDatesTestCase(TestCase):
             start_date=cls.parent_entity_calendar.start_date - datetime.timedelta(days=1))
 
     def test_when_entity_version_has_entity_calendar(self):
-        child_entity_dates = find_summary_course_submission_dates_for_entity_version(self.child_entity_version_bis)
+        child_entity_dates = find_summary_course_submission_dates_for_entity_version(self.academic_calendar,
+                                                                                     self.child_entity_version_bis)
         self.assertEqual(child_entity_dates, {'start_date': self.child_entity_calendar_bis.start_date,
                                               'end_date': self.child_entity_calendar_bis.end_date})
 
     def test_when_parent_has_entity_calendar_instance(self):
-        child_entity_dates = find_summary_course_submission_dates_for_entity_version(self.child_entity_version)
-        self.assertEqual(child_entity_dates, {'start_date':self.parent_entity_calendar.start_date,
-                                              'end_date':self.parent_entity_calendar.end_date})
+        child_entity_dates = find_summary_course_submission_dates_for_entity_version(self.academic_calendar,
+                                                                                     self.child_entity_version)
+        self.assertEqual(child_entity_dates, {'start_date': self.parent_entity_calendar.start_date,
+                                              'end_date': self.parent_entity_calendar.end_date})
 
     def test_when_no_parent_has_entity_calendar_instance(self):
-        default_entity_dates = find_summary_course_submission_dates_for_entity_version(self.entity_version_without_entity_calendar)
-        self.assertEqual(default_entity_dates, {'start_date':self.academic_calendar.start_date,
-                                                'end_date':self.academic_calendar.end_date})
+        default_entity_dates = find_summary_course_submission_dates_for_entity_version(
+            self.academic_calendar, self.entity_version_without_entity_calendar
+        )
+        self.assertEqual(default_entity_dates, {'start_date': self.academic_calendar.start_date,
+                                                'end_date': self.academic_calendar.end_date})
 
 
 class TestUserCanEditEntityCalendarEducationalInformation(TestCase):
