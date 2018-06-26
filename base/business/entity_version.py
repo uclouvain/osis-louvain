@@ -38,7 +38,7 @@ def find_from_offer_year(offer_year):
 def find_entity_version_according_academic_year(entity_versions, academic_year):
     """This function can be use after a prefetech_related"""
     return next((entity_vers for entity_vers in entity_versions
-                 if entity_vers.start_date <= academic_year.start_date and
+                 if entity_vers.start_date <= academic_year.end_date and
                  (entity_vers.end_date is None or entity_vers.end_date > academic_year.end_date)), None)
 
 
