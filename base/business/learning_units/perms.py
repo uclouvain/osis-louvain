@@ -27,7 +27,8 @@ import datetime
 
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models import learning_unit_year, proposal_learning_unit
-from base.models.academic_year import current_academic_year, MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL
+from base.models.academic_year import current_academic_year, MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, \
+    find_academic_year_by_year
 from base.models.entity import Entity
 from base.models.entity_version import find_last_entity_version_by_learning_unit_year_id
 from base.models.enums import learning_container_year_types
@@ -307,8 +308,9 @@ def find_educational_information_submission_dates_of_learning_unit_year(learning
     if entity_version is None:
         return {}
     luy = learning_unit_year.get_by_id(learning_unit_year_id)
+    academic_year = find_academic_year_by_year(luy.academic_year.year-1)
 
-    return find_summary_course_submission_dates_for_entity_version(luy.academic_year, entity_version)
+    return find_summary_course_submission_dates_for_entity_version(academic_year, entity_version)
 
 
 def is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person):
