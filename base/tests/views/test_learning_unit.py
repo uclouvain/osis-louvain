@@ -1389,9 +1389,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTrue(response.context["can_edit_information"])
 
-    @mock.patch('base.models.person.Person.is_faculty_manager')
-    def test_learning_unit_pedagogy_summary_editable_as_tutor_ouside_summary_period(self, mock_faculty_manager):
-        mock_faculty_manager.return_value = False
+    def test_learning_unit_pedagogy_summary_editable_as_tutor_ouside_summary_period(self):
 
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                      learning_container_year=self.learning_container_yr,

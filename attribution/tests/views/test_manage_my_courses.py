@@ -25,6 +25,7 @@
 ##############################################################################
 from unittest import mock
 
+from django.contrib.auth.models import Group
 from django.forms import model_to_dict
 from django.http import HttpResponse, HttpResponseNotFound
 from django.test import TestCase
@@ -34,9 +35,15 @@ from attribution.tests.factories.attribution import AttributionFactory
 from attribution.views.manage_my_courses import list_my_attributions_summary_editable, view_educational_information
 from base.business.learning_units.perms import can_user_view_educational_information
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm
-from base.models.enums import academic_calendar_type
+from base.models.enums import academic_calendar_type, entity_container_year_link_type
+from base.models.learning_unit_year import LearningUnitYear
+from base.models.person import FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.tutor import TutorFactory
 
@@ -47,12 +54,21 @@ class ManageMyCoursesViewTestCase(TestCase):
         cls.person = PersonFactory()
         cls.user = cls.person.user
         cls.tutor = TutorFactory(person=cls.person)
-
-        cls.attribution = AttributionFactory(tutor=cls.tutor,
-                                             summary_responsible=True,
-                                             learning_unit_year__summary_locked=False)
         cls.academic_calendar = AcademicCalendarFactory(academic_year=create_current_academic_year(),
                                                         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+        previous_academic_year = AcademicYearFactory(year=cls.academic_calendar.academic_year.year-1)
+        cls.previous_academic_calendar = AcademicCalendarFactory(
+            academic_year=previous_academic_year, reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+        )
+        cls.learning_unit_year = LearningUnitYearFactory(academic_year=cls.academic_calendar.academic_year)
+        cls.attribution = AttributionFactory(tutor=cls.tutor,
+                                             summary_responsible=True,
+                                             learning_unit_year__summary_locked=False,
+                                             learning_unit_year=cls.learning_unit_year)
+        entity_version = EntityVersionFactory()
+        EntityContainerYearFactory(entity=entity_version.entity,
+                                   learning_container_year=cls.attribution.learning_unit_year.learning_container_year,
+                                   type=entity_container_year_link_type.REQUIREMENT_ENTITY)
         cls.url = reverse(list_my_attributions_summary_editable)
 
     def setUp(self):
@@ -72,17 +88,19 @@ class ManageMyCoursesViewTestCase(TestCase):
 
     @mock.patch("attribution.views.manage_my_courses.find_learning_unit_years_summary_editable")
     def test_list_my_attributions_summary_editable(self, mock_find_luys_summary_editable):
-        expected_luys_summary_editable = [self.attribution.learning_unit_year]
+        expected_luys_summary_editable = [self.learning_unit_year]
         mock_find_luys_summary_editable.return_value = expected_luys_summary_editable
 
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "manage_my_courses/list_my_courses_summary_editable.html")
         self.assertTrue(mock_find_luys_summary_editable.called)
-
         context = response.context
-        self.assertCountEqual(context['learning_unit_years_summary_editable'], expected_luys_summary_editable)
-        self.assertDictEqual(context['submission_dates'], model_to_dict(self.academic_calendar,
-                                                                        fields=("start_date", "end_date")))
+        test = context['learning_unit_years'][self.learning_unit_year]['entity_calendar']
+        self.assertDictEqual(context['learning_unit_years'][self.learning_unit_year]['entity_calendar'],
+                             {"start_date": self.previous_academic_calendar.start_date,
+                              "end_date": self.previous_academic_calendar.end_date})
+        context = response.context
+        self.assertCountEqual(context['learning_unit_years'], expected_luys_summary_editable)
 
 
 class TestViewEducationalInformation(TestCase):
@@ -108,8 +126,9 @@ class TestViewEducationalInformation(TestCase):
 
     @mock.patch("attribution.views.manage_my_courses.can_user_edit_educational_information",
                 side_effect=lambda usr, luy_id: False)
-    @mock.patch("attribution.views.manage_my_courses.find_educational_information_submission_dates_of_learning_unit_year",
-                return_value={})
+    @mock.patch(
+        "attribution.views.manage_my_courses.find_educational_information_submission_dates_of_learning_unit_year",
+        return_value={})
     def test_template_used(self, mock_find_submission_dates, mock_can_edit):
         response = self.client.get(self.url)
 
