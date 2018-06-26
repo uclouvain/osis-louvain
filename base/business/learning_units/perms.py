@@ -231,7 +231,7 @@ def _is_attached_to_initial_entity(learning_unit_proposal, a_person):
 
 
 def _is_container_type_course_dissertation_or_internship(learning_unit_year, _):
-    return learning_unit_year.learning_container_year and\
+    return learning_unit_year.learning_container_year and \
            learning_unit_year.learning_container_year.container_type in FACULTY_UPDATABLE_CONTAINER_TYPES
 
 
@@ -256,7 +256,6 @@ def learning_unit_proposal_permissions(proposal, person, current_learning_unit_y
 
 
 def _conjunction(*predicates):
-
     def conjunction_method(*args, **kwargs):
         return all(
             p(*args, **kwargs) for p in predicates
@@ -266,7 +265,6 @@ def _conjunction(*predicates):
 
 
 def _disjunction(*predicates):
-
     def disjunction_method(*args, **kwargs):
         return any(
             p(*args, **kwargs) for p in predicates
@@ -276,7 +274,6 @@ def _disjunction(*predicates):
 
 
 def _negation(predicate):
-
     def negation_method(*args, **kwargs):
         return not predicate(*args, **kwargs)
 
@@ -300,7 +297,7 @@ def can_user_edit_educational_information(user, learning_unit_year_id):
     now = datetime.datetime.now(tz=get_tzinfo())
     person = find_by_user(user)
     return convert_date_to_datetime(submission_dates["start_date"]) <= now <= \
-        convert_date_to_datetime(submission_dates["end_date"]) or person.is_faculty_manager() \
+           convert_date_to_datetime(submission_dates["end_date"]) or person.is_faculty_manager() \
            or person.is_central_manager()
 
 
@@ -309,7 +306,7 @@ def find_educational_information_submission_dates_of_learning_unit_year(learning
     if entity_version is None:
         return {}
     luy = learning_unit_year.get_by_id(learning_unit_year_id)
-    academic_year = find_academic_year_by_year(luy.academic_year.year-1)
+    academic_year = find_academic_year_by_year(luy.academic_year.year - 1)
 
     return find_summary_course_submission_dates_for_entity_version(academic_year, entity_version)
 
