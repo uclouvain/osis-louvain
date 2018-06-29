@@ -29,6 +29,7 @@
 {% url 'education_group_general_informations' education_group_year_id=education_group_year.id as url_general_informations_tab %}
 {% url 'education_group_administrative' education_group_year_id=education_group_year.id as url_administrative_tab %}
 {% url 'education_group_content' education_group_year_id=education_group_year.id as url_content_tab %}
+{% url 'education_group_admission' education_group_year_id=education_group_year.id as url_admission_conditions_tab %}
 
 
 <ul class="nav nav-tabs" role="tablist">
@@ -61,6 +62,12 @@
     <li role="presentation" {% if request.path == url_content_tab %} class="active" {% endif %}>
         <a id="link_content" href="{% url 'education_group_content' education_group_year_id=education_group_year.id %}?root={{ parent.id}}&tree=1" role="tab">
             {% trans 'content' %}
+        </a>
+    </li>
+    <li role="presentation" {% if request.path == url_admission_conditions_tab %} class="active"{% endif %}>
+        <a id="link_content"
+           href="{% url 'education_group_year_admission_condition_edit' education_group_year_id=education_group_year.id %}?root={{ parent.id }}&tree=1" role="tab">
+            {% trans 'Conditions' %}
         </a>
     </li>
 </ul>

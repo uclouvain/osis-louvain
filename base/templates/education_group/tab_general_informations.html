@@ -177,22 +177,22 @@
             return false;
         });
 
-        $('div#panel-data').on('click', 'a.pedagogy-remove-btn', function(evt) {
+        $('div#panel-data').on('click', 'a.pedagogy-remove-btn', function (evt) {
             evt.preventDefault();
-           var url = $(this).data("form");
-           var identifier = $(this).data("identifier");
-           var label = $(this).data("label");
+            var url = $(this).data("form");
+            var identifier = $(this).data("identifier");
+            var label = $(this).data("label");
 
-           var pedagogy_remove_modal = $("#pedagogy_remove");
-           var button = pedagogy_remove_modal.find('#pedagogy_remove_save_btn');
-           var label_to_suppress = pedagogy_remove_modal.find('#label_to_suppress');
-           label_to_suppress.text(label);
+            var pedagogy_remove_modal = $("#pedagogy_remove");
+            var button = pedagogy_remove_modal.find('#pedagogy_remove_save_btn');
+            var label_to_suppress = pedagogy_remove_modal.find('#label_to_suppress');
+            label_to_suppress.text(label);
 
-           button.data('form', url);
-           button.data('identifier', identifier);
+            button.data('form', url);
+            button.data('identifier', identifier);
 
-           pedagogy_remove_modal.modal('show');
-           return false;
+            pedagogy_remove_modal.modal('show');
+            return false;
         });
 
         function close_add_modal(ptr) {

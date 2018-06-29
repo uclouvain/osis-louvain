@@ -3065,3 +3065,66 @@ msgstr ""
 
 msgid "The parent is %(parent_periodicty)s and there is at least one partim which is not %(parent_periodicty)s"
 msgstr ""
+
+msgid "Admission Conditions for Bachelors"
+msgstr "Admission Conditions for Bachelors"
+
+msgid "Alert Message"
+msgstr "Alert Message"
+
+msgid "Free Text"
+msgstr "Free Text"
+
+msgid "University Bachelors"
+msgstr "University Bachelors"
+
+msgid "Diploma"
+msgstr "Diploma"
+
+msgid "Conditions"
+msgstr "Conditions"
+
+msgid "Access"
+msgstr "Access"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "UCL Bachelors"
+msgstr "UCL Bachelors"
+
+msgid "Others Bachelors of the French speaking Community of Belgium"
+msgstr "Others Bachelors of the French speaking Community of Belgium"
+
+msgid "Bachelors of the Dutch speaking Community of Beligum"
+msgstr "Bachelors of the Dutch speaking Community of Beligum"
+
+msgid "Foreign Bachelors"
+msgstr "Foreign Bachelors"
+
+msgid "Non university Bachelors"
+msgstr "Non university Bachelors"
+
+msgid "Holders of a 2nd cycle University degree"
+msgstr "Holders of a 2nd cycle University degree"
+
+msgid "Holders of a non-University 2nd cycle degree"
+msgstr "Holders of a non-University 2nd cycle degree"
+
+msgid "Adults taking up their university training"
+msgstr "Adults taking up their university training"
+
+msgid "Personalized access"
+msgstr "Personalized access"
+
+msgid "Admission and Enrolment Procedures for general registration"
+msgstr "Admission and Enrolment Procedures for general registration"
+
+msgid "Modify text"
+msgstr "Modify text"
+
+msgid "Add a new line"
+msgstr "Add a new line"
+
+msgid "Modify an existing line"
+msgstr "Modify an existing line"

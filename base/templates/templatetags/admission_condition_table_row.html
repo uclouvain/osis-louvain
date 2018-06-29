@@ -1,0 +1,28 @@
+<tr id="{{ section_name }}">
+    <td colspan="5" class="info">
+        {{ header_text }} {% if condition %}<a class="button line-add-btn" data-section="{{ section_name }}" href="#">
+        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+    </a>{% endif %}
+    </td>
+</tr>
+{% for record in records %}
+<tr id="{{ section_name }}_{{ record.id }}">
+    <td id="{{ section_name }}_{{ record.id }}_diploma">{{ record.diploma }}</td>
+    <td id="{{ section_name }}_{{ record.id }}_conditions">{{record.conditions|safe }}</td>
+    <td id="{{ section_name }}_{{ record.id }}_access" class="text-right">{{ record.access|safe }}</td>
+    <td id="{{ section_name }}_{{ record.id }}_remarks">{{ record.remarks|safe }}</td>
+    {% if condition %}
+    <td class="text-right">
+        <a href="#" role="button" data-record-id="{{ record.id }}" data-section="{{ section_name }}" class="button line-remove-btn">
+            <span class="glyphicon glyphicon-remove-circle" style="font-size: 16px;" aria-hidden="true"></span>
+        </a>
+        <a href="#" role="button" class="button line-edit-btn" data-record-id="{{ record.id }}" data-section="{{ section_name }}" data-language="fr">
+            <span class="glyphicon glyphicon-edit" style="font-size: 16px;" aria-hidden="true"></span>
+        </a>
+        <a href="#" role="button" class="button line-edit-btn" data-record-id="{{ record.id }}" data-section="{{ section_name }}" data-language="en">
+            <span class="glyphicon glyphicon-flag" style="font-size: 16px;" aria-hidden="true"></span>
+        </a>
+    </td>
+    {% endif %}
+</tr>
+{% endfor %}

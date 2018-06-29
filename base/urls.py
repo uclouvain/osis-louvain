@@ -232,7 +232,33 @@ urlpatterns = [
                 url(u'^edit/$', education_group.education_group_edit_administrative_data,
                     name='education_group_edit_administrative')])),
             url(r'^content/$', education_group.education_group_content, name='education_group_content'),
-        ]))
+            url(r'^admission_conditions/$',
+                education_group.education_group_year_admission_condition_edit,
+                name='education_group_year_admission_condition_edit'),
+            url(r'^admission_conditions/add_line$',
+                education_group.education_group_year_admission_condition_add_line,
+                name='education_group_year_admission_condition_add_line'),
+
+            url(r'^admission_conditions/modify_text$',
+                education_group.education_group_year_admission_condition_modify_text,
+                name='education_group_year_admission_condition_modify_text'),
+
+            url(r'^admission_conditions/get_text$',
+                education_group.education_group_year_admission_condition_get_text,
+                name='education_group_year_admission_condition_get_text'),
+
+            url(r'^admission_conditions/remove_line$',
+                education_group.education_group_year_admission_condition_remove_line,
+                name='education_group_year_admission_condition_remove_line'),
+
+            url(r'^admission_conditions/update_line$',
+                education_group.education_group_year_admission_condition_update_line,
+                name='education_group_year_admission_condition_update_line'),
+
+            url(r'^admission_conditions/get_line$',
+                education_group.education_group_year_admission_condition_get_line,
+                name='education_group_year_admission_condition_get_line'),
+        ])),
     ])),
 
     url(r'^offer_year_calendars/([0-9]+)/$', offer.offer_year_calendar_read, name='offer_year_calendar_read'),

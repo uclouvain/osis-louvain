@@ -3067,3 +3067,66 @@ msgstr "Ce partim est %(partim_periodicity)s alors que l'UE parent est %(parent_
 
 msgid "The parent is %(parent_periodicty)s and there is at least one partim which is not %(parent_periodicty)s"
 msgstr "L'UE parent est %(parent_periodicty)s et au moins un partim n'est pas %(parent_periodicty)s"
+
+msgid "Admission Conditions for Bachelors"
+msgstr "Conditions d'admissions pour Bacheliers"
+
+msgid "Alert Message"
+msgstr "Message d'alerte"
+
+msgid "Free Text"
+msgstr "Zone libre"
+
+msgid "University Bachelors"
+msgstr "Bacheliers universitaires"
+
+msgid "Diploma"
+msgstr "Diplôme"
+
+msgid "Conditions"
+msgstr "Conditions"
+
+msgid "Access"
+msgstr "Accès"
+
+msgid "Actions"
+msgstr "Actions"
+
+msgid "UCL Bachelors"
+msgstr "Bacheliers UCL"
+
+msgid "Others Bachelors of the French speaking Community of Belgium"
+msgstr "Autres bacheliers de la Communauté française de Belgique"
+
+msgid "Bachelors of the Dutch speaking Community of Beligum"
+msgstr "Bachelier de la Communauté flamande de Belgique"
+
+msgid "Foreign Bachelors"
+msgstr "Bacheliers étrangers"
+
+msgid "Non university Bachelors"
+msgstr "Bacheliers non universitaires"
+
+msgid "Holders of a 2nd cycle University degree"
+msgstr "Diplômés du 2° cycle universitaire"
+
+msgid "Holders of a non-University 2nd cycle degree"
+msgstr "Diplômés de 2° cycle non universitaire"
+
+msgid "Adults taking up their university training"
+msgstr "Adultes en reprise d'études"
+
+msgid "Personalized access"
+msgstr "Accès personnalisé"
+
+msgid "Admission and Enrolment Procedures for general registration"
+msgstr "Procédures d'admission et d'inscription"
+
+msgid "Modify text"
+msgstr "Modifier un texte"
+
+msgid "Add a new line"
+msgstr "Ajouter une nouvelle ligne"
+
+msgid "Modify an existing line"
+msgstr "Modifier une ligne existante"

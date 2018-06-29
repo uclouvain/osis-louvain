@@ -23,8 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import json
 from collections import OrderedDict
 
+from ckeditor.widgets import CKEditorWidget
+from django import forms
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
@@ -44,6 +47,7 @@ from base.business.learning_unit import find_language_in_settings
 from base.forms.education_group_general_informations import EducationGroupGeneralInformationsForm
 from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
 from base.forms.education_groups_administrative_data import CourseEnrollmentForm, AdministrativeDataFormset
+from base.models.admission_condition import AdmissionConditionLine, AdmissionCondition
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
@@ -413,3 +417,191 @@ def translated_text_labels2dict(translated_text_label):
         'label': translated_text_label.text_label.label,
         'translation': translated_text_label.label
     }
+
+
+@login_required
+@permission_required('base.can_edit_educationgroup_pedagogy', raise_exception=True)
+def education_group_year_admission_condition_edit(request, education_group_year_id):
+    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+
+    education_group_year_root_id = request.GET.get('root')
+    parent = _get_education_group_root(education_group_year_root_id, education_group_year)
+
+    acronym = education_group_year.acronym.lower()
+
+    is_common = acronym.startswith('common-')
+    is_specific = not is_common
+
+    is_master = acronym.endswith(('2m', '2m1'))
+    use_standard_text = acronym.endswith(('2a', '2mc'))
+
+    class AdmissionConditionForm(forms.Form):
+        text_field = forms.CharField(widget=CKEditorWidget(config_name='minimal'))
+
+    admission_condition_form = AdmissionConditionForm()
+
+    admission_condition, created = AdmissionCondition.objects.get_or_create(
+        education_group_year=education_group_year)
+
+    record = {}
+    for section in ('ucl_bachelors', 'others_bachelors_french', 'bachelors_dutch', 'foreign_bachelors',
+                    'graduates', 'masters'):
+        record[section] = AdmissionConditionLine.objects.filter(admission_condition=admission_condition,
+                                                                section=section)
+
+    context = {
+        'admission_condition_form': admission_condition_form,
+        'education_group_year': education_group_year,
+        'parent': parent,
+        'can_edit_information': request.user.has_perm('base.can_edit_educationgroup_pedagogy'),
+        'info': {
+            'is_specific': is_specific,
+            'is_common': is_common,
+            'is_bachelor': acronym == 'common-bacs',
+            'is_master': is_master,
+            'show_free_text': is_specific and (is_master or use_standard_text),
+        },
+        'admission_condition': admission_condition,
+        'record': record,
+    }
+
+    return layout.render(request, 'education_group/tab_admission_conditions.html', context)
+
+
+@login_required
+@ajax_required
+@permission_required('base.can_edit_educationgroup_pedagogy', raise_exception=True)
+def education_group_year_admission_condition_add_line(request, education_group_year_id):
+    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+    info = json.loads(request.body.decode('utf-8'))
+
+    admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=education_group_year)
+
+    admission_condition_line = AdmissionConditionLine.objects.create(
+        admission_condition=admission_condition,
+        section=info['section'],
+        diploma=info['diploma'],
+        conditions=info['conditions'],
+        access=info['access'],
+        remarks=info['remarks']
+    )
+
+    record = {
+        'id': admission_condition_line.id,
+        'section': admission_condition_line.section,
+        'diploma': admission_condition_line.diploma,
+        'conditions': admission_condition_line.conditions,
+        'access': admission_condition_line.access,
+        'remarks': admission_condition_line.remarks,
+    }
+    return JsonResponse({'message': 'added', 'record': record})
+
+
+@login_required
+@ajax_required
+@permission_required('base.can_edit_educationgroup_pedagogy', raise_exception=True)
+def education_group_year_admission_condition_remove_line(request, education_group_year_id):
+    info = json.loads(request.body.decode('utf-8'))
+    admission_condition_line_id = info['id']
+
+    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+    admission_condition = get_object_or_404(AdmissionCondition, education_group_year=education_group_year)
+    admission_condition_line = get_object_or_404(AdmissionConditionLine,
+                                                 admission_condition=admission_condition,
+                                                 pk=admission_condition_line_id)
+    admission_condition_line.delete()
+    return JsonResponse({'message': 'deleted'})
+
+
+@login_required
+@ajax_required
+@permission_required('base.can_edit_educationgroup_pedagogy', raise_exception=True)
+def education_group_year_admission_condition_modify_text(request, education_group_year_id):
+    info = json.loads(request.body.decode('utf-8'))
+    lang = '' if info['language'] == 'fr' else '_en'
+
+    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+    admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=education_group_year)
+
+    column = 'text_{}{}'.format(info['section'], lang)
+    setattr(admission_condition, column, info['text'])
+    admission_condition.save()
+    admission_condition.refresh_from_db()
+
+    response = {
+        'message': 'updated',
+        'text': getattr(admission_condition, column, '')
+    }
+    return JsonResponse(response)
+
+
+@login_required
+@ajax_required
+@permission_required('base.can_edit_educationgroup_pedagogy', raise_exception=True)
+def education_group_year_admission_condition_get_text(request, education_group_year_id):
+    info = json.loads(request.body.decode('utf-8'))
+    lang = '' if info['language'] == 'fr' else '_en'
+    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+    admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=education_group_year)
+    column = 'text_' + info['section'] + lang
+    text = getattr(admission_condition, column, 'Undefined')
+    return JsonResponse({'message': 'read', 'section': info['section'], 'text': text})
+
+
+@login_required
+@ajax_required
+@permission_required('base.can_edit_educationgroup_pedagogy', raise_exception=True)
+def education_group_year_admission_condition_get_line(request, education_group_year_id):
+    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+    admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=education_group_year)
+
+    info = json.loads(request.body.decode('utf-8'))
+    lang = '' if info['language'] == 'fr' else '_en'
+
+    admission_condition_line = get_object_or_404(AdmissionConditionLine,
+                                                 admission_condition=admission_condition,
+                                                 section=info['section'],
+                                                 pk=info['id'])
+
+    response = get_content_of_admission_condition_line('read', admission_condition_line, lang)
+    return JsonResponse(response)
+
+
+def get_content_of_admission_condition_line(message, admission_condition_line, lang):
+    return {
+        'message': message,
+        'section': admission_condition_line.section,
+        'id': admission_condition_line.id,
+        'diploma': getattr(admission_condition_line, 'diploma' + lang, ''),
+        'conditions': getattr(admission_condition_line, 'conditions' + lang, ''),
+        'access': getattr(admission_condition_line, 'access' + lang, ''),
+        'remarks': getattr(admission_condition_line, 'remarks' + lang, ''),
+    }
+
+
+@login_required
+@ajax_required
+@permission_required('base.can_edit_educationgroup_pedagogy', raise_exception=True)
+def education_group_year_admission_condition_update_line(request, education_group_year_id):
+    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+    admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=education_group_year)
+
+    info = json.loads(request.body.decode('utf-8'))
+
+    admission_condition_line = get_object_or_404(AdmissionConditionLine,
+                                                 admission_condition=admission_condition,
+                                                 section=info.pop('section'),
+                                                 pk=info.pop('id')
+                                                 )
+
+    lang = '' if info['language'] == 'fr' else '_en'
+
+    for key, value in info.items():
+        setattr(admission_condition_line, key + lang, value)
+
+    admission_condition_line.save()
+
+    admission_condition_line.refresh_from_db()
+
+    response = get_content_of_admission_condition_line('updated', admission_condition_line, lang)
+    return JsonResponse(response)

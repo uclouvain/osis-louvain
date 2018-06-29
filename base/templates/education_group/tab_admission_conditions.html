@@ -1,0 +1,455 @@
+{% extends 'education_group/layout_detail.html' %}
+{% load bootstrap3 %}
+{% load i18n %}
+{% load staticfiles %}
+{% load admission_conditions %}
+
+{% block content %}
+    <div class="panel panel-default">
+        <div class="panel-body" id="tabs">
+            <div class="tab-content" id="tab_content">
+                <div role="tabpanel" class="tab-pane active" id="admission_conditions">
+                    <div class="row">
+                        {% include "education_group/training_tree.html" %}
+                        <div id="panel-data" class="col-md-9">
+                            {% include "education_group/tabs.html" %}
+                            <br/>
+
+                            <div class="row">
+                                {% if info.is_common and info.is_bachelor %}
+                                    {% render_condition_text 'bachelor' _('Admission Conditions for Bachelors') admission_condition.text_bachelor can_edit_information %}
+                                {% endif %}
+                                {% if info.is_common and info.is_master %}
+                                    {% render_condition_text 'alert_message' _('Alert Message') admission_condition.text_alert_message can_edit_information %}
+                                {% endif %}
+                                {% if info.show_free_text %}
+                                    {% render_condition_text 'standard' _('Free Text') admission_condition.text_standard can_edit_information %}
+                                {% endif %}
+                                {% if info.is_specific and info.is_master %}
+                                    <div id="university_bachelors">
+                                        <h3>{% trans 'University Bachelors' %} {% if can_edit_information %}<a href="#" class="modify-text-btn button" role="button" data-section="university_bachelors" data-language="fr"><span class="glyphicon glyphicon-edit" style="font-size: 16px;" aria-hidden="true"></span></a>{% endif %}</h3>
+                                        <div id="text_university_bachelors">{{ admission_condition.text_university_bachelors|safe }}</div>
+
+                                        <table class="table table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th width="30%">{% trans 'Diploma' %}</th>
+                                                <th width="20%">{% trans 'Conditions' %}</th>
+                                                <th width="150px">{% trans 'Access' %}</th>
+                                                <th>{% trans 'Remarks' %}</th>
+                                                {% if can_edit_information %}<th width="10%">{% trans 'Actions' %}</th>{% endif %}
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% render_condition_rows 'ucl_bachelors' _('UCL Bachelors') record.ucl_bachelors can_edit_information %}
+                                            {% render_condition_rows 'others_bachelors_french' _('Others Bachelors of the French speaking Community of Belgium') record.others_bachelors_french can_edit_information %}
+                                            {% render_condition_rows 'bachelors_dutch' _('Bachelors of the Dutch speaking Community of Beligum') record.bachelors_dutch can_edit_information %}
+                                            {% render_condition_rows 'foreign_bachelors' _('Foreign Bachelors') record.foreign_bachelors can_edit_information %}
+                                            </tbody>
+                                        </table>
+                                        <hr/>
+                                    </div>
+                                {% endif %}
+                                {% if info.is_master %}
+                                    {% render_condition_text 'non_university_bachelors' _('Non university Bachelors') admission_condition.text_non_university_bachelors can_edit_information %}
+                                {% endif %}
+                                {% if info.is_specific and info.is_master %}
+                                    <div id="holders_second_university_degree">
+                                        <h3>{% trans 'Holders of a 2nd cycle University degree' %}</h3>
+                                        <table class="table table-bordered">
+                                            <thead>
+                                            <tr>
+                                                <th width="30%">{% trans 'Diploma' %}</th>
+                                                <th width="20%">{% trans 'Conditions' %}</th>
+                                                <th width="150px">{% trans 'Access' %}</th>
+                                                <th>{% trans 'Remarks' %}</th>
+                                                {% if can_edit_information %}<th width="10%">{% trans 'Actions' %}</th>{% endif %}
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {% render_condition_rows 'graduates' _('Graduates') record.graduates can_edit_information %}
+                                            {% render_condition_rows 'masters' _('Masters') record.masters can_edit_information %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% render_condition_text 'holders_non_university_second_degree' _('Holders of a non-University 2nd cycle degree') admission_condition.text_holders_non_university_second_degree can_edit_information %}
+                                {% endif %}
+                                {% if info.is_master %}
+                                    {% render_condition_text 'adults_taking_up_university_training' _('Adults taking up their university training') admission_condition.text_adults_taking_up_university_training can_edit_information %}
+                                    {% render_condition_text 'personalized_access' _('Personalized access') admission_condition.text_personalized_access can_edit_information %}
+                                    {% render_condition_text 'admission_enrollment_procedures' _('Admission and Enrolment Procedures for general registration') admission_condition.text_admission_enrollment_procedures can_edit_information %}
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if can_edit_information %}
+    <div class="modal fade" id="modify_text">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">{% trans 'Modify text' %}</h5>
+                </div>
+                <div class="modal-body">
+                    {{ admission_condition_form.text_field }}
+                </div>
+                <div class="modal-footer">
+                    <button id="modify_text_btn" type="submit" class="btn btn-primary" role="button"
+                            title="{% trans 'save' %}">{% trans 'save' %}</button>
+                    <button type="submit" class="btn" data-dismiss="modal">{% trans 'cancel' %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="save_term">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"></h5>
+                </div>
+                <div class="modal-body">
+                    <ul class="nav nav-tabs" id="modification_tabs" role="tablist">
+                        <li role="presentation" class="active"><a href="#modification_diploma">{% trans 'Diploma' %}</a></li>
+                        <li role="presentation"><a href="#modification_conditions">{% trans 'Conditions' %}</a></li>
+                        <li role="presentation"><a href="#modification_access">{% trans 'Access' %}</a></li>
+                        <li role="presentation"><a href="#modification_remarks">{% trans 'Remarks' %}</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane active" id="modification_diploma">
+                            <textarea id="textarea_diploma" class="form-control" style="min-width: 100%" rows="10"></textarea>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="modification_conditions">
+                            <textarea id="textarea_conditions" class="form-control" style="min-width: 100%" rows="10"></textarea>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="modification_access">
+                            <textarea id="textarea_access" class="form-control" style="min-width: 100%" rows="10"></textarea>
+                        </div>
+                        <div role="tabpanel" class="tab-pane" id="modification_remarks">
+                            <textarea id="textarea_remarks" class="form-control" style="min-width: 100%" rows="10"></textarea>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="save_term_button" type="submit"
+                            class="btn btn-primary" role="button"
+                            title="{% trans 'save' %}">{% trans 'save' %}</button>
+                    <button type="submit" class="btn" data-dismiss="modal">{% trans 'cancel' %}</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+{% endblock %}
+
+{% block script %}
+    <script src="{% static 'js/education_group/education_group_tree.js' %}"></script>
+    {% if can_edit_information %}
+    <script>
+        $(".line-add-btn").click(function (evt) {
+            evt.preventDefault();
+            var section = $(this).data('section');
+            var modal = $("#save_term");
+
+            var button = modal.find('#save_term_button'),
+                diploma_ptr = modal.find('#textarea_diploma'),
+                conditions_ptr = modal.find('#textarea_conditions'),
+                access_ptr = modal.find('#textarea_access'),
+                remarks_ptr = modal.find('#textarea_remarks'),
+                modal_title = modal.find('.modal-title');
+
+            modal_title.text("{% trans 'Add a new line' %}");
+
+            reset_textareas(diploma_ptr, conditions_ptr, access_ptr, remarks_ptr);
+
+            button.data('section', section);
+            modal.modal('show');
+            return false;
+        });
+
+        $('div#panel-data').on('click', 'a.line-remove-btn', function (evt) {
+            evt.preventDefault();
+
+            var section = $(this).data('section');
+            var record_id = $(this).data('record-id');
+
+            var url = "{% url 'education_group_year_admission_condition_remove_line' education_group_year_id=education_group_year.id %}";
+
+            $.ajax(url, {
+                data: JSON.stringify({'id': record_id, 'section': section}),
+                type: 'post',
+                dataType: 'json',
+                success: function (data) {
+                    var element = $("tr#" + section + "_" + record_id);
+                    element.remove();
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status == 404) {
+                        alert("We can't remove this line of section because it does not exist on the server");
+                    } else if (jqXHR.status == 500) {
+                        alert("There is an error on the server, please contact the OSIS team.");
+                    }
+                }
+            });
+
+            return false;
+        });
+
+        $('div#panel-data').on('click', 'a.line-edit-btn', function (evt) {
+            evt.preventDefault();
+            var section = $(this).data('section'),
+                record_id = $(this).data('record-id'),
+                language = $(this).data('language');
+
+            var modal = $("#save_term");
+            var button = modal.find('#save_term_button');
+
+            button.data('section', section);
+            button.data('record-id', record_id);
+            button.data('language', language);
+
+            var url = "{% url 'education_group_year_admission_condition_get_line' education_group_year_id=education_group_year.id %}";
+
+            var diploma_ptr = $('#textarea_diploma'),
+                conditions_ptr = $('#textarea_conditions'),
+                access_ptr = $('#textarea_access'),
+                remarks_ptr = $('#textarea_remarks'),
+                modal_title = modal.find('.modal-title');
+
+            modal_title.text("{% trans 'Modify an existing line' %}");
+
+            var data = {
+                section: section,
+                id: record_id,
+                language: language,
+            };
+
+            $.ajax(url, {
+                data: JSON.stringify(data),
+                type: 'post',
+                dataType: 'json',
+                success: function(data) {
+                    diploma_ptr.val(data.diploma);
+                    conditions_ptr.val(data.conditions);
+                    access_ptr.val(data.access);
+                    remarks_ptr.val(data.remarks);
+                    modal.modal('show');
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status == 404) {
+                        alert("We can't edit this line of section because it does not exist on the server");
+                    } else if (jqXHR.status == 500) {
+                        alert("There is an error on the server, please contact the OSIS team.");
+                    }
+                }
+            });
+        });
+
+        $('#modify_text_btn').click(function(evt) {
+            evt.preventDefault();
+            var modal = $("#modify_text");
+            var url = "{% url 'education_group_year_admission_condition_modify_text' education_group_year_id=education_group_year.id %}";
+            var section = $(this).data('section'),
+                language = $(this).data('language');
+
+            console.log('modify_text_btn.click', section);
+
+            var text_ptr = CKEDITOR.instances['id_text_field'];
+
+            var data = {
+                section: section,
+                text: text_ptr.getData(),
+                language: language,
+            };
+
+            $.ajax(url, {
+                data: JSON.stringify(data),
+                type: 'post',
+                dataType: 'json',
+                success: function (response) {
+                    if (language === 'fr') {
+                        $("#text_" + section).html(response.text);
+                    }
+                    modal.modal('hide');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status == 404) {
+                        alert("We can't read the text because it does not exist on the server");
+                    } else if (jqXHR.status == 500) {
+                        alert("There is an error on the server, please contact the OSIS team.");
+                    }
+                }
+            });
+        });
+
+        $('.modify-text-btn').click(function (evt) {
+            evt.preventDefault();
+            var section = $(this).data('section'),
+                language = $(this).data('language');
+            var url = "{% url 'education_group_year_admission_condition_get_text' education_group_year_id=education_group_year.id %}";
+
+            var modal = $("#modify_text");
+            var button = modal.find('#modify_text_btn');
+            button.data('section', section);
+            button.data('language', language);
+
+            var text_ptr = CKEDITOR.instances['id_text_field'];
+            var data = {
+                section: section,
+                language: language,
+            };
+
+            $.ajax(url, {
+                data: JSON.stringify(data),
+                type: 'post',
+                dataType: 'json',
+                success: function (data) {
+                    text_ptr.setData(data.text);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status == 404) {
+                        alert("We can't modify the text because it does not exist on the server");
+                    } else if (jqXHR.status == 500) {
+                        alert("There is an error on the server, please contact the OSIS team.");
+                    }
+                }
+            })
+            {#text_ptr.setData()#}
+
+            modal.modal('show');
+            return false;
+        });
+
+        $('#myTabs a').click(function (e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
+
+        $('#modification_tabs a').click(function(e) {
+            e.preventDefault();
+            $(this).tab('show');
+        });
+
+        function change_row_in_table(section, record_id, data) {
+            $('#' + section + '_' + record_id + "_diploma").html(data.diploma);
+            $('#' + section + '_' + record_id + "_conditions").html(data.conditions);
+            $('#' + section + '_' + record_id + "_access").html(data.access);
+            $('#' + section + '_' + record_id + "_remarks").html(data.remarks);
+        }
+
+        function reset_textareas(diploma_ptr, conditions_ptr, access_ptr, remarks_ptr) {
+            diploma_ptr.val('');
+            conditions_ptr.val('');
+            access_ptr.val('');
+            remarks_ptr.val('');
+        }
+
+        $('#save_term_button').click(function(evt) {
+            var modal = $('#save_term');
+
+            var section = $(this).data('section'),
+                record_id = $(this).data('record-id'),
+                language = $(this).data('language'),
+                add_mode = (record_id === undefined),
+                url = '';
+
+            if (language === undefined) {
+                language = 'fr';
+            }
+
+            if (add_mode) {
+                url = "{% url 'education_group_year_admission_condition_add_line' education_group_year_id=education_group_year.id %}";
+            }
+            else {
+                url = "{% url 'education_group_year_admission_condition_update_line' education_group_year_id=education_group_year.id %}"
+            }
+            var diploma_ptr = modal.find('#textarea_diploma'),
+                conditions_ptr = modal.find('#textarea_conditions'),
+                access_ptr = modal.find('#textarea_access'),
+                remarks_ptr = modal.find('#textarea_remarks');
+
+            var data = {
+                id: record_id,
+                language: language,
+                section: section,
+                diploma: diploma_ptr.val(),
+                conditions: conditions_ptr.val(),
+                access: access_ptr.val(),
+                remarks: remarks_ptr.val()
+            };
+            console.log(data);
+
+            $.ajax(url, {
+                data: JSON.stringify(data),
+                type: 'post',
+                dataType: 'json',
+
+                success: function (data) {
+                    if (language === 'fr') {
+                        if (add_mode) {
+                            add_new_row_in_table(section, data);
+                        } else {
+                            change_row_in_table(section, record_id, data);
+                        }
+                    }
+
+                    reset_textareas(diploma_ptr, conditions_ptr, access_ptr, remarks_ptr);
+
+                    modal.modal('hide');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    if (jqXHR.status == 404) {
+                        alert("We can't save this line because it (the offer or the line) does not exist on the server");
+                    } else if (jqXHR.status == 500) {
+                        alert("There is an error on the server, please contact the OSIS team.");
+                    }
+                }
+            });
+
+        });
+
+        function add_new_row_in_table(section, data) {
+            var html = create_html_for_record(section, data.record);
+            var pointer = $('#' + section);
+
+            var css_selector = "tr[id^='" + section + "_']";
+            var number_of_lines = $(css_selector).length;
+
+            if (number_of_lines > 0) {
+                pointer = $(css_selector + ':last');
+            }
+
+            pointer.after(html);
+        }
+
+        function create_html_for_record(section, record) {
+            return [
+                '<tr id="', section, '_',record.id,'">',
+                    '<td id="', section, '_', record.id, '_diploma">', record.diploma, '</td>',
+                    '<td id="', section, '_', record.id, '_conditions">', record.conditions, '</td>',
+                    '<td id="', section, '_', record.id, '_access">', record.access, '</td>',
+                    '<td id="', section, '_', record.id, '_remarks">', record.remarks, '</td>',
+                    '<td class="text-right">',
+                        '<a href="#" class="button line-remove-btn" data-record-id="', record.id,'" data-section="',section,'">',
+                            '<span class="glyphicon glyphicon-remove-circle" style="font-size: 16px;" aria-hidden="true" />',
+                        '</a>',
+                        '<a href="#" class="button line-edit-btn" data-record-id="', record.id, '" data-section="', section, '" data-language="fr">',
+                            '<span class="glyphicon glyphicon-edit" style="font-size: 16px;" aria-hidden="true" />',
+                        '</a>',
+                        '<a href="#" class="button line-edit-btn" data-record-id="', record.id, '" data-section="', section, '" data-language="en">',
+                            '<span class="glyphicon glyphicon-flag" style="font-size: 16px;" aria-hidden="true" />',
+                        '</a>',
+                    '</td>',
+                '</tr>'
+            ].join('')
+        }
+
+    </script>
+    {% endif %}
+{% endblock %}

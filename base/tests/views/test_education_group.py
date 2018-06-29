@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+import json
 from unittest import mock
 
 import bs4
@@ -35,6 +36,7 @@ from django.test import TestCase, RequestFactory
 from django.utils.translation import ugettext_lazy as _
 
 from base.forms.education_group_general_informations import EducationGroupGeneralInformationsForm
+from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.forms.education_groups import EducationGroupFilter
 from base.models.enums import education_group_categories, offer_year_entity_type, academic_calendar_type
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -968,3 +970,256 @@ class WebServiceForManagementTermsEducationGroupYear(TestCase):
         response_json = response.json()
 
         self.assertDictEqual(response_json, {'education_group_year': education_group_year.id})
+
+
+class EducationGroupAdmissionConditionWSTest(TestCase):
+    def setUp(self):
+        user = SuperUserFactory()
+
+        self.client.force_login(user)
+
+    def test_ws_add_line(self):
+        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+        education_group_year = EducationGroupYearFactory(acronym='actu2m')
+
+        url = reverse('education_group_year_admission_condition_add_line', kwargs={
+            'education_group_year_id': education_group_year.id,
+        })
+
+        data = {
+            'language': 'fr',
+            'section': 'ucl_bachelors',
+            'diploma': 'Diplome',
+            'conditions': '',
+            'access': 'Access',
+            'remarks': 'Remarks',
+        }
+
+        response = self.client.post(url, data=json.dumps(data), content_type='application/json',
+                                    **kwargs)
+
+        self.assertEqual(response.status_code, 200)
+
+        response_json = response.json()
+
+        self.assertEqual(response_json['message'], 'added')
+        response_json['record'].pop('id')
+
+        self.assertDictEqual(response_json['record'], {
+            'section': data['section'],
+            'diploma': data['diploma'],
+            'conditions': data['conditions'],
+            'access': data['access'],
+            'remarks': data['remarks']
+        })
+
+    def test_ws_remove_line(self):
+        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+
+        education_group_year = EducationGroupYearFactory(acronym='actu2m')
+        admission_condition = AdmissionCondition.objects.create(education_group_year=education_group_year)
+        self.assertEqual(AdmissionConditionLine.objects.filter(admission_condition=admission_condition).count(), 0)
+        admission_condition_line = AdmissionConditionLine.objects.create(admission_condition=admission_condition,
+                                                                         section='ucl_bachelors',
+                                                                         diploma='Diploma',
+                                                                         conditions='',
+                                                                         access='Access',
+                                                                         remarks='Remarks')
+        self.assertEqual(AdmissionConditionLine.objects.filter(admission_condition=admission_condition).count(), 1)
+
+        data = {
+            'id': admission_condition_line.id,
+        }
+
+        url = reverse('education_group_year_admission_condition_remove_line', kwargs={
+            'education_group_year_id': education_group_year.id,
+        })
+
+        response = self.client.post(url, data=json.dumps(data), content_type='application/json', **kwargs)
+
+        self.assertEqual(response.status_code, 200)
+
+        response_json = response.json()
+
+        self.assertEqual(response_json['message'], 'deleted')
+        self.assertEqual(AdmissionConditionLine.objects.filter(admission_condition=admission_condition).count(), 0)
+
+    def test_ws_update_line(self):
+        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+
+        education_group_year = EducationGroupYearFactory(acronym='actu2m')
+        admission_condition = AdmissionCondition.objects.create(education_group_year=education_group_year)
+        self.assertEqual(AdmissionConditionLine.objects.filter(admission_condition=admission_condition).count(), 0)
+        admission_condition_line = AdmissionConditionLine.objects.create(admission_condition=admission_condition,
+                                                                         section='ucl_bachelors',
+                                                                         diploma='Diploma',
+                                                                         conditions='',
+                                                                         access='Access',
+                                                                         remarks='Remarks')
+        self.assertEqual(AdmissionConditionLine.objects.filter(admission_condition=admission_condition).count(), 1)
+
+        data = {
+            'id': admission_condition_line.id,
+            'language': 'fr',
+            'section': admission_condition_line.section,
+            'diploma': 'New Diploma',
+            'conditions': 'New Conditions',
+            'access': 'New Access',
+            'remarks': 'New Remarques',
+        }
+
+        url = reverse('education_group_year_admission_condition_update_line', kwargs={
+            'education_group_year_id': education_group_year.id,
+        })
+
+        response = self.client.post(url, data=json.dumps(data), content_type='application/json', **kwargs)
+
+        self.assertEqual(response.status_code, 200)
+
+        response_json = response.json()
+
+        self.assertEqual(response_json['message'], 'updated')
+        self.assertEqual(AdmissionConditionLine.objects.filter(admission_condition=admission_condition).count(), 1)
+
+        checked_response = dict(data, message='updated')
+        checked_response.pop('language')
+
+        self.assertDictEqual(response_json, checked_response)
+
+    def test_ws_get_text(self):
+        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+
+        education_group_year = EducationGroupYearFactory(acronym='actu2m')
+        admission_condition = AdmissionCondition.objects.create(
+            education_group_year=education_group_year,
+            text_bachelor='ceci est un test',
+            text_bachelor_en='this is a test',
+        )
+
+        url = reverse('education_group_year_admission_condition_get_text', kwargs={
+            'education_group_year_id': education_group_year.id,
+        })
+
+        data = {
+            'section': 'bachelor',
+            'language': 'fr',
+        }
+        response = self.client.post(url, data=json.dumps(data), content_type='application/json', **kwargs)
+
+        self.assertEqual(response.status_code, 200)
+
+        response_json = response.json()
+
+        self.assertDictEqual(response_json, {
+            'message': 'read',
+            'section': 'bachelor',
+            'text': admission_condition.text_bachelor,
+        })
+
+        data = {
+            'section': 'bachelor',
+            'language': 'en',
+        }
+        response = self.client.post(url, data=json.dumps(data), content_type='application/json', **kwargs)
+
+        self.assertEqual(response.status_code, 200)
+
+        response_json = response.json()
+
+        self.assertDictEqual(response_json, {
+            'message': 'read',
+            'section': 'bachelor',
+            'text': admission_condition.text_bachelor_en,
+        })
+
+    def test_ws_modify_text(self):
+        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+
+        education_group_year = EducationGroupYearFactory(acronym='actu2m')
+        admission_condition = AdmissionCondition.objects.create(
+            education_group_year=education_group_year,
+            text_bachelor='ceci est un test',
+            text_bachelor_en='this is a test',
+        )
+
+        url = reverse('education_group_year_admission_condition_modify_text', kwargs={
+            'education_group_year_id': education_group_year.id,
+        })
+
+        data = {
+            'section': 'bachelor',
+            'language': 'fr',
+            'text': 'ceci est un second test'
+        }
+        response = self.client.post(url, data=json.dumps(data), content_type='application/json', **kwargs)
+
+        self.assertEqual(response.status_code, 200)
+
+        response_json = response.json()
+
+        self.assertDictEqual(response_json, {
+            'message': 'updated',
+            'text': data['text'],
+        })
+
+        admission_condition.refresh_from_db()
+
+        self.assertEqual(admission_condition.text_bachelor, data['text'])
+
+        data = {
+            'section': 'bachelor',
+            'language': 'en',
+            'text': 'this is a second test'
+        }
+        response = self.client.post(url, data=json.dumps(data), content_type='application/json', **kwargs)
+
+        self.assertEqual(response.status_code, 200)
+
+        response_json = response.json()
+
+        self.assertDictEqual(response_json, {
+            'message': 'updated',
+            'text': data['text'],
+        })
+
+        admission_condition.refresh_from_db()
+
+        self.assertEqual(admission_condition.text_bachelor_en, data['text'])
+
+    def test_ws_get_line(self):
+        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
+        education_group_year = EducationGroupYearFactory(acronym='actu2m')
+
+        admission_condition = AdmissionCondition.objects.create(education_group_year=education_group_year)
+        admission_condition_line = AdmissionConditionLine.objects.create(admission_condition=admission_condition,
+                                                                         section='ucl_bachelors',
+                                                                         diploma='Diplome',
+                                                                         conditions='Conditions',
+                                                                         access='Acces',
+                                                                         remarks='Remarks'
+                                                                         )
+
+        url = reverse('education_group_year_admission_condition_get_line', kwargs={
+            'education_group_year_id': education_group_year.id,
+        })
+
+        data = {
+            'id': admission_condition_line.id,
+            'language': 'fr',
+            'section': admission_condition_line.section,
+        }
+
+        response = self.client.post(url, data=json.dumps(data), content_type='application/json', **kwargs)
+
+        self.assertEqual(response.status_code, 200)
+
+        response_json = response.json()
+        self.assertDictEqual(response_json, {
+            'message': 'read',
+            'section': admission_condition_line.section,
+            'id': admission_condition_line.id,
+            'diploma': admission_condition_line.diploma,
+            'conditions': admission_condition_line.conditions,
+            'access': admission_condition_line.access,
+            'remarks': admission_condition_line.remarks
+        })

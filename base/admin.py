@@ -188,3 +188,6 @@ admin.site.register(teaching_material.TeachingMaterial,
 
 admin.site.register(tutor.Tutor,
                     tutor.TutorAdmin)
+
+admin.site.register(admission_condition.AdmissionCondition,
+                    admission_condition.AdmissionConditionAdmin)
