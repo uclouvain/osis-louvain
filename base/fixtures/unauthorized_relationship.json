@@ -1,0 +1,1247 @@
+[
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 1,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Bachelier"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:35:31.852Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 2,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Bachelier"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Mineures"
+        ],
+        "changed": "2018-07-04T13:35:45.625Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 3,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Bachelier"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Majeures"
+        ],
+        "changed": "2018-07-04T13:36:04.707Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 4,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Bachelier"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Partenariat mobilit\u00e9"
+        ],
+        "changed": "2018-07-04T13:36:19.097Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 5,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Programme de Master 120"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:36:36.850Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 6,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Programme de Master 120"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Options"
+        ],
+        "changed": "2018-07-04T13:36:50.273Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 8,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Programme de Master 120"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix de Finalit\u00e9s (120)"
+        ],
+        "changed": "2018-07-04T13:37:18.071Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 9,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Programme de Master 120"
+        ],
+        "child_type": [
+            "GROUP",
+            "Module compl\u00e9ment"
+        ],
+        "changed": "2018-07-04T13:37:29.814Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 10,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master approfondi 120"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:38:30.989Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 11,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master approfondi 120"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Options"
+        ],
+        "changed": "2018-07-04T13:38:48.420Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 12,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master approfondi 120"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Partenariat mobilit\u00e9"
+        ],
+        "changed": "2018-07-04T13:39:09.569Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 13,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master didactique 120"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:39:30.518Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 14,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master didactique 120"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Options"
+        ],
+        "changed": "2018-07-04T13:39:47.954Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 15,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master didactique 120"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Partenariat mobilit\u00e9"
+        ],
+        "changed": "2018-07-04T13:39:57.804Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 16,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master sp\u00e9cialis\u00e9 120"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:40:10.093Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 17,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master sp\u00e9cialis\u00e9 120"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Options"
+        ],
+        "changed": "2018-07-04T13:40:21.589Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 18,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master sp\u00e9cialis\u00e9 120"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Partenariat mobilit\u00e9"
+        ],
+        "changed": "2018-07-04T13:40:31.635Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 19,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Programme de Master 180 ou 240"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:41:34.457Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 20,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Programme de Master 180 ou 240"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Options"
+        ],
+        "changed": "2018-07-04T13:41:47.942Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 21,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Programme de Master 180 ou 240"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix de Finalit\u00e9s (180)"
+        ],
+        "changed": "2018-07-04T13:42:06.902Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 22,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Programme de Master 180 ou 240"
+        ],
+        "child_type": [
+            "GROUP",
+            "Module compl\u00e9ment"
+        ],
+        "changed": "2018-07-04T13:42:16.755Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 23,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master approfondi 180 ou 240"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:42:34.930Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 24,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master approfondi 180 ou 240"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Options"
+        ],
+        "changed": "2018-07-04T13:42:44.223Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 25,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master approfondi 180 ou 240"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Partenariat mobilit\u00e9"
+        ],
+        "changed": "2018-07-04T13:42:58.085Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 26,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master didactique 180 ou 240"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:43:17.896Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 27,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master didactique 180 ou 240"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Options"
+        ],
+        "changed": "2018-07-04T13:43:24.270Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 28,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master didactique 180 ou 240"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Partenariat mobilit\u00e9"
+        ],
+        "changed": "2018-07-04T13:43:28.757Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 29,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master sp\u00e9cialis\u00e9 180 ou 240"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:43:41.731Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 31,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master sp\u00e9cialis\u00e9 180 ou 240"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Options"
+        ],
+        "changed": "2018-07-04T13:44:05.330Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 32,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master sp\u00e9cialis\u00e9 180 ou 240"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Partenariat mobilit\u00e9"
+        ],
+        "changed": "2018-07-04T13:44:12.642Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 33,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master en un an"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:44:25.278Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 34,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master en un an"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Options"
+        ],
+        "changed": "2018-07-04T13:44:32.821Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 35,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master en un an"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Partenariat mobilit\u00e9"
+        ],
+        "changed": "2018-07-04T13:44:38.372Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 36,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master en un an"
+        ],
+        "child_type": [
+            "GROUP",
+            "Module compl\u00e9ment"
+        ],
+        "changed": "2018-07-04T13:44:44.626Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 37,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master de sp\u00e9cialisation"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:44:57.476Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 38,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master de sp\u00e9cialisation"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Options"
+        ],
+        "changed": "2018-07-04T13:45:07.106Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 39,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master de sp\u00e9cialisation"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Partenariat mobilit\u00e9"
+        ],
+        "changed": "2018-07-04T13:45:11.514Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 40,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Master de sp\u00e9cialisation"
+        ],
+        "child_type": [
+            "GROUP",
+            "Module compl\u00e9ment"
+        ],
+        "changed": "2018-07-04T13:45:18.933Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 41,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Agr\u00e9gation"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:45:28.575Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 42,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Agr\u00e9gation"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Options"
+        ],
+        "changed": "2018-07-04T13:45:34.179Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 43,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Agr\u00e9gation"
+        ],
+        "child_type": [
+            "GROUP",
+            "Liste au choix Partenariat mobilit\u00e9"
+        ],
+        "changed": "2018-07-04T13:45:39.549Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 44,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Agr\u00e9gation"
+        ],
+        "child_type": [
+            "GROUP",
+            "Module compl\u00e9ment"
+        ],
+        "changed": "2018-07-04T13:45:43.419Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 45,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Certificat de recherche"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:45:59.012Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 46,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Certificat de m\u00e9decine"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:46:03.441Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 47,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Certificat CAPAES"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:46:09.012Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 48,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Certificat de formation continue"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:46:14.715Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 49,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Attestation de formation continue"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:46:57.891Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 50,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Cours de langue"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:47:06.193Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 51,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Doctorat"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:47:17.636Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 52,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Formation doctorat"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:47:21.538Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 53,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Concours d\u2019acc\u00e8s"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:47:28.989Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 54,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Cours isol\u00e9s"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:47:35.112Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 55,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Stagiaire"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:47:42.428Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 56,
+    "fields": {
+        "parent_type": [
+            "TRAINING",
+            "Junior year"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:47:55.320Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 57,
+    "fields": {
+        "parent_type": [
+            "MINI_TRAINING",
+            "Approfondissement"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:48:03.131Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 58,
+    "fields": {
+        "parent_type": [
+            "MINI_TRAINING",
+            "Mineure de soci\u00e9t\u00e9"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:48:18.488Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 59,
+    "fields": {
+        "parent_type": [
+            "MINI_TRAINING",
+            "Mineure de soci\u00e9t\u00e9"
+        ],
+        "child_type": [
+            "GROUP",
+            "Sous-groupe"
+        ],
+        "changed": "2018-07-04T13:48:36.842Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 60,
+    "fields": {
+        "parent_type": [
+            "MINI_TRAINING",
+            "Mineure d'acc\u00e8s"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:48:48.031Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 61,
+    "fields": {
+        "parent_type": [
+            "MINI_TRAINING",
+            "Mineure d'acc\u00e8s"
+        ],
+        "child_type": [
+            "GROUP",
+            "Sous-groupe"
+        ],
+        "changed": "2018-07-04T13:48:53.989Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 62,
+    "fields": {
+        "parent_type": [
+            "MINI_TRAINING",
+            "Mineure d'ouverture"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:48:59.142Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 63,
+    "fields": {
+        "parent_type": [
+            "MINI_TRAINING",
+            "Mineure d'ouverture"
+        ],
+        "child_type": [
+            "GROUP",
+            "Sous-groupe"
+        ],
+        "changed": "2018-07-04T13:49:05.065Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 64,
+    "fields": {
+        "parent_type": [
+            "MINI_TRAINING",
+            "Mineure compl\u00e9ment disciplinaire"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:49:10.269Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 65,
+    "fields": {
+        "parent_type": [
+            "MINI_TRAINING",
+            "Mineure compl\u00e9ment disciplinaire"
+        ],
+        "child_type": [
+            "GROUP",
+            "Sous-groupe"
+        ],
+        "changed": "2018-07-04T13:49:16.366Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 66,
+    "fields": {
+        "parent_type": [
+            "MINI_TRAINING",
+            "Option"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:49:53.793Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 67,
+    "fields": {
+        "parent_type": [
+            "MINI_TRAINING",
+            "Option"
+        ],
+        "child_type": [
+            "GROUP",
+            "Sous-groupe"
+        ],
+        "changed": "2018-07-04T13:50:03.260Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 68,
+    "fields": {
+        "parent_type": [
+            "MINI_TRAINING",
+            "Partenariat de mobilit\u00e9"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:50:12.721Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 69,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "child_type": [
+            "GROUP",
+            "Sous-groupe"
+        ],
+        "changed": "2018-07-04T13:50:28.900Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 70,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Liste au choix Mineures"
+        ],
+        "child_type": [
+            "MINI_TRAINING",
+            "Approfondissement"
+        ],
+        "changed": "2018-07-04T13:51:06.469Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 71,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Liste au choix Mineures"
+        ],
+        "child_type": [
+            "MINI_TRAINING",
+            "Mineure de soci\u00e9t\u00e9"
+        ],
+        "changed": "2018-07-04T13:51:35.345Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 72,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Liste au choix Mineures"
+        ],
+        "child_type": [
+            "MINI_TRAINING",
+            "Mineure d'acc\u00e8s"
+        ],
+        "changed": "2018-07-04T13:51:47.533Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 73,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Liste au choix Mineures"
+        ],
+        "child_type": [
+            "MINI_TRAINING",
+            "Mineure d'ouverture"
+        ],
+        "changed": "2018-07-04T13:51:58.390Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 74,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Liste au choix Mineures"
+        ],
+        "child_type": [
+            "MINI_TRAINING",
+            "Mineure compl\u00e9ment disciplinaire"
+        ],
+        "changed": "2018-07-04T13:52:02.526Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 75,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Liste au choix Majeures"
+        ],
+        "child_type": [
+            "MINI_TRAINING",
+            "Sp\u00e9cialit\u00e9 FSA (Majeure)"
+        ],
+        "changed": "2018-07-04T13:52:40.179Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 76,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Liste au choix Options"
+        ],
+        "child_type": [
+            "MINI_TRAINING",
+            "Option"
+        ],
+        "changed": "2018-07-04T13:53:08.075Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 77,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Liste au choix de Finalit\u00e9s (120)"
+        ],
+        "child_type": [
+            "TRAINING",
+            "Master approfondi 120"
+        ],
+        "changed": "2018-07-04T13:53:53.748Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 78,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Liste au choix de Finalit\u00e9s (120)"
+        ],
+        "child_type": [
+            "TRAINING",
+            "Master didactique 120"
+        ],
+        "changed": "2018-07-04T13:53:58.763Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 79,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Liste au choix de Finalit\u00e9s (120)"
+        ],
+        "child_type": [
+            "TRAINING",
+            "Master sp\u00e9cialis\u00e9 120"
+        ],
+        "changed": "2018-07-04T13:54:02.796Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 80,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Liste au choix de Finalit\u00e9s (180)"
+        ],
+        "child_type": [
+            "TRAINING",
+            "Master approfondi 180 ou 240"
+        ],
+        "changed": "2018-07-04T13:54:25.511Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 81,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Liste au choix de Finalit\u00e9s (180)"
+        ],
+        "child_type": [
+            "TRAINING",
+            "Master didactique 180 ou 240"
+        ],
+        "changed": "2018-07-04T13:54:52.906Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 82,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Liste au choix de Finalit\u00e9s (180)"
+        ],
+        "child_type": [
+            "TRAINING",
+            "Master sp\u00e9cialis\u00e9 180 ou 240"
+        ],
+        "changed": "2018-07-04T13:54:59.653Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 83,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Module compl\u00e9ment"
+        ],
+        "child_type": [
+            "GROUP",
+            "Partie de base (Tronc commun)"
+        ],
+        "changed": "2018-07-04T13:55:34.751Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 84,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Liste au choix Partenariat mobilit\u00e9"
+        ],
+        "child_type": [
+            "MINI_TRAINING",
+            "Partenariat de mobilit\u00e9"
+        ],
+        "changed": "2018-07-04T13:55:58.626Z"
+    }
+},
+{
+    "model": "base.unauthorizedrelationship",
+    "pk": 85,
+    "fields": {
+        "parent_type": [
+            "GROUP",
+            "Sous-groupe"
+        ],
+        "child_type": [
+            "GROUP",
+            "Sous-groupe"
+        ],
+        "changed": "2018-07-04T13:56:16.151Z"
+    }
+}
+]

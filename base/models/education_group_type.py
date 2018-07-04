@@ -38,7 +38,15 @@ class EducationGroupTypeAdmin(OsisModelAdmin):
     search_fields = ['name', 'category']
 
 
+class EducationGroupTypeManager(models.Manager):
+    def get_by_natural_key(self, category, name):
+        return self.get(category=category, name=name)
+
+
 class EducationGroupType(models.Model):
+
+    objects = EducationGroupTypeManager()
+
     external_id = models.CharField(max_length=100, blank=True, null=True)
     category = models.CharField(max_length=25, choices=education_group_categories.CATEGORIES,
                                 default=education_group_categories.TRAINING)
@@ -46,6 +54,9 @@ class EducationGroupType(models.Model):
 
     def __str__(self):
         return u"%s" % self.name
+
+    def natural_key(self):
+        return self.category, self.name
 
 
 def search(**kwargs):
