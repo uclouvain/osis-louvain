@@ -147,7 +147,13 @@ class TestViewEducationalInformation(TestCase):
         self.assertIsInstance(context["form_french"], LearningUnitPedagogyForm)
         self.assertIsInstance(context["form_english"], LearningUnitPedagogyForm)
         self.assertFalse(context["can_edit_information"])
+        self.assertFalse(context["can_edit_summary_locked_field"])
         self.assertFalse(context["submission_dates"])
+        # Verify URL for tutor [==> Specific redirection]
+        self.assertEqual(context['create_teaching_material_urlname'], 'tutor_teaching_material_create')
+        self.assertEqual(context['update_teaching_material_urlname'], 'tutor_teaching_material_edit')
+        self.assertEqual(context['delete_teaching_material_urlname'], 'tutor_teaching_material_delete')
+        self.assertEqual(context['update_mobility_modality_urlname'], 'tutor_mobility_modality_update')
 
 
 class TestManageEducationalInformation(TestCase):
@@ -187,40 +193,49 @@ class TestManageEducationalInformation(TestCase):
         self.assertTrue(mock_edit_learning_unit_pedagogy.called)
 
 
-class TestManageMyCoursesTeachingMaterialsRedirection(TestCase):
-    def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        self.academic_calendar = AcademicCalendarFactory(academic_year=self.current_academic_year,
-                                                         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
-                                                         start_date=datetime.date(timezone.now().year - 1, 9, 30),
-                                                         end_date=datetime.date(timezone.now().year + 1, 9, 30))
-        self.academic_year_in_future = AcademicYearFactory(year=self.current_academic_year.year + 1)
-        self.learning_unit_year = LearningUnitYearFactory(
+class ManageMyCoursesMixin(TestCase):
+    """This mixin is used in context of edition of pedagogy data for tutor"""
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        cls.academic_calendar = AcademicCalendarFactory(academic_year=cls.current_academic_year,
+                                                        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
+                                                        start_date=datetime.date(timezone.now().year - 1, 9, 30),
+                                                        end_date=datetime.date(timezone.now().year + 1, 9, 30))
+        cls.academic_year_in_future = AcademicYearFactory(year=cls.current_academic_year.year + 1)
+        cls.learning_unit_year = LearningUnitYearFactory(
             subtype=FULL,
-            academic_year=self.academic_year_in_future,
-            learning_container_year__academic_year=self.academic_year_in_future,
+            academic_year=cls.academic_year_in_future,
+            learning_container_year__academic_year=cls.academic_year_in_future,
             summary_locked=False
         )
         a_valid_entity_version = EntityVersionFactory(entity_type=FACULTY)
         EntityContainerYearFactory(
-            learning_container_year=self.learning_unit_year.learning_container_year,
+            learning_container_year=cls.learning_unit_year.learning_container_year,
             entity=a_valid_entity_version.entity,
             type=entity_container_year_link_type.REQUIREMENT_ENTITY
         )
-        self.teaching_material = TeachingMaterialFactory(learning_unit_year=self.learning_unit_year)
-        self.tutor = _get_tutor()
+        cls.tutor = _get_tutor()
         # Add attribution to course [set summary responsible]
         AttributionFactory(
-            tutor=self.tutor,
+            tutor=cls.tutor,
             summary_responsible=True,
-            learning_unit_year= self.learning_unit_year,
+            learning_unit_year=cls.learning_unit_year,
         )
+
+    def setUp(self):
         self.client.force_login(self.tutor.person.user)
+
+
+class TestManageMyCoursesTeachingMaterialsRedirection(ManageMyCoursesMixin):
+    def setUp(self):
+        super().setUp()
+        self.teaching_material = TeachingMaterialFactory(learning_unit_year=self.learning_unit_year)
 
     @patch('base.views.teaching_material.create_view')
     def test_redirection_create_teaching_material(self, mock_create_view):
         url = reverse('tutor_teaching_material_create', kwargs={'learning_unit_year_id': self.learning_unit_year.id})
-        request = self._prepare_request(url)
+        request = _prepare_request(url, self.tutor.person.user)
 
         from attribution.views.manage_my_courses import create_teaching_material
         create_teaching_material(request, learning_unit_year_id=self.learning_unit_year.pk)
@@ -234,7 +249,7 @@ class TestManageMyCoursesTeachingMaterialsRedirection(TestCase):
     def test_redirection_update_teaching_material(self, mock_update_view):
         url = reverse('tutor_teaching_material_edit', kwargs={'learning_unit_year_id': self.learning_unit_year.id,
                                                               'teaching_material_id': self.teaching_material.id})
-        request = self._prepare_request(url)
+        request = _prepare_request(url, self.tutor.person.user)
 
         from attribution.views.manage_my_courses import update_teaching_material
         update_teaching_material(
@@ -252,7 +267,7 @@ class TestManageMyCoursesTeachingMaterialsRedirection(TestCase):
     def test_redirection_delete_teaching_material(self, mock_delete_view):
         url = reverse('tutor_teaching_material_delete', kwargs={'learning_unit_year_id': self.learning_unit_year.id,
                                                                 'teaching_material_id': self.teaching_material.id})
-        request = self._prepare_request(url)
+        request = _prepare_request(url, self.tutor.person.user)
 
         from attribution.views.manage_my_courses import delete_teaching_material
         delete_teaching_material(
@@ -267,11 +282,28 @@ class TestManageMyCoursesTeachingMaterialsRedirection(TestCase):
         mock_delete_view.assert_called_once_with(request, self.learning_unit_year.pk, self.teaching_material.id,
                                                  expected_redirection)
 
-    def _prepare_request(self, url):
-        request_factory = RequestFactory()
-        request = request_factory.get(url)
-        request.user = self.tutor.person.user
-        return request
+
+class TestManageMyCoursesMobilityModalityRedirection(ManageMyCoursesMixin):
+    @mock.patch("attribution.views.manage_my_courses.update_mobility_modality_view", return_value=HttpResponse())
+    def test_redirection_update_mobility_modality(self, mock_update_view):
+        url = reverse('tutor_mobility_modality_update', kwargs={'learning_unit_year_id': self.learning_unit_year.id})
+        request = _prepare_request(url, self.tutor.person.user)
+        from attribution.views.manage_my_courses import update_mobility_modality
+        update_mobility_modality(
+            request,
+            learning_unit_year_id=self.learning_unit_year.pk
+        )
+        self.assertTrue(mock_update_view.called)
+        expected_redirection = reverse(view_educational_information,
+                                       kwargs={'learning_unit_year_id': self.learning_unit_year.pk})
+        mock_update_view.assert_called_once_with(request, self.learning_unit_year.pk, expected_redirection)
+
+
+def _prepare_request(url, user):
+    request_factory = RequestFactory()
+    request = request_factory.get(url)
+    request.user = user
+    return request
 
 
 def _get_tutor():

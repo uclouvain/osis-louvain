@@ -26,7 +26,7 @@
 import factory.fuzzy
 
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories
+from base.models.enums import education_group_categories, active_status, schedule_type
 from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
@@ -58,6 +58,8 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     max_credits = factory.fuzzy.FuzzyDecimal(MINIMUM_CREDITS)
     remark = factory.fuzzy.FuzzyText(length=255)
     remark_english = factory.fuzzy.FuzzyText(length=255)
+    active = active_status.ACTIVE
+    schedule_type = schedule_type.DAILY
 
 
 class MiniTrainingFactory(EducationGroupYearFactory):

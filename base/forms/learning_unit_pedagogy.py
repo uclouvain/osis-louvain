@@ -30,7 +30,6 @@ from django.db.transaction import atomic
 
 from base.business.learning_unit import find_language_in_settings, CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_ONLY
 from base.business.learning_units.pedagogy import is_pedagogy_data_must_be_postponed, save_teaching_material
-from base.business.learning_units.perms import can_edit_summary_locked_field
 from base.forms.common import set_trans_txt
 from base.models import learning_unit_year
 from base.models.learning_unit_year import LearningUnitYear
@@ -115,19 +114,10 @@ class LearningUnitPedagogyEditForm(forms.Form):
         )
 
 
-class SummaryModelForm(forms.ModelForm):
-    def __init__(self, data, person, is_person_linked_to_entity, *args, **kwargs):
-        super().__init__(data, *args, **kwargs)
-        if not can_edit_summary_locked_field(person, is_person_linked_to_entity):
-            self.fields["summary_locked"].disabled = True
-
-        if not person.user.has_perm('base.can_edit_learningunit_pedagogy'):
-            for field in self.fields.values():
-                field.disabled = True
-
+class MobilityModalityModelForm(forms.ModelForm):
     class Meta:
         model = LearningUnitYear
-        fields = ["summary_locked", 'mobility_modality']
+        fields = ['mobility_modality']
 
     @atomic
     def save(self, commit=True):

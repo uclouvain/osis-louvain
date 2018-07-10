@@ -1,0 +1,28 @@
+{% load bootstrap3 %}
+{% load i18n %}
+
+<div class="col-md-6">
+    {% if can_edit_summary_locked_field %}
+        <form method="POST"
+              action="{% url 'learning_unit_pedagogy_toggle_summary_locked' learning_unit_year_id=learning_unit_year.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-primary pull-right" type="submit" data-toggle="tooltip" data-placement="left"
+                {% if learning_unit_year.summary_locked %}
+                     title="{% trans 'unlock update for teacher'|capfirst %}">
+                    <i class="fa fa-unlock"> </i> <span>{% trans 'unlock'|capfirst %}</span>
+                {% else %}
+                    title="{% trans 'lock update for teacher'|capfirst %}">
+                    <i class="fa fa-lock"></i> <span>{% trans 'lock'|capfirst %}</span>
+                {% endif %}
+            </button>
+        </form>
+    {% else %}
+        <span class="pull-right">
+            {% if learning_unit_year.summary_locked %}
+                {% trans 'Update for teacher locked' %}
+            {% else %}
+                {% trans 'Update for teacher unlocked' %}
+            {% endif %}
+        </span>
+    {% endif %}
+</div>

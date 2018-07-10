@@ -1,4 +1,6 @@
+{% extends "education_group/layout_detail.html" %}
 {% load i18n %}
+{% load staticfiles bootstrap3 %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -23,24 +25,12 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% if status %}
-    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"
-          style="color:green;"
-          {% if title_status_true %} data-toggle="tooltip" data-html="true" title="{{ title_status_true }}"{% endif %} >
-        <!-- This span is used for table sort JS -->
-        <span style="display:None;">2</span>
-    </span>
-{% elif title_status_false %}
-    <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"
-          style="color:red;"
-          data-toggle="tooltip" data-html="true" title="{{ title_status_false }}">
-        <!-- This span is used for table sort JS -->
-         <span style="display:None;">0</span>
-    </span>
-{% else %}
-    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"
-          style="color:grey;">
-         <!-- This span is used for table sort JS -->
-         <span style="display:None;">1</span>
-    </span>
-{% endif %}
+{% block breadcrumb %}
+    {{ block.super }}
+    <li>{% trans "MODIFICATION" %}</li>
+{% endblock %}
+
+{% block content %}
+    {% include "education_group/blocks/form/minitraining.html" %}
+{% endblock %}
+

@@ -48,10 +48,7 @@
                 <br>
                 {% url 'tutor_edit_educational_information' learning_unit_year_id=learning_unit_year.id as post_url%}
 
-                <!-- URL for teaching material panels  -->
-                {% with create_teaching_material_urlname='tutor_teaching_material_create' update_teaching_material_urlname='tutor_teaching_material_edit' delete_teaching_material_urlname='tutor_teaching_material_delete' %}
-                    {% include "learning_unit/blocks/panel/educational_informations.html" %}
-                {% endwith %}
+                {% include "learning_unit/blocks/panel/educational_informations.html" %}
             </div>
         </div>
     </div>

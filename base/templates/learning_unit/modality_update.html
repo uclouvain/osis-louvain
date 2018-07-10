@@ -1,4 +1,5 @@
-{% load i18n %}
+{% load staticfiles %}
+{% load i18n bootstrap3 %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -23,24 +24,22 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% if status %}
-    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"
-          style="color:green;"
-          {% if title_status_true %} data-toggle="tooltip" data-html="true" title="{{ title_status_true }}"{% endif %} >
-        <!-- This span is used for table sort JS -->
-        <span style="display:None;">2</span>
-    </span>
-{% elif title_status_false %}
-    <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"
-          style="color:red;"
-          data-toggle="tooltip" data-html="true" title="{{ title_status_false }}">
-        <!-- This span is used for table sort JS -->
-         <span style="display:None;">0</span>
-    </span>
-{% else %}
-    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"
-          style="color:grey;">
-         <!-- This span is used for table sort JS -->
-         <span style="display:None;">1</span>
-    </span>
-{% endif %}
+<div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <form method="POST" action="{{ request.path }}">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h4>{% trans 'Mobility' %}</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    {% bootstrap_field form.mobility_modality form_group_class="col-md-12" %}
+                </div>
+             </div>
+             <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "cancel" %}</button>
+                <button type="submit" class="btn btn-primary">{% trans "save" %}</button>
+             </div>
+        </form>
+    </div>
+</div>

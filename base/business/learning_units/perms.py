@@ -119,8 +119,9 @@ def is_eligible_to_consolidate_proposal(proposal, person):
     )(proposal, person)
 
 
-def can_edit_summary_locked_field(person, is_person_linked_to_entity):
-    return person.is_faculty_manager() and is_person_linked_to_entity
+def can_edit_summary_locked_field(learning_unit_year, person):
+    return person.is_faculty_manager() and \
+           person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
 
 def can_update_learning_achievement(learning_unit_year, person):

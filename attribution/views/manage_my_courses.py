@@ -40,7 +40,9 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.tutor import Tutor
 from base.views import layout
 from base.views import teaching_material
-from base.views.learning_units.pedagogy.update import update_learning_unit_pedagogy, edit_learning_unit_pedagogy
+from base.views.learning_units.pedagogy.update import edit_learning_unit_pedagogy, \
+    update_mobility_modality_view
+from base.views.learning_units.pedagogy.read import read_learning_unit_pedagogy
 from base.views.learning_units.perms import PermissionDecorator
 
 
@@ -73,10 +75,14 @@ def list_my_attributions_summary_editable(request):
 def view_educational_information(request, learning_unit_year_id):
     context = {
         'submission_dates': find_educational_information_submission_dates_of_learning_unit_year(
-                learning_unit_year_id)
+                learning_unit_year_id),
+        'create_teaching_material_urlname': 'tutor_teaching_material_create',
+        'update_teaching_material_urlname': 'tutor_teaching_material_edit',
+        'delete_teaching_material_urlname': 'tutor_teaching_material_delete',
+        'update_mobility_modality_urlname': 'tutor_mobility_modality_update'
     }
     template = 'manage_my_courses/educational_information.html'
-    return update_learning_unit_pedagogy(request, learning_unit_year_id, context, template)
+    return read_learning_unit_pedagogy(request, learning_unit_year_id, context, template)
 
 
 @login_required
@@ -108,3 +114,11 @@ def update_teaching_material(request, learning_unit_year_id, teaching_material_i
 def delete_teaching_material(request, learning_unit_year_id, teaching_material_id):
     success_url = reverse(view_educational_information, kwargs={'learning_unit_year_id': learning_unit_year_id})
     return teaching_material.delete_view(request, learning_unit_year_id, teaching_material_id, success_url)
+
+
+@login_required
+@require_http_methods(['POST', 'GET'])
+@PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
+def update_mobility_modality(request, learning_unit_year_id):
+    success_url = reverse(view_educational_information, kwargs={'learning_unit_year_id': learning_unit_year_id})
+    return update_mobility_modality_view(request, learning_unit_year_id, success_url)

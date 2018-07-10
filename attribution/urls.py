@@ -26,6 +26,7 @@
 from django.conf.urls import url, include
 
 from attribution.views import summary_responsible, manage_my_courses
+from attribution.views.manage_my_courses import update_mobility_modality
 
 urlpatterns = [
     url(r'^summary_responsible_manager/', include([
@@ -51,7 +52,8 @@ urlpatterns = [
                     name="tutor_teaching_material_edit"),
                 url(r'^(?P<teaching_material_id>[0-9]+)/delete/', manage_my_courses.delete_teaching_material,
                     name="tutor_teaching_material_delete")
-            ]))
+            ])),
+            url(r'^update_mobility_modality/$', update_mobility_modality, name='tutor_mobility_modality_update')
         ]))
     ])),
 ]

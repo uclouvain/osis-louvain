@@ -35,9 +35,9 @@ from base.models.enums import education_group_categories
 class MiniTrainingModelForm(forms.ModelForm):
     class Meta:
         model = EducationGroupYear
-        fields = ("acronym", "partial_acronym", "education_group_type", "title", "title_english", "credits",
+        fields = ("acronym", "partial_acronym", "education_group_type", "title", "title_english", "credits", "active",
                   "main_teaching_campus", "academic_year", "remark", "remark_english", "min_credits", "max_credits",
-                  "administration_entity")
+                  "schedule_type", "administration_entity", "keywords")
         field_classes = {
             "administration_entity": MainEntitiesVersionChoiceField,
             "main_teaching_campus": MainTeachingCampusChoiceField

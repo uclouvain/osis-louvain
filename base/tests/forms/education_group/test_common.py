@@ -244,5 +244,7 @@ def _get_valid_post_data(category):
         'min_credits': str(fake_education_group_year.min_credits),
         'remark': str(fake_education_group_year.remark),
         'acronym': str(fake_education_group_year.acronym),
+        'active': str(fake_education_group_year.active),
+        'schedule_type': str(fake_education_group_year.schedule_type),
     }
     return fake_education_group_year, post_data

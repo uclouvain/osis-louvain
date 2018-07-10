@@ -1,0 +1,21 @@
+{% load i18n bootstrap3 %}
+
+<div class="panel">
+    <div class="panel-heading">
+        <label>{% trans 'Mobility' %}</label>
+        {% if can_edit_information %}
+        <a class="mobility-modality-edit-btn pull-right" href="#"
+            data-form="{% url update_mobility_modality_urlname learning_unit_year_id=learning_unit_year.pk %}">
+            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+        </a>
+        {% endif %}
+    </div>
+
+    <div class="panel-body" style="padding-top:0px;">
+        <div class="row">
+            <div class="col-md-12">
+                {{ learning_unit_year.mobility_modality|default_if_none:'' }}
+            </div>
+        </div>
+    </div>
+</div>

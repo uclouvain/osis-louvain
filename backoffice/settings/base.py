@@ -389,3 +389,5 @@ if CACHE_ENABLED:
             "KEY_PREFIX": os.environ.get("REDIS_PREFIX", 'osis')
         }
     }
+
+WAFFLE_FLAG_DEFAULT = os.environ.get("WAFFLE_FLAG_DEFAULT", "False").lower() == 'true'

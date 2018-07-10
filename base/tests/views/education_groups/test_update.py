@@ -36,6 +36,7 @@ from base.models.enums.active_status import ACTIVE
 from base.models.enums.schedule_type import DAILY
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import GroupFactory, TrainingFactory
+from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
 from base.tests.factories.entity_version import EntityVersionFactory, MainEntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.views.education_groups.update import update_education_group
@@ -137,6 +138,12 @@ class TestUpdate(TestCase):
         self.assertTemplateUsed(response, "education_group/update_trainings.html")
 
     def test_post_training(self):
+        old_domain = DomainFactory()
+        EducationGroupYearDomainFactory(
+            education_group_year=self.training_education_group_year,
+            domain=old_domain
+        )
+
         new_entity_version = MainEntityVersionFactory()
         list_domains = [domain.pk for domain in self.domains]
         data = {
@@ -167,3 +174,4 @@ class TestUpdate(TestCase):
             list(self.training_education_group_year.domains.values_list('id', flat=True)),
             list_domains
         )
+        self.assertNotIn(old_domain, self.education_group_year.domains.all())

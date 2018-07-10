@@ -47,7 +47,7 @@ from attribution.tests.factories.attribution import AttributionFactory
 from base.business import learning_unit as learning_unit_business
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.forms.learning_unit.search_form import LearningUnitYearForm, LearningUnitSearchForm
-from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm, SummaryModelForm
+from base.forms.learning_unit_pedagogy import LearningUnitPedagogyForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models import learning_unit_component
 from base.models import learning_unit_component_class
@@ -1295,158 +1295,11 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(template, 'learning_unit/pedagogy.html')
         self.assertIsInstance(context['form_french'], LearningUnitPedagogyForm)
         self.assertIsInstance(context['form_english'], LearningUnitPedagogyForm)
-
-    @mock.patch('base.views.layout.render')
-    def test_learning_unit_pedagogy_summary_editable_form_present(self, mock_render):
-        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     learning_container_year=self.learning_container_yr,
-                                                     subtype=learning_unit_year_subtypes.FULL,
-                                                     summary_locked=False)
-
-        request = self.create_learning_unit_request(learning_unit_year)
-        learning_unit_pedagogy(request, learning_unit_year.id)
-
-        self.assertTrue(mock_render.called)
-        request, template, context = mock_render.call_args[0]
-        self.assertIsInstance(context['summary_editable_form'], SummaryModelForm)
-
-    @mock.patch('base.models.person.Person.is_faculty_manager')
-    def test_learning_unit_pedagogy_summary_editable_update_ok(self, mock_faculty_manager):
-        mock_faculty_manager.return_value = True
-
-        self.client.logout()
-        fac_manager_user = self.a_superuser
-        fac_manager_user.is_staff = False
-        fac_manager_user.is_superuser = False
-        fac_manager_user.refresh_from_db()
-        self.client.force_login(fac_manager_user)
-
-        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     learning_container_year=self.learning_container_yr,
-                                                     subtype=learning_unit_year_subtypes.FULL,
-                                                     summary_locked=False)
-
-        text_label_bibliography = TextLabelFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            label='bibliography'
-        )
-        cms_translated_text_fr = TranslatedTextFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=learning_unit_year.id,
-            language='fr-be',
-            text_label=text_label_bibliography,
-            text='Some random text'
-        )
-
-        url = reverse(learning_unit_pedagogy, args=[learning_unit_year.id])
-        request_factory = RequestFactory()
-
-        data = {'summary_locked': True}
-        request = request_factory.post(url, data=data)
-
-        request.user = fac_manager_user
-        request.session = 'session'
-        setattr(request, '_messages', FallbackStorage(request))
-
-        learning_unit_pedagogy(request, learning_unit_year.id)
-
-        msg = [m.message for m in messages.get_messages(request)]
-        msg_level = [m.level for m in messages.get_messages(request)]
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.SUCCESS, msg_level)
-
-        learning_unit_year.refresh_from_db()
-        self.assertTrue(learning_unit_year.summary_locked)
-
-    @mock.patch('base.models.person.Person.is_faculty_manager')
-    def test_learning_unit_pedagogy_summary_editable_cannot_update_entity_not_linked(self, mock_faculty_manager):
-        mock_faculty_manager.return_value = True
-        PersonEntity.objects.filter(person=self.person).delete()
-
-        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     learning_container_year=self.learning_container_yr,
-                                                     subtype=learning_unit_year_subtypes.FULL,
-                                                     summary_locked=False)
-
-        data = {'summary_locked': True}
-
-        url = reverse(learning_unit_pedagogy, args=[learning_unit_year.id])
-        request_factory = RequestFactory()
-        request = request_factory.post(url, data=data)
-
-        request.user = self.a_superuser
-        setattr(request, 'session', 'session')
-        setattr(request, '_messages', FallbackStorage(request))
-
-        learning_unit_pedagogy(request, learning_unit_year.id)
-
-        learning_unit_year.refresh_from_db()
-        self.assertFalse(learning_unit_year.summary_locked)
-
-    @mock.patch('base.models.person.Person.is_faculty_manager')
-    def test_learning_unit_pedagogy_summary_editable_as_tutor(self, mock_faculty_manager):
-        mock_faculty_manager.return_value = False
-
-        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     learning_container_year=self.learning_container_yr,
-                                                     subtype=learning_unit_year_subtypes.FULL,
-                                                     summary_locked=False)
-
-        tutor = TutorFactory(person=self.person)
-        AttributionFactory(summary_responsible=True, learning_unit_year=learning_unit_year, tutor=tutor)
-
-        AcademicCalendarSummaryCourseSubmissionFactory(academic_year=create_current_academic_year())
-
-        url = reverse(learning_unit_pedagogy, args=[learning_unit_year.id])
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.context["can_edit_information"])
-
-    def test_learning_unit_pedagogy_without_permission(self):
-        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     learning_container_year=self.learning_container_yr,
-                                                     subtype=learning_unit_year_subtypes.FULL,
-                                                     summary_locked=False)
-
-        data = {'summary_locked': True}
-
-        url = reverse(learning_unit_pedagogy, args=[learning_unit_year.id])
-        request_factory = RequestFactory()
-        request = request_factory.post(url, data=data)
-        self.user.user_permissions.add(Permission.objects.get(codename='can_access_learningunit'))
-
-        request.user = self.user
-        setattr(request, 'session', 'session')
-        setattr(request, '_messages', FallbackStorage(request))
-
-        learning_unit_pedagogy(request, learning_unit_year.id)
-
-        learning_unit_year.refresh_from_db()
-        self.assertFalse(learning_unit_year.summary_locked)
-        self.assertEqual(TeachingMaterial.objects.filter(learning_unit_year=learning_unit_year).count(), 0,
-                         'Teaching material cannot be updated')
-
-    @mock.patch('base.models.person.Person.is_faculty_manager')
-    def test_learning_unit_pedagogy_summary_editable_cannot_update_not_faculty_manager(self, mock_faculty_manager):
-        mock_faculty_manager.return_value = False
-
-        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     learning_container_year=self.learning_container_yr,
-                                                     subtype=learning_unit_year_subtypes.FULL,
-                                                     summary_locked=False)
-        url = reverse(learning_unit_pedagogy, args=[learning_unit_year.id])
-        request_factory = RequestFactory()
-        data = {'summary_locked': True}
-        request = request_factory.post(url, data=data)
-
-        request.user = self.a_superuser
-        setattr(request, 'session', 'session')
-        setattr(request, '_messages', FallbackStorage(request))
-
-        learning_unit_pedagogy(request, learning_unit_year.id)
-
-        learning_unit_year.refresh_from_db()
-        self.assertFalse(learning_unit_year.summary_locked)
+        # Verify URL [Specific redirection]
+        self.assertEqual(context['create_teaching_material_urlname'], 'teaching_material_create')
+        self.assertEqual(context['update_teaching_material_urlname'], 'teaching_material_edit')
+        self.assertEqual(context['delete_teaching_material_urlname'], 'teaching_material_delete')
+        self.assertEqual(context['update_mobility_modality_urlname'], 'mobility_modality_update')
 
     @mock.patch('base.views.layout.render')
     def test_learning_unit_specification(self, mock_render):

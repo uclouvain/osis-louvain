@@ -3179,3 +3179,24 @@ msgstr ""
 
 msgid "Enter text to search"
 msgstr ""
+
+msgid "Mobility has been updated"
+msgstr ""
+
+msgid "lock"
+msgstr ""
+
+msgid "unlock"
+msgstr ""
+
+msgid "Update for teacher unlocked"
+msgstr ""
+
+msgid "Update for teacher locked"
+msgstr ""
+
+msgid "lock update for teacher"
+msgstr ""
+
+msgid "unlock update for teacher"
+msgstr ""

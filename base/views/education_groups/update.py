@@ -102,7 +102,7 @@ def _update_mini_training(request, education_group_year):
     if form.is_valid():
         return _common_success_redirect(request, form.save())
 
-    return layout.render(request, "education_group/minitraining_form.html", {
+    return layout.render(request, "education_group/update_minitrainings.html", {
         "form_education_group_year": form.forms[forms.ModelForm],
         "education_group_year": education_group_year,
         "form_education_group": form.forms[EducationGroupModelForm]

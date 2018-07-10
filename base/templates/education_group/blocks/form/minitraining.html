@@ -1,6 +1,5 @@
-{% load staticfiles bootstrap3 %}
 {% load i18n %}
-
+{% load staticfiles bootstrap3 %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -25,8 +24,7 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-
-<form method="post" id="UpdateTrainingForm">
+<form method="post" id="UpdateMiniTrainingForm">
     {% csrf_token %}
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -72,53 +70,13 @@
                     <div class="panel panel-default">
                         <div class="panel-body">
                             {% bootstrap_field form_education_group_year.administration_entity %}
-                            {% bootstrap_field form_education_group_year.management_entity %}
                             {% bootstrap_field form_education_group_year.academic_year %}
                             <div class="row">
                                 {% bootstrap_field form_education_group.start_year form_group_class="col-md-6" %}
                                 {% bootstrap_field form_education_group.end_year form_group_class="col-md-6" %}
                             </div>
                             <br>
-                            {% bootstrap_field form_education_group_year.enrollment_campus %}
                             {% bootstrap_field form_education_group_year.main_teaching_campus %}
-                            {% bootstrap_field form_education_group_year.other_campus_activities %}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-md-7">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            {% bootstrap_field form_education_group_year.academic_type %}
-                            <div class="row">
-                                {% bootstrap_field form_education_group_year.duration form_group_class="col-md-2" %}
-                                {% bootstrap_field form_education_group_year.duration_unit form_group_class="col-md-4" %}
-                                {% bootstrap_field form_education_group_year.internship form_group_class="col-md-6" %}
-                            </div>
-                            <div class="row">
-                                {% bootstrap_field form_education_group_year.enrollment_enabled form_group_class="col-md-6" %}
-                                {% bootstrap_field form_education_group_year.partial_deliberation form_group_class="col-md-6" %}
-                            </div>
-                            <div class="row">
-                                {% bootstrap_field form_education_group_year.admission_exam form_group_class="col-md-6" %}
-                                {% bootstrap_field form_education_group_year.dissertation form_group_class="col-md-6" %}
-                            </div>
-                            {% bootstrap_field form_education_group_year.university_certificate %}
-                            {% bootstrap_field form_education_group_year.primary_language %}
-                            {% bootstrap_field form_education_group_year.other_language_activities %}
-                            {{ form_education_group_year.media }}
-                            {% bootstrap_field form_education_group_year.domains placeholder="test" %}
-                            </div>
-                        </div>
-                    </div>
-                <div class="col-md-5">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            {% bootstrap_field form_education_group_year.funding %}
-                            {% bootstrap_field form_education_group_year.funding_direction %}
-                            {% bootstrap_field form_education_group_year.funding_cud %}
-                            {% bootstrap_field form_education_group_year.funding_direction_cud %}
                         </div>
                     </div>
                 </div>

@@ -1,4 +1,6 @@
 {% load staticfiles bootstrap3 %}
+{% load i18n %}
+
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -22,7 +24,7 @@
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
-<form method="post" id="NewEducationGroupYearForm">
+<form method="post" id="UpdateGroupForm">
     {% csrf_token %}
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -30,46 +32,52 @@
         </div>
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-6">
+                <div class="col-md-7">
                     <div class="panel panel-default">
                         <div class="panel-body">
+                            <div class="row">
+                                {% bootstrap_field form_education_group_year.acronym form_group_class="col-md-6" %}
+                                {% bootstrap_field form_education_group_year.partial_acronym form_group_class="col-md-6" %}
+                            </div>
+                            <br>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label>{% trans 'type' %}</label><br>
+                                    <input value="{% trans education_group_year.education_group_type.category %}"
+                                           disabled class="form-control" >
+                                </div>
+                                {% bootstrap_field form_education_group_year.education_group_type form_group_class="col-md-6" %}
+                            </div>
+                            <br>
+                            <div class="row">
+                                {% bootstrap_field form_education_group_year.credits form_group_class="col-md-4" %}
+                                {% bootstrap_field form_education_group_year.min_credits form_group_class="col-md-4" %}
+                                {% bootstrap_field form_education_group_year.max_credits form_group_class="col-md-4" %}
+                            </div>
+                            <br>
                             {% bootstrap_field form_education_group_year.title %}
                             {% bootstrap_field form_education_group_year.title_english %}
                         </div>
                     </div>
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            {% bootstrap_field form_education_group_year.education_group_type %}
-                            {% bootstrap_field form_education_group_year.credits %}
-                            {% bootstrap_field form_education_group_year.min_credits %}
-                            {% bootstrap_field form_education_group_year.max_credits %}
-                        </div>
-                    </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            {% bootstrap_field form_education_group_year.acronym %}
-                            {% bootstrap_field form_education_group_year.partial_acronym %}
-                        </div>
-                    </div>
+                <div class="col-md-5">
                     <div class="panel panel-default">
                         <div class="panel-body">
                             {% bootstrap_field form_education_group_year.administration_entity %}
-                            {% bootstrap_field form_education_group_year.main_teaching_campus %}
                             {% bootstrap_field form_education_group_year.academic_year %}
-                        </div>
-                    </div>
-                    <div class="panel panel-default">
-                        <div class="panel-body">
-                            {% bootstrap_field form_education_group_year.remark %}
-                            {% bootstrap_field form_education_group_year.remark_english %}
+                            {% bootstrap_field form_education_group_year.main_teaching_campus %}
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    {% bootstrap_field form_education_group_year.remark %}
+                    {% bootstrap_field form_education_group_year.remark_english %}
+                </div>
+            </div>
         </div>
-        <div class="panel-footer">
+        <div class="panel-footer text-right">
             {% include "education_group/blocks/form/create_cancel_buttons.html" %}
         </div>
     </div>

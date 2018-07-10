@@ -89,6 +89,7 @@ class TrainingEducationGroupYearForm(forms.ModelForm):
         return education_group_year
 
     def save_domains(self):
+        self.instance.domains.clear()
         # Save_m2m can not be used because the many_to_many use a through parameter
         for domain_id in self.cleaned_data["domains"]:
             EducationGroupYearDomain.objects.get_or_create(

@@ -147,3 +147,13 @@ def can_update_learning_achievement(view_func):
             raise PermissionDenied("The user is not linked to the learning unit year")
         return view_func(request, learning_unit_year_id, *args, **kwargs)
     return f_can_update_learning_achievement
+
+
+def can_edit_summary_locked_field(view_func):
+    def f_can_update_learning_achievement(request, learning_unit_year_id, *args, **kwargs):
+        learn_unit_year = get_object_or_404(learning_unit_year.LearningUnitYear, pk=learning_unit_year_id)
+        pers = get_object_or_404(Person, user=request.user)
+        if not business_perms.can_edit_summary_locked_field(learn_unit_year, pers):
+            raise PermissionDenied("The user cannot edit summary locked field")
+        return view_func(request, learning_unit_year_id, *args, **kwargs)
+    return f_can_update_learning_achievement

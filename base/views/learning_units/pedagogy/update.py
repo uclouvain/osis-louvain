@@ -23,74 +23,50 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
-from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
 from base import models as mdl
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, get_cms_label_data, find_language_in_settings, \
-    get_no_summary_responsible_teachers, CMS_LABEL_PEDAGOGY_FR_ONLY
+from base.business.learning_unit import find_language_in_settings, CMS_LABEL_PEDAGOGY_FR_ONLY
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy
-from base.forms.learning_unit_pedagogy import SummaryModelForm, LearningUnitPedagogyForm, \
-    LearningUnitPedagogyEditForm
-from base.models import teaching_material
+from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm, MobilityModalityModelForm
+from base.models import learning_unit_year
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
-from base.models.tutor import find_all_summary_responsibles_by_learning_unit_year
 from base.views import layout
-from base.views.common import display_error_messages, display_success_messages
+from base.views.common import display_success_messages
+from base.views.learning_units import perms
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from base.views.learning_units.perms import PermissionDecorator
 from cms.models import text_label
 
 
-def update_learning_unit_pedagogy(request, learning_unit_year_id, context, template):
-    person = get_object_or_404(Person, user=request.user)
-    context.update(get_common_context_learning_unit_year(learning_unit_year_id, person))
-    learning_unit_year = context['learning_unit_year']
-    perm_to_edit = is_eligible_to_update_learning_unit_pedagogy(learning_unit_year, person)
-
-    post = request.POST or None
-    summary_form = SummaryModelForm(post, person, context['is_person_linked_to_entity'], instance=learning_unit_year)
-    if perm_to_edit and summary_form.is_valid():
-        try:
-            summary_form.save()
-            display_success_messages(request, _("success_modification_learning_unit"))
-            # Redirection on the same page
-            return HttpResponseRedirect(request.path_info)
-        except ValueError as e:
-            display_error_messages(request, e.args[0])
-
-    context.update(get_cms_pedagogy_form(request, learning_unit_year))
-    context['teaching_materials'] = teaching_material.find_by_learning_unit_year(learning_unit_year)
-    context['summary_editable_form'] = summary_form
-    context['can_edit_information'] = perm_to_edit
-    context['summary_responsibles'] = find_all_summary_responsibles_by_learning_unit_year(learning_unit_year)
-    context['other_teachers'] = get_no_summary_responsible_teachers(learning_unit_year, context['summary_responsibles'])
-    context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
-    return layout.render(request, template, context)
+@login_required
+@require_http_methods(["POST"])
+@perms.can_edit_summary_locked_field
+def toggle_summary_locked(request, learning_unit_year_id):
+    luy = learning_unit_year.toggle_summary_locked(learning_unit_year_id)
+    success_msg = "Update for teacher locked" if luy.summary_locked else "Update for teacher unlocked"
+    display_success_messages(request, success_msg)
+    return redirect(reverse("learning_unit_pedagogy", kwargs={'learning_unit_year_id': learning_unit_year_id}))
 
 
-# TODO Method similar with all cms forms
-def get_cms_pedagogy_form(request, learning_unit_year):
-    user_language = mdl.person.get_user_interface_language(request.user)
-    return {
-        'cms_labels_translated': get_cms_label_data(CMS_LABEL_PEDAGOGY, user_language),
-        'form_french': LearningUnitPedagogyForm(learning_unit_year=learning_unit_year,
-                                                language_code=settings.LANGUAGE_CODE_FR),
-        'form_english': LearningUnitPedagogyForm(learning_unit_year=learning_unit_year,
-                                                 language_code=settings.LANGUAGE_CODE_EN)
-    }
-
-
-@PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
+@login_required
 @require_http_methods(["GET", "POST"])
+@PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
 def learning_unit_pedagogy_edit(request, learning_unit_year_id):
     redirect_url = reverse("learning_unit_pedagogy", kwargs={'learning_unit_year_id': learning_unit_year_id})
     return edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url)
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+@PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
+def update_mobility_modality(request, learning_unit_year_id):
+    redirect_url = reverse("learning_unit_pedagogy", kwargs={'learning_unit_year_id': learning_unit_year_id})
+    return update_mobility_modality_view(request, learning_unit_year_id, redirect_url)
 
 
 def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
@@ -120,3 +96,13 @@ def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
     context['label_name'] = label_name
     return layout.render(request, "learning_unit/pedagogy_edit.html", context)
+
+
+def update_mobility_modality_view(request, learning_unit_year_id, success_url):
+    learning_unit_yr = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
+    form = MobilityModalityModelForm(request.POST or None, instance=learning_unit_yr)
+    if form.is_valid():
+        form.save()
+        display_success_messages(request, "Mobility has been updated")
+        return redirect(success_url)
+    return layout.render(request, "learning_unit/modality_update.html", {'form': form})
