@@ -96,14 +96,16 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
 
     @cached_property
     def instance(self):
-        try:
-            return learning_unit_year.search(
-                academic_year_id=self.academic_year.id,
-                learning_unit=self.learning_unit_instance,
-                subtype=self.subtype
-            ).get()
-        except (LearningUnitYear.DoesNotExist, LearningUnitYear.MultipleObjectsReturned):
-            return None
+        if self.learning_unit_instance:
+            try:
+                return learning_unit_year.search(
+                    academic_year_id=self.academic_year.id,
+                    learning_unit=self.learning_unit_instance,
+                    subtype=self.subtype
+                ).get()
+            except (LearningUnitYear.DoesNotExist, LearningUnitYear.MultipleObjectsReturned):
+                return None
+        return None
 
     @property
     def errors(self):
