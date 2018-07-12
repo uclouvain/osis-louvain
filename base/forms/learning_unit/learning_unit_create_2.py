@@ -26,11 +26,14 @@
 from abc import ABCMeta
 from collections import OrderedDict
 
+import logging
+import traceback
+
+from django.conf import settings
 from django.db import transaction
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
-from base.forms.common import TooManyResultsException
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
 from base.forms.learning_unit.entity_form import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
@@ -59,6 +62,8 @@ FACULTY_OPEN_FIELDS = {
     "professional_integration",
     "id"  # THIS IS A FIX, BUT A BETTER SOLUTION SHOULD BE FIND
 }
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class LearningUnitBaseForm(metaclass=ABCMeta):
@@ -96,16 +101,29 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
 
     @cached_property
     def instance(self):
+        result = None
         if self.learning_unit_instance:
             try:
-                return learning_unit_year.search(
+                result = learning_unit_year.search(
                     academic_year_id=self.academic_year.id,
                     learning_unit=self.learning_unit_instance,
                     subtype=self.subtype
                 ).get()
-            except (LearningUnitYear.DoesNotExist, LearningUnitYear.MultipleObjectsReturned):
-                return None
-        return None
+            except LearningUnitYear.DoesNotExist:
+                logger.warning(
+                    'Warning : object learning_unit_instance {} has no corresponding learning_unit_year!'
+                    .format(self.learning_unit_instance))
+                trace = traceback.format_exc()
+                logger.error(trace)
+                result = None
+            except LearningUnitYear.MultipleObjectsReturned:
+                logger.error(
+                    'Error : object learning_unit_instance {} has multiple objects learning_unit_year!'
+                    .format(self.learning_unit_instance))
+                trace = traceback.format_exc()
+                logger.error(trace)
+                result = None
+        return result
 
     @property
     def errors(self):
