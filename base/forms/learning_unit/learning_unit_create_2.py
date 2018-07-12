@@ -26,6 +26,10 @@
 from abc import ABCMeta
 from collections import OrderedDict
 
+import logging
+import traceback
+
+from django.conf import settings
 from django.db import transaction
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
@@ -40,6 +44,7 @@ from base.models.campus import Campus
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY
 from base.models.learning_component_year import LearningComponentYear
+from base.models.learning_unit_year import LearningUnitYear
 from reference.models import language
 
 FULL_READ_ONLY_FIELDS = {"acronym", "academic_year", "container_type"}
@@ -57,6 +62,8 @@ FACULTY_OPEN_FIELDS = {
     "professional_integration",
     "id"  # THIS IS A FIX, BUT A BETTER SOLUTION SHOULD BE FIND
 }
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
 class LearningUnitBaseForm(metaclass=ABCMeta):
@@ -94,13 +101,29 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
 
     @cached_property
     def instance(self):
+        result = None
         if self.learning_unit_instance:
-            return learning_unit_year.search(
-                academic_year_id=self.academic_year.id,
-                learning_unit=self.learning_unit_instance,
-                subtype=self.subtype
-            ).get()
-        return None
+            try:
+                result = learning_unit_year.search(
+                    academic_year_id=self.academic_year.id,
+                    learning_unit=self.learning_unit_instance,
+                    subtype=self.subtype
+                ).get()
+            except LearningUnitYear.DoesNotExist:
+                logger.warning(
+                    'Warning : object learning_unit_instance {} has no corresponding learning_unit_year!'
+                    .format(self.learning_unit_instance))
+                trace = traceback.format_exc()
+                logger.error(trace)
+                result = None
+            except LearningUnitYear.MultipleObjectsReturned:
+                logger.error(
+                    'Error : object learning_unit_instance {} has multiple objects learning_unit_year!'
+                    .format(self.learning_unit_instance))
+                trace = traceback.format_exc()
+                logger.error(trace)
+                result = None
+        return result
 
     @property
     def errors(self):
