@@ -85,15 +85,37 @@
             </div>
         {% endif %}
         <br>
-        <div>
-            <label>{% trans 'credits' %}</label><br>
-            {% if education_group_year.credits %}
-                {{ education_group_year.credits }}
-            {% elif parent.credits %}
-                <strong class="text-primary">{{ parent.credits }}</strong><br>
-            {% else %}
-                <br>
-            {% endif %}
+        <div class="row">
+            <div class="col-md-4">
+                <label>{% trans 'credits' %}</label><br>
+                {% if education_group_year.credits %}
+                    {{ education_group_year.credits }}
+                {% elif parent.credits %}
+                    <strong class="text-primary">{{ parent.credits }}</strong><br>
+                {% else %}
+                    <br>
+                {% endif %}
+            </div>
+            <div class="col-md-4">
+                <label>{% trans 'minimum credits'|capfirst %}</label><br>
+                {% if education_group_year.min_credits %}
+                    {{ education_group_year.min_credits }}
+                {% elif parent.min_credits %}
+                    <strong class="text-primary">{{ parent.min_credits }}</strong><br>
+                {% else %}
+                    <br>
+                {% endif %}
+            </div>
+            <div class="col-md-4">
+                <label>{% trans 'maximum credits'|capfirst %}</label><br>
+                {% if education_group_year.max_credits %}
+                    {{ education_group_year.max_credits }}
+                {% elif parent.max_credits %}
+                    <strong class="text-primary">{{ parent.max_credits }}</strong><br>
+                {% else %}
+                    <br>
+                {% endif %}
+            </div>
         </div>
         <br>
         <div>
@@ -107,11 +129,13 @@
             <strong class="text-primary">{{ parent.title_english | default_if_none:'' }}</strong><br>
             {{ education_group_year.title_english | default_if_none:'' }}
         </div>
-        <br>
-        <div>
-            <label>{% trans 'keywords' %}</label><br>
-            <strong class="text-primary">{{ parent.keywords | default_if_none:'' }}</strong><br>
-            {{ education_group_year.keywords | default_if_none:'' }}
-        </div>
+        {% if education_group_year.education_group_type.category != 'GROUP' %}
+            <br>
+            <div>
+                <label>{% trans 'keywords' %}</label><br>
+                <strong class="text-primary">{{ parent.keywords | default_if_none:'' }}</strong><br>
+                {{ education_group_year.keywords | default_if_none:'' }}
+            </div>
+        {% endif %}
     </div>
 </div>

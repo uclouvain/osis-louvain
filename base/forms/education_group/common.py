@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from base.models.education_group_year import EducationGroupYear
 from django import forms
 
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
@@ -44,25 +45,44 @@ class MainEntitiesVersionChoiceField(EntitiesVersionChoiceField):
         super(MainEntitiesVersionChoiceField, self).__init__(queryset, *args, **kwargs)
 
 
-def init_education_group_type_field(form_field, parent_education_group_year, category):
-    parent_group_type = None
-    if parent_education_group_year:
-        parent_group_type = parent_education_group_year.education_group_type
+class EducationGroupYearModelForm(forms.ModelForm):
+    category = None
 
-    form_field.queryset = education_group_type.find_authorized_types(category=category, parent_type=parent_group_type)
-    form_field.required = True
+    class Meta:
+        model = EducationGroupYear
+        field_classes = {
+            "administration_entity": MainEntitiesVersionChoiceField,
+            "main_teaching_campus": MainTeachingCampusChoiceField
+        }
+        fields = []
 
+    def __init__(self, *args, **kwargs):
+        self.parent = kwargs.pop("parent", None)
 
-def init_academic_year(form_field, parent_education_group_year):
-    if parent_education_group_year:
-        form_field.initial = parent_education_group_year.academic_year.id
-        form_field.disabled = True
-        form_field.required = False
+        super().__init__(*args, **kwargs)
 
+        self._filter_education_group_type()
+        self._init_and_disable_academic_year()
+        self._preselect_entity_version_from_entity_value()
 
-def preselect_entity_version_from_entity_value(modelform):
-    if getattr(modelform.instance, 'administration_entity', None):
-        modelform.initial['administration_entity'] = get_last_version(modelform.instance.administration_entity).pk
+    def _filter_education_group_type(self):
+        parent_group_type = None
+        if self.parent:
+            parent_group_type = self.parent.education_group_type
+
+        queryset = education_group_type.find_authorized_types(category=self.category, parent_type=parent_group_type)
+        self.fields["education_group_type"].queryset = queryset
+
+    def _init_and_disable_academic_year(self):
+        if self.parent or self.instance.academic_year_id:
+            academic_year = self.parent.academic_year if self.parent else self.instance.academic_year
+            self.fields["academic_year"].initial = academic_year.id
+            self.fields["academic_year"].disabled = True
+            self.fields["academic_year"].required = False
+
+    def _preselect_entity_version_from_entity_value(self):
+        if getattr(self.instance, 'administration_entity', None):
+            self.initial['administration_entity'] = get_last_version(self.instance.administration_entity).pk
 
 
 class EducationGroupModelForm(forms.ModelForm):

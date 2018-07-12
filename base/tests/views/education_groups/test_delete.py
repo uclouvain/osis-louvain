@@ -29,9 +29,11 @@ from django.urls import reverse
 from django.utils import timezone
 from waffle.testutils import override_flag
 
+from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
@@ -42,7 +44,8 @@ from base.tests.factories.person import PersonFactory
 class TestDeleteGroupEducationYearView(TestCase):
 
     def setUp(self):
-        self.education_group_year = EducationGroupYearFactory()
+        self.education_group = EducationGroupFactory()
+        self.education_group_year = EducationGroupYearFactory(education_group=self.education_group)
         self.person = PersonFactory()
         self.url = reverse('delete_education_group', args=[self.education_group_year.id])
 
@@ -72,6 +75,7 @@ class TestDeleteGroupEducationYearView(TestCase):
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, 302)
         self.assertFalse(EducationGroupYear.objects.filter(pk=self.education_group_year.pk).exists())
+        self.assertFalse(EducationGroup.objects.filter(pk=self.education_group.pk).exists())
 
     def test_delete_get_with_protected_objects(self):
         protected_objects = {

@@ -28,6 +28,7 @@ import itertools
 from django.db import models, IntegrityError
 from django.db.models import Q
 from django.utils.functional import cached_property
+from ordered_model.models import OrderedModel
 
 from base.models import education_group_type, education_group_year
 from base.models.education_group_type import GROUP_TYPE_OPTION
@@ -41,6 +42,7 @@ from osis_common.models import osis_model_admin
 
 class GroupElementYearAdmin(osis_model_admin.OsisModelAdmin):
     list_display = ('parent', 'child_branch', 'child_leaf',)
+    readonly_fields = ('order',)
     search_fields = [
         'child_branch__acronym',
         'child_branch__partial_acronym',
@@ -51,7 +53,7 @@ class GroupElementYearAdmin(osis_model_admin.OsisModelAdmin):
     list_filter = ('is_mandatory', 'minor_access', 'sessions_derogation')
 
 
-class GroupElementYear(models.Model):
+class GroupElementYear(OrderedModel):
     external_id = models.CharField(max_length=100, blank=True, null=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
@@ -80,7 +82,6 @@ class GroupElementYear(models.Model):
     max_credits = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
     is_mandatory = models.BooleanField(default=False)
     block = models.CharField(max_length=7, blank=True, null=True)
-    current_order = models.IntegerField(blank=True, null=True)
     minor_access = models.BooleanField(default=False)
     comment = models.CharField(max_length=500, blank=True, null=True)
     comment_english = models.CharField(max_length=500, blank=True, null=True)
@@ -91,9 +92,13 @@ class GroupElementYear(models.Model):
         choices=sessions_derogation.SessionsDerogationTypes.choices(),
         default=sessions_derogation.SessionsDerogationTypes.SESSION_UNDEFINED.value
     )
+    order_with_respect_to = 'parent'
 
     def __str__(self):
         return "{} - {}".format(self.parent, self.child)
+
+    class Meta:
+        ordering = ('order',)
 
     def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
         if self.child_branch and self.child_leaf:

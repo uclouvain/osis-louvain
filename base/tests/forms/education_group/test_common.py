@@ -25,10 +25,12 @@
 ##############################################################################
 from unittest.mock import patch
 
+from django.forms import ModelForm
 from django.test import TestCase
 
 from base.forms.education_group.common import EducationGroupModelForm, CommonBaseForm
 from base.forms.education_group.mini_training import MiniTrainingModelForm, MiniTrainingForm
+from base.models.academic_year import current_academic_year
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
@@ -44,7 +46,7 @@ from base.tests.factories.entity_version import MainEntityVersionFactory, Entity
 from base.tests.factories.group_element_year import GroupElementYearFactory
 
 
-class EducationGroupYearMixin(TestCase):
+class EducationGroupYearModelFormMixin(TestCase):
     """Common class used to get common tests on ModelForm instances of Training, MiniTraining and Group"""
     education_group_type = None
 
@@ -70,7 +72,11 @@ class EducationGroupYearMixin(TestCase):
         cls.parent_education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         cls.entity_version = EntityVersionFactory(entity=cls.parent_education_group_year.administration_entity)
 
-    def _test_init_academic_year_field(self, form_class):
+    def _test_fields(self, form_class, fields):
+        form = form_class(parent=None)
+        self.assertCountEqual(tuple(form.fields.keys()), fields)
+
+    def _test_init_and_disable_academic_year_field(self, form_class):
         form = form_class(parent=self.parent_education_group_year)
 
         academic_year_field = form.fields["academic_year"]
@@ -148,7 +154,8 @@ class TestCommonBaseFormSave(TestCase):
 
     def test_update_without_parent(self):
         entity_version = MainEntityVersionFactory()
-        initial_educ_group_year = EducationGroupYearFactory(administration_entity=entity_version.entity)
+        initial_educ_group_year = EducationGroupYearFactory(academic_year=current_academic_year(),
+                                                            administration_entity=entity_version.entity)
         initial_educ_group = initial_educ_group_year.education_group
 
         form = self.form_class(data=self.post_data, instance=initial_educ_group_year, parent=None)
@@ -159,6 +166,7 @@ class TestCommonBaseFormSave(TestCase):
         # Assert keep the same EducationGroup when update
         self.assertEqual(updated_educ_group_year.education_group, initial_educ_group)
         self._assert_all_fields_correctly_saved(updated_educ_group_year)
+        self.assertTrue(form.forms[ModelForm].fields["academic_year"].disabled)
 
     def test_create_without_parent(self):
         initial_count = GroupElementYear.objects.all().count()
@@ -172,6 +180,7 @@ class TestCommonBaseFormSave(TestCase):
 
         self._assert_all_fields_correctly_saved(created_education_group_year)
         self.assertEqual(initial_count, GroupElementYear.objects.all().count())
+        self.assertFalse(form.forms[ModelForm].fields["academic_year"].disabled)
 
     @patch('base.models.education_group_type.find_authorized_types', return_value=EducationGroupType.objects.all())
     def test_create_with_parent(self, mock_find_authorized_types):
@@ -184,6 +193,7 @@ class TestCommonBaseFormSave(TestCase):
         group_element_year = GroupElementYear.objects.filter(parent=parent, child_branch=created_education_group_year)
         self.assertTrue(group_element_year.exists())
         self._assert_all_fields_correctly_saved(created_education_group_year)
+        self.assertTrue(form.forms[ModelForm].fields["academic_year"].disabled)
 
     @patch('base.models.education_group_type.find_authorized_types', return_value=EducationGroupType.objects.all())
     def test_update_with_parent_when_existing_group_element_year(self, mock_find_authorized_types):
@@ -203,6 +213,7 @@ class TestCommonBaseFormSave(TestCase):
         # Assert existing GroupElementYear is reused.
         self.assertEqual(initial_count, GroupElementYear.objects.all().count())
         self._assert_all_fields_correctly_saved(updated_education_group_year)
+        self.assertTrue(form.forms[ModelForm].fields["academic_year"].disabled)
 
     def test_create_when_no_start_year_is_posted(self):
         data = dict(self.post_data)

@@ -23,35 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import forms
-
-from base.forms.education_group.common import MainEntitiesVersionChoiceField, MainTeachingCampusChoiceField, \
-    init_education_group_type_field, init_academic_year, preselect_entity_version_from_entity_value, \
-    CommonBaseForm, EducationGroupModelForm
-from base.models.education_group_year import EducationGroupYear
+from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, EducationGroupYearModelForm
 from base.models.enums import education_group_categories
 
 
-class GroupModelForm(forms.ModelForm):
-    class Meta:
-        model = EducationGroupYear
+class GroupModelForm(EducationGroupYearModelForm):
+    category = education_group_categories.GROUP
+
+    class Meta(EducationGroupYearModelForm.Meta):
         fields = ("acronym", "partial_acronym", "education_group_type", "title", "title_english", "credits",
                   "main_teaching_campus", "academic_year", "remark", "remark_english", "min_credits", "max_credits",
                   "administration_entity")
-        field_classes = {
-            "administration_entity": MainEntitiesVersionChoiceField,
-            "main_teaching_campus": MainTeachingCampusChoiceField
-        }
-
-    def __init__(self, *args, **kwargs):
-        self.parent = kwargs.pop("parent", None)
-        super().__init__(*args, **kwargs)
-        init_education_group_type_field(self.fields["education_group_type"],
-                                        self.parent,
-                                        education_group_categories.GROUP)
-        init_academic_year(self.fields["academic_year"], self.parent)
-
-        preselect_entity_version_from_entity_value(self)
 
 
 class GroupForm(CommonBaseForm):

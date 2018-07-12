@@ -3,10 +3,17 @@ version: "2"
 checks:
   file-lines:
     enabled: false
+  method-complexity:
+    config:
+      threshold: 8
 
 plugins:
   pep8:
     enabled: true
+  duplication:
+    enabled: true
+    config:
+        count_threshold: 3
 
 exclude_patterns:
 - "**/tests/"

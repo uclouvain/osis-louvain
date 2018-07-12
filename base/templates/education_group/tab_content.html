@@ -68,7 +68,7 @@
                                         <td>{{ element.credits_max | default_if_none:'-' }}</td>
                                         <td>{% if element.group_element.is_mandatory %}{% trans 'yes'%} {% else %}{% trans 'no' %}{% endif %}</td>
                                         <td>{{ element.block | default_if_none:'-' }}</td>
-                                        <td>{{ element.group_element.current_order | default_if_none:'-' }}</td>
+                                        <td>{{ element.group_element.order }}</td>
                                         <td>{% if element.sessions_derogation %}{% trans element.sessions_derogation %}{% else %}-{% endif %}</td>
                                     </tr>
                                     <tr>

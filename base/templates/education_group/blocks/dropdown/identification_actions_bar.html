@@ -44,14 +44,14 @@
                 {% flag "education_group_update" %}
                     <li {% if not can_change_education_group %} class="disabled" {% endif %}>
                         <a {% if can_change_education_group %} href="{% url 'update_education_group' education_group_year_id=education_group_year.id %}?root={{ request.GET.root }}" {% endif %}>
-                            {% trans 'Update Education Group' %}
+                            {% trans 'Modify' %}
                         </a>
                     </li>
                 {% endflag %}
 
                 {% flag "education_group_delete" %}
                     {% url 'delete_education_group' education_group_year_id=education_group_year.id as delete_url %}
-                    {% li_with_deletion_perm delete_url _('Delete Education Group') person root=request.GET.root %}
+                    {% li_with_deletion_perm delete_url _('Delete') person root=request.GET.root %}
                 {% endflag %}
             </ul>
         </div>

@@ -3202,3 +3202,6 @@ msgstr "bloquer la mise à jour pour l'enseignant"
 
 msgid "unlock update for teacher"
 msgstr "débloquer la mise à jour pour l'enseignant"
+
+msgid "The education group has been deleted."
+msgstr "L'organisation de formation a été supprimée."

@@ -44,7 +44,7 @@ class DeleteGroupEducationYearView(DeleteViewWithDependencies):
     rules = [can_delete_education_group]
 
     # DeleteViewWithDependencies
-    success_message = "The education group has been deleted"
+    success_message = "The education group has been deleted."
     protected_template = "education_group/protect_delete.html"
 
     # FlagMixin

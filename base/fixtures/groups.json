@@ -3061,12 +3061,12 @@
                 "educationgroup"
             ],
             [
-                "can_access_education_group",
+                "change_educationgroup",
                 "base",
                 "educationgroup"
             ],
             [
-                "add_educationgroup",
+                "can_access_education_group",
                 "base",
                 "educationgroup"
             ],

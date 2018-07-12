@@ -265,6 +265,7 @@ def _group_elements(education_group_yr):
     return None
 
 
+# @TODO: Enhance research via queryset annotate
 def _get_group_elements_data(group_elements):
     group_elements_data = []
     for group_element in group_elements:
@@ -278,10 +279,7 @@ def _get_group_elements_data(group_elements):
 
 
 def _sorting(group_elements_data):
-    return sorted(group_elements_data,
-                  key=lambda k: (k.get('group_element').current_order is None,
-                                 k.get('group_element').current_order == -1,
-                                 k.get('group_element').current_order))
+    return sorted(group_elements_data, key=lambda k: k.get('group_element').order)
 
 
 def _get_education_group_detail(dict_param, group_element):

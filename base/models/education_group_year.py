@@ -55,12 +55,21 @@ class EducationGroupYear(models.Model):
     title_english = models.CharField(max_length=240, blank=True, null=True, verbose_name=_("title_in_english"))
     academic_year = models.ForeignKey('AcademicYear', verbose_name=_("validity"))
 
-    education_group = models.ForeignKey('EducationGroup')
+    education_group = models.ForeignKey(
+        'EducationGroup',
+        on_delete=models.CASCADE
+    )
+
     education_group_type = models.ForeignKey(
-        'EducationGroupType', blank=True, null=True, verbose_name=_("training_type")
+        'EducationGroupType',
+        blank=False, null=True,
+        verbose_name=_("training_type")
     )
     active = models.CharField(
-        max_length=20, choices=active_status.ACTIVE_STATUS_LIST, default=active_status.ACTIVE, verbose_name=_('status')
+        max_length=20,
+        choices=active_status.ACTIVE_STATUS_LIST,
+        default=active_status.ACTIVE,
+        verbose_name=_('status')
     )
 
     partial_deliberation = models.BooleanField(default=False, verbose_name=_('partial_deliberation'))
@@ -239,6 +248,14 @@ class EducationGroupYear(models.Model):
         if self.education_group_type:
             return self.education_group_type.category == education_group_categories.TRAINING
         return False
+
+    def delete(self, using=None, keep_parents=False):
+        result = super().delete(using, keep_parents)
+
+        # If the education_group has no more children, we can delete it
+        if not self.education_group.educationgroupyear_set.all().exists():
+            result = self.education_group.delete()
+        return result
 
 
 def find_by_id(an_id):

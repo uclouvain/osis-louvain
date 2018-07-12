@@ -27,10 +27,10 @@ from base.forms.education_group.group import GroupModelForm
 from base.forms.education_group.mini_training import MiniTrainingModelForm
 from base.models.enums import education_group_categories
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.forms.education_group.test_common import EducationGroupYearMixin
+from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin
 
 
-class TestMiniTrainingModelForm(EducationGroupYearMixin):
+class TestMiniTrainingModelForm(EducationGroupYearModelFormMixin):
 
     def setUp(self):
         self.education_group_type = EducationGroupTypeFactory(category=education_group_categories.MINI_TRAINING)
@@ -38,15 +38,13 @@ class TestMiniTrainingModelForm(EducationGroupYearMixin):
         super(TestMiniTrainingModelForm, self).setUp(education_group_type=self.education_group_type)
 
     def test_fields(self):
-        fields = ("acronym", "partial_acronym", "education_group_type", "title", "title_english", "credits",
+        fields = ("acronym", "partial_acronym", "education_group_type", "title", "title_english", "credits", "active",
                   "main_teaching_campus", "academic_year", "remark", "remark_english", "min_credits", "max_credits",
-                  "administration_entity")
-
-        form = GroupModelForm(parent=None)
-        self.assertCountEqual(tuple(form.fields.keys()), fields)
+                  "schedule_type", "administration_entity", "keywords")
+        self._test_fields(self.form_class, fields)
 
     def test_init_academic_year_field(self):
-        self._test_init_academic_year_field(self.form_class)
+        self._test_init_and_disable_academic_year_field(self.form_class)
 
     def test_init_education_group_type_field(self):
         self._test_init_education_group_type_field(self.form_class, education_group_categories.MINI_TRAINING)
