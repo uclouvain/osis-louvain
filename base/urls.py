@@ -44,6 +44,7 @@ from base.views import learning_achievement, search
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, education_group
 from base.views import teaching_material
+from base.views.education_groups.cache import select_education_group
 from base.views.education_groups.delete import DeleteGroupEducationYearView
 from base.views.education_groups.update import update_education_group
 from base.views.learning_units.external import create as create_external
@@ -286,7 +287,8 @@ urlpatterns = [
                     ]))
                 ]))
             ]))
-        ]))
+        ])),
+        url(r'^select_education_group/$', select_education_group, name='select_education_group')
     ])),
 
     url(r'^offer_year_calendars/([0-9]+)/$', offer.offer_year_calendar_read, name='offer_year_calendar_read'),

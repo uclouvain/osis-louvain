@@ -42,6 +42,14 @@ $(document).ready(function () {
                   "action" : function (data) {
                     var inst = $.jstree.reference(data.reference),
                         obj = inst.get_node(data.reference);
+
+                    $.ajax({
+                        url: '../select_education_group/',
+                        data: {'education_group_id' : obj.li_attr.id},
+                        type: 'get',
+                        dataType: 'json',
+                    });
+
                     alert('Select : ' + obj.li_attr.id)
                   },
                   "icon": "fa fa-check-square"

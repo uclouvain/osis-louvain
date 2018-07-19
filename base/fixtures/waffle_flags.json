@@ -1,0 +1,182 @@
+[
+{
+    "model": "waffle.flag",
+    "pk": 2,
+    "fields": {
+        "name": "learning_unit_update",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T08:51:05Z",
+        "modified": "2018-07-10T11:52:42.584Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 3,
+    "fields": {
+        "name": "learning_unit_delete",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:54:54Z",
+        "modified": "2018-07-10T13:55:27.412Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 4,
+    "fields": {
+        "name": "learning_unit_proposal_update",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:55:42Z",
+        "modified": "2018-07-10T13:55:48.045Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 5,
+    "fields": {
+        "name": "learning_unit_proposal_delete",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:56:00Z",
+        "modified": "2018-07-10T13:56:08.077Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 6,
+    "fields": {
+        "name": "education_group_create",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:56:20Z",
+        "modified": "2018-07-10T13:56:26.091Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 7,
+    "fields": {
+        "name": "education_group_update",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:57:05Z",
+        "modified": "2018-07-10T13:57:11.708Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 8,
+    "fields": {
+        "name": "education_group_delete",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:57:23Z",
+        "modified": "2018-07-10T13:57:29.911Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 9,
+    "fields": {
+        "name": "learning_unit_create",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:57:47Z",
+        "modified": "2018-07-10T13:57:54.139Z",
+        "groups": [],
+        "users": []
+    }
+},
+{
+    "model": "waffle.flag",
+    "pk": 10,
+    "fields": {
+        "name": "learning_unit_proposal_create",
+        "everyone": null,
+        "percent": null,
+        "testing": false,
+        "superusers": true,
+        "staff": true,
+        "authenticated": true,
+        "languages": "",
+        "rollout": false,
+        "note": "",
+        "created": "2018-07-10T13:58:08Z",
+        "modified": "2018-07-10T13:58:13.883Z",
+        "groups": [],
+        "users": []
+    }
+}
+]
