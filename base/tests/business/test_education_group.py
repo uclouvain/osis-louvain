@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import datetime
 from unittest import mock
 
 from django.contrib.auth.models import Permission, Group
@@ -31,7 +32,11 @@ from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_group import can_user_edit_administrative_data, prepare_xls_content, create_xls, \
-    XLS_DESCRIPTION, XLS_FILENAME, WORKSHEET_TITLE, EDUCATION_GROUP_TITLES, ORDER_COL, ORDER_DIRECTION
+    XLS_DESCRIPTION, XLS_FILENAME, WORKSHEET_TITLE, EDUCATION_GROUP_TITLES, ORDER_COL, ORDER_DIRECTION, \
+    XLS_DESCRIPTION_ADMINISTRATIVE, XLS_FILENAME_ADMINISTRATIVE, WORKSHEET_TITLE_ADMINISTRATIVE, \
+    EDUCATION_GROUP_TITLES_ADMINISTRATIVE, prepare_xls_content_administrative, create_xls_administrative_data, \
+    PRESIDENTS, SECRETARIES, SIGNATORIES, DATE_TIME_FORMAT, DATE_FORMAT
+
 from base.models.enums import offer_year_entity_type
 from base.models.person import Person, CENTRAL_MANAGER_GROUP
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -47,6 +52,16 @@ from base.models.enums import education_group_categories
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from osis_common.document import xls_build
+from base.tests.factories.mandate import MandateFactory
+from base.tests.factories.mandatary import MandataryFactory
+from base.tests.factories.education_group import EducationGroupFactory
+from base.models.enums import mandate_type as mandate_types
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
+from base.models.enums import academic_calendar_type
+from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
+from django.test.utils import override_settings
+NO_SESSION_DATA = {'session1': None, 'session2': None, 'session3': None}
 
 
 class EducationGroupTestCase(TestCase):
@@ -182,6 +197,124 @@ class EducationGroupXlsTestCase(TestCase):
         mock_generate_xls.assert_called_with(expected_argument, None)
 
 
+class EducationGroupXlsAdministrativeDataTestCase(TestCase):
+    def setUp(self):
+        self.academic_year = create_current_academic_year()
+        self.education_group_type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
+        self.education_group = EducationGroupFactory(start_year=self.academic_year.year,
+                                                     end_year=self.academic_year.year + 1)
+        self.education_group_year_1 = EducationGroupYearFactory(academic_year=self.academic_year, acronym="PREMIER",
+                                                                education_group=self.education_group,
+                                                                weighting=True)
+        self.education_group_year_1.management_entity_version = EntityVersionFactory()
+        self.mandate_president = MandateFactory(education_group=self.education_group, function=mandate_types.PRESIDENT,
+                                                qualification=None)
+        self.president = MandataryFactory(mandate=self.mandate_president,
+                                          start_date=self.academic_year.start_date,
+                                          end_date=self.academic_year.end_date)
+        self.secretary_1 = MandataryFactory(
+            mandate=MandateFactory(education_group=self.education_group, function=mandate_types.SECRETARY,
+                                   qualification=None),
+            start_date=self.academic_year.start_date,
+            end_date=self.academic_year.end_date)
+        self.secretary_2 = MandataryFactory(
+            mandate=MandateFactory(education_group=self.education_group, function=mandate_types.SECRETARY,
+                                   qualification=None),
+            start_date=self.academic_year.start_date,
+            end_date=self.academic_year.end_date)
+        self.signatory = MandataryFactory(
+            mandate=MandateFactory(education_group=self.education_group, function=mandate_types.SIGNATORY,
+                                   qualification='Responsable'),
+            start_date=self.academic_year.start_date,
+            end_date=self.academic_year.end_date)
+
+        self.academic_cal_course_enrollment = AcademicCalendarFactory(
+            academic_year=self.academic_year,
+            reference=academic_calendar_type.COURSE_ENROLLMENT
+        )
+        OfferYearCalendarFactory(education_group_year=self.education_group_year_1,
+                                 academic_calendar=self.academic_cal_course_enrollment)
+        self.academic_cal_scores_exam_submission_1 = AcademicCalendarFactory(
+            academic_year=self.academic_year,
+            reference=academic_calendar_type.SCORES_EXAM_SUBMISSION
+        )
+        self.scores_exam_submission_2 = AcademicCalendarFactory(academic_year=self.academic_year,
+                                                                reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
+        self.offer_yr_cal_score_exam_submission_1 = OfferYearCalendarFactory(
+            education_group_year=self.education_group_year_1,
+            academic_calendar=self.academic_cal_scores_exam_submission_1)
+
+        self.offer_yr_cal_score_exam_submission_2 = OfferYearCalendarFactory(
+            education_group_year=self.education_group_year_1,
+            academic_calendar=self.scores_exam_submission_2)
+        self.session_exam_cal_deliberation_1 = SessionExamCalendarFactory(
+            academic_calendar=self.academic_cal_scores_exam_submission_1,
+            number_session=1)
+        self.session_exam_cal_deliberation_2 = SessionExamCalendarFactory(
+            academic_calendar=self.scores_exam_submission_2,
+            number_session=2)
+        self.offer_yr_cal_score_exam_submission_1.start_date = datetime.date(2017, 9, 1)
+        self.offer_yr_cal_score_exam_submission_1.save()
+        self.education_group_year_1.administrative_data = {
+            'course_enrollment': {'dates': self.academic_cal_course_enrollment},
+            'exam_enrollments': NO_SESSION_DATA,
+            'scores_exam_submission': {'session1': self.offer_yr_cal_score_exam_submission_1},
+            'dissertation_submission': NO_SESSION_DATA,
+            'deliberation': NO_SESSION_DATA,
+            'scores_exam_diffusion': NO_SESSION_DATA,
+            PRESIDENTS: [self.president],
+            SECRETARIES: [self.secretary_1, self.secretary_2],
+            SIGNATORIES: [self.signatory]}
+        self.user = UserFactory()
+
+    def test_prepare_xls_content_no_data(self):
+        self.assertEqual(prepare_xls_content_administrative([]), [])
+
+    def test_prepare_xls_content_administrative_with_data(self):
+        data = prepare_xls_content_administrative([self.education_group_year_1])
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0], self.get_xls_administrative_data(self.education_group_year_1))
+
+    @mock.patch("osis_common.document.xls_build.generate_xls")
+    def test_generate_xls_data_with_no_data(self, mock_generate_xls):
+        create_xls_administrative_data(self.user, [], None, {ORDER_COL: None, ORDER_DIRECTION: None})
+
+        expected_argument = _generate_xls_administrative_data_build_parameter([], self.user)
+        mock_generate_xls.assert_called_with(expected_argument, None)
+
+    def get_xls_administrative_data(self, an_education_group_year):
+        return [an_education_group_year.management_entity_version.acronym,
+                an_education_group_year.acronym,
+                an_education_group_year.education_group_type,
+                an_education_group_year.academic_year.name,
+                self.academic_cal_course_enrollment.start_date.strftime(DATE_FORMAT),
+                self.academic_cal_course_enrollment.end_date.strftime(DATE_FORMAT),
+                '-',
+                '-',
+                self.offer_yr_cal_score_exam_submission_1.start_date.strftime(DATE_TIME_FORMAT),
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                '-',
+                _('yes'),
+                _('no'),
+                str(self.president.person),
+                '{}, {}'.format(str(self.secretary_1.person), str(self.secretary_2.person)),
+                str(self.signatory.person),
+                'Responsable']
+
+
 def get_xls_data(an_education_group_year):
     return [an_education_group_year.academic_year.name,
             an_education_group_year.acronym,
@@ -202,3 +335,17 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE),
         }]
     }
+
+
+def _generate_xls_administrative_data_build_parameter(xls_data, user):
+    return {
+        xls_build.LIST_DESCRIPTION_KEY: _(XLS_DESCRIPTION_ADMINISTRATIVE),
+        xls_build.FILENAME_KEY: _(XLS_FILENAME_ADMINISTRATIVE),
+        xls_build.USER_KEY: user.username,
+        xls_build.WORKSHEETS_DATA: [{
+            xls_build.CONTENT_KEY: xls_data,
+            xls_build.HEADER_TITLES_KEY: EDUCATION_GROUP_TITLES_ADMINISTRATIVE,
+            xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE_ADMINISTRATIVE),
+        }]
+    }
+

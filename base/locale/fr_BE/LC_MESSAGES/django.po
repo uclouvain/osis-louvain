@@ -3270,3 +3270,33 @@ msgstr "Le contenu du programme type n'est pas vide."
 
 msgid "Cred. abs./rel."
 msgstr "Créd. abs./rel."
+
+msgid "Produce xls with a list of education groups"
+msgstr "Produire un fichier Excel avec la liste des organisations de formations"
+
+msgid "Produce xls of trainings with administrative data"
+msgstr "Produire un fichier Excel pour les organisations de type 'formation' avec le détail des données administratives"
+
+msgid "Begining of course registration"
+msgstr "Début inscription au cours"
+
+msgid "Ending of course registration"
+msgstr "Fin inscription au cours"
+
+msgid "Begining of exam registration"
+msgstr "Début Inscription examens"
+
+msgid "Ending of exam registration"
+msgstr "Fin Inscription examens"
+
+msgid "Exam board signatory"
+msgstr "Signataire du jury"
+
+msgid "List of trainings, with administrative data"
+msgstr "Liste des formations avec leurs données administratives"
+
+msgid "List of trainings"
+msgstr "Liste des organisation de formation"
+
+msgid "List of trainings with administrative data"
+msgstr "Liste des formations avec données administratives"

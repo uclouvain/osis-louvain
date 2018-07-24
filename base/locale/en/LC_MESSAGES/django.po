@@ -3270,3 +3270,33 @@ msgstr ""
 
 msgid "Cred. abs./rel."
 msgstr ""
+
+msgid "Produce xls with a list of education groups"
+msgstr ""
+
+msgid "Produce xls of trainings with administrative data"
+msgstr ""
+
+msgid "Begining of course registration"
+msgstr ""
+
+msgid "Ending of course registration"
+msgstr ""
+
+msgid "Begining of exam registration"
+msgstr ""
+
+msgid "Ending of exam registration"
+msgstr ""
+
+msgid "Exam board signatory"
+msgstr ""
+
+msgid "List of trainings, with administrative data"
+msgstr ""
+
+msgid "List of trainings"
+msgstr ""
+
+msgid "List of trainings with administrative data"
+msgstr ""

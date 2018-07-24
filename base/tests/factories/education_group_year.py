@@ -60,6 +60,8 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     remark_english = factory.fuzzy.FuzzyText(length=255)
     active = active_status.ACTIVE
     schedule_type = schedule_type.DAILY
+    weighting = False
+    default_learning_unit_enrollment = False
 
 
 class MiniTrainingFactory(EducationGroupYearFactory):

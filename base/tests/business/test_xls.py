@@ -23,29 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-import operator
-import string
+from django.utils import timezone
 
-import factory
-import factory.fuzzy
-from factory.django import DjangoModelFactory
-from faker import Faker
-
-from osis_common.utils.datetime import get_tzinfo
-from base.tests.factories.education_group import EducationGroupFactory
-from base.models.enums import mandate_type as mandate_types
-fake = Faker()
+from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
+from base.business.xls import convert_boolean, NO_DATA
 
 
-class MandateFactory(DjangoModelFactory):
-    class Meta:
-        model = "base.Mandate"
+class TestXls(TestCase):
+    def setUp(self):
+        self.now = timezone.now()
 
-    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyDateTime(datetime.datetime(2016, 1, 1, tzinfo=get_tzinfo()),
-                                          datetime.datetime(2017, 3, 1, tzinfo=get_tzinfo()))
-    education_group = factory.SubFactory(EducationGroupFactory)
-    function = factory.Iterator(mandate_types.MANDATE_TYPES,
-                            getter=operator.itemgetter(0))
-    qualification = factory.Sequence(lambda n: 'qualification - %d' % n)
+    def test_convert_boolean(self):
+        self.assertEqual(convert_boolean(None), _('no'))
+        self.assertEqual(convert_boolean(True), _('yes'))
+        self.assertEqual(convert_boolean(False), _('no'))

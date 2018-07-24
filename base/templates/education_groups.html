@@ -112,12 +112,32 @@
                     <strong style="margin-left:10px;color:grey;"> {{object_list_count}} {% trans 'education_groups'|lower %} </strong>
                 </div>
                 <div class="col-md-6">
-                    <a id="btn_produce_xls"
-                       class="btn btn-default pull-right"
-                       style="margin-right:10px;"
-                       title="{% trans 'Export' %}" >
+                    <button id="dLabel" class="btn btn-default pull-right" type="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                            style="margin-right:10px;"
+                            title="{% trans 'Export' %}">
                         <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
-                    </a>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
+                        <li>
+                            <a id="btn_produce_xls"
+                               style="margin-right:10px;"
+                               title="{% trans 'Produce xls with a list of education groups' %}" >
+                                &nbsp;{% trans 'List of trainings' %}
+                            </a>
+                        </li>
+                        <li>
+                            <a id="btn_produce_xls_administrative_data"
+                               style="margin-right:10px;" title="Produce xls of trainings with administrative data" >
+                                &nbsp;{% trans 'List of trainings with administrative data' %}
+                            </a>
+                        </li>
+                    </ul>
+                    <form id="download_xls" action="{{ request.path }}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" id="xls_status" name="xls_status">
+                    </form>
                 </div>
                 </div>
 
@@ -129,7 +149,7 @@
                         <th id="th_1_acronym">{% trans 'acronym'%}</th>
                         <th id="th_2_title">{% trans 'title'%}</th>
                         <th id="th_3_education_group_type.name">{% trans 'type'%}</th>
-                        <th id="th_4_entity_management.acronym">{% trans 'entity'%}</th>
+                        <th id="th_4_management_entity_version.acronym">{% trans 'entity'%}</th>
                         <th id="th_5_partial_acronym">{% trans 'code'%}</th>
                     </tr>
                 </thead>
@@ -229,6 +249,22 @@
         $("#xls_order").val('');
         $("#xls_order_col").val('');
     });
+
+
+    $("#btn_produce_xls_administrative_data").click(function(e) {
+        e.preventDefault();
+        var status = $("#xls_status");
+        status.val('xls_administrative');
+        var table = $('#table_education_groups').DataTable();
+        var order = table.order();
+        $("#xls_order_col").val(get_ordering_column(order));
+        $("#xls_order").val(order[0][1]);
+        $("#search_form").submit();
+        status.val('');
+        $("#xls_order").val('');
+        $("#xls_order_col").val('');
+    });
+
 
     function get_ordering_column(order){
         var id_search = 'th_' + order[0][0] + '_';
