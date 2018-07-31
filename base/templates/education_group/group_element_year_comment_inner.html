@@ -33,7 +33,11 @@
 
     <div class="form-group row" style="margin-top:10px;">
         {% bootstrap_field form.link_type  form_group_class="col-md-4"%}
-        {% bootstrap_field form.is_mandatory label=_('required') form_group_class="col-md-4"%}
+        <div class="col-md-8">
+            <br>
+            {{ form.is_mandatory }}
+            <label>{% trans 'required' %}</label>
+        </div>
     </div>
     <div class="form-group row">
         {% bootstrap_field form.relative_credits form_group_class="col-md-4"%}

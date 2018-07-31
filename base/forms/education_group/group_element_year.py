@@ -29,6 +29,11 @@ from base.models.group_element_year import GroupElementYear
 
 
 class UpdateGroupElementYearForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super(UpdateGroupElementYearForm, self).__init__(*args, **kwargs)
+        self.fields['is_mandatory'].label = ""
+
     class Meta:
         model = GroupElementYear
         fields = [
