@@ -5,7 +5,7 @@ jdcal==1.2
 pika==0.10.0
 openpyxl==2.3.2
 Pillow==3.1.0
-psycopg2==2.6.2
+psycopg2==2.7.3.2
 reportlab==3.2.0
 django-analytical==2.2.2
 django-localflavor==1.3
