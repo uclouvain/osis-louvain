@@ -1,4 +1,4 @@
-##############################################################################
+############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,44 +22,56 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
+############################################################################
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class EducationGroupAdmin(OsisModelAdmin):
-    list_display = ('most_recent_acronym', 'start_year', 'end_year', 'changed')
-    search_fields = ('educationgroupyear__acronym',)
+class ValidationRuleAdmin(OsisModelAdmin):
+    list_display = ('field_reference', 'required_field', 'initial_value', 'regex_rule')
 
 
-class EducationGroup(models.Model):
-    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    changed = models.DateTimeField(null=True, auto_now=True)
-
-    start_year = models.IntegerField(
-        null=True,
-        verbose_name=_('start')
+class ValidationRule(models.Model):
+    field_reference = models.CharField(
+        max_length=255,
+        verbose_name=_("field reference"),
+        primary_key=True
     )
 
-    end_year = models.IntegerField(
+    required_field = models.BooleanField(
+        default=False,
+        verbose_name=_("required field")
+    )
+
+    disabled_field = models.BooleanField(
+        default=False,
+        verbose_name=_("disabled field")
+    )
+
+    initial_value = models.CharField(
+        max_length=255,
+        verbose_name=_("initial value")
+    )
+
+    regex_rule = models.CharField(
+        max_length=255,
         blank=True,
-        null=True,
-        verbose_name=_('end')
+        verbose_name=_("regex rule")
     )
 
-    @property
-    def most_recent_acronym(self):
-        most_recent_education_group = self.educationgroupyear_set.filter(education_group_id=self.id)\
-                                                                 .latest('academic_year__year')
-        return most_recent_education_group.acronym
-
-    def __str__(self):
-        return "{}".format(self.id)
+    regex_error_message = models.CharField(
+        max_length=255,
+        blank=True,
+        verbose_name=_("regex error message")
+    )
 
     class Meta:
-        permissions = (
-            ("can_access_education_group", "Can access education_group"),
-            ("can_edit_educationgroup_pedagogy", "Can edit education group pedagogy")
-        )
+        verbose_name = _("validation rule")
+
+    def save(self, *args, **kwargs):
+        if self.disabled_field:
+            self.required_field = False
+
+        return super().save(*args, **kwargs)

@@ -25,12 +25,15 @@
 ##############################################################################
 from unittest.mock import patch
 
+from django.core.validators import _lazy_re_compile
 from django.test import TestCase
 
 from base.forms.education_group.group import GroupModelForm, GroupForm
 from base.models.education_group_type import EducationGroupType
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.group_element_year import GroupElementYear
+from base.models.validation_rule import ValidationRule
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import GroupFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin, _get_valid_post_data
@@ -57,6 +60,24 @@ class TestGroupModelFormModelForm(EducationGroupYearModelFormMixin):
 
     def test_preselect_entity_version_from_entity_value(self):
         self._test_preselect_entity_version_from_entity_value(self.form_class)
+
+    def test_create_with_validation_rule(self):
+        ValidationRule.objects.create(
+            field_reference=(EducationGroupYear._meta.db_table + ".acronym." + self.education_group_type.name),
+            initial_value="yolo",
+            required_field=False,
+            regex_rule="([A-Z]{2})(.*)"
+        )
+
+        form = GroupModelForm(initial={
+            "education_group_type": self.education_group_type
+        })
+
+        self.assertEqual(form.fields["acronym"].initial, "yolo")
+        self.assertEqual(form.fields["acronym"].required, False)
+        self.assertEqual(form.fields["acronym"].validators[1].regex, _lazy_re_compile("([A-Z]{2})(.*)"))
+
+
 
 
 class TestGroupForm(TestCase):
@@ -85,3 +106,4 @@ class TestGroupForm(TestCase):
         education_group_year = form.save()
 
         self.assertTrue(GroupElementYear.objects.get(child_branch=education_group_year, parent=parent))
+

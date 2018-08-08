@@ -50,10 +50,29 @@ class EducationGroupYearAdmin(OsisModelAdmin):
 class EducationGroupYear(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    acronym = models.CharField(max_length=40, db_index=True, verbose_name=_("acronym"))
-    title = models.CharField(max_length=255, verbose_name=_("title_in_french"))
-    title_english = models.CharField(max_length=240, blank=True, null=True, verbose_name=_("title_in_english"))
-    academic_year = models.ForeignKey('AcademicYear', verbose_name=_("validity"))
+
+    acronym = models.CharField(
+        max_length=40,
+        db_index=True,
+        verbose_name=_("acronym")
+    )
+
+    title = models.CharField(
+        max_length=255,
+        verbose_name=_("title_in_french")
+    )
+
+    title_english = models.CharField(
+        max_length=240,
+        blank=True,
+        null=True,
+        verbose_name=_("title_in_english")
+    )
+
+    academic_year = models.ForeignKey(
+        'AcademicYear',
+        verbose_name=_("validity")
+    )
 
     education_group = models.ForeignKey(
         'EducationGroup',
@@ -62,9 +81,11 @@ class EducationGroupYear(models.Model):
 
     education_group_type = models.ForeignKey(
         'EducationGroupType',
-        blank=False, null=True,
+        blank=False,
+        null=True,
         verbose_name=_("training_type")
     )
+
     active = models.CharField(
         max_length=20,
         choices=active_status.ACTIVE_STATUS_LIST,
@@ -72,63 +93,125 @@ class EducationGroupYear(models.Model):
         verbose_name=_('status')
     )
 
-    partial_deliberation = models.BooleanField(default=False, verbose_name=_('partial_deliberation'))
-    admission_exam = models.BooleanField(default=False, verbose_name=_('admission_exam'))
-    funding = models.BooleanField(default=False, verbose_name=_('funding'))
-    funding_direction = models.CharField(max_length=1, blank=True, null=True, verbose_name=_('funding_direction'))
+    partial_deliberation = models.BooleanField(
+        default=False,
+        verbose_name=_('partial_deliberation')
+    )
+
+    admission_exam = models.BooleanField(
+        default=False,
+        verbose_name=_('admission_exam')
+    )
+
+    funding = models.BooleanField(
+        default=False,
+        verbose_name=_('funding')
+    )
+
+    funding_direction = models.CharField(
+        max_length=1,
+        blank=True,
+        null=True,
+        verbose_name=_('funding_direction')
+    )
 
     funding_cud = models.BooleanField(
-        default=False, verbose_name=_('funding_cud')  # cud = commission universitaire au développement
+        default=False,
+        verbose_name=_('funding_cud')  # cud = commission universitaire au développement
     )
 
     funding_direction_cud = models.CharField(
-        max_length=1, blank=True, null=True, verbose_name=_('cud_funding_direction')
+        max_length=1,
+        blank=True,
+        null=True,
+        verbose_name=_('cud_funding_direction')
     )
 
     academic_type = models.CharField(
-        max_length=20, choices=academic_type.ACADEMIC_TYPES, blank=True, null=True, verbose_name=_('academic_type')
+        max_length=20,
+        choices=academic_type.ACADEMIC_TYPES,
+        blank=True,
+        null=True,
+        verbose_name=_('academic_type')
     )
 
-    university_certificate = models.BooleanField(default=False, verbose_name=_('university_certificate'))
+    university_certificate = models.BooleanField(
+        default=False,
+        verbose_name=_('university_certificate')
+    )
 
     enrollment_campus = models.ForeignKey(
-        'Campus', related_name='enrollment', blank=True, null=True, verbose_name=_("enrollment_campus")
+        'Campus',
+        related_name='enrollment',
+        blank=True,
+        null=True,
+        verbose_name=_("enrollment_campus")
     )
 
     main_teaching_campus = models.ForeignKey(
-        'Campus', blank=True, null=True, related_name='teaching', verbose_name=_("learning_location")
+        'Campus',
+        blank=True,
+        null=True,
+        related_name='teaching',
+        verbose_name=_("learning_location")
     )
 
-    dissertation = models.BooleanField(default=False, verbose_name=_('dissertation'))
+    dissertation = models.BooleanField(
+        default=False,
+        verbose_name=_('dissertation')
+    )
+
     internship = models.CharField(
-        max_length=20, choices=internship_presence.INTERNSHIP_PRESENCE, blank=True, null=True,
+        max_length=20,
+        choices=internship_presence.INTERNSHIP_PRESENCE,
+        default=internship_presence.NO,
+        null=True,
         verbose_name=_('internship')
     )
 
     schedule_type = models.CharField(
-        max_length=20, choices=schedule_type.SCHEDULE_TYPES, default=schedule_type.DAILY,
+        max_length=20,
+        choices=schedule_type.SCHEDULE_TYPES,
+        default=schedule_type.DAILY,
         verbose_name=_('schedule_type')
     )
 
     english_activities = models.CharField(
-        max_length=20, choices=activity_presence.ACTIVITY_PRESENCES, blank=True, null=True
+        max_length=20,
+        choices=activity_presence.ACTIVITY_PRESENCES,
+        blank=True,
+        null=True
     )
 
     other_language_activities = models.CharField(
-        max_length=20, choices=activity_presence.ACTIVITY_PRESENCES,
-        blank=True, null=True, verbose_name=_('other_language_activities')
+        max_length=20,
+        choices=activity_presence.ACTIVITY_PRESENCES,
+        blank=True,
+        null=True,
+        verbose_name=_('other_language_activities')
     )
 
     other_campus_activities = models.CharField(
-        max_length=20, choices=activity_presence.ACTIVITY_PRESENCES, blank=True,
-        null=True, verbose_name=_('other_campus_activities')
+        max_length=20,
+        choices=activity_presence.ACTIVITY_PRESENCES,
+        blank=True,
+        null=True,
+        verbose_name=_('other_campus_activities')
     )
 
-    professional_title = models.CharField(max_length=320, blank=True, null=True)
+    professional_title = models.CharField(
+        max_length=320,
+        blank=True,
+        null=True
+    )
+
     joint_diploma = models.BooleanField(default=False)
 
     diploma_printing_orientation = models.CharField(
-        max_length=30, choices=diploma_printing_orientation.DIPLOMA_FOCUS, blank=True, null=True
+        max_length=30,
+        choices=diploma_printing_orientation.DIPLOMA_FOCUS,
+        blank=True,
+        null=True
     )
 
     diploma_printing_title = models.CharField(max_length=140, blank=True, null=True)
@@ -138,26 +221,71 @@ class EducationGroupYear(models.Model):
     inter_university_abroad = models.BooleanField(default=False)
 
     primary_language = models.ForeignKey(
-        'reference.Language', blank=True, null=True, verbose_name=_('primary_language')
+        'reference.Language',
+        null=True,
+        verbose_name=_('primary_language'),
+        # default='FR'
     )
 
     language_association = models.CharField(
-        max_length=5, choices=education_group_association.EducationGroupAssociations.choices(), blank=True, null=True
+        max_length=5,
+        choices=education_group_association.EducationGroupAssociations.choices(),
+        blank=True,
+        null=True
     )
 
-    keywords = models.CharField(max_length=320, blank=True, null=True, verbose_name=_('keywords'))
-    duration = models.IntegerField(blank=True, null=True, verbose_name=_('duration'))
-    duration_unit = models.CharField(max_length=40,
-                                     choices=duration_unit.DURATION_UNIT,
-                                     default=duration_unit.DurationUnits.QUADRIMESTER.value,
-                                     blank=True, null=True, verbose_name=_('unit'))
-    enrollment_enabled = models.BooleanField(default=False, verbose_name=_('enrollment_enabled'))
-    partial_acronym = models.CharField(max_length=15, db_index=True, null=True, verbose_name=_("code"))
+    keywords = models.CharField(
+        max_length=320,
+        blank=True,
+        null=True,
+        verbose_name=_('keywords')
+    )
+
+    duration = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_('duration')
+    )
+
+    duration_unit = models.CharField(
+        max_length=40,
+        choices=duration_unit.DURATION_UNIT,
+        default=duration_unit.DurationUnits.QUADRIMESTER.value,
+        blank=True,
+        null=True,
+        verbose_name=_('unit')
+    )
+
+    enrollment_enabled = models.BooleanField(
+        default=True,
+        verbose_name=_('enrollment_enabled')
+    )
+
+    partial_acronym = models.CharField(
+        max_length=15,
+        db_index=True,
+        null=True,
+        verbose_name=_("code")
+    )
 
     # TODO :: rename credits into expected_credits
-    credits = models.IntegerField(blank=True, null=True, verbose_name=_("credits"))
-    remark = models.TextField(blank=True, null=True, verbose_name=_("remark"))
-    remark_english = models.TextField(blank=True, null=True, verbose_name=_("remark_english"))
+    credits = models.IntegerField(
+        blank=True,
+        null=True,
+        verbose_name=_("credits")
+    )
+
+    remark = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_("remark")
+    )
+
+    remark_english = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name=_("remark_english")
+    )
 
     min_credits = models.IntegerField(
         blank=True, null=True,
@@ -212,13 +340,21 @@ class EducationGroupYear(models.Model):
         related_name="education_group_years"
     )
 
-    decree_category = models.CharField(max_length=40,
-                                       choices=decree_category.DECREE_CATEGORY,
-                                       blank=True, null=True, verbose_name=_('Decree category'))
+    decree_category = models.CharField(
+        max_length=40,
+        choices=decree_category.DECREE_CATEGORY,
+        blank=True,
+        null=True,
+        verbose_name=_('Decree category')
+    )
 
-    rate_code = models.CharField(max_length=50,
-                                 choices=rate_code.RATE_CODE,
-                                 blank=True, null=True, verbose_name=_('Rate code'))
+    rate_code = models.CharField(
+        max_length=50,
+        choices=rate_code.RATE_CODE,
+        blank=True,
+        null=True,
+        verbose_name=_('Rate code')
+    )
 
     def __str__(self):
         return "{} - {} - {}".format(
@@ -311,6 +447,10 @@ class EducationGroupYear(models.Model):
         if not self.education_group.educationgroupyear_set.all().exists():
             result = self.education_group.delete()
         return result
+
+    @property
+    def category(self):
+        return self.education_group_type.category
 
     def is_deletable(self):
         """An education group year cannot be deleted if there are enrollment on it"""

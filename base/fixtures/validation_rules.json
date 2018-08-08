@@ -1,0 +1,3566 @@
+[
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Agrégation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "2A",
+      "regex_rule": "^(.*)(2A)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Attestation de participation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "8FC",
+      "regex_rule": "^(.*)(8FC)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Attestation de réussite",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "7FC",
+      "regex_rule": "^(.*)(7FC)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Attestation d'obtention de crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "9FC",
+      "regex_rule": "^(.*)(9FC)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Bachelier",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "1BA",
+      "regex_rule": "^(.*)(1BA)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.CAPAES",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "CE",
+      "regex_rule": "^(.*)(2CE|9CE)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Certificat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "2CE",
+      "regex_rule": "^(.*)(2CE)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Certificat de recherche",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "3CE",
+      "regex_rule": "^(.*)(3CE)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Certificat d'université 1er cycle",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "1FC",
+      "regex_rule": "^(.*)(1FC)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Certificat d'université 2er cycle",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "2FC",
+      "regex_rule": "^(.*)(2FC)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Concours d'accès",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "CA",
+      "regex_rule": "^(.*)(CA)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Cours de langues",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "LV",
+      "regex_rule": "^(.*)(LV)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Cours isolés",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "IS",
+      "regex_rule": "^(.*)(IS)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Doctorat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "3DP",
+      "regex_rule": "^(.*)(3DP)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Formation doctorale",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "3FP",
+      "regex_rule": "^(.*)(3FP)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Junior Year",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "JY",
+      "regex_rule": "^(.*)(JY)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Master en 120 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "2M",
+      "regex_rule": "^(.*)(2M)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Master en 120 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "2MA",
+      "regex_rule": "^(.*)(2MA)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Master en 120 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "2MD",
+      "regex_rule": "^(.*)(2MD)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Master en 120 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "2MS/",
+      "regex_rule": "^(.*)(2MS\\/)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Master 180-240 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "2M",
+      "regex_rule": "^(.*)(2M)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Master en 180-240 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "2MA",
+      "regex_rule": "^(.*)(2MA)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Master en 180-240 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "2MS/",
+      "regex_rule": "^(.*)(2MS\\/)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Master en 180-240 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "2MS/",
+      "regex_rule": "^(.*)(2MS\\/)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Master en 60 crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "2M1",
+      "regex_rule": "^(.*)(2M1)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Master de spécialisation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "2MC",
+      "regex_rule": "^(.*)(2MC)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.acronym.Stagiaire",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "ST",
+      "regex_rule": "^(.*)(ST)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Agrégation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "200E",
+      "regex_rule": "^(.*)(2)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Attestation de participation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "100Q",
+      "regex_rule": "^(.*)(Q)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Attestation de réussite",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "100W",
+      "regex_rule": "^(.*)(W)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Attestation d'obtention de crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "100Q",
+      "regex_rule": "^(.*)(Q|W)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Bachelier",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "100B",
+      "regex_rule": "^(.*)(B)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.CAPAES",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "300Q",
+      "regex_rule": "^(.*)(Q)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Certificat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "300Q",
+      "regex_rule": "^(.*)(Q)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Certificat de recherche",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "300Q",
+      "regex_rule": "^(.*)(Q)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Certificat d'université 1er cycle",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "100Q",
+      "regex_rule": "^(.*)(Q)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Certificat d'université 2er cycle",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "100Q",
+      "regex_rule": "^(.*)(Q)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Concours d'accès",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "100Z",
+      "regex_rule": "^(.*)(Z)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Cours de langues",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "100L",
+      "regex_rule": "^(.*)(L)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Cours isolés",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "900X",
+      "regex_rule": "^(.*)(X)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Doctorat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "300D",
+      "regex_rule": "^(.*)(D)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Formation doctorale",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "330D",
+      "regex_rule": "^(.*)(D)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Junior Year",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "100Y",
+      "regex_rule": "^(.*)(Y)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Master en 120 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "200M",
+      "regex_rule": "^(.*)(M)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Master en 120 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "200A",
+      "regex_rule": "^(.*)(A)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Master en 120 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "200D",
+      "regex_rule": "^(.*)(D)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Master en 120 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "200S",
+      "regex_rule": "^(.*)(S)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Master 180-240 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "200M",
+      "regex_rule": "^(.*)(M)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Master en 180-240 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "200A",
+      "regex_rule": "^(.*)(A)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Master en 180-240 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "200D",
+      "regex_rule": "^(.*)(D)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Master en 180-240 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "200S",
+      "regex_rule": "^(.*)(S)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Master en 60 crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "200U",
+      "regex_rule": "^(.*)(U)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Master de spécialisation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "200C",
+      "regex_rule": "^(.*)(C)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.partial_acronym.Stagiaire",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "100H",
+      "regex_rule": "^(.*)(H)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Agrégation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Agrégation de l'enseignement secondaire supérieur ()",
+      "regex_rule": "^(Agrégation de l'enseignement secondaire supérieur \\()(.*)(\\))$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Attestation de participation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Attestation de participation : ",
+      "regex_rule": "^(Attestation de participation :)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Attestation de réussite",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Attestation de réussite : ",
+      "regex_rule": "^(Attestation de réussite :)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Attestation d'obtention de crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Attestation d'obtention de crédits : ",
+      "regex_rule": "^(Attestation d'obtention de crédits : :)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Bachelier",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Bachelier en ",
+      "regex_rule": "^(Bachelier en)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.CAPAES",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Certificat",
+      "regex_rule": "^(Certificat)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Certificat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Certificat",
+      "regex_rule": "^(Certificat)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Certificat de recherche",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Certificat de recherche en ",
+      "regex_rule": "^(Certificat de recherche en)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Certificat d'université 1er cycle",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Certificat d'université : ",
+      "regex_rule": "^(Certificat d'université :)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Certificat d'université 2er cycle",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Certificat",
+      "regex_rule": "^(Certificat)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Concours d'accès",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Préparation concours d'accès",
+      "regex_rule": "^(Préparation concours d'accès)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Cours de langues",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Langue ",
+      "regex_rule": "^(.*)(Langue)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Cours isolés",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Cours isolé(s)",
+      "regex_rule": "^(Cours isolé\\(s\\))(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Doctorat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Doctorat en ",
+      "regex_rule": "^(Doctorat en)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Formation doctorale",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Formation doctorale en ",
+      "regex_rule": "^(Formation doctorale en)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Junior Year",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Baccalauréat par affiliation",
+      "regex_rule": "^(Baccalauréat par affiliation)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Master en 120 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Master [120] en ",
+      "regex_rule": "^(Master \\[120\\] en)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Master en 120 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Master [120] en , à finalité approfondie",
+      "regex_rule": "^(Master \\[120\\] en)(.*)(\\, à finalité approfondie)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Master en 120 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Master [120] en , à finalité didactique",
+      "regex_rule": "^(Master \\[120\\] en)(.*)(\\, à finalité didactique)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Master en 120 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Master [120] en , à finalité spécialisée",
+      "regex_rule": "^(Master \\[120\\] en)(.*)(\\, à finalité spécialisée)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Master 180-240 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Master [180] en ",
+      "regex_rule": "^(Master \\[180\\] en)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Master en 180-240 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Master [180] en , à finalité approfondie",
+      "regex_rule": "^(Master \\[120\\] en)(.*)(\\, à finalité approfondie)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Master en 180-240 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Master [180] en , à finalité didactique",
+      "regex_rule": "^(Master \\[120\\] en)(.*)(\\, à finalité didactique)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Master en 180-240 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Master [180] en , à finalité spécialisée",
+      "regex_rule": "^(Master \\[120\\] en)(.*)(\\, à finalité spécialisée)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Master en 60 crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Master [60] en ",
+      "regex_rule": "^(Master \\[60\\] en)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Master de spécialisation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Master de spécialisation en ",
+      "regex_rule": "^(Master de spécialisation en)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.title.Stagiaire",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "Stagiaire",
+      "regex_rule": "^(Stagiaire)(.*)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Agrégation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Attestation de participation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Attestation de réussite",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Attestation d'obtention de crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Bachelier",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.CAPAES",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Certificat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Certificat de recherche",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Certificat d'université 1er cycle",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Certificat d'université 2er cycle",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Concours d'accès",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Cours de langues",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Cours isolés",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Doctorat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Formation doctorale",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Junior Year",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Master en 120 crédits (programme)",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Master en 120 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Master en 120 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Master en 120 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Master 180-240 crédits (programme)",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Master en 180-240 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Master en 180-240 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Master en 180-240 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Master en 60 crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Master de spécialisation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.enrollment_enabled.Stagiaire",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Agrégation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Attestation de participation",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Attestation de réussite",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Attestation d'obtention de crédits",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Bachelier",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.CAPAES",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Certificat",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Certificat de recherche",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Certificat d'université 1er cycle",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Certificat d'université 2er cycle",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Concours d'accès",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Cours de langues",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Cours isolés",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Doctorat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Formation doctorale",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Junior Year",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Master en 120 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Master en 120 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Master en 120 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Master en 120 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Master 180-240 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Master en 180-240 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Master en 180-240 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Master en 180-240 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Master en 60 crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Master de spécialisation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.main_domain.Stagiaire",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Agrégation",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Attestation de participation",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Attestation de réussite",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Attestation d'obtention de crédits",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Bachelier",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.CAPAES",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Certificat",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Certificat de recherche",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Certificat d'université 1er cycle",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Certificat d'université 2er cycle",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Concours d'accès",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Cours de langues",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Cours isolés",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Doctorat",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Formation doctorale",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Junior Year",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Master en 120 crédits (programme)",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Master en 120 crédits à finalité approfondie",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Master en 120 crédits à finalité didactique",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Master en 120 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Master 180-240 crédits (programme)",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Master en 180-240 crédits à finalité approfondie",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Master en 180-240 crédits à finalité didactique",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Master en 180-240 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Master en 60 crédits",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Master de spécialisation",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.secondary_domains.Stagiaire",
+    "fields": {
+      "required_field": false,
+      "disabled_field": true,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Agrégation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Attestation de participation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Attestation de réussite",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Attestation d'obtention de crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Bachelier",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.CAPAES",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Certificat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Certificat de recherche",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Certificat d'université 1er cycle",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Certificat d'université 2er cycle",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Concours d'accès",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Cours de langues",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Cours isolés",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Doctorat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Formation doctorale",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Junior Year",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Master en 120 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Master en 120 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Master en 120 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Master en 120 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Master 180-240 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Master en 180-240 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Master en 180-240 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Master en 180-240 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Master en 60 crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Master de spécialisation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.university_certificate.Stagiaire",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Agrégation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "2",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Attestation de participation",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Attestation de réussite",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Attestation d'obtention de crédits",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Bachelier",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "6",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.CAPAES",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Certificat",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Certificat de recherche",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Certificat d'université 1er cycle",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Certificat d'université 2er cycle",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Concours d'accès",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Cours de langues",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Cours isolés",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Doctorat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "6",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Formation doctorale",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "6",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Junior Year",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Master en 120 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "4",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Master en 120 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "4",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Master en 120 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "4",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Master en 120 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "4",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Master 180-240 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "6",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Master en 180-240 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "6",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Master en 180-240 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "6",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Master en 180-240 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "6",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Master en 60 crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "2",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Master de spécialisation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration.Stagiaire",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "1",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Agrégation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Attestation de participation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "NON_ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Attestation de réussite",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "NON_ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Attestation d'obtention de crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "NON_ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Bachelier",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Certificat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "NON_ACADEMIC",
+      "regex_rule": "^(NON_ACADEMIC|NON_ACADEMIC_CREF)$",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.CAPAES",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "NON_ACADEMIC_CREF",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Certificat de recherche",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "NON_ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Certificat d'université 1er cycle",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "NON_ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Certificat d'université 2er cycle",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "NON_ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Concours d'accès",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "NON_ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Cours de langues",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "NON_ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Cours isolés",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "NON_ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Doctorat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Formation doctorale",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "NON_ACADEMIC_CREF",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Junior Year",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "NON_ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Master en 120 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Master en 120 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Master en 120 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Master en 120 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Master 180-240 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Master en 180-240 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Master en 180-240 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Master en 180-240 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Master en 60 crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Master de spécialisation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.academic_type.Stagiaire",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "NON_ACADEMIC",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Agrégation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "QUADRIMESTER",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Attestation de participation",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Attestation de réussite",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Attestation d'obtention de crédits",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Bachelier",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "QUADRIMESTER",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Certificat",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.CAPAES",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Certificat de recherche",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Certificat d'université 1er cycle",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Certificat d'université 2er cycle",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Concours d'accès",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Cours de langues",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Cours isolés",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Doctorat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "QUADRIMESTER",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Formation doctorale",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "QUADRIMESTER",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Junior Year",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Master en 120 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "QUADRIMESTER",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Master en 120 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "QUADRIMESTER",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Master en 120 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "QUADRIMESTER",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Master en 120 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "QUADRIMESTER",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Master 180-240 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "QUADRIMESTER",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Master en 180-240 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "QUADRIMESTER",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Master en 180-240 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "QUADRIMESTER",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Master en 180-240 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "QUADRIMESTER",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Master en 60 crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "QUADRIMESTER",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Master de spécialisation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "QUADRIMESTER",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.duration_unit.Stagiaire",
+    "fields": {
+      "required_field": true,
+      "disabled_field": true,
+      "initial_value": "QUADRIMESTER",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Agrégation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Attestation de participation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Attestation de réussite",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Attestation d'obtention de crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Bachelier",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Certificat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.CAPAES",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Certificat de recherche",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Certificat d'université 1er cycle",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Certificat d'université 2er cycle",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Concours d'accès",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Cours de langues",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Cours isolés",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Doctorat",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Formation doctorale",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Junior Year",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Master en 120 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Master en 120 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Master en 120 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Master en 120 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Master 180-240 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Master en 180-240 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Master en 180-240 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Master en 180-240 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Master en 60 crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Master de spécialisation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "true",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.dissertation.Stagiaire",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "false",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Agrégation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "30",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Attestation de participation",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Attestation de réussite",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Attestation d'obtention de crédits",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Bachelier",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "180",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Certificat",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.CAPAES",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Certificat de recherche",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Certificat d'université 1er cycle",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Certificat d'université 2er cycle",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Concours d'accès",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Cours de langues",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Cours isolés",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Doctorat",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Formation doctorale",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Junior Year",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Master en 120 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "120",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Master en 120 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "120",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Master en 120 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "120",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Master en 120 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "120",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Master 180-240 crédits (programme)",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "180",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Master en 180-240 crédits à finalité approfondie",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "180",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Master en 180-240 crédits à finalité didactique",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "180",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Master en 180-240 crédits à finalité spécialisée",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "180",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Master en 60 crédits",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "60",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Master de spécialisation",
+    "fields": {
+      "required_field": true,
+      "disabled_field": false,
+      "initial_value": "60",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  },
+  {
+    "model": "base.validationrule",
+    "pk": "base_educationgroupyear.credits.Stagiaire",
+    "fields": {
+      "required_field": false,
+      "disabled_field": false,
+      "initial_value": "",
+      "regex_rule": "",
+      "regex_error_message": ""
+    }
+  }
+]

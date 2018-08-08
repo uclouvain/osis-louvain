@@ -49,9 +49,18 @@ class EducationGroupType(models.Model):
 
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    category = models.CharField(max_length=25, choices=education_group_categories.CATEGORIES,
-                                default=education_group_categories.TRAINING, verbose_name=_('type'))
-    name = models.CharField(max_length=255, verbose_name=_('training_type'))
+
+    category = models.CharField(
+        max_length=25,
+        choices=education_group_categories.CATEGORIES,
+        default=education_group_categories.TRAINING,
+        verbose_name=_('type')
+    )
+
+    name = models.CharField(
+        max_length=255,
+        verbose_name=_('training_type')
+    )
 
     def __str__(self):
         return u"%s" % self.name

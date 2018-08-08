@@ -28,15 +28,15 @@ from http import HTTPStatus
 from unittest import mock
 from unittest.mock import patch
 
-
 from django.contrib.auth.models import Permission
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils.translation import ugettext as _
 from waffle.testutils import override_flag
 
+from base.business.group_element_years import management
 from base.forms.education_group.group import GroupModelForm
-from base.models.enums import education_group_categories
+from base.models.enums import education_group_categories, internship_presence
 from base.models.enums.active_status import ACTIVE
 from base.models.enums.schedule_type import DAILY
 from base.models.group_element_year import GroupElementYear
@@ -51,9 +51,9 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import cache
-from base.business.group_element_years import management
 from base.views.education_groups.update import update_education_group
 from reference.tests.factories.domain import DomainFactory
+from reference.tests.factories.language import LanguageFactory
 
 
 @override_flag('education_group_update', active=True)
@@ -190,8 +190,9 @@ class TestUpdate(TestCase):
             'secondary_domains': ['|' + ('|'.join([str(domain.pk) for domain in self.domains])) + '|'],
             'active': ACTIVE,
             'schedule_type': DAILY,
+            "internship": internship_presence.NO,
+            "primary_language": LanguageFactory().pk
         }
-
         response = self.client.post(self.training_url, data=data)
 
         self.assertEqual(response.status_code, 302)

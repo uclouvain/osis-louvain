@@ -24,16 +24,19 @@
 #
 ##############################################################################
 from django import forms
+from django.core.validators import RegexValidator
 
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models import campus, education_group_type, group_element_year
+from base.models.campus import Campus
 from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import find_main_entities_version, get_last_version
+from base.models.validation_rule import ValidationRule
+from reference.models.language import Language
 
 
 class MainTeachingCampusChoiceField(forms.ModelChoiceField):
-
     def __init__(self, queryset, *args, **kwargs):
         queryset = campus.find_main_campuses()
         super(MainTeachingCampusChoiceField, self).__init__(queryset, *args, **kwargs)
@@ -45,7 +48,64 @@ class MainEntitiesVersionChoiceField(EntitiesVersionChoiceField):
         super(MainEntitiesVersionChoiceField, self).__init__(queryset, *args, **kwargs)
 
 
-class EducationGroupYearModelForm(forms.ModelForm):
+class ValidationRuleMixin:
+    """
+    Mixin for ModelForm
+
+    It appends additional rules from VadilationRule table on fields.
+    """
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.rules = self.get_rules()
+        self._set_rule_on_fields()
+
+    def get_rules(self):
+        result = {}
+        for name, field in self.fields.items():
+            full_name = self.field_reference(name)
+            qs = ValidationRule.objects.filter(field_reference=full_name)
+            if qs:
+                result[name] = qs.get()
+        return result
+
+    def field_reference(self, name):
+        return '.'.join([self._meta.model._meta.db_table, name])
+
+    def _set_rule_on_fields(self):
+        for name, field in self.fields.items():
+            if name in self.rules:
+                rule = self.rules[name]
+
+                field.required = rule.required_field
+                field.disabled = rule.disabled_field
+                if not field.disabled:
+                    field.initial = rule.initial_value
+
+                field.validators.append(RegexValidator(rule.regex_rule, rule.regex_error_message or None))
+
+
+class ValidationRuleEducationGroupTypeMixin(ValidationRuleMixin):
+    """
+    ValidationRuleMixin For EducationGroupType
+
+    The object reference must be structured like that:
+        {db_table_name}.{col_name}.{education_group_type_name}
+    """
+
+    def field_reference(self, name):
+        return super().field_reference(name) + '.' + self.get_type()
+
+    def get_type(self):
+        if self.instance and self.instance.education_group_type:
+            return self.instance.education_group_type.name
+        elif "education_group_type" in self.initial:
+            return self.initial["education_group_type"].name
+        else:
+            return ""
+
+
+class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, forms.ModelForm):
     category = None
 
     class Meta:
@@ -58,6 +118,15 @@ class EducationGroupYearModelForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.parent = kwargs.pop("parent", None)
+
+        if "initial" not in kwargs:
+            kwargs["initial"] = {}
+
+        # TODO use natural-key to select default value
+        # Default campus selected 'Louvain-la-Neuve' if exist
+        kwargs['initial']['main_teaching_campus'] = Campus.objects.filter(name='Louvain-la-Neuve').first()
+        kwargs['initial']['enrollment_campus'] = Campus.objects.filter(name='Louvain-la-Neuve').first()
+        kwargs['initial']['primary_language'] = Language.objects.filter(code='FR').first()
 
         super().__init__(*args, **kwargs)
 
@@ -96,6 +165,12 @@ class EducationGroupYearModelForm(forms.ModelForm):
 
 
 class EducationGroupModelForm(forms.ModelForm):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # TODO For the moment the start_year value is set after the validation
+        self.fields["start_year"].required = False
+
     class Meta:
         model = EducationGroup
         fields = ("start_year", "end_year")
