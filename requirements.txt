@@ -28,3 +28,4 @@ django-ajax-selects==1.7.0
 
 -r ./osis_common/requirements.txt
 -r ./internship/requirements.txt
+-r ./partnership/requirements.txt
