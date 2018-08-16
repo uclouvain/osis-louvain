@@ -52,6 +52,8 @@ MESSAGE_STORAGE = os.environ.get('MESSAGE_STORAGE', 'django.contrib.messages.sto
 # Specific apps (all osis modules except base and reference(mandatory) + env specific apps like sentry)
 # have to be defined in environment settings (ex: dev.py)
 INSTALLED_APPS = (
+    'dal',  # Dependency from 'partnership' module (Django auto-complete-light)
+    'dal_select2',  # Dependency from 'partnership' module (Django auto-complete-light)
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
