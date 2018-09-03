@@ -29,6 +29,8 @@ from django.conf import settings
 from django.core.cache import caches, InvalidCacheBackendError
 from functools import wraps
 
+from django.http import QueryDict
+
 CACHE_FILTER_TIMEOUT = None
 PREFIX_CACHE_KEY = 'cache_filter'
 
@@ -66,7 +68,9 @@ def _save_filter_to_cache(request, exclude_params=None):
 def _restore_filter_from_cache(request):
     cached_value = _get_from_cache(request)
     if cached_value:
-        request.GET = {**request.GET.dict(), **cached_value}
+        qdict = QueryDict('', mutable=True)
+        qdict.update({**request.GET.dict(), **cached_value})
+        request.GET = qdict
 
 
 def _get_from_cache(request):
