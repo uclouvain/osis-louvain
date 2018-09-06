@@ -30,7 +30,7 @@ from django.utils.translation import ugettext_lazy as _
 from base.business.entity import get_entities_ids
 from base.forms.bootstrap import BootstrapForm
 from base.models import academic_year, education_group_year
-from base.models.education_group_type import EducationGroupType
+from base.models.education_group_type import EducationGroupType, get_queryset_ordered_by_name_translation
 from base.models.enums import education_group_categories
 
 
@@ -56,7 +56,6 @@ class ModelChoiceFieldWithData(forms.ModelChoiceField):
     widget = SelectWithData
 
     def set_data_attrs(self):
-        # Lazy load of the attrs
         self.widget.data_attrs = self.queryset.in_bulk()
 
 
@@ -90,6 +89,9 @@ class EducationGroupFilter(BootstrapForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.fields["education_group_type"].queryset = get_queryset_ordered_by_name_translation(
+            EducationGroupType.objects.all()
+        )
         self.fields["education_group_type"].set_data_attrs()
 
     def clean_category(self):

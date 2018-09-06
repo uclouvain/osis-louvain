@@ -30,6 +30,7 @@ from base.models.enums import education_group_categories
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from django.test.utils import override_settings
 
 
 class TestAuthorizedTypes(TestCase):
@@ -37,28 +38,46 @@ class TestAuthorizedTypes(TestCase):
     def setUp(self):
         self.category = education_group_categories.GROUP
 
-        self.subgroup = EducationGroupTypeFactory(name='Subgroup', category=self.category)
-        self.complementary_module = EducationGroupTypeFactory(name='Complementary module', category=self.category)
-        self.options_list = EducationGroupTypeFactory(name='Options list', category=self.category)
+        self.access_contest = EducationGroupTypeFactory(name='ACCESS_CONTEST', category=self.category)
+        self.bachelor = EducationGroupTypeFactory(name='BACHELOR', category=self.category)
+        self.master_60 = EducationGroupTypeFactory(name='MASTER_60', category=self.category)
 
-    def test_ordered_by_name(self):
+    @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
+    def test_ordered_by_name_fr(self):
+        # Considering that translations stay similar to
+        #
+        # ACCESS_CONTEST = Concours d’accès
+        # BACHELOR = Bachelier
+        # MASTER_60 = Master 60
+
         EducationGroupTypeFactory(category=education_group_categories.TRAINING)
-        expected_result = [self.complementary_module, self.options_list, self.subgroup]
+        expected_result = [self.bachelor, self.access_contest, self.master_60]
+        self.assertEqual(expected_result, list(find_authorized_types(category=self.category)))
+
+    @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='en')
+    def test_ordered_by_name_en(self):
+        # Considering that translations stay similar to
+        #
+        # ACCESS_CONTEST = Access contest
+        # BACHELOR = Bachelor
+        # MASTER_60 = Master 60
+        EducationGroupTypeFactory(category=education_group_categories.TRAINING)
+        expected_result = [self.access_contest, self.bachelor, self.master_60]
         self.assertEqual(expected_result, list(find_authorized_types(category=self.category)))
 
     def test_filter_on_authorized_types(self):
         doctorate = EducationGroupTypeFactory(name='PhD', category=education_group_categories.TRAINING)
-        AuthorizedRelationshipFactory(parent_type=doctorate, child_type=self.options_list)
+        AuthorizedRelationshipFactory(parent_type=doctorate, child_type=self.master_60)
         educ_group_year = EducationGroupYearFactory(education_group_type=doctorate)
         result = find_authorized_types(parents=[educ_group_year])
         self.assertEqual(len(result), 1)
-        self.assertIn(self.options_list, result)
-        self.assertNotIn(self.subgroup, result)
-        self.assertNotIn(self.complementary_module, result)
+        self.assertIn(self.master_60, result)
+        self.assertNotIn(self.access_contest, result)
+        self.assertNotIn(self.bachelor, result)
 
     def test_when_no_authorized_type_matches(self):
-        AuthorizedRelationshipFactory(parent_type=self.complementary_module, child_type=self.options_list)
-        AuthorizedRelationshipFactory(parent_type=self.options_list, child_type=self.subgroup)
-        educ_group_year = EducationGroupYearFactory(education_group_type=self.subgroup)
+        AuthorizedRelationshipFactory(parent_type=self.bachelor, child_type=self.master_60)
+        AuthorizedRelationshipFactory(parent_type=self.master_60, child_type=self.access_contest)
+        educ_group_year = EducationGroupYearFactory(education_group_type=self.access_contest)
         result = find_authorized_types(parents=[educ_group_year])
         self.assertEqual(result.count(), 0)

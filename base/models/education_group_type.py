@@ -101,8 +101,27 @@ def find_authorized_types(category=None, parents=None):
                 authorized_child_type__parent_type__educationgroupyear=parent
             )
 
-    return queryset.order_by('name')
+    return get_queryset_ordered_by_name_translation(queryset)
 
 
 def find_by_name(name=None):
     return EducationGroupType.objects.filter(name=name)
+
+
+def get_queryset_ordered_by_name_translation(qs):
+    education_group_types_sorted = sorted(list(qs),
+                                          key=lambda education_grp_type: _(education_grp_type.name)
+                                          )
+    pk_list = _get_pk_list(education_group_types_sorted)
+
+    clauses = ' '.join(['WHEN id=%s THEN %s' % (pk, i) for i, pk in enumerate(pk_list)])
+    ordering = 'CASE %s END' % clauses
+    return EducationGroupType.objects.filter(pk__in=pk_list) \
+        .extra(select={'ordering': ordering}, order_by=('ordering',))
+
+
+def _get_pk_list(education_group_types_sorted):
+    pk_list = []
+    for education_grp_type in education_group_types_sorted:
+        pk_list.append(education_grp_type.id)
+    return pk_list
