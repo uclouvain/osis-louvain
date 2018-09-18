@@ -60,7 +60,7 @@
                     <tr>
                         <td>
                             <abbr title="{{ form.title_help }}">
-                                {{ form.title }}
+                                {% if form.title == 'NT' %}PM{% else %}{{ form.title }}{% endif %}
                             </abbr>
                         </td>
                         <td></td>{% bootstrap_form_errors form %}

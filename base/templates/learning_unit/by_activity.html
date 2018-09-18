@@ -61,6 +61,15 @@
                         </a>
                     </li>
                     <li>
+                        <a id="btn_produce_xls_with_parameters"
+                           style="margin-right:10px;"
+                           title="{% trans 'Produce configurable xls of learning units' %}"
+                           href="#"
+                           data-toggle="modal" data-target="#modalXlsLuyWithParameters">
+                            &nbsp;{% trans 'Configurable list of learning units' %}
+                        </a>
+                    </li>
+                    <li>
                         <a id="btn_produce_xls_comparison"
                            style="margin-right:10px;" title="Produce xls of comparison"
                            href="#"
@@ -74,6 +83,8 @@
                 {% csrf_token %}
                 <input type="hidden" id="xls_status" name="xls_status">
                 <input type="hidden" id="comparison_year" name="comparison_year">
+                <input type="hidden" id="hdn_with_grp" name="with_grp">
+                <input type="hidden" id="hdn_with_attributions" name="with_attributions">
             </form>
 
             <table id="table_learning_units" class="table table-striped table-hover">

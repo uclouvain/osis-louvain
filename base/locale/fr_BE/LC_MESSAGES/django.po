@@ -3884,3 +3884,51 @@ msgstr "Acquis d'apprentissage d'organisation de formation"
 
 msgid "education group detailed achievement"
 msgstr "Acquis d'apprentissage détaillé d'organisation de formation"
+
+msgid "Produce configurable xls of learning units"
+msgstr "Produire une liste personnalisable des unités d'enseignement"
+
+msgid "Configurable list of learning units"
+msgstr "Liste personnalisée des unités d'enseignement"
+
+msgid "Do you want to export the following informations"
+msgstr "Désirez-vous exporter les informations suivantes"
+
+msgid "With programs"
+msgstr "Programmes/Regroupements"
+
+msgid "List of teachers"
+msgstr "Liste des enseignants"
+
+msgid "Beg. of attribution"
+msgstr "Déb. attribution"
+
+msgid "Attribution duration"
+msgstr "Durée attribution"
+
+msgid "Attrib. vol1"
+msgstr ""
+
+msgid "Attrib. vol2"
+msgstr ""
+
+msgid "Absolute credits"
+msgstr "Crédits absolus"
+
+msgid "Hourly vol."
+msgstr "Vol. hor."
+
+msgid "1st quadri"
+msgstr "1er quadri"
+
+msgid "2nd quadri"
+msgstr "2ieme quadri"
+
+msgid "Suppression proposal"
+msgstr "Proposition de suppression"
+
+msgid "Transformation proposal"
+msgstr "Proposition de transformation"
+
+msgid "Transformation/modification proposal"
+msgstr "Proposition de transform. - modif."

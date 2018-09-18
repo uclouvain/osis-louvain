@@ -28,7 +28,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from osis_common.document import xls_build
 from attribution.business import attribution_charge_new
-from base.business.learning_unit import extract_xls_data_from_learning_unit, LEARNING_UNIT_TITLES
+from base.business.learning_unit import get_entity_acronym
 from base.business.xls import get_name_or_username
 
 WORKSHEET_TITLE = 'learning_units'
@@ -37,6 +37,18 @@ XLS_DESCRIPTION = "attribution_list"
 
 ATTRIBUTION_TITLES = [str(_('tutor')), str(_('function')), str(_('substitute')), str(_('LECTURING')),
                       str(_('PRACTICAL_EXERCISES')), str(_('start_year')), str(_('duration'))]
+
+LEARNING_UNIT_TITLES = [
+    str(_('academic_year_small')),
+    str(_('code')),
+    str(_('title')),
+    str(_('type')),
+    str(_('subtype')),
+    str(_('requirement_entity_small')),
+    str(_('allocation_entity_small')),
+    str(_('credits')),
+    str(_('active_title'))
+]
 
 
 def prepare_xls_content(found_learning_units):
@@ -81,3 +93,16 @@ def create_xls_attribution(user, found_learning_units, filters):
 
     working_sheets_data = prepare_xls_content(found_learning_units)
     return xls_build.generate_xls(prepare_xls_parameters_list(user, working_sheets_data), filters)
+
+
+def extract_xls_data_from_learning_unit(learning_unit_yr):
+    return [
+        learning_unit_yr.academic_year.name, learning_unit_yr.acronym, learning_unit_yr.complete_title,
+        xls_build.translate(learning_unit_yr.learning_container_year.container_type)
+        # FIXME Condition to remove when the LearningUnitYear.learning_continer_year_id will be null=false
+        if learning_unit_yr.learning_container_year else "",
+        xls_build.translate(learning_unit_yr.subtype),
+        get_entity_acronym(learning_unit_yr.entities.get('REQUIREMENT_ENTITY')),
+        get_entity_acronym(learning_unit_yr.entities.get('ALLOCATION_ENTITY')),
+        learning_unit_yr.credits, xls_build.translate(learning_unit_yr.status)
+    ]

@@ -99,7 +99,7 @@
                                     {% trans component.learning_component_year.type %}
                                 {% endif %}
                             </td>
-                            <td>/{{ component.learning_component_year.acronym  | default_if_none:'' }}</td>
+                            <td>/{% if component.learning_component_year.acronym == 'NT' %}PM{% else %}{{ component.learning_component_year.acronym  | default_if_none:'' }}{% endif %}</td>
                             <td>{{ component.volumes.VOLUME_Q1.normalize | default_if_none:'' }}</td>
                             <td>{{ component.volumes.VOLUME_Q2.normalize | default_if_none:'' }}</td>
                             <td>{{ component.volumes.VOLUME_TOTAL.normalize | default_if_none:''}}</td>

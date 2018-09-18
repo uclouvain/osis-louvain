@@ -36,7 +36,7 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from attribution.business import attribution_charge_new
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.business.learning_unit import LEARNING_UNIT_TITLES
+from attribution.business.xls_build import LEARNING_UNIT_TITLES
 from base.tests.factories.user import UserFactory
 from osis_common.document import xls_build
 

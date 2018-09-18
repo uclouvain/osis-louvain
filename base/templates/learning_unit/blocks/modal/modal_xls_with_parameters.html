@@ -1,0 +1,61 @@
+{% extends 'blocks/modal/generic_modal.html' %}
+{% load i18n %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block modal_id %}modalXlsLuyWithParameters{% endblock %}
+
+{% block modal_header %}
+{% endblock %}
+
+{% block modal_content %}
+    <form method="POST" id="form_xls_with_parameters">
+        {% csrf_token %}
+        <div class="modal-body">
+            {% csrf_token %}
+            <label>{% trans 'Do you want to export the following informations' %}?</label><br>
+            <input type="checkbox" id="chb_with_grp" value="chb_with_grp"> {% trans 'With programs' %}<br>
+            <input type="checkbox" id="chb_with_attributions" value="chb_with_attributions"> {% trans 'tutors' %}<br>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "cancel" %}</button>
+            <button type="button" onclick="get_parameters();" class="btn btn-primary" id="btn_xls_with_parameters" data-dismiss="modal">
+                {% trans "Produce Xls" %}
+            </button>
+        </div>
+    </form>
+
+    <script type="application/javascript">
+        function get_parameters(){
+            $('#hdn_with_grp').val(false);
+            $('#hdn_with_attributions').val(false);
+            if($('#chb_with_grp').prop('checked')){
+                $('#hdn_with_grp').val(true);
+            }
+            if($('#chb_with_attributions').prop('checked')){
+                $('#hdn_with_attributions').val(true);
+            }
+        }
+    </script>
+{% endblock %}

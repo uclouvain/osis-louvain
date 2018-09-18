@@ -36,7 +36,7 @@
                         : {% trans learning_component_year.type %}
                     {% endif %}
                     {% if learning_component_year.acronym %}
-                        /{{ learning_component_year.acronym }}
+                        /{% if learning_component_year.acronym == 'NT' %}PM{% else %}{{ learning_component_year.acronym }}{% endif %}
                     {% endif %}
 
                 </h4>

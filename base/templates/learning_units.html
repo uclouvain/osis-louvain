@@ -102,6 +102,7 @@
     {% include 'learning_unit/by_activity.html' %}
 {% endif %}
 {% include "learning_unit/blocks/modal/modal_comparison.html" %}
+{% include "learning_unit/blocks/modal/modal_xls_with_parameters.html" %}
 {% endblock %}
 
 {% block script %}
@@ -148,7 +149,13 @@
 
     $("#comparison_xls").click(function(e) {
         prepare_xls(e, 'xls_comparison');
-        comparison_year.val('');
+        $("#comparison_year").val('');
+    });
+
+    $("#btn_xls_with_parameters").click(function(e) {
+        prepare_xls(e, 'xls_with_parameters');
+        $("#hdn_with_grp").val('');
+        $("#hdn_with_attributions").val('');
     });
 
     function prepare_xls(e, action_value){

@@ -3877,3 +3877,51 @@ msgstr ""
 
 msgid "education group detailed achievement"
 msgstr ""
+
+msgid "Produce configurable xls of learning units"
+msgstr ""
+
+msgid "Configurable list of learning units"
+msgstr ""
+
+msgid "Do you want to export the following informations"
+msgstr ""
+
+msgid "With programs"
+msgstr ""
+
+msgid "List of teachers"
+msgstr ""
+
+msgid "Beg. of attribution"
+msgstr ""
+
+msgid "Attribution duration"
+msgstr ""
+
+msgid "Attrib. vol1"
+msgstr ""
+
+msgid "Attrib. vol2"
+msgstr ""
+
+msgid "Absolute credits"
+msgstr ""
+
+msgid "Hourly vol."
+msgstr ""
+
+msgid "1st quadri"
+msgstr ""
+
+msgid "2nd quadri"
+msgstr ""
+
+msgid "Suppression proposal"
+msgstr "Suppression proposal"
+
+msgid "Transformation proposal"
+msgstr ""
+
+msgid "Transformation/modification proposal"
+msgstr ""

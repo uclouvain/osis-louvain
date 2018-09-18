@@ -83,7 +83,10 @@ class LearningComponentYear(SerializableModel):
     def complete_acronym(self):
         queryset = self.learningunitcomponent_set
         learning_unit_acronym = queryset.all().values_list('learning_unit_year__acronym', flat=True).get()
-        return '{}/{}'.format(learning_unit_acronym, self.acronym)
+        if self.acronym == 'NT':
+            return '{}/PM'.format(learning_unit_acronym)
+        else:
+            return '{}/{}'.format(learning_unit_acronym, self.acronym)
 
     @property
     def real_classes(self):

@@ -114,6 +114,7 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.CONTENT_KEY: xls_data,
             xls_build.HEADER_TITLES_KEY: proposal_xls.PROPOSAL_TITLES,
             xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE),
-            xls_build.STYLED_CELLS: None
+            xls_build.STYLED_CELLS: None,
+            xls_build.COLORED_ROWS: None,
         }]
     }
