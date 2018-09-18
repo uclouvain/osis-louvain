@@ -223,12 +223,12 @@ class FullForm(LearningUnitBaseForm):
             self._restrict_academic_years_choice()
 
     def _restrict_academic_years_choice(self):
-        current_academic_year = academic_year.current_academic_year()
+        starting_academic_year = academic_year.starting_academic_year()
         end_year_range = MAX_ACADEMIC_YEAR_FACULTY if self.person.is_faculty_manager() else MAX_ACADEMIC_YEAR_CENTRAL
 
         self.fields["academic_year"].queryset = academic_year.find_academic_years(
-            start_year=current_academic_year.year,
-            end_year=current_academic_year.year + end_year_range
+            start_year=starting_academic_year.year,
+            end_year=starting_academic_year.year + end_year_range
         )
 
     def _disable_fields(self):

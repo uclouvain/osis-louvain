@@ -69,7 +69,7 @@ def create_learning_unit_with_context(academic_year, structure, entity, acronym)
 
 
 class LearningUnitsMixin:
-    this_year = start_year = last_year = current_academic_year = None
+    this_year = start_year = last_year = starting_academic_year = None
     old_academic_year = last_academic_year = oldest_academic_year = latest_academic_year = None
     learning_unit = learning_unit_year = learning_container_year = None
     list_of_academic_years = []
@@ -86,9 +86,8 @@ class LearningUnitsMixin:
         self.last_year = self.this_year + LEARNING_UNIT_CREATION_SPAN_YEARS * 2
 
         self.list_of_academic_years = self.create_list_of_academic_years(self.start_year, self.last_year)
-
-        self.current_academic_year = mdl_academic_year.current_academic_year()
-        index_of_current_academic_year_in_list = self.list_of_academic_years.index(self.current_academic_year)
+        self.starting_academic_year = mdl_academic_year.starting_academic_year()
+        index_of_current_academic_year_in_list = self.list_of_academic_years.index(self.starting_academic_year)
 
         self.oldest_academic_year = self.list_of_academic_years[0]
         self.latest_academic_year = self.list_of_academic_years[-1]
@@ -99,7 +98,7 @@ class LearningUnitsMixin:
 
         self.list_of_academic_years_after_now = [
             academic_year for academic_year in self.list_of_academic_years
-            if (self.current_academic_year.year <= academic_year.year <= self.last_academic_year.year)
+            if (self.starting_academic_year.year <= academic_year.year <= self.last_academic_year.year)
         ]
         self.list_of_odd_academic_years = [academic_year for academic_year in self.list_of_academic_years_after_now
                                            if academic_year.year % 2]

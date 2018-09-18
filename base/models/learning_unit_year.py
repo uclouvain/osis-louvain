@@ -33,8 +33,8 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 
 from base.models import entity_container_year as mdl_entity_container_year
-from base.models.academic_year import current_academic_year, compute_max_academic_year_adjournment, AcademicYear, \
-    MAX_ACADEMIC_YEAR_FACULTY
+from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
+    MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
 from base.models.enums import active_status, learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
@@ -249,9 +249,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         if not self.learning_container_year:
             return False
 
-        current_year = current_academic_year().year
+        starting_year = starting_academic_year().year
         year = self.academic_year.year
-        return current_year <= year <= current_year + MAX_ACADEMIC_YEAR_FACULTY
+        return starting_year <= year <= starting_year + MAX_ACADEMIC_YEAR_FACULTY
 
     def is_full(self):
         return self.subtype == learning_unit_year_subtypes.FULL

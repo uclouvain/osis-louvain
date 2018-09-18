@@ -72,13 +72,13 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
         self.client.force_login(self.user)
 
         self.setup_academic_years()
-        self.learning_unit = self.setup_learning_unit(self.current_academic_year.year)
+        self.learning_unit = self.setup_learning_unit(self.starting_academic_year.year)
         self.learning_container_year = self.setup_learning_container_year(
-            academic_year=self.current_academic_year,
+            academic_year=self.starting_academic_year,
             container_type=learning_container_year_types.COURSE
         )
         self.learning_unit_year = self.setup_learning_unit_year(
-            self.current_academic_year,
+            self.starting_academic_year,
             self.learning_unit,
             self.learning_container_year,
             learning_unit_year_subtypes.FULL,
@@ -115,7 +115,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
 
         request_factory = RequestFactory()
 
-        form_data = {"academic_year": self.current_academic_year.pk}
+        form_data = {"academic_year": self.starting_academic_year.pk}
         request = request_factory.post(reverse('learning_unit_edition', args=[self.learning_unit_year.id]),
                                        data=form_data)
         request.user = self.a_superuser

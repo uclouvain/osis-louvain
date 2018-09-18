@@ -41,7 +41,7 @@ from waffle.testutils import override_flag
 
 from attribution.tests.factories.attribution import AttributionFactory
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
-from base.models.academic_year import current_academic_year
+from base.models.academic_year import current_academic_year, starting_academic_year
 from base.models.enums import academic_calendar_type
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_container_year_types, organization_type
@@ -127,7 +127,7 @@ class LearningUnitPedagogyTestCase(TestCase):
                              end_date=datetime.datetime(now.year+1, 9, 15),
                              entity_type='INSTITUTE')
 
-        request = request_factory.get(self.url, data={'academic_year_id': current_academic_year().id})
+        request = request_factory.get(self.url, data={'academic_year_id': starting_academic_year().id})
         request.user = self.faculty_user
 
         lu = self._create_learning_unit_year_for_entity(self.an_entity)
@@ -146,14 +146,14 @@ class LearningUnitPedagogyTestCase(TestCase):
         self.assertEqual(len(context['learning_units_with_errors']), 1)
         self.assertTrue(context['is_faculty_manager'])
 
-    def test_learning_units_summary_list_by_cient(self):
+    def test_learning_units_summary_list_by_client(self):
         self.client.force_login(self.faculty_user)
         response = self.client.get(self.url, data={'academic_year_id': current_academic_year().id})
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "learning_units.html")
 
-    def test_learning_units_summary_list_by_cient_xls(self):
+    def test_learning_units_summary_list_by_client_xls(self):
         # Generate data
         now = datetime.datetime.now()
         EntityVersionFactory(entity=self.an_entity,
@@ -173,7 +173,7 @@ class LearningUnitPedagogyTestCase(TestCase):
         # Test the view
         self.client.force_login(self.faculty_user)
         response = self.client.get(self.url, data={
-            'academic_year_id': current_academic_year().id,
+            'academic_year_id': starting_academic_year().id,
             'xls_status': 'xls_teaching_material'
         })
 
@@ -207,7 +207,7 @@ class LearningUnitPedagogyTestCase(TestCase):
         with self.assertRaises(StopIteration):
             next(data)
 
-    def test_learning_units_summary_list_by_cient_xls_empty(self):
+    def test_learning_units_summary_list_by_client_xls_empty(self):
         # Generate data
         now = datetime.datetime.now()
         EntityVersionFactory(entity=self.an_entity,
@@ -227,7 +227,7 @@ class LearningUnitPedagogyTestCase(TestCase):
         # Test the view
         self.client.force_login(self.faculty_user)
         response = self.client.get(self.url, data={
-            'academic_year_id': current_academic_year().id,
+            'academic_year_id': starting_academic_year().id,
             'xls_status': 'xls_teaching_material'
         })
 
@@ -238,7 +238,6 @@ class LearningUnitPedagogyTestCase(TestCase):
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), _("the list to generate is empty.").capitalize())
-
 
     def _create_entity_calendar(self, an_entity):
         an_academic_calendar = AcademicCalendarFactory(academic_year=self.previous_academic_year,

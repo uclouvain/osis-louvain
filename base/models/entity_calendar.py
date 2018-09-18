@@ -29,7 +29,7 @@ from django.db import models
 from base.models import academic_calendar
 from base.models import entity_version
 from base.models.abstracts.abstract_calendar import AbstractCalendar
-from base.models.academic_year import current_academic_year
+from base.models.academic_year import current_academic_year, starting_academic_year
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -50,7 +50,7 @@ class EntityCalendar(AbstractCalendar):
 
 
 def find_by_entity_and_reference_for_current_academic_year(entity_id, reference):
-    return find_by_entity_and_reference_and_academic_year(entity_id, reference, current_academic_year())
+    return find_by_entity_and_reference_and_academic_year(entity_id, reference, starting_academic_year())
 
 
 def find_by_entity_and_reference_and_academic_year(entity_id, reference, academic_year):
