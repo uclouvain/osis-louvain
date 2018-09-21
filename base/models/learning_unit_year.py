@@ -300,7 +300,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         return entity
 
     def clean(self):
-        learning_unit_years = find_gte_year_acronym(self.academic_year, self.acronym, self.learning_unit)
+        learning_unit_years = find_gte_year_acronym(self.academic_year, self.acronym)
 
         if getattr(self, 'learning_unit', None):
             learning_unit_years = learning_unit_years.exclude(learning_unit=self.learning_unit)
@@ -489,8 +489,7 @@ def convert_status_bool(status):
 
 def find_gte_year_acronym(academic_yr, acronym, learning_unit=None):
     return LearningUnitYear.objects.filter(academic_year__year__gte=academic_yr.year,
-                                           acronym__iexact=acronym,
-                                           learning_unit=learning_unit)
+                                           acronym__iexact=acronym)
 
 
 def find_lt_year_acronym(academic_yr, acronym):
