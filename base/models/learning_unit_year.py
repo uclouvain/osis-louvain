@@ -487,7 +487,7 @@ def convert_status_bool(status):
     return boolean
 
 
-def find_gte_year_acronym(academic_yr, acronym, learning_unit):
+def find_gte_year_acronym(academic_yr, acronym, learning_unit=None):
     return LearningUnitYear.objects.filter(academic_year__year__gte=academic_yr.year,
                                            acronym__iexact=acronym,
                                            learning_unit=learning_unit)
