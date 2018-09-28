@@ -1989,6 +1989,9 @@ msgstr "Testing"
 msgid "RELEASE"
 msgstr "Release"
 
+msgid "AD_HOC"
+msgstr "Ad hoc"
+
 msgid "field_is_required"
 msgstr "This field is required"
 

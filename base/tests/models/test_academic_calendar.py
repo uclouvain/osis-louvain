@@ -163,6 +163,7 @@ class TestIsAcademicCalendarHasStarted(TestCase):
         excepted_project_calendar_types = (
             (academic_calendar_type.TESTING, academic_calendar_type.TESTING),
             (academic_calendar_type.RELEASE, academic_calendar_type.RELEASE),
+            (academic_calendar_type.AD_HOC, academic_calendar_type.AD_HOC),
         )
         self.assertCountEqual(
             academic_calendar_type.PROJECT_CALENDAR_TYPES,
