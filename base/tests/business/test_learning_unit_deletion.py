@@ -81,7 +81,7 @@ class LearningUnitYearDeletion(TestCase):
         msg = deletion._check_related_partims_deletion(l_container_year)
         self.assertEqual(len(msg.values()), 0)
 
-        l_unit_2 = LearningUnitYearFactory(acronym="LBIR1213", learning_container_year=l_container_year,
+        l_unit_2 = LearningUnitYearFactory(acronym="LBIR1212", learning_container_year=l_container_year,
                                            academic_year=self.academic_year, subtype=learning_unit_year_subtypes.PARTIM)
 
         LearningUnitEnrollmentFactory(learning_unit_year=l_unit_2)

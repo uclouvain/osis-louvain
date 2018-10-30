@@ -146,7 +146,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     _warnings = None
 
     class Meta:
-        unique_together = (('learning_unit', 'academic_year'), ('acronym', 'academic_year'))
+        unique_together = ('learning_unit', 'academic_year',)
 
         permissions = (
             ("can_receive_emails_about_automatic_postponement", "Can receive emails about automatic postponement"),

@@ -55,7 +55,6 @@ def create_learning_units_year(start_year, end_year, learning_unit):
 class LearningUnitYearFactory(DjangoModelFactory):
     class Meta:
         model = "base.LearningUnitYear"
-        django_get_or_create = ('acronym', 'academic_year')
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     academic_year = factory.SubFactory(AcademicYearFactory)

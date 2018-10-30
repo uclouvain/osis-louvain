@@ -52,15 +52,17 @@ class MandataryTest(TestCase):
                                                     year=today.year - 2)
         academic_year_2.save()
         self.an_education_group = EducationGroupFactory()
-
         # education group year for acy 1
         self.education_group_year_acy1_1 = EducationGroupYearFactory(education_group=self.an_education_group,
                                                                 academic_year=academic_year_1)
-
+        education_group_year_acy1_2 = EducationGroupYearFactory(education_group=self.an_education_group,
+                                                                academic_year=academic_year_1)
+        # education group year for acy 2
+        education_group_year_acy2_1 = EducationGroupYearFactory(education_group=self.an_education_group,
+                                                                academic_year=academic_year_2)
         # mandates
         self.mandate_secretary = MandateFactory(education_group=self.an_education_group, function=mandate_types.SECRETARY)
         self.mandate_president = MandateFactory(education_group=self.an_education_group, function=mandate_types.PRESIDENT)
-
         # Mandataries during academic year 1 period
         self.mandatary_secretary_egy1 = MandataryFactory(mandate=self.mandate_secretary,
                                                     start_date=self.start_date_ay_1,
@@ -69,7 +71,15 @@ class MandataryTest(TestCase):
                                                     start_date=self.start_date_ay_1,
                                                     end_date=self.end_date_ay_1)
 
+        # Mandataries during academic year 2 period
+        mandatary_secretary_egy_2 = MandataryFactory(mandate=self.mandate_secretary,
+                                                     start_date=self.start_date_ay_2,
+                                                     end_date=self.end_date_ay_2)
     def test_find_by_education_group_year(self):
+
+
+
+
         self.assertListEqual(list(mandatary.find_by_education_group_year(self.education_group_year_acy1_1)),
                              [self.mandatary_president_egy1, self.mandatary_secretary_egy1])
 

@@ -40,7 +40,6 @@ from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_types, education_group_categories
-from base.tests.factories.education_group import EducationGroupFactory
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
@@ -80,8 +79,12 @@ OFFERS = [
 
 def create_common_offer_for_academic_year(year):
     academic_year = AcademicYear.objects.get(year=year)
+    education_group = EducationGroup.objects.filter(start_year=academic_year.year,
+                                                    end_year=academic_year.year + 1).first()
+    if not education_group:
+        education_group = EducationGroup.objects.create(start_year=academic_year.year,
+                                                        end_year=academic_year.year + 1)
     for offer in OFFERS:
-        education_group = EducationGroupFactory(start_year=academic_year.year, end_year=academic_year.year + 1)
         education_group_type = EducationGroupType.objects.get(
             name=offer['name'],
             category=offer['category']

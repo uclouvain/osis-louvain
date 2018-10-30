@@ -236,6 +236,7 @@ class CreateCommonOfferForAcademicYearTest(TestCase):
             EducationGroupType.objects.create(name=offer['name'], category=offer['category'])
 
         from base.management.commands.import_reddot import create_common_offer_for_academic_year
+        education_group = EducationGroupFactory(start_year=academic_year.year, end_year=academic_year.year + 1)
         self.assertEqual(EducationGroupYear.objects.count(), 0)
         create_common_offer_for_academic_year(academic_year.year)
         self.assertEqual(EducationGroupYear.objects.count(), 2)

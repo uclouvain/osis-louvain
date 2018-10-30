@@ -522,9 +522,7 @@ class TestLearningUnitProposalSearch(TestCase):
                                                    end_date=create_current_academic_year().end_date)
         self.person_entity = PersonEntityFactory(person=self.person, entity=self.an_entity, with_child=True)
         self.client.force_login(self.person.user)
-        self.proposals = [_create_proposal_learning_unit("LOSIS1211"),
-                          _create_proposal_learning_unit("LOSIS1212"),
-                          _create_proposal_learning_unit("LOSIS1213")]
+        self.proposals = [_create_proposal_learning_unit() for _ in range(3)]
         for proposal in self.proposals:
             PersonEntityFactory(person=self.person, entity=proposal.entity)
 
@@ -534,10 +532,10 @@ class TestLearningUnitProposalSearch(TestCase):
 
         self.assertIsInstance(response.context['form'], LearningUnitProposalForm)
         self.assertEqual(response.context['search_type'], PROPOSAL_SEARCH)
-        self.assertEqual(len(response.context['proposals']), 1)
+        self.assertCountEqual(list(response.context['proposals']), self.proposals)
 
     def test_learning_units_proposal_search_by_tutor(self):
-        proposal = _create_proposal_learning_unit("LOSIS1211")
+        proposal = _create_proposal_learning_unit()
         tutor = TutorFactory(person=self.person)
         attribution = AttributionNewFactory(tutor=tutor)
         learning_unit_component = LearningUnitComponentFactory(learning_unit_year=proposal.learning_unit_year)
@@ -559,9 +557,7 @@ class TestGroupActionsOnProposals(TestCase):
     def setUpTestData(cls):
         cls.person = PersonFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        cls.proposals = [_create_proposal_learning_unit("LOSIS1211"),
-                         _create_proposal_learning_unit("LOSIS1212"),
-                         _create_proposal_learning_unit("LOSIS1213")]
+        cls.proposals = [_create_proposal_learning_unit() for _ in range(3)]
         cls.url = reverse(learning_units_proposal_search)
         create_current_academic_year()
 
@@ -625,7 +621,7 @@ class TestLearningUnitProposalCancellation(TestCase):
         self.person.user.user_permissions.add(self.permission)
         self.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
 
-        self.learning_unit_proposal = _create_proposal_learning_unit("LOSIS1211")
+        self.learning_unit_proposal = _create_proposal_learning_unit()
         self.learning_unit_year = self.learning_unit_proposal.learning_unit_year
 
         requirement_entity_container = entity_container_year. \
@@ -742,10 +738,10 @@ def _test_entities_equal(learning_container_year, entities_values_dict):
     return True
 
 
-def _create_proposal_learning_unit(acronym):
+def _create_proposal_learning_unit():
     an_entity = EntityFactory()
     EntityVersionFactory(entity=an_entity)
-    a_learning_unit_year = LearningUnitYearFactory(acronym=acronym, subtype=learning_unit_year_subtypes.FULL)
+    a_learning_unit_year = LearningUnitYearFakerFactory(acronym="LOSIS1212", subtype=learning_unit_year_subtypes.FULL)
     an_entity_container_year = EntityContainerYearFactory(
         learning_container_year=a_learning_unit_year.learning_container_year,
         type=entity_container_year_link_type.REQUIREMENT_ENTITY,
@@ -1151,7 +1147,7 @@ class TestCreationProposalCancel(TestCase):
                 side_effect=lambda *args: True)
     @mock.patch('base.utils.send_mail.send_mail_cancellation_learning_unit_proposals')
     def test_cancel_proposal_of_learning_unit(self, mock_send_mail, mock_perms):
-        a_proposal = _create_proposal_learning_unit("LOSIS1211")
+        a_proposal = _create_proposal_learning_unit()
         luy = a_proposal.learning_unit_year
         url = reverse('learning_unit_cancel_proposal', args=[luy.id])
 

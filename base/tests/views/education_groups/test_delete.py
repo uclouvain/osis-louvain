@@ -53,20 +53,17 @@ class TestDeleteGroupEducationView(TestCase):
         current_ac = create_current_academic_year()
         next_ac = AcademicYearFactory(year=current_ac.year + 1)
 
-        self.education_group1 = EducationGroupFactory()
-        self.education_group2 = EducationGroupFactory()
-        self.education_group_year1 = EducationGroupYearFactory(education_group=self.education_group1,
-                                                               academic_year=next_ac)
-        self.education_group_year2 = EducationGroupYearFactory(education_group=self.education_group2,
+        self.education_group = EducationGroupFactory()
+        self.education_group_year = EducationGroupYearFactory(education_group=self.education_group,
+                                                              academic_year=next_ac)
+        self.education_group_year2 = EducationGroupYearFactory(education_group=self.education_group,
                                                                academic_year=next_ac)
         self.person = PersonFactory()
-        PersonEntityFactory(person=self.person, entity=self.education_group_year1.management_entity)
+        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
         PersonEntityFactory(person=self.person, entity=self.education_group_year2.management_entity)
 
-        self.url = reverse('delete_education_group', args=[self.education_group_year1.id,
-                                                           self.education_group_year1.education_group.id])
-        self.url2 = reverse('delete_education_group', args=[self.education_group_year2.id,
-                                                           self.education_group_year2.education_group.id])
+        self.url = reverse('delete_education_group', args=[self.education_group_year.id,
+                                                           self.education_group_year.education_group.id])
 
         self.person.user.user_permissions.add(Permission.objects.get(codename="delete_educationgroup"))
         self.client.force_login(user=self.person.user)
@@ -92,20 +89,15 @@ class TestDeleteGroupEducationView(TestCase):
     def test_delete_post(self):
         response = self.client.post(self.url)
         self.assertEqual(response.status_code, 302)
-        self.assertFalse(EducationGroupYear.objects.filter(pk=self.education_group_year1.pk).exists())
-        self.assertTrue(EducationGroupYear.objects.filter(pk=self.education_group_year2.pk).exists())
-        self.assertFalse(EducationGroup.objects.filter(pk=self.education_group1.pk).exists())
-        self.assertTrue(EducationGroup.objects.filter(pk=self.education_group2.pk).exists())
-        response = self.client.post(self.url2)
-        self.assertEqual(response.status_code, 302)
+        self.assertFalse(EducationGroupYear.objects.filter(pk=self.education_group_year.pk).exists())
         self.assertFalse(EducationGroupYear.objects.filter(pk=self.education_group_year2.pk).exists())
-        self.assertFalse(EducationGroup.objects.filter(pk=self.education_group2.pk).exists())
+        self.assertFalse(EducationGroup.objects.filter(pk=self.education_group.pk).exists())
 
     def test_delete_get_with_protected_objects(self):
         # Create protected data
-        OfferEnrollmentFactory(education_group_year=self.education_group_year1)
-        GroupElementYearFactory(parent=self.education_group_year1)
-        GroupElementYearFactory(parent=self.education_group_year1)
+        OfferEnrollmentFactory(education_group_year=self.education_group_year)
+        GroupElementYearFactory(parent=self.education_group_year)
+        GroupElementYearFactory(parent=self.education_group_year)
 
         count_enrollment = 1
         msg_offer_enrollment = ngettext_lazy(
@@ -117,7 +109,7 @@ class TestDeleteGroupEducationView(TestCase):
 
         protected_messages = [
             {
-                'education_group_year': self.education_group_year1,
+                'education_group_year': self.education_group_year,
                 'messages': [
                     msg_offer_enrollment,
                     msg_pgrm_content

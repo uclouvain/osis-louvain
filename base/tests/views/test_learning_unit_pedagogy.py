@@ -106,7 +106,7 @@ class LearningUnitPedagogyTestCase(TestCase):
 
         request = request_factory.get(self.url)
         request.user = self.faculty_user
-        self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1100")
+        self._create_learning_unit_year_for_entity(self.an_entity)
         self.client.force_login(self.faculty_user)
 
         learning_units_summary_list(request)
@@ -130,7 +130,7 @@ class LearningUnitPedagogyTestCase(TestCase):
         request = request_factory.get(self.url, data={'academic_year_id': starting_academic_year().id})
         request.user = self.faculty_user
 
-        lu = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1100")
+        lu = self._create_learning_unit_year_for_entity(self.an_entity)
         person_lu = PersonFactory()
         tutor_lu_1 = TutorFactory(person=person_lu)
         self.attribution_lu = AttributionFactory(learning_unit_year=lu, tutor=tutor_lu_1, summary_responsible=True)
@@ -161,13 +161,13 @@ class LearningUnitPedagogyTestCase(TestCase):
                              end_date=datetime.datetime(now.year+1, 9, 15),
                              entity_type='INSTITUTE')
 
-        luy = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1100")
+        luy = self._create_learning_unit_year_for_entity(self.an_entity)
         self._create_entity_calendar(self.an_entity)
 
         TeachingMaterialFactory(learning_unit_year=luy, title="Magic wand", mandatory=True)
         TeachingMaterialFactory(learning_unit_year=luy, title="Broomsticks", mandatory=False)
 
-        luy_without_mandatory_teaching_material = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1101")
+        luy_without_mandatory_teaching_material = self._create_learning_unit_year_for_entity(self.an_entity)
         TeachingMaterialFactory(learning_unit_year=luy_without_mandatory_teaching_material, title="cauldron", mandatory=False)
 
         # Test the view
@@ -215,13 +215,13 @@ class LearningUnitPedagogyTestCase(TestCase):
                              end_date=datetime.datetime(now.year+1, 9, 15),
                              entity_type='INSTITUTE')
 
-        luy = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1100")
+        luy = self._create_learning_unit_year_for_entity(self.an_entity)
         self._create_entity_calendar(self.an_entity)
 
         TeachingMaterialFactory(learning_unit_year=luy, title="Magic wand", mandatory=False)
         TeachingMaterialFactory(learning_unit_year=luy, title="Broomsticks", mandatory=False)
 
-        luy_without_mandatory_teaching_material = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1101")
+        luy_without_mandatory_teaching_material = self._create_learning_unit_year_for_entity(self.an_entity)
         TeachingMaterialFactory(learning_unit_year=luy_without_mandatory_teaching_material, title="cauldron", mandatory=False)
 
         # Test the view
@@ -248,14 +248,14 @@ class LearningUnitPedagogyTestCase(TestCase):
                               start_date=an_academic_calendar.start_date,
                               end_date=an_academic_calendar.end_date)
 
-    def _create_learning_unit_year_for_entity(self, an_entity, acronym):
-        l_container_yr = LearningContainerYearFactory(acronym=acronym,
+    def _create_learning_unit_year_for_entity(self, an_entity):
+        l_container_yr = LearningContainerYearFactory(acronym="LBIR1100",
                                                       academic_year=self.current_academic_year,
                                                       container_type=learning_container_year_types.COURSE)
         EntityContainerYearFactory(learning_container_year=l_container_yr,
                                    entity=an_entity,
                                    type=entity_container_year_link_type.REQUIREMENT_ENTITY)
-        return LearningUnitYearFactory(acronym=acronym,
+        return LearningUnitYearFactory(acronym="LBIR1100",
                                        learning_container_year=l_container_yr,
                                        academic_year=self.current_academic_year)
 
@@ -270,7 +270,7 @@ class LearningUnitPedagogyTestCase(TestCase):
             send_email_educational_information_needs_update(request)
 
     def test_learning_unit_pedagogy_edit(self):
-        luy = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1100")
+        luy = self._create_learning_unit_year_for_entity(self.an_entity)
         edit_url = reverse(learning_unit_pedagogy_edit, kwargs={'learning_unit_year_id': luy.id})
 
         text_label_bibliography = TextLabelFactory(

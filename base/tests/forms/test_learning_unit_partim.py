@@ -144,17 +144,14 @@ class TestPartimFormInit(LearningUnitPartimFormContextMixin):
             self.assertEqual(partim_form.forms[form_class].initial, initial)
 
     def test_instance_partim_values(self):
-        partim = LearningUnitYearFactory(
-            acronym='LBIR1200Z',
-            subtype=learning_unit_year_subtypes.PARTIM,
-            learning_container_year=self.learning_unit_year_full.learning_container_year,
-            academic_year=self.learning_unit_year_full.academic_year
-        )
+        partim = LearningUnitYearFactory(acronym='LBIR1200A', subtype=learning_unit_year_subtypes.PARTIM,
+                                         learning_container_year=self.learning_unit_year_full.learning_container_year,
+                                         academic_year=self.learning_unit_year_full.academic_year)
 
         partim_form = _instanciate_form(learning_unit_full=self.learning_unit_year_full.learning_unit,
                                         academic_year=self.learning_unit_year_full.academic_year,
                                         instance=partim.learning_unit)
-        self.assertEqual(partim_form.forms[LearningUnitYearModelForm].initial['acronym'], ['L', 'BIR1200', 'Z'])
+        self.assertEqual(partim_form.forms[LearningUnitYearModelForm].initial['acronym'], ['L', 'BIR1200', 'A'])
 
     def test_disabled_fields(self):
         """This function will check if fields is disabled"""
