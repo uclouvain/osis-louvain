@@ -7,7 +7,7 @@ python: "3.5.5"
 cache: pip
 
 before_install:
-    - sed -i -e '/fsync =/ s/= .*/= "off"/' /etc/postgresql/9.4/main/postgresql.conf
+    - sudo sed -i -e '/fsync =/ s/= .*/= "off"/' /etc/postgresql/9.4/main/postgresql.conf
     - sudo service postgresql restart 9.4;
 
 install:
