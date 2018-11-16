@@ -24,9 +24,11 @@
 #
 ##############################################################################
 import itertools
+import re
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.core.validators import RegexValidator
 from django.db.models import OuterRef, Subquery, Exists
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.utils.translation import ugettext_lazy as _
@@ -61,6 +63,7 @@ class LearningUnitSearchForm(BaseSearchForm):
     MAX_RECORDS = 1000
     ALL_LABEL = (None, _('all_label'))
     ALL_CHOICES = (ALL_LABEL,)
+    acronym_regex = re.compile(r'^[a-zA-Z0-9]*$')
 
     academic_year_id = forms.ModelChoiceField(
         label=_('academic_year_small'),
@@ -75,7 +78,8 @@ class LearningUnitSearchForm(BaseSearchForm):
 
     acronym = forms.CharField(
         max_length=15,
-        label=_('code')
+        label=_('code'),
+        validators=[RegexValidator(regex=acronym_regex)],
     )
 
     tutor = forms.CharField(
