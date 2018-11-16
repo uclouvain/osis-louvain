@@ -148,33 +148,36 @@ def __display_creation_date_with_message_about_state(ws, row_number):
     printing_date = timezone.now()
     printing_date = printing_date.strftime(date_format)
 
-    ws.cell(row=row_number, column=1).value = str('%s' % (_('warn_user_data_can_change') % printing_date))
+    ws.cell(row=row_number, column=1).value = str(
+        '%s' % (_("The data presented on this document correspond to the state of the system dated %(printing_date)s "
+                  "and are likely to evolve") % printing_date))
     ws.cell(row=row_number, column=1).font = Font(color=colors.RED)
 
 
 def __display_warning_about_students_deliberated(ws, row_number):
-    ws.cell(row=row_number, column=1).value = str(_('students_deliberated_are_not_shown'))
+    ws.cell(row=row_number, column=1).value = str(_("Students deliberated are not shown"))
     ws.cell(row=row_number, column=1).font = Font(color=colors.RED)
 
 
 def __display_legends(ws):
     ws.append([
-        str(_('justification')),
-        str(_('justification_values_accepted') % mdl.exam_enrollment.justification_label_authorized())
+        str(_('Justification')),
+        str(_("Accepted value: %(justification_label_authorized)s ")
+            % mdl.exam_enrollment.justification_label_authorized())
     ])
     ws.append([
         str(''),
-        str(_('justification_other_values') % justification_other_values())
+        str(_("Other values: %(justification_other_values)s ") % justification_other_values())
     ])
     ws.append([
-        str(_('numbered_score')),
-        str(_('score_legend') % "0 - 20")
+        str(_('Numbered scores')),
+        str(_('Score legend: %(score_legend)s (0=Score of presence)') % "0 - 20")
     ])
 
 
 def justification_other_values():
-    return "%s, %s" % (_('unjustified_absence_export_legend'),
-                       _('justified_absence_export_legend'))
+    return "%s, %s" % (_('S=Unjustified Absence'),
+                       _('M=Justified Absence'))
 
 
 def __get_session_exam_deadline(exam_enroll):

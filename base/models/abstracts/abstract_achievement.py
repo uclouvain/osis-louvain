@@ -45,7 +45,7 @@ class AbstractAchievement(OrderedModel):
     text = RichTextField(null=True, verbose_name=_('text'))
     language = models.ForeignKey(
         'reference.Language',
-        verbose_name=_('language'),
+        verbose_name=_('Language'),
         on_delete=models.CASCADE,
     )
 

@@ -45,15 +45,15 @@
                 <th>{% trans 'LU' %}</th>
                 <th>{% trans 'components' %}</th>
                 <th>{% trans 'code' %}</th>
-                <th>{% trans 'volume_partial' %}</th>
-                <th>{% trans 'volume_remaining' %}</th>
+                <th>{% trans 'Vol. Q1' %}</th>
+                <th>{% trans 'Vol. Q2' %}</th>
                 <th>
                     <abbr title="{% trans 'The annual volume must be equal to the sum of the volumes Q1 and Q2' %}">
                         {% trans 'Vol. annual' %}
                     </abbr>
                 </th>
                 <th>
-                    <abbr title="{% trans 'real_on_planned_classrooms' %}">{% trans 'Classes' %}</abbr>
+                    <abbr title="{% trans 'Real/Planned classrooms' %}">{% trans 'Classes' %}</abbr>
                 </th>
                 <th>
                     <abbr title="{% trans 'The global volume corresponding to the product of the annual volume and the number of planned classes must be equal to the sum of the volumes for each entity' %}">
@@ -119,10 +119,10 @@
             {% with component_number=forloop.counter0 classes_count=component.learning_component_year.classes|length|add:"1" %}
                 <tr class="class_year class_year_head collapse collapse_classes{{ component_number }}">
                     <td rowspan="{{ classes_count }}"></td>
-                    <td rowspan="{{ classes_count }}">{% trans 'classes' %}</td>
+                    <td rowspan="{{ classes_count }}">{% trans 'Classes' %}</td>
                     <td colspan="1">{% trans 'LU' %}</td>
                     <td colspan="2">{% trans 'code' %}</td>
-                    <td colspan="6">{% trans 'description' %}</td>
+                    <td colspan="6">{% trans 'Description' %}</td>
                 </tr>
                 {% for learning_class_year in component.learning_component_year.classes|dictsort:"acronym" %}
                     <tr class="class_year collapse collapse_classes{{ component_number }}">

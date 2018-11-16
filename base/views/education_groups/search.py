@@ -86,7 +86,7 @@ def _get_object_list(form, request):
 
 def _check_if_display_message(request, an_education_groups):
     if not an_education_groups:
-        messages.add_message(request, messages.WARNING, _('no_result'))
+        messages.add_message(request, messages.WARNING, _('No result!'))
 
         return False
     return True

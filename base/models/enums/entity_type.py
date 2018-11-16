@@ -36,14 +36,14 @@ LOGISTICS_ENTITY = "LOGISTICS_ENTITY"
 
 
 ENTITY_TYPES = (
-    (SECTOR, _(SECTOR)),
-    (FACULTY, _(FACULTY)),
-    (SCHOOL, _(SCHOOL)),
-    (INSTITUTE, _(INSTITUTE)),
-    (POLE, _(POLE)),
-    (DOCTORAL_COMMISSION, _(DOCTORAL_COMMISSION)),
-    (PLATFORM, _(PLATFORM)),
-    (LOGISTICS_ENTITY, _(LOGISTICS_ENTITY)),
+    (SECTOR, _("Sector")),
+    (FACULTY, _("Faculty")),
+    (SCHOOL, _("School")),
+    (INSTITUTE, _("Institute")),
+    (POLE, _("Pole")),
+    (DOCTORAL_COMMISSION, _("Doctoral commission")),
+    (PLATFORM, _("Platform")),
+    (LOGISTICS_ENTITY, _("Logistics entity")),
 )
 
 

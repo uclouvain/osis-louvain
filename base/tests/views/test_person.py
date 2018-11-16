@@ -23,12 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
-from unittest.mock import PropertyMock
-
 from django.test import TestCase
 
-from base.models.person import Person
 from base.tests.factories.person import PersonFactory
 from base.views.person import EmployeeAutocomplete
 
@@ -70,13 +66,12 @@ class TestPersonAutoComplete(TestCase):
         )
 
     def test_get_result_label(self):
-        with mock.patch.object(Person, "age", new_callable=PropertyMock, return_value=5):
-            self.assertEqual(
-                EmployeeAutocomplete().get_result_label(self.jean),
-                "Dupont Jean (5)"
-            )
+        self.assertEqual(
+            EmployeeAutocomplete().get_result_label(self.jean),
+            "Dupont Jean"
+        )
 
-            self.assertEqual(
-                EmployeeAutocomplete().get_result_label(self.henry),
-                "Arkin Henry (5)"
-            )
+        self.assertEqual(
+            EmployeeAutocomplete().get_result_label(self.henry),
+            "Arkin Henry"
+        )

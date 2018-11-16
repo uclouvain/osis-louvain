@@ -16,6 +16,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='proposallearningunit',
             name='state',
-            field=models.CharField(choices=[('FACULTY', 'FACULTY'), ('CENTRAL', 'CENTRAL'), ('SUSPENDED', 'SUSPENDED'), ('ACCEPTED', 'ACCEPTED'), ('REFUSED', 'REFUSED')], default=base.models.enums.proposal_state.ProposalState('FACULTY'), max_length=50, verbose_name='state'),
+            field=models.CharField(choices=[('FACULTY', 'FACULTY'), ('CENTRAL', 'CENTRAL'), ('SUSPENDED', 'SUSPENDED'), ('ACCEPTED', 'ACCEPTED'), ('REFUSED', 'REFUSED')], default='FACULTY', max_length=50, verbose_name='state'),
         ),
     ]

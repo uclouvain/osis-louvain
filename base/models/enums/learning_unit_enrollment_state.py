@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import ugettext_lazy as _
+
 ENROLLED = 'ENROLLED'
 
-STATES = ((ENROLLED, ENROLLED),)
+STATES = ((ENROLLED, _("Enrolled")),)

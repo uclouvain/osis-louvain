@@ -100,8 +100,8 @@ class LearningUnitYearModelForm(forms.ModelForm):
 
         if subtype == learning_unit_year_subtypes.PARTIM:
             self.fields['acronym'] = PartimAcronymField()
-            self.fields['specific_title'].label = _('official_title_proper_to_partim')
-            self.fields['specific_title_english'].label = _('official_english_title_proper_to_partim')
+            self.fields['specific_title'].label = _('Title proper to the partim')
+            self.fields['specific_title_english'].label = _('English title proper to the partim')
 
         # Disabled fields when it's an update
         if self.instance.pk:
@@ -125,10 +125,12 @@ class LearningUnitYearModelForm(forms.ModelForm):
         error_messages = {
             'credits': {
                 # Override unwanted DecimalField standard error messages
-                'max_digits': _('Ensure this value is less than or equal to {max_value}.').format(
-                    max_value=MAXIMUM_CREDITS),
-                'max_whole_digits': _('Ensure this value is less than or equal to {max_value}.').format(
-                    max_value=MAXIMUM_CREDITS)
+                'max_digits': _('Ensure this value is less than or equal to %(limit_value)s.') % {
+                    'limit_value': MAXIMUM_CREDITS
+                },
+                'max_whole_digits': _('Ensure this value is less than or equal to %(limit_value)s.') % {
+                    'limit_value': MAXIMUM_CREDITS
+                }
             }
         }
         widgets = {
@@ -156,8 +158,8 @@ class LearningUnitYearModelForm(forms.ModelForm):
 class LearningUnitYearPartimModelForm(LearningUnitYearModelForm):
     class Meta(LearningUnitYearModelForm.Meta):
         labels = {
-            'specific_title': _('official_title_proper_to_partim'),
-            'specific_title_english': _('official_english_title_proper_to_partim')
+            'specific_title': _('Title proper to the partim'),
+            'specific_title_english': _('English title proper to the partim')
         }
         field_classes = {
             'acronym': PartimAcronymField
@@ -194,6 +196,6 @@ class LearningContainerYearModelForm(forms.ModelForm):
 
     def post_clean(self, specific_title):
         if not self.instance.common_title and not specific_title:
-            self.add_error("common_title", _("must_set_common_title_or_specific_title"))
+            self.add_error("common_title", _("You must either set the common title or the specific title"))
 
         return not self.errors

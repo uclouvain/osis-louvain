@@ -65,7 +65,7 @@
     <table class="table" style="border-bottom: 1px solid #ddd">
         <thead>
         <tr>
-            <th class="col-md-2" style="padding: 20px;">{% trans 'language' %}</th>
+            <th class="col-md-2" style="padding: 20px;">{% trans 'Language' %}</th>
             <th class="col-md-5" style="padding: 20px;">{{ form_french.language.1 }}</th>
             <th class="col-md-5" style="padding: 20px;">{{ form_english.language.1 }}</th>
         </tr>
@@ -82,7 +82,7 @@
                             <a class="trigger_modal pull-right"
                                data-url="{{ post_url }}?language={{ form_french.language.0 }}&label={{ label_key }}"
                                data-modal_class="modal-lg"
-                               title="{% trans 'edit' %}">
+                               title="{% trans 'Edit' %}">
                                 <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                             </a>
                         {% endif %}
@@ -94,7 +94,7 @@
                                 <a class="trigger_modal pull-right"
                                    data-url="{{ post_url }}?language={{ form_english.language.0 }}&label={{ label_key }}"
                                    data-modal_class="modal-lg"
-                                   title="{% trans 'edit' %}">
+                                   title="{% trans 'Edit' %}">
                                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                                 </a>
                             {% endif %}
@@ -117,7 +117,7 @@
                 <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"
                       style="color:green;margin-right:10px;
                               {% if not teaching_material.mandatory %}visibility: hidden; {% endif %}"
-                      data-toggle="tooltip" title="{% trans 'required' %}"></span>
+                      data-toggle="tooltip" title="{% trans 'Required' %}"></span>
                         {{ teaching_material.title }}
 
                         {% if can_edit_information %}
@@ -137,7 +137,7 @@
                 <div class="pull-right">
                     <a class="btn btn-primary trigger_modal"
                        data-url="{% url "teaching_material_create" learning_unit_year_id=learning_unit_year.pk %}">
-                        {% trans 'add' %}
+                        {% trans 'Add' %}
                     </a>
                 </div>
             {% endif %}

@@ -37,14 +37,14 @@
             <input type="hidden" name="group_element_year_id" value="{{ request.GET.group_element_year_id }}">
             <input type="hidden" name="root_id" value="{{ request.GET.root_id }}">
             {% if not request.is_ajax %}
-                <input type="submit" value="{% trans "i_confirm" %}" class="btn btn-danger"/>
+                <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-danger"/>
             {% endif %}
         </form>
 
 {% if request.is_ajax %}
        <div class="modal-footer">
            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'cancel' %}</button>
-           <input type="submit" value="{% trans "i_confirm" %}" class="btn btn-danger" onclick="$('#form_detach_confirm').submit();"/>
+           <input type="submit" value="{% trans "Yes, I confirm." %}" class="btn btn-danger" onclick="$('#form_detach_confirm').submit();"/>
        </div>
 </div>
 {% endif %}

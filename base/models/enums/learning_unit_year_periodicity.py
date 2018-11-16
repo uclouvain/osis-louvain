@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django.utils.translation import ugettext_lazy as _
 
 ANNUAL = "ANNUAL"
@@ -31,7 +30,7 @@ BIENNIAL_EVEN = "BIENNIAL_EVEN"
 BIENNIAL_ODD = "BIENNIAL_ODD"
 
 PERIODICITY_TYPES = (
-    (ANNUAL,  _(ANNUAL)),
-    (BIENNIAL_EVEN,  _(BIENNIAL_EVEN)),
-    (BIENNIAL_ODD,  _(BIENNIAL_ODD))
+    (ANNUAL, _("Annual")),
+    (BIENNIAL_EVEN, _("biennial even")),
+    (BIENNIAL_ODD, _("biennial odd"))
 )

@@ -23,10 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import ugettext_lazy as _
+
 LECTURING = "LECTURING"
 PRACTICAL_EXERCISES = "PRACTICAL_EXERCISES"
 
 LEARNING_COMPONENT_YEAR_TYPES = (
-    (LECTURING, LECTURING),
-    (PRACTICAL_EXERCISES, PRACTICAL_EXERCISES)
+    (LECTURING, _("Lecturing")),
+    (PRACTICAL_EXERCISES, _("Practical exercises"))
 )

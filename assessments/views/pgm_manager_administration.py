@@ -225,7 +225,7 @@ def add_program_managers(offers, person):
     error_messages = []
     for offer_yr in offers:
         if not add_offer_program_manager(offer_yr, person):
-            error_messages.append("{0} {1} {2}".format(person, _('already_program_mgr'), offer_yr.acronym))
+            error_messages.append("{0} {1} {2}".format(person, _('is already program manager for'), offer_yr.acronym))
     return error_messages
 
 

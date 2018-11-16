@@ -47,49 +47,49 @@ DATE_TIME_FORMAT = '%d-%m-%Y %H:%M'
 DESC = "desc"
 WORKSHEET_TITLE = 'learning_units_comparison'
 XLS_FILENAME = 'learning_units_comparison'
-XLS_DESCRIPTION = _("list_learning_units_comparison")
+XLS_DESCRIPTION = _("Comparison of learning units")
 
 LEARNING_UNIT_TITLES = [
     str(_('code')),
-    str(_('academic_year_small')),
+    str(_('Ac yr.')),
     str(_('type')),
-    str(_('active_title')),
-    str(_('subtype')),
+    str(_('Active')),
+    str(_('Subtype')),
     str(_('Internship subtype')),
     str(_('credits')),
-    str(_('language')),
-    str(_('periodicity')),
-    str(_('quadrimester')),
-    str(_('session_title')),
-    str(_('common_title')),
-    str(_('title_proper_to_UE')),
-    str(_('common_english_title')),
-    str(_('english_title_proper_to_UE')),
+    str(_('Language')),
+    str(_('Periodicity')),
+    str(_('Quadrimester')),
+    str(_('Session derogation')),
+    str(_('Common title')),
+    str(_('English title proper')),
+    str(_('Common English title')),
+    str(_('English title proper')),
     str(_('Req. Entities')),
-    str(_('allocation_entity_small')),
+    str(_('Alloc. Ent.')),
     str(_('Add. requ. ent. 1')),
     str(_('Add. requ. ent. 2')),
     str(_('Profes. integration')),
-    str(_('institution')),
-    str(_('learning_location')),
-    str(_('partims')),
+    str(_('Institution')),
+    str(_('Learning location')),
+    str(_('Partims')),
     "PM {}".format(_('code')),
-    "PM {}".format(_('volume_partial')),
-    "PM {}".format(_('volume_remaining')),
+    "PM {}".format(_('Vol. Q1')),
+    "PM {}".format(_('Vol. Q2')),
     "PM {}".format(_('Vol. annual')),
-    "PM {}".format(_('real_classes')),
-    "PM {}".format(_('planned_classes')),
-    "PM {}".format(_('vol_global')),
+    "PM {}".format(_('Real classes')),
+    "PM {}".format(_('Planned classes')),
+    "PM {}".format(_('Vol. global')),
     "PM {}".format(_('Req. Entities')),
     "PM {}".format(_('Add. requ. ent. 1')),
     "PM {}".format(_('Add. requ. ent. 2')),
     "PP {}".format(_('code')),
-    "PP {}".format(_('volume_partial')),
-    "PP {}".format(_('volume_remaining')),
+    "PP {}".format(_('Vol. Q1')),
+    "PP {}".format(_('Vol. Q2')),
     "PP {}".format(_('Vol. annual')),
-    "PM {}".format(_('real_classes')),
-    "PM {}".format(_('planned_classes')),
-    "PP {}".format(_('vol_global')),
+    "PM {}".format(_('Real classes')),
+    "PM {}".format(_('Planned classes')),
+    "PP {}".format(_('Vol. global')),
     "PP {}".format(_('Req. Entities')),
     "PM {}".format(_('Add. requ. ent. 1')),
     "PM {}".format(_('Add. requ. ent. 2'))
@@ -203,9 +203,9 @@ def extract_xls_data_from_learning_unit(learning_unit_yr, new_line, first_data):
 
 def _translate_status(value):
     if value:
-        return _('active').title()
+        return _('Active')
     else:
-        return _('inactive').title()
+        return _('Inactive')
 
 
 def _component_data(components, learning_component_yr_type):

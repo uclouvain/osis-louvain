@@ -27,9 +27,9 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-    <li><a href="{% url 'my_osis' %}" id="lnk_my_osis">{% trans 'my_osis' %}</a></li>
-    <li><a href="{% url 'my_messages' %}" id="lnk_my_messages">{% trans 'messages' %}</a></li>
-    <li class="active">{% trans 'message' %}</li>
+    <li><a href="{% url 'my_osis' %}" id="lnk_my_osis">{% trans 'My OSIS' %}</a></li>
+    <li><a href="{% url 'my_messages' %}" id="lnk_my_messages">{% trans 'Messages' %}</a></li>
+    <li class="active">{% trans 'Message' %}</li>
 {% endblock %}
 
 {% block content %}
@@ -41,7 +41,7 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-4 col-md-offset-1">
-                    <p>{% trans 'received_on' %} : {{ my_message.created }}
+                    <p>{% trans 'Received on' %} : {{ my_message.created }}
                 </div>
             </div>
             <br/>
@@ -57,9 +57,9 @@
         <div class="row">
             <div class="col-md-4 col-md-offset-4">
                 <a href="{% url 'my_messages' %}" class="btn btn-default btn-primary" id="btn_to_my_messages"
-                   role="button" data-toggle="tooltip" data-placement="left" title="{% trans 'tooltip_to_my_messages' %}">{% trans 'close' %}</a>
+                   role="button" data-toggle="tooltip" data-placement="left" title="{% trans 'Back to messages' %}">{% trans 'Close' %}</a>
                 <a href="{% url 'delete_my_message' my_message.id %}" class="btn btn-default btn-secondary" id="btn_delete_from_my_osis"
-                   role="button" data-toggle="tooltip" data-placement="right"  title="{% trans 'tooltip_delete_message' %}">{% trans 'delete' %}</a>
+                   role="button" data-toggle="tooltip" data-placement="right"  title="{% trans 'Delete message' %}">{% trans 'delete' %}</a>
             </div>
         </div>
         <br/>

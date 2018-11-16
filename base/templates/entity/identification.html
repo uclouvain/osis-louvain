@@ -48,11 +48,11 @@
                 <br>
                 <div class="row">
                     <div class="col-md-2">
-                        <label>{% trans 'acronym' %}</label><br>
+                        <label>{% trans 'Acronym' %}</label><br>
                         {{ entity_version.acronym }}
                     </div>
                     <div class="col-md-10">
-                        <label>{% trans 'title'%}</label><br>
+                        <label>{% trans 'Title'%}</label><br>
                         {{ entity_version.title }}
                     </div>
                 </div>
@@ -66,13 +66,13 @@
                     {% endif %}
                     {% if entity_parent %}
                         <div class="col-md-4">
-                            <label>{% trans 'attached_to' %}</label><br>
+                            <label>{% trans 'Attached to' %}</label><br>
                             <a href="{% url 'entity_read' entity_version_id=entity_parent.id %}">{{ entity_parent.acronym }} - {{ entity_parent.title }}</a>
                         </div>
                     {% endif %}
                     {% if entity_version.entity.organization %}
                         <div class="col-md-6">
-                            <label>{% trans 'organization'%}</label><br>
+                            <label>{% trans 'Organization'%}</label><br>
                             <a href="{% url 'organization_read' organization_id=entity_version.entity.organization.id %}">{{ entity_version.entity.organization | default_if_none:'' }}</a>
                         </div>
                     {% endif %}
@@ -89,7 +89,7 @@
                 <br>
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <label>{% trans 'attached_entities' %}</label>
+                        <label>{% trans 'Attached entities' %}</label>
                     </div>
                     <div class="panel-body">
                         <div class="row">
@@ -97,8 +97,8 @@
                                 {% if descendants %}
                                 <table class="table table-striped table-hover">
                                     <thead>
-                                        <th>{% trans 'acronym'%}</th>
-                                        <th>{% trans 'title'%}</th>
+                                        <th>{% trans 'Acronym'%}</th>
+                                        <th>{% trans 'Title'%}</th>
                                         <th>{% trans 'type'%}</th>
                                     </thead>
                                     <tbody>

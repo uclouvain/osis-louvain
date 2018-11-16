@@ -27,10 +27,10 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
-<li><a href="{% url 'organizations' %}" id="lnk_organizations">{% trans 'organizations' %}</a></li>
-<li><a href="{% url 'organization_read' organization_id=organization_id %}" id="lnk_organization">{% trans 'organization' %}</a></li>
-<li class="active">{% trans 'organization_address' %}</li>
+<li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'Institution' %}</a></li>
+<li><a href="{% url 'organizations' %}" id="lnk_organizations">{% trans 'Organizations' %}</a></li>
+<li><a href="{% url 'organization_read' organization_id=organization_id %}" id="lnk_organization">{% trans 'Organization' %}</a></li>
+<li class="active">{% trans 'Organization address' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
@@ -41,41 +41,41 @@
 
         <div class="row">
             <div class="col-md-6">
-                &nbsp;&nbsp;&nbsp;<label>{% trans 'label' %}</label><br>
+                &nbsp;&nbsp;&nbsp;<label>{% trans 'Label' %}</label><br>
                 &nbsp;&nbsp;&nbsp;{{ organization_address.label | default_if_none:'-' }}
             </div>
             <div class="col-md-6">
-                <label>{% trans 'location' %}</label><br>
+                <label>{% trans 'Location' %}</label><br>
                 {{ organization_address.location | default_if_none:'-' }}
             </div>
         </div>
         <div class="row">
             <div class="col-md-4">
-                &nbsp;&nbsp;&nbsp;<label>{% trans 'postal_code' %}</label><br>
+                &nbsp;&nbsp;&nbsp;<label>{% trans 'Postal code' %}</label><br>
                 &nbsp;&nbsp;&nbsp;{{ organization_address.postal_code | default_if_none:'-' }}
             </div>
             <div class="col-md-4">
-                <label>{% trans 'city' %}</label><br>
+                <label>{% trans 'City' %}</label><br>
                 {{ organization_address.city | default_if_none:'-' }}
             </div>
             <div class="col-md-4">
-                <label>{% trans 'country' %}</label><br>
+                <label>{% trans 'Country' %}</label><br>
                 {{ organization_address.country | default_if_none:'-' }}
             </div>
         </div>
         <br>
         <div class=pull-right>
-            <a href="{% url 'organization_address_edit' organization_address_id=organization_address.id %}" title="{%trans 'edit'%}"
+            <a href="{% url 'organization_address_edit' organization_address_id=organization_address.id %}" title="{%trans 'Edit'%}"
                class="btn btn-primary" role="button" id="lnk_organization_edit">
-                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> {% trans 'edit'%}
+                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> {% trans 'Edit'%}
             </a>
-             <a href="{% url 'organization_address_delete' organization_address_id=organization_address.id %}" title="{%trans 'delete'%}"
+             <a href="{% url 'organization_address_delete' organization_address_id=organization_address.id %}" title="{%trans 'Delete'%}"
                class="btn btn-primary" role="button" id="lnk_organization_delete">
-                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {% trans 'delete'%}
+                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {% trans 'Delete'%}
             </a>
             <a href="{% url 'organization_read' organization_id=organization_address.organization.pk %}"
-               id="lnk_organization_read_{{organization_address.organization.id}}"  title="{%trans 'back'%}"
-               class="btn btn-default" role="button" ><span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span> {% trans 'back'%}</a>
+               id="lnk_organization_read_{{organization_address.organization.id}}"  title="{%trans 'Back'%}"
+               class="btn btn-default" role="button" ><span class="glyphicon glyphicon-step-backward" aria-hidden="true"></span> {% trans 'Back'%}</a>
         </div>
     </div>
 </div>

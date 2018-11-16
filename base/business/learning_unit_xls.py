@@ -26,8 +26,9 @@
 
 from django.utils.translation import ugettext_lazy as _
 
+from attribution.models.enums.function import Functions
 from base import models as mdl_base
-from base.business.learning_unit import LEARNING_UNIT_TITLES_PART2,  XLS_DESCRIPTION, XLS_FILENAME, \
+from base.business.learning_unit import LEARNING_UNIT_TITLES_PART2, XLS_DESCRIPTION, XLS_FILENAME, \
     WORKSHEET_TITLE, get_same_container_year_components, get_entity_acronym
 from base.business.xls import get_name_or_username
 from osis_common.document import xls_build
@@ -37,6 +38,7 @@ from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
 from base.models.enums.proposal_type import ProposalType
 from openpyxl.utils import get_column_letter
 from collections import defaultdict
+
 # List of key that a user can modify
 VOLUMES_INITIALIZED = {'VOLUME_TOTAL': 0, 'PLANNED_CLASSES': 0, 'VOLUME_Q1': 0, 'VOLUME_Q2': 0}
 
@@ -56,11 +58,11 @@ SPACES = '  '
 HEADER_TEACHERS = _('List of teachers')
 HEADER_PROGRAMS = _('Programs')
 PROPOSAL_LINE_STYLES = {
-    ProposalType.CREATION.name: Style(font=Font(color=CREATION_COLOR),),
-    ProposalType.MODIFICATION.name: Style(font=Font(color=MODIFICATION_COLOR),),
-    ProposalType.SUPPRESSION.name: Style(font=Font(color=SUPPRESSION_COLOR),),
-    ProposalType.TRANSFORMATION.name: Style(font=Font(color=TRANSFORMATION_COLOR),),
-    ProposalType.TRANSFORMATION_AND_MODIFICATION.name: Style(font=Font(color=TRANSFORMATION_AND_MODIFICATION_COLOR),),
+    ProposalType.CREATION.name: Style(font=Font(color=CREATION_COLOR), ),
+    ProposalType.MODIFICATION.name: Style(font=Font(color=MODIFICATION_COLOR), ),
+    ProposalType.SUPPRESSION.name: Style(font=Font(color=SUPPRESSION_COLOR), ),
+    ProposalType.TRANSFORMATION.name: Style(font=Font(color=TRANSFORMATION_COLOR), ),
+    ProposalType.TRANSFORMATION_AND_MODIFICATION.name: Style(font=Font(color=TRANSFORMATION_AND_MODIFICATION_COLOR), ),
 }
 WRAP_TEXT_STYLE = Style(alignment=Alignment(wrapText=True, vertical="top"), )
 WITH_ATTRIBUTIONS = 'with_attributions'
@@ -68,32 +70,26 @@ WITH_GRP = 'with_grp'
 
 LEARNING_UNIT_TITLES_PART1 = [
     str(_('code')),
-    str(_('academic_year_small')),
-    str(_('title')),
+    str(_('Ac yr.')),
+    str(_('Title')),
     str(_('type')),
-    str(_('subtype')),
-    "{} ({})".format(_('requirement_entity_small'), _('fac. level')),
-    str(_('proposal_type')),
-    str(_('proposal_status')),
+    str(_('Subtype')),
+    "{} ({})".format(_('Req. Entity'), _('fac. level')),
+    str(_('Proposal type')),
+    str(_('Proposal status')),
     str(_('credits')),
-    str(_('allocation_entity_small')),
-    str(_('title_in_english')),
+    str(_('Alloc. Ent.')),
+    str(_('Title in English')),
 ]
 
 
-def prepare_xls_content(learning_units,
-                        with_grp=False,
-                        with_attributions=False):
+def prepare_xls_content(learning_units, with_grp=False, with_attributions=False):
     return [
-        extract_xls_data_from_learning_unit(lu,
-                                            with_grp,
-                                            with_attributions)
-        for lu in learning_units
-        ]
+        extract_xls_data_from_learning_unit(lu, with_grp, with_attributions) for lu in learning_units
+    ]
 
 
 def extract_xls_data_from_learning_unit(learning_unit_yr, with_grp, with_attributions):
-
     lu_data_part1 = _get_data_part1(learning_unit_yr)
     lu_data_part2 = _get_data_part2(learning_unit_yr, with_attributions)
 
@@ -194,7 +190,7 @@ def _prepare_legend_ws_data():
     return {
         xls_build.HEADER_TITLES_KEY: [str(_('Legend'))],
         xls_build.CONTENT_KEY: [
-            [SPACES, _('proposal_creation')],
+            [SPACES, _('Proposal of creation')],
             [SPACES, _('Proposal for modification')],
             [SPACES, _('Suppression proposal')],
             [SPACES, _('Transformation proposal')],
@@ -230,9 +226,9 @@ def _get_colored_rows(learning_units):
 def _get_attribution_line(an_attribution):
     return "{} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} - {} : {} ".format(
         an_attribution.get('person'),
-        _('function'),
-        _(an_attribution.get('function')) if an_attribution.get('function') else '',
-        _('substitute'),
+        _('Function'),
+        Functions[an_attribution['function']].value if 'function' in an_attribution else '',
+        _('Substitute'),
         an_attribution.get('substitute') if an_attribution.get('substitute') else '',
         _('Beg. of attribution'),
         an_attribution.get('start_year'),
@@ -286,7 +282,9 @@ def _get_data_part2(learning_unit_yr, with_attributions):
     lu_data_part2 = []
     if with_attributions:
         lu_data_part2.append(
-            " \n".join([_get_attribution_line(value) for value in learning_unit_yr.attribution_charge_news.values()]))
+            " \n".join([_get_attribution_line(value) for value in learning_unit_yr.attribution_charge_news.values()])
+        )
+
     volume_lecturing = volumes.get(learning_component_year_type.LECTURING)
     volumes_practical = volumes.get(learning_component_year_type.PRACTICAL_EXERCISES)
     lu_data_part2.extend([

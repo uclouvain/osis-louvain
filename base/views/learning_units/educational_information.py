@@ -51,7 +51,7 @@ from base.views.common import check_if_display_message, display_warning_messages
 from base.views.common import display_error_messages
 from base.views.learning_units.search import SUMMARY_LIST
 
-SUCCESS_MESSAGE = _('success_mail_reminder')
+SUCCESS_MESSAGE = _('Reminding mails sent')
 
 
 @login_required

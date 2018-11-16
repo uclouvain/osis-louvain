@@ -34,7 +34,7 @@ from base.forms.utils.choice_field import add_blank, add_all
 from base.models.entity_container_year import EntityContainerYear
 from base.models.entity_version import get_last_version, find_all_current_entities_version
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
-    ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2, ENTITY_TYPE_LIST
+    ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2, ENTITY_TYPE_LIST, EntityContainerYearLinkTypes
 from reference.models.country import Country
 
 
@@ -66,14 +66,14 @@ class EntityContainerYearModelForm(forms.ModelForm):
         queryset=find_all_current_entities_version()
     )
     entity_type = ''
-    country = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False, label=_("country"))
+    country = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False, label=_("Country"))
 
     def __init__(self, *args, **kwargs):
         self.person = kwargs.pop('person')
 
         super().__init__(*args, prefix=self.entity_type.lower(), **kwargs)
 
-        self.fields['entity'].label = _(self.entity_type.lower())
+        self.fields['entity'].label = EntityContainerYearLinkTypes[self.entity_type].value
         self.instance.type = self.entity_type
 
         if hasattr(self.instance, 'entity'):

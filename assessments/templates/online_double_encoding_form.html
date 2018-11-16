@@ -29,15 +29,15 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'studies' %}</a></li>
-<li><a href="{% url 'assessments' %}" id="lnk_assesments">{% trans 'evaluations' %}</a></li>
-<li><a href="{% url 'scores_encoding' %}?{{ request.GET.urlencode }}" id="lnk_scores_encoding">{% trans 'scores_encoding' %}</a></li>
-<li><a href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" id="lnk_online_encoding">{% trans 'online_scores_encoding' %}</a></li>
-<li class="active">{% trans 'dubble_online_scores_encoding' %}</li>
+<li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'Studies' %}</a></li>
+<li><a href="{% url 'assessments' %}" id="lnk_assesments">{% trans 'Evaluations' %}</a></li>
+<li><a href="{% url 'scores_encoding' %}?{{ request.GET.urlencode }}" id="lnk_scores_encoding">{% trans 'Scores encoding' %}</a></li>
+<li><a href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" id="lnk_online_encoding">{% trans 'Online scores encoding' %}</a></li>
+<li class="active">{% trans 'Online double scores encoding' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'dubble_online_scores_encoding' %}</h2>
+    <h2>{% trans 'Online double scores encoding' %}</h2>
 </div>
 {% include "template_messages.html" %}
 <div class="panel panel-default">
@@ -48,12 +48,12 @@
         <div class="row">
             <div class="col-md-3">
                 <div class="form-group" id="pnl_responsable_name" >
-                    <label>{% trans 'scores_responsible' %}</label><br>
+                    <label>{% trans 'Scores responsible' %}</label><br>
                     {% if tutors %}
                         <a role="button" data-toggle="collapse" data-target="#tutors_by_course"
                            aria-expanded="false" class="pull-right"
                            aria-controls="tutors_by_course"
-                           title="{% trans 'display_tutors' %}">
+                           title="{% trans 'Display all tutors for this learning unit' %}">
                           <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
                         </a>
                     {% endif %}
@@ -64,10 +64,10 @@
                             {% endfor %}
                         </ul>
                     {% else %}
-                        {% trans 'none' %}
+                        {% trans 'None' %}
                     {% endif %}
                     <div class="collapse" id="tutors_by_course">
-                        <label>{% trans 'other_tutors' %}</label><br>
+                        <label>{% trans 'Other tutors' %}</label><br>
                         <ul>
                             {% for prof in tutors %}
                                 <li>{{ prof }}</li>
@@ -78,19 +78,19 @@
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>{% trans 'academic_year' %}</label><br>
+                    <label>{% trans 'Academic year' %}</label><br>
                     {{ academic_year }}
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>{% trans 'number_session' %}</label><br>
+                    <label>{% trans 'Session number' %}</label><br>
                     {{ number_session }}
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>{% trans 'number_of_enrollments' %}</label><br>
+                    <label>{% trans 'Number of enrollments' %}</label><br>
                     {{ count_total_enrollments }}
                 </div>
             </div>
@@ -99,9 +99,9 @@
         <div class="alert alert-info">
             {% get_current_language as LANGUAGE_CODE %}
             {% if enrollments.0.learning_unit_enrollment.learning_unit_year.decimal_scores %}
-              {% trans 'decimal_values_accepted' %}
+              {% trans 'Decimal values in scores are accepted.' %}
             {% else %}
-              {% trans 'decimal_values_ignored' %}
+              {% trans "Decimal values in scores are NOT accepted. If you try to put decimal values, it will be ignored." %}
             {% endif %}
         </div>
         <form class="form-inline" method="POST"
@@ -109,19 +109,19 @@
               id="form_online_double_encoding">
             {% csrf_token %}
             <button type="submit" class="btn btn-primary" id="bt_compare_up">
-                <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> {% trans 'compare' %}</button>
+                <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> {% trans 'Compare' %}</button>
             <a class="btn btn-default" href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" role="button" id="bt_cancel_online_double_encoding_up">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans 'cancel' %}</a>
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans 'Cancel' %}</a>
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>{% trans 'offer' %}</th>
-                        <th>{% trans 'registration_number' %}</th>
-                        <th>{% trans 'lastname' %}</th>
-                        <th>{% trans 'firstname' %}</th>
-                        <th>{% trans 'score' %}</th>
-                        <th>{% trans 'justification' %}</th>
-                        <th>{% trans 'end_date_teacher' %}</th>
+                        <th>{% trans 'Offer' %}</th>
+                        <th>{% trans 'Registration number' %}</th>
+                        <th>{% trans 'Lastname' %}</th>
+                        <th>{% trans 'Firstname' %}</th>
+                        <th>{% trans 'Score' %}</th>
+                        <th>{% trans 'Justification' %}</th>
+                        <th>{% trans 'Teacher deadline' %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -167,12 +167,12 @@
                                    {% endif %}>
                                 <option value=""></option>
                                 {% if is_program_manager %}
-                                    <option value="ABSENCE_UNJUSTIFIED" {% if enrollment.post_justification_encoded == 'ABSENCE_UNJUSTIFIED' %}selected{% endif %} >{% trans 'ABSENCE_UNJUSTIFIED' %}</option>
-                                    <option value="ABSENCE_JUSTIFIED" {% if enrollment.post_justification_encoded == 'ABSENCE_JUSTIFIED' %}selected{% endif %} >{% trans 'ABSENCE_JUSTIFIED' %}</option>
+                                    <option value="ABSENCE_UNJUSTIFIED" {% if enrollment.post_justification_encoded == 'ABSENCE_UNJUSTIFIED' %}selected{% endif %} >{% trans 'Unjustified absence' %}</option>
+                                    <option value="ABSENCE_JUSTIFIED" {% if enrollment.post_justification_encoded == 'ABSENCE_JUSTIFIED' %}selected{% endif %} >{% trans 'Justified absence' %}</option>
                                 {% else %}
-                                    <option value="ABSENCE_UNJUSTIFIED" {% if enrollment.post_justification_encoded == 'ABSENCE_UNJUSTIFIED' %}selected{% endif %}>{% trans 'absent' %}</option>
+                                    <option value="ABSENCE_UNJUSTIFIED" {% if enrollment.post_justification_encoded == 'ABSENCE_UNJUSTIFIED' %}selected{% endif %}>{% trans 'Absent' %}</option>
                                 {% endif %}
-                                <option value="CHEATING" {% if enrollment.post_justification_encoded == 'CHEATING' %}selected{% endif %}>{% trans 'CHEATING' %}</option>
+                                <option value="CHEATING" {% if enrollment.post_justification_encoded == 'CHEATING' %}selected{% endif %}>{% trans 'Cheating' %}</option>
                             </select>
                             <input type="hidden" id="hdn_score_changed_{{ enrollment.id }}" name="score_changed_{{ enrollment.id }}">
                         </td>
@@ -182,9 +182,9 @@
                 </tbody>
             </table>
             <button type="submit" class="btn btn-primary" id="bt_compare_down">
-                <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> {% trans 'compare' %}</button>
+                <span class="glyphicon glyphicon-transfer" aria-hidden="true"></span> {% trans 'Compare' %}</button>
             <a class="btn btn-default" href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" role="button" id="bt_cancel_online_double_encoding_down">
-                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans 'cancel' %}</a>
+                <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans 'Cancel' %}</a>
         </form>
     </div>
 </div>

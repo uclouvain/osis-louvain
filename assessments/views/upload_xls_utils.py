@@ -76,7 +76,10 @@ def upload_scores_file(request, learning_unit_year_id=None):
             try:
                 __save_xls_scores(request, file_name, learning_unit_year.id)
             except IndexError:
-                messages.add_message(request, messages.ERROR, _('xls_columns_structure_error').format(_('via_excel'), _('get_excel_file')))
+                messages.add_message(request, messages.ERROR,
+                                     _("Your excel file isn't well structured. "
+                                       "Please follow the structure of the excel file provided "
+                                       "(button '%(button_value)s')") % {'button_value':  _('Get Excel file')})
     else:
         for error_msg in [error_msg for error_msgs in form.errors.values() for error_msg in error_msgs]:
             messages.add_message(request, messages.ERROR, "{}".format(error_msg))
@@ -138,7 +141,7 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
     try:
         workbook = load_workbook(file_name, read_only=True, data_only=True)
     except KeyError:
-        messages.add_message(request, messages.ERROR, _('file_must_be_xlsx'))
+        messages.add_message(request, messages.ERROR, _("The file must be a valid 'XLSX' excel file"))
         return False
     worksheet = workbook.active
     new_scores_number = 0
@@ -156,7 +159,8 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
 
     academic_year_in_database = mdl.academic_year.find_academic_year_by_year(data_xls['academic_year'])
     if not academic_year_in_database:
-        messages.add_message(request, messages.ERROR, '%s (%s).' % (_('no_data_for_this_academic_year'), data_xls['academic_year']))
+        messages.add_message(request, messages.ERROR,
+                             '%s (%s).' % (_("No data for this academic year"), data_xls['academic_year']))
         return False
 
     score_list = score_encoding_list.get_scores_encoding_list(
@@ -181,8 +185,8 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
         try:
             _check_intergity_data(row,
                                   offer_acronyms_managed=offer_acronyms_managed_by_user,
-                                  learn_unit_acronyms_managed = learn_unit_acronyms_managed_by_user,
-                                  registration_ids_managed = registration_ids_managed_by_user,
+                                  learn_unit_acronyms_managed=learn_unit_acronyms_managed_by_user,
+                                  registration_ids_managed=registration_ids_managed_by_user,
                                   learning_unit_year=learning_unit_year)
             _check_consistency_data(row)
             updated_row = _update_row(request.user, row, enrollments_grouped, is_program_manager)
@@ -194,12 +198,12 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
     _show_error_messages(request, errors_list)
 
     if new_scores_number:
-        messages.add_message(request, messages.SUCCESS, '%s %s' % (str(new_scores_number), _('score_saved')))
+        messages.add_message(request, messages.SUCCESS, '%s %s' % (str(new_scores_number), _('Score saved')))
         if not is_program_manager:
             __warn_that_score_responsibles_must_submit_scores(request, learning_unit_year)
         return True
     else:
-        messages.add_message(request, messages.ERROR, '%s' % _('no_score_injected'))
+        messages.add_message(request, messages.ERROR, '%s' % _("No scores injected"))
         return False
 
 
@@ -266,26 +270,32 @@ def _check_intergity_data(row, **kwargs):
         # In case the xls registration_id is not in the list, we check...
         if xls_learning_unit_acronym not in learn_unit_acronyms_managed:
             # ... if it is because the user doesn't have access to the learningUnit
-            raise UploadValueError("'%s' %s" % (xls_learning_unit_acronym, _('learning_unit_not_access_or_not_exist')),
-                                   messages.ERROR)
+            raise UploadValueError("'%s' %s" % (
+                xls_learning_unit_acronym,
+                _("You don't have access rights for this learning unit or it doesn't exist in our database")),
+                messages.ERROR)
         elif learning_unit_year.acronym != xls_learning_unit_acronym:
             # ... if it is because the user has multiple learningUnit in his excel file
             # (the data from the DataBase are filtered by LearningUnitYear because excel file is build by learningUnit)
-            raise UploadValueError("%s" % _('more_than_one_learning_unit_error'), messages.ERROR)
+            raise UploadValueError(
+                "%s" % _("You encoded scores for more than 1 learning unit in your excel file (column 'Learning unit')."
+                         "Please make one excel file by learning unit."), messages.ERROR)
         elif xls_offer_year_acronym not in offer_acronyms_managed:
             # ... if it is because the user haven't access rights to the offerYear
-            raise UploadValueError("'%s' %s" % (xls_offer_year_acronym, _('offer_year_not_access_or_not_exist')),
-                                   messages.ERROR)
+            raise UploadValueError(
+                "'%s' %s" % (xls_offer_year_acronym,
+                             _("You don't have access rights for this offer or it doesn't exist in our database")),
+                messages.ERROR)
         else:
             # ... if it's beacause the registration id doesn't exist
-            raise UploadValueError("%s" % _('registration_id_not_access_or_not_exist'), messages.ERROR)
+            raise UploadValueError("%s" % _("Student not registered for exam"), messages.ERROR)
 
 
 def _check_consistency_data(row):
     xls_registration_id = _extract_registration_id(row)
     xls_email = _extract_email(row)
     if not _registration_id_matches_email(xls_registration_id, xls_email):
-        raise UploadValueError("%s" % _('registration_id_does_not_match_email'), messages.ERROR)
+        raise UploadValueError("%s" % _("Registration ID does not match email"), messages.ERROR)
 
 
 def _registration_id_matches_email(registration_id, email):
@@ -303,18 +313,20 @@ def _update_row(user, row, enrollments_managed_grouped, is_program_manager):
     enrollments = enrollments_managed_grouped.get(key, [])
 
     if not enrollments:
-        raise ValueError("%s!" % _('enrollment_activity_not_exist') % (xls_learning_unit_acronym))
+        raise ValueError("%s!" %
+                         _("The enrollment to the activity %(xls_learning_unit_acronym)s doesn't exist")
+                         % xls_learning_unit_acronym)
 
     enrollment = enrollments[0]
 
     if score_encoding_list.is_deadline_reached(enrollment, is_program_manager):
-        raise UploadValueError("%s" % _('deadline_reached'), messages.ERROR)
+        raise UploadValueError("%s" % _("Deadline reached"), messages.ERROR)
 
     if not is_program_manager and enrollment.is_final:
-        raise UploadValueError("%s" % _('score_already_submitted'), messages.WARNING)
+        raise UploadValueError("%s" % _("Score already submitted"), messages.WARNING)
 
     if (xls_score or xls_score == 0) and xls_justification:
-        raise UploadValueError("%s" % _('constraint_score_other_score'), messages.ERROR)
+        raise UploadValueError("%s" % _("You can't encode a 'score' and a 'justification' together"), messages.ERROR)
 
     if xls_justification and _is_informative_justification(enrollment, xls_justification, is_program_manager):
        return False
@@ -343,7 +355,8 @@ def _is_informative_justification(enrollment, xls_justification, is_program_mana
 def __warn_that_score_responsibles_must_submit_scores(request, learning_unit_year):
     tutor = mdl.tutor.find_by_user(request.user)
     if tutor and not mdl_attr.attribution.is_score_responsible(request.user, learning_unit_year):
-        messages.add_message(request, messages.SUCCESS, '%s' % _('scores_responsible_must_still_submit_scores'))
+        messages.add_message(request, messages.SUCCESS,
+                             '%s' % _("The scores responsible must still submit the scores"))
 
 
 def _get_justification_from_aliases(enrollment, justification_encoded):
@@ -354,13 +367,14 @@ def _get_justification_from_aliases(enrollment, justification_encoded):
         _check_is_user_try_change_justified_to_unjustified_absence(enrollment, justification)
         return justification
     else:
-        raise UploadValueError('%s' % _('justification_invalid_value'), messages.ERROR)
+        raise UploadValueError('%s' % _("Invalid justification value"), messages.ERROR)
 
 
 def _check_is_user_try_change_justified_to_unjustified_absence(enrollment, justification):
     if justification == justification_types.ABSENCE_UNJUSTIFIED and \
        enrollment.justification_final == justification_types.ABSENCE_JUSTIFIED:
-            raise UploadValueError('%s' % _('absence_justified_to_unjustified_invalid'), messages.ERROR)
+            raise UploadValueError(
+                '%s' % _("Absence justified cannot be remplaced by absence unjustified"), messages.ERROR)
 
 
 def _show_error_messages(request, errors_list):
@@ -389,7 +403,7 @@ def _extract_error_message(error):
     elif isinstance(error, ValidationError):
         return _(error.messages[0])
     elif isinstance(error, decimal.InvalidOperation):
-        return _('scores_must_be_between_0_and_20')
+        return _("Scores must be between 0 and 20")
     return _(error.args[0])
 
 

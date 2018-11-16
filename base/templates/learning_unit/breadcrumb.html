@@ -25,6 +25,6 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a></li>
-<li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'learning_units' %}</a></li>
-<li class="active">{% if learning_unit_year.id %}{{ learning_unit_year.acronym }}{% else %}{% trans 'learning_unit' %}{% endif %}</li>
+<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
+<li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></li>
+<li class="active">{% if learning_unit_year.id %}{{ learning_unit_year.acronym }}{% else %}{% trans 'Learning unit' %}{% endif %}</li>

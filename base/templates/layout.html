@@ -118,24 +118,24 @@
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                    aria-haspopup="true"
                                    aria-expanded="false"
-                                   id="lnk_home_dropdown_catalog">{% trans 'formation_catalogue' %}<span
+                                   id="lnk_home_dropdown_catalog">{% trans 'Formation catalogue' %}<span
                                         class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                     {% if perms.base.can_access_offer %}
                                         <li><a href="{% url 'offers' %}"
-                                               id="lnk_dropdown_offers">{% trans 'offers' %}</a></li>
+                                               id="lnk_dropdown_offers">{% trans 'Offers' %}</a></li>
                                     {% endif %}
                                     {% if perms.base.can_access_education_group %}
                                         <li><a href="{% url 'education_groups' %}"
-                                               id="lnk_dropdown_educationgroups">{% trans 'formations' %}</a></li>
+                                               id="lnk_dropdown_educationgroups">{% trans 'Trainings' %}</a></li>
                                     {% endif %}
                                     {% if perms.base.can_access_learningunit %}
                                         <li><a href="{% url 'learning_units' %}"
-                                               id="lnk_dropdown_learning_units">{% trans 'learning_units' %}</a></li>
+                                               id="lnk_dropdown_learning_units">{% trans 'Learning units' %}</a></li>
                                     {% endif %}
                                     {% if perms.base.can_access_academicyear %}
                                         <li><a href="{% url 'academic_year' %}"
-                                               id="lnk_dropdown_academic_year">{% trans 'academic_year' %}</a></li>
+                                               id="lnk_dropdown_academic_year">{% trans 'Academic year' %}</a></li>
                                     {% endif %}
                                 </ul>
                             </li>
@@ -144,20 +144,20 @@
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                    aria-haspopup="true"
-                                   aria-expanded="false" id="lnk_home_dropdown_parcours">{% trans 'student_path' %}<span
+                                   aria-expanded="false" id="lnk_home_dropdown_parcours">{% trans 'Student path' %}<span
                                         class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                     {% if 'assessments' in installed_apps and perms.base.can_access_evaluation %}
                                         <li><a href="{% url 'assessments' %}"
-                                               id="lnk_dropdown_evaluations">{% trans 'evaluations' %}</a></li>
+                                               id="lnk_dropdown_evaluations">{% trans 'Evaluations' %}</a></li>
                                     {% endif %}
                                     {% if perms.base.can_access_student %}
                                         <li><a href="{% url 'students' %}"
-                                               id="lnk_dropdown_students">{% trans 'students_title' %}</a></li>
+                                               id="lnk_dropdown_students">{% trans 'Students' %}</a></li>
                                     {% endif %}
                                     {% if 'internship' in installed_apps and perms.internship.can_access_internship %}
                                         <li><a href="{% url 'internship' %}"
-                                               id="lnk_dropdown_internships">{% trans 'internships' %}</a></li>
+                                               id="lnk_dropdown_internships">{% trans 'Internships' %}</a></li>
                                     {% endif %}
                                 </ul>
                             </li>
@@ -166,21 +166,21 @@
                             <li class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                    aria-haspopup="true"
-                                   aria-expanded="false" id="lnk_home_dropdown_institution">{% trans 'institution' %}
+                                   aria-expanded="false" id="lnk_home_dropdown_institution">{% trans 'Institution' %}
                                     <span
                                             class="caret"></span></a>
                                 <ul class="dropdown-menu">
                                     {% if perms.base.can_access_organization %}
                                         <li><a href="{% url 'organizations' %}"
-                                               id="lnk_organizations">{% trans 'organizations' %}</a></li>
+                                               id="lnk_organizations">{% trans 'Organizations' %}</a></li>
                                     {% endif %}
                                     {% if perms.base.can_access_structure %}
                                         <li><a href="{% url 'entities' %}"
-                                               id="lnk_dropdown_entities">{% trans 'entities' %}</a></li>
+                                               id="lnk_dropdown_entities">{% trans 'Entities' %}</a></li>
                                     {% endif %}
                                     {% if perms.base.is_entity_manager %}
                                         <li><a href="{% url 'academic_actors' %}"
-                                               id="lnk_dropdown_academic actors">{% trans 'academic_actors' %}</a></li>
+                                               id="lnk_dropdown_academic actors">{% trans 'Academic actors' %}</a></li>
                                     {% endif %}
                                 </ul>
                             </li>
@@ -190,23 +190,27 @@
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
                                    aria-haspopup="true"
                                    aria-expanded="false"
-                                   id="lnk_home_dropdown_partnerships">{% trans 'partnerships' %}
+                                   id="lnk_home_dropdown_partnerships">{% trans 'Partnerships' %}
                                   <span
                                     class="caret"></span></a>
                               <ul class="dropdown-menu">
-                                <li><a href="{% url 'partnerships:list' %}"
-                                       id="lnk_dropdown_partnerships">{% trans 'partnerships' %}</a></li>
                                 {% if perms.partnership.change_uclmanagemententity %}
                                   <li><a href="{% url 'partnerships:ucl_management_entities:list' %}"
-                                         id="lnk_dropdown_uclmanagemententities">{% trans 'ucl_management_entities' %}</a></li>
+                                         id="lnk_dropdown_uclmanagemententities">{% trans 'Management entity' %}</a></li>
                                 {% endif %}
                                 <li><a href="{% url 'partnerships:partners:list' %}"
-                                       id="lnk_dropdown_partners">{% trans 'partners' %}</a></li>
-                                <li><a href="{% url 'partnerships:list' %}?agreeements=1"
+                                       id="lnk_dropdown_partners">{% trans 'Partners' %}</a></li>
+                                <li><a href="{% url 'partnerships:list' %}"
+                                       id="lnk_dropdown_partnerships">{% trans 'partnerships' %}</a></li>
+                                <li><a href="{% url 'partnerships:list' %}?agreements=1"
                                        id="lnk_dropdown_agreements">{% trans 'agreements' %}</a></li>
                                 {% if perms.partnership.change_partnershipconfiguration %}
                                   <li><a href="{% url 'partnerships:configuration_update' %}"
-                                         id="lnk_dropdown_general_conf">{% trans 'general_configuration' %}</a></li>
+                                         id="lnk_dropdown_partnerships_general_conf">{% trans 'General configuration' %}</a></li>
+                                {% endif %}
+                                {% if perms.partnership.change_financing %}
+                                  <li><a href="{% url 'partnerships:financings:list' %}"
+                                         id="lnk_dropdown_partnerships_financing_conf">{% trans 'partnerships_financing_configuration' %}</a></li>
                                 {% endif %}
                               </ul>
                             </li>
@@ -221,7 +225,7 @@
                         {% if perms.base.is_administrator %}
                             <li><a href="{% url 'data' %}" role="button" id="bt_administration">
                                 <span class="glyphicon glyphicon-tower" aria-hidden="true"></span>
-                                {% trans 'administration' %}</a></li>
+                                {% trans 'Administration' %}</a></li>
                         {% endif %}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
@@ -247,11 +251,11 @@
                             <ul class="dropdown-menu">
                                 <li><a href="{% url 'my_osis' %}" id="lnk_my_osis">
                                     <span class="glyphicon glyphicon glyphicon-user" aria-hidden="true"></span>
-                                    {% trans 'my_osis' %}</a></li>
+                                    {% trans 'My OSIS' %}</a></li>
                                 <li role="separator" class="divider"></li>
                                 <li><a href="{% url 'logout' %}?next=/" id="lnk_logout">
                                     <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
-                                    {% trans 'logout' %}</a></li>
+                                    {% trans 'Logout' %}</a></li>
                             </ul>
                         </li>
                         <li>
@@ -259,7 +263,7 @@
                         </li>
                     {% else %}
                         <li><a href="{% url 'login' %}" id="lnk_login"><span class="glyphicon glyphicon-lock"
-                                                                             aria-hidden="true"></span> {% trans 'login' %}
+                                                                             aria-hidden="true"></span> {% trans 'Login' %}
                         </a>
                         </li>
                     {% endif %}
@@ -278,7 +282,7 @@
 <div id="alert_wrong_version" class="container">
     <div class="alert alert-warning">
         <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
-        {% trans 'old_browser_warning' %}
+        {% trans 'Your browser is out of date. This can lead to unknown behaviour.' %}
     </div>
 </div>
 {% if subject %}
@@ -305,7 +309,7 @@
     {% endif %}
     {% if experimental_phase %}
         <div class="alert alert-warning" style="margin-bottom: 10px;">
-            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'experimental_phase' %}.
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'This feature is in testing phase' %}.
         </div>
     {% endif %}
 
@@ -314,7 +318,7 @@
     {# FIXME ! It is forbidden to add something in the main layout for a specific need. Use messages instead !#}
     {% if warnings %}
         <div class="alert alert-warning" style="margin-bottom: 10px">
-            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'warnings_detected' %}
+            <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'We detected inconsistencies in the following data :' %}
             <button id="btn_expandButton" type="button" class="btn" data-toggle="collapse" data-target="#CollapseWarnings"
                     style="background-color: transparent;">
                 <span id="expandButton" class="glyphicon glyphicon-collapse-down" aria-hidden="true"
@@ -352,11 +356,11 @@
     <div class="container-fluid p0-50">
         <p class="navbar-text pull-left"><a
                 href="{{ user_manual.global }}"
-                target="_blank" id="lnk_user_manual">{% trans 'documentation' %}</a> |
+                target="_blank" id="lnk_user_manual">{% trans 'Documentation' %}</a> |
             <a href="http://uclouvain.github.io/osis/" target="_blank"
-               id="lnk_osis_website">{% trans 'website' %}</a> |
+               id="lnk_osis_website">{% trans 'Website' %}</a> |
             <a href="https://github.com/uclouvain/osis" target="_blank"
-               id="lnk_osis_source_code">{% trans 'source_code' %}</a>
+               id="lnk_osis_source_code">{% trans 'Source code' %}</a>
             {% if release_tag %}
                 |<a href="https://github.com/uclouvain/osis/releases/tag/{{ release_tag }}" target="_blank"
                     id="lnk_latest_tag">v{{ release_tag }}</a>

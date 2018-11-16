@@ -29,9 +29,9 @@
 
 {% block breadcrumb %}
     <li>
-        <a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a>
+        <a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a>
     </li>
-    <li class="active">{% trans 'education_groups' %}</li>
+    <li class="active">{% trans 'Education groups' %}</li>
 {% endblock %}
 
 {% block content %}
@@ -39,7 +39,7 @@
     <div class="page-header">
         <div class="row">
             <div class="col-md-10">
-                <h2>{% trans 'education_groups' %}</h2>
+                <h2>{% trans 'Education groups' %}</h2>
             </div>
             <div class="col-md-2" style="margin-top:20px;">
                 <div class="btn-group pull-right">
@@ -83,7 +83,7 @@
                                     {% if request.GET.with_entity_subordinated and 'on' == request.GET.with_entity_subordinated %}
                                    checked
                                     {% endif %} >
-                            <label>{% trans 'with_entity_subordinated_small' %}</label>
+                            <label>{% trans 'With subord. ent.' %}</label>
                         </div>
                     </div>
                     <div class="col-md-2">
@@ -107,7 +107,7 @@
                 {% if object_list %}
                     <div class="row">
                         <div class="col-md-6">
-                            <strong style="margin-left:10px;color:grey;"> {{ object_list_count }} {% trans 'education_groups'|lower %} </strong>
+                            <strong style="margin-left:10px;color:grey;"> {{ object_list_count }} {% trans 'Education groups'|lower %} </strong>
                         </div>
                         <div class="col-md-6">
                             <button id="dLabel" class="btn btn-default pull-right" type="button"
@@ -144,11 +144,11 @@
                     <table id="table_education_groups" class="table table-striped table-hover">
                         <thead>
                         <tr>
-                            <th id="th_0_academic_year.year">{% trans 'academic_year_small' %}</th>
-                            <th id="th_1_acronym">{% trans 'acronym' %}</th>
-                            <th id="th_2_title">{% trans 'title' %}</th>
+                            <th id="th_0_academic_year.year">{% trans 'Ac yr.' %}</th>
+                            <th id="th_1_acronym">{% trans 'Acronym' %}</th>
+                            <th id="th_2_title">{% trans 'Title' %}</th>
                             <th id="th_3_education_group_type.name">{% trans 'type' %}</th>
-                            <th id="th_4_management_entity_version.acronym">{% trans 'entity' %}</th>
+                            <th id="th_4_management_entity_version.acronym">{% trans 'Entity' %}</th>
                             <th id="th_5_partial_acronym">{% trans 'code' %}</th>
                         </tr>
                         </thead>
@@ -229,8 +229,8 @@
                     "searching": false,
                     "language": {
                         "oAria": {
-                            "sSortAscending": "{% trans 'datatable_sortascending'%}",
-                            "sSortDescending": "{% trans 'datatable_sortdescending'%}",
+                            "sSortAscending": "{% trans 'activate to sort column ascending'%}",
+                            "sSortDescending": "{% trans 'activate to sort column descending'%}",
                         }
                     }
                 });

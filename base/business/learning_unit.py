@@ -56,32 +56,32 @@ XLS_FILENAME = 'learning_units_filename'
 XLS_DESCRIPTION = "List_activities"
 LEARNING_UNIT_TITLES_PART1 = [
     str(_('code')),
-    str(_('academic_year_small')),
-    str(_('title')),
+    str(_('Ac yr.')),
+    str(_('Title')),
     str(_('type')),
-    str(_('subtype')),
-    str(_('requirement_entity_small')),
-    str(_('proposal_type')),
-    str(_('proposal_status')),
+    str(_('Subtype')),
+    str(_('Req. Entity')),
+    str(_('Proposal type')),
+    str(_('Proposal status')),
     str(_('credits')),
-    str(_('allocation_entity_small')),
-    str(_('title_in_english')),
+    str(_('Alloc. Ent.')),
+    str(_('Title in English')),
 ]
 
 LEARNING_UNIT_TITLES_PART2 = [
-    str(_('periodicity')),
-    str(_('active_title')),
-    "{} 1 - {}".format(_('Hourly vol.'), _('ANNUAL')),
+    str(_('Periodicity')),
+    str(_('Active')),
+    "{} 1 - {}".format(_('Hourly vol.'), _('Annual')),
     "{} 1 - {}".format(_('Hourly vol.'), _('1st quadri')),
     "{} 1 - {}".format(_('Hourly vol.'), _('2nd quadri')),
-    "{} 1".format(_('PLANNED_CLASSES')),
-    "{} 2 - {}".format(_('Hourly vol.'), _('ANNUAL')),
+    "{} 1".format(_('Planned classes')),
+    "{} 2 - {}".format(_('Hourly vol.'), _('Annual')),
     "{} 2 - {}".format(_('Hourly vol.'), _('1st quadri')),
     "{} 2 - {}".format(_('Hourly vol.'), _('2nd quadri')),
-    "{} 2".format(_('PLANNED_CLASSES')),
-    str(_('quadrimester')),
-    str(_('session_title')),
-    str(_('language')),
+    "{} 2".format(_('Planned classes')),
+    str(_('Quadrimester')),
+    str(_('Session derogation')),
+    str(_('Language')),
     str(_('Absolute credits')),
 ]
 CMS_LABEL_SPECIFICATIONS = ['themes_discussed', 'prerequisite']
@@ -161,8 +161,10 @@ def get_cms_label_data(cms_label, user_language):
 
 def _learning_unit_usage(a_learning_component_year):
     components = mdl_base.learning_unit_component.find_by_learning_component_year(a_learning_component_year)
-    return ", ".join(["{} ({})".format(c.learning_unit_year.acronym, _(c.learning_unit_year.quadrimester or '?'))
-                      for c in components])
+    return ", ".join(["{} ({})".format(
+        c.learning_unit_year.acronym,
+        _(c.learning_unit_year.quadrimester) if c.learning_unit_year.quadrimester else '?'
+    ) for c in components])
 
 
 def _learning_unit_usage_by_class(a_learning_class_year):

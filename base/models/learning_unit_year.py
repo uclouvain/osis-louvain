@@ -53,7 +53,11 @@ def academic_year_validator(value):
     academic = AcademicYear.objects.get(pk=value)
     academic_year_max = compute_max_academic_year_adjournment()
     if academic.year > academic_year_max:
-        raise ValidationError(_('learning_unit_creation_academic_year_max_error').format(academic_year_max))
+        raise ValidationError(
+            _('Please select an academic year lower than %(academic_year_max)d.') % {
+                'academic_year_max': academic_year_max,
+            }
+        )
 
 
 class LearningUnitYearAdmin(SerializableModelAdmin):
@@ -104,7 +108,7 @@ class ExtraManagerLearningUnitYear(models.Model):
 
 class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    academic_year = models.ForeignKey(AcademicYear, verbose_name=_('academic_year'),
+    academic_year = models.ForeignKey(AcademicYear, verbose_name=_('Academic year'),
                                       validators=[academic_year_validator])
     learning_unit = models.ForeignKey('LearningUnit')
     learning_container_year = models.ForeignKey('LearningContainerYear', null=True)
@@ -112,9 +116,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     acronym = models.CharField(max_length=15, db_index=True, verbose_name=_('code'),
                                validators=[RegexValidator(LEARNING_UNIT_ACRONYM_REGEX_ALL)])
     specific_title = models.CharField(max_length=255, blank=True, null=True,
-                                      verbose_name=_('title_proper_to_UE'))
+                                      verbose_name=_('English title proper'))
     specific_title_english = models.CharField(max_length=250, blank=True, null=True,
-                                              verbose_name=_('english_title_proper_to_UE'))
+                                              verbose_name=_('English title proper'))
     subtype = models.CharField(max_length=50, choices=learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
                                default=learning_unit_year_subtypes.FULL)
     credits = models.DecimalField(null=True, max_digits=5, decimal_places=2,
@@ -123,26 +127,31 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     decimal_scores = models.BooleanField(default=False)
     structure = models.ForeignKey('Structure', blank=True, null=True)
     internship_subtype = models.CharField(max_length=250, blank=True, null=True,
-                                          verbose_name=_('internship_subtype'),
+                                          verbose_name=_('Internship subtype'),
                                           choices=internship_subtypes.INTERNSHIP_SUBTYPES)
-    status = models.BooleanField(default=False, verbose_name=_('active_title'))
+    status = models.BooleanField(default=False, verbose_name=_('Active'))
     session = models.CharField(max_length=50, blank=True, null=True,
                                choices=learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION,
-                               verbose_name=_('session_title'))
-    quadrimester = models.CharField(max_length=9, blank=True, null=True, verbose_name=_('quadrimester'),
+                               verbose_name=_('Session derogation'))
+    quadrimester = models.CharField(max_length=9, blank=True, null=True, verbose_name=_('Quadrimester'),
                                     choices=quadrimesters.LEARNING_UNIT_YEAR_QUADRIMESTERS)
-    attribution_procedure = models.CharField(max_length=20, blank=True, null=True, verbose_name=_('procedure'),
-                                             choices=attribution_procedure.ATTRIBUTION_PROCEDURES)
-    summary_locked = models.BooleanField(default=False, verbose_name=_("summary_locked"))
 
-    professional_integration = models.BooleanField(default=False, verbose_name=_('professional_integration'))
+    attribution_procedure = models.CharField(
+        max_length=20, blank=True, null=True,
+        verbose_name=_('Procedure'),
+        choices=attribution_procedure.ATTRIBUTION_PROCEDURES
+    )
 
-    campus = models.ForeignKey('Campus', null=True, verbose_name=_("learning_location"))
+    summary_locked = models.BooleanField(default=False, verbose_name=_("blocked update for tutor"))
 
-    language = models.ForeignKey('reference.Language', null=True, verbose_name=_('language'))
+    professional_integration = models.BooleanField(default=False, verbose_name=_('professional integration'))
+
+    campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"))
+
+    language = models.ForeignKey('reference.Language', null=True, verbose_name=_('Language'))
 
     periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
-                                   verbose_name=_('periodicity'))
+                                   verbose_name=_('Periodicity'))
     _warnings = None
 
     class Meta:
@@ -229,22 +238,23 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def container_type_verbose(self):
         container_type = ''
         if self.learning_container_year:
-            container_type = _(self.learning_container_year.container_type)
+            container_type = _(self.learning_container_year.get_container_type_display())
 
             if self.learning_container_year.container_type in (COURSE, INTERNSHIP):
-                container_type += " ({subtype})".format(subtype=_(self.subtype))
+                container_type += " ({subtype})".format(subtype=self.get_subtype_display())
 
         return container_type
 
     @property
     def status_verbose(self):
-        return _("active") if self.status else _("inactive")
+        return _("Active") if self.status else _("Inactive")
 
     @property
     def internship_subtype_verbose(self):
-        return _('to_complete') if self.learning_container_year and \
-                                   self.learning_container_year.container_type == INTERNSHIP and \
-                                   not self.internship_subtype else self.internship_subtype
+        if self.learning_container_year and self.learning_container_year.container_type == INTERNSHIP and \
+                not self.internship_subtype:
+            return _('To complete')
+        return self.get_internship_subtype_display()
 
     @property
     def get_previous_acronym(self):
@@ -305,9 +315,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     def clean_acronym(self, learning_unit_years):
         if self.acronym in learning_unit_years.values_list('acronym', flat=True):
-            raise ValidationError({'acronym': _('already_existing_acronym')})
+            raise ValidationError({'acronym': _('Existing acronym')})
         if not re.match(REGEX_BY_SUBTYPE[self.subtype], self.acronym):
-            raise ValidationError({'acronym': _('invalid_acronym')})
+            raise ValidationError({'acronym': _('Invalid code')})
 
     @property
     def warnings(self):
@@ -341,7 +351,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         if getattr(self, 'learning_container_year', None):
             if (self.learning_container_year.container_type == learning_container_year_types.INTERNSHIP and
                     not self.internship_subtype):
-                warnings.append(_('missing_internship_subtype'))
+                warnings.append(_('It is necessary to indicate the internship subtype.'))
         return warnings
 
     def _check_partim_parent_status(self):

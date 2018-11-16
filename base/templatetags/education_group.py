@@ -219,7 +219,7 @@ def button_edit_administrative_data(context):
     return {
         'is_disabled': is_disabled,
         'message': permission_denied_message,
-        'text': _('Modify'),
+        'text': _('Edit'),
         'url': reverse('education_group_edit_administrative', args=[root.pk, education_group_year.pk])
     }
 
@@ -400,7 +400,9 @@ def link_detach_education_group(context, url):
         if not context['can_change_education_group']:
             title += _("The user has not permission to change education groups.")
         if context['group_to_parent'] == '0':
-            title += " " + _("It is not possible to {action} the root element.".format(action=str.lower(action)))
+            title += " " + _("It is not possible to %(action)s the root element.") % {
+                "action": str.lower(_(action))
+            }
 
         a_attributes = """ title="{title}" """.format(title=title)
     text = _(action)
@@ -434,7 +436,7 @@ def link_pdf_content_education_group(url):
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=True)
-def dl_with_parent(context, dl_title, key=None, class_dl="", default_value=None):
+def dl_with_parent(context, dl_title, key, class_dl="", default_value=None):
     """
     Tag to render <dl> for details of education_group.
     If the fetched value does not exist for the current education_group_year,
@@ -448,10 +450,6 @@ def dl_with_parent(context, dl_title, key=None, class_dl="", default_value=None)
     :param default_value: display a default value in <dd> if no value was found.
     :return: dict
     """
-
-    if not key:
-        key = dl_title
-
     education_group_year = context.get('education_group_year')
     value = _fetch_value_with_attrgetter(education_group_year, key)
 

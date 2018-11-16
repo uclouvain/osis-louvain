@@ -38,6 +38,6 @@ SCORE_MISSING = "SCORE_MISSING"
 #    'ABSENCE_JUSTIFIED'   => 'M'
 #    'CHEATING'            => 'T'
 JUSTIFICATION_TYPES = (
-    (ABSENCE_UNJUSTIFIED, _('ABSENCE_UNJUSTIFIED')),  # A -> S
-    (ABSENCE_JUSTIFIED, _('ABSENCE_JUSTIFIED')),      # M
-    (CHEATING, _('CHEATING')))                        # T
+    (ABSENCE_UNJUSTIFIED, _('Absence unjustified')),  # A -> S
+    (ABSENCE_JUSTIFIED, _('Absence justified')),      # M
+    (CHEATING, _('Cheating')))                        # T

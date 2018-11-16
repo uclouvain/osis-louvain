@@ -39,8 +39,8 @@
                             <button type="button" class="btn btn-default" style="margin-left:10px;"
                                     id="btn_modal_mail_educational_information_update_reminder"
                                     data-toggle="modal" data-target="#modal_mail_summary_reminder"
-                                    {% if not formset %}disabled title='{% trans 'need_no_reminder' %}'{% endif %}>
-                                {% trans 'educational_information_update_reminder' %}
+                                    {% if not formset %}disabled title='{% trans 'Need no reminder' %}'{% endif %}>
+                                {% trans 'Mail to remind educational information update' %}
                             </button>
                         {% endflag %}
                     </div>
@@ -55,7 +55,7 @@
                             </button>
                             <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
                                 <li>
-                                    {% trans 'list of required teaching material' as title_material%}
+                                    {% trans 'list of required teaching materials' as title_material%}
                                     <a id="btn_teaching_material_xls" title="{{ title_material|capfirst }}" >
                                         {{ title_material|capfirst }}
                                     </a>
@@ -67,19 +67,19 @@
                 <br>
                 <strong style="margin-left:10px;color:grey;">
                     {{learning_units_with_errors|length}}
-                    {% trans 'learning_units'|lower %}
+                    {% trans 'Learning units'|lower %}
                 </strong>
 
                 <table id="table_learning_units" class="table table-striped table-hover">
                     <thead>
                     <tr>
-                        <th>{% trans 'academic_year_small'%}</th>
+                        <th>{% trans 'Ac yr.'%}</th>
                         <th>{% trans 'code'%}</th>
-                        <th  id="lu_title_sort">{% trans 'title'%}</th>
+                        <th  id="lu_title_sort">{% trans 'Title'%}</th>
                         <th>{% trans 'type'%}</th>
-                        <th>{% trans 'subtype'%}</th>
-                        <th>{% trans 'summary_responsible' %}</th>
-                        <th>{% trans 'status' %}</th>
+                        <th>{% trans 'Subtype'%}</th>
+                        <th>{% trans 'Summary responsible(s)' %}</th>
+                        <th>{% trans 'Status' %}</th>
                     </tr>
                     </thead>
                     {% for learning_unit, error in learning_units_with_errors %}
@@ -115,7 +115,7 @@
                     {% endfor %}
                 </table>
             {% else %}
-                <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
+                <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
             {% endif %}
             <form method="post" action="{% url 'email_educational_information_update' %}">
                 {% csrf_token %}

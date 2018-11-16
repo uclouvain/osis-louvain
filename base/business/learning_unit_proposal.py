@@ -50,8 +50,8 @@ END_FOREIGN_KEY_NAME = "_id"
 NO_PREVIOUS_VALUE = '-'
 # TODO : VALUES_WHICH_NEED_TRANSLATION ?
 VALUES_WHICH_NEED_TRANSLATION = ["periodicity", "container_type", "internship_subtype"]
-LABEL_ACTIVE = _('active')
-LABEL_INACTIVE = _('inactive')
+LABEL_ACTIVE = _('Active')
+LABEL_INACTIVE = _('Inactive')
 INITIAL_DATA_FIELDS = {
         'learning_container_year': [
             "id", "acronym", "common_title", "container_type", "in_charge"

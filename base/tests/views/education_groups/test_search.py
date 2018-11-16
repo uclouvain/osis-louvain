@@ -193,7 +193,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertEqual(context["experimental_phase"], True)
         self.assertEqual(len(context["object_list"]), 0)
         messages = [str(m) for m in context["messages"]]
-        self.assertIn(_('no_result'), messages)
+        self.assertIn(_('No result!'), messages)
 
     def test_search_with_acronym_only(self):
         response = self.client.get(self.url, data={"acronym": self.education_group_arke2a.acronym})

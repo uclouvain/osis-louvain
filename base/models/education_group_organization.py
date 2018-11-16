@@ -43,7 +43,7 @@ class EducationGroupOrganization(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     education_group_year = models.ForeignKey('EducationGroupYear')
     organization = models.ForeignKey('Organization')
-    all_students = models.BooleanField(default=False, verbose_name=_('for_all_students'))
+    all_students = models.BooleanField(default=False, verbose_name=_('For all students'))
     enrollment_place = models.BooleanField(default=False, verbose_name=_('Reference institution'))
     diploma = models.CharField(max_length=40,
                                choices=diploma_coorganization.COORGANIZATION_DIPLOMA_TYPE,

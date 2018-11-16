@@ -126,7 +126,7 @@ class LearningUnitYearDeletion(TestCase):
                                           'tutor': attribution_2.tutor},
                       msg)
 
-        msg_delete_offer_type = _('lu_included_in_group')
+        msg_delete_offer_type = _('%(subtype)s %(acronym)s is included in the group %(group)s for the year %(year)s')
 
         self.assertIn(msg_delete_offer_type
                       % {'subtype': _('The partim'),
@@ -237,10 +237,11 @@ class LearningUnitYearDeletion(TestCase):
 
         msg = deletion.delete_from_given_learning_unit_year(learning_unit_year)
 
-        msg_success = _("learning_unit_successfuly_deleted")
-        self.assertEqual(msg_success.format(acronym=learning_unit_year.acronym,
-                                            academic_year=learning_unit_year.academic_year),
-                         msg.pop())
+        msg_success = _("Learning unit %(acronym)s (%(academic_year)s) successfuly deleted.") % {
+            'acronym': learning_unit_year.acronym,
+            'academic_year': learning_unit_year.academic_year,
+        }
+        self.assertEqual(msg_success, msg.pop())
 
         self.assertEqual(LearningClassYear.objects.all().count(), 0)
 

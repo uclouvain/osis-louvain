@@ -26,10 +26,10 @@
 {% endcomment %}
 
 {% block content %}
-  <h1>{% trans 'log-in' %}</h1>
+  <h1>{% trans 'Login' %}</h1>
   {% if form.errors %}
     <p class="text-danger">
-      {% trans 'msg_error_username_password_not_matching' %}
+      {% trans "Your username and password didn't match. Please try again." %}
     </p>
   {% endif %}
   <br>
@@ -37,11 +37,11 @@
     {% csrf_token %}
     <div style="width: 300px;">
       <div class="form-group">
-        <label class="control-label" for="username">{% trans 'user' %}</label>
+        <label class="control-label" for="username">{% trans 'User' %}</label>
         <input id="id_username" maxlength="254" name="username" type="text" class="form-control" placeholder="utilisateur">
       </div>
       <div class="form-group">
-        <label class="control-label" for="password">{% trans 'password' %}</label>
+        <label class="control-label" for="password">{% trans 'Password' %}</label>
         <input id="id_password" name="password" type="password" class="form-control" placeholder="mot de passe">
       </div>
       <input type="hidden" name="next" value="{{ next }}" />

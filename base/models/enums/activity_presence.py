@@ -29,8 +29,9 @@ YES = "YES"
 NO = "NO"
 OPTIONAL = "OPTIONAL"
 
+# TODO replace it by a boolean value.
 ACTIVITY_PRESENCES = (
-    (YES, _(YES)),
-    (NO, _(NO)),
-    (OPTIONAL, _(OPTIONAL))
+    (YES, _("yes")),
+    (NO, _("no")),
+    (OPTIONAL, _("optional"))
 )

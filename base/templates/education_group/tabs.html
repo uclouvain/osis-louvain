@@ -36,13 +36,13 @@
 <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" {% if request.path == url_identification_tab %} class="active" {% endif %}>
         <a id="link_identification" href="{% url 'education_group_read' root.pk education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
-            {% trans 'identification'%}
+            {% trans 'Identification'%}
         </a>
     </li>
     {% if education_group_year.education_group_type.category == "TRAINING" %}
     <li role="presentation" {% if request.path == url_diplomas_tab %} class="active" {% endif %}>
         <a id="link_diploma" href="{% url 'education_group_diplomas' root.pk education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
-            {% trans 'diplomas_certificates' %}
+            {% trans 'Diplomas /  Certificates' %}
         </a>
     </li>
     {% endif %}
@@ -50,7 +50,7 @@
     <li role="presentation" {% if request.path == url_general_informations_tab %} class="active" {% endif %}>
         <a id="link_general_information"
            href="{% url 'education_group_general_informations' root.pk education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
-            {% trans 'general_informations' %}
+            {% trans 'General informations' %}
         </a>
     </li>
     <li role="presentation" {% if request.path == url_skill_achievements_tab %} class="active" {% endif %}>
@@ -64,13 +64,13 @@
     <li role="presentation" {% if request.path == url_administrative_tab %} class="active" {% endif %}>
         <a id="link_administrative" href="{% url 'education_group_administrative' root.pk education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}"
            role="tab">
-            {% trans 'administrative_data' %}
+            {% trans 'Administrative data' %}
         </a>
     </li>
     {% endif %}
     <li role="presentation" {% if request.path == url_content_tab %} class="active" {% endif %}>
         <a id="link_content" href="{% url 'education_group_content' root.pk education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
-            {% trans 'content' %}
+            {% trans 'Content' %}
         </a>
     </li>
     <li role="presentation" {% if request.path == url_utilization_tab %} class="active" {% endif %}>

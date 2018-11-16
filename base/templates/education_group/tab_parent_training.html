@@ -35,7 +35,7 @@
                     <br>
                     <div class="row">
                         <div class="col-md-6">
-                        <label>{% trans 'focuses'%}</label> :
+                        <label>{% trans 'Focuses'%}</label> :
                         {% for child in education_group_year.children_by_group_element_year %}
                             <a href="{% url 'education_group_read' education_group_year.pk child.id %}">
                                     {{ child.acronym }}

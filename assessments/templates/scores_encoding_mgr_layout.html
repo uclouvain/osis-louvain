@@ -26,13 +26,13 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 {% block breadcrumb %}
-<li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'studies' %}</a></li>
-<li><a href="{% url 'assessments' %}" id="lnk_evaluations">{% trans 'evaluations' %}</a></li>
-<li class="active">{% trans 'scores_encoding' %}</li>
+<li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'Studies' %}</a></li>
+<li><a href="{% url 'assessments' %}" id="lnk_evaluations">{% trans 'Evaluations' %}</a></li>
+<li class="active">{% trans 'Scores encoding' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'scores_encoding' %}</h2>
+    <h2>{% trans 'Scores encoding' %}</h2>
 </div>
 
 {% block scores_encoding_tabs %}

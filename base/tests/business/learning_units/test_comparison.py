@@ -67,7 +67,7 @@ class TestComparison(TestCase):
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
     def test_get_value_for_enum(self):
         data = self.learning_unit_year.__dict__
-        self.assertEqual(get_value(LearningUnitYear, data, 'subtype'), gettext('FULL'))
+        self.assertEqual(get_value(LearningUnitYear, data, 'subtype'), 'FULL')
 
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
     def test_get_value(self):

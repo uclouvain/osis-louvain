@@ -24,71 +24,73 @@
 {% endcomment %}
 
 {% block content %}
-<div class="panel panel-default">
+    <div class="panel panel-default">
 
-    {% include "learning_unit/blocks/form/search_form_proposal.html" %}
+        {% include "learning_unit/blocks/form/search_form_proposal.html" %}
 
-    <form method="post">
-        {% csrf_token %}
-        <div style="margin-top:10px;">
-            {% if proposals %}
-                 <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal_force_state">
-                    {% trans 'force_state' %}
-                 </button>
-                <button type="button" class="btn btn-default" style="margin-left:10px;" id="btn_modal_get_back_to_initial"
-                        data-toggle="modal" data-target="#modalBackToInitial">
-                    {% trans 'get_back_to_initial' %}
-                </button>
-                <button type="button" class="btn btn-default" style="margin-left:10px;" id="btn_modal_consolidate"
-                        data-toggle="modal" data-target="#modalConsolidate">
-                    {% trans 'consolidate' %}
-                </button>
-                {% include "learning_unit/blocks/dropdown/proposal_xls_actions_bar.html" with dropdirection="dropdown" %}
+        <form method="post">
+            {% csrf_token %}
+            <div style="margin-top:10px;">
+                {% if proposals %}
+                    <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modal_force_state">
+                        {% trans 'Force state' %}
+                    </button>
+                    <button type="button" class="btn btn-default" style="margin-left:10px;"
+                            id="btn_modal_get_back_to_initial"
+                            data-toggle="modal" data-target="#modalBackToInitial">
+                        {% trans 'Get back to initial data' %}
+                    </button>
+                    <button type="button" class="btn btn-default" style="margin-left:10px;" id="btn_modal_consolidate"
+                            data-toggle="modal" data-target="#modalConsolidate">
+                        {% trans 'Consolidate' %}
+                    </button>
+                    {% include "learning_unit/blocks/dropdown/proposal_xls_actions_bar.html" with dropdirection="dropdown" %}
 
-                <table id="table_learning_units" class="table table-striped table-hover">
-                <thead>
-                <tr>
-                    <th><input id="id_check_all" type="checkbox" name="check_all" title="Check All"></th>
-                    <th>{% trans 'folder'%}</th>
-                    <th>{% trans 'acronym'%}</th>
-                    <th>{% trans 'validite'%}</th>
-                    <th>{% trans 'title'%}</th>
-                    <th>{% trans 'type'%}</th>
-                    <th>{% trans 'requirement_entity_small'%}</th>
-                    <th>{% trans 'proposal_type' %}</th>
-                    <th>{% trans 'proposal_status' %}</th>
-                </tr>
-                </thead>
-                <tbody>
-                {% for proposal in proposals %}
-                    <tr class="row-proposal" data-id="{{proposal.id}}" data-value="{{proposal.acronym}}">
-                        <td><input type="checkbox" name="selected_action" value="{{ proposal.id }}"/></td>
-                        <td>{{ proposal.folder }}</td>
-                        <td class="col-acronym"><a href="{% url "learning_unit" learning_unit_year_id=proposal.learning_unit_year.id %}">{{ proposal.learning_unit_year.acronym }}</a></td>
-                        <td>{{ proposal.learning_unit_year.academic_year }}</td>
-                        <td>{{ proposal.learning_unit_year.complete_title }}</td>
-                        <td>{% with proposal.learning_unit_year.learning_container_year.container_type|default_if_none:'-' as type %}
-                                    {% trans type %}
-                            {% endwith %}
-                        </td>
-                        <td>{{ proposal.learning_unit_year.entities.REQUIREMENT_ENTITY.acronym|default:"" }}</td>
-                        <td>{% with proposal.type|default_if_none:'-' as proposal_type %}
-                                    {% trans proposal_type %}
-                            {% endwith %}
-                        </td>
-                        <td class="col-proposal_state">{% with proposal.state|default_if_none:'-' as proposal_state %}
-                                    {% trans proposal_state%}
-                            {% endwith %}
-                        </td>
-                    </tr>
-                {% endfor %}
-                </tbody>
-            </table>
-            {% include "learning_unit/blocks/modal/modal_force_state.html" %}
-            {% include "learning_unit/blocks/modal/modal_back_to_initial.html" %}
-            {% include "learning_unit/blocks/modal/modal_consolidate.html" %}
-        {% endif %}
-        </div>
-    </form>
-</div>
+                    <table id="table_learning_units" class="table table-striped table-hover">
+                        <thead>
+                        <tr>
+                            <th><input id="id_check_all" type="checkbox" name="check_all" title="Check All"></th>
+                            <th>{% trans 'Folder' %}</th>
+                            <th>{% trans 'Acronym' %}</th>
+                            <th>{% trans 'Validity' %}</th>
+                            <th>{% trans 'Title' %}</th>
+                            <th>{% trans 'Type' %}</th>
+                            <th>{% trans 'Req. Entity' %}</th>
+                            <th>{% trans 'Proposal type' %}</th>
+                            <th>{% trans 'Proposal status' %}</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for proposal in proposals %}
+                            <tr class="row-proposal" data-id="{{ proposal.id }}" data-value="{{ proposal.acronym }}">
+                                <td><input type="checkbox" name="selected_action" value="{{ proposal.id }}"/></td>
+                                <td>{{ proposal.folder }}</td>
+                                <td class="col-acronym">
+                                    <a href="{% url "learning_unit" learning_unit_year_id=proposal.learning_unit_year.id %}">
+                                        {{ proposal.learning_unit_year.acronym }}
+                                    </a>
+                                </td>
+                                <td>{{ proposal.learning_unit_year.academic_year }}</td>
+                                <td>{{ proposal.learning_unit_year.complete_title }}</td>
+                                <td>
+                                    {{ proposal.learning_unit_year.learning_container_year.get_container_type_display|default_if_none:'-' }}
+                                </td>
+                                <td>{{ proposal.learning_unit_year.entities.REQUIREMENT_ENTITY.acronym|default:"" }}</td>
+                                <td>
+                                    {{ proposal.get_type_display|default_if_none:'-' }}
+                                </td>
+                                <td class="col-proposal_state">
+                                    {{ proposal.get_state_display|default_if_none:'-' }}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {% include "learning_unit/blocks/modal/modal_force_state.html" %}
+                    {% include "learning_unit/blocks/modal/modal_back_to_initial.html" %}
+                    {% include "learning_unit/blocks/modal/modal_consolidate.html" %}
+                {% endif %}
+            </div>
+        </form>
+    </div>
 {% endblock %}

@@ -3,29 +3,29 @@
 {% if proposal %}
     <div class="panel panel-default">
         <div class="panel-heading">
-            {% trans 'proposal' %}
+            {% trans 'Proposal' %}
         </div>
         <dl class="panel-body">
             {% if learning_unit_year != proposal.learning_unit_year %}
-            <dt>{% trans 'academic_year' %}</dt>
+            <dt>{% trans 'Academic year' %}</dt>
             <dd><a href="{% url 'learning_unit' learning_unit_year_id=proposal.learning_unit_year.id %}">{{ proposal.learning_unit_year }}</a></dd><br>
             {% endif %}
 
-            <dt>{% trans 'folder' %}</dt>
+            <dt>{% trans 'Folder' %}</dt>
             <dd>{{ proposal_folder_entity_version.0.acronym}} - {{ proposal.folder_id }}</dd><br>
 
             <dt>{% trans 'type' %}</dt>
             <dd>{% trans proposal.type %}</dd><br>
 
             {% block proposal_state %}
-                <dt>{% trans 'state' %}</dt>
+                <dt>{% trans 'State' %}</dt>
                 <dd>{% trans proposal.state %}</dd><br>
             {% endblock proposal_state %}
 
-            <dt>{% trans 'introduced_by' %}</dt>
+            <dt>{% trans 'Introduced by' %}</dt>
             <dd>{{ proposal.author }}</dd><br>
 
-            <dt>{% trans 'the' %}</dt>
+            <dt>{% trans 'The' %}</dt>
             <dd>{{ proposal.date }}</dd>
         </dl>
     </div>

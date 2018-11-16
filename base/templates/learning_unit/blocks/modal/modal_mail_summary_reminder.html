@@ -29,7 +29,7 @@
 {% block modal_content %}
     <div style="margin:10px;">
         {% block modal_header %}
-            <h3>{% trans 'do_you_want_to_sent_email' %}</h3>
+            <h3>{% trans 'Do you want to sent email to remind to update the educational informations?' %}</h3>
             <div class='alert alert-warning' id="alert_warning" style="display: none;"></div>
         {% endblock %}
 
@@ -38,8 +38,8 @@
                 <thead>
                     <tr>
                         <th></th>
-                        <th>{% trans 'responsible' %}</th>
-                        <th>{% trans 'learning_units' %}</th>
+                        <th>{% trans 'Responsible' %}</th>
+                        <th>{% trans 'Learning units' %}</th>
                     </tr>
                 </thead>
             <tbody>
@@ -56,7 +56,9 @@
         {% endblock %}
 
         {% block modal_footer %}
-            <button type="button" class="btn btn-primary" id="btn_modal_mail_summary_reminder" title="{% trans 'desc_mail_reminder' %}">{% trans 'yes' %}</button>
+            <button type="button" class="btn btn-primary" id="btn_modal_mail_summary_reminder" title="{% trans 'Sent email to remind to update educational information' %}">
+                {% trans 'yes' %}
+            </button>
             <button type="button" class="btn btn-default" id="btn_modal_mail_summary_reminder_cancel" data-dismiss="modal"  title="{% trans 'cancel'%}">{% trans "cancel" %}</button>
         {% endblock %}
 

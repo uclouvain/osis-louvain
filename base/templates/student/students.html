@@ -27,31 +27,31 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'student_path' %}</a></li>
-<li class="active">{% trans 'students_title' %}</li>
+<li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'Student path' %}</a></li>
+<li class="active">{% trans 'Students' %}</li>
 {% endblock %}
 
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'students_title' %}</h2>
+    <h2>{% trans 'Students' %}</h2>
 </div>
 <div class="panel panel-default">
     <form method="get" action="{% url 'students_search'%}" id="form_students" name="search">
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-3">
-                    <label>{% trans 'registration_id'%}</label>
+                    <label>{% trans 'Registration ID'%}</label>
                     <input type="text" class="form-control" id="txt_registration_id" name="registration_id"
                            value="{{registration_id | default_if_none:''}}">
                 </div>
                 <div class="col-md-3">
-                    <label>{% trans 'name'%}</label>
+                    <label>{% trans 'Name'%}</label>
                     <input type="text" class="form-control" id="txt_name" name="name" value="{{name | default_if_none:''}}">
                 </div>
                 <div class="col-md-6">
                     <button type="submit" id="bt_submit_student_search"
                             class="btn btn-primary" style="margin-top:23px;" role="button"
-                            title="{% trans 'student_search' %}">
+                            title="{% trans 'Student search' %}">
                         <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
                 </div>
             </div>
@@ -69,9 +69,9 @@
         {% if students %}
         <table id="table_students" class="table table-striped table-hover">
             <thead>
-            <th>{% trans 'registration_id'%}</th>
-            <th>{% trans 'name'%}</th>
-            <th>{% trans 'gender'%}</th>
+            <th>{% trans 'Registration ID'%}</th>
+            <th>{% trans 'Name'%}</th>
+            <th>{% trans 'Gender'%}</th>
             </thead>
             {% for student in students %}
             <tr>

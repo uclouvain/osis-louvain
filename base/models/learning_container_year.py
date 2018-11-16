@@ -46,17 +46,21 @@ class LearningContainerYear(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey('AcademicYear')
     learning_container = models.ForeignKey('LearningContainer')
-    container_type = models.CharField(max_length=20, verbose_name=_('type'),
-                                      choices=learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES)
-    common_title = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('common_title'))
+
+    container_type = models.CharField(
+        max_length=20, verbose_name=_('type'),
+        choices=learning_container_year_types.LEARNING_CONTAINER_YEAR_TYPES
+    )
+
+    common_title = models.CharField(max_length=255, blank=True, null=True, verbose_name=_('Common title'))
     common_title_english = models.CharField(max_length=250, blank=True, null=True,
-                                            verbose_name=_('common_english_title'))
+                                            verbose_name=_('Common English title'))
     acronym = models.CharField(max_length=10)
     changed = models.DateTimeField(null=True, auto_now=True)
-    team = models.BooleanField(default=False, verbose_name=_('team_management'))
-    is_vacant = models.BooleanField(default=False,  verbose_name=_('vacant'))
+    team = models.BooleanField(default=False, verbose_name=_('Team management'))
+    is_vacant = models.BooleanField(default=False,  verbose_name=_('Vacant'))
     type_declaration_vacant = models.CharField(max_length=100, blank=True, null=True,
-                                               verbose_name=_('type_declaration_vacant'),
+                                               verbose_name=_('Decision'),
                                                choices=vacant_declaration_type.DECLARATION_TYPE)
     in_charge = models.BooleanField(default=False)
 

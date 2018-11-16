@@ -23,11 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import ugettext_lazy as _
 
 ENTITY_ADMINISTRATION = "ENTITY_ADMINISTRATION"
 ENTITY_MANAGEMENT = "ENTITY_MANAGEMENT"
 
 TYPES = (
-    (ENTITY_ADMINISTRATION, ENTITY_ADMINISTRATION),
-    (ENTITY_MANAGEMENT, ENTITY_MANAGEMENT),
+    (ENTITY_ADMINISTRATION, _("Administration entity")),
+    (ENTITY_MANAGEMENT, _("Management entity")),
 )

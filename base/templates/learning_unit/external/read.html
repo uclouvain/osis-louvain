@@ -5,29 +5,29 @@
 {#{% block tabs %} {% endblock tabs %}#}
 {% block content_row1 %}
     <dl class="col-md-3">
-        <dt>{% trans 'code'%}</dt>
+        <dt>{% trans 'Code'%}</dt>
         <dd>{{ learning_unit_year.acronym }}</dd>
     </dl>
     <div class="col-md-3"></div>
     <div class="col-md-3">
-        {% dl_tooltip differences 'container_type' label_text='type' value=learning_unit_year.container_type_verbose %}
+        {% dl_tooltip learning_unit_year.learning_container_year 'container_type' %}
     </div>
     <div class="col-md-3"></div>
 {% endblock content_row1 %}
 
 {% block content_row2 %}
     <div class="col-md-3">
-        {% dl_tooltip differences 'credits' label_text='nominal_credits' value=learning_unit_year.credits %}
+        {% dl_tooltip learning_unit_year 'credits' %}
     </div>
     <div class="col-md-3">
-        {% dl_tooltip differences 'local_credits' value=learning_unit_year.externallearningunityear.external_credits %}
+        {% dl_tooltip learning_unit_year.externallearningunityear 'external_credits' %}
     </div>
 
     <div class="col-md-3">
-        {% dl_tooltip differences 'status' label_text='status' value=learning_unit_year.status_verbose.title %}
+        {% dl_tooltip learning_unit_year 'status' value=learning_unit_year.status_verbose.title %}
     </div>
     <div class="col-md-3">
-        {% dl_tooltip differences 'language' value=learning_unit_year.language %}
+        {% dl_tooltip learning_unit_year 'language' %}
     </div>
 {% endblock content_row2 %}
 
@@ -40,32 +40,30 @@
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-3">
-                    {% dl_tooltip differences 'external_code' value=learning_unit_year.externallearningunityear.external_acronym %}
+                    {% dl_tooltip learning_unit_year.externallearningunityear 'external_acronym' %}
                 </div>
                 <div class="col-md-9">
-                    {% dl_tooltip differences "url" label_text="url of the learning unit" value=learning_unit_year.externallearningunityear.url %}
+                    {% dl_tooltip learning_unit_year.externallearningunityear "url" %}
                 </div>
             </div>
-
-            {% dl_tooltip differences 'requesting_entity' value=learning_unit_year.externallearningunityear.requesting_entity %}
-
-            {% dl_tooltip differences 'faculty_remark' label_text='faculty_remark' value=learning_unit_year.learning_unit.faculty_remark %}
+            {% dl_tooltip learning_unit_year.externallearningunityear 'requesting_entity' %}
+            {% dl_tooltip learning_unit_year.learning_unit 'faculty_remark' %}
         </div>
     </div>
 {% endblock panel_external %}
 
 {% block institution %}
     {% url 'organization_read' organization_id=organization.id as url_organization%}
-    {% dl_tooltip differences 'country' value=organization.country %}
-    {% dl_tooltip differences 'campus' label_text='learning_location'  value=campus.name %}
-    {% dl_tooltip differences 'institution' value=organization.name url=url_organization %}
+    {% dl_tooltip organization 'country' label_text=_('Country') %}
+    {% dl_tooltip campus 'campus' label_text=_('Learning location')  value=campus.name %}
+    {% dl_tooltip organization 'institution' label_text=_('Institution') value=organization.name url=url_organization %}
 {% endblock institution %}
 
 {% block panel_external_author %}
     <div class="panel panel-default">
         <div class="panel-body">
-            <p>{% trans 'introduced_by' %} {{ learning_unit_year.externallearningunityear.author }}</p>
-            <p>{% trans 'the' %} {{ learning_unit_year.externallearningunityear.date }}</p>
+            <p>{% trans 'Introduced by' %} {{ learning_unit_year.externallearningunityear.author }}</p>
+            <p>{% trans 'The' %} {{ learning_unit_year.externallearningunityear.date }}</p>
         </div>
     </div>
 {% endblock %}

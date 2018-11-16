@@ -36,7 +36,7 @@ from base.models.tutor import Tutor
 
 
 class AttributionForm(forms.ModelForm):
-    duration = forms.IntegerField(min_value=1, required=True, label=_("duration"))
+    duration = forms.IntegerField(min_value=1, required=True, label=_("Duration"))
 
     class Meta:
         model = AttributionNew
@@ -68,7 +68,7 @@ class AttributionCreationForm(AttributionForm):
                 'data-placeholder': _('Indicate the name or the FGS')
             }
         ),
-        label=_('tutor'),
+        label=_('Tutor'),
     )
 
     class Meta:

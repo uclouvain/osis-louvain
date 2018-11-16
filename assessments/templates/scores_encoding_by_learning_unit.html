@@ -29,8 +29,8 @@
 {% block scores_encoding_tabs %}
 {% if notes_list != None and notes_list|length >= 0 %}
 <ul class="nav nav-tabs nav-justified" id="tabs">
-    <li class="active"><a data-toggle="tab" role="tab" href="#tab_scores_encoding" id="lnk_scores_encoding">{% trans 'by_learning_unit' %}</a></li>
-    <li><a href="{% url 'specific_criteria' %}" id="lnk_justifications">{% trans 'by_specific_criteria' %}</a></li>
+    <li class="active"><a data-toggle="tab" role="tab" href="#tab_scores_encoding" id="lnk_scores_encoding">{% trans 'By learning unit' %}</a></li>
+    <li><a href="{% url 'specific_criteria' %}" id="lnk_justifications">{% trans 'By specific criteria' %}</a></li>
 </ul>
 <div class="tab-content">
     <div id="tab_scores_encoding" class="tab-pane fade in active">
@@ -39,28 +39,28 @@
             <div class="row">
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label>{% trans 'academic_year' %}</label><br>
+                        <label>{% trans 'Academic year' %}</label><br>
                         <span id="academic_year">{{ academic_year }}</span>
                     </div>
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label>{% trans 'number_session' %}</label><br>
+                        <label>{% trans 'Session number' %}</label><br>
                         <span id="number_session">{{ number_session }}</span>
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                        <label>{% trans 'last_synchronization' %}</label><br>
+                        <label>{% trans 'Last synchronization' %}</label><br>
                         {{ last_synchronization | default_if_none:'-' }}
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-3">
-                    <label>{% trans 'offer' %} {{ offer_sel }}</label><br>
+                    <label>{% trans 'Offer' %} {{ offer_sel }}</label><br>
                     <select id="slt_offer_list_selection" name="offer" class="form-control">
-                        <option value="">{% trans 'all'%}</option>
+                        <option value="">{% trans 'All'%}</option>
                         {% for o in offer_list %}
                         <option value="{{o.id}}" {%if offer_year_id == o.id %}selected{%endif%}>{{o.acronym}}</option>
                         {% endfor %}
@@ -68,10 +68,10 @@
                 </div>
                 <div class="col-md-3">
                     <div class="form-group">
-                        <label>{% trans 'tutor' %}</label><br>
+                        <label>{% trans 'Tutor' %}</label><br>
                         <select id="slt_tutor" name="tutor" class="form-control">
-                            <option value="">{% trans 'all' %}</option>
-                            <option value="-1" {%if tutor_id == -1 %}selected{%endif%}>{% trans 'without_attribution' %} (NOBODY)</option>
+                            <option value="">{% trans 'All' %}</option>
+                            <option value="-1" {%if tutor_id == -1 %}selected{%endif%}>{% trans 'Without attribution' %} (NOBODY)</option>
                             {%for t in tutor_list%}
                                 <option value="{{t.id}}" {% if tutor_id == t.id %}selected{%endif%}>
                                     {{t.person.last_name|default_if_none:""}}
@@ -82,8 +82,8 @@
                     </div>
                 </div>
                 <div class="col-md-3">
-                    <label for="txt_acronym">{% trans 'learning_unit'%}</label>
-                    <input class="form-control" id="txt_acronym" placeholder="{% trans 'acronym' %}"
+                    <label for="txt_acronym">{% trans 'Learning unit'%}</label>
+                    <input class="form-control" id="txt_acronym" placeholder="{% trans 'Acronym' %}"
                            name="learning_unit_year_acronym"
                            value="{{ learning_unit_year_acronym  | default_if_none:'' }}"
                            style="text-transform:uppercase" maxlength="15">
@@ -94,7 +94,7 @@
                         <input id="chckbox_incompleted_encodings"
                                {% if incomplete_encodings_only %} checked {% endif %}
                                name="incomplete_encodings_only"
-                               type="checkbox"> {% trans 'incomplete' %}
+                               type="checkbox"> {% trans 'Incomplete' %}
                       </label>
                     </div>
                 </div>
@@ -102,7 +102,7 @@
                     <br>
                     <button type="submit" id="bt_submit_offer_search" class="btn btn-primary" role="button"
                             style="margin-top: 4px"
-                            title="{% trans 'refresh_list' %}">
+                            title="{% trans 'Refresh list' %}">
                         <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
                     &nbsp;&nbsp;
                 </div>
@@ -113,14 +113,14 @@
         {% include "template_messages.html" %}
         <div class="row">
             <div class="col-md-6">
-                <b>{% trans 'select_an_encoding_type' %}</b>
+                <b>{% trans 'Select an encoding type' %}</b>
             </div>
             <div class="col-md-6">
                 <div class="pull-right">
                     <b><span class="badge" id="scores_encoding_learning_units">{{ notes_list|length }}</span>
-                        {% trans 'learning_units_in' %}
+                        {% trans 'learning units in' %}
                         <span class="badge" id="scores_encoding_programs">{% if offer_year_id %} 1 {% else %} {{ offer_list|length }} {% endif %}</span>
-                        {% trans 'program_s' %}.
+                        {% trans 'program(s)' %}.
                     </b>
                 </div>
             </div>
@@ -130,15 +130,15 @@
             <ul class="nav nav-tabs" id="tabs_encoding_type" role="tablist">
                 <li role="presentation" class="active">
                     <a href="#tab_online" aria-controls="online" role="tab" data-toggle="tab"
-                       id="lnk_online">{% trans 'online' %}</a>
+                       id="lnk_online">{% trans 'Online' %}</a>
                 </li>
                 <li role="presentation">
                     <a href="#tab_via_excel" aria-controls="via_excel" role="tab"
-                       data-toggle="tab" id="lnk_via_excel">{% trans 'via_excel' %}</a>
+                       data-toggle="tab" id="lnk_via_excel">{% trans 'Via excel' %}</a>
                 </li>
                 <li role="presentation">
                     <a href="#tab_via_paper" aria-controls="via_paper" role="tab"
-                       data-toggle="tab" id="lnk_via_paper">{% trans 'via_paper' %}</a>
+                       data-toggle="tab" id="lnk_via_paper">{% trans 'Via paper' %}</a>
                 </li>
             </ul>
             <div class="tab-content" id="pnl_learning_units">
@@ -147,11 +147,11 @@
                     <table class="table table-hover">
                         <thead>
                         <tr>
-                            <th>{% trans 'complete' %}</th>
-                            <th>{% trans 'acronym' %}</th>
-                            <th>{% trans 'learning_unit' %}</th>
-                            <th>{% trans 'scores_responsible' %}</th>
-                            <th>{% trans 'progress' %}</th>
+                            <th>{% trans 'Complete' %}</th>
+                            <th>{% trans 'Acronym' %}</th>
+                            <th>{% trans 'Learning unit' %}</th>
+                            <th>{% trans 'Scores responsible' %}</th>
+                            <th>{% trans 'Progress' %}</th>
                             <th></th>
                         </tr>
                         </thead>
@@ -191,7 +191,7 @@
                                  role="progressbar"
                                  aria-valuenow="{{ note_detail.progress_int }}" aria-valuemin="0" aria-valuemax="100"
                                  style="width: {{ note_detail.progress }}%;"
-                                 title="{% trans 'tooltip_scores_encodings_progress_bar' %}">
+                                 title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}">
                                     <span>
                                         {% if note_detail.scores_not_yet_submitted %}
                                             ({{ note_detail.scores_not_yet_submitted }})
@@ -209,8 +209,8 @@
                            href="{% url 'online_encoding_form' note_detail.learning_unit_year_id %}?{{ request.GET.urlencode }}"
                            role="button" id="lnk_encode_{{ note_detail.learning_unit_year_id }}"
                            data-toggle="tooltip" data-placement="right"
-                           title="{% trans 'tooltip_encode_for' %}">
-                            <i class="fa fa-hashtag"></i> {% trans 'encode' %}</a>
+                           title="{% trans 'Encode scores' %}">
+                            <i class="fa fa-hashtag"></i> {% trans 'Encode' %}</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -222,11 +222,11 @@
             <table class="table table-hover">
                 <thead>
                 <tr>
-                    <th>{% trans 'complete' %}</th>
-                    <th>{% trans 'acronym' %}</th>
-                    <th>{% trans 'learning_unit' %}</th>
-                    <th>{% trans 'scores_responsible' %}</th>
-                    <th>{% trans 'progress' %}</th>
+                    <th>{% trans 'Complete' %}</th>
+                    <th>{% trans 'Acronym' %}</th>
+                    <th>{% trans 'Learning unit' %}</th>
+                    <th>{% trans 'Scores responsible' %}</th>
+                    <th>{% trans 'Progress' %}</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -242,7 +242,7 @@
                     </td>
                     <td>{{ note_detail.learning_unit_year_acronym }}</td>
                     <td><a href="{% url 'online_encoding' note_detail.learning_unit_year_id %}?{{ request.GET.urlencode }}"
-                           title="{% trans 'display_scores_for_one_learning_unit' %}"
+                           title="{% trans 'Display scores for this learning unit' %}"
                            id="lnk_online_encoding_messages_{{note_detail.learning_unit_year_id}}">{{ note_detail.learning_unit_year_title }}</a></td>
                     <td>
                         {% if note_detail.score_responsibles %}
@@ -262,7 +262,7 @@
                                  role="progressbar"
                                  aria-valuenow="{{ note_detail.progress_int }}" aria-valuemin="0" aria-valuemax="100"
                                  style="width: {{ note_detail.progress }}%;"
-                                 title="{% trans 'tooltip_scores_encodings_progress_bar' %}">
+                                 title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}">
                                     <span>
                                         {% if note_detail.scores_not_yet_submitted %}
                                             ({{ note_detail.scores_not_yet_submitted }})
@@ -281,8 +281,8 @@
                            role="button"
                            id="lnk_scores_encoding_download_{{note_detail.learning_unit_year_id}}"
                            data-toggle="tooltip" data-placement="right"
-                           title="{% trans 'tooltip_dowload_excel_file' %}"
-                        ><span class="glyphicon glyphicon-download" aria-hidden="true"></span> {% trans 'get_excel_file'%}</a>
+                           title="{% trans 'Download the Excel file' %}"
+                        ><span class="glyphicon glyphicon-download" aria-hidden="true"></span> {% trans 'Get Excel file'%}</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -304,16 +304,16 @@
                         {%endif%}
                     {%endif%}"
                role="button" id="lnk_notes_printing_all_{{learning_unit.id}}">
-                <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {% trans 'print_all_courses' %}</a>
+                <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {% trans 'Print all courses' %}</a>
             <br><br>
             <table class="table table-hover">
                 <thead>
                 <tr>
-                    <th>{% trans 'complete' %}</th>
-                    <th>{% trans 'acronym' %}</th>
-                    <th>{% trans 'learning_unit' %}</th>
-                    <th>{% trans 'scores_responsible' %}</th>
-                    <th>{% trans 'progress' %}</th>
+                    <th>{% trans 'Complete' %}</th>
+                    <th>{% trans 'Acronym' %}</th>
+                    <th>{% trans 'Learning unit' %}</th>
+                    <th>{% trans 'Scores responsible' %}</th>
+                    <th>{% trans 'Progress' %}</th>
                     <th></th>
                 </tr>
                 </thead>
@@ -329,7 +329,7 @@
                     </td>
                     <td>{{ note_detail.learning_unit_year_acronym }}</td>
                     <td><a href="{% url 'online_encoding' note_detail.learning_unit_year_id %}?{{ request.GET.urlencode }}"
-                           title="{% trans 'display_scores_for_one_learning_unit' %}"
+                           title="{% trans 'Display scores for this learning unit' %}"
                            id="lnk_paper_encoding_messages_{{note_detail.learning_unit_year_id}}">{{ note_detail.learning_unit_year_title }}</a></td>
                     <td>
                         {% if note_detail.score_responsibles %}
@@ -349,7 +349,7 @@
                                  role="progressbar"
                                  aria-valuenow="{{ note_detail.progress_int }}" aria-valuemin="0" aria-valuemax="100"
                                  style="width: {{ note_detail.progress }}%;"
-                                 title="{% trans 'tooltip_scores_encodings_progress_bar' %}">
+                                 title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}">
                                     <span>
                                         {% if note_detail.scores_not_yet_submitted %}
                                             ({{ note_detail.scores_not_yet_submitted }})
@@ -367,9 +367,9 @@
                            href="{% url 'notes_printing' note_detail.learning_unit_year_id%}"
                            role="button" id="lnk_notes_printing_{{note_detail.learning_unit_year_id}}"
                            data-toggle="tooltip" data-placement="right"
-                           title="{% trans 'tooltip_print_scores' %}"
-                           title="{% trans 'tooltip_scores_encodings_progress_bar' %}">
-                        <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {% trans 'print' %}</a>
+                           title="{% trans 'Print the scores' %}"
+                           title="{% trans "Represents the quantity of scores submitted to the administration. The number surrounded by parenthesis is the number of scores encoded by the tutor that aren't submitted yet ('draft' state)" %}">
+                        <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {% trans 'Print' %}</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -384,7 +384,7 @@
 </div>
 {% else %}
     <div class="alert alert-warning">
-      <p style="font-size: 130%">{% trans 'no_score_to_encode' %} </p>
+      <p style="font-size: 130%">{% trans "You haven't any score to encode." %} </p>
     </div>
 {% endif %}
 {% endblock %}

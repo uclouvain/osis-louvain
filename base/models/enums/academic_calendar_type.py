@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import ugettext_lazy as _
 
 # TYPES_CATEGORIES
 ACADEMIC_CATEGORY = "ACADEMIC"
@@ -47,24 +48,24 @@ RELEASE = "RELEASE"
 
 
 ACADEMIC_CALENDAR_TYPES = (
-    (DELIBERATION, DELIBERATION),
-    (DISSERTATION_SUBMISSION, DISSERTATION_SUBMISSION),
-    (EXAM_ENROLLMENTS, EXAM_ENROLLMENTS),
-    (SCORES_EXAM_DIFFUSION, SCORES_EXAM_DIFFUSION),
-    (SCORES_EXAM_SUBMISSION, SCORES_EXAM_SUBMISSION),
-    (TEACHING_CHARGE_APPLICATION, TEACHING_CHARGE_APPLICATION),
-    (COURSE_ENROLLMENT, COURSE_ENROLLMENT),
-    (SUMMARY_COURSE_SUBMISSION, SUMMARY_COURSE_SUBMISSION),
-    (EDUCATION_GROUP_EDITION, EDUCATION_GROUP_EDITION),
-    (EDITION_OF_GENERAL_INFORMATION, EDITION_OF_GENERAL_INFORMATION),
+    (DELIBERATION, _("Deliberation")),
+    (DISSERTATION_SUBMISSION, _("Dissertation submission")),
+    (EXAM_ENROLLMENTS, _("Exam enrollments")),
+    (SCORES_EXAM_DIFFUSION, _("Scores exam diffusion")),
+    (SCORES_EXAM_SUBMISSION, _("Scores exam submission")),
+    (TEACHING_CHARGE_APPLICATION, _("Teaching charge application")),
+    (COURSE_ENROLLMENT, _("Course enrollment")),
+    (SUMMARY_COURSE_SUBMISSION, _("Summary course submission")),
+    (EDUCATION_GROUP_EDITION, _("Education group edition")),
+    (EDITION_OF_GENERAL_INFORMATION, _("Edition of general information")),
 )
 
 PROJECT_CALENDAR_TYPES = (
-    (TESTING, TESTING),
+    (TESTING, _("Testing")),
 )
 
 AD_HOC_CALENDAR_TYPES = (
-    (RELEASE, RELEASE),
+    (RELEASE, _("Release")),
 )
 
 CALENDAR_TYPES = ACADEMIC_CALENDAR_TYPES + PROJECT_CALENDAR_TYPES + AD_HOC_CALENDAR_TYPES

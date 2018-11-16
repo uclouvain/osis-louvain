@@ -28,10 +28,10 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a></li>
-<li><a href="{% url 'academic_year' %}" id="lnk_academic_year">{% trans 'academic_year' %}</a></li>
-<li><a href="{% url 'academic_calendars' %}" id="lnk_academic_calendars">{% trans 'academic_calendars' %}</a></li>
-<li class="active">{% trans 'event' %}</li>
+<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
+<li><a href="{% url 'academic_year' %}" id="lnk_academic_year">{% trans 'Academic year' %}</a></li>
+<li><a href="{% url 'academic_calendars' %}" id="lnk_academic_calendars">{% trans 'Academic calendars' %}</a></li>
+<li class="active">{% trans 'Event' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
@@ -41,37 +41,37 @@
     <div class="panel-body">
         <div class="row">
             <div class="col-md-2">
-                <label>{% trans 'academic_year'%}</label><br>
+                <label>{% trans 'Academic year'%}</label><br>
                 <span id="ac_academic_year">{{ academic_calendar.academic_year }}</span>
             </div>
             <div class="col-md-6">
-                <label>{% trans 'title' %}</label><br>
+                <label>{% trans 'Title' %}</label><br>
                 <span id="ac_title">{{ academic_calendar.title }}</span>
             </div>
             <div class="col-md-2">
-                <label>{% trans 'start_date'%}</label><br>
+                <label>{% trans 'Start date'%}</label><br>
                 <span id="ac_start_date">{{ academic_calendar.start_date| default_if_none:''|date_in_form_format }}</span>
             </div>
             <div class="col-md-2">
-                <label>{% trans 'end_date' %}</label><br>
+                <label>{% trans 'End date' %}</label><br>
                 <span id="ac_end_date">{{ academic_calendar.end_date| default_if_none:''|date_in_form_format }}</span>
             </div>
         </div>
         <br>
         <div class="row">
             <div class="col-md-12">
-                <label>{% trans 'description'%}</label><br>
+                <label>{% trans 'Description'%}</label><br>
                 {{ academic_calendar.description| default_if_none:'' }}&nbsp;
             </div>
         </div>
         <br>
-        <label>{% trans 'label_jumbotron_details_academic_cal' %}</label><br>
+        <label>{% trans 'As displayed on the home page' %}</label><br>
         <div class="jumbotron">
             <h1>{{ academic_calendar.highlight_title| default_if_none:'' }}</h1>
             <p>{{ academic_calendar.highlight_description| default_if_none:'' }}</p>
             {% if academic_calendar.highlight_shortcut %}
             <p><a class="btn btn-primary btn-lg" href="/{{ academic_calendar.highlight_shortcut| default_if_none:'' }}" role="button"
-                  id="lnk_highlight" target="_blank">{% trans 'go'%}</a></p>
+                  id="lnk_highlight" target="_blank">{% trans 'Go'%}</a></p>
             {% endif %}
         </div>
 
@@ -80,9 +80,9 @@
                role="button" id="bt_academic_calendar_delete" style="margin-left: 1em;">
                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span> {% trans 'delete'%}
             </a>
-            <a href="{% url 'academic_calendar_form' academic_calendar_id=academic_calendar.id %}" title="{%trans 'edit'%}"
+            <a href="{% url 'academic_calendar_form' academic_calendar_id=academic_calendar.id %}" title="{%trans 'Edit'%}"
                class="btn btn-primary pull-right" role="button" id="bt_academic_calendar_edit" style="margin-left: 1em;">
-                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> {% trans 'edit'%}
+                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> {% trans 'Edit'%}
             </a>
 
         {% endif %}

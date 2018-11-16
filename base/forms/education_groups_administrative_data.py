@@ -41,7 +41,7 @@ NUMBER_SESSIONS = 3
 
 
 class CourseEnrollmentForm(BootstrapForm):
-    range_date = DateRangeField(required=False, label=_("course_enrollment"))
+    range_date = DateRangeField(required=False, label=_("Course enrollment"))
 
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.pop('instance')
@@ -88,23 +88,23 @@ def _build_new_course_enrollment_offer_yr_calendar(education_group_yr):
 
 
 class AdministrativeDataSessionForm(BootstrapForm):
-    exam_enrollment_range = DateRangeField(label=_('EXAM_ENROLLMENTS'), required=False)
+    exam_enrollment_range = DateRangeField(label=_('Exam enrollments'), required=False)
 
     scores_exam_submission = forms.DateField(widget=DatePickerInput(format=DATE_FORMAT),
                                              input_formats=[DATE_FORMAT, ],
-                                             label=_('marks_presentation'),
+                                             label=_('Marks presentation'),
                                              required=False)
 
     dissertation_submission = forms.DateField(widget=DatePickerInput(format=DATE_FORMAT),
                                               input_formats=[DATE_FORMAT, ],
-                                              label=_('dissertation_presentation'),
+                                              label=_('Dissertation submission'),
                                               required=False)
 
     deliberation = forms.SplitDateTimeField(widget=DateTimePickerInput(),
-                                            label=_('DELIBERATION'), required=False)
+                                            label=_('Deliberation'), required=False)
 
     scores_exam_diffusion = forms.SplitDateTimeField(widget=DateTimePickerInput(),
-                                                     label=_("scores_diffusion"),
+                                                     label=_("Scores diffusion"),
                                                      required=False)
 
     def __init__(self, *args, **kwargs):

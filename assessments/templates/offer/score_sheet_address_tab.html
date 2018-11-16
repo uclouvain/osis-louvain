@@ -44,19 +44,20 @@
                     <form method="POST" action="{% url 'save_score_sheet_address' offer_year.id %}" id="form_score_sheet_address" novalidate>
                         {% csrf_token %}
                         <br>
-                        <p>{% trans 'message_address_papersheet' %}</p>
+                        <p>{% trans 'Reuse the address of an entity linked to the program or inform the posting address for the papersheet.' %}</p>
                         <div class="alert alert-dismissible alert-warning text-justify">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
-                            <p>{% trans 'info_address_changed_for_papersheet' as info_address_changed_for_papersheet %}
-                                {{ info_address_changed_for_papersheet | format:offer_year.acronym}}.
+                            <p>
+                                {% trans 'If you customize one of the field below, it only change the address displayed on the score encodings sheets for the program %(program)s. It will never change the address of any structure. The list below will help you to pre-fill in the form.' as info_address_changed_for_papersheet %}
+                                {{ info_address_changed_for_papersheet | format:offer_year.acronym }}.
                                 <br>
-                                <b>{% trans 'optional_email_field_note' %}</b>
+                                <b>{% trans "NOTE : the 'Email' field is optional. You can fill in this field if you want it to appear on the score sheet." %}</b>
                             </p>
                         </div>
 
-                        <label for="slt_related_entities">{% trans 'select_an_address' %}...</label>
+                        <label for="slt_related_entities">{% trans 'Please select an address' %}...</label>
                         <select class="form-control" id="slt_related_entities" name="related_entity">
-                            <option value="" selected>{% trans 'customized' %}</option>
+                            <option value="" selected>{% trans 'Customized' %}</option>
                             {% for version in entity_versions %}
                                 <option {% if entity_id_selected == version.entity_id %} selected {% endif %} value="{{ version.id }}">
                                     {{ version.acronym }} - {{ version.title }}
@@ -66,21 +67,21 @@
                         <br>
                         <div id="warning_no_address_found" class="alert alert-dismissible alert-warning">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
-                            <p><span class="fa fa-warning" aria-hidden="true"></span> {% trans 'no_entity_address_found' %}</p>
+                            <p><span class="fa fa-warning" aria-hidden="true"></span> {% trans 'No address found for the selected entity.' %}</p>
                         </div>
                         <div id="warning_no_current_entity_version_found" class="alert alert-dismissible alert-warning">
                             <button type="button" class="close" data-dismiss="alert">&times;</button>
-                            <p><span class="fa fa-warning" aria-hidden="true"></span> {% trans 'no_current_entity_version_found' %}</p>
+                            <p><span class="fa fa-warning" aria-hidden="true"></span> {% trans 'The selected entity no longer exists today (end date passed).' %}</p>
                         </div>
                         <br>
                         <div class="row">
                             <div class="col-md-6">
-                                <label for="id_recipient">{% trans 'recipient' %}</label>
+                                <label for="id_recipient">{% trans 'Recipient' %}</label>
                                 {{ form.recipient }}
                                 <span style="color:red;">{{ form.recipient.errors }}</span>
                             </div>
                             <div class="col-md-6">
-                                <label for="id_location">{% trans 'location' %}</label>
+                                <label for="id_location">{% trans 'Location' %}</label>
                                 {{ form.location }}
                                 <span style="color:red;">{{ form.location.errors }}</span>
                             </div>
@@ -88,32 +89,32 @@
                         <br>
                         <div class="row">
                             <div class="col-md-3">
-                                <label for="id_postal_code">{% trans 'postal_code' %}</label>
+                                <label for="id_postal_code">{% trans 'Postal code' %}</label>
                                 {{ form.postal_code }}
                                 <span style="color:red;">{{ form.postal_code.errors }}</span>
                             </div>
                             <div class="col-md-5">
-                                <label for="id_city">{% trans 'city' %}</label>
+                                <label for="id_city">{% trans 'City' %}</label>
                                 {{ form.city }}
                                 <span style="color:red;">{{ form.city.errors }}</span>
                             </div>
                             <div class="col-md-4">
-                                <label for="id_country">{% trans 'country'%}</label>
+                                <label for="id_country">{% trans 'Country'%}</label>
                                 {{ form.country }}
                             </div>
                         </div>
                         <br>
                         <div class="row">
                             <div class="col-md-3">
-                                <label for="id_phone">{% trans 'phone' %}</label>
+                                <label for="id_phone">{% trans 'Phone' %}</label>
                                 {{ form.phone }}
                             </div>
                             <div class="col-md-3">
-                                <label for="id_fax">{% trans 'fax' %}</label>
+                                <label for="id_fax">{% trans 'Fax' %}</label>
                                 {{ form.fax }}
                             </div>
                             <div class="col-md-6">
-                                <label for="id_email">{% trans 'email' %}</label>
+                                <label for="id_email">{% trans 'Email' %}</label>
                                 {{ form.email }}
                                 <span style="color:red;">{{ form.email.errors }}</span>
                             </div>
@@ -122,7 +123,7 @@
                         <span style="visibility:hidden;display:none;">{{ form.offer_year }}</span>
                         {% if is_program_manager %}
                             <button type="submit" class="btn btn-primary" id="bt_save_score_encoding_address">
-                                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}</button>
+                                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}</button>
                         {% endif %}
                         <span id="status_save"></span>
                     </form>

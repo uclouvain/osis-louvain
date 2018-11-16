@@ -29,6 +29,8 @@ DAILY = 'DAILY'
 SHIFTED = 'SHIFTED'
 ADAPTED = 'ADAPTED'
 
-SCHEDULE_TYPES = ((DAILY, _(DAILY)),
-                  (SHIFTED, _(SHIFTED)),
-                  (ADAPTED, _(ADAPTED)))
+SCHEDULE_TYPES = (
+    (DAILY, _("Daily")),
+    (SHIFTED, _("Shifted")),
+    (ADAPTED, _("Adapted"))
+)

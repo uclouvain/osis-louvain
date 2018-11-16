@@ -27,11 +27,11 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-    <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a></li>
-    <li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'learning_units' %}</a></li>
+    <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
+    <li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></li>
     <li><a href="{% url luy_url learning_unit_year_id=learning_unit_year.id %}"
            id="lnk_learning_unit">{{ learning_unit_year.acronym }}</a></li>
-    <li class="active">{% trans 'volumes_management' %}</li>
+    <li class="active">{% trans 'Volumes management' %}</li>
 {% endblock %}
 
 {% block content %}
@@ -41,7 +41,7 @@
         <div class="tab-content" id="tab_content">
             <div role="tabpanel" class="tab-pane active" id="components">
 
-                <h4 class="text-center">{% trans 'volumes_management' %}</h4>
+                <h4 class="text-center">{% trans 'Volumes management' %}</h4>
                 {% include "learning_unit/blocks/form/volumes_management_form.html" %}
             </div>
         </div>

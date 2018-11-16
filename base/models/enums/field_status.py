@@ -32,9 +32,9 @@ NOT_REQUIRED = "NOT_REQUIRED"
 DISABLED = "DISABLED"
 
 FIELD_STATUS = (
-    (REQUIRED, _(REQUIRED)),
-    (FIXED, _(FIXED)),
-    (ALERT, _(ALERT)),
-    (NOT_REQUIRED, _(NOT_REQUIRED)),
-    (DISABLED, _(DISABLED)),
+    (REQUIRED, _("Required")),
+    (FIXED, _("Fixed")),
+    (ALERT, _("Alert")),
+    (NOT_REQUIRED, _("Not required")),
+    (DISABLED, _("Disabled")),
 )

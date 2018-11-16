@@ -64,26 +64,26 @@ class EducationGroupFilter(forms.Form):
     academic_year = forms.ModelChoiceField(
         queryset=academic_year.find_academic_years(),
         required=False,
-        empty_label=_('all_label'),
-        label=_('academic_year_small')
+        empty_label=_('All label'),
+        label=_('Ac yr.')
     )
 
     category = forms.ChoiceField(
-        choices=[("", _('all_label'))] + list(education_group_categories.CATEGORIES),
+        choices=[("", _('All label'))] + list(education_group_categories.CATEGORIES),
         required=False,
-        label=_('category')
+        label=_('Category')
     )
 
     education_group_type = ModelChoiceFieldWithData(
         queryset=EducationGroupType.objects.all(),
         required=False,
-        empty_label=_('all_label'),
+        empty_label=_('All label'),
         label=_('type')
     )
 
-    acronym = forms.CharField(max_length=40, required=False, label=_('acronym'))
-    title = forms.CharField(max_length=255, required=False, label=_('title'))
-    requirement_entity_acronym = forms.CharField(max_length=20, required=False, label=_('entity'))
+    acronym = forms.CharField(max_length=40, required=False, label=_('Acronym'))
+    title = forms.CharField(max_length=255, required=False, label=_('Title'))
+    requirement_entity_acronym = forms.CharField(max_length=20, required=False, label=_('Entity'))
     partial_acronym = forms.CharField(max_length=15, required=False, label=_('code'))
     with_entity_subordinated = forms.BooleanField(required=False)
 

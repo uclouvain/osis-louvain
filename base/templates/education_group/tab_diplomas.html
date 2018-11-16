@@ -47,17 +47,17 @@
 
                         <br>
 
-                        <label>{% trans 'university_certificate_desc' %}</label><br>
+                        <label>{% trans 'University certificate' %}</label><br>
                         {{ education_group_year.joint_diploma|yesno|title }}
 
                         <br><br>
 
-                        <label>{% trans 'diploma_title'%}</label><br>
+                        <label>{% trans 'Diploma title'%}</label><br>
                         {{education_group_year.diploma_printing_title | default_if_none:'-'}}
 
                         <br><br>
 
-                        <label>{% trans 'professionnal_title'%}</label><br>
+                        <label>{% trans 'Professionnal title'%}</label><br>
                         {{education_group_year.professional_title | default_if_none:'-'}}
 
                         <br><br>

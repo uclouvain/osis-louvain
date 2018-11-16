@@ -30,7 +30,7 @@
     <form method="POST" action="{% url 'learning_unit_delete_all' learning_unit_year_id=learning_unit_year.id %}">
         {% csrf_token %}
         <div class="modal-body">
-            {% trans "msg_confirm_delete_luy" %}
+            {% trans "Are you certain that you want to delete the learning unit ?" %}
          </div>
          <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "cancel" %}</button>

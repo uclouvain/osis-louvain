@@ -23,13 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import ugettext_lazy as _
 
 NO_PRINT = "NO_PRINT"
 IN_HEADING_2_OF_DIPLOMA = "IN_HEADING_2_OF_DIPLOMA"
 IN_EXPECTED_FORM = "IN_EXPECTED_FORM"
 
 DIPLOMA_FOCUS = (
-    (NO_PRINT, NO_PRINT),
-    (IN_HEADING_2_OF_DIPLOMA, IN_HEADING_2_OF_DIPLOMA),
-    (IN_EXPECTED_FORM, IN_EXPECTED_FORM)
+    (NO_PRINT, _("No print")),
+    (IN_HEADING_2_OF_DIPLOMA, _("In heading 2 of diploma")),
+    (IN_EXPECTED_FORM, _("In expected form"))
 )

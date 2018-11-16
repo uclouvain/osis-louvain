@@ -308,7 +308,7 @@ class CommonBaseForm:
 class EducationGroupTypeForm(forms.Form):
     name = EducationGroupTypeModelChoiceField(
         EducationGroupType.objects.none(),
-        label=_("training_type"),
+        label=_("Type of training"),
         required=True,
     )
 

@@ -53,7 +53,7 @@
             </div>
             <div class="panel panel-default">
                 <div class="panel-body">
-                    {% trans 'introduced_by' %}
+                    {% trans 'Introduced by' %}
                     {% if learning_unit_year %}
                         {{ learning_unit_year.externallearningunityear.author }}
                     {% else %}
@@ -61,7 +61,7 @@
                     {% endif %}
                     <br><br>
 
-                    {% trans 'the' %}
+                    {% trans 'The' %}
                     {% if learning_unit_year %}
                         {{ learning_unit_year.externallearningunityear.date| date:"SHORT_DATE_FORMAT" }}
                     {% else %}

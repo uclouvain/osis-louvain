@@ -33,8 +33,8 @@
 
 {% if is_program_manager %}
 <ul class="nav nav-tabs nav-justified" id="tabs">
-    <li><a href="{% url 'scores_encoding' %}" id="lnk_scores_encoding">{% trans 'by_learning_unit' %}</a></li>
-    <li class="active"><a data-toggle="tab" role="tab" href="#tab_justifications" id="lnk_justifications">{% trans 'by_specific_criteria' %}</a></li>
+    <li><a href="{% url 'scores_encoding' %}" id="lnk_scores_encoding">{% trans 'By learning unit' %}</a></li>
+    <li class="active"><a data-toggle="tab" role="tab" href="#tab_justifications" id="lnk_justifications">{% trans 'By specific criteria' %}</a></li>
 </ul>
 <div class="tab-content">
     <div id="tab_scores_encoding" class="tab-pane fade">
@@ -45,31 +45,31 @@
             <br>
             <div class="row">
                 <div class="col-md-2">
-                    <label>{% trans 'registration_id' %}</label>
-                    <input type="text" class="form-control" id="txt_registration_id" name="registration_id" placeholder="{% trans 'registration_id' %}" value="{{registration_id | default_if_none:''}}">
+                    <label>{% trans 'Registration ID' %}</label>
+                    <input type="text" class="form-control" id="txt_registration_id" name="registration_id" placeholder="{% trans 'Registration ID' %}" value="{{registration_id | default_if_none:''}}">
                 </div>
                 <div class="col-md-2">
-                    <label>{% trans 'lastname' %}</label>
-                    <input type="text" class="form-control" id="txt_last_name" name="last_name" placeholder="{% trans 'lastname' %}" value="{{last_name | default_if_none:''}}">
+                    <label>{% trans 'Lastname' %}</label>
+                    <input type="text" class="form-control" id="txt_last_name" name="last_name" placeholder="{% trans 'Lastname' %}" value="{{last_name | default_if_none:''}}">
                 </div>
                 <div class="col-md-2">
-                    <label>{% trans 'firstname' %}</label>
-                    <input type="text" class="form-control" id="txt_first_name" name="first_name" placeholder="{% trans 'firstname' %}" value="{{first_name | default_if_none:''}}">
+                    <label>{% trans 'Firstname' %}</label>
+                    <input type="text" class="form-control" id="txt_first_name" name="first_name" placeholder="{% trans 'Firstname' %}" value="{{first_name | default_if_none:''}}">
                 </div>
                 <div class="col-md-3">
-                    <label>{% trans 'state' %}</label>
+                    <label>{% trans 'State' %}</label>
                     <select class="form-control" name="justification" id="slt_justification">
-                        <option value="">{% trans 'all' %}</option>
-                        <option {% if justification == "ABSENCE_UNJUSTIFIED" %} selected {% endif %} value="ABSENCE_UNJUSTIFIED">{% trans 'ABSENCE_UNJUSTIFIED' %}</option>
-                        <option {% if justification == "ABSENCE_JUSTIFIED" %} selected {% endif %} value="ABSENCE_JUSTIFIED">{% trans 'ABSENCE_JUSTIFIED' %}</option>
-                        <option {% if justification == "CHEATING" %} selected {% endif %} value="CHEATING">{% trans 'CHEATING' %}</option>
-                        <option {% if justification == "SCORE_MISSING" %} selected {% endif %} value="SCORE_MISSING">{% trans 'SCORE_MISSING' %}</option>
+                        <option value="">{% trans 'All' %}</option>
+                        <option {% if justification == "ABSENCE_UNJUSTIFIED" %} selected {% endif %} value="ABSENCE_UNJUSTIFIED">{% trans 'Unjustified absence' %}</option>
+                        <option {% if justification == "ABSENCE_JUSTIFIED" %} selected {% endif %} value="ABSENCE_JUSTIFIED">{% trans 'Justified absence' %}</option>
+                        <option {% if justification == "CHEATING" %} selected {% endif %} value="CHEATING">{% trans 'Cheating' %}</option>
+                        <option {% if justification == "SCORE_MISSING" %} selected {% endif %} value="SCORE_MISSING">{% trans 'Missing score' %}</option>
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <label>{% trans 'offer' %}</label><br>
+                    <label>{% trans 'Offer' %}</label><br>
                     <select id="slt_program" name="program" class="form-control">
-                        <option value="">{% trans 'all'%}</option>
+                        <option value="">{% trans 'All'%}</option>
                         {% for o in offer_list %}
                             <option value="{{o.id}}" {%if offer_year_id == o.id %}selected{%endif%}>{{o.acronym}}</option>
                         {% endfor %}
@@ -78,7 +78,7 @@
                 <div class="col-md-1">
                     <br>
                     <button type="submit" id="bt_submit_offer_year_search" class="btn btn-primary" role="button"
-                        title="{% trans 'offer_year_search' %}" name="action" value="search"
+                        title="{% trans 'Search of annual programs' %}" name="action" value="search"
                         style="margin-top:4px">
                         <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
                 </div>
@@ -89,18 +89,18 @@
             
             {% if enrollments %}
             <button type="submit" class="btn btn-primary" id="bt_save_online_encoding_up" name="action" value="save">
-                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}</button>
+                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}</button>
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>{% trans 'status' %}</th>
-                        <th>{% trans 'offer' %}</th>
-                        <th>{% trans 'learning_unit' %}</th>
-                        <th>{% trans 'registration_id' %}</th>
-                        <th>{% trans 'lastname' %}</th>
-                        <th>{% trans 'firstname' %}</th>
-                        <th>{% trans 'score' %}</th>
-                        <th>{% trans 'justification' %}</th>
+                        <th>{% trans 'Status' %}</th>
+                        <th>{% trans 'Offer' %}</th>
+                        <th>{% trans 'Learning unit' %}</th>
+                        <th>{% trans 'Registration ID' %}</th>
+                        <th>{% trans 'Lastname' %}</th>
+                        <th>{% trans 'Firstname' %}</th>
+                        <th>{% trans 'Score' %}</th>
+                        <th>{% trans 'Justification' %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -110,10 +110,10 @@
                                {% endif %}">
                         <td style="text-align:center;">
                             {% if enrollment.deadline_reached %}
-                                <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'deadline_reached' %}"></span>
+                                <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
                             {% endif %}
                             {% if enrollment.score_final != None or enrollment.justification_final %}
-                                <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'score_submitted' %}"></span>
+                                <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'Score submitted' %}"></span>
                             {% endif %}
                         </td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
@@ -145,9 +145,9 @@
                                     disabled
                                  {% endif %}>
                                 <option value=""></option>
-                                <option {% if enrollment.justification_final == "ABSENCE_UNJUSTIFIED" %} selected {% endif %} value="ABSENCE_UNJUSTIFIED">{% trans 'ABSENCE_UNJUSTIFIED' %}</option>
-                                <option {% if enrollment.justification_final == "ABSENCE_JUSTIFIED" %} selected {% endif %} value="ABSENCE_JUSTIFIED">{% trans 'ABSENCE_JUSTIFIED' %}</option>
-                                <option {% if enrollment.justification_final == "CHEATING" %} selected {% endif %} value="CHEATING">{% trans 'CHEATING' %}</option>
+                                <option {% if enrollment.justification_final == "ABSENCE_UNJUSTIFIED" %} selected {% endif %} value="ABSENCE_UNJUSTIFIED">{% trans 'Unjustified absence' %}</option>
+                                <option {% if enrollment.justification_final == "ABSENCE_JUSTIFIED" %} selected {% endif %} value="ABSENCE_JUSTIFIED">{% trans 'Justified absence' %}</option>
+                                <option {% if enrollment.justification_final == "CHEATING" %} selected {% endif %} value="CHEATING">{% trans 'Cheating' %}</option>
                             </select>
                         </td>
                     </tr>
@@ -156,7 +156,7 @@
             </table>
             <br>
             <button type="submit" class="btn btn-primary" id="bt_save_online_encoding_down" name="action" value="save">
-                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}</button>
+                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}</button>
             {% endif %}
         </form>
     </div>

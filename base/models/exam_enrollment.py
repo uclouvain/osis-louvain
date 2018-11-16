@@ -39,7 +39,8 @@ from base.models.exceptions import JustificationValueException
 from base.models.utils.admin_extentions import remove_delete_action
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
-JUSTIFICATION_ABSENT_FOR_TUTOR = _('absent')
+JUSTIFICATION_ABSENT_FOR_TUTOR = _('Absent')
+SCORE_BETWEEN_0_AND_20 = _("Scores must be between 0 and 20")
 
 
 class ExamEnrollmentAdmin(OsisModelAdmin):
@@ -58,14 +59,16 @@ class ExamEnrollment(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     score_draft = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
-                                      validators=[MinValueValidator(0, message="scores_must_be_between_0_and_20"),
-                                                  MaxValueValidator(20, message="scores_must_be_between_0_and_20")])
+                                      validators=[MinValueValidator(0, message=SCORE_BETWEEN_0_AND_20),
+                                                  MaxValueValidator(20, message=SCORE_BETWEEN_0_AND_20)])
     score_reencoded = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
-                                          validators=[MinValueValidator(0, message="scores_must_be_between_0_and_20"),
-                                                      MaxValueValidator(20, message="scores_must_be_between_0_and_20")])
+                                          validators=[MinValueValidator(0,
+                                                                        message=SCORE_BETWEEN_0_AND_20),
+                                                      MaxValueValidator(20,
+                                                                        message=SCORE_BETWEEN_0_AND_20)])
     score_final = models.DecimalField(max_digits=4, decimal_places=2, blank=True, null=True,
-                                      validators=[MinValueValidator(0, message="scores_must_be_between_0_and_20"),
-                                                  MaxValueValidator(20, message="scores_must_be_between_0_and_20")])
+                                      validators=[MinValueValidator(0, message=SCORE_BETWEEN_0_AND_20),
+                                                  MaxValueValidator(20, message=SCORE_BETWEEN_0_AND_20)])
     justification_draft = models.CharField(max_length=20, blank=True, null=True,
                                            choices=justification_types.JUSTIFICATION_TYPES)
     justification_reencoded = models.CharField(max_length=20, blank=True, null=True,
@@ -215,8 +218,8 @@ def calculate_exam_enrollment_progress(enrollments):
 
 
 def justification_label_authorized():
-    return "%s, %s" % (_('absent_pdf_legend'),
-                       _('cheating_pdf_legend'))
+    return "%s, %s" % (_('A=Absent'),
+                       _('T=Cheating'))
 
 
 class ExamEnrollmentHistoryAdmin(OsisModelAdmin):

@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import ugettext_lazy as _
 
 LECTURING_COMPLETE = "LECTURING_COMPLETE"
 LECTURING_INCOMPLETE = "LECTURING_INCOMPLETE"
@@ -31,7 +32,8 @@ PRACTICAL_EXERCISES_INCOMPLETE = "PRACTICAL_EXERCISES_INCOMPLETE"
 
 
 LEARNING_COMPONENT_DESCRIPTIONS = (
-    (LECTURING_COMPLETE, LECTURING_COMPLETE),
-    (LECTURING_INCOMPLETE, LECTURING_INCOMPLETE),
-    (PRACTICAL_EXERCISES_COMPLETE, PRACTICAL_EXERCISES_COMPLETE),
-    (PRACTICAL_EXERCISES_INCOMPLETE, PRACTICAL_EXERCISES_INCOMPLETE))
+    (LECTURING_COMPLETE, _("Lecturing complete")),
+    (LECTURING_INCOMPLETE, _("Lecturing incomplete")),
+    (PRACTICAL_EXERCISES_COMPLETE, _("Practical exercises complete")),
+    (PRACTICAL_EXERCISES_INCOMPLETE, _("Practical exercises incomplete"))
+)

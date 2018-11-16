@@ -149,7 +149,7 @@ class LearningUnitEditionTestCase(TestCase):
                         "and year %(next_year)s - %(next_value)s"
         # Error : Acronym diff
         error_acronym = _(generic_error) % {
-            'field': _('acronym'),
+            'field': _('Acronym'),
             'year': self.learning_unit_year.academic_year,
             'value': getattr(self.learning_unit_year, 'acronym'),
             'next_year': another_learning_unit_year.academic_year,
@@ -158,11 +158,11 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertIn(error_acronym, error_list)
         # Error : Specific title english diff
         error_specific_title_english = _(generic_error) % {
-            'field': _('english_title_proper_to_UE'),
+            'field': _('English title proper'),
             'year': self.learning_unit_year.academic_year,
             'value': getattr(self.learning_unit_year, 'specific_title_english'),
             'next_year': another_learning_unit_year.academic_year,
-            'next_value': _('no_data')
+            'next_value': _('No data')
         }
         self.assertIn(error_specific_title_english, error_list)
 
@@ -181,7 +181,7 @@ class LearningUnitEditionTestCase(TestCase):
                         "and year %(next_year)s - %(next_value)s"
         # Error : Status diff
         error_status = _(generic_error) % {
-            'field': _('status'),
+            'field': _('Status'),
             'year': self.learning_unit_year.academic_year,
             'value': _('yes'),
             'next_year': another_learning_unit_year.academic_year,
@@ -206,7 +206,7 @@ class LearningUnitEditionTestCase(TestCase):
 
         # Error : Language diff
         error_language = _(generic_error) % {
-            'field': _('language'),
+            'field': _('Language'),
             'year': self.learning_container_year.academic_year,
             'value': getattr(self.learning_unit_year, 'language'),
             'next_year': another_learning_unit_year.academic_year,
@@ -244,7 +244,7 @@ class LearningUnitEditionTestCase(TestCase):
 
         # Error : Common title diff
         error_common_title = _(generic_error) % {
-            'field': _('common_title'),
+            'field': _('Common title'),
             'year': self.learning_container_year.academic_year,
             'value': getattr(self.learning_container_year, 'common_title'),
             'next_year': another_learning_container_year.academic_year,
@@ -269,7 +269,7 @@ class LearningUnitEditionTestCase(TestCase):
 
         # Error : Campus diff
         error_campus = _(generic_error) % {
-            'field': _('campus'),
+            'field': _('Campus'),
             'year': self.learning_unit_year.academic_year,
             'value': getattr(self.learning_unit_year, 'campus'),
             'next_year': another_learning_unit_year.academic_year,
@@ -372,7 +372,7 @@ class LearningUnitEditionTestCase(TestCase):
             'year': self.learning_container_year.academic_year,
             'value': self.add_requirement_entity_1.entity.most_recent_acronym,
             'next_year': another_learning_container_year.academic_year,
-            'next_value': _('no_data')
+            'next_value': _('No data')
         }
         self.assertIn(error_requirement_entity, error_list)
 

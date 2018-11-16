@@ -26,9 +26,8 @@
 from django.db import models
 from django.db.models import Prefetch
 
-from attribution.models.enums import function
+from attribution.models.enums.function import Functions
 from base.models import entity_container_year
-from base.models import learning_unit_year
 from base.models import person
 from base.models.academic_year import current_academic_year
 from base.models.enums import entity_container_year_link_type
@@ -54,7 +53,7 @@ class Attribution(SerializableModel):
     end_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
     start_year = models.IntegerField(blank=True, null=True)
     end_year = models.IntegerField(blank=True, null=True)
-    function = models.CharField(max_length=35, blank=True, null=True, choices=function.FUNCTIONS, db_index=True)
+    function = models.CharField(max_length=35, blank=True, null=True, choices=Functions.choices(), db_index=True)
     learning_unit_year = models.ForeignKey('base.LearningUnitYear')
     tutor = models.ForeignKey('base.Tutor')
     score_responsible = models.BooleanField(default=False)

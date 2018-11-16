@@ -23,16 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from enum import Enum
 from django.utils.translation import ugettext_lazy as _
 
-
-class ProposalState(Enum):
-    FACULTY = "FACULTY"
-    CENTRAL = "CENTRAL"
-    SUSPENDED = "SUSPENDED"
-    ACCEPTED = "ACCEPTED"
-    REFUSED = "REFUSED"
+from base.models.utils.utils import ChoiceEnum
 
 
-CHOICES = tuple((name, _(name)) for name, member in ProposalState.__members__.items())
+class ProposalState(ChoiceEnum):
+    FACULTY = _("Faculty")
+    CENTRAL = _("Central")
+    SUSPENDED = _("Suspended")
+    ACCEPTED = _("Accepted")
+    REFUSED = _("Refused")

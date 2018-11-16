@@ -29,6 +29,6 @@ FULL = "FULL"
 PARTIM = "PARTIM"
 
 LEARNING_UNIT_YEAR_SUBTYPES = (
-    (FULL, _(FULL)),
-    (PARTIM, _(PARTIM))
+    (FULL, _("Full")),
+    (PARTIM, _("Partim"))
 )

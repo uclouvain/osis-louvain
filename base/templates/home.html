@@ -47,7 +47,7 @@
                 <h3>{{ highlight.highlight_title }}</h3>
                 <small style="margin-bottom: 10px;">{{ highlight.highlight_description }}</small>
                 <p style="margin-top: 10px;"><a class="btn btn-primary btn-sm" href="/{{ highlight.highlight_shortcut }}"
-                      role="button">{% trans 'go' %}</a>
+                      role="button">{% trans 'Go' %}</a>
                 </p>
               </div>
             </div>
@@ -55,11 +55,11 @@
         </div>
         <a class="left carousel-control" href="#carousel_academic_event" role="button" data-slide="prev" style="width: 10%;">
             <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-            <span class="sr-only">{% trans 'previous' %}</span>
+            <span class="sr-only">{% trans 'Previous' %}</span>
         </a>
         <a class="right carousel-control" href="#carousel_academic_event" role="button" data-slide="next" style="width: 10%;">
             <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-            <span class="sr-only">{% trans 'next' %}</span>
+            <span class="sr-only">{% trans 'Next' %}</span>
         </a>
     </div>
     <br>
@@ -70,15 +70,15 @@
             {% if perms.base.can_access_catalog %}
                 <div class="col-md-1"><i class="fa fa-graduation-cap" style="font-size: 400%; color: #6699FF;"></i></div>
                 <div class="col-md-5">
-                    <h4 class="media-heading"><a href="{% url 'catalog' %}" id="lnk_home_catalog">{% trans 'formation_catalogue' %}</a></h4>
-                    <p>{% trans 'desc_lnk_home_catalog' %}</p>
+                    <h4 class="media-heading"><a href="{% url 'catalog' %}" id="lnk_home_catalog">{% trans 'Formation catalogue' %}</a></h4>
+                    <p>{% trans 'Elaboration and management of the formation catalogue.' %}</p>
                 </div>
             {% endif %}
             {% if perms.base.can_access_student_path %}
                 <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
                 <div class="col-md-5">
-                    <h4 class="media-heading"><a href="{% url 'studies' %}" id="lnk_home_studies">{% trans 'student_path' %}</a></h4>
-                    <p>{% trans 'desc_lnk_home_studies' %}</p>
+                    <h4 class="media-heading"><a href="{% url 'studies' %}" id="lnk_home_studies">{% trans 'Student path' %}</a></h4>
+                    <p>{% trans "Management of students' path from their registration until their diploma." %}</p>
                 </div>
             {% endif %}
         </div>
@@ -87,14 +87,16 @@
             {% if perms.base.is_institution_administrator %}
                 <div class="col-md-1"><i class="fa fa-university" style="font-size: 400%; color: #6699FF;"></i></div>
                 <div class="col-md-5">
-                    <h4 class="media-heading"><a href="{% url 'institution' %}" id ="lnk_home_institution">{% trans 'institution' %}</a></h4>
-                    <p>{% trans 'desc_lnk_home_institution' %}</p>
+                    <h4 class="media-heading">
+                        <a href="{% url 'institution' %}" id ="lnk_home_institution">{% trans 'Institution' %}</a>
+                    </h4>
+                    <p>{% trans 'Management of the institution.' %}</p>
                 </div>
             {% endif %}
             <div class="col-md-1"><span class="glyphicon glyphicon-user" aria-hidden="true" style="font-size: 400%; color: #6699FF;"></span></div>
             <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'my_osis' %}">{% trans 'my_osis' %}</a></h4>
-                <p>{% trans 'desc_lnk_my_osis' %}</p>
+                <h4 class="media-heading"><a href="{% url 'my_osis' %}">{% trans 'My OSIS' %}</a></h4>
+                <p>{% trans 'Your personal details, configurations and other information related to you.' %}</p>
             </div>
         </div>
         <br>
@@ -103,7 +105,7 @@
 {% if request.user.is_authenticated %}
   {% if academic_calendar|length > 0%}
   <div class="panel panel-default">
-      <div class="panel-heading"><h3 class="panel-title">{% trans 'academic_calendar'%}</h3></div>
+      <div class="panel-heading"><h3 class="panel-title">{% trans 'Academic calendar'%}</h3></div>
       <div class="panel-body">
         <dl>
           {% for academic_event in academic_calendar %}

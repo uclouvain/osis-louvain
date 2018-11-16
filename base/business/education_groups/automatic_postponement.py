@@ -41,7 +41,7 @@ class EducationGroupAutomaticPostponement(AutomaticPostponement):
     send_before = send_mail_before_annual_procedure_of_automatic_postponement_of_egy
     send_after = send_mail_after_annual_procedure_of_automatic_postponement_of_egy
     extend_method = duplicate_education_group_year
-    msg_result = _("%s education group(s) extended and %s error(s)")
+    msg_result = _("%(number_extended)s education group(s) extended and %(number_error)s error(s)")
 
     def get_queryset(self, queryset=None):
         # We need to postpone only trainings and some mini trainings

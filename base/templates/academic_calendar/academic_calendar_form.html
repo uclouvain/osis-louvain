@@ -31,10 +31,10 @@
 <link rel="stylesheet" href="{% static 'css/bootstrap-datepicker3.min.css' %}" type='text/css'>
 {% endblock %}
 {% block breadcrumb %}
-<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a></li>
-<li><a href="{% url 'academic_year' %}" id="lnk_academic_year">{% trans 'academic_year' %}</a></li>
-<li><a href="{% url 'academic_calendars' %}" id="lnk_academic_calendars">{% trans 'academic_calendars' %}</a></li>
-<li class="active">{% trans 'academic_calendar' %}</li>
+<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
+<li><a href="{% url 'academic_year' %}" id="lnk_academic_year">{% trans 'Academic year' %}</a></li>
+<li><a href="{% url 'academic_calendars' %}" id="lnk_academic_calendars">{% trans 'Academic calendars' %}</a></li>
+<li class="active">{% trans 'Academic calendar' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
@@ -57,17 +57,17 @@
                    name="reference" id="txt_reference">
             <div class="row">
                 <div class="col-md-3">
-                    <label for="slt_academic_year">{% trans 'academic_year'%}</label>
+                    <label for="slt_academic_year">{% trans 'Academic year'%}</label>
                     <br>
                     {{ form.academic_year }}
                 </div>
                 <div class="col-md-5">
-                    <label for="txt_title">{% trans 'title' %}</label>
+                    <label for="txt_title">{% trans 'Title' %}</label>
                     {{ form.title}}
                     <span class="error">{{ form.title.errors }}</span>
                 </div>
                 <div class="col-md-2">
-                    <label for="txt_start_date">{% trans 'start_date'%}</label>
+                    <label for="txt_start_date">{% trans 'Start date'%}</label>
                     <input type="text" class="form-control"
                            value="{{ form.start_date.value| default_if_none:''| date_in_form_format }}"
                     name="start_date" id="txt_start_date"/>
@@ -75,7 +75,7 @@
                     <span class="error">{{ form.start_date.errors }}</span>
                 </div>
                 <div class="col-md-2">
-                    <label for="txt_end_date">{% trans 'end_date' %}</label>
+                    <label for="txt_end_date">{% trans 'End date' %}</label>
                     <input type="text" class="form-control"
                            value="{{ form.end_date.value| default_if_none:''| date_in_form_format }}"
                            name="end_date" id="txt_end_date"/>
@@ -86,14 +86,14 @@
             <br>
             <div class="row">
                 <div class="col-md-12">
-                    <label for="txt_description">{% trans 'description'%}</label>
+                    <label for="txt_description">{% trans 'Description'%}</label>
                     <textarea name="description" id="txt_description" class="form-control">{{ form.description.value | default_if_none:'' }}</textarea>
                 </div>
             </div>
             <br>
             <div class="row">
               <div class="col-md-3">
-                  <label for="slt_reference">{% trans 'academic_calendar_type'%}</label>
+                  <label for="slt_reference">{% trans 'Type of event'%}</label>
                   <br>
                   {{ form.reference }}
               </div>
@@ -101,19 +101,19 @@
             <br>
             <div class="row">
                 <div class="col-md-6">
-                    <label for="txt_highlight_title">{% trans 'highlight_title' %}</label>
+                    <label for="txt_highlight_title">{% trans 'Highlight title' %}</label>
                     {{ form.highlight_title}}
                     <span class="error">{{ form.highlight_title.errors }}</span>
                 </div>
                 <div class="col-md-6">
-                    <label for="txt_highlight_shortcut">{% trans 'highlight_shortcut' %}</label>
+                    <label for="txt_highlight_shortcut">{% trans 'Highlight shortcut' %}</label>
                     {{ form.highlight_shortcut}}
                     <span class="error">{{ form.highlight_shortcut.errors }}</span>
                     <p style="margin-top: 5px;">http://osis.uclouvain.be/<span id="url"></span></p>
                 </div>
             </div>
             <br>
-            <label for="txa_highlight_description">{% trans 'highlight_description' %}</label>
+            <label for="txa_highlight_description">{% trans 'Highlight description' %}</label>
             <textarea name="highlight_description" id="txa_highlight_description" class="form-control">{{ form.highlight_description.value | default_if_none:'' }}</textarea>
             <span class="error">{{ form.highlight_description.errors }}</span>
             <br>

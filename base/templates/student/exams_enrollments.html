@@ -29,47 +29,49 @@
     <ul class="nav nav-tabs" role="tablist">
         {% regroup exams_enrollments by learning_unit_enrollment.learning_unit_year.academic_year as grouped_by_year %}
         {% for lue_year in grouped_by_year %}
-        <li class="{% if forloop.counter == 1 %}active{%endif%}" >
-            <a data-toggle="tab" href="#tab_exams_enrollments_year_{{lue_year.grouper}}" role="tab">
-                {{lue_year.grouper}}
-            </a>
-        </li>
-        {% endfor%}
+            <li class="{% if forloop.counter == 1 %}active{% endif %}">
+                <a data-toggle="tab" href="#tab_exams_enrollments_year_{{ lue_year.grouper }}" role="tab">
+                    {{ lue_year.grouper }}
+                </a>
+            </li>
+        {% endfor %}
     </ul>
     <div class="tab-content">
-        {% if exams_enrollments%}
+        {% if exams_enrollments %}
             {% regroup exams_enrollments by learning_unit_enrollment.learning_unit_year.academic_year as grouped_by_year %}
             {% for ee_year in grouped_by_year %}
-            <div id="tab_exams_enrollments_year_{{ee_year.grouper}}"
-                 class="tab-pane fade {% if forloop.counter == 1 %} in active{%endif%}">
-                {% regroup ee_year.list by session_exam.number_session as grouped_by_session %}
-                {% for session in grouped_by_session %}
-                    <table class="table table-striped table-hover">
-                        <thead>
-                        <th width="30%">{% trans 'learning_unit' %}</th>
-                        <th width="30%">{% trans 'number_session' %}</th>
-                        <th width="30%">{% trans 'result' %}</th>
-                        </thead>
-                        <tbody>
-                        {% for ee in session.list %}
-                        <tr>
-                            <td>{{ee.learning_unit_enrollment.learning_unit_year.acronym}}</td>
-                            <td>{{ee.session_exam.number_session}}</td>
-                            <td>{% if ee.score_final %}{{ee.score_final}}{% endif%}
-                                {% if ee.justification_final%}{% trans ee.justification_final%}{% endif%}
-                            </td>
-                        </tr>
-                        {% endfor%}
-                        </tbody>
-                    </table>
-                {% endfor%}
+                <div id="tab_exams_enrollments_year_{{ ee_year.grouper }}"
+                     class="tab-pane fade {% if forloop.counter == 1 %} in active{% endif %}">
+                    {% regroup ee_year.list by session_exam.number_session as grouped_by_session %}
+                    {% for session in grouped_by_session %}
+                        <table class="table table-striped table-hover">
+                            <thead>
+                            <tr>
+                                <th width="30%">{% trans 'Learning unit' %}</th>
+                                <th width="30%">{% trans 'No. Session' %}</th>
+                                <th width="30%">{% trans 'result' %}</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for ee in session.list %}
+                                <tr>
+                                    <td>{{ ee.learning_unit_enrollment.learning_unit_year.acronym }}</td>
+                                    <td>{{ ee.session_exam.number_session }}</td>
+                                    <td>{% if ee.score_final %}{{ ee.score_final }}{% endif %}
+                                        {% if ee.justification_final %}{% trans ee.justification_final %}{% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% endfor %}
 
-            </div>
-            {% endfor%}
-        {% else%}
+                </div>
+            {% endfor %}
+        {% else %}
             <div>
-                <label class="alert alert-warning" style="margin:5px">{% trans 'no_data'%}</label>
+                <label class="alert alert-warning" style="margin:5px">{% trans 'No data' %}</label>
             </div>
-        {% endif%}
+        {% endif %}
     </div>
 </div>

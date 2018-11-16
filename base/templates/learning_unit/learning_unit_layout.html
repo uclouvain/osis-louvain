@@ -7,10 +7,10 @@
 {% load learning_unit %}
 
 {% block breadcrumb %}
-<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a></li>
-<li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'learning_units' %}</a></li>
+<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
+<li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></li>
 <li><a href="{% url 'learning_unit' learning_unit_year.id %}" id="lnk_learning_units">{{learning_unit_year.acronym}}</a></li>
-<li class="active">{% trans 'modification'|capfirst %}</li>
+<li class="active">{% trans 'Modification' %}</li>
 {% endblock %}
 
 {% block header %}
@@ -22,7 +22,7 @@
   {% include "learning_unit/blocks/header.html" %}
 {% endwith %}
 <div class="page-header">
-    <h2>{% block h2_title %}{% trans 'modification'|capfirst %}{% endblock %}</h2>
+    <h2>{% block h2_title %}{% trans 'Modification' %}{% endblock %}</h2>
 </div>
 <div class="panel panel-default">
     <div class="panel-heading">

@@ -27,9 +27,9 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue' %}</a></li>
-<li><a href="{% url 'offers' %}" id="lnk_offers">{% trans 'offers' %}</a></li>
-<li class="active">{% trans 'offer_year_calendar' %}</li>
+<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
+<li><a href="{% url 'Offers' %}" id="lnk_offers">{% trans 'Offers' %}</a></li>
+<li class="active">{% trans 'Calendar of the annual program' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
@@ -39,15 +39,15 @@
     <div class="panel-body">
         <div class="row">
             <div class="col-md-8">
-                <label>{% trans 'academic_calendar'%}</label><br>
+                <label>{% trans 'Academic calendar'%}</label><br>
                 {{ offer_year_calendar.academic_calendar }}
             </div>
             <div class="col-md-2">
-                <label>{% trans 'start_date'%}</label><br>
+                <label>{% trans 'Start date'%}</label><br>
                 {{ offer_year_calendar.start_date| default_if_none:''|date:"j/m/Y" }}
             </div>
             <div class="col-md-2">
-                <label>{% trans 'end_date' %}</label><br>
+                <label>{% trans 'End date' %}</label><br>
                 {{ offer_year_calendar.end_date| default_if_none:''|date:"j/m/Y" }}
             </div>
         </div>

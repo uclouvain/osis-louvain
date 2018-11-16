@@ -40,8 +40,8 @@ class TeachingMaterialAdmin(OrderedModelAdmin):
 
 
 class TeachingMaterial(OrderedModel):
-    title = models.CharField(max_length=255, verbose_name=_('teachingmaterial', 'title'))
-    mandatory = models.BooleanField(verbose_name=_('teachingmaterial', 'mandatory'))
+    title = models.CharField(max_length=255, verbose_name=_('teaching materials', 'title'))
+    mandatory = models.BooleanField(verbose_name=_('teaching materials', 'mandatory'))
     learning_unit_year = models.ForeignKey(LearningUnitYear, on_delete=models.CASCADE)
     order_with_respect_to = 'learning_unit_year'
 

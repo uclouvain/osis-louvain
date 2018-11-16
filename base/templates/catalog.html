@@ -27,11 +27,11 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li class="active">{% trans 'formation_catalogue' %}</li>
+<li class="active">{% trans 'Formation catalogue' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'formation_catalogue' %}</h2>
+    <h2>{% trans 'Formation catalogue' %}</h2>
 </div>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -39,15 +39,15 @@
             {% if perms.base.can_access_offer %}
             <div class="col-md-1"><i class="fa fa-map" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'offers' %}" id="lnk_offers">{% trans 'offers' %}</a></h4>
-                <p>{% trans 'desc_lnk_offers' %}</p>
+                <h4 class="media-heading"><a href="{% url 'offers' %}" id="lnk_offers">{% trans 'Offers' %}</a></h4>
+                <p>{% trans 'Management of programs.' %}</p>
             </div>
             {% endif %}
             {% if perms.base.can_access_learningunit %}
             <div class="col-md-1"><i class="fa fa-book" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'learning_units' %}</a></h4>
-                <p> {% trans 'desc_lnk_learning_units' %}</p>
+                <h4 class="media-heading"><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></h4>
+                <p> {% trans 'Management of learning units, formations and others activities of the program.' %}</p>
             </div>
             {% endif %}
         </div>
@@ -56,15 +56,17 @@
             {%  if perms.base.can_access_academicyear %}
             <div class="col-md-1"><i class="fa fa-calendar" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'academic_year' %}" id="lnk_academic_year">{% trans 'academic_year' %}</a></h4>
-                <p>{% trans 'desc_lnk_academic_year' %}</p>
+                <h4 class="media-heading"><a href="{% url 'academic_year' %}" id="lnk_academic_year">{% trans 'Academic year' %}</a></h4>
+                <p>{% trans 'Management of the annualized program.' %}</p>
             </div>
             {% endif %}
             {%  if perms.base.can_access_education_group %}
             <div class="col-md-1"><i class="fa fa-map" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'education_groups' %}" id="lnk_education_groups">{% trans 'formations_lnk' %}</a></h4>
-                <p>{% trans 'desc_lnk_formations' %}</p>
+                <h4 class="media-heading">
+                    <a href="{% url 'education_groups' %}" id="lnk_education_groups">{% trans 'Trainings' %}</a>
+                </h4>
+                <p>{% trans 'Organization of formations' %}</p>
             </div>
             {% endif %}
         </div>

@@ -31,7 +31,7 @@ INACTIVE = "INACTIVE"
 RE_REGISTRATION = "RE_REGISTRATION"
 
 ACTIVE_STATUS_LIST = (
-    (ACTIVE, _(ACTIVE)),
-    (INACTIVE, _(INACTIVE)),
-    (RE_REGISTRATION, _(RE_REGISTRATION))
+    (ACTIVE, _("Active")),
+    (INACTIVE, _("Inactive")),
+    (RE_REGISTRATION, _("Reregistration"))
 )

@@ -46,7 +46,7 @@ class AbstractCalendar(models.Model):
     def end_start_dates_validation(self):
         if self._dates_are_set() and not is_in_chronological_order(self.start_date, self.end_date):
             raise ValidationError({
-                "end_date": _('end_start_date_error')
+                "end_date": _('End date must be lower than start date')
             })
 
     def _dates_are_set(self):

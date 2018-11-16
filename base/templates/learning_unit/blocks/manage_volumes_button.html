@@ -4,8 +4,7 @@
 
 {% flag "learning_unit_update" %}
 <a {% if can_manage_volume %}href="{% url 'learning_unit_volumes_management' learning_unit_year_id=learning_unit_year.id form_type=form_type %}"{% endif %}
-    id="lnk_learning_unit_create" class="btn btn-default" role="button"
-    title="{% trans 'learning_unit_create' %}" {% if not can_manage_volume %} disabled {% endif %}>
+    id="lnk_learning_unit_create" class="btn btn-default" role="button" {% if not can_manage_volume %} disabled {% endif %}>
         {% trans 'Manage volumes' %}
 </a>
 {% endflag %}

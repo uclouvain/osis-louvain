@@ -31,8 +31,8 @@
     <input type="hidden" name="group_element_year_id" value="{{ group.id }}"/>
     {% csrf_token %}
     <div class="btn-group">
-        {% button_order_with_permission _("up") "btn_operation_up_"|addstr:group.id "up" %}
-        {% button_order_with_permission _("down") "btn_operation_down_"|addstr:group.id "down" %}
+        {% button_order_with_permission _("Up") "btn_operation_up_"|addstr:group.id "up" %}
+        {% button_order_with_permission _("Down") "btn_operation_down_"|addstr:group.id "down" %}
     </div>
 </form>
 
@@ -43,5 +43,5 @@
     {% button_with_permission _("Detach") "detach" detach_url %}
 
     {% url 'group_element_year_management_comment' root_id=parent.id education_group_year_id=education_group_year.id group_element_year_id=group.id as update_comment_url %}
-    {% button_with_permission _("edit") "edit" update_comment_url %}
+    {% button_with_permission _("Edit") "edit" update_comment_url %}
 </div>

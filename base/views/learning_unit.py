@@ -288,7 +288,7 @@ def _get_changed_organization(context, context_prev, context_next):
     data = {}
     for key_value in ORGANIZATION_KEYS:
         if _has_changed(context, context_next, context_prev, key_value):
-            translated_key = _('learning_location') if key_value == "campus" else _(key_value.lower())
+            translated_key = _('Learning location') if key_value == "campus" else _(key_value.lower())
             data.update({translated_key: {'prev': context_prev.get(key_value),
                                           'current': context.get(key_value),
                                           'next': context_next.get(key_value)}

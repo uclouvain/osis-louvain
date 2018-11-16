@@ -29,6 +29,7 @@ from unittest import mock
 from django.forms import model_to_dict
 from django.test import TestCase
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
 from base.models import academic_calendar
 from base.models.academic_calendar import find_dates_for_current_academic_year, is_academic_calendar_has_started
@@ -96,7 +97,6 @@ class AcademicCalendarTest(TestCase):
 class TestFindDatesForCurrentAcademicYear(TestCase):
     @classmethod
     def setUpTestData(cls):
-
         cls.current_academic_calendar = AcademicCalendarFactory(academic_year=create_current_academic_year(),
                                                                 reference=academic_calendar_type.EXAM_ENROLLMENTS)
 
@@ -142,27 +142,9 @@ class TestIsAcademicCalendarHasStarted(TestCase):
             date=higher_date
         ))
 
-    def test_academic_calendar_types(self):
-        excepted_academic_calendar_types = (
-            (academic_calendar_type.DELIBERATION, academic_calendar_type.DELIBERATION),
-            (academic_calendar_type.DISSERTATION_SUBMISSION, academic_calendar_type.DISSERTATION_SUBMISSION),
-            (academic_calendar_type.EXAM_ENROLLMENTS, academic_calendar_type.EXAM_ENROLLMENTS),
-            (academic_calendar_type.SCORES_EXAM_DIFFUSION, academic_calendar_type.SCORES_EXAM_DIFFUSION),
-            (academic_calendar_type.SCORES_EXAM_SUBMISSION, academic_calendar_type.SCORES_EXAM_SUBMISSION),
-            (academic_calendar_type.TEACHING_CHARGE_APPLICATION, academic_calendar_type.TEACHING_CHARGE_APPLICATION),
-            (academic_calendar_type.COURSE_ENROLLMENT, academic_calendar_type.COURSE_ENROLLMENT),
-            (academic_calendar_type.SUMMARY_COURSE_SUBMISSION, academic_calendar_type.SUMMARY_COURSE_SUBMISSION),
-            (academic_calendar_type.EDUCATION_GROUP_EDITION, academic_calendar_type.EDUCATION_GROUP_EDITION),
-            (academic_calendar_type.EDITION_OF_GENERAL_INFORMATION, academic_calendar_type.EDITION_OF_GENERAL_INFORMATION),
-        )
-        self.assertCountEqual(
-            academic_calendar_type.ACADEMIC_CALENDAR_TYPES,
-            excepted_academic_calendar_types
-        )
-
     def test_project_calendar_types(self):
         excepted_project_calendar_types = (
-            (academic_calendar_type.TESTING, academic_calendar_type.TESTING),
+            (academic_calendar_type.TESTING, _("Testing")),
         )
         self.assertCountEqual(
             academic_calendar_type.PROJECT_CALENDAR_TYPES,
@@ -176,6 +158,7 @@ class TestIsAcademicCalendarHasStarted(TestCase):
             academic_calendar_type.AD_HOC_CALENDAR_TYPES,
             academic_calendar_type.CALENDAR_TYPES
         )
+
 
 class TestGetStartingAcademicCalendar(TestCase):
     @classmethod

@@ -122,7 +122,7 @@ class OrganizationViewTestCase(TestCase):
         setattr(request, '_messages', FallbackStorage(request))
 
         organization_address_new(request)
-        self.assertEqual(str(request._messages._queued_messages[0]), _("organization_address_save_error"))
+        self.assertEqual(str(request._messages._queued_messages[0]), _("Impossible to save the organization address"))
 
     def test_organizations_search(self):
         response = self.client.get(reverse('organizations_search'), data={

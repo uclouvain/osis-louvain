@@ -23,8 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import ugettext_lazy as _
+
 BASE = 'BASE'
 DISSERTATION = 'DISSERTATION'
 
-CHOICES = ((BASE, BASE),
-           (DISSERTATION, DISSERTATION))
+CHOICES = (
+    (BASE, _("Base")),
+    (DISSERTATION, _("Dissertation"))
+)

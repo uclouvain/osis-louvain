@@ -43,7 +43,7 @@ class EducationGroup(models.Model):
     start_year = models.PositiveIntegerField(
         blank=True,
         null=True,
-        verbose_name=_('start')
+        verbose_name=_('Start')
     )
 
     end_year = models.PositiveIntegerField(
@@ -74,7 +74,7 @@ class EducationGroup(models.Model):
                 raise ValidationError({
                     'end_year': _("%(max)s must be greater or equals than %(min)s") % {
                         "max": _("end").title(),
-                        "min": _("start").title(),
+                        "min": _("Start"),
                     }
                 })
         # Check if end_year could be set according to protected data

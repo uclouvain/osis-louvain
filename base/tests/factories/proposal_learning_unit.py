@@ -29,7 +29,8 @@ import string
 
 import factory.fuzzy
 
-from base.models.enums import proposal_state, proposal_type
+from base.models.enums.proposal_state import ProposalState
+from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 
@@ -42,8 +43,8 @@ class ProposalLearningUnitFactory(factory.django.DjangoModelFactory):
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
                                           datetime.datetime(2017, 3, 1))
     learning_unit_year = factory.SubFactory(LearningUnitYearFakerFactory)
-    type = factory.Iterator(proposal_type.CHOICES, getter=operator.itemgetter(0))
-    state = factory.Iterator(proposal_state.CHOICES, getter=operator.itemgetter(0))
+    type = factory.Iterator(ProposalType.choices(), getter=operator.itemgetter(0))
+    state = factory.Iterator(ProposalState.choices(), getter=operator.itemgetter(0))
     initial_data = {}
     entity = factory.SubFactory(EntityFactory)
     folder_id = factory.fuzzy.FuzzyInteger(100)

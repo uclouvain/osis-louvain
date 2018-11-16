@@ -40,9 +40,8 @@ from base.models.enums import exam_enrollment_justification_type
 from base.tests.mixin.academic_year import AcademicYearMockMixin
 from base.tests.mixin.session_exam_calendar import SessionExamCalendarMockMixin
 
-from base.tests.models import test_exam_enrollment, test_offer_enrollment, \
-    test_learning_unit_enrollment, test_session_exam, test_offer_year
-from attribution.tests.models import test_attribution
+from base.tests.models import test_exam_enrollment, test_offer_enrollment, test_learning_unit_enrollment, \
+    test_session_exam
 from assessments.views import score_encoding
 from base.models.enums import number_session, academic_calendar_type
 from base.models.exam_enrollment import ExamEnrollment
@@ -52,7 +51,6 @@ from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
@@ -350,7 +348,7 @@ class OutsideEncodingPeriodTest(AcademicYearMockMixin, SessionExamCalendarMockMi
         messages = list(response.context['messages'])
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].tags, 'warning')
-        self.assertEqual(messages[0].message, _('score_encoding_period_not_open'))
+        self.assertEqual(messages[0].message, _("The period of scores' encoding is not opened"))
 
     def test_multiple_messages_outside_encoding_period(self):
         date_format = str(_('date_format'))
@@ -376,10 +374,14 @@ class OutsideEncodingPeriodTest(AcademicYearMockMixin, SessionExamCalendarMockMi
         self.assertEqual(len(messages), 2)
         self.assertEqual(messages[0].tags, 'warning')
         end_date_str = self.academic_calendar.end_date.strftime(date_format)
-        self.assertEqual(messages[0].message, _('outside_scores_encodings_period_latest_session') % (1, end_date_str))
+        self.assertEqual(messages[0].message,
+                         _("The period of scores' encoding %(session_number)s is closed since %(str_date)s")
+                         % {'session_number': 1, 'str_date': end_date_str})
         self.assertEqual(messages[1].tags, 'warning')
         start_date_str = ac.start_date.strftime(date_format)
-        self.assertEqual(messages[1].message, _('outside_scores_encodings_period_closest_session') % (2, start_date_str))
+        self.assertEqual(messages[1].message,
+                         _("The period of scores' encoding %(session_number)s will be open %(str_date)s")
+                         % {'session_number': 2, 'str_date': start_date_str})
 
 
 class GetScoreEncodingViewProgramManagerTest(AcademicYearMockMixin, SessionExamCalendarMockMixin, TestCase):

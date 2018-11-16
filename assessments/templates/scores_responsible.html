@@ -27,13 +27,13 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li id="lnk_institution"><a href="{% url 'institution' %}" id ="lnk_home_institution">{% trans 'institution' %}</a></li>
-<li id="lnk_studies"><a href="{% url 'academic_actors' %}">{% trans 'academic_actors' %}</a></li>
-<li class="active">{% trans 'scores_responsibles' %}</li>
+<li id="lnk_institution"><a href="{% url 'institution' %}" id ="lnk_home_institution">{% trans 'Institution' %}</a></li>
+<li id="lnk_studies"><a href="{% url 'academic_actors' %}">{% trans 'Academic actors' %}</a></li>
+<li class="active">{% trans 'Scores responsibles' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'scores_responsibles' %} -
+    <h2>{% trans 'Scores responsibles' %} -
         <label>
             {% for entity in entities_manager %}
                 {% if forloop.last %}
@@ -51,42 +51,42 @@
         <form method="get" action="{% url 'scores_responsible_search'%}">
             <div class="row">
                 <div class="col-md-2 form-group">
-                    <label for="txt_course_code">{% trans 'course_code' %}</label>
+                    <label for="txt_course_code">{% trans 'Code' %}</label>
                     <input class="form-control" id="txt_course_code"  name="course_code"
                            value="{{ course_code|default_if_none:'' }}">
                 </div>
                 <div class="col-md-3 form-group">
-                    <label for="txt_learning_unit_title">{% trans 'learning_unit_title' %}</label>
+                    <label for="txt_learning_unit_title">{% trans 'Learning unit title' %}</label>
                     <input class="form-control" id="txt_learning_unit_title"  name="learning_unit_title"
                            value="{{ learning_unit_title|default_if_none:'' }}">
                 </div>
                 <div class="col-md-3 form-group">
-                    <label for="txt_tutor">{% trans 'tutor' %}</label>
+                    <label for="txt_tutor">{% trans 'Tutor' %}</label>
                     <input class="form-control" id="txt_tutor"  name="tutor"
                            value="{{ tutor|default_if_none:'' }}">
                 </div>
                 <div class="col-md-3 form-group">
-                    <label for="txt_scores_responsible">{% trans 'scores_responsible_title' %}</label>
+                    <label for="txt_scores_responsible">{% trans 'Scores responsible title' %}</label>
                     <input class="form-control" id="txt_scores_responsible"  name="scores_responsible"
                            value="{{ scores_responsible|default_if_none:'' }}">
                 </div>
                 <div class="col-md-1 form-group" style="margin-top:25px">
                     <button type="submit" id="bt_submit_search" class="btn btn-primary" role="button"
-                            title="{% trans 'search' %}"><span class="glyphicon glyphicon-search"></span></button>
+                            title="{% trans 'Search' %}"><span class="glyphicon glyphicon-search"></span></button>
                 </div>
             </div>
         </form>
         {% if dict_attribution|length == 0 and init == "1" %}
-            <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
+            <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
         {% endif %}
         <div {% if dict_attribution|length > 0 %}style="visibility:visible;display:block;"{%else%}style="visibility:hidden;display:none;"{% endif %}>
             <table class="table table-hover" id="tb_responsibles">
                 <thead>
                     <tr>
-                        <th>{% trans 'entity' %}</th>
-                        <th>{% trans 'course_code' %}</th>
-                        <th>{% trans 'learning_unit_title' %}</th>
-                        <th>{% trans 'tutor' %}</th>
+                        <th>{% trans 'Entity' %}</th>
+                        <th>{% trans 'Code' %}</th>
+                        <th>{% trans 'Learning unit title' %}</th>
+                        <th>{% trans 'Tutor' %}</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -106,7 +106,7 @@
                                                     <a role="button" data-toggle="collapse" data-target="#list_{{ value_list.2 }}"
                                                        aria-expanded="false"
                                                        aria-controls="tutors_by_course"
-                                                       title="{% trans 'display_tutors' %}">
+                                                       title="{% trans 'Display all tutors for this learning unit' %}">
                                                         <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
                                                     </a>
                                                 {% endif %}
@@ -120,7 +120,7 @@
                                     {% endfor %}
                                     </div>
                                 {% else %}
-                                    {% trans 'without_attribution' %}
+                                    {% trans 'Without attribution' %}
                                 {% endif %}
                             </td>
                             <td>
@@ -152,8 +152,8 @@
                 "searching" : false,
                 "language":
                 {"oAria":{
-                    "sSortAscending":  "{% trans 'datatable_sortascending'%}",
-                    "sSortDescending": "{% trans 'datatable_sortdescending'%}",
+                    "sSortAscending":  "{% trans 'Datatable sort ascending'%}",
+                    "sSortDescending": "{% trans 'Datatable sort descending'%}",
                     }
                 }
             })

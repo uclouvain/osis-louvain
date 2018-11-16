@@ -108,7 +108,9 @@ class AdmissionConditionLine(OrderedModel):
         super().save(*args, **kwargs)
 
         if self.access not in dict(CONDITION_ADMISSION_ACCESSES):
-            raise ValidationError({'access': _('%s is not an accepted value') % (self.access,)})
+            raise ValidationError({
+                'access': _('%(access_value)s is not an accepted value') % {'access_value': self.access}
+            })
 
 
 class AdmissionConditionLineAdmin(osis_model_admin.OsisModelAdmin):

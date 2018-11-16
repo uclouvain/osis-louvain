@@ -27,12 +27,12 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-  <li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'student_path' %}</a></li>
-  <li class="active">{% trans 'evaluations' %}</li>
+  <li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'Academic background' %}</a></li>
+  <li class="active">{% trans 'Evaluations' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'evaluations' %}</h2>
+    <h2>{% trans 'Evaluations' %}</h2>
 </div>
 
 <div class="panel panel-default">
@@ -40,8 +40,8 @@
         <div class="row">
             <div class="col-md-1"><i class="fa fa-hashtag" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-11">
-                <h4 class="media-heading"><a href="{% url 'scores_encoding' %}" id="lnk_score_encoding">{% trans 'scores_encoding' %}</a></h4>
-                <p>{% trans 'desc_lnk_score_encoding' %}</p>
+                <h4 class="media-heading"><a href="{% url 'scores_encoding' %}" id="lnk_score_encoding">{% trans 'Scores encoding' %}</a></h4>
+                <p>{% trans 'This process helps tutor while encoding notes for the exams sessions.' %}</p>
             </div>
         </div>
     </div>

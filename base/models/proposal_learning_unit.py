@@ -29,7 +29,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.models import entity_version
 from base.models.entity import Entity
-from base.models.enums import proposal_type, proposal_state
+from base.models.enums.proposal_state import ProposalState
+from base.models.enums.proposal_type import ProposalType
 from base.models.utils.utils import get_object_or_none
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
@@ -48,10 +49,20 @@ class ProposalLearningUnit(models.Model):
     author = models.ForeignKey('Person', null=True)
     date = models.DateTimeField(auto_now=True)
     learning_unit_year = models.OneToOneField('LearningUnitYear')
-    type = models.CharField(max_length=50, choices=proposal_type.CHOICES, verbose_name=_("type"),
-                            default=proposal_type.ProposalType.MODIFICATION.name)
-    state = models.CharField(max_length=50, choices=proposal_state.CHOICES, verbose_name=_("state"),
-                             default=proposal_state.ProposalState.FACULTY.name)
+    type = models.CharField(
+        max_length=50,
+        choices=ProposalType.choices(),
+        verbose_name=_("Type"),
+        default=ProposalType.MODIFICATION.name
+    )
+
+    state = models.CharField(
+        max_length=50,
+        choices=ProposalState.choices(),
+        verbose_name=_("State"),
+        default=ProposalState.FACULTY.name
+    )
+
     initial_data = JSONField(default={})
     entity = models.ForeignKey('Entity')
     folder_id = models.PositiveIntegerField()

@@ -28,13 +28,13 @@
 
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'logout' %}</h2>
+    <h2>{% trans 'Logout' %}</h2>
 </div>
 
 <div class="panel panel-default">
     <div class="panel-body">
-        <p>{% trans 'succesfull_logout' %}</p>
-        <p><a href={%  url 'login' %}>{% trans 'redirect_to_login' %}</a></p>
+        <p>{% trans 'You are succesfully logout.' %}</p>
+        <p><a href={%  url 'login' %}>{% trans 'Click to reconnect' %}</a></p>
     </div>
 </div>
 {% endblock %}

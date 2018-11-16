@@ -28,16 +28,16 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'student_path' %}</a></li>
-<li><a href="{% url 'assessments' %}" id="lnk_evaluations">{% trans 'evaluations' %}</a></li>
-<li><a href="{% url 'scores_encoding' %}?{{ request.GET.urlencode }}" id="lnk_scores_encoding">{% trans 'scores_encoding' %}</a></li>
-<li><a href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" id="lnk_online_scores_encoding">{% trans 'online_scores_encoding' %}</a></li>
-<li class="active">{% trans 'dubble_online_scores_encoding' %}</li>
+<li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'Academic background' %}</a></li>
+<li><a href="{% url 'assessments' %}" id="lnk_evaluations">{% trans 'Evaluations' %}</a></li>
+<li><a href="{% url 'scores_encoding' %}?{{ request.GET.urlencode }}" id="lnk_scores_encoding">{% trans 'Scores encoding' %}</a></li>
+<li><a href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" id="lnk_online_scores_encoding">{% trans 'Online scores encoding' %}</a></li>
+<li class="active">{% trans 'Online double scores encoding' %}</li>
 {% endblock %}
 
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'dubble_online_scores_encoding' %}</h2>
+    <h2>{% trans 'Online double scores encoding' %}</h2>
 </div>
 {% include "template_messages.html" %}
 <div class="panel panel-default">
@@ -48,12 +48,12 @@
         <div class="row">
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>{% trans 'scores_responsible' %}</label><br>
+                    <label>{% trans 'Scores responsible' %}</label><br>
                      {% if tutors %}
                         <a role="button" data-toggle="collapse" data-target="#tutors_by_course"
                            aria-expanded="false" class="pull-right"
                            aria-controls="tutors_by_course"
-                           title="{% trans 'display_tutors' %}">
+                           title="{% trans 'Display all tutors for this learning unit' %}">
                           <span class="glyphicon glyphicon-list" aria-hidden="true"></span>
                         </a>
                     {% endif %}
@@ -64,10 +64,10 @@
                             {% endfor %}
                         </ul>
                     {% else %}
-                        {% trans 'none' %}
+                        {% trans 'None' %}
                     {% endif %}
                     <div class="collapse" id="tutors_by_course">
-                        <label>{% trans 'other_tutors' %}</label><br>
+                        <label>{% trans 'Other tutors' %}</label><br>
                         <ul>
                             {% for prof in tutors %}
                                 <li>{{ prof }}</li>
@@ -78,19 +78,19 @@
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>{% trans 'academic_year' %}</label><br>
+                    <label>{% trans 'Academic year' %}</label><br>
                     {{ academic_year }}
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>{% trans 'number_session' %}</label><br>
+                    <label>{% trans 'Session number' %}</label><br>
                     {{ number_session }}
                 </div>
             </div>
             <div class="col-md-3">
                 <div class="form-group">
-                    <label>{%trans 'number_of_enrollments' %}</label><br>
+                    <label>{%trans 'Number of enrollments' %}</label><br>
                     {{ count_total_enrollments }}
                 </div>
             </div>
@@ -104,21 +104,21 @@
                 <thead>
                     <tr>
                         <th colspan="4"></th>
-                        <th colspan="3" style="background-color: #eaf2f8">{%trans 'encoding' %}</th>
-                        <th colspan="3" style="background-color: #fcf3cf">{% trans 'dubble_encoding' %}</th>
-                        <th colspan="2">{% trans 'final' %}</th>
+                        <th colspan="3" style="background-color: #eaf2f8">{%trans 'Encoding' %}</th>
+                        <th colspan="3" style="background-color: #fcf3cf">{% trans 'Double encoding' %}</th>
+                        <th colspan="2">{% trans 'Final' %}</th>
                     </tr>
                     <tr>
-                        <th>{%trans 'offer' %}</th>
-                        <th>{%trans 'registration_number' %}</th>
-                        <th>{% trans 'lastname' %}</th>
-                        <th>{% trans 'firstname' %}</th>
-                        <th colspan="1" style="background-color: #eaf2f8">{%trans 'score' %}</th>
-                        <th colspan="2" style="background-color: #eaf2f8">{%trans 'justification' %}</th>
-                        <th colspan="1" style="background-color: #fcf3cf">{%trans 'score' %}</th>
-                        <th colspan="2" style="background-color: #fcf3cf">{%trans 'justification' %}</th>
-                        <th colspan="1">{%trans 'score' %}</th>
-                        <th colspan="2">{%trans 'justification' %}</th>
+                        <th>{%trans 'Offer' %}</th>
+                        <th>{%trans 'Registration number' %}</th>
+                        <th>{% trans 'Lastname' %}</th>
+                        <th>{% trans 'Firstname' %}</th>
+                        <th colspan="1" style="background-color: #eaf2f8">{%trans 'Score' %}</th>
+                        <th colspan="2" style="background-color: #eaf2f8">{%trans 'Justification' %}</th>
+                        <th colspan="1" style="background-color: #fcf3cf">{%trans 'Score' %}</th>
+                        <th colspan="2" style="background-color: #fcf3cf">{%trans 'Justification' %}</th>
+                        <th colspan="1">{%trans 'Score' %}</th>
+                        <th colspan="2">{%trans 'Justification' %}</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -247,8 +247,8 @@
                 </tbody>
             </table>
 
-            <button type="submit" class="btn btn-primary" id="bt_submit_online_double_encoding_validation" disabled><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}</button>
-            <a class="btn btn-default" id="lnk_cancel" href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" role="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans 'cancel' %}</a>
+            <button type="submit" class="btn btn-primary" id="bt_submit_online_double_encoding_validation" disabled><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}</button>
+            <a class="btn btn-default" id="lnk_cancel" href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" role="button"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> {% trans 'Cancel' %}</a>
         </form>
     </div>
 </div>
@@ -269,18 +269,18 @@ function validation_finished() {
 function translate_justification(justification) {
     if(justification == "ABSENCE_UNJUSTIFIED") {
         {% if not is_program_manager %}
-            return "{% trans 'absent' %}";
+            return "{% trans 'Absent' %}";
         {% else %}
-            return "{% trans 'ABSENCE_UNJUSTIFIED' %}";
+            return "{% trans 'Unjustified absence' %}";
         {% endif %}
     } else if (justification == "ABSENCE_JUSTIFIED") {
         {% if not is_program_manager %}
-            return "{% trans 'absent' %}";
+            return "{% trans 'Absent' %}";
         {% else %}
-            return "{% trans 'ABSENCE_JUSTIFIED' %}";
+            return "{% trans 'Justified absence' %}";
         {% endif %}
     } else if (justification == "CHEATING") {
-        return "{% trans 'CHEATING' %}";
+        return "{% trans 'Cheating' %}";
     } else {
         return justification;
     }

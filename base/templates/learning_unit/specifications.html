@@ -30,7 +30,7 @@
     <div role="tabpanel" class="tab-pane active" id="specifications">
         <div class="row" style="margin-top:10px;">
             <div class="col-md-2">
-                <label> {% trans 'language' %} </label>
+                <label> {% trans 'Language' %} </label>
             </div>
             <div class="col-md-5">
                 <label> {{ form_french.language.1 }} </label>
@@ -50,7 +50,7 @@
                         <a class="trigger_modal pull-right"
                            data-url="{% url 'learning_unit_specifications_edit' learning_unit_year_id=learning_unit_year.id %}?language={{ form_french.language.0 }}&label={{ label_key }}"
                            data-modal_class="modal-lg"
-                           title="{% trans 'edit' %}">
+                           title="{% trans 'Edit' %}">
                             <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                         </a>
                     {% endif %}
@@ -62,7 +62,7 @@
                         <a class="trigger_modal pull-right" href="#"
                            data-url="{% url 'learning_unit_specifications_edit' learning_unit_year_id=learning_unit_year.id %}?language={{ form_english.language.0 }}&label={{ label_key }}"
                            data-modal_class="modal-lg"
-                           title="{% trans 'edit' %}">
+                           title="{% trans 'Edit' %}">
                             <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                         </a>
                     {% endif %}
@@ -78,13 +78,13 @@
             <input type="hidden" id="hdn_achievement_id" name="achievement_id"/>
             <div class="row" style="margin-top:10px;">
                 <div class="col-md-2">
-                    <label>{% trans 'learning_achievements' %}</label>
+                    <label>{% trans 'Learning achievements' %}</label>
                     {% if not achievements_FR and can_update_learning_achievement %}
                         <a class="btn btn-info btn-sm trigger_modal"
                            data-url="{% url 'achievement_create_first' learning_unit_year_id=learning_unit_year.id %}?language_code=FR"
                            data-modal_class="modal-lg"
-                           title="{% trans 'create' %}">
-                            {% trans 'add_another' %}
+                           title="{% trans 'Create' %}">
+                            {% trans 'Add another' %}
                         </a>
                     {% endif %}
                 </div>
@@ -93,12 +93,12 @@
                         <div class="row">
                             <div class="col-md-6">
                                 {% language LANGUAGE_CODE_FR %}
-                                    <label>{% trans 'learning_achievements_headline' %}</label>
+                                    <label>{% trans 'At the end of this learning unit, the student is able to:' %}</label>
                                 {% endlanguage %}
                             </div>
                             <div class="col-md-6">
                                 {% language LANGUAGE_CODE_EN %}
-                                    <label>{% trans 'learning_achievements_headline' %}</label>
+                                    <label>{% trans 'At the end of this learning unit, the student is able to:' %}</label>
                                 {% endlanguage %}
                             </div>
                         </div>
@@ -111,13 +111,13 @@
                     <div class="col-md-2">
                         {% if can_update_learning_achievement %}
                             <div class="btn-group">
-                                <button type="submit" title="{% trans 'up' %}" class="btn btn-default btn-sm"
+                                <button type="submit" title="{% trans 'Up' %}" class="btn btn-default btn-sm"
                                         id="btn_operation_up_{{ achievement.id }}"
                                         name="action" value="up"
                                         {% if forloop.counter0 == 0 %}disabled{% endif %}>
                                     <i class="fa fa-arrow-up"></i>
                                 </button>
-                                <button type="submit" title="{% trans 'down' %}" class="btn btn-default btn-sm"
+                                <button type="submit" title="{% trans 'Down' %}" class="btn btn-default btn-sm"
                                         id="btn_operation_down_{{ achievement.id }}"
                                         name="action" value="down" {% if forloop.last %}disabled{% endif %}>
                                     <i class="fa fa-arrow-down"></i>
@@ -143,7 +143,7 @@
                                     <a class="trigger_modal pull-right"
                                        data-url="{% url 'achievement_edit' learning_unit_year_id=learning_unit_year.id learning_achievement_id=achievement.id %}"
                                        data-modal_class="modal-lg"
-                                       title="{% trans 'edit' %}">
+                                       title="{% trans 'Edit' %}">
                                         <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                                     </a>
 
@@ -165,7 +165,7 @@
                                                 <a class="trigger_modal pull-right"
                                                    data-url="{% url 'achievement_edit' learning_unit_year_id=learning_unit_year.id learning_achievement_id=achievement_en.id %}"
                                                    data-modal_class="modal-lg"
-                                                   title="{% trans 'edit' %}">
+                                                   title="{% trans 'Edit' %}">
                                                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                                                 </a>
                                             {% endif %}
@@ -180,9 +180,9 @@
                 {% if forloop.last and can_update_learning_achievement %}
                     <a class="btn btn-info btn-sm trigger_modal"
                        data-url="{% url 'achievement_create' learning_unit_year_id=learning_unit_year.id learning_achievement_id=achievement.id %}?language_code=FR"
-                       data-modal_class="modal-lg" title="{% trans 'create' %}"
+                       data-modal_class="modal-lg" title="{% trans 'Create' %}"
                        style="margin-top:10px;">
-                        {% trans 'add_another' %}
+                        {% trans 'Add another' %}
                     </a>
                 {% else %}
                     <hr>

@@ -59,7 +59,7 @@ class CertificateAim(models.Model):
     )
 
     description = models.CharField(
-        verbose_name=_("description"),
+        verbose_name=_("Description"),
         max_length=1024,
         db_index=True,
         unique=True,

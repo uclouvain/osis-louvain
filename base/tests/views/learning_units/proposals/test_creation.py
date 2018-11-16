@@ -183,17 +183,17 @@ class LearningUnitViewTestCase(TestCase):
         luy_errors = learning_unit_form.learning_unit_form_container.forms[LearningUnitYearModelForm].errors
         lcy_errors = learning_unit_form.learning_unit_form_container.forms[LearningContainerYearModelForm].errors
 
-        self.assertEqual(luy_errors['acronym'], [_('field_is_required'), _('invalid_acronym')])
-        self.assertEqual(lcy_errors['container_type'], [_('field_is_required')])
-        self.assertEqual(luy_errors['periodicity'], [_('field_is_required')])
-        self.assertEqual(luy_errors['language'], [_('field_is_required')])
-        self.assertEqual(luy_errors['campus'], [_('field_is_required')])
+        self.assertEqual(luy_errors['acronym'], [_('This field is required.'), _('Invalid code')])
+        self.assertEqual(lcy_errors['container_type'], [_('This field is required.')])
+        self.assertEqual(luy_errors['periodicity'], [_('This field is required.')])
+        self.assertEqual(luy_errors['language'], [_('This field is required.')])
+        self.assertEqual(luy_errors['campus'], [_('This field is required.')])
 
     def test_proposal_learning_unit_form_with_empty_title_fields(self):
         learning_unit_form = CreationProposalBaseForm(self.get_empty_title_fields(), person=self.person)
         self.assertFalse(learning_unit_form.is_valid(), learning_unit_form.errors)
         lcy_errors = learning_unit_form.learning_unit_form_container.forms[LearningContainerYearModelForm].errors
-        self.assertEqual(lcy_errors['common_title'], [_('must_set_common_title_or_specific_title')])
+        self.assertEqual(lcy_errors['common_title'], [_('You must either set the common title or the specific title')])
 
     def test_proposal_learning_unit_add_with_valid_data_for_faculty_manager(self):
         learning_unit_form = CreationProposalBaseForm(self.get_valid_data(), person=self.faculty_person)

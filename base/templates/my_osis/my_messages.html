@@ -27,12 +27,12 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-    <li><a href="{% url 'my_osis' %}" id="lnk_my_osis">{% trans 'my_osis' %}</a></li>
-    <li class="active">{% trans 'messages' %}</li>
+    <li><a href="{% url 'my_osis' %}" id="lnk_my_osis">{% trans 'My OSIS' %}</a></li>
+    <li class="active">{% trans 'Messages' %}</li>
 {% endblock %}
 {% block content %}
     <div class="page-header">
-        <h2>{% trans 'my_messages' %}</h2>
+        <h2>{% trans 'My Messages' %}</h2>
     </div>
     {% if my_messages_formset and my_message_action_form %}
         <form action="{% url 'my_messages_action' %}" method="post">
@@ -41,18 +41,18 @@
             <div class="row">
                 <div class="col-md-3">
                     <select class="form-control" name="{{ my_message_action_form.action.html_name }}"
-                            id="slt_my_message_action" data-toggle="tooltip" data-placement="bottom" title="{% trans 'tooltip_select_action' %}">
+                            id="slt_my_message_action" data-toggle="tooltip" data-placement="bottom" title="{% trans 'Select action to execute' %}">
                         <option value="" selected>-----</option>
-                        <option value="MARK_AS_READ">{% trans 'mark_selected_messages_as_read' %}</option>
-                        <option value="DELETE">{% trans 'delete_selected_messages' %}</option>
+                        <option value="MARK_AS_READ">{% trans 'Mark selected messages as read' %}</option>
+                        <option value="DELETE">{% trans 'Delete selected messages' %}</option>
                     </select>
                 </div>
                 <div class="col-md-1">
                     <input type="submit"
                            class="btn btn-default"
-                           value="{% trans 'execute' %}"
+                           value="{% trans 'Execute' %}"
                            data-toggle="tooltip" data-placement="right"
-                           title="{% trans 'tooltip_execute_my_message_action' %}"
+                           title="{% trans 'Execute selected action' %}"
                            id="btn_my_message_action_execute"/>
                 </div>
             </div>
@@ -62,9 +62,9 @@
                     <th><input type="checkbox"
                                id="chk_select_all"
                                data-toggle="tooltip" data-placement="left"
-                               title="{% trans 'tooltip_select_all_messages' %}"/></th>
-                    <th>{% trans 'subject' %}</th>
-                    <th>{% trans 'received_on' %}</th>
+                               title="{% trans 'Select all the messages' %}"/></th>
+                    <th>{% trans 'Subject' %}</th>
+                    <th>{% trans 'Received on' %}</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -77,7 +77,7 @@
                         <td><a href="{% url 'read_my_message' message_id=my_message_form.id.value %}"
                                id="lnk_my_message_read_{{ my_message_form.id.value }}"
                                data-toggle="tooltip" data-placement="bottom"
-                               title="{% trans 'tooltip_my_message_read' %}">{{ my_message_form.subject.value }}</a></td>
+                               title="{% trans 'Show message' %}">{{ my_message_form.subject.value }}</a></td>
                         <td>{{ my_message_form.created.value }}</td>
                         {{ my_message_form.id.as_hidden }}
                     </tr>

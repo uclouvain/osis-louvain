@@ -32,7 +32,7 @@ from base.models import tutor
 
 class TutorSearchForm(BaseSearchForm):
     name = forms.CharField(max_length=40,
-                           label=_("name"))
+                           label=_("Name"))
 
     def search(self):
         return tutor.search(**self.cleaned_data).order_by("person__last_name", "person__first_name")

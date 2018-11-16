@@ -28,10 +28,10 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-  <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
-  <li><a href="{% url 'organizations' %}" id="lnk_organizations">{% trans 'organizations' %}</a></li>
-  <li><a href="{% url 'organization_read' organization_id=organization_id %}" id="lnk_organization">{% trans 'organization' %}</a></li>
-  <li class="active">{% trans 'organization_address' %}</li>
+  <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'Institution' %}</a></li>
+  <li><a href="{% url 'organizations' %}" id="lnk_organizations">{% trans 'Organizations' %}</a></li>
+  <li><a href="{% url 'organization_read' organization_id=organization_id %}" id="lnk_organization">{% trans 'Organization' %}</a></li>
+  <li class="active">{% trans 'Organization address' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
@@ -48,26 +48,26 @@
 
             <div class="row">
                 <div class="col-md-6">
-                    <label for="txt_organization_address_label">{% trans 'label' %}</label>
+                    <label for="txt_organization_address_label">{% trans 'Label' %}</label>
                     <input class="form-control" value="{{ organization_address.label | default_if_none:'' }}" name="organization_address_label" id="txt_organization_address_label" maxlength="20" required>
                 </div>
                 <div class="col-md-6">
-                    <label for="address_location">{% trans 'location' %}</label>
+                    <label for="address_location">{% trans 'Location' %}</label>
                     <input class="form-control" value="{{ organization_address.location | default_if_none:'' }}" name="organization_address_location" id="txt_organization_address_location" maxlength="255" required>
                 </div>
             </div>
             <br>
             <div class="row">
                 <div class="col-md-4">
-                    <label for="address_postal_code">{% trans 'postal_code' %}</label>
+                    <label for="address_postal_code">{% trans 'Postal code' %}</label>
                     <input class="form-control" value="{{ organization_address.postal_code | default_if_none:'' }}" name="organization_address_postal_code" id="txt_organization_address_postal_code" maxlength="20" required>
                 </div>
                 <div class="col-md-4">
-                    <label for="address_city">{% trans 'city' %}</label>
+                    <label for="address_city">{% trans 'City' %}</label>
                     <input class="form-control" value="{{ organization_address.city | default_if_none:'' }}" name="organization_address_city" id="txt_organization_address_city" maxlength="255" required>
                 </div>
                 <div class="col-md-4">
-                    <label for="country">{% trans 'country'%}</label><br>
+                    <label for="country">{% trans 'Country'%}</label><br>
                     <select class="form-control" id="country" name="country">
                         {% for country in countries %}
                             <option value="{{ country.id }}" {% if organization_address.country.id == country.id %}selected{% endif %}>{{ country.name }}</option>

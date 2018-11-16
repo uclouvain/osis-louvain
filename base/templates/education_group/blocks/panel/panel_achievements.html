@@ -86,7 +86,7 @@
                                 </div>
                             </div>
                         {% endfor %}
-                        <button title="{% trans 'create' %}" class="btn btn-default btn-sm trigger_modal"
+                        <button title="{% trans 'Create' %}" class="btn btn-default btn-sm trigger_modal"
                                 data-url="{% url 'create_education_group_detailed_achievement' root.pk education_group_year.pk achievement.pk %}"
                                 {% permission_create_achievement %}>
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
@@ -98,7 +98,7 @@
         </div>
     {% endfor %}
 
-    <button title="{% trans 'create' %}" class="btn btn-default trigger_modal"
+    <button title="{% trans 'Create' %}" class="btn btn-default trigger_modal"
             data-url="{% url 'create_education_group_achievement' root.pk education_group_year.pk %}"
             {% permission_create_achievement %}>
         <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>

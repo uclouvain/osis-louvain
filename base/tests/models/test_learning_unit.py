@@ -88,9 +88,9 @@ class LearningUnitTest(TestCase):
         self.assertEqual(len(all_partims_container_year_2), 0)
 
     def test_academic_years_tags(self):
-        self.assertEqual(academic_years(2017, 2018), _('from').title()+" 2017-18 "+_('to').lower()+" 2018-19")
+        self.assertEqual(academic_years(2017, 2018), _('From').title()+" 2017-18 "+_('to').lower()+" 2018-19")
         self.assertEqual(academic_years(None, 2018), "-")
-        self.assertEqual(academic_years(2017, None), _('from').title()+" 2017-18 ("+_('not_end_year').lower()+")")
+        self.assertEqual(academic_years(2017, None), _('From').title()+" 2017-18 ("+_('no planned end').lower()+")")
         self.assertEqual(academic_years(None, None), "-")
 
     def test_academic_year_tags(self):

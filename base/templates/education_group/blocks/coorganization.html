@@ -27,14 +27,14 @@
 
 <div class="panel panel-default">
     <div class="panel-body" id="panel_coorganization">
-        <label>{% trans 'program_coorganization' %}</label>
+        <label>{% trans 'Program organized with other institutes' %}</label>
         {% if education_group_year.coorganizations %}
             <table class="table" id="tbl_coorganization">
                 <thead>
                 <tr>
-                    <th>{% trans 'institution' %}</th>
+                    <th>{% trans 'Institution' %}</th>
                     <th></th>
-                    <th>{% trans 'for_all_students' %}</th>
+                    <th>{% trans 'For all students' %}</th>
                     <th>{% trans 'Reference institution' %}</th>
                     <th>{% trans 'UCL Diploma' %}</th>
                     <th>{% trans 'Producing certificat' %}</th>
@@ -76,7 +76,7 @@
                         </td>
                         <td>
                             {% if  can_change_education_group %}
-                                <a title="{% trans 'edit' %}"
+                                <a title="{% trans 'Edit' %}"
                                    class="btn coorganization-edit-btn trigger_modal" role="button"
                                    data-url="{% url 'coorganization_edit' root_id=root.pk education_group_year_id=education_group_year.id coorganization_id=coorganization.id %}">
                                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
@@ -127,7 +127,7 @@
                         </td>
                         <td>
                             {% if can_change_education_group %}
-                                <a title="{% trans 'edit' %}"
+                                <a title="{% trans 'Edit' %}"
                                    class="btn coorganization-edit-btn trigger_modal" role="button"
                                    data-url="{% url 'coorganization_edit' root_id=root.pk education_group_year_id=education_group_year.id coorganization_id=coorganization.id %}">
                                     <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
@@ -153,9 +153,9 @@
         {% if can_change_education_group %}
             <a class="btn btn-info btn-sm coorganization-edit-btn trigger_modal"
                data-url="{% url 'coorganization_create' root_id=root.pk education_group_year_id=education_group_year.id %}"
-               title="{% trans 'create' %}"
+               title="{% trans 'Create' %}"
                style="margin-top:10px;">
-                {% trans 'add_another' %}
+                {% trans 'Add another' %}
             </a>
         {% endif %}
     </div>

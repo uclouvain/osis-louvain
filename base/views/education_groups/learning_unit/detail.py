@@ -123,8 +123,13 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
         if learning_unit_inconsistent:
             display_warning_messages(
                 self.request,
-                _("The prerequisites %s for the learning unit %s are not inside the selected formation %s") %
-                (", ".join(learning_unit_inconsistent), learning_unit_year, root))
+                _("The prerequisites %(prerequisites)s for the learning unit %(learning_unit)s "
+                  "are not inside the selected training %(root)s") % {
+                    "prerequisites": ", ".join(learning_unit_inconsistent),
+                    "learning_unit": learning_unit_year,
+                    "root": root,
+                }
+            )
 
 
 class LearningUnitPrerequisiteGroup(LearningUnitGenericDetailView):

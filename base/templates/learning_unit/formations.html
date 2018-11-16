@@ -41,11 +41,11 @@
                                 <thead>
                                 <tr>
                                 <th>{% trans 'code' %}</th>
-                                <th>{% trans 'title' %}</th>
-                                <th>{% trans 'type_code_formation' %}</th>
-                                <th>{% trans 'block' %}</th>
-                                <th>{% trans 'trainings' %}</th>
-                                <th class="text-nowrap text-center">{% trans 'absolute_and_relative_credits' %}</th>
+                                <th>{% trans 'Title' %}</th>
+                                <th>{% trans "Training type" %}</th>
+                                <th>{% trans 'Block' %}</th>
+                                <th>{% trans 'Trainings' %}</th>
+                                <th class="text-nowrap text-center">{% trans 'Relative / Absolute <br>credits' %}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -84,7 +84,7 @@
                 </div>
             </div>
         {% else %}
-            <span>{% trans '' %}</span>
+            <span></span>
             {% blocktrans with acronym=learning_unit_year.acronym %}The learning unit {{ acronym }} is not included in any education group{% endblocktrans %}
             <br>
         {% endif %}

@@ -3,7 +3,7 @@
 
 
 {% block edit_academic_year %}
-    <label style="margin-top:10px;">{% trans 'academic_start_year'%}</label><br>
+    <label style="margin-top:10px;">{% trans 'Academic start year'%}</label><br>
     {{ learning_unit_year.learning_unit.start_year|academic_year }}
     <br>
     <form method="post" style="display: inline;">
@@ -19,7 +19,7 @@
         <a href="{% url 'learning_unit' learning_unit_year_id=learning_unit_year.id %}" class="btn btn-default">
             {% trans 'cancel' %}
         </a>
-        <button type="submit" class="btn btn-danger">{% trans 'i_confirm' %}</button>
+        <button type="submit" class="btn btn-danger">{% trans 'Yes, I confirm.' %}</button>
     {% endbuttons %}
     </form>
 {% endblock %}

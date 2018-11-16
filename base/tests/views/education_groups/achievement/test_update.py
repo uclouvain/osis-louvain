@@ -28,6 +28,7 @@ from django.contrib.messages import get_messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -96,7 +97,7 @@ class TestEducationGroupAchievementAction(TestCase):
         self.assertEqual(response.status_code, 302)
 
         messages = [m.message for m in get_messages(response.wsgi_request)]
-        self.assertEqual(messages[0], "Invalid action")
+        self.assertEqual(messages[0], _("Invalid action"))
 
 
 class TestUpdateEducationGroupAchievement(TestCase):

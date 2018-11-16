@@ -31,13 +31,13 @@
         <table class="table">
             <thead>
             <tr>
-                <th>{% trans 'tutor' %}</th>
-                <th>{% trans 'function' %}</th>
-                <th>{% trans 'start' %}</th>
-                <th>{% trans 'duration' %}</th>
-                <th>Volume 1</th>
-                <th>Volume 2</th>
-                <th>{% trans 'substitute' %}</th>
+                <th>{% trans 'Tutor' %}</th>
+                <th>{% trans 'Function' %}</th>
+                <th>{% trans 'Start' %}</th>
+                <th>{% trans 'Duration' %}</th>
+                <th>{% trans "Volume 1" %}</th>
+                <th>{% trans "Volume 2" %}</th>
+                <th>{% trans 'Substitute' %}</th>
                 <th></th>
             </tr>
             </thead>
@@ -45,7 +45,7 @@
             {% for key,value in attribution_charge_news.items %}
                 <tr>
                     <td>{{ value.person }}</td>
-                    <td>{% trans value.function %}</td>
+                    <td>{{ value.get_function_display }}</td>
                     <td>{{ value.start_year | default_if_none:'' }}</td>
                     <td>{{ value.duration | default_if_none:'' }}</td>
                     <td>{{ value.LECTURING | floatformat:2 }}</td>

@@ -33,8 +33,8 @@ from base.models.enums import entity_type
 
 
 class EntitySearchForm(forms.Form):
-    acronym = forms.CharField(label=_('acronym'), required=False)
-    title = forms.CharField(label=_('title'), required=False)
+    acronym = forms.CharField(label=_('Acronym'), required=False)
+    title = forms.CharField(label=_('Title'), required=False)
     entity_type = forms.ChoiceField(label=_('type'), choices=add_blank(entity_type.ENTITY_TYPES), required=False)
 
     def __init__(self, *args, **kwargs):

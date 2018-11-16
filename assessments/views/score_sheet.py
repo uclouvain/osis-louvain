@@ -82,7 +82,7 @@ def _save_customized_address(request, offer_year_id):
                                                      instance=score_sheet_address_model.get_from_offer_year(offer_year_id))
     if form.is_valid():
         form.save()
-        messages.add_message(request, messages.SUCCESS, _('score_sheet_address_saved'))
+        messages.add_message(request, messages.SUCCESS, _("Score sheet address was successfully saved."))
     return form
 
 
@@ -92,7 +92,7 @@ def _save_from_entity_address(context, entity_version_id_selected, offer_year_id
     if form.is_valid():
         score_encoding_sheet.save_address_from_entity(context.get('offer_year'), entity_version_id_selected,
                                                       request.POST.get('email'))
-        messages.add_message(request, messages.SUCCESS, _('score_sheet_address_saved'))
+        messages.add_message(request, messages.SUCCESS, _("Score sheet address was successfully saved."))
         return HttpResponseRedirect(reverse("offer_score_encoding_tab", args=[offer_year_id]))
     else:
         incorrect_email_management(context, email_encode, offer_year_id)

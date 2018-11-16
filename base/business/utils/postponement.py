@@ -47,7 +47,7 @@ class AutomaticPostponement(ABC):
     send_after = None
     extend_method = None
 
-    msg_result = _("%s object(s) extended and %s error(s)")
+    msg_result = _("%(number_extended)s object(s) extended and %(number_error)s error(s)")
 
     def __init__(self, queryset=None):
 
@@ -106,6 +106,6 @@ class AutomaticPostponement(ABC):
 
     def serialize_postponement_results(self):
         return {
-            "msg": self.msg_result % (len(self.result), len(self.errors)),
+            "msg": self.msg_result % {'number_extended': len(self.result), 'number_error': len(self.errors)},
             "errors": [str(obj) for obj in self.errors]
         }

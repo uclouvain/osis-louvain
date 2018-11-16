@@ -27,7 +27,7 @@ from django import template
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym
+from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym, LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.business.learning_units.comparison import DEFAULT_VALUE_FOR_NONE
 
@@ -41,13 +41,13 @@ def academic_years(start_year, end_year):
         str_start_year = ''
         str_end_year = ''
         if start_year:
-            str_start_year = "{} {}-{}".format(_('from').title(), start_year, str(start_year+1)[-2:])
+            str_start_year = "{} {}-{}".format(_('From').title(), start_year, str(start_year + 1)[-2:])
         if end_year:
-            str_end_year = "{} {}-{}".format(_('to'), end_year, str(end_year+1)[-2:])
+            str_end_year = "{} {}-{}".format(_('to'), end_year, str(end_year + 1)[-2:])
         return "{} {}".format(str_start_year, str_end_year)
     else:
         if start_year and not end_year:
-            return "{} {}-{} ({})".format(_('from'), start_year, str(start_year+1)[-2:], _('not_end_year'))
+            return "{} {}-{} ({})".format(_('From'), start_year, str(start_year + 1)[-2:], _('no planned end'))
         else:
             return "-"
 
@@ -55,7 +55,7 @@ def academic_years(start_year, end_year):
 @register.filter
 def academic_year(year):
     if year:
-        return "{}-{}".format(year, str(year+1)[-2:])
+        return "{}-{}".format(year, str(year + 1)[-2:])
     return "-"
 
 
@@ -63,7 +63,7 @@ def academic_year(year):
 def get_difference_css(differences, parameter, default_if_none=""):
     if parameter in differences:
         return mark_safe(
-            " data-toggle=tooltip title='{} : {}' class={} ".format(_("value_before_proposal"),
+            " data-toggle=tooltip title='{} : {}' class={} ".format(_("Value before proposal"),
                                                                     differences[parameter] or default_if_none,
                                                                     "proposal_value"))
     return None
@@ -74,8 +74,9 @@ def has_proposal(luy):
     return ProposalLearningUnit.objects.filter(learning_unit_year=luy).exists()
 
 
-@register.simple_tag
-def dl_tooltip(differences, key, **kwargs):
+# TODO Use inclusion tag instead
+@register.simple_tag(takes_context=True)
+def dl_tooltip(context, instance, key, **kwargs):
     title = kwargs.get('title', '')
     label_text = _(str(kwargs.get('label_text', '')))
     url = kwargs.get('url', '')
@@ -83,12 +84,16 @@ def dl_tooltip(differences, key, **kwargs):
     value = kwargs.get('value', '')
     inherited = kwargs.get('inherited', '')
     not_annualized = kwargs.get('not_annualized', '')
+    differences = context['differences']
 
     if not label_text:
-        label_text = _(str(key.lower()))
+        label_text = instance._meta.get_field(key).verbose_name.capitalize()
 
     if not value:
-        value = default_if_none
+        if hasattr(instance, "get_"+key+"_display"):
+            value = getattr(instance, "get_"+key+"_display")()
+        else:
+            value = getattr(instance, key, default_if_none)
 
     difference = get_difference_css(differences, key, default_if_none) or 'title="{}"'.format(_(title))
 

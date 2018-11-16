@@ -37,16 +37,16 @@
                 {% include 'education_group/blocks/informations.html' %}
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        {% dl_with_parent 'academic_type' %}
+                        {% dl_with_parent _('Academic type') 'academic_type' %}
                         <div class="row">
-                            {% dl_with_parent 'duration' 'verbose_duration' class_dl="col-md-6" %}
-                            {% dl_with_parent 'internship' class_dl="col-md-6" %}
-                            {% dl_with_parent 'enrollment_enabled' class_dl="col-md-6" %}
-                            {% dl_with_parent 'partial_deliberation' class_dl="col-md-6" %}
-                            {% dl_with_parent 'admission_exam' class_dl="col-md-6" %}
-                            {% dl_with_parent 'dissertation' class_dl="col-md-6" %}
+                            {% dl_with_parent _('Duration') 'verbose_duration' class_dl="col-md-6" %}
+                            {% dl_with_parent _('Internship') 'internship' class_dl="col-md-6" %}
+                            {% dl_with_parent _('Enrollment enabled') 'enrollment_enabled' class_dl="col-md-6" %}
+                            {% dl_with_parent _('Partial deliberation') 'partial_deliberation' class_dl="col-md-6" %}
+                            {% dl_with_parent _('Admission exam') 'admission_exam' class_dl="col-md-6" %}
+                            {% dl_with_parent _('Dissertation') 'dissertation' class_dl="col-md-6" %}
                         </div>
-                        {% dl_with_parent 'university_certificate' %}
+                        {% dl_with_parent _('University certificate') 'university_certificate' %}
                         <dl>
                             <dt>{% trans 'Decree category' %}</dt>
                             <dd>
@@ -64,12 +64,12 @@
                             </dd>
                         </dl>
                         <dl>
-                            <dt>{% trans 'primary_language' %}</dt>
+                            <dt>{% trans 'Primary language' %}</dt>
                             <dd>{{ education_group_year.primary_language }}</dd>
                         </dl>
-                        {% dl_with_parent 'activities in English' 'english_activities' %}
-                        {% dl_with_parent 'other_language_activities' %}
-                        {% dl_with_parent 'main domain' 'main_domain' %}
+                        {% dl_with_parent _('activities in English') 'english_activities' %}
+                        {% dl_with_parent _('Activities on other campus') 'other_language_activities' %}
+                        {% dl_with_parent _('main domain') 'main_domain' %}
 
                         {# TODO dl_with_parent needs to manage list #}
                         <div>
@@ -83,28 +83,28 @@
                             {% endif %}
                             <br>
                         </div>
-                        {% dl_with_parent 'comment (internal)' 'internal_comment' %}
+                        {% dl_with_parent _('comment (internal)') 'internal_comment' %}
                     </div>
                 </div>
             </div>
             <div class="col-md-5" style="margin-top: 10px">
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        {% dl_with_parent "management_entity" "management_entity_version.acronym" %}
-                        {% dl_with_parent "administration_entity" "administration_entity_version.acronym" %}
-                        {% dl_with_parent "start" "education_group.start_year" default_value=_('unspecified') %}
-                        {% dl_with_parent "end" "education_group.end_year" default_value=_('unspecified') %}
-                        {% dl_with_parent "learning_location" "main_teaching_campus" %}
-                        {% dl_with_parent "enrollment_campus" %}
-                        {% dl_with_parent "other_campus_activities" %}
+                        {% dl_with_parent _("Management entity") "management_entity_version.acronym" %}
+                        {% dl_with_parent _("Administration entity") "administration_entity_version.acronym" %}
+                        {% dl_with_parent _("Start") "education_group.start_year" default_value=_('unspecified') %}
+                        {% dl_with_parent _("End") "education_group.end_year" default_value=_('unspecified') %}
+                        {% dl_with_parent _("Learning location") "main_teaching_campus" %}
+                        {% dl_with_parent _("Enrollment campus") "enrollment_campus" %}
+                        {% dl_with_parent _("Activities on other campus") "other_campus_activities" %}
                     </div>
                 </div>
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        {% dl_with_parent "funding" %}
-                        {% dl_with_parent "funding_direction" %}
-                        {% dl_with_parent "funding_cud" %}
-                        {% dl_with_parent "cud_funding_direction" "funding_direction_cud" %}
+                        {% dl_with_parent _("Funding") "funding" %}
+                        {% dl_with_parent _("Funding direction") "funding_direction" %}
+                        {% dl_with_parent _("Funding international cooperation CCD/CUD") "funding_cud" %}
+                        {% dl_with_parent _("Funding international cooperation CCD/CUD direction") "funding_direction_cud" %}
                     </div>
                 </div>
             </div>
@@ -133,8 +133,8 @@
                 "searching": false,
                 "language": {
                     "oAria": {
-                        "sSortAscending": "{% trans 'datatable_sortascending'%}",
-                        "sSortDescending": "{% trans 'datatable_sortdescending'%}"
+                        "sSortAscending": "{% trans 'activate to sort column ascending'%}",
+                        "sSortDescending": "{% trans 'activate to sort column descending'%}"
                     }
                 },
                 "order": [[2, "desc"], [0, "asc"]]

@@ -26,12 +26,12 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li>{% trans 'administration' %}</li>
-<li class="active">{% trans 'data' %}</li>
+<li>{% trans 'Administration' %}</li>
+<li class="active">{% trans 'Data' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'data' %}</h2>
+    <h2>{% trans 'Data' %}</h2>
 </div>
 <div class="panel panel-default">
     <div class="panel-body">
@@ -40,13 +40,13 @@
             <div class="col-md-1"><i class="fa fa-cubes" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
                 <h4 class="media-heading"><a href="{% url 'admin:index' %}" id="lnk_data_management" target="_blank">
-                    {% trans 'data_management'%}</a></h4>
-                <p>{% trans 'desc_lnk_data_management' %}</p>
+                    {% trans 'Data Management'%}</a></h4>
+                <p>{% trans 'Management of data by entity' %}</p>
             </div>
             <div class="col-md-1"><i class="fa fa-database" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'data_maintenance' %}" id="lnk_data_maintenance">{% trans 'data_maintenance' %}</a></h4>
-                <p>{% trans 'desc_lnk_data_maintenance' %}</p>
+                <h4 class="media-heading"><a href="{% url 'data_maintenance' %}" id="lnk_data_maintenance">{% trans 'Data Maintenance' %}</a></h4>
+                <p>{% trans 'Maintenance of data with the SQL language' %}</p>
             </div>
         </div>
         <br>
@@ -54,8 +54,8 @@
         <div class="row">
             <div class="col-md-1"><i class="fa fa-folder-open" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'storage' %}" id="lnk_storage">{% trans 'storage' %}</a></h4>
-                <p>{% trans 'desc_lnk_storage' %}</p>
+                <h4 class="media-heading"><a href="{% url 'storage' %}" id="lnk_storage">{% trans 'Storage' %}</a></h4>
+                <p>{% trans 'Monitoring of the storage capacity' %}</p>
             </div>
         </div>
     </div>

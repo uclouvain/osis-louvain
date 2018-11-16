@@ -31,5 +31,5 @@ ENROLLED = "ENROLLED"
 NOT_ENROLLED = "NOT_ENROLLED"
 
 STATES = (
-    (ENROLLED, _('ENROLLED')),
-    (NOT_ENROLLED, _('NOT_ENROLLED')))
+    (ENROLLED, _('Enrolled')),
+    (NOT_ENROLLED, _('Not enrolled')))

@@ -35,7 +35,7 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from django.utils.safestring import mark_safe
 
-LABEL_VALUE_BEFORE_PROPROSAL = _('value_before_proposal')
+LABEL_VALUE_BEFORE_PROPROSAL = _('Value before proposal')
 
 
 class LearningUnitTagTest(TestCase):

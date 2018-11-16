@@ -27,9 +27,9 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-    <li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'student_path' %}</a></li>
-    <li><a href="{% url 'students' %}" id="lnk_student">{% trans 'students_title' %}</a></li>
-    <li class="active">{% trans 'student_title' %}</li>
+    <li><a href="{% url 'studies' %}" id="lnk_studies">{% trans 'Student path' %}</a></li>
+    <li><a href="{% url 'students' %}" id="lnk_student">{% trans 'Students' %}</a></li>
+    <li class="active">{% trans 'Student' %}</li>
 {% endblock %}
 
 {% block content %}
@@ -44,19 +44,19 @@
             </div>
 
             <div class="col-md-4">
-                <label>{% trans 'full_name'%}</label><br>
+                <label>{% trans 'Full name'%}</label><br>
                 {{ student.person }}
             </div>
             <div class="col-md-2">
-                <label>{% trans 'identification_number'%}</label><br>
+                <label>{% trans 'Number ID'%}</label><br>
                 {{ student.registration_id }}
             </div>
             <div class="col-md-2">
-                <label>{% trans 'gender'%}</label><br>
+                <label>{% trans 'Gender'%}</label><br>
                 {{ student.person.get_gender_display| default_if_none:''}}
             </div>
             <div class="col-md-2">
-                <label>{% trans 'birth_date' %}</label><br>
+                <label>{% trans 'Birth Date' %}</label><br>
                 {{ student.person.birth_date| default_if_none:''|date_in_form_format }}
             </div>
         </div>
@@ -67,17 +67,17 @@
 <ul class="nav nav-tabs" role="tablist">
     <li role="offers_enrollments" class="active" >
         <a data-toggle="tab" href="#tab_offers_enrollments" role="tab">
-            {% trans 'offers_enrollments'%}
+            {% trans 'Offers enrollments'%}
         </a>
     </li>
     <li role="learning_units_enrollments"  >
         <a data-toggle="tab" href="#tab_learning_units_enrollments" role="tab">
-            {% trans 'learning_units_enrollments'%}
+            {% trans 'Learning units enrollments'%}
         </a>
     </li>
     <li role="exams_enrollments"  >
         <a data-toggle="tab" href="#tab_exams_enrollments" role="tab">
-            {% trans 'exams_enrollments'%}
+            {% trans 'Exams Enrollments'%}
         </a>
     </li>
 </ul>

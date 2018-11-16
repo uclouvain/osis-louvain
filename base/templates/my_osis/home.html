@@ -27,24 +27,26 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-    <li class="active">{% trans 'my_osis' %}</li>
+    <li class="active">{% trans 'My OSIS' %}</li>
 {% endblock %}
 {% block content %}
     <div class="page-header">
-        <h2>{% trans 'my_osis' %}</h2>
+        <h2>{% trans 'My OSIS' %}</h2>
     </div>
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="row">
                 <div class="col-md-1"><i class="fa fa-user" style="font-size: 400%; color: #6699FF;"></i></div>
                 <div class="col-md-5">
-                    <h4 class="media-heading"><a href="{% url 'profile' %}" id="lnk_profile">{% trans 'profile' %}</a></h4>
-                    <p>{% trans 'desc_profile' %}</p>
+                    <h4 class="media-heading"><a href="{% url 'profile' %}" id="lnk_profile">{% trans 'Profile' %}</a></h4>
+                    <p>{% trans 'The configuration of you user profile' %}</p>
                 </div>
                 <div class="col-md-1"><i class="fa fa-envelope" style="font-size: 400%; color: #6699FF;"></i></div>
                 <div class="col-md-5">
-                    <h4 class="media-heading"><a href="{% url 'my_messages' %}" id="lnk_my_messages">{% trans 'messages' %}</a></h4>
-                    <p> {% trans 'desc_my_messages' %}</p>
+                    <h4 class="media-heading">
+                        <a href="{% url 'my_messages' %}" id="lnk_my_messages">{% trans 'Messages' %}</a>
+                    </h4>
+                    <p> {% trans 'The messages sent by the application to you' %}</p>
                 </div>
             </div>
         </div>

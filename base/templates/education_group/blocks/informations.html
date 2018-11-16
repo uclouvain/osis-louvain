@@ -27,37 +27,37 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            {% dl_with_parent 'acronym' class_dl="col-md-6" %}
-            {% dl_with_parent  'code' 'partial_acronym' class_dl="col-md-6" %}
-            {% dl_with_parent  'category' 'education_group_type.category' class_dl="col-md-6" %}
-            {% dl_with_parent  'training_type' 'education_group_type.name' class_dl="col-md-6" %}
+            {% dl_with_parent _('Acronym') 'acronym' class_dl="col-md-6" %}
+            {% dl_with_parent  _('code') 'partial_acronym' class_dl="col-md-6" %}
+            {% dl_with_parent  _('Category') 'education_group_type.category' class_dl="col-md-6" %}
+            {% dl_with_parent  _('Training type') 'education_group_type.name' class_dl="col-md-6" %}
 
             {% if education_group_year.education_group_type.category != 'GROUP' %}
-                {% dl_with_parent  'status' 'active' class_dl="col-md-6" %}
-                {% dl_with_parent  'schedule_type' class_dl="col-md-6" %}
+                {% dl_with_parent  _('Status') 'active' class_dl="col-md-6" %}
+                {% dl_with_parent  _('Schedule type') 'schedule_type' class_dl="col-md-6" %}
             {% endif %}
 
-            {% dl_with_parent 'credits' class_dl="col-md-6" %}
-            {% dl_with_parent 'type of constraint' 'verbose_constraint_type' class_dl="col-md-6" %}
-            {% dl_with_parent 'minimum constraint' 'min_constraint' class_dl="col-md-6" %}
-            {% dl_with_parent 'maximum constraint' 'max_constraint' class_dl="col-md-6" %}
+            {% dl_with_parent _('Credits') 'credits' class_dl="col-md-6" %}
+            {% dl_with_parent _('type of constraint') 'verbose_constraint_type' class_dl="col-md-6" %}
+            {% dl_with_parent _('minimum constraint') 'min_constraint' class_dl="col-md-6" %}
+            {% dl_with_parent _('maximum constraint') 'max_constraint' class_dl="col-md-6" %}
         </div>
 
         <div>
-            <label>{% trans 'title_in_french' %}</label>
+            <label>{% trans 'Title in French' %}</label>
             <strong class="text-primary">{{ parent.title | default_if_none:'' }}</strong><br>
             {{ education_group_year.title | default_if_none:'-' }}
         </div>
         <br>
         <div>
-            <label>{% trans 'title_in_english' %}</label>
+            <label>{% trans 'Title in English' %}</label>
             <strong class="text-primary">{{ parent.title_english | default_if_none:'' }}</strong><br>
             {{ education_group_year.title_english | default_if_none:'' }}
         </div>
         {% if education_group_year.education_group_type.category != 'GROUP' %}
             <br>
             <div>
-                <label>{% trans 'keywords' %}</label><br>
+                <label>{% trans 'Keywords' %}</label><br>
                 <strong class="text-primary">{{ parent.keywords | default_if_none:'' }}</strong><br>
                 {{ education_group_year.keywords | default_if_none:'' }}
             </div>

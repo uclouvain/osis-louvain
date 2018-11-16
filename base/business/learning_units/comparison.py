@@ -87,7 +87,7 @@ def _get_boolean_translation(value):
 
 
 def _get_status(value):
-    return _('ACTIVE') if value else _('inactive')
+    return _('Active') if value else _('Inactive')
 
 
 def _decrypt_boolean_value(field_name, value):

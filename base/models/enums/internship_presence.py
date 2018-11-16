@@ -29,9 +29,9 @@ from django.utils.translation import ugettext_lazy as _
 YES = "YES"
 NO = "NO"
 OPTIONAL = "OPTIONAL"
-
+# TODO Can be replace by a boolean field
 INTERNSHIP_PRESENCE = (
-    (YES, _(YES)),
-    (NO, _(NO)),
-    (OPTIONAL, _(OPTIONAL))
+    (YES, _("yes")),
+    (NO, _("no")),
+    (OPTIONAL, _("optional"))
 )

@@ -58,14 +58,14 @@ class VolumeEditionForm(forms.Form):
 
     opening_parenthesis_field = EmptyField(label='(')
     volume_q1 = VolumeField(
-        label=_('partial_volume_1Q'),
-        help_text=_('partial_volume_1'),
+        label=_('Q1'),
+        help_text=_('Volume Q1'),
         widget=forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
     )
     add_field = EmptyField(label='+')
     volume_q2 = VolumeField(
-        label=_('partial_volume_2Q'),
-        help_text=_('partial_volume_2'),
+        label=_('Q2'),
+        help_text=_('Volume Q2'),
         widget=forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
     )
     equal_field_1 = EmptyField(label='=')
@@ -74,10 +74,10 @@ class VolumeEditionForm(forms.Form):
         help_text=_('The annual volume must be equal to the sum of the volumes Q1 and Q2'),
         widget=forms.NumberInput(attrs={'step': STEP_HALF_INTEGER}),
     )
-    help_volume_total = "{} = {} + {}".format(_('Volume total annual'), _('partial_volume_1'), _('partial_volume_2'))
+    help_volume_total = "{} = {} + {}".format(_('Volume total annual'), _('Volume Q1'), _('Volume Q2'))
     closing_parenthesis_field = EmptyField(label=')')
     mult_field = EmptyField(label='*')
-    planned_classes = forms.IntegerField(label=_('planned_classes_pc'), help_text=_('planned_classes'), min_value=0)
+    planned_classes = forms.IntegerField(label=_('P.C.'), help_text=_('Planned classes'), min_value=0)
     equal_field_2 = EmptyField(label='=')
 
     _post_errors = []
@@ -95,7 +95,9 @@ class VolumeEditionForm(forms.Form):
         self.title_help += self.component.acronym
 
         super().__init__(*args, **kwargs)
-        help_volume_global = "{} = {} * {}".format(_('volume_global'), _('Volume total annual'), _('planned_classes'))
+        help_volume_global = "{} = {} * {}".format(_('volume total global'),
+                                                   _('Volume total annual'),
+                                                   _('Planned classes'))
 
         # Append dynamic fields
         entities_to_add = [entity for entity in ENTITY_TYPES_VOLUME if entity in self.entities]

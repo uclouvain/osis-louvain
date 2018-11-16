@@ -27,14 +27,14 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li id="lnk_institution"><a href="{% url 'institution' %}" id ="lnk_home_institution">{% trans 'institution' %}</a></li>
-<li id="lnk_studies"><a href="{% url 'academic_actors' %}">{% trans 'academic_actors' %}</a></li>
-<li class="active" id="lnk_pgm_manager_management">{% trans 'pgm_mgr_administration' %}</li>
+<li id="lnk_institution"><a href="{% url 'institution' %}" id ="lnk_home_institution">{% trans 'Institution' %}</a></li>
+<li id="lnk_studies"><a href="{% url 'academic_actors' %}">{% trans 'Academic actors' %}</a></li>
+<li class="active" id="lnk_pgm_manager_management">{% trans 'Program managers' %}</li>
 {% endblock %}
 {% block content %}
 {% if administrator_entities_string %}
     <div class="page-header">
-        <h2>{% trans 'pgm_mgr_administration' %} - <label>{{ administrator_entities_string }} </label>({{ academic_year }})</h2>
+        <h2>{% trans 'Program managers' %} - <label>{{ administrator_entities_string }} </label>({{ academic_year }})</h2>
     </div>
     <div class="panel panel-default">
         <div class="panel-body">
@@ -42,10 +42,10 @@
             <div class="row">
                 <form  method="get" action="{% url 'pgm_manager_search'%}" >
                     <div class="col-md-3">
-                        <label for="slt_entity" >{% trans 'entity'%}</label>
+                        <label for="slt_entity" >{% trans 'Entity'%}</label>
                         <select class="form-control" id="slt_entity" name="entity" >
                             {% for e in entities_managed_root %}
-                                <option  value="all_{{e.root.id}}" {% if e.root.id|slugify == entity_root_selected %} selected {% endif %}>{% trans 'all_hierarchy' %} {{ e.root.acronym }}</option>
+                                <option  value="all_{{e.root.id}}" {% if e.root.id|slugify == entity_root_selected %} selected {% endif %}>{% trans 'All hierarchy of ' %} {{ e.root.acronym }}</option>
                                 {% for e in e.structures %}
                                     {% if e.id|slugify == entity_selected %}
                                     <option selected value="{{ e.id }}">{{ e.acronym }}</option>
@@ -57,9 +57,9 @@
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <label for="slt_offer_type" >{% trans 'pgm_type'%}</label>
+                        <label for="slt_offer_type" >{% trans 'Program type'%}</label>
                         <select class="form-control" id="slt_offer_type"  name="offer_type">
-                            <option value="-">{% trans 'all_label' %}</option>
+                            <option value="-">{% trans 'All' %}</option>
                             {% for p in offer_types %}
                                 {% if p.id|slugify == offer_type %}
                                     <option selected value="{{ p.id }}">{{ p.name }}</option>
@@ -70,9 +70,9 @@
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <label for="slt_manager" >{% trans 'managers'%}</label>
+                        <label for="slt_manager" >{% trans 'Managers'%}</label>
                         <select class="form-control" id="slt_person"  name="person">
-                            <option value="-">{% trans 'all_label' %}</option>
+                            <option value="-">{% trans 'All' %}</option>
                             {% for mgr in managers %}
                                 <option value="{{ mgr.person.id }}" {%if person.id == mgr.person.id %}selected{% endif %} >{{ mgr.person }}</option>
                             {% endfor %}
@@ -102,20 +102,20 @@
                        {% csrf_token %}
                        <div class="col-md-6">
                            {% if pgms|length == 0 and init != "1" %}
-                           <div class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</div>
+                           <div class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</div>
                            {% endif %}
                            <input type="hidden" id="hdn_entity" name="entity">
                            <input type="hidden" id="hdn_offer_type" name="offer_type">
                            <input type="hidden" id="hdn_offers_checked" name="offers_checked">
                            <input type="hidden" id="hdn_manager" name="person">
                            {% if pgms|length > 0 %}
-                               <strong style="color:gray;"><span id="nb_selected"></span> {% trans 'of'%} {{pgms|length}} {% trans 'selected'%}</strong>
+                               <strong style="color:gray;"><span id="nb_selected"></span> {% trans 'of' %} {{pgms|length}} {% trans 'Selected'%}</strong>
                                <table class="table table-striped table-hover" id="tb_pgms">
                                    <thead>
-                                   <th class="no-sort"><input type="checkbox" id="chb_pgm_all_id" title="{% trans 'select_all' %}"></th>
-                                   <th>{% trans 'program'%}</th>
-                                   <th>{% trans 'type'%}</th>
-                                   <th>{% trans 'entity'%}</th>
+                                   <th class="no-sort"><input type="checkbox" id="chb_pgm_all_id" title="{% trans 'Select/deselect all' %}"></th>
+                                   <th>{% trans 'Program'%}</th>
+                                   <th>{% trans 'Type'%}</th>
+                                   <th>{% trans 'Entity'%}</th>
                                    </thead>
                                    {% for pgm in pgms %}
                                    <tr>
@@ -140,7 +140,7 @@
 
                            <table class="table table-striped table-hover" id="tb_managers" style="visibility:{% if pgms|length > 0 %}visibility{%else%}hidden{%endif%}">
                                <thead>
-                                   <th>{% trans 'manager'%}</th>
+                                   <th>{% trans 'Manager'%}</th>
                                    <th></th>
                                </thead>
                                <tbody>
@@ -150,7 +150,7 @@
                            <br>
                            {% if pgms %}
                            <button type="button" id="bt_add_pgm_manager" class="btn btn-primary pull-right" role="button"
-                                   title="{% trans 'add_manager' %}" data-toggle="modal" data-target="#pnl_add_manager_modal">
+                                   title="{% trans 'Add manager' %}" data-toggle="modal" data-target="#pnl_add_manager_modal">
                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
                            </button>
                            {% endif%}
@@ -167,7 +167,7 @@
     {% include 'admin/modal/add_manager.html'%}
     <!-- end - Add manager modal -->
 {% else %}
-    <div class="center-block"><h3>{% trans 'no_structure_specified' %}</h3></div>
+    <div class="center-block"><h3>{% trans 'No entity associated to your profile' %}</h3></div>
 {% endif %}
 {% endblock %}
 

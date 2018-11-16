@@ -5,18 +5,18 @@
     {% csrf_token %}
     <div class="btn-group pull-right {{ additional_class }}" role="group" aria-label="actions">
 
-        <button type="button" title="{% trans 'update' %}" class="btn btn-primary trigger_modal"
+        <button type="button" title="{% trans 'Update' %}" class="btn btn-primary trigger_modal"
                 data-url="{{ update_url }}" {% permission_change_achievement %}>
             <span class="glyphicon glyphicon-edit"></span>
         </button>
 
-        <button type="submit" title="{% trans 'up' %}" class="btn btn-default"
+        <button type="submit" title="{% trans 'Up' %}" class="btn btn-default"
                 name="action" value="up"
                 {% if forloop.counter0 == 0 %}disabled{% endif %} {% permission_change_achievement %} >
             <i class="fa fa-arrow-up"></i>
         </button>
 
-        <button type="submit" title="{% trans 'down' %}" class="btn btn-default"
+        <button type="submit" title="{% trans 'Down' %}" class="btn btn-default"
                 name="action" value="down"
                 {% if forloop.last %}disabled{% endif %} {% permission_change_achievement %} >
             <i class="fa fa-arrow-down"></i>

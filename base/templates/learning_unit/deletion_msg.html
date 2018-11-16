@@ -40,19 +40,19 @@
                 {% endfor %}
             </ul>
         {% else %}
-            <p>{% trans 'learning_unit_years_to_delete' %} : </p>
+            <p>{% trans 'You will definitely delete the following learning units.' %} : </p>
             <ul>
                 {% for luy in learning_units_to_delete %}
                     <li> {{ luy }}</li>
                 {% endfor %}
             </ul>
-            {% trans 'are_you_sure' %}
+            {% trans 'Are you sure?' %}
             <div class="panel-footer">
                 <form method="post" style="display: inline;">
                     {% csrf_token %}
                     <input type="hidden" name="learning_unit_id" value="{{ learning_unit.id }}" />
                     <button type="button" onclick="javascript:history.back()" class="btn btn-default">{% trans 'cancel' %}</button>
-                    <button type="submit" class="btn btn-danger">{% trans 'i_confirm' %}</button>
+                    <button type="submit" class="btn btn-danger">{% trans 'Yes, I confirm.' %}</button>
                 </form>
             </div>
         {% endif %}

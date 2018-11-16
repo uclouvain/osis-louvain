@@ -48,20 +48,20 @@ class ExternalLearningUnitYear(models.Model):
         max_length=15,
         db_index=True,
         blank=True,
-        verbose_name=_('external_code')
+        verbose_name=_('External code')
     )
 
     external_credits = models.DecimalField(
         max_digits=5,
         decimal_places=2,
-        verbose_name=_('local_credits'),
+        verbose_name=_('Local credits'),
         validators=[
             MinValueValidator(MINIMUM_CREDITS),
             MaxValueValidator(MAXIMUM_CREDITS)
         ]
     )
 
-    url = models.URLField(max_length=255, blank=True, verbose_name=_('url of the learning unit'))
+    url = models.URLField(max_length=255, blank=True, verbose_name=_('URL of the learning unit'))
 
     learning_unit_year = models.OneToOneField(
         'LearningUnitYear',
@@ -71,7 +71,7 @@ class ExternalLearningUnitYear(models.Model):
 
     requesting_entity = models.ForeignKey(
         'Entity',
-        verbose_name=_('requesting_entity'),
+        verbose_name=_('Requesting entity'),
         on_delete=models.PROTECT,
     )
 

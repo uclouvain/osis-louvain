@@ -25,6 +25,8 @@
 ##############################################################################
 from django.utils.translation import ugettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
+
 COORDINATOR = "COORDINATOR"
 HOLDER = "HOLDER"
 CO_HOLDER = "CO_HOLDER"
@@ -36,14 +38,15 @@ PROFESSOR = "PROFESSOR"  # To remove afterwards.
 INTERNSHIP_SUPERVISOR = "INTERNSHIP_SUPERVISOR"
 INTERNSHIP_CO_SUPERVISOR = "INTERNSHIP_CO_SUPERVISOR"
 
-FUNCTIONS = ((COORDINATOR, _(COORDINATOR)),
-             (HOLDER, _(HOLDER)),
-             (CO_HOLDER, _(CO_HOLDER)),
-             (DEPUTY, _(DEPUTY)),
-             (DEPUTY_AUTHORITY, _(DEPUTY_AUTHORITY)),
-             (DEPUTY_SABBATICAL, _(DEPUTY_SABBATICAL)),
-             (DEPUTY_TEMPORARY, _(DEPUTY_TEMPORARY)),
-             (PROFESSOR, _(PROFESSOR)),
-             (INTERNSHIP_SUPERVISOR, _(INTERNSHIP_SUPERVISOR)),
-             (INTERNSHIP_CO_SUPERVISOR, _(INTERNSHIP_CO_SUPERVISOR)),)
 
+class Functions(ChoiceEnum):
+    COORDINATOR = _("Coordinator")
+    HOLDER = _("Holder")
+    CO_HOLDER = _("Co-holder")
+    DEPUTY = _("Deputy")
+    DEPUTY_AUTHORITY = _("Deputy authority")
+    DEPUTY_SABBATICAL = _("Deputy sabbatical")
+    DEPUTY_TEMPORARY = _("Deputy temporary")
+    PROFESSOR = _("Professor")
+    INTERNSHIP_SUPERVISOR = _("Internship supervisor")
+    INTERNSHIP_CO_SUPERVISOR = _("Internship co-supervisor")

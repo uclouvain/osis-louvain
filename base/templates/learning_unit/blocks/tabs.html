@@ -36,12 +36,12 @@
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" {% if request.path == url_identification %} class="active" {% endif %}>
             <a href="{{ url_identification }}" role="tab">
-                {% trans 'identification' %}
+                {% trans 'Identification' %}
             </a>
         </li>
         <li role="presentation" {% if request.path == url_formations %} class="active" {% endif %}>
             <a href="{{ url_formations }}" role="tab">
-                {% trans 'trainings' %}
+                {% trans 'Trainings' %}
             </a>
         </li>
     </ul>
@@ -49,7 +49,7 @@
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation" {% if request.path == url_identification %} class="active" {% endif %}>
             <a href="{{ url_identification }}" role="tab">
-                {% trans 'identification' %}
+                {% trans 'Identification' %}
             </a>
         </li>
         <li role="presentation" {% if request.path == url_components %} class="active" {% endif %}>
@@ -59,23 +59,23 @@
         </li>
         <li role="presentation" {% if request.path == url_pedagogy %} class="active" {% endif %}>
             <a href="{{ url_pedagogy }}" role="tab">
-                {% trans 'educational_information' %}
+                {% trans 'Educational information' %}
             </a>
         </li>
         <li role="presentation" {% if request.path == url_specifications %} class="active" {% endif %}>
             <a href="{{ url_specifications }}" role="tab">
-                {% trans 'learning_unit_specifications' %}
+                {% trans 'Specifications' %}
             </a>
         </li>
         <li role="presentation" {% if request.path == url_formations %} class="active" {% endif %}>
             <a href="{{ url_formations }}" role="tab">
-                {% trans 'trainings' %}
+                {% trans 'Trainings' %}
             </a>
         </li>
         <li role="presentation" {% if request.path == url_attributions or request.path == url_select_attributions %}
             class="active" {% endif %}>
             <a href="{% url 'learning_unit_attributions' learning_unit_year.id %}" role="tab">
-                {% trans 'tutors' %}
+                {% trans 'Tutors' %}
             </a>
         </li>
     </ul>

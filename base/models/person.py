@@ -59,8 +59,8 @@ class EmployeeManager(SerializableModelManager):
 
 class Person(SerializableModel):
     GENDER_CHOICES = (
-        ('F', _('female')),
-        ('M', _('male')),
+        ('F', _('Female')),
+        ('M', _('Male')),
         ('U', _('unknown')))
 
     objects = SerializableModelManager()
@@ -127,14 +127,6 @@ class Person(SerializableModel):
             first_name or "",
             middle_name or ""
         ]).strip()
-
-    @property
-    def age(self):
-        if not self.birth_date:
-            return None
-        today = date.today()
-        return today.year - self.birth_date.year - \
-            ((today.month, today.day) < (self.birth_date.month, self.birth_date.day))
 
     @cached_property
     def linked_entities(self):

@@ -32,9 +32,9 @@ SEPARATE = "SEPARATE"
 NOT_CONCERNED = "NOT_CONCERNED"
 
 COORGANIZATION_DIPLOMA_TYPE = (
-    (UNIQUE, _(UNIQUE)),
-    (SEPARATE, _(SEPARATE)),
-    (NOT_CONCERNED, _(NOT_CONCERNED)),
+    (UNIQUE, _("Unique")),
+    (SEPARATE, _("Separate")),
+    (NOT_CONCERNED, _("Not concerned")),
 )
 
 

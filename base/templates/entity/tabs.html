@@ -30,14 +30,14 @@
 
 <ul class="nav nav-tabs" role="tablist">
     <li role="presentation" {% if request.path == url_identification %} class="active" {% endif %}>
-        <a href="{{url_identification}}">{% trans 'identification'%}</a>
+        <a href="{{ url_identification }}">{% trans 'Identification' %}</a>
     </li>
     {% if entity_version.descendants|length > 0 %}
         <li role="presentation" {% if request.path == url_organogram %} class="active" {% endif %}>
-            <a href="{{url_organogram}}">{% trans 'organogram'%}</a>
+            <a href="{{ url_organogram }}">{% trans 'Organizational chart' %}</a>
         </li>
     {% endif %}
     <li role="presentation" {% if request.path == url_versions %} class="active" {% endif %}>
-        <a href="{{url_versions}}">{% trans 'versions'%}</a>
+        <a href="{{ url_versions }}">{% trans 'Versions' %}</a>
     </li>
 </ul>

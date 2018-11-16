@@ -36,18 +36,18 @@
                 <br>
                 <strong style="margin-left:10px;color:grey;">
                     {{ learning_units|length }}
-                    {% trans 'learning_units'|lower %}
+                    {% trans 'Learning units'|lower %}
                 </strong>
 
                 <table id="table_learning_units" class="table table-striped table-hover">
                     <thead>
                     <tr>
-                        <th>{% trans 'academic_year_small' %}</th>
+                        <th>{% trans 'Ac yr.' %}</th>
                         <th>{% trans 'code' %}</th>
-                        <th id="lu_title_sort">{% trans 'title' %}</th>
-                        <th>{% trans 'institution' %}</th>
+                        <th id="lu_title_sort">{% trans 'Title' %}</th>
+                        <th>{% trans 'Institution' %}</th>
                         <th>{% trans 'credits' %}</th>
-                        <th>{% trans 'status' %}</th>
+                        <th>{% trans 'Status' %}</th>
                     </tr>
                     </thead>
                     {% for external_learning_unit_yr in learning_units %}
@@ -65,11 +65,11 @@
                             <td>
                                 {% if external_learning_unit_yr.learning_unit_year.status %}
                                     <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:green;"
-                                          title="{% trans 'active' %}"></span>
+                                          title="{% trans 'Active' %}"></span>
                                     <div style="display:none;">1</div>
                                 {% else %}
                                     <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:gray;"
-                                          title="{% trans 'inactive' %}"></span>
+                                          title="{% trans 'Inactive' %}"></span>
                                     <div style="display:none;">0</div>
                                 {% endif %}
                             </td>

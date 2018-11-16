@@ -453,7 +453,9 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
         self.assertFalse(form.is_valid(), form.errors)
         self.assertEqual(
             form.errors[0]['credits'],
-            [_('Ensure this value is less than or equal to {max_value}.').format(max_value=MAXIMUM_CREDITS)]
+            [_('Ensure this value is less than or equal to %(limit_value)s.') % {
+                'limit_value': MAXIMUM_CREDITS
+            }]
         )
 
     def test_update_case_credits_too_high_4_digits(self):
@@ -465,7 +467,9 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
         self.assertFalse(form.is_valid(), form.errors)
         self.assertEqual(
             form.errors[0]['credits'],
-            [_('Ensure this value is less than or equal to {max_value}.').format(max_value=MAXIMUM_CREDITS)]
+            [_('Ensure this value is less than or equal to %(limit_value)s.') % {
+                'limit_value': MAXIMUM_CREDITS
+            }]
         )
 
 

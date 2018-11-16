@@ -31,7 +31,8 @@ from base import models as mdl
 from base.business.learning_unit_year_with_context import append_latest_entities
 from base.forms.common import get_clean_data, TooManyResultsException
 from base.forms.learning_unit.search_form import LearningUnitSearchForm
-from base.models.enums import proposal_type, proposal_state
+from base.models.enums.proposal_state import ProposalState
+from base.models.enums.proposal_type import ProposalType
 from base.models.proposal_learning_unit import ProposalLearningUnit
 
 
@@ -50,30 +51,30 @@ def _get_sorted_choices(tuple_of_choices):
 class LearningUnitProposalForm(LearningUnitSearchForm):
 
     entity_folder_id = forms.ChoiceField(
-        label=_('folder_entity'),
+        label=_('Folder entity'),
         choices=lazy(_get_entity_folder_id_ordered_by_acronym, list),
         required=False
     )
 
     folder_id = forms.IntegerField(min_value=0,
                                    required=False,
-                                   label=_('folder_num'),)
+                                   label=_('Folder num.'),)
 
     proposal_type = forms.ChoiceField(
-        label=_('proposal_type'),
-        choices=_get_sorted_choices(proposal_type.CHOICES),
+        label=_('Proposal type'),
+        choices=_get_sorted_choices(ProposalType.choices()),
         required=False
     )
 
     proposal_state = forms.ChoiceField(
-        label=_('proposal_status'),
-        choices=_get_sorted_choices(proposal_state.CHOICES),
+        label=_('Proposal status'),
+        choices=_get_sorted_choices(ProposalState.choices()),
         required=False
     )
 
     def clean(self):
         if not self._has_criteria():
-            self.add_error(None, _('minimum_one_criteria'))
+            self.add_error(None, _('Please choose at least one criteria!'))
 
         return get_clean_data(self.cleaned_data)
 

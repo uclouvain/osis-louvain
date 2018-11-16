@@ -120,15 +120,20 @@ def _check_extend_partim(last_learning_unit_year, new_academic_year):
     if last_learning_unit_year.is_partim() and lu_parent:
         if _get_actual_end_year(lu_parent.learning_unit) < new_academic_year.year:
             raise IntegrityError(
-                _('parent_greater_than_partim') % {'partim_end_year': new_academic_year,
-                                                   'lu_parent': lu_parent.acronym}
+                _('The selected end year (%(partim_end_year)s) is greater '
+                  'than the end year of the parent %(lu_parent)s') % {
+                    'partim_end_year': new_academic_year,
+                    'lu_parent': lu_parent.acronym
+                }
             )
 
 
 def _update_end_year_field(lu, year):
     lu.end_year = year
     lu.save()
-    return _('learning_unit_updated').format(acronym=lu.acronym)
+    return _('Learning unit %(acronym)s successfully updated.') % {
+        'acronym': lu.acronym,
+    }
 
 
 def duplicate_learning_unit_year(old_learn_unit_year, new_academic_year):
@@ -192,7 +197,7 @@ def _duplicate_entity_container_year(new_lcy, new_academic_year):
         entity_versions = EntityVersion.objects.entity(entity_container_y.entity)
         if not entity_versions.current(new_academic_year.end_date).exists():
             raise IntegrityError(
-                _('Entity_not_exist') % {
+                _('The entity %(entity_acronym)s does not exist for the selected academic year %(academic_year)s') % {
                     'entity_acronym': entity_versions.last().acronym,
                     'academic_year': new_academic_year
                 })
@@ -200,8 +205,8 @@ def _duplicate_entity_container_year(new_lcy, new_academic_year):
 
 
 def _duplicate_learning_component_year(new_learn_container_year, new_learn_unit_year, old_learn_unit_year):
-    old_learning_unit_components = learning_unit_component.find_by_learning_unit_year(old_learn_unit_year)\
-                                                          .select_related('learning_component_year')
+    old_learning_unit_components = learning_unit_component.find_by_learning_unit_year(old_learn_unit_year) \
+        .select_related('learning_component_year')
     for learn_unit_component in old_learning_unit_components:
         old_component = learn_unit_component.learning_component_year
         new_component = update_related_object(old_component, 'learning_container_year', new_learn_container_year)
@@ -265,7 +270,8 @@ def _check_shorten_partims(learning_unit_to_edit, new_academic_year):
 def _check_shorten_partim(learning_unit_to_edit, new_academic_year, partim):
     if _get_actual_end_year(partim.learning_unit) > new_academic_year.year:
         raise IntegrityError(
-            _('partim_greater_than_parent') % {
+            _('The learning unit %(learning_unit)s has a partim %(partim)s with '
+              'an end year greater than %(year)s') % {
                 'learning_unit': learning_unit_to_edit.acronym,
                 'partim': partim.acronym,
                 'year': new_academic_year
@@ -341,7 +347,7 @@ def check_postponement_conflict_report_errors(conflict_report):
         raise ConsistencyError(
             last_instance_updated,
             conflict_report.get('errors'),
-            _('error_modification_learning_unit')
+            _('An error occured when updating the learning unit.')
         )
 
 
@@ -423,17 +429,17 @@ def _check_postponement_conflict(luy, next_luy):
 
 def _check_postponement_conflict_on_learning_unit_year(luy, next_luy):
     fields_to_compare = {
-        'acronym': _('acronym'),
-        'specific_title': _('title_proper_to_UE'),
-        'specific_title_english': _('english_title_proper_to_UE'),
-        'subtype': _('subtype'),
+        'acronym': _('Acronym'),
+        'specific_title': _('English title proper'),
+        'specific_title_english': _('English title proper'),
+        'subtype': _('Subtype'),
         'credits': _('credits'),
-        'internship_subtype': _('internship_subtype'),
-        'status': _('status'),
-        'session': _('session_title'),
-        'quadrimester': _('quadrimester'),
-        'campus': _('campus'),
-        'language': _('language'),
+        'internship_subtype': _('Internship subtype'),
+        'status': _('Status'),
+        'session': _('Session derogation'),
+        'quadrimester': _('Quadrimester'),
+        'campus': _('Campus'),
+        'language': _('Language'),
     }
     return _get_differences(luy, next_luy, fields_to_compare)
 
@@ -441,10 +447,10 @@ def _check_postponement_conflict_on_learning_unit_year(luy, next_luy):
 def _check_postponement_conflict_on_learning_container_year(lcy, next_lcy):
     fields_to_compare = {
         'container_type': _('type'),
-        'common_title': _('common_title'),
-        'common_title_english': _('common_english_title'),
-        'acronym': _('acronym'),
-        'team': _('team_management')
+        'common_title': _('Common title'),
+        'common_title_english': _('Common English title'),
+        'acronym': _('Acronym'),
+        'team': _('Team management')
     }
     return _get_differences(lcy, next_lcy, fields_to_compare)
 
@@ -468,15 +474,18 @@ def _get_differences(obj1, obj2, fields_to_compare):
 
 def _get_translated_value(value):
     if value is None:
-        return _('no_data')
+        return _('No data')
     if isinstance(value, bool):
         return _('yes') if value else _('no')
     return value
 
 
 def _check_postponement_learning_unit_year_proposal_state(nex_luy):
-    error_msg = _("learning_unit_in_proposal_cannot_save") % {'luy': nex_luy.acronym,
-                                                              'academic_year': nex_luy.academic_year}
+    error_msg = _("The learning unit %(luy)s is in proposal,"
+                  " can not save the change from the year %(academic_year)s") % {
+                    'luy': nex_luy.acronym,
+                    'academic_year': nex_luy.academic_year
+    }
     return [error_msg] if is_learning_unit_year_in_proposal(nex_luy) else []
 
 
@@ -493,9 +502,9 @@ def _check_postponement_conflict_on_entity_container_year(lcy, next_lcy):
                             "and year %(next_year)s - %(next_value)s") % {
                               'field': _(entity_type.lower()),
                               'year': lcy.academic_year,
-                              'value': current_entity.most_recent_acronym if current_entity else _('no_data'),
+                              'value': current_entity.most_recent_acronym if current_entity else _('No data'),
                               'next_year': next_lcy.academic_year,
-                              'next_value': next_year_entity.most_recent_acronym if next_year_entity else _('no_data')
+                              'next_value': next_year_entity.most_recent_acronym if next_year_entity else _('No data')
                           })
     return error_list
 
@@ -613,9 +622,9 @@ def _get_error_volume_field_diff(field_diff, current_component, next_year_compon
                'acronym': current_component.learning_container_year.acronym,
                'component_type': _(current_component.type) if current_component.type else 'NT',
                'year': current_component.learning_container_year.academic_year,
-               'value': values_diff.get('current') or _('no_data'),
+               'value': values_diff.get('current') or _('No data'),
                'next_year': next_year_component.learning_container_year.academic_year,
-               'next_value': values_diff.get('next_year') or _('no_data')
+               'next_value': values_diff.get('next_year') or _('No data')
            }
 
 

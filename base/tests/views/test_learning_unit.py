@@ -1212,7 +1212,7 @@ class LearningUnitViewTestCase(TestCase):
 
         response = self.client.get(reverse('learning_units'), {'academic_year_id': self.academic_year_1.id})
         messages = list(response.context['messages'])
-        self.assertEqual(messages[0].message, _('too_many_results'))
+        self.assertEqual(messages[0].message, _('Too many results! Please be more specific.'))
 
         # Restore max_record
         LearningUnitSearchForm.MAX_RECORDS = tmpmaxrecors

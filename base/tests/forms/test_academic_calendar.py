@@ -47,7 +47,7 @@ class TestAcademicCalendarForm(TestCase):
             "description": "Description of an academic event"
         })
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['start_date'], _('dates_mandatory_error'))
+        self.assertEqual(form.errors['start_date'], _('Start date and end date are mandatory'))
 
     def test_with_start_date_higher_than_end_date(self):
         form = AcademicCalendarForm(data={
@@ -58,7 +58,7 @@ class TestAcademicCalendarForm(TestCase):
             "end_date": datetime.date.today() - datetime.timedelta(days=2)
         })
         self.assertFalse(form.is_valid())
-        self.assertEqual(form.errors['start_date'], _('start_date_must_be_lower_than_end_date'))
+        self.assertEqual(form.errors['start_date'], _('Start date must be lower than end date'))
 
     @override_settings(USE_TZ=False)
     def test_with_end_date_inferior_to_offer_year_calendar_end_date(self):
@@ -75,11 +75,15 @@ class TestAcademicCalendarForm(TestCase):
         }, instance=an_academic_calendar)
         self.assertFalse(form.is_valid())
         date_format = str(_('date_format'))
-        self.assertEqual(form.errors['end_date'], "%s." % (_('academic_calendar_offer_year_calendar_end_date_error')
-                                                           % (an_academic_calendar.title,
-                                                              an_offer_year_calendar.end_date.strftime(date_format),
-                                                              an_academic_calendar.title,
-                                                              an_offer_year_calendar.offer_year.acronym)))
+        self.assertEqual(
+            form.errors['end_date'],
+            _("The closure's date of '%s' of the academic calendar can't be "
+              "lower than %s (end date of '%s' of the program '%s')")
+            % (an_academic_calendar.title,
+               an_offer_year_calendar.end_date.strftime(date_format),
+               an_academic_calendar.title,
+               an_offer_year_calendar.offer_year.acronym)
+        )
 
     def test_with_correct_form(self):
         form = AcademicCalendarForm(data={

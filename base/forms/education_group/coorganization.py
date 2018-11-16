@@ -37,13 +37,13 @@ from base.models.organization import Organization
 class CoorganizationEditForm(forms.ModelForm):
     country = ModelChoiceField(
         queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),
-        label=_("country"),
+        label=_("Country"),
     )
 
     organization = ModelChoiceField(
         queryset=Organization.objects.all(),
         required=True,
-        label=_("institution"),
+        label=_("Institution"),
         widget=autocomplete.ModelSelect2(
             url='organization_autocomplete',
             attrs={'data-theme': 'bootstrap', 'data-width': 'null', 'data-placeholder': '---------'},

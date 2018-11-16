@@ -27,12 +27,12 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-<li id="lnk_institution">{% trans 'institution' %}</li>
-<li class="active" id="lnk_studies">{% trans 'academic_actors' %}</li>
+<li id="lnk_institution">{% trans 'Institution' %}</li>
+<li class="active" id="lnk_studies">{% trans 'Academic actors' %}</li>
 {% endblock %}
 {% block content %}
 <div class="page-header">
-    <h2>{% trans 'academic_actors' %}</h2>
+    <h2>{% trans 'Academic actors' %}</h2>
 </div>
 
 <div class="panel panel-default">
@@ -41,21 +41,21 @@
         <div class="row">
             <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'pgm_manager' %}" id="lnk_pgm_managers" >{% trans 'pgm_managers' %}</a></h4>
-                <p>{% trans 'desc_lnk_pgm_managers' %}</p>
+                <h4 class="media-heading"><a href="{% url 'pgm_manager' %}" id="lnk_pgm_managers" >{% trans 'Program Managers' %}</a></h4>
+                <p>{% trans 'Management of the program managers' %}</p>
             </div>
             <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'scores_responsible' %}" id="lnk_srm_managers" >{% trans 'scores_responsibles' %}</a></h4>
-                <p>{% trans 'desc_lnk_srm_managers' %}</p>
+                <h4 class="media-heading"><a href="{% url 'scores_responsible' %}" id="lnk_srm_managers" >{% trans 'Scores responsibles' %}</a></h4>
+                <p>{% trans 'Management of the scores responsibles managers' %}</p>
             </div>
         </div>
         <br>
         <div class="row">
             <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'summary_responsible' %}" id="lnk_srm_managers" >{% trans 'summary_responsibles' %}</a></h4>
-                <p>{% trans 'desc_lnk_summary_responsible' %}</p>
+                <h4 class="media-heading"><a href="{% url 'summary_responsible' %}" id="lnk_srm_managers" >{% trans 'Summary responsible(s)' %}</a></h4>
+                <p>{% trans 'Management of the summary responsibles' %}</p>
             </div>
         </div>
 

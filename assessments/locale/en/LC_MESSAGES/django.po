@@ -1,97 +1,933 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
-#, fuzzy
+#: templates/online_encoding.html:290
+#, python-format
 msgid ""
+"\n"
+"                        You will submit %(draft_scores_not_submitted)s notes "
+"to faculty(ies). Warning : submitted scores <b>can't be modified anymore.</"
+"b>\n"
+"                    "
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
-"Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-28 11:56+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
 
-msgid "pgm_type"
-msgstr "Program type"
+#: views/upload_xls_utils.py:377
+msgid "Absence justified cannot be remplaced by absence unjustified"
+msgstr ""
 
-msgid "managers"
-msgstr "Managers"
+#: templates/online_double_encoding_form.html:173
+#: templates/online_double_encoding_validation.html:272
+#: templates/online_double_encoding_validation.html:278
+#: templates/online_encoding_form.html:211
+msgid "Absent"
+msgstr ""
 
-msgid "all_label"
-msgstr "All"
+#: templates/admin/pgm_manager.html:31 templates/scores_responsible.html:31
+#: templates/scores_responsible_edit.html:30
+msgid "Academic actors"
+msgstr ""
 
-msgid "pgm_mgr_administration"
-msgstr "Program managers"
+#: templates/assessments.html:30
+#: templates/online_double_encoding_validation.html:31
+#: templates/online_encoding.html:32 templates/online_encoding_form.html:32
+#: templates/outside_scores_encodings_period.html:29
+#: templates/scores_encoding.html:30
+msgid "Academic background"
+msgstr ""
 
-msgid "all_hierarchy"
-msgstr "All hierarchy of "
+#: templates/online_double_encoding_form.html:81
+#: templates/online_double_encoding_validation.html:81
+#: templates/online_encoding.html:81 templates/online_encoding_form.html:80
+#: templates/scores_encoding.html:50
+#: templates/scores_encoding_by_learning_unit.html:42
+msgid "Academic year"
+msgstr ""
 
-msgid "remove_manager"
-msgstr "Remove the manager"
+#: business/score_encoding_export.py:165
+#, python-format
+msgid "Accepted value: %(justification_label_authorized)s "
+msgstr ""
 
-msgid "add_manager"
-msgstr "Add a manager"
+#: templates/scores_encoding.html:101 templates/scores_encoding.html:153
+#: templates/scores_encoding.html:196
+#: templates/scores_encoding_by_learning_unit.html:86
+#: templates/scores_encoding_by_learning_unit.html:151
+#: templates/scores_encoding_by_learning_unit.html:226
+#: templates/scores_encoding_by_learning_unit.html:313
+msgid "Acronym"
+msgstr ""
 
-msgid "select_all"
-msgstr "Select/deselect all"
+#: templates/scores_responsible_edit.html:69
+msgid "Add"
+msgstr ""
 
-msgid "pgm_managers"
-msgstr "Program's managers"
+#: templates/admin/pgm_manager.html:153
+msgid "Add manager"
+msgstr ""
 
-msgid "desc_lnk_srm_managers"
-msgstr "Management of the scores responsibles managers"
+#: templates/admin/pgm_manager.html:62 templates/admin/pgm_manager.html:75
+#: templates/scores_encoding.html:66
+#: templates/scores_encoding_by_learning_unit.html:63
+#: templates/scores_encoding_by_learning_unit.html:73
+#: templates/scores_encoding_by_specific_criteria.html:62
+#: templates/scores_encoding_by_specific_criteria.html:72
+msgid "All"
+msgstr ""
 
-msgid "desc_lnk_pgm_managers"
-msgstr "Management of the program managers"
+#: templates/admin/pgm_manager.html:48
+msgid "All hierarchy of "
+msgstr ""
 
-msgid "person_search"
-msgstr "Person search"
+#: templates/online_encoding.html:147
+msgid ""
+"All the scores were submitted. It is not possible inject Excel file anymore."
+msgstr ""
 
-msgid "remove_manager_label"
-msgstr "Are you sure you want to remove the following manager"
+#: templates/online_encoding.html:125
+msgid ""
+"All the scores were submitted. It is not possible to double encode scores "
+"anymore."
+msgstr ""
 
-msgid "stay_manager_label"
-msgstr "He will keep the following program's management : "
+#: templates/online_encoding.html:116 templates/scores_encoding.html:132
+msgid ""
+"All the scores were submitted. It is not possible to encode scores anymore."
+msgstr ""
 
-msgid "confirm"
-msgstr "Confirm"
+#: templates/admin/modal/remove_manager_confirm.html:21
+msgid "Are you sure you want to remove the following manager ?"
+msgstr ""
 
-msgid "no_structure_specified"
-msgstr "No entity associated to your entity manager's profil"
+#: templates/scores_encoding_by_learning_unit.html:32
+#: templates/scores_encoding_by_specific_criteria.html:36
+msgid "By learning unit"
+msgstr ""
 
-msgid "already_program_mgr"
-msgstr "is already program manager for"
+#: templates/scores_encoding_by_learning_unit.html:33
+#: templates/scores_encoding_by_specific_criteria.html:37
+msgid "By specific criteria"
+msgstr ""
 
-msgid "remove"
-msgstr "Remove"
+#: templates/admin/modal/add_manager.html:62
+#: templates/admin/modal/remove_manager_confirm.html:29
+#: templates/online_double_encoding_form.html:114
+#: templates/online_double_encoding_form.html:187
+#: templates/online_double_encoding_validation.html:251
+#: templates/online_encoding.html:272 templates/online_encoding.html:299
+#: templates/online_encoding_form.html:115
+#: templates/online_encoding_form.html:240
+#: templates/scores_responsible_edit.html:71
+msgid "Cancel"
+msgstr ""
 
-msgid "hlp_employee_search"
-msgstr "Please enter a lastname, and optionnally a firstname"
+#: templates/online_double_encoding_form.html:175
+#: templates/online_double_encoding_validation.html:283
+#: templates/online_encoding_form.html:221
+#: templates/scores_encoding_by_specific_criteria.html:65
+#: templates/scores_encoding_by_specific_criteria.html:150
+msgid "Cheating"
+msgstr ""
 
-msgid "lastname"
-msgstr "Lastname"
+#: templates/online_encoding.html:266
+msgid "Choose file"
+msgstr ""
 
-msgid "firstname"
-msgstr "Firstname"
+#: templates/offer/score_sheet_address_tab.html:97
+msgid "City"
+msgstr ""
 
-msgid "middlename"
-msgstr "Middlename"
+#: templates/scores_responsible.html:54 templates/scores_responsible.html:87
+msgid "Code"
+msgstr ""
 
-msgid "optional_email_field_note"
-msgstr "NOTE : the 'Email' field is optional. You can fill in this field if you want it to appear on the score sheet."
+#: templates/online_double_encoding_form.html:112
+#: templates/online_double_encoding_form.html:185
+msgid "Compare"
+msgstr ""
 
-msgid "score_sheet_address_saved"
-msgstr "Score sheet address was successfully saved."
+#: templates/scores_encoding_by_learning_unit.html:150
+#: templates/scores_encoding_by_learning_unit.html:225
+#: templates/scores_encoding_by_learning_unit.html:312
+msgid "Complete"
+msgstr ""
 
-msgid "select_an_address"
-msgstr "Please select an address"
+#: templates/admin/modal/remove_manager_confirm.html:10
+msgid "Confirm"
+msgstr ""
 
+#: templates/offer/score_sheet_address_tab.html:102
+msgid "Country"
+msgstr ""
 
+#: templates/offer/score_sheet_address_tab.html:60
+msgid "Customized"
+msgstr ""
 
+#: templates/scores_responsible.html:155
+msgid "Datatable sort ascending"
+msgstr ""
 
+#: templates/scores_responsible.html:156
+msgid "Datatable sort descending"
+msgstr ""
+
+#: templates/online_encoding.html:201 templates/online_encoding.html:203
+#: templates/online_encoding_form.html:145
+#: templates/online_encoding_form.html:147
+#: templates/scores_encoding_by_specific_criteria.html:113
+#: views/upload_xls_utils.py:323
+msgid "Deadline reached"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:104
+#: templates/online_encoding_form.html:103
+msgid ""
+"Decimal values in scores are NOT accepted. If you try to put decimal values, "
+"it will be ignored."
+msgstr ""
+
+#: templates/online_double_encoding_form.html:102
+#: templates/online_encoding_form.html:101
+msgid "Decimal values in scores are accepted."
+msgstr ""
+
+#: templates/online_encoding.html:154 templates/online_encoding.html:298
+msgid "Definitive submission (Submit to faculty)"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:56
+#: templates/online_double_encoding_validation.html:56
+#: templates/online_encoding.html:56 templates/online_encoding_form.html:55
+#: templates/scores_responsible.html:109
+msgid "Display all tutors for this learning unit"
+msgstr ""
+
+#: templates/scores_encoding_by_learning_unit.html:245
+#: templates/scores_encoding_by_learning_unit.html:332
+msgid "Display scores for this learning unit"
+msgstr ""
+
+#: templates/online_encoding.html:127
+msgid "Double encode scores"
+msgstr ""
+
+#: templates/online_double_encoding_validation.html:108
+#: templates/online_encoding.html:128
+msgid "Double encoding"
+msgstr ""
+
+#: templates/online_encoding.html:142 templates/scores_encoding.html:227
+#: templates/scores_encoding_by_learning_unit.html:284
+msgid "Download the Excel file"
+msgstr ""
+
+#: templates/admin/modal/add_manager.html:51
+#: templates/offer/score_sheet_address_tab.html:117
+msgid "Email"
+msgstr ""
+
+#: templates/online_encoding.html:119 templates/scores_encoding.html:136
+#: templates/scores_encoding_by_learning_unit.html:213
+msgid "Encode"
+msgstr ""
+
+#: templates/online_encoding.html:118 templates/scores_encoding.html:134
+#: templates/scores_encoding_by_learning_unit.html:212
+msgid "Encode scores"
+msgstr ""
+
+#: templates/online_double_encoding_validation.html:107
+msgid "Encoding"
+msgstr ""
+
+#: views/score_sheet.py:111
+msgid "Enter a valid email address."
+msgstr ""
+
+#: templates/admin/pgm_manager.html:45 templates/admin/pgm_manager.html:118
+#: templates/scores_responsible.html:86
+msgid "Entity"
+msgstr ""
+
+#: templates/assessments.html:31 templates/assessments.html:35
+#: templates/online_double_encoding_form.html:33
+#: templates/online_double_encoding_validation.html:32
+#: templates/online_encoding.html:33 templates/online_encoding_form.html:33
+#: templates/outside_scores_encodings_period.html:30
+#: templates/scores_encoding.html:31
+#: templates/scores_encoding_mgr_layout.html:30
+msgid "Evaluations"
+msgstr ""
+
+#: templates/offer/score_sheet_address_tab.html:113
+msgid "Fax"
+msgstr ""
+
+#: templates/online_double_encoding_validation.html:109
+msgid "Final"
+msgstr ""
+
+#: templates/admin/modal/add_manager.html:49
+#: templates/online_double_encoding_form.html:121
+#: templates/online_double_encoding_validation.html:115
+#: templates/online_encoding.html:179 templates/online_encoding_form.html:123
+#: templates/scores_encoding_by_specific_criteria.html:56
+#: templates/scores_encoding_by_specific_criteria.html:57
+#: templates/scores_encoding_by_specific_criteria.html:101
+msgid "Firstname"
+msgstr ""
+
+#: templates/online_encoding.html:142 templates/scores_encoding.html:229
+#: templates/scores_encoding_by_learning_unit.html:285
+#: views/upload_xls_utils.py:82
+msgid "Get Excel file"
+msgstr ""
+
+#: templates/offer/score_sheet_address_tab.html:51
+#, python-format
+msgid ""
+"If you customize one of the field below, it only change the address "
+"displayed on the score encodings sheets for the program %%(program)s. It "
+"will never change the address of any structure. The list below will help you "
+"to pre-fill in the form."
+msgstr ""
+
+#: templates/scores_encoding_by_learning_unit.html:97
+msgid "Incomplete"
+msgstr ""
+
+#: templates/online_encoding.html:273
+msgid "Inject"
+msgstr ""
+
+#: templates/online_encoding.html:150
+msgid "Inject XLS file"
+msgstr ""
+
+#: templates/admin/pgm_manager.html:30 templates/scores_responsible.html:30
+#: templates/scores_responsible_edit.html:29
+msgid "Institution"
+msgstr ""
+
+#: tests/views/test_upload_xls_utils.py:192 views/upload_xls_utils.py:370
+msgid "Invalid justification value"
+msgstr ""
+
+#: business/score_encoding_export.py:164
+#: templates/online_double_encoding_form.html:123
+#: templates/online_double_encoding_validation.html:117
+#: templates/online_double_encoding_validation.html:119
+#: templates/online_double_encoding_validation.html:121
+#: templates/online_encoding.html:181 templates/online_encoding_form.html:125
+#: templates/scores_encoding_by_specific_criteria.html:103
+msgid "Justification"
+msgstr ""
+
+#: business/score_encoding_sheet.py:111
+#, python-format
+msgid "Justification legend: %(justification_label_authorized)s"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:171
+#: templates/online_double_encoding_validation.html:280
+#: templates/online_encoding_form.html:204
+#: templates/scores_encoding_by_specific_criteria.html:64
+#: templates/scores_encoding_by_specific_criteria.html:149
+msgid "Justified absence"
+msgstr ""
+
+#: templates/scores_encoding_by_learning_unit.html:54
+msgid "Last synchronization"
+msgstr ""
+
+#: templates/admin/modal/add_manager.html:48
+#: templates/online_double_encoding_form.html:120
+#: templates/online_double_encoding_validation.html:114
+#: templates/online_encoding.html:178 templates/online_encoding_form.html:122
+#: templates/scores_encoding_by_specific_criteria.html:52
+#: templates/scores_encoding_by_specific_criteria.html:53
+#: templates/scores_encoding_by_specific_criteria.html:100
+msgid "Lastname"
+msgstr ""
+
+#: templates/scores_encoding.html:102 templates/scores_encoding.html:154
+#: templates/scores_encoding.html:197
+#: templates/scores_encoding_by_learning_unit.html:85
+#: templates/scores_encoding_by_learning_unit.html:152
+#: templates/scores_encoding_by_learning_unit.html:227
+#: templates/scores_encoding_by_learning_unit.html:314
+#: templates/scores_encoding_by_specific_criteria.html:98
+msgid "Learning unit"
+msgstr ""
+
+#: templates/scores_responsible.html:59 templates/scores_responsible.html:88
+msgid "Learning unit title"
+msgstr ""
+
+#: views/upload_xls_utils.py:385
+msgid "Line"
+msgstr ""
+
+#: templates/offer/score_sheet_address_tab.html:84
+msgid "Location"
+msgstr ""
+
+#: business/score_encoding_export.py:180
+msgid "M=Justified Absence"
+msgstr ""
+
+#: templates/admin/pgm_manager.html:143
+msgid "Manager"
+msgstr ""
+
+#: templates/admin/pgm_manager.html:73
+msgid "Managers"
+msgstr ""
+
+#: templates/admin/modal/add_manager.html:50
+msgid "Middlename"
+msgstr ""
+
+#: templates/scores_encoding_by_specific_criteria.html:66
+msgid "Missing score"
+msgstr ""
+
+#: templates/offer/score_sheet_address_tab.html:54
+msgid ""
+"NOTE : the 'Email' field is optional. You can fill in this field if you want "
+"it to appear on the score sheet."
+msgstr ""
+
+#: templates/offer/score_sheet_address_tab.html:70
+msgid "No address found for the selected entity."
+msgstr ""
+
+#: views/upload_xls_utils.py:163
+msgid "No data for this academic year"
+msgstr ""
+
+#: views/score_encoding.py:349
+msgid "No double score encoded ; nothing to compare."
+msgstr ""
+
+#: templates/admin/pgm_manager.html:170
+msgid "No entity associated to your profile"
+msgstr ""
+
+#: views/score_encoding.py:527
+msgid "No new scores encoded. The double encoding needs new scores."
+msgstr ""
+
+#: templates/admin/modal/add_manager.html:42
+#: templates/admin/modal/add_manager.html:44
+#: templates/admin/pgm_manager.html:105 templates/scores_responsible.html:80
+#: views/score_encoding.py:163 views/score_encoding.py:599
+msgid "No result!"
+msgstr ""
+
+#: tests/views/test_upload_xls_utils.py:183
+msgid "No score injected"
+msgstr ""
+
+#: views/upload_xls_utils.py:206
+msgid "No scores injected"
+msgstr ""
+
+#: views/score_encoding.py:404
+msgid "No students to encode by excel"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:67
+#: templates/online_double_encoding_validation.html:67
+#: templates/online_encoding.html:67 templates/online_encoding_form.html:66
+msgid "None"
+msgstr ""
+
+#: business/score_encoding_sheet.py:169
+msgid "Not passed"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:93
+#: templates/online_double_encoding_validation.html:93
+#: templates/online_encoding.html:93 templates/online_encoding_form.html:92
+msgid "Number of enrollments"
+msgstr ""
+
+#: business/score_encoding_export.py:173
+msgid "Numbered scores"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:118
+#: templates/online_double_encoding_validation.html:112
+#: templates/online_encoding_form.html:120 templates/scores_encoding.html:64
+#: templates/scores_encoding_by_learning_unit.html:61
+#: templates/scores_encoding_by_specific_criteria.html:70
+#: templates/scores_encoding_by_specific_criteria.html:97
+msgid "Offer"
+msgstr ""
+
+#: templates/scores_encoding.html:91
+#: templates/scores_encoding_by_learning_unit.html:133
+msgid "Online"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:36
+#: templates/online_double_encoding_form.html:40
+#: templates/online_double_encoding_validation.html:35
+#: templates/online_double_encoding_validation.html:40
+msgid "Online double scores encoding"
+msgstr ""
+
+#: templates/online_encoding.html:35 templates/online_encoding_form.html:35
+#: templates/online_encoding_form.html:39
+msgid "Online encoding"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:35
+#: templates/online_double_encoding_validation.html:34
+msgid "Online scores encoding"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:70
+#: templates/online_double_encoding_validation.html:70
+#: templates/online_encoding.html:70 templates/online_encoding_form.html:69
+msgid "Other tutors"
+msgstr ""
+
+#: business/score_encoding_export.py:170
+#, python-format
+msgid "Other values: %(justification_other_values)s "
+msgstr ""
+
+#: templates/admin/modal/add_manager.html:10
+msgid "Person search"
+msgstr ""
+
+#: templates/offer/score_sheet_address_tab.html:109
+msgid "Phone"
+msgstr ""
+
+#: views/score_encoding.py:582
+msgid "Please choose at least one criteria!"
+msgstr ""
+
+#: templates/admin/modal/add_manager.html:21
+msgid "Please enter a lastname, and optionnally a firstname"
+msgstr ""
+
+#: templates/online_encoding.html:269
+msgid "Please select an XLS file for injection"
+msgstr ""
+
+#: templates/offer/score_sheet_address_tab.html:58
+msgid "Please select an address"
+msgstr ""
+
+#: templates/offer/score_sheet_address_tab.html:92
+msgid "Postal code"
+msgstr ""
+
+#: templates/online_encoding.html:135 templates/scores_encoding.html:185
+#: templates/scores_encoding_by_learning_unit.html:372
+msgid "Print"
+msgstr ""
+
+#: templates/scores_encoding.html:148
+#: templates/scores_encoding_by_learning_unit.html:307
+msgid "Print all courses"
+msgstr ""
+
+#: templates/online_encoding.html:134 templates/scores_encoding.html:184
+#: templates/scores_encoding_by_learning_unit.html:370
+msgid "Print the scores"
+msgstr ""
+
+#: templates/admin/pgm_manager.html:116 templates/online_encoding.html:176
+msgid "Program"
+msgstr ""
+
+#: templates/admin/pgm_manager.html:32 templates/admin/pgm_manager.html:37
+msgid "Program managers"
+msgstr ""
+
+#: templates/admin/pgm_manager.html:60
+msgid "Program type"
+msgstr ""
+
+#: templates/online_encoding.html:99 templates/scores_encoding.html:103
+#: templates/scores_encoding.html:155 templates/scores_encoding.html:198
+#: templates/scores_encoding_by_learning_unit.html:154
+#: templates/scores_encoding_by_learning_unit.html:229
+#: templates/scores_encoding_by_learning_unit.html:316
+msgid "Progress"
+msgstr ""
+
+#: templates/offer/score_sheet_address_tab.html:79
+msgid "Recipient"
+msgstr ""
+
+#: templates/scores_encoding.html:80
+#: templates/scores_encoding_by_learning_unit.html:105
+msgid "Refresh list"
+msgstr ""
+
+#: templates/scores_encoding_by_specific_criteria.html:48
+#: templates/scores_encoding_by_specific_criteria.html:49
+#: templates/scores_encoding_by_specific_criteria.html:99
+msgid "Registration ID"
+msgstr ""
+
+#: tests/views/test_upload_xls_utils.py:262 views/upload_xls_utils.py:298
+msgid "Registration ID does not match email"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:119
+#: templates/online_double_encoding_validation.html:113
+#: templates/online_encoding.html:177 templates/online_encoding_form.html:121
+msgid "Registration number"
+msgstr ""
+
+#: templates/admin/modal/remove_manager_confirm.html:30
+msgid "Remove"
+msgstr ""
+
+#: templates/scores_encoding_by_learning_unit.html:194
+#: templates/scores_encoding_by_learning_unit.html:265
+#: templates/scores_encoding_by_learning_unit.html:352
+#: templates/scores_encoding_by_learning_unit.html:371
+msgid ""
+"Represents the quantity of scores submitted to the administration. The "
+"number surrounded by parenthesis is the number of scores encoded by the "
+"tutor that aren't submitted yet ('draft' state)"
+msgstr ""
+
+#: templates/offer/score_sheet_address_tab.html:47
+msgid ""
+"Reuse the address of an entity linked to the program or inform the posting "
+"address for the papersheet."
+msgstr ""
+
+#: tests/views/test_upload_xls_utils.py:192
+#: tests/views/test_upload_xls_utils.py:202
+#: tests/views/test_upload_xls_utils.py:245
+#: tests/views/test_upload_xls_utils.py:263
+msgid "Row"
+msgstr ""
+
+#: business/score_encoding_export.py:179
+msgid "S=Unjustified Absence"
+msgstr ""
+
+#: templates/offer/score_sheet_address_tab.html:126
+#: templates/online_double_encoding_validation.html:250
+#: templates/online_encoding_form.html:113
+#: templates/online_encoding_form.html:238
+#: templates/scores_encoding_by_specific_criteria.html:92
+#: templates/scores_encoding_by_specific_criteria.html:159
+#: templates/scores_responsible_edit.html:69
+msgid "Save"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:122
+#: templates/online_double_encoding_validation.html:116
+#: templates/online_double_encoding_validation.html:118
+#: templates/online_double_encoding_validation.html:120
+#: templates/online_encoding.html:180 templates/online_encoding_form.html:124
+#: templates/scores_encoding_by_specific_criteria.html:102
+msgid "Score"
+msgstr ""
+
+#: views/upload_xls_utils.py:326
+msgid "Score already submitted"
+msgstr ""
+
+#: business/score_encoding_export.py:174
+#, python-format
+msgid "Score legend: %(score_legend)s (0=Score of presence)"
+msgstr ""
+
+#: tests/views/test_upload_xls_utils.py:214
+#: tests/views/test_upload_xls_utils.py:229
+#: tests/views/test_upload_xls_utils.py:247
+#: tests/views/test_upload_xls_utils.py:274
+#: tests/views/test_upload_xls_utils.py:291 views/upload_xls_utils.py:201
+msgid "Score saved"
+msgstr ""
+
+#: views/score_sheet.py:85 views/score_sheet.py:95
+msgid "Score sheet address was successfully saved."
+msgstr ""
+
+#: templates/online_encoding.html:206 templates/online_encoding_form.html:151
+#: templates/scores_encoding_by_specific_criteria.html:116
+msgid "Score submitted"
+msgstr ""
+
+#: templates/assessments.html:43 templates/online_double_encoding_form.html:34
+#: templates/online_double_encoding_validation.html:33
+#: templates/online_encoding.html:34 templates/online_encoding.html:40
+#: templates/online_encoding_form.html:34
+#: templates/outside_scores_encodings_period.html:31
+#: templates/outside_scores_encodings_period.html:36
+#: templates/scores_encoding.html:32 templates/scores_encoding.html:37
+#: templates/scores_encoding_mgr_layout.html:31
+#: templates/scores_encoding_mgr_layout.html:35
+msgid "Scores encoding"
+msgstr ""
+
+#: templates/online_encoding.html:263
+msgid "Scores injection"
+msgstr ""
+
+#: tests/views/test_upload_xls_utils.py:202
+#: tests/views/test_upload_xls_utils.py:245 views/upload_xls_utils.py:406
+msgid "Scores must be between 0 and 20"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:51
+#: templates/online_double_encoding_validation.html:51
+#: templates/online_encoding.html:51 templates/online_encoding_form.html:50
+#: templates/scores_encoding_by_learning_unit.html:153
+#: templates/scores_encoding_by_learning_unit.html:228
+#: templates/scores_encoding_by_learning_unit.html:315
+#: templates/scores_responsible_edit.html:47
+msgid "Scores responsible"
+msgstr ""
+
+#: templates/scores_responsible.html:69
+msgid "Scores responsible title"
+msgstr ""
+
+#: templates/scores_responsible.html:32 templates/scores_responsible.html:36
+#: templates/scores_responsible_edit.html:31
+msgid "Scores responsibles"
+msgstr ""
+
+#: templates/scores_responsible.html:75
+msgid "Search"
+msgstr ""
+
+#: templates/scores_encoding_by_specific_criteria.html:81
+msgid "Search of annual programs"
+msgstr ""
+
+#: templates/scores_encoding.html:88
+#: templates/scores_encoding_by_learning_unit.html:116
+msgid "Select an encoding type"
+msgstr ""
+
+#: templates/online_encoding.html:149
+msgid "Select an excel file to inject scores."
+msgstr ""
+
+#: templates/admin/pgm_manager.html:115
+msgid "Select/deselect all"
+msgstr ""
+
+#: templates/admin/pgm_manager.html:112
+msgid "Selected"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:87
+#: templates/online_double_encoding_validation.html:87
+#: templates/online_encoding.html:87 templates/online_encoding_form.html:86
+#: templates/scores_encoding.html:56
+#: templates/scores_encoding_by_learning_unit.html:48
+msgid "Session number"
+msgstr ""
+
+#: templates/scores_encoding_by_specific_criteria.html:60
+msgid "State"
+msgstr ""
+
+#: templates/online_encoding.html:175 templates/online_encoding_form.html:119
+#: templates/scores_encoding_by_specific_criteria.html:96
+#: templates/scores_responsible_edit.html:46
+msgid "Status"
+msgstr ""
+
+#: views/upload_xls_utils.py:291
+msgid "Student not registered for exam"
+msgstr ""
+
+#: business/score_encoding_export.py:158
+msgid "Students deliberated are not shown"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:32
+#: templates/scores_encoding_mgr_layout.html:29
+msgid "Studies"
+msgstr ""
+
+#: templates/online_encoding.html:155 templates/online_encoding.html:286
+#: templates/online_encoding.html:298
+msgid "Submission"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:124
+#: templates/online_encoding.html:182 templates/online_encoding_form.html:126
+msgid "Teacher deadline"
+msgstr ""
+
+#: templates/online_encoding_form.html:111
+#: templates/online_encoding_form.html:236
+msgid "Temporary save (not submitted to the faculty yet)"
+msgstr ""
+
+#: business/score_encoding_export.py:152
+#, python-format
+msgid ""
+"The data presented on this document correspond to the state of the system "
+"dated %(printing_date)s and are likely to evolve"
+msgstr ""
+
+#: views/upload_xls_utils.py:317
+#, python-format
+msgid ""
+"The enrollment to the activity %(xls_learning_unit_acronym)s doesn't exist"
+msgstr ""
+
+#: forms/score_file.py:38 tests/views/test_upload_xls_utils.py:174
+#: views/upload_xls_utils.py:144
+msgid "The file must be a valid 'XLSX' excel file"
+msgstr ""
+
+#: templates/admin/modal/remove_manager_confirm.html:25
+msgid "The manager will keep the following programs : "
+msgstr ""
+
+#: tests/views/test_score_encoding.py:378 views/score_encoding.py:83
+#, python-format
+msgid ""
+"The period of scores' encoding %(session_number)s is closed since "
+"%(str_date)s"
+msgstr ""
+
+#: tests/views/test_score_encoding.py:383 views/score_encoding.py:90
+#, python-format
+msgid ""
+"The period of scores' encoding %(session_number)s will be open %(str_date)s"
+msgstr ""
+
+#: tests/views/test_score_encoding.py:351 views/score_encoding.py:94
+msgid "The period of scores' encoding is not opened"
+msgstr ""
+
+#: views/upload_xls_utils.py:359
+msgid "The scores responsible must still submit the scores"
+msgstr ""
+
+#: templates/offer/score_sheet_address_tab.html:74
+msgid "The selected entity no longer exists today (end date passed)."
+msgstr ""
+
+#: templates/assessments.html:44
+msgid "This process helps tutor while encoding notes for the exams sessions."
+msgstr ""
+
+#: templates/scores_encoding.html:45
+#: templates/scores_encoding_by_learning_unit.html:71
+#: templates/scores_responsible.html:64 templates/scores_responsible.html:89
+#: templates/scores_responsible_edit.html:45
+msgid "Tutor"
+msgstr ""
+
+#: templates/scores_responsible_edit.html:36
+msgid "Tutors of the course"
+msgstr ""
+
+#: templates/admin/pgm_manager.html:117
+msgid "Type"
+msgstr ""
+
+#: templates/online_double_encoding_form.html:170
+#: templates/online_double_encoding_validation.html:274
+#: templates/online_encoding_form.html:198
+#: templates/scores_encoding_by_specific_criteria.html:63
+#: templates/scores_encoding_by_specific_criteria.html:148
+msgid "Unjustified absence"
+msgstr ""
+
+#: templates/admin/modal/add_manager.html:52
+msgid "Username"
+msgstr ""
+
+#: templates/scores_encoding.html:93
+#: templates/scores_encoding_by_learning_unit.html:137
+msgid "Via excel"
+msgstr ""
+
+#: templates/scores_encoding.html:92
+#: templates/scores_encoding_by_learning_unit.html:141
+msgid "Via paper"
+msgstr ""
+
+#: templates/online_encoding.html:166
+msgid "Warning : some registered scores have not been submitted yet!"
+msgstr ""
+
+#: templates/scores_encoding_by_learning_unit.html:74
+#: templates/scores_responsible.html:123
+msgid "Without attribution"
+msgstr ""
+
+#: views/upload_xls_utils.py:329
+msgid "You can't encode a 'score' and a 'justification' together"
+msgstr ""
+
+#: views/upload_xls_utils.py:275
+msgid ""
+"You don't have access rights for this learning unit or it doesn't exist in "
+"our database"
+msgstr ""
+
+#: views/upload_xls_utils.py:287
+msgid ""
+"You don't have access rights for this offer or it doesn't exist in our "
+"database"
+msgstr ""
+
+#: views/upload_xls_utils.py:281
+msgid ""
+"You encoded scores for more than 1 learning unit in your excel file (column "
+"'Learning unit').Please make one excel file by learning unit."
+msgstr ""
+
+#: forms/score_file.py:31 tests/views/test_upload_xls_utils.py:165
+msgid "You have to select a file to upload."
+msgstr ""
+
+#: templates/scores_encoding.html:242
+#: templates/scores_encoding_by_learning_unit.html:387
+msgid "You haven't any score to encode."
+msgstr ""
+
+#: views/upload_xls_utils.py:80
+#, python-format
+msgid ""
+"Your excel file isn't well structured. Please follow the structure of the "
+"excel file provided (button '%(button_value)s')"
+msgstr ""
+
+#: business/score_encoding_export.py:147 business/score_encoding_export.py:184
+#: business/score_encoding_sheet.py:103 tests/views/test_score_encoding.py:354
+#: views/score_encoding.py:75
+msgid "date_format"
+msgstr ""
+
+#: views/pgm_manager_administration.py:228
+msgid "is already program manager for"
+msgstr ""
+
+#: templates/scores_encoding_by_learning_unit.html:121
+msgid "learning units in"
+msgstr ""
+
+#: templates/admin/pgm_manager.html:112
+msgid "of"
+msgstr ""
+
+#: templates/scores_encoding_by_learning_unit.html:123
+msgid "program(s)"
+msgstr ""
+
+#: views/score_encoding.py:324
+msgid "score(s) saved"
+msgstr ""

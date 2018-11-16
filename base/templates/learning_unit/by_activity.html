@@ -27,119 +27,117 @@
 {% endcomment %}
 
 {% block content %}
-<div class="panel panel-default">
+    <div class="panel panel-default">
 
-    {% include "learning_unit/blocks/form/search_form_learning_unit.html" %}
+        {% include "learning_unit/blocks/form/search_form_learning_unit.html" %}
 
-    <div style="margin-top:10px;">
+        <div style="margin-top:10px;">
 
-        {% if learning_units %}
-            <strong style="margin-left:10px;color:grey;">
-                {{learning_units|length}}
-                {% trans 'learning_units'|lower %}
-            </strong>
+            {% if learning_units %}
+                <strong style="margin-left:10px;color:grey;">
+                    {{ learning_units|length }} {% trans 'learning units' %}
+                </strong>
 
-            <div class="dropdown {{ dropdirection }} text-right">
-                <button id="dLabel" class="btn btn-default" type="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                        style="margin-right:10px;"
-                        title="{% trans 'Export' %}">
-                    <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
-                    <span class="caret"></span>
-                </button>
-                <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
-                    <li>
-                        <a id="btn_produce_xls"
-                                style="margin-right:10px;" title="{% trans 'produce_xls_lus_desc' %}" >
-                            &nbsp;{% trans 'produce_xls_lus' %}
-                        </a>
-                    </li>
-                    <li>
-                        <a id="btn_produce_xls_attributions"
-                                style="margin-right:10px;" title="{% trans 'produce_xls_attributions_desc' %}" >
-                            &nbsp;{% trans 'produce_xls_attributions' %}
-                        </a>
-                    </li>
-                    <li>
-                        <a id="btn_produce_xls_with_parameters"
-                           style="margin-right:10px;"
-                           title="{% trans 'Produce a customizable xls of learning units' %}"
-                           href="#"
-                           data-toggle="modal" data-target="#modalXlsLuyWithParameters">
-                            &nbsp;{% trans 'Configurable list of learning units' %}
-                        </a>
-                    </li>
-                    <li>
-                        <a id="btn_produce_xls_comparison"
-                           style="margin-right:10px;" title="Produce xls of comparison"
-                           href="#"
-                           data-toggle="modal" data-target="#modalComparisonLuy">
-                            &nbsp;{% trans 'List of learning_units with comparison' %}
-                        </a>
-                    </li>
-                </ul>
-            </div>
-            <form id="download_xls" action="{{ request.path }}" method="post">
-                {% csrf_token %}
-                <input type="hidden" id="xls_status" name="xls_status">
-                <input type="hidden" id="comparison_year" name="comparison_year">
-                <input type="hidden" id="hdn_with_grp" name="with_grp">
-                <input type="hidden" id="hdn_with_attributions" name="with_attributions">
-            </form>
+                <div class="dropdown {{ dropdirection }} text-right">
+                    <button id="dLabel" class="btn btn-default" type="button"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                            style="margin-right:10px;"
+                            title="{% trans 'Export' %}">
+                        <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
+                        <li>
+                            <a id="btn_produce_xls"
+                               style="margin-right:10px;"
+                               title="{% trans 'Produce xls with a list of learning units' %}">
+                                &nbsp;{% trans 'The learning units' %}
+                            </a>
+                        </li>
+                        <li>
+                            <a id="btn_produce_xls_attributions"
+                               style="margin-right:10px;"
+                               title="{% trans 'Produce xls with a list of learning units and attributions' %}">
+                                &nbsp;{% trans 'The learning units and attributions' %}
+                            </a>
+                        </li>
+                        <li>
+                            <a id="btn_produce_xls_with_parameters"
+                               style="margin-right:10px;"
+                               title="{% trans 'Produce a customizable xls of learning units' %}"
+                               href="#"
+                               data-toggle="modal" data-target="#modalXlsLuyWithParameters">
+                                &nbsp;{% trans 'Configurable list of learning units' %}
+                            </a>
+                        </li>
+                        <li>
+                            <a id="btn_produce_xls_comparison"
+                               style="margin-right:10px;" title="Produce xls of comparison"
+                               href="#"
+                               data-toggle="modal" data-target="#modalComparisonLuy">
+                                &nbsp;{% trans 'List of learning_units with comparison' %}
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <form id="download_xls" action="{{ request.path }}" method="post">
+                    {% csrf_token %}
+                    <input type="hidden" id="xls_status" name="xls_status">
+                    <input type="hidden" id="comparison_year" name="comparison_year">
+                    <input type="hidden" id="hdn_with_grp" name="with_grp">
+                    <input type="hidden" id="hdn_with_attributions" name="with_attributions">
+                </form>
 
-            <table id="table_learning_units" class="table table-striped table-hover">
-            <thead>
-                <tr>
-                    <th>{% trans 'academic_year_small'%}</th>
-                    <th>{% trans 'code'%}</th>
-                    <th  id="lu_title_sort">{% trans 'title'%}</th>
-                    <th>{% trans 'type'%}</th>
-                    <th>{% trans 'subtype'%}</th>
-                    <th>{% trans 'requirement_entity_small'%}</th>
-                    <th>{% trans 'allocation_entity_small'%}</th>
-                    <th>{% trans 'credits'%}</th>
-                    <th>{% trans 'status'|title%}</th>
-                </tr>
-            </thead>
-                {% for learning_unit in learning_units %}
-                <tr data-id="{{learning_unit.id}}" data-value="{{learning_unit.acronym}}">
-                    <td>{{learning_unit.academic_year.name}}</td>
-                    <td>
-                        <a href="{% url 'learning_unit' learning_unit.id %}"
-                           id="lnk_learning_unit_{{learning_unit.id}}">{{ learning_unit.acronym }}</a>
-                    </td>
-                    <td>{{ learning_unit.complete_title|default_if_none:'' }}</td>
-                    <td>
-                        {% with learning_unit.learning_container_year.container_type|default_if_none:'-' as type %}
-                            {% trans type %}
-                        {% endwith %}
-                    </td>
-                    <td>
-                        {% with learning_unit.subtype|default_if_none:'-' as subtype %}
-                        {% trans subtype %}
-                        {% endwith %}
-                    </td>
-                    <td>{{learning_unit.entities.REQUIREMENT_ENTITY.acronym|default_if_none:'-'}}</td>
-                    <td>{{learning_unit.entities.ALLOCATION_ENTITY.acronym|default_if_none:'-'}}</td>
-                    <td>{% if learning_unit.credits %}{{ learning_unit.credits }}{% endif %}</td>
-                    <td>
-                        {% if learning_unit.status %}
-                            <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:green;"
-                                  title="{% trans  'active' %}"></span>
-                            <div style="display:none;">1</div>
-                        {% else %}
-                            <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:gray;"
-                                  title="{% trans  'inactive' %}"></span>
-                            <div style="display:none;">0</div>
-                        {% endif %}
-                        {% if learning_unit.has_proposal %}
-                            <i class="fa fa-flag warning" data-toggle="tooltip" data-placement="right" title="{% trans 'in_proposal' %}"></i>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-        {% endif %}
+                <table id="table_learning_units" class="table table-striped table-hover">
+                    <thead>
+                    <tr>
+                        <th>{% trans 'Ac yr.' %}</th>
+                        <th>{% trans 'Code' %}</th>
+                        <th id="lu_title_sort">{% trans 'Title' %}</th>
+                        <th>{% trans 'Type' %}</th>
+                        <th>{% trans 'Subtype' %}</th>
+                        <th>{% trans 'Req. Entity' %}</th>
+                        <th>{% trans 'Alloc. Ent.' %}</th>
+                        <th>{% trans 'Credits' %}</th>
+                        <th>{% trans 'Status' %}</th>
+                    </tr>
+                    </thead>
+                    {% for learning_unit in learning_units %}
+                        <tr data-id="{{ learning_unit.id }}" data-value="{{ learning_unit.acronym }}">
+                            <td>{{ learning_unit.academic_year.name }}</td>
+                            <td>
+                                <a href="{% url 'learning_unit' learning_unit.id %}"
+                                   id="lnk_learning_unit_{{ learning_unit.id }}">{{ learning_unit.acronym }}</a>
+                            </td>
+                            <td>{{ learning_unit.complete_title|default_if_none:'' }}</td>
+                            <td>
+                                {{ learning_unit.learning_container_year.get_container_type_display|default_if_none:'-' }}
+                            </td>
+                            <td>
+                                {{ learning_unit.get_subtype_display |default_if_none:'-' }}
+                            </td>
+                            <td>{{ learning_unit.entities.REQUIREMENT_ENTITY.acronym|default_if_none:'-' }}</td>
+                            <td>{{ learning_unit.entities.ALLOCATION_ENTITY.acronym|default_if_none:'-' }}</td>
+                            <td>{% if learning_unit.credits %}{{ learning_unit.credits }}{% endif %}</td>
+                            <td>
+                                {% if learning_unit.status %}
+                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:green;"
+                                          title="{% trans 'Active' %}"></span>
+                                    <div style="display:none;">1</div>
+                                {% else %}
+                                    <span class="glyphicon glyphicon-ok-circle" aria-hidden="true" style="color:gray;"
+                                          title="{% trans 'Inactive' %}"></span>
+                                    <div style="display:none;">0</div>
+                                {% endif %}
+                                {% if learning_unit.has_proposal %}
+                                    <i class="fa fa-flag warning" data-toggle="tooltip" data-placement="right"
+                                       title="{% trans 'In proposal' %}"></i>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% endif %}
+        </div>
     </div>
-</div>
 {% endblock %}

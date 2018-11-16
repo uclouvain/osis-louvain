@@ -89,8 +89,9 @@ class EducationGroupYearTest(TestCase):
                                                             child_branch=self.education_group_year_1)
 
     def test_verbose_credit(self):
-        verbose__waiting = _("%(title)s (%(credits)s credits)") % {"title": self.education_group_year_1.title,
-                                                                   "credits": self.education_group_year_1.credits}
+        verbose__waiting = "{} ({} {})".format(
+            self.education_group_year_1.title, self.education_group_year_1.credits, _("credits")
+        )
         self.assertEqual(self.education_group_year_1.verbose_credit, verbose__waiting)
 
     def test_find_by_id(self):

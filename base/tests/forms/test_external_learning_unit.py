@@ -242,4 +242,4 @@ class TestExternalLearningUnitSearchForm(TestCase):
     def test_has_no_criteria(self):
         form = ExternalLearningUnitYearForm({})
         self.assertFalse(form.is_valid())
-        self.assertIn(_("minimum_one_criteria"), form.errors['__all__'])
+        self.assertIn(_("Please choose at least one criteria!"), form.errors['__all__'])

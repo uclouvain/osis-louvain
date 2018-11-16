@@ -27,8 +27,8 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-    <li><a href="{% url 'my_osis' %}" id="lnk_my_osis">{% trans 'my_osis' %}</a></li>
-    <li class="active">{% trans 'profile' %}</li>
+    <li><a href="{% url 'my_osis' %}" id="lnk_my_osis">{% trans 'My OSIS' %}</a></li>
+    <li class="active">{% trans 'Profile' %}</li>
 {% endblock %}
 {% block content %}
 
@@ -40,20 +40,20 @@
             {% if not tab_attribution_on %}
                 class="active"
             {% endif %}>
-            <a href="#identification" aria-controls="identification" role="tab" data-toggle="tab">{% trans 'identification' %}</a>
+            <a href="#identification" aria-controls="identification" role="tab" data-toggle="tab">{% trans 'Identification' %}</a>
         </li>
         {% if attributions and tutor %}
             <li role="presentation"
                 {% if tab_attribution_on %}
                     class="active"
                 {% endif %}>
-                <a href="#attributions" aria-controls="attributions" role="tab" data-toggle="tab">{% trans 'attributions' %}</a>
+                <a href="#attributions" aria-controls="attributions" role="tab" data-toggle="tab">{% trans 'Attributions' %}</a>
             </li>
         {% endif %}
         {% if programs_managers %}
-            <li role="presentation"><a href="#program" aria-controls="program" role="tab" data-toggle="tab">{% trans 'programs' %}</a></li>
+            <li role="presentation"><a href="#program" aria-controls="program" role="tab" data-toggle="tab">{% trans 'Programs' %}</a></li>
         {% endif %}
-        <li role="presentation"><a href="#preferences" aria-controls="preferences" role="tab" data-toggle="tab">{% trans 'preferences' %}</a></li>
+        <li role="presentation"><a href="#preferences" aria-controls="preferences" role="tab" data-toggle="tab">{% trans 'Preferences' %}</a></li>
     </ul>
 
     <div class="tab-content">
@@ -65,22 +65,22 @@
             <br>
             <div class="row">
                 <div class="col-md-2">
-                    <label>{% trans 'fgs' %}</label><br>
+                    <label>{% trans 'FGS' %}</label><br>
                     {{ person.global_id }}
                 </div>
                 <div class="col-md-3">
-                    <label>{% trans 'firstname' %}</label><br>
+                    <label>{% trans 'Firstname' %}</label><br>
                     {{ person.first_name }}
                     {% if person.middle_name %}
                         {{ person.middle_name }}
                     {% endif %}
                 </div>
                 <div class="col-md-3">
-                    <label>{% trans 'lastname' %}</label><br>
+                    <label>{% trans 'Lastname' %}</label><br>
                     {{ person.last_name }}
                 </div>
                 <div class="col-md-1">
-                    <label>{% trans 'gender' %}</label><br>
+                    <label>{% trans 'Gender' %}</label><br>
                     {{ person.gender }}
                 </div>
             </div>
@@ -91,21 +91,21 @@
                     {{ person.email | default_if_none:'-' }}
                 </div>
                 <div class="col-md-3">
-                    <label>{% trans 'fixed_line_phone' %}</label><br>
+                    <label>{% trans 'Fixed-line phone' %}</label><br>
                     {{ person.phone | default_if_none:'-' }}
                 </div>
                 <div class="col-md-2">
-                    <label>{% trans 'mobile_phone' %}</label><br>
+                    <label>{% trans 'Mobile phone' %}</label><br>
                     {{ person.phone_mobile | default_if_none:'-' }}
                 </div>
                 <div class="col-md-2">
-                    <label>{% trans 'language' %}</label><br>
+                    <label>{% trans 'Language' %}</label><br>
                     {{ person.language | default_if_none:'-' }}
                 </div>
             </div>
             {% if addresses %}
                 <br>
-                <label>{% trans 'addresses' %}</label>
+                <label>{% trans 'Addresses' %}</label>
                 <div class="list-group">
                     {% for address in addresses %}
                         <a href="#" class="list-group-item">
@@ -128,7 +128,7 @@
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th>{% trans 'learning_unit' %}</th>
+                            <th>{% trans 'Learning unit' %}</th>
                         </tr>
                     </thead>
                     {% for attribution in attributions %}
@@ -153,7 +153,7 @@
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th>{% trans 'managed_programs' %}</th>
+                            <th>{% trans 'Managed programs' %}</th>
                         </tr>
                     </thead>
                     {% for program_manager in programs_managers %}
@@ -170,7 +170,7 @@
             <br>
             <form method="post" action="{% url 'profile_lang' %}">
                 {% csrf_token %}
-                <label for="slt_ui_language">{% trans 'user_interface_language' %}</label>
+                <label for="slt_ui_language">{% trans 'User interface language' %}</label>
                 <select class="form-control" id="slt_ui_language"  name="ui_language"
                         onchange="">
                     {% for lang in supported_languages %}

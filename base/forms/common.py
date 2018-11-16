@@ -77,7 +77,7 @@ class WarningFormMixin:
         return cleaned_data
 
     def add_warning(self, name, field):
-        self.add_error(name, _("This field is empty"))
+        self.add_error(name, _("This field is required."))
         field.widget.attrs['class'] = "has-warning"
 
 

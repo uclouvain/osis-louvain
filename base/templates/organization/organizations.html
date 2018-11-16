@@ -27,13 +27,13 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-    <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
-    <li class="active">{% trans 'organizations' %}</li>
+    <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'Institution' %}</a></li>
+    <li class="active">{% trans 'Organizations' %}</li>
 {% endblock %}
 
 {% block content %}
     <div class="page-header">
-        <h2>{% trans 'organizations' %}</h2>
+        <h2>{% trans 'Organizations' %}</h2>
     </div>
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -45,7 +45,7 @@
                     <div class="col-md-2">
                         <br>
                         <button type="submit" id="bt_submit_organization_search" class="btn btn-primary" role="button"
-                                title="{% trans 'search_for_an_organization' %}">
+                                title="{% trans 'Search for an organization' %}">
                             <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
                         </button>
                     </div>
@@ -58,8 +58,8 @@
                     <thead>
                     <tr>
                         <th></th>
-                        <th>{% trans 'acronym'%}</th>
-                        <th>{% trans 'organization_name'%}</th>
+                        <th>{% trans 'Acronym'%}</th>
+                        <th>{% trans 'Name'%}</th>
                         <th>{% trans 'type'%}</th>
                     </tr>
                     </thead>
@@ -78,7 +78,7 @@
                 </table>
                 {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
             {% else %}
-                <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
+                <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
             {% endif %}
         </div>
     </div>

@@ -23,13 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.utils.translation import ugettext_lazy as _
 
 OR = "OR"
 AND = "AND"
 
 
 PREREQUISITES_OPERATORS = (
-    (OR, OR),
-    (AND, AND),
+    (OR, _("Or")),
+    (AND, _("And")),
 )

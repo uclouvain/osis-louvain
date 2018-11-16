@@ -293,7 +293,8 @@ class LearningUnitPostponementForm:
     def _check_postponement_proposal_state(self, luy, ac_year):
         if is_learning_unit_year_in_proposal(luy):
             self.consistency_errors.setdefault(ac_year, []).append(
-                _("learning_unit_in_proposal_cannot_save") % {
+                _("The learning unit %(luy)s is in proposal, can not"
+                  " save the change from the year %(academic_year)s") % {
                     'luy': luy.acronym, 'academic_year': ac_year
                 }
             )

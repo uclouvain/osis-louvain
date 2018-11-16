@@ -170,7 +170,7 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
         specific_title = self.learning_unit_year_form.cleaned_data["specific_title"]
         if not common_title and not specific_title:
             self.learning_container_year_form.add_error(
-                "common_title", _("must_set_common_title_or_specific_title"))
+                "common_title", _("You must either set the common title or the specific title"))
             return False
         return True
 

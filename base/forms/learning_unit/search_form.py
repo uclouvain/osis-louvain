@@ -61,19 +61,19 @@ MAX_RECORDS = 1000
 
 class LearningUnitSearchForm(BaseSearchForm):
     MAX_RECORDS = 1000
-    ALL_LABEL = (None, _('all_label'))
+    ALL_LABEL = (None, _('All label'))
     ALL_CHOICES = (ALL_LABEL,)
     acronym_regex = re.compile(r'^[a-zA-Z0-9]*$')
 
     academic_year_id = forms.ModelChoiceField(
-        label=_('academic_year_small'),
+        label=_('Ac yr.'),
         queryset=AcademicYear.objects.all(),
-        empty_label=_('all_label'),
+        empty_label=_('All label'),
     )
 
     requirement_entity_acronym = forms.CharField(
         max_length=20,
-        label=_('requirement_entity_small')
+        label=_('Req. Entity')
     )
 
     acronym = forms.CharField(
@@ -84,20 +84,20 @@ class LearningUnitSearchForm(BaseSearchForm):
 
     tutor = forms.CharField(
         max_length=40,
-        label=_('tutor')
+        label=_('Tutor')
     )
 
     summary_responsible = forms.CharField(
         max_length=20,
-        label=_('summary_responsible')
+        label=_('Summary responsible(s)')
     )
 
     allocation_entity_acronym = forms.CharField(
         max_length=20,
-        label=_('allocation_entity_small')
+        label=_('Alloc. Ent.')
     )
 
-    with_entity_subordinated = forms.BooleanField(label=_('with_entity_subordinated_small'))
+    with_entity_subordinated = forms.BooleanField(label=_('With subord. ent.'))
 
     def clean_requirement_entity_acronym(self):
         return convert_to_uppercase(self.cleaned_data.get('requirement_entity_acronym'))
@@ -164,28 +164,28 @@ class LearningUnitYearForm(LearningUnitSearchForm):
     )
 
     subtype = forms.ChoiceField(
-        label=_('subtype'),
+        label=_('Subtype'),
         choices=LearningUnitSearchForm.ALL_CHOICES + learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
     )
 
     status = forms.ChoiceField(
-        label=_('status'),
+        label=_('Status'),
         choices=LearningUnitSearchForm.ALL_CHOICES + active_status.ACTIVE_STATUS_LIST[:-1],
     )
 
     title = forms.CharField(
         max_length=20,
-        label=_('title')
+        label=_('Title')
     )
 
     allocation_entity_acronym = forms.CharField(
         max_length=20,
-        label=_('allocation_entity_small')
+        label=_('Alloc. Ent.')
     )
 
     faculty_borrowing_acronym = forms.CharField(
         max_length=20,
-        label=_("faculty_borrowing")
+        label=_("Faculty borrowing")
     )
 
     def __init__(self, *args, **kwargs):
@@ -343,9 +343,9 @@ def __is_borrowed_learning_unit(luy, map_entity_faculty, map_luy_entity, map_luy
 class ExternalLearningUnitYearForm(LearningUnitYearForm):
     country = forms.ModelChoiceField(queryset=Country.objects.filter(organizationaddress__isnull=False)
                                      .distinct().order_by('name'),
-                                     required=False, label=_("country"))
-    campus = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("institution"))
-    city = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("city"))
+                                     required=False, label=_("Country"))
+    campus = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("Institution"))
+    city = DynamicChoiceField(choices=BLANK_CHOICE_DASH, required=False, label=_("City"))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -401,7 +401,7 @@ class ExternalLearningUnitYearForm(LearningUnitYearForm):
 
     def clean(self):
         if not self._has_criteria():
-            self.add_error(None, _('minimum_one_criteria'))
+            self.add_error(None, _('Please choose at least one criteria!'))
 
 
 def _get_value(data_cleaned):

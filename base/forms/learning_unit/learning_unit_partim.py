@@ -78,7 +78,7 @@ class LearningUnitPartimModelForm(LearningUnitModelForm):
     def __init__(self, *args, start_year, max_end_year, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['end_year'] = YearChoiceField(start_year=start_year, end_year=max_end_year, required=False,
-                                                  label=_('end_year_title'))
+                                                  label=_('End year'))
 
     class Meta(LearningUnitModelForm.Meta):
         fields = ('faculty_remark', 'other_remark', 'end_year')

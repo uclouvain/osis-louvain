@@ -31,8 +31,8 @@ INTERNAL_TEAM = "INTERNAL_TEAM"
 EXTERNAL = "EXTERNAL"
 
 ATTRIBUTION_PROCEDURES = (
-    (INTERNAL_TEAM, _(INTERNAL_TEAM)),
-    (EXTERNAL, _(EXTERNAL)))
+    (INTERNAL_TEAM, _("Internal team")),
+    (EXTERNAL, _("External")))
 
 
 class AttributionProcedures(ChoiceEnum):

@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import ugettext_lazy as _
+
 SECTOR = 'SECTOR'
 FACULTY = 'FACULTY'
 INSTITUTE = 'INSTITUTE'
@@ -34,13 +36,15 @@ RESEARCH_CENTER = 'RESEARCH_CENTER'
 TECHNOLOGIC_PLATFORM = 'TECHNOLOGIC_PLATFORM'
 UNDEFINED = 'UNDEFINED'
 
-TYPES = ((SECTOR, SECTOR),
-         (FACULTY, FACULTY),
-         (INSTITUTE, INSTITUTE),
-         (POLE, POLE),
-         (DOCTORAL_COMMISSION, DOCTORAL_COMMISSION),
-         (PROGRAM_COMMISSION, PROGRAM_COMMISSION),
-         (LOGISTIC, LOGISTIC),
-         (RESEARCH_CENTER, RESEARCH_CENTER),
-         (TECHNOLOGIC_PLATFORM, TECHNOLOGIC_PLATFORM),
-         (UNDEFINED, UNDEFINED))
+TYPES = (
+    (SECTOR, _("Sector")),
+    (FACULTY, _("Faculty")),
+    (INSTITUTE, _("Institute")),
+    (POLE, _("Pole")),
+    (DOCTORAL_COMMISSION, _("Doctoral commission")),
+    (PROGRAM_COMMISSION, _("Program commission")),
+    (LOGISTIC, _("Logistic")),
+    (RESEARCH_CENTER, _("Research center")),
+    (TECHNOLOGIC_PLATFORM, _("Technologic platform")),
+    (UNDEFINED, _("Undefined"))
+)

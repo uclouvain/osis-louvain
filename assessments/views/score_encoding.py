@@ -79,15 +79,19 @@ def outside_period(request):
     if latest_session_exam:
         session_number = latest_session_exam.number_session
         str_date = latest_session_exam.academic_calendar.end_date.strftime(date_format)
-        messages.add_message(request, messages.WARNING, _('outside_scores_encodings_period_latest_session') % (session_number,str_date))
+        messages.add_message(request, messages.WARNING,
+                             _("The period of scores' encoding %(session_number)s is closed since %(str_date)s")
+                             % {'session_number': session_number, 'str_date': str_date})
 
     if closest_new_session_exam:
         session_number = closest_new_session_exam.number_session
         str_date = closest_new_session_exam.academic_calendar.start_date.strftime(date_format)
-        messages.add_message(request, messages.WARNING, _('outside_scores_encodings_period_closest_session') % (session_number,str_date))
+        messages.add_message(request, messages.WARNING,
+                             _("The period of scores' encoding %(session_number)s will be open %(str_date)s")
+                             % {'session_number': session_number, 'str_date': str_date})
 
     if not messages.get_messages(request):
-        messages.add_message(request, messages.WARNING, _('score_encoding_period_not_open'))
+        messages.add_message(request, messages.WARNING, _("The period of scores' encoding is not opened"))
     return layout.render(request, "outside_scores_encodings_period.html", {})
 
 
@@ -120,8 +124,9 @@ def scores_encoding(request):
         # Manage filter
         learning_unit_year_ids = None
         if learning_unit_year_acronym:
-            learning_unit_year_acronym = learning_unit_year_acronym.strip() if isinstance(learning_unit_year_acronym, str)\
-                                         else learning_unit_year_acronym
+            learning_unit_year_acronym = learning_unit_year_acronym.strip() \
+                if isinstance(learning_unit_year_acronym, str)\
+                else learning_unit_year_acronym
             learning_unit_year_ids = list(mdl.learning_unit_year.search(academic_year_id=academic_yr.id,
                                                                         acronym=learning_unit_year_acronym) \
                                                                 .values_list('id', flat=True))
@@ -155,7 +160,7 @@ def scores_encoding(request):
         all_offers = mdl.offer_year.find_by_user(request.user, academic_yr=academic_yr)
 
         if not score_encoding_progress_list:
-            messages.add_message(request, messages.WARNING, "%s" % _('no_result'))
+            messages.add_message(request, messages.WARNING, _('No result!'))
 
         context.update({'offer_list': all_offers,
                         'tutor_list': all_tutors,
@@ -167,17 +172,20 @@ def scores_encoding(request):
 
     elif mdl.tutor.is_tutor(request.user):
         tutor = mdl.tutor.find_by_user(request.user)
-        score_encoding_progress_list = score_encoding_progress.get_scores_encoding_progress(user=request.user,
-                                                                                            offer_year_id=None,
-                                                                                            number_session=number_session,
-                                                                                            academic_year=academic_yr)
+        score_encoding_progress_list = score_encoding_progress.get_scores_encoding_progress(
+            user=request.user,
+            offer_year_id=None,
+            number_session=number_session,
+            academic_year=academic_yr
+        )
         all_offers = score_encoding_progress.find_related_offer_years(score_encoding_progress_list)
 
         context.update({'tutor': tutor,
                         'offer_year_list': all_offers,
                         'offer_year_id': offer_year_id})
     if score_encoding_progress_list:
-        filtered_list = [score_encoding for score_encoding in score_encoding_progress_list if score_encoding.offer_year_id == offer_year_id]
+        filtered_list = [score_encoding for score_encoding in score_encoding_progress_list
+                         if score_encoding.offer_year_id == offer_year_id]
     else:
         filtered_list = []
     context.update({
@@ -313,7 +321,7 @@ def specific_criteria_submission(request):
         is_program_manager = mdl.program_manager.is_program_manager(request.user)
         bulk_send_messages_to_notify_encoding_progress(request, updated_enrollments, is_program_manager)
         if updated_enrollments:
-            messages.add_message(request, messages.SUCCESS, "%s %s" % (len(updated_enrollments), _('scores_saved')))
+            messages.add_message(request, messages.SUCCESS, "%s %s" % (len(updated_enrollments), _('score(s) saved')))
         return specific_criteria(request)
 
 
@@ -338,7 +346,7 @@ def online_double_encoding_form(request, learning_unit_year_id=None):
             context = _preserve_encoded_values(request, context)
             return online_double_encoding_get_form(request, context, learning_unit_year_id)
         elif not scores_list:
-            messages.add_message(request, messages.WARNING, "%s" % _('no_dubble_score_encoded_comparison_impossible'))
+            messages.add_message(request, messages.WARNING, _("No double score encoded ; nothing to compare."))
             return online_encoding(request, learning_unit_year_id=learning_unit_year_id)
         else:
             context = _get_double_encoding_context(request, learning_unit_year_id)
@@ -393,7 +401,7 @@ def export_xls(request, learning_unit_year_id):
     if scores_list.enrollments:
         return score_encoding_export.export_xls(scores_list.enrollments)
     else:
-        messages.add_message(request, messages.WARNING, _('no_student_to_encode_xls'))
+        messages.add_message(request, messages.WARNING, _("No students to encode by excel"))
         return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))
 
 
@@ -515,14 +523,17 @@ def online_double_encoding_get_form(request, data=None, learning_unit_year_id=No
     if len(data['enrollments']) > 0:
         return layout.render(request, "online_double_encoding_form.html", data)
     else:
-        messages.add_message(request, messages.WARNING, "%s" % _('no_score_encoded_double_encoding_impossible'))
+        messages.add_message(request, messages.WARNING,
+                             _("No new scores encoded. The double encoding needs new scores."))
         return online_encoding(request, learning_unit_year_id=learning_unit_year_id)
 
 
 def _get_common_encoding_context(request, learning_unit_year_id):
     scores_list = score_encoding_list.get_scores_encoding_list(user=request.user,
                                                                learning_unit_year_id=learning_unit_year_id)
-    score_responsibles = mdl_attr.attribution.find_all_responsibles_by_learning_unit_year(scores_list.learning_unit_year)
+    score_responsibles = mdl_attr.attribution.find_all_responsibles_by_learning_unit_year(
+        scores_list.learning_unit_year
+    )
     tutors = mdl.tutor.find_by_learning_unit(scores_list.learning_unit_year) \
                       .exclude(id__in=[score_responsible.id for score_responsible in score_responsibles])
     is_coordinator = mdl_attr.attribution.is_score_responsible(request.user, scores_list.learning_unit_year)
@@ -568,7 +579,7 @@ def _get_specific_criteria_context(request):
     if request.method == 'POST':
         # Make a search
         if not registration_id and not last_name and not first_name and not justification and not offer_year_id:
-            messages.add_message(request, messages.WARNING, "%s" % _('minimum_one_criteria'))
+            messages.add_message(request, messages.WARNING, _("Please choose at least one criteria!"))
         else:
             _append_search_to_specific_criteria_context(request, context)
     return context
@@ -585,7 +596,7 @@ def _append_search_to_specific_criteria_context(request, context):
     )
     context.update(scores_list.__dict__)
     if not scores_list.enrollments:
-        messages.add_message(request, messages.WARNING, _('no_result'))
+        messages.add_message(request, messages.WARNING, _('No result!'))
 
 
 def _get_double_encoding_context(request, learning_unit_year_id):
@@ -630,7 +641,9 @@ def get_json_data_scores_sheets(tutor_global_id):
 
             return {}
     except (PsycopOperationalError, PsycopInterfaceError, DjangoOperationalError, DjangoInterfaceError):
-        queue_exception_logger.error('Postgres Error during get_json_data_scores_sheets on global_id {} => retried'.format(tutor_global_id))
+        queue_exception_logger.error(
+            'Postgres Error during get_json_data_scores_sheets on global_id {} => retried'.format(tutor_global_id)
+        )
         trace = traceback.format_exc()
         queue_exception_logger.error(trace)
         return get_json_data_scores_sheets(tutor_global_id)

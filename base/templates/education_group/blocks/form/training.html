@@ -39,12 +39,12 @@
             <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="{% if not request.GET.tab_to_show %} active {% endif %}">
                     <a href="#description" aria-controls="description" role="tab" data-toggle="tab">
-                        {% trans 'identification' %}
+                        {% trans 'Identification' %}
                     </a>
                 </li>
                 <li role="presentation" class="{% if request.GET.tab_to_show == 'diplomas_certificates' %} active {% endif %}">
                     <a href="#diplomas_certificates" aria-controls="profile" role="tab" data-toggle="tab">
-                        {% trans 'diplomas_certificates' %}
+                        {% trans 'Diplomas /  Certificates' %}
                     </a>
                 </li>
             </ul>

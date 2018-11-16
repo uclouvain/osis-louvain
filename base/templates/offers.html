@@ -27,20 +27,20 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-  <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue'%}</a></li>
-  <li class="active">{% trans 'offers' %}</li>
+  <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue'%}</a></li>
+  <li class="active">{% trans 'Offers' %}</li>
 
 {% endblock %}
 {% block content %}
 <div class="page-header">
-  <h2>{% trans 'offers' %}</h2>
+  <h2>{% trans 'Offers' %}</h2>
 </div>
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
             <form method="get" action="{% url 'offers_search'%}">
                 <div class="col-md-3">
-                    <label for="slt_academic_year">{% trans 'academic_year'%}</label>
+                    <label for="slt_academic_year">{% trans 'Academic year'%}</label>
                     <select class="form-control" id="slt_academic_year" name="academic_year" value="{{ academic_year }}">
                         {% for v in academic_years %}
                             <option {%if v.id == academic_year%} selected {%endif%} value="{{ v.id }}">{{ v }}</option>
@@ -48,36 +48,36 @@
                     </select>
                 </div>
                 <div class="col-md-3">
-                    <label for="txt_entity_acronym">{% trans 'entity' %}</label>
-                    <input class="form-control" id="txt_entity_acronym" placeholder="{% trans 'entity' %}"
+                    <label for="txt_entity_acronym">{% trans 'Entity' %}</label>
+                    <input class="form-control" id="txt_entity_acronym" placeholder="{% trans 'Entity' %}"
                            name="entity_acronym"
                            value="{{ entity_acronym | default_if_none:'' }}" style="text-transform:uppercase" maxlength="15">
                 </div>
                 <div class="col-md-3">
-                    <label for="txt_code">{% trans 'acronym'%}</label>
-                    <input class="form-control" id="txt_code" placeholder="{% trans 'acronym' %}" name="code"
+                    <label for="txt_code">{% trans 'Acronym'%}</label>
+                    <input class="form-control" id="txt_code" placeholder="{% trans 'Acronym' %}" name="code"
                            value="{{ code  | default_if_none:'' }}" style="text-transform:uppercase" maxlength="15">
                 </div>
                 <div class="col-md-3">
                     <br>
                     <button type="submit" id="bt_submit_offer_year_search" class="btn btn-primary" role="button"
-                            title="{% trans 'offer_year_search' %}">
+                            title="{% trans 'Search of annual programs' %}">
                             <span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
                 </div>
             </form>
         </div>
     </div>
     {% if offer_years|length == 0 and init == "0" %}
-        <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
+        <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
     {% endif %}
     {% if offer_years|length > 0%}
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
-                    <th>{% trans 'academic_year'%}</th>
-                    <th>{% trans 'acronym'%}</th>
-                    <th>{% trans 'title'%}</th>
-                    <th>{% trans 'entity'%}</th>
+                    <th>{% trans 'Academic year'%}</th>
+                    <th>{% trans 'Acronym'%}</th>
+                    <th>{% trans 'Title'%}</th>
+                    <th>{% trans 'Entity'%}</th>
                 </tr>
             </thead>
             {% for offer_year in offer_years %}

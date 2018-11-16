@@ -23,11 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
 from django.contrib import admin
+from django.db import models
 from django.utils.translation import ugettext_lazy as _
 
-from attribution.models.enums import function
+from attribution.models.enums.function import Functions
 
 
 class AttributionNewAdmin(admin.ModelAdmin):
@@ -54,7 +54,7 @@ class AttributionNew(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     learning_container_year = models.ForeignKey('base.LearningContainerYear')
     tutor = models.ForeignKey('base.Tutor')
-    function = models.CharField(max_length=35, choices=function.FUNCTIONS, db_index=True, verbose_name=_("Function"))
+    function = models.CharField(max_length=35, choices=Functions.choices(), db_index=True, verbose_name=_("Function"))
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     start_year = models.IntegerField(blank=True, null=True, verbose_name=_("Start"))

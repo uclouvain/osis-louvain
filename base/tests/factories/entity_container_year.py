@@ -28,7 +28,7 @@ import operator
 
 import factory.fuzzy
 
-from base.models.enums import entity_container_year_link_type
+from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 
@@ -42,5 +42,4 @@ class EntityContainerYearFactory(factory.django.DjangoModelFactory):
                                           datetime.datetime(2017, 3, 1))
     entity = factory.SubFactory(EntityFactory)
     learning_container_year = factory.SubFactory(LearningContainerYearFactory)
-    type = factory.Iterator(entity_container_year_link_type.ENTITY_CONTAINER_YEAR_LINK_TYPES,
-                            getter=operator.itemgetter(0))
+    type = factory.Iterator(EntityContainerYearLinkTypes.choices(), getter=operator.itemgetter(0))

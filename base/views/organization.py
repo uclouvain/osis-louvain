@@ -131,7 +131,7 @@ def organization_address_new(request):
     try:
         return organization_address_save(request, None)
     except IntegrityError:
-        messages.error(request, _("organization_address_save_error"))
+        messages.error(request, _("Impossible to save the organization address"))
         return redirect('organizations')
 
 

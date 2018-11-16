@@ -43,33 +43,33 @@
                 <br>
                 <div class="row">
                     <div class="col-md-3">
-                        <label>{% trans 'academic_year'%}</label><br>
+                        <label>{% trans 'Academic year'%}</label><br>
                         {{ offer_year.academic_year }}
                     </div>
                     <div class="col-md-3">
-                        <label>{% trans 'acronym' %}</label><br>
+                        <label>{% trans 'Acronym' %}</label><br>
                         {{ offer_year.acronym }}
                     </div>
                     <div class="col-md-6">
-                        <label>{% trans 'structure' %}</label><br>
+                        <label>{% trans 'Structure' %}</label><br>
                         {{ offer_year.entity_management }}
                     </div>
                 </div>
 
                 <br>
-                <label>{% trans 'international_title'%}</label><br>
+                <label>{% trans 'International title'%}</label><br>
                 {{ offer_year.title_international | default_if_none:'-' }}
 
                 <br>
-                <label>{% trans 'short_title'%}</label><br>
+                <label>{% trans 'Short title'%}</label><br>
                 {{ offer_year.title_short | default_if_none:'-' }}
 
                 <br>
-                <label>{% trans 'printable_title'%}</label><br>
+                <label>{% trans 'Printable title'%}</label><br>
                 {{ offer_year.title_printable | default_if_none:'-' }}
 
                 <br>
-                <label>{% trans 'grade'%}</label><br>
+                <label>{% trans 'Grade'%}</label><br>
                 {{ offer_year.get_grade_display | default_if_none:'-' }}
             </div>
         </div>

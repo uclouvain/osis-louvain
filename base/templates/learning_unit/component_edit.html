@@ -30,8 +30,8 @@
         <form class="component-form" role="form" method="POST"
               action="{% url 'learning_unit_component_edit' learning_unit_year_id=form.learning_unit_year.id%}?learning_component_year_id={{form.instance.id}}">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" title="{% trans 'close'%}">×</button>
-                <h4>{% trans 'component'%}
+                <button type="button" class="close" data-dismiss="modal" title="{% trans 'Close'%}">×</button>
+                <h4>{% trans 'Component'%}
                     {% if learning_component_year.type %}
                         : {% trans learning_component_year.type %}
                     {% endif %}
@@ -44,10 +44,10 @@
             </div>
             <div class="modal-body">
                 {% csrf_token %}
-                <label>{% trans 'description'%}</label>
+                <label>{% trans 'Description'%}</label>
                 {{ form.comment }}
                 <br>
-                {{ form.used_by }} <label>{% trans 'used_by' %} {{ form.learning_unit_year.acronym}}</label>
+                {{ form.used_by }} <label>{% trans 'Used by learning unit' %} {{ form.learning_unit_year.acronym}}</label>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" type="submit" title="{% trans 'save'%}"><span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save' %}</button>

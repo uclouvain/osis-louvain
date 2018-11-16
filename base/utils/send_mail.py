@@ -65,8 +65,8 @@ def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enr
     receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in persons]
     suject_data = {'learning_unit_name': learning_unit_name}
     template_base_data = {'learning_unit_name': learning_unit_name,
-                          'encoding_status': _('encoding_status_ended') if all_encoded
-                          else _('encoding_status_notended')
+                          'encoding_status': _('All the scores are encoded.') if all_encoded
+                          else _('It remains notes to encode.')
                           }
     header_txt = ['acronym', 'session_title', 'registration_number', 'lastname', 'firstname', 'score', 'documentation']
     submitted_enrollments_data = [
@@ -227,8 +227,8 @@ def build_proposal_report_attachment(manager, proposals_with_results, operation,
         xls_build.WORKSHEETS_DATA: [
             {
                 xls_build.CONTENT_KEY: table_data,
-                xls_build.HEADER_TITLES_KEY: [_('academic_year_small'), _('code'), _('title'), _('type'),
-                                              _("proposal_status"), _('status'), _('Remarks')],
+                xls_build.HEADER_TITLES_KEY: [_('Ac yr.'), _('code'), _('Title'), _('type'),
+                                              _("Proposal status"), _('Status'), _('Remarks')],
                 xls_build.WORKSHEET_TITLE_KEY: 'Report'
             }
         ],
@@ -271,7 +271,7 @@ def _build_worksheet_parameters(workbook, a_user, operation, research_criteria):
     worksheet_parameters = workbook.create_sheet(title=str(_('parameters')))
     now = datetime.datetime.now()
     worksheet_parameters.append([str(_('author')), str(a_user)])
-    worksheet_parameters.append([str(_('date')), now.strftime('%d-%m-%Y %H:%M')])
+    worksheet_parameters.append([str(_('Date')), now.strftime('%d-%m-%Y %H:%M')])
     worksheet_parameters.append([_('Operation'), _(operation)])
     if research_criteria:
         worksheet_parameters.append([_('Research criteria')])
@@ -332,7 +332,7 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
 
 
 def build_scores_sheet_attachment(list_exam_enrollments):
-    name = "%s.pdf" % _('scores_sheet')
+    name = "%s.pdf" % _('score(s) saved')
     mimetype = "application/pdf"
     content = paper_sheet.build_pdf(
         score_encoding_sheet.scores_sheet_data(list_exam_enrollments, tutor=None))
@@ -354,7 +354,7 @@ def send_again(message_history_id):
         receiver = message_config.create_receiver(person.id, person.email, person.language)
         return message_service.send_again(receiver, message_history_id)
     else:
-        return _('no_receiver_error')
+        return _('No receiver for this message')
 
 
 def send_mail_for_educational_information_update(teachers, learning_units_years):

@@ -34,21 +34,21 @@
 {% endblock %}
 
 {% block breadcrumb %}
-  <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'formation_catalogue'%}</a></li>
-  <li><a href="{% url 'academic_year' %}" id="lnk_academic_year">{% trans 'academic_year'%}</a></li>
-  <li class="active">{% trans 'academic_calendars'%}</li>
+  <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue'%}</a></li>
+  <li><a href="{% url 'academic_year' %}" id="lnk_academic_year">{% trans 'Academic year'%}</a></li>
+  <li class="active">{% trans 'Academic calendars'%}</li>
 
 {% endblock %}
 {% block content %}
 <div class="page-header">
-  <h2>{% trans 'academic_calendar' %}</h2>
+  <h2>{% trans 'Academic calendar' %}</h2>
 </div>
 <div class="panel panel-default">
   <div class="panel-body">
     <div class="row">
       <form  method="get" action="{% url 'academic_calendars' %}" >
         <div class="col-md-2">
-          <label for="slt_academic_year" >{% trans 'academic_year'%}</label>
+          <label for="slt_academic_year" >{% trans 'Academic year'%}</label>
           <select class="form-control" id="slt_academic_year"  name="academic_year" value="{{ academic_year }}" onchange='this.form.submit();'>
             {% for v in academic_years %}
               <option value="{{ v.id }}" {% if v.id == academic_year %}selected {% endif %} >
@@ -104,12 +104,12 @@
       {% if show_gantt_diagram %}
         <div id="gantt_div"></div>
       {% else %}
-          <label class="alert alert-info" style="margin:5px">{% trans 'no_result' %}</label>
+          <label class="alert alert-info" style="margin:5px">{% trans 'No result!' %}</label>
       {% endif %}
     </div>
     {% if undated_calendars_list|length > 0 %}
       <div id="undated_calendars">
-        <br>{% trans 'undated_events' %} :
+        <br>{% trans 'Unscheduled events' %} :
         <ul>
           {% for calendar in undated_calendars_list %}
             <li>
@@ -166,7 +166,7 @@
             + formatDate(task.start_date) + " - " + formatDate(task.end_date)
             + " (" + duration +  ") <br>"
             + "<a href=\"{% url 'academic_calendars' %}" + task.id + "\">"
-            + "{% trans 'details'%}</a>";
+            + "{% trans 'Details'%}</a>";
         };
 
         /* Update lines style for project events */
@@ -201,7 +201,7 @@
             return "<b>" + gettext('Release') + " : " + d + "/" + m + "/" +  y + "</b>"
                     + "<br>"
                     + "<a href=\"{% url 'academic_calendars' %}" + id + "\">"
-                    + "{% trans 'details'%}</a>";
+                    + "{% trans 'Details'%}</a>";
         }
     </script>
 {% endblock %}

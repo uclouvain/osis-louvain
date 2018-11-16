@@ -34,11 +34,11 @@ WEEK = "WEEK"
 DAY = "DAY"
 
 DURATION_UNIT = (
-    (QUADRIMESTER, _(QUADRIMESTER)),
-    (TRIMESTER, _(TRIMESTER)),
-    (MONTH, _(MONTH)),
-    (WEEK, _(WEEK)),
-    (DAY, _(DAY))
+    (QUADRIMESTER, _("Quadrimester")),
+    (TRIMESTER, _("Trimester")),
+    (MONTH, _("Month")),
+    (WEEK, _("Week")),
+    (DAY, _("Day"))
 )
 
 

@@ -43,6 +43,6 @@ class LearningUnitTagTest(TestCase):
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
     def test_get_attribute(self):
         self.assertEqual(get_attribute(self.learning_unit_yr, 'specific_title'), TITLE)
-        self.assertEqual(get_attribute(self.learning_unit_yr, 'professional_integration'), 'Oui')
+        self.assertEqual(get_attribute(self.learning_unit_yr, 'professional_integration'), 'oui')
         self.assertEqual(get_attribute(self.learning_unit_yr, 'status'), 'Actif')
         self.assertEqual(get_attribute(self.learning_unit_yr, 'quadrimester'), quadrimesters.Q1)

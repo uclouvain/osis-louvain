@@ -34,15 +34,15 @@ Q1or2 = "Q1 or Q2"
 LEARNING_UNIT_YEAR_QUADRIMESTERS = (
     (Q1, Q1),
     (Q2, Q2),
-    (Q1and2, _(Q1and2)),
-    (Q1or2, _(Q1or2)),
+    (Q1and2, _("Q1 and Q2")),
+    (Q1or2, _("Q1 or Q2")),
     (Q3, Q3)
 )
 
 DEROGATION_QUADRIMESTERS = (
     (Q1, Q1),
     (Q2, Q2),
-    (Q1and2, _(Q1and2)),
-    (Q1or2, _(Q1or2)),
+    (Q1and2, _("Q1 and Q2")),
+    (Q1or2, _("Q1 or Q2")),
     (Q3, Q3)
 )

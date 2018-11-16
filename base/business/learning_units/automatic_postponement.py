@@ -39,7 +39,7 @@ class LearningUnitAutomaticPostponement(AutomaticPostponement):
     send_before = send_mail_before_annual_procedure_of_automatic_postponement_of_luy
     send_after = send_mail_after_annual_procedure_of_automatic_postponement_of_luy
     extend_method = duplicate_learning_unit_year
-    msg_result = _("%s learning unit(s) extended and %s error(s)")
+    msg_result = _("%(number_extended)s learning unit(s) extended and %(number_error)s error(s)")
 
     def get_queryset(self, queryset=None):
         return super().get_queryset(queryset).filter(learning_container_year__isnull=False)

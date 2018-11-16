@@ -7,7 +7,7 @@
                 {% csrf_token %}
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="bt_close_remove_manager_modal"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title">{% trans 'confirm' %}</h4>
+                    <h4 class="modal-title">{% trans 'Confirm' %}</h4>
                 </div>
                 <div class="modal-body">
                     <input type="hidden"  id="hdn_to_be_removed_person" name="person_to_be_removed">
@@ -18,16 +18,16 @@
                     <input type="hidden" id="hdn_manager" name="person">
 
                     <div id="pnl_pgm_off">
-                        {% trans 'remove_manager_label' %}<br>
+                        {% trans 'Are you sure you want to remove the following manager ?' %}<br>
                     </div>
                     <br>
                     <div id="pnl_pgm_on">
-                        {% trans 'stay_manager_label' %}<br>
+                        {% trans 'The manager will keep the following programs : ' %}<br>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal" id="bt_cancel_remove_manager_modal">{% trans 'cancel' %}</button>
-                    <input type="button" class="btn btn-primary" value="{% trans 'remove' %}"
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="bt_cancel_remove_manager_modal">{% trans 'Cancel' %}</button>
+                    <input type="button" class="btn btn-primary" value="{% trans 'Remove' %}"
                            id="bt_submit_remove_manager_modal" onclick="removal_submission();"/>
                 </div>
             </form>

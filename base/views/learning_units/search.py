@@ -77,7 +77,7 @@ def learning_units_search(request, search_type):
             found_learning_units = form.get_activity_learning_units()
             check_if_display_message(request, found_learning_units)
     except TooManyResultsException:
-        messages.add_message(request, messages.ERROR, _('too_many_results'))
+        messages.add_message(request, messages.ERROR, _('Too many results! Please be more specific.'))
 
     if request.POST.get('xls_status') == "xls":
         return create_xls(request.user, found_learning_units, _get_filter(form, search_type))
@@ -197,16 +197,16 @@ def apply_action_on_proposals(proposals, author, post_data, research_criteria):
 
 
 def _get_filter(form, search_type):
-    criterias = itertools.chain([(_('search_type'), _get_search_type_label(search_type))], get_research_criteria(form))
+    criterias = itertools.chain([(_('Search type'), _get_search_type_label(search_type))], get_research_criteria(form))
     return collections.OrderedDict(criterias)
 
 
 def _get_search_type_label(search_type):
     return {
-        PROPOSAL_SEARCH: _('proposals_search'),
-        SERVICE_COURSES_SEARCH: _('service_course_search'),
-        BORROWED_COURSE: _('borrowed_course_search')
-    }.get(search_type, _('activity_search'))
+        PROPOSAL_SEARCH: _('Proposals'),
+        SERVICE_COURSES_SEARCH: _('Service courses'),
+        BORROWED_COURSE: _('Borrowed courses')
+    }.get(search_type, _('Learning units'))
 
 
 @login_required

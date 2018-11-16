@@ -73,13 +73,14 @@ def _check_group_element_year_deletion(group_element_year):
     if not group_element_year.parent:
         return {}
 
-    return {group_element_year: _('lu_included_in_group') % {
-        'subtype': _str_partim_or_full(group_element_year.child_leaf),
-        'acronym': group_element_year.child_leaf.acronym,
-        'group': group_element_year.parent.partial_acronym,
-        'year': group_element_year.child_leaf.academic_year
-    }
-            }
+    return {
+        group_element_year: _('%(subtype)s %(acronym)s is included in the group %(group)s for the year %(year)s') % {
+            'subtype': _str_partim_or_full(group_element_year.child_leaf),
+            'acronym': group_element_year.child_leaf.acronym,
+            'group': group_element_year.parent.partial_acronym,
+            'year': group_element_year.child_leaf.academic_year
+        }
+        }
 
 
 def _check_attribution_deletion(learning_unit_year):
@@ -258,10 +259,12 @@ def check_can_delete_ignoring_proposal_validation(learning_unit_year):
 def check_tutorings_deletion(learning_unit_year):
     msg = {}
     for tutoring in tutoring_learning_unit_year.find_learning_unit_year(learning_unit_year=learning_unit_year):
-            msg.update(_check_tutoring_learning_unit_year(tutoring))
+        msg.update(_check_tutoring_learning_unit_year(tutoring))
     return msg
 
 
 def create_learning_unit_year_deletion_message(learning_unit_year_deleted):
-    return _('learning_unit_successfuly_deleted').format(acronym=learning_unit_year_deleted.acronym,
-                                                         academic_year=learning_unit_year_deleted.academic_year)
+    return _('Learning unit %(acronym)s (%(academic_year)s) successfuly deleted.') % {
+        'acronym': learning_unit_year_deleted.acronym,
+        'academic_year': learning_unit_year_deleted.academic_year,
+    }

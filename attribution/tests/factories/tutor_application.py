@@ -29,7 +29,7 @@ import string
 import factory.fuzzy
 from faker import Faker
 
-from attribution.models.enums import function
+from attribution.models.enums.function import Functions
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.tutor import TutorFactory
 from osis_common.utils.datetime import get_tzinfo
@@ -43,7 +43,7 @@ class TutorApplicationFactory(factory.django.DjangoModelFactory):
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
-    function = factory.Iterator(function.FUNCTIONS, getter=lambda c: c[0])
+    function = factory.Iterator(Functions.choices(), getter=lambda c: c[0])
     tutor = factory.SubFactory(TutorFactory)
     learning_container_year = factory.SubFactory(LearningContainerYearFactory)
     volume_lecturing = factory.fuzzy.FuzzyDecimal(99)

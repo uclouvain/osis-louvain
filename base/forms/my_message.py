@@ -36,5 +36,5 @@ class MyMessageForm(forms.Form):
 
 
 class MyMessageActionForm(forms.Form):
-    ACTIONS = (('MARK_AS_READ', _('mark_selected_as_read')), ('DELETE', _('delete_selected')))
+    ACTIONS = (('MARK_AS_READ', _('Mark selected messages as read')), ('DELETE', _('Delete selected messages')))
     action = forms.ChoiceField(required=False, choices=ACTIONS, initial=None)

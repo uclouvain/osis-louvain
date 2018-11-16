@@ -48,6 +48,4 @@ class EmployeeAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView)
         return qs.order_by("last_name", "first_name")
 
     def get_result_label(self, result):
-        return "{last_name} {first_name} ({age})".format(last_name=result.last_name,
-                                                         first_name=result.first_name,
-                                                         age=result.age)
+        return "{last_name} {first_name}".format(last_name=result.last_name, first_name=result.first_name)

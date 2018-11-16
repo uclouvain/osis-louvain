@@ -27,7 +27,7 @@ from django.db.models import QuerySet
 from django.utils.translation import ugettext_lazy as _
 
 BLANK_CHOICE = [(None, "---------")]
-ALL_CHOICE = [("all", _('all_label'))]
+ALL_CHOICE = [("all", _('All label'))]
 
 
 def add_blank(choices):

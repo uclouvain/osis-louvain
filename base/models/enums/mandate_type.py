@@ -23,14 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.utils.translation import ugettext_lazy as _
+
 PRESIDENT = "PRESIDENT"
 SECRETARY = "SECRETARY"
 SIGNATORY = "SIGNATORY"
 
 
 MANDATE_TYPES = (
-    (PRESIDENT, PRESIDENT),
-    (SECRETARY, SECRETARY),
-    (SIGNATORY, SIGNATORY)
+    (PRESIDENT, _("President")),
+    (SECRETARY, _("Secretary")),
+    (SIGNATORY, _("Signatory"))
 )
 

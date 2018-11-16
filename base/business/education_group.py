@@ -45,8 +45,8 @@ DESC = "desc"
 WORKSHEET_TITLE = 'education_groups'
 XLS_FILENAME = 'education_groups_filename'
 XLS_DESCRIPTION = "list_education_groups"
-EDUCATION_GROUP_TITLES = [str(_('academic_year_small')), str(_('code')), str(_('title')), str(_('type')),
-                          str(_('entity')), str(_('code'))]
+EDUCATION_GROUP_TITLES = [str(_('Ac yr.')), str(_('code')), str(_('Title')), str(_('type')),
+                          str(_('Entity')), str(_('code'))]
 ORDER_COL = 'order_col'
 ORDER_DIRECTION = 'order_direction'
 #

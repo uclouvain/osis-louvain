@@ -44,7 +44,7 @@ def get_scores_encoding_list(user, **kwargs):
     enrollments_ids = kwargs.get('enrollments_ids')
 
     if is_program_manager:
-        professor = tutor.find_by_id(tutor_id) if tutor_id else None            #Filter by tutor
+        professor = tutor.find_by_id(tutor_id) if tutor_id else None
         offers_year = [offer_year.find_by_id(offer_year_id)] if offer_year_id else \
                        list(offer_year.find_by_user(user, academic_yr=current_academic_year))
 
@@ -201,7 +201,7 @@ def _format_score_to_decimal(score):
 
 def _check_str_score_is_digit(score_str):
     if not score_str.replace('.', '').isdigit():  # Case not empty string but have alphabetic values
-        raise ValueError("scores_must_be_between_0_and_20")
+        raise ValueError("Scores must be between 0 and 20")
 
 
 def is_enrollment_changed(enrollment, is_program_manager):

@@ -26,9 +26,9 @@
 {% endcomment %}
 
 {% block breadcrumb %}
-    <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'institution' %}</a></li>
-    <li><a href="{% url 'organizations' %}" id="lnk_organizations">{% trans 'organizations' %}</a></li>
-    <li class="active">{% trans 'organization' %}</li>
+    <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'Institution' %}</a></li>
+    <li><a href="{% url 'organizations' %}" id="lnk_organizations">{% trans 'Organizations' %}</a></li>
+    <li class="active">{% trans 'Organization' %}</li>
 {% endblock %}
 
 {% block content %}
@@ -41,12 +41,12 @@
             <ul class="nav nav-tabs" role="tablist">
                 <li role="presentation" class="active">
                     <a data-toggle="tab" href="#tab_identification" role="tab">
-                        {% trans 'identification'%}
+                        {% trans 'Identification'%}
                     </a>
                 </li>
                 <li role="presentation">
                     <a data-toggle="tab" href="#tab_campus_list" role="tab">
-                        {% trans 'campus'%}
+                        {% trans 'Campus'%}
                     </a>
                 </li>
             </ul>
@@ -59,11 +59,11 @@
                         {% endif %}
                         <dl class="col-md-4">
 
-                            <dt>{% trans 'organization_name'%}</dt>
+                            <dt>{% trans 'Name'%}</dt>
                             <dd>{{ object.name | title }}</dd>
                         </dl>
                         <dl class="col-md-4">
-                            <dt>{% trans 'website' %}</dt>
+                            <dt>{% trans 'Website' %}</dt>
                             <dd><a href="{{ object.website }}">{{ object.website }}</a></dd>
                         </dl>
                         <dl class="col-md-2">
@@ -71,18 +71,18 @@
                             <dd>{{ object.get_type_display }}</dd>
                         </dl>
                         <dl class="col-md-2">
-                            <dt>{% trans 'start_date' %}</dt>
+                            <dt>{% trans 'Start date' %}</dt>
                             <dd>{{ object.start_date }}</dd>
                         </dl>
                         <dl class="col-md-2">
-                            <dt>{% trans 'end_date' %}</dt>
+                            <dt>{% trans 'End date' %}</dt>
                             <dd>{{ object.end_date | default_if_none:'-' }}</dd>
                         </dl>
                     </div>
                     <br>
                     {% with object.organizationaddress_set.all as addresses %}
                         {% if addresses %}
-                            <label>{% trans 'address(ses)' %}</label>
+                            <label>{% trans 'Address(es)' %}</label>
                             <br>
                             <div class="row">
                                 {% for address in addresses %}
@@ -112,7 +112,7 @@
                     <table class="table">
                         <thead>
                         <tr>
-                            <th>{% trans 'name'|title %}</th>
+                            <th>{% trans 'Name' %}</th>
                         </tr>
                         </thead>
                         <tbody>

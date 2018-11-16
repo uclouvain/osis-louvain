@@ -48,13 +48,13 @@
                         <table class="table table-hover">
                             <thead>
                                 <tr>
-                                    <th>{% trans 'code_scs'%}</th>
-                                    <th>{% trans 'title_code_formation' %}</th>
+                                    <th>{% trans 'Code SCS'%}</th>
+                                    <th>{% trans "Title" %} / {% trans "Formation's code" %}</th>
                                     <th>{% trans 'Cred. rel./abs.' %}</th>
-                                    <th>{% trans 'min_credits' %}</th>
-                                    <th>{% trans 'max_credits' %}</th>
-                                    <th>{% trans 'mandatory' %}</th>
-                                    <th>{% trans 'block' %}</th>
+                                    <th>{% trans 'Min. credits' %}</th>
+                                    <th>{% trans 'Max. credits' %}</th>
+                                    <th>{% trans 'Mandatory' %}</th>
+                                    <th>{% trans 'Block' %}</th>
                                     <th>{% trans 'Quad. derog.' %}</th>
                                     <th>{% trans 'Link type' %}</th>
                                     <th></th>
@@ -80,7 +80,7 @@
                                     <tr>
                                         <td colspan="{{ nb_col_spanned }}" style="border-top: none;border-bottom: none;">
                                             {% if group.own_comment %}
-                                                <label>{% trans 'own_comment' %}</label> :&nbsp;
+                                                <label>{% trans 'Own comment' %}</label> :&nbsp;
                                                 {{ group.own_comment }}
                                             {% endif %}
                                         </td>
@@ -89,7 +89,7 @@
                                         <tr style="border-spacing: 100px">
                                             <td colspan="{{ nb_col_spanned }}" style="border-top: none; border-bottom: none;">
                                                 {% if group.comment %}
-                                                    <label>{% trans 'comment_title' %}</label> :&nbsp;
+                                                    <label>{% trans 'Comment' %}</label> :&nbsp;
                                                     {{ group.comment }}
                                                 {% endif %}
                                             </td>

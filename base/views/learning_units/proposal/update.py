@@ -80,7 +80,9 @@ def _update_or_create_proposal(request, learning_unit_year, proposal=None):
     if proposal_base_form.is_valid():
         proposal = proposal_base_form.save()
         display_success_messages(
-            request, _("success_modification_proposal").format(_(proposal.type), learning_unit_year.acronym))
+            request, _("You proposed a modification of type {} for the learning unit {}.").format(
+                _(proposal.type), learning_unit_year.acronym)
+        )
         return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
 
     context = proposal_base_form.get_context()
@@ -109,7 +111,9 @@ def _update_or_create_suppression_proposal(request, learning_unit_year, proposal
             form_end_date.save(update_learning_unit_year=False)
 
             display_success_messages(
-                request, _("success_modification_proposal").format(_(proposal_type), learning_unit_year.acronym))
+                request, _("You proposed a modification of type {} for the learning unit {}.").format(
+                    _(proposal_type), learning_unit_year.acronym)
+            )
 
         return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
 

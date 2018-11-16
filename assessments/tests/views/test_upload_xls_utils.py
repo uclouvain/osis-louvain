@@ -70,7 +70,7 @@ def generate_exam_enrollments(year, with_different_offer=False):
                                                    end_date=datetime.datetime.today() + datetime.timedelta(days=20),
                                                    reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
     session_exam_calendar = SessionExamCalendarFactory(number_session=number_session.ONE,
-                                                        academic_calendar=an_academic_calendar)
+                                                       academic_calendar=an_academic_calendar)
 
     learning_unit_year = LearningUnitYearFakerFactory(academic_year=academic_year,
                                                       learning_container_year__academic_year=academic_year,
@@ -91,7 +91,7 @@ def generate_exam_enrollments(year, with_different_offer=False):
         student = StudentFactory()
         offer_enrollment = OfferEnrollmentFactory(offer_year=offer_years[i], student=student)
         learning_unit_enrollment = LearningUnitEnrollmentFactory(learning_unit_year=learning_unit_year,
-                                                                   offer_enrollment=offer_enrollment)
+                                                                 offer_enrollment=offer_enrollment)
         exam_enrollments.append(ExamEnrollmentFactory(session_exam=session_exams[i],
                                                       learning_unit_enrollment=learning_unit_enrollment))
     return locals()
@@ -162,7 +162,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
 
         self.assertEqual(len(messages), 1)
         self.assertEqual(messages[0].tags, 'error')
-        self.assertEqual(messages[0].message, _('no_file_submitted'))
+        self.assertEqual(messages[0].message, _('You have to select a file to upload.'))
 
     def test_with_incorrect_format_file(self):
         with open("assessments/tests/resources/bad_format.txt", 'rb') as score_sheet:
@@ -171,7 +171,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
 
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].tags, 'error')
-            self.assertEqual(messages[0].message, _('file_must_be_xlsx'))
+            self.assertEqual(messages[0].message, _("The file must be a valid 'XLSX' excel file"))
 
     def test_with_no_scores_encoded(self):
         with open("assessments/tests/resources/empty_scores.xlsx", 'rb') as score_sheet:
@@ -180,7 +180,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
 
             self.assertEqual(len(messages), 1)
             self.assertEqual(messages[0].tags, 'error')
-            self.assertEqual(messages[0].message, _('no_score_injected'))
+            self.assertEqual(messages[0].message, _('No score injected'))
 
     def test_with_incorrect_justification(self):
         INCORRECT_LINES = '13'
@@ -189,7 +189,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('error', "%s : %s %s" % (_('justification_invalid_value'), _('Line'), INCORRECT_LINES)),
+            self.assertIn(('error', "%s : %s %s" % (_('Invalid justification value'), _('Row'), INCORRECT_LINES)),
                           messages_tag_and_content)
 
     def test_with_numbers_outside_scope(self):
@@ -199,7 +199,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('error', "%s : %s %s" % (_('scores_must_be_between_0_and_20'), _('Line'), INCORRECT_LINES)),
+            self.assertIn(('error', "%s : %s %s" % (_("Scores must be between 0 and 20"), _('Row'), INCORRECT_LINES)),
                           messages_tag_and_content)
 
     def test_with_correct_score_sheet(self):
@@ -211,7 +211,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('score_saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
                           messages_tag_and_content)
 
             self.assert_enrollments_equal(
@@ -226,7 +226,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('success', '%s %s' % (NUMBER_SCORES, _('score_saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_SCORES, _('Score saved'))),
                           messages_tag_and_content)
 
             self.assert_enrollments_equal(
@@ -242,9 +242,9 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('error', "%s : %s %s" % (_('scores_must_be_between_0_and_20'), _('Line'), INCORRECT_LINE)),
+            self.assertIn(('error', "%s : %s %s" % (_("Scores must be between 0 and 20"), _('Row'), INCORRECT_LINE)),
                           messages_tag_and_content)
-            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('score_saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
                           messages_tag_and_content)
 
             self.assert_enrollments_equal(
@@ -259,11 +259,10 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('error', "%s : %s %s" % (_('registration_id_does_not_match_email'),
-                                                    _('Line'),
+            self.assertIn(('error', "%s : %s %s" % (_('Registration ID does not match email'),
+                                                    _('Row'),
                                                     INCORRECT_LINES)),
                           messages_tag_and_content)
-
 
     def test_with_correct_score_sheet_white_spaces_around_emails(self):
         NUMBER_CORRECT_SCORES = "2"
@@ -272,7 +271,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('score_saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
                           messages_tag_and_content)
 
             self.assert_enrollments_equal(
@@ -289,7 +288,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             messages = list(response.context['messages'])
 
             messages_tag_and_content = _get_list_tag_and_content(messages)
-            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('score_saved'))),
+            self.assertIn(('success', '%s %s' % (NUMBER_CORRECT_SCORES, _('Score saved'))),
                           messages_tag_and_content)
 
             self.assert_enrollments_equal(

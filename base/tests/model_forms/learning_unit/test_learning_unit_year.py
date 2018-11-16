@@ -74,8 +74,8 @@ class TestLearningUnitYearModelFormInit(TestCase):
 
     def test_label_specific_title_case_partim(self):
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=PARTIM)
-        self.assertEqual(self.form.fields['specific_title'].label, _('official_title_proper_to_partim'))
-        self.assertEqual(self.form.fields['specific_title_english'].label, _('official_english_title_proper_to_partim'))
+        self.assertEqual(self.form.fields['specific_title'].label, _('Title proper to the partim'))
+        self.assertEqual(self.form.fields['specific_title_english'].label, _('English title proper to the partim'))
 
     def test_case_update_academic_year_is_disabled(self):
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=PARTIM,

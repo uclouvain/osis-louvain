@@ -26,7 +26,7 @@
 {% if components_comparison %}
     {% for component in components_comparison %}
         <tr class="table_header" style="border-top: groove">
-            <td class="table_header">{% trans 'component' %} : {{ component|get_item:'type' }}</td>
+            <td class="table_header">{% trans 'Component' %} : {{ component|get_item:'type' }}</td>
             <th>{{ previous_academic_yr }}</th>
             <th>{{ learning_unit_year.academic_year }}</th>
             <th>{{ next_academic_yr }}</th>

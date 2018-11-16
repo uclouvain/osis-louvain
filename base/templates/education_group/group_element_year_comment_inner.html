@@ -33,12 +33,12 @@
 
     <div class="form-group row" style="margin-top:10px;">
         {% bootstrap_field form.link_type  form_group_class="col-md-4"%}
-        {% bootstrap_field form.is_mandatory label=_('required') form_group_class="col-md-4"%}
+        {% bootstrap_field form.is_mandatory label=_('Required') form_group_class="col-md-4"%}
     </div>
     <div class="form-group row">
         {% bootstrap_field form.relative_credits form_group_class="col-md-4"%}
-        {% bootstrap_field form.min_credits label=_('minimum credits')|capfirst form_group_class="col-md-4"%}
-        {% bootstrap_field form.max_credits label=_('maximum credits')|capfirst form_group_class="col-md-4"%}
+        {% bootstrap_field form.min_credits label=_('Min. credits')|capfirst form_group_class="col-md-4"%}
+        {% bootstrap_field form.max_credits label=_('Max. credits')|capfirst form_group_class="col-md-4"%}
     </div>
     <div class="form-group row">
         {% bootstrap_field form.block form_group_class="col-md-6"%}
