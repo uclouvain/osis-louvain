@@ -79,7 +79,7 @@ class LearningUnitSearchForm(BaseSearchForm):
     acronym = forms.CharField(
         max_length=15,
         label=_('code'),
-        validators=[RegexValidator(regex=acronym_regex)],
+
     )
 
     tutor = forms.CharField(
