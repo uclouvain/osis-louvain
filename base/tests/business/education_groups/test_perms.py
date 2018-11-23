@@ -125,7 +125,7 @@ class TestPerms(TestCase):
             start_date=today + datetime.timedelta(days=1),
             end_date=today + datetime.timedelta(days=3),
             academic_year=current_ac,
-            reference=academic_calendar_type.EDITION_OF_GENERAL_INFORMATION,
+            reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
         )
 
         next_ac = AcademicYearFactory(year=current_ac.year + 1)
@@ -134,7 +134,7 @@ class TestPerms(TestCase):
         self.assertFalse(
             is_academic_calendar_opened(
                 education_group,
-                academic_calendar_type.EDITION_OF_GENERAL_INFORMATION
+                academic_calendar_type.EDUCATION_GROUP_EDITION
             )
         )
 
@@ -146,7 +146,7 @@ class TestPerms(TestCase):
         self.assertFalse(
             is_academic_calendar_opened(
                 education_group,
-                academic_calendar_type.EDITION_OF_GENERAL_INFORMATION
+                academic_calendar_type.EDUCATION_GROUP_EDITION
             )
         )
 
@@ -156,7 +156,7 @@ class TestPerms(TestCase):
         self.assertTrue(
             is_academic_calendar_opened(
                 education_group,
-                academic_calendar_type.EDITION_OF_GENERAL_INFORMATION,
+                academic_calendar_type.EDUCATION_GROUP_EDITION,
                 raise_exception=True
             )
         )
