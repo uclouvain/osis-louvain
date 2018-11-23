@@ -56,9 +56,6 @@ if 'webservices' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^api/', include('webservices.urls')),)
 if 'partnership' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^partnerships/', include('partnership.urls', namespace='partnerships')),)
-if 'debug_toolbar' in settings.INSTALLED_APPS:
-    import debug_toolbar
-    urlpatterns += (url(r'^__debug__/', include(debug_toolbar.urls, namespace='debug_toolbar')),)
 if 'continuing_education' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^continuing_education/', include('continuing_education.urls')),)
 

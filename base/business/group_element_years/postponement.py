@@ -30,7 +30,7 @@ from base.business.education_groups.postponement import duplicate_education_grou
 from base.business.utils.model import update_related_object
 from base.models.academic_year import starting_academic_year
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import MINITRAINING_TO_POSTONE
+from base.models.enums.education_group_types import MiniTrainingType
 
 
 class NotPostponeError(Error):
@@ -62,7 +62,7 @@ class PostponeContent:
     def check_instance(self):
         if self.instance.is_training():
             pass
-        elif self.instance.education_group_type.name in MINITRAINING_TO_POSTONE:
+        elif self.instance.education_group_type.name in MiniTrainingType.to_postpone():
             pass
         else:
             raise NotPostponeError(_('You are not allowed to copy the content of this kind of education group.'))

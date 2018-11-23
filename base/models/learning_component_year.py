@@ -26,6 +26,7 @@
 from django.db import models
 from django.db.models import Sum
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models import learning_class_year
 from base.models.enums import learning_component_year_type, learning_container_year_types
@@ -33,7 +34,7 @@ from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
-class LearningComponentYearAdmin(SerializableModelAdmin):
+class LearningComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('learning_container_year', 'learning_unit_year',  'acronym', 'type', 'comment', 'changed')
     search_fields = ['acronym', 'learning_container_year__acronym']
     list_filter = ('learning_container_year__academic_year',)

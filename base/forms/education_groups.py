@@ -78,13 +78,13 @@ class EducationGroupFilter(forms.Form):
         queryset=EducationGroupType.objects.all(),
         required=False,
         empty_label=pgettext("plural", "All"),
-        label=_('type')
+        label=_('Type')
     )
 
     acronym = forms.CharField(max_length=40, required=False, label=_('Acronym'))
     title = forms.CharField(max_length=255, required=False, label=_('Title'))
     requirement_entity_acronym = forms.CharField(max_length=20, required=False, label=_('Entity'))
-    partial_acronym = forms.CharField(max_length=15, required=False, label=_('code'))
+    partial_acronym = forms.CharField(max_length=15, required=False, label=_('Code'))
     with_entity_subordinated = forms.BooleanField(required=False)
 
     def __init__(self, *args, **kwargs):

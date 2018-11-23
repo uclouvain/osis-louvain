@@ -24,10 +24,9 @@
 #
 ##############################################################################
 import json
-
-import requests
 from collections import OrderedDict, namedtuple
 
+import requests
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.conf import settings
@@ -36,10 +35,11 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import F, Case, When
 from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DetailView
-from django.urls import reverse
+from reversion.models import Version
 
 from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
@@ -47,10 +47,16 @@ from base.business.education_groups import perms
 from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
 from base.business.education_groups.perms import is_eligible_to_edit_general_information
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
+from base.models.education_group import EducationGroup
+from base.models.education_group_achievement import EducationGroupAchievement
+from base.models.education_group_certificate_aim import EducationGroupCertificateAim
+from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.models.education_group_organization import EducationGroupOrganization
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories, academic_calendar_type, education_group_types
+from base.models.education_group_year_domain import EducationGroupYearDomain
+from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import PGRM_MASTER_120, PGRM_MASTER_180_240
+from base.models.enums.education_group_types import TrainingType
 from base.models.person import Person
 from base.views.common import display_error_messages, display_success_messages
 from cms import models as mdl_cms
@@ -143,7 +149,10 @@ class EducationGroupRead(EducationGroupGenericDetailView):
             education_group_language.language.name for education_group_language in
             mdl.education_group_language.find_by_education_group_year(self.object)
         ]
+
         context["show_coorganization"] = self.show_coorganization()
+
+        context["versions"] = self.get_related_versions()
 
         return context
 
@@ -153,7 +162,29 @@ class EducationGroupRead(EducationGroupGenericDetailView):
     def show_coorganization(self):
         """Co-organization doesn't have sense for 2M (120/180-240) """
         return self.object.education_group_type.category == TRAINING and \
-            self.object.education_group_type.name not in [PGRM_MASTER_120, PGRM_MASTER_180_240]
+            self.object.education_group_type.name not in [TrainingType.PGRM_MASTER_120.name,
+                                                          TrainingType.PGRM_MASTER_180_240.name]
+
+    def get_related_versions(self):
+        versions = Version.objects.get_for_object(self.object)
+
+        related_models = [
+            EducationGroupOrganization,
+            EducationGroupAchievement,
+            EducationGroupDetailedAchievement,
+            EducationGroupYearDomain,
+            EducationGroupCertificateAim
+        ]
+
+        subversion = Version.objects.none()
+        for model in related_models:
+            subversion |= Version.objects.get_for_model(model)
+
+        versions |= subversion.filter(
+            serialized_data__contains="\"education_group_year\": {}".format(self.object.pk)
+        )
+
+        return versions.order_by('-revision__date_created').distinct('revision__date_created')
 
 
 class EducationGroupDiplomas(EducationGroupGenericDetailView):
@@ -413,6 +444,8 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         acronym = self.object.acronym.lower()
         is_common = acronym.startswith('common-')
         is_specific = not is_common
+        is_minor = self.object.is_minor
+        is_deepening = self.object.is_deepening
 
         is_master = acronym.endswith(('2m', '2m1'))
         use_standard_text = acronym.endswith(('2a', '2mc'))
@@ -427,17 +460,16 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         for section in SECTIONS_WITH_TEXT:
             record[section] = AdmissionConditionLine.objects.filter(admission_condition=admission_condition,
                                                                     section=section)
-
         context.update({
             'admission_condition_form': admission_condition_form,
             'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object']),
             'info': {
                 'is_specific': is_specific,
                 'is_common': is_common,
-                'is_bachelor': is_common and self.object.education_group_type.name == education_group_types.BACHELOR,
+                'is_bachelor': is_common and self.object.education_group_type.name is TrainingType.BACHELOR.name,
                 'is_master': is_master,
                 'show_components_for_agreg_and_mc': is_common and use_standard_text,
-                'show_free_text': is_specific and (is_master or use_standard_text),
+                'show_free_text': (is_specific and (is_master or use_standard_text)) or is_minor or is_deepening,
             },
             'admission_condition': admission_condition,
             'record': record,

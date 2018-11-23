@@ -32,12 +32,11 @@ from django.test import TestCase
 from base.business.education_groups.automatic_postponement import EducationGroupAutomaticPostponement
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import MINI_TRAINING
-from base.models.enums.education_group_types import OPTION
+from base.models.enums.education_group_types import MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
 
 
 class TestFetchEducationGroupToPostpone(TestCase):
@@ -101,7 +100,7 @@ class TestFetchEducationGroupToPostpone(TestCase):
         self.assertEqual(len(result), 0)
 
     def test_education_group_wrong_mini_training(self):
-        egt = EducationGroupTypeFactory(name=OPTION, category=MINI_TRAINING)
+        egt = EducationGroupTypeFactory(name=MiniTrainingType.OPTION.name, category=MINI_TRAINING)
         EducationGroupYearFactory(
             education_group=self.education_group,
             academic_year=self.academic_years[-2],

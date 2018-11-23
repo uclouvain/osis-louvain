@@ -25,6 +25,7 @@
 ##############################################################################
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from attribution.models.attribution_new import AttributionNew
 from base.business.learning_container_year import get_learning_container_year_warnings
@@ -36,7 +37,7 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 FIELDS_FOR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant']
 
 
-class LearningContainerYearAdmin(SerializableModelAdmin):
+class LearningContainerYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('learning_container', 'academic_year', 'container_type', 'acronym', 'common_title')
     search_fields = ['acronym']
     list_filter = ('academic_year', 'in_charge', 'is_vacant',)

@@ -36,10 +36,10 @@ from django.db.transaction import atomic
 
 from base.models.academic_year import AcademicYear
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
-from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_types, education_group_categories
+from base.models.enums.education_group_categories import TRAINING
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.education_group import EducationGroupFactory
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
@@ -56,25 +56,20 @@ COMMON_FIELDS = (
 )
 
 OFFERS = [
-    {'name': education_group_types.AGREGATION, 'category': education_group_categories.TRAINING, 'code': '2A'},
-    {'name': education_group_types.CERTIFICATE_OF_PARTICIPATION, 'category': education_group_categories.TRAINING,
-     'code': '8FC'},
-    {'name': education_group_types.CERTIFICATE_OF_SUCCESS, 'category': education_group_categories.TRAINING,
-     'code': '7FC'},
-    {'name': education_group_types.CERTIFICATE_OF_HOLDING_CREDITS, 'category': education_group_categories.TRAINING,
-     'code': '9FC'},
-    {'name': education_group_types.BACHELOR, 'category': education_group_categories.TRAINING, 'code': '1BA'},
-    {'name': education_group_types.CERTIFICAT, 'category': education_group_categories.TRAINING, 'code': 'CE'},
-    {'name': education_group_types.CAPAES, 'category': education_group_categories.TRAINING, 'code': '2CE'},
-    {'name': education_group_types.RESEARCH_CERTIFICAT, 'category': education_group_categories.TRAINING, 'code': '3CE'},
-    {'name': education_group_types.UNIVERSITY_FIRST_CYCLE_CERTIFICAT, 'category': education_group_categories.TRAINING,
-     'code': '1FC'},
-    {'name': education_group_types.UNIVERSITY_SECOND_CYCLE_CERTIFICAT, 'category': education_group_categories.TRAINING,
-     'code': '2FC'},
-    {'name': education_group_types.PGRM_MASTER_120, 'category': education_group_categories.TRAINING, 'code': '2M'},
-    {'name': education_group_types.MASTER_M1, 'category': education_group_categories.TRAINING, 'code': '2M1'},
-    {'name': education_group_types.MASTER_MC, 'category': education_group_categories.TRAINING, 'code': '2MC'},
-    {'name': education_group_types.STAGIAIRE, 'category': education_group_categories.TRAINING, 'code': 'ST'},
+    {'name': TrainingType.AGGREGATION.name, 'category': TRAINING, 'code': '2A'},
+    {'name': TrainingType.CERTIFICATE_OF_PARTICIPATION.name, 'category': TRAINING, 'code': '8FC'},
+    {'name': TrainingType.CERTIFICATE_OF_SUCCESS.name, 'category': TRAINING, 'code': '7FC'},
+    {'name': TrainingType.CERTIFICATE_OF_HOLDING_CREDITS.name, 'category': TRAINING, 'code': '9FC'},
+    {'name': TrainingType.BACHELOR.name, 'category': TRAINING, 'code': '1BA'},
+    {'name': TrainingType.CERTIFICATE.name, 'category': TRAINING, 'code': 'CE'},
+    {'name': TrainingType.CAPAES.name, 'category': TRAINING, 'code': '2CE'},
+    {'name': TrainingType.RESEARCH_CERTIFICATE.name, 'category': TRAINING, 'code': '3CE'},
+    {'name': TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name, 'category': TRAINING, 'code': '1FC'},
+    {'name': TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name, 'category': TRAINING, 'code': '2FC'},
+    {'name': TrainingType.PGRM_MASTER_120.name, 'category': TRAINING, 'code': '2M'},
+    {'name': TrainingType.MASTER_M1.name, 'category': TRAINING, 'code': '2M1'},
+    {'name': TrainingType.MASTER_MC.name, 'category': TRAINING, 'code': '2MC'},
+    {'name': TrainingType.INTERNSHIP.name, 'category': TRAINING, 'code': 'ST'},
 ]
 
 

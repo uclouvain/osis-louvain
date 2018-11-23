@@ -32,6 +32,7 @@ django-notifications-hq==1.5.0
 django-filter==2.0.0
 django-hijack==2.1.10
 django-hijack-admin==2.1.10
+django-reversion==3.0.2
 
 
 -r ./osis_common/requirements.txt

@@ -46,7 +46,7 @@ from base.views.filter import filter_cities_by_country, filter_campus_by_city
 from base.views.learning_units.attribution import DeleteAttribution, EditAttributionView, AddAttribution
 from base.views.learning_units.charge_repartition import AddChargeRepartition, \
     EditChargeRepartition, SelectAttributionView
-from base.views.learning_units.detail import learning_unit_identification
+from base.views.learning_units.detail import DetailLearningUnitYearView
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked
@@ -138,7 +138,7 @@ urlpatterns = [
         ])),
 
         url(r'^(?P<learning_unit_year_id>[0-9]+)/', include([
-            url(r'^$', learning_unit_identification, name='learning_unit'),
+            url(r'^$', DetailLearningUnitYearView.as_view(), name='learning_unit'),
             url(r'^formations/$', learning_unit.learning_unit_formations, name="learning_unit_formations"),
             url(r'^components/$', learning_unit.learning_unit_components, name="learning_unit_components"),
             url(r'^pedagogy/', include([

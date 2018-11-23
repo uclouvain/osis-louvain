@@ -29,7 +29,7 @@ from django.db import models
 from django.db.models import Case, When
 from django.utils.translation import ugettext_lazy as _
 
-from base.models.enums import education_group_categories
+from base.models.enums import education_group_categories, education_group_types
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 GROUP_TYPE_OPTION = 'Option'
@@ -75,11 +75,12 @@ class EducationGroupType(SerializableModel):
 
     name = models.CharField(
         max_length=255,
+        choices=education_group_types.ALL_TYPES,
         verbose_name=_('Type of training'),
     )
 
     def __str__(self):
-        return u"%s" % self.name
+        return self.get_name_display()
 
     def natural_key(self):
         return (self.external_id,)

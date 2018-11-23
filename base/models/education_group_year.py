@@ -31,8 +31,7 @@ from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, ngettext
-
-from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin
+from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models import entity_version
@@ -42,12 +41,13 @@ from base.models.enums import academic_type, internship_presence, schedule_type,
 from base.models.enums import education_group_association
 from base.models.enums import education_group_categories
 from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
-from base.models.enums.education_group_types import MINOR, DEEPENING
+from base.models.enums.education_group_types import MiniTrainingType
 from base.models.exceptions import MaximumOneParentAllowedException
 from base.models.prerequisite import Prerequisite
+from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin
 
 
-class EducationGroupYearAdmin(SerializableModelAdmin):
+class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('acronym', 'title', 'academic_year', 'education_group_type', 'changed')
     list_filter = ('academic_year', 'education_group_type')
     raw_id_fields = (
@@ -452,11 +452,11 @@ class EducationGroupYear(SerializableModel):
 
     @property
     def is_minor(self):
-        return self.education_group_type.name in MINOR
+        return self.education_group_type.name in MiniTrainingType.minors()
 
     @property
     def is_deepening(self):
-        return self.education_group_type.name == DEEPENING
+        return self.education_group_type.name == MiniTrainingType.DEEPENING.name
 
     @property
     def is_common(self):
@@ -625,18 +625,15 @@ class EducationGroupYear(SerializableModel):
             raise ValidationError({'constraint_type': _("This field is required.")})
 
     def clean_min_max(self):
-        # If constraint_type has been set, min and max are required
-        error_dict = {}
-        if self.min_constraint is None:
-            error_dict['min_constraint'] = ValidationError(_("This field is required."), code='required')
+        # If constraint_type has been set, min OR max are required
+        if self.min_constraint is None and self.max_constraint is None:
+            raise ValidationError({
+                'min_constraint': _("You should precise at least minimum or maximum constraint"),
+                'max_constraint': '',
+            })
 
-        if self.max_constraint is None:
-            error_dict['max_constraint'] = ValidationError(_("This field is required."), code='required')
-
-        if error_dict:
-            raise ValidationError(error_dict)
-
-        if self.min_constraint > self.max_constraint:
+        if self.min_constraint is not None and self.max_constraint is not None and \
+                self.min_constraint > self.max_constraint:
             raise ValidationError({
                 'max_constraint': _("%(max)s must be greater or equals than %(min)s") % {
                     "max": _("maximum constraint").title(),

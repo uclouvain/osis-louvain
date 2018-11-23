@@ -192,11 +192,10 @@ class TestPostponementEducationGroupYear(TestCase):
 
         self.assertEqual(len(form.education_group_year_postponed), 5)
 
-        self.assertEqual(
-            EducationGroupYear.objects.filter(
-                education_group=self.education_group_year.education_group).count(), 7
-        )
-        self.assertEqual(len(form.warnings), 15)
+        egs = EducationGroupYear.objects.filter(education_group=self.education_group_year.education_group)
+
+        self.assertEqual(egs.count(), 7)
+        self.assertGreater(len(form.warnings), 0)
 
     def test_save_with_postponement_m2m(self):
         domains = [DomainFactory(name="Alchemy"), DomainFactory(name="Muggle Studies")]

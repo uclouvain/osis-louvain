@@ -38,7 +38,7 @@ class EducationGroupTypeFactory(DjangoModelFactory):
 
     external_id = factory.Sequence(lambda n: '10000000%02d' % n)
     category = education_group_categories.TRAINING
-    name = factory.Iterator(education_group_types.TYPES, getter=operator.itemgetter(0))
+    name = factory.Iterator(education_group_types.ALL_TYPES, getter=operator.itemgetter(0))
 
 
 class ExistingEducationGroupTypeFactory(EducationGroupTypeFactory):

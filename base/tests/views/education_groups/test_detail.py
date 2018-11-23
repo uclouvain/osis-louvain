@@ -28,7 +28,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import CAPAES, PGRM_MASTER_120
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, GroupFactory, \
     MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -76,7 +76,7 @@ class TestReadEducationGroup(TestCase):
     def test_show_coorganization_case_not_2m(self):
         training_not_2m = EducationGroupYearFactory(
             education_group_type__category=TRAINING,
-            education_group_type__name=CAPAES
+            education_group_type__name=TrainingType.CAPAES.name
         )
         url = reverse("education_group_read", args=[training_not_2m.pk, training_not_2m.pk])
         self.client.force_login(self.user)
@@ -86,7 +86,7 @@ class TestReadEducationGroup(TestCase):
     def test_show_coorganization_case_2m(self):
         training_2m = EducationGroupYearFactory(
             education_group_type__category=TRAINING,
-            education_group_type__name=PGRM_MASTER_120
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name
         )
         url = reverse("education_group_read", args=[training_2m.pk, training_2m.pk])
         self.client.force_login(self.user)

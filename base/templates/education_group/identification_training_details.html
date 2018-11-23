@@ -37,16 +37,16 @@
                 {% include 'education_group/blocks/informations.html' %}
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        {% dl_with_parent _('Academic type') 'academic_type' %}
+                        {% dl_with_parent 'academic_type' %}
                         <div class="row">
-                            {% dl_with_parent _('Duration') 'verbose_duration' class_dl="col-md-6" %}
-                            {% dl_with_parent _('Internship') 'internship' class_dl="col-md-6" %}
-                            {% dl_with_parent _('Enrollment enabled') 'enrollment_enabled' class_dl="col-md-6" %}
-                            {% dl_with_parent _('Partial deliberation') 'partial_deliberation' class_dl="col-md-6" %}
-                            {% dl_with_parent _('Admission exam') 'admission_exam' class_dl="col-md-6" %}
-                            {% dl_with_parent _('Dissertation') 'dissertation' class_dl="col-md-6" %}
+                            {% dl_with_parent 'verbose_duration' dl_title=_('Duration') class_dl="col-md-6" %}
+                            {% dl_with_parent 'internship' class_dl="col-md-6" %}
+                            {% dl_with_parent 'enrollment_enabled' class_dl="col-md-6" %}
+                            {% dl_with_parent 'partial_deliberation' class_dl="col-md-6" %}
+                            {% dl_with_parent 'admission_exam' class_dl="col-md-6" %}
+                            {% dl_with_parent 'dissertation' class_dl="col-md-6" %}
                         </div>
-                        {% dl_with_parent _('University certificate') 'university_certificate' %}
+                        {% dl_with_parent 'university_certificate' %}
                         <dl>
                             <dt>{% trans 'Decree category' %}</dt>
                             <dd>
@@ -59,7 +59,7 @@
                             <dt>{% trans 'Rate code' %}</dt>
                             <dd>
                                 {% if education_group_year.rate_code %}
-                                    {% trans education_group_year.rate_code %}
+                                    {% trans education_group_year.get_rate_code_display %}
                                 {% endif %}
                             </dd>
                         </dl>
@@ -67,9 +67,9 @@
                             <dt>{% trans 'Primary language' %}</dt>
                             <dd>{{ education_group_year.primary_language }}</dd>
                         </dl>
-                        {% dl_with_parent _('activities in English') 'english_activities' %}
-                        {% dl_with_parent _('Activities on other campus') 'other_language_activities' %}
-                        {% dl_with_parent _('main domain') 'main_domain' %}
+                        {% dl_with_parent 'english_activities' %}
+                        {% dl_with_parent 'other_language_activities' %}
+                        {% dl_with_parent 'main_domain' %}
 
                         {# TODO dl_with_parent needs to manage list #}
                         <div>
@@ -83,30 +83,31 @@
                             {% endif %}
                             <br>
                         </div>
-                        {% dl_with_parent _('comment (internal)') 'internal_comment' %}
+                        {% dl_with_parent 'internal_comment' %}
                     </div>
                 </div>
             </div>
             <div class="col-md-5" style="margin-top: 10px">
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        {% dl_with_parent _("Management entity") "management_entity_version.acronym" %}
-                        {% dl_with_parent _("Administration entity") "administration_entity_version.acronym" %}
-                        {% dl_with_parent _("Start") "education_group.start_year" default_value=_('unspecified') %}
-                        {% dl_with_parent _("End") "education_group.end_year" default_value=_('unspecified') %}
-                        {% dl_with_parent _("Learning location") "main_teaching_campus" %}
-                        {% dl_with_parent _("Enrollment campus") "enrollment_campus" %}
-                        {% dl_with_parent _("Activities on other campus") "other_campus_activities" %}
+                        {% dl_with_parent "acronym" education_group_year.management_entity_version parent.management_entity_version  dl_title=_("Management entity")%}
+                        {% dl_with_parent "acronym" education_group_year.administration_entity_version parent.administration_entity_version dl_title=_("Administration entity")%}
+                        {% dl_with_parent "start_year" education_group_year.education_group parent.education_group dl_title=_("Start") default_value=_('unspecified') %}
+                        {% dl_with_parent "end_year" education_group_year.education_group parent.education_group dl_title=_("End") default_value=_('unspecified') %}
+                        {% dl_with_parent "main_teaching_campus" %}
+                        {% dl_with_parent "enrollment_campus" %}
+                        {% dl_with_parent "other_campus_activities" %}
                     </div>
                 </div>
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        {% dl_with_parent _("Funding") "funding" %}
-                        {% dl_with_parent _("Funding direction") "funding_direction" %}
-                        {% dl_with_parent _("Funding international cooperation CCD/CUD") "funding_cud" %}
-                        {% dl_with_parent _("Funding international cooperation CCD/CUD direction") "funding_direction_cud" %}
+                        {% dl_with_parent "funding" %}
+                        {% dl_with_parent "funding_direction" %}
+                        {% dl_with_parent "funding_cud" %}
+                        {% dl_with_parent "funding_direction_cud" %}
                     </div>
                 </div>
+                {% include "blocks/panel/reversion.html" %}
             </div>
         </div>
         {% include 'education_group/blocks/remarks.html' %}

@@ -30,7 +30,7 @@ from base.business.education_groups.postponement import duplicate_education_grou
 from base.business.utils.postponement import AutomaticPostponement
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import TRAINING
-from base.models.enums.education_group_types import MINITRAINING_TO_POSTONE
+from base.models.enums.education_group_types import MiniTrainingType
 from base.utils.send_mail import send_mail_before_annual_procedure_of_automatic_postponement_of_egy, \
     send_mail_after_annual_procedure_of_automatic_postponement_of_egy
 
@@ -47,7 +47,7 @@ class EducationGroupAutomaticPostponement(AutomaticPostponement):
         # We need to postpone only trainings and some mini trainings
         return super().get_queryset(queryset).filter(
             Q(education_group_type__category=TRAINING) |
-            Q(education_group_type__name__in=MINITRAINING_TO_POSTONE)
+            Q(education_group_type__name__in=MiniTrainingType.to_postpone())
         )
 
     def get_already_duplicated(self):

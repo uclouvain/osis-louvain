@@ -1,0 +1,29 @@
+{% load i18n %}
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4>{% trans "Last modifications" %}</h4>
+    </div>
+    <div class="panel-body" style="max-height: 200px; overflow-y: auto">
+        <table class="table table-striped">
+            <thead>
+            <tr>
+                <th>{% trans "Datetime" %}</th>
+                <th>{% trans "User" %}</th>
+            </tr>
+            <thead>
+            <tbody>
+            {% for version in versions %}
+                <tr>
+                    <td>
+                        {{ version.revision.date_created }}
+                    </td>
+                    <td>
+                        {{ version.revision.user.person| default_if_none:"-" }}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>

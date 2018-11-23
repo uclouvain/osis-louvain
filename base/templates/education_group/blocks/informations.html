@@ -27,20 +27,20 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            {% dl_with_parent _('Acronym') 'acronym' class_dl="col-md-6" %}
-            {% dl_with_parent  _('code') 'partial_acronym' class_dl="col-md-6" %}
-            {% dl_with_parent  _('Category') 'education_group_type.category' class_dl="col-md-6" %}
-            {% dl_with_parent  _('Training type') 'education_group_type.name' class_dl="col-md-6" %}
+            {% dl_with_parent 'acronym' class_dl="col-md-6" %}
+            {% dl_with_parent 'partial_acronym' class_dl="col-md-6" %}
+            {% dl_with_parent 'category' education_group_year.education_group_type parent.education_group_type class_dl="col-md-6" %}
+            {% dl_with_parent 'name' education_group_year.education_group_type parent.education_group_type class_dl="col-md-6" %}
 
             {% if education_group_year.education_group_type.category != 'GROUP' %}
-                {% dl_with_parent  _('Status') 'active' class_dl="col-md-6" %}
-                {% dl_with_parent  _('Schedule type') 'schedule_type' class_dl="col-md-6" %}
+                {% dl_with_parent 'active' class_dl="col-md-6" %}
+                {% dl_with_parent 'schedule_type' class_dl="col-md-6" %}
             {% endif %}
 
-            {% dl_with_parent _('Credits') 'credits' class_dl="col-md-6" %}
-            {% dl_with_parent _('type of constraint') 'verbose_constraint_type' class_dl="col-md-6" %}
-            {% dl_with_parent _('minimum constraint') 'min_constraint' class_dl="col-md-6" %}
-            {% dl_with_parent _('maximum constraint') 'max_constraint' class_dl="col-md-6" %}
+            {% dl_with_parent 'credits' class_dl="col-md-6" %}
+            {% dl_with_parent 'verbose_constraint_type' dl_title=_('Type of constraint') class_dl="col-md-6" %}
+            {% dl_with_parent 'min_constraint' class_dl="col-md-6" %}
+            {% dl_with_parent 'max_constraint' class_dl="col-md-6" %}
         </div>
 
         <div>

@@ -1,4 +1,4 @@
-##############################################################################
+############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,24 +22,10 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from django.db import models
-from reversion.admin import VersionAdmin
-
-from osis_common.models.osis_model_admin import OsisModelAdmin
+############################################################################
+from reversion.middleware import RevisionMiddleware
 
 
-class EducationGroupYearDomainAdmin(VersionAdmin, OsisModelAdmin):
-    list_display = ('domain', 'education_group_year', 'changed')
-    list_filter = ('education_group_year__academic_year',)
-    search_fields = ['domain__name', 'education_group_year__acronym']
-
-
-class EducationGroupYearDomain(models.Model):
-    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    changed = models.DateTimeField(null=True, auto_now=True)
-    domain = models.ForeignKey('reference.Domain')
-    education_group_year = models.ForeignKey('base.EducationGroupYear')
-
-    def __str__(self):
-        return u"%s - %s" % (self.domain, self.education_group_year)
+class BaseRevisionMiddleware(RevisionMiddleware):
+    # Some views are non_atimoc, so we can not wrap the revision transaction
+    atomic = False

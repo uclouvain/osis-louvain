@@ -27,14 +27,15 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models import entity_version
 from base.models.enums import entity_container_year_link_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES, EntityContainerYearLinkTypes
-from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
+from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
-class EntityContainerYearAdmin(SerializableModelAdmin):
+class EntityContainerYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('external_id', 'learning_container_year', 'entity', 'type')
     search_fields = ['learning_container_year__acronym', 'type']
     list_filter = ('learning_container_year__academic_year',)

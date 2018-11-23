@@ -195,13 +195,20 @@ class EducationGroupYearTest(TestCase):
 
 
 class EducationGroupYearCleanTest(TestCase):
-    def test_clean_constraint(self):
-
+    def test_clean_constraint_both_value_set_case_no_errors(self):
         e = EducationGroupYearFactory(min_constraint=12, max_constraint=20, constraint_type=CREDITS)
         try:
             e.clean()
         except ValidationError:
             self.fail()
+
+    def test_clean_constraint_only_one_value_set_case_no_errors(self):
+        e = EducationGroupYearFactory(min_constraint=12, max_constraint=None, constraint_type=CREDITS)
+        e.clean()
+
+        e.min_constraint = None
+        e.max_constraint = 12
+        e.clean()
 
     def test_clean_no_constraint_type(self):
         e = EducationGroupYearFactory(min_constraint=12, max_constraint=20, constraint_type=None)

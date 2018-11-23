@@ -25,14 +25,15 @@
 ##############################################################################
 from django.db import models
 from django.utils.functional import cached_property
+from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models import organization_address
 from base.models.enums import diploma_coorganization
 from osis_common.models.osis_model_admin import OsisModelAdmin
-from django.utils.translation import ugettext_lazy as _
 
 
-class EducationGroupOrganizationAdmin(OsisModelAdmin):
+class EducationGroupOrganizationAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('education_group_year', 'organization')
     raw_id_fields = ('education_group_year', 'organization')
     search_fields = ['education_group_year__acronym']

@@ -51,3 +51,11 @@ def get_object_or_none(klass, *args, **kwargs):
             "First argument to get_object_or_none() must be a Model, Manager, "
             "or QuerySet, not '%s'." % klass__name
         )
+
+
+def get_verbose_field_value(instance, key):
+    if hasattr(instance, "get_" + key + "_display"):
+        value = getattr(instance, "get_" + key + "_display")()
+    else:
+        value = getattr(instance, key, None)
+    return value

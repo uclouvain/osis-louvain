@@ -31,6 +31,7 @@ from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from ordered_model.models import OrderedModel
+from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models import education_group_type, education_group_year
@@ -40,10 +41,10 @@ from base.models.enums import education_group_categories, link_type, quadrimeste
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.models.learning_unit_year import LearningUnitYear
 from osis_common.decorators.deprecated import deprecated
-from osis_common.models import osis_model_admin
+from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class GroupElementYearAdmin(osis_model_admin.OsisModelAdmin):
+class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('parent', 'child_branch', 'child_leaf',)
     readonly_fields = ('order',)
     search_fields = [

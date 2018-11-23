@@ -828,16 +828,17 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
         self.other_campus = CampusFactory()
 
     def test_with_no_fields_to_update(self):
-        old_luy_values = model_to_dict(self.learning_unit_year)
+        old_luy_values = model_to_dict(self.learning_unit_year, exclude="learning_component_years")
         old_lc_values = model_to_dict(self.learning_container_year)
 
         update_learning_unit_year_with_report(self.learning_unit_year, {}, {})
 
         self.learning_unit_year.refresh_from_db()
         self.learning_container_year.refresh_from_db()
-        new_luy_values = model_to_dict(self.learning_unit_year)
+        new_luy_values = model_to_dict(self.learning_unit_year, exclude="learning_component_years")
         new_lc_values = model_to_dict(self.learning_container_year)
 
+        self.maxDiff = None
         self.assertDictEqual(old_luy_values, new_luy_values)
         self.assertDictEqual(old_lc_values, new_lc_values)
 
@@ -911,7 +912,7 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
         update_learning_unit_year_with_report(learning_unit_years[1], fields_to_update, {},
                                               override_postponement_consistency=True)
 
-        self.assert_fields_not_updated(learning_unit_years[0])
+        self.assert_fields_not_updated(learning_unit_years[0], exclude="learning_component_years")
         self.assert_fields_not_updated(learning_unit_years[0].learning_container_year)
 
         for index, luy in enumerate(learning_unit_years[1:]):
@@ -1000,7 +1001,7 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
                                    learning_container_year_fields_to_update)
 
         for luy in learning_unit_years[1:]:
-            self.assert_fields_not_updated(luy)
+            self.assert_fields_not_updated(luy, exclude="learning_component_years")
             self.assert_fields_not_updated(luy.learning_container_year)
 
     def assert_fields_updated(self, instance, fields_value, exclude=None):
@@ -1012,11 +1013,14 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
         fields_value_without_excluded = {field: value for field, value in fields_value.items() if field not in exclude}
         self.assertDictEqual(fields_value_without_excluded, instance_values)
 
-    def assert_fields_not_updated(self, instance, fields=None):
-        past_instance_values = model_to_dict(instance, fields=fields)
+    def assert_fields_not_updated(self, instance, fields=None, exclude=None):
+
+        past_instance_values = model_to_dict(instance, fields, exclude)
 
         instance.refresh_from_db()
-        new_instance_values = model_to_dict(instance, fields=fields)
+        new_instance_values = model_to_dict(instance, fields, exclude)
+        self.maxDiff = None
+
         self.assertDictEqual(past_instance_values, new_instance_values)
 
 

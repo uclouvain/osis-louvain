@@ -28,13 +28,14 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.db.models import Q
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models.learning_unit_year import MINIMUM_CREDITS, MAXIMUM_CREDITS
 from base.models.organization_address import OrganizationAddress
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
-class ExternalLearningUnitYearAdmin(OsisModelAdmin):
+class ExternalLearningUnitYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('external_id', 'external_acronym', 'external_credits', 'url', 'learning_unit_year',
                     'requesting_entity', "author", "date")
     search_fields = ['acronym', 'learning_unit_year__acronym', 'author']

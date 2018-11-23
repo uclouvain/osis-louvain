@@ -83,6 +83,7 @@ def validate_json_request(request, year, acronym):
         raise SuspiciousOperation('Invalid JSON')
 
     request_json = request.data
+
     if 'anac' not in request_json or 'code_offre' not in request_json or 'sections' not in request_json:
         raise SuspiciousOperation('Invalid JSON')
 
@@ -231,7 +232,7 @@ def admission_condition_line_to_dict(context, admission_condition_line):
         for field in fields
     }
 
-    result['access'] = admission_condition_line.access
+    result['access'] = admission_condition_line.get_access_display()
     return result
 
 

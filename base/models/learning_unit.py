@@ -26,10 +26,12 @@
 from django.db import models, IntegrityError
 from django.db.models import Max
 from django.utils.translation import ugettext_lazy as _
+from reversion.admin import VersionAdmin
 
 from base.models.academic_year import current_academic_year, AcademicYear
 from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
-from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
+from osis_common.models.serializable_model import SerializableModel, \
+    SerializableModelAdmin
 
 LEARNING_UNIT_ACRONYM_REGEX_BASE = "^[BLMWX][A-Z]{2,4}\d{4}"
 LETTER_OR_DIGIT = "[A-Z0-9]"
@@ -45,7 +47,7 @@ REGEX_BY_SUBTYPE = {
 }
 
 
-class LearningUnitAdmin(SerializableModelAdmin):
+class LearningUnitAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('learning_container', 'acronym', 'title', 'start_year', 'end_year', 'changed')
     search_fields = ['learningunityear__acronym', 'learningunityear__specific_title', 'learning_container__external_id']
     list_filter = ('start_year',)

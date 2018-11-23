@@ -51,7 +51,6 @@ from base.views.learning_unit import learning_unit_components
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context, \
     get_common_context_learning_unit_year
-from base.views.learning_units.detail import learning_unit_identification
 
 
 @login_required
@@ -150,7 +149,7 @@ def learning_unit_volumes_management(request, learning_unit_year_id, form_type):
         if form_type == "full":
             return HttpResponseRedirect(reverse(learning_unit_components, args=[learning_unit_year_id]))
         else:
-            return HttpResponseRedirect(reverse(learning_unit_identification, args=[learning_unit_year_id]))
+            return HttpResponseRedirect(reverse("learning_unit", args=[learning_unit_year_id]))
 
     context['formsets'] = volume_edition_formset_container.formsets
     context['tab_active'] = 'components'

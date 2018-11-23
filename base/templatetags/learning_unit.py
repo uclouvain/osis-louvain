@@ -30,6 +30,7 @@ from django.utils.translation import ugettext_lazy as _
 from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym, LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.business.learning_units.comparison import DEFAULT_VALUE_FOR_NONE
+from base.models.utils.utils import get_verbose_field_value
 
 register = template.Library()
 DIFFERENCE_CSS = "style='color:#5CB85C;'"
@@ -90,10 +91,7 @@ def dl_tooltip(context, instance, key, **kwargs):
         label_text = instance._meta.get_field(key).verbose_name.capitalize()
 
     if not value:
-        if hasattr(instance, "get_"+key+"_display"):
-            value = getattr(instance, "get_"+key+"_display")()
-        else:
-            value = getattr(instance, key, default_if_none)
+        value = get_verbose_field_value(instance, key)
 
     difference = get_difference_css(differences, key, default_if_none) or 'title="{}"'.format(_(title))
 

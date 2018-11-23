@@ -8,7 +8,8 @@ from base.models.admission_condition import AdmissionCondition, AdmissionConditi
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_types, education_group_categories
+from base.models.enums.education_group_categories import TRAINING
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import (
@@ -18,8 +19,8 @@ from base.tests.factories.education_group_year import (
 )
 
 OFFERS = [
-    {'name': education_group_types.BACHELOR, 'category': education_group_categories.TRAINING, 'code': '1BA'},
-    {'name': education_group_types.PGRM_MASTER_120, 'category': education_group_categories.TRAINING, 'code': '2M'},
+    {'name': TrainingType.BACHELOR.name, 'category': TRAINING, 'code': '1BA'},
+    {'name': TrainingType.PGRM_MASTER_120.name, 'category': TRAINING, 'code': '2M'},
 ]
 
 

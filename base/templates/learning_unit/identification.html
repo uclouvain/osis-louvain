@@ -124,7 +124,7 @@
                         <div class="panel-body">
                             <div class="row" style="padding-left: 5px">
                                 <div class="col-md-3">
-                                    {% dl_tooltip learning_unit_year 'quadrimester'%}
+                                    {% dl_tooltip learning_unit_year 'quadrimester' %}
                                 </div>
                                 <div class="col-md-9">
                                     {% dl_tooltip learning_unit_year 'session' %}
@@ -168,7 +168,7 @@
                                         <label>{% trans 'Decision' %}</label><br>
                                         <p id="id_type_declaration_vacant">
                                             {% if learning_unit_year.learning_container_year.type_declaration_vacant %}
-                                                {{ learning_unit_year.learning_container_year.get_type_declaration_vacant_display  }}
+                                                {{ learning_unit_year.learning_container_year.get_type_declaration_vacant_display }}
                                             {% endif %}
                                         </p>
                                     </div>
@@ -218,6 +218,7 @@
                     {% include 'learning_unit/blocks/panel/proposal.html' %}
                 {% endblock %}
                 {% block panel_external_author %}{% endblock %}
+                {% include 'blocks/panel/reversion.html' %}
             </div>
         </div>
     </div>

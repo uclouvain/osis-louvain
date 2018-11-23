@@ -34,12 +34,13 @@
             <div class="col-md-5" style="margin-top: 10px">
                 <div class="panel panel-default">
                     <div class="panel-body">
-                        {% dl_with_parent _("Management entity") "management_entity_version.acronym" %}
-                        {% dl_with_parent _("Start") "education_group.start_year" default_value=_('unspecified') %}
-                        {% dl_with_parent _("End") "education_group.end_year" default_value=_('unspecified') %}
-                        {% dl_with_parent _("Learning location") "main_teaching_campus" %}
+                        {% dl_with_parent 'acronym' education_group_year.management_entity_version parent.management_entity_version  %}
+                        {% dl_with_parent "start_year" education_group_year.education_group parent.education_group dl_title=_("Start") default_value=_('unspecified') %}
+                        {% dl_with_parent "end_year" education_group_year.education_group parent.education_group dl_title=_("End") default_value=_('unspecified') %}
+                        {% dl_with_parent "main_teaching_campus" %}
                     </div>
                 </div>
+                {% include "blocks/panel/reversion.html" %}
             </div>
         </div>
         {% include 'education_group/blocks/remarks.html' %}

@@ -57,7 +57,6 @@ from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFact
 from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.tests.forms.test_edition_form import get_valid_formset_data
 from base.views.learning_unit import learning_unit_components
-from base.views.learning_units.detail import learning_unit_identification
 from base.views.learning_units.update import learning_unit_edition_end_date, learning_unit_volumes_management, \
     update_learning_unit, _get_learning_units_for_context
 
@@ -507,7 +506,7 @@ class TestLearningUnitVolumesManagement(TestCase):
         msg = [m.message for m in get_messages(request)]
         self.assertEqual(len(msg), 1)
         self.assertIn(messages.SUCCESS, msg_level)
-        self.assertEqual(response.url, reverse(learning_unit_identification, args=[self.learning_unit_year.id]))
+        self.assertEqual(response.url, reverse("learning_unit", args=[self.learning_unit_year.id]))
 
         for generated_container_year in self.generate_container:
             learning_component_year = generated_container_year.learning_component_cm_full

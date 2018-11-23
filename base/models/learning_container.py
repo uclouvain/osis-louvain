@@ -24,11 +24,12 @@
 #
 ##############################################################################
 from django.db import models
+from reversion.admin import VersionAdmin
 
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
-class LearningContainerAdmin(SerializableModelAdmin):
+class LearningContainerAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('external_id',)
     search_fields = ['external_id', 'learningcontaineryear__acronym']
 

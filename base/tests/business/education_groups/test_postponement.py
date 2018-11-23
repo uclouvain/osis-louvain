@@ -34,7 +34,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import entity_type
 from base.models.enums import organization_type
 from base.models.enums.education_group_categories import GROUP, MINI_TRAINING
-from base.models.enums.education_group_types import OPTION
+from base.models.enums.education_group_types import MiniTrainingType
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.education_group import EducationGroupFactory
@@ -197,7 +197,7 @@ class TestPostpone(TestCase):
 
     def test_init_wrong_instance_minitraining(self):
         self.current_education_group_year.education_group_type.category = MINI_TRAINING
-        self.current_education_group_year.education_group_type.name = OPTION
+        self.current_education_group_year.education_group_type.name = MiniTrainingType.OPTION.name
         self.current_education_group_year.education_group_type.save()
 
         with self.assertRaises(NotPostponeError) as cm:

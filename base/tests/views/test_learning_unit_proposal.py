@@ -73,7 +73,6 @@ from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
-from base.views.learning_units.detail import learning_unit_identification
 from base.views.learning_units.proposal.update import update_learning_unit_proposal, \
     learning_unit_modification_proposal, \
     learning_unit_suppression_proposal
@@ -242,7 +241,7 @@ class TestLearningUnitModificationProposal(TestCase):
     def test_post_request(self):
         response = self.client.post(self.url, data=self.form_data)
 
-        redirected_url = reverse(learning_unit_identification, args=[self.learning_unit_year.id])
+        redirected_url = reverse("learning_unit", args=[self.learning_unit_year.id])
         self.assertRedirects(response, redirected_url, fetch_redirect_response=False)
 
         a_proposal_learning_unit = proposal_learning_unit.find_by_learning_unit_year(self.learning_unit_year)
@@ -493,7 +492,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
     def test_post_request(self):
         response = self.client.post(self.url, data=self.form_data)
 
-        redirected_url = reverse(learning_unit_identification, args=[self.learning_unit_year.id])
+        redirected_url = reverse("learning_unit", args=[self.learning_unit_year.id])
         self.assertRedirects(response, redirected_url, fetch_redirect_response=False)
 
         a_proposal_learning_unit = proposal_learning_unit.find_by_learning_unit_year(self.learning_unit_year)

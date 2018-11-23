@@ -23,28 +23,62 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404, render
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.shortcuts import get_object_or_404
+from django.utils.functional import cached_property
+from django.views.generic import DetailView
+from reversion.models import Version
 
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.views.learning_units.common import get_learning_unit_identification_context
 
 
-@login_required
-def learning_unit_identification(request, learning_unit_year_id):
-    person = get_object_or_404(Person, user=request.user)
-    context = get_learning_unit_identification_context(learning_unit_year_id, person)
+class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
+    permission_required = 'base.can_access_learningunit'
+    raise_exception = True
 
-    learning_unit_year = context['learning_unit_year']
+    template_name = "learning_unit/identification.html"
 
-    if learning_unit_year.is_external():
-        template = "learning_unit/external/read.html"
-        permission = 'base.can_access_externallearningunityear'
-    else:
-        template = "learning_unit/identification.html"
-        permission = 'base.can_access_learningunit'
+    pk_url_kwarg = "learning_unit_year_id"
+    context_object_name = "learning_unit_year"
 
-    if not person.user.has_perm(permission):
-        raise PermissionDenied
-    return render(request, template, context)
+    model = LearningUnitYear
+
+    def dispatch(self, request, *args, **kwargs):
+        # Change template and permissions for external learning units.
+        if self.get_object().is_external():
+            self.permission_required = "base.can_access_externallearningunityear"
+            self.template_name = "learning_unit/external/read.html"
+
+        return super().dispatch(request, *args, **kwargs)
+
+    @cached_property
+    def person(self):
+        return get_object_or_404(Person, user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # TODO clean in the context params alredy given by the View.
+        context.update(get_learning_unit_identification_context(
+            self.kwargs['learning_unit_year_id'], self.person
+        ))
+        context["versions"] = self.get_versions()
+        return context
+
+    def get_versions(self):
+        """ Fetch all versions related to the learning unit year """
+        versions = Version.objects.get_for_object(self.object)
+        versions |= Version.objects.get_for_object(self.object.learning_container_year)
+        versions |= Version.objects.get_for_object(self.object.learning_unit)
+
+        if self.object.is_external():
+            versions |= Version.objects.get_for_object(self.object.externallearningunityear)
+
+        for component in self.object.learning_component_years.all():
+            versions |= Version.objects.get_for_object(component)
+            for entity_component in component.entitycomponentyear_set.all():
+                versions |= Version.objects.get_for_object(entity_component)
+
+        return versions.order_by('-revision__date_created').distinct('revision__date_created')

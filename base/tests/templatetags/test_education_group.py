@@ -25,6 +25,7 @@
 ##############################################################################
 from datetime import timedelta
 
+from django.core.exceptions import FieldDoesNotExist
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 from django.utils import timezone
@@ -446,14 +447,14 @@ class TestEducationGroupDlWithParent(TestCase):
         }
 
     def test_dl_value_in_education_group(self):
-        response = dl_with_parent(self.context, _("Acronym"), "acronym")
+        response = dl_with_parent(self.context, "acronym")
         self.assertEqual(response["value"], self.education_group_year.acronym)
         self.assertEqual(response["label"], _("Acronym"))
         self.assertEqual(response["parent_value"], None)
 
     def test_dl_value_in_parent(self):
         self.education_group_year.acronym = ""
-        response = dl_with_parent(self.context, _("Acronym"), "acronym")
+        response = dl_with_parent(self.context, "acronym")
         self.assertEqual(response["value"], "")
         self.assertEqual(response["label"], _("Acronym"))
         self.assertEqual(response["parent_value"], self.parent.acronym)
@@ -461,7 +462,7 @@ class TestEducationGroupDlWithParent(TestCase):
     def test_dl_default_value(self):
         self.education_group_year.acronym = ""
         self.parent.acronym = ""
-        response = dl_with_parent(self.context, _("Acronym"), "acronym", default_value="avada kedavra")
+        response = dl_with_parent(self.context, "acronym", default_value="avada kedavra")
 
         self.assertEqual(response["value"], "")
         self.assertEqual(response["label"], _("Acronym"))
@@ -470,23 +471,22 @@ class TestEducationGroupDlWithParent(TestCase):
 
     def test_dl_with_bool(self):
         self.education_group_year.partial_deliberation = False
-        response = dl_with_parent(self.context, "partial_deliberation", "partial_deliberation")
+        response = dl_with_parent(self.context, "partial_deliberation")
         self.assertEqual(response["value"], "no")
         self.assertEqual(response["parent_value"], None)
 
         self.education_group_year.partial_deliberation = True
-        response = dl_with_parent(self.context, "partial_deliberation", "partial_deliberation")
+        response = dl_with_parent(self.context, "partial_deliberation")
         self.assertEqual(response["value"], "yes")
         self.assertEqual(response["parent_value"], None)
 
         self.education_group_year.partial_deliberation = None
         self.parent.partial_deliberation = True
-        response = dl_with_parent(self.context, "partial_deliberation", "partial_deliberation")
+        response = dl_with_parent(self.context, "partial_deliberation")
         self.assertEqual(response["value"], None)
         self.assertEqual(response["parent_value"], "yes")
 
     def test_dl_invalid_key(self):
         self.education_group_year.partial_deliberation = False
-        response = dl_with_parent(self.context, "partial_deliberation", "not_a_real_attr")
-        self.assertEqual(response["value"], None)
-        self.assertEqual(response["parent_value"], None)
+        with self.assertRaises(FieldDoesNotExist):
+            response = dl_with_parent(self.context, "not_a_real_attr")

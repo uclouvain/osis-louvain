@@ -26,12 +26,13 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from ordered_model.models import OrderedModel
+from reversion.admin import VersionAdmin
 
 from base.models.abstracts.abstract_education_group_achievement import AbstractEducationGroupAchievement, \
     AbstractEducationGroupAchievementAdmin
 
 
-class EducationGroupAchievementAdmin(AbstractEducationGroupAchievementAdmin):
+class EducationGroupAchievementAdmin(VersionAdmin, AbstractEducationGroupAchievementAdmin):
     raw_id_fields = ('education_group_year',)
 
     def get_list_display(self, request):
