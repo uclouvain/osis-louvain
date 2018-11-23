@@ -100,9 +100,8 @@ def _common_success_redirect(request, form, root):
 
 
 def _get_success_message_for_update_education_group_year(root_id, education_group_year):
-    msg_key = "Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfuly updated."
     link = reverse("education_group_read", args=[root_id, education_group_year.id])
-    return _(msg_key) % {
+    return _("Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfuly updated.") % {
         "link": link,
         "acronym": education_group_year.acronym,
         "academic_year": education_group_year.academic_year,
@@ -110,8 +109,7 @@ def _get_success_message_for_update_education_group_year(root_id, education_grou
 
 
 def _get_success_message_for_deleted_education_group_year(education_group_year):
-    MSG_KEY = "Education group year %(acronym)s (%(academic_year)s) successfuly deleted."
-    return _(MSG_KEY) % {
+    return _("Education group year %(acronym)s (%(academic_year)s) successfuly deleted.") % {
         "acronym": education_group_year.acronym,
         "academic_year": education_group_year.academic_year,
     }

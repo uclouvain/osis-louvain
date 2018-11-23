@@ -42,7 +42,7 @@ from base.models.enums import education_group_categories, internship_presence
 from base.models.enums.active_status import ACTIVE
 from base.models.enums.schedule_type import DAILY
 from base.models.group_element_year import GroupElementYear
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.certificate_aim import CertificateAimFactory
@@ -66,6 +66,18 @@ from reference.tests.factories.language import LanguageFactory
 class TestUpdate(TestCase):
     def setUp(self):
         self.current_academic_year = create_current_academic_year()
+        self.start_date_ay_1 = self.current_academic_year.start_date.replace(year=self.current_academic_year.year + 1)
+        self.end_date_ay_1 = self.current_academic_year.end_date.replace(year=self.current_academic_year.year + 2)
+        academic_year_1 = AcademicYearFactory.build(start_date=self.start_date_ay_1,
+                                                    end_date=self.end_date_ay_1,
+                                                    year=self.current_academic_year.year + 1)
+        academic_year_1.save()
+        self.start_date_ay_2 = self.current_academic_year.start_date.replace(year=self.current_academic_year.year + 2)
+        self.end_date_ay_2 = self.current_academic_year.end_date.replace(year=self.current_academic_year.year + 3)
+        academic_year_2 = AcademicYearFactory.build(start_date=self.start_date_ay_2,
+                                                    end_date=self.end_date_ay_2,
+                                                    year=self.current_academic_year.year + 2)
+        academic_year_2.save()
 
         self.education_group_year = GroupFactory()
 
@@ -95,6 +107,18 @@ class TestUpdate(TestCase):
         self.training_education_group_year = TrainingFactory(
             academic_year=self.current_academic_year,
             education_group_type=self.an_training_education_group_type
+        )
+
+        self.training_education_group_year_1 = TrainingFactory(
+            academic_year=academic_year_1,
+            education_group_type=self.an_training_education_group_type,
+            education_group=self.training_education_group_year.education_group
+        )
+
+        self.training_education_group_year_2 = TrainingFactory(
+            academic_year=academic_year_2,
+            education_group_type=self.an_training_education_group_type,
+            education_group=self.training_education_group_year.education_group
         )
 
         AuthorizedRelationshipFactory(
@@ -223,6 +247,44 @@ class TestUpdate(TestCase):
             list_domains
         )
         self.assertNotIn(old_domain, self.education_group_year.secondary_domains.all())
+
+    def test_post_training_with_end_year(self):
+        new_entity_version = MainEntityVersionFactory()
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        data = {
+            'title': 'Cours au choix',
+            'title_english': 'deaze',
+            'education_group_type': self.an_training_education_group_type.pk,
+            'credits': 42,
+            'acronym': 'CRSCHOIXDVLD',
+            'partial_acronym': 'LDVLD101R',
+            'management_entity': new_entity_version.pk,
+            'administration_entity': new_entity_version.pk,
+            'main_teaching_campus': "",
+            'academic_year': self.training_education_group_year.academic_year.pk,
+            'secondary_domains': ['|' + ('|'.join([str(domain.pk) for domain in self.domains])) + '|'],
+            'active': ACTIVE,
+            'schedule_type': DAILY,
+            "internship": internship_presence.NO,
+            "primary_language": LanguageFactory().pk,
+            "start_year": 2010,
+            "end_year": 2018,
+            "constraint_type": "",
+        }
+        response = self.client.post(self.training_url, data=data)
+        messages = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertEqual(
+            messages[1], _("Education group year %(acronym)s (%(academic_year)s) successfuly deleted.") % {
+                "acronym": self.training_education_group_year_1.acronym,
+                "academic_year": self.training_education_group_year_1.academic_year,
+            }
+        )
+        self.assertEqual(
+            messages[2], _("Education group year %(acronym)s (%(academic_year)s) successfuly deleted.") % {
+                "acronym": self.training_education_group_year_2.acronym,
+                "academic_year": self.training_education_group_year_2.academic_year,
+            }
+        )
 
 
 class TestGetSuccessRedirectUrl(TestCase):

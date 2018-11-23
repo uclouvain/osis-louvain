@@ -39,9 +39,7 @@ from django_filters.views import FilterView
 from base import models as mdl
 from base.forms.organization import OrganizationFilter
 from base.models.campus import Campus
-from base.models.entity_version import EntityVersion
 from base.models.organization import Organization
-from base.models.organization_address import find_distinct_by_country
 from base.views import layout
 from reference import models as mdlref
 from reference.models.country import Country
@@ -55,6 +53,12 @@ class OrganizationSearch(PermissionRequiredMixin, FilterView):
     filterset_class = OrganizationFilter
     permission_required = 'base.can_access_organization'
     raise_exception = True
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        # Display the list even if the filter is not bound
+        if not self.filterset.is_bound:
+            object_list = self.filterset.qs
+        return super().get_context_data(object_list=object_list, **kwargs)
 
 
 class DetailOrganization(PermissionRequiredMixin, DetailView):
@@ -112,7 +116,7 @@ def organization_address_save(request, organization_address_id):
 
     country = request.POST.get('country')
     if country is not None:
-        organization_address.country = mdlref.country.find_by_id(int(country))
+        organization_address.country = Country.objects.get(pk=country)
 
     organization_id = request.POST.get('organization_id')
     if organization_id is not None:

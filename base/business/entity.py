@@ -50,7 +50,7 @@ def get_entities_ids(entity_acronym, with_entity_subordinated):
 
 
 def get_entity_calendar(an_entity_version, academic_yr):
-    entity_cal = entity_calendar.find_by_entity_and_reference_and_academic_year(
+    entity_cal = entity_calendar.find_by_entity_and_reference(
         an_entity_version.entity.id,
         academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
         academic_yr

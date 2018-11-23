@@ -1,6 +1,7 @@
 $(document).ready(function(){
     $('[data-toggle="tooltip"]').tooltip();
     check_browser();
+    collapseWarnings();
 });
 
 $.ajaxSetup({
@@ -168,4 +169,21 @@ function displayInfoMessage(jsonResponse, containerId) {
     message_info_container.innerHTML = jsonResponse['success_message'];
     message_info_container.style.display = "block";
     message_info_container.style.visibility = "visible";
+}
+
+function collapseWarnings() {
+    let collapse_warnings = $('#CollapseWarnings');
+    let expand_button = $('#btn_expandButton');
+    //To open by default collapse of warnings
+    collapse_warnings.collapse('toggle');
+
+    collapse_warnings.on("hide.bs.collapse", function(){
+        expand_button.html('<span id="expandButton" class="glyphicon glyphicon-collapse-down" style="color:#8a6d3b"></span>');
+        expand_button.attr("title", gettext("Open"));
+    });
+
+    collapse_warnings.on("show.bs.collapse", function(){
+        expand_button.html('<span id="expandButton"  class="glyphicon glyphicon-collapse-up" style="color:#8a6d3b"></span>');
+        expand_button.attr("title", gettext("Collapse"));
+    });
 }

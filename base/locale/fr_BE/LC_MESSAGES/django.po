@@ -51,7 +51,7 @@ msgstr ""
 
 #: models/education_group_year.py:74
 #: tests/views/group_element_years/test_postpone.py:108
-#: views/education_groups/update.py:226
+#: views/education_groups/update.py:224
 #, python-format
 msgid "%(count)d education group has been postponed with success."
 msgid_plural "%(count)d education groups have been postponed with success."
@@ -563,7 +563,7 @@ msgid "Are you sure you want to detach this content?"
 msgstr "Êtes-vous sûr·e de vouloir détacher ce contenu?"
 
 #: tests/views/group_element_years/test_postpone.py:88
-#: views/education_groups/update.py:215
+#: views/education_groups/update.py:213
 #, python-format
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr "Êtes-vous sûr·e de vouloir reporter le contenu dans %(root)s?"
@@ -1184,6 +1184,21 @@ msgstr "Edition d'organisation de formations"
 #: models/education_group_achievement.py:48 models/education_group_year.py:443
 msgid "Education group year"
 msgstr "Organisation de formations annualisée"
+
+#: views/education_groups/update.py:112
+msgid ""
+"Education group year %(acronym)s (%(academic_year)s) successfuly deleted."
+msgstr ""
+"Organisation de formations %(acronym)s (%(academic_year)s) supprimée avec "
+"succès."
+
+#: views/education_groups/update.py:104
+msgid ""
+"Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
+"a> successfuly updated."
+msgstr ""
+"Organisation de formations <a href='%(link)s'> %(acronym)s "
+"(%(academic_year)s) </a> mis à jour avec succès."
 
 #: templates/education_group/search.html:34
 #: templates/education_group/search.html:42
@@ -2631,10 +2646,9 @@ msgstr "Ph.D"
 msgid "Planned classes"
 msgstr "Classes prévues"
 
-# TODO
 #: models/enums/entity_type.py:45
 msgid "Platform"
-msgstr "%d/%m/%Y"
+msgstr "Plateforme"
 
 #: tests/views/education_groups/test_update.py:573
 #: views/education_groups/group_element_year/update.py:151

@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,24 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import operator
+from django.test import TestCase
 
-import factory
-from factory.django import DjangoModelFactory
-
-from base.models.enums import education_group_categories, education_group_types
+from base.business.utils import url
 
 
-class EducationGroupTypeFactory(DjangoModelFactory):
-    class Meta:
-        model = "base.EducationGroupType"
-
-    external_id = factory.Sequence(lambda n: '10000000%02d' % n)
-    category = education_group_categories.TRAINING
-    name = factory.Iterator(education_group_types.TrainingType.choices(), getter=operator.itemgetter(0))
-
-
-class ExistingEducationGroupTypeFactory(EducationGroupTypeFactory):
-    class Meta:
-        model = 'base.EducationGroupType'
-        django_get_or_create = ('category', 'name')
+class UrlUtilsTestCase(TestCase):
+    def test_get_element_id_from_url(self):
+        self.assertEqual(
+            url.get_parameter_from_url_querystring(
+                "https://www.test.be/?bar=1&foo=2&test=3",
+                'foo'
+            ),
+            '2'
+        )

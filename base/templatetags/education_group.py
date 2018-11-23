@@ -40,8 +40,11 @@ from base.business.education_groups.perms import is_eligible_to_delete_education
     is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_change_achievement, \
     is_eligible_to_delete_achievement, is_eligible_to_postpone_education_group
+from base.business.learning_units.prerequisite import luy_has_or_is_prerequisite
+from base.business.utils.url import get_parameter_from_url_querystring
 from base.models.academic_year import AcademicYear
 from base.models.enums.learning_unit_year_periodicity import BIENNIAL_EVEN, BIENNIAL_ODD, ANNUAL
+from base.models.group_element_year import get_group_element_year_by_id
 from base.models.utils.utils import get_verbose_field_value
 
 OPTIONAL_PNG = base.STATIC_URL + 'img/education_group_year/optional.png'
@@ -244,12 +247,20 @@ def button_order_with_permission(context, title, id_button, value):
 @register.inclusion_tag("blocks/button/button_template.html", takes_context=True)
 def button_with_permission(context, title, value, url):
     permission_denied_message, disabled, root = _get_permission(context, is_eligible_to_change_education_group)
+    load_modal = True
+    if value == 'detach':
+        group_element_year = get_group_element_year_by_id(
+            int(get_parameter_from_url_querystring(url, 'group_element_year_id'))
+        )
+        if group_element_year.child_leaf and luy_has_or_is_prerequisite(group_element_year.child_leaf):
+            disabled = "disabled"
+            load_modal = False
 
     if disabled:
         title = permission_denied_message
 
     return {
-        'load_modal': True,
+        'load_modal': load_modal,
         'title': title,
         'class_button': "btn-default btn-sm " + disabled,
         'icon': ICONS[value],

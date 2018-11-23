@@ -47,7 +47,7 @@ msgstr ""
 
 #: models/education_group_year.py:74
 #: tests/views/group_element_years/test_postpone.py:108
-#: views/education_groups/update.py:226
+#: views/education_groups/update.py:224
 #, python-format
 msgid "%(count)d education group has been postponed with success."
 msgid_plural "%(count)d education groups have been postponed with success."
@@ -539,7 +539,7 @@ msgid "Are you sure you want to detach this content?"
 msgstr ""
 
 #: tests/views/group_element_years/test_postpone.py:88
-#: views/education_groups/update.py:215
+#: views/education_groups/update.py:213
 #, python-format
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr ""
@@ -1153,6 +1153,19 @@ msgstr ""
 
 #: models/education_group_achievement.py:48 models/education_group_year.py:443
 msgid "Education group year"
+msgstr ""
+
+#: views/education_groups/update.py:112
+#, python-format
+msgid ""
+"Education group year %(acronym)s (%(academic_year)s) successfuly deleted."
+msgstr ""
+
+#: views/education_groups/update.py:104
+#, python-format
+msgid ""
+"Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </"
+"a> successfuly updated."
 msgstr ""
 
 #: templates/education_group/search.html:34

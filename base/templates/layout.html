@@ -60,7 +60,6 @@
         $.widget.bridge('uitooltip', $.ui.tooltip);
     </script>
     <script src="{% static 'js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'js/osis.js' %}?version={{ js }}"></script>
     <script type="text/javascript" src="{% static 'js/jquery.dataTables.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/dataTables.bootstrap.min.js' %}"></script>
     <script type="text/javascript" src="{% static "ckeditor/ckeditor-init.js" %}"></script>
@@ -372,26 +371,12 @@
     </div>
 </nav>
 
-{% block script %}
-    <script type="text/javascript">
-    $(document).ready(function(){
-        //To open by default collapse of warnings
-        $('#CollapseWarnings').collapse('toggle');
-
-        $("#CollapseWarnings").on("hide.bs.collapse", function(){
-            $(".btn").html('<span id="expandButton" class="glyphicon glyphicon-collapse-down" style="color:#8a6d3b"></span>');
-            $("#btn_expandButton").attr("title", gettext("Open"));
-        });
-
-        $("#CollapseWarnings").on("show.bs.collapse", function(){
-            $(".btn").html('<span id="expandButton"  class="glyphicon glyphicon-collapse-up" style="color:#8a6d3b"></span>');
-            $("#btn_expandButton").attr("title", gettext("Collapse"));
-        });
-    });
-    </script>
-{% endblock %}
-
+<script src="{% static 'js/osis.js' %}?version={{ js }}"></script>
 <script type="text/javascript" src="{% static "js/modal_form_submit.js" %}"></script>
+
+{% block script %}
+
+{% endblock %}
 
 {% analytical_body_bottom %}
 </body>

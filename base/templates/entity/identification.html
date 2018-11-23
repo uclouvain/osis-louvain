@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% load staticfiles %}
-{% load i18n %}
+{% load i18n bootstrap3 %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -29,107 +29,121 @@
     {% block style %}
         {% include "education_group/blocks/datetimepicker_imports_css.html" %}
     {% endblock style %}
- {% endif %}
+{% endif %}
 
 {% block breadcrumb %}
-{% include "entity/breadcrumb.html" %}
+    {% include "entity/breadcrumb.html" %}
 {% endblock %}
 
 {% block content %}
 
-{% include "entity/header.html" %}
+    {% include "entity/header.html" %}
 
-<div class="panel panel-default" >
-    <div class="panel-body" id="tabs" >
-        {% include "entity/tabs.html" %}
+    <div class="panel panel-default">
+        <div class="panel-body" id="tabs">
+            {% include "entity/tabs.html" %}
 
-        <div class="tab-content">
-            <div id="tab_identification" class="tab-pane active">
-                <br>
-                <div class="row">
-                    <div class="col-md-2">
-                        <label>{% trans 'Acronym' %}</label><br>
-                        {{ entity_version.acronym }}
+            <div class="tab-content">
+                <div id="tab_identification" class="tab-pane active">
+                    <br>
+                    <div class="row">
+                        <dl class="col-md-2">
+                            <dt>{% trans 'Acronym' %}</dt>
+                            <dd>{{ entity_version.acronym }}</dd>
+                        </dl>
+                        <dl class="col-md-10">
+                            <dt>{% trans 'Title' %}</dt>
+                            <dd>{{ entity_version.title }}</dd>
+                        </dl>
                     </div>
-                    <div class="col-md-10">
-                        <label>{% trans 'Title'%}</label><br>
-                        {{ entity_version.title }}
+                    <div class="row">
+                        {% if entity_version.entity_type %}
+                            <dl class="col-md-2">
+                                <dt>{% trans 'Type' %}</dt>
+                                <dd>{% trans entity_version.get_entity_type_display %}</dd>
+                            </dl>
+                        {% endif %}
+                        {% if entity_parent %}
+                            <dl class="col-md-4">
+                                <dt>{% trans 'Attached to' %}</dt>
+                                <dd>
+                                    <a href="{% url 'entity_read' entity_version_id=entity_parent.id %}">
+                                        {{ entity_parent.acronym }} - {{ entity_parent.title }}</a>
+                                </dd>
+                            </dl>
+                        {% endif %}
+                        {% if entity_version.entity.organization %}
+                            <dl class="col-md-6">
+                                <dt>{% trans 'Organization' %}</dt>
+                                <dd>
+                                    <a href="{% url 'organization_read' organization_id=entity_version.entity.organization.id %}">
+                                        {{ entity_version.entity.organization | default_if_none:'' }}
+                                    </a>
+                                </dd>
+                            </dl>
+                        {% endif %}
                     </div>
-                </div>
-                <br>
-                <div class="row">
-                    {% if entity_version.entity_type %}
-                        <div class="col-md-2">
-                            <label>{% trans 'type'%}</label><br>
-                            {% trans entity_version.entity_type %}
-                        </div>
-                    {% endif %}
-                    {% if entity_parent %}
-                        <div class="col-md-4">
-                            <label>{% trans 'Attached to' %}</label><br>
-                            <a href="{% url 'entity_read' entity_version_id=entity_parent.id %}">{{ entity_parent.acronym }} - {{ entity_parent.title }}</a>
-                        </div>
-                    {% endif %}
-                    {% if entity_version.entity.organization %}
-                        <div class="col-md-6">
-                            <label>{% trans 'Organization'%}</label><br>
-                            <a href="{% url 'organization_read' organization_id=entity_version.entity.organization.id %}">{{ entity_version.entity.organization | default_if_none:'' }}</a>
-                        </div>
-                    {% endif %}
-                </div>
-                <br>
 
-                {% if can_user_post %}
-                    {% include "entity/blocks/educational_summary_calendar_widget.html" %}
-                {% else %}
-                    {% include "entity/blocks/educational_summary_calendar_informations.html" %}
-                {% endif %}
-
-                {% if descendants %}
-                <br>
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        <label>{% trans 'Attached entities' %}</label>
-                    </div>
-                    <div class="panel-body">
+                    {% if can_user_post %}
+                        {% include "entity/blocks/educational_summary_calendar_widget.html" %}
+                    {% else %}
                         <div class="row">
-                            <div class="col-md-12">
-                                {% if descendants %}
-                                <table class="table table-striped table-hover">
-                                    <thead>
-                                        <th>{% trans 'Acronym'%}</th>
-                                        <th>{% trans 'Title'%}</th>
-                                        <th>{% trans 'type'%}</th>
-                                    </thead>
-                                    <tbody>
-                                    {% for entity_version in descendants %}
-                                        <tr>
-                                            <td>
-                                                <a href="{% url 'entity_read' entity_version.pk %}"
-                                                   id="lnk_entity_read_{{ entity_version.id }}">
-                                                    {{ entity_version.acronym }}
-                                                </a>
-                                            </td>
-                                            <td>{{ entity_version.title }}</td>
-                                            <td>
-                                                {% if entity_version.entity_type %}
-                                                    {% trans entity_version.entity_type %}
-                                                {% endif %}
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                                {% endif %}
+                            <dl class="col-md-4">
+                                <dt>{{ form.start_date.label }}</dt>
+                                <dd>{{ form.start_date.initial|date:"d/m/Y"|default:"-" }}</dd>
+                            </dl>
+                            <dl class="col-md-4">
+                                <dt>{{ form.end_date.label }}</dt>
+                                <dd>{{ form.end_date.initial|date:"d/m/Y"|default:"-" }}</dd>
+                            </dl>
+                        </div>
+                    {% endif %}
+
+                    {% if descendants %}
+                        <br>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <label>{% trans 'Attached entities' %}</label>
+                            </div>
+                            <div class="panel-body">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        {% if descendants %}
+                                            <table class="table table-striped table-hover">
+                                                <thead>
+                                                <tr>
+                                                    <th>{% trans 'Acronym' %}</th>
+                                                    <th>{% trans 'Title' %}</th>
+                                                    <th>{% trans 'Type' %}</th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                {% for entity_version in descendants %}
+                                                    <tr>
+                                                        <td>
+                                                            <a href="{% url 'entity_read' entity_version.pk %}"
+                                                               id="lnk_entity_read_{{ entity_version.id }}">
+                                                                {{ entity_version.acronym }}
+                                                            </a>
+                                                        </td>
+                                                        <td>{{ entity_version.title }}</td>
+                                                        <td>
+                                                            {{ entity_version.get_entity_type_display|default_if_none:"-" }}
+                                                        </td>
+                                                    </tr>
+                                                {% endfor %}
+                                                </tbody>
+                                            </table>
+                                        {% endif %}
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
         </div>
     </div>
-</div>
 {% endblock %}
 
 {% if can_user_post %}

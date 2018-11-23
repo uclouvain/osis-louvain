@@ -35,7 +35,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 class EntityCalendarAdmin(OsisModelAdmin):
     list_display = ('academic_calendar', 'entity', 'start_date', 'end_date', 'changed')
-    raw_id_fields = ('entity', )
+    raw_id_fields = ('entity',)
     list_filter = ('academic_calendar__academic_year', 'academic_calendar__reference')
 
 
@@ -49,16 +49,15 @@ class EntityCalendar(AbstractCalendar):
         return "{} - {}".format(self.academic_calendar, self.entity)
 
 
-def find_by_entity_and_reference_for_current_academic_year(entity_id, reference):
-    return find_by_entity_and_reference_and_academic_year(entity_id, reference, starting_academic_year())
-
-
-def find_by_entity_and_reference_and_academic_year(entity_id, reference, academic_year):
+def find_by_entity_and_reference(entity_id, reference, academic_year=None):
+    if not academic_year:
+        academic_year = starting_academic_year()
     try:
-        return EntityCalendar.objects.filter(entity_id=entity_id,
-                                             academic_calendar__academic_year=academic_year,
-                                             academic_calendar__reference=reference)\
-            .select_related('entity', 'academic_calendar__academic_year').get()
+        return EntityCalendar.objects.filter(
+            entity_id=entity_id,
+            academic_calendar__academic_year=academic_year,
+            academic_calendar__reference=reference
+        ).select_related('entity', 'academic_calendar__academic_year').get()
     except ObjectDoesNotExist:
         return None
 
@@ -73,12 +72,13 @@ def find_interval_dates_for_entity(ac_year, reference, entity):
 def build_calendar_by_entities(ac_year, reference):
     """
     This function will compute date for each entity. If entity calendar not exist,
-    get default date to academic calendar"""
+    get default date to academic calendar
+    """
     entity_structure = entity_version.build_current_entity_version_structure_in_memory(date=ac_year.end_date)
     entities_id = list(entity_structure.keys())
     ac_calendar = academic_calendar.get_by_reference_and_academic_year(reference, ac_year)
-    all_entities_calendars = EntityCalendar.objects.filter(entity__in=entities_id, academic_calendar=ac_calendar)\
-                                                   .select_related('entity')
+    all_entities_calendars = EntityCalendar.objects.filter(entity__in=entities_id, academic_calendar=ac_calendar) \
+        .select_related('entity')
 
     # Specific date for an entity [record found on entity calendar]
     entity_calendar_computed = {}

@@ -41,8 +41,11 @@ from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory, EducationGroupYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 
 DELETE_MSG = _("delete education group")
 PERMISSION_DENIED_MSG = _("The education group edition period is not open.")
@@ -94,6 +97,29 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
                 'load_modal': True,
                 'url': '#',
                 'icon': 'fa-edit'
+            }
+        )
+
+    def test_button_with_permission_learning_unit_is_prerequisite(self):
+        luy = LearningUnitYearFactory()
+        PrerequisiteItemFactory(learning_unit=luy.learning_unit)
+        group_element_year = GroupElementYearFactory(
+            parent=self.education_group_year,
+            child_branch=None,
+            child_leaf=luy,
+        )
+        url_detach = "{}?group_element_year_id={}".format(
+            reverse('education_groups_management'),
+            group_element_year.pk,
+        )
+        result = button_with_permission(self.context, "title", "detach", url_detach)
+        self.assertDictEqual(
+            result, {
+                'title': '',
+                'class_button': 'btn-default btn-sm disabled',
+                'load_modal': False,
+                'url': url_detach,
+                'icon': 'fa-close'
             }
         )
 

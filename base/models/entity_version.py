@@ -162,8 +162,15 @@ class EntityVersion(SerializableModel):
     entity = models.ForeignKey('Entity')
     title = models.CharField(db_index=True, max_length=255)
     acronym = models.CharField(db_index=True, max_length=20)
-    entity_type = models.CharField(choices=entity_type.ENTITY_TYPES, max_length=50, db_index=True, blank=True,
-                                   null=True)
+
+    entity_type = models.CharField(
+        choices=entity_type.ENTITY_TYPES,
+        max_length=50,
+        db_index=True,
+        blank=True,
+        verbose_name=_("Type")
+    )
+
     parent = models.ForeignKey('Entity', related_name='parent_of', blank=True, null=True)
     start_date = models.DateField(db_index=True)
     end_date = models.DateField(db_index=True, blank=True, null=True)

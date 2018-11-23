@@ -44,7 +44,9 @@ $(document).ready(function () {
         return {
             group_element_year_id: obj.a_attr.group_element_year,
             element_id: obj.a_attr.element_id,
-            element_type: obj.a_attr.element_type
+            element_type: obj.a_attr.element_type,
+            has_prerequisite: obj.a_attr.has_prerequisite,
+            is_prerequisite: obj.a_attr.is_prerequisite
         };
     }
 
@@ -148,7 +150,10 @@ $(document).ready(function () {
                         },
                         "_disabled": function (data) {
                             var __ret = get_data_from_tree(data);
-                            return __ret.group_element_year_id === null; // tree's root cannot be detached
+                            // tree's root and learning_unit having/being prerequisite(s) cannot be detached
+                            return __ret.group_element_year_id === null ||
+                                __ret.has_prerequisite === true ||
+                                __ret.is_prerequisite === true;
                         }
                     }
                 }

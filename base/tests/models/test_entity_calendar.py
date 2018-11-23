@@ -27,7 +27,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from base.models import entity_calendar
-from base.models.entity_calendar import find_by_entity_and_reference_for_current_academic_year
+from base.models.entity_calendar import find_by_entity_and_reference
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION, EXAM_ENROLLMENTS
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -42,21 +42,22 @@ class TestFindByReferenceForCurrentAcademicYear(TestCase):
         previous_academic_year = AcademicYearFactory(year=current_academic_year.year-1)
 
         cls.current_entity_calendar = EntityCalendarFactory(academic_calendar__academic_year=current_academic_year,
-                                                        academic_calendar__reference=SUMMARY_COURSE_SUBMISSION)
+                                                            academic_calendar__reference=SUMMARY_COURSE_SUBMISSION)
         previous_entity_calendar = EntityCalendarFactory(academic_calendar__academic_year=previous_academic_year,
                                                          academic_calendar__reference=SUMMARY_COURSE_SUBMISSION,
                                                          entity=cls.current_entity_calendar.entity)
 
     def test_when_no_data_match_criteria(self):
-        entity_calendar_obj = find_by_entity_and_reference_for_current_academic_year(
+        entity_calendar_obj = find_by_entity_and_reference(
             self.current_entity_calendar.entity.id, EXAM_ENROLLMENTS)
         self.assertIsNone(entity_calendar_obj)
 
     def test_find_for_current_academic_year(self):
-        entity_calendar_obj = find_by_entity_and_reference_for_current_academic_year(
-            self.current_entity_calendar.entity.id, SUMMARY_COURSE_SUBMISSION)
+        entity_calendar_obj = find_by_entity_and_reference(
+            self.current_entity_calendar.entity.id,
+            SUMMARY_COURSE_SUBMISSION
+        )
         self.assertEqual(entity_calendar_obj, self.current_entity_calendar)
-
 
 
 class TestBuildCalendarByEntity(TestCase):

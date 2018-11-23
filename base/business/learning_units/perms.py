@@ -25,11 +25,13 @@
 ##############################################################################
 import datetime
 
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.utils.translation import ugettext_lazy as _, pgettext
+from django.utils.translation import ugettext_lazy as _
 from waffle.models import Flag
 
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
+from base.business.learning_units.prerequisite import luy_has_or_is_prerequisite
 from base.models import proposal_learning_unit, tutor
 from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, \
     starting_academic_year
@@ -43,8 +45,6 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import is_person_linked_to_entity_in_charge_of_learning_unit
 from osis_common.utils.datetime import get_tzinfo, convert_date_to_datetime
 from osis_common.utils.perms import conjunction, disjunction, negation, BasePerm
-from django.core.exceptions import PermissionDenied
-from django.conf import settings
 
 FACULTY_UPDATABLE_CONTAINER_TYPES = (learning_container_year_types.COURSE,
                                      learning_container_year_types.DISSERTATION,
@@ -60,6 +60,8 @@ MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE = _("You are not eligible to modify the end d
 MSG_CANNOT_MODIFY_ON_PREVIOUS_ACADEMIC_YR = _("You can't modify learning unit of a previous year")
 MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY = _("You can only modify a learning unit when your are linked to its requirement "
                                         "entity")
+MSG_LEARNING_UNIT_IS_OR_HAS_PREREQUISITE = _("You cannot delete a learning unit which is prerequisite or has "
+                                             "prerequisite(s)")
 MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE = _("Person not in accordance with proposal state")
 MSG_NOT_PROPOSAL_STATE_FACULTY = _("You are faculty manager and the proposal state is not 'Faculty', so you can't edit")
 MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL = _("You are not eligible to cancel proposal")
@@ -196,6 +198,8 @@ def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_e
         msg = MSG_NOT_ELIGIBLE_TO_DELETE_LU
     elif not person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year):
         msg = MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY
+    elif luy_has_or_is_prerequisite(learning_unit_year):
+        msg = MSG_LEARNING_UNIT_IS_OR_HAS_PREREQUISITE
 
     result = False if msg else True
     can_raise_exception(

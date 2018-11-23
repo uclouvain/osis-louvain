@@ -23,26 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import forms
+import django_filters
+from django.forms import TextInput
 from django.utils.translation import ugettext_lazy as _
 
-from base import models as mdl
-from base.forms.utils.choice_field import add_blank
 from base.models.entity_version import EntityVersion
-from base.models.enums import entity_type
 
 
-class EntitySearchForm(forms.Form):
-    acronym = forms.CharField(label=_('Acronym'), required=False)
-    title = forms.CharField(label=_('Title'), required=False)
-    entity_type = forms.ChoiceField(label=_('type'), choices=add_blank(entity_type.ENTITY_TYPES), required=False)
+class EntityVersionFilter(django_filters.FilterSet):
+    acronym = django_filters.CharFilter(
+        lookup_expr='icontains', label=_("Acronym"),
+        widget=TextInput(attrs={'style': "text-transform:uppercase"})
+    )
+    title = django_filters.CharFilter(lookup_expr='icontains', label=_("Title"), )
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['acronym'].widget.attrs['style'] = "text-transform:uppercase"
-
-    def get_entities(self):
-        if super().is_valid():
-            return mdl.entity_version.search_entities(with_entity=True, **self.cleaned_data)
-        else:
-            return EntityVersion.objects.all()
+    class Meta:
+        model = EntityVersion
+        fields = ["entity_type"]
