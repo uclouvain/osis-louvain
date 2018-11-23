@@ -209,7 +209,7 @@ def _is_eligible_to_edit_general_information(person, education_group, raise_exce
                    person.is_central_manager() or
                    is_academic_calendar_opened(
                         education_group,
-                        academic_calendar_type.EDITION_OF_GENERAL_INFORMATION,
+                        academic_calendar_type.EDUCATION_GROUP_EDITION,
                         raise_exception
                    )
            )
