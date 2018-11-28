@@ -43,7 +43,7 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 CENTRAL_MANAGER_GROUP = "central_managers"
 FACULTY_MANAGER_GROUP = "faculty_managers"
-SIC_GROUP = "SIC"
+SIC_GROUP = "sic"
 
 
 class PersonAdmin(SerializableModelAdmin):
