@@ -43,6 +43,7 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 CENTRAL_MANAGER_GROUP = "central_managers"
 FACULTY_MANAGER_GROUP = "faculty_managers"
+SIC_GROUP = "SIC"
 
 
 class PersonAdmin(SerializableModelAdmin):
@@ -112,6 +113,9 @@ class Person(SerializableModel):
 
     def is_faculty_manager(self):
         return self.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists()
+
+    def is_sic(self):
+        return self.user.groups.filter(name=SIC_GROUP).exists()
 
     @property
     def full_name(self):

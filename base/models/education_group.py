@@ -65,7 +65,8 @@ class EducationGroup(SerializableModel):
     class Meta:
         permissions = (
             ("can_access_education_group", "Can access education_group"),
-            ("can_edit_educationgroup_pedagogy", "Can edit education group pedagogy")
+            ("can_edit_educationgroup_pedagogy", "Can edit education group pedagogy"),
+            ("can_edit_common_education_group", "Can edit common education group")
         )
 
     def clean(self):

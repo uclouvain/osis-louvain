@@ -203,7 +203,8 @@ def is_eligible_to_edit_general_information(person, education_group, raise_excep
 
 
 def _is_eligible_to_edit_general_information(person, education_group, raise_exception):
-    return check_link_to_management_entity(education_group, person, raise_exception) and \
+    return (education_group.is_common and person.is_sic()) or \
+           check_link_to_management_entity(education_group, person, raise_exception) and \
            (
                    person.is_central_manager() or
                    is_academic_calendar_opened(
