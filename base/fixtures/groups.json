@@ -3380,7 +3380,7 @@
         "name": "sic",
         "permissions": [
             [
-                "can_access_education_group",
+                "can_edit_common_education_group",
                 "base",
                 "educationgroup"
             ],
