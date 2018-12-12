@@ -47,13 +47,15 @@
         </a>
     </li>
     {% endif %}
-    {% if education_group_year.education_group_type.category != "GROUP" %}
+    {% if education_group_year.education_group_type.category != "GROUP" or has_intro %}
     <li role="presentation" {% if request.path == url_general_informations_tab %} class="active" {% endif %}>
         <a id="link_general_information"
            href="{% url 'education_group_general_informations' root.pk education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
             {% trans 'General informations' %}
         </a>
     </li>
+    {% endif %}
+    {% if education_group_year.education_group_type.category != "GROUP" %}
     <li role="presentation" {% if request.path == url_skill_achievements_tab %} class="active" {% endif %}>
         <a id="link_skill_achievements"
            href="{% url 'education_group_skills_achievements' root.pk education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
