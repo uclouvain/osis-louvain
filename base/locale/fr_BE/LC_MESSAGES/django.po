@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-11 17:13+0100\n"
+"POT-Creation-Date: 2018-12-12 11:42+0100\n"
 "PO-Revision-Date: 2018-11-21 14:40+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -81,7 +81,7 @@ msgstr[1] "%(count_enrollment)d étudiants sont inscrits à l'offre."
 msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
 msgstr "%(date)s doit être comprise entre %(start_date)s et %(end_date)s"
 
-#: models/education_group.py:77 models/education_group_year.py:664
+#: models/education_group.py:77 models/education_group_year.py:679
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr "%(max)s doit être plus grand ou égal à %(min)s"
@@ -295,7 +295,7 @@ msgstr "Partenaire académique"
 msgid "Academic responsible"
 msgstr "Responsable académique"
 
-#: templates/education_group/blocks/contacts_general_informations.html:48
+#: templates/education_group/blocks/contacts_general_informations.html:67
 msgid "Academic responsibles"
 msgstr "Responsables académique"
 
@@ -331,8 +331,8 @@ msgid "Accepted"
 msgstr "Accepté"
 
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:38
-#: templates/education_group/tab_admission_conditions.html:98
-#: templates/education_group/tab_admission_conditions.html:141
+#: templates/education_group/tab_admission_conditions.html:99
+#: templates/education_group/tab_admission_conditions.html:142
 msgid "Access"
 msgstr "Accès"
 
@@ -375,8 +375,8 @@ msgstr "Sigle"
 #: templates/education_group/blocks/dropdown/administrative_data_actions_bar.html:36
 #: templates/education_group/blocks/dropdown/education_groups_action_button.html:33
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:36
-#: templates/education_group/tab_admission_conditions.html:100
-#: templates/education_group/tab_admission_conditions.html:143
+#: templates/education_group/tab_admission_conditions.html:101
+#: templates/education_group/tab_admission_conditions.html:144
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:46
 msgid "Actions"
 msgstr "Actions"
@@ -490,7 +490,7 @@ msgstr "Entité d'administration"
 msgid "Administrative data"
 msgstr "Données administratives"
 
-#: templates/education_group/tab_admission_conditions.html:158
+#: templates/education_group/tab_admission_conditions.html:159
 msgid "Admission and Enrolment Procedures for general registration"
 msgstr "Procédures d'admission et d'inscription"
 
@@ -498,7 +498,7 @@ msgstr "Procédures d'admission et d'inscription"
 msgid "Admission exam"
 msgstr "Concours"
 
-#: templates/education_group/tab_admission_conditions.html:156
+#: templates/education_group/tab_admission_conditions.html:157
 msgid "Adults taking up their university training"
 msgstr "Adultes en reprise d'études"
 
@@ -695,7 +695,7 @@ msgstr "Attributions"
 msgid "Bachelor"
 msgstr "Bachelier"
 
-#: templates/education_group/tab_admission_conditions.html:106
+#: templates/education_group/tab_admission_conditions.html:107
 msgid "Bachelors of the Dutch speaking Community of Belgium"
 msgstr "Bachelier de la Communauté flamande de Belgique"
 
@@ -940,8 +940,8 @@ msgid "Components"
 msgstr "Composants"
 
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:44
-#: templates/education_group/tab_admission_conditions.html:97
-#: templates/education_group/tab_admission_conditions.html:140
+#: templates/education_group/tab_admission_conditions.html:98
+#: templates/education_group/tab_admission_conditions.html:141
 #: templates/education_group/tabs.html:85
 msgid "Conditions"
 msgstr "Conditions"
@@ -968,7 +968,7 @@ msgstr "Consolider"
 msgid "Consolidate the proposal"
 msgstr "Consolider la proposition"
 
-#: templates/education_group/blocks/contacts_general_informations.html:35
+#: templates/education_group/blocks/contacts_general_informations.html:53
 msgid "Contacts"
 msgstr "Contacts"
 
@@ -1006,7 +1006,7 @@ msgstr "Cours"
 msgid "Course enrollment"
 msgstr "Inscription aux cours"
 
-#: templates/education_group/blocks/contacts_general_informations.html:38
+#: templates/education_group/blocks/contacts_general_informations.html:56
 #: templates/education_group/blocks/coorganization.html:156
 #: templates/education_group/blocks/panel/panel_achievements.html:89
 #: templates/education_group/blocks/panel/panel_achievements.html:101
@@ -1016,7 +1016,7 @@ msgstr "Inscription aux cours"
 msgid "Create"
 msgstr "Créer"
 
-#: forms/education_group/publication_contact.py:51
+#: forms/education_group/publication_contact.py:55
 msgid "Create contact"
 msgstr "Créer contact"
 
@@ -1132,8 +1132,8 @@ msgid "Details"
 msgstr "Détails"
 
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:43
-#: templates/education_group/tab_admission_conditions.html:96
-#: templates/education_group/tab_admission_conditions.html:139
+#: templates/education_group/tab_admission_conditions.html:97
+#: templates/education_group/tab_admission_conditions.html:140
 msgid "Diploma"
 msgstr "Diplôme"
 
@@ -1231,6 +1231,7 @@ msgstr "Durée"
 
 #: templates/academic_calendar/academic_calendar.html:83
 #: templates/academic_calendar/academic_calendar.html:85
+#: templates/education_group/blocks/contacts_general_informations.html:33
 #: templates/education_group/blocks/contacts_general_informations_ul.html:49
 #: templates/education_group/blocks/content_actions.html:46
 #: templates/education_group/blocks/coorganization.html:79
@@ -1266,7 +1267,7 @@ msgstr "Acquis d'apprentissage détaillé d'organisation de formation"
 msgid "Education group edition"
 msgstr "Edition d'organisation de formations"
 
-#: models/education_group_achievement.py:48 models/education_group_year.py:467
+#: models/education_group_achievement.py:48 models/education_group_year.py:474
 msgid "Education group year"
 msgstr "Organisation de formations annualisée"
 
@@ -1418,6 +1419,7 @@ msgid "Entities"
 msgstr "Entités"
 
 #: business/education_group.py:49 forms/education_groups.py:86
+#: templates/education_group/blocks/contacts_general_informations.html:30
 #: templates/education_group/search.html:151 templates/offers.html:51
 #: templates/offers.html:52 templates/offers.html:80
 msgid "Entity"
@@ -1562,7 +1564,7 @@ msgstr "Pour accord,"
 msgid "Force state"
 msgstr "Forcer l'état"
 
-#: templates/education_group/tab_admission_conditions.html:107
+#: templates/education_group/tab_admission_conditions.html:108
 msgid "Foreign Bachelors"
 msgstr "Bacheliers étrangers"
 
@@ -1693,7 +1695,7 @@ msgstr "Continuer"
 msgid "Grade"
 msgstr "Niveau"
 
-#: templates/education_group/tab_admission_conditions.html:147
+#: templates/education_group/tab_admission_conditions.html:148
 msgid "Graduates"
 msgstr "Diplômés"
 
@@ -1717,11 +1719,11 @@ msgstr "Titre raccourcis de l'événement"
 msgid "Highlight title"
 msgstr "Titre de l'événement"
 
-#: templates/education_group/tab_admission_conditions.html:119
+#: templates/education_group/tab_admission_conditions.html:120
 msgid "Holders of a 2nd cycle University degree"
 msgstr "Diplômés du 2° cycle universitaire"
 
-#: templates/education_group/tab_admission_conditions.html:153
+#: templates/education_group/tab_admission_conditions.html:154
 msgid "Holders of a non-University 2nd cycle degree"
 msgstr "Diplômés de 2° cycle non universitaire"
 
@@ -1750,10 +1752,6 @@ msgstr "Sous forme attendue"
 #: models/enums/diploma_printing_orientation.py:34
 msgid "In heading 2 of diploma"
 msgstr "Dans la rubrique 2 du diplôme"
-
-#: templates/education_group/blocks/contacts_general_informations.html:30
-msgid "In practice"
-msgstr "En pratique"
 
 #: templates/learning_unit/by_activity.html:120
 msgid "In proposal"
@@ -1889,7 +1887,7 @@ msgstr "Jury"
 msgid "Jury member"
 msgstr "Membre du jury"
 
-#: templates/education_group/blocks/contacts_general_informations.html:62
+#: templates/education_group/blocks/contacts_general_informations.html:81
 msgid "Jury members"
 msgstr "Membres du jury"
 
@@ -2270,7 +2268,7 @@ msgstr "Master de spécialisation"
 msgid "Master thesis"
 msgstr "Thèse de master"
 
-#: templates/education_group/tab_admission_conditions.html:148
+#: templates/education_group/tab_admission_conditions.html:149
 msgid "Masters"
 msgstr "Masters"
 
@@ -2535,7 +2533,7 @@ msgstr "Non académiques"
 msgid "Non academic CREF"
 msgstr "Non académique CREF"
 
-#: templates/education_group/tab_admission_conditions.html:115
+#: templates/education_group/tab_admission_conditions.html:116
 msgid "Non university Bachelors"
 msgstr "Bacheliers non universitaires"
 
@@ -2681,7 +2679,7 @@ msgstr "Organisations"
 msgid "Other academic responsible"
 msgstr "Autre responsable académique"
 
-#: templates/education_group/blocks/contacts_general_informations.html:55
+#: templates/education_group/blocks/contacts_general_informations.html:74
 msgid "Other academic responsibles"
 msgstr "Autres responsables académique"
 
@@ -2694,7 +2692,7 @@ msgstr "Autre collectif"
 msgid "Other contact"
 msgstr "Autre contact"
 
-#: templates/education_group/blocks/contacts_general_informations.html:69
+#: templates/education_group/blocks/contacts_general_informations.html:88
 msgid "Other contacts"
 msgstr "Autres contacts"
 
@@ -2715,7 +2713,7 @@ msgstr "Autre remarque"
 msgid "Other teacher(s)"
 msgstr "Autre(s) enseignant(s)"
 
-#: templates/education_group/tab_admission_conditions.html:105
+#: templates/education_group/tab_admission_conditions.html:106
 msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr "Autres bacheliers de la Communauté française de Belgique"
 
@@ -2774,7 +2772,7 @@ msgstr "Périodicité"
 msgid "Person not in accordance with proposal state"
 msgstr "Personne qui ne peut pas travailler avec une proposition dans cet état"
 
-#: templates/education_group/tab_admission_conditions.html:157
+#: templates/education_group/tab_admission_conditions.html:158
 msgid "Personalized access"
 msgstr "Accès personnalisé"
 
@@ -3048,6 +3046,10 @@ msgstr "Provisoire"
 msgid "Public partner"
 msgstr "Partenaire public"
 
+#: models/education_group_year.py:468
+msgid "Publication contact entity"
+msgstr ""
+
 #: templates/education_group/tab_admission_conditions.html:38
 #: templates/education_group/tab_general_informations.html:39
 msgid "Publish"
@@ -3147,8 +3149,8 @@ msgid "Release"
 msgstr "Release"
 
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:45
-#: templates/education_group/tab_admission_conditions.html:99
-#: templates/education_group/tab_admission_conditions.html:142
+#: templates/education_group/tab_admission_conditions.html:100
+#: templates/education_group/tab_admission_conditions.html:143
 #: utils/send_mail.py:235
 msgid "Remarks"
 msgstr "Remarques"
@@ -3626,11 +3628,11 @@ msgstr "Les commentaires de %(acronym)s ont été mis à jour"
 msgid "The configuration of you user profile"
 msgstr "Informations liées à votre profil"
 
-#: views/education_groups/publication_contact.py:74
+#: views/education_groups/publication_contact.py:75
 msgid "The contact has been created"
 msgstr "Le contact a bien été créee"
 
-#: views/education_groups/publication_contact.py:88
+#: views/education_groups/publication_contact.py:89
 msgid "The contacts modifications has been saved"
 msgstr "Les données de contact ont été sauvegardées"
 
@@ -3997,8 +3999,8 @@ msgstr "Ce champ ne peut pas être défini"
 
 #: forms/common.py:80 models/education_group_publication_contact.py:99
 #: models/education_group_publication_contact.py:100
-#: models/education_group_year.py:651 models/education_group_year.py:672
-#: models/education_group_year.py:674
+#: models/education_group_year.py:666 models/education_group_year.py:687
+#: models/education_group_year.py:689
 #: tests/views/learning_units/proposals/test_creation.py:186
 #: tests/views/learning_units/proposals/test_creation.py:187
 #: tests/views/learning_units/proposals/test_creation.py:188
@@ -4193,7 +4195,7 @@ msgstr "Type d'événement"
 msgid "Type of training"
 msgstr "Type de formation"
 
-#: templates/education_group/tab_admission_conditions.html:104
+#: templates/education_group/tab_admission_conditions.html:105
 msgid "UCL Bachelors"
 msgstr "Bacheliers UCL"
 
@@ -4218,6 +4220,10 @@ msgstr "Indéfini"
 #: models/enums/diploma_coorganization.py:35
 msgid "Unique"
 msgstr "Unique"
+
+#: templates/education_group/tab_admission_conditions.html:79
+msgid "University Bachelors"
+msgstr "Bacheliers universitaires"
 
 #: models/education_group_year.py:185 models/enums/rate_code.py:44
 msgid "University certificate"
@@ -4249,8 +4255,14 @@ msgstr "Haut"
 msgid "Update"
 msgstr "Mettre à jour"
 
-#: forms/education_group/publication_contact.py:50
+#: forms/education_group/publication_contact.py:54
 msgid "Update contact"
+msgstr "Mise-à-jour contact"
+
+#: forms/education_group/publication_contact.py:90
+#, fuzzy
+#| msgid "Update contact"
+msgid "Update entity"
 msgstr "Mise-à-jour contact"
 
 #: templates/learning_unit/blocks/summary_locked.html:22
@@ -4618,7 +4630,7 @@ msgstr ""
 "Une proposition de modification de type {} a été faite pour l'unité "
 "d'enseignement {}."
 
-#: models/education_group_year.py:657
+#: models/education_group_year.py:672
 msgid "You should precise at least minimum or maximum constraint"
 msgstr "Vous devez préciser au moins la contrainte minimum ou maximum"
 
@@ -4743,6 +4755,7 @@ msgstr "mise-à-jour bloquée pour l'enseignant"
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:50
 #: templates/education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html:14
 #: templates/education_group/blocks/modal/modal_publication_contact_edit_inner.html:40
+#: templates/education_group/blocks/modal/modal_publication_contact_entity_edit_inner.html:40
 #: templates/education_group/group_element_year/confirm_detach_inner.html:46
 #: templates/education_group/group_element_year/confirm_postpone_content_inner.html:10
 #: templates/education_group/organization_edit_inner.html:51
@@ -4829,7 +4842,7 @@ msgstr "confirmer"
 
 #: business/learning_units/edition.py:435
 #: business/learning_units/xls_comparison.py:59 business/proposal_xls.py:39
-#: models/education_group_year.py:334 models/education_group_year.py:497
+#: models/education_group_year.py:334 models/education_group_year.py:504
 #: models/enums/constraint_type.py:32 models/group_element_year.py:155
 #: models/group_element_year.py:171
 #: tests/models/test_education_group_year.py:93
@@ -4977,11 +4990,11 @@ msgstr "logo"
 msgid "main domain"
 msgstr "domaine principal"
 
-#: models/education_group_year.py:359 models/education_group_year.py:665
+#: models/education_group_year.py:359 models/education_group_year.py:680
 msgid "maximum constraint"
 msgstr "contrainte maximum"
 
-#: models/education_group_year.py:352 models/education_group_year.py:666
+#: models/education_group_year.py:352 models/education_group_year.py:681
 msgid "minimum constraint"
 msgstr "contrainte minimum"
 
@@ -5115,6 +5128,7 @@ msgstr "rôle (français)"
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:52
 #: templates/education_group/blocks/modal/modal_pedagogy_edit_inner.html:49
 #: templates/education_group/blocks/modal/modal_publication_contact_edit_inner.html:39
+#: templates/education_group/blocks/modal/modal_publication_contact_entity_edit_inner.html:39
 #: templates/education_group/organization_edit_inner.html:43
 #: templates/education_group/organization_edit_inner.html:52
 #: templates/learning_unit/achievement_edit.html:51
@@ -5279,3 +5293,6 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:165
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "In practice"
+#~ msgstr "En pratique"
