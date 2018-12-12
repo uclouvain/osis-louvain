@@ -32,7 +32,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import F, Case, When
+from django.db.models import F, Case, When, Q
 from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -58,6 +58,7 @@ from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType
+from base.models.group_element_year import GroupElementYear
 from base.models.person import Person
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys
@@ -106,6 +107,28 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
     def get_root(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
+    def get_appropriate_sections(self, education_group_year, request):
+        try:
+            group_element_year = GroupElementYear.objects.get(
+                Q(child_branch=education_group_year.id) | Q(child_leaf=education_group_year.id)
+            )
+            education_group_year = group_element_year.parent
+        except GroupElementYear.DoesNotExist:
+            pass
+        code, type_education_group_year = _get_code_and_type(education_group_year)
+        url = settings.URL_TO_PORTAL_UCL.format(
+            type=type_education_group_year,
+            anac=education_group_year.academic_year.year,
+            code=code
+        )
+        url += "?" + settings.GET_SECTION_PARAM
+        try:
+            sections_request = requests.get(url, timeout=settings.REQUESTS_TIMEOUT).json()
+        except (json.JSONDecodeError, TimeoutError, requests.exceptions.ConnectionError):
+            display_error_messages(request, _("Unable to retrieve appropriate sections for this programs"))
+            sections_request = {'sections': []}
+        return sections_request['sections']
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -121,7 +144,6 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
 
         if self.with_tree:
             context['tree'] = json.dumps(NodeBranchJsTree(self.root).to_json())
-
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
             person=self.get_person(),
@@ -226,7 +248,6 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     def get_sections_with_translated_labels(self, is_common_education_group_year=None):
         # Load the info from the common education group year
         common_education_group_year = None
-        print(self.object.academic_year)
         if not is_common_education_group_year:
             common_education_group_year = EducationGroupYear.objects.get(
                 acronym='common',
@@ -312,20 +333,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         }
 
     def get_appropriate_sections(self):
-        education_group_year = self.object
-        code, type_education_group_year = _get_code_and_type(education_group_year)
-        url = settings.URL_TO_PORTAL_UCL.format(
-            type=type_education_group_year,
-            anac=education_group_year.academic_year.year,
-            code=code
-        )
-        url += "?" + settings.GET_SECTION_PARAM
-        try:
-            sections_request = requests.get(url, timeout=settings.REQUESTS_TIMEOUT).json()
-        except (json.JSONDecodeError, TimeoutError, requests.exceptions.ConnectionError):
-            display_error_messages(self.request, _("Unable to retrieve appropriate sections for this programs"))
-            sections_request = {'sections': []}
-        return sections_request['sections']
+        return super().get_appropriate_sections(self.object, self.request)
 
     def get_publication_contacts_group_by_type(self):
         contacts_by_type = {}
