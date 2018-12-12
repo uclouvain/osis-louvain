@@ -135,8 +135,7 @@ def _is_management_entity_linked_to_user(person, an_education_group_year):
 
 
 def assert_category_of_education_group_year(education_group_year, authorized_categories):
-    if education_group_year.education_group_type.category not in authorized_categories and \
-            'has_intro' not in authorized_categories:
+    if education_group_year.education_group_type.category not in authorized_categories:
         raise PermissionDenied("Education group category is not correct.")
 
 

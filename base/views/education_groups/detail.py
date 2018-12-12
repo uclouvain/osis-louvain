@@ -240,7 +240,7 @@ class EducationGroupDiplomas(EducationGroupGenericDetailView):
 
 class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     template_name = "education_group/tab_general_informations.html"
-    limited_by_category = (education_group_categories.TRAINING, education_group_categories.MINI_TRAINING, 'has_intro')
+    limited_by_category = (education_group_categories.TRAINING, education_group_categories.MINI_TRAINING)
 
     def get_queryset(self):
         """ Optimization """
