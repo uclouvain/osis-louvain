@@ -108,17 +108,20 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
     def get_appropriate_sections(self, education_group_year, request):
-        try:
-            group_element_year = GroupElementYear.objects.get(
-                Q(child_branch=education_group_year.id) | Q(child_leaf=education_group_year.id)
-            )
-            education_group_year = group_element_year.parent
-        except GroupElementYear.DoesNotExist:
-            pass
-        code, type_education_group_year = _get_code_and_type(education_group_year)
+        if self.get_root().acronym == education_group_year.acronym:
+            try:
+                group_element_year = GroupElementYear.objects.get(
+                    Q(child_branch=education_group_year.id) | Q(child_leaf=education_group_year.id)
+                )
+                real_edy = group_element_year.parent
+            except GroupElementYear.DoesNotExist:
+                real_edy = education_group_year
+        else:
+            real_edy = self.get_root()
+        code, type_education_group_year = _get_code_and_type(real_edy)
         url = settings.URL_TO_PORTAL_UCL.format(
             type=type_education_group_year,
-            anac=education_group_year.academic_year.year,
+            anac=real_edy.academic_year.year,
             code=code
         )
         url += "?" + settings.GET_SECTION_PARAM
@@ -127,7 +130,16 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         except (json.JSONDecodeError, TimeoutError, requests.exceptions.ConnectionError):
             display_error_messages(request, _("Unable to retrieve appropriate sections for this programs"))
             sections_request = {'sections': []}
-        return sections_request['sections']
+
+        intro_list = list(map(
+            lambda intro: intro.replace('intro-', ''),
+            filter(
+                lambda section: section.startswith('intro-'), sections_request['sections']
+            )
+        ))
+        has_intro = education_group_year.acronym.lower() in intro_list or \
+            education_group_year.partial_acronym.lower() in intro_list
+        return sections_request['sections'], has_intro
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -150,6 +162,9 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
             education_group=context['object'],
         )
         context['enums'] = mdl.enums.education_group_categories
+        sections_list, has_intro = self.get_appropriate_sections(self.object, self.request)
+        context['sections_list'] = sections_list
+        context['has_intro'] = has_intro
 
         return context
 
@@ -235,17 +250,20 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         context = super().get_context_data(**kwargs)
 
         is_common_education_group_year = self.object.acronym.startswith('common')
-
+        sections_list = context['sections_list']
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
-            'sections_with_translated_labels': self.get_sections_with_translated_labels(is_common_education_group_year),
+            'sections_with_translated_labels': self.get_sections_with_translated_labels(
+                sections_list,
+                is_common_education_group_year
+            ),
             'contacts': self.get_publication_contacts_group_by_type(),
             'can_edit_information': is_eligible_to_edit_general_information(context['person'], context['object'])
         })
 
         return context
 
-    def get_sections_with_translated_labels(self, is_common_education_group_year=None):
+    def get_sections_with_translated_labels(self, sections_list, is_common_education_group_year=None):
         # Load the info from the common education group year
         common_education_group_year = None
         if not is_common_education_group_year:
@@ -258,7 +276,6 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         Section = namedtuple('Section', 'title labels')
         user_language = mdl.person.get_user_interface_language(self.request.user)
         sections_with_translated_labels = []
-        sections_list = self.get_appropriate_sections()
 
         for section in settings.SECTION_LIST:
             translated_labels = self.get_translated_labels_and_content(section,
@@ -331,9 +348,6 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             french: fr_translated_text.text if fr_translated_text else None,
             english: en_translated_text.text if en_translated_text else None,
         }
-
-    def get_appropriate_sections(self):
-        return super().get_appropriate_sections(self.object, self.request)
 
     def get_publication_contacts_group_by_type(self):
         contacts_by_type = {}
