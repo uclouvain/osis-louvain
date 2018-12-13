@@ -307,17 +307,19 @@ class EducationGroupDiplomas(TestCase):
 class EducationGroupGeneralInformations(TestCase):
     @classmethod
     def setUpTestData(cls):
-        academic_year = AcademicYearFactory()
         cls.current_academic_year = AcademicYearFactory(year=datetime.datetime.now().year)
         cls.type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
         cls.type_minor = EducationGroupTypeFactory(name="ACCESS_MINOR")
         cls.type_deepening = EducationGroupTypeFactory(name="DEEPENING")
         EducationGroupYearCommonFactory(
-            academic_year=academic_year
+            academic_year=cls.current_academic_year
         )
-        cls.education_group_parent = EducationGroupYearFactory(acronym="Parent", academic_year=academic_year,
+
+        cls.education_group_parent = EducationGroupYearFactory(acronym="Parent",
+                                                               academic_year=cls.current_academic_year,
                                                                education_group_type=cls.type_training)
-        cls.education_group_child = EducationGroupYearFactory(acronym="Child_1", academic_year=academic_year,
+        cls.education_group_child = EducationGroupYearFactory(acronym="Child_1",
+                                                              academic_year=cls.current_academic_year,
                                                               education_group_type=cls.type_training)
         GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
 
@@ -356,7 +358,7 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
 
     def test_with_education_group_year_of_type_group(self):
-        group_education_group_year = EducationGroupYearFactory()
+        group_education_group_year = EducationGroupYearFactory(academic_year=self.current_academic_year)
         group_education_group_year.education_group_type.category = education_group_categories.GROUP
         group_education_group_year.education_group_type.save()
 
@@ -364,8 +366,8 @@ class EducationGroupGeneralInformations(TestCase):
                       args=[group_education_group_year.id, group_education_group_year.id])
         response = self.client.get(url)
 
-        self.assertTemplateUsed(response, "access_denied.html")
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+        self.assertEqual(response.status_code, HttpResponse.status_code)
 
     def test_without_get_data(self):
         response = self.client.get(self.url)
