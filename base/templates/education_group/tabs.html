@@ -81,10 +81,12 @@
             {% trans 'Utilizations' %}
         </a>
     </li>
+    {% if not has_intro %}
     <li role="presentation" {% if request.path == url_admission_conditions_tab %} class="active"{% endif %}>
         <a id="link_content"
            href="{% url 'education_group_year_admission_condition_edit' root.pk education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
             {% trans 'Conditions' %}
         </a>
     </li>
+    {% endif %}
 </ul>
