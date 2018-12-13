@@ -57,6 +57,7 @@
                                 </div>
                             </div>
                             {% for label in labels %}
+                                {% if label.label == 'welcome_introduction' or not has_intro %}
                                 <div class="section_label row">
                                     <div class="row">
                                         <div class="col-md-12">
@@ -91,6 +92,7 @@
                                 </div>
                                 {% if not forloop.last %}
                                 <hr/>
+                                {% endif %}
                                 {% endif %}
                             {% endfor %}
                             <hr/>
