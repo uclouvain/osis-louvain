@@ -79,6 +79,8 @@ class EducationGroupType(SerializableModel):
         verbose_name=_('Type of training'),
     )
 
+    learning_unit_child_allowed = models.BooleanField(default=False)
+
     def __str__(self):
         return self.get_name_display()
 

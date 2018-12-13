@@ -343,7 +343,10 @@ class TestSelectAttach(TestCase):
         self.child_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
         self.learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
         self.initial_parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
-        self.new_parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
+        self.new_parent_education_group_year = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__learning_unit_child_allowed=True
+        )
 
         self.initial_group_element_year = GroupElementYearFactory(
             parent=self.initial_parent_education_group_year,

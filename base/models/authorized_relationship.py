@@ -45,10 +45,3 @@ class AuthorizedRelationship(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.parent_type, self.child_type)
-
-
-def find_by_parent_and_child_types(parent_type, child_type):
-    return AuthorizedRelationship.objects.filter(
-        parent_type=parent_type,
-        child_type=child_type,
-    )

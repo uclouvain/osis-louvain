@@ -82,7 +82,7 @@ OFFERS = [
 ]
 
 COMMON_OFFER = ['1BA', '2A', '2M', '2MC', '']
-
+CONTACTS_ENTITY_KEY = 'contact_entity_code'
 
 def create_common_offer_for_academic_year(year):
     academic_year = AcademicYear.objects.get(year=year)
@@ -164,6 +164,8 @@ def import_offer_and_items(item, education_group_year, mapping_label_text_label,
             _import_skills_and_achievements(value, education_group_year, context)
         elif label == CONTACTS_KEY:
             _import_contacts(value, education_group_year, context)
+        elif label == CONTACTS_ENTITY_KEY:
+            _import_contact_entity(value, education_group_year)
         else:
             # General CMS data
             TranslatedText.objects.update_or_create(
@@ -259,6 +261,16 @@ def _get_role_field_publication_contact_according_to_language(language):
     elif language == settings.LANGUAGE_CODE_EN:
         return 'role_en'
     raise AttributeError('Language not supported {}'.format(language))
+
+
+def _import_contact_entity(entity_acronym, education_group_year):
+    try:
+        entity = Entity.objects.filter(entityversion__acronym=entity_acronym).distinct().get()
+        education_group_year.publication_contact_entity = entity
+        education_group_year.save()
+    except Entity.DoesNotExist:
+        msg = 'Entity {acronym} not found for program: {program}'
+        print(msg.format(acronym=entity_acronym, program=education_group_year.acronym))
 
 
 LABEL_TEXTUALS = [

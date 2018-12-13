@@ -43,7 +43,7 @@ from base.business.group_element_years.management import SELECT_CACHE_KEY, selec
     select_learning_unit_year
 from base.forms.education_group.group_element_year import UpdateGroupElementYearForm
 from base.models.education_group_year import EducationGroupYear
-from base.models.exceptions import IncompatiblesTypesException
+from base.models.exceptions import IncompatiblesTypesException, MaxChildrenReachedException
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.utils.utils import get_object_or_none
@@ -154,6 +154,9 @@ def _attach(request, group_element_year, *args, **kwargs):
     except IncompatiblesTypesException as e:
         warning_msg = e.errors
         display_warning_messages(request, warning_msg)
+    except MaxChildrenReachedException as e:
+        warning_msg = e.errors
+        display_warning_messages(request, warning_msg)
     except IntegrityError as e:
         warning_msg = _(str(e))
         display_warning_messages(request, warning_msg)
@@ -235,12 +238,22 @@ class DetachGroupElementYearView(GenericUpdateGroupElementYearMixin, DeleteView)
 
     def delete(self, request, *args, **kwargs):
         child_leaf = self.get_object().child_leaf
+        child_branch = self.get_object().child_branch
         parent = self.get_object().parent
         if child_leaf and child_leaf.has_or_is_prerequisite(parent):
             # FIXME Method should be in permission to view and display message in page
             error_msg = \
                 _("Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
                     "acronym": child_leaf.acronym
+                }
+            display_error_messages(request, error_msg)
+            return JsonResponse({"error": True, "success_url": self.get_success_url()})
+        if child_branch and group_element_years.management.is_min_child_reached(parent, child_branch):
+            error_msg = \
+                _("Cannot detach child \"%(child)s\". "
+                  "The parent must have at least one child of type \"%(type)s\".") % {
+                    "child": child_branch,
+                    "type": child_branch.education_group_type
                 }
             display_error_messages(request, error_msg)
             return JsonResponse({"error": True, "success_url": self.get_success_url()})

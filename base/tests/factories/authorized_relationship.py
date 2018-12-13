@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from base.models.enums import count_constraint
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 import factory
 import factory.fuzzy
@@ -34,3 +35,5 @@ class AuthorizedRelationshipFactory(factory.DjangoModelFactory):
 
     parent_type = factory.SubFactory(EducationGroupTypeFactory)
     child_type = factory.SubFactory(EducationGroupTypeFactory)
+    min_count_authorized = count_constraint.ZERO
+    max_count_authorized = count_constraint.MANY

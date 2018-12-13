@@ -122,7 +122,7 @@ class LearningComponentYear(SerializableModel):
         if vol_q1 + vol_q2 != vol_total_annual:
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
-                _('Vol_tot is not equal to vol_q1 + vol_q2')))
+                _('The annual volume must be equal to the sum of the volumes Q1 and Q2')))
         if vol_total_annual * planned_classes != self.vol_global:
             _warnings.append("{} ({})".format(
                 inconsistent_msg,

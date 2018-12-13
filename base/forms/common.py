@@ -105,7 +105,11 @@ class ValidationRuleMixin(WarningFormMixin):
         return result
 
     def field_reference(self, name):
-        return '.'.join([self._meta.model._meta.db_table, name])
+        return self._field_reference(self._meta.model, name)
+
+    @staticmethod
+    def _field_reference(model, name, *args):
+        return '.'.join([model._meta.db_table, name, *args])
 
     def _set_rules_on_fields(self):
         for name, field in self.fields.items():

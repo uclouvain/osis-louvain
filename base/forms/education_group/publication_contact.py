@@ -30,7 +30,7 @@ from django.core.exceptions import ImproperlyConfigured
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models.education_group_publication_contact import EducationGroupPublicationContact, ROLE_REQUIRED_FOR_TYPES
 from base.models.education_group_year import EducationGroupYear
-from base.models.entity_version import find_all_current_entities_version
+from base.models.entity_version import find_all_current_entities_version, get_last_version
 from base.models.enums.organization_type import MAIN
 
 
@@ -83,7 +83,11 @@ class EducationGroupEntityPublicationContactForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         if not kwargs.get('instance'):
             raise ImproperlyConfigured("This form allow update only")
+
         super().__init__(*args, **kwargs)
+
+        if self.instance.publication_contact_entity:
+            self.initial['publication_contact_entity'] = get_last_version(self.instance.publication_contact_entity)
 
     @property
     def title(self):

@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-12-12 11:42+0100\n"
+"POT-Creation-Date: 2018-12-12 15:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: views/education_groups/group_element_year/update.py:248
+#: views/education_groups/group_element_year/update.py:261
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr ""
@@ -740,9 +740,16 @@ msgstr ""
 msgid "Cancel the proposal"
 msgstr ""
 
-#: tests/views/group_element_years/test_detach.py:156
-#: tests/views/group_element_years/test_detach.py:181
-#: views/education_groups/group_element_year/update.py:242
+#: views/education_groups/group_element_year/update.py:253
+#, python-format
+msgid ""
+"Cannot detach child \"%(child)s\". The parent must have at least one child "
+"of type \"%(type)s\"."
+msgstr ""
+
+#: tests/views/group_element_years/test_detach.py:158
+#: tests/views/group_element_years/test_detach.py:183
+#: views/education_groups/group_element_year/update.py:246
 #, python-format
 msgid ""
 "Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a "
@@ -1370,7 +1377,7 @@ msgstr ""
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
-#: forms/education_group/training.py:141
+#: forms/education_group/training.py:142
 msgid "Enter text to search"
 msgstr ""
 
@@ -1806,7 +1813,7 @@ msgstr ""
 msgid "Isolated classes"
 msgstr ""
 
-#: tests/views/education_groups/test_update.py:546
+#: tests/views/education_groups/test_update.py:549
 msgid "It is forbidden to attach an element to one of its included elements."
 msgstr ""
 
@@ -1923,6 +1930,7 @@ msgstr ""
 msgid "Learning location"
 msgstr ""
 
+#: business/group_element_years/management.py:68
 #: templates/learning_unit/breadcrumb.html:30
 #: templates/learning_unit/comparison.html:29 templates/learning_units.html:63
 #: templates/my_osis/profile.html:131
@@ -2537,13 +2545,13 @@ msgstr ""
 msgid "One"
 msgstr ""
 
-#: forms/learning_unit/edition_volume.py:148
-#: forms/learning_unit/edition_volume.py:149
-#: forms/learning_unit/edition_volume.py:338
-#: forms/learning_unit/edition_volume.py:339
+#: forms/learning_unit/edition_volume.py:151
+#: forms/learning_unit/edition_volume.py:152
+#: forms/learning_unit/edition_volume.py:341
+#: forms/learning_unit/edition_volume.py:342
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:169
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:171
-#: tests/forms/test_edition_form.py:319 tests/forms/test_edition_form.py:320
+#: tests/forms/test_edition_form.py:321 tests/forms/test_edition_form.py:322
 msgid "One of the partial volumes must have a value to 0."
 msgstr ""
 
@@ -2729,7 +2737,7 @@ msgstr ""
 msgid "Platform"
 msgstr ""
 
-#: tests/views/education_groups/test_update.py:635
+#: tests/views/education_groups/test_update.py:638
 #: views/education_groups/group_element_year/update.py:152
 msgid "Please Select or Move an item before Attach it"
 msgstr ""
@@ -3223,7 +3231,7 @@ msgstr ""
 msgid "Search type"
 msgstr ""
 
-#: forms/education_group/training.py:132
+#: forms/education_group/training.py:133
 msgid "Search..."
 msgstr ""
 
@@ -3532,8 +3540,14 @@ msgid "The administrative data has been successfully modified"
 msgstr ""
 
 #: forms/learning_unit/edition_volume.py:79
+#: forms/learning_unit/edition_volume.py:143
+#: forms/learning_unit/edition_volume.py:357
+#: models/learning_component_year.py:125
 #: templates/learning_unit/components.html:51
 #: templates/learning_unit/components_identification.html:36
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:195
+#: tests/models/test_learning_unit_year.py:351
+#: tests/models/test_learning_unit_year.py:391
 msgid "The annual volume must be equal to the sum of the volumes Q1 and Q2"
 msgstr ""
 
@@ -3549,7 +3563,7 @@ msgid ""
 "(end date of '%s' of the program '%s')"
 msgstr ""
 
-#: views/education_groups/group_element_year/update.py:226
+#: views/education_groups/group_element_year/update.py:229
 #, python-format
 msgid "The comments of %(acronym)s has been updated"
 msgstr ""
@@ -3743,6 +3757,13 @@ msgstr ""
 msgid "The messages sent by the application to you"
 msgstr ""
 
+#: business/group_element_years/management.py:88
+#, python-format
+msgid ""
+"The number of children of type \"%(child_type)s\" for \"%(parent)s\" has "
+"already reached the limit."
+msgstr ""
+
 #: models/learning_unit_year.py:388 tests/models/test_learning_unit_year.py:564
 #, python-format
 msgid ""
@@ -3841,12 +3862,12 @@ msgid ""
 "%(value)s and year %(next_year)s - %(next_value)s"
 msgstr ""
 
-#: forms/learning_unit/edition_volume.py:153
-#: forms/learning_unit/edition_volume.py:155
-#: forms/learning_unit/edition_volume.py:343
-#: forms/learning_unit/edition_volume.py:345
+#: forms/learning_unit/edition_volume.py:156
+#: forms/learning_unit/edition_volume.py:158
+#: forms/learning_unit/edition_volume.py:346
+#: forms/learning_unit/edition_volume.py:348
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:181
-#: tests/forms/test_edition_form.py:330 tests/forms/test_edition_form.py:340
+#: tests/forms/test_edition_form.py:332 tests/forms/test_edition_form.py:342
 msgid "The volume can not be set to 0."
 msgstr ""
 
@@ -4234,15 +4255,6 @@ msgstr ""
 "The overall volume must be equal to the annual volume multiplied by the "
 "number of classes"
 
-#: forms/learning_unit/edition_volume.py:142
-#: forms/learning_unit/edition_volume.py:352
-#: models/learning_component_year.py:125
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:195
-#: tests/models/test_learning_unit_year.py:351
-#: tests/models/test_learning_unit_year.py:391
-msgid "Vol_tot is not equal to vol_q1 + vol_q2"
-msgstr ""
-
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:35
 msgid "Volume"
 msgstr ""
@@ -4451,7 +4463,8 @@ msgid ""
 msgstr ""
 
 #: business/group_element_years/management.py:65
-#: tests/views/education_groups/test_update.py:492
+#: business/group_element_years/management.py:78
+#: tests/views/education_groups/test_update.py:495
 #, python-format
 msgid ""
 "You cannot attach \"%(child)s\" (type \"%(child_type)s\") to \"%(parent)s"
@@ -4999,7 +5012,7 @@ msgstr ""
 msgid "search"
 msgstr ""
 
-#: forms/education_group/training.py:62 models/education_group_year.py:383
+#: forms/education_group/training.py:63 models/education_group_year.py:383
 #: templates/education_group/identification_training_details.html:77
 msgid "secondary domains"
 msgstr ""

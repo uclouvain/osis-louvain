@@ -23,30 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import operator
-
 import factory
-from factory.django import DjangoModelFactory
 
-from base.models.enums import education_group_categories, education_group_types
+from base.models.enums import field_status
 
 
-class EducationGroupTypeFactory(DjangoModelFactory):
+class ValidationRuleFactory(factory.DjangoModelFactory):
     class Meta:
-        model = "base.EducationGroupType"
+        model = 'base.ValidationRule'
+        django_get_or_create = ('field_reference', )
 
-    external_id = factory.Sequence(lambda n: '10000000%02d' % n)
-    category = education_group_categories.TRAINING
-    name = factory.Iterator(education_group_types.TrainingType.choices(), getter=operator.itemgetter(0))
-    learning_unit_child_allowed = False
-
-
-class GroupEducationGroupTypeFactory(EducationGroupTypeFactory):
-    category = education_group_categories.GROUP
-    name = factory.Iterator(education_group_types.GroupType.choices(), getter=operator.itemgetter(0))
-
-
-class ExistingEducationGroupTypeFactory(EducationGroupTypeFactory):
-    class Meta:
-        model = 'base.EducationGroupType'
-        django_get_or_create = ('category', 'name')
+    field_reference = "base.validationrule,base_educationgroupyear.title." \
+                      "osis.education_group_type_finality120listchoice"
+    status_field = field_status.REQUIRED
+    initial_value = None
+    regex_rule = ""
+    regex_error_message = ""
