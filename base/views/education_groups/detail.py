@@ -240,7 +240,11 @@ class EducationGroupDiplomas(EducationGroupGenericDetailView):
 
 class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     template_name = "education_group/tab_general_informations.html"
-    limited_by_category = (education_group_categories.TRAINING, education_group_categories.MINI_TRAINING)
+    limited_by_category = (
+        education_group_categories.TRAINING,
+        education_group_categories.MINI_TRAINING,
+        education_group_categories.GROUP
+    )
 
     def get_queryset(self):
         """ Optimization """
@@ -251,6 +255,9 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
 
         is_common_education_group_year = self.object.acronym.startswith('common')
         sections_list = context['sections_list']
+        has_intro = context['has_intro']
+        if has_intro:
+            sections_list = ['welcome_introduction']
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
             'sections_with_translated_labels': self.get_sections_with_translated_labels(
