@@ -84,6 +84,7 @@ OFFERS = [
 COMMON_OFFER = ['1BA', '2A', '2M', '2MC', '']
 CONTACTS_ENTITY_KEY = 'contact_entity_code'
 
+
 def create_common_offer_for_academic_year(year):
     academic_year = AcademicYear.objects.get(year=year)
     for offer in OFFERS:
