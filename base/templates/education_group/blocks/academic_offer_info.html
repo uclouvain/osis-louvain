@@ -28,6 +28,21 @@
     <div class="panel-body">
         <div class="row">
             <div class="col-md-4">
+                <label>{% trans 'ARES study code' %}</label><br>
+                {{ education_group_year.hops.ares_study | default_if_none:'' }}
+            </div>
+            <div class="col-md-4">
+                <label>{% trans 'ARES-GRACA' %}</label><br>
+                {{ education_group_year.hops.ares_graca | default_if_none:'' }}
+            </div>
+            <div class="col-md-4">
+                <label>{% trans 'ARES ability' %}</label><br>
+                {{ education_group_year.hops.ares_ability | default_if_none:'' }}
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-4">
                 <label>{% trans 'Co-graduation' %}</label><br>
                 {{ education_group_year.co_graduation | default_if_none:'' }}
             </div>

@@ -30,7 +30,6 @@ import re
 from django.core.exceptions import SuspiciousOperation
 from django.db.models import Q
 from django.http import Http404
-from django.template import loader
 from rest_framework.decorators import api_view, renderer_classes
 from rest_framework.generics import get_object_or_404
 from rest_framework.renderers import JSONRenderer

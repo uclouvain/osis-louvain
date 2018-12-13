@@ -57,49 +57,19 @@
                                 </div>
                             </div>
                             {% for label in labels %}
-                                {% if label.label == 'welcome_introduction' or not has_intro %}
-                                <div class="section_label row">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <label id="label_{{ label.label }}"
-                                                   {% if label.type == 'common' %}class="education_group_year-common italic"{% endif %}>{{ label.translation }}</label>
-                                            {% if label.type == 'specific' and can_edit_information %}
-                                                <a class="pedagogy-edit-btn" href="#"
-                                                   data-form="{{ post_url }}?label={{ label.label }}"
-                                                   title="{% trans 'Edit' %}">
-                                                    <span class="glyphicon glyphicon-edit"
-                                                          aria-hidden="true"></span>
-                                                </a>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                    <div class="row" id="content_{{ label.label }}">
-                                        <div class="col-md-6" id="content_fr_{{ label.type }}_{{ label.label }}">
-                                            {% if label|get_item:'fr-be' %}
-                                                <span {% if label.type == 'common' %}class="education_group_year-common italic"{% endif %}>{{ label|get_item:'fr-be'|truncatewords_html:40|safe }}</span>
-                                            {% else %}
-                                                <span class="italic">{% trans 'Add the French content of this paragraph' %}</span>
-                                            {% endif %}
-                                        </div>
-                                        <div class="col-md-6" id="content_en_{{ label.type }}_{{ label.label }}">
-                                            {% if label|get_item:'en' %}
-                                                <span {% if label.type == 'common' %}class="education_group_year-common italic"{% endif %}>{{ label|get_item:'en'|truncatewords_html:40|safe }}</span>
-                                            {% else %}
-                                                <span class="italic">{% trans 'Add the English content of this paragraph' %}</span>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
+                                {% include  "education_group/blocks/row_label_general_informations.html" %}
                                 {% if not forloop.last %}
                                 <hr/>
-                                {% endif %}
                                 {% endif %}
                             {% endfor %}
                             <hr/>
                         {% endfor %}
-                        <div class="row">
-                            {% include  "education_group/blocks/contacts_general_informations.html" %}
-                        </div>
+
+                        {% if show_contacts %}
+                            <div class="row">
+                                {% include  "education_group/blocks/contacts_general_informations.html" %}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

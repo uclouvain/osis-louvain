@@ -1,0 +1,59 @@
+{% load staticfiles %}
+{% load i18n %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="section_label row">
+    <div class="row">
+        <div class="col-md-12">
+            <label id="label_{{ label.label }}"
+                   {% if label.type == 'common' %}class="education_group_year-common italic"{% endif %}>{{ label.translation }}</label>
+            {% if label.type == 'specific' and can_edit_information %}
+                <a class="pedagogy-edit-btn" href="#"
+                   data-form="{{ post_url }}?label={{ label.label }}"
+                   title="{% trans 'Edit' %}">
+                    <span class="glyphicon glyphicon-edit"
+                          aria-hidden="true"></span>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="row" id="content_{{ label.label }}">
+        <div class="col-md-6" id="content_fr_{{ label.type }}_{{ label.label }}">
+            {% if label|get_item:'fr-be' %}
+                <span {% if label.type == 'common' %}class="education_group_year-common italic"{% endif %}>{{ label|get_item:'fr-be'|truncatewords_html:40|safe }}</span>
+            {% else %}
+                <span class="italic">{% trans 'Add the French content of this paragraph' %}</span>
+            {% endif %}
+        </div>
+        <div class="col-md-6" id="content_en_{{ label.type }}_{{ label.label }}">
+            {% if label|get_item:'en' %}
+                <span {% if label.type == 'common' %}class="education_group_year-common italic"{% endif %}>{{ label|get_item:'en'|truncatewords_html:40|safe }}</span>
+            {% else %}
+                <span class="italic">{% trans 'Add the English content of this paragraph' %}</span>
+            {% endif %}
+        </div>
+    </div>
+</div>

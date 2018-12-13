@@ -25,8 +25,7 @@
 ##############################################################################
 from django.conf import settings
 from django.db.models import Prefetch, CharField, Case, When, Value
-from django.db.models.functions import Coalesce, Lower
-from django.forms import model_to_dict
+from django.db.models.functions import Lower
 
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement

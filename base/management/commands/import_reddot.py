@@ -298,7 +298,7 @@ LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_FR, 'finalites_didactiques', 'Finalités Didactique'),
     (settings.LANGUAGE_CODE_FR, 'agregation', 'Agrégation'),
     (settings.LANGUAGE_CODE_FR, 'prerequis', 'Prérequis'),
-    (settings.LANGUAGE_CODE_FR, 'contact_intro', 'Introduction contact'),
+    (settings.LANGUAGE_CODE_FR, 'contact_intro', 'Introduction'),
     (settings.LANGUAGE_CODE_EN, 'pedagogie', 'Pedagogy'),
     (settings.LANGUAGE_CODE_EN, 'mobilite', 'Mobility'),
     (settings.LANGUAGE_CODE_EN, 'formations_accessibles', 'Possible Trainings'),
@@ -322,7 +322,7 @@ LABEL_TEXTUALS = [
     (settings.LANGUAGE_CODE_EN, 'finalites_didactiques', 'Teaching Focuses'),
     (settings.LANGUAGE_CODE_EN, 'agregation', 'Agregation'),
     (settings.LANGUAGE_CODE_EN, 'prerequis', 'Prerequis'),
-    (settings.LANGUAGE_CODE_EN, 'contact_intro', 'Contact Introduction'),
+    (settings.LANGUAGE_CODE_EN, 'contact_intro', 'Introduction'),
 ]
 
 MAPPING_LABEL_TEXTUAL = collections.defaultdict(dict)
