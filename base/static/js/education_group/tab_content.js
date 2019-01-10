@@ -1,7 +1,7 @@
 $(document).ready(function () {
     $('#minor_major_option_table').DataTable({
         columnDefs: [
-            //implement actions { orderable: false, targets: [4] }
+            { orderable: false, targets: [4] }
         ],
         "stateSave": true,
         "paging" : false,

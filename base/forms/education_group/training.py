@@ -80,7 +80,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         'university_domains', required=False, help_text="", label=_('secondary domains').title()
     )
 
-    section = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False)
+    section = forms.ChoiceField(choices=lazy(_get_section_choices, list), required=False, disabled=True)
 
     class Meta(EducationGroupYearModelForm.Meta):
         fields = [
@@ -166,6 +166,8 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         self.fields['main_domain'].queryset = Domain.objects.filter(type=domain_type.UNIVERSITY)\
                                                     .select_related('decree')\
                                                     .order_by('-decree__name', 'name')
+        if not self.fields['certificate_aims'].disabled:
+            self.fields['section'].disabled = False
 
         if not getattr(self.initial, 'academic_year', None):
             self.set_initial_diploma_values()

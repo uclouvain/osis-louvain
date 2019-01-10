@@ -336,8 +336,10 @@ class TestSelectAttach(TestCase):
         self.person = PersonFactory()
         self.client = Client()
         self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
-                                       return_value=True)
+        self.perm_patcher = mock.patch(
+            "base.business.group_element_years.perms.is_eligible_to_create_group_element_year",
+            return_value=True
+        )
         self.mocked_perm = self.perm_patcher.start()
 
         self.academic_year = create_current_academic_year()
@@ -545,9 +547,8 @@ class TestSelectAttach(TestCase):
         ).exists()
         self.assertFalse(expected_absent_group_element_year)
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
-    def test_attach_case_child_education_group_year_without_person_entity_link_fails(self, mock_permission):
-        mock_permission.return_value = False
+    def test_attach_case_child_education_group_year_without_person_entity_link_fails(self):
+        self.mocked_perm.return_value = False
         AuthorizedRelationshipFactory(
             parent_type=self.new_parent_education_group_year.education_group_type,
             child_type=self.child_education_group_year.education_group_type,

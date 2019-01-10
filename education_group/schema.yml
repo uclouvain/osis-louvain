@@ -1,0 +1,423 @@
+openapi: 3.0.0
+servers:
+ - url: https://{environment}.osis.uclouvain.be/api/v1/education_group/
+   variables:
+     environment:
+       default: dev
+       enum:
+         - dev # Development server
+         - qa # Staging server
+         - test # Test server
+ - url: https://osis.uclouvain.be/api/v1/education_group/
+   description: Production server
+info:
+  version: '1'
+  title: Education Group Service
+  description: |-
+    A set of API endpoints that allow you to get, update, delete an education group.
+paths:
+  /trainings/:
+    get:
+      description: Return a list of all the training with optional filtering.
+      operationId: trainings_list
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          description: Number of results to return per page.
+          type: integer
+      - in: query
+        name: offset
+        schema:
+          description: The initial index from which to return the results.
+          type: integer
+      - in: query
+        name: acronym
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: partial_acronym
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: title
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: title_english
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: ordering
+        schema:
+          description: Which field to use when ordering the results.
+          type: string
+      - in: query
+        name: search
+        schema:
+          description: A search term.
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfTraining'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - trainings
+  /trainings/{uuid}:
+    get:
+      description: Return the detail of the training
+      operationId: trainings_read
+      parameters:
+      - in: path
+        name: uuid
+        required: true
+        schema:
+          description: ''
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingDetailed'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - trainings
+components:
+  securitySchemes:
+    Token:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Enter your token in the format **Token &lt;token>**
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    ArrayOfTraining:
+      type: array
+      items:
+        $ref: '#/components/schemas/Training'
+    Training:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        acronym:
+          type: string
+        education_group_type:
+          $ref: '#/components/schemas/TrainingTypeEnum'
+        education_group_type_text:
+          type: string
+        code:
+          type: string
+        title:
+          type: string
+        title_english:
+          type: string
+        academic_year:
+          type: number
+        administration_entity:
+          type: string
+        management_entity:
+          type: string
+    TrainingDetailed:
+      allOf:
+        - $ref: '#/components/schemas/Training'
+        - type: object
+          properties:
+            active:
+              $ref: '#/components/schemas/ActiveEnum'
+            active_text:
+              type: string
+            partial_deliberation:
+              type: boolean
+            admission_exam:
+              type: boolean
+            funding:
+              type: boolean
+            funding_direction:
+              type: string
+            funding_cud:
+              type: boolean
+            funding_direction_cud:
+              type: string
+            academic_type:
+              $ref: '#/components/schemas/AcademicTypeEnum'
+            academic_type_text:
+              type: string
+            university_certificate:
+              type: boolean
+            enrollment_campus:
+              $ref: '#/components/schemas/Campus'
+            main_teaching_campus:
+              $ref: '#/components/schemas/Campus'
+            dissertation:
+               type: boolean
+            internship:
+              $ref: '#/components/schemas/InternshipPresenceEnum'
+            internship_text:
+              type: string
+            schedule_type:
+              $ref: '#/components/schemas/ScheduleTypeEnum'
+            schedule_type_text:
+              type: string
+            english_activities:
+              $ref: '#/components/schemas/ActivityPresenceEnum'
+            english_activities_text:
+              type: string
+            other_language_activities:
+              $ref: '#/components/schemas/ActivityPresenceEnum'
+            other_language_activities_text:
+              type: string
+            other_campus_activities:
+              $ref: '#/components/schemas/ActivityPresenceEnum'
+            other_campus_activities_text:
+              type: string
+            professional_title:
+              type: string
+            joint_diploma:
+              type: boolean
+            diploma_printing_orientation:
+              $ref: '#/components/schemas/PrintOrientationEnum'
+            diploma_printing_orientation_text:
+              type: string
+            diploma_printing_title:
+              type: string
+            inter_organization_information:
+              type: string
+            inter_university_french_community:
+              type: boolean
+            inter_university_belgium:
+              type: boolean
+            inter_university_abroad:
+              type: boolean
+            primary_language:
+              type: string
+              description: |
+                The language code according to ISO 639-1 specification (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+            keywords:
+             type: string
+            duration:
+              type: integer
+              minimum: 1
+            duration_unit:
+              $ref: '#/components/schemas/DurationUnitEnum'
+            duration_unit_text:
+              type: string
+            enrollment_enabled:
+              type: boolean
+            credits:
+              type: integer
+              minimum: 1
+            remark:
+              type: string
+            remark_english:
+              type: string
+            min_constraint:
+              type: integer
+              minimum: 1
+            max_constraint:
+              type: integer
+              minimum: 1
+            constraint_type:
+              $ref: '#/components/schemas/ConstraintTypeEnum'
+            constraint_type_text:
+              type: string
+            weighting:
+              type: boolean
+            default_learning_unit_enrollment:
+              type: boolean
+            decree_category:
+              $ref: '#/components/schemas/DecreeCategoryEnum'
+            decree_category_text:
+              type: string
+            rate_code:
+              $ref: '#/components/schemas/RateCodeEnum'
+            rate_code_text:
+              type: string
+            internal_comment:
+              type: string
+            co_graduation:
+              type: string
+            co_graduation_coefficient:
+              type: number
+            web_re_registration:
+              type: boolean
+    Campus:
+      type: object
+      properties:
+        name:
+          type: string
+        is_administration:
+          type: boolean
+    ActiveEnum:
+      type: string
+      enum:
+       - ACTIVE
+       - INACTIVE
+       - RE_REGISTRATION
+    InternshipPresenceEnum:
+      type: string
+      enum:
+        - YES
+        - NO
+        - OPTIONAL
+    ScheduleTypeEnum:
+      type: string
+      enum:
+        - DAILY
+        - SHIFTED
+        - ADAPTED
+    ActivityPresenceEnum:
+      type: string
+      enum:
+        - YES
+        - NO
+        - OPTIONAL
+    PrintOrientationEnum:
+      type: string
+      enum:
+        - NO_PRINT
+        - IN_HEADING_2_OF_DIPLOMA
+        - IN_EXPECTED_FORM
+    DurationUnitEnum:
+      type: string
+      enum:
+        - QUADRIMESTER
+        - TRIMESTER
+        - MONTH
+        - WEEK
+        - DAY
+    ConstraintTypeEnum:
+      type: string
+      enum:
+        - CREDITS
+        - NUMBER_OF_ELEMENTS
+    DecreeCategoryEnum:
+      type: string
+      enum:
+        - FCONT
+        - BAS1
+        - BAS2
+        - AESS
+        - DEC1
+        - DEC2
+        - DES
+        - DEA
+        - DOC
+        - AES
+        - AUTRE
+        - BAC
+        - AP2C
+        - MA1
+        - MA2X
+        - MA2D
+        - MA2S
+        - MA2A
+        - MA2M
+        - AS2C
+        - MACO
+        - AESSB
+        - CAPS
+        - AS3C
+        - FODO
+        - DOCB
+        - CEMC
+        - MED
+        - VETE
+    RateCodeEnum:
+      type: string
+      enum:
+        - NO_ADDITIONAL_FEES
+        - AESS_CAPAES
+        - MINERVAL_COMPLETE
+        - UNIVERSITY_CERTIFICATE
+        - ADVANCED_MASTER_IN_MEDICAL_SPECIALIZATION
+        - ACCESS_CONTEST
+        - UNIVERSITY_CERTIFICATE_30_CREDITS
+        - CERTIFICATE_MEDECINE_COMPETENCE
+    TrainingTypeEnum:
+      type: string
+      enum:
+        - AGGREGATION
+        - CERTIFICATE_OF_PARTICIPATION
+        - CERTIFICATE_OF_SUCCESS
+        - CERTIFICATE_OF_HOLDING_CREDITS
+        - BACHELOR
+        - CERTIFICATE
+        - CAPAES
+        - RESEARCH_CERTIFICATE
+        - UNIVERSITY_FIRST_CYCLE_CERTIFICATE
+        - UNIVERSITY_SECOND_CYCLE_CERTIFICATE
+        - ACCESS_CONTEST
+        - LANGUAGE_CLASS
+        - ISOLATED_CLASS
+        - PHD
+        - FORMATION_PHD
+        - JUNIOR_YEAR
+        - PGRM_MASTER_120
+        - MASTER_MA_120
+        - MASTER_MD_120
+        - MASTER_MS_120
+        - PGRM_MASTER_180_240
+        - MASTER_MA_180_240
+        - MASTER_MD_180_240
+        - MASTER_MS_180_240
+        - MASTER_M1
+        - MASTER_MC
+        - INTERNSHIP
+    AcademicTypeEnum:
+      type: string
+      enum:
+        - NON_ACADEMIC
+        - NON_ACADEMIC_CREF
+        - ACADEMIC
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+security:
+  - Token: []

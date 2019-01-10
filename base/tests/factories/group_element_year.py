@@ -36,10 +36,10 @@ class GroupElementYearFactory(factory.django.DjangoModelFactory):
         model = "base.GroupElementYear"
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     parent = factory.SubFactory(EducationGroupYearFactory)
     child_branch = factory.SubFactory(EducationGroupYearFactory)
     child_leaf = None
     is_mandatory = False
     link_type = None
+    order = None

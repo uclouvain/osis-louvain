@@ -111,6 +111,7 @@ def is_academic_calendar_opened(education_group, type_academic_calendar, raise_e
         can_raise_exception(raise_exception, result, "The education group edition period is not open.")
 
     # During the edition period, the manager can only edit the N+1 education_group_year.
+
     elif education_group and education_group.academic_year != ac.get().academic_year.next():
         can_raise_exception(
             raise_exception, result, "this education group is not editable during this period."

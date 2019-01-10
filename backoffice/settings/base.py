@@ -70,6 +70,7 @@ INSTALLED_APPS = (
     'reference',
     'rules_management',
     'base',
+    'education_group',
     'statici18n',
     'rest_framework',
     'rest_framework.authtoken',
@@ -381,8 +382,11 @@ REST_FRAMEWORK = {
 }
 
 # ESB Configuration
+ESB_API_URL = os.environ.get('ESB_API_URL')
 ESB_AUTHORIZATION = os.environ.get('ESB_AUTHORIZATION')
+# TODO: rename to ESB_STUDENT_ENDPOINT
 ESB_STUDENT_API = os.environ.get('ESB_STUDENT_API')
+ESB_REFRESH_PEDAGOGY_ENDPOINT = os.environ.get('ESB_REFRESH_PEDAGOGY_ENDPOINT')
 
 RELEASE_TAG = os.environ.get('RELEASE_TAG')
 
@@ -437,8 +441,7 @@ HIJACK_USE_BOOTSTRAP = True
 REQUESTS_TIMEOUT = 20
 
 # PEDAGOGY INFORMATION
-URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/prog-{anac}{type}-{code}")
-REFRESH_PARAM = os.environ.get("REFRESH_PARAM", "")
+URL_TO_PORTAL_UCL = os.environ.get("URL_TO_PORTAL_UCL", "https://uclouvain.be/prog-{year}-{code}")
 GET_SECTION_PARAM = os.environ.get("GET_SECTION_PARAM", "")
 
 YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 2018))

@@ -24,6 +24,7 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+{% if not cannot_order %}
 <form id="form_group_element_year_actions" method="POST" style="display:inline;"
       action="{% url 'education_groups_management' %}">
     <input type="hidden" name="root_id" value="{{ root.id }}"/>
@@ -35,6 +36,7 @@
         {% button_order_with_permission _("Down") "btn_operation_down_"|addstr:group.id "down" %}
     </div>
 </form>
+{% endif %}
 
 <div class="btn-group">
     {% url 'group_element_year_delete' root.pk education_group_year.pk group.pk as detach_url %}

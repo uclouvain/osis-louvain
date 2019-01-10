@@ -32,6 +32,7 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.exceptions import ImproperlyConfigured
 from django.db.models import F, Case, When
 from django.http import HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect
@@ -44,10 +45,11 @@ from reversion.models import Version
 
 from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
-from base.business.education_groups import perms
+from base.business.education_groups import perms, general_information
 from base.business.education_groups.group_element_year_tree import NodeBranchJsTree
 from base.business.education_groups.perms import is_eligible_to_edit_general_information, \
     is_eligible_to_edit_admission_condition
+from base.business.education_groups.general_information import PublishException, RelevantSectionException
 from base.management.commands.import_reddot import COMMON_OFFER
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_achievement import EducationGroupAchievement
@@ -338,20 +340,12 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         }
 
     def get_appropriate_sections(self):
-        education_group_year = self.object
-        code, type_education_group_year = _get_code_and_type(education_group_year)
-        url = settings.URL_TO_PORTAL_UCL.format(
-            type=type_education_group_year,
-            anac=education_group_year.academic_year.year,
-            code=code
-        )
-        url += "?" + settings.GET_SECTION_PARAM
+        sections = []
         try:
-            sections_request = requests.get(url, timeout=settings.REQUESTS_TIMEOUT).json()
-        except (json.JSONDecodeError, TimeoutError, requests.exceptions.ConnectionError):
-            display_error_messages(self.request, _("Unable to retrieve appropriate sections for this programs"))
-            sections_request = {'sections': []}
-        return sections_request['sections']
+            sections = general_information.get_relevant_sections(self.object)
+        except RelevantSectionException as e:
+            display_error_messages(self.request, str(e))
+        return sections
 
     def get_contacts_section(self):
         introduction = self.get_content_translations_for_label(
@@ -372,58 +366,20 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         return contacts_by_type
 
 
-def _get_code_and_type(education_group_year):
-    minor = education_group_year.is_minor
-    deep = education_group_year.is_deepening
-    special = minor or deep
-    if special:
-        code = education_group_year.partial_acronym
-        if minor:
-            type_education_group_year = "-min"
-        elif deep:
-            type_education_group_year = "-app"
-    else:
-        code = education_group_year.acronym
-        type_education_group_year = ""
-    return code, type_education_group_year
-
-
 @login_required
 def publish(request, education_group_year_id, root_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    code, type_education_group_year = _get_code_and_type(education_group_year)
-    url = settings.URL_TO_PORTAL_UCL.format(
-        type=type_education_group_year,
-        anac=education_group_year.academic_year.year,
-        code=code
-    )
-    url += "?" + settings.REFRESH_PARAM
-    publish_request = requests.get(url, timeout=settings.REQUESTS_TIMEOUT)
-    if publish_request.status_code == HttpResponseNotFound.status_code:
-        display_error_messages(request, _("This program has no page to publish on it"))
-    else:
-        url_to_display = url.split("?")[0]
+
+    try:
+        portal_url = general_information.publish(education_group_year)
         message = _("The program are published. Click on the link to display it : ") + \
-            "<a href=" + url_to_display + ">" + education_group_year.acronym + "</a>"
+            "<a href=" + portal_url + ">" + education_group_year.acronym + "</a>"
         display_success_messages(request, message, extra_tags='safe')
+    except PublishException as e:
+        display_error_messages(request, str(e))
 
     return redirect(reverse('education_group_general_informations',
                             kwargs={'root_id': root_id, 'education_group_year_id': education_group_year_id}))
-
-
-def _get_cms_label_data(cms_label, user_language):
-    cms_label_data = OrderedDict()
-    translated_labels = mdl_cms.translated_text_label.search(
-        text_entity=entity_name.OFFER_YEAR,
-        labels=cms_label,
-        language=user_language
-    )
-
-    for label in cms_label:
-        translated_text = next((trans.label for trans in translated_labels if trans.text_label.label == label), None)
-        cms_label_data[label] = translated_text
-
-    return cms_label_data
 
 
 class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
@@ -502,11 +458,7 @@ class EducationGroupContent(EducationGroupGenericDetailView):
         return context
 
     def _show_minor_major_option_table(self):
-        return self.object.education_group_type.name in (
-            GroupType.MAJOR_LIST_CHOICE.name,
-            GroupType.MINOR_LIST_CHOICE.name,
-            GroupType.OPTION_LIST_CHOICE.name
-        )
+        return self.object.education_group_type.name in GroupType.minor_major_option_list_choice()
 
 
 class EducationGroupUsing(EducationGroupGenericDetailView):

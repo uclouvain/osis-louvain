@@ -1,4 +1,4 @@
-{% load bootstrap3 i18n %}
+{% load bootstrap3 osis_bootstrap3 i18n %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -31,27 +31,19 @@
             <h4 class="text-center">{{ form.instance.child.acronym }}</h4>
         </div>
 
-
         <div id="form-modal-body" class="modal-body">
-
             {% bootstrap_form_errors form %}
             <form method="post" id="form_comment_update" action="{{ request.path }}">
                 {% csrf_token %}
-                <div class="form-group row">
-                    {% bootstrap_field form.link_type form_group_class="col-md-4" %}
-                    {% bootstrap_field form.is_mandatory label=_('Required') form_group_class="col-md-4" %}
-                    {% bootstrap_field form.relative_credits form_group_class="col-md-4" %}
-                </div>
-                <div class="form-group row">
-                    {% bootstrap_field form.block form_group_class="col-md-6" %}
-                    {% bootstrap_field form.quadrimester_derogation form_group_class="col-md-6" %}
-                </div>
-                <div class="form-group row">
-                    {% bootstrap_field form.comment form_group_class="col-md-12" %}
-                </div>
-                <div class="form-group row">
-                    {% bootstrap_field form.comment_english form_group_class="col-md-12" %}
-                </div>
+                {% bootstrap_row field_0=form.link_type form_group_class_0="col-md-4" field_1=form.is_mandatory label_1=_('Required') form_group_class_1="col-md-4" field_2=form.relative_credits form_group_class_2="col-md-4" %}
+
+                {% bootstrap_row field_0=form.block form_group_class_0="col-md-6" field_1=form.quadrimester_derogation form_group_class_1="col-md-6" %}
+
+                {% bootstrap_row field_0=form.comment form_group_class_0="col-md-12" %}
+
+                {% bootstrap_row field_0=form.comment_english form_group_class_0="col-md-12" %}
+
+                {% bootstrap_row field_0=form.access_condition form_group_class_0="col-md-4" %}
             </form>
         </div>
 

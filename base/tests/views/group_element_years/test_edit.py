@@ -56,6 +56,12 @@ class TestEdit(TestCase):
 
     def setUp(self):
         self.client.force_login(self.person.user)
+        self.perm_patcher = mock.patch(
+            "base.business.group_element_years.perms.is_eligible_to_create_group_element_year",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
 
     def test_edit_case_user_not_logged(self):
         self.client.logout()
@@ -69,20 +75,17 @@ class TestEdit(TestCase):
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
         self.assertTemplateUsed(response, "page_not_found.html")
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
-    def test_edit_comment_get(self, mock_permission):
+    def test_edit_comment_get(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "education_group/group_element_year_comment_inner.html")
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
-    def test_edit_comment_get_ajax(self, mock_permission):
+    def test_edit_comment_get_ajax(self):
         response = self.client.get(self.url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "education_group/group_element_year_comment_inner.html")
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
-    def test_edit_comment_post(self, mock_permission):
+    def test_edit_comment_post(self):
         data = {
             "comment":  """C'est une affaire dangereuse de passer ta porte, Frodon, 
             Tu vas sur la route, et si tu ne retiens pas tes pieds,

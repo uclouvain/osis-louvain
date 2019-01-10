@@ -30,7 +30,7 @@ from django.utils.decorators import method_decorator
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
-from base.views.education_groups import perms
+from base.views.education_groups.group_element_year import perms
 from base.views.mixins import FlagMixin, RulesRequiredMixin, AjaxTemplateMixin
 
 
@@ -45,7 +45,7 @@ class GenericGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessMessage
 
     # RulesRequiredMixin
     raise_exception = True
-    rules = [perms.can_change_education_group]
+    rules = [perms.can_create_group_element_year]
 
     def _call_rule(self, rule):
         """ The permission is computed from the education_group_year """

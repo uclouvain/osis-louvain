@@ -30,6 +30,7 @@ from base.forms.education_group.group_element_year import GroupElementYearForm
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
@@ -90,3 +91,21 @@ class TestGroupElementYearForm(TestCase):
         )
 
         self.assertTrue(form.is_valid())
+
+    def test_reorder_children_by_partial_acronym(self):
+        group_element_1 = GroupElementYearFactory(
+            child_branch__partial_acronym="SECOND",
+            order=1
+        )
+        group_element_2 = GroupElementYearFactory(
+            parent=group_element_1.parent,
+            child_branch__partial_acronym="FIRST",
+            order=2
+        )
+        GroupElementYearForm._reorder_children_by_partial_acronym(group_element_1.parent)
+
+        group_element_1.refresh_from_db()
+        group_element_2.refresh_from_db()
+        self.assertTrue(
+            group_element_1.order == 1 and group_element_2.order == 0
+        )

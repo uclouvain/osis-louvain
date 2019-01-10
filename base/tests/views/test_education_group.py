@@ -37,23 +37,24 @@ from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse
-from django.test import TestCase, RequestFactory
+from django.test import TestCase, RequestFactory, override_settings
 from waffle.testutils import override_flag
 
+from base.business.education_groups.general_information import PublishException
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine, CONDITION_ADMISSION_ACCESSES
 from base.models.enums import education_group_categories, academic_calendar_type
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.certificate_aim import CertificateAimFactory
 from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
 from base.tests.factories.education_group_language import EducationGroupLanguageFactory
 from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory, \
+    TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory
-from base.views.education_groups.detail import _get_code_and_type
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
@@ -306,6 +307,7 @@ class EducationGroupDiplomas(TestCase):
                 )
 
 
+@override_settings(URL_TO_PORTAL_UCL="http://portal-url.com", GET_SECTION_PARAM="sectionsParams")
 class EducationGroupGeneralInformations(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -478,90 +480,44 @@ class EducationGroupGeneralInformations(TestCase):
 
         self.assertEqual(response.status_code, 302)
 
-    @mock.patch("requests.get", return_value=HttpResponseNotFound)
-    def test_education_group_year_pedagogy_publish_not_found(self, mock_get):
-        url = reverse('education_group_publish', args=(self.education_group_child.id, self.education_group_parent.id))
-        response = self.client.get(url)
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.ERROR, msg_level)
-        self.assertEqual(response.status_code, 302)
-        code, type_education_group_year = _get_code_and_type(self.education_group_parent)
-        url = settings.URL_TO_PORTAL_UCL.format(
-            type=type_education_group_year,
-            anac=self.education_group_parent.academic_year.year,
-            code=code
-        )
-        url += "?" + settings.REFRESH_PARAM
-        mock_get.assert_called_once_with(url, timeout=settings.REQUESTS_TIMEOUT)
 
-    @mock.patch("requests.get", return_value=HttpResponse)
-    def test_education_group_year_pedagogy_publish_found(self, mock_get):
-        education_group_real = EducationGroupYearFactory(acronym="SINF1BA", academic_year=self.current_academic_year,
-                                                         education_group_type=self.type_training)
-        url = reverse('education_group_publish', args=(self.education_group_parent.id, education_group_real.id))
-        response = self.client.get(url)
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.SUCCESS, msg_level)
-        self.assertEqual(response.status_code, 302)
-        code, type_education_group_year = _get_code_and_type(education_group_real)
-        url = settings.URL_TO_PORTAL_UCL.format(
-            type=type_education_group_year,
-            anac=education_group_real.academic_year.year,
-            code=code
-        )
-        url += "?" + settings.REFRESH_PARAM
-        mock_get.assert_called_once_with(url, timeout=settings.REQUESTS_TIMEOUT)
+class EducationGroupPublishViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+        cls.training = TrainingFactory(academic_year=cls.academic_year)
+        cls.url = reverse('education_group_publish', args=(cls.training.pk, cls.training.pk))
+        cls.person = PersonWithPermissionsFactory('can_access_education_group')
 
-    def test_education_group_year_pedagogy_publish_when_not_logged(self):
+    def setUp(self):
+        self.client.force_login(self.person.user)
+
+    def test_publish_case_user_not_logged(self):
         self.client.logout()
         response = self.client.get(self.url)
         self.assertRedirects(response, '/login/?next={}'.format(self.url))
 
-    @mock.patch("requests.get", return_value=HttpResponse)
-    def test_education_group_year_pedagogy_publish_minor(self, mock_get):
-        education_group_minor = EducationGroupYearFactory(partial_acronym="LALLE100I",
-                                                          academic_year=self.current_academic_year,
-                                                          education_group_type=self.type_minor)
-        url = reverse('education_group_publish', args=(self.education_group_parent.id, education_group_minor.id))
-        response = self.client.get(url)
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.SUCCESS, msg_level)
-        self.assertEqual(response.status_code, 302)
-        code, type_education_group_year = _get_code_and_type(education_group_minor)
-        url = settings.URL_TO_PORTAL_UCL.format(
-            type=type_education_group_year,
-            anac=education_group_minor.academic_year.year,
-            code=code
-        )
-        url += "?" + settings.REFRESH_PARAM
-        mock_get.assert_called_once_with(url, timeout=settings.REQUESTS_TIMEOUT)
+    @mock.patch("base.business.education_groups.general_information.publish", side_effect=lambda e: "portal-url")
+    def test_publish_case_ok_redirection_with_success_message(self, mock_publish):
+        response = self.client.get(self.url)
 
-    @mock.patch("requests.get", return_value=HttpResponse)
-    def test_education_group_year_pedagogy_publish_deepening(self, mock_get):
-        education_group_deep = EducationGroupYearFactory(partial_acronym="LDRT100P",
-                                                         academic_year=self.current_academic_year,
-                                                         education_group_type=self.type_deepening)
-        url = reverse('education_group_publish', args=(self.education_group_parent.id, education_group_deep.id))
-        response = self.client.get(url)
         msg = [m.message for m in get_messages(response.wsgi_request)]
         msg_level = [m.level for m in get_messages(response.wsgi_request)]
+
         self.assertEqual(len(msg), 1)
         self.assertIn(messages.SUCCESS, msg_level)
         self.assertEqual(response.status_code, 302)
-        code, type_education_group_year = _get_code_and_type(education_group_deep)
-        url = settings.URL_TO_PORTAL_UCL.format(
-            type=type_education_group_year,
-            anac=education_group_deep.academic_year.year,
-            code=code
-        )
-        url += "?" + settings.REFRESH_PARAM
-        mock_get.assert_called_once_with(url, timeout=settings.REQUESTS_TIMEOUT)
+
+    @mock.patch("base.business.education_groups.general_information.publish", side_effect=PublishException('error'))
+    def test_publish_case_ko_redirection_with_error_message(self, mock_publish):
+        response = self.client.get(self.url)
+
+        msg = [m.message for m in get_messages(response.wsgi_request)]
+        msg_level = [m.level for m in get_messages(response.wsgi_request)]
+
+        self.assertEqual(len(msg), 1)
+        self.assertIn(messages.ERROR, msg_level)
+        self.assertEqual(response.status_code, 302)
 
 
 @override_flag('education_group_update', active=True)

@@ -71,6 +71,16 @@ class AcademicCalendarFactory(factory.DjangoModelFactory):
     reference = factory.Iterator(ACADEMIC_CALENDAR_TYPES, getter=operator.itemgetter(0))
 
 
+class OpenAcademicCalendarFactory(AcademicCalendarFactory):
+    start_date = factory.LazyAttribute(lambda obj: datetime.date.today() - datetime.timedelta(days=3))
+    end_date = factory.LazyAttribute(lambda obj: datetime.date.today() + datetime.timedelta(days=3))
+
+
+class CloseAcademicCalendarFactory(AcademicCalendarFactory):
+    start_date = factory.LazyAttribute(lambda obj: datetime.date.today() - datetime.timedelta(days=3))
+    end_date = factory.LazyAttribute(lambda obj: datetime.date.today() - datetime.timedelta(days=1))
+
+
 class AcademicCalendarExamSubmissionFactory(AcademicCalendarFactory):
     reference = 'SCORES_EXAM_SUBMISSION'
 

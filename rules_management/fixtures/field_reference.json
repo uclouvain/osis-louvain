@@ -343,9 +343,6 @@
             "groups": [
                 [
                     "central_managers"
-                ],
-                [
-                    "central_managers"
                 ]
             ]
         },
@@ -1742,6 +1739,9 @@
             "groups": [
                 [
                     "central_managers"
+                ],
+                [
+                    "faculty_managers"
                 ]
             ]
         },
@@ -4206,6 +4206,53 @@
                 ],
                 [
                     "faculty_managers"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 262,
+        "fields": {
+            "field_name": "certificate_aims",
+            "context": "TRAINING_DAILY_MANAGEMENT",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": [
+                [
+                    "central_managers"
+                ]
+            ]
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 263,
+        "fields": {
+            "field_name": "certificate_aims",
+            "context": "TRAINING_PROPOSAL_MANAGEMENT",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": []
+        },
+        "model": "rules_management.fieldreference"
+    },
+    {
+        "pk": 264,
+        "fields": {
+            "field_name": "certificate_aims",
+            "context": "TRAINING_PGRM_ENCODING_PERIOD",
+            "content_type": [
+                "base",
+                "educationgroupyear"
+            ],
+            "groups": [
+                [
+                    "central_managers"
                 ]
             ]
         },

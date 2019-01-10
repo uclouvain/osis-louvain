@@ -979,7 +979,7 @@ msgstr "Vous avez sélectionné un fichier à téléversé"
 #: templates/scores_encoding.html:242
 #: templates/scores_encoding_by_learning_unit.html:387
 msgid "You haven't any score to encode."
-msgstr "Vous n'avez pas aucune note à encoder"
+msgstr "Vous n'avez pas de note à encoder."
 
 #: views/upload_xls_utils.py:80
 #, python-format

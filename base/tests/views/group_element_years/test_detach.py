@@ -59,6 +59,12 @@ class TestDetach(TestCase):
 
     def setUp(self):
         self.client.force_login(self.person.user)
+        self.perm_patcher = mock.patch(
+            "base.business.group_element_years.perms.is_eligible_to_create_group_element_year",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
 
     def test_edit_case_user_not_logged(self):
         self.client.logout()
@@ -73,17 +79,14 @@ class TestDetach(TestCase):
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
         self.assertTemplateUsed(response, "page_not_found.html")
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
-    def test_detach_case_user_not_have_access(self, mock_permission):
-        mock_permission.return_value = False
-
+    def test_detach_case_user_not_have_access(self):
+        self.mocked_perm.return_value = False
         response = self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self.assertTemplateUsed(response, "access_denied.html")
 
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group", return_value=True)
-    def test_detach_case_get_with_ajax_success(self, mock_permission):
+    def test_detach_case_get_with_ajax_success(self):
         response = self.client.get(self.url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, "education_group/group_element_year/confirm_detach_inner.html")
@@ -127,11 +130,15 @@ class TestDetachLearningUnitPrerequisite(TestCase):
 
     def setUp(self):
         self.client.force_login(self.person.user)
+        self.perm_patcher = mock.patch(
+            "base.business.group_element_years.perms.is_eligible_to_create_group_element_year",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
 
     @mock.patch("base.models.group_element_year.GroupElementYear.delete")
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
-    def test_detach_case_learning_unit_being_prerequisite(self, mock_permission, mock_delete):
-        mock_permission.return_value = True
+    def test_detach_case_learning_unit_being_prerequisite(self, mock_delete):
 
         PrerequisiteItemFactory(
             prerequisite__education_group_year=self.group_element_year_root.parent,
@@ -150,9 +157,7 @@ class TestDetachLearningUnitPrerequisite(TestCase):
         self.assertFalse(mock_delete.called)
 
     @mock.patch("base.models.group_element_year.GroupElementYear.delete")
-    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
-    def test_detach_case_learning_unit_having_prerequisite(self, mock_permission, mock_delete):
-        mock_permission.return_value = True
+    def test_detach_case_learning_unit_having_prerequisite(self, mock_delete):
 
         PrerequisiteItemFactory(
             prerequisite__learning_unit_year=self.luy,

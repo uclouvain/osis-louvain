@@ -1,4 +1,4 @@
-{% load i18n %}
+{% load i18n format education_group %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -31,7 +31,7 @@
             <th>{% trans 'Sigle'%}</th>
             <th>{% trans 'Title'%}</th>
             <th>{% trans 'Access condition'%}</th>
-            <!-- implement actions <th></th>-->
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -41,7 +41,9 @@
                 <td width="10%">{{ group.acronym }}</td>
                 <td width="45%" style="white-space: pre;">{{ group.title }}</td>
                 <td width="20%">{{ group.access_condition| yesno:_("yes,no") |title }}</td>
-                <!-- implement actions <td width="15%"></td> -->
+                <td width="15%">
+                    {% include "education_group/blocks/content_actions.html" with cannot_order=True %}
+                </td>
             </tr>
         {% endfor %}
     </tbody>

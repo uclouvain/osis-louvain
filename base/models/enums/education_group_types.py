@@ -99,5 +99,11 @@ class GroupType(ChoiceEnum):
     COMPLEMENTARY_MODULE = _("Complementary module")
     SUB_GROUP = _("Sub group")
 
+    @classmethod
+    def minor_major_option_list_choice(cls):
+        return [
+            cls.MINOR_LIST_CHOICE.name, cls.MAJOR_LIST_CHOICE.name, cls.OPTION_LIST_CHOICE.name
+        ]
+
 
 ALL_TYPES = TrainingType.choices() + MiniTrainingType.choices() + GroupType.choices()
