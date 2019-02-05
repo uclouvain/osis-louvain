@@ -446,7 +446,6 @@ GET_SECTION_PARAM = os.environ.get("GET_SECTION_PARAM", "")
 YEAR_LIMIT_LUE_MODIFICATION = int(os.environ.get("YEAR_LIMIT_LUE_MODIFICATION", 2018))
 
 # Continuing education settings
-ACCOUNT_ACTIVATION_DAYS = int(os.environ.get('IUFC_ACCOUNT_ACTIVATION_DAYS', 7))
 IUFC_CONFIG = {
     'IUFC_MESSAGES_OUTSIDE_PRODUCTION': os.environ.get('IUFC_MESSAGES_OUTSIDE_PRODUCTION', 'false').lower() == 'true',
 }
