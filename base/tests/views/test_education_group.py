@@ -154,6 +154,31 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertEqual(sections[0].labels[0]['label'], 'intro')
         self.assertEqual(sections[1].labels[0]['label'], 'finalites_didactiques-commun')
 
+    def test_case_common_do_not_have_double_field_prerequisite(self):
+        education_group_year = EducationGroupYearCommonFactory(
+            academic_year=self.current_academic_year,
+        )
+        url = reverse("education_group_general_informations",
+                      args=[education_group_year.pk, education_group_year.id])
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+
+        context = response.context
+        self.assertEqual(context["parent"], education_group_year)
+        self.assertEqual(context["education_group_year"], education_group_year)
+        sections = context['sections_with_translated_labels']
+        prerequis = {
+            'label': 'prerequis',
+            'type': 'specific',
+            'translation':
+                'Ce label prerequis n’existe pas',
+            'fr-be': None,
+            'en': None
+        }
+        self.assertIn(prerequis, sections[0].labels)
+        self.assertEqual(sections[0].labels.count(prerequis),1)
+
     def test_case_user_has_link_to_edit_pedagogy(self):
         response = self.client.get(self.url)
 
