@@ -344,7 +344,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             elif selector == 'common':
                 translations = self._get_common_selector(common_education_group_year, label, user_language)
 
-            if translations:
+            if translations and translations not in records:
                 records.append(translations)
 
         return records
