@@ -508,6 +508,10 @@ class EducationGroupYear(SerializableModel):
         return self.education_group_type.name == TrainingType.BACHELOR.name
 
     @property
+    def is_certificate(self):
+        return self.education_group_type.name == TrainingType.CERTIFICATE.name
+
+    @property
     def verbose(self):
         return "{} - {}".format(self.partial_acronym or "", self.acronym)
 
