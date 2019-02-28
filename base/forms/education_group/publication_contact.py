@@ -23,15 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy as _
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
+from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models.education_group_publication_contact import EducationGroupPublicationContact, ROLE_REQUIRED_FOR_TYPES
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import find_all_current_entities_version, get_last_version
 from base.models.enums.organization_type import MAIN
+from base.models.enums.publication_contact_type import PublicationContactType
 
 
 class EducationGroupPublicationContactForm(forms.ModelForm):
@@ -42,10 +43,16 @@ class EducationGroupPublicationContactForm(forms.ModelForm):
     def __init__(self, education_group_year=None, *args, **kwargs):
         if not education_group_year and not kwargs.get('instance'):
             raise ImproperlyConfigured("Provide an education_group_year or an instance")
-
         super().__init__(*args, **kwargs)
         if not kwargs.get('instance'):
             self.instance.education_group_year = education_group_year
+        contacts = EducationGroupPublicationContact.objects.filter(
+            education_group_year=education_group_year,
+            type=PublicationContactType.ACADEMIC_RESPONSIBLE.name
+        ).count()
+        if contacts > 0:
+            self.fields['type'].choices = self.fields['type'].choices[1:]
+
         self._disable_fields()
 
     @property

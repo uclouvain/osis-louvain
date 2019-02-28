@@ -43,13 +43,17 @@
 </div>
 
 <script>
-    no_role = ['OTHER_ACADEMIC_RESPONSIBLE', 'ACADEMIC_RESPONSIBLE']
+    no_role = ['OTHER_ACADEMIC_RESPONSIBLE', 'ACADEMIC_RESPONSIBLE'];
     $('#id_type').change(function (e) {
         var typeContact = $(this).val();
 
         if(no_role.indexOf(typeContact) >= 0){
             $('#id_role_fr').attr('disabled', true);
             $('#id_role_en').attr('disabled', true);
+        }
+        else{
+            $('#id_role_fr').attr('disabled', false);
+            $('#id_role_en').attr('disabled', false);
         }
     })
 </script>
