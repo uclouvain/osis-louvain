@@ -82,6 +82,17 @@ class TrainingType(ChoiceEnum):
             cls.CAPAES.name,
         ]
 
+    @classmethod
+    def part_of_continuing_education(cls):
+        return [
+            cls.AGGREGATION.name,
+            cls.CERTIFICATE.name,
+            cls.CERTIFICATE_OF_PARTICIPATION.name,
+            cls.CERTIFICATE_OF_SUCCESS.name,
+            cls.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
+            cls.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name,
+        ]
+
 
 class MiniTrainingType(ChoiceEnum):
     DEEPENING = _("Deepening")

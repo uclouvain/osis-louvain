@@ -28,13 +28,13 @@ from django_filters import rest_framework as filters
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_types import TrainingType
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 
 
 class TrainingFilter(filters.FilterSet):
     from_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='gte')
     to_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='lte')
-    in_type = filters.CharFilter(field_name="education_group_type__name", lookup_expr='contains')
 
     class Meta:
         model = EducationGroupYear
@@ -71,6 +71,12 @@ class TrainingList(generics.ListAPIView):
         '-academic_year__year',
         'acronym',
     )  # Default ordering
+
+    def get_queryset(self):
+        # filter continuing_education trainings if param is set
+        if self.request.query_params.get("continuing_education"):
+            return self.queryset.filter(education_group_type__name__in=TrainingType.part_of_continuing_education())
+        return self.queryset
 
 
 class TrainingDetail(generics.RetrieveAPIView):
