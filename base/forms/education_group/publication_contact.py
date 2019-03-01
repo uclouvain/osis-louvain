@@ -52,9 +52,12 @@ class EducationGroupPublicationContactForm(forms.ModelForm):
         ).exists()
         if contacts:
             self.fields['type'].choices = [
-                PublicationContactType.OTHER_ACADEMIC_RESPONSIBLE,
-                PublicationContactType.JURY_MEMBER,
-                PublicationContactType.OTHER_CONTACT
+                (PublicationContactType.OTHER_ACADEMIC_RESPONSIBLE.name,
+                 PublicationContactType.OTHER_ACADEMIC_RESPONSIBLE.value),
+                (PublicationContactType.JURY_MEMBER.name,
+                 PublicationContactType.JURY_MEMBER.value),
+                (PublicationContactType.OTHER_CONTACT.name,
+                 PublicationContactType.OTHER_CONTACT.value),
             ]
 
         self._disable_fields()
