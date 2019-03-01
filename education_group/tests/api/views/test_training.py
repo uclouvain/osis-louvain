@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import uuid
+from pprint import pprint
 
 from django.test import RequestFactory
 from django.urls import reverse
@@ -33,6 +34,7 @@ from rest_framework.test import APITestCase
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.user import UserFactory
@@ -163,16 +165,15 @@ class FilterTrainingTestCase(APITestCase):
         )
         self.assertEqual(response.data['results'], serializer.data)
 
-    def test_get_training_case_filter_type_params(self):
-        query_string = {'in_type': 'continue'}
+    def test_get_continuing_education_trainings(self):
+        query_string = {'continuing_education': True}
 
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         trainings = EducationGroupYear.objects.filter(
-            education_group_type__category=education_group_categories.TRAINING,
-            education_group_type__name__contains=query_string['in_type']
-        )
+            education_group_type__name__in=TrainingType.part_of_continuing_education()
+        ).order_by('-academic_year__year', 'acronym')
 
         serializer = TrainingListSerializer(
             trainings,
