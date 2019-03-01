@@ -49,12 +49,12 @@ class EducationGroupPublicationContactForm(forms.ModelForm):
         contacts = EducationGroupPublicationContact.objects.filter(
             education_group_year=education_group_year,
             type=PublicationContactType.ACADEMIC_RESPONSIBLE.name
-        ).count()
-        if contacts > 0:
+        ).exists()
+        if contacts:
             list_choices = [
-                ('OTHER_ACADEMIC_RESPONSIBLE', 'Autre responsable académique'),
-                ('JURY_MEMBER', 'Membre du jury'),
-                ('OTHER_CONTACT', 'Autre contact')
+                PublicationContactType.OTHER_ACADEMIC_RESPONSIBLE,
+                PublicationContactType.JURY_MEMBER,
+                PublicationContactType.OTHER_CONTACT
             ]
             self.fields['type'].choices = list_choices
 
