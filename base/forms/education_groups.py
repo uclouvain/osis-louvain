@@ -82,7 +82,7 @@ class EducationGroupFilter(forms.Form):
         label=_('Type')
     )
 
-    acronym = forms.CharField(max_length=40, required=False, label=_('Acronym'))
+    acronym = forms.CharField(max_length=40, required=False, label=_('Acronym/Short title'))
     title = forms.CharField(max_length=255, required=False, label=_('Title'))
     requirement_entity_acronym = forms.CharField(max_length=20, required=False, label=_('Entity'))
     partial_acronym = forms.CharField(max_length=15, required=False, label=_('Code'))

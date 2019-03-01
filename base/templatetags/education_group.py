@@ -258,7 +258,7 @@ def dl_with_parent(context, key, obj=None, parent=None,  dl_title="", class_dl="
     value = get_verbose_field_value(obj, key)
 
     if not dl_title:
-        dl_title = obj._meta.get_field(key).verbose_name.capitalize()
+        dl_title = obj._meta.get_field(key).verbose_name
 
     if value is None or value == "":
         parent_value = get_verbose_field_value(parent, key)

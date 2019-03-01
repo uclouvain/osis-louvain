@@ -147,7 +147,6 @@ class TestGroupForm(TestCase):
             user=self.user,
             education_group_type=self.egt
         )
-
         self.assertTrue(form.is_valid(), form.errors)
 
         education_group_year = form.save()
@@ -157,7 +156,10 @@ class TestGroupForm(TestCase):
             self.expected_educ_group_year.academic_year.year
         )
 
-        self.assertIsNone(education_group_year.education_group.end_year)
+        self.assertEqual(
+            education_group_year.education_group.end_year,
+            self.expected_educ_group_year.education_group.end_year
+        )
 
     @patch('base.forms.education_group.common.find_authorized_types', return_value=EducationGroupType.objects.all())
     def test_create_with_parent(self, mock_find_authorized_types):

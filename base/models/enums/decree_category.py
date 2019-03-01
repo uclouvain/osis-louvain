@@ -38,7 +38,6 @@ class DecreeCategories(ChoiceEnum):
     DEC2 = "Etudes complémentaires de deuxième cycle"
     DES = "Etudes spécialisées de troisième cycle"
     DEA = "Etudes approfondies de troisième cycle"
-    DOC = "Docteur"
     AES = "A.E.S."
     AUTRE = "Autre (non académique)"
     BAC = "Bachelier"

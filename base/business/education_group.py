@@ -25,7 +25,7 @@
 ##############################################################################
 from django.core.exceptions import PermissionDenied, MultipleObjectsReturned
 from django.db.models import Prefetch
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 
 from base.business.education_groups.perms import check_permission
 from base.business.xls import get_name_or_username, convert_boolean
@@ -45,8 +45,8 @@ DESC = "desc"
 WORKSHEET_TITLE = 'education_groups'
 XLS_FILENAME = 'education_groups_filename'
 XLS_DESCRIPTION = "list_education_groups"
-EDUCATION_GROUP_TITLES = [str(_('Ac yr.')), str(_('code')), str(_('Title')), str(_('type')),
-                          str(_('Entity')), str(_('code'))]
+EDUCATION_GROUP_TITLES = [str(_('Ac yr.')), str(pgettext_lazy('abbreviation', 'Acronym/Short title')),
+                          str(_('Title')), str(_('type')), str(_('Entity')), str(_('code'))]
 ORDER_COL = 'order_col'
 ORDER_DIRECTION = 'order_direction'
 #

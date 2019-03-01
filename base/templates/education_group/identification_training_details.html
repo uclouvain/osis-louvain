@@ -51,7 +51,7 @@
                         <dl>
                             <dt>{% trans 'Decree category' %}</dt>
                             <dd>
-                                    {{ education_group_year.get_decree_category_display }}
+                                    {{ education_group_year.get_decree_category_display|default:"" }}
                             </dd>
                         </dl>
                         <dl>

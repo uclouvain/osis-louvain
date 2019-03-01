@@ -52,17 +52,10 @@ class GroupYearModelForm(EducationGroupYearModelForm):
             "management_entity"
         )
 
-        labels = {
-            "acronym": _("Acronym/Short title")
-        }
-
 
 class GroupModelForm(EducationGroupModelForm):
     """ For groups, it is forbidden to update data about education_group """
     category = education_group_categories.GROUP
-
-    def __init__(self, _, *args, **kwargs):
-        super().__init__({}, *args, **kwargs)
 
 
 class GroupForm(CommonBaseForm):

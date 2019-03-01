@@ -338,14 +338,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>Q</b></li>
 </ul>
-Examples: <i></i>","Code d’un CAPAES est composé de:
+Examples: <i>LCAPA100Q</i>","Code d’un CAPAES est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>Q</b></li>
 </ul>
-Exemples: <i></i>"
+Exemples: <i>LCAPA100Q</i>"
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_3CE,REQUIRED,300Q,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Qq])$",,"Code of Research certificate is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -578,14 +578,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>D</b></li>
 </ul>
-Examples: <i></i>","Code d’un Master en 180-240 crédits à finalité didactique est composé de:
+Examples: <i>WMED100D</i>","Code d’un Master en 180-240 crédits à finalité didactique est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3 chiffres</li>
 <li><b>D</b></li>
 </ul>
-Exemples: <i></i>"
+Exemples: <i>WMED100D</i>"
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2MS180,REQUIRED,200S,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ss])$",,"Code of Master MS 180-240 is composed of:
 <ul>
 <li>site: 1 letter</li>
@@ -1265,14 +1265,14 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3-6 numbers</li>
 <li><b>G</b></li>
 </ul>
-Examples: <i></i>","Code d’une Liste au choix majeures est composée de:
+Examples: <i>LMAJ400G</i>","Code d’une Liste au choix majeures est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>G</b></li>
 </ul>
-Exemples: <i></i>"
+Exemples: <i>LMAJ400G</i>"
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_optionlistchoice,REQUIRED,300G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Option list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
