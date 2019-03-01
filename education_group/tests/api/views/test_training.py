@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import uuid
-from pprint import pprint
 
 from django.test import RequestFactory
 from django.urls import reverse
