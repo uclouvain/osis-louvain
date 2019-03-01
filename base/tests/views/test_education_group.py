@@ -689,6 +689,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertEqual(len(soup.select('button.btn-publish')), 0)
 
     def test_case_free_text_is_not_show_when_common(self):
+        AcademicYearFactory(current=True)
         common_bachelor = EducationGroupYearCommonBachelorFactory()
         url_edit_common = reverse(
             "education_group_year_admission_condition_edit",
@@ -722,7 +723,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         self.assertEqual(qs.count(), 1)
         response = self.client.get(delete_url, data={'id': admission_condition_line.pk})
-        self.assertEqual(response.status_code,  HttpResponseRedirect.status_code)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
         self.assertEqual(qs.count(), 0)
 
     @mock.patch('base.views.education_group.education_group_year_admission_condition_update_line_get',

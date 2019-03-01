@@ -38,7 +38,8 @@ class EducationGroupHierarchy:
 
     _cache_hierarchy = None
 
-    def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear=None, cache_hierarchy: dict=None):
+    def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear = None,
+                 cache_hierarchy: dict = None):
 
         self.children = []
         self.root = root
@@ -159,7 +160,7 @@ class NodeLeafJsTree(EducationGroupHierarchy):
     def to_json(self):
         group_element_year_pk = self.group_element_year.pk if self.group_element_year else '#'
         return {
-            'text': self.learning_unit_year.acronym,
+            'text': self._get_acronym(),
             'icon': self.icon,
             'a_attr': {
                 'href': self.get_url(),
@@ -185,6 +186,12 @@ class NodeLeafJsTree(EducationGroupHierarchy):
         elif self.group_element_year.is_prerequisite:
             return "fa fa-arrow-left"
         return "jstree-file"
+
+    def _get_acronym(self) -> str:
+        """ When the LU year is different than its education group, we have to display the year in the title. """
+        if self.learning_unit_year.academic_year != self.root.academic_year:
+            return "|{}| {}".format(self.learning_unit_year.academic_year.year, self.learning_unit_year.acronym)
+        return self.learning_unit_year.acronym
 
     def get_url(self):
         url = reverse('learning_unit_utilization', args=[self.root.pk, self.learning_unit_year.pk])

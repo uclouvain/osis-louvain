@@ -137,8 +137,8 @@ def _is_eligible_to_add_education_group_with_category(person, category, raise_ex
 
     msg = pgettext(
         "male" if category == Categories.GROUP else "female",
-        "The user has not permission to create a %(category)s." % {"category": category.value}
-    )
+        "The user has not permission to create a %(category)s."
+    ) % {"category": category.value}
 
     can_raise_exception(raise_exception, result, msg)
     return result

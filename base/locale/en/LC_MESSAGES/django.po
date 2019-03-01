@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-02-27 15:34+0100\n"
+"POT-Creation-Date: 2019-02-25 13:21+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -49,7 +49,7 @@ msgstr ""
 
 #: models/education_group.py:53 tests/models/test_education_group.py:135
 #: tests/views/group_element_years/test_postpone.py:108
-#: views/education_groups/update.py:222
+#: views/education_groups/update.py:223
 #, python-format
 msgid "%(count)d education group has been postponed with success."
 msgid_plural "%(count)d education groups have been postponed with success."
@@ -77,7 +77,15 @@ msgstr[1] ""
 msgid "%(date)s must be set within %(start_date)s and %(end_date)s"
 msgstr ""
 
-#: models/education_group.py:113 models/education_group_year.py:712
+#: business/group_element_years/postponement.py:79
+#: tests/business/education_groups/test_postponement.py:539
+#, python-format
+msgid ""
+"%(education_group_year)s is closed in %(end_year)s, there is no more link to "
+"this element in %(academic_year)s."
+msgstr ""
+
+#: models/education_group.py:113 models/education_group_year.py:693
 #, python-format
 msgid "%(max)s must be greater or equals than %(min)s"
 msgstr ""
@@ -281,7 +289,7 @@ msgstr ""
 msgid "Academic start year"
 msgstr ""
 
-#: models/education_group_year.py:180
+#: models/education_group_year.py:161
 msgid "Academic type"
 msgstr ""
 
@@ -336,7 +344,7 @@ msgstr ""
 #: business/learning_units/edition.py:431
 #: business/learning_units/edition.py:451 forms/education_groups.py:85
 #: forms/entity.py:35 forms/organization.py:33 forms/utils/acronym_field.py:83
-#: forms/utils/acronym_field.py:129 models/education_group_year.py:102
+#: forms/utils/acronym_field.py:129 models/education_group_year.py:83
 #: templates/education_group/blocks/table_utilizations.html:31
 #: templates/education_group/search.html:148 templates/entities.html:66
 #: templates/entity/identification.html:51
@@ -346,18 +354,18 @@ msgstr ""
 #: templates/offers.html:58 templates/offers.html:78
 #: templates/organization/organizations.html:61
 #: tests/business/learning_units/test_edition.py:152
-#: tests/templatetags/test_education_group.py:446
-#: tests/templatetags/test_education_group.py:453
-#: tests/templatetags/test_education_group.py:462
+#: tests/templatetags/test_education_group.py:444
+#: tests/templatetags/test_education_group.py:451
+#: tests/templatetags/test_education_group.py:460
 msgid "Acronym"
 msgstr ""
 
-#: models/education_group_year.py:767
+#: models/education_group_year.py:754
 #, python-format
 msgid "Acronym already exists in %(academic_year)s"
 msgstr ""
 
-#: models/education_group_year.py:774
+#: models/education_group_year.py:761
 #, python-format
 msgid "Acronym existed in %(academic_year)s"
 msgstr ""
@@ -387,7 +395,7 @@ msgstr ""
 msgid "Active"
 msgstr ""
 
-#: models/education_group_year.py:245
+#: models/education_group_year.py:226
 msgid "Activities on other campus"
 msgstr ""
 
@@ -471,7 +479,7 @@ msgstr ""
 msgid "Administration"
 msgstr ""
 
-#: models/education_group_year.py:396 models/enums/offer_year_entity_type.py:32
+#: models/education_group_year.py:377 models/enums/offer_year_entity_type.py:32
 #: templates/education_group/identification_training_details.html:93
 msgid "Administration entity"
 msgstr ""
@@ -489,7 +497,7 @@ msgstr ""
 msgid "Admission and Enrolment Procedures for general registration"
 msgstr ""
 
-#: models/education_group_year.py:146
+#: models/education_group_year.py:127
 msgid "Admission exam"
 msgstr ""
 
@@ -593,7 +601,7 @@ msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr ""
 
 #: tests/views/group_element_years/test_postpone.py:88
-#: views/education_groups/update.py:211
+#: views/education_groups/update.py:212
 #, python-format
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr ""
@@ -795,9 +803,9 @@ msgid "Cannot set end year to %(end_year)s :"
 msgstr ""
 
 #: forms/education_groups.py:75 models/education_group_type.py:75
-#: templates/education_group/blocks/form/group.html:58
-#: templates/education_group/blocks/form/minitraining.html:59
-#: templates/education_group/blocks/form/training_tab_identification.html:51
+#: templates/education_group/blocks/form/group.html:46
+#: templates/education_group/blocks/form/minitraining.html:48
+#: templates/education_group/blocks/form/training_tab_identification.html:39
 msgid "Category"
 msgstr ""
 
@@ -872,12 +880,12 @@ msgstr ""
 msgid "Close"
 msgstr ""
 
-#: models/education_group_year.py:447 models/external_learning_unit_year.py:89
+#: models/education_group_year.py:428 models/external_learning_unit_year.py:89
 #: templates/education_group/blocks/academic_offer_info.html:46
 msgid "Co-graduation"
 msgstr ""
 
-#: models/education_group_year.py:455
+#: models/education_group_year.py:436
 #: templates/education_group/blocks/academic_offer_info.html:50
 msgid "Co-graduation coefficient"
 msgstr ""
@@ -904,7 +912,7 @@ msgstr ""
 msgid "Code"
 msgstr ""
 
-#: templates/education_group/blocks/content_default_table.html:76
+#: templates/education_group/blocks/content_default_table.html:69
 #: templates/learning_unit/blocks/comment.html:6
 msgid "Comment"
 msgstr ""
@@ -1086,7 +1094,7 @@ msgstr ""
 msgid "Decision"
 msgstr ""
 
-#: models/education_group_year.py:420
+#: models/education_group_year.py:401
 #: templates/education_group/identification_training_details.html:52
 msgid "Decree category"
 msgstr ""
@@ -1095,7 +1103,7 @@ msgstr ""
 msgid "Deepening"
 msgstr ""
 
-#: business/education_group.py:72 models/education_group_year.py:406
+#: business/education_group.py:72 models/education_group_year.py:387
 #: templates/education_group/tab_administrative_data.html:155
 msgid "Default learning unit enrollment"
 msgstr ""
@@ -1160,7 +1168,7 @@ msgstr ""
 msgid "Diploma"
 msgstr ""
 
-#: models/education_group_year.py:268
+#: models/education_group_year.py:249
 #: templates/education_group/tab_diplomas.html:38
 msgid "Diploma title"
 msgstr ""
@@ -1246,7 +1254,7 @@ msgid "Down"
 msgstr ""
 
 #: forms/learning_unit/attribution_charge_repartition.py:40
-#: models/education_group_year.py:305
+#: models/education_group_year.py:286
 #: templates/education_group/identification_training_details.html:42
 #: templates/learning_unit/add_charge_repartition_inner.html:36
 #: templates/learning_unit/attributions.html:37
@@ -1292,7 +1300,7 @@ msgstr ""
 msgid "Education group edition"
 msgstr ""
 
-#: models/education_group_achievement.py:48 models/education_group_year.py:480
+#: models/education_group_achievement.py:48 models/education_group_year.py:461
 msgid "Education group year"
 msgstr ""
 
@@ -1406,7 +1414,7 @@ msgstr ""
 msgid "Enrolled to learning unit"
 msgstr ""
 
-#: models/education_group_year.py:193
+#: models/education_group_year.py:174
 msgid "Enrollment campus"
 msgstr ""
 
@@ -1414,7 +1422,7 @@ msgstr ""
 msgid "Enrollment date"
 msgstr ""
 
-#: models/education_group_year.py:320
+#: models/education_group_year.py:301
 msgid "Enrollment enabled"
 msgstr ""
 
@@ -1671,19 +1679,19 @@ msgstr ""
 msgid "Function"
 msgstr ""
 
-#: models/education_group_year.py:151
+#: models/education_group_year.py:132
 msgid "Funding"
 msgstr ""
 
-#: models/education_group_year.py:159
+#: models/education_group_year.py:140
 msgid "Funding direction"
 msgstr ""
 
-#: models/education_group_year.py:164
+#: models/education_group_year.py:145
 msgid "Funding international cooperation CCD/CUD"
 msgstr ""
 
-#: models/education_group_year.py:172
+#: models/education_group_year.py:153
 msgid "Funding international cooperation CCD/CUD direction"
 msgstr ""
 
@@ -1841,7 +1849,7 @@ msgstr ""
 msgid "International title"
 msgstr ""
 
-#: models/education_group_year.py:214
+#: models/education_group_year.py:195
 #: models/enums/learning_container_year_types.py:39
 msgid "Internship"
 msgstr ""
@@ -1939,8 +1947,8 @@ msgstr ""
 msgid "Jury members"
 msgstr ""
 
-#: models/education_group_year.py:298
-#: templates/education_group/blocks/informations.html:60
+#: models/education_group_year.py:279
+#: templates/education_group/blocks/informations.html:64
 msgid "Keywords"
 msgstr ""
 
@@ -1989,7 +1997,7 @@ msgstr ""
 msgid "Lastname"
 msgstr ""
 
-#: models/education_group_year.py:255
+#: models/education_group_year.py:236
 #: templates/education_group/tab_diplomas.html:33
 msgid "Leads to diploma/certificate"
 msgstr ""
@@ -2006,7 +2014,7 @@ msgstr ""
 msgid "Learning achievements"
 msgstr ""
 
-#: business/proposal_xls.py:65 models/education_group_year.py:201
+#: business/proposal_xls.py:65 models/education_group_year.py:182
 #: models/learning_unit_year.py:138
 #: templates/learning_unit/external/read.html:59
 #: templates/learning_unit/identification.html:191 views/learning_unit.py:327
@@ -2105,7 +2113,7 @@ msgstr ""
 msgid "Link type"
 msgstr ""
 
-#: business/education_groups/shorten.py:91 models/education_group_year.py:475
+#: business/education_groups/shorten.py:91 models/education_group_year.py:456
 #: tests/business/education_groups/test_shorten.py:154
 msgid "Linked with EPC"
 msgstr ""
@@ -2199,7 +2207,7 @@ msgstr ""
 msgid "Managed programs"
 msgstr ""
 
-#: business/education_group.py:59 models/education_group_year.py:389
+#: business/education_group.py:59 models/education_group_year.py:370
 #: models/enums/offer_year_entity_type.py:33
 #: templates/education_group/identification_group_details.html:37
 #: templates/education_group/identification_training_details.html:92
@@ -2403,7 +2411,7 @@ msgstr ""
 #: templates/education_group/blocks/dropdown/identification_actions_bar.html:88
 #: templates/learning_unit/blocks/dropdown/identification_actions_bar.html:75
 #: templatetags/education_group.py:150
-#: tests/templatetags/test_education_group.py:431
+#: tests/templatetags/test_education_group.py:429
 msgid "Modify"
 msgstr ""
 
@@ -2660,7 +2668,7 @@ msgid "One of the partial volumes must have a value to 0."
 msgstr ""
 
 #: templatetags/education_group.py:144
-#: tests/templatetags/test_education_group.py:427 views/education_group.py:69
+#: tests/templatetags/test_education_group.py:425 views/education_group.py:69
 msgid ""
 "Only program managers of the education group OR central manager linked to "
 "entity can edit."
@@ -2752,7 +2760,7 @@ msgstr ""
 msgid "Other individual"
 msgstr ""
 
-#: models/education_group_year.py:237
+#: models/education_group_year.py:218
 msgid "Other languages activities"
 msgstr ""
 
@@ -2768,7 +2776,7 @@ msgstr ""
 msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr ""
 
-#: templates/education_group/blocks/content_default_table.html:67
+#: templates/education_group/blocks/content_default_table.html:60
 msgid "Own comment"
 msgstr ""
 
@@ -2784,17 +2792,17 @@ msgstr ""
 msgid "Page not found."
 msgstr ""
 
-#: models/education_group_year.py:739
+#: models/education_group_year.py:721
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
 msgstr ""
 
-#: models/education_group_year.py:746
+#: models/education_group_year.py:728
 #, python-format
 msgid "Partial acronym existed in %(academic_year)s"
 msgstr ""
 
-#: models/education_group_year.py:141
+#: models/education_group_year.py:122
 msgid "Partial deliberation"
 msgstr ""
 
@@ -2925,7 +2933,7 @@ msgstr ""
 msgid "Previous"
 msgstr ""
 
-#: models/education_group_year.py:284
+#: models/education_group_year.py:265
 #: templates/education_group/identification_training_details.html:66
 msgid "Primary language"
 msgstr ""
@@ -2973,7 +2981,7 @@ msgstr ""
 msgid "Professional internship"
 msgstr ""
 
-#: models/education_group_year.py:252
+#: models/education_group_year.py:233
 #: templates/education_group/tab_diplomas.html:43
 msgid "Professionnal title"
 msgstr ""
@@ -3123,7 +3131,7 @@ msgstr ""
 msgid "Public partner"
 msgstr ""
 
-#: models/education_group_year.py:468
+#: models/education_group_year.py:449
 msgid "Publication contact entity"
 msgstr ""
 
@@ -3167,7 +3175,7 @@ msgstr ""
 msgid "Quadrimester derogation"
 msgstr ""
 
-#: models/education_group_year.py:428
+#: models/education_group_year.py:409
 #: templates/education_group/identification_training_details.html:58
 msgid "Rate code"
 msgstr ""
@@ -3319,7 +3327,7 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
-#: models/education_group_year.py:221
+#: models/education_group_year.py:202
 msgid "Schedule type"
 msgstr ""
 
@@ -3489,8 +3497,7 @@ msgstr ""
 msgid "Specifications"
 msgstr ""
 
-#: forms/education_group/training.py:202 models/education_group.py:83
-#: models/education_group.py:115
+#: models/education_group.py:83 models/education_group.py:115
 #: templates/education_group/identification_mini_training_details.html:38
 #: templates/education_group/identification_training_details.html:94
 #: templates/learning_unit/add_charge_repartition_inner.html:35
@@ -3528,7 +3535,7 @@ msgid "State"
 msgstr ""
 
 #: business/learning_units/edition.py:437
-#: forms/learning_unit/search_form.py:174 models/education_group_year.py:136
+#: forms/learning_unit/search_form.py:174 models/education_group_year.py:117
 #: templates/learning_unit/by_activity.html:86
 #: templates/learning_unit/by_external.html:50
 #: templates/learning_unit/summary_list.html:82
@@ -3812,9 +3819,9 @@ msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
 #: forms/education_group/common.py:191
-#: templates/education_group/blocks/form/group.html:61
-#: templates/education_group/blocks/form/minitraining.html:62
-#: templates/education_group/blocks/form/training_tab_identification.html:54
+#: templates/education_group/blocks/form/group.html:49
+#: templates/education_group/blocks/form/minitraining.html:51
+#: templates/education_group/blocks/form/training_tab_identification.html:42
 msgid "The field can contain only one value."
 msgstr ""
 
@@ -3876,6 +3883,13 @@ msgstr ""
 msgid ""
 "The learning unit %(learning_unit)s has a partim %(partim)s with an end year "
 "greater than %(year)s"
+msgstr ""
+
+#: business/group_element_years/postponement.py:52
+#: tests/business/education_groups/test_postponement.py:423
+#, python-format
+msgid ""
+"The learning unit %(learning_unit_year)s does not exist in %(academic_year)s."
 msgstr ""
 
 #: business/learning_units/edition.py:483
@@ -3985,6 +3999,14 @@ msgstr ""
 #: tests/views/test_learning_unit_deletion.py:219
 #: tests/views/test_learning_unit_deletion.py:286
 msgid "The partim"
+msgstr ""
+
+#: business/group_element_years/postponement.py:65
+#: tests/business/education_groups/test_postponement.py:476
+#, python-format
+msgid ""
+"The postponed learning unit %(learning_unit)s has a prerequisite %(item)s "
+"which does not exist in %(academic_year)s."
 msgstr ""
 
 #: views/education_groups/learning_unit/detail.py:125
@@ -4142,8 +4164,8 @@ msgstr ""
 
 #: forms/common.py:80 models/education_group_publication_contact.py:99
 #: models/education_group_publication_contact.py:100
-#: models/education_group_year.py:699 models/education_group_year.py:720
-#: models/education_group_year.py:722
+#: models/education_group_year.py:680 models/education_group_year.py:701
+#: models/education_group_year.py:703
 #: tests/views/learning_units/proposals/test_creation.py:186
 #: tests/views/learning_units/proposals/test_creation.py:187
 #: tests/views/learning_units/proposals/test_creation.py:188
@@ -4220,12 +4242,12 @@ msgid "Title"
 msgstr ""
 
 #: business/learning_unit.py:67 business/learning_unit_xls.py:82
-#: models/education_group_year.py:114
-#: templates/education_group/blocks/informations.html:53
+#: models/education_group_year.py:95
+#: templates/education_group/blocks/informations.html:55
 msgid "Title in English"
 msgstr ""
 
-#: models/education_group_year.py:107
+#: models/education_group_year.py:88
 #: templates/education_group/blocks/informations.html:47
 msgid "Title in French"
 msgstr ""
@@ -4323,7 +4345,7 @@ msgid "Type of event"
 msgstr ""
 
 #: forms/education_group/common.py:315 models/education_group_type.py:81
-#: models/education_group_year.py:129
+#: models/education_group_year.py:110
 msgid "Type of training"
 msgstr ""
 
@@ -4356,7 +4378,7 @@ msgstr ""
 msgid "University Bachelors"
 msgstr ""
 
-#: models/education_group_year.py:185 models/enums/rate_code.py:44
+#: models/education_group_year.py:166 models/enums/rate_code.py:44
 msgid "University certificate"
 msgstr ""
 
@@ -4535,7 +4557,7 @@ msgstr ""
 msgid "We will fix this as soon as possible"
 msgstr ""
 
-#: models/education_group_year.py:463
+#: models/education_group_year.py:444
 msgid "Web re-registration"
 msgstr ""
 
@@ -4547,7 +4569,7 @@ msgstr ""
 msgid "Week"
 msgstr ""
 
-#: business/education_group.py:71 models/education_group_year.py:402
+#: business/education_group.py:71 models/education_group_year.py:383
 #: templates/education_group/tab_administrative_data.html:151
 msgid "Weighting"
 msgstr ""
@@ -4740,7 +4762,7 @@ msgstr ""
 msgid "You cannot modify content for %(education_group_types)s"
 msgstr ""
 
-#: forms/common.py:133
+#: forms/common.py:132
 msgid "You don't have sufficient rights to edit the field."
 msgstr ""
 
@@ -4765,7 +4787,7 @@ msgstr ""
 msgid "You proposed a modification of type {} for the learning unit {}."
 msgstr ""
 
-#: models/education_group_year.py:705
+#: models/education_group_year.py:686
 msgid "You should precise at least minimum or maximum constraint"
 msgstr ""
 
@@ -4813,7 +4835,7 @@ msgstr ""
 msgid "activate to sort column descending"
 msgstr ""
 
-#: models/education_group_year.py:229
+#: models/education_group_year.py:210
 msgid "activities in English"
 msgstr ""
 
@@ -4923,7 +4945,7 @@ msgstr ""
 #: business/learning_units/xls_generator.py:48 business/proposal_xls.py:79
 #: business/proposal_xls.py:89 models/abstracts/abstract_achievement.py:44
 #: models/abstracts/abstract_education_group_achievement.py:53
-#: models/education_group_year.py:327
+#: models/education_group_year.py:308
 #: templates/learning_unit/components.html:124
 #: templates/learning_unit/formations.html:43
 #: templates/student/learning_units_enrollments.html:47
@@ -4936,7 +4958,7 @@ msgstr ""
 msgid "comment"
 msgstr ""
 
-#: models/education_group_year.py:434
+#: models/education_group_year.py:415
 msgid "comment (internal)"
 msgstr ""
 
@@ -4946,8 +4968,8 @@ msgstr ""
 msgid "confirm"
 msgstr ""
 
-#: business/learning_units/edition.py:435 models/education_group_year.py:334
-#: models/education_group_year.py:541 models/enums/constraint_type.py:32
+#: business/learning_units/edition.py:435 models/education_group_year.py:315
+#: models/education_group_year.py:522 models/enums/constraint_type.py:32
 #: models/group_element_year.py:187 models/group_element_year.py:203
 #: tests/models/test_education_group_year.py:93
 #: tests/views/education_groups/group_element_year/test_read.py:99
@@ -4988,11 +5010,11 @@ msgstr ""
 msgid "delete education group"
 msgstr ""
 
-#: models/education_group_year.py:206
+#: models/education_group_year.py:187
 msgid "dissertation"
 msgstr ""
 
-#: models/education_group_year.py:315
+#: models/education_group_year.py:296
 msgid "duration unit"
 msgstr ""
 
@@ -5007,7 +5029,7 @@ msgid "end"
 msgstr ""
 
 #: models/group_element_year.py:159
-#: templates/education_group/blocks/content_default_table.html:86
+#: templates/education_group/blocks/content_default_table.html:79
 msgid "english comment"
 msgstr ""
 
@@ -5023,7 +5045,7 @@ msgstr ""
 msgid "faculty number"
 msgstr ""
 
-#: models/validation_rule.py:43
+#: models/validation_rule.py:41
 msgid "field reference"
 msgstr ""
 
@@ -5059,7 +5081,7 @@ msgstr ""
 msgid "hourly volume total annual"
 msgstr ""
 
-#: models/validation_rule.py:55
+#: models/validation_rule.py:53
 msgid "initial value"
 msgstr ""
 
@@ -5088,15 +5110,15 @@ msgstr ""
 msgid "logo"
 msgstr ""
 
-#: models/education_group_year.py:376
+#: models/education_group_year.py:357
 msgid "main domain"
 msgstr ""
 
-#: models/education_group_year.py:359 models/education_group_year.py:713
+#: models/education_group_year.py:340 models/education_group_year.py:694
 msgid "maximum constraint"
 msgstr ""
 
-#: models/education_group_year.py:352 models/education_group_year.py:714
+#: models/education_group_year.py:333 models/education_group_year.py:695
 msgid "minimum constraint"
 msgstr ""
 
@@ -5180,11 +5202,11 @@ msgstr ""
 msgid "project events"
 msgstr ""
 
-#: models/validation_rule.py:68
+#: models/validation_rule.py:66
 msgid "regex error message"
 msgstr ""
 
-#: models/validation_rule.py:62
+#: models/validation_rule.py:60
 msgid "regex rule"
 msgstr ""
 
@@ -5192,11 +5214,11 @@ msgstr ""
 msgid "relative credits"
 msgstr ""
 
-#: models/education_group_year.py:340
+#: models/education_group_year.py:321
 msgid "remark"
 msgstr ""
 
-#: models/education_group_year.py:346
+#: models/education_group_year.py:327
 msgid "remark in english"
 msgstr ""
 
@@ -5254,7 +5276,7 @@ msgstr ""
 msgid "search"
 msgstr ""
 
-#: forms/education_group/training.py:105 models/education_group_year.py:383
+#: forms/education_group/training.py:105 models/education_group_year.py:364
 #: templates/education_group/identification_training_details.html:75
 msgid "secondary domains"
 msgstr ""
@@ -5321,7 +5343,7 @@ msgstr ""
 msgid "type"
 msgstr ""
 
-#: models/education_group_year.py:369
+#: models/education_group_year.py:350
 msgid "type of constraint"
 msgstr ""
 
@@ -5344,11 +5366,11 @@ msgstr ""
 msgid "unspecified"
 msgstr ""
 
-#: models/validation_rule.py:82
+#: models/validation_rule.py:70
 msgid "validation rule"
 msgstr ""
 
-#: models/education_group_year.py:119
+#: models/education_group_year.py:100
 msgid "validity"
 msgstr ""
 

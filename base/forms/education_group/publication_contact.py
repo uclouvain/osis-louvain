@@ -51,7 +51,12 @@ class EducationGroupPublicationContactForm(forms.ModelForm):
             type=PublicationContactType.ACADEMIC_RESPONSIBLE.name
         ).count()
         if contacts > 0:
-            self.fields['type'].choices = self.fields['type'].choices[1:]
+            list_choices = [
+                ('OTHER_ACADEMIC_RESPONSIBLE', 'Autre responsable académique'),
+                ('JURY_MEMBER', 'Membre du jury'),
+                ('OTHER_CONTACT', 'Autre contact')
+            ]
+            self.fields['type'].choices = list_choices
 
         self._disable_fields()
 

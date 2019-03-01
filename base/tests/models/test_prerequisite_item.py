@@ -27,7 +27,6 @@ from django.db import IntegrityError
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
-from base.models import prerequisite_item
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
@@ -50,13 +49,6 @@ class TestPrerequisiteItem(TestCase):
         self.assertEqual(
             list(self.prerequisite.prerequisiteitem_set.all()),
             [self.prerequisite_item]
-        )
-
-    def test_delete_items_by_related_prerequisite(self):
-        prerequisite_item.delete_items_by_related_prerequisite(self.prerequisite)
-        self.assertEqual(
-            len(prerequisite_item.PrerequisiteItem.objects.filter(prerequisite=self.prerequisite)),
-            0
         )
 
     def test_learning_unit_prerequisite_to_itself_forbidden(self):

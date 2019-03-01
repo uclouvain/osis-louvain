@@ -233,7 +233,7 @@ def display_messages(request, messages_to_display, level, extra_tags=None):
         messages_to_display = [messages_to_display]
 
     for msg in messages_to_display:
-        messages.add_message(request, level, _(msg), extra_tags=extra_tags)
+        messages.add_message(request, level, str(msg), extra_tags=extra_tags)
 
 
 def check_if_display_message(request, results):

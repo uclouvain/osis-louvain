@@ -41,7 +41,6 @@ from base.forms.education_group.training import TrainingForm
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from base.models.enums.education_group_categories import TRAINING
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from base.views.education_groups import perms
 from base.views.education_groups.detail import EducationGroupGenericDetailView
@@ -223,6 +222,8 @@ class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, Educat
                 "%(count)d education groups have been postponed with success.", count
             ) % {'count': count}
             display_success_messages(request, success)
+            display_warning_messages(request, postponer.warnings)
+
         except NotPostponeError as e:
             display_error_messages(request, str(e))
 

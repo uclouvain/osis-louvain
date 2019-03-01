@@ -23,12 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 #############################################################################
-import itertools
 
 from django.db import models, IntegrityError
-from django.utils.translation import ugettext_lazy as _
 
-from base.models.enums.prerequisite_operator import OR, AND
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -52,10 +49,13 @@ class PrerequisiteItem(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
 
     learning_unit = models.ForeignKey("LearningUnit")
-    prerequisite = models.ForeignKey("Prerequisite")
+    prerequisite = models.ForeignKey("Prerequisite", on_delete=models.CASCADE)
 
     group_number = models.PositiveIntegerField()
     position = models.PositiveIntegerField()
+
+    def __str__(self):
+        return "{} / {}".format(self.prerequisite, self.learning_unit.acronym)
 
     class Meta:
         unique_together = (
@@ -65,8 +65,4 @@ class PrerequisiteItem(models.Model):
     def save(self, *args, **kwargs):
         if self.learning_unit == self.prerequisite.learning_unit_year.learning_unit:
             raise IntegrityError("A learning unit cannot be prerequisite to itself")
-        super(PrerequisiteItem, self).save(*args, **kwargs)
-
-
-def delete_items_by_related_prerequisite(prerequisite):
-    PrerequisiteItem.objects.filter(prerequisite=prerequisite).delete()
+        super().save(*args, **kwargs)

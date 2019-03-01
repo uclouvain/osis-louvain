@@ -28,7 +28,8 @@ from django.test import TestCase
 from django.utils.translation import ugettext as _
 
 from base.business.education_groups.postponement import EDUCATION_GROUP_MAX_POSTPONE_YEARS, _compute_end_year
-from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
+from base.business.group_element_years.postponement import PostponeContent, NotPostponeError, \
+    ReuseOldLearningUnitYearWarning, PrerequisiteItemWarning
 from base.business.utils.model import model_to_dict_fk
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import entity_type
@@ -153,12 +154,15 @@ class TestPostpone(TestCase):
 
         self.education_group = EducationGroupFactory(end_year=self.next_academic_year.year)
 
-        self.current_education_group_year = TrainingFactory(education_group=self.education_group,
-                                                            academic_year=self.current_academic_year)
+        self.current_education_group_year = TrainingFactory(
+            education_group=self.education_group,
+            academic_year=self.current_academic_year
+        )
 
         self.current_group_element_year = GroupElementYearFactory(
             parent=self.current_education_group_year,
-            child_branch__academic_year=self.current_academic_year
+            child_branch__academic_year=self.current_academic_year,
+            child_branch__education_group__end_year=None
         )
 
         self.next_education_group_year = TrainingFactory(
@@ -192,16 +196,16 @@ class TestPostpone(TestCase):
 
         self.postponer = PostponeContent(self.current_education_group_year)
 
-        gr_1 = GroupElementYearFactory(parent=gr.child_branch)
+        GroupElementYearFactory(parent=gr.child_branch)
 
         with self.assertRaises(NotPostponeError) as cm:
             self.postponer = PostponeContent(self.current_education_group_year)
         self.assertEqual(str(cm.exception), _("The content has already been postponed."))
 
     def test_init_already_postponed_content_with_child_leaf(self):
-        gr = GroupElementYearFactory(parent=self.next_education_group_year,
-                                     child_branch=None,
-                                     child_leaf=LearningUnitYearFactory())
+        GroupElementYearFactory(parent=self.next_education_group_year,
+                                child_branch=None,
+                                child_leaf=LearningUnitYearFactory())
 
         with self.assertRaises(NotPostponeError) as cm:
             self.postponer = PostponeContent(self.current_education_group_year)
@@ -338,7 +342,7 @@ class TestPostpone(TestCase):
             child_type=self.current_group_element_year.child_branch.education_group_type,
             min_count_authorized=1
         )
-        self.current_group_element_year.child_branch.acronym="mandatory_child_n"
+        self.current_group_element_year.child_branch.acronym = "mandatory_child_n"
         self.current_group_element_year.child_branch.save()
 
         n1_mandatory_egy = EducationGroupYearFactory(
@@ -360,14 +364,19 @@ class TestPostpone(TestCase):
         self.assertEqual(new_mandatory_child, n1_mandatory_egy)
         self.assertEqual(new_mandatory_child.groupelementyear_set.first(), n1_child_gr)
 
-
     def test_postpone_with_child_branches(self):
-        sub_group = GroupElementYearFactory(parent=self.current_group_element_year.child_branch)
+        sub_group = GroupElementYearFactory(
+            parent=self.current_group_element_year.child_branch,
+            child_branch__academic_year=self.current_academic_year,
+            child_branch__education_group__end_year=None,
+        )
         self.postponer = PostponeContent(self.current_education_group_year)
 
         new_root = self.postponer.postpone()
+
         self.assertEqual(new_root, self.next_education_group_year)
         self.assertEqual(new_root.groupelementyear_set.count(), 1)
+
         new_child_branch = new_root.groupelementyear_set.get().child_branch
         self.assertEqual(new_child_branch.acronym, self.current_group_element_year.child_branch.acronym)
         self.assertEqual(new_child_branch.academic_year, self.next_academic_year)
@@ -378,15 +387,20 @@ class TestPostpone(TestCase):
         self.assertEqual(new_child_branch_2.academic_year, self.next_academic_year)
 
     def test_postpone_with_old_child_leaf(self):
-        luy = LearningUnitYearFactory(academic_year=self.current_academic_year)
+        prerequisite = PrerequisiteFactory(
+            learning_unit_year__academic_year=self.current_academic_year,
+            education_group_year=self.current_education_group_year,
+        )
 
-        prerequisite = PrerequisiteFactory(learning_unit_year=luy)
-        EducationGroupYearFactory(education_group=prerequisite.education_group_year.education_group,
-                                  academic_year=self.next_academic_year)
-        item = PrerequisiteItemFactory(prerequisite=prerequisite)
+        n1_item_luy = LearningUnitYearFactory(academic_year=self.next_academic_year)
+
+        PrerequisiteItemFactory(
+            prerequisite=prerequisite,
+            learning_unit=n1_item_luy.learning_unit,
+        )
 
         group_leaf = GroupElementYearFactory(
-            parent=self.current_education_group_year, child_branch=None, child_leaf=luy
+            parent=self.current_education_group_year, child_branch=None, child_leaf=prerequisite.learning_unit_year
         )
 
         self.postponer = PostponeContent(self.current_education_group_year)
@@ -401,7 +415,17 @@ class TestPostpone(TestCase):
         self.assertEqual(new_prerequisite.education_group_year.education_group,
                          prerequisite.education_group_year.education_group)
 
-        self.assertEqual(new_prerequisite.prerequisiteitem_set.first().learning_unit, item.learning_unit)
+        self.assertTrue(self.postponer.warnings)
+
+        self.assertIsInstance(self.postponer.warnings[0], ReuseOldLearningUnitYearWarning)
+        self.assertEqual(
+            str(self.postponer.warnings[0]),
+            _("The learning unit %(learning_unit_year)s does not exist in %(academic_year)s.") % {
+                "learning_unit_year": prerequisite.learning_unit_year.acronym,
+                "academic_year": self.next_academic_year,
+            }
+        )
+        self.assertFalse(new_root.prerequisite_set.all())
 
     def test_postpone_with_new_child_leaf(self):
         luy = LearningUnitYearFactory(academic_year=self.current_academic_year)
@@ -415,3 +439,107 @@ class TestPostpone(TestCase):
         new_child_leaf = new_root.groupelementyear_set.last().child_leaf
         self.assertEqual(new_child_leaf, new_luy)
         self.assertEqual(new_child_leaf.academic_year, self.next_academic_year)
+
+    def test_postpone_with_outdated_prerequisite(self):
+        prerequisite = PrerequisiteFactory(
+            learning_unit_year__academic_year=self.current_academic_year,
+            education_group_year=self.current_education_group_year
+        )
+
+        item_luy = LearningUnitYearFactory(academic_year=self.current_academic_year)
+        item = PrerequisiteItemFactory(
+            prerequisite=prerequisite,
+            learning_unit=item_luy.learning_unit
+        )
+        n1_luy = LearningUnitYearFactory(
+            learning_unit=prerequisite.learning_unit_year.learning_unit,
+            academic_year=self.next_academic_year,
+        )
+
+        GroupElementYearFactory(
+            parent=self.current_education_group_year, child_branch=None, child_leaf=prerequisite.learning_unit_year
+        )
+
+        self.postponer = PostponeContent(self.current_education_group_year)
+
+        new_root = self.postponer.postpone()
+
+        new_child_leaf = new_root.groupelementyear_set.last().child_leaf
+        self.assertEqual(new_child_leaf.acronym, n1_luy.acronym)
+        # If the luy does not exist in N+1, it should attach N instance
+        self.assertEqual(new_child_leaf.academic_year, self.next_academic_year)
+
+        self.assertTrue(self.postponer.warnings)
+        self.assertIsInstance(self.postponer.warnings[0], PrerequisiteItemWarning)
+        self.assertEqual(
+            str(self.postponer.warnings[0]),
+            _("The postponed learning unit %(learning_unit)s has a "
+              "prerequisite %(item)s which does not exist in %(academic_year)s.") % {
+                "learning_unit": prerequisite.learning_unit_year.acronym,
+                "item": item.learning_unit.acronym,
+                "academic_year": self.next_academic_year,
+            }
+        )
+
+    def test_postpone_with_prerequisite(self):
+        prerequisite = PrerequisiteFactory(
+            learning_unit_year__academic_year=self.current_academic_year,
+            education_group_year=self.current_education_group_year
+        )
+
+        item_luy = LearningUnitYearFactory(academic_year=self.current_academic_year)
+        n1_item_luy = LearningUnitYearFactory(
+            academic_year=self.next_academic_year,
+            learning_unit=item_luy.learning_unit,
+        )
+        PrerequisiteItemFactory(
+            prerequisite=prerequisite,
+            learning_unit=item_luy.learning_unit
+        )
+
+        n1_luy = LearningUnitYearFactory(
+            learning_unit=prerequisite.learning_unit_year.learning_unit,
+            academic_year=self.next_academic_year,
+        )
+
+        GroupElementYearFactory(
+            parent=self.current_education_group_year,
+            child_branch=None,
+            child_leaf=prerequisite.learning_unit_year
+        )
+
+        self.postponer = PostponeContent(self.current_education_group_year)
+
+        new_root = self.postponer.postpone()
+
+        new_child_leaf = new_root.groupelementyear_set.last().child_leaf
+        self.assertEqual(new_child_leaf.acronym, n1_luy.acronym)
+        # If the luy does not exist in N+1, it should attach N instance
+        self.assertEqual(new_child_leaf.academic_year, self.next_academic_year)
+
+        self.assertFalse(self.postponer.warnings)
+        self.assertEqual(
+            new_child_leaf.prerequisite_set.first().prerequisiteitem_set.first().learning_unit,
+            n1_item_luy.learning_unit
+        )
+
+    def test_postpone_with_terminated_child_branches(self):
+        sub_group = GroupElementYearFactory(
+            parent=self.current_group_element_year.child_branch,
+            child_branch__academic_year=self.current_academic_year,
+            child_branch__education_group__end_year=self.current_academic_year.year,
+        )
+        self.postponer = PostponeContent(self.current_education_group_year)
+
+        self.postponer.postpone()
+
+        self.assertTrue(self.postponer.warnings)
+        self.assertEqual(
+            str(self.postponer.warnings[0]),
+            _("%(education_group_year)s is closed in %(end_year)s, there is no more link to this "
+              "element in %(academic_year)s.") % {
+                "education_group_year": sub_group.child_branch.acronym,
+                "end_year": sub_group.child_branch.education_group.end_year,
+                "academic_year": self.next_academic_year,
+            }
+        )

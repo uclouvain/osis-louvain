@@ -25,6 +25,7 @@
 ##############################################################################
 from gettext import ngettext
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, IntegrityError
 from django.db.models import Max
 from django.utils.translation import ugettext_lazy as _
@@ -100,7 +101,7 @@ class LearningUnit(SerializableModel):
     )
 
     def __str__(self):
-        return "{}".format(self.id)
+        return self.acronym
 
     def save(self, *args, **kwargs):
         if self.end_year and self.end_year < self.start_year:
@@ -109,7 +110,10 @@ class LearningUnit(SerializableModel):
 
     @property
     def acronym(self):
-        return self.most_recent_learning_unit_year().acronym
+        try:
+            return self.most_recent_learning_unit_year().acronym
+        except ObjectDoesNotExist:
+            return str(self.id)
 
     @property
     def title(self):
@@ -124,7 +128,7 @@ class LearningUnit(SerializableModel):
         return self.end_year and current_academic_year().year > self.end_year
 
     def most_recent_learning_unit_year(self):
-        return self.learningunityear_set.filter(learning_unit_id=self.id).latest('academic_year__year')
+        return self.learningunityear_set.latest('academic_year__year')
 
     class Meta:
         permissions = (

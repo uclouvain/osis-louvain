@@ -396,9 +396,9 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         """
         self.context['education_group_year'] = TrainingFactory()
         result = li_with_create_perm_training(self.context, self.url, "")
-        msg = pgettext("female", "The user has not permission to create a %(category)s." % {
+        msg = pgettext("female", "The user has not permission to create a %(category)s.") % {
             "category": Categories.TRAINING.value
-        })
+        }
         msg = msg.capitalize()
         self.assertEqual(
             result, {
