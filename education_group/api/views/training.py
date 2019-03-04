@@ -73,10 +73,10 @@ class TrainingList(generics.ListAPIView):
     )  # Default ordering
 
     def get_queryset(self):
-        # filter continuing_education trainings if param is set
         if self.request.query_params.get("continuing_education"):
             return self.queryset.filter(education_group_type__name__in=TrainingType.part_of_continuing_education())
-        return self.queryset
+        else:
+            return self.queryset
 
 
 class TrainingDetail(generics.RetrieveAPIView):
