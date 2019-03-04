@@ -167,7 +167,7 @@ class FilterTrainingTestCase(APITestCase):
     def test_get_continuing_education_trainings(self):
         query_string = {'continuing_education': True}
 
-        response = self.client.get(self.url, data=query_string)
+        response = self.client.get(self.url, query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         trainings = EducationGroupYear.objects.filter(
