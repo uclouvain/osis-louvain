@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.db import models
-from django.utils.translation import pgettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 from ordered_model.admin import OrderedModelAdmin
 from ordered_model.models import OrderedModel
 
@@ -40,8 +40,8 @@ class TeachingMaterialAdmin(OrderedModelAdmin):
 
 
 class TeachingMaterial(OrderedModel):
-    title = models.CharField(max_length=255, verbose_name=_('teaching materials', 'title'))
-    mandatory = models.BooleanField(verbose_name=_('teaching materials', 'mandatory'))
+    title = models.CharField(max_length=255, verbose_name=_('Title'))
+    mandatory = models.BooleanField(verbose_name=_('Mandatory'))
     learning_unit_year = models.ForeignKey(LearningUnitYear, on_delete=models.CASCADE)
     order_with_respect_to = 'learning_unit_year'
 
