@@ -37,6 +37,8 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.teaching_material import TeachingMaterial
 from cms.enums import entity_name
 from cms.models import translated_text
+from django import forms
+from django.utils.translation import ugettext_lazy as _
 
 
 class LearningUnitPedagogyForm(forms.Form):
@@ -119,6 +121,11 @@ class TeachingMaterialModelForm(forms.ModelForm):
     class Meta:
         model = TeachingMaterial
         fields = ['title', 'mandatory']
+        widgets = {'mandatory': forms.RadioSelect(choices=[
+            (True, _('Mandatory')),
+            (False, _('No mandatory'))
+        ]),
+        }
 
     def save(self, learning_unit_year, commit=True):
         instance = super().save(commit=False)
