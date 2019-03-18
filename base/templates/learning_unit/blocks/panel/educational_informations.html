@@ -53,42 +53,14 @@
         </thead>
         <tbody>
         {% for translated_label in cms_labels_translated %}
-            {% if translated_label.text_label.label != "mobility" %}
-                <tr>
-                    <td style="padding: 20px;">
-                        <label>{{ translated_label.label }}</label>
-                    </td>
-                    <td style="padding: 20px;" {% if translated_label.text_label.label in cms_label_pedagogy_fr_only %}colspan="2"{% endif %}>
-                        {% if can_edit_information %}
-                            <a class="trigger_modal pull-right"
-                               data-url="{{ post_url }}?language=fr-be&label={{ translated_label.text_label.label }}"
-                               data-modal_class="modal-lg"
-                               title="{% trans 'Edit' %}">
-                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                            </a>
-                        {% endif %}
-                        {{ translated_label.text_label.text_fr.0.text|default_if_none:""|safe }}
-                    </td>
-                    {% if translated_label.text_label.label not in cms_label_pedagogy_fr_only %}
-                        <td style="padding: 20px;">
-                            {% if can_edit_information %}
-                                <a class="trigger_modal pull-right"
-                                   data-url="{{ post_url }}?language=en&label={{ translated_label.text_label.label }}"
-                                   data-modal_class="modal-lg"
-                                   title="{% trans 'Edit' %}">
-                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                                </a>
-                            {% endif %}
-                            {{ translated_label.text_label.text_en.0.text|default_if_none:""|safe }}
-                        </td>
-                    {% endif %}
-                </tr>
+            {% if translated_label.text_label.label not in cms_label_pedagogy_fr_only %}
+                {% include 'learning_unit/blocks/panel/cms_informations.html' %}
             {% endif %}
         {% endfor %}
         </tbody>
     </table>
 
-    <div class="panel" style="border-bottom: 1px solid #ddd;box-shadow: none;">
+    <div class="panel" style="box-shadow: none;">
         <div class="panel-heading"><label>{% trans 'Teaching material' %}</label></div>
 
         <div class="panel-body" style="padding-top:0px;">
@@ -125,6 +97,15 @@
         </div>
     </div>
 
+    <table class="table" style="border-bottom: 1px solid #ddd">
+        <tbody>
+        {% for translated_label in cms_labels_translated %}
+            {% if translated_label.text_label.label == 'bibliography' %}
+                {% include 'learning_unit/blocks/panel/cms_informations.html' %}
+            {% endif %}
+        {% endfor %}
+        </tbody>
+    </table>
 
     <div class="panel">
         <div class="panel-heading">

@@ -1,0 +1,57 @@
+{% load staticfiles %}
+{% load i18n bootstrap3 %}
+{% load getattr %}
+
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2018 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<tr>
+    <td style="padding: 20px;">
+        <label>{{ translated_label.label }}</label>
+    </td>
+    <td style="padding: 20px;" {% if translated_label.text_label.label in cms_label_pedagogy_fr_only %}colspan="2"{% endif %}>
+        {% if can_edit_information %}
+            <a class="trigger_modal pull-right"
+               data-url="{{ post_url }}?language=fr-be&label={{ translated_label.text_label.label }}"
+               data-modal_class="modal-lg"
+               title="{% trans 'Edit' %}">
+                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+            </a>
+        {% endif %}
+        {{ translated_label.text_label.text_fr.0.text|default_if_none:""|safe }}
+    </td>
+    {% if translated_label.text_label.label not in cms_label_pedagogy_fr_only %}
+        <td style="padding: 20px;">
+            {% if can_edit_information %}
+                <a class="trigger_modal pull-right"
+                   data-url="{{ post_url }}?language=en&label={{ translated_label.text_label.label }}"
+                   data-modal_class="modal-lg"
+                   title="{% trans 'Edit' %}">
+                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                </a>
+            {% endif %}
+            {{ translated_label.text_label.text_en.0.text|default_if_none:""|safe }}
+        </td>
+    {% endif %}
+</tr>
