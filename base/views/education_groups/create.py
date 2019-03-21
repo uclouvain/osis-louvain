@@ -146,9 +146,8 @@ def _common_success_redirect(request, form, parent=None):
 
 
 def _get_success_message_for_creation_education_group_year(parent_id, education_group_year):
-    msg_key = _("Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully created.")
     link = reverse("education_group_read", args=[parent_id, education_group_year.id])
-    return _(msg_key) % {
+    return _("Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully created.") % {
         "link": link,
         "acronym": education_group_year.acronym,
         "academic_year": education_group_year.academic_year,
