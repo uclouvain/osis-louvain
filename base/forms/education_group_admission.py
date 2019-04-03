@@ -24,11 +24,13 @@
 #
 ##############################################################################
 from ckeditor.fields import RichTextFormField
+from ckeditor_uploader.fields import RichTextUploadingFormField
 from django import forms
 
 from base.models.admission_condition import CONDITION_ADMISSION_ACCESSES
 
 PARAMETERS_FOR_RICH_TEXT = dict(required=False, config_name='minimal')
+PARAMETERS_FOR_RICH_TEXT_UPLOAD = dict(required=False, config_name='minimal_upload')
 
 
 class UpdateLineForm(forms.Form):
@@ -42,6 +44,6 @@ class UpdateLineForm(forms.Form):
 
 
 class UpdateTextForm(forms.Form):
-    text_fr = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
-    text_en = RichTextFormField(**PARAMETERS_FOR_RICH_TEXT)
+    text_fr = RichTextUploadingFormField(**PARAMETERS_FOR_RICH_TEXT_UPLOAD)
+    text_en = RichTextUploadingFormField(**PARAMETERS_FOR_RICH_TEXT_UPLOAD)
     section = forms.CharField(widget=forms.HiddenInput())

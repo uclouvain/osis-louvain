@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from ckeditor.fields import RichTextFormField
+from ckeditor_uploader.fields import RichTextUploadingFormField
 from django import forms
 from django.forms import HiddenInput
 
 
 class EducationGroupPedagogyEditForm(forms.Form):
     label = forms.CharField(widget=HiddenInput())
-    text_english = RichTextFormField(required=False, config_name='reddot')
-    text_french = RichTextFormField(required=False, config_name='reddot')
+    text_english = RichTextUploadingFormField(required=False, config_name='reddot')
+    text_french = RichTextUploadingFormField(required=False, config_name='reddot')
