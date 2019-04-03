@@ -84,6 +84,7 @@ INSTALLED_APPS = (
     'compat',
     'hijack_admin',
     'reversion',
+    'ckeditor_uploader',
 )
 
 MIDDLEWARE = (
@@ -225,7 +226,6 @@ LOGO_OSIS_URL = os.environ.get('LOGO_OSIS_URL', '')
 # See in settings.dev.example to configure the queues
 QUEUES = {}
 
-
 # Celery settings
 CELERY_BROKER_URL = "amqp://{user}:{password}@{host}:{port}".format(
     user=os.environ.get('RABBITMQ_USER', 'guest'),
@@ -261,6 +261,7 @@ REDDOT_STYLES = [
 ]
 
 # Apps Settings
+CKEDITOR_UPLOAD_PATH = ''
 CKEDITOR_JQUERY_URL = os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js")
 CKEDITOR_CONFIGS = {
     'reddot': {
@@ -274,11 +275,15 @@ CKEDITOR_CONFIGS = {
             {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
             ['Bold', 'Italic', 'Underline'],
             ['NumberedList', 'BulletedList'],
-            ['Link', 'Unlink'],
+            ['Link', 'Unlink', 'Image'],
             ['CreateDiv'],
             {'name': 'insert', 'items': ['Table']},
         ],
-        'autoParagraph': False
+        'autoParagraph': False,
+        'filebrowserBrowseUrl': '',
+        'filebrowserImageBrowseUrl': '',
+        'filebrowserUploadUrl': '',
+        'filebrowserImageUploadUrl': '',
     },
     'default': {
         "removePlugins": "stylesheetparser",
@@ -315,7 +320,22 @@ CKEDITOR_CONFIGS = {
             ['NumberedList', 'BulletedList'],
             ['Link', 'Unlink']
         ],
-        'autoParagraph': False
+        'autoParagraph': False,
+    },
+    'minimal_upload': {
+        'toolbar': 'Custom',
+        'coreStyles_italic': {'element': 'i', 'overrides': 'em'},
+        'toolbar_Custom': [
+            {'name': 'clipboard', 'items': ['PasteFromWord', '-', 'Undo', 'Redo']},
+            ['Bold', 'Italic', 'Underline'],
+            ['NumberedList', 'BulletedList'],
+            ['Link', 'Unlink', 'Image']
+        ],
+        'autoParagraph': False,
+        'filebrowserBrowseUrl': '',
+        'filebrowserImageBrowseUrl': '',
+        'filebrowserUploadUrl': '',
+        'filebrowserImageUploadUrl': '',
     },
     'minimal_plus_headers': {
         'toolbar': 'Custom',
