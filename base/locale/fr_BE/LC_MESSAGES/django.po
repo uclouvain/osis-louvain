@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-11 14:41+0200\n"
+"POT-Creation-Date: 2019-04-11 14:46+0200\n"
 "PO-Revision-Date: 2019-04-04 13:59+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2033,7 +2033,7 @@ msgstr "Action invalide"
 msgid "Invalid code"
 msgstr "Code non valide"
 
-#: forms/learning_unit_pedagogy.py:101
+#: forms/learning_unit_pedagogy.py:101 models/teaching_material.py:45
 msgid "Is this teaching material mandatory?"
 msgstr "Ce support de cours est-il obligatoire ?"
 
@@ -2464,7 +2464,7 @@ msgstr ""
 msgid "Mandates"
 msgstr "Mandates"
 
-#: models/group_element_year.py:170 models/teaching_material.py:45
+#: models/group_element_year.py:170
 #: templates/education_group/blocks/content_default_table.html:34
 #: templates/education_group/blocks/table_utilizations.html:36
 #: templates/education_group/pdf_content.html:112
