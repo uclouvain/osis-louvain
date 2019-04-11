@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-10 15:45+0200\n"
+"POT-Creation-Date: 2019-04-11 14:41+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1989,6 +1989,10 @@ msgstr ""
 msgid "Invalid code"
 msgstr ""
 
+#: forms/learning_unit_pedagogy.py:101
+msgid "Is this teaching material mandatory?"
+msgstr ""
+
 #: templatetags/learning_unit_li.py:40
 msgid "Isn't a proposal"
 msgstr ""
@@ -2397,7 +2401,6 @@ msgstr ""
 msgid "Mandates"
 msgstr ""
 
-#: forms/learning_unit_pedagogy.py:98 forms/learning_unit_pedagogy.py:101
 #: models/group_element_year.py:170 models/teaching_material.py:45
 #: templates/education_group/blocks/content_default_table.html:34
 #: templates/education_group/blocks/table_utilizations.html:36
@@ -2652,6 +2655,7 @@ msgstr ""
 #: business/learning_units/xls_comparison.py:413
 #: business/learning_units/xls_comparison.py:418
 #: business/learning_units/xls_comparison.py:419
+#: forms/learning_unit_pedagogy.py:99
 #: templates/learning_unit/proposal_comparison.html:55
 #: templates/learning_unit/proposal_comparison.html:64
 #: templates/learning_unit/proposal_comparison.html:92
@@ -2697,10 +2701,6 @@ msgstr ""
 
 #: templates/learning_unit/formations.html:128
 msgid "No enrollment for this learning unit"
-msgstr ""
-
-#: forms/learning_unit_pedagogy.py:99
-msgid "No mandatory"
 msgstr ""
 
 #: forms/prerequisite.py:113
@@ -4840,6 +4840,7 @@ msgstr ""
 #: business/learning_units/xls_comparison.py:413
 #: business/learning_units/xls_comparison.py:418
 #: business/learning_units/xls_comparison.py:419
+#: forms/learning_unit_pedagogy.py:98
 #: templates/learning_unit/proposal_comparison.html:53
 #: templates/learning_unit/proposal_comparison.html:62
 #: templates/learning_unit/proposal_comparison.html:90

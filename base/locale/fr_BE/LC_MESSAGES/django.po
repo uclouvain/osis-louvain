@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-10 15:45+0200\n"
+"POT-Creation-Date: 2019-04-11 14:41+0200\n"
 "PO-Revision-Date: 2019-04-04 13:59+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -2033,6 +2033,10 @@ msgstr "Action invalide"
 msgid "Invalid code"
 msgstr "Code non valide"
 
+#: forms/learning_unit_pedagogy.py:101
+msgid "Is this teaching material mandatory?"
+msgstr "Ce support de cours est-il obligatoire ?"
+
 #: templatetags/learning_unit_li.py:40
 msgid "Isn't a proposal"
 msgstr "Ce n'est pas une proposition"
@@ -2460,7 +2464,6 @@ msgstr ""
 msgid "Mandates"
 msgstr "Mandates"
 
-#: forms/learning_unit_pedagogy.py:98 forms/learning_unit_pedagogy.py:101
 #: models/group_element_year.py:170 models/teaching_material.py:45
 #: templates/education_group/blocks/content_default_table.html:34
 #: templates/education_group/blocks/table_utilizations.html:36
@@ -2715,6 +2718,7 @@ msgstr "Suivant"
 #: business/learning_units/xls_comparison.py:413
 #: business/learning_units/xls_comparison.py:418
 #: business/learning_units/xls_comparison.py:419
+#: forms/learning_unit_pedagogy.py:99
 #: templates/learning_unit/proposal_comparison.html:55
 #: templates/learning_unit/proposal_comparison.html:64
 #: templates/learning_unit/proposal_comparison.html:92
@@ -2761,10 +2765,6 @@ msgstr "Aucune différence"
 #: templates/learning_unit/formations.html:128
 msgid "No enrollment for this learning unit"
 msgstr "Il n'y a aucune inscription pour cette unité d'enseignement"
-
-#: forms/learning_unit_pedagogy.py:99
-msgid "No mandatory"
-msgstr "Non-obligatoire"
 
 #: forms/prerequisite.py:113
 #: tests/views/education_groups/learning_unit/test_update.py:203
@@ -4989,6 +4989,7 @@ msgstr "Xls avec les propositions"
 #: business/learning_units/xls_comparison.py:413
 #: business/learning_units/xls_comparison.py:418
 #: business/learning_units/xls_comparison.py:419
+#: forms/learning_unit_pedagogy.py:98
 #: templates/learning_unit/proposal_comparison.html:53
 #: templates/learning_unit/proposal_comparison.html:62
 #: templates/learning_unit/proposal_comparison.html:90
