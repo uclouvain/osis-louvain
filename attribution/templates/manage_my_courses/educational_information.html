@@ -43,10 +43,18 @@
         {% include "manage_my_courses/blocks/tabs.html" %}
         <br>
         <div class="panel panel-default" style="background-color: #f5f5f5">
-            <div class="panel-heading">
+            <div class="panel-heading show_collapse">
                 <label style="font-size: larger">{% trans 'Information approved and updatable by the Commission of Program' %}</label>
+                <a
+                        class=" pull-right collapsed a_show_collapse"
+                        data-toggle="collapse"
+                        href="#ue_specifications"
+                        role="button"
+                        aria-expanded="false"
+                        aria-controls="eu_specifications">
+                </a>
             </div>
-            <div class="panel-body">
+            <div class="panel-body collapse" id="ue_specifications">
                 {% include "learning_unit/specifications_all.html" %}
             </div>
         </div>

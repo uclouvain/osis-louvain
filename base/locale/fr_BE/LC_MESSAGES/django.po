@@ -926,6 +926,7 @@ msgstr "Ville"
 msgid "Classe"
 msgstr "Classe"
 
+#: forms/learning_unit/edition_volume.py:82
 #: templates/learning_unit/components.html:56
 #: templates/learning_unit/components.html:122
 #: templates/learning_unit/components_identification.html:42
@@ -3024,10 +3025,6 @@ msgstr "Commentaire propre"
 #: templates/learning_unit/components_identification.html:32
 msgid "Own components"
 msgstr "Composants propres"
-
-#: forms/learning_unit/edition_volume.py:82
-msgid "P.C."
-msgstr "C.P."
 
 #: templates/page_not_found.html:34
 msgid "Page not found."
@@ -5875,3 +5872,6 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:163
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "P.C."
+#~ msgstr "C.P."

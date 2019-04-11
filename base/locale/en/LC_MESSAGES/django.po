@@ -894,6 +894,7 @@ msgstr ""
 msgid "Classe"
 msgstr ""
 
+#: forms/learning_unit/edition_volume.py:82
 #: templates/learning_unit/components.html:56
 #: templates/learning_unit/components.html:122
 #: templates/learning_unit/components_identification.html:42
@@ -2944,10 +2945,6 @@ msgstr ""
 
 #: templates/learning_unit/components_identification.html:32
 msgid "Own components"
-msgstr ""
-
-#: forms/learning_unit/edition_volume.py:82
-msgid "P.C."
 msgstr ""
 
 #: templates/page_not_found.html:34
