@@ -32,7 +32,6 @@ from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.core.urlresolvers import reverse
-from django.db import IntegrityError, transaction
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
 from django.test import TestCase, RequestFactory
 from django.utils.translation import ugettext_lazy as _
@@ -54,11 +53,11 @@ from base.models.enums import organization_type, entity_type, \
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
-from base.tests.factories import academic_year as academic_year_factory, campus as campus_factory, \
+from base.tests.factories import campus as campus_factory, \
     organization as organization_factory
 from base.tests.factories.academic_year import create_current_academic_year, \
     get_current_year, AcademicYearFactory
-from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
+from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
@@ -74,7 +73,6 @@ from base.tests.factories.person import PersonFactory, PersonWithPermissionsFact
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
-from base.tests.factories.user import UserFactory
 from base.views.learning_units.proposal.update import update_learning_unit_proposal, \
     learning_unit_modification_proposal, \
     learning_unit_suppression_proposal
@@ -239,7 +237,7 @@ class TestLearningUnitModificationProposal(TestCase):
         messages_list = [str(message) for message in get_messages(response.wsgi_request)]
         self.assertIn(
             _("You proposed a modification of type {} for the learning unit {}.").format(
-                _(proposal_type.ProposalType.MODIFICATION.name),
+                _(proposal_type.ProposalType.MODIFICATION.value),
                 self.learning_unit_year.acronym),
             list(messages_list))
 
