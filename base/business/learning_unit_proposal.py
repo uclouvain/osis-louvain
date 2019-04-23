@@ -89,7 +89,7 @@ def compute_proposal_type(proposal_learning_unit_year, learning_unit_year):
     if proposal_learning_unit_year.type in [ProposalType.CREATION.name, ProposalType.SUPPRESSION.name]:
         return proposal_learning_unit_year.type
     differences = get_difference_of_proposal(proposal_learning_unit_year, learning_unit_year)
-    differences.pop('components_initial_data')
+    differences.pop('components_initial_data', None)
     if differences.get('acronym') and len(differences) == 1:
         return ProposalType.TRANSFORMATION.name
     elif differences.get('acronym'):
