@@ -80,7 +80,7 @@ def _update_or_create_proposal(request, learning_unit_year, proposal=None):
         proposal = proposal_base_form.save()
         display_success_messages(
             request, _("You proposed a modification of type {} for the learning unit {}.").format(
-                _(proposal.type), learning_unit_year.acronym)
+                _(proposal.get_type_display()), learning_unit_year.acronym)
         )
         return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
 
