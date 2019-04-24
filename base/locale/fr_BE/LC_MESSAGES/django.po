@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: templatetags/learning_unit.py:125
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:165
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:166
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-19 14:47+0200\n"
+"POT-Creation-Date: 2019-04-24 08:24+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -255,7 +256,7 @@ msgstr ""
 msgid "A null value means many relationships."
 msgstr "Une valeur nulle signifie plusieurs relations."
 
-#: business/learning_unit_proposal.py:286
+#: business/learning_unit_proposal.py:284
 #: tests/business/test_learning_unit_proposal.py:260
 msgid "A report has been sent."
 msgstr "Un rapport a été envoyé."
@@ -469,7 +470,7 @@ msgstr "Sigle/Int. abr."
 msgid "Actions"
 msgstr "Actions"
 
-#: business/learning_unit.py:71 business/learning_unit_proposal.py:69
+#: business/learning_unit.py:71 business/learning_unit_proposal.py:66
 #: business/learning_units/comparison.py:67
 #: business/learning_units/xls_comparison.py:177 business/proposal_xls.py:54
 #: models/enums/active_status.py:34 models/learning_unit_year.py:121
@@ -1989,7 +1990,7 @@ msgstr "En pratique"
 msgid "In proposal"
 msgstr "En proposition"
 
-#: business/learning_unit_proposal.py:70
+#: business/learning_unit_proposal.py:67
 #: business/learning_units/comparison.py:67
 #: business/learning_units/xls_comparison.py:179
 #: models/enums/active_status.py:35 models/learning_unit_year.py:253
@@ -2770,8 +2771,8 @@ msgstr "Nouvelle valeur"
 msgid "Next"
 msgstr "Suivant"
 
-#: business/learning_unit_proposal.py:215
-#: business/learning_unit_proposal.py:220
+#: business/learning_unit_proposal.py:213
+#: business/learning_unit_proposal.py:218
 #: business/learning_units/xls_comparison.py:215
 #: business/learning_units/xls_comparison.py:224
 #: business/learning_units/xls_comparison.py:225
@@ -3367,8 +3368,8 @@ msgstr "Interdiction de supprimer une unité d'enseignement avant 2015."
 msgid "Prolong"
 msgstr "Prolonger"
 
-#: business/learning_unit_proposal.py:291
-#: business/learning_unit_proposal.py:298
+#: business/learning_unit_proposal.py:289
+#: business/learning_unit_proposal.py:296
 #: business/learning_units/xls_comparison.py:498
 #: templates/learning_unit/blocks/panel/proposal.html:6
 #: tests/business/learning_units/test_xls_comparison.py:175
@@ -3390,7 +3391,7 @@ msgstr "Proposition %(acronym)s (%(academic_year)s) consolidée avec succès."
 msgid "Proposal for modification"
 msgstr "Proposition de modification"
 
-#: business/learning_unit_proposal.py:340
+#: business/learning_unit_proposal.py:338
 #: tests/business/test_learning_unit_proposal.py:285
 msgid "Proposal is neither accepted nor refused."
 msgstr "La proposition n'est ni acceptée ni refusée."
@@ -4872,7 +4873,7 @@ msgid "Validity"
 msgstr "Validité"
 
 #: templatetags/learning_unit.py:40
-#: tests/views/test_learning_unit_proposal.py:85
+#: tests/views/test_learning_unit_proposal.py:83
 msgid "Value before proposal"
 msgstr "Valeur avant proposition"
 
@@ -5030,7 +5031,7 @@ msgstr "Xls de comparaison UE/proposition"
 msgid "Xls with proposals"
 msgstr "Xls avec les propositions"
 
-#: business/learning_unit_proposal.py:215
+#: business/learning_unit_proposal.py:213
 #: business/learning_units/xls_comparison.py:215
 #: business/learning_units/xls_comparison.py:224
 #: business/learning_units/xls_comparison.py:225
@@ -5251,14 +5252,18 @@ msgstr "Vous avez le choix entre"
 msgid "You must either set the common title or the specific title"
 msgstr "L'intitulé propre ou l'intitulé commun est requis"
 
-#: tests/views/test_learning_unit_proposal.py:241
-#: tests/views/test_learning_unit_proposal.py:367
-#: views/learning_units/proposal/update.py:82
-#: views/learning_units/proposal/update.py:113
-msgid "You proposed a modification of type {} for the learning unit {}."
+#: tests/views/test_learning_unit_proposal.py:239
+#: tests/views/test_learning_unit_proposal.py:366
+#: views/learning_units/proposal/update.py:81
+#: views/learning_units/proposal/update.py:86
+#: views/learning_units/proposal/update.py:119
+#, python-format
+msgid ""
+"You proposed a modification of type %(type)s for the learning unit "
+"%(acronym)s."
 msgstr ""
-"Une proposition de modification de type {} a été faite pour l'unité "
-"d'enseignement {}."
+"Une proposition de modification de type %(type)s a été faite pour l'unité "
+"d'enseignement %(acronym)s."
 
 #: models/education_group_year.py:773
 msgid "You should precise at least minimum or maximum constraint"
@@ -5412,15 +5417,15 @@ msgstr "mise-à-jour bloquée pour l'enseignant"
 msgid "cancel"
 msgstr "annuler"
 
-#: business/learning_unit_proposal.py:259
+#: business/learning_unit_proposal.py:257
 msgid "cannot be canceled"
 msgstr "ne peut pas être annulé"
 
-#: business/learning_unit_proposal.py:240
+#: business/learning_unit_proposal.py:238
 msgid "cannot be changed state"
 msgstr "ne peut pas changer d'état"
 
-#: business/learning_unit_proposal.py:272
+#: business/learning_unit_proposal.py:270
 msgid "cannot be consolidated"
 msgstr "ne peut pas être consolidé"
 
@@ -5779,15 +5784,15 @@ msgstr "rubrique"
 msgid "skills and achievements"
 msgstr "compétences et acquis"
 
-#: business/learning_unit_proposal.py:258
+#: business/learning_unit_proposal.py:256
 msgid "successfully canceled"
 msgstr "annulée avec succès"
 
-#: business/learning_unit_proposal.py:239
+#: business/learning_unit_proposal.py:237
 msgid "successfully changed state"
 msgstr "a changé d'état avec succès"
 
-#: business/learning_unit_proposal.py:271
+#: business/learning_unit_proposal.py:269
 msgid "successfully consolidated"
 msgstr "consolidée avec succès"
 
@@ -5920,6 +5925,11 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:163
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "You proposed a modification of type {} for the learning unit {}."
+#~ msgstr ""
+#~ "Une proposition de modification de type {} a été faite pour l'unité "
+#~ "d'enseignement {}."
 
 #~ msgid "Unable to retrieve appropriate sections for this programs"
 #~ msgstr ""

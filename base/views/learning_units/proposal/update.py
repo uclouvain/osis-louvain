@@ -26,7 +26,7 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db import transaction
 from django.shortcuts import redirect, get_object_or_404, render
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from waffle.decorators import waffle_flag
 
 from base.business.learning_unit_proposal import compute_proposal_state
@@ -78,9 +78,15 @@ def _update_or_create_proposal(request, learning_unit_year, proposal=None):
 
     if proposal_base_form.is_valid():
         proposal = proposal_base_form.save()
+        success_message = _("You proposed a modification of type %(type)s for the learning unit %(acronym)s." % {
+                'type': proposal.get_type_display(),
+                'acronym': learning_unit_year.acronym
+            })
         display_success_messages(
-            request, _("You proposed a modification of type {} for the learning unit {}.").format(
-                _(proposal.get_type_display()), learning_unit_year.acronym)
+            request, _("You proposed a modification of type %(type)s for the learning unit %(acronym)s." % {
+                'type': proposal.get_type_display(),
+                'acronym': learning_unit_year.acronym
+            })
         )
         return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
 
@@ -110,8 +116,9 @@ def _update_or_create_suppression_proposal(request, learning_unit_year, proposal
             form_end_date.save(update_learning_unit_year=False)
 
             display_success_messages(
-                request, _("You proposed a modification of type {} for the learning unit {}.").format(
-                    _(proposal_type), learning_unit_year.acronym)
+                request, _("You proposed a modification of type %(type)s for the learning unit %(acronym)s." % {
+                    'type': _(proposal_type), 'acronym': learning_unit_year.acronym
+                })
             )
 
         return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)

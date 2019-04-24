@@ -3,13 +3,14 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+#: templatetags/learning_unit.py:125
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:165
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:166
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-19 14:47+0200\n"
+"POT-Creation-Date: 2019-04-24 08:24+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -221,7 +222,7 @@ msgstr ""
 msgid "A null value means many relationships."
 msgstr ""
 
-#: business/learning_unit_proposal.py:286
+#: business/learning_unit_proposal.py:284
 #: tests/business/test_learning_unit_proposal.py:260
 msgid "A report has been sent."
 msgstr ""
@@ -435,7 +436,7 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
-#: business/learning_unit.py:71 business/learning_unit_proposal.py:69
+#: business/learning_unit.py:71 business/learning_unit_proposal.py:66
 #: business/learning_units/comparison.py:67
 #: business/learning_units/xls_comparison.py:177 business/proposal_xls.py:54
 #: models/enums/active_status.py:34 models/learning_unit_year.py:121
@@ -1936,7 +1937,7 @@ msgstr ""
 msgid "In proposal"
 msgstr ""
 
-#: business/learning_unit_proposal.py:70
+#: business/learning_unit_proposal.py:67
 #: business/learning_units/comparison.py:67
 #: business/learning_units/xls_comparison.py:179
 #: models/enums/active_status.py:35 models/learning_unit_year.py:253
@@ -2695,8 +2696,8 @@ msgstr ""
 msgid "Next"
 msgstr ""
 
-#: business/learning_unit_proposal.py:215
-#: business/learning_unit_proposal.py:220
+#: business/learning_unit_proposal.py:213
+#: business/learning_unit_proposal.py:218
 #: business/learning_units/xls_comparison.py:215
 #: business/learning_units/xls_comparison.py:224
 #: business/learning_units/xls_comparison.py:225
@@ -3271,8 +3272,8 @@ msgstr ""
 msgid "Prolong"
 msgstr ""
 
-#: business/learning_unit_proposal.py:291
-#: business/learning_unit_proposal.py:298
+#: business/learning_unit_proposal.py:289
+#: business/learning_unit_proposal.py:296
 #: business/learning_units/xls_comparison.py:498
 #: templates/learning_unit/blocks/panel/proposal.html:6
 #: tests/business/learning_units/test_xls_comparison.py:175
@@ -3294,7 +3295,7 @@ msgstr ""
 msgid "Proposal for modification"
 msgstr ""
 
-#: business/learning_unit_proposal.py:340
+#: business/learning_unit_proposal.py:338
 #: tests/business/test_learning_unit_proposal.py:285
 msgid "Proposal is neither accepted nor refused."
 msgstr ""
@@ -4713,7 +4714,7 @@ msgid "Validity"
 msgstr ""
 
 #: templatetags/learning_unit.py:40
-#: tests/views/test_learning_unit_proposal.py:85
+#: tests/views/test_learning_unit_proposal.py:83
 msgid "Value before proposal"
 msgstr ""
 
@@ -4871,7 +4872,7 @@ msgstr ""
 msgid "Xls with proposals"
 msgstr ""
 
-#: business/learning_unit_proposal.py:215
+#: business/learning_unit_proposal.py:213
 #: business/learning_units/xls_comparison.py:215
 #: business/learning_units/xls_comparison.py:224
 #: business/learning_units/xls_comparison.py:225
@@ -5059,11 +5060,15 @@ msgstr ""
 msgid "You must either set the common title or the specific title"
 msgstr ""
 
-#: tests/views/test_learning_unit_proposal.py:241
-#: tests/views/test_learning_unit_proposal.py:367
-#: views/learning_units/proposal/update.py:82
-#: views/learning_units/proposal/update.py:113
-msgid "You proposed a modification of type {} for the learning unit {}."
+#: tests/views/test_learning_unit_proposal.py:239
+#: tests/views/test_learning_unit_proposal.py:366
+#: views/learning_units/proposal/update.py:81
+#: views/learning_units/proposal/update.py:86
+#: views/learning_units/proposal/update.py:119
+#, python-format
+msgid ""
+"You proposed a modification of type %(type)s for the learning unit "
+"%(acronym)s."
 msgstr ""
 
 #: models/education_group_year.py:773
@@ -5212,15 +5217,15 @@ msgstr ""
 msgid "cancel"
 msgstr ""
 
-#: business/learning_unit_proposal.py:259
+#: business/learning_unit_proposal.py:257
 msgid "cannot be canceled"
 msgstr ""
 
-#: business/learning_unit_proposal.py:240
+#: business/learning_unit_proposal.py:238
 msgid "cannot be changed state"
 msgstr ""
 
-#: business/learning_unit_proposal.py:272
+#: business/learning_unit_proposal.py:270
 msgid "cannot be consolidated"
 msgstr ""
 
@@ -5572,15 +5577,15 @@ msgstr ""
 msgid "skills and achievements"
 msgstr ""
 
-#: business/learning_unit_proposal.py:258
+#: business/learning_unit_proposal.py:256
 msgid "successfully canceled"
 msgstr ""
 
-#: business/learning_unit_proposal.py:239
+#: business/learning_unit_proposal.py:237
 msgid "successfully changed state"
 msgstr ""
 
-#: business/learning_unit_proposal.py:271
+#: business/learning_unit_proposal.py:269
 msgid "successfully consolidated"
 msgstr ""
 
