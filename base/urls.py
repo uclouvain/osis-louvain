@@ -290,6 +290,7 @@ urlpatterns = [
         url(r'^clear/$', base.views.notifications.clear_user_notifications, name="clear_notifications"),
         url(r'^mark_as_read/$', base.views.notifications.mark_notifications_as_read, name="mark_notifications_as_read"),
     ])),
+    url(r'^ckeditor/', include('ckeditor_uploader.urls')),
 
 ]
 
