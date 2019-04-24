@@ -78,10 +78,6 @@ def _update_or_create_proposal(request, learning_unit_year, proposal=None):
 
     if proposal_base_form.is_valid():
         proposal = proposal_base_form.save()
-        success_message = _("You proposed a modification of type %(type)s for the learning unit %(acronym)s." % {
-                'type': proposal.get_type_display(),
-                'acronym': learning_unit_year.acronym
-            })
         display_success_messages(
             request, _("You proposed a modification of type %(type)s for the learning unit %(acronym)s." % {
                 'type': proposal.get_type_display(),

@@ -5925,16 +5925,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:163
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "You proposed a modification of type {} for the learning unit {}."
-#~ msgstr ""
-#~ "Une proposition de modification de type {} a été faite pour l'unité "
-#~ "d'enseignement {}."
-
-#~ msgid "Unable to retrieve appropriate sections for this programs"
-#~ msgstr ""
-#~ "Impossible de récupérer les sections pertinentes pour le programme "
-#~ "consulté"
-
-#~ msgid "Volume"
-#~ msgstr "Volume"
