@@ -66,12 +66,8 @@ def _compute_list(global_ids=None):
 
 def _get_all_attributions_with_charges(global_ids):
     attributioncharge_prefetch = mdl_attribution.attribution_charge_new.search()\
-        .prefetch_related(
-            Prefetch('learning_component_year__learningunitcomponent_set',
-                     queryset=mdl_base.learning_unit_component.search()
-                        .filter(learning_unit_year__learning_container_year__in_charge=True),
-                     to_attr='learning_unit_components')
-    )
+        .filter(learning_component_year__learning_unit_year__learning_container_year__in_charge=True)\
+        .select_related('learning_component_year__learning_unit_year__academic_year')
 
     if global_ids is not None:
         qs = mdl_attribution.attribution_new.search(global_id=global_ids)
@@ -107,25 +103,24 @@ def _split_attribution_by_learning_unit_year(attribution):
     attribution_splitted = {}
 
     for attrib_charge in attribution.attribution_charges:
-        for learning_component in attrib_charge.learning_component_year.learning_unit_components:
-            lunit_year = learning_component.learning_unit_year
+        component = attrib_charge.learning_component_year
+        lunit_year = component.learning_unit_year
 
-            allocation_charge_key = attrib_charge.learning_component_year.type if attrib_charge.learning_component_year.type\
-                                    else 'OTHER_CHARGE'
+        allocation_charge_key = component.type if component.type else 'OTHER_CHARGE'
 
-            attribution_splitted.setdefault(lunit_year.id, {
-                    'acronym': lunit_year.acronym,
-                    'title': lunit_year.complete_title,
-                    'title_next_yr': _get_title_next_luyr(learning_component.learning_unit_year),
-                    'start_year': attribution.start_year,
-                    'end_year': attribution.end_year,
-                    'function': attribution.function,
-                    'year': lunit_year.academic_year.year,
-                    'weight': str(lunit_year.credits) if lunit_year.credits else '',
-                    'is_substitute': bool(attribution.substitute)
-            }).update({
-                allocation_charge_key: str(attrib_charge.allocation_charge)
-            })
+        attribution_splitted.setdefault(lunit_year.id, {
+                'acronym': lunit_year.acronym,
+                'title': lunit_year.complete_title,
+                'title_next_yr': _get_title_next_luyr(component.learning_unit_year),
+                'start_year': attribution.start_year,
+                'end_year': attribution.end_year,
+                'function': attribution.function,
+                'year': lunit_year.academic_year.year,
+                'weight': str(lunit_year.credits) if lunit_year.credits else '',
+                'is_substitute': bool(attribution.substitute)
+        }).update({
+            allocation_charge_key: str(attrib_charge.allocation_charge)
+        })
 
     return attribution_splitted.values()
 

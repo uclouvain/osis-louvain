@@ -218,8 +218,7 @@ class LearningUnitPostponementForm:
 
     @staticmethod
     def _update_form_set_data(data_to_postpone, luy_to_update):
-        learning_component_years = LearningComponentYear.objects.filter(
-            learningunitcomponent__learning_unit_year=luy_to_update)
+        learning_component_years = LearningComponentYear.objects.filter(learning_unit_year=luy_to_update)
         for learning_component_year in learning_component_years:
             if learning_component_year.type == LECTURING:
                 data_to_postpone['component-0-id'] = learning_component_year.id
@@ -349,7 +348,7 @@ class LearningUnitPostponementForm:
         """
         initial_learning_unit_year = self._forms_to_upsert[0].instance
         initial_values = EntityComponentYear.objects.filter(
-            learning_component_year__learningunitcomponent__learning_unit_year=initial_learning_unit_year
+            learning_component_year__learning_unit_year=initial_learning_unit_year
         ).values_list('repartition_volume', 'learning_component_year__type', 'entity_container_year__type')
 
         for reparation_volume, component_type, entity_type in initial_values:
@@ -357,7 +356,7 @@ class LearningUnitPostponementForm:
                 component = EntityComponentYear.objects.filter(
                     learning_component_year__type=component_type,
                     entity_container_year__type=entity_type,
-                    learning_component_year__learningunitcomponent__learning_unit_year=luy
+                    learning_component_year__learning_unit_year=luy
                 ).get()
             except EntityComponentYear.DoesNotExist:
                 # Case: N year have additional requirement but N+1 doesn't have.

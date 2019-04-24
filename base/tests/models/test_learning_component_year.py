@@ -32,9 +32,6 @@ from django.utils import timezone
 from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit_year import LearningUnitYear
-from base.models.learning_unit_component import LearningUnitComponent
-from base.models.learning_class_year import LearningClassYear
 from base.models.academic_year import AcademicYear
 
 now = timezone.now()
@@ -54,35 +51,6 @@ class LearningComponentYearTest(TestCase):
                                      start_date=datetime.date(now.year-1, now.month, 15),
                                      end_date=datetime.date(now.year + 2, now.month, 28))
         self.current_academic_year_different.save()
-
-    def test_creation_learning_unit_component_class_with_different_year(self):
-
-        learning_container = LearningContainer()
-
-        learning_container_year = LearningContainerYear(common_title="Biology",
-                                                        acronym="LBIO1212",
-                                                        academic_year=self.current_academic_year,
-                                                        learning_container=learning_container)
-        #Composant annualisé est associé à son composant et à son conteneur annualisé
-        learning_component_year = LearningComponentYear(learning_container_year=learning_container_year,
-                                                        acronym="/C",
-                                                        comment="TEST")
-        #Classe annualisée est associée à son composant et à son conteneur annualisé
-        learning_class_year = LearningClassYear(learning_component_year=learning_component_year,
-                                                acronym="/C1")
-
-
-        #UE associée à un conteneur d'une année différente du composant
-        learning_unit_year = LearningUnitYear(specific_title="Biology",
-                                              acronym="LBIO1212",
-                                              academic_year=self.current_academic_year_different,
-                                              learning_container_year=learning_container_year)
-        #Association du conteneur et de son composant dont les années académiques diffèrent l'une de l'autre
-        learning_unit_component = LearningUnitComponent(learning_component_year=learning_component_year,
-                                                        learning_unit_year=learning_unit_year)
-
-        self.assertEqual(learning_unit_component.learning_component_year,
-                         learning_class_year.learning_component_year)
 
     def test_get_basic_inconsistent_msg_no_luy(self):
         learning_container = LearningContainer()

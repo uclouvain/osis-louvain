@@ -34,8 +34,8 @@ from base.models.enums import entity_container_year_link_type, entity_type
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.tutor import TutorFactory
 from reference.tests.factories.country import CountryFactory
@@ -57,10 +57,10 @@ class TestLearningUnitForm(TestCase):
             self.list_learning_unit_container_year)
         self.tutor = TutorFactory()
         self.attribution = AttributionNewFactory(tutor=self.tutor)
-        self.learning_unit_component = LearningUnitComponentFactory(learning_unit_year=self.list_learning_unit_year[0])
+        self.learning_component = LearningComponentYearFactory(learning_unit_year=self.list_learning_unit_year[0])
         self.attribution_charge_new = \
             AttributionChargeNewFactory(attribution=self.attribution,
-                                        learning_component_year=self.learning_unit_component.learning_component_year)
+                                        learning_component_year=self.learning_component)
 
     def _create_list_containers(self, number_of_containers):
         list_lu_container_year = [

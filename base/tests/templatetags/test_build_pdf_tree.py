@@ -34,7 +34,6 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
@@ -93,35 +92,6 @@ class TestBuildPDFTree(TestCase):
         self.learning_component_year_7 = LearningComponentYearFactory(
             learning_container_year=self.learning_unit_year_4.learning_container_year,
             type=LECTURING
-        )
-
-        self.learning_unit_component_1 = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year_1,
-            learning_component_year=self.learning_component_year_1
-        )
-        self.learning_unit_component_2 = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year_1,
-            learning_component_year=self.learning_component_year_2
-        )
-        self.learning_unit_component_3 = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year_2,
-            learning_component_year=self.learning_component_year_3
-        )
-        self.learning_unit_component_4 = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year_2,
-            learning_component_year=self.learning_component_year_4
-        )
-        self.learning_unit_component_5 = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year_3,
-            learning_component_year=self.learning_component_year_5
-        )
-        self.learning_unit_component_6 = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year_3,
-            learning_component_year=self.learning_component_year_6
-        )
-        self.learning_unit_component_7 = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year_4,
-            learning_component_year=self.learning_component_year_7
         )
 
     def test_build_pdf_tree_with_mandatory(self):

@@ -34,7 +34,6 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from waffle.decorators import waffle_flag
 
 from attribution.business import attribution_charge_new
 from attribution.models.attribution_charge_new import AttributionChargeNew
@@ -48,8 +47,6 @@ from base.business.learning_units import perms as business_perms
 from base.business.learning_units.comparison import get_entity_by_type, \
     FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON, FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON
 from base.business.learning_units.perms import can_update_learning_achievement
-from base.forms.learning_class import LearningClassEditForm
-from base.forms.learning_unit_component import LearningUnitComponentEditForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models import education_group_year, campus, proposal_learning_unit, entity
 from base.models import learning_component_year as mdl_learning_component_year
@@ -172,64 +169,6 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
     context['text_label_translated'] = get_text_label_translated(text_lb, user_language)
     context['language_translated'] = find_language_in_settings(language)
     return render(request, "learning_unit/specifications_edit.html", context)
-
-
-@login_required
-@permission_required('base.change_learningcomponentyear', raise_exception=True)
-@require_http_methods(["GET", "POST"])
-def learning_unit_component_edit(request, learning_unit_year_id):
-    context = get_common_context_learning_unit_year(learning_unit_year_id,
-                                                    get_object_or_404(Person, user=request.user))
-    learning_component_id = request.GET.get('learning_component_year_id')
-    context['learning_component_year'] = mdl.learning_component_year.find_by_id(learning_component_id)
-
-    if request.method == 'POST':
-        form = LearningUnitComponentEditForm(request.POST,
-                                             learning_unit_year=context['learning_unit_year'],
-                                             instance=context['learning_component_year'])
-        if form.is_valid():
-            form.save()
-        return HttpResponseRedirect(reverse(learning_unit_components,
-                                            kwargs={'learning_unit_year_id': learning_unit_year_id}))
-
-    form = LearningUnitComponentEditForm(learning_unit_year=context['learning_unit_year'],
-                                         instance=context['learning_component_year'])
-    form.load_initial()  # Load data from database
-    context['form'] = form
-    return render(request, "learning_unit/component_edit.html", context)
-
-
-@login_required
-@permission_required('base.change_learningclassyear', raise_exception=True)
-@require_http_methods(["GET", "POST"])
-def learning_class_year_edit(request, learning_unit_year_id):
-    context = get_common_context_learning_unit_year(learning_unit_year_id,
-                                                    get_object_or_404(Person, user=request.user))
-    context.update(
-        {'learning_class_year': mdl.learning_class_year.find_by_id(request.GET.get('learning_class_year_id')),
-         'learning_component_year':
-             mdl.learning_component_year.find_by_id(request.GET.get('learning_component_year_id'))})
-
-    if request.method == 'POST':
-        form = LearningClassEditForm(
-            request.POST,
-            instance=context['learning_class_year'],
-            learning_unit_year=context['learning_unit_year'],
-            learning_component_year=context['learning_component_year']
-        )
-        if form.is_valid():
-            form.save()
-        return HttpResponseRedirect(reverse("learning_unit_components",
-                                            kwargs={'learning_unit_year_id': learning_unit_year_id}))
-
-    form = LearningClassEditForm(
-        instance=context['learning_class_year'],
-        learning_unit_year=context['learning_unit_year'],
-        learning_component_year=context['learning_component_year']
-    )
-    form.load_initial()  # Load data from database
-    context['form'] = form
-    return render(request, "learning_unit/class_edit.html", context)
 
 
 @login_required
@@ -496,7 +435,7 @@ def get_charge_repartition_warning_messages(learning_container_year):
         .values("attribution__tutor", "attribution__tutor__person__first_name",
                 "attribution__tutor__person__middle_name", "attribution__tutor__person__last_name",
                 "attribution__function", "attribution__start_year",
-                "learning_component_year__learningunitcomponent__learning_unit_year__subtype") \
+                "learning_component_year__learning_unit_year__subtype") \
         .annotate(total_volume=Sum("allocation_charge"))
 
     charges_by_attribution = itertools.groupby(total_charges_by_attribution_and_learning_subtype,
@@ -506,7 +445,7 @@ def get_charge_repartition_warning_messages(learning_container_year):
     msgs = []
     for attribution_key, charges in charges_by_attribution:
         charges = list(charges)
-        subtype_key = "learning_component_year__learningunitcomponent__learning_unit_year__subtype"
+        subtype_key = "learning_component_year__learning_unit_year__subtype"
         full_total_charges = next(
             (charge["total_volume"] for charge in charges if charge[subtype_key] == learning_unit_year_subtypes.FULL),
             0)

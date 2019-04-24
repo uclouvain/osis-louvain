@@ -29,12 +29,11 @@ from attribution.models import attribution_charge_new
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.models.enums import learning_component_year_type
-from base.models.learning_unit_component import LearningUnitComponent
 
 
 def find_attribution_charge_new(learning_unit_year):
     return attribution_charge_new.AttributionChargeNew.objects \
-        .filter(learning_component_year__learningunitcomponent__learning_unit_year=learning_unit_year) \
+        .filter(learning_component_year__learning_unit_year=learning_unit_year) \
         .select_related('learning_component_year', 'attribution__tutor__person')
 
 
@@ -58,7 +57,7 @@ def create_attributions_dictionary(attribution_charges):
 
 
 # FIXME Refactor code to work with base.views.learning_units.charge_repartition.SelectAttributionView#attributions
-def find_attributions_with_charges(learning_unit_year):
+def find_attributions_with_charges(learning_unit_year_id):
     lecturing_charges = AttributionChargeNew.objects \
         .filter(Q(learning_component_year__type=learning_component_year_type.LECTURING)
                 | Q(learning_component_year__type__isnull=True))
@@ -70,9 +69,8 @@ def find_attributions_with_charges(learning_unit_year):
     prefetch_practical_charges = Prefetch("attributionchargenew_set", queryset=practical_charges,
                                           to_attr="practical_charges")
 
-    learning_unit_components = LearningUnitComponent.objects.filter(learning_unit_year=learning_unit_year)
     attributions = AttributionNew.objects \
-        .filter(attributionchargenew__learning_component_year__learningunitcomponent__in=learning_unit_components) \
+        .filter(attributionchargenew__learning_component_year__learning_unit_year_id=learning_unit_year_id) \
         .distinct("id") \
         .prefetch_related(prefetch_lecturing_charges) \
         .prefetch_related(prefetch_practical_charges) \

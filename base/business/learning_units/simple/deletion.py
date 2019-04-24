@@ -30,8 +30,7 @@ from attribution.models.attribution import Attribution
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY, CMS_LABEL_SUMMARY
-from base.models import learning_unit_enrollment, learning_unit_component, learning_class_year, \
-    learning_unit_year as learn_unit_year_model
+from base.models import learning_unit_enrollment, learning_class_year, learning_unit_year as learn_unit_year_model
 from base.models import proposal_learning_unit
 from cms.enums import entity_name
 from cms.models import translated_text
@@ -96,7 +95,7 @@ def _check_attribution_deletion(learning_unit_year):
 
     for attribution_new in AttributionNew.objects.filter(
             learning_container_year=learning_unit_year.learning_container_year,
-            attributionchargenew__learning_component_year__learningunitcomponent__learning_unit_year=learning_unit_year
+            attributionchargenew__learning_component_year__learning_unit_year=learning_unit_year
     ):
         msg[attribution_new] = _(error_attribution) % {
             'subtype': _str_partim_or_full(learning_unit_year),
@@ -107,17 +106,17 @@ def _check_attribution_deletion(learning_unit_year):
     return msg
 
 
-def _check_learning_unit_component_deletion(l_unit_component):
+def _check_learning_component_deletion(learning_component_year):
     msg = {}
 
     for attribution_charge in \
-            AttributionChargeNew.objects.filter(learning_component_year=l_unit_component.learning_component_year):
+            AttributionChargeNew.objects.filter(learning_component_year=learning_component_year):
         attribution = attribution_charge.attribution
         msg[attribution] = _("%(subtype)s %(acronym)s is assigned to %(tutor)s for the year %(year)s") % {
-            'subtype': _str_partim_or_full(l_unit_component.learning_unit_year),
-            'acronym': l_unit_component.learning_unit_year.acronym,
+            'subtype': _str_partim_or_full(learning_component_year.learning_unit_year),
+            'acronym': learning_component_year.learning_unit_year.acronym,
             'tutor': attribution.tutor,
-            'year': l_unit_component.learning_unit_year.academic_year}
+            'year': learning_component_year.learning_unit_year.academic_year}
 
     return msg
 
@@ -166,8 +165,8 @@ def delete_from_given_learning_unit_year(learning_unit_year):
     if learning_unit_year.learning_container_year and learning_unit_year.is_full():
         msg.extend(_delete_learning_container_year(learning_unit_year.learning_container_year))
 
-    for component in learning_unit_component.find_by_learning_unit_year(learning_unit_year):
-        msg.extend(_delete_learning_unit_component(component))
+    for component in learning_unit_year.learningcomponentyear_set.all():
+        msg.extend(_delete_learning_component_year(component))
 
     _delete_cms_data(learning_unit_year)
 
@@ -195,15 +194,6 @@ def _delete_learning_container_year(learning_unit_container):
     for partim in learning_unit_container.get_partims_related():
         msg.extend(delete_from_given_learning_unit_year(partim))
     learning_unit_container.delete()
-
-    return msg
-
-
-def _delete_learning_unit_component(l_unit_component):
-    msg = []
-
-    msg.extend(_delete_learning_component_year(l_unit_component.learning_component_year))
-    l_unit_component.delete()
 
     return msg
 
@@ -245,8 +235,9 @@ def check_can_delete_ignoring_proposal_validation(learning_unit_year):
     if learning_unit_year.is_full() and learning_unit_year.learning_container_year:
         msg.update(_check_related_partims_deletion(learning_unit_year.learning_container_year))
     msg.update(_check_attribution_deletion(learning_unit_year))
-    for component in learning_unit_component.find_by_learning_unit_year(learning_unit_year):
-        msg.update(_check_learning_unit_component_deletion(component))
+    components = learning_unit_year.learningcomponentyear_set.all().select_related('learning_unit_year__academic_year')
+    for component in components:
+        msg.update(_check_learning_component_deletion(component))
     for group_element_year in learning_unit_year.find_list_group_element_year():
         msg.update(_check_group_element_year_deletion(group_element_year))
     msg.update(check_tutorings_deletion(learning_unit_year))

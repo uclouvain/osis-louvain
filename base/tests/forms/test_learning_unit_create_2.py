@@ -55,7 +55,6 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container import LearningContainer
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit
-from base.models.learning_unit_component import LearningUnitComponent
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -111,8 +110,8 @@ def get_valid_form_data(academic_year, person, learning_unit_year=None):
             periodicity=learning_unit_year_periodicity.ANNUAL
         )
 
-    cm_lcy = LearningComponentYear.objects.filter(learningunitcomponent__learning_unit_year=learning_unit_year).first()
-    pp_lcy = LearningComponentYear.objects.filter(learningunitcomponent__learning_unit_year=learning_unit_year).last()
+    cm_lcy = LearningComponentYear.objects.filter(learning_unit_year=learning_unit_year).first()
+    pp_lcy = LearningComponentYear.objects.filter(learning_unit_year=learning_unit_year).last()
 
     return {
         # Learning unit year data model form
@@ -480,7 +479,6 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
             LearningUnitYear: self._count_records(LearningUnitYear),
             EntityContainerYear: self._count_records(EntityContainerYear),
             LearningComponentYear: self._count_records(LearningComponentYear),
-            LearningUnitComponent: self._count_records(LearningUnitComponent),
             EntityComponentYear: self._count_records(EntityComponentYear),
         })
 
@@ -532,18 +530,18 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
         saved_luy = form.save()
         self.assertEqual(LearningUnitYear.objects.filter(acronym='LAGRO1200').count(), 1)
         self.assertEqual(LearningComponentYear.objects.filter(
-            learning_container_year=self.learning_unit_year.learning_container_year).count(), 4)
+            learning_unit_year__learning_container_year=self.learning_unit_year.learning_container_year).count(), 4)
 
         self._assert_correctly_create_records_in_all_learning_unit_structure(initial_counts)
         self.assertEqual(LearningComponentYear.objects.filter(
-            learning_container_year=saved_luy.learning_container_year
+            learning_unit_year=saved_luy
         ).count(), 2)
         self.assertEqual(
             LearningComponentYear.objects.get(
-                learning_container_year=saved_luy.learning_container_year, type=LECTURING).acronym, "PM")
+                learning_unit_year=saved_luy, type=LECTURING).acronym, "PM")
         self.assertEqual(
             LearningComponentYear.objects.get(
-                learning_container_year=saved_luy.learning_container_year, type=PRACTICAL_EXERCISES).acronym, "PP")
+                learning_unit_year=saved_luy, type=PRACTICAL_EXERCISES).acronym, "PP")
 
     def test_when_type_is_internship(self):
         EntityContainerYear.objects.filter(type__in=[ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2],
@@ -566,7 +564,7 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
         self.assertEqual(saved_luy.learning_container_year.container_type, INTERNSHIP)
         self.assertEqual(saved_luy.internship_subtype, TEACHING_INTERNSHIP)
         learning_component_year_list = LearningComponentYear.objects.filter(
-            learning_container_year=saved_luy.learning_container_year
+            learning_unit_year__learning_container_year=saved_luy.learning_container_year
         )
         self.assertEqual(learning_component_year_list.count(), 2)
         self.assertEqual(
@@ -574,10 +572,10 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
                 learning_component_year__in=learning_component_year_list).count(), 2)
         self.assertEqual(
             LearningComponentYear.objects.get(
-                learning_container_year=saved_luy.learning_container_year, type=LECTURING).acronym, "PM")
+                learning_unit_year=saved_luy, type=LECTURING).acronym, "PM")
         self.assertEqual(
             LearningComponentYear.objects.get(
-                learning_container_year=saved_luy.learning_container_year, type=PRACTICAL_EXERCISES).acronym, "PP")
+                learning_unit_year=saved_luy, type=PRACTICAL_EXERCISES).acronym, "PP")
 
     def test_when_type_is_dissertation(self):
         EntityContainerYear.objects.filter(type__in=[ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2],
@@ -598,14 +596,13 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
         self.assertEqual(saved_luy.credits, 99)
         self.assertEqual(saved_luy.learning_container_year.container_type, DISSERTATION)
         learning_component_year_list = LearningComponentYear.objects.filter(
-            learning_container_year=saved_luy.learning_container_year
+            learning_unit_year__learning_container_year=saved_luy.learning_container_year
         )
         self.assertEqual(learning_component_year_list.count(), 1)
         self.assertEqual(
             EntityComponentYear.objects.filter(
                 learning_component_year__in=learning_component_year_list).count(), 1)
-        learning_component_year = LearningComponentYear.objects.get(
-            learning_container_year=saved_luy.learning_container_year, type=None)
+        learning_component_year = LearningComponentYear.objects.get(learning_unit_year=saved_luy, type=None)
         self.assertEqual(learning_component_year.acronym, DEFAULT_ACRONYM_COMPONENT[None])
         self.assertEqual(learning_component_year.type, None)
 
@@ -621,8 +618,6 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
                          initial_counts[EntityContainerYear] + NUMBER_OF_ENTITIES_BY_CONTAINER)
         self.assertEqual(self._count_records(LearningComponentYear),
                          initial_counts[LearningComponentYear] + NUMBER_OF_COMPONENTS)
-        self.assertEqual(self._count_records(LearningUnitComponent),
-                         initial_counts[LearningUnitComponent] + NUMBER_OF_COMPONENTS)
         self.assertEqual(self._count_records(EntityComponentYear),
                          initial_counts[EntityComponentYear] + NUMBER_OF_COMPONENTS)
 

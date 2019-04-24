@@ -35,7 +35,7 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from base.models.enums import entity_container_year_link_type
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.user import UserFactory
 from osis_common.document import xls_build
 
@@ -54,8 +54,8 @@ class TestXlsBuild(TestCase):
             entity_container_year_link_type.ALLOCATION_ENTITY: EntityVersionFactory(acronym=ACRONYM_ALLOCATION)
         }
 
-        component_1 = LearningUnitComponentFactory(learning_unit_year=self.learning_unit_yr_1)
-        self.attribution_1 = AttributionChargeNewFactory(learning_component_year=component_1.learning_component_year)
+        component_1 = LearningComponentYearFactory(learning_unit_year=self.learning_unit_yr_1)
+        self.attribution_1 = AttributionChargeNewFactory(learning_component_year=component_1)
         self.learning_unit_yr_1.attribution_charge_news = attribution_charge_new. \
             find_attribution_charge_new_by_learning_unit_year_as_dict(self.learning_unit_yr_1)
         self.user = UserFactory()

@@ -45,7 +45,7 @@ from base.models.enums import learning_unit_year_subtypes, learning_unit_year_pe
     learning_container_year_types, attribution_procedure, internship_subtypes, learning_unit_year_session, \
     quadrimesters, vacant_declaration_type, entity_container_year_link_type
 from base.models.learning_class_year import LearningClassYear
-from base.models.learning_unit_component import LearningUnitComponent
+from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer
 from base.tests.factories.campus import CampusFactory
@@ -57,7 +57,6 @@ from base.tests.factories.external_learning_unit_year import ExternalLearningUni
 from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.models import translated_text
@@ -578,9 +577,8 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         ]
         self._assert_entity_component_year_correctly_duplicated(expected_entities, last_container)
 
-        last_generated_luc = LearningUnitComponent.objects.filter(learning_unit_year=last_generated_luy).last()
-        last_generated_component = last_generated_luc.learning_component_year
-        self.assertEqual(last_generated_luy.learning_container_year, last_generated_component.learning_container_year)
+        last_generated_component = LearningComponentYear.objects.filter(learning_unit_year=last_generated_luy).last()
+        self.assertEqual(last_generated_luy.learning_container_year, last_generated_component.learning_unit_year.learning_container_year)
 
         self._assert_learning_classes_correctly_duplicated(
             last_generated_component,
@@ -784,7 +782,6 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
         self.assertEqual(new_luy.externallearningunityear.external_acronym, "Yolo")
 
 
-
 def _create_classes(learning_component_year, number_classes):
     for i in range(number_classes):
         LearningClassYearFactory(learning_component_year=learning_component_year)
@@ -802,10 +799,7 @@ def _create_entity_container_years(learning_unit_years, entity=None):
 
 def _create_learning_component_years(learning_unit_years, number_classes=None):
     for luy in learning_unit_years:
-        luc = LearningUnitComponentFactory(learning_unit_year=luy)
-        component = luc.learning_component_year
-        component.learning_container_year = luy.learning_container_year
-        component.save()
+        component = LearningComponentYearFactory(learning_unit_year=luy)
         if number_classes:
             _create_classes(component, number_classes)
 

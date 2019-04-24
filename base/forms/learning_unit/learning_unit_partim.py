@@ -149,7 +149,7 @@ class PartimForm(LearningUnitBaseForm):
             SimplifiedVolumeManagementForm: {
                 'data': data,
                 'queryset': LearningComponentYear.objects.filter(
-                    learningunitcomponent__learning_unit_year=self.instance)
+                    learning_unit_year=self.instance)
                 if self.instance else LearningComponentYear.objects.none(),
                 'person': self.person,
             }

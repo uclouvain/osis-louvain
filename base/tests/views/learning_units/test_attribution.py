@@ -34,11 +34,11 @@ from attribution.models.attribution_new import AttributionNew
 from attribution.models.enums.function import COORDINATOR
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
-from base.models.enums.learning_container_year_types import LearningContainerYearType
+from base.models.enums.learning_container_year_types import LearningContainerYearType, COURSE
 from base.models.enums.learning_unit_year_subtypes import PARTIM
+from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
+    PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_component import LecturingLearningUnitComponentFactory, \
-    PracticalLearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.tutor import TutorFactory
@@ -58,20 +58,20 @@ class TestEditAttribution(TestCase):
         self.learning_unit_year = LearningUnitYearFullFactory(
             learning_container_year = self.learning_container_year
         )
-        self.lecturing_unit_component = LecturingLearningUnitComponentFactory(
+        self.lecturing_component = LecturingLearningComponentYearFactory(
             learning_unit_year=self.learning_unit_year)
-        self.practical_unit_component = PracticalLearningUnitComponentFactory(
+        self.practical_component = PracticalLearningComponentYearFactory(
             learning_unit_year=self.learning_unit_year)
         self.attribution = AttributionNewFactory(
             learning_container_year=self.learning_unit_year.learning_container_year
         )
         self.charge_lecturing = AttributionChargeNewFactory(
             attribution=self.attribution,
-            learning_component_year=self.lecturing_unit_component.learning_component_year
+            learning_component_year=self.lecturing_component
         )
         self.charge_practical = AttributionChargeNewFactory(
             attribution=self.attribution,
-            learning_component_year=self.practical_unit_component.learning_component_year
+            learning_component_year=self.practical_component
         )
 
         self.client.force_login(self.person.user)
@@ -139,16 +139,15 @@ class TestEditAttribution(TestCase):
 
 
 class TestAddAttribution(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_year = LearningUnitYearFullFactory(learning_container_year__container_type=COURSE)
+        cls.lecturing_component = LecturingLearningComponentYearFactory(learning_unit_year=cls.learning_unit_year)
+        cls.practical_component = PracticalLearningComponentYearFactory(learning_unit_year=cls.learning_unit_year)
+        cls.person = PersonWithPermissionsFactory('can_access_learningunit')
+        cls.tutor = TutorFactory(person=cls.person)
 
     def setUp(self):
-        self.learning_unit_year = LearningUnitYearFullFactory(
-            learning_container_year__container_type=LearningContainerYearType.COURSE.name)
-        self.lecturing_unit_component = LecturingLearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year)
-        self.practical_unit_component = PracticalLearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year)
-        self.person = PersonWithPermissionsFactory('can_access_learningunit')
-        self.tutor = TutorFactory(person=self.person)
         self.client.force_login(self.person.user)
         self.url = reverse("add_attribution", args=[self.learning_unit_year.id])
 
@@ -172,32 +171,34 @@ class TestAddAttribution(TestCase):
     def test_post(self):
         self.person.employee = True
         self.person.save()
+        start_year = self.learning_unit_year.academic_year.year
         data = {
             'attribution_form-person': self.tutor.person.id,
             'attribution_form-function': COORDINATOR,
-            'attribution_form-start_year': 2018,
+            'attribution_form-start_year': start_year,
             'attribution_form-duration': 3,
             'lecturing_form-allocation_charge': 50,
             'practical_form-allocation_charge': 10
         }
         response = self.client.post(self.url, data=data)
 
-        attribution = AttributionNew.objects.get(
+        attribution_qs = AttributionNew.objects.filter(
             tutor__id=self.tutor.id,
             function=COORDINATOR,
-            start_year=2018,
-            end_year=2020
+            start_year=start_year,
+            end_year=start_year+2
         )
-        charge_lecturing = AttributionChargeNew.objects.get(
+        self.assertTrue(attribution_qs.exists())
+        attribution = attribution_qs.get()
+        self.assertTrue(AttributionChargeNew.objects.filter(
             attribution=attribution,
-            learning_component_year=self.lecturing_unit_component.learning_component_year,
+            learning_component_year=self.lecturing_component,
             allocation_charge=50
-        )
-        charge_practical = AttributionChargeNew.objects.get(
+        ).exists())
+        self.assertTrue(AttributionChargeNew.objects.filter(
             attribution=attribution,
-            learning_component_year=self.practical_unit_component.learning_component_year,
+            learning_component_year=self.practical_component,
             allocation_charge=10
-        )
+        ).exists())
 
-        self.assertRedirects(response,
-                             reverse("learning_unit_attributions", args=[self.learning_unit_year.id]))
+        self.assertRedirects(response, reverse("learning_unit_attributions", args=[self.learning_unit_year.id]))

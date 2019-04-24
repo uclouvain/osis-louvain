@@ -32,7 +32,6 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
@@ -50,17 +49,11 @@ class TestDetail(TestCase):
         cls.learning_unit_year_1 = LearningUnitYearFactory(specific_title_english="")
         cls.learning_unit_year_2 = LearningUnitYearFactory(specific_title_english="")
         cls.learning_component_year_1 = LearningComponentYearFactory(
-            learning_container_year=cls.learning_unit_year_1.learning_container_year, hourly_volume_partial_q1=10,
+            learning_unit_year=cls.learning_unit_year_1, hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=10)
         cls.learning_component_year_2 = LearningComponentYearFactory(
-            learning_container_year=cls.learning_unit_year_1.learning_container_year, hourly_volume_partial_q1=10,
+            learning_unit_year=cls.learning_unit_year_1, hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=10)
-        cls.learning_unit_component_1 = LearningUnitComponentFactory(
-            learning_component_year=cls.learning_component_year_1,
-            learning_unit_year=cls.learning_unit_year_1)
-        cls.learning_unit_component_2 = LearningUnitComponentFactory(
-            learning_component_year=cls.learning_component_year_2,
-            learning_unit_year=cls.learning_unit_year_1)
         cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year_1,
                                                            child_branch=cls.education_group_year_2)
         cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year_2,

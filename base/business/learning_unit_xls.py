@@ -97,7 +97,7 @@ def annotate_qs(learning_unit_years):
     """ Fetch directly in the queryset all volumes data."""
 
     subquery_component = LearningComponentYear.objects.filter(
-        learningunityear__in=OuterRef('pk')
+        learning_unit_year__in=OuterRef('pk')
     )
     subquery_component_pm = subquery_component.filter(
         type=LECTURING

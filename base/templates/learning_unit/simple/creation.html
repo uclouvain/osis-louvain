@@ -50,11 +50,12 @@
     <h2>{% block h2_title %}{% trans 'New learning unit' %}{% endblock %}</h2>
 </div>
 <div class="panel panel-default">
+    <form method="post" id="LearningUnitYearForm" data-validate-url="{% url 'check_acronym' subtype %}">
     <div class="panel-heading">
         {% include "learning_unit/blocks/create_cancel_buttons.html" %}
     </div>
     <div class="panel-body">
-        <form method="post" id="LearningUnitYearForm" data-validate-url="{% url 'check_acronym' subtype %}">
+
             {% csrf_token %}
             <div class="row">
                 <div class="col-md-8">
@@ -109,13 +110,14 @@
                 </div>
             </div>
             <br>
-        </form>
+
 
         {% include 'learning_unit/blocks/modal/prolongOrCreateModal.html' %}
     </div>
     <div class="panel-footer">
         {% include "learning_unit/blocks/create_cancel_buttons.html" %}
     </div>
+    </form>
 </div>
 {% endblock %}
 

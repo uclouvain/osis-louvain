@@ -47,7 +47,6 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
@@ -430,12 +429,11 @@ def _setup_learning_component_tp(learning_unit_year):
 
 
 def _setup_learning_component_year(learning_unit_year, component_type):
-    component = LearningComponentYearFactory(learning_container_year=learning_unit_year.learning_container_year,
-                                             type=component_type,
-                                             planned_classes=1)
-
-    LearningUnitComponentFactory(learning_unit_year=learning_unit_year, learning_component_year=component)
-    return component
+    return LearningComponentYearFactory(
+        learning_unit_year=learning_unit_year,
+        type=component_type,
+        planned_classes=1
+    )
 
 
 def _setup_entity_container_year(learning_container_year, entity_container_type, entity):

@@ -50,7 +50,6 @@ from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
@@ -94,8 +93,6 @@ class LearningUnitDelete(TestCase):
         lcomponent = LearningComponentYearFactory()
         LearningClassYearFactory(learning_component_year=lcomponent)
         LearningClassYearFactory(learning_component_year=lcomponent)
-        LearningUnitComponentFactory(learning_unit_year=learning_unit_years[1],
-                                     learning_component_year=lcomponent)
         return learning_unit_years
 
     def test_delete_all_learning_units_year_method_not_allowed(self):
@@ -260,8 +257,7 @@ class LearningUnitDelete(TestCase):
         learning_unit_years = self.learning_unit_year_list
         ly1 = learning_unit_years[1]
         attrib_new_1 = AttributionNewFactory(learning_container_year=ly1.learning_container_year)
-        learning_component_year_1 = LearningComponentYearFactory(learning_container_year=ly1.learning_container_year)
-        LearningUnitComponentFactory(learning_unit_year=ly1, learning_component_year=learning_component_year_1)
+        learning_component_year_1 = LearningComponentYearFactory(learning_unit_year=ly1)
         AttributionChargeNewFactory(attribution=attrib_new_1, learning_component_year=learning_component_year_1)
 
         request_factory = RequestFactory()

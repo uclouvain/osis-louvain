@@ -466,17 +466,16 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
     def _change_cm_component_value(self, academic_year, new_hourly_total_value):
         LearningComponentYear.objects.filter(
             type=LECTURING,
-            learning_container_year__academic_year=academic_year,
-            learning_container_year__learning_container=self.learning_unit_year_full.learning_container_year.learning_container
+            learning_unit_year__academic_year=academic_year,
+            learning_unit_year__learning_container_year__learning_container=self.learning_unit_year_full.learning_container_year.learning_container
         ).update(hourly_volume_total_annual=new_hourly_total_value)
 
     def _change_entity_component_value(self, academic_year, repartition_volume):
         qs = EntityComponentYear.objects.filter(
             learning_component_year__type=LECTURING,
             entity_container_year__type=REQUIREMENT_ENTITY,
-            learning_component_year__learning_container_year__academic_year=academic_year,
-            learning_component_year__learningunitcomponent__learning_unit_year__learning_unit=
-            self.learning_unit_year_full.learning_unit
+            learning_component_year__learning_unit_year__academic_year=academic_year,
+            learning_component_year__learning_unit_year__learning_unit=self.learning_unit_year_full.learning_unit
         )
         qs.update(repartition_volume=repartition_volume)
         return qs.get()
@@ -486,8 +485,8 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         learning_unit_full = self.learning_unit_year_full.learning_unit
         EntityComponentYear.objects.filter(
             entity_container_year__type=ADDITIONAL_REQUIREMENT_ENTITY_2,
-            learning_component_year__learning_container_year__academic_year=academic_year,
-            learning_component_year__learningunitcomponent__learning_unit_year__learning_unit=learning_unit_full
+            learning_component_year__learning_unit_year__academic_year=academic_year,
+            learning_component_year__learning_unit_year__learning_unit=learning_unit_full
         ).delete()
 
         # Remove additional requirement entity 2 container year

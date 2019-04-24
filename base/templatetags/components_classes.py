@@ -24,8 +24,6 @@
 #
 ##############################################################################
 from django import template
-from base.models import learning_unit_component
-from django.utils.translation import ugettext_lazy as _
 
 
 register = template.Library()

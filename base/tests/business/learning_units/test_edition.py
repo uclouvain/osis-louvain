@@ -39,7 +39,6 @@ from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit_component import LearningUnitComponent
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
@@ -48,7 +47,6 @@ from base.tests.factories.entity_container_year import EntityContainerYearFactor
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from reference.tests.factories.language import LanguageFactory
 
@@ -420,14 +418,14 @@ class LearningUnitEditionTestCase(TestCase):
                                                                                 create_lecturing_component=True)
         another_learning_unit_year.learning_unit = self.learning_unit_year.learning_unit
         LearningComponentYear.objects.filter(
-            learningunitcomponent__learning_unit_year=self.learning_unit_year
+            learning_unit_year=self.learning_unit_year
         ).update(
             hourly_volume_total_annual=60,
             hourly_volume_partial_q1=40,
             hourly_volume_partial_q2=20
         )
         LearningComponentYear.objects.filter(
-            learningunitcomponent__learning_unit_year=another_learning_unit_year
+            learning_unit_year=another_learning_unit_year
         ).update(
             hourly_volume_total_annual=50,
             hourly_volume_partial_q1=35,
@@ -599,7 +597,7 @@ class LearningUnitEditionTestCase(TestCase):
                                                    subtype=learning_unit_year_subtypes.PARTIM)
 
         inital_components_count = LearningComponentYear.objects.all().count()
-        number_of_components = LearningUnitComponent.objects.filter(learning_unit_year=self.learning_unit_year).count()
+        number_of_components = LearningComponentYear.objects.filter(learning_unit_year=self.learning_unit_year).count()
         expected_count = inital_components_count + number_of_components
         next_year = self.academic_year.year + 1
 
@@ -623,20 +621,18 @@ def _create_learning_unit_year_with_components(l_container, create_lecturing_com
                                                    subtype=subtype)
 
     if create_lecturing_component:
-        a_component = LearningComponentYearFactory(
-            learning_container_year=l_container,
+        LearningComponentYearFactory(
+            learning_unit_year=a_learning_unit_year,
             type=learning_component_year_type.LECTURING,
             planned_classes=1
         )
-        LearningUnitComponentFactory(learning_unit_year=a_learning_unit_year, learning_component_year=a_component)
 
     if create_pratical_component:
-        a_component = LearningComponentYearFactory(
-            learning_container_year=l_container,
+        LearningComponentYearFactory(
+            learning_unit_year=a_learning_unit_year,
             type=learning_component_year_type.PRACTICAL_EXERCISES,
             planned_classes=1
         )
-        LearningUnitComponentFactory(learning_unit_year=a_learning_unit_year, learning_component_year=a_component)
 
     return a_learning_unit_year
 
@@ -659,16 +655,14 @@ def _create_entity_container_with_entity_components(a_learning_unit_year, contai
 
 
 def _create_entity_component_year(luy, component_type, entity_container_year, repartition_volume):
-    a_learning_unit_component = LearningUnitComponent.objects.get(learning_unit_year=luy,
-                                                                  learning_component_year__type=component_type)
+    component = LearningComponentYear.objects.get(learning_unit_year=luy, type=component_type)
     EntityComponentYearFactory(entity_container_year=entity_container_year,
-                               learning_component_year=a_learning_unit_component.learning_component_year,
+                               learning_component_year=component,
                                repartition_volume=repartition_volume)
 
 
 def _delete_components(luy, component_type):
-    LearningUnitComponent.objects.filter(learning_unit_year=luy, learning_component_year__type=component_type) \
-        .delete()
+    LearningComponentYear.objects.filter(learning_unit_year=luy, type=component_type).delete()
 
 
 def _build_copy(instance):

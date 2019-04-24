@@ -41,6 +41,7 @@ from base.models.enums import academic_calendar_type
 from base.models.enums import entity_container_year_link_type
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
+from base.models.learning_component_year import LearningComponentYear
 from base.models.utils.utils import get_object_or_none
 from cms import models as mdl_cms
 from cms.enums import entity_name
@@ -103,21 +104,22 @@ def get_same_container_year_components(learning_unit_year):
     learning_container_year = learning_unit_year.learning_container_year
     components = []
 
-    learning_components_year = learning_container_year.learningcomponentyear_set.prefetch_related(
+    learning_components_year = LearningComponentYear.objects.filter(
+        learning_unit_year__learning_container_year=learning_container_year
+    ).prefetch_related(
         Prefetch('learningclassyear_set', to_attr="classes"),
-        'learningunityear_set'
-    ).order_by('type', 'acronym')
+    ).select_related('learning_unit_year').order_by('type', 'acronym')
 
     additionnal_entities = {}
 
     for indx, learning_component_year in enumerate(learning_components_year):
         if learning_component_year.classes:
             for learning_class_year in learning_component_year.classes:
-                learning_class_year.used_by_learning_units_year = _learning_unit_usage_by_class(learning_class_year)
+                learning_class_year.used_by_learning_units_year = learning_unit_year.acronym
                 learning_class_year.is_used_by_full_learning_unit_year = _is_used_by_full_learning_unit_year(
                     learning_class_year)
 
-        used_by_learning_unit = mdl_base.learning_unit_component.search(learning_component_year, learning_unit_year)
+        used_by_learning_unit = learning_component_year.learning_unit_year == learning_unit_year
 
         entity_components_yr = learning_component_year.entitycomponentyear_set.all()
         if indx == 0:
@@ -127,7 +129,7 @@ def get_same_container_year_components(learning_unit_year):
             {
                 'learning_component_year': learning_component_year,
                 'volumes': volume_learning_component_year(learning_component_year, entity_components_yr),
-                'learning_unit_usage': _learning_unit_usage(learning_component_year),
+                'learning_unit_usage': _learning_unit_usage(learning_component_year.learning_unit_year),
                 'used_by_learning_unit': used_by_learning_unit
             }
         )
@@ -168,27 +170,19 @@ def get_cms_label_data(cms_label, user_language):
     return cms_label_data
 
 
-def _learning_unit_usage(a_learning_component_year):
-    components = mdl_base.learning_unit_component.find_by_learning_component_year(a_learning_component_year)
-    return ", ".join(["{} ({})".format(
-        c.learning_unit_year.acronym,
-        _(c.learning_unit_year.quadrimester) if c.learning_unit_year.quadrimester else '?'
-    ) for c in components])
-
-
-def _learning_unit_usage_by_class(a_learning_class_year):
-    queryset = a_learning_class_year.learningunitcomponentclass_set \
-        .order_by('learning_unit_component__learning_unit_year__acronym') \
-        .values_list('learning_unit_component__learning_unit_year__acronym', flat=True)
-    return ", ".join(list(queryset))
+def _learning_unit_usage(learning_unit_year):
+    return "{} ({})".format(
+        learning_unit_year.acronym,
+        _(learning_unit_year.quadrimester) if learning_unit_year.quadrimester else '?'
+    )
 
 
 def get_components_identification(learning_unit_yr):
     components = []
     additional_entities = {}
 
-    learning_component_year_list_from_luy = learning_unit_yr.learning_component_years.filter(
-        learning_container_year=learning_unit_yr.learning_container_year
+    learning_component_year_list_from_luy = LearningComponentYear.objects.filter(
+        learning_unit_year=learning_unit_yr
     ).order_by('type', 'acronym').prefetch_related('entitycomponentyear_set')
 
     for learning_component_year in learning_component_year_list_from_luy:
@@ -212,11 +206,7 @@ def get_components_identification(learning_unit_yr):
 
 
 def _is_used_by_full_learning_unit_year(a_learning_class_year):
-    for l in mdl_base.learning_unit_component_class.find_by_learning_class_year(a_learning_class_year):
-        if l.learning_unit_component.learning_unit_year.subdivision is None:
-            return True
-
-    return False
+    return a_learning_class_year.learning_component_year.learning_unit_year.is_full()
 
 
 def prepare_xls_content(found_learning_units):

@@ -95,12 +95,6 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     learning_container_year = models.ForeignKey('LearningContainerYear', null=True)
 
-    learning_component_years = models.ManyToManyField(
-        LearningComponentYear,
-        through="base.LearningUnitComponent",
-        verbose_name=_("Components"),
-    )
-
     changed = models.DateTimeField(null=True, auto_now=True)
     acronym = models.CharField(max_length=15, db_index=True, verbose_name=_('Code'),
                                validators=[RegexValidator(LEARNING_UNIT_ACRONYM_REGEX_MODEL)])
@@ -380,9 +374,12 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     def _check_learning_component_year_warnings(self):
         _warnings = []
-        components_queryset = self.learning_container_year.learningcomponentyear_set
-        all_components = components_queryset.order_by('learningunityear__acronym').prefetch_related(
-            'learningunityear_set').annotate(vol_global=Sum('entitycomponentyear__repartition_volume'))
+        components_queryset = LearningComponentYear.objects.filter(
+            learning_unit_year__learning_container_year=self.learning_container_year
+        )
+        all_components = components_queryset.order_by('acronym')\
+            .select_related('learning_unit_year')\
+            .annotate(vol_global=Sum('entitycomponentyear__repartition_volume'))
         for learning_component_year in all_components:
             _warnings.extend(learning_component_year.warnings)
 
@@ -501,7 +498,7 @@ def find_summary_responsible_by_name(queryset, name):
 
 
 def _build_tutor_filter(name_type):
-    return '__'.join(['learningunitcomponent', 'learning_component_year', 'attributionchargenew', 'attribution',
+    return '__'.join(['learningcomponentyear', 'attributionchargenew', 'attribution',
                       'tutor', 'person', name_type, 'iregex'])
 
 

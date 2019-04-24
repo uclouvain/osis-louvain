@@ -33,8 +33,8 @@ from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
-from base.tests.factories.learning_unit_component import LecturingLearningUnitComponentFactory, \
-    PracticalLearningUnitComponentFactory
+from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
+    PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, LearningUnitYearPartimFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.views.mixins import RulesRequiredMixin
@@ -44,17 +44,17 @@ class TestChargeRepartitionMixin:
     @classmethod
     def setUpTestData(cls):
         cls.learning_unit_year = LearningUnitYearPartimFactory()
-        cls.lecturing_unit_component = LecturingLearningUnitComponentFactory(learning_unit_year=cls.learning_unit_year)
-        cls.practical_unit_component = PracticalLearningUnitComponentFactory(learning_unit_year=cls.learning_unit_year)
+        cls.lecturing_component = LecturingLearningComponentYearFactory(learning_unit_year=cls.learning_unit_year)
+        cls.practical_component = PracticalLearningComponentYearFactory(learning_unit_year=cls.learning_unit_year)
 
         cls.full_learning_unit_year = LearningUnitYearFullFactory(
             learning_container_year=cls.learning_unit_year.learning_container_year,
             academic_year=cls.learning_unit_year.academic_year
         )
-        cls.lecturing_unit_component_full = LecturingLearningUnitComponentFactory(
+        cls.lecturing_component_full = LecturingLearningComponentYearFactory(
             learning_unit_year=cls.full_learning_unit_year
         )
-        cls.practical_unit_component_full = PracticalLearningUnitComponentFactory(
+        cls.practical_component_full = PracticalLearningComponentYearFactory(
             learning_unit_year=cls.full_learning_unit_year
         )
         cls.person = PersonWithPermissionsFactory('can_access_learningunit')
@@ -66,11 +66,11 @@ class TestChargeRepartitionMixin:
         attribution_id = self.attribution.id
         self.charge_lecturing = AttributionChargeNewFactory(
             attribution=self.attribution,
-            learning_component_year=self.lecturing_unit_component.learning_component_year
+            learning_component_year=self.lecturing_component
         )
         self.charge_practical = AttributionChargeNewFactory(
             attribution=self.attribution,
-            learning_component_year=self.practical_unit_component.learning_component_year
+            learning_component_year=self.practical_component
         )
 
         self.attribution_full = self.attribution
@@ -78,11 +78,11 @@ class TestChargeRepartitionMixin:
         self.attribution_full.save()
         self.charge_lecturing_full = AttributionChargeNewFactory(
             attribution=self.attribution_full,
-            learning_component_year=self.lecturing_unit_component_full.learning_component_year
+            learning_component_year=self.lecturing_component_full
         )
         self.charge_practical_full = AttributionChargeNewFactory(
             attribution=self.attribution_full,
-            learning_component_year=self.practical_unit_component_full.learning_component_year
+            learning_component_year=self.practical_component_full
         )
 
         self.attribution = AttributionNew.objects.get(id=attribution_id)
@@ -136,11 +136,11 @@ class TestSelectAttributionView(TestChargeRepartitionMixin, TestCase):
 
         charge_lecturing = AttributionChargeNewFactory(
             attribution=attribution,
-            learning_component_year=self.lecturing_unit_component.learning_component_year
+            learning_component_year=self.lecturing_component
         )
         charge_practical = AttributionChargeNewFactory(
             attribution=attribution,
-            learning_component_year=self.practical_unit_component.learning_component_year
+            learning_component_year=self.practical_component
         )
 
         response = self.client.get(self.url)
@@ -178,9 +178,9 @@ class TestAddChargeRepartition(TestChargeRepartitionMixin, TestCase):
         }
         response = self.client.post(self.url, data=data)
 
-        AttributionChargeNew.objects.get(learning_component_year=self.lecturing_unit_component.learning_component_year,
+        AttributionChargeNew.objects.get(learning_component_year=self.lecturing_component,
                                          allocation_charge=50)
-        AttributionChargeNew.objects.get(learning_component_year=self.practical_unit_component.learning_component_year,
+        AttributionChargeNew.objects.get(learning_component_year=self.practical_component,
                                          allocation_charge=10)
         AttributionNew.objects.exclude(id=self.attribution_full.id).get(tutor=self.attribution_full.tutor)
 

@@ -42,7 +42,6 @@ from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITI
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY, \
     CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit_component import LearningUnitComponent
 
 
 class VolumeField(forms.DecimalField):
@@ -201,15 +200,15 @@ class VolumeEditionForm(forms.Form):
 
     def _find_learning_components_year(self, luy_to_update_list):
         prefetch = Prefetch(
-            'learning_component_year__entitycomponentyear_set',
+            'entitycomponentyear_set',
             queryset=EntityComponentYear.objects.all(),
             to_attr='entity_components_year'
         )
         return [
-            luc.learning_component_year
-            for luc in LearningUnitComponent.objects.filter(
+            lcy
+            for lcy in LearningComponentYear.objects.filter(
                 learning_unit_year__in=luy_to_update_list).prefetch_related(prefetch)
-            if luc.learning_component_year.type == self.component.type
+            if lcy.type == self.component.type
         ]
 
 
@@ -375,29 +374,24 @@ class SimplifiedVolumeForm(forms.ModelForm):
         return container_type not in CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
 
     def _create_structure_components(self, commit):
-        self.instance.learning_container_year = self._learning_unit_year.learning_container_year
+        self.instance.learning_unit_year = self._learning_unit_year
 
         instance = super().save(commit)
 
-        LearningUnitComponent.objects.update_or_create(
-            learning_unit_year=self._learning_unit_year,
-            learning_component_year=instance
-        )
-
         requirement_entity_containers = self._get_requirement_entity_container()
         for requirement_entity_container in requirement_entity_containers:
-            learning_unit_components = LearningUnitComponent.objects.filter(
+            learning_components = LearningComponentYear.objects.filter(
                 learning_unit_year__learning_container_year=self._learning_unit_year.learning_container_year
             )
-            self._create_entity_component_years(learning_unit_components, requirement_entity_container)
+            self._create_entity_component_years(learning_components, requirement_entity_container)
         return instance
 
     @staticmethod
-    def _create_entity_component_years(learning_unit_components, requirement_entity_container):
-        for learning_unit_component in learning_unit_components:
+    def _create_entity_component_years(learning_components, requirement_entity_container):
+        for component_year in learning_components:
             EntityComponentYear.objects.update_or_create(
                 entity_container_year=requirement_entity_container,
-                learning_component_year=learning_unit_component.learning_component_year
+                learning_component_year=component_year
             )
 
     def _get_requirement_entity_container(self):

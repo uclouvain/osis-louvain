@@ -291,6 +291,9 @@ class TestPartimFormIsValid(LearningUnitPartimFormContextMixin):
 class TestPartimFormSave(LearningUnitPartimFormContextMixin):
     """Unit tests for save() for save"""
     def test_save(self):
+
+
+
         learning_container_year_full = self.learning_unit_year_full.learning_container_year
         a_new_learning_unit_partim = LearningUnitYearFactory.build(
             academic_year=self.current_academic_year,
@@ -309,7 +312,7 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
         self.assertIsInstance(saved_instance, LearningUnitYear)
         self.assertEqual(saved_instance.learning_container_year, learning_container_year_full)
         learning_component_year_list = LearningComponentYear.objects.filter(
-            learning_container_year=saved_instance.learning_container_year
+            learning_unit_year__learning_container_year=saved_instance.learning_container_year
         )
         self.assertEqual(learning_component_year_list.count(), 6)
         self.assertEqual(

@@ -28,9 +28,10 @@ from collections import OrderedDict
 from django.db import models
 
 from base.business import entity_version as business_entity_version
-from base.models import entity_container_year, learning_unit_component, entity_component_year, learning_unit_year
+from base.models import entity_container_year, entity_component_year, learning_unit_year
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
+from base.models.learning_component_year import LearningComponentYear
 from osis_common.utils.numbers import to_float_or_zero
 
 
@@ -79,9 +80,8 @@ def append_latest_entities(learning_unit_yr, service_course_search=False):
 
 def append_components(learning_unit_year):
     learning_unit_year.components = OrderedDict()
-    if learning_unit_year.learning_unit_components:
-        for learning_unit_component in learning_unit_year.learning_unit_components:
-            component = learning_unit_component.learning_component_year
+    if learning_unit_year.learning_components:
+        for component in learning_unit_year.learning_components:
             entity_components_year = component.entity_components_year
             req_entities_volumes = _get_requirement_entities_volumes(entity_components_year)
             vol_req_entity = req_entities_volumes.get(entity_types.REQUIREMENT_ENTITY, 0) or 0
@@ -156,22 +156,17 @@ def is_service_course(academic_year, requirement_entity_version, allocation_enti
 
 
 def get_learning_component_prefetch():
-    learning_component_prefetch = models.Prefetch(
-        'learningunitcomponent_set',
-        queryset=learning_unit_component.LearningUnitComponent.objects.all().order_by(
-            'learning_component_year__type', 'learning_component_year__acronym'
-        ).select_related(
-            'learning_component_year'
-        ).prefetch_related(
-            models.Prefetch('learning_component_year__entitycomponentyear_set',
+    return models.Prefetch(
+        'learningcomponentyear_set',
+        queryset=LearningComponentYear.objects.all().order_by('type', 'acronym').prefetch_related(
+            models.Prefetch('entitycomponentyear_set',
                             queryset=entity_component_year.EntityComponentYear.objects.all()
                             .select_related('entity_container_year'),
                             to_attr='entity_components_year'
                             )
         ),
-        to_attr='learning_unit_components'
+        to_attr='learning_components'
     )
-    return learning_component_prefetch
 
 
 def volume_from_initial_learning_component_year(learning_component_year, entity_components_year):

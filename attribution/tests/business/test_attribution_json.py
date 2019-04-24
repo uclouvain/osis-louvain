@@ -34,10 +34,10 @@ from attribution.business import attribution_json
 from attribution.models.enums import function
 from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from base.models.learning_component_year import LearningComponentYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.tutor import TutorFactory
@@ -169,35 +169,36 @@ def _create_learning_unit_year_with_components(academic_year, l_container, acron
                                           acronym=acronym, subtype=subtype)
 
     # Create component - CM - TP
-    l_component_cm = LearningComponentYearFactory(learning_container_year=l_container,
-                                 type=learning_component_year_type.LECTURING, acronym="PM")
-    l_component_tp = LearningComponentYearFactory(learning_container_year=l_container,
-                                                  type=learning_component_year_type.PRACTICAL_EXERCISES,
-                                                  acronym="PP")
-
-    # Create Link between UE and component
-    LearningUnitComponentFactory(learning_unit_year=l_unit_year, learning_component_year=l_component_cm)
-    LearningUnitComponentFactory(learning_unit_year=l_unit_year, learning_component_year=l_component_tp)
+    LearningComponentYearFactory(
+        learning_unit_year=l_unit_year,
+        type=learning_component_year_type.LECTURING,
+        acronym="PM"
+    )
+    LearningComponentYearFactory(
+        learning_unit_year=l_unit_year,
+        type=learning_component_year_type.PRACTICAL_EXERCISES,
+        acronym="PP"
+    )
     return l_unit_year
 
 
 def _create_attribution_charge(academic_year, attribution, l_acronym, volume_cm=None, volume_tp=None):
-    from base.models.learning_unit_component import LearningUnitComponent
-
+    component_qs = LearningComponentYear.objects.filter(
+        learning_unit_year__acronym=l_acronym,
+        learning_unit_year__academic_year=academic_year
+    )
     if volume_cm is not None:
-        l_unit_component = LearningUnitComponent.objects.filter(
-            learning_unit_year__acronym=l_acronym,
-            learning_unit_year__academic_year=academic_year,
-            learning_component_year__type=learning_component_year_type.LECTURING).first()
-        AttributionChargeNewFactory(attribution=attribution,
-                                    learning_component_year=l_unit_component.learning_component_year,
-                                    allocation_charge=volume_cm)
+        component = component_qs.filter(type=learning_component_year_type.LECTURING).first()
+        AttributionChargeNewFactory(
+            attribution=attribution,
+            learning_component_year=component,
+            allocation_charge=volume_cm
+        )
 
     if volume_tp is not None:
-        l_unit_component = LearningUnitComponent.objects.filter(
-            learning_unit_year__acronym=l_acronym,
-            learning_unit_year__academic_year=academic_year,
-            learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES).first()
-        AttributionChargeNewFactory(attribution=attribution,
-                                    learning_component_year=l_unit_component.learning_component_year,
-                                    allocation_charge=volume_tp)
+        component = component_qs.filter(type=learning_component_year_type.PRACTICAL_EXERCISES).first()
+        AttributionChargeNewFactory(
+            attribution=attribution,
+            learning_component_year=component,
+            allocation_charge=volume_tp
+        )

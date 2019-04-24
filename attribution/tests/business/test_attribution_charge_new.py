@@ -31,7 +31,7 @@ from attribution.business.attribution_charge_new import find_attribution_charge_
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.models.enums import learning_unit_year_subtypes
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
@@ -40,9 +40,9 @@ class TestAttributionChargeNew(TestCase):
         self.academic_year = AcademicYearFactory(year=timezone.now().year)
         self.l_unit_1 = LearningUnitYearFactory(acronym="LBIR1212", academic_year=self.academic_year,
                                                 subtype=learning_unit_year_subtypes.FULL)
-        component = LearningUnitComponentFactory(learning_unit_year=self.l_unit_1)
+        component = LearningComponentYearFactory(learning_unit_year=self.l_unit_1)
         self.attribution_charge_news = [
-            AttributionChargeNewFactory(learning_component_year=component.learning_component_year) for _ in range(5)
+            AttributionChargeNewFactory(learning_component_year=component) for _ in range(5)
         ]
 
     def test_find_attribution_charge_new_by_learning_unit_year(self):

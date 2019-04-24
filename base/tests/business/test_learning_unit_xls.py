@@ -51,7 +51,6 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
@@ -247,7 +246,7 @@ class TestLearningUnitXls(TestCase):
                                       )
 
         component_lecturing = LearningComponentYearFactory(
-            learning_container_year=learning_container_luy,
+            learning_unit_year=luy,
             type=learning_component_year_type.LECTURING,
             hourly_volume_total_annual=15,
             hourly_volume_partial_q1=10,
@@ -255,15 +254,13 @@ class TestLearningUnitXls(TestCase):
             planned_classes=1
         )
         component_practical = LearningComponentYearFactory(
-            learning_container_year=learning_container_luy,
+            learning_unit_year=luy,
             type=learning_component_year_type.PRACTICAL_EXERCISES,
             hourly_volume_total_annual=15,
             hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=5,
             planned_classes=1
         )
-        LearningUnitComponentFactory(learning_unit_year=luy, learning_component_year=component_lecturing)
-        LearningUnitComponentFactory(learning_unit_year=luy, learning_component_year=component_practical)
         a_tutor = TutorFactory()
 
         an_attribution = AttributionNewFactory(

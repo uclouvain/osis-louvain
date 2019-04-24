@@ -35,7 +35,6 @@ from base.business.learning_units import perms
 from base.forms.learning_unit.attribution_charge_repartition import LecturingAttributionChargeForm, \
     PracticalAttributionChargeForm
 from base.models.enums import learning_component_year_type
-from base.models.learning_unit_component import LearningUnitComponent
 from base.views.learning_units.attribution import AttributionBaseViewMixin, EditAttributionView
 
 
@@ -54,12 +53,12 @@ class SelectAttributionView(AttributionBaseViewMixin, TemplateView):
         prefetch_practical_charges = Prefetch("attributionchargenew_set", queryset=practical_charges,
                                               to_attr="practical_charges")
         attributions_to_exclude = AttributionChargeNew.objects \
-            .filter(learning_component_year__learningunitcomponent__learning_unit_year=self.luy) \
+            .filter(learning_component_year__learning_unit_year=self.luy) \
             .annotate(id_text=Concat("attribution__tutor__person__global_id", "attribution__function")) \
             .values_list("id_text", flat=True)
 
         parent_attributions = AttributionNew.objects \
-            .filter(attributionchargenew__learning_component_year__learningunityear=self.parent_luy) \
+            .filter(attributionchargenew__learning_component_year__learning_unit_year=self.parent_luy) \
             .distinct("id") \
             .annotate(id_text=Concat("tutor__person__global_id", "function")) \
             .exclude(id_text__in=attributions_to_exclude) \

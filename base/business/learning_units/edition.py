@@ -34,7 +34,7 @@ from base.business.learning_units.simple.deletion import delete_from_given_learn
     check_learning_unit_year_deletion
 from base.business.utils.model import update_instance_model_from_data, update_related_object
 from base.models import entity_component_year
-from base.models import entity_container_year, learning_component_year, learning_class_year, learning_unit_component
+from base.models import entity_container_year, learning_component_year, learning_class_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
@@ -204,22 +204,18 @@ def _duplicate_entity_container_year(new_lcy, new_academic_year):
 
 
 def _duplicate_learning_component_year(new_learn_container_year, new_learn_unit_year, old_learn_unit_year):
-    old_learning_unit_components = learning_unit_component.find_by_learning_unit_year(old_learn_unit_year) \
-        .select_related('learning_component_year')
-    for learn_unit_component in old_learning_unit_components:
-        old_component = learn_unit_component.learning_component_year
-        new_component = update_related_object(old_component, 'learning_container_year', new_learn_container_year)
+    old_components = old_learn_unit_year.learningcomponentyear_set.all()
+    for old_component in old_components:
+        new_component = update_related_object(old_component, 'learning_unit_year', new_learn_unit_year)
         _duplicate_learning_class_year(new_component)
-        _duplicate_learning_unit_component(new_component, new_learn_unit_year)
-        _duplicate_entity_component_year(new_component)
+        _duplicate_entity_component_year(new_component, new_learn_container_year)
 
 
-def _duplicate_entity_component_year(new_component):
-    new_learning_container = new_component.learning_container_year
+def _duplicate_entity_component_year(new_component, new_learn_container_year):
     for old_entity_comp_year in EntityComponentYear.objects.filter(learning_component_year=new_component.copied_from):
         old_entity_container = old_entity_comp_year.entity_container_year
         new_entity_container_year = EntityContainerYear.objects.get(
-            learning_container_year=new_learning_container,
+            learning_container_year=new_learn_container_year,
             entity=old_entity_container.entity,
             type=old_entity_container.type
         )
@@ -229,14 +225,6 @@ def _duplicate_entity_component_year(new_component):
                                                           new_entity_container_year)
         new_entity_component_year.learning_component_year = new_component
         new_entity_component_year.save()
-
-
-def _duplicate_learning_unit_component(new_component, new_learn_unit_year):
-    for old_learn_unit_comp in learning_unit_component.search(a_learning_component_year=new_component.copied_from,
-                                                              a_learning_unit_year=new_learn_unit_year.copied_from):
-        new_luc = update_related_object(old_learn_unit_comp, 'learning_unit_year', new_learn_unit_year)
-        new_luc.learning_component_year = new_component
-        new_luc.save()
 
 
 def _duplicate_learning_class_year(new_component):
@@ -618,11 +606,11 @@ def _get_error_volume_field_diff(field_diff, current_component, next_year_compon
              "is different between year %(year)s - %(value)s and year %(next_year)s - %(next_value)s") % \
            {
                'field': _(field_diff.lower()),
-               'acronym': current_component.learning_container_year.acronym,
+               'acronym': current_component.learning_unit_year.acronym,
                'component_type': _(current_component.type) if current_component.type else 'NT',
-               'year': current_component.learning_container_year.academic_year,
+               'year': current_component.learning_unit_year.academic_year,
                'value': values_diff.get('current') or _('No data'),
-               'next_year': next_year_component.learning_container_year.academic_year,
+               'next_year': next_year_component.learning_unit_year.academic_year,
                'next_value': values_diff.get('next_year') or _('No data')
            }
 

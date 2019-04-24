@@ -9,10 +9,12 @@ from django.db import migrations
 
 def remove_duplicate_permission_code_name(apps, schema_editor):
     Permission = apps.get_model('auth', 'Permission')
-    ContentType = apps.get_model('contenttypes.ContentType')
-    content_type = ContentType.objects.get(app_label="base", model="learningunitcomponent")
-    Permission.objects.filter(codename='can_access_learningunit', content_type=content_type)\
-                      .delete()
+    Permission.objects.filter(
+        codename='can_access_learningunit',
+        content_type__app_label="base",
+        content_type__model="learningunitcomponent"
+    ).delete()
+
 
 def add_central_manager_group(apps, schema_editor):
     # create group

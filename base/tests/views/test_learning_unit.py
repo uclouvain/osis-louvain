@@ -49,8 +49,6 @@ from base.business.learning_unit import learning_unit_titles_part1, learning_uni
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.forms.learning_unit.search_form import LearningUnitYearForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
-from base.models import learning_unit_component
-from base.models import learning_unit_component_class
 from base.models.academic_year import AcademicYear
 from base.models.enums import entity_container_year_link_type, active_status, education_group_categories, \
     learning_component_year_type, proposal_type, proposal_state
@@ -77,12 +75,10 @@ from base.tests.factories.external_learning_unit_year import ExternalLearningUni
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_class_year import LearningClassYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory, \
+    LecturingLearningComponentYearFactory, PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_component import LearningUnitComponentFactory, \
-    LecturingLearningUnitComponentFactory, PracticalLearningUnitComponentFactory
-from base.tests.factories.learning_unit_component_class import LearningUnitComponentClassFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
     LearningUnitYearFullFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
@@ -90,7 +86,7 @@ from base.tests.factories.person import PersonFactory, PersonWithPermissionsFact
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
-from base.views.learning_unit import learning_unit_components, learning_class_year_edit, learning_unit_specifications, \
+from base.views.learning_unit import learning_unit_components, learning_unit_specifications, \
     get_charge_repartition_warning_messages, learning_unit_attributions, learning_unit_comparison, \
     learning_unit_proposal_comparison
 from base.views.learning_unit import learning_unit_specifications_edit
@@ -328,7 +324,11 @@ class LearningUnitViewTestCase(TestCase):
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
 
         cls.learning_container_yr = LearningContainerYearFactory(academic_year=cls.current_academic_year)
-        cls.learning_component_yr = LearningComponentYearFactory(learning_container_year=cls.learning_container_yr,
+        cls.luy = LearningUnitYearFactory(
+            academic_year=cls.current_academic_year,
+            learning_container_year=cls.learning_container_yr
+        )
+        cls.learning_component_yr = LearningComponentYearFactory(learning_unit_year=cls.luy,
                                                                  hourly_volume_total_annual=10,
                                                                  hourly_volume_partial_q1=5,
                                                                  hourly_volume_partial_q2=5)
@@ -521,7 +521,7 @@ class LearningUnitViewTestCase(TestCase):
         learning_unit_year = LearningUnitYearFullFactory(
             academic_year=self.current_academic_year,
         )
-        LearningUnitComponentFactory(learning_unit_year=learning_unit_year)
+        LearningComponentYearFactory(learning_unit_year=learning_unit_year)
 
         response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
         self.assertEqual(len(response.context['versions']), 0)
@@ -533,7 +533,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(len(response.context['versions']), 1)
 
         with reversion.create_revision():
-            learning_unit_year.learning_component_years.first().save()
+            learning_unit_year.learningcomponentyear_set.first().save()
 
         response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
         self.assertEqual(len(response.context['versions']), 2)
@@ -660,19 +660,19 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(response.context["can_edit_date"], False)
 
     def test_get_components_no_learning_container_yr(self):
-        learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year)
-        components_dict = learning_unit_business.get_same_container_year_components(learning_unit_year)
+        luy_without_components = LearningUnitYearFactory(academic_year=self.current_academic_year)
+        components_dict = learning_unit_business.get_same_container_year_components(luy_without_components)
         self.assertEqual(len(components_dict.get('components')), 0)
 
     def test_get_components_with_classes(self):
         l_container = LearningContainerFactory()
         l_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year,
                                                         common_title="LC-98998", learning_container=l_container)
-        l_component_year = LearningComponentYearFactory(learning_container_year=l_container_year)
-        LearningClassYearFactory(learning_component_year=l_component_year)
-        LearningClassYearFactory(learning_component_year=l_component_year)
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                      learning_container_year=l_container_year)
+        l_component_year = LearningComponentYearFactory(learning_unit_year=learning_unit_year)
+        LearningClassYearFactory(learning_component_year=l_component_year)
+        LearningClassYearFactory(learning_component_year=l_component_year)
 
         components_dict = learning_unit_business.get_same_container_year_components(learning_unit_year)
         self.assertEqual(len(components_dict.get('components')), 1)
@@ -745,28 +745,6 @@ class LearningUnitViewTestCase(TestCase):
     def _assert_group_elements_ordered_by_partial_acronym(self, context, expected_order):
         self.assertListEqual(list(context['group_elements_years']), expected_order)
 
-    def test_learning_unit_usage_two_usages(self):
-        learning_container_yr = LearningContainerYearFactory(academic_year=self.current_academic_year,
-                                                             acronym='LBIOL')
-
-        learning_unit_yr_1 = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     acronym='LBIOLA',
-                                                     quadrimester='Q1',
-                                                     learning_container_year=learning_container_yr)
-        learning_unit_yr_2 = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                     acronym='LBIOLB',
-                                                     learning_container_year=learning_container_yr,
-                                                     quadrimester=None)
-
-        learning_component_yr = LearningComponentYearFactory(learning_container_year=learning_container_yr)
-
-        LearningUnitComponentFactory(learning_unit_year=learning_unit_yr_1,
-                                     learning_component_year=learning_component_yr)
-        LearningUnitComponentFactory(learning_unit_year=learning_unit_yr_2,
-                                     learning_component_year=learning_component_yr)
-
-        self.assertEqual(learning_unit_business._learning_unit_usage(learning_component_yr), 'LBIOLA (Q1), LBIOLB (?)')
-
     def test_learning_unit_usage_with_complete_LU(self):
         learning_container_yr = LearningContainerYearFactory(academic_year=self.current_academic_year,
                                                              acronym='LBIOL')
@@ -775,64 +753,10 @@ class LearningUnitViewTestCase(TestCase):
                                                      acronym='LBIOL', quadrimester='Q1&2',
                                                      learning_container_year=learning_container_yr)
 
-        learning_component_yr = LearningComponentYearFactory(learning_container_year=learning_container_yr)
+        learning_component_yr = LearningComponentYearFactory(learning_unit_year=learning_unit_yr_1)
 
-        LearningUnitComponentFactory(learning_unit_year=learning_unit_yr_1,
-                                     learning_component_year=learning_component_yr)
-
-        self.assertEqual(learning_unit_business._learning_unit_usage(learning_component_yr), 'LBIOL (Q1&2)')
-
-    def test_learning_unit_usage_by_class_with_complete_LU(self):
-        academic_year = AcademicYearFactory(year=2016)
-        learning_container_yr = LearningContainerYearFactory(academic_year=academic_year,
-                                                             acronym='LBIOL')
-
-        learning_unit_yr_1 = LearningUnitYearFactory(academic_year=academic_year,
-                                                     acronym='LBIOL',
-                                                     learning_container_year=learning_container_yr)
-
-        learning_component_yr = LearningComponentYearFactory(learning_container_year=learning_container_yr)
-
-        learning_unit_compo = LearningUnitComponentFactory(learning_unit_year=learning_unit_yr_1,
-                                                           learning_component_year=learning_component_yr)
-        learning_class_year = LearningClassYearFactory(learning_component_year=learning_component_yr)
-        LearningUnitComponentClassFactory(learning_unit_component=learning_unit_compo,
-                                          learning_class_year=learning_class_year)
-        self.assertEqual(learning_unit_business._learning_unit_usage_by_class(learning_class_year), 'LBIOL')
-
-    def test_component_save(self):
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                   learning_container_year=self.learning_container_yr)
-        learning_unit_compnt = LearningUnitComponentFactory(learning_unit_year=learning_unit_yr,
-                                                            learning_component_year=self.learning_component_yr)
-        url = reverse('learning_unit_component_edit', args=[learning_unit_yr.id])
-        qs = 'learning_component_year_id={}'.format(self.learning_component_yr.id)
-
-        response = self.client.post('{}?{}'.format(url, qs), data={"used_by": "on"})
-        self.learning_component_yr.refresh_from_db()
-        self.assertEqual(response.status_code, 302)
-
-    def test_component_save_delete_link(self):
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                   learning_container_year=self.learning_container_yr)
-        learning_unit_compnt = LearningUnitComponentFactory(learning_unit_year=learning_unit_yr,
-                                                            learning_component_year=self.learning_component_yr)
-        url = reverse('learning_unit_component_edit', args=[learning_unit_yr.id])
-        qs = 'learning_component_year_id={}'.format(self.learning_component_yr.id)
-
-        response = self.client.post('{}?{}'.format(url, qs), data={"planned_classes": "1"})
-        with self.assertRaises(ObjectDoesNotExist):
-            learning_unit_component.LearningUnitComponent.objects.filter(pk=learning_unit_compnt.id).get()
-
-    def test_component_save_create_link(self):
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                   learning_container_year=self.learning_container_yr)
-        url = reverse('learning_unit_component_edit', args=[learning_unit_yr.id])
-        qs = 'learning_component_year_id={}'.format(self.learning_component_yr.id)
-
-        response = self.client.post('{}?{}'.format(url, qs), data={"planned_classes": "1", "used_by": "on"})
-
-        self.assertTrue(learning_unit_component.find_by_learning_component_year(self.learning_component_yr).exists())
+        result = learning_unit_business._learning_unit_usage(learning_component_yr.learning_unit_year)
+        self.assertEqual(result, 'LBIOL (Q1&2)')
 
     def _prepare_context_learning_units_search(self):
         # Create a structure [Entity / Entity version]
@@ -927,53 +851,6 @@ class LearningUnitViewTestCase(TestCase):
                                    type=entity_container_year_link_type.ALLOCATION_ENTITY)
         LearningUnitYearFactory(acronym="LOGO1200", learning_container_year=l_container_yr_5,
                                 academic_year=self.current_academic_year, subtype=learning_unit_year_subtypes.FULL)
-
-    def test_class_save(self):
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                   learning_container_year=self.learning_container_yr)
-        LearningUnitComponentFactory(learning_unit_year=learning_unit_yr,
-                                     learning_component_year=self.learning_component_yr)
-        learning_class_yr = LearningClassYearFactory(learning_component_year=self.learning_component_yr)
-
-        response = self.client.post('{}?{}&{}'.format(reverse(learning_class_year_edit, args=[learning_unit_yr.id]),
-                                                      'learning_component_year_id={}'.format(
-                                                          self.learning_component_yr.id),
-                                                      'learning_class_year_id={}'.format(learning_class_yr.id)),
-                                    data={"used_by": "on"})
-        self.learning_component_yr.refresh_from_db()
-        self.assertEqual(response.status_code, 302)
-
-    def test_class_save_create_link(self):
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                   learning_container_year=self.learning_container_yr)
-        learning_unit_compnt = LearningUnitComponentFactory(learning_unit_year=learning_unit_yr,
-                                                            learning_component_year=self.learning_component_yr)
-        learning_class_yr = LearningClassYearFactory(learning_component_year=self.learning_component_yr)
-
-        response = self.client.post('{}?{}&{}'.format(reverse(learning_class_year_edit, args=[learning_unit_yr.id]),
-                                                      'learning_component_year_id={}'.format(
-                                                          self.learning_component_yr.id),
-                                                      'learning_class_year_id={}'.format(learning_class_yr.id)),
-                                    data={"used_by": "on"})
-
-        self.assertTrue(learning_unit_component_class.search(learning_unit_compnt, learning_class_yr).exists())
-
-    def test_class_save_delete_link(self):
-        learning_unit_yr = LearningUnitYearFactory(academic_year=self.current_academic_year,
-                                                   learning_container_year=self.learning_container_yr)
-        learning_unit_compnt = LearningUnitComponentFactory(learning_unit_year=learning_unit_yr,
-                                                            learning_component_year=self.learning_component_yr)
-        learning_class_yr = LearningClassYearFactory(learning_component_year=self.learning_component_yr)
-        a_link = LearningUnitComponentClassFactory(learning_unit_component=learning_unit_compnt,
-                                                   learning_class_year=learning_class_yr)
-
-        response = self.client.post('{}?{}&{}'.format(reverse(learning_class_year_edit, args=[learning_unit_yr.id]),
-                                                      'learning_component_year_id={}'.format(
-                                                          self.learning_component_yr.id),
-                                                      'learning_class_year_id={}'.format(learning_class_yr.id)),
-                                    data={})
-
-        self.assertFalse(learning_unit_component_class.LearningUnitComponentClass.objects.filter(pk=a_link.id).exists())
 
     def get_base_form_data(self):
         data = self.get_common_data()
@@ -1279,27 +1156,27 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
         cls.attribution_full = AttributionNewFactory(
             learning_container_year=cls.full_luy.learning_container_year
         )
-        cls.full_lecturing_unit_component = LecturingLearningUnitComponentFactory(learning_unit_year=cls.full_luy)
-        cls.full_practical_unit_component = PracticalLearningUnitComponentFactory(learning_unit_year=cls.full_luy)
+        cls.full_lecturing_component = LecturingLearningComponentYearFactory(learning_unit_year=cls.full_luy)
+        cls.full_practical_component = PracticalLearningComponentYearFactory(learning_unit_year=cls.full_luy)
 
-        cls.partim_1_lecturing_unit_component = \
-            LecturingLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_1)
-        cls.partim_1_practical_unit_component = \
-            PracticalLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_1)
+        cls.partim_1_lecturing_component = \
+            LecturingLearningComponentYearFactory(learning_unit_year=cls.partim_luy_1)
+        cls.partim_1_practical_component = \
+            PracticalLearningComponentYearFactory(learning_unit_year=cls.partim_luy_1)
 
-        cls.partim_2_lecturing_unit_component = \
-            LecturingLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_2)
-        cls.partim_2_practical_unit_component = \
-            PracticalLearningUnitComponentFactory(learning_unit_year=cls.partim_luy_2)
+        cls.partim_2_lecturing_component = \
+            LecturingLearningComponentYearFactory(learning_unit_year=cls.partim_luy_2)
+        cls.partim_2_practical_component = \
+            PracticalLearningComponentYearFactory(learning_unit_year=cls.partim_luy_2)
 
         cls.charge_lecturing = AttributionChargeNewFactory(
             attribution=cls.attribution_full,
-            learning_component_year=cls.full_lecturing_unit_component.learning_component_year,
+            learning_component_year=cls.full_lecturing_component,
             allocation_charge=20
         )
         cls.charge_practical = AttributionChargeNewFactory(
             attribution=cls.attribution_full,
-            learning_component_year=cls.full_practical_unit_component.learning_component_year,
+            learning_component_year=cls.full_practical_component,
             allocation_charge=20
         )
 
@@ -1314,23 +1191,23 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
     def setUp(self):
         self.charge_lecturing_1 = AttributionChargeNewFactory(
             attribution=self.attribution_partim_1,
-            learning_component_year=self.partim_1_lecturing_unit_component.learning_component_year,
+            learning_component_year=self.partim_1_lecturing_component,
             allocation_charge=10
         )
         self.charge_practical_1 = AttributionChargeNewFactory(
             attribution=self.attribution_partim_1,
-            learning_component_year=self.partim_1_practical_unit_component.learning_component_year,
+            learning_component_year=self.partim_1_practical_component,
             allocation_charge=10
         )
 
         self.charge_lecturing_2 = AttributionChargeNewFactory(
             attribution=self.attribution_partim_2,
-            learning_component_year=self.partim_2_lecturing_unit_component.learning_component_year,
+            learning_component_year=self.partim_2_lecturing_component,
             allocation_charge=10
         )
         self.charge_practical_2 = AttributionChargeNewFactory(
             attribution=self.attribution_partim_2,
-            learning_component_year=self.partim_2_practical_unit_component.learning_component_year,
+            learning_component_year=self.partim_2_practical_component,
             allocation_charge=10
         )
 
@@ -1431,20 +1308,13 @@ class TestLearningUnitProposalComparison(TestCase):
         self.learning_component_year_lecturing = LearningComponentYearFactory(
             type=learning_component_year_type.LECTURING,
             acronym="TP",
-            learning_container_year=learning_container_year
+            learning_unit_year=self.learning_unit_year
         )
         self.learning_component_year_practical = LearningComponentYearFactory(
             type=learning_component_year_type.PRACTICAL_EXERCISES,
             acronym="PP",
-            learning_container_year=learning_container_year
+            learning_unit_year=self.learning_unit_year
         )
-        self.learning_unit_component_lecturing = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year,
-            learning_component_year=self.learning_component_year_lecturing)
-        self.learning_unit_component_practical = LearningUnitComponentFactory(
-            learning_unit_year=self.learning_unit_year,
-            learning_component_year=self.learning_component_year_practical)
-
         self.entity_container_year = EntityContainerYearFactory(
             learning_container_year=self.learning_unit_year.learning_container_year,
             type=entity_container_year_link_type.REQUIREMENT_ENTITY
