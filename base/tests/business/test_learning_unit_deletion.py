@@ -41,11 +41,11 @@ from base.models.enums import entity_container_year_link_type
 from base.models.enums import entity_type
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.learning_class_year import LearningClassYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -220,7 +220,7 @@ class LearningUnitYearDeletion(TestCase):
         # Composant annualisé est associé à son composant et à son conteneur annualisé
         learning_component_year = LearningComponentYearFactory(acronym="/C",
                                                                comment="TEST")
-        learning_container_year = learning_component_year.learning_container_year
+        learning_container_year = learning_component_year.learning_unit_year.learning_container_year
 
         number_classes = 10
         for x in range(number_classes):

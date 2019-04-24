@@ -66,31 +66,31 @@ class TestBuildPDFTree(TestCase):
                                                             child_leaf=self.learning_unit_year_3,
                                                             is_mandatory=True)
         self.learning_component_year_1 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_1.learning_container_year,
+            learning_unit_year=self.learning_unit_year_1,
             type=LECTURING
         )
         self.learning_component_year_2 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_1.learning_container_year,
+            learning_unit_year=self.learning_unit_year_1,
             type=PRACTICAL_EXERCISES
         )
         self.learning_component_year_3 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_2.learning_container_year,
+            learning_unit_year=self.learning_unit_year_2,
             type=LECTURING
         )
         self.learning_component_year_4 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_2.learning_container_year,
+            learning_unit_year=self.learning_unit_year_2,
             type=PRACTICAL_EXERCISES
         )
         self.learning_component_year_5 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_3.learning_container_year,
+            learning_unit_year=self.learning_unit_year_3,
             type=LECTURING
         )
         self.learning_component_year_6 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_3.learning_container_year,
+            learning_unit_year=self.learning_unit_year_3,
             type=PRACTICAL_EXERCISES
         )
         self.learning_component_year_7 = LearningComponentYearFactory(
-            learning_container_year=self.learning_unit_year_4.learning_container_year,
+            learning_unit_year=self.learning_unit_year_4,
             type=LECTURING
         )
 

@@ -93,6 +93,19 @@ class TrainingType(ChoiceEnum):
             cls.CAPAES.name,
         ]
 
+    @classmethod
+    def with_skills_achievements(cls):
+        return [
+            cls.BACHELOR.name,
+            cls.MASTER_MC.name,
+            cls.MASTER_M1.name,
+            cls.PGRM_MASTER_120.name,
+            cls.PGRM_MASTER_180_240.name,
+            cls.AGGREGATION.name,
+            cls.CERTIFICATE.name,
+            cls.RESEARCH_CERTIFICATE.name,
+        ]
+
 
 class MiniTrainingType(ChoiceEnum):
     DEEPENING = _("Deepening")

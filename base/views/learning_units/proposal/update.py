@@ -36,7 +36,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, display_warning_messages
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context
 
@@ -125,6 +125,10 @@ def _update_or_create_suppression_proposal(request, learning_unit_year, proposal
         'form_end_date': form_end_date,
         'form_proposal': form_proposal,
         'experimental_phase': True})
+
+    if learning_unit_year.get_partims_related().exists():
+        display_warning_messages(request, _("The learning unit have partim"))
+
     if proposal:
         return render(request, 'learning_unit/proposal/update_suppression.html', context)
     return render(request, 'learning_unit/proposal/create_suppression.html', context)

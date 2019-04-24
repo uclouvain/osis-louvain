@@ -1117,6 +1117,13 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         result = get_appropriate_common_admission_condition(edy)
         self.assertEqual(result, self.master_adm_cond)
 
+        edy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_180_240.name,
+            academic_year=self.academic_year
+        )
+        result = get_appropriate_common_admission_condition(edy)
+        self.assertEqual(result, self.master_adm_cond)
+
     def test_get_appropriate_common_offer_for_special_master(self):
         edy = EducationGroupYearFactory(
             education_group_type__name=TrainingType.MASTER_MC.name,

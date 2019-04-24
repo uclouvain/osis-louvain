@@ -118,10 +118,9 @@ class TestPartimFormInit(LearningUnitPartimFormContextMixin):
         expected_initials = {
             LearningUnitPartimModelForm: {},
             LearningUnitYearModelForm: {
-                'acronym': ['L', 'BIR1200', ''],
+                'acronym': ['L', 'BIR1200'],
                 'acronym_0': 'L',  # Multiwidget decomposition
                 'acronym_1': 'BIR1200',
-                'acronym_2': '',
                 'academic_year': self.learning_unit_year_full.academic_year.id,
                 'internship_subtype': self.learning_unit_year_full.internship_subtype,
                 'attribution_procedure': self.learning_unit_year_full.attribution_procedure,
@@ -187,7 +186,7 @@ class TestPartimFormIsValid(LearningUnitPartimFormContextMixin):
     def test_creation_case_correct_post_data(self):
         a_new_learning_unit_partim = LearningUnitYearFactory.build(
             academic_year=self.current_academic_year,
-            acronym=FULL_ACRONYM + 'B',
+            acronym=FULL_ACRONYM,
             subtype=learning_unit_year_subtypes.PARTIM,
             language=self.learning_unit_year_full.language
         )
@@ -324,10 +323,10 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
             learning_component_year_list.filter(type=PRACTICAL_EXERCISES, acronym="PP").exists())
 
     def test_save_method_create_new_instance(self):
-        partim_acronym = FULL_ACRONYM + 'C'
+        partim_acronym = FULL_ACRONYM+"B"
         a_new_learning_unit_partim = LearningUnitYearFactory.build(
             academic_year=self.current_academic_year,
-            acronym=partim_acronym,
+            acronym=FULL_ACRONYM,
             subtype=learning_unit_year_subtypes.PARTIM,
             language=self.learning_unit_year_full.language
         )
@@ -415,7 +414,7 @@ def get_valid_form_data(learning_unit_year_partim):
     acronym_splited = acronym_field.split_acronym(learning_unit_year_partim.acronym)
     return {
         # Learning unit year data model form
-        'acronym_2': acronym_splited[2],
+        'acronym_2': 'B',
         'subtype': learning_unit_year_partim.subtype,
         'specific_title': learning_unit_year_partim.specific_title,
         'specific_title_english': learning_unit_year_partim.specific_title_english,

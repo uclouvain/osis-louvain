@@ -180,7 +180,10 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
                and self.is_general_info_and_condition_admission_in_display_range()
 
     def show_skills_and_achievements(self):
-        return self.show_admission_conditions() and not self.object.is_common
+        return not self.object.is_common and \
+               self.object.education_group_type.name in itertools.chain(TrainingType.with_skills_achievements(),
+                                                                        MiniTrainingType.with_admission_condition()) \
+               and self.is_general_info_and_condition_admission_in_display_range()
 
     def is_general_info_and_condition_admission_in_display_range(self):
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.object.academic_year.year < \
@@ -566,10 +569,16 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
 
 
 def get_appropriate_common_admission_condition(edy):
-    if not edy.is_common and \
-            any([edy.is_bachelor, edy.is_master60, edy.is_master120, edy.is_aggregation, edy.is_specialized_master]):
+    if not edy.is_common and any([
+        edy.is_bachelor,
+        edy.is_master60,
+        edy.is_master120,
+        edy.is_aggregation,
+        edy.is_specialized_master,
+        edy.is_master180
+    ]):
         common_egy = EducationGroupYear.objects.look_for_common(
-            education_group_type__name=TrainingType.PGRM_MASTER_120.name if edy.is_master60
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name if edy.is_master60 or edy.is_master180
             else edy.education_group_type.name,
             academic_year=edy.academic_year
         ).get()

@@ -26,9 +26,9 @@
 import re
 
 from django import forms
+from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
-from base.forms.common import STEP_HALF_INTEGER
 from base.forms.utils.acronym_field import AcronymField, PartimAcronymField, split_acronym
 from base.forms.utils.choice_field import add_blank
 from base.models.campus import find_main_campuses
@@ -41,7 +41,6 @@ from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit import LearningUnit, REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
 from reference.models.language import find_all_languages
-from django.core.exceptions import ValidationError
 
 CRUCIAL_YEAR_FOR_CREDITS_VALIDATION = 2018
 
@@ -88,7 +87,7 @@ class LearningUnitYearModelForm(forms.ModelForm):
 
         acronym = self.initial.get('acronym')
         if acronym:
-            self.initial['acronym'] = split_acronym(acronym, subtype)
+            self.initial['acronym'] = split_acronym(acronym, subtype, instance=self.instance)
 
         if subtype == learning_unit_year_subtypes.PARTIM:
             self.fields['acronym'] = PartimAcronymField()

@@ -26,7 +26,7 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, connection
-from django.db.models import Count, OuterRef, Exists, Min, When, Case, Max
+from django.db.models import Count, Min, When, Case, Max
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -44,7 +44,6 @@ from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
 from base.models.enums.funding_codes import FundingCodes
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
-from base.models.prerequisite_item import PrerequisiteItem
 from base.models.utils.utils import get_object_or_none
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
     SerializableQuerySet
@@ -604,6 +603,10 @@ class EducationGroupYear(SerializableModel):
     @property
     def is_bachelor(self):
         return self.type == TrainingType.BACHELOR.name
+
+    @property
+    def is_master180(self):
+        return self.type == TrainingType.PGRM_MASTER_180_240.name
 
     @property
     def verbose(self):

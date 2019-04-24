@@ -1031,7 +1031,7 @@ class TestUpdateLearningUnitEntities(TestCase, LearningUnitsMixin):
             subtype=learning_unit_year_subtypes.FULL,
             attribution_procedure=attribution_procedure.INTERNAL_TEAM)
         self.learning_component_year = LearningComponentYearFactory(
-            learning_container_year=self.learning_container_year,
+            learning_unit_year=self.learning_unit_year,
             acronym="PM",
             type=learning_component_year_type.LECTURING)
 

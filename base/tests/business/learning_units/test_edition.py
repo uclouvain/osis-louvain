@@ -91,8 +91,8 @@ class LearningUnitEditionTestCase(TestCase):
            we have an entity_component created"""
         an_entity = EntityFactory()
         a_learning_container_year = LearningContainerYearFactory(academic_year=self.academic_year)
-        LearningComponentYearFactory(acronym="PM", learning_container_year=a_learning_container_year)
-        LearningComponentYearFactory(acronym="PP", learning_container_year=a_learning_container_year)
+        LearningComponentYearFactory(acronym="PM", learning_unit_year__learning_container_year=a_learning_container_year)
+        LearningComponentYearFactory(acronym="PP", learning_unit_year__learning_container_year=a_learning_container_year)
         link_type = random.choice(REQUIREMENT_ENTITIES)
 
         business_edition.update_or_create_entity_container_year_with_components(
@@ -109,8 +109,8 @@ class LearningUnitEditionTestCase(TestCase):
            we have NO entity_component created"""
         an_entity = EntityFactory()
         a_learning_container_year = LearningContainerYearFactory(academic_year=self.academic_year)
-        LearningComponentYearFactory(acronym="PM", learning_container_year=a_learning_container_year)
-        LearningComponentYearFactory(acronym="PP", learning_container_year=a_learning_container_year)
+        LearningComponentYearFactory(acronym="PM", learning_unit_year__learning_container_year=a_learning_container_year)
+        LearningComponentYearFactory(acronym="PP", learning_unit_year__learning_container_year=a_learning_container_year)
         link_type = entity_container_year_link_type.ALLOCATION_ENTITY
 
         business_edition.update_or_create_entity_container_year_with_components(an_entity, a_learning_container_year,

@@ -39,6 +39,7 @@ from base.business.learning_unit_proposal import compute_proposal_type, consolid
 from base.business.learning_unit_proposal import consolidate_proposals_and_send_report
 from base.business.learning_units.perms import PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS
+from base.models.enums import learning_component_year_type
 from base.models.enums import organization_type, proposal_type, entity_type, \
     learning_container_year_types, entity_container_year_link_type, \
     learning_unit_year_subtypes, proposal_state
@@ -50,14 +51,13 @@ from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_container_year import EntityContainerYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.models.enums import learning_component_year_type
 
 
 class TestLearningUnitProposalCancel(TestCase):
@@ -89,12 +89,12 @@ class TestLearningUnitProposalCancel(TestCase):
         self.learning_component_year_lecturing = LearningComponentYearFactory(
             type=learning_component_year_type.LECTURING,
             acronym="TP",
-            learning_container_year=learning_container_year
+            learning_unit_year=self.learning_unit_year
         )
         self.learning_component_year_practical = LearningComponentYearFactory(
             type=learning_component_year_type.PRACTICAL_EXERCISES,
             acronym="PP",
-            learning_container_year=learning_container_year
+            learning_unit_year=self.learning_unit_year
         )
 
     def test_cancel_proposal_of_type_suppression_case_success(self):

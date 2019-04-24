@@ -363,7 +363,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
         messages = [str(message) for message in get_messages(response.wsgi_request)]
         self.assertIn(
             _("You proposed a modification of type %(type)s for the learning unit %(acronym)s." % {
-                'type': _(proposal_type.ProposalType.SUPPRESSION.name),
+                'type': proposal_type.ProposalType.SUPPRESSION.value,
                 'acronym': self.learning_unit_year.acronym
             }),
             list(messages)
@@ -606,11 +606,11 @@ def _create_proposal_learning_unit(acronym):
         entity=an_entity
     )
     learning_component_lecturing = LearningComponentYearFactory(
-        learning_container_year=a_learning_unit_year.learning_container_year,
+        learning_unit_year=a_learning_unit_year,
         type=learning_component_year_type.LECTURING
     )
     learning_component_practical = LearningComponentYearFactory(
-        learning_container_year=a_learning_unit_year.learning_container_year,
+        learning_unit_year=a_learning_unit_year,
         type=learning_component_year_type.PRACTICAL_EXERCISES)
 
     initial_data = {

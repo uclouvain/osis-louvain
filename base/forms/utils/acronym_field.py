@@ -136,14 +136,18 @@ class PartimAcronymField(forms.MultiValueField):
         return ''.join(data_list).upper()
 
 
-def split_acronym(value, subtype=learning_unit_year_subtypes.PARTIM):
+def split_acronym(value, subtype=learning_unit_year_subtypes.PARTIM, instance=None):
     """This function split acronym into small piece list
     Index 0 :  Localisation (L/M/...)
     Index 1 :  Sigle/Cnum
     Index 2 :  Subdivision
     """
-    last_digit_position = re.match('.+([0-9])[^0-9]*$', value).start(1)
-    base_acronym = [value[0], value[1:last_digit_position + 1]]
     if subtype == learning_unit_year_subtypes.PARTIM:
-        base_acronym.append(value[last_digit_position + 1] if len(value) > last_digit_position + 1 else '')
+        if instance and instance.pk:
+            base_acronym = [value[0], value[1:-1], value[-1]]
+        else:
+            base_acronym = [value[0], value[1:]]
+    else:
+        last_digit_position = re.match('.+([0-9])[^0-9]*$', value).start(1)
+        base_acronym = [value[0], value[1:last_digit_position + 1]]
     return base_acronym

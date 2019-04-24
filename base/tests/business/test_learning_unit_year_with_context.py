@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import datetime
-from decimal import Decimal
 
 from django.test import TestCase
 
@@ -54,8 +53,11 @@ class LearningUnitYearWithContextTestCase(TestCase):
         self.entity_container_yr = EntityContainerYearFactory(learning_container_year=self.learning_container_yr,
                                                               type=entity_container_year_link_type.REQUIREMENT_ENTITY,
                                                               entity=self.entity)
-        self.learning_component_yr = LearningComponentYearFactory(learning_container_year=self.learning_container_yr,
-                                                                  hourly_volume_partial_q1=-1, planned_classes=1)
+        self.learning_component_yr = LearningComponentYearFactory(
+            learning_unit_year__learning_container_year=self.learning_container_yr,
+            hourly_volume_partial_q1=-1,
+            planned_classes=1
+        )
         self.entity_component_yr = EntityComponentYearFactory(learning_component_year=self.learning_component_yr,
                                                               entity_container_year=self.entity_container_yr,
                                                               repartition_volume=None)
@@ -78,7 +80,9 @@ class LearningUnitYearWithContextTestCase(TestCase):
     def test_get_requirement_entities_volumes(self):
         academic_year = AcademicYearFactory(year=2016)
         learning_container_year = LearningContainerYearFactory(academic_year=academic_year)
-        learning_component_year = LearningComponentYearFactory(learning_container_year=learning_container_year)
+        learning_component_year = LearningComponentYearFactory(
+            learning_unit_year__learning_container_year=learning_container_year
+        )
         entity_types_list = [
             entity_types.REQUIREMENT_ENTITY,
             entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1,
