@@ -122,7 +122,7 @@ def dl_tooltip(context, instance, key, **kwargs):
     html_id = "id='id_{}'".format(key.lower())
 
     return mark_safe("<dl><dt {difference}>{label_text}</dt><dd {difference} {id}>{value}</dd></dl>".format(
-        difference=difference, id=html_id, label_text=label_text, value=_(str(value) if value else '')))
+        difference=difference, id=html_id, label_text=label_text, value=value if value else ''))
 
 
 def get_style_of_value(style, title, value):
