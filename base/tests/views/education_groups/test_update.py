@@ -432,9 +432,9 @@ class TestSelectAttach(TestCase):
             academic_year=self.academic_year,
             education_group_type__learning_unit_child_allowed=True
         )
-        print("child", self.child_education_group_year.education_group_type)
-        print("initial parent", self.initial_parent_education_group_year.education_group_type)
-        print("new_parent", self.new_parent_education_group_year.education_group_type)
+        print("child", self.child_education_group_year.education_group_type, self.child_education_group_year.id)
+        print("initial parent", self.initial_parent_education_group_year.education_group_type, self.initial_parent_education_group_year.id)
+        print("new_parent", self.new_parent_education_group_year.education_group_type, self.new_parent_education_group_year.id)
         self.initial_group_element_year = GroupElementYearFactory(
             parent=self.initial_parent_education_group_year,
             child_branch=self.child_education_group_year
