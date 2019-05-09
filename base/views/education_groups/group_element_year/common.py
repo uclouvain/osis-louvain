@@ -52,6 +52,7 @@ class GenericGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessMessage
         return rule(self.request.user, self.education_group_year)
 
     def get_context_data(self, **kwargs):
+        print("kwargs", self.kwargs, kwargs)
         context = super().get_context_data(**kwargs)
         context['root'] = self.kwargs["root_id"]
         return context
