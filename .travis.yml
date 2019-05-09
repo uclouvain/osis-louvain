@@ -14,7 +14,7 @@ before_script:
   - "chmod +x ./cc-test-reporter"
   - "./cc-test-reporter before-build"
 
-script: "python3 manage.py compilemessages && coverage run manage.py test base.tests.views.education_groups.test_update --exclude-tag=selenium"
+script: "python3 manage.py compilemessages && coverage run manage.py test base.tests.views.education_groups --exclude-tag=selenium"
 
 after_script:
   - "coverage xml"
