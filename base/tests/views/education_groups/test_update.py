@@ -432,7 +432,9 @@ class TestSelectAttach(TestCase):
             academic_year=self.academic_year,
             education_group_type__learning_unit_child_allowed=True
         )
-
+        print("child", self.child_education_group_year.education_group_type)
+        print("initial parent", self.initial_parent_education_group_year.education_group_type)
+        print("new_parent", self.new_parent_education_group_year.education_group_type)
         self.initial_group_element_year = GroupElementYearFactory(
             parent=self.initial_parent_education_group_year,
             child_branch=self.child_education_group_year
@@ -530,7 +532,8 @@ class TestSelectAttach(TestCase):
         self.assertFalse(expected_absent_group_element_year)
 
         self._assert_link_with_inital_parent_present()
-
+        print("select", self.select_data)
+        print("attach", self.attach_data)
         # Select :
         self.client.post(self.url_management, data=self.select_data)
 
