@@ -109,9 +109,6 @@ if TESTING:
     # add test packages that have specific models for tests
     INSTALLED_APPS += ('osis_common.tests', )
 APPS_TO_TEST = (
-    'osis_common',
-    'reference',
-    'rules_management',
     'base',
 )
 TEST_RUNNER = os.environ.get('TEST_RUNNER', 'osis_common.tests.runner.InstalledAppsTestRunner')
