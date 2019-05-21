@@ -33,7 +33,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units import edition
 from base.business.learning_units.edition import check_postponement_conflict_report_errors
-from base.forms.common import STEP_HALF_INTEGER
 from base.forms.utils.emptyfield import EmptyField
 from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import entity_container_year_link_type as entity_types
@@ -396,11 +395,11 @@ class SimplifiedVolumeForm(forms.ModelForm):
     @staticmethod
     def _create_entity_component_years(learning_components, requirement_entity_container):
         for component_year in learning_components:
-            EntityComponentYear.objects.update_or_create(
+            obj, created = EntityComponentYear.objects.update_or_create(
                 entity_container_year=requirement_entity_container,
                 learning_component_year=component_year,
-                defaults={'repartition_volume': component_year.hourly_volume_total_annual}
             )
+            obj.repartition_volume = 0 if created else component_year.hourly_volume_total_annual
 
     def _get_requirement_entity_container(self):
         requirement_entity_containers = []

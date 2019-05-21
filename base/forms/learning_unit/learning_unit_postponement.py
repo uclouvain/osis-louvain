@@ -350,7 +350,6 @@ class LearningUnitPostponementForm:
         initial_values = EntityComponentYear.objects.filter(
             learning_component_year__learning_unit_year=initial_learning_unit_year
         ).values_list('repartition_volume', 'learning_component_year__type', 'entity_container_year__type')
-
         for reparation_volume, component_type, entity_type in initial_values:
             try:
                 component = EntityComponentYear.objects.filter(
