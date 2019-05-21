@@ -5297,7 +5297,7 @@ msgstr ""
 msgid "You can't edit because the learning unit has proposal"
 msgstr ""
 "Vous ne pouvez pas modifier l'unité d'enseignement car elle est en "
-"proposition pour cette année ou un année antérieure"
+"proposition pour cette année ou une année antérieure"
 
 #: business/learning_units/perms.py:61
 msgid "You can't modify learning unit of a previous year"
