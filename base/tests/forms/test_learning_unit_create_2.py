@@ -35,7 +35,6 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelF
     LearningUnitModelForm, LearningContainerYearModelForm, LearningContainerModelForm
 from base.forms.learning_unit.learning_unit_create_2 import FullForm, FACULTY_OPEN_FIELDS, \
     FULL_READ_ONLY_FIELDS, PROPOSAL_READ_ONLY_FIELDS
-from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_unit_year_subtypes, learning_container_year_types, organization_type, \
@@ -479,7 +478,6 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
             LearningUnitYear: self._count_records(LearningUnitYear),
             EntityContainerYear: self._count_records(EntityContainerYear),
             LearningComponentYear: self._count_records(LearningComponentYear),
-            EntityComponentYear: self._count_records(EntityComponentYear),
         })
 
     def test_when_update_instance(self):
@@ -501,6 +499,42 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
         for model_class, initial_count in initial_counts.items():
             current_count = self._count_records(model_class)
             self.assertEqual(current_count, initial_count, model_class.objects.all())
+
+    def test_when_delete_additionnal_entity(self):
+        post_data = get_valid_form_data(self.current_academic_year, self.person, self.learning_unit_year)
+        # Assert additionnal entityContainerYear exists
+        EntityContainerYear.objects.get_or_create(
+            type=ADDITIONAL_REQUIREMENT_ENTITY_1,
+            learning_container_year=self.learning_unit_year.learning_container_year
+        )
+        # Assert repartition volumes are set for additional entity
+        component_queryset = LearningComponentYear.objects.filter(
+            learning_unit_year__learning_container_year=self.learning_unit_year.learning_container_year
+        )
+        component_queryset.update(repartition_volume_additional_entity_1=15.0)
+
+        # Removing additionnal entity
+        post_data["additional_requirement_entity_1-entity"] = ""
+
+        self.assertEqual(component_queryset.count(), 4)  # Assert we are testing for Full AND Partim (2 components each)
+
+        form = FullForm(
+            self.person,
+            self.learning_unit_year.academic_year,
+            learning_unit_instance=self.learning_unit_year.learning_unit,
+            data=post_data
+        )
+
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+
+        self.assertFalse(EntityContainerYear.objects.filter(
+                type=ADDITIONAL_REQUIREMENT_ENTITY_1,
+                learning_container_year=self.learning_unit_year.learning_container_year
+        ).exists())
+
+        for component in component_queryset:
+            self.assertIsNone(component.repartition_volume_additional_entity_1)
 
     def test_default_acronym_component(self):
         default_acronym_component = {
@@ -568,9 +602,6 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
         )
         self.assertEqual(learning_component_year_list.count(), 2)
         self.assertEqual(
-            EntityComponentYear.objects.filter(
-                learning_component_year__in=learning_component_year_list).count(), 2)
-        self.assertEqual(
             LearningComponentYear.objects.get(
                 learning_unit_year=saved_luy, type=LECTURING).acronym, "PM")
         self.assertEqual(
@@ -599,9 +630,6 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
             learning_unit_year__learning_container_year=saved_luy.learning_container_year
         )
         self.assertEqual(learning_component_year_list.count(), 1)
-        self.assertEqual(
-            EntityComponentYear.objects.filter(
-                learning_component_year__in=learning_component_year_list).count(), 1)
         learning_component_year = LearningComponentYear.objects.get(learning_unit_year=saved_luy, type=None)
         self.assertEqual(learning_component_year.acronym, DEFAULT_ACRONYM_COMPONENT[None])
         self.assertEqual(learning_component_year.type, None)
@@ -618,8 +646,6 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
                          initial_counts[EntityContainerYear] + NUMBER_OF_ENTITIES_BY_CONTAINER)
         self.assertEqual(self._count_records(LearningComponentYear),
                          initial_counts[LearningComponentYear] + NUMBER_OF_COMPONENTS)
-        self.assertEqual(self._count_records(EntityComponentYear),
-                         initial_counts[EntityComponentYear] + NUMBER_OF_COMPONENTS)
 
     @staticmethod
     def _count_records(model_class):

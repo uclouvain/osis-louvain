@@ -26,6 +26,7 @@
 from collections import OrderedDict
 from unittest import mock
 
+from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.utils.translation import ugettext as _
 
@@ -35,11 +36,11 @@ from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm, FIELDS_TO_NOT_POSTPONE
 from base.models import entity_container_year
 from base.models.academic_year import AcademicYear
-from base.models.entity_component_year import EntityComponentYear
 from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import attribution_procedure, entity_container_year_link_type, learning_unit_year_subtypes, \
     vacant_declaration_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ADDITIONAL_REQUIREMENT_ENTITY_2
+from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.models.enums.learning_component_year_type import LECTURING
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -49,8 +50,6 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from django.contrib.auth.models import Group
-from base.models.enums.groups import FACULTY_MANAGER_GROUP
 
 FULL_ACRONYM = 'LAGRO1000'
 SUBDIVISION_ACRONYM = 'C'
@@ -470,25 +469,16 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
             learning_unit_year__learning_container_year__learning_container=self.learning_unit_year_full.learning_container_year.learning_container
         ).update(hourly_volume_total_annual=new_hourly_total_value)
 
-    def _change_entity_component_value(self, academic_year, repartition_volume):
-        qs = EntityComponentYear.objects.filter(
-            learning_component_year__type=LECTURING,
-            entity_container_year__type=REQUIREMENT_ENTITY,
-            learning_component_year__learning_unit_year__academic_year=academic_year,
-            learning_component_year__learning_unit_year__learning_unit=self.learning_unit_year_full.learning_unit
+    def _change_requirement_entity_repartition_vlume(self, academic_year, repartition_volume):
+        qs = LearningComponentYear.objects.filter(
+            type=LECTURING,
+            learning_unit_year__academic_year=academic_year,
+            learning_unit_year__learning_unit=self.learning_unit_year_full.learning_unit
         )
-        qs.update(repartition_volume=repartition_volume)
+        qs.update(repartition_volume_requirement_entity=repartition_volume)
         return qs.get()
 
     def _remove_additional_requirement_entity_2(self, academic_year):
-        # Remove additional requirements entities component year
-        learning_unit_full = self.learning_unit_year_full.learning_unit
-        EntityComponentYear.objects.filter(
-            entity_container_year__type=ADDITIONAL_REQUIREMENT_ENTITY_2,
-            learning_component_year__learning_unit_year__academic_year=academic_year,
-            learning_component_year__learning_unit_year__learning_unit=learning_unit_full
-        ).delete()
-
         # Remove additional requirement entity 2 container year
         initial_entity_container_year = EntityContainerYear.objects.get(
             type=ADDITIONAL_REQUIREMENT_ENTITY_2,
@@ -622,18 +612,22 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         result = form.consistency_errors
         self.assertEqual(result, expected_result)
 
-
-    def test_when_differences_found_on_entity_component(self):
+    def test_when_differences_found_on_repartition_volume(self):
         next_academic_year = AcademicYear.objects.get(year=self.learning_unit_year_full.academic_year.year + 1)
-        component = self._change_entity_component_value(next_academic_year, 24)
+        component = self._change_requirement_entity_repartition_vlume(next_academic_year, 24)
+
+        requirement_entity = EntityContainerYear.objects.filter(
+            learning_container_year=component.learning_unit_year.learning_container_year,
+            type=REQUIREMENT_ENTITY
+        ).select_related('entity').get().entity
 
         expected_result = OrderedDict({
             next_academic_year: [
                 _("The repartition volume of %(col_name)s has been already modified. "
                   "({%(new_value)s} instead of {%(current_value)s})") % {
-                    'col_name': component.learning_component_year.acronym + "-" + component.entity_container_year.entity.most_recent_acronym,
-                    'new_value': component.repartition_volume,
-                    'current_value': '0.00'
+                    'col_name': component.acronym + "-" + requirement_entity.most_recent_acronym,
+                    'new_value': float(component.repartition_volume_requirement_entity),
+                    'current_value': float('0.00')
                 }
             ],
         })

@@ -570,21 +570,6 @@
                 "entity"
             ],
             [
-                "add_entitycomponentyear",
-                "base",
-                "entitycomponentyear"
-            ],
-            [
-                "change_entitycomponentyear",
-                "base",
-                "entitycomponentyear"
-            ],
-            [
-                "delete_entitycomponentyear",
-                "base",
-                "entitycomponentyear"
-            ],
-            [
                 "add_entitycontaineryear",
                 "base",
                 "entitycontaineryear"

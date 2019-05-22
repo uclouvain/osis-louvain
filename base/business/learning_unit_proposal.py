@@ -476,17 +476,12 @@ def get_components_identification_initial_data(proposal):
     learning_component_year_list_from_initial = proposal.initial_data.get('learning_component_years')
     if learning_component_year_list_from_initial:
         for learning_component_year in learning_component_year_list_from_initial:
-            entity_components_yr = mdl_base.entity_component_year.EntityComponentYear.objects.filter(
-                learning_component_year=learning_component_year.get('id')
-            )
-
             components.append(
                 {
                     'learning_component_year': learning_component_year,
-                    'entity_component_yr': entity_components_yr.first(),
                     'volumes': volume_from_initial_learning_component_year(
                         learning_component_year,
-                        entity_components_yr
+                        proposal.initial_data.get('volumes')[learning_component_year['type']]
                     )
                 }
             )

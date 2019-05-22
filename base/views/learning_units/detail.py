@@ -85,8 +85,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         return current_academic_year()
 
     def get_queryset(self):
-        qs_learningcomponentyear = LearningComponentYear.objects.order_by('type', 'acronym').\
-            prefetch_related('entitycomponentyear_set')
+        qs_learningcomponentyear = LearningComponentYear.objects.order_by('type', 'acronym')
         prefetch = Prefetch('learningcomponentyear_set', queryset=qs_learningcomponentyear)
         return super().get_queryset().select_related(
             'learning_container_year__academic_year',
@@ -148,8 +147,6 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
 
         for component in self.object.learningcomponentyear_set.all():
             versions |= Version.objects.get_for_object(component)
-            for entity_component in component.entitycomponentyear_set.all():
-                versions |= Version.objects.get_for_object(entity_component)
 
         return versions.order_by('-revision__date_created').distinct('revision__date_created'
                                                                      ).select_related('revision__user__person')

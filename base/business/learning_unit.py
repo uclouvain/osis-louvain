@@ -110,9 +110,9 @@ def get_same_container_year_components(learning_unit_year):
         Prefetch('learningclassyear_set', to_attr="classes"),
     ).select_related('learning_unit_year').order_by('type', 'acronym')
 
-    additionnal_entities = {}
+    additionnal_entities = get_entities(learning_container_year)
 
-    for indx, learning_component_year in enumerate(learning_components_year):
+    for learning_component_year in learning_components_year:
         if learning_component_year.classes:
             for learning_class_year in learning_component_year.classes:
                 learning_class_year.used_by_learning_units_year = learning_unit_year.acronym
@@ -121,14 +121,10 @@ def get_same_container_year_components(learning_unit_year):
 
         used_by_learning_unit = learning_component_year.learning_unit_year == learning_unit_year
 
-        entity_components_yr = learning_component_year.entitycomponentyear_set.all()
-        if indx == 0:
-            additionnal_entities = get_entities(entity_components_yr)
-
         components.append(
             {
                 'learning_component_year': learning_component_year,
-                'volumes': volume_learning_component_year(learning_component_year, entity_components_yr),
+                'volumes': volume_learning_component_year(learning_component_year),
                 'learning_unit_usage': _learning_unit_usage(learning_component_year.learning_unit_year),
                 'used_by_learning_unit': used_by_learning_unit
             }
@@ -179,22 +175,17 @@ def _learning_unit_usage(learning_unit_year):
 
 def get_components_identification(learning_unit_yr):
     components = []
-    additional_entities = {}
+    additional_entities = get_entities(learning_unit_yr.learning_container_year)
 
-    for learning_component_year in learning_unit_yr.learningcomponentyear_set.all().order_by('type'):
-        entity_components_yr = learning_component_year.entitycomponentyear_set.all()
+    learning_component_year_list_from_luy = LearningComponentYear.objects.filter(
+        learning_unit_year=learning_unit_yr
+    ).order_by('type', 'acronym')
 
-        if not additional_entities:
-            additional_entities = get_entities(entity_components_yr)
-
+    for learning_component_year in learning_component_year_list_from_luy:
         components.append(
             {
                 'learning_component_year': learning_component_year,
-                'entity_component_yr': entity_components_yr.first(),
-                'volumes': volume_learning_component_year(
-                    learning_component_year,
-                    entity_components_yr
-                )
+                'volumes': volume_learning_component_year(learning_component_year)
             }
         )
 
@@ -251,11 +242,11 @@ def compose_components_dict(components, additional_entities):
     return data_components
 
 
-def get_entities(entity_components_yr):
+def get_entities(container_year):
     return {
-        e.entity_container_year.type: e.entity_container_year.entity.most_recent_acronym
-        for e in entity_components_yr
-        if e.entity_container_year.type in REQUIREMENT_ENTITIES
+        ecy.type: ecy.entity.most_recent_acronym
+        for ecy in container_year.entitycontaineryear_set.all().select_related('entity')
+        if ecy.type in REQUIREMENT_ENTITIES
     }
 
 

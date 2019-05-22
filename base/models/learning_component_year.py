@@ -25,15 +25,18 @@
 ##############################################################################
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Sum
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.business.learning_units.quadrimester_strategy import LearningComponentYearQ1Strategy, \
-    LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy
+    LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy, \
+    LearningComponentYearQuadriNoStrategy
 from base.models import learning_class_year
 from base.models.enums import learning_component_year_type, learning_container_year_types, quadrimesters
 from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
+from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ADDITIONAL_REQUIREMENT_ENTITY_2, \
+    ADDITIONAL_REQUIREMENT_ENTITY_1
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
@@ -41,6 +44,14 @@ class LearningComponentYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('learning_unit_year', 'acronym', 'type', 'comment', 'changed')
     search_fields = ['acronym', 'learning_unit_year__acronym']
     list_filter = ('learning_unit_year__academic_year',)
+
+
+class RepartitionVolumeField(models.DecimalField):
+    def __init__(self, *args, **kwargs):
+        super(RepartitionVolumeField, self).__init__(*args, **kwargs)
+        self.blank = self.null = True
+        self.max_digits = 6
+        self.decimal_places = 2
 
 
 class LearningComponentYear(SerializableModel):
@@ -60,6 +71,9 @@ class LearningComponentYear(SerializableModel):
                                                    verbose_name=_("hourly volume partial q2"))
     volume_declared_vacant = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True,
                                                  verbose_name=_("volume declared vacant"))
+    repartition_volume_requirement_entity = RepartitionVolumeField()
+    repartition_volume_additional_entity_1 = RepartitionVolumeField()
+    repartition_volume_additional_entity_2 = RepartitionVolumeField()
 
     _warnings = None
 
@@ -104,10 +118,6 @@ class LearningComponentYear(SerializableModel):
     def _check_volumes_consistency(self):
         _warnings = []
 
-        if not hasattr(self, 'vol_global'):
-            self.vol_global = self.entitycomponentyear_set.aggregate(
-                Sum('repartition_volume')
-            )['repartition_volume__sum'] or 0
         vol_total_annual = self.hourly_volume_total_annual or 0
         vol_q1 = self.hourly_volume_partial_q1 or 0
         vol_q2 = self.hourly_volume_partial_q2 or 0
@@ -117,10 +127,10 @@ class LearningComponentYear(SerializableModel):
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
                 _('The annual volume must be equal to the sum of the volumes Q1 and Q2')))
-        if vol_total_annual * planned_classes != self.vol_global:
+        if self.vol_global != float(sum(self.repartition_volumes.values())):
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
-                _('Vol_global is not equal to Vol_tot * planned_classes')))
+                _('the sum of repartition volumes must be equal to the global volume')))
         if planned_classes == 0 and vol_total_annual > 0:
             _warnings.append("{} ({})".format(
                 inconsistent_msg,
@@ -131,20 +141,52 @@ class LearningComponentYear(SerializableModel):
                 _('planned classes cannot be greather than 0 while volume is equal to 0')))
 
         strategies = {
+            None: LearningComponentYearQuadriNoStrategy,
             quadrimesters.Q1: LearningComponentYearQ1Strategy,
             quadrimesters.Q2: LearningComponentYearQ2Strategy,
             quadrimesters.Q1and2: LearningComponentYearQ1and2Strategy,
             quadrimesters.Q1or2: LearningComponentYearQ1or2Strategy,
+            quadrimesters.Q3: LearningComponentYearQuadriNoStrategy,
         }
 
         try:
-            quadri = self.learning_unit_year.quadrimester
-            if quadri:
-                strategies[quadri](lcy=self).is_valid()
+            strategies[self.learning_unit_year.quadrimester](lcy=self).is_valid()
         except ValidationError as e:
             _warnings.append("{} ({})".format(inconsistent_msg, e.message))
 
         return _warnings
+
+    def get_repartition_volume(self, entity_type):
+        return self.repartition_volumes[entity_type]
+
+    @cached_property
+    def vol_global(self):
+        return float(float(self.hourly_volume_total_annual or 0.0) * float(self.planned_classes or 0.0))
+
+    @property
+    def repartition_volumes(self):
+        default_value = 0.0
+        return {
+            REQUIREMENT_ENTITY: float(self.repartition_volume_requirement_entity or default_value),
+            ADDITIONAL_REQUIREMENT_ENTITY_1: float(self.repartition_volume_additional_entity_1 or default_value),
+            ADDITIONAL_REQUIREMENT_ENTITY_2: float(self.repartition_volume_additional_entity_2 or default_value),
+        }
+
+    def set_repartition_volume(self, entity_container_type, repartition_volume):
+        attr_name = self.repartition_volume_attrs_by_entity_container_type()[entity_container_type]
+        setattr(self, attr_name, repartition_volume)
+
+    @staticmethod
+    def repartition_volume_attrs_by_entity_container_type():
+        return {
+            REQUIREMENT_ENTITY: 'repartition_volume_requirement_entity',
+            ADDITIONAL_REQUIREMENT_ENTITY_1: 'repartition_volume_additional_entity_1',
+            ADDITIONAL_REQUIREMENT_ENTITY_2: 'repartition_volume_additional_entity_2',
+        }
+
+    def set_repartition_volumes(self, repartition_volumes):
+        for entity_container_type, attr in self.repartition_volume_attrs_by_entity_container_type().items():
+            setattr(self, attr, repartition_volumes[entity_container_type])
 
 
 def volume_total_verbose(learning_component_years):

@@ -39,10 +39,10 @@ from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YE
 from base.models.campus import Campus
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY
+from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from reference.models import language
-from base.models.enums.proposal_type import ProposalType
 
 FULL_READ_ONLY_FIELDS = {"acronym", "academic_year", "container_type"}
 FULL_PROPOSAL_READ_ONLY_FIELDS = {"academic_year", "container_type"}
@@ -349,7 +349,7 @@ class FullForm(LearningUnitBaseForm):
             commit=commit
         )
 
-        # Save learning unit year (learning_component_year + entity_component_year)
+        # Save learning unit year (learning_component_year)
         learning_unit_yr = self.learning_unit_year_form.save(
             learning_container_year=container_year,
             learning_unit=learning_unit,

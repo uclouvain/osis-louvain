@@ -39,7 +39,6 @@ from waffle.testutils import override_flag
 from base.forms.learning_unit.entity_form import EntityContainerBaseForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
     LearningContainerYearModelForm
-from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import learning_unit_year_periodicity, learning_container_year_types, \
     learning_unit_year_subtypes, \
     entity_container_year_link_type, vacant_declaration_type, attribution_procedure, entity_type, organization_type
@@ -54,7 +53,6 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.tests.forms.test_edition_form import get_valid_formset_data
 from base.views.learning_unit import learning_unit_components
@@ -486,10 +484,9 @@ class TestLearningUnitVolumesManagement(TestCase):
         learning_component_year.refresh_from_db()
         self.assertEqual(learning_component_year.planned_classes, 1)
         self.assertEqual(learning_component_year.hourly_volume_partial_q1, 0)
-        self.assertEqual(EntityComponentYear.objects.get(
-            learning_component_year=learning_component_year,
-            entity_container_year__type=entity_container_year_link_type.REQUIREMENT_ENTITY
-        ).repartition_volume, 1)
+        self.assertEqual(learning_component_year.repartition_volume_requirement_entity, 1)
+        self.assertEqual(learning_component_year.repartition_volume_additional_entity_1, 0.5)
+        self.assertEqual(learning_component_year.repartition_volume_additional_entity_2, 0.5)
 
     @mock.patch('base.models.program_manager.is_program_manager')
     @mock.patch('base.views.layout.render')

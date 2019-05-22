@@ -37,7 +37,6 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelF
 from base.forms.learning_unit.learning_unit_partim import PARTIM_FORM_READ_ONLY_FIELD, PartimForm, \
     LearningUnitPartimModelForm
 from base.forms.utils import acronym_field
-from base.models.entity_component_year import EntityComponentYear
 from base.models.enums import learning_unit_year_subtypes, organization_type
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_periodicity import ANNUAL, BIENNIAL_EVEN
@@ -314,9 +313,6 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
             learning_unit_year__learning_container_year=saved_instance.learning_container_year
         )
         self.assertEqual(learning_component_year_list.count(), 6)
-        self.assertEqual(
-            EntityComponentYear.objects.filter(
-                learning_component_year__in=learning_component_year_list).count(), 18)
         self.assertTrue(
             learning_component_year_list.filter(type=LECTURING, acronym="PM").exists())
         self.assertTrue(

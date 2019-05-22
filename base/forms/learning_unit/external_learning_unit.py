@@ -195,7 +195,8 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
     def _build_instance_data_external_learning_unit(self, data):
         return {
             'data': data,
-            'instance': self.instance and self.instance.externallearningunityear,
+            'instance': self.instance.externallearningunityear
+            if self.instance and self.instance.is_external() else None,
             'person': self.person
         }
 
@@ -252,7 +253,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             commit=commit
         )
 
-        # Save learning unit year (learning_component_year + entity_component_year)
+        # Save learning unit year (learning_component_year)
         learning_unit_year = self.learning_unit_year_form.save(
             learning_container_year=container_year,
             learning_unit=learning_unit,
@@ -367,7 +368,8 @@ class ExternalPartimForm(LearningUnitBaseForm):
     def _build_instance_data_external_learning_unit(self, data):
         return {
             'data': data,
-            'instance': self.instance and self.instance.externallearningunityear,
+            'instance': self.instance.externallearningunityear
+            if self.instance and self.instance.is_external() else None,
             'person': self.person
         }
 

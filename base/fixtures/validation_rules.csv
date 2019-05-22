@@ -88,33 +88,33 @@ Examples: <i>ANSO2FC,JDAN2FC, MAIN2FC</i>","Sigle d’un Certificat d’universi
 <li>2-4 lettres + <b>12FC</b></li>
 </ul>
 Exemples: <i>ANSO2FC,JDAN2FC, MAIN2FC</i>",Ex: ANSO2FC
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_CA,REQUIRED,CA,"^([A-Za-z]{2,4})([Cc])([Aa])$",,"Acronym of Access contest is composed of:
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_CA,REQUIRED,CA,"^([A-Za-z]{2,4})[ ]([Cc])([Aa])$",,"Acronym of Access contest is composed of:
 <ul>
-<li>2-4 letters + <b>CA</b></li>
+<li>2-4 letters + space + <b>CA</b></li>
 </ul>
-Examples: <i>MEDCA</i>","Sigle d’un Concours d’accès est composé de:
+Examples: <i>MED CA</i>","Sigle d’un Concours d’accès est composé de:
 <ul>
-<li>2-4 lettres + <b>CA</b></li>
+<li>2-4 lettres + espace + <b>CA</b></li>
 </ul>
-Exemples: <i>MEDCA</i>",Ex: MEDCA
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_LV,REQUIRED,LV,"^([A-Za-z]{2,4})([Ll])([Vv])$",,"Acronym of Language classes is composed of:
+Exemples: <i>MED CA</i>",Ex: MED CA
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_LV,REQUIRED,LV,"^([A-Za-z]{2,4})[ ]([Ll])([Vv])$",,"Acronym of Language classes is composed of:
 <ul>
-<li>2-4 letters + <b>LV</b></li>
+<li>2-4 letters + space + <b>LV</b></li>
 </ul>
-Examples: <i>ALLELV, JAPOLV, FRANLV</i>","Sigle d’un Cours de langue est composé de:
+Examples: <i>ALLE LV, JAPO LV, FRAN LV</i>","Sigle d’un Cours de langue est composé de:
 <ul>
-<li>2-4 lettres + <b>LV</b></li>
+<li>2-4 lettres + espace + <b>LV</b></li>
 </ul>
-Exemples: <i>ALLELV, JAPOLV, FRANLV</i>",Ex: FRANLV
+Exemples: <i>ALLE LV, JAPO LV, FRAN LV</i>",Ex: FRAN LV
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_IS,REQUIRED,IS,"^([A-Za-z]{2,4})[ ]([Ii])([Ss])$",,"Acronym of Isolated class is composed of:
 <ul>
-<li>2-4 letters + <b>IS</b></li>
+<li>2-4 letters + space + <b>IS</b></li>
 </ul>
-Examples: <i>ACTUIS, CFARIS, COMUIS</i>","Sigle d’un Cours isolés est composé de:
+Examples: <i>ACTU IS, CFAR IS, COMU IS</i>","Sigle d’un Cours isolés est composé de:
 <ul>
-<li>2-4 lettres + <b>IS</b></li>
+<li>2-4 lettres + espace + <b>IS</b></li>
 </ul>
-Exemples: <i>ACTUIS, CFARIS, COMUIS</i>",Ex: ACTUIS
+Exemples: <i>ACTU IS, CFAR IS, COMU IS</i>",Ex: ACTU IS
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3DP,REQUIRED,3DP,"^([A-Za-z]{2,4})(3)([Dd])([Pp])$",,"Acronym of PhD is composed of:
 <ul>
 <li>2-4 letters + <b>3DP</b></li>
@@ -133,15 +133,15 @@ Examples: <i>ART3FD</i>","Sigle d’une Formation doctorale est composé de:
 <li>2-4 lettres + <b>3FP</b></li>
 </ul>
 Exemples: <i>ART3FD</i>",Ex: ART3FD
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_JY,REQUIRED,JY,"^([A-Za-z]{2,4})([Jj])([Yy])$",,"Acronym of Junior year is composed of:
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_JY,REQUIRED,JY,"^([A-Za-z]{2,4})[ ]([Jj])([Yy])$",,"Acronym of Junior year is composed of:
 <ul>
-<li>2-4 letters + <b>JY</b></li>
+<li>2-4 letters + space + <b>JY</b></li>
 </ul>
-Examples: <i>TECCJY</i>","Sigle d’un Junior Year  est composé de:
+Examples: <i>TECC JY</i>","Sigle d’un Junior Year  est composé de:
 <ul>
-<li>2-4 lettres + <b>JY</b></li>
+<li>2-4 lettres + espace + <b>JY</b></li>
 </ul>
-Exemples: <i>TECCJY</i>",Ex: TECCJY
+Exemples: <i>TECC JY</i>",Ex: TECC JY
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2M120,REQUIRED,2M,"^([A-Za-z]{2,4})(2)([Mm])$",,"Acronym of Program master 120 is composed of:
 <ul>
 <li>2-4 letters + <b>2M</b></li>
@@ -232,15 +232,15 @@ Examples: <i>BRAS2MC, DRIF2MC, EDUC2MC</i>","Sigle d’un Master de spécialisat
 <li>2-4 lettres + <b>2MC</b></li>
 </ul>
 Exemples: <i>BRAS2MC, DRIF2MC, EDUC2MC</i>",Ex: BRAS2MC
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_ST,REQUIRED,ST,"^([A-Za-z]{2,4})([Ss])([Tt])$",,"Acronym of Internship is composed of:
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_ST,REQUIRED,ST,"^([A-Za-z]{2,4})[ ]([Ss])([Tt])$",,"Acronym of Internship is composed of:
 <ul>
-<li>2-4 letters + <b>ST</b></li>
+<li>2-4 letters + space + <b>ST</b></li>
 </ul>
-Examples: <i>DRTST, AGROST, STATST</i>","Sigle d’un Stagiaire est composé de:
+Examples: <i>DRT ST, AGRO ST, STAT ST</i>","Sigle d’un Stagiaire est composé de:
 <ul>
-<li>2-4 lettres + <b>ST</b></li>
+<li>2-4 lettres + espace + <b>ST</b></li>
 </ul>
-Exemples: <i>DRTST, AGROST, STATST</i>",Ex: AGROST
+Exemples: <i>DRT ST, AGRO ST, STAT ST</i>",Ex: AGRO ST
 base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_2A,REQUIRED,200E,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Ee])$",,"Code of Aggregation is composed of:
 <ul>
 <li>site: 1 letter</li>

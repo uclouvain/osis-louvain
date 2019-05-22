@@ -28,7 +28,6 @@ import operator
 import factory.fuzzy
 
 from base.models.enums import learning_component_year_type
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
@@ -45,13 +44,15 @@ class LearningComponentYearFactory(factory.django.DjangoModelFactory):
     hourly_volume_total_annual = None
     hourly_volume_partial_q1 = None
     hourly_volume_partial_q2 = None
+    repartition_volume_requirement_entity = 0.0
+    repartition_volume_additional_entity_1 = 0.0
+    repartition_volume_additional_entity_2 = 0.0
 
     @factory.post_generation
-    def consistency_of_planned_classes(self, create, extracted, ** kwargs):
+    def consistency_of_planned_classes_and_volumes(self, create, extracted, ** kwargs):
         if self.hourly_volume_total_annual is None or self.hourly_volume_total_annual == 0:
             self.planned_classes = 0
-        else:
-            self.planned_classes = 1
+            self.repartition_volume_requirement_entity = self.vol_global
 
 
 class LecturingLearningComponentYearFactory(LearningComponentYearFactory):

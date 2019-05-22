@@ -33,14 +33,11 @@ from base.business import learning_unit_year_with_context
 from base.business.learning_units.simple.deletion import delete_from_given_learning_unit_year, \
     check_learning_unit_year_deletion
 from base.business.utils.model import update_instance_model_from_data, update_related_object
-from base.models import entity_component_year
-from base.models import entity_container_year, learning_component_year, learning_class_year
+from base.models import entity_container_year, learning_class_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
-from base.models.entity_component_year import EntityComponentYear
-from base.models.entity_container_year import EntityContainerYear
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_unit_year_periodicity, learning_unit_year_subtypes
-from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST, REQUIREMENT_ENTITIES
+from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
@@ -208,23 +205,6 @@ def _duplicate_learning_component_year(new_learn_container_year, new_learn_unit_
     for old_component in old_components:
         new_component = update_related_object(old_component, 'learning_unit_year', new_learn_unit_year)
         _duplicate_learning_class_year(new_component)
-        _duplicate_entity_component_year(new_component, new_learn_container_year)
-
-
-def _duplicate_entity_component_year(new_component, new_learn_container_year):
-    for old_entity_comp_year in EntityComponentYear.objects.filter(learning_component_year=new_component.copied_from):
-        old_entity_container = old_entity_comp_year.entity_container_year
-        new_entity_container_year = EntityContainerYear.objects.get(
-            learning_container_year=new_learn_container_year,
-            entity=old_entity_container.entity,
-            type=old_entity_container.type
-        )
-
-        new_entity_component_year = update_related_object(old_entity_comp_year,
-                                                          'entity_container_year',
-                                                          new_entity_container_year)
-        new_entity_component_year.learning_component_year = new_component
-        new_entity_component_year.save()
 
 
 def _duplicate_learning_class_year(new_component):
@@ -359,17 +339,12 @@ def _update_learning_unit_year_entities(luy, entities_by_type_to_update):
     for entity_link_type, entity, in entities_by_type_to_update.items():
         if entity:
             entity_container_yr = _update_entity_container_year(entity, luy.learning_container_year, entity_link_type)
-            _create_entity_component_year_if_not_exists(entity_container_yr)
         else:
-            _delete_entity_component_year(luy.learning_container_year, entity_link_type)
             _delete_entity_container_year(luy.learning_container_year, entity_link_type)
 
 
 def update_or_create_entity_container_year_with_components(an_entity, learning_container_year, type_entity):
-    an_entity_container_year = _update_entity_container_year(an_entity, learning_container_year, type_entity)
-    if type_entity in REQUIREMENT_ENTITIES:
-        # Only entity with volume can have entity_component_year
-        _create_entity_component_year_if_not_exists(an_entity_container_year)
+    return _update_entity_container_year(an_entity, learning_container_year, type_entity)
 
 
 def _update_entity_container_year(an_entity, learning_container_year, type_entity):
@@ -378,28 +353,9 @@ def _update_entity_container_year(an_entity, learning_container_year, type_entit
     return entity_container_yr
 
 
-def _create_entity_component_year_if_not_exists(an_entity_container):
-    """We must create an entity component year for each component (Full+Partim)"""
-    learning_component_yr_list = learning_component_year.find_by_learning_container_year(
-        learning_container_year=an_entity_container.learning_container_year
-    )
-    for learning_component_yr in learning_component_yr_list:
-        entity_component_year.EntityComponentYear.objects.get_or_create(
-            entity_container_year=an_entity_container,
-            learning_component_year=learning_component_yr
-        )
-
-
 def _delete_entity_container_year(learning_container_year, type_entity):
     entity_container_year.EntityContainerYear.objects.filter(
         type=type_entity, learning_container_year=learning_container_year).delete()
-
-
-def _delete_entity_component_year(learning_container_year, type_entity):
-    entity_component_year.EntityComponentYear.objects.filter(
-        entity_container_year__learning_container_year=learning_container_year,
-        entity_container_year__type=type_entity
-    ).delete()
 
 
 def _check_postponement_conflict(luy, next_luy):

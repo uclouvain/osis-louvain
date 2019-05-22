@@ -70,9 +70,6 @@ class TestSimplifiedVolumeManagementForm(TestCase):
         self.assertEqual(cm_component.type, LECTURING)
         self.assertEqual(tp_component.type, PRACTICAL_EXERCISES)
 
-        self.assertEqual(cm_component.entitycomponentyear_set.count(), 3)
-        self.assertEqual(tp_component.entitycomponentyear_set.count(), 3)
-
     def test_save_with_master_thesis_container_type(self):
         formset = SimplifiedVolumeManagementForm(self.data, self.person, queryset=LearningComponentYear.objects.none())
         self.assertEqual(len(formset.forms), 2)
@@ -88,9 +85,6 @@ class TestSimplifiedVolumeManagementForm(TestCase):
 
         self.assertEqual(cm_component.type, LECTURING)
         self.assertEqual(tp_component.type, PRACTICAL_EXERCISES)
-
-        self.assertEqual(cm_component.entitycomponentyear_set.count(), 3)
-        self.assertEqual(tp_component.entitycomponentyear_set.count(), 3)
 
     def test_save_update(self):
         formset = SimplifiedVolumeManagementForm(
@@ -111,9 +105,6 @@ class TestSimplifiedVolumeManagementForm(TestCase):
 
         self.assertEqual(cm_component.type, LECTURING)
         self.assertEqual(tp_component.type, PRACTICAL_EXERCISES)
-
-        self.assertEqual(cm_component.entitycomponentyear_set.count(), 3)
-        self.assertEqual(tp_component.entitycomponentyear_set.count(), 3)
 
 
 class TestSimplifiedVolumeForm(TestCase):

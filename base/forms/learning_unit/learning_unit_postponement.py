@@ -37,7 +37,7 @@ from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.models import academic_year
 from base.models.academic_year import AcademicYear
-from base.models.entity_component_year import EntityComponentYear
+from base.models.entity_container_year import EntityContainerYear
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING
 from base.models.learning_component_year import LearningComponentYear
@@ -347,34 +347,31 @@ class LearningUnitPostponementForm:
         This volume is never edited in the form, so we have to load data separably
         """
         initial_learning_unit_year = self._forms_to_upsert[0].instance
-        initial_values = EntityComponentYear.objects.filter(
-            learning_component_year__learning_unit_year=initial_learning_unit_year
-        ).values_list('repartition_volume', 'learning_component_year__type', 'entity_container_year__type')
+        entity_containers = EntityContainerYear.objects.filter(
+            learning_container_year=initial_learning_unit_year.learning_container_year,
+        ).select_related("entity")
+        entity_by_type = {ec.type: ec.entity for ec in entity_containers}
 
-        for reparation_volume, component_type, entity_type in initial_values:
-            try:
-                component = EntityComponentYear.objects.filter(
-                    learning_component_year__type=component_type,
-                    entity_container_year__type=entity_type,
-                    learning_component_year__learning_unit_year=luy
-                ).get()
-            except EntityComponentYear.DoesNotExist:
-                # Case: N year have additional requirement but N+1 doesn't have.
-                # Not need to display message because, already done on _check_differences function
-                component = None
+        for current_component in initial_learning_unit_year.learningcomponentyear_set.all():
+            component_type = current_component.type
+            new_component = LearningComponentYear.objects.filter(
+                type=component_type,
+                learning_unit_year=luy
+            ).select_related("learning_unit_year__learning_container_year").get()
 
-            if component and component.repartition_volume != reparation_volume:
-                name = component.learning_component_year.acronym + "-" + \
-                       component.entity_container_year.entity.most_recent_acronym
+            for entity_container_type, new_repartition_volume in new_component.repartition_volumes.items():
+                current_repartition = current_component.repartition_volumes[entity_container_type]
+                if new_repartition_volume != current_repartition:
+                    name = new_component.acronym + "-" + entity_by_type[entity_container_type].most_recent_acronym
 
-                self.consistency_errors.setdefault(luy.academic_year, []).append(
-                    _("The repartition volume of %(col_name)s has been already modified. "
-                      "({%(new_value)s} instead of {%(current_value)s})") % {
-                        'col_name': name,
-                        'new_value': component.repartition_volume,
-                        'current_value': reparation_volume
-                    }
-                )
+                    self.consistency_errors.setdefault(luy.academic_year, []).append(
+                        _("The repartition volume of %(col_name)s has been already modified. "
+                          "({%(new_value)s} instead of {%(current_value)s})") % {
+                            'col_name': name,
+                            'new_value': new_repartition_volume,
+                            'current_value': current_repartition
+                        }
+                    )
 
     def _check_differences(self, current_form, next_form, ac_year):
         differences = [
