@@ -227,7 +227,7 @@
                             	<input type="hidden" id="hdn_score_changed_{{ enrollment.id }}" name="score_changed_{{ enrollment.id }}" value="false"></td>
 			                {% endif %}
                         <td>
-                            {{ enrollment.deadline | default_if_none:''|date:"j/m/Y" }}
+                            {% if enrollment.enrollment_state == 'ENROLLED' %}{{ enrollment.deadline | default_if_none:''|date:"j/m/Y" }}{% endif %}
                         </td>
                     </tr>
                 {% endfor %}

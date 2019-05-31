@@ -207,3 +207,13 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(count_learning_unit_year, 1)
         count_proposition_by_author = ProposalLearningUnit.objects.filter(author=self.faculty_person).count()
         self.assertEqual(count_proposition_by_author, 1)
+
+    def test_restrict_type_choice_for_proposal_creation(self):
+        full_form = CreationProposalBaseForm(self.get_valid_data(), person=self.faculty_person)
+
+        self.assertEqual(full_form.fields['container_type'].choices,
+                         [(None, '---------'),
+                          ('COURSE', 'Cours'),
+                          ('DISSERTATION', 'Mémoire'),
+                          ('INTERNSHIP', 'Stage')]
+                         )

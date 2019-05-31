@@ -37,12 +37,10 @@ from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 
 from assessments.business import score_encoding_sheet
-from base.models import person as person_mdl
 from base.models.person import Person
 from osis_common.document import paper_sheet, xls_build
 from osis_common.document.xls_build import _adjust_column_width
 from osis_common.messaging import message_config, send_message as message_service
-from osis_common.models import message_history as message_history_mdl
 
 EDUCATIONAL_INFORMATION_UPDATE_TXT = 'educational_information_update_txt'
 
@@ -181,13 +179,22 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
     template_base_data = {'academic_year': end_academic_year.past().year,
                           'end_academic_year': end_academic_year.year,
                           'egys_postponed': len(egys_postponed),
+                          'egys_postponed_qs': sorted(egys_postponed, key=__sort_education_group_type),
                           'egys_already_existing': len(egys_already_existing),
+                          'egys_already_existing_qs': egys_already_existing.order_by(
+                              'educationgroupyear__education_group_type__name'),
                           'egys_ending_this_year': len(egys_ending_this_year),
-                          'egys_with_errors': egys_with_errors
+                          'egys_ending_this_year_qs': egys_ending_this_year.order_by(
+                              'educationgroupyear__education_group_type__name'),
+                          'egys_with_errors': sorted(egys_with_errors)
                           }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)
     return message_service.send_messages(message_content)
+
+
+def __sort_education_group_type(egy):
+    return egy.education_group_type.name
 
 
 def send_mail_cancellation_learning_unit_proposals(manager, tuple_proposals_results, research_criteria):

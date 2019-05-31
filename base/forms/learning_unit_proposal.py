@@ -39,9 +39,11 @@ from base.models.academic_year import current_academic_year
 from base.models.entity_version import find_pedagogical_entities_version, get_last_version
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.entity_type import FACULTY
+from base.models.enums.learning_container_year_types import CONTAINER_TYPES_CREATION_PROPOSAL
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import get_by_id
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
 
 
 class ProposalLearningUnitForm(forms.ModelForm):
@@ -170,9 +172,14 @@ class CreationProposalBaseForm(ProposalBaseForm):
             default_ac_year = current_academic_year().next()
 
         super().__init__(data, person, default_ac_year=default_ac_year, proposal_type=ProposalType.CREATION.name)
+        self._restrict_type_choice_for_proposal_creation(self.proposal_type)
 
     @transaction.atomic
     def save(self):
         new_luy = self.learning_unit_form_container.save()
         self.form_proposal.instance.learning_unit_year = new_luy
         return self.form_proposal.save()
+
+    def _restrict_type_choice_for_proposal_creation(self, proposal_type):
+        if proposal_type == ProposalType.CREATION.name:
+            self.fields["container_type"].choices = ((None, BLANK_CHOICE_DISPLAY),) + CONTAINER_TYPES_CREATION_PROPOSAL

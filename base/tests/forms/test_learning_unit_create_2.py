@@ -67,13 +67,15 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from reference.tests.factories.language import LanguageFactory
+from base.models.enums.proposal_type import ProposalType
 
 
-def _instanciate_form(academic_year, person=None, post_data=None, learning_unit_instance=None, start_year=None):
+def _instanciate_form(academic_year, person=None, post_data=None, learning_unit_instance=None, start_year=None,
+                      proposal_type=None):
     if not person:
         person = PersonFactory()
     return FullForm(person, academic_year, learning_unit_instance=learning_unit_instance, data=post_data,
-                    start_year=start_year)
+                    start_year=start_year, proposal_type=proposal_type)
 
 
 def get_valid_form_data(academic_year, person, learning_unit_year=None):

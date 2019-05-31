@@ -633,6 +633,10 @@ class EducationGroupYear(SerializableModel):
         return self.title
 
     @property
+    def verbose_type(self):
+        return self.education_group_type.get_name_display()
+
+    @property
     def complete_title(self):
         return self.verbose_title
 

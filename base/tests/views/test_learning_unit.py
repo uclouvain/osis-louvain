@@ -342,13 +342,16 @@ class LearningUnitViewTestCase(TestCase):
             type=entity_container_year_link_type.REQUIREMENT_ENTITY,
             entity=cls.entities[0]
         )
-        cls.entity_version = EntityVersionFactory(acronym="1 acronym",entity=cls.entities[0], entity_type=entity_type.SCHOOL,
+        cls.entity_version = EntityVersionFactory(acronym="1 acronym", entity=cls.entities[0],
+                                                  entity_type=entity_type.SCHOOL,
                                                   start_date=today - datetime.timedelta(days=1),
                                                   end_date=today.replace(year=today.year + 1))
-        cls.entity_version_2 = EntityVersionFactory(acronym="2 acronym", entity=cls.entities[1], entity_type=entity_type.INSTITUTE,
+        cls.entity_version_2 = EntityVersionFactory(acronym="2 acronym", entity=cls.entities[1],
+                                                    entity_type=entity_type.INSTITUTE,
                                                     start_date=today - datetime.timedelta(days=20),
                                                     end_date=today.replace(year=today.year + 1))
-        cls.entity_version_3 = EntityVersionFactory(acronym="3 acronym", entity=cls.entities[2], entity_type=entity_type.FACULTY,
+        cls.entity_version_3 = EntityVersionFactory(acronym="3 acronym", entity=cls.entities[2],
+                                                    entity_type=entity_type.FACULTY,
                                                     start_date=today - datetime.timedelta(days=50),
                                                     end_date=today.replace(year=today.year + 1))
 
@@ -1350,12 +1353,18 @@ class TestLearningUnitProposalComparison(TestCase):
         self.learning_component_year_lecturing = LearningComponentYearFactory(
             type=learning_component_year_type.LECTURING,
             acronym="TP",
-            learning_unit_year=self.learning_unit_year
+            learning_unit_year=self.learning_unit_year,
+            repartition_volume_requirement_entity=10,
+            repartition_volume_additional_entity_1=10,
+            repartition_volume_additional_entity_2=10
         )
         self.learning_component_year_practical = LearningComponentYearFactory(
             type=learning_component_year_type.PRACTICAL_EXERCISES,
             acronym="PP",
-            learning_unit_year=self.learning_unit_year
+            learning_unit_year=self.learning_unit_year,
+            repartition_volume_requirement_entity=10,
+            repartition_volume_additional_entity_1=10,
+            repartition_volume_additional_entity_2=10
         )
         self.entity_container_year = EntityContainerYearFactory(
             learning_container_year=self.learning_unit_year.learning_container_year,
@@ -1392,8 +1401,8 @@ class TestLearningUnitProposalComparison(TestCase):
             "entities": {
                 entity_container_year_link_type.REQUIREMENT_ENTITY: self.entity_container_year.id,
                 entity_container_year_link_type.ALLOCATION_ENTITY: None,
-                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: None,
-                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: None
+                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: self.entity_container_year.id,
+                entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: self.entity_container_year.id
             },
             "learning_component_years": [
                 {"id": self.learning_component_year_lecturing.id,
@@ -1401,14 +1410,23 @@ class TestLearningUnitProposalComparison(TestCase):
                  "planned_classes": self.learning_component_year_lecturing.planned_classes,
                  "hourly_volume_partial_q1": self.learning_component_year_lecturing.hourly_volume_partial_q1,
                  "hourly_volume_partial_q2": self.learning_component_year_lecturing.hourly_volume_partial_q2,
-                 "hourly_volume_total_annual": self.learning_component_year_lecturing.hourly_volume_total_annual
+                 "hourly_volume_total_annual": self.learning_component_year_lecturing.hourly_volume_total_annual,
+                 "repartition_volume_requirement_entity":
+                     self.learning_component_year_lecturing.repartition_volume_requirement_entity,
+                 "repartition_volume_additional_entity_1":
+                     self.learning_component_year_lecturing.repartition_volume_additional_entity_1,
+                 "repartition_volume_additional_entity_2":
+                     self.learning_component_year_lecturing.repartition_volume_additional_entity_2
                  },
                 {"id": self.learning_component_year_practical.id,
                  "type": "PRACTICAL_EXERCISES",
                  "planned_classes": self.learning_component_year_practical.planned_classes,
                  "hourly_volume_partial_q1": self.learning_component_year_practical.hourly_volume_partial_q1,
                  "hourly_volume_partial_q2": self.learning_component_year_practical.hourly_volume_partial_q2,
-                 "hourly_volume_total_annual": self.learning_component_year_practical.hourly_volume_total_annual
+                 "hourly_volume_total_annual": self.learning_component_year_practical.hourly_volume_total_annual,
+                 "repartition_volume_requirement_entity": self.learning_component_year_practical.repartition_volume_requirement_entity,
+                 "repartition_volume_additional_entity_1": self.learning_component_year_practical.repartition_volume_additional_entity_1,
+                 "repartition_volume_additional_entity_2": self.learning_component_year_practical.repartition_volume_additional_entity_2
                  }
             ],
             "volumes": {

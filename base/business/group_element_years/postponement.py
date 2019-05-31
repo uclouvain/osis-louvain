@@ -184,7 +184,7 @@ class PostponeContent:
         self.number_elements_created = 0
 
     def check_instance(self):
-        if self.instance.academic_year.year < self.current_year.year:
+        if self.instance.academic_year.year + 1 < self.current_year.year:
             raise NotPostponeError(_("You are not allowed to postpone this training in the past."))
         if self.instance.academic_year.year > self.current_year.year:
             raise NotPostponeError(_("You are not allowed to postpone this training in the future."))

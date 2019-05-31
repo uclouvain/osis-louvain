@@ -316,7 +316,10 @@ class SimplifiedVolumeForm(forms.ModelForm):
             'hourly_volume_total_annual',
             'hourly_volume_partial_q1',
             'hourly_volume_partial_q2',
-            'planned_classes'
+            'planned_classes',
+            'repartition_volume_requirement_entity',
+            'repartition_volume_additional_entity_1',
+            'repartition_volume_additional_entity_2'
         )
         widgets = {
             'hourly_volume_total_annual': forms.TextInput(
@@ -324,7 +327,10 @@ class SimplifiedVolumeForm(forms.ModelForm):
             ),
             'hourly_volume_partial_q1': forms.TextInput(attrs={'title': _("Volume Q1")}),
             'hourly_volume_partial_q2': forms.TextInput(attrs={'title': _("Volume Q2")}),
-            'planned_classes': forms.TextInput(attrs={'title': _("Planned classes")})
+            'planned_classes': forms.TextInput(attrs={'title': _("Planned classes")}),
+            'repartition_volume_requirement_entity': forms.TextInput(),
+            'repartition_volume_additional_entity_1': forms.TextInput(),
+            'repartition_volume_additional_entity_2': forms.TextInput(),
         }
 
     def clean(self):

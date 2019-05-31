@@ -40,6 +40,14 @@
         <th>=</th>
         <th class="text-center">{% trans 'Volume annuel' %}</th>
         <th class="text-center">{% trans 'Classes' %}</th>
+        <th>=</th>
+        <th>(</th>
+        <th class="text-center">{% trans 'Entity' %} 1</th>
+        <th>+</th>
+        <th class="text-center">{% trans 'Entity' %} 2</th>
+        <th>+</th>
+        <th class="text-center">{% trans 'Entity' %} 3</th>
+        <th>)</th>
     </tr>
     </thead>
     <tbody>
@@ -56,6 +64,13 @@
             <td></td>
             <td>{% bootstrap_field form.hourly_volume_total_annual show_label=False %}</td>
             <td>{% bootstrap_field form.planned_classes show_label=False %}</td>
+            <td></td><td></td>
+            <td>{% bootstrap_field form.repartition_volume_requirement_entity show_label=False %}</td>
+            <td></td>
+            <td>{% bootstrap_field form.repartition_volume_additional_entity_1 show_label=False %}</td>
+            <td></td>
+            <td>{% bootstrap_field form.repartition_volume_additional_entity_2 show_label=False %}</td>
+            <td></td>
         </tr>
     {% endfor %}
     </tbody>

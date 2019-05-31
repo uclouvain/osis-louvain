@@ -90,6 +90,10 @@ class EducationGroupYearTest(TestCase):
         self.group_element_year_5 = GroupElementYearFactory(parent=self.education_group_year_6,
                                                             child_branch=self.education_group_year_1)
 
+    def test_verbose_type(self):
+        type_of_egt = self.education_group_year_1.education_group_type.get_name_display()
+        self.assertEqual(type_of_egt, self.education_group_year_1.verbose_type)
+
     def test_verbose_credit(self):
         verbose__waiting = "{} ({} {})".format(
             self.education_group_year_1.title, self.education_group_year_1.credits, _("credits")

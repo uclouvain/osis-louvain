@@ -27,6 +27,7 @@ from unittest.mock import patch
 
 from django.test import TestCase
 
+from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -146,7 +147,7 @@ class TestSendMessage(TestCase):
             self.egys_to_postpone,
             self.egys_already_existing,
             self.egys_ending_this_year,
-            self.msg_list
+            EducationGroup.objects.all()
         )
         args = mock_send_messages.call_args[0][0]
         self.assertEqual(self.academic_year.year, args.get('template_base_data').get('end_academic_year'))

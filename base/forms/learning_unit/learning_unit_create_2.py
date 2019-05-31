@@ -147,8 +147,8 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
         data = {}
         for form_instance in self.forms.values():
             data.update({
-                key: field.label for key, field in form_instance.fields.items()
-            })
+                            key: field.label for key, field in form_instance.fields.items()
+                            })
         return data
 
     @property

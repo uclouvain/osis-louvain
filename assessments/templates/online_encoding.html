@@ -241,7 +241,7 @@
                                 {% endif %}
                             {% endif %}
                         </td>
-                        <td>{{ enrollment.deadline | default_if_none:'' |date:"j/m/Y" }}</td>
+                        <td>{% if enrollment.enrollment_state == 'ENROLLED' %}{{ enrollment.deadline | default_if_none:'' |date:"j/m/Y" }}{% endif %}</td>
                     </tr>
                 {% endfor %}
             </tbody>
