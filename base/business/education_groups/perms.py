@@ -127,26 +127,19 @@ def is_eligible_to_delete_education_group(person, education_group, raise_excepti
            _is_eligible_education_group(person, education_group, raise_exception)
 
 
-def is_eligible_to_delete_education_groups(person, education_group, raise_exception=False):
-    if check_permission(person, "base.delete_educationgroup", raise_exception) and check_link_to_management_entity(education_group, person, raise_exception):
+def is_eligible_to_delete_education_groups(person, education_group_yr, raise_exception=False):
+    if check_permission(person, "base.delete_educationgroup", raise_exception) and \
+            check_link_to_management_entity(education_group_yr, person, raise_exception):
 
         if person.is_central_manager:
             return True
         else:
             try:
-                return can_delete_all_education_group(person.user, education_group.education_group)
+                return can_delete_all_education_group(person.user, education_group_yr.education_group)
             except PermissionDenied as e:
-                max_yr = EducationGroupYear.objects.filter(education_group=education_group.education_group).aggregate(
-                    Max('academic_year__year')
-                )['academic_year__year__max']
-
-                min_yr = EducationGroupYear.objects.filter(education_group=education_group.education_group).aggregate(
-                    Min('academic_year__year')
-                )['academic_year__year__min']
-
                 can_raise_exception(raise_exception,
                                     False,
-                                    _("This education group is not editable during the entire period ({}-{}).".format(min_yr, max_yr)))
+                                    _build_msg_not_allowed_to_delete(education_group_yr.education_group))
                 return False
     else:
         return False
@@ -357,3 +350,15 @@ class AdmissionConditionPerms(CommonEducationGroupStrategyPerms):
 
     def _is_sic_eligible(self):
         return True
+
+
+def _build_msg_not_allowed_to_delete(education_group):
+    max_yr = EducationGroupYear.objects.filter(education_group=education_group).aggregate(
+        Max('academic_year__year')
+    )['academic_year__year__max']
+
+    min_yr = EducationGroupYear.objects.filter(education_group=education_group).aggregate(
+        Min('academic_year__year')
+    )['academic_year__year__min']
+
+    return "{} ({}-{}).".format(_("This education group is not editable during the entire period"), min_yr, max_yr)
