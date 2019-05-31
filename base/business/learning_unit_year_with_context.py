@@ -105,17 +105,16 @@ def append_components(learning_unit_year):
 
 def volume_learning_component_year(learning_component_year):
     requirement_vols = learning_component_year.repartition_volumes
+    planned_classes = learning_component_year.planned_classes or 1
     return {
         'VOLUME_TOTAL': learning_component_year.hourly_volume_total_annual,
         'VOLUME_Q1': learning_component_year.hourly_volume_partial_q1,
         'VOLUME_Q2': learning_component_year.hourly_volume_partial_q2,
-        'PLANNED_CLASSES': learning_component_year.planned_classes or 1,
+        'PLANNED_CLASSES': planned_classes,
         'VOLUME_REQUIREMENT_ENTITY': requirement_vols.get(entity_types.REQUIREMENT_ENTITY, 0),
         'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1': requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
         'VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2': requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0),
-        'VOLUME_GLOBAL': sum([requirement_vols.get(entity_types.REQUIREMENT_ENTITY, 0),
-                              requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1, 0),
-                              requirement_vols.get(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_2, 0)])
+        'VOLUME_GLOBAL': learning_component_year.vol_global
     }
 
 
