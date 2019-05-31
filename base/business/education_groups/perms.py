@@ -33,8 +33,11 @@ from base.business.group_element_years.postponement import PostponeContent, NotP
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import current_academic_year
 from base.models.education_group_type import find_authorized_types
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
+from base.views.education_groups.perms import can_delete_all_education_group
+from django.db.models import Max, Min
 
 ERRORS_MSG = {
     "base.add_educationgroup": "The user has not permission to create education groups.",
@@ -124,13 +127,38 @@ def is_eligible_to_delete_education_group(person, education_group, raise_excepti
            _is_eligible_education_group(person, education_group, raise_exception)
 
 
-def is_education_group_edit_period_opened(education_group, raise_exception=False):
+def is_eligible_to_delete_education_groups(person, education_group, raise_exception=False):
+    if check_permission(person, "base.delete_educationgroup", raise_exception) and check_link_to_management_entity(education_group, person, raise_exception):
+
+        if person.is_central_manager:
+            return True
+        else:
+            try:
+                return can_delete_all_education_group(person.user, education_group.education_group)
+            except PermissionDenied as e:
+                max_yr = EducationGroupYear.objects.filter(education_group=education_group.education_group).aggregate(
+                    Max('academic_year__year')
+                )['academic_year__year__max']
+
+                min_yr = EducationGroupYear.objects.filter(education_group=education_group.education_group).aggregate(
+                    Min('academic_year__year')
+                )['academic_year__year__min']
+
+                can_raise_exception(raise_exception,
+                                    False,
+                                    _("This education group is not editable during the entire period ({}-{}).".format(min_yr, max_yr)))
+                return False
+    else:
+        return False
+
+
+def is_education_group_edit_period_opened(education_group_yr, raise_exception=False):
     error_msg = None
 
     qs = AcademicCalendar.objects.filter(reference=academic_calendar_type.EDUCATION_GROUP_EDITION).open_calendars()
     if not qs.exists():
         error_msg = _("The education group edition period is not open.")
-    elif education_group and not qs.filter(academic_year=education_group.academic_year).exists():
+    elif education_group_yr and not qs.filter(academic_year=education_group_yr.academic_year).exists():
         error_msg = _("This education group is not editable during this period.")
 
     result = error_msg is None
@@ -138,9 +166,9 @@ def is_education_group_edit_period_opened(education_group, raise_exception=False
     return result
 
 
-def _is_eligible_education_group(person, education_group, raise_exception):
-    return (check_link_to_management_entity(education_group, person, raise_exception) and
-            (person.is_central_manager or is_education_group_edit_period_opened(education_group, raise_exception)))
+def _is_eligible_education_group(person, education_group_yr, raise_exception):
+    return (check_link_to_management_entity(education_group_yr, person, raise_exception) and
+            (person.is_central_manager or is_education_group_edit_period_opened(education_group_yr, raise_exception)))
 
 
 def _is_eligible_certificate_aims(person, education_group, raise_exception):

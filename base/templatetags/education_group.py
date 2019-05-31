@@ -31,7 +31,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext as _
 
 from base.business.education_group import can_user_edit_administrative_data
-from base.business.education_groups.perms import is_eligible_to_delete_education_group, \
+from base.business.education_groups.perms import is_eligible_to_delete_education_group, is_eligible_to_delete_education_groups, \
     is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_postpone_education_group, \
     _is_eligible_certificate_aims
@@ -58,7 +58,7 @@ register = template.Library()
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_deletion_perm(context, url, message, url_id="link_delete"):
-    return li_with_permission(context, is_eligible_to_delete_education_group, url, message, url_id, True)
+    return li_with_permission(context, is_eligible_to_delete_education_groups, url, message, url_id, True)
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
