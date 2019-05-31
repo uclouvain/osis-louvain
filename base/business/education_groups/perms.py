@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.core.exceptions import PermissionDenied
+from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext
 
@@ -36,8 +37,8 @@ from base.models.education_group_type import find_authorized_types
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
-from base.views.education_groups.perms import can_delete_all_education_group
 from django.db.models import Max, Min
+from base.models.person import Person
 
 ERRORS_MSG = {
     "base.add_educationgroup": "The user has not permission to create education groups.",
@@ -362,3 +363,12 @@ def _build_msg_not_allowed_to_delete(education_group):
     )['academic_year__year__min']
 
     return "{} ({}-{}).".format(_("This education group is not editable during the entire period"), min_yr, max_yr)
+
+
+def can_delete_all_education_group(user, education_group):
+    pers = get_object_or_404(Person, user=user)
+    education_group_years = EducationGroupYear.objects.filter(education_group=education_group)
+    for education_group_yr in education_group_years:
+        if not is_eligible_to_delete_education_group(pers, education_group_yr, raise_exception=True):
+            raise PermissionDenied
+    return True

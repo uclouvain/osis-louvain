@@ -350,7 +350,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
         self.assertEqual(
             result, {
                 'load_modal': False,
-                'title': PERMISSION_DENIED_MSG,
+                'title': "{} ({}-{}).".format(_('This education group is not editable during the entire period'), self.education_group_year.academic_year.year,self.education_group_year.academic_year.year),
                 'class_li': 'disabled',
                 'id_li': 'link_delete',
                 'url': "#",

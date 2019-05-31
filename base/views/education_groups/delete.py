@@ -29,7 +29,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups import delete
 from base.models.education_group import EducationGroup
-from base.views.education_groups.perms import can_delete_all_education_group
+from base.business.education_groups.perms import can_delete_all_education_group
 
 from base.views import common
 from base.views.mixins import DeleteViewWithDependencies

@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import itertools
 import json
 from collections import namedtuple, defaultdict
 
@@ -43,6 +42,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import DetailView
 from reversion.models import Version
 
+import itertools
 from base import models as mdl
 from base.business.education_group import assert_category_of_education_group_year, can_user_edit_administrative_data
 from base.business.education_groups import perms, general_information
