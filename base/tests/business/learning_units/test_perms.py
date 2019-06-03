@@ -37,7 +37,7 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import FacultyManagerFactory, CatalogViewerFactory
+from base.tests.factories.person import FacultyManagerFactory, AdministrativeManagerFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 
 
@@ -122,7 +122,7 @@ class TestPerms(TestCase):
             True
         ))
 
-    def test_is_not_eligible_to_modify_cause_user_is_catalog_viewer(self):
-        cv = CatalogViewerFactory()
+    def test_is_not_eligible_to_modify_cause_user_is_administrative_manager(self):
+        administrative_manager = AdministrativeManagerFactory()
         luy = LearningUnitYearFactory(learning_unit=self.learning_unit, learning_container_year=self.lcy)
-        self.assertFalse(is_eligible_for_modification(luy, cv))
+        self.assertFalse(is_eligible_for_modification(luy, administrative_manager))

@@ -43,7 +43,7 @@ from base.tests.factories.entity_container_year import EntityContainerYearFactor
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory, SICFactory, \
-    CatalogViewerFactory
+    AdministrativeManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
 
@@ -181,12 +181,12 @@ class PersonTest(PersonTestCase):
         a_person = SICFactory()
         self.assertTrue(a_person.is_sic)
 
-    def test_is_catalog_viewer(self):
+    def test_is_administrative_manager(self):
         a_person = PersonFactory()
-        self.assertFalse(a_person.is_catalog_viewer)
+        self.assertFalse(a_person.is_administrative_manager)
 
-        a_person = CatalogViewerFactory()
-        self.assertTrue(a_person.is_catalog_viewer)
+        a_person = AdministrativeManagerFactory()
+        self.assertTrue(a_person.is_administrative_manager)
 
     def test_show_username_from_person_with_user(self):
         self.assertEqual(self.person_with_user.username(), "user_with_person")

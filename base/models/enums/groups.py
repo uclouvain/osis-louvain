@@ -26,5 +26,5 @@
 
 CENTRAL_MANAGER_GROUP = "central_managers"
 FACULTY_MANAGER_GROUP = "faculty_managers"
-CATALOG_VIEWER_GROUP = "catalog_viewers"
+ADMINISTRATIVE_MANAGER_GROUP = "administrative_manager"
 SIC_GROUP = "sic"

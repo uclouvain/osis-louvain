@@ -39,7 +39,8 @@ from base.models.entity import Entity
 from base.models.entity_version import find_pedagogical_entities_version
 from base.models.enums import person_source_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, CATALOG_VIEWER_GROUP
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
+    ADMINISTRATIVE_MANAGER_GROUP
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
 
 
@@ -119,8 +120,8 @@ class Person(SerializableModel):
         return self.user.groups.filter(name=SIC_GROUP).exists()
 
     @cached_property
-    def is_catalog_viewer(self):
-        return self.user.groups.filter(name=CATALOG_VIEWER_GROUP).exists()
+    def is_administrative_manager(self):
+        return self.user.groups.filter(name=ADMINISTRATIVE_MANAGER_GROUP).exists()
 
     @property
     def full_name(self):
