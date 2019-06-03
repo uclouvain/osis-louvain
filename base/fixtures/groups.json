@@ -3323,6 +3323,49 @@
         ]
     }
 },
+    {
+    "model": "auth.group",
+    "fields": {
+        "name": "catalog_viewers",
+        "permissions": [
+            [
+                "can_access_education_group",
+                "base",
+                "educationgroup"
+            ],
+            [
+                "can_access_learningunit",
+                "base",
+                "learningunit"
+            ],
+            [
+                "can_access_externallearningunityear",
+                "base",
+                "externallearningunityear"
+            ],
+            [
+                "can_access_catalog",
+                "base",
+                "offer"
+            ],
+            [
+                "can_access_offer",
+                "base",
+                "offer"
+            ],
+            [
+                "is_institution_administrator",
+                "base",
+                "person"
+            ],
+            [
+                "can_access_structure",
+                "base",
+                "structure"
+            ]
+        ]
+    }
+},
 {
     "model": "auth.group",
     "fields": {
