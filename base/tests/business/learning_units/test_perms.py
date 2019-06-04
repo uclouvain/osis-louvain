@@ -86,7 +86,6 @@ class TestPerms(TestCase):
 
     @mock.patch("base.business.learning_units.perms.is_eligible_to_create_modification_proposal", return_value=True)
     def test_not_is_eligible_to_modify_by_proposal(self, mock_perm):
-
         lu = LearningUnitFactory(existing_proposal_in_epc=False)
         learning_unit_yr = LearningUnitYearFactory(
             academic_year=self.current_academic_year,

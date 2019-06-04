@@ -40,7 +40,7 @@ from base.tests.factories.authorized_relationship import AuthorizedRelationshipF
 from base.tests.factories.education_group_year import EducationGroupYearFactory, \
     EducationGroupYearCommonBachelorFactory, TrainingFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, SICFactory, \
-    FacultyManagerFactory, AdministrativeManagerFactory
+    FacultyManagerFactory, AdministrativeManagerFactory, UEFacultyManagerFactory
 from base.tests.factories.user import UserFactory
 
 
@@ -245,6 +245,14 @@ class TestGeneralInformationPerms(TestCase):
         self.assertTrue(mock_is_faculty_eligible.called)
 
     @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
+    def test_is_not_eligible_case_user_is_faculty_manager_for_ue(self, mock_super_is_eligible):
+        faculty_manager = UEFacultyManagerFactory()
+        perm = GeneralInformationPerms(faculty_manager.user, self.common_bachelor)
+        with self.assertRaises(PermissionDenied):
+            perm._is_eligible()
+        self.assertTrue(mock_super_is_eligible.called)
+
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
     @mock.patch("base.business.education_groups.perms.GeneralInformationPerms._is_user_have_perm", return_value=True)
     @mock.patch("base.business.education_groups.perms.GeneralInformationPerms._is_sic_eligible")
     def test_is_eligible_case_user_is_sic(self, mock_is_sic_eligible, mock_user_have_perm, mock_super_is_eligible):
@@ -356,6 +364,14 @@ class TestAdmissionConditionPerms(TestCase):
 
         self.assertTrue(mock_super_is_eligible.called)
         self.assertTrue(mock_is_faculty_eligible.called)
+
+    @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
+    def test_is_not_eligible_case_user_is_faculty_manager_for_ue(self, mock_super_is_eligible):
+        faculty_manager = UEFacultyManagerFactory()
+        perm = AdmissionConditionPerms(faculty_manager.user, self.common_bachelor)
+        with self.assertRaises(PermissionDenied):
+            perm._is_eligible()
+        self.assertTrue(mock_super_is_eligible.called)
 
     @mock.patch("base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_eligible")
     @mock.patch("base.business.education_groups.perms.AdmissionConditionPerms._is_user_have_perm", return_value=True)

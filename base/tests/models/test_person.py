@@ -43,7 +43,7 @@ from base.tests.factories.entity_container_year import EntityContainerYearFactor
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory, SICFactory, \
-    AdministrativeManagerFactory
+    AdministrativeManagerFactory, UEFacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
 
@@ -172,6 +172,13 @@ class PersonTest(PersonTestCase):
         del a_person.is_faculty_manager
         a_person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
         self.assertTrue(a_person.is_faculty_manager)
+
+    def test_is_faculty_manager_for_ue(self):
+        a_person = PersonFactory()
+        self.assertFalse(a_person.is_faculty_manager_for_ue)
+
+        a_person = UEFacultyManagerFactory()
+        self.assertTrue(a_person.is_faculty_manager_for_ue)
 
     def test_is_sic(self):
         a_person = PersonFactory()

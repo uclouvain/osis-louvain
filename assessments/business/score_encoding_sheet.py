@@ -25,15 +25,18 @@
 ##############################################################################
 from django.utils import timezone
 from django.utils.translation import ugettext as _
-from attribution.models import attribution
-from base.models import entity as entity_model, entity_version as entity_version, person_address, session_exam_calendar, offer_year_entity
-from base.models.exam_enrollment import justification_label_authorized, get_deadline
+
+from assessments.business.enrollment_state import get_line_color
 from assessments.business.score_encoding_list import sort_encodings
 from assessments.models import score_sheet_address
 from assessments.models.enums.score_sheet_address_choices import *
+from attribution.models import attribution
 from base.business import entity_version as entity_version_business
+from base.models import entity as entity_model, entity_version as entity_version, person_address, session_exam_calendar, \
+    offer_year_entity
+from base.models.enums import exam_enrollment_state as enrollment_states
 from base.models.enums.person_address_type import PersonAddressType
-from assessments.business.enrollment_state import get_line_color
+from base.models.exam_enrollment import justification_label_authorized, get_deadline
 
 
 def get_score_sheet_address(off_year):
@@ -175,26 +178,15 @@ def scores_sheet_data(exam_enrollments, tutor=None):
             enrollments = []
             for exam_enrol in list_enrollments:
                 student = exam_enrol.learning_unit_enrollment.student
-                score = ''
-                if exam_enrol.score_final is not None:
-                    if learning_unit_yr.decimal_scores:
-                        score = str(exam_enrol.score_final)
-                    else:
-                        score = str(int(exam_enrol.score_final))
-
-                # Compute deadline score encoding
-                deadline = get_deadline(exam_enrol)
-                if deadline:
-                    deadline = deadline.strftime(date_format)
 
                 enrollments.append({
                     "registration_id": student.registration_id,
                     "last_name": student.person.last_name,
                     "first_name": student.person.first_name,
-                    "score": score,
+                    "score": _format_score(exam_enrol, learning_unit_yr),
                     "justification": _(exam_enrol.get_justification_final_display())
                     if exam_enrol.justification_final else '',
-                    "deadline": deadline if deadline else '',
+                    "deadline": _get_formatted_deadline(date_format, exam_enrol),
                     "enrollment_state_color": get_line_color(exam_enrol),
                 })
             program['enrollments'] = enrollments
@@ -227,3 +219,21 @@ def _group_by_learning_unit_year_id(exam_enrollments):
         else:
             enrollments_by_learn_unit[key].append(exam_enroll)
     return enrollments_by_learn_unit
+
+
+def _get_formatted_deadline(date_format, exam_enrol):
+    # Compute deadline score encoding
+    if exam_enrol.enrollment_state == enrollment_states.ENROLLED:
+        deadline = get_deadline(exam_enrol)
+        if deadline:
+            return deadline.strftime(date_format)
+    return ''
+
+
+def _format_score(exam_enrol, learning_unit_yr):
+    if exam_enrol.score_final is not None:
+        if learning_unit_yr.decimal_scores:
+            return str(exam_enrol.score_final)
+        else:
+            return str(int(exam_enrol.score_final))
+    return ''
