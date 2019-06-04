@@ -177,7 +177,6 @@ class PersonTest(PersonTestCase):
         a_person = PersonFactory()
         self.assertFalse(a_person.is_sic)
 
-        del a_person.is_sic
         a_person = SICFactory()
         self.assertTrue(a_person.is_sic)
 
