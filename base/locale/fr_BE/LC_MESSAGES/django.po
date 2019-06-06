@@ -6130,9 +6130,3 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:164
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Management of programs."
-#~ msgstr "Gestion des programmes."
-
-#~ msgid "Modification blocked"
-#~ msgstr "Modification bloquée"
