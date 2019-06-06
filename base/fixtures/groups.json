@@ -1918,11 +1918,6 @@
                 "offer"
             ],
             [
-                "can_access_offer",
-                "base",
-                "offer"
-            ],
-            [
                 "can_access_evaluation",
                 "base",
                 "offerenrollment"
@@ -2694,11 +2689,6 @@
                 "offer"
             ],
             [
-                "can_access_offer",
-                "base",
-                "offer"
-            ],
-            [
                 "is_institution_administrator",
                 "base",
                 "person"
@@ -3063,11 +3053,6 @@
                 "offer"
             ],
             [
-                "can_access_offer",
-                "base",
-                "offer"
-            ],
-            [
                 "can_edit_education_group_administrative_data",
                 "base",
                 "person"
@@ -3251,11 +3236,6 @@
                 "offer"
             ],
             [
-                "can_access_offer",
-                "base",
-                "offer"
-            ],
-            [
                 "is_institution_administrator",
                 "base",
                 "person"
@@ -3409,11 +3389,6 @@
                 "offer"
             ],
             [
-                "can_access_offer",
-                "base",
-                "offer"
-            ],
-            [
                 "is_institution_administrator",
                 "base",
                 "person"
@@ -3543,11 +3518,6 @@
                 "can_access_education_group",
                 "base",
                 "educationgroup"
-            ],
-            [
-                "can_access_offer",
-                "base",
-                "offer"
             ],
             [
                 "is_institution_administrator",

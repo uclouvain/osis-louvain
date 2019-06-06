@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-06 10:02+0200\n"
+"POT-Creation-Date: 2019-06-06 16:07+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -584,6 +584,7 @@ msgstr "Entité resp. cahier des charges complémentaire 2"
 msgid "Address(es)"
 msgstr "Adresse(s)"
 
+#: templates/blocks/navbar_top.html:36 templates/catalog.html:42
 #: templates/my_osis/profile.html:108
 msgid "Addresses"
 msgstr "Adresses"
@@ -2558,6 +2559,10 @@ msgstr "Programmes gérés"
 msgid "Management entity"
 msgstr "Entité de gestion"
 
+#: templates/catalog.html:43
+msgid "Management of addresses on the scoresheets."
+msgstr "Gestion des adresses sur les feuilles de notes."
+
 #: templates/admin/data.html:44
 msgid "Management of data by entity"
 msgstr "Gestion des données par entité du métier"
@@ -2577,10 +2582,6 @@ msgstr "Gestion des la structure organisationnelle."
 #: templates/institution.html:43
 msgid "Management of organizations"
 msgstr "Gestion des organisations"
-
-#: templates/catalog.html:43
-msgid "Management of programs."
-msgstr "Gestion des programmes."
 
 #: templates/home.html:81
 msgid ""
@@ -3019,7 +3020,6 @@ msgstr "Nombre d'éléments"
 msgid "OR"
 msgstr "OU"
 
-#: templates/blocks/navbar_top.html:36 templates/catalog.html:42
 #: templates/offer/breadcrumb.html:28 templates/offer_year_calendar.html:31
 #: templates/offers.html:31 templates/offers.html:36
 msgid "Offers"
@@ -6130,6 +6130,9 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:164
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "Management of programs."
+#~ msgstr "Gestion des programmes."
 
 #~ msgid "Modification blocked"
 #~ msgstr "Modification bloquée"
