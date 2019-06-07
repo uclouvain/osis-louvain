@@ -31,7 +31,6 @@ from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory, \
     GroupFactory, EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -139,7 +138,6 @@ class TestGroupElementYearForm(TestCase):
     def test_remove_access_condition_when_not_authorized_relationship(self):
         form = GroupElementYearForm(parent=self.parent, child_branch=self.child_branch)
         self.assertTrue("access_condition" not in list(form.fields.keys()))
-        self.assertEqual(LinkTypes.REFERENCE.name, form.fields["link_type"].initial)
 
     def test_only_keep_access_condition_when_parent_is_minor_major_option_list_choice(self):
         expected_fields = ["access_condition"]

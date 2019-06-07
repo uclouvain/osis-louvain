@@ -40,7 +40,8 @@ from base.models.enums import education_group_categories, internship_presence
 from base.models.enums.active_status import ACTIVE
 from base.models.enums.schedule_type import DAILY
 from base.tests.factories.academic_calendar import AcademicCalendarEducationGroupEditionFactory
-from base.tests.factories.academic_year import create_current_academic_year, get_current_year
+from base.tests.factories.academic_year import create_current_academic_year, get_current_year, AcademicYearFactory
+from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.certificate_aim import CertificateAimFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -58,6 +59,10 @@ from rules_management.tests.fatories import PermissionFactory, FieldReferenceFac
 
 
 class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=get_current_year())
+
     def setUp(self):
         self.education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
         self.form_class = TrainingEducationGroupYearForm
@@ -68,6 +73,54 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
                                 ares_graca=200,
                                 ares_ability=300
                                 )
+
+    def test_clean_certificate_aims(self):
+        administration_entity_version = MainEntityVersionFactory(end_date=None)
+        management_entity_version = MainEntityVersionFactory(end_date=None)
+        person = PersonFactory()
+        PersonEntityFactory(
+            person=person,
+            entity=management_entity_version.entity
+        )
+        user = person.user
+
+        parent_education_group_year = TrainingFactory(academic_year=self.academic_year,
+                                                      education_group_type=self.education_group_type,
+                                                      management_entity=management_entity_version.entity,
+                                                      administration_entity=administration_entity_version.entity,
+                                                      )
+        AuthorizedRelationshipFactory(
+            parent_type=parent_education_group_year.education_group_type,
+            child_type=self.education_group_type,
+        )
+
+        cert = [CertificateAimFactory(code=code, section=2) for code in range(100, 102)]
+        for i in range(0, len(cert)):
+            with self.subTest(i=i):
+                cert_for_form = [str(cert[j].pk) for j in range(0, i+1)]
+
+                form = self.form_class(
+                    data={
+                        'acronym': "EEDY2020",
+                        'partial_acronym': 'EEDY2020F',
+                        'title': "Test",
+                        'internship': 'OPTIONAL',
+                        'primary_language': LanguageFactory().pk,
+                        'active': 'ACTIVE',
+                        'schedule_type': 'DAILY',
+                        'administration_entity': administration_entity_version.pk,
+                        'management_entity': management_entity_version.pk,
+                        'diploma_printing_title': 'Diplome en test',
+                        'certificate_aims': cert_for_form,
+                    },
+                    parent=parent_education_group_year,
+                    education_group_type=parent_education_group_year.education_group_type,
+                    user=user,
+                )
+                if i == 0:
+                    self.assertTrue(form.is_valid())
+                else:
+                    self.assertFalse(form.is_valid())
 
     @patch('base.forms.education_group.common.find_authorized_types')
     def test_get_context_for_field_references_case_not_in_editing_pgrm_period(self, mock_authorized_types):
@@ -259,7 +312,7 @@ class TestPostponementEducationGroupYear(TestCase):
         domains = [DomainFactory(name="Alchemy"), DomainFactory(name="Muggle Studies")]
         self.data["secondary_domains"] = '|'.join([str(domain.pk) for domain in domains])
 
-        certificate_aims = [CertificateAimFactory(code=code) for code in range(100, 103)]
+        certificate_aims = [CertificateAimFactory(code=100, section=1), CertificateAimFactory(code=101, section=2)]
         self.data["certificate_aims"] = [str(aim.pk) for aim in certificate_aims]
 
         form = TrainingForm(
@@ -281,7 +334,7 @@ class TestPostponementEducationGroupYear(TestCase):
         self.education_group_year.refresh_from_db()
         self.assertEqual(self.education_group_year.secondary_domains.count(), 2)
         self.assertEqual(last.secondary_domains.count(), 2)
-        self.assertEqual(last.certificate_aims.count(), 3)
+        self.assertEqual(last.certificate_aims.count(), len(certificate_aims))
         self.assertEqual(len(form.warnings), 0)
 
         # update with a conflict

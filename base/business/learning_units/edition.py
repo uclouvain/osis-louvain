@@ -33,16 +33,17 @@ from base.business import learning_unit_year_with_context
 from base.business.learning_units.simple.deletion import delete_from_given_learning_unit_year, \
     check_learning_unit_year_deletion
 from base.business.utils.model import update_instance_model_from_data, update_related_object
+from base.enums.component_detail import COMPONENT_DETAILS
 from base.models import entity_container_year, learning_class_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_unit_year_periodicity, learning_unit_year_subtypes
+from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
 from cms.models import translated_text
-from base.enums.component_detail import COMPONENT_DETAILS
 
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
 
@@ -564,7 +565,7 @@ def _get_error_volume_field_diff(field_diff, current_component, next_year_compon
            {
                'field': COMPONENT_DETAILS[field_diff].lower(),
                'acronym': current_component.learning_unit_year.acronym,
-               'component_type': _(current_component.type) if current_component.type else 'NT',
+               'component_type': dict(COMPONENT_TYPES)[current_component.type] if current_component.type else 'NT',
                'year': current_component.learning_unit_year.academic_year,
                'value': values_diff.get('current') or _('No data'),
                'next_year': next_year_component.learning_unit_year.academic_year,

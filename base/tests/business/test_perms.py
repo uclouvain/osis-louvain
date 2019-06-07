@@ -179,7 +179,7 @@ class PermsTestCase(TestCase):
         self.assertFalse(luy.can_update_by_faculty_manager())
 
     def test_can_central_manager_modify_end_date_full(self):
-        a_person = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP)
+        a_person = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP, 'can_edit_learningunit')
         generated_container = GenerateContainer(start_year=self.academic_yr.year,
                                                 end_year=self.academic_yr.year)
         generated_container_first_year = generated_container.generated_container_years[0]

@@ -31,8 +31,7 @@
 <link rel="stylesheet" href="{% static 'css/bootstrap-datepicker3.min.css' %}" type='text/css'>
 {% endblock %}
 {% block breadcrumb %}
-<li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
-<li><a href="{% url 'academic_year' %}" id="lnk_academic_year">{% trans 'Academic year' %}</a></li>
+  <li><a href="{% url 'institution' %}" id="lnk_institution">{% trans 'Institution'%}</a></li>
 <li><a href="{% url 'academic_calendars' %}" id="lnk_academic_calendars">{% trans 'Academic calendars' %}</a></li>
 <li class="active">{% trans 'Academic calendar' %}</li>
 {% endblock %}

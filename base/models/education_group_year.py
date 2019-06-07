@@ -765,12 +765,6 @@ class EducationGroupYear(SerializableModel):
 
         return list(set(ascendants))
 
-    def is_deletable(self):
-        """An education group year cannot be deleted if there are enrollment on it"""
-        if self.offerenrollment_set.all().exists():
-            return False
-        return True
-
     def clean(self):
         self.clean_acronym()
         self.clean_partial_acronym()

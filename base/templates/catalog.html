@@ -53,13 +53,6 @@
         </div>
         <br>
         <div class="row">
-            {%  if perms.base.can_access_academicyear %}
-            <div class="col-md-1"><i class="fa fa-calendar" style="font-size: 400%; color: #6699FF;"></i></div>
-            <div class="col-md-5">
-                <h4 class="media-heading"><a href="{% url 'academic_year' %}" id="lnk_academic_year">{% trans 'Academic year' %}</a></h4>
-                <p>{% trans 'Management of the annualized program.' %}</p>
-            </div>
-            {% endif %}
             {%  if perms.base.can_access_education_group %}
             <div class="col-md-1"><i class="fa fa-map" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">

@@ -24,39 +24,40 @@
 #
 ##############################################################################
 
-from django.test import TestCase, RequestFactory
-from django.urls import reverse
-from django.test.utils import override_settings
+from django.conf import settings
 from django.contrib.auth.models import Permission
+from django.core.exceptions import PermissionDenied
+from django.test import TestCase, RequestFactory
+from django.test.utils import override_settings
+from django.urls import reverse
 
 from base.business.learning_units.perms import MSG_EXISTING_PROPOSAL_IN_EPC, MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE, \
     MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY, \
     MSG_NOT_PROPOSAL_STATE_FACULTY, MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL, \
     MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE, MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY, MSG_NOT_GOOD_RANGE_OF_YEARS, \
     MSG_NO_RIGHTS_TO_CONSOLIDATE, \
-    MSG_NOT_ELIGIBLE_TO_CONSOLIDATE_PROPOSAL, MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES, \
-    MSG_NOT_ELIGIBLE_TO_DELETE_LU, MSG_CAN_DELETE_ACCORDING_TO_TYPE, MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR, \
-    can_modify_end_year_by_proposal, is_eligible_to_modify_by_proposal, can_modify_by_proposal, \
+    MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES, \
+    MSG_CAN_DELETE_ACCORDING_TO_TYPE, can_modify_end_year_by_proposal, can_modify_by_proposal, \
     MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR, MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
+from base.models.enums import entity_container_year_link_type
+from base.models.enums import learning_container_year_types
+from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
+from base.models.enums.proposal_state import ProposalState
 from base.templatetags.learning_unit_li import li_edit_lu, li_edit_date_lu, li_modification_proposal, is_valid_proposal, \
     MSG_IS_NOT_A_PROPOSAL, MSG_PROPOSAL_NOT_ON_CURRENT_LU, DISABLED, li_suppression_proposal, li_cancel_proposal, \
     li_edit_proposal, li_consolidate_proposal, li_delete_all_lu
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.person import CentralManagerFactory, FacultyManagerFactory
-from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
-from base.models.enums import learning_unit_year_subtypes
-from base.tests.factories.user import UserFactory
+from base.tests.factories.entity_container_year import EntityContainerYearFactory
+from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.person import CentralManagerFactory, FacultyManagerFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.entity_container_year import EntityContainerYearFactory
-from base.models.enums import entity_container_year_link_type
-from base.models.enums import learning_container_year_types
-from base.models.enums.proposal_state import ProposalState
-from django.conf import settings
-from django.core.exceptions import PermissionDenied
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from base.tests.factories.user import UserFactory
 
 ID_LINK_EDIT_LU = "link_edit_lu"
 ID_LINK_EDIT_DATE_LU = "link_edit_date_lu"
@@ -98,7 +99,10 @@ class LearningUnitTagLiEditTest(TestCase):
 
         self.previous_proposal = ProposalLearningUnitFactory(learning_unit_year=self.previous_luy_2)
         self.user = UserFactory()
-        self.central_manager_person = CentralManagerFactory()
+        self.central_manager_person = create_person_with_permission_and_group(
+            CENTRAL_MANAGER_GROUP,
+            'can_edit_learningunit'
+        )
         self.person_entity = PersonEntityFactory(person=self.central_manager_person)
 
         self.requirement_entity = self.person_entity.entity
@@ -131,27 +135,30 @@ class LearningUnitTagLiEditTest(TestCase):
         }
 
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
-    def test_li_edit_lu_year_non_editable_for_faculty_manager(self):
-        faculty_manager = FacultyManagerFactory()
+    def test_li_edit_lu_year_non_editable_for_faculty_managers(self):
+        faculty_managers = [
+            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),
+            create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_edit_learningunit')
+        ]
+        for manager in faculty_managers:
+            self.context["learning_unit_year"] = self.previous_learning_unit_year
+            self.context["user"] = manager.user
 
-        self.context["learning_unit_year"] = self.previous_learning_unit_year
-        self.context["user"] = faculty_manager.user
+            result = li_edit_lu(self.context, self.url_edit, "")
 
-        result = li_edit_lu(self.context, self.url_edit, "")
-
-        self.assertEqual(
-            result, {
-                'load_modal': False,
-                'id_li': ID_LINK_EDIT_LU,
-                'url': "#",
-                'title': "{}.  {}".format("You can't modify learning unit under year : %(year)d" %
-                                          {"year": settings.YEAR_LIMIT_LUE_MODIFICATION},
-                                          "Modifications should be made in EPC for year %(year)d" %
-                                          {"year": self.previous_learning_unit_year.academic_year.year}),
-                'class_li': DISABLED,
-                'text': "",
-                'data_target': ""
-            })
+            self.assertEqual(
+                result, {
+                    'load_modal': False,
+                    'id_li': ID_LINK_EDIT_LU,
+                    'url': "#",
+                    'title': "{}.  {}".format("You can't modify learning unit under year : %(year)d" %
+                                              {"year": settings.YEAR_LIMIT_LUE_MODIFICATION},
+                                              "Modifications should be made in EPC for year %(year)d" %
+                                              {"year": self.previous_learning_unit_year.academic_year.year}),
+                    'class_li': DISABLED,
+                    'text': "",
+                    'data_target': ""
+                })
 
     def test_li_edit_lu_year_is_editable_but_existing_proposal_in_epc(self):
         self.learning_unit.existing_proposal_in_epc = True
@@ -189,22 +196,28 @@ class LearningUnitTagLiEditTest(TestCase):
         )
 
     def test_li_edit_lu_year_is_learning_unit_year_not_in_range_to_be_modified(self):
-        person_faculty = FacultyManagerFactory()
+        managers = [
+            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),
+            create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),
+        ]
+
         later_luy = LearningUnitYearFactory(academic_year=self.later_academic_year,
                                             learning_unit=LearningUnitFactory(existing_proposal_in_epc=False))
         self.context["learning_unit_year"] = later_luy
-        self.context["user"] = person_faculty.user
 
-        result = li_edit_lu(self.context, reverse('edit_learning_unit', args=[later_luy.id]), "")
+        for manager in managers:
+            self.context["user"] = manager.user
 
-        self.assertEqual(
-            result, self._get_result_data_expected(ID_LINK_EDIT_LU,
-                                                   MSG_NOT_GOOD_RANGE_OF_YEARS
-                                                   )
-        )
+            result = li_edit_lu(self.context, reverse('edit_learning_unit', args=[later_luy.id]), "")
+
+            self.assertEqual(
+                result, self._get_result_data_expected(ID_LINK_EDIT_LU,
+                                                       MSG_NOT_GOOD_RANGE_OF_YEARS
+                                                       )
+            )
 
     def test_li_edit_lu_year_person_is_not_linked_to_entity_in_charge_of_lu(self):
-        a_person = CentralManagerFactory()
+        a_person = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP, 'can_edit_learningunit')
         self.context['user'] = a_person.user
         result = li_edit_lu(self.context, self.url_edit, "")
         self.assertEqual(
@@ -230,50 +243,59 @@ class LearningUnitTagLiEditTest(TestCase):
         lu = LearningUnitFactory(existing_proposal_in_epc=False)
         learning_unit_year_without_proposal = LearningUnitYearFactory(
             academic_year=self.current_academic_year,
-            subtype=learning_unit_year_subtypes.FULL,
             learning_unit=lu,
-            learning_container_year=self.lcy
         )
-        person_faculty_manager = FacultyManagerFactory()
+        person_faculty_managers = [
+            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),
+            create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_edit_learningunit')
+        ]
 
-        PersonEntityFactory(person=person_faculty_manager,
-                            entity=self.entity_container_yr.entity)
+        for manager in person_faculty_managers:
+            learning_unit_year_without_proposal.subtype = learning_unit_year_subtypes.FULL
+            learning_unit_year_without_proposal.learning_container_year = self.lcy
+            learning_unit_year_without_proposal.learning_container_year.container_type = learning_container_year_types.COURSE
+            learning_unit_year_without_proposal.learning_container_year.save()
+            learning_unit_year_without_proposal.save()
+            PersonEntityFactory(
+                person=manager,
+                entity=self.entity_container_yr.entity
+            )
 
-        self.context['user'] = person_faculty_manager.user
-        self.context['learning_unit_year'] = learning_unit_year_without_proposal
-        result = li_edit_date_lu(self.context, self.url_edit, "")
+            self.context['user'] = manager.user
+            self.context['learning_unit_year'] = learning_unit_year_without_proposal
+            result = li_edit_date_lu(self.context, self.url_edit, "")
 
-        self.assertEqual(
-            result, self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE)
-        )
+            self.assertEqual(
+                result, self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE)
+            )
 
-        # allowed if _is_person_central_manager or
-        #            _is_learning_unit_year_a_partim or
-        #            negation(_is_container_type_course_dissertation_or_internship),
-        # test 1st condition true
-        self.context['user'] = self.central_manager_person.user
-        result = li_edit_date_lu(self.context, self.url_edit, "")
+            # allowed if _is_person_central_manager or
+            #            _is_learning_unit_year_a_partim or
+            #            negation(_is_container_type_course_dissertation_or_internship),
+            # test 1st condition true
+            self.context['user'] = self.central_manager_person.user
+            result = li_edit_date_lu(self.context, self.url_edit, "")
 
-        self.assertEqual(
-            result, self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, url=self.url_edit)
-        )
-        # test 2nd condition true
-        self.context['user'] = person_faculty_manager.user
-        learning_unit_year_without_proposal.subtype = learning_unit_year_subtypes.PARTIM
-        learning_unit_year_without_proposal.save()
-        self.context['learning_unit_year'] = learning_unit_year_without_proposal
+            self.assertEqual(
+                result, self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, url=self.url_edit)
+            )
+            # test 2nd condition true
+            self.context['user'] = manager.user
+            learning_unit_year_without_proposal.subtype = learning_unit_year_subtypes.PARTIM
+            learning_unit_year_without_proposal.save()
+            self.context['learning_unit_year'] = learning_unit_year_without_proposal
 
-        self.assertEqual(li_edit_date_lu(self.context, self.url_edit, ""),
-                         self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, url=self.url_edit))
-        # test 3rd condition true
-        learning_unit_year_without_proposal.learning_container_year.container_type = learning_container_year_types.OTHER_COLLECTIVE
-        learning_unit_year_without_proposal.learning_container_year.save()
-        learning_unit_year_without_proposal.subtype = learning_unit_year_subtypes.FULL
-        learning_unit_year_without_proposal.save()
-        self.context['learning_unit_year'] = learning_unit_year_without_proposal
+            self.assertEqual(li_edit_date_lu(self.context, self.url_edit, ""),
+                             self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, url=self.url_edit))
+            # test 3rd condition true
+            learning_unit_year_without_proposal.learning_container_year.container_type = learning_container_year_types.OTHER_COLLECTIVE
+            learning_unit_year_without_proposal.learning_container_year.save()
+            learning_unit_year_without_proposal.subtype = learning_unit_year_subtypes.FULL
+            learning_unit_year_without_proposal.save()
+            self.context['learning_unit_year'] = learning_unit_year_without_proposal
 
-        self.assertEqual(li_edit_date_lu(self.context, self.url_edit, ""),
-                         self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, url=self.url_edit))
+            self.assertEqual(li_edit_date_lu(self.context, self.url_edit, ""),
+                             self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, url=self.url_edit))
 
     def test_is_not_valid_not_proposal(self):
         self.context['proposal'] = None

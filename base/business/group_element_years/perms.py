@@ -22,12 +22,14 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from django.utils.text import ugettext_lazy as _
-from base.business.education_groups.perms import _is_eligible_education_group, can_raise_exception
+
+from base.business.education_groups.perms import can_raise_exception, \
+    is_eligible_to_change_education_group
 from base.models.enums.education_group_types import GroupType
 
 
 def is_eligible_to_update_group_element_year(person, group_element_year, raise_exception):
-    return _is_eligible_education_group(person, group_element_year.parent, raise_exception) and \
+    return is_eligible_to_change_education_group(person, group_element_year.parent, raise_exception) and \
            (not group_element_year.child_branch
             or _can_user_update_education_group_year_child(person, group_element_year.child_branch, raise_exception))
 

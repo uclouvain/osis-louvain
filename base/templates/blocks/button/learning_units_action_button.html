@@ -35,18 +35,15 @@
         <span class="caret"></span>
     </button>
 
-
     <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
         {% flag "learning_unit_create" %}
-            {% if perms.base.can_edit_learningunit %}
-                <li>
-                    <a href="{{ create_learning_unit_url }}" id="lnk_learning_unit_create">{% trans 'New learning unit' %}</a>
-                </li>
-            {% endif %}
+            <li {% if not perms.base.can_edit_learningunit %}class="disabled"{% endif %}>
+                <a {% if perms.base.can_edit_learningunit %}href="{{ create_learning_unit_url }}"{% endif %} id="lnk_learning_unit_create">{% trans 'New learning unit' %}</a>
+            </li>
         {% endflag %}
         {% flag "learning_unit_external_create" %}
-            <li>
-                <a href="{{ create_external_url }}" id="lnk_create_external_url">{% trans 'New external learning unit' %}</a>
+            <li {% if not perms.base.add_externallearningunityear %}class="disabled"{% endif %}>
+                <a {% if perms.base.add_externallearningunityear %}href="{{ create_external_url }}"{% endif %} id="lnk_create_external_url">{% trans 'New external learning unit' %}</a>
             </li>
             <li role="separator" class="divider"></li>
         {% endflag %}

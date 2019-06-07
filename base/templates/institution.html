@@ -59,8 +59,15 @@
                     <h4 class="media-heading"><a href="{% url 'academic_actors' %}" id="lnk_academic_actors">{% trans 'Academic actors'%}</a></h4>
                     <p>{% trans 'Academic actors management' %}</p>
                 </div>
-            </div>
-        {% endif %}
+            {% endif %}
+            {%  if perms.base.can_access_academicyear and perms.base.can_access_academic_calendar %}
+                <div class="col-md-1"><i class="fa fa-calendar" style="font-size: 400%; color: #6699FF;"></i></div>
+                <div class="col-md-5">
+                    <h4 class="media-heading"><a href="{% url 'academic_calendars' %}" id="lnk_academic_calendars">{% trans 'Academic calendar' %}</a></h4>
+                    <p>{% trans 'Academic calendar management' %}</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -29,7 +29,7 @@ from unittest import mock
 
 import factory.fuzzy
 import reversion
-from django.contrib.auth.models import Permission, Group
+from django.contrib.auth.models import Permission
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden
 from django.http import HttpResponseNotAllowed
@@ -46,6 +46,9 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business import learning_unit as learning_unit_business
 from base.business.learning_unit import learning_unit_titles_part1, learning_unit_titles_part2
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
+    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
+    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.forms.learning_unit.search_form import LearningUnitYearForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
@@ -59,10 +62,11 @@ from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import EXTERNAL
-from base.models.enums.groups import FACULTY_MANAGER_GROUP
+from base.models.enums.groups import FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.person import Person
+from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -82,7 +86,7 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
     LearningUnitYearFullFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
@@ -99,9 +103,6 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 from osis_common.document import xls_build
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory
-from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
-    VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
-    VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES, VOLUME_GLOBAL
 
 
 @override_flag('learning_unit_create', active=True)
@@ -652,14 +653,23 @@ class LearningUnitViewTestCase(TestCase):
 
         learning_unit_year.learning_unit.end_year = None
         learning_unit_year.learning_unit.save()
+        ue_manager = create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_edit_learningunit')
+        ue_manager.user.user_permissions.add(Permission.objects.get(codename='can_access_learningunit'))
+        managers = [
+            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),
+            ue_manager
+        ]
 
-        person_entity = PersonEntityFactory(entity=entity_container.entity)
-        person_entity.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
-        url = reverse("learning_unit", args=[learning_unit_year.id])
-        self.client.force_login(person_entity.person.user)
+        for manager in managers:
+            PersonEntityFactory(
+                entity=entity_container.entity,
+                person=manager
+            )
+            url = reverse("learning_unit", args=[learning_unit_year.id])
+            self.client.force_login(manager.user)
 
-        response = self.client.get(url)
-        self.assertEqual(response.context["can_edit_date"], True)
+            response = self.client.get(url)
+            self.assertEqual(response.context["can_edit_date"], True)
 
     def test_learning_unit_of_type_partim_with_faculty_manager(self):
         learning_container_year = LearningContainerYearFactory(
@@ -675,15 +685,19 @@ class LearningUnitViewTestCase(TestCase):
         EntityVersionFactory(entity=entity_container.entity)
         learning_unit_year.learning_unit.end_year = None
         learning_unit_year.learning_unit.save()
+        ue_manager = create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_edit_learningunit')
+        ue_manager.user.user_permissions.add(Permission.objects.get(codename='can_access_learningunit'))
+        managers = [
+            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),
+            ue_manager
+        ]
+        for manager in managers:
+            PersonEntityFactory(entity=entity_container.entity, person=manager)
+            url = reverse("learning_unit", args=[learning_unit_year.id])
+            self.client.force_login(manager.user)
 
-        person_entity = PersonEntityFactory(entity=entity_container.entity)
-        group, created = Group.objects.get_or_create(name=FACULTY_MANAGER_GROUP)
-        person_entity.person.user.groups.add(group)
-        url = reverse("learning_unit", args=[learning_unit_year.id])
-        self.client.force_login(person_entity.person.user)
-
-        response = self.client.get(url)
-        self.assertEqual(response.context["can_edit_date"], True)
+            response = self.client.get(url)
+            self.assertEqual(response.context["can_edit_date"], True)
 
     def test_learning_unit_with_faculty_manager_when_cannot_edit_end_date(self):
         learning_container_year = \
@@ -697,15 +711,17 @@ class LearningUnitViewTestCase(TestCase):
         EntityVersionFactory(entity=entity_container.entity)
         learning_unit_year.learning_unit.end_year = None
         learning_unit_year.learning_unit.save()
+        managers = [
+            FacultyManagerFactory(),
+            create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_access_learningunit')
+        ]
+        for manager in managers:
+            PersonEntityFactory(entity=entity_container.entity, person=manager)
+            url = reverse("learning_unit", args=[learning_unit_year.id])
+            self.client.force_login(manager.user)
 
-        person_entity = PersonEntityFactory(entity=entity_container.entity)
-        group, created = Group.objects.get_or_create(name=FACULTY_MANAGER_GROUP)
-        person_entity.person.user.groups.add(group)
-        url = reverse("learning_unit", args=[learning_unit_year.id])
-        self.client.force_login(person_entity.person.user)
-
-        response = self.client.get(url)
-        self.assertEqual(response.context["can_edit_date"], False)
+            response = self.client.get(url)
+            self.assertEqual(response.context["can_edit_date"], False)
 
     def test_get_components_no_learning_container_yr(self):
         luy_without_components = LearningUnitYearFactory(academic_year=self.current_academic_year)

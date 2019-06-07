@@ -77,7 +77,7 @@ class VolumeEditionForm(forms.Form):
     help_volume_total = "{} = {} + {}".format(_('Volume total annual'), _('Volume Q1'), _('Volume Q2'))
     closing_brackets_field = EmptyField(label=']')
     mult_field = EmptyField(label='*')
-    planned_classes = forms.IntegerField(label=_('Classes'), help_text=_('Planned classes'), min_value=0,
+    planned_classes = forms.IntegerField(label=_('Planned classes'), help_text=_('Planned classes'), min_value=0,
                                          widget=forms.TextInput(), required=False)
     equal_field_2 = EmptyField(label='=')
 

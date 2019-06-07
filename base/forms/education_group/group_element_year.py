@@ -29,7 +29,6 @@ from django.core.exceptions import ValidationError
 from base.business.group_element_years.attach import AttachEducationGroupYearStrategy, AttachLearningUnitYearStrategy
 from base.business.group_element_years.management import check_authorized_relationship
 from base.models.enums import education_group_categories
-from base.models.enums.link_type import LinkTypes
 from base.models.exceptions import AuthorizedRelationshipNotRespectedException
 from base.models.group_element_year import GroupElementYear
 
@@ -69,10 +68,6 @@ class GroupElementYearForm(forms.ModelForm):
         if self.instance.child_branch and not self._check_authorized_relationship(
                 self.instance.child_branch.education_group_type):
             self.fields.pop("access_condition")
-
-            # Change the initial but (for strange reasons) let the possibility to the user to try with the main link.
-            # Like that he will see the form error.
-            self.fields["link_type"].initial = LinkTypes.REFERENCE.name
 
         elif self._is_education_group_year_a_minor_major_option_list_choice(self.instance.parent) and \
                 not self._is_education_group_year_a_minor_major_option_list_choice(self.instance.child_branch):

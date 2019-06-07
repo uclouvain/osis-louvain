@@ -72,7 +72,14 @@
 
                 }
 
-        },true)
+            },true);
+            let tab_identification = document.getElementById('tab_identification');
+            let tab_diploma = document.getElementById('tab_diploma');
+
+            if(tab_identification.getElementsByClassName('has-error').length > 0)
+                $("#spn_identification_errors").append('<i class="fa fa-circle" aria-hidden="true"></i>');
+            if(tab_diploma.getElementsByClassName('has-error').length > 0)
+                $("#spn_diploma_errors").append('<i class="fa fa-circle" aria-hidden="true"></i>');
         });
 
     </script>

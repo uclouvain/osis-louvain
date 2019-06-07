@@ -50,14 +50,14 @@ base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_CE
 </ul>
 Examples: <i>ETES9CE</i>","Sigle d’un Certificat est composé de:
 <ul>
-<li>2-4 lettres + 1 chiffre parmis 2 et 9 + <b>CE</b></li>
+<li>2-4 lettres + 1 chiffre parmi 2 et 9 + <b>CE</b></li>
 </ul>
 Exemples: <i>ETES9CE</i>",Ex: ETES9CE
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_2CE,REQUIRED,2CE,"^([A-Za-z]{2,4})(2)([Cc])([Ee])$",,"Acronym of CAPAES is composed of:
 <ul>
 <li>2-4 letters + <b>2CE</b></li>
 </ul>
-Examples: <i>CAPA2CE</i>","Sigle d’une CAPAES est composé de
+Examples: <i>CAPA2CE</i>","Sigle d’un CAPAES est composé de
 <ul>
 <li>2-4 lettres + <b>2CE</b></li>
 </ul>
@@ -339,7 +339,7 @@ base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group
 <li>numerical part: 3 numbers</li>
 <li><b>Q</b></li>
 </ul>
-Examples: <i>LETES300Q</i>","Code d’un Certificate est composé de:
+Examples: <i>LETES300Q</i>","Code d’un Certificat est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>

@@ -53,14 +53,6 @@
                                         </a>
                                     </li>
                                 {% endif %}
-                                {% if perms.base.can_access_academicyear %}
-                                    <li>
-                                        <a href="{% url 'academic_year' %}" id="lnk_dropdown_academic_year">
-                                            <span class="fa fa-calendar"></span>
-                                            {% trans 'Academic year' %}
-                                        </a>
-                                    </li>
-                                {% endif %}
                             </ul>
                         </li>
                     {% endif %}
@@ -123,6 +115,14 @@
                                         <a href="{% url 'academic_actors' %}" id="lnk_dropdown_academic actors">
                                             <span class="fa fa-users"></span>
                                             {% trans 'Academic actors' %}
+                                        </a>
+                                    </li>
+                                {% endif %}
+                                {% if perms.base.can_access_academicyear and perms.base.can_access_academic_calendar %}
+                                    <li>
+                                        <a href="{% url 'academic_calendars' %}" id="lnk_academic_calendars">
+                                            <span class="fa fa-calendar"></span>
+                                            {% trans 'Academic calendar' %}
                                         </a>
                                     </li>
                                 {% endif %}

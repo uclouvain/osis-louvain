@@ -174,18 +174,6 @@ def data_maintenance(request):
 
 
 @login_required
-@permission_required('base.can_access_academicyear', raise_exception=True)
-def academic_year(request):
-    return render(
-        request,
-        "academic_year.html",
-        {
-            'section': 'academic_year',
-        }
-    )
-
-
-@login_required
 @permission_required('base.is_administrator', raise_exception=True)
 def storage(request):
     df = subprocess.Popen(["df", "-h"], stdout=subprocess.PIPE)

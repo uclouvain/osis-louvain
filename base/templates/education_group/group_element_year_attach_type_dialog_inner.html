@@ -34,21 +34,18 @@
 
         <div id="form-modal-body" class="modal-body">
            <div id="attach_info">
-                {% blocktrans with object_acronym=object_to_attach.acronym parent_acronym=source_link.parent.acronym%}Do you want to copy {{ object_acronym }} or to move {{ object_acronym }} from {{ parent_acronym }} ?{% endblocktrans %}
-
-                {% if not request.is_ajax %}
-                    {% if source_link %}
-                        <a class="btn btn-primary" href="">{% trans "Move" %}</a>
-                    {% endif %}
-                    <a class="btn btn-primary" href="">{% trans "Copy" %}</a>
-                {% endif %}
+            {% if source_link %}
+                {% blocktrans with object_acronym=object_to_attach.acronym parent_acronym=source_link.parent.acronym%}Do you want to copy or to move {{ object_acronym }} from {{ parent_acronym }} ?{% endblocktrans %}
+            {% else %}
+                {% blocktrans with object_acronym=object_to_attach.acronym parent_acronym=source_link.parent.acronym%}Do you want to copy {{ object_acronym }} ?{% endblocktrans %}
+            {% endif %}
            </div>
         </div>
 
         <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
             {% if source_link %}
-                <a class="trigger_modal btn btn-primary"
+                <a class="trigger_modal btn btn-danger"
                    data-url="{% url "group_element_year_move" root education_group_year_parent.id source_link.id %}">
                     {% trans "Move" %}
                 </a>
