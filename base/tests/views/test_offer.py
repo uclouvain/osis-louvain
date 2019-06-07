@@ -27,12 +27,14 @@ import datetime
 from unittest import mock
 
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseForbidden
 from django.test import TestCase
 
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import SuperUserFactory
 
@@ -69,8 +71,7 @@ class OfferViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'offers.html')
         self.assertEqual(response.context['offer_years'].count(), 0)
 
-    @mock.patch('base.models.program_manager.is_program_manager', return_value=True)
-    def test_offer_read(self, mock_program_manager):
+    def test_offer_read(self):
         today = datetime.date.today()
         academic_year = AcademicYearFactory(start_date=today,
                                             end_date=today.replace(year=today.year + 1),
@@ -97,3 +98,21 @@ class OfferViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'offer_year_calendar.html')
         self.assertEqual(response.context['offer_year_calendar'], offer_year)
         self.assertEqual(response.context['is_programme_manager'], mock_program_manager.is_program_manager())
+
+    def test_cannot_access_any_offer_pages_if_not_program_manager(self):
+        offer_year = OfferYearCalendarFactory()
+        person = PersonFactory()
+        self.client.force_login(person.user)
+        pages = [
+            ('offer_year_calendar_read', offer_year.id),
+            ('offer_read', offer_year.pk),
+            ('offer_academic_calendar_tab', offer_year.pk),
+            ('offer_program_managers_tab', offer_year.pk),
+            ('offers_search', None),
+            ('offers', None)
+        ]
+        for page, arg in pages:
+            url = reverse(page, args=[arg]) if arg else reverse(page)
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+            self.assertTemplateUsed(response, 'access_denied.html')
