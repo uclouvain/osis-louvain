@@ -29,7 +29,7 @@ from base.models.program_manager import ProgramManager
 from base.models.student import find_by_registration_id
 
 
-def checkAccessToStudent(global_id, registration_id):
+def check_access_to_student(global_id, registration_id):
     student = find_by_registration_id(registration_id)
     offer_years_ids = list(OfferEnrollment.objects.filter(student=student).values_list('offer_year__id', flat=True))
     manager = find_by_global_id(global_id)

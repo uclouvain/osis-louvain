@@ -48,7 +48,7 @@ class CheckAccessToStudentTestCase(TestCase):
         cls.program_manager = ProgramManagerFactory(person=cls.person, offer_year=cls.offer_year_1)
 
     def testManagerAllowed(self):
-        self.assertTrue(pm_business.checkAccessToStudent(self.person.global_id, self.student_1.registration_id))
+        self.assertTrue(pm_business.check_access_to_student(self.person.global_id, self.student_1.registration_id))
 
     def testManagerNotAllowed(self):
-        self.assertFalse(pm_business.checkAccessToStudent(self.person.global_id, self.student_2.registration_id))
+        self.assertFalse(pm_business.check_access_to_student(self.person.global_id, self.student_2.registration_id))

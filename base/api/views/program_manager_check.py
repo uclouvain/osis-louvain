@@ -37,5 +37,9 @@ class AccessToStudentView(views.APIView):
     http_method_names = ['get']
 
     def get(self, request, global_id, registration_id):
-        results = CheckAccessToStudentSerializer(CheckAccessToStudent(global_id, registration_id, pm_business.checkAccessToStudent(global_id, registration_id)))
-        return Response(results.data)
+        access_results = CheckAccessToStudent(global_id,
+                                              registration_id,
+                                              pm_business.check_access_to_student(global_id,
+                                                                                  registration_id))
+        access_results_ser = CheckAccessToStudentSerializer(access_results)
+        return Response(access_results_ser.data)

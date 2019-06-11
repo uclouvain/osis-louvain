@@ -31,4 +31,3 @@ class CheckAccessToStudent:
         self.global_id = global_id
         self.registration_id = registration_id
         self.authorized = authorized
-
