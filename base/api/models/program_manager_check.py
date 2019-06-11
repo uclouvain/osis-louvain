@@ -23,14 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
 
-from base.api.views.person import PersonRoles
-from base.api.views.program_manager_check import AccessToStudentView
 
-urlpatterns = [
-    url(r'^person/(?P<global_id>[0-9]+)/roles$', PersonRoles.as_view(), name=PersonRoles.name),
-    url(r'^programmanager/checkaccesstostudent/(?P<global_id>[0-9]+)/(?P<registration_id>[0-9]+)$',
-        AccessToStudentView.as_view(),
-        name=AccessToStudentView.name),
-]
+class CheckAccessToStudent:
+
+    def __init__(self, global_id, registration_id, authorized=False):
+        self.global_id = global_id
+        self.registration_id = registration_id
+        self.authorized = authorized
+

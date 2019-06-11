@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,14 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from rest_framework import serializers
 
-from base.api.views.person import PersonRoles
-from base.api.views.program_manager_check import AccessToStudentView
 
-urlpatterns = [
-    url(r'^person/(?P<global_id>[0-9]+)/roles$', PersonRoles.as_view(), name=PersonRoles.name),
-    url(r'^programmanager/checkaccesstostudent/(?P<global_id>[0-9]+)/(?P<registration_id>[0-9]+)$',
-        AccessToStudentView.as_view(),
-        name=AccessToStudentView.name),
-]
+class CheckAccessToStudentSerializer(serializers.Serializer):
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
+    global_id = serializers.CharField(max_length=10, allow_null=False)
+    registration_id = serializers.CharField(max_length=10, allow_null=False)
+    authorized = serializers.BooleanField(default=False)

@@ -1,0 +1,98 @@
+openapi: 3.0.0
+servers:
+ - url: https://{environment}.osis.uclouvain.be/api/v1/base/
+   variables:
+     environment:
+       default: dev
+       enum:
+         - dev # Development server
+         - qa # Staging server
+         - test # Test server
+ - url: https://osis.uclouvain.be/api/v1/base/
+   description: Production server
+info:
+  version: '1'
+  title: Base Service
+  description: |-
+    A set of API endpoints that allow you to get, update, delete base objects.
+paths:
+  /programmanager/checkaccesstostudent/{global_id}/{registration_id}:
+      get:
+        description: Return the authorisation to access the student infos
+        operationId: pgm_manager_check_access
+        parameters:
+        - in: path
+          name: global_id
+          required: true
+          schema:
+            description: 'Global id of the manager'
+            type: string
+        - in: path
+          name: registration_id
+          required: true
+          schema:
+            description: 'Registration id of the student'
+            type: string
+        responses:
+          '200':
+            description: OK
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/CheckAccessToStudent'
+          '400':
+            $ref: '#/components/responses/BadRequest'
+          '401':
+            $ref: '#/components/responses/Unauthorized'
+          '404':
+            $ref: '#/components/responses/NotFound'
+        tags:
+        - trainings
+  components:
+    securitySchemes:
+      Token:
+        type: apiKey
+        in: header
+        name: Authorization
+        description: Enter your token in the format **Token &lt;token>**
+    responses:
+      Unauthorized:
+        description: Unauthorized
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+      BadRequest:
+        description: Bad request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+      NotFound:
+        description: The specified resource was not found
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Error'
+  schemas:
+    CheckAccessToStudent:
+      type: object
+      properties:
+        global_id:
+          type: string
+        registration_id:
+          type: string
+        authorized:
+          type: boolean
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+security:
+  - Token: []

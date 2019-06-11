@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,14 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from rest_framework import views
+from rest_framework.response import Response
 
-from base.api.views.person import PersonRoles
-from base.api.views.program_manager_check import AccessToStudentView
+from base.api.models.program_manager_check import CheckAccessToStudent
+from base.api.serializers.program_manager_check import CheckAccessToStudentSerializer
+from base.business.program_manager import program_manager_check as pm_business
 
-urlpatterns = [
-    url(r'^person/(?P<global_id>[0-9]+)/roles$', PersonRoles.as_view(), name=PersonRoles.name),
-    url(r'^programmanager/checkaccesstostudent/(?P<global_id>[0-9]+)/(?P<registration_id>[0-9]+)$',
-        AccessToStudentView.as_view(),
-        name=AccessToStudentView.name),
-]
+
+class AccessToStudentView(views.APIView):
+
+    name = 'check-program-manager'
+    http_method_names = ['get']
+
+    def get(self, request, global_id, registration_id):
+        results = CheckAccessToStudentSerializer(CheckAccessToStudent(global_id, registration_id, pm_business.checkAccessToStudent(global_id, registration_id)))
+        return Response(results.data)

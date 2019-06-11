@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,14 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf.urls import url
+from base.models.offer_enrollment import OfferEnrollment
+from base.models.person import find_by_global_id
+from base.models.program_manager import ProgramManager
+from base.models.student import find_by_registration_id
 
-from base.api.views.person import PersonRoles
-from base.api.views.program_manager_check import AccessToStudentView
 
-urlpatterns = [
-    url(r'^person/(?P<global_id>[0-9]+)/roles$', PersonRoles.as_view(), name=PersonRoles.name),
-    url(r'^programmanager/checkaccesstostudent/(?P<global_id>[0-9]+)/(?P<registration_id>[0-9]+)$',
-        AccessToStudentView.as_view(),
-        name=AccessToStudentView.name),
-]
+def checkAccessToStudent(global_id, registration_id):
+    student = find_by_registration_id(registration_id)
+    offer_years_ids = list(OfferEnrollment.objects.filter(student=student).values_list('offer_year__id', flat=True))
+    manager = find_by_global_id(global_id)
+    return ProgramManager.objects.filter(person=manager, offer_year__id__in=offer_years_ids).exists()
