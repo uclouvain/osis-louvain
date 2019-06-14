@@ -33,3 +33,5 @@ OSIS is writen in
 To know more about the code and the collaboration of the community, please visit
 our [OpenHub](https://www.openhub.net/p/osis-louvain) page.
 
+This is a jenkins test.
+
