@@ -31,7 +31,7 @@
     <li>
         <a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a>
     </li>
-    <li class="active">{% trans 'Education groups' %}</li>
+    <li class="active">{% trans 'Trainings' %}</li>
 {% endblock %}
 
 {% block content %}
@@ -39,7 +39,7 @@
     <div class="page-header">
         <div class="row">
             <div class="col-md-10">
-                <h2>{% trans 'Education groups' %}</h2>
+                <h2>{% trans 'Trainings' %}</h2>
             </div>
             <div class="col-md-2" style="margin-top:20px;">
                 <div class="btn-group pull-right">
@@ -104,7 +104,7 @@
                 {% if object_list_count %}
                     <div class="row">
                         <div class="col-md-6">
-                            <strong style="margin-left:10px;color:grey;"> {{ object_list_count }} {% trans 'Education groups'|lower %} </strong>
+                            <strong style="margin-left:10px;color:grey;"> {{ object_list_count }} {% trans 'Trainings'|lower %} </strong>
                         </div>
                         <div class="col-md-6">
                             <button id="dLabel" class="btn btn-default pull-right" type="button"
@@ -118,14 +118,14 @@
                                 <li>
                                     <a id="btn_produce_xls"
                                        style="margin-right:10px;"
-                                       title="{% trans 'Produce xls with a list of education groups' %}">
+                                       title="{% trans 'Produce xls with a list of trainings' %}">
                                         &nbsp;{% trans 'List of trainings' %}
                                     </a>
                                 </li>
                                 <li>
                                     <a id="btn_produce_xls_administrative_data"
                                        style="margin-right:10px;"
-                                       title="Produce xls of trainings with administrative data">
+                                       title="{% trans 'Produce xls of trainings with administrative data' %}">
                                         &nbsp;{% trans 'List of trainings with administrative data' %}
                                     </a>
                                 </li>

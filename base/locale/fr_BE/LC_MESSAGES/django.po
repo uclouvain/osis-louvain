@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-24 15:25+0200\n"
+"POT-Creation-Date: 2019-06-25 15:26+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -20,7 +20,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Poedit 2.2.1\n"
 
-#: views/education_groups/group_element_year/delete.py:67
+#: views/education_groups/group_element_year/delete.py:68
 #, python-format
 msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" a été détaché de \"%(parent)s\""
@@ -930,7 +930,7 @@ msgstr "Annuler"
 msgid "Cancel the proposal"
 msgstr "Annuler la proposition"
 
-#: business/group_element_years/detach.py:125
+#: business/group_element_years/detach.py:128
 #, python-format
 msgid ""
 "Cannot detach education group year %(acronym)s as the following learning "
@@ -940,7 +940,7 @@ msgstr ""
 "détachée car les unités d'enseignement suivantes sont des prérequis dans "
 "%(formation)s: %(learning_units)s"
 
-#: business/group_element_years/detach.py:199
+#: business/group_element_years/detach.py:202
 #, python-format
 msgid ""
 "Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a "
@@ -1555,12 +1555,6 @@ msgid ""
 msgstr ""
 "Organisation de formations <a href='%(link)s'> %(acronym)s "
 "(%(academic_year)s) </a> mis à jour avec succès."
-
-#: templates/education_group/search.html:34
-#: templates/education_group/search.html:42
-#: templates/education_group/search.html:107
-msgid "Education groups"
-msgstr "Organisations de formations"
 
 #: business/education_group.py:45 business/education_group.py:46
 msgid "Education_groups"
@@ -2468,7 +2462,7 @@ msgstr "Liste des enseignants"
 
 #: templates/education_group/search.html:122
 msgid "List of trainings"
-msgstr "Liste des organisations de formation"
+msgstr "Liste des formations"
 
 #: business/education_group.py:56 templates/education_group/search.html:129
 msgid "List of trainings with administrative data"
@@ -3085,7 +3079,7 @@ msgstr "Opération"
 msgid "Option"
 msgstr "Option"
 
-#: business/group_element_years/detach.py:177
+#: business/group_element_years/detach.py:180
 #, python-format
 msgid ""
 "Option \"%(acronym)s\" cannot be detach because it is contained in "
@@ -3100,7 +3094,7 @@ msgstr[1] ""
 "Les options \"%(acronym)s\" ne peuvent pas être détachées car elles sont "
 "présentes dans le programme %(finality_acronym)s."
 
-#: business/group_element_years/attach.py:137
+#: business/group_element_years/attach.py:139
 #, python-format
 msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
 msgid_plural ""
@@ -3325,8 +3319,8 @@ msgstr ""
 "%(academic_year_max)d."
 
 #: tests/views/education_groups/test_update.py:712
-#: views/education_groups/group_element_year/create.py:55
-#: views/education_groups/group_element_year/create.py:82
+#: views/education_groups/group_element_year/create.py:56
+#: views/education_groups/group_element_year/create.py:83
 msgid "Please select an item before attach it"
 msgstr "Veuillez Sélectionner ou Déplacer un élément avant d'Attacher"
 
@@ -3414,10 +3408,14 @@ msgstr "Produire Excel"
 msgid "Produce a customizable xls of learning units"
 msgstr "Produire une liste personnalisable des unités d'enseignement"
 
+#: templates/education_group/search.html:128
+msgid "Produce xls of trainings with administrative data"
+msgstr "Produire un fichier Excel avec la liste des formations avec données administratives"
+
 #: templates/education_group/search.html:121
-msgid "Produce xls with a list of education groups"
+msgid "Produce xls with a list of trainings"
 msgstr ""
-"Produire un fichier Excel avec la liste des organisations de formations"
+"Produire un fichier Excel avec la liste des formations"
 
 #: models/education_group_organization.py:54
 #: templates/education_group/blocks/coorganization.html:41
@@ -3879,7 +3877,7 @@ msgstr "Secteur"
 msgid "Select"
 msgstr "Sélectionner"
 
-#: forms/education_group/common.py:356
+#: forms/education_group/common.py:359
 msgid "Select a language"
 msgstr "Sélectionnez une langue"
 
@@ -4307,7 +4305,7 @@ msgstr ""
 msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
-#: forms/common.py:142 forms/education_group/common.py:194
+#: forms/common.py:142 forms/education_group/common.py:197
 #: templates/education_group/blocks/form/group.html:63
 #: templates/education_group/blocks/form/minitraining.html:64
 #: templates/education_group/blocks/form/training_tab_identification.html:70
@@ -4435,12 +4433,12 @@ msgstr ""
 msgid "The learning units"
 msgstr "Les unités d'enseignement"
 
-#: views/education_groups/group_element_year/create.py:102
+#: views/education_groups/group_element_year/create.py:103
 #, python-format
 msgid "The link of %(acronym)s has been created"
 msgstr "Le lien de %(acronym)s ont été mis à jour"
 
-#: views/education_groups/group_element_year/update.py:146
+#: views/education_groups/group_element_year/update.py:147
 #, python-format
 msgid "The link of %(acronym)s has been updated"
 msgstr "Le lien de %(acronym)s ont été mis à jour"
@@ -4461,7 +4459,7 @@ msgstr ""
 msgid "The messages sent by the application to you"
 msgstr "La liste des messages qui vous ont été envoyés par l'application"
 
-#: forms/education_group/common.py:345
+#: forms/education_group/common.py:348
 #: tests/views/education_groups/test_select_education_group_type.py:131
 #, python-format
 msgid ""
@@ -4532,7 +4530,7 @@ msgstr ""
 "Les prérequis %(prerequisites)s pour l'unité d'enseignement "
 "%(learning_unit)s ne sont pas dans la formation sélectionnée %(root)s"
 
-#: business/group_element_years/detach.py:143
+#: business/group_element_years/detach.py:146
 #, python-format
 msgid ""
 "The prerequisites for the following learning units contained in education "
@@ -4863,6 +4861,9 @@ msgstr "Type d'OF"
 #: templates/catalog.html:43 templates/education_group/layout.html:7
 #: templates/education_group/learning_unit/layout_detail.html:6
 #: templates/education_group/learning_unit/tab_prerequisite_group.html:38
+#: templates/education_group/search.html:34
+#: templates/education_group/search.html:42
+#: templates/education_group/search.html:107
 #: templates/learning_unit/blocks/tabs.html:44
 #: templates/learning_unit/formations.html:47
 #: templates/learning_unit/proposal/tabs.html:45
@@ -4941,7 +4942,7 @@ msgstr "Type de contrainte"
 msgid "Type of event"
 msgstr "Type d'événement"
 
-#: forms/education_group/common.py:325 models/education_group_type.py:79
+#: forms/education_group/common.py:328 models/education_group_type.py:79
 #: models/education_group_year.py:195
 msgid "Type of training"
 msgstr "Type de formation"
@@ -5191,7 +5192,7 @@ msgstr "Pondération par crédit"
 msgid "Welcome"
 msgstr "Accueil"
 
-#: forms/education_group/common.py:337
+#: forms/education_group/common.py:340
 #, python-format
 msgid "Which type of %(category)s do you want to create ?"
 msgstr "Quel type de %(category)s voulez-vous créer ?"
@@ -5331,8 +5332,8 @@ msgstr ""
 msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
 
-#: business/group_element_years/attach.py:150
-#: business/group_element_years/attach.py:166
+#: business/group_element_years/attach.py:152
+#: business/group_element_years/attach.py:168
 msgid "You can not attach the same child several times."
 msgstr "Vous ne pouvez pas attaché plusieurs fois le même enfant."
 
@@ -5406,8 +5407,8 @@ msgstr ""
 #, python-format
 msgid "You cannot create/update an education group before %(limit_year)s"
 msgstr ""
-"Vous ne pouvez pas créer/modifier une organisation de formation datant d'avant "
-"%(limit_year)s"
+"Vous ne pouvez pas créer/modifier une organisation de formation datant "
+"d'avant %(limit_year)s"
 
 #: business/learning_units/perms.py:67
 #, python-format
