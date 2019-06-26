@@ -46,8 +46,8 @@ from base.forms.learning_unit_proposal import ProposalLearningUnitForm
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm
 from base.models import entity_version
 from base.models import proposal_learning_unit
-from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_component_year_type
+from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import organization_type, entity_type, \
     learning_unit_year_subtypes, proposal_type, learning_container_year_types, proposal_state
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
@@ -152,6 +152,8 @@ class TestLearningUnitModificationProposal(TestCase):
             'component-1-hourly_volume_total_annual': 20,
             'component-1-hourly_volume_partial_q1': 10,
             'component-1-hourly_volume_partial_q2': 10,
+            'component-0-planned_classes': 1,
+            'component-1-planned_classes': 1,
         }
 
     def setUp(self):
@@ -724,6 +726,8 @@ class TestEditProposal(TestCase):
             'component-1-hourly_volume_total_annual': 20,
             'component-1-hourly_volume_partial_q1': 10,
             'component-1-hourly_volume_partial_q2': 10,
+            'component-0-planned_classes': 1,
+            'component-1-planned_classes': 1,
         }
 
     def get_modify_data(self):

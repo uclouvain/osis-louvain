@@ -10,17 +10,15 @@ $(document).ready(function () {
     let $documentTree = $('#panel_file_tree');
 
     $documentTree.bind("state_ready.jstree", function (event, data) {
+        // Bind the redirection only when the tree is ready,
+        // however, it reload the page during the loading
+        $documentTree.bind("select_node.jstree", function (event, data) {
+            document.location.href = data.node.a_attr.href;
+        });
         // if the tree has never been loaded, execute close_all by default.
         if ($.vakata.storage.get(data.instance.settings.state.key) === null) {
             $(this).jstree('close_all');
         }
-
-        $("a.jstree-anchor").click(function( event ) {
-            let pageLocator = '_self';
-            if (event.ctrlKey || event.metaKey) pageLocator = '_blank';
-            data.instance.deselect_all();
-            window.open($(this).attr('href'), pageLocator);
-        });
     });
 
     function get_data_from_tree(data) {
@@ -70,7 +68,7 @@ $(document).ready(function () {
                 "selected": false,
             },
             "contextmenu": {
-                "select_node": true,
+                "select_node": false,
                 "items": {
                     "select": {
                         "label": gettext("Select"),

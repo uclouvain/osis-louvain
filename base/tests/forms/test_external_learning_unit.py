@@ -106,9 +106,11 @@ def get_valid_external_learning_unit_form_data(academic_year, person, learning_u
         'component-0-hourly_volume_total_annual': 20,
         'component-0-hourly_volume_partial_q1': 10,
         'component-0-hourly_volume_partial_q2': 10,
+        'component-0-planned_classes': 1,
         'component-1-hourly_volume_total_annual': 20,
         'component-1-hourly_volume_partial_q1': 10,
         'component-1-hourly_volume_partial_q2': 10,
+        'component-1-planned_classes': 1,
     }
 
 

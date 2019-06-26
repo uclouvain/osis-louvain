@@ -33,12 +33,14 @@ from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test import TestCase, RequestFactory, TransactionTestCase
 from django.utils import timezone
+from django.utils.translation import gettext
 from django.utils.translation import ugettext_lazy as _
 
 from assessments.business.score_encoding_list import ScoresEncodingList
 from assessments.tests.views.test_upload_xls_utils import generate_exam_enrollments
 from assessments.views import score_encoding
 from assessments.views.score_encoding import online_encoding_submission
+from assessments.views.upload_xls_utils import UploadValueError, _extract_session_number
 from base.models.enums import exam_enrollment_justification_type
 from base.models.enums import exam_enrollment_state
 from base.models.enums import number_session, academic_calendar_type
@@ -522,6 +524,30 @@ class UploadXLSTest(TestCase):
                                 'Registration number', 'Lastname', 'Firstname', 'Email', 'Numbered scores',
                                 'Justification (A,T)', 'End date Prof']
         self.assertListEqual(HEADER, header_expected_list)
+
+
+class UploadXLSExtractSessionTest(TestCase):
+    def test_extract_session_number_many_values(self):
+        with self.assertRaisesMessage(
+                UploadValueError,
+                gettext("File error : Different values in the column Session. No scores injected.")
+        ):
+            _extract_session_number(
+                {
+                    'sessions': [1, 2]
+                }
+            )
+
+    def test_extract_session_number_no_value(self):
+        with self.assertRaisesMessage(
+                UploadValueError,
+                gettext("File error : No value in the column Session. No scores injected.")
+        ):
+            _extract_session_number(
+                {
+                    'sessions': []
+                }
+            )
 
 
 def prepare_exam_enrollment_for_double_encoding_validation(exam_enrollment):

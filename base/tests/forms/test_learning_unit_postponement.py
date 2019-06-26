@@ -27,6 +27,7 @@ from collections import OrderedDict
 from decimal import Decimal
 from unittest import mock
 
+from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.utils.translation import ugettext as _
 
@@ -35,11 +36,12 @@ from base.forms.learning_unit.learning_unit_create_2 import FullForm
 from base.forms.learning_unit.learning_unit_partim import PartimForm
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm, FIELDS_TO_NOT_POSTPONE
 from base.models.academic_year import AcademicYear
-from base.models.enums import attribution_procedure, entity_container_year_link_type, learning_unit_year_subtypes, \
+from base.models.enums import attribution_procedure, learning_unit_year_subtypes, \
     vacant_declaration_type
+from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.models.enums.learning_component_year_type import LECTURING
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_container_year import find_last_entity_version_grouped_by_linktypes, LearningContainerYear
+from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -47,8 +49,6 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from django.contrib.auth.models import Group
-from base.models.enums.groups import FACULTY_MANAGER_GROUP
 
 FULL_ACRONYM = 'LAGRO1000'
 SUBDIVISION_ACRONYM = 'C'
@@ -712,6 +712,8 @@ def _instantiate_base_learning_unit_form(learning_unit_year_instance, person):
             'component-1-hourly_volume_total_annual': 20,
             'component-1-hourly_volume_partial_q1': 10,
             'component-1-hourly_volume_partial_q2': 10,
+            'component-0-planned_classes': 1,
+            'component-1-planned_classes': 1,
 
             'acronym': learning_unit_year_instance.acronym,
             'acronym_0': learning_unit_year_instance.acronym[0],

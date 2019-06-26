@@ -23,34 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from .base import *
+from unittest import mock
 
-OPTIONAL_APPS = (
-    'attribution',
-    'assistant',
-    'continuing_education',
-    'dissertation',
-    'internship',
-    'assessments',
-    'cms',
-    'webservices',
-    'behave_django',
-    'backoffice'
-)
-OPTIONAL_MIDDLEWARES = ()
-OPTIONAL_INTERNAL_IPS = ()
+from django.test import TestCase, override_settings
 
-if os.environ.get("ENABLE_DEBUG_TOOLBAR", "False").lower() == "true":
-    OPTIONAL_APPS += ('debug_toolbar',)
-    OPTIONAL_MIDDLEWARES += ('debug_toolbar.middleware.DebugToolbarMiddleware',)
-    OPTIONAL_INTERNAL_IPS += ('127.0.0.1',)
-    DEBUG_TOOLBAR_CONFIG = {
-        'SHOW_TOOLBAR_CALLBACK': 'base.middlewares.toolbar.show_toolbar',
-        'JQUERY_URL': os.path.join(STATIC_URL, "js/jquery-2.1.4.min.js"),
+from osis_common.queue.queue_listener import SynchronousConsumerThread
+
+
+@override_settings(
+    QUEUES={
+        'QUEUES_NAME': {
+            'QUEUE': 'NAME'
+        }
     }
-
-INSTALLED_APPS += OPTIONAL_APPS
-APPS_TO_TEST += OPTIONAL_APPS
-MIDDLEWARE += OPTIONAL_MIDDLEWARES
-INTERNAL_IPS += OPTIONAL_INTERNAL_IPS
-SITE_ID = 1
+)
+class WSGITestCase(TestCase):
+    @mock.patch.object(SynchronousConsumerThread, 'start', return_value=None)
+    def test_listen_to_queue_with_callback(self, mock_queue):
+        from backoffice.wsgi import _listen_to_queue_with_callback
+        _listen_to_queue_with_callback(
+            callback=lambda: None,
+            queue_name='QUEUE'
+        )
+        self.assertTrue(mock_queue.called)

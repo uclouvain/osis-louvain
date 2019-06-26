@@ -19,6 +19,8 @@ from .local import *
 #        'SCORE_ENCODING_PDF_RESPONSE': 'score_encoding_pdf_response',
 #        'APPLICATION_OSIS_PORTAL': 'application_osis_portal',
 #        'ATTRIBUTION_RESPONSE': 'attribution_response',
+#        'IUFC_TO_EPC': 'rabbitIUFCInscrRequest',
+#        'EPC_TO_IUFC': 'rabbitIUFCInscrResponse'
 #    }
 #}
 

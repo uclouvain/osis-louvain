@@ -37,8 +37,8 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm,
 from base.forms.learning_unit_proposal import ProposalLearningUnitForm, CreationProposalBaseForm
 from base.models.enums import learning_unit_year_subtypes, learning_container_year_types, organization_type, \
     entity_type, learning_unit_year_periodicity
-from base.models.learning_unit_year import LearningUnitYear
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.tests.factories import campus as campus_factory, \
     organization as organization_factory, person as factory_person, user as factory_user
@@ -106,6 +106,8 @@ class LearningUnitViewTestCase(TestCase):
             'component-1-hourly_volume_total_annual': 20,
             'component-1-hourly_volume_partial_q1': 10,
             'component-1-hourly_volume_partial_q2': 10,
+            'component-0-planned_classes': 1,
+            'component-1-planned_classes': 1,
         }
 
     def test_get_proposal_learning_unit_creation_form(self):

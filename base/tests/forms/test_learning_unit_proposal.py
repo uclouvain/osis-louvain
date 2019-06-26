@@ -123,6 +123,8 @@ class TestSave(TestCase):
             'component-1-hourly_volume_total_annual': Decimal(20),
             'component-1-hourly_volume_partial_q1': Decimal(10),
             'component-1-hourly_volume_partial_q2': Decimal(10),
+            'component-0-planned_classes': 1,
+            'component-1-planned_classes': 1,
         }
 
     def test_learning_unit_proposal_form_get_as_faculty_manager(self):

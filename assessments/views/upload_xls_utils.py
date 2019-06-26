@@ -206,9 +206,15 @@ def __save_xls_scores(request, file_name, learning_unit_year_id):
 
 def _extract_session_number(data_xls):
     if len(data_xls['sessions']) > 1:
-        raise UploadValueError('more_than_one_session_error', messages.ERROR)
+        raise UploadValueError(
+            _("File error : Different values in the column Session. No scores injected."),
+            messages.ERROR
+        )
     elif len(data_xls['sessions']) == 0:
-        raise UploadValueError('missing_column_session', messages.ERROR)
+        raise UploadValueError(
+            _("File error : No value in the column Session. No scores injected."),
+            messages.ERROR
+        )
     return data_xls['sessions'][0] # Only one session
 
 

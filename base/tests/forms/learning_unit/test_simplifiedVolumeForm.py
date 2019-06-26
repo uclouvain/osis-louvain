@@ -48,6 +48,8 @@ class TestSimplifiedVolumeManagementForm(TestCase):
             'component-1-hourly_volume_total_annual': 20,
             'component-1-hourly_volume_partial_q1': 10,
             'component-1-hourly_volume_partial_q2': 10,
+            'component-0-planned_classes': 1,
+            'component-1-planned_classes': 1,
         }
         generator = GenerateContainer(get_current_year(), get_current_year())
         self.learning_unit_year = generator[0].learning_unit_year_full
@@ -116,15 +118,15 @@ class TestSimplifiedVolumeForm(TestCase):
     def test_clean(self):
         self.instance.hourly_volume_partial_q1 = 0
         form = SimplifiedVolumeForm(
-            data={"hourly_volume_partial_q1": 12}, is_faculty_manager=True, instance=self.instance,
+            data={"hourly_volume_partial_q1": 5}, is_faculty_manager=True, instance=self.instance,
             index=0,
             component_type=COMPONENT_TYPES[0]
         )
         form.is_valid()
-        self.assertEqual(form.errors["hourly_volume_partial_q1"][0],
-                         gettext("One of the partial volumes must have a value to 0."))
-        self.assertEqual(form.errors["hourly_volume_partial_q2"][0],
-                         gettext("One of the partial volumes must have a value to 0."))
+        self.assertTrue(
+            gettext("One of the partial volumes must have a value to 0.") in form.errors["hourly_volume_partial_q1"])
+        self.assertTrue(
+            gettext("One of the partial volumes must have a value to 0.") in form.errors["hourly_volume_partial_q2"])
 
         self.instance.hourly_volume_partial_q1 = 12
         form = SimplifiedVolumeForm(
@@ -133,9 +135,19 @@ class TestSimplifiedVolumeForm(TestCase):
             index=0
         )
         form.is_valid()
-        self.assertEqual(form.errors["hourly_volume_partial_q1"][0],
-                         gettext("The volume can not be set to 0."))
+        self.assertTrue(gettext("The volume can not be set to 0.") in form.errors["hourly_volume_partial_q1"])
         self.assertFalse(form.errors.get("hourly_volume_partial_q2"))
+
+        self.instance.hourly_volume_partial_q1 = 5
+        self.instance.hourly_volume_partial_q2 = 12
+        form = SimplifiedVolumeForm(
+            data={"hourly_volume_partial_q2": 0}, is_faculty_manager=True, instance=self.instance,
+            component_type=COMPONENT_TYPES[0],
+            index=0
+        )
+        form.is_valid()
+        self.assertTrue(gettext("The volume can not be set to 0.") in form.errors["hourly_volume_partial_q2"])
+        self.assertFalse(form.errors.get("hourly_volume_partial_q1"))
 
     def test_with_incorrect_volume_total(self):
         form = SimplifiedVolumeForm(

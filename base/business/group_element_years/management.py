@@ -109,7 +109,7 @@ def can_link_be_detached(root, link):
     min_reached, max_reached, not_authorized = _check_authorized_relationship(root, link, to_delete=True)
     if link.child_branch.education_group_type.name in min_reached:
         raise AuthorizedRelationshipNotRespectedException(
-            errors=_("The parent must have at least one child of type(s) \"%(types)s\".") % {
+            message=_("The parent must have at least one child of type(s) \"%(types)s\".") % {
                 "types": ', '.join(str(AllTypes.get_value(name)) for name in min_reached)
             }
         )

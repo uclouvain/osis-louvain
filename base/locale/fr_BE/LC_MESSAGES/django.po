@@ -3,13 +3,13 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:148
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:149
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:160
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:161
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-25 15:26+0200\n"
+"POT-Creation-Date: 2019-06-25 15:41+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -36,12 +36,12 @@ msgid "%(col_name)s has been already modified."
 msgstr "%(col_name)s a déjà été modifié."
 
 #: forms/learning_unit/learning_unit_postponement.py:375
-#: tests/forms/test_learning_unit_postponement.py:526
-#: tests/forms/test_learning_unit_postponement.py:540
-#: tests/forms/test_learning_unit_postponement.py:564
-#: tests/forms/test_learning_unit_postponement.py:571
-#: tests/forms/test_learning_unit_postponement.py:594
-#: tests/forms/test_learning_unit_postponement.py:675
+#: tests/forms/test_learning_unit_postponement.py:527
+#: tests/forms/test_learning_unit_postponement.py:541
+#: tests/forms/test_learning_unit_postponement.py:565
+#: tests/forms/test_learning_unit_postponement.py:572
+#: tests/forms/test_learning_unit_postponement.py:595
+#: tests/forms/test_learning_unit_postponement.py:676
 #, python-format
 msgid ""
 "%(col_name)s has been already modified. (%(new_value)s instead of "
@@ -479,7 +479,7 @@ msgstr "Actions"
 #: templates/learning_unit/comparison.html:54
 #: templates/learning_unit/summary_list.html:102
 #: tests/business/test_proposal_xls.py:107
-#: tests/forms/test_learning_unit_postponement.py:541
+#: tests/forms/test_learning_unit_postponement.py:542
 msgid "Active"
 msgstr "Actif"
 
@@ -571,7 +571,7 @@ msgstr "Entité resp. cahier des charges complémentaire 1"
 #: models/enums/entity_container_year_link_type.py:47
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:53
 #: templates/learning_unit/identification.html:236
-#: tests/forms/test_learning_unit_postponement.py:676
+#: tests/forms/test_learning_unit_postponement.py:677
 #: views/learning_unit.py:243 views/learning_unit.py:358
 #: views/learning_unit.py:376
 msgid "Additional requirement entity 2"
@@ -1897,7 +1897,7 @@ msgid "French language proficiency examination"
 msgstr "Maîtrise de la langue française"
 
 #: models/learning_unit_year.py:139
-#: tests/forms/test_learning_unit_postponement.py:527
+#: tests/forms/test_learning_unit_postponement.py:528
 msgid "French title proper"
 msgstr "Intitulé propre en français"
 
@@ -2939,7 +2939,7 @@ msgstr ""
 msgid "No print"
 msgstr "Pas d’impression"
 
-#: tests/views/test_learning_unit_proposal.py:401
+#: tests/views/test_learning_unit_proposal.py:403
 #: views/learning_units/search.py:204
 msgid "No proposals was selected."
 msgstr "Aucune proposition n'a été sélectionnée."
@@ -3029,13 +3029,13 @@ msgid "On the file: direct access or access with additional training"
 msgstr ""
 "Sur dossier: accès direct, moyennant compléments de formation, ou refusé"
 
-#: forms/learning_unit/edition_volume.py:156
-#: forms/learning_unit/edition_volume.py:157
-#: forms/learning_unit/edition_volume.py:358
-#: forms/learning_unit/edition_volume.py:359
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:125
+#: business/education_groups/volume_strategy.py:77
+#: business/education_groups/volume_strategy.py:79
+#: business/education_groups/volume_strategy.py:99
+#: business/education_groups/volume_strategy.py:101
 #: tests/forms/learning_unit/test_simplifiedVolumeForm.py:127
-#: tests/forms/test_edition_form.py:321 tests/forms/test_edition_form.py:322
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:129
+#: tests/forms/test_edition_form.py:339 tests/forms/test_edition_form.py:340
 msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
 
@@ -3278,9 +3278,9 @@ msgid "Placeholder"
 msgstr ""
 
 #: business/proposal_xls.py:94 business/proposal_xls.py:104
-#: enums/component_detail.py:43 forms/learning_unit/edition_volume.py:83
-#: forms/learning_unit/edition_volume.py:104
-#: forms/learning_unit/edition_volume.py:338
+#: enums/component_detail.py:43 forms/learning_unit/edition_volume.py:85
+#: forms/learning_unit/edition_volume.py:106
+#: forms/learning_unit/edition_volume.py:335
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:46
 #: tests/business/test_proposal_xls.py:151
 #: tests/business/test_proposal_xls.py:161
@@ -3497,7 +3497,7 @@ msgstr "Prolonger"
 msgid "Proposal"
 msgstr "Proposition"
 
-#: tests/views/test_learning_unit_proposal.py:522
+#: tests/views/test_learning_unit_proposal.py:524
 #, python-format
 msgid "Proposal %(acronym)s (%(academic_year)s) successfully canceled."
 msgstr "Proposition %(acronym)s (%(academic_year)s) annulée avec succès."
@@ -3602,7 +3602,7 @@ msgstr "Mettre en proposition de fin d'enseignement"
 msgid "Put in proposal in modification"
 msgstr "Mettre en proposition de modification"
 
-#: forms/learning_unit/edition_volume.py:60
+#: forms/learning_unit/edition_volume.py:62
 msgid "Q1"
 msgstr "Q1"
 
@@ -3614,7 +3614,7 @@ msgstr "Q1 et Q2"
 msgid "Q1 or Q2"
 msgstr "Q1 ou Q2"
 
-#: forms/learning_unit/edition_volume.py:67
+#: forms/learning_unit/edition_volume.py:69
 msgid "Q2"
 msgstr "Q2"
 
@@ -3749,7 +3749,7 @@ msgstr "Obligatoire"
 #: models/enums/entity_container_year_link_type.py:44
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:49
 #: templates/learning_unit/identification.html:233
-#: tests/forms/test_learning_unit_postponement.py:595
+#: tests/forms/test_learning_unit_postponement.py:596
 #: views/learning_unit.py:235 views/learning_unit.py:356
 #: views/learning_unit.py:374
 msgid "Requirement entity"
@@ -4167,14 +4167,13 @@ msgstr "Les information supplémentaires ont été sauvegardées avec succès"
 msgid "The administrative data has been successfully modified"
 msgstr "Les données administratives ont été sauvées avec succès"
 
-#: forms/learning_unit/edition_volume.py:76
-#: forms/learning_unit/edition_volume.py:148
-#: forms/learning_unit/edition_volume.py:327
-#: forms/learning_unit/edition_volume.py:374
+#: business/education_groups/volume_strategy.py:34
+#: forms/learning_unit/edition_volume.py:78
+#: forms/learning_unit/edition_volume.py:324
 #: models/learning_component_year.py:132
 #: templates/learning_unit/components.html:51
 #: templates/learning_unit/components_identification.html:37
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:151
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:163
 #: tests/models/test_learning_unit_year.py:346
 #: tests/models/test_learning_unit_year.py:382
 msgid "The annual volume must be equal to the sum of the volumes Q1 and Q2"
@@ -4384,7 +4383,7 @@ msgstr ""
 #: business/learning_units/edition.py:418
 #: forms/learning_unit/learning_unit_postponement.py:337
 #: tests/business/test_learning_unit_edition.py:930
-#: tests/forms/test_learning_unit_postponement.py:646
+#: tests/forms/test_learning_unit_postponement.py:647
 #, python-format
 msgid ""
 "The learning unit %(luy)s is in proposal, can not save the change from the "
@@ -4554,7 +4553,7 @@ msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
 
 #: forms/learning_unit/learning_unit_postponement.py:365
-#: tests/forms/test_learning_unit_postponement.py:618
+#: tests/forms/test_learning_unit_postponement.py:619
 #, python-format
 msgid ""
 "The repartition volume of %(col_name)s has been already modified. "
@@ -4582,6 +4581,13 @@ msgstr ""
 #: tests/forms/test_education_groups_administrative_data.py:278
 msgid "The start date must be equals or lower than the end date"
 msgstr "La date de début doit être égale ou inférieure à la date de fin"
+
+#: business/education_groups/volume_strategy.py:59
+msgid ""
+"The sum of the volumes of the entities must be equal to the global volume"
+msgstr ""
+"Le volume global doit être égal à la somme des volumes répartis sur les "
+"entités"
 
 #: tests/views/test_learning_unit.py:1322 views/learning_unit.py:489
 #, python-format
@@ -4664,14 +4670,21 @@ msgstr ""
 msgid "The volume Q1 or Q2 must have a value but not both"
 msgstr "Le volume Q1 ou Q2 doit avoir une valeur"
 
-#: forms/learning_unit/edition_volume.py:161
-#: forms/learning_unit/edition_volume.py:163
-#: forms/learning_unit/edition_volume.py:363
-#: forms/learning_unit/edition_volume.py:365
-#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:137
-#: tests/forms/test_edition_form.py:332 tests/forms/test_edition_form.py:342
+#: business/education_groups/volume_strategy.py:83
+#: business/education_groups/volume_strategy.py:85
+#: business/education_groups/volume_strategy.py:105
+#: business/education_groups/volume_strategy.py:107
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:138
+#: tests/forms/learning_unit/test_simplifiedVolumeForm.py:149
+#: tests/forms/test_edition_form.py:350 tests/forms/test_edition_form.py:360
 msgid "The volume can not be set to 0."
 msgstr "Le volume ne peut pas être mis à 0."
+
+#: business/education_groups/volume_strategy.py:56
+msgid "The volume of the entity must be equal to the global volume"
+msgstr ""
+"Le volume global doit être égal à la somme des volumes répartis sur les "
+"entités"
 
 #: business/learning_units/quadrimester_strategy.py:38
 #: tests/models/test_learning_unit_year.py:809
@@ -4740,13 +4753,13 @@ msgstr "Ce champ ne peut pas être défini"
 #: models/education_group_publication_contact.py:100
 #: models/education_group_year.py:797 models/education_group_year.py:818
 #: models/education_group_year.py:820
-#: tests/views/learning_units/proposals/test_creation.py:186
-#: tests/views/learning_units/proposals/test_creation.py:187
 #: tests/views/learning_units/proposals/test_creation.py:188
 #: tests/views/learning_units/proposals/test_creation.py:189
 #: tests/views/learning_units/proposals/test_creation.py:190
+#: tests/views/learning_units/proposals/test_creation.py:191
+#: tests/views/learning_units/proposals/test_creation.py:192
 msgid "This field is required."
-msgstr "Ce champ est vide."
+msgstr "Ce champ est obligatoire."
 
 #: templates/education_group/pdf_content.html:65
 msgid ""
@@ -5082,7 +5095,7 @@ msgid "Vol. Q2"
 msgstr "Vol. Q2"
 
 #: business/proposal_xls.py:92 business/proposal_xls.py:102
-#: enums/component_detail.py:40 forms/learning_unit/edition_volume.py:75
+#: enums/component_detail.py:40 forms/learning_unit/edition_volume.py:77
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:43
 #: templates/learning_unit/components.html:52
 #: templates/learning_unit/components_identification.html:38
@@ -5109,18 +5122,18 @@ msgstr "Volume 1"
 msgid "Volume 2"
 msgstr "Volume 2"
 
-#: forms/learning_unit/edition_volume.py:61
-#: forms/learning_unit/edition_volume.py:80
-#: forms/learning_unit/edition_volume.py:330
+#: forms/learning_unit/edition_volume.py:63
+#: forms/learning_unit/edition_volume.py:82
+#: forms/learning_unit/edition_volume.py:327
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:38
 #: tests/views/test_learning_unit.py:1525 views/learning_unit.py:231
 #: views/learning_unit.py:354 views/learning_unit.py:372
 msgid "Volume Q1"
 msgstr "Volume Q1"
 
-#: forms/learning_unit/edition_volume.py:68
-#: forms/learning_unit/edition_volume.py:80
-#: forms/learning_unit/edition_volume.py:334
+#: forms/learning_unit/edition_volume.py:70
+#: forms/learning_unit/edition_volume.py:82
+#: forms/learning_unit/edition_volume.py:331
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:40
 #: tests/views/test_learning_unit.py:1526 views/learning_unit.py:233
 #: views/learning_unit.py:355 views/learning_unit.py:373
@@ -5131,8 +5144,8 @@ msgstr "Volume Q2"
 msgid "Volume annuel"
 msgstr "Volume total annuel"
 
-#: forms/learning_unit/edition_volume.py:80
-#: forms/learning_unit/edition_volume.py:103
+#: forms/learning_unit/edition_volume.py:82
+#: forms/learning_unit/edition_volume.py:105
 #: tests/views/test_learning_unit.py:1523 views/learning_unit.py:226
 #: views/learning_unit.py:352 views/learning_unit.py:370
 msgid "Volume total annual"
@@ -5441,12 +5454,12 @@ msgstr "Vous avez le choix entre"
 
 #: forms/learning_unit/learning_unit_create.py:364
 #: forms/learning_unit/learning_unit_create_2.py:209
-#: tests/views/learning_units/proposals/test_creation.py:196
+#: tests/views/learning_units/proposals/test_creation.py:198
 msgid "You must either set the common title or the specific title"
 msgstr "L'intitulé propre ou l'intitulé commun est requis"
 
-#: tests/views/test_learning_unit_proposal.py:218
-#: tests/views/test_learning_unit_proposal.py:338
+#: tests/views/test_learning_unit_proposal.py:220
+#: tests/views/test_learning_unit_proposal.py:340
 #: views/learning_units/proposal/update.py:82
 #: views/learning_units/proposal/update.py:115
 #, python-format
@@ -5837,8 +5850,8 @@ msgstr "contrainte minimum"
 #: tests/business/test_education_group.py:357
 #: tests/business/test_learning_unit_xls.py:289 tests/business/test_xls.py:40
 #: tests/business/test_xls.py:42
-#: tests/forms/test_learning_unit_postponement.py:542
 #: tests/forms/test_learning_unit_postponement.py:543
+#: tests/forms/test_learning_unit_postponement.py:544
 msgid "no"
 msgstr "non"
 
@@ -5883,12 +5896,14 @@ msgstr ""
 msgid "person"
 msgstr "personne"
 
+#: business/education_groups/volume_strategy.py:45
 #: models/learning_component_year.py:140
 #: tests/models/test_learning_unit_year.py:606
 msgid "planned classes cannot be 0 while volume is greater than 0"
 msgstr ""
 "le nombre de classes prévues ne peut être 0 si le volume est supérieur à 0"
 
+#: business/education_groups/volume_strategy.py:42
 #: models/learning_component_year.py:144
 #: tests/models/test_learning_unit_year.py:624
 msgid "planned classes cannot be greather than 0 while volume is equal to 0"
@@ -6116,7 +6131,7 @@ msgstr "volume déclaré vacant"
 msgid "volume requirement entity"
 msgstr "vol. ent. charge"
 
-#: forms/learning_unit/edition_volume.py:102
+#: forms/learning_unit/edition_volume.py:104
 msgid "volume total global"
 msgstr "volume total global"
 
@@ -6138,8 +6153,8 @@ msgstr "vol. tot. ent. charge"
 #: tests/business/learning_units/test_edition.py:147
 #: tests/business/test_education_group.py:356
 #: tests/business/test_learning_unit_xls.py:289 tests/business/test_xls.py:41
-#: tests/forms/test_learning_unit_postponement.py:542
 #: tests/forms/test_learning_unit_postponement.py:543
+#: tests/forms/test_learning_unit_postponement.py:544
 msgid "yes"
 msgstr "oui"
 

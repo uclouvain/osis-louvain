@@ -60,21 +60,38 @@ except ImportError as ie:
 from django.conf import settings
 LOGGER = logging.getLogger(settings.DEFAULT_LOGGER)
 
-if hasattr(settings, 'QUEUES') and settings.QUEUES:
-    from osis_common.queue import queue_listener, callbacks
-    # migration queue used to migrate data between osis ans osis_portal
+
+def _listen_to_queue_with_callback(callback, queue_name):
+    from osis_common.queue import queue_listener
     try:
-        queue_listener.SynchronousConsumerThread(settings.QUEUES.get('QUEUES_NAME').get('MIGRATIONS_TO_CONSUME'),
-                                                 callbacks.process_message).start()
+        queue_listener.SynchronousConsumerThread(
+            settings.QUEUES.get('QUEUES_NAME').get(queue_name),
+            callback
+        ).start()
     except (ConnectionClosed, ChannelClosed, AMQPConnectionError, ConnectionError) as e:
         LOGGER.exception("Couldn't connect to the QueueServer")
+
+
+if hasattr(settings, 'QUEUES') and settings.QUEUES:
+    from osis_common.queue import callbacks
+    # migration queue used to migrate data between osis ans osis_portal
+    _listen_to_queue_with_callback(
+        callback=callbacks.process_message,
+        queue_name='MIGRATIONS_TO_CONSUME'
+    )
 
     # Queue in which are sent scores sheets json data
     # This queue is used only if assessments module is installed
     if 'assessments' in settings.INSTALLED_APPS:
         from assessments.views.score_encoding import send_json_scores_sheets_to_response_queue
-        try:
-            queue_listener.SynchronousConsumerThread(settings.QUEUES.get('QUEUES_NAME').get('SCORE_ENCODING_PDF_REQUEST'),
-                                                     send_json_scores_sheets_to_response_queue).start()
-        except (ConnectionClosed, ChannelClosed, AMQPConnectionError, ConnectionError) as e:
-            LOGGER.exception("Couldn't connect to the QueueServer")
+        _listen_to_queue_with_callback(
+            callback=send_json_scores_sheets_to_response_queue,
+            queue_name='SCORE_ENCODING_PDF_REQUEST'
+        )
+    if 'continuing_education' in settings.INSTALLED_APPS:
+        from continuing_education.business.registration_queue import save_role_registered_in_admission
+
+        _listen_to_queue_with_callback(
+            callback=save_role_registered_in_admission,
+            queue_name='EPC_TO_IUFC'
+        )

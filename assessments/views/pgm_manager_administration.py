@@ -193,7 +193,7 @@ def pgm_manager_administration(request):
         'academic_year': current_academic_yr,
         'administrator_entities_string': _get_administrator_entities_acronym_list(administrator_entities),
         'entities_managed_root': administrator_entities,
-        'offer_types': OfferType.objects.exclude(name_in=EXCLUDE_OFFER_TYPE_SEARCH),
+        'offer_types': OfferType.objects.exclude(name__in=EXCLUDE_OFFER_TYPE_SEARCH),
         'managers': _get_entity_program_managers(administrator_entities, current_academic_yr),
         'init': '1'})
 
