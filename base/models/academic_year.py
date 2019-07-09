@@ -29,6 +29,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
 
+from base.models import academic_calendar
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
@@ -170,7 +171,10 @@ def get_last_academic_years(last_years=10):
 
 def get_default_academic_year_for_search_form():
     current_ac = current_academic_year()
-    event = current_ac.next().academiccalendar_set.get(reference=EDUCATION_GROUP_EDITION)
-    if event and event.start_date <= datetime.date.today():
-        return current_ac.next()
-    return current_ac
+    try:
+        event = current_ac.next().academiccalendar_set.get(reference=EDUCATION_GROUP_EDITION)
+        if event.start_date <= datetime.date.today():
+            return current_ac.next()
+        return current_ac
+    except academic_calendar.AcademicCalendar.DoesNotExist:
+        return current_ac

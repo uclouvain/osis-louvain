@@ -43,7 +43,8 @@ from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search_form import LearningUnitYearForm, ExternalLearningUnitYearForm
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm, ProposalStateModelForm
 from base.forms.search.search_form import get_research_criteria
-from base.models.academic_year import current_academic_year, get_last_academic_years, starting_academic_year
+from base.models.academic_year import current_academic_year, get_last_academic_years, starting_academic_year, \
+    get_default_academic_year_for_search_form
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear
@@ -73,7 +74,7 @@ def learning_units_search(request, search_type):
         request.GET or None,
         service_course_search=service_course_search,
         borrowed_course_search=borrowed_course_search,
-        initial={'academic_year_id': starting_academic_year(), 'with_entity_subordinated': True}
+        initial={'academic_year_id': get_default_academic_year_for_search_form(), 'with_entity_subordinated': True}
     )
     found_learning_units = LearningUnitYear.objects.none()
     try:

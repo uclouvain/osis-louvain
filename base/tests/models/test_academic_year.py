@@ -73,27 +73,39 @@ class MultipleAcademicYearTest(TestCase):
         academic_yr = academic_year.starting_academic_year()
         self.assertEqual(academic_yr.year, now.year)
 
-    def test_default_academic_year_if_before_event(self):
-        date_in_one_day = datetime.date.today() + datetime.timedelta(days=1)
-        AcademicCalendarFactory(
+    def test_get_default_academic_year_for_search_form(self):
+        test_cases = [
+            {
+                'name': 'before_event',
+                'start_date': datetime.date.today() + datetime.timedelta(days=1),
+                'delta': datetime.timedelta(days=1),
+                'expected_result': academic_year.current_academic_year()
+            },
+            {
+                'name': 'after_event',
+                'start_date': datetime.date.today() + datetime.timedelta(days=-1),
+                'delta': datetime.timedelta(days=3),
+                'expected_result': academic_year.current_academic_year().next()
+            },
+            {
+                'name': 'no_event',
+                'expected_result': academic_year.current_academic_year()
+            }
+        ]
+        acf = AcademicCalendarFactory(
             reference=EDUCATION_GROUP_EDITION,
-            start_date=date_in_one_day,
-            end_date=date_in_one_day + datetime.timedelta(days=1),
             academic_year=academic_year.current_academic_year().next()
         )
-        ac = academic_year.get_default_academic_year_for_search_form()
-        self.assertEqual(ac, academic_year.current_academic_year())
-
-    def test_default_academic_year_if_during_of_after_event(self):
-        yesterday = datetime.date.today() + datetime.timedelta(days=-1)
-        AcademicCalendarFactory(
-            reference=EDUCATION_GROUP_EDITION,
-            start_date=yesterday,
-            end_date=yesterday + datetime.timedelta(days=3),
-            academic_year=academic_year.current_academic_year().next()
-        )
-        ac = academic_year.get_default_academic_year_for_search_form()
-        self.assertEqual(ac, academic_year.current_academic_year().next())
+        for case in test_cases:
+            with self.subTest(type=case['name']):
+                if case.get('start_date'):
+                    acf.start_date = case['start_date']
+                    acf.end_date = case['start_date'] + case['delta']
+                    acf.save()
+                else:
+                    acf.delete()
+                ac = academic_year.get_default_academic_year_for_search_form()
+                self.assertEqual(ac, case['expected_result'])
 
 
 class SingleAcademicYearTest(TestCase):
