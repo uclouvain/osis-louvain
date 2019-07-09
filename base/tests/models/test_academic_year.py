@@ -24,11 +24,14 @@
 #
 ##############################################################################
 import datetime
-from django.utils import timezone
+
 from django.test import TestCase
+from django.utils import timezone
+
 from base.models import academic_year
 from base.models.academic_year import AcademicYear
-
+from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 
 now = datetime.datetime.now()
@@ -69,6 +72,40 @@ class MultipleAcademicYearTest(TestCase):
     def test_starting_academic_year(self):
         academic_yr = academic_year.starting_academic_year()
         self.assertEqual(academic_yr.year, now.year)
+
+    def test_get_default_academic_year_for_search_form(self):
+        test_cases = [
+            {
+                'name': 'before_event',
+                'start_date': datetime.date.today() + datetime.timedelta(days=1),
+                'delta': datetime.timedelta(days=1),
+                'expected_result': academic_year.current_academic_year()
+            },
+            {
+                'name': 'after_event',
+                'start_date': datetime.date.today() + datetime.timedelta(days=-1),
+                'delta': datetime.timedelta(days=3),
+                'expected_result': academic_year.current_academic_year().next()
+            },
+            {
+                'name': 'no_event',
+                'expected_result': academic_year.current_academic_year()
+            }
+        ]
+        acf = AcademicCalendarFactory(
+            reference=EDUCATION_GROUP_EDITION,
+            academic_year=academic_year.current_academic_year().next()
+        )
+        for case in test_cases:
+            with self.subTest(type=case['name']):
+                if case.get('start_date'):
+                    acf.start_date = case['start_date']
+                    acf.end_date = case['start_date'] + case['delta']
+                    acf.save()
+                else:
+                    acf.delete()
+                ac = academic_year.get_default_academic_year_for_search_form()
+                self.assertEqual(ac, case['expected_result'])
 
 
 class SingleAcademicYearTest(TestCase):

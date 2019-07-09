@@ -29,7 +29,7 @@ from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
 
 from base.business.entity import get_entities_ids
-from base.models.academic_year import AcademicYear, current_academic_year
+from base.models.academic_year import AcademicYear, get_default_academic_year_for_search_form
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
@@ -130,7 +130,7 @@ class EducationGroupFilter(FilterSet):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.form.fields['education_group_type'].queryset = EducationGroupType.objects.all().order_by_translated_name()
-        self.form.fields['academic_year'].initial = current_academic_year()
+        self.form.fields['academic_year'].initial = get_default_academic_year_for_search_form()
         self.form.fields['category'].initial = education_group_categories.TRAINING
         self.form.fields["with_entity_subordinated"].initial = kwargs.pop('with_entity_subordinated', True)
 
