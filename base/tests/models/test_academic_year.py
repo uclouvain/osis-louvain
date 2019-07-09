@@ -24,11 +24,14 @@
 #
 ##############################################################################
 import datetime
-from django.utils import timezone
+
 from django.test import TestCase
+from django.utils import timezone
+
 from base.models import academic_year
 from base.models.academic_year import AcademicYear
-
+from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 
 now = datetime.datetime.now()
@@ -69,6 +72,28 @@ class MultipleAcademicYearTest(TestCase):
     def test_starting_academic_year(self):
         academic_yr = academic_year.starting_academic_year()
         self.assertEqual(academic_yr.year, now.year)
+
+    def test_default_academic_year_if_before_event(self):
+        date_in_one_day = datetime.date.today() + datetime.timedelta(days=1)
+        AcademicCalendarFactory(
+            reference=EDUCATION_GROUP_EDITION,
+            start_date=date_in_one_day,
+            end_date=date_in_one_day + datetime.timedelta(days=1),
+            academic_year=academic_year.current_academic_year().next()
+        )
+        ac = academic_year.get_default_academic_year_for_search_form()
+        self.assertEqual(ac, academic_year.current_academic_year())
+
+    def test_default_academic_year_if_during_of_after_event(self):
+        yesterday = datetime.date.today() + datetime.timedelta(days=-1)
+        AcademicCalendarFactory(
+            reference=EDUCATION_GROUP_EDITION,
+            start_date=yesterday,
+            end_date=yesterday + datetime.timedelta(days=3),
+            academic_year=academic_year.current_academic_year().next()
+        )
+        ac = academic_year.get_default_academic_year_for_search_form()
+        self.assertEqual(ac, academic_year.current_academic_year().next())
 
 
 class SingleAcademicYearTest(TestCase):
