@@ -29,6 +29,7 @@ from django.db import models
 from django.utils import timezone
 from django.utils.functional import cached_property
 
+from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 LEARNING_UNIT_CREATION_SPAN_YEARS = 6
@@ -165,3 +166,11 @@ def get_last_academic_years(last_years=10):
     today = datetime.date.today()
     date_ten_years_before = today.replace(year=today.year - last_years)
     return AcademicYear.objects.filter(start_date__gte=date_ten_years_before)
+
+
+def get_default_academic_year_for_search_form():
+    current_ac = current_academic_year()
+    event = current_ac.next().academiccalendar_set.get(reference=EDUCATION_GROUP_EDITION)
+    if event and event.start_date <= datetime.date.today():
+        return current_ac.next()
+    return current_ac
