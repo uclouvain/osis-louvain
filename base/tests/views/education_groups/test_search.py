@@ -36,7 +36,7 @@ from django.utils.translation import ugettext_lazy as _
 from base import utils
 from base.forms.education_groups import EducationGroupFilter
 from base.models.enums import education_group_categories
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
@@ -56,6 +56,8 @@ class TestEducationGroupSearchView(TestCase):
         cls.person = PersonFactory(user=cls.user)
         cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
         cls.url = reverse("education_groups")
+        current = create_current_academic_year()
+        AcademicYearFactory(year=current.year + 1)
 
     def setUp(self):
         self.client.force_login(self.user)
@@ -99,6 +101,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         today = datetime.date.today()
         cls.academic_year = AcademicYearFactory(start_date=today, end_date=today.replace(year=today.year + 1),
                                                 year=today.year)
+        AcademicYearFactory(year=cls.academic_year.year + 1)
         cls.previous_academic_year = AcademicYearFactory(start_date=today.replace(year=today.year - 1),
                                                          end_date=today - datetime.timedelta(days=1),
                                                          year=today.year - 1)
