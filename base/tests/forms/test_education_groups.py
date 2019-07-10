@@ -26,8 +26,9 @@
 
 from django.test import TestCase
 
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.forms.education_groups import EducationGroupFilter
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
 
 
 class TestEducationGroupTypeOrderingForm(TestCase):
@@ -36,6 +37,8 @@ class TestEducationGroupTypeOrderingForm(TestCase):
         self.educ_grp_type_D = EducationGroupTypeFactory(name='D label')
         self.educ_grp_type_B = EducationGroupTypeFactory(name='B label')
         self.educ_grp_type_A = EducationGroupTypeFactory(name='A label')
+        current = create_current_academic_year()
+        AcademicYearFactory(year=current.year + 1)
 
     def test_ordering(self):
         filter = EducationGroupFilter()
