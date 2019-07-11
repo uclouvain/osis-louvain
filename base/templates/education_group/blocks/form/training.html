@@ -29,7 +29,8 @@
 <form method="post" id="UpdateTrainingForm"
       class="education_group_form"
       novalidate
-      data-validate-url="{% if education_group_year %}{% url 'validate_education_group_field' form_education_group_year.category education_group_year.pk %} {% else %}{% url 'validate_education_group_field' form_education_group_year.category %}{% endif %}">
+      data-validate-url="
+              {% if education_group_year %}{% url 'validate_education_group_field' form_education_group_year.category education_group_year.pk %} {% else %}{% url 'validate_education_group_field' form_education_group_year.category %}{% endif %}">
     {% csrf_token %}
     <div class="panel panel-default">
 
@@ -50,20 +51,29 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-                let tab_identification = document.getElementById('tab_identification');
-                let tab_diploma = document.getElementById('tab_diploma');
-                let spn_identification_errors = $("#spn_identification_errors");
-                let spn_diploma_errors = $("#spn_diploma_errors");
+            let warning_nodes = $(".has-warning");
+            if (warning_nodes.length > 0) {
+
+                warning_nodes.each(
+                    function () {
+                        $(this).parent().removeClass("has-error").addClass("has-warning");
+                    }
+                );
+            }
+            let tab_identification = document.getElementById('tab_identification');
+            let tab_diploma = document.getElementById('tab_diploma');
+            let spn_identification_errors = $("#spn_identification_errors");
+            let spn_diploma_errors = $("#spn_diploma_errors");
+            spn_identification_errors.empty();
+            spn_diploma_errors.empty();
+            if (tab_identification.getElementsByClassName('has-error').length > 0) {
                 spn_identification_errors.empty();
+                spn_identification_errors.append('<i class="fa fa-circle" aria-hidden="true"></i>');
+            }
+            if (tab_diploma.getElementsByClassName('has-error').length > 0) {
                 spn_diploma_errors.empty();
-                if (tab_identification.getElementsByClassName('has-error').length > 0){
-                    spn_identification_errors.empty();
-                    spn_identification_errors.append('<i class="fa fa-circle" aria-hidden="true"></i>');
-                }
-                if (tab_diploma.getElementsByClassName('has-error').length > 0){
-                    spn_diploma_errors.empty();
-                    spn_diploma_errors.append('<i class="fa fa-circle" aria-hidden="true"></i>');
-                }
+                spn_diploma_errors.append('<i class="fa fa-circle" aria-hidden="true"></i>');
+            }
         });
 
     </script>

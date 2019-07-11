@@ -178,6 +178,7 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
 
         self.fields['academic_year'].queryset = \
             self.fields['academic_year'].queryset.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
+        self.fields['academic_year'].empty_label = None
 
     def _preselect_entity_version_from_entity_value(self):
         if getattr(self.instance, 'management_entity', None):

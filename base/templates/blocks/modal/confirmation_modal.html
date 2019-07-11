@@ -28,7 +28,7 @@
                         function () {
                             $(this).parent().removeClass("has-error").addClass("has-warning");
                             $("#ul_warnings").append('<li>' + $(this).siblings("label").text() + '</li>');
-
+                            $(this).parent().children(".help-block").remove();
                         }
                     );
 
