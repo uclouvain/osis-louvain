@@ -313,7 +313,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
             .order_by('academic_year__year')
 
     def is_past(self):
-        return self.academic_year.is_past
+        return self.academic_year.is_past_for_catalog
 
     # FIXME move this method to business/perm file
     def can_update_by_faculty_manager(self):

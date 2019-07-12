@@ -100,8 +100,12 @@ class AcademicYear(SerializableModel):
         )
 
     @cached_property
-    def is_past(self):
-        return self.year < current_academic_year().year
+    def is_past_for_catalog(self):
+        """
+        This property must be used in context of catalog because:
+            - Past notion is the academic_year which are the latest active
+        """
+        return self.year < starting_academic_year().year
 
     def next(self):
         return AcademicYear.objects.get(year=self.year + 1)

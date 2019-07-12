@@ -154,7 +154,7 @@ class LearningUnitPostponementForm:
             ).order_by('academic_year__year')
         to_delete = to_update = to_insert = []
 
-        if self.start_postponement.is_past:
+        if self.start_postponement.is_past_for_catalog:
             to_update = self._init_forms_in_past(existing_learn_unit_years, data)
         else:
             if self._is_update_action() and existing_learn_unit_years:
