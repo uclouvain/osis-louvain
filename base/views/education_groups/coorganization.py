@@ -61,7 +61,7 @@ class CommonEducationGroupOrganizationView(RulesRequiredMixin, AjaxTemplateMixin
 
     def get_success_url(self):
         return reverse(
-            'education_group_read', args=[self.kwargs["root_id"], self.kwargs["education_group_year_id"]]
+            'update_education_group', args=[self.kwargs["root_id"], self.kwargs["education_group_year_id"]]
         ).rstrip('/') + "#panel_coorganization"
 
 

@@ -80,11 +80,11 @@
 <script src="{% static 'js/jquery.formset.js' %}"></script>
 <script>
     $('.link-formset').formset({
-        addText: 'Add',
+        addText: '<span class="fas fa-plus"></span>',
+        deleteText: '<span class="fas fa-trash-alt"></span>',
         deleteCssClass: 'delete-row btn'
     });
     var deleteButton = document.getElementsByClassName("delete-row");
-    console.log(deleteButton);
     for (var i = 0; i < deleteButton.length; i++) {
         deleteButton[i].innerHTML = '<span class="fas fa-trash-alt"></span>';
     }

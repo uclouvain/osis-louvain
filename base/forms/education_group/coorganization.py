@@ -30,8 +30,8 @@ from django.forms import ModelChoiceField
 from django.utils.translation import ugettext_lazy as _
 
 from base.models.education_group_organization import EducationGroupOrganization
-from reference.models.country import Country
 from base.models.organization import Organization
+from reference.models.country import Country
 
 
 class CoorganizationEditForm(forms.ModelForm):
@@ -46,7 +46,6 @@ class CoorganizationEditForm(forms.ModelForm):
         label=_("Institution"),
         widget=autocomplete.ModelSelect2(
             url='organization_autocomplete',
-            attrs={'data-theme': 'bootstrap', 'data-width': 'null', 'data-placeholder': '---------'},
             forward=['country']
         ),
     )
@@ -63,6 +62,7 @@ class CoorganizationEditForm(forms.ModelForm):
         js = ('js/education_group/coorganization.js',)
 
     def __init__(self, education_group_year=None, *args, **kwargs):
+
         if not education_group_year and not kwargs.get('instance'):
             raise ImproperlyConfigured("Provide an education_group_year or an instance")
 
