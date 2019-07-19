@@ -1,4 +1,4 @@
-{% load staticfiles bootstrap3 %}
+{% load staticfiles %}
 {% load format %}
 {% load i18n education_group %}
 {% comment "License" %}
@@ -38,18 +38,16 @@
                     <th>{% trans 'UCL Diploma' %}</th>
                     <th>{% trans 'Producing certificat' %}</th>
                     <th>{% trans 'Producing annexe' %}</th>
-                    <th></th>
-                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for coorganization in education_group_year.coorganizations %}
                     <tr>
                         <td>
-                                        <span id="coorganization_id_{{ coorganization.id }}">
-                                            {{ coorganization.address.country.name }} - {{ coorganization.address.city }}<br>
-                                        {{ coorganization.organization.name }}
-                                        </span>
+                            <span id="coorganization_id_{{ coorganization.id }}">
+                                {{ coorganization.address.country.name }} - {{ coorganization.address.city }}<br>
+                                {{ coorganization.organization.name }}
+                            </span>
                         </td>
                         <td>
                             {% if coorganization.organization.logo %}
@@ -78,10 +76,10 @@
                 {% for coorganization in parent.coorganizations %}
                     <tr class="text-primary">
                         <td>
-                                        <span id="coorganization_id_{{ coorganization.id }}">
-                                        {{ coorganization.address.country.name }} - {{ coorganization.address.city }}<br>
-                                        {{ coorganization.organization.name }}
-                                        </span>
+                            <span id="coorganization_id_{{ coorganization.id }}">
+                                {{ coorganization.address.country.name }} - {{ coorganization.address.city }}<br>
+                                {{ coorganization.organization.name }}
+                            </span>
                         </td>
                         <td>
                             {% if coorganization.organization.logo %}
@@ -110,6 +108,5 @@
                 </tbody>
             </table>
         {% endif %}
-
     </div>
 </div>

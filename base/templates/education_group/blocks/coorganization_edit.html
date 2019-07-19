@@ -27,60 +27,53 @@
 <div class="panel panel-default">
     <div class="panel-body" id="panel_coorganization">
         <label>{% trans 'Program organized with other institutes' %}</label>
-        {% if education_group_year.coorganizations %}f
-            <form method="post" action="">
-                <table class="table">
-                    <thead>
-                    <tr>
-                        <th>{% trans 'Country' %}</th>
-                        <th>{% trans 'Institution' %}</th>
-                        <th></th>
-                        <th></th>
-                        <th>{% trans 'UCL Diploma' %}</th>
-                        <th></th>
-                        <th></th>
+        {% if education_group_year.coorganizations %}
+            <div class="table-responsive">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>{% trans 'Country' %}</th>
+                    <th>{% trans 'Institution' %}</th>
+                    <th></th>
+                    <th></th>
+                    <th>{% trans 'UCL Diploma' %}</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {{ form_coorganization.management_form }}
+                {% for form in form_coorganization.forms %}
+                    {{ form.id }}
+                    <tr class="link-formset">
+                        <td>
+                            {% bootstrap_field form.country show_label=False %}
+                        </td>
+                        <td>
+                            {% bootstrap_field form.organization show_label=False %}
+                        </td>
+                        <td>
+                            {% bootstrap_field form.all_students %}
+                        </td>
+                        <td>
+                            {% bootstrap_field form.enrollment_place show_label=False %}
+                        </td>
+                        <td>
+                            {% bootstrap_field form.diploma show_label=False %}
+                        </td>
+                        <td>
+                            {% bootstrap_field form.is_producing_cerfificate %}
+                        </td>
+                        <td>
+                            {% bootstrap_field form.is_producing_annexe %}
+                        </td>
+                        <td></td>
                     </tr>
-                    </thead>
-                    <tbody>
-                    {{ form_coorganization.management_form }}
-                    {% for form in form_coorganization.forms %}
-                        {{ form.id }}
-                        {#                    {% if form.errors %}#}
-                        {#                    <tr>#}
-                        {#                        {% bootstrap_form_errors form %}#}
-                        {#                    </tr>#}
-                        {#                    {% endif %}#}
-                        <tr class="link-formset">
-                            <td>
-                                {% bootstrap_field form.country show_label=False %}
-                            </td>
-                            <td>
-                                {% bootstrap_field form.organization show_label=False %}
-                            </td>
-                            <td>
-                                {% bootstrap_field form.all_students %}
-                            </td>
-                            <td>
-                                {% bootstrap_field form.enrollment_place show_label=False %}
-                            </td>
-                            <td>
-                                {% bootstrap_field form.diploma show_label=False %}
-                            </td>
-                            <td>
-                                {% bootstrap_field form.is_producing_cerfificate %}
-                            </td>
-                            <td>
-                                {% bootstrap_field form.is_producing_annexe %}
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-
-            </form>
-
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
         {% endif %}
-
     </div>
 </div>
 
@@ -88,6 +81,11 @@
 <script>
     $('.link-formset').formset({
         addText: 'Add',
-        deleteText: 'Remove'
+        deleteCssClass: 'delete-row btn'
     });
+    var deleteButton = document.getElementsByClassName("delete-row");
+    console.log(deleteButton);
+    for (var i = 0; i < deleteButton.length; i++) {
+        deleteButton[i].innerHTML = '<span class="fas fa-trash-alt"></span>';
+    }
 </script>
