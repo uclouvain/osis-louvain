@@ -176,6 +176,9 @@
                 </div>
             </div>
         </div>
+        {% if show_coorganization %}
+            {% include 'education_group/blocks/coorganization_edit.html' %}
+        {% endif %}
     </div>
 
     <div id="tab_diploma" class="tab-pane {% if request.GET.tab_to_show or request.GET.tab_to_show == 'diplomas_certificates'%}active{% else %}fade{% endif %}">
