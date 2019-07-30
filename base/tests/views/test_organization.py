@@ -26,8 +26,8 @@
 import json
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.urls import reverse
 
 from base.models import organization_address
 from base.tests.factories.campus import CampusFactory

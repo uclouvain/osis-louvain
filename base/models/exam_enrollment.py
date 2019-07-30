@@ -33,12 +33,11 @@ from django.utils.translation import ugettext as _
 from attribution.models import attribution
 from base.models import person, session_exam_deadline, \
     academic_year as academic_yr, offer_year, program_manager, tutor
-from base.models.enums import exam_enrollment_state as enrollment_states, \
-    exam_enrollment_justification_type as justification_types
+from base.models.enums import exam_enrollment_justification_type as justification_types
+from base.models.enums import exam_enrollment_state as enrollment_states
 from base.models.exceptions import JustificationValueException
 from base.models.utils.admin_extentions import remove_delete_action
 from osis_common.models.osis_model_admin import OsisModelAdmin
-from base.models.enums import exam_enrollment_state as enrollment_states
 
 JUSTIFICATION_ABSENT_FOR_TUTOR = _('Absent')
 SCORE_BETWEEN_0_AND_20 = _("Scores must be between 0 and 20")
@@ -77,7 +76,7 @@ class ExamEnrollment(models.Model):
     justification_final = models.CharField(max_length=20, blank=True, null=True,
                                            choices=justification_types.JUSTIFICATION_TYPES)
     session_exam = models.ForeignKey('SessionExam', on_delete=models.CASCADE)
-    learning_unit_enrollment = models.ForeignKey('LearningUnitEnrollment', on_delete=models.CASCADE)
+    learning_unit_enrollment = models.ForeignKey('LearningUnitEnrollment', on_delete=models.PROTECT)
     enrollment_state = models.CharField(max_length=20,
                                         default=enrollment_states.ENROLLED,
                                         choices=enrollment_states.STATES,
@@ -247,7 +246,7 @@ class ExamEnrollmentHistoryAdmin(OsisModelAdmin):
 
 class ExamEnrollmentHistory(models.Model):
     exam_enrollment = models.ForeignKey(ExamEnrollment, on_delete=models.CASCADE)
-    person = models.ForeignKey(person.Person, on_delete=models.CASCADE)
+    person = models.ForeignKey(person.Person, on_delete=models.PROTECT)
     score_final = models.DecimalField(max_digits=4, decimal_places=2, null=True)
     justification_final = models.CharField(max_length=20, null=True, choices=justification_types.JUSTIFICATION_TYPES)
     modification_date = models.DateTimeField(auto_now=True)

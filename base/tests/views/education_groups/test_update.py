@@ -247,18 +247,34 @@ class TestUpdate(TestCase):
         self.client.force_login(self.faculty_user)
         permission = Permission.objects.get(codename='change_educationgroup')
         self.faculty_user.user_permissions.add(permission)
+        self._assert_redirects_to_modal_to_update_certificate_aims(self.previous_training_education_group_year)
+        self._assert_redirects_to_modal_to_update_certificate_aims(self.training_education_group_year)
+
+        certificate_aims = [CertificateAimFactory(code=code) for code in range(100, 103)]
+        first_certificate_aim = certificate_aims[0].id
+
+        self._assert_post_to_modal_to_update_certificate_aims(
+            first_certificate_aim,
+            self.previous_training_education_group_year
+        )
+        self._assert_post_to_modal_to_update_certificate_aims(
+            first_certificate_aim,
+            self.training_education_group_year
+        )
+
+    def _assert_redirects_to_modal_to_update_certificate_aims(self, education_group_year):
         response = self.client.get(reverse(
             update_education_group,
-            args=[self.previous_training_education_group_year.pk, self.previous_training_education_group_year.pk]
+            args=[education_group_year.pk, education_group_year.pk]
         ))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "education_group/blocks/form/training_certificate.html")
 
-        certificate_aims = [CertificateAimFactory(code=code) for code in range(100, 103)]
+    def _assert_post_to_modal_to_update_certificate_aims(self, first_certificate_aim, education_group_year):
         response = self.client.post(reverse(update_education_group,
-                                            args=[self.previous_training_education_group_year.pk,
-                                                  self.previous_training_education_group_year.pk]),
-                                    data={'certificate_aims': str(certificate_aims[0].id)})
+                                            args=[education_group_year.pk,
+                                                  education_group_year.pk]),
+                                    data={'certificate_aims': str(first_certificate_aim)})
         self.assertEqual(response.status_code, 302)
 
     def test_post_training(self):

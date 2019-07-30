@@ -24,8 +24,8 @@
 #
 ##############################################################################
 from django.db import models
-from base.models.enums import learning_unit_enrollment_state
 
+from base.models.enums import learning_unit_enrollment_state
 from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
 
@@ -44,7 +44,7 @@ class LearningUnitEnrollment(SerializableModel):
     changed = models.DateTimeField(null=True, auto_now=True)
     date_enrollment = models.DateField()
     learning_unit_year = models.ForeignKey('LearningUnitYear', on_delete=models.CASCADE)
-    offer_enrollment = models.ForeignKey('OfferEnrollment', on_delete=models.CASCADE)
+    offer_enrollment = models.ForeignKey('OfferEnrollment', on_delete=models.PROTECT)
     enrollment_state = models.CharField(max_length=20, choices=learning_unit_enrollment_state.STATES, default="")
 
     class Meta:

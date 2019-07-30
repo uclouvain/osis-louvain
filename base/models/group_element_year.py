@@ -269,7 +269,8 @@ class GroupElementYear(OrderedModel):
     def _check_same_academic_year_parent_child_branch(self):
         if (self.parent and self.child_branch) and \
                 (self.parent.academic_year.year != self.child_branch.academic_year.year):
-            raise ValidationError(_("It is forbidden to attach an element to an element of another academic year."))
+            raise ValidationError(_("It is prohibited to attach a group, mini-training or training to an element of "
+                                    "another academic year."))
 
         self._clean_link_type()
 

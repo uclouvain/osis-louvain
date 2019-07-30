@@ -28,10 +28,14 @@ import datetime
 import factory
 import factory.fuzzy
 from django.test import TestCase
+from django.utils import timezone
 
-from base.models import entity_version
 from base.business.learning_units.perms import find_last_requirement_entity_version
+from base.models import entity_version
+from base.models.entity_version import build_current_entity_version_structure_in_memory, \
+    find_parent_of_type_into_entity_structure
 from base.models.enums import organization_type
+from base.models.enums.entity_type import FACULTY, SCHOOL
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -244,6 +248,35 @@ class EntityVersionTest(TestCase):
             self.assertEqual(child.get_parent_version(date=self.date_in_2015), self.parent_entity_version)
             self.assertEqual(child.get_parent_version(date=self.date_in_2017), None)
 
+    def test_find_parent_of_type_itself(self):
+        entity_v = EntityVersionFactory(entity_type=FACULTY)
+        result = find_parent_of_type_into_entity_structure(
+            entity_v,
+            build_current_entity_version_structure_in_memory(timezone.now().date()),
+            FACULTY
+        )
+        self.assertEqual(entity_v.entity, result)
+
+    def test_find_parent_of_type_first_parent(self):
+        entity = EntityFactory()
+        EntityVersionFactory(entity=entity, entity_type=FACULTY)
+        entity_v = EntityVersionFactory(parent=entity)
+        result = find_parent_of_type_into_entity_structure(
+            entity_v,
+            build_current_entity_version_structure_in_memory(timezone.now().date()),
+            FACULTY
+        )
+        self.assertEqual(entity_v.parent, result)
+
+    def test_find_parent_of_type_without_parent(self):
+        entity_v = EntityVersionFactory(parent=None, entity_type=SCHOOL)
+        result = find_parent_of_type_into_entity_structure(
+            entity_v,
+            build_current_entity_version_structure_in_memory(timezone.now().date()),
+            FACULTY
+        )
+        self.assertEqual(None, result)
+
     def test_find_parent_faculty_version(self):
         ac_yr = AcademicYearFactory()
         start_date = ac_yr.start_date
@@ -342,6 +375,53 @@ class EntityVersionTest(TestCase):
         self.assertTrue(entity_list)
         self.assertEqual(len(entity_list), 1)
         self.assertEqual(entity_list[0], entity_version_attached)
+
+    def test_find_attached_faculty_entities_version_filtered_by_person(self):
+        person = PersonFactory()
+        entity_attached = EntityFactory(organization=self.organization)
+        entity_version_attached = EntityVersionFactory(entity=entity_attached, entity_type="FACULTY")
+        
+        entity_not_attached = EntityFactory(organization=self.organization)
+        EntityVersionFactory(entity=entity_not_attached, entity_type="SECTOR")
+        
+        entity_ilv = EntityFactory(organization=self.organization)
+        entity_version_ilv = EntityVersionFactory(entity=entity_ilv, acronym="ILV")
+        
+        entity_parent = EntityFactory(organization=self.organization)
+        entity_version_parent = EntityVersionFactory(entity=entity_parent, entity_type='FACULTY')
+        EntityVersionFactory(parent=entity_parent)
+
+        PersonEntityFactory(person=person, entity=entity_attached)
+        PersonEntityFactory(person=person, entity=entity_ilv)
+        PersonEntityFactory(person=person, entity=entity_parent)
+
+        entity_list = list(person.find_attached_faculty_entities_version(acronym_exceptions=['ILV']))
+        self.assertTrue(entity_list)
+        self.assertEqual(len(entity_list), 3)
+        self.assertIn(entity_version_attached, entity_list)
+        self.assertIn(entity_version_ilv, entity_list)
+        self.assertIn(entity_version_parent, entity_list)
+
+    def test_find_attached_faculty_entities_version_filtered_by_person_but_faculty_below_attached_entities(self):
+        person = PersonFactory()
+
+        entity_attached = EntityFactory(organization=self.organization)
+        EntityVersionFactory(entity=entity_attached, entity_type="SECTOR")
+
+        entity_fac = EntityFactory(organization=self.organization)
+        entity_version_fac = EntityVersionFactory(
+            entity=entity_fac,
+            acronym="FAC",
+            entity_type="FACULTY",
+            parent=entity_attached
+        )
+
+        PersonEntityFactory(person=person, entity=entity_attached)
+
+        entity_list = list(person.find_attached_faculty_entities_version())
+        self.assertTrue(entity_list)
+        self.assertEqual(len(entity_list), 1)
+        self.assertIn(entity_version_fac, entity_list)
 
 
 class EntityVersionLoadInMemoryTest(TestCase):

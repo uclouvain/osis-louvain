@@ -27,6 +27,7 @@ from django.conf.urls import url
 
 from education_group.api.views.training import TrainingList, TrainingDetail
 
+app_name = "education_group"
 urlpatterns = [
     url(r'^trainings/$', TrainingList.as_view(), name=TrainingList.name),
     url(r'^trainings/(?P<uuid>[0-9a-f-]+)$', TrainingDetail.as_view(), name=TrainingDetail.name),

@@ -27,7 +27,6 @@ from unittest.mock import patch
 
 from django.test import TestCase
 
-from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -134,7 +133,7 @@ class TestSendMessage(TestCase):
     def test_send_mail_before_annual_procedure_of_automatic_postponement_of_egy(self, mock_send_messages):
         send_mail.send_mail_before_annual_procedure_of_automatic_postponement_of_egy(self.statistics_data)
         args = mock_send_messages.call_args[0][0]
-        self.assertEqual(self.academic_year.year, args.get('template_base_data').get('end_academic_year'))
+        self.assertEqual(self.academic_year.year, args.get('template_base_data').get('current_academic_year'))
         self.assertEqual(len(args.get('receivers')), 1)
         self.assertIsNone(args.get('attachment'))
 
@@ -149,7 +148,7 @@ class TestSendMessage(TestCase):
             []
         )
         args = mock_send_messages.call_args[0][0]
-        self.assertEqual(self.academic_year.year, args.get('template_base_data').get('end_academic_year'))
+        self.assertEqual(self.academic_year.year, args.get('template_base_data').get('current_academic_year'))
         self.assertEqual(len(args.get('receivers')), 1)
         self.assertIsNone(args.get('attachment'))
 

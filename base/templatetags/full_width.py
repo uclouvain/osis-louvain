@@ -28,7 +28,7 @@ from django import template
 register = template.Library()
 
 
-@register.assignment_tag(takes_context=True)
+@register.simple_tag(takes_context=True)
 def full_width(context):
     """
     :return: True only if there is no offer_year.orientation_sibling OR

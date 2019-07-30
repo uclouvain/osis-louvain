@@ -29,7 +29,6 @@ from reversion.admin import VersionAdmin
 
 from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import learning_unit_year
-from base.models.entity import Entity
 from base.models.enums import learning_unit_year_subtypes, entity_container_year_link_type
 from base.models.enums import vacant_declaration_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
@@ -48,7 +47,7 @@ class LearningContainerYearAdmin(VersionAdmin, SerializableModelAdmin):
 
 class LearningContainerYear(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
-    academic_year = models.ForeignKey('AcademicYear', on_delete=models.CASCADE)
+    academic_year = models.ForeignKey('AcademicYear', on_delete=models.PROTECT)
     learning_container = models.ForeignKey('LearningContainer', on_delete=models.CASCADE)
 
     container_type = models.CharField(

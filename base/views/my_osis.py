@@ -26,11 +26,11 @@
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.urlresolvers import reverse
 from django.db.models import Prefetch
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
+from django.urls import reverse
 from django.utils import translation
 from django.utils.translation import ugettext as _
 

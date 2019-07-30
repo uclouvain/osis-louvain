@@ -25,6 +25,7 @@
 ##############################################################################
 import waffle
 from django import template
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -57,8 +58,8 @@ def li_with_update_perm(context, url, message, url_id="link_update"):
     person = context['person']
     year = context['education_group_year'].academic_year.year
     is_general_faculty_manager = person.is_faculty_manager and not person.is_faculty_manager_for_ue
-    is_education_group_in_past = year < context['current_academic_year'].year
-    if is_education_group_in_past and is_general_faculty_manager:
+    is_education_group_in_past = year <= context['current_academic_year'].year
+    if is_education_group_in_past and is_general_faculty_manager and year >= settings.YEAR_LIMIT_EDG_MODIFICATION:
         return li_with_permission(context, _is_eligible_certificate_aims, url, message, url_id, True)
     return li_with_permission(context, is_eligible_to_change_education_group, url, message, url_id)
 

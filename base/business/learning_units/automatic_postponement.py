@@ -21,6 +21,7 @@
 #  at the root of the source code of this program.  If not,                                        #
 #  see http://www.gnu.org/licenses/.                                                               #
 # ##################################################################################################
+from django.db.models import Q
 from django.utils.translation import ugettext as _
 
 from base.business.learning_units.edition import duplicate_learning_unit_year
@@ -41,5 +42,10 @@ class LearningUnitAutomaticPostponementToN6(AutomaticPostponementToN6):
 
     def get_queryset(self, queryset=None):
         return super().get_queryset(queryset).filter(
+            # Ignoring classes - FIXME :: remove this when classes are in separate Model
             learningunityear__learning_container_year__isnull=False
+        ).filter(
+            # Ignoring external learning units of "mobility" (too much dirty data - to clean into EPC)
+            Q(learningunityear__externallearningunityear__mobility=False)
+            | Q(learningunityear__externallearningunityear__isnull=True)
         ).distinct()

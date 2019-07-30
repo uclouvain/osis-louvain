@@ -31,7 +31,6 @@ from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models.learning_unit_year import MINIMUM_CREDITS, MAXIMUM_CREDITS
-from base.models.organization_address import OrganizationAddress
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -88,7 +87,7 @@ class ExternalLearningUnitYear(models.Model):
 
     co_graduation = models.BooleanField(default=False, verbose_name=_('Co-graduation'))
     mobility = models.BooleanField(default=False, verbose_name=_('Mobility'))
-    author = models.ForeignKey('Person', null=True, on_delete=models.CASCADE)
+    author = models.ForeignKey('Person', null=True, on_delete=models.PROTECT)
     creation_date = models.DateTimeField(null=True, auto_now_add=True)
 
     class Meta:

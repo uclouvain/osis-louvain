@@ -215,9 +215,9 @@ class EntityVersion(SerializableModel):
         return complete_title
 
     def can_save_entity_version(self):
-        return self.count_entity_versions_same_entity_overlapping_dates() == 0 and \
-               self.count_entity_versions_same_acronym_overlapping_dates() == 0 and \
-               self.parent != self.entity
+        return not self.search_entity_versions_with_overlapping_dates().filter(
+            Q(entity=self.entity) | Q(acronym=self.acronym)
+        ).exists() and self.parent != self.entity
 
     def search_entity_versions_with_overlapping_dates(self):
         if self.end_date:
@@ -234,12 +234,6 @@ class EntityVersion(SerializableModel):
             )
 
         return qs.exclude(id=self.id)
-
-    def count_entity_versions_same_entity_overlapping_dates(self):
-        return self.search_entity_versions_with_overlapping_dates().filter(entity=self.entity).count()
-
-    def count_entity_versions_same_acronym_overlapping_dates(self):
-        return self.search_entity_versions_with_overlapping_dates().filter(acronym=self.acronym).count()
 
     def _direct_children(self, date=None):
         if date is None:
@@ -330,14 +324,25 @@ class EntityVersion(SerializableModel):
         return nodes[tree[0]['entity_id']].to_json(limit)
 
 
+def find_parent_of_type_into_entity_structure(entity_version, entities_structure, parent_type):
+    if entity_version.entity_type == parent_type:
+        return entity_version.entity
+    elif not entities_structure[entity_version.entity_id]['entity_version_parent']:
+        return None
+    else:
+        parent = entities_structure[entity_version.entity_id]['entity_version_parent']
+        return find_parent_of_type_into_entity_structure(parent, entities_structure, parent_type)
+
+
 def find(acronym, date=None):
     if date is None:
         date = timezone.now()
     try:
-        entity_version = EntityVersion.objects.get(acronym=acronym,
-                                                   start_date__lte=date,
-                                                   end_date__gte=date
-                                                   )
+        entity_version = EntityVersion.objects.get(
+            acronym=acronym,
+            start_date__lte=date,
+            end_date__gte=date
+        )
     except EntityVersion.DoesNotExist:
         return None
 
@@ -345,7 +350,7 @@ def find(acronym, date=None):
 
 
 def find_latest_version(date):
-    return EntityVersion.objects.current(date).select_related('entity').order_by('-start_date')
+    return EntityVersion.objects.current(date).select_related('entity', 'entity__organization').order_by('-start_date')
 
 
 def get_last_version(entity, date=None):

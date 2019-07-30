@@ -70,7 +70,7 @@ def _postpone_m2m(education_group_year, postponed_egy, hops_values):
     for f in opts.many_to_many:
         if f.name in fields_to_exclude:
             continue
-        m2m_cls = f.rel.through
+        m2m_cls = f.remote_field.through
 
         # Remove records of postponed_egy
         m2m_cls.objects.all().filter(education_group_year=postponed_egy).delete()

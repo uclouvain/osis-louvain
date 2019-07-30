@@ -27,25 +27,39 @@
 <table id="minor_major_option_table" class="table table-hover">
     <thead>
         <tr>
-            <th>{% trans 'Code'%}</th>
             <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
+            <th>{% trans 'Code'%}</th>
             <th>{% trans 'Title'%}</th>
             <th>{% trans 'Access condition'%}</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        {% for group in group_element_years %}
+        {% for group in object.groupelementyear_set.all %}
             <tr>
-                <td width="10%">
-                    <a href="{% url 'education_group_read' group.child_id group.child_id %}">{{ group.code }}</a>
-                </td>
-                <td width="10%">{{ group.acronym }}</td>
-                <td width="45%" style="white-space: pre;">{{ group.title }}</td>
-                <td width="20%">{{ group.access_condition| yesno:_("yes,no") |title }}</td>
-                <td width="15%">
-                    {% include "education_group/blocks/content_actions.html" with cannot_order=True %}
-                </td>
+                {% if group.child_branch %}
+                    <td width="10%">{{ group.child_branch.acronym }}</td>
+                    <td width="10%">
+                        <a href="{% url 'education_group_read' root.pk group.child_branch.pk %}"
+                       id="lnk_education_group_{{ group.child_branch.pk }}">{{ group.child_branch.partial_acronym }}</a>
+                    </td>
+                    <td width="45%" style="white-space: pre;">{{ group.child_branch.title }}</td>
+                    <td width="20%">{{ group.access_condition| yesno:_("yes,no") |title }}</td>
+                    <td width="15%">
+                        {% include "education_group/blocks/content_actions.html" with cannot_order=True %}
+                    </td>
+                {% else %}
+                    <td width="10%"></td>
+                    <td width="10%">
+                        <a href="{% url 'learning_unit' group.child_leaf.pk %}"
+                       id="lnk_learning_unit_{{ group.child_leaf.pk }}">{{ group.child_leaf.acronym }}</a>
+                    </td>
+                    <td width="45%" style="white-space: pre;">{{ group.child_leaf.complete_title }}</td>
+                    <td width="20%">{{ group.access_condition| yesno:_("yes,no") |title }}</td>
+                    <td width="15%">
+                        {% include "education_group/blocks/content_actions.html" with cannot_order=True %}
+                    </td>
+                {% endif %}
             </tr>
         {% endfor %}
     </tbody>

@@ -27,6 +27,7 @@ from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages, SUCCESS
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.models.enums.learning_container_year_types import EXTERNAL
@@ -86,3 +87,17 @@ class TestUpdateExternalLearningUnitView(TestCase):
         self.assertEqual(response.status_code, 302)
         messages = [m.level for m in get_messages(response.wsgi_request)]
         self.assertEqual(messages, [SUCCESS])
+
+    def test_update_message_with_report(self):
+        self.data['postponement'] = "1"
+        response = self.client.post(self.url, data=self.data)
+        self.assertEqual(response.status_code, 302)
+        messages = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertEqual(messages[0], _("The learning unit has been updated (with report)."))
+
+    def test_update_message_without_report(self):
+        self.data['postponement'] = "0"
+        response = self.client.post(self.url, data=self.data)
+        self.assertEqual(response.status_code, 302)
+        messages = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertEqual(messages[0], _("The learning unit has been updated (without report)."))

@@ -48,7 +48,7 @@ class Entity(SerializableModel):
     location = models.CharField(max_length=255, blank=True, null=True)
     postal_code = models.CharField(max_length=20, blank=True, null=True)
     city = models.CharField(max_length=255, blank=True, null=True)
-    country = models.ForeignKey('reference.Country', blank=True, null=True, on_delete=models.CASCADE)
+    country = models.ForeignKey('reference.Country', blank=True, null=True, on_delete=models.PROTECT)
     phone = models.CharField(max_length=30, blank=True, null=True)
     fax = models.CharField(max_length=255, blank=True, null=True)
     website = models.CharField(max_length=255, blank=True, null=True)

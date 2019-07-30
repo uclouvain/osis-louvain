@@ -24,9 +24,9 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
+from django.urls import reverse
 
 from attribution import models as mdl_attr
 from attribution.business.attribution import get_attributions_list

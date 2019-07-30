@@ -26,8 +26,8 @@
 
 from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
 from django.test import TestCase, RequestFactory
+from django.urls import reverse
 from waffle.models import Flag
 from waffle.testutils import override_flag
 

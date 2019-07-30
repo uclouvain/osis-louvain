@@ -41,7 +41,7 @@ class EducationGroupLanguage(models.Model):
     type = models.CharField(max_length=255, choices=education_group_language.EducationGroupLanguages.choices())
     order = models.IntegerField()
     education_group_year = models.ForeignKey('base.EducationGroupYear', on_delete=models.CASCADE)
-    language = models.ForeignKey('reference.Language', on_delete=models.CASCADE)
+    language = models.ForeignKey('reference.Language', on_delete=models.PROTECT)
 
     def __str__(self):
         return "{} - {}".format(self.education_group_year, self.language)

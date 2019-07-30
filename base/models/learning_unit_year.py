@@ -28,7 +28,7 @@ import re
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q, Sum
+from django.db.models import Q
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -127,7 +127,7 @@ class ExtraManagerLearningUnitYear(models.Model):
 class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey(AcademicYear, verbose_name=_('Academic year'),
-                                      validators=[academic_year_validator], on_delete=models.CASCADE)
+                                      validators=[academic_year_validator], on_delete=models.PROTECT)
     learning_unit = models.ForeignKey('LearningUnit', on_delete=models.CASCADE)
 
     learning_container_year = models.ForeignKey('LearningContainerYear', null=True, on_delete=models.CASCADE)
@@ -166,9 +166,9 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     professional_integration = models.BooleanField(default=False, verbose_name=_('professional integration'))
 
-    campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"), on_delete=models.CASCADE)
+    campus = models.ForeignKey('Campus', null=True, verbose_name=_("Learning location"), on_delete=models.PROTECT)
 
-    language = models.ForeignKey('reference.Language', null=True, verbose_name=_('Language'), on_delete=models.CASCADE)
+    language = models.ForeignKey('reference.Language', null=True, verbose_name=_('Language'), on_delete=models.PROTECT)
 
     periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
                                    verbose_name=_('Periodicity'))
@@ -523,6 +523,10 @@ def search(academic_year_id=None, acronym=None, learning_container_year_id=None,
         queryset = queryset.filter(campus__organization__organizationaddress__city=city)
     elif country:
         queryset = queryset.filter(campus__organization__organizationaddress__country=country)
+
+    quadrimester = kwargs.get('quadrimester')
+    if quadrimester:
+        queryset = queryset.filter(quadrimester=quadrimester)
 
     return queryset.select_related('learning_container_year', 'academic_year')
 

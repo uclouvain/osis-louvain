@@ -25,17 +25,16 @@
 ##############################################################################
 import datetime
 
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseForbidden
 from django.test import TestCase
+from django.urls import reverse
 
 from base.forms.academic_calendar import AcademicCalendarForm
 from base.models.academic_calendar import AcademicCalendar
 from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
-from base.tests.factories.user import SuperUserFactory
 from base.views.academic_calendar import _compute_progress
 
 now = datetime.datetime.now()

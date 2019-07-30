@@ -25,6 +25,7 @@
 ##############################################################################
 from dal import autocomplete
 from django import forms
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.forms import modelformset_factory
 from django.http import JsonResponse
@@ -64,8 +65,9 @@ def update_education_group(request, root_id, education_group_year_id):
     # it will be used in the templates.
     education_group_year.root = root_id
 
-    if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and\
-            education_group_year.academic_year.year < starting_academic_year().year:
+    year = education_group_year.academic_year.year
+    if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and \
+            settings.YEAR_LIMIT_EDG_MODIFICATION <= year <= starting_academic_year().year:
         return update_certificate_aims(request, root_id, education_group_year)
 
     # Proctect the view
@@ -218,7 +220,7 @@ def _update_training(request, education_group_year, root):
 
 class CertificateAimAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        if not self.request.user.is_authenticated():
+        if not self.request.user.is_authenticated:
             return CertificateAim.objects.none()
 
         qs = CertificateAim.objects.all()

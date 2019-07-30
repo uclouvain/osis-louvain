@@ -45,8 +45,8 @@ from base.models import learning_unit_year, group_element_year
 from base.models.academic_year import AcademicYear
 from base.models.campus import Campus
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
-from base.models.enums import entity_container_year_link_type, learning_unit_year_subtypes, active_status, entity_type,\
-    learning_container_year_types
+from base.models.enums import entity_container_year_link_type, learning_unit_year_subtypes, active_status, \
+    entity_type, learning_container_year_types, quadrimesters
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import convert_status_bool, LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
@@ -89,6 +89,11 @@ class LearningUnitSearchForm(BaseSearchForm):
     allocation_entity_acronym = forms.CharField(
         max_length=20,
         label=_('Alloc. Ent.')
+    )
+
+    quadrimester = forms.ChoiceField(
+        label=_('Quadri'),
+        choices=ALL_CHOICES + quadrimesters.LEARNING_UNIT_YEAR_QUADRIMESTERS
     )
 
     with_entity_subordinated = forms.BooleanField(label=_('Include subordinate entities'))

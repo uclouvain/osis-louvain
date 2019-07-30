@@ -28,7 +28,7 @@ from django.conf import settings
 
 def virtual_desktop(request):
     url = ''
-    if request.user.is_authenticated():
+    if request.user.is_authenticated:
         url = _get_virtual_desktop_url_if_program_manager(request, url)
     return {"virtual_desktop_url": url}
 

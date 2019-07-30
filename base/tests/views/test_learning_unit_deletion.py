@@ -31,8 +31,8 @@ from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.api import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
-from django.core.urlresolvers import reverse
 from django.test import TestCase, RequestFactory
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 

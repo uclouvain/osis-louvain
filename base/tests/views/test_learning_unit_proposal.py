@@ -31,9 +31,9 @@ from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
 from django.test import TestCase, RequestFactory
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
@@ -46,8 +46,8 @@ from base.forms.learning_unit_proposal import ProposalLearningUnitForm
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm
 from base.models import entity_version
 from base.models import proposal_learning_unit
-from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_component_year_type
+from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import organization_type, entity_type, \
     learning_unit_year_subtypes, proposal_type, learning_container_year_types, proposal_state
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
@@ -71,6 +71,7 @@ from base.tests.factories.person import PersonFactory, PersonWithPermissionsFact
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
+from base.tests.factories.user import UserFactory
 from base.views.learning_units.proposal.update import update_learning_unit_proposal, \
     learning_unit_modification_proposal, \
     learning_unit_suppression_proposal
@@ -486,7 +487,9 @@ class TestLearningUnitProposalCancellation(TestCase):
         self.assertTemplateUsed(response, "page_not_found.html")
 
     def test_with_none_person(self):
-        self.person.delete()
+        user = UserFactory()
+        user.user_permissions.add(self.permission)
+        self.client.force_login(user)
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponseNotFound.status_code)

@@ -31,12 +31,12 @@ from unittest import mock
 import factory.fuzzy
 import reversion
 from django.contrib.auth.models import Permission
-from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseForbidden
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
 from django.test import TestCase, RequestFactory, Client
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
@@ -55,7 +55,7 @@ from base.forms.learning_unit.search_form import LearningUnitYearForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models.academic_year import AcademicYear
 from base.models.enums import active_status, education_group_categories, \
-    learning_component_year_type, proposal_type, proposal_state
+    learning_component_year_type, proposal_type, proposal_state, quadrimesters
 from base.models.enums import entity_type
 from base.models.enums import internship_subtypes
 from base.models.enums import learning_container_year_types, organization_type
@@ -553,6 +553,20 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_units.html')
         self.assertEqual(response.context['learning_units_count'], number_of_results)
 
+    def test_learning_units_search_quadrimester(self):
+        self._prepare_context_learning_units_search()
+        self.luy_LBIR1100C.quadrimester = quadrimesters.Q1and2
+        self.luy_LBIR1100C.save()
+        filter_data = {
+            'academic_year_id': self.current_academic_year.id,
+            'quadrimester': quadrimesters.Q1and2,
+            'acronym': 'LBIR1100C',
+        }
+        response = self.client.get(reverse('learning_units'), data=filter_data)
+
+        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertEqual(response.context['learning_units_count'], 1)
+
     def test_learning_unit_read(self):
         learning_container_year = LearningContainerYearFactory(academic_year=self.current_academic_year)
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
@@ -876,9 +890,9 @@ class LearningUnitViewTestCase(TestCase):
                                 academic_year=self.current_academic_year, subtype=learning_unit_year_subtypes.PARTIM)
         LearningUnitYearFactory(acronym="LBIR1100B", learning_container_year=l_container_yr,
                                 academic_year=self.current_academic_year, subtype=learning_unit_year_subtypes.PARTIM)
-        LearningUnitYearFactory(acronym="LBIR1100C", learning_container_year=l_container_yr,
-                                academic_year=self.current_academic_year, subtype=learning_unit_year_subtypes.PARTIM,
-                                status=False)
+        self.luy_LBIR1100C = LearningUnitYearFactory(
+            acronym="LBIR1100C", learning_container_year=l_container_yr, academic_year=self.current_academic_year,
+            subtype=learning_unit_year_subtypes.PARTIM, status=False)
 
         # Create another UE and put entity charge [ENV]
         l_container_yr_2 = LearningContainerYearFactory(

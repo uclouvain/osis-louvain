@@ -25,9 +25,9 @@
 ##############################################################################
 from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.test import TestCase
+from django.urls import reverse
 
 from attribution.models import attribution
 from attribution.tests.models import test_attribution

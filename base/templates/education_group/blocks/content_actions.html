@@ -24,11 +24,10 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% if not cannot_order %}
-    <div class="btn-group  pull-right" role="group" aria-label="actions">
-        {% url 'group_element_year_update' root.pk education_group_year.pk group.pk as update_url %}
-        {% action_with_permission _("Edit") "edit" update_url %}
-
+<div class="btn-group  pull-right" role="group" aria-label="actions">
+    {% url 'group_element_year_update' root.pk education_group_year.pk group.pk as update_url %}
+    {% action_with_permission _("Edit") "edit" update_url %}
+    {% if not cannot_order %}
         <form id="form_group_element_year_actions" method="POST" style="display:inline;"
               action="{% url 'education_groups_management' %}">
             <input type="hidden" name="root_id" value="{{ root.id }}"/>
@@ -38,8 +37,7 @@
             {% button_order_with_permission _("Up") "btn_operation_up_"|addstr:group.id "up" %}
             {% button_order_with_permission _("Down") "btn_operation_down_"|addstr:group.id "down" %}
         </form>
-
-        {% url 'group_element_year_delete' root.pk education_group_year.pk group.pk as detach_url %}
-        {% action_with_permission _("Detach") "detach" detach_url %}
-    </div>
-{% endif %}
+    {% endif %}
+    {% url 'group_element_year_delete' root.pk education_group_year.pk group.pk as detach_url %}
+    {% action_with_permission _("Detach") "detach" detach_url %}
+</div>

@@ -52,6 +52,7 @@ for appname in webservice_apps:
             regex = r'^{appname}/'.format(**context)
             namespace = '{appname}_api_v1'.format(**context)
 
+            # FIXME Add app_name for continuing_education and partnership
             url_api_v1.append(url(regex, include(module_name, namespace=namespace)))
         except ImportError:
             logger.warning('API urls from {appname} could not be imported'.format(**context))

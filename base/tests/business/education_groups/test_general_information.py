@@ -38,7 +38,8 @@ from base.business.education_groups.general_information import PublishException,
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory, \
-    EducationGroupYearCommonBachelorFactory, MiniTrainingFactory
+    EducationGroupYearCommonBachelorFactory, MiniTrainingFactory, EducationGroupYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 
 
 @override_settings(ESB_API_URL="api.esb.com",
@@ -129,22 +130,34 @@ class TestGetUrlToPublish(TestCase):
         )
         self.assertEqual(expected_url, _get_url_to_publish(training))
 
-    def test_get_publish_url_case_not_common_and_finality_case(self):
-        training = TrainingFactory(education_group_type__name=random.choice(TrainingType.finality_types()))
+    def test_get_publish_url_case_not_common_and_finality_or_option_case(self):
+        training = EducationGroupYearFactory(
+            education_group_type__name=random.choice(TrainingType.finality_types() + [MiniTrainingType.OPTION.name])
+        )
+        parent = TrainingFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            academic_year=training.academic_year
+        )
+        GroupElementYearFactory(parent=parent, child_branch=training)
         expected_url = "{api_url}/{endpoint}".format(
             api_url=settings.ESB_API_URL,
             endpoint=settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(
                 year=training.academic_year.year,
-                code=training.partial_acronym
+                code="{parent}-{partial_acronym}".format(
+                    parent=parent.acronym,
+                    partial_acronym=training.partial_acronym
+                )
             ),
         )
         self.assertEqual(expected_url, _get_url_to_publish(training))
 
     def test_get_publish_url_case_not_common_and_mini_training_case(self):
-        mini_training = MiniTrainingFactory(education_group_type__name=random.choice(
-            [t.name for t in MiniTrainingType])
+        mini_training = MiniTrainingFactory(
+            education_group_type__name=random.choice([
+                t.name for t in MiniTrainingType
+                if t.name not in [MiniTrainingType.OPTION.name, MiniTrainingType.FSA_SPECIALITY.name]
+            ])
         )
-        print(mini_training.education_group_type)
         expected_url = "{api_url}/{endpoint}".format(
             api_url=settings.ESB_API_URL,
             endpoint=settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(
@@ -154,8 +167,18 @@ class TestGetUrlToPublish(TestCase):
         )
         self.assertEqual(expected_url, _get_url_to_publish(mini_training))
 
+    def test_get_publish_url_case_not_common_and_fsa_speciality_case(self):
+        fsa_speciality = MiniTrainingFactory(education_group_type__name=MiniTrainingType.FSA_SPECIALITY.name)
+        expected_url = "{api_url}/{endpoint}".format(
+            api_url=settings.ESB_API_URL,
+            endpoint=settings.ESB_REFRESH_PEDAGOGY_ENDPOINT.format(
+                year=fsa_speciality.academic_year.year,
+                code='fsa1ba-{partial_acronym}'.format(partial_acronym=fsa_speciality.partial_acronym)
+            ),
+        )
+        self.assertEqual(expected_url, _get_url_to_publish(fsa_speciality))
+
     def _get_correct_mini_training_code(self, mini_training):
         return "app-{}".format(mini_training.partial_acronym) if mini_training.is_deepening else \
             "min-{}".format(mini_training.partial_acronym) if mini_training.is_minor else \
-            mini_training.partial_acronym if mini_training.is_option else \
             mini_training.acronym

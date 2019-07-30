@@ -37,9 +37,9 @@ class EntityManagerAdmin(VersionAdmin, SerializableModelAdmin):
 
 
 class EntityManager(SerializableModel):
-    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    person = models.ForeignKey('Person', on_delete=models.PROTECT)
     structure = models.ForeignKey('Structure', on_delete=models.CASCADE)
-    entity = models.ForeignKey('Entity', blank=True, null=True, on_delete=models.CASCADE)
+    entity = models.ForeignKey('Entity', blank=True, null=True, on_delete=models.PROTECT)
 
     def __str__(self):
         return u"%s" % self.person

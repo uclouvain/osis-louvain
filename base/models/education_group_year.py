@@ -185,7 +185,7 @@ class EducationGroupYear(SerializableModel):
     academic_year = models.ForeignKey(
         'AcademicYear',
         verbose_name=_("validity"),
-        on_delete=models.CASCADE
+        on_delete=models.PROTECT
     )
 
     education_group = models.ForeignKey(
@@ -261,7 +261,7 @@ class EducationGroupYear(SerializableModel):
         blank=True,
         null=True,
         verbose_name=_("Enrollment campus"),
-        on_delete=models.CASCADE
+        on_delete=models.PROTECT
     )
 
     main_teaching_campus = models.ForeignKey(
@@ -270,7 +270,7 @@ class EducationGroupYear(SerializableModel):
         null=True,
         related_name='teaching',
         verbose_name=_("Learning location"),
-        on_delete=models.CASCADE
+        on_delete=models.PROTECT
     )
 
     dissertation = models.BooleanField(
@@ -354,7 +354,7 @@ class EducationGroupYear(SerializableModel):
         'reference.Language',
         null=True,
         verbose_name=_('Primary language'),
-        on_delete=models.CASCADE
+        on_delete=models.PROTECT
     )
 
     language_association = models.CharField(
@@ -444,7 +444,7 @@ class EducationGroupYear(SerializableModel):
 
     main_domain = models.ForeignKey(
         "reference.domain",
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         null=True, blank=True,
         verbose_name=_("main domain")
     )
@@ -468,14 +468,14 @@ class EducationGroupYear(SerializableModel):
         verbose_name=_("Management entity"),
         null=True,
         related_name="management_entity",
-        on_delete=models.CASCADE
+        on_delete=models.PROTECT
     )
 
     administration_entity = models.ForeignKey(
         Entity, null=True,
         verbose_name=_("Administration entity"),
         related_name='administration_entity',
-        on_delete=models.CASCADE
+        on_delete=models.PROTECT
     )
 
     weighting = models.BooleanField(
@@ -549,7 +549,7 @@ class EducationGroupYear(SerializableModel):
         verbose_name=_("Publication contact entity"),
         null=True,
         blank=True,
-        on_delete=models.CASCADE
+        on_delete=models.PROTECT
     )
 
     linked_with_epc = models.BooleanField(
@@ -587,6 +587,10 @@ class EducationGroupYear(SerializableModel):
     @property
     def is_minor(self):
         return self.type in MiniTrainingType.minors()
+
+    @property
+    def is_major(self):
+        return self.type == MiniTrainingType.FSA_SPECIALITY.name
 
     @property
     def is_deepening(self):

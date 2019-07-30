@@ -32,12 +32,16 @@ from django.db import models
 from django.db.models import Q
 from django.db.models import Value
 from django.db.models.functions import Concat, Lower
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
 from base.models.entity import Entity
-from base.models.entity_version import find_pedagogical_entities_version
+from base.models.entity_version import find_pedagogical_entities_version, \
+    build_current_entity_version_structure_in_memory, find_all_current_entities_version, \
+    find_parent_of_type_into_entity_structure
 from base.models.enums import person_source_type
+from base.models.enums.entity_type import FACULTY
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
     UE_FACULTY_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP, PROGRAM_MANAGER_GROUP
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
@@ -66,7 +70,7 @@ class Person(SerializableModel):
 
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
+    user = models.OneToOneField(User, on_delete=models.SET_NULL, blank=True, null=True)
     global_id = models.CharField(max_length=10, blank=True, null=True, db_index=True)
     gender = models.CharField(max_length=1, blank=True, null=True, choices=GENDER_CHOICES, default='U')
     first_name = models.CharField(max_length=50, blank=True, null=True, db_index=True)
@@ -153,6 +157,13 @@ class Person(SerializableModel):
 
         return entities_id
 
+    @cached_property
+    def directly_linked_entities(self):
+        entities = []
+        for person_entity in self.personentity_set.all().select_related('entity'):
+            entities.append(person_entity.entity)
+        return entities
+
     def get_managed_programs(self):
         return set(pgm_manager.offer_year for pgm_manager in self.programmanager_set.all())
 
@@ -182,6 +193,22 @@ class Person(SerializableModel):
     @cached_property
     def find_main_entities_version(self):
         return find_pedagogical_entities_version().filter(entity__in=self.linked_entities)
+
+    def find_attached_faculty_entities_version(self, acronym_exceptions=None):
+        entity_structure = build_current_entity_version_structure_in_memory(timezone.now().date())
+        faculties = set()
+        for entity in self.directly_linked_entities:
+            faculties = faculties.union({
+                e.entity for e in entity_structure[entity.id]['all_children']
+                if e.entity_type == FACULTY or (acronym_exceptions and e.acronym in acronym_exceptions)
+            })
+
+            entity_version = entity_structure[entity.id]['entity_version']
+            if acronym_exceptions and entity_version.acronym in acronym_exceptions:
+                faculties.add(entity)
+            else:
+                faculties.add(find_parent_of_type_into_entity_structure(entity_version, entity_structure, FACULTY))
+        return find_all_current_entities_version().filter(entity__in=faculties)
 
 
 def find_by_id(person_id):

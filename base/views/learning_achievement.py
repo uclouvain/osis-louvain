@@ -24,9 +24,9 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required, permission_required
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.views.decorators.http import require_http_methods
 
 from base.business.learning_units.achievement import get_code_name, get_anchor_reference, DELETE, DOWN, UP, \

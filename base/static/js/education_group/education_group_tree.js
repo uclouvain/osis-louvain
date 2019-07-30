@@ -34,7 +34,10 @@ $(document).ready(function () {
             view_url: obj.a_attr.href,
             attach_url: obj.a_attr.attach_url,
             detach_url: obj.a_attr.detach_url,
-            modify_url: obj.a_attr.modify_url
+            modify_url: obj.a_attr.modify_url,
+            attach_disabled: obj.a_attr.attach_disabled,
+            detach_disabled: obj.a_attr.detach_disabled,
+            modification_disabled: obj.a_attr.modification_disabled
         };
     }
 
@@ -69,125 +72,120 @@ $(document).ready(function () {
             },
             "contextmenu": {
                 "select_node": false,
-                "items": {
-                    "select": {
-                        "label": gettext("Select"),
-                        "action": function (data) {
-                            let __ret = get_data_from_tree(data);
-                            let element_id = __ret.element_id;
-                            let group_element_year_id = __ret.group_element_year_id;
-                            $.ajax({
-                                url: management_url,
-                                dataType: 'json',
-                                data: {
-                                    'element_id': element_id,
-                                    'group_element_year_id': group_element_year_id,
-                                    'action': 'select'
-                                },
-                                type: 'POST',
-                                success: function (jsonResponse) {
-                                    displayInfoMessage(jsonResponse, 'message_info_container')
-                                }
-                            });
-                        }
-                    },
-
-                    "open" : {
-                        "label": gettext("Open"),
-                        "action": function (data) {
-                            let __ret = get_data_from_tree(data);
-                            window.open(__ret.view_url, '_blank');
-                        }
-                    },
-
-                    "modify" : {
-                        "label": gettext("Modify"),
-                        "action": function(data) {
-                            let __ret = get_data_from_tree(data);
-
-                            $('#form-modal-ajax-content').load(__ret.modify_url, function (response, status, xhr) {
-                                if (status === "success") {
-                                    $('#form-ajax-modal').modal('toggle');
-                                    let form = $(this).find('form').first();
-                                    formAjaxSubmit(form, '#form-ajax-modal');
-                                } else {
-                                    window.location.href = __ret.modify_url
-                                }
-                            });
-                        },
-                        "_disabled": function (data) {
-                            let __ret = get_data_from_tree(data);
-                            // tree's root cannot be edit (no link with parent...)
-                            return __ret.group_element_year_id === null
-                        }
-                    },
-
-                    "attach": {
-                        "label": gettext("Attach"),
-                        "separator_before": true,
-                        "action": function (data) {
-                            let __ret = get_data_from_tree(data);
-
-                            $('#form-modal-ajax-content').load(__ret.attach_url, function (response, status, xhr) {
-                                if (status === "success") {
-                                    $('#form-ajax-modal').modal('toggle');
-                                    let form = $(this).find('form').first();
-                                    formAjaxSubmit(form, '#form-ajax-modal');
-                                } else {
-                                    window.location.href = __ret.attach_url
-                                }
-                            });
-                        },
-                        "_disabled": function (data) {
-                            let __ret = get_data_from_tree(data);
-                            return __ret.element_type === "learningunityear";
-                        }
-                    },
-
-                    "detach": {
-                        "label": gettext("Detach"),
-                        "action": function (data) {
-                            let __ret = get_data_from_tree(data);
-                            if (__ret.detach_url === '#') {
-                                return;
+                "items": function($node){
+                    return {
+                        "select": {
+                            "label": gettext("Select"),
+                            "action": function (data) {
+                                let __ret = get_data_from_tree(data);
+                                let element_id = __ret.element_id;
+                                let group_element_year_id = __ret.group_element_year_id;
+                                $.ajax({
+                                    url: management_url,
+                                    dataType: 'json',
+                                    data: {
+                                        'element_id': element_id,
+                                        'group_element_year_id': group_element_year_id,
+                                        'action': 'select'
+                                    },
+                                    type: 'POST',
+                                    success: function (jsonResponse) {
+                                        displayInfoMessage(jsonResponse, 'message_info_container')
+                                    }
+                                });
                             }
+                        },
 
-                            $('#form-modal-ajax-content').load(__ret.detach_url, function (response, status, xhr) {
-                                if (status === "success") {
-                                    $('#form-ajax-modal').modal('toggle');
+                        "modify": {
+                            "label": gettext("Modify"),
+                            "action": function (data) {
+                                let __ret = get_data_from_tree(data);
 
-                                    let form = $(this).find('form').first();
-                                    formAjaxSubmit(form, '#form-ajax-modal');
-                                } else {
-                                    window.location.href = __ret.detach_url
+                                $('#form-modal-ajax-content').load(__ret.modify_url, function (response, status, xhr) {
+                                    if (status === "success") {
+                                        $('#form-ajax-modal').modal('toggle');
+                                        let form = $(this).find('form').first();
+                                        formAjaxSubmit(form, '#form-ajax-modal');
+                                    } else {
+                                        window.location.href = __ret.modify_url
+                                    }
+                                });
+                            },
+                            "title": $node.a_attr.modification_msg,
+                            "_disabled": function (data) {
+                                let __ret = get_data_from_tree(data);
+                                // tree's root cannot be edit (no link with parent...)
+                                return __ret.modification_disabled === true;
+                            }
+                        },
+
+                        "attach": {
+                            "label": gettext("Attach"),
+                            "separator_before": true,
+                            "action": function (data) {
+                                let __ret = get_data_from_tree(data);
+
+                                $('#form-modal-ajax-content').load(__ret.attach_url, function (response, status, xhr) {
+                                    if (status === "success") {
+                                        $('#form-ajax-modal').modal('toggle');
+                                        let form = $(this).find('form').first();
+                                        formAjaxSubmit(form, '#form-ajax-modal');
+                                    } else {
+                                        window.location.href = __ret.attach_url
+                                    }
+                                });
+                            },
+                            "title": $node.a_attr.attach_msg,
+                            "_disabled": function (data) {
+                                let __ret = get_data_from_tree(data);
+                                return __ret.attach_disabled === true;
+                            }
+                        },
+
+                        "detach": {
+                            "label": gettext("Detach"),
+                            "action": function (data) {
+                                let __ret = get_data_from_tree(data);
+                                if (__ret.detach_url === '#') {
+                                    return;
                                 }
 
-                            });
-                        },
-                        "_disabled": function (data) {
-                            let __ret = get_data_from_tree(data);
-                            // tree's root and learning_unit having/being prerequisite(s) cannot be detached
-                            return __ret.group_element_year_id === null ||
-                                __ret.has_prerequisite === true ||
-                                __ret.is_prerequisite === true;
-                        }
-                    },
+                                $('#form-modal-ajax-content').load(__ret.detach_url, function (response, status, xhr) {
+                                    if (status === "success") {
+                                        $('#form-ajax-modal').modal('toggle');
 
-                    "open_all": {
-                        "separator_before": true,
-                        "label": gettext("Open all"),
-                        "action": function (node) {
-                            let tree = $("#panel_file_tree").jstree(true);
-                            tree.open_all(node.reference)
+                                        let form = $(this).find('form').first();
+                                        formAjaxSubmit(form, '#form-ajax-modal');
+                                    } else {
+                                        window.location.href = __ret.detach_url
+                                    }
+
+                                });
+                            },
+                            "title": $node.a_attr.detach_msg,
+                            "_disabled": function (data) {
+                                let __ret = get_data_from_tree(data);
+                                // tree's root and learning_unit having/being prerequisite(s) cannot be detached
+                                return __ret.detach_disabled === true;
+                            }
+                        },
+
+                        "open_all": {
+                            "separator_before": true,
+                            "label": gettext("Open all"),
+                            "action": function (node) {
+                                let tree = $("#panel_file_tree").jstree(true);
+                                tree.open_all(node.reference)
+                            }
+                        },
+                        "close_all": {
+                            "label": gettext("Close all"),
+                            "action": function (node) {
+                                let tree = $("#panel_file_tree").jstree(true);
+                                tree.close_all(node.reference);
+                            }
                         }
-                    },
-                    "close_all": {
-                        "label": gettext("Close all"),
-                        "action": function (node) {
-                            let tree = $("#panel_file_tree").jstree(true);
-                            tree.close_all(node.reference);
-                        }
-                    }
+                    };
                 }
             }
         }

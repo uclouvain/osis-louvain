@@ -174,7 +174,10 @@ def _save_form_and_display_messages(request, form):
     try:
         records = form.save()
         display_warning_messages(request, getattr(form, 'warnings', []))
-        display_success_messages(request, _('The learning unit has been updated.'))
+        if bool(int(request.POST.get('postponement', 0))):
+            display_success_messages(request, _('The learning unit has been updated (with report).'))
+        else:
+            display_success_messages(request, _('The learning unit has been updated (without report).'))
 
     except ConsistencyError as e:
         error_list = e.error_list

@@ -26,9 +26,9 @@
 
 from unittest import mock
 
-from django.core.urlresolvers import reverse
 from django.db import IntegrityError
 from django.test import TestCase, RequestFactory
+from django.urls import reverse
 
 from assessments.views import pgm_manager_administration
 from base.models.program_manager import ProgramManager

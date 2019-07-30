@@ -26,6 +26,7 @@
 import os
 import sys
 
+from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
 
@@ -420,24 +421,29 @@ BOOTSTRAP3 = {
 AJAX_SELECT_BOOTSTRAP = False
 
 
-CACHE_ENABLED = os.environ.get("CACHE_ENABLED", "False").lower() == 'true'
-if CACHE_ENABLED:
-    CACHES = {
-        'default': {
-            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
-        },
-        "redis": {
-            "BACKEND": "django_redis.cache.RedisCache",
-            "LOCATION": os.environ.get("REDIS_LOCATIONS", "redis://127.0.0.1:6379").split(),
-            "OPTIONS": {
-                "CLIENT_CLASS": "django_redis.client.DefaultClient",
-                "SOCKET_CONNECT_TIMEOUT": 2,
-                "SOCKET_TIMEOUT": 2,
-                "PASSWORD": os.environ.get("REDIS_PASSWORD", "")
-            },
-            "KEY_PREFIX": os.environ.get("REDIS_PREFIX", 'osis')
-        }
+BACKEND_CACHE = os.environ.get("BACKEND_CACHE", "locmem").lower()
+if BACKEND_CACHE == 'locmem':
+    CACHE_CONFIG = {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache'
     }
+elif BACKEND_CACHE == 'redis':
+    CACHE_CONFIG = {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": os.environ.get("REDIS_LOCATIONS", "redis://127.0.0.1:6379").split(),
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "SOCKET_CONNECT_TIMEOUT": 2,
+            "SOCKET_TIMEOUT": 2,
+            "PASSWORD": os.environ.get("REDIS_PASSWORD", "")
+        },
+        "KEY_PREFIX": os.environ.get("REDIS_PREFIX", 'osis')
+    }
+else:
+    raise ImproperlyConfigured("Cache configuration error: invalid BACKEND_CACHE")
+
+
+CACHES = {"default": CACHE_CONFIG}
+
 
 WAFFLE_FLAG_DEFAULT = os.environ.get("WAFFLE_FLAG_DEFAULT", "False").lower() == 'true'
 

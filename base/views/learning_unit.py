@@ -29,10 +29,10 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
-from django.core.urlresolvers import reverse
 from django.db.models import Sum
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.http import require_http_methods
@@ -52,12 +52,12 @@ from base.business.learning_units.perms import can_update_learning_achievement
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
-from base.models import education_group_year, campus, proposal_learning_unit, entity
+from base.models import education_group_year, proposal_learning_unit
 from base.models import learning_component_year as mdl_learning_component_year
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import ATTRIBUTION_PROCEDURES
-from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST, EntityContainerYearLinkTypes
+from base.models.enums.entity_container_year_link_type import EntityContainerYearLinkTypes
 from base.models.enums.learning_component_year_type import LEARNING_COMPONENT_YEAR_TYPES
 from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.vacant_declaration_type import DECLARATION_TYPE
@@ -66,7 +66,6 @@ from base.models.person import Person
 from base.views.common import display_warning_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models import text_label
-from reference.models import language
 from reference.models.language import find_language_in_settings
 
 ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',

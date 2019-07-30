@@ -29,9 +29,9 @@ from unittest.mock import patch
 
 from django.contrib.auth.models import Permission, Group
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test import TestCase, RequestFactory, TransactionTestCase
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext
 from django.utils.translation import ugettext_lazy as _

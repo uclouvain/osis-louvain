@@ -101,7 +101,7 @@ class AcademicYear(SerializableModel):
 
     @cached_property
     def is_past(self):
-        return self.year < current_academic_year().year
+        return self.year < starting_academic_year().year
 
     def next(self):
         return AcademicYear.objects.get(year=self.year + 1)

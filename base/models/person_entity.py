@@ -48,7 +48,7 @@ class PersonEntityAdmin(VersionAdmin, OsisModelAdmin):
 
 
 class PersonEntity(models.Model):
-    person = models.ForeignKey('Person', on_delete=models.CASCADE)
+    person = models.ForeignKey('Person', on_delete=models.PROTECT)
     entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
     with_child = models.BooleanField(default=False)
 

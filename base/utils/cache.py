@@ -28,18 +28,13 @@ import logging
 from functools import wraps
 
 from django.conf import settings
-from django.core.cache import caches, InvalidCacheBackendError
+from django.core.cache import cache
 from django.http import QueryDict
 
 CACHE_FILTER_TIMEOUT = None
 PREFIX_CACHE_KEY = 'cache_filter'
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
-try:
-    cache = caches["redis"]
-except InvalidCacheBackendError:
-    logger.warning("Rolled back to default cache")
-    cache = caches["default"]
 
 
 def cache_filter(exclude_params=None, **default_values):

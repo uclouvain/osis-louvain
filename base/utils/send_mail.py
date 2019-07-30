@@ -154,8 +154,8 @@ def send_mail_before_annual_procedure_of_automatic_postponement_of_egy(statistic
         .distinct()
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
     template_base_data = {
-        'academic_year': statistics_context['max_academic_year_to_postpone'].past().year,
-        'end_academic_year': statistics_context['max_academic_year_to_postpone'].year,
+        'previous_academic_year': statistics_context['max_academic_year_to_postpone'].past().year,
+        'current_academic_year': statistics_context['max_academic_year_to_postpone'].year,
 
         # Use len instead of count() (it's buggy when a queryset is built with a difference())
         'egys_to_postpone': len(statistics_context['to_duplicate']),
@@ -181,8 +181,8 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
                       if edy.academic_year_id == statistics_context['max_academic_year_to_postpone'].pk]
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
     template_base_data = {
-        'academic_year': statistics_context['max_academic_year_to_postpone'].past().year,
-        'end_academic_year': statistics_context['max_academic_year_to_postpone'].year,
+        'previous_academic_year': statistics_context['max_academic_year_to_postpone'].past().year,
+        'current_academic_year': statistics_context['max_academic_year_to_postpone'].year,
         'egys_postponed': len(egys_postponed),
         'egys_postponed_qs': sorted(egys_postponed, key=__sort_education_group_type),
         'egys_already_existing': statistics_context['already_duplicated'].count(),
@@ -191,7 +191,7 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
         'egys_ending_this_year': statistics_context['ending_on_max_academic_year'].count(),
         'egys_ending_this_year_qs': statistics_context['ending_on_max_academic_year'].order_by(
           'educationgroupyear__education_group_type__name', 'educationgroupyear__acronym'),
-        'egys_with_errors': sorted(egys_with_errors)
+        'egys_with_errors': egys_with_errors
     }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, None, None)

@@ -27,8 +27,8 @@ import datetime
 
 from django.contrib.auth.models import Group, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.core.urlresolvers import reverse
 from django.test import TestCase
+from django.urls import reverse
 
 from attribution.business.attribution import get_attributions_list
 from attribution.models import attribution
