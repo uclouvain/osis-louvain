@@ -205,11 +205,12 @@ def _update_training(request, education_group_year, root):
         "form_education_group": form_education_group_year.forms[EducationGroupModelForm],
         "form_coorganization": formset_list,
         "form_hops": form_education_group_year.hops_form,
-        "show_coorganization": education_group_year.education_group_type.category == "TRAINING" and
-                               education_group_year.education_group_type.name not in [
-                                   TrainingType.PGRM_MASTER_120.name,
-                                   TrainingType.PGRM_MASTER_180_240.name
-                               ],
+        "show_coorganization":
+            education_group_year.education_group_type.category == "TRAINING" and
+            education_group_year.education_group_type.name not in [
+                TrainingType.PGRM_MASTER_120.name,
+                TrainingType.PGRM_MASTER_180_240.name
+            ],
         'can_change_coorganization': perms.is_eligible_to_change_coorganization(
             person=request.user.person,
             education_group=education_group_year,
