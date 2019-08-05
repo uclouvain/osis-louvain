@@ -1,0 +1,117 @@
+{% extends "layout.html" %}
+{% load staticfiles %}
+{% load i18n %}
+
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumbarea %}
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+            <div class="center-block"><h3>{% trans 'User list' %}</h3></div>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Lastname' %}</th>
+                        <th>{% trans 'Firstname' %}</th>
+                        <th>{% trans 'Global ID' %}</th>
+                        <th>{% trans 'Groups' %}</th>
+                        <th>{% trans 'Entity managers' %}</th>
+                        <th>{% trans 'Person entities (OF + UE)' %}</th>
+                        <th>{% trans 'Partnership entities' %}</th>
+                        <th>{% trans 'Program managers' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for object in object_list %}
+                        <tr>
+                            <td>{{ object.last_name }}</td>
+                            <td>{{ object.first_name }}</td>
+                            <td>{{ object.global_id }}</td>
+                            <td>
+                                <ul>{% for group in object.user.groups.all %}
+                                    <li>{{ group.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td>
+                                <ul>{% for entity in object.entitymanager_set.all %}
+                                    <li>{{ entity.entity }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td>
+                                <ul>{% for entity in object.personentity_set.all %}
+                                    <li>{{ entity.entity }} {% if entity.with_child %}({% trans 'With child' %}){% endif %}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td>
+                                <ul>{% for entity in object.partnershipentitymanager_set.all %}
+                                    <li>{{ entity.entity }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </td>
+                            <td><ul>{% for ed in object.programmanager_set.all %}
+                                    <li>{{ ed.offer_year }}</li>
+                                    {% endfor %}
+                                </ul></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+                <div class="text-center">
+                    <ul class="pagination">
+                        {% if page_obj.has_previous %}
+                            <li><a href="#" onclick="submit_with_page('{{ page_obj.previous_page_number }}')">&laquo;</a>
+                            </li>
+                        {% else %}
+                            <li class="disabled"><span>&laquo;</span></li>
+                        {% endif %}
+                        {% for i in page_obj.paginator.page_range %}
+                            {% if i <= page_obj.number|add:5 and i >= page_obj.number|add:-5 %}
+
+                                {% if page_obj.number == i %}
+                                    <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
+                                {% else %}
+                                    <li><a href="#" onclick="submit_with_page('{{ i }}')">{{ i }}</a></li>
+                                {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                        {% if page_obj.has_next %}
+                            <li><a href="#" onclick="submit_with_page('{{ page_obj.next_page_number }}')">&raquo;</a></li>
+                        {% else %}
+                            <li class="disabled"><span>&raquo;</span></li>
+                        {% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
