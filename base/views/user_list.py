@@ -8,7 +8,7 @@ from base.views.mixins import AjaxTemplateMixin
 
 class UserListView(AjaxTemplateMixin, ListView):
     model = Person
-    # paginate_by = "200"
+    paginate_by = "200"
     ordering = 'global_id',
     # template_name = ''
 
