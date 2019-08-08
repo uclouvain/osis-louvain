@@ -4,12 +4,11 @@ from django.views.generic import ListView
 
 from base.models.person import Person
 from base.models.student import Student
-from base.views.mixins import AjaxTemplateMixin
 
 
-class UserListView(LoginRequiredMixin, AjaxTemplateMixin, ListView):
+class UserListView(LoginRequiredMixin, ListView):
     model = Person
-    paginate_by = "50"
+    paginate_by = "20"
     ordering = 'last_name', 'first_name', 'global_id'
     # template_name = ''
 

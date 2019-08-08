@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-08 13:41+0200\n"
+"POT-Creation-Date: 2019-08-08 16:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4997,7 +4997,7 @@ msgid "User interface language"
 msgstr ""
 
 #: templates/base/person_list.html:35
-msgid "User list"
+msgid "Users"
 msgstr ""
 
 #: templates/education_group/learning_unit/tabs.html:35

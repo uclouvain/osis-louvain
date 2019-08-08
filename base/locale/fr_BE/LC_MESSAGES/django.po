@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-08 13:41+0200\n"
+"POT-Creation-Date: 2019-08-08 16:10+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -5170,8 +5170,8 @@ msgid "User interface language"
 msgstr "Langue de l'interface utilisateur"
 
 #: templates/base/person_list.html:35
-msgid "User list"
-msgstr "Utilisateur"
+msgid "Users"
+msgstr "Utilisateurs"
 
 #: templates/education_group/learning_unit/tabs.html:35
 #: templates/education_group/tabs.html:71
@@ -6300,3 +6300,6 @@ msgstr "oui"
 #: templates/learning_unit/identification.html:176
 msgid "yes,no"
 msgstr "oui,non"
+
+#~ msgid "User list"
+#~ msgstr "Utilisateur"
