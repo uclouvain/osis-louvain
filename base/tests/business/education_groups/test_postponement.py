@@ -159,7 +159,7 @@ class TestPostpone(TestCase):
         cls.previous_academic_year, cls.current_academic_year, cls.next_academic_year = AcademicYearFactory.produce()
 
     def setUp(self):
-        self.education_group = EducationGroupFactory(end_year=self.next_academic_year.year)
+        self.education_group = EducationGroupFactory(end_year=self.next_academic_year)
 
         self.current_education_group_year = TrainingFactory(
             education_group=self.education_group,

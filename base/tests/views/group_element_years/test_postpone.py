@@ -51,7 +51,7 @@ class TestPostpone(TestCase):
 
         self.client.force_login(self.person.user)
 
-        self.education_group = EducationGroupFactory(end_year=self.next_academic_year.year)
+        self.education_group = EducationGroupFactory(end_year=self.next_academic_year)
         self.education_group_year = TrainingFactory(academic_year=self.current_academic_year,
                                                     education_group=self.education_group)
 
