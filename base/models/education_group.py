@@ -105,7 +105,7 @@ class EducationGroup(SerializableModel):
     def clean(self):
         # Check end_year should be greater of equals to start_year
         if self.start_year and self.end_year:
-            if self.start_year > self.end_year:
+            if self.start_year.year > self.end_year.year:
                 raise ValidationError({
                     'end_year': _("%(max)s must be greater or equals than %(min)s") % {
                         "max": _("Last year of organization").title(),
@@ -137,7 +137,7 @@ class EducationGroup(SerializableModel):
         if self.end_year is None:
             qs = qs.filter(education_group__end_year__isnull=False)
         else:
-            qs = qs.filter(education_group__end_year__lt=self.end_year)
+            qs = qs.filter(education_group__end_year__year__lt=self.end_year.year)
 
         for invalid_root_2m in qs:
             raise ValidationError({
@@ -150,7 +150,7 @@ class EducationGroup(SerializableModel):
         qs = EducationGroupYear.hierarchy.filter(pk=root_2m_egy.pk) \
             .get_children() \
             .filter(
-            Q(education_group__end_year__gt=self.end_year) | Q(education_group__end_year__isnull=True),
+            Q(education_group__end_year__year__gt=self.end_year.year) | Q(education_group__end_year__isnull=True),
             education_group_type__name__in=TrainingType.finality_types(),
         )
 
