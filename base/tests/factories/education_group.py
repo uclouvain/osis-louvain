@@ -26,6 +26,8 @@
 import factory
 import factory.fuzzy
 import string
+
+from base.tests.factories.academic_year import AcademicYearFactory
 from osis_common.utils.datetime import get_tzinfo
 from django.utils import timezone
 from factory.django import DjangoModelFactory
@@ -40,6 +42,13 @@ class EducationGroupFactory(DjangoModelFactory):
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
-    start_year = factory.fuzzy.FuzzyInteger(2000, timezone.now().year)
-    end_year = factory.LazyAttribute(lambda obj: factory.fuzzy.FuzzyInteger(obj.start_year + 1,
-                                                                            obj.start_year + 9).fuzz())
+    start_year = factory.SubFactory(AcademicYearFactory, year=factory.fuzzy.FuzzyInteger(2000, timezone.now().year))
+    # end_year = factory.SubFactory(AcademicYearFactory, year=factory.LazyAttribute(lambda obj: factory.fuzzy.FuzzyInteger(obj.start_year + 1,
+    #                                                                         obj.start_year + 9).fuzz()))
+    end_year = None
+
+    @factory.post_generation
+    def gen_end_year(self, create, extracted, **kwargs):
+        if self.end_year == '':
+            self.end_year = factory.SubFactory(AcademicYearFactory, year=factory.LazyAttribute(
+                lambda obj: factory.fuzzy.FuzzyInteger(obj.start_year + 1, obj.start_year + 9).fuzz()))
