@@ -51,7 +51,7 @@ class PersonAdmin(SerializableModelAdmin):
     list_display = ('get_first_name', 'middle_name', 'last_name', 'username', 'email', 'gender', 'global_id',
                     'changed', 'source', 'employee')
     search_fields = ['first_name', 'middle_name', 'last_name', 'user__username', 'email', 'global_id']
-    list_filter = ('gender', 'language')
+    list_filter = ('gender', 'language', 'employee', 'user__is_active')
 
 
 class EmployeeManager(SerializableModelManager):

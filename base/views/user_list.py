@@ -1,3 +1,4 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.views.generic import ListView
 
@@ -6,25 +7,22 @@ from base.models.student import Student
 from base.views.mixins import AjaxTemplateMixin
 
 
-class UserListView(AjaxTemplateMixin, ListView):
+class UserListView(LoginRequiredMixin, AjaxTemplateMixin, ListView):
     model = Person
-    paginate_by = "200"
-    ordering = 'global_id',
+    paginate_by = "50"
+    ordering = 'last_name', 'first_name', 'global_id'
     # template_name = ''
 
     def get_queryset(self):
         qs = super().get_queryset().select_related('user')\
-                    .prefetch_related('entitymanager_set',
+                    .prefetch_related('managed_entities',
                                       'personentity_set',
                                       'partnershipentitymanager_set',
-                                      'programmanager_set')\
-                    .exclude(pk__in=Student.objects.all())
-        # qs = super().get_queryset().select_related('user')\
-        #     .prefetch_related('entitymanager_set',
-        #                       'personentity_set',
-        #                       'partnershipentitymanager_set',
-        #                       'programmanager_set')\
-        #     .filter(user__username='admin')
+                                      'programmanager_set',
+                                      'user__groups')\
+                    .filter(user__is_active=True)\
+                    .exclude(user__groups__name='tutors')\
+                    .exclude(pk__in=Student.objects.all().values_list('person_id', flat=True))
         return qs
 
     def paginate_queryset(self, queryset, page_size):
