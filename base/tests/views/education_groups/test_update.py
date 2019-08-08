@@ -85,6 +85,11 @@ class TestUpdate(TestCase):
                                                     year=self.current_academic_year.year + 2)
         academic_year_2.save()
 
+        self.academic_year_3 = AcademicYearFactory.build(start_date=self.start_date_ay_2,
+                                                    end_date=self.end_date_ay_2,
+                                                    year=self.current_academic_year.year + 8)
+        self.academic_year_3.save()
+
         self.education_group_year = GroupFactory()
 
         EntityVersionFactory(entity=self.education_group_year.management_entity,
@@ -383,8 +388,8 @@ class TestUpdate(TestCase):
             'schedule_type': DAILY,
             "internship": internship_presence.NO,
             "primary_language": LanguageFactory().pk,
-            "start_year": 2010,
-            "end_year": 2018,
+            "start_year": self.training_education_group_year.academic_year,
+            "end_year": self.academic_year_3,
             "constraint_type": "",
             "diploma_printing_title": "Diploma Title",
         }
@@ -448,21 +453,24 @@ class TestSelectAttach(TestCase):
     def setUpTestData(self):
         self.person = PersonFactory()
         self.academic_year = create_current_academic_year()
+        self.next_academic_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
+        self.double_next_academic_year = AcademicYearFactory(year=self.current_academic_year.year + 2)
+        self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year - 1)
         self.child_education_group_year = EducationGroupYearFactory(
             academic_year=self.academic_year,
-            education_group__end_year=self.academic_year.year + 1
+            education_group__end_year=self.next_academic_year
         )
         self.learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
         self.initial_parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
         self.new_parent_education_group_year = EducationGroupYearFactory(
             academic_year=self.academic_year,
             education_group_type__learning_unit_child_allowed=True,
-            education_group__end_year=self.academic_year.year + 2
+            education_group__end_year=self.double_next_academic_year
         )
         self.bad_parent = EducationGroupYearFactory(
             academic_year=self.academic_year,
             education_group_type__learning_unit_child_allowed=True,
-            education_group__end_year=self.academic_year.year - 1
+            education_group__end_year=self.previous_academic_year
         )
 
         self.initial_group_element_year = GroupElementYearFactory(
