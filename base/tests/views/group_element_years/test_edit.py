@@ -43,10 +43,11 @@ class TestEdit(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=get_current_year() + 1)
+        cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year,
-                                                             education_group__end_year=cls.academic_year.year + 2)
+                                                             education_group__end_year=cls.next_academic_year)
         cls.education_group_year_child = EducationGroupYearFactory(academic_year=cls.academic_year,
-                                                                   education_group__end_year=cls.academic_year.year + 2)
+                                                                   education_group__end_year=cls.next_academic_year)
         cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
                                                          child_branch=cls.education_group_year_child)
         AuthorizedRelationshipFactory(

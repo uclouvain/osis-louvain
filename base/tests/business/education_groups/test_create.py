@@ -153,11 +153,11 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
         child_egy = create_initial_group_element_year_structure([self.egy])[self.egy.id][0].child_branch
         self.assertEqual(
             child_egy.education_group.start_year,
-            self.egy.academic_year.year
+            self.egy.academic_year
         )
         self.assertEqual(
             child_egy.education_group.end_year,
-            self.egy.academic_year.year
+            self.egy.academic_year
         )
 
     def test_should_increment_cnum_of_child_partial_acronym_to_avoid_conflicted_acronyms(self):

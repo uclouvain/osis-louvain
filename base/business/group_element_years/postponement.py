@@ -190,7 +190,7 @@ class PostponeContent:
             raise NotPostponeError(_("You are not allowed to postpone this training in the future."))
 
         end_year = self.instance.education_group.end_year
-        if end_year and end_year < self.next_academic_year.year:
+        if end_year and end_year.year < self.next_academic_year.year:
             raise NotPostponeError(_("The end date of the education group is smaller than the year of postponement."))
 
         if not self.instance.groupelementyear_set.exists():
