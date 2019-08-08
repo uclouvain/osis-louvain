@@ -114,7 +114,7 @@ class TestUpdate(TestCase):
         self.previous_training_education_group_year = TrainingFactory(
             academic_year=self.previous_academic_year,
             education_group_type=self.an_training_education_group_type,
-            education_group__start_year=1968
+            education_group__start_year=self.current_academic_year
         )
 
         EntityVersionFactory(entity=self.previous_training_education_group_year.management_entity,
@@ -126,7 +126,7 @@ class TestUpdate(TestCase):
         self.training_education_group_year = TrainingFactory(
             academic_year=self.current_academic_year,
             education_group_type=self.an_training_education_group_type,
-            education_group__start_year=1968
+            education_group__start_year=self.current_academic_year
         )
 
         self.training_education_group_year_1 = TrainingFactory(
