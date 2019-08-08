@@ -213,8 +213,8 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
         EducationGroupYearFactory(
             acronym=acronym,
             education_group=EducationGroupFactory(
-                start_year=self.egy.academic_year.year,
-                end_year=self.egy.academic_year.year
+                start_year=self.egy.academic_year,
+                end_year=self.egy.academic_year
             )
         )
         self.assertEqual(EducationGroup.objects.filter(educationgroupyear__acronym=acronym).count(), 1)
