@@ -42,9 +42,7 @@
                         <th>{% trans 'Groups' %}</th>
                         <th><span id="entity_manager" data-toggle="popover" data-trigger="hover" data-placement="top" data-title="{% trans 'Entity managers' %}" data-content='{% trans "Entities for DAFs + designation of note holders and program managers" %}'>{% trans 'Entity managers' %}</span></th>
                         <th><span id="person_entities" data-toggle="popover" data-trigger="hover" data-placement="top" data-title="{% trans 'Person entities' %}" data-content='{% trans "Trainings and learning units" %}'>{% trans 'Person entities' %}</span></th>
-                        {% if "partnership" in installed_apps %}
                         <th>{% trans 'Partnership entities' %}</th>
-                        {% endif %}
                         <th><span id="program_manager" data-toggle="popover" data-trigger="hover" data-placement="top" data-title="{% trans 'Program managers' %}" data-content='{% trans "Note encoding" %}'>{% trans 'Program managers' %}</span></th>
                     </tr>
                 </thead>
@@ -72,14 +70,12 @@
                                     {% endfor %}
                                 </ul>
                             </td>
-                            {% if "partnership" in installed_apps %}
                             <td>
                                 <ul>{% for entity in object.partnershipentitymanager_set.all %}
                                     <li>{{ entity.entity }}</li>
                                     {% endfor %}
                                 </ul>
                             </td>
-                            {% endif %}
                             <td>
                                 <ul>{% for ed in object.programmanager_set.all %}
                                     <li>{{ ed.offer_year }}</li>
