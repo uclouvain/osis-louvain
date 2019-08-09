@@ -25,7 +25,6 @@
 ##############################################################################
 import datetime
 
-from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
@@ -35,7 +34,6 @@ from base.models.enums import learning_container_year_types, organization_type
 from base.models.enums.attribution_procedure import INTERNAL_TEAM
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     EntityContainerYearLinkTypes
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.enums.internship_subtypes import PROFESSIONAL_INTERNSHIP
 from base.models.enums.learning_unit_year_periodicity import ANNUAL
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
@@ -49,7 +47,7 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import CentralManagerFactory, FacultyManagerFactory
 from reference.tests.factories.language import LanguageFactory
 
 
@@ -57,10 +55,8 @@ class TestLearningUnitYearModelFormInit(TestCase):
     """Tests LearningUnitYearModelForm.__init__()"""
     def setUp(self):
         create_current_academic_year()
-        self.central_manager = PersonFactory()
-        self.central_manager.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
-        self.faculty_manager = PersonFactory()
-        self.faculty_manager.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+        self.central_manager = CentralManagerFactory()
+        self.faculty_manager = FacultyManagerFactory()
 
     def test_acronym_field_case_partim(self):
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=PARTIM)
@@ -105,10 +101,8 @@ class TestLearningUnitYearModelFormSave(TestCase):
     """Tests LearningUnitYearModelForm.save()"""
 
     def setUp(self):
-        self.central_manager = PersonFactory()
-        self.central_manager.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
-        self.faculty_manager = PersonFactory()
-        self.faculty_manager.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+        self.central_manager = CentralManagerFactory()
+        self.faculty_manager = FacultyManagerFactory()
         self.current_academic_year = create_current_academic_year()
 
         self.learning_container = LearningContainerFactory()

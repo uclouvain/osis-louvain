@@ -54,8 +54,9 @@ MESSAGE_STORAGE = os.environ.get('MESSAGE_STORAGE', 'django.contrib.messages.sto
 # have to be defined in environment settings (ex: dev.py)
 INSTALLED_APPS = (
     'django.contrib.sites',
-    'dal',  # Dependency from 'partnership' module (Django auto-complete-light)
-    'dal_select2',  # Dependency from 'partnership' module (Django auto-complete-light)
+    'dal',
+    'dal_select2',
+    'dal_legacy_static',  # TODO : Useless in Django 2.0
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -93,7 +94,6 @@ MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'django.middleware.security.SecurityMiddleware',
@@ -181,6 +181,7 @@ TIME_ZONE = os.environ.get('TIME_ZONE', 'Europe/Brussels')
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 STATIC_URL = os.environ.get('STATIC_URL', '/static/')
 STATICI18N_ROOT = os.path.join(BASE_DIR, os.environ.get('STATICI18N', 'base/static'))
+
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(BASE_DIR, "uploads"))
 MEDIA_URL = os.environ.get('MEDIA_URL',  '/media/')
 CONTENT_TYPES = ['application/csv', 'application/doc', 'application/pdf', 'application/xls', 'application/xml',

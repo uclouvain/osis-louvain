@@ -26,15 +26,19 @@
 import itertools
 from collections import OrderedDict
 
+from dal import autocomplete
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.utils.html import format_html
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_group import create_xls, ORDER_COL, ORDER_DIRECTION, create_xls_administrative_data
 from base.forms.education_groups import EducationGroupFilter
 from base.forms.search.search_form import get_research_criteria
+from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.person import Person
@@ -87,3 +91,21 @@ def education_groups(request):
 
 def _get_filter_keys(form):
     return OrderedDict(itertools.chain(get_research_criteria(form)))
+
+
+class EducationGroupTypeAutoComplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
+    def get_queryset(self):
+        if not self.request.user.is_authenticated:
+            return EducationGroupType.objects.none()
+
+        qs = EducationGroupType.objects.all()
+
+        category = self.forwarded.get('category', None)
+        if category:
+            qs = qs.filter(category=category)
+
+        qs = qs.order_by_translated_name()
+        return qs
+
+    def get_result_label(self, result):
+        return format_html('{}', result.get_name_display())

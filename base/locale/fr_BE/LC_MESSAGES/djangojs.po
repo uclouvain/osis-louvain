@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-18 10:45+0200\n"
+"POT-Creation-Date: 2019-08-02 13:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,11 +15,11 @@ msgstr ""
 msgid ": "
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:119
+#: static/js/education_group/education_group_tree.js:123
 msgid "Attach"
 msgstr "Attacher"
 
-#: static/js/education_group/education_group_tree.js:178
+#: static/js/education_group/education_group_tree.js:182
 msgid "Close all"
 msgstr "Fermer tout"
 
@@ -27,7 +27,7 @@ msgstr "Fermer tout"
 msgid "Collapse"
 msgstr "Fermer"
 
-#: static/js/education_group/education_group_tree.js:141
+#: static/js/education_group/education_group_tree.js:146
 msgid "Detach"
 msgstr "Détacher"
 
@@ -38,10 +38,6 @@ msgstr "Code a déjà existé pour "
 #: static/js/learning_unit_creation.js:4
 msgid "Existing code in "
 msgstr "Code déjà existant en "
-
-#: static/js/learning_unit_creation.js:6
-msgid "This field is required"
-msgstr "Ce champ est obligatoire."
 
 #: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:8
 msgid "Insertion of a link to a CDN document"
@@ -55,15 +51,7 @@ msgstr "Code non valide"
 msgid "Link to CDN Doc"
 msgstr "Lien vers document du CDN"
 
-#: static/js/learning_unit_creation.js:8
-msgid "Please enter a value less than or equal to 500."
-msgstr "Veuillez entrer une valeur inférieur ou égale à 500."
-
-#: static/js/learning_unit_creation.js:7
-msgid "Please enter a value greater than or equal to 0."
-msgstr "Veuillez entrer une valeur supérieure ou égale à 0."
-
-#: static/js/education_group/education_group_tree.js:97
+#: static/js/education_group/education_group_tree.js:100
 msgid "Modify"
 msgstr "Modifier"
 
@@ -71,7 +59,7 @@ msgstr "Modifier"
 msgid "Open"
 msgstr "Ouvrir"
 
-#: static/js/education_group/education_group_tree.js:171
+#: static/js/education_group/education_group_tree.js:175
 msgid "Open all"
 msgstr "Ouvrir tout"
 
@@ -79,7 +67,23 @@ msgstr "Ouvrir tout"
 msgid "Please enter a valid URL."
 msgstr "Entrez une URL valide."
 
-#: static/js/education_group/education_group_tree.js:75
+#: static/js/learning_unit_creation.js:7
+msgid "Please enter a value greater than or equal to 0."
+msgstr "Veuillez entrer une valeur supérieure ou égale à 0."
+
+#: static/js/learning_unit_creation.js:8
+msgid "Please enter a value less than or equal to 500."
+msgstr "Veuillez entrer une valeur inférieure ou égale à 500."
+
+#: static/js/learning_unit_creation.js:9
+msgid "Please enter a value that is a multiple of 0.5."
+msgstr "Veuillez entrer une valeur qui est un multiple de 0,5."
+
+#: static/js/education_group/education_group_tree.js:191
+msgid "Search"
+msgstr "Rechercher"
+
+#: static/js/education_group/education_group_tree.js:78
 msgid "Select"
 msgstr "Sélectionner"
 
@@ -87,9 +91,9 @@ msgstr "Sélectionner"
 msgid "Selection of target files"
 msgstr "Sélection du fichier cible"
 
-#: static/js/learning_unit_creation.js:9
-msgid "Please enter a value that is a multiple of 0.5."
-msgstr "Veuillez entrer une valeur qui est un multiple de 0,5."
+#: static/js/learning_unit_creation.js:6
+msgid "This field is required"
+msgstr "Ce champ est obligatoire."
 
 #: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:32
 msgid "You should make a selection before clicking 'ok'"

@@ -23,11 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.conf import settings
+
 from base.views import common
-from django.views.i18n import JavaScriptCatalog
 
 packages = ('assessments', 'base')
 
@@ -55,9 +55,9 @@ if 'webservices' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^api/', include('webservices.urls')),)
 if 'partnership' in settings.INSTALLED_APPS:
     urlpatterns += (
-        url(r'^partnerships/', include('partnership.urls')),
+        url(r'^partnerships/', include('partnership.urls', namespace='partnerships')),
         # API
-        url(r'^partnerships/v1/', include('partnership.api.url_v1'))
+        url(r'^partnerships/v1/', include('partnership.api.url_v1', namespace='partnership_api_v1'))
     )
 if 'continuing_education' in settings.INSTALLED_APPS:
     urlpatterns += (url(r'^continuing_education/', include('continuing_education.urls')),)

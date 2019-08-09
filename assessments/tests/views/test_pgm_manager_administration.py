@@ -26,9 +26,9 @@
 
 from unittest import mock
 
-from django.urls import reverse
 from django.db import IntegrityError
 from django.test import TestCase, RequestFactory
+from django.urls import reverse
 
 from assessments.views import pgm_manager_administration
 from base.models.program_manager import ProgramManager
@@ -300,6 +300,7 @@ class TestAddSaveProgramManager(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonFactory()
+        ProgramManagerGroupFactory()
         cls.offer_year_without_equivalent_education_group_year = OfferYearFactory(
             corresponding_education_group_year=None
         )

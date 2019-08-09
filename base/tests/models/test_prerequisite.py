@@ -25,10 +25,11 @@
 ##############################################################################
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
 
+import base.templatetags.prerequisite
 from base.models import prerequisite
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
-from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
@@ -102,7 +103,6 @@ class TestPrerequisiteSyntaxValidator(TestCase):
 
 
 class TestPrerequisiteString(TestCase):
-
     def test_get_acronym_as_href(self):
         current_academic_yr = create_current_academic_year()
 
@@ -115,9 +115,23 @@ class TestPrerequisiteString(TestCase):
         )
 
         previous_academic_yr = AcademicYearFactory(year=current_academic_yr.year - 1)
-        self.assertEqual(prerequisite._get_acronym_as_href(prerequisite_item, previous_academic_yr), '')
+        self.assertEqual(
+            base.templatetags.prerequisite._get_acronym_as_href({}, prerequisite_item, previous_academic_yr),
+            '')
 
-        self.assertEqual(prerequisite._get_acronym_as_href(prerequisite_item, current_academic_yr),
-                         "<a href='/learning_units/{}/'>{}</a>".format(learning_unit_yr_prerequisite.id,
-                                                                       prerequisite_item.learning_unit.acronym)
-                         )
+        self.assertEqual(
+            base.templatetags.prerequisite._get_acronym_as_href({}, prerequisite_item, current_academic_yr),
+            _get_acronym_as_href(learning_unit_yr_prerequisite)
+        )
+
+
+def _get_acronym_as_href(luy):
+    return "<a href='/learning_units/{}/' title=\"{}\n{} : {} / {}\">{}</a>".format(
+        luy.id,
+        luy.complete_title,
+        _('Cred. rel./abs.'),
+        '-',
+        luy.credits.normalize(),
+        luy.acronym
+    )
+

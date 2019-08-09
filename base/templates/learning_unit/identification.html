@@ -93,6 +93,12 @@
                                 <br>
                             {% endif %}
                         {% endwith %}
+                        {% with new_acronym=learning_unit_year|get_next_acronym %}
+                            {% if new_acronym %}
+                                <div>({% trans 'Newly' %} : {{ new_acronym }})</div>
+                                <br>
+                            {% endif %}
+                        {% endwith %}
                         <div class="row">
                             {% block content_row2 %}
                                 <div class="col-md-3">

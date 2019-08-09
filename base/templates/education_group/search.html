@@ -96,6 +96,7 @@
                 <input type="hidden" id="xls_order" name="xls_order">
 
                 {% bootstrap_field form.ordering %}
+                {{ form.media }}
             </form>
 
             {% include 'learning_unit/blocks/form/search_form_reset.html' %}
@@ -162,40 +163,6 @@
 
 {% block script %}
     <script>
-        jQuery.fn.filterTypeByCategory = function (category) {
-            return this.each(function () {
-                var select = this;
-                var options = [];
-                $(select).find('option').each(function () {
-                    options.push({
-                        value: $(this).val(),
-                        category: $(this).data('category'),
-                        text: $(this).text()
-                    });
-                });
-                $(select).data('options', options);
-
-                $(category).on('change', function () {
-                    var current = $(select).val();
-                    var options = $(select).empty().data('options');
-                    var newCategory = $(category).val();
-
-                    $.each(options, function (i) {
-                        var option = options[i];
-                        if (option.category === newCategory || option.value === "" || newCategory === "") {
-                            $(select).append(
-                                $('<option>').text(option.text).val(option.value).data('category', option.category)
-                            );
-                            // Try to keep the old value
-                            if (current === option.value) {
-                                $(select).val(option.value)
-                            }
-                        }
-                    });
-                }).trigger('change');
-            });
-        };
-
         $(document).ready(function () {
             let domTable = $('#table_education_groups');
             domTable.DataTable({
@@ -227,7 +194,11 @@
                         let formdata = $('#search_form').serializeArray();
                         let queryString = {};
                         $(formdata).each(function(index, obj){
-                            queryString[obj.name] = obj.value;
+                            if (!queryString.hasOwnProperty(obj.name)){
+                                queryString[obj.name] = [obj.value];
+                            } else {
+                                queryString[obj.name].push([obj.value]);
+                            }
                         });
 
                         // Append ordering to querystring
@@ -240,7 +211,8 @@
                         // Append page to querystring
                         queryString['page'] = {{ object_list.number }}
                         return queryString;
-                    }
+                    },
+                    "traditional": true
                 },
                 "info": false,
                 "searching": false,
@@ -251,7 +223,6 @@
                     }
                 }
             });
-           $('#id_education_group_type').filterTypeByCategory($('#id_category'));
         });
 
         // FIXME remove xls_order_col / xls_order ==> USE ordering params
@@ -292,6 +263,12 @@
             var field_name = element.replace(id_search, "");
             return field_name;
         }
+
+        // Disable typing on education group type select input
+        $('#id_education_group_type').on('select2:opening select2:closing', function( event ) {
+            var $searchfield = $(this).parent().find('.select2-search__field');
+            $searchfield.prop('disabled', true);
+        });
     </script>
     <script src="{% static "js/sorting_dropdown_type.js" %}"></script>
 {% endblock %}

@@ -176,7 +176,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     class Meta:
         unique_together = (('learning_unit', 'academic_year'), ('acronym', 'academic_year'))
-        ordering = 'acronym',
+        ordering = ('academic_year', 'acronym')
         verbose_name = _("Learning unit year")
         permissions = (
             ("can_receive_emails_about_automatic_postponement", "Can receive emails about automatic postponement"),
@@ -592,6 +592,14 @@ def find_lt_learning_unit_year_with_different_acronym(a_learning_unit_yr):
                                            academic_year__year__lt=a_learning_unit_yr.academic_year.year,
                                            proposallearningunit__isnull=True) \
         .order_by('-academic_year') \
+        .exclude(acronym__iexact=a_learning_unit_yr.acronym).first()
+
+
+def find_gt_learning_unit_year_with_different_acronym(a_learning_unit_yr):
+    return LearningUnitYear.objects.filter(learning_unit__id=a_learning_unit_yr.learning_unit.id,
+                                           academic_year__year__gt=a_learning_unit_yr.academic_year.year,
+                                           proposallearningunit__isnull=True) \
+        .order_by('academic_year') \
         .exclude(acronym__iexact=a_learning_unit_yr.acronym).first()
 
 

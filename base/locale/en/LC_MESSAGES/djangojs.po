@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-18 10:45+0200\n"
+"POT-Creation-Date: 2019-08-02 13:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -15,11 +15,11 @@ msgstr ""
 msgid ": "
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:119
+#: static/js/education_group/education_group_tree.js:123
 msgid "Attach"
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:178
+#: static/js/education_group/education_group_tree.js:182
 msgid "Close all"
 msgstr ""
 
@@ -27,7 +27,7 @@ msgstr ""
 msgid "Collapse"
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:141
+#: static/js/education_group/education_group_tree.js:146
 msgid "Detach"
 msgstr ""
 
@@ -37,10 +37,6 @@ msgstr ""
 
 #: static/js/learning_unit_creation.js:4
 msgid "Existing code in "
-msgstr ""
-
-#: static/js/learning_unit_creation.js:6
-msgid "This field is required"
 msgstr ""
 
 #: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:8
@@ -55,15 +51,7 @@ msgstr ""
 msgid "Link to CDN Doc"
 msgstr ""
 
-#: static/js/learning_unit_creation.js:8
-msgid "Please enter a value less than or equal to 500."
-msgstr ""
-
-#: static/js/learning_unit_creation.js:7
-msgid "Please enter a value greater than or equal to 0."
-msgstr ""
-
-#: static/js/education_group/education_group_tree.js:97
+#: static/js/education_group/education_group_tree.js:100
 msgid "Modify"
 msgstr ""
 
@@ -71,7 +59,7 @@ msgstr ""
 msgid "Open"
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:171
+#: static/js/education_group/education_group_tree.js:175
 msgid "Open all"
 msgstr ""
 
@@ -79,7 +67,23 @@ msgstr ""
 msgid "Please enter a valid URL."
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:75
+#: static/js/learning_unit_creation.js:7
+msgid "Please enter a value greater than or equal to 0."
+msgstr ""
+
+#: static/js/learning_unit_creation.js:8
+msgid "Please enter a value less than or equal to 500."
+msgstr ""
+
+#: static/js/learning_unit_creation.js:9
+msgid "Please enter a value that is a multiple of 0.5."
+msgstr ""
+
+#: static/js/education_group/education_group_tree.js:191
+msgid "Search"
+msgstr ""
+
+#: static/js/education_group/education_group_tree.js:78
 msgid "Select"
 msgstr ""
 
@@ -87,8 +91,8 @@ msgstr ""
 msgid "Selection of target files"
 msgstr ""
 
-#: static/js/learning_unit_creation.js:9
-msgid "Please enter a value that is a multiple of 0.5."
+#: static/js/learning_unit_creation.js:6
+msgid "This field is required"
 msgstr ""
 
 #: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:32

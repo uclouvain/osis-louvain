@@ -130,8 +130,6 @@
                 columnDefs: [
                     {targets: 3, type: 'diacritics-neutralise'},
                     {targets: 1, orderable: false},
-                    {targets: 7, orderable: false},
-                    {targets: 8, orderable: false}
                 ],
                 "paging": false,
                 "ordering": true,
@@ -144,16 +142,6 @@
                     }
                 },
                 "order": [[2, "desc"], [0, "asc"]]
-            });
-
-            $(".coorganization-edit-btn").click(function (ev) {
-                ev.preventDefault();
-                var url = $(this).data("form");
-                var coorganization_edit_modal = $("#coorganization_edit");
-                coorganization_edit_modal.load(url, function () { // load the url into the modal
-                    $(this).modal('show');
-                });
-                return false;
             });
         });
     </script>

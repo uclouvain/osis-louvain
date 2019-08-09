@@ -26,7 +26,7 @@
 import datetime
 from unittest.mock import patch
 
-from django.core.validators import _lazy_re_compile
+from django.core.validators import _lazy_re_compile, RegexValidator
 from django.test import TestCase
 
 from base.forms.education_group.group import GroupYearModelForm, GroupForm
@@ -39,8 +39,7 @@ from base.models.validation_rule import ValidationRule
 from base.tests.factories.academic_calendar import AcademicCalendarEducationGroupEditionFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import GroupFactory, EducationGroupYearFactory
-from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.education_group_year import GroupFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin, _get_valid_post_data
@@ -89,7 +88,10 @@ class TestGroupModelFormModelForm(EducationGroupYearModelFormMixin):
 
         self.assertEqual(form.fields["acronym"].initial, "yolo")
         self.assertEqual(form.fields["acronym"].required, False)
-        self.assertEqual(form.fields["acronym"].validators[1].regex, _lazy_re_compile("([A-Z]{2})(.*)"))
+        regex_validator = next(
+            (validator for validator in form.fields['acronym'].validators if isinstance(validator, RegexValidator))
+        )
+        self.assertEqual(regex_validator.regex, _lazy_re_compile("([A-Z]{2})(.*)"))
 
     @patch('base.forms.education_group.common.find_authorized_types')
     def test_get_context_for_field_references_case_not_in_editing_pgrm_period(self, mock_authorized_types):

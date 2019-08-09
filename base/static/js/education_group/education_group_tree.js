@@ -37,7 +37,8 @@ $(document).ready(function () {
             modify_url: obj.a_attr.modify_url,
             attach_disabled: obj.a_attr.attach_disabled,
             detach_disabled: obj.a_attr.detach_disabled,
-            modification_disabled: obj.a_attr.modification_disabled
+            modification_disabled: obj.a_attr.modification_disabled,
+            search_url: obj.a_attr.search_url
         };
     }
 
@@ -184,7 +185,29 @@ $(document).ready(function () {
                                 let tree = $("#panel_file_tree").jstree(true);
                                 tree.close_all(node.reference);
                             }
-                        }
+                        },
+                        "search": {
+                            "separator_before": true,
+                            "label": gettext("Search"),
+                            "data-modal_class": "modal-lg",
+                            "action": function (data) {
+                                let __ret = get_data_from_tree(data);
+
+                                document.getElementById("modal_dialog_id").classList.add("modal-lg");
+
+                                $('#form-modal-ajax-content').load(__ret.search_url, function (response, status, xhr) {
+                                    if (status === "success") {
+                                        $('#form-ajax-modal').modal('toggle');
+
+                                        let form = $(this).find('form').first();
+                                        formAjaxSubmit(form, '#form-ajax-modal');
+                                    } else {
+                                        window.location.href = __ret.search_url;
+                                    }
+
+                                });
+                            },
+                        },
                     };
                 }
             }
@@ -248,3 +271,7 @@ $(document).mouseup(function () {
     $(document).unbind('mousemove');
 });
 
+$("a[id^='quick-search']").click(function(event) {
+    event.preventDefault();
+    $(this).attr('data-url', $('#j1_1_anchor').attr('search_url'));
+});

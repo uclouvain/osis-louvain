@@ -24,11 +24,9 @@
 #
 ##############################################################################
 from unittest import mock
-from unittest.mock import Mock
 
 from django.test import TestCase, RequestFactory
 from django.views.generic import TemplateView
-from django.views.generic.base import View
 
 from base.tests.factories.user import UserFactory
 from base.utils.cache import cache, RequestCache, CacheFilterMixin
@@ -40,7 +38,7 @@ class TestRequestCache(TestCase):
         cls.user = UserFactory()
         cls.path = 'dummy_url'
         cls.request_cache = RequestCache(cls.user, cls.path)
-        cls.request_data = {"name": "Axandre", "city": "City25"}
+        cls.request_data = {"name": ["Axandre", "Jean"], "city": ["City25"]}
 
     def setUp(self):
         request_factory = RequestFactory()
@@ -57,8 +55,9 @@ class TestRequestCache(TestCase):
 
     def test_save_and_restore_get_parameters(self):
         self.request_cache.save_get_parameters(self.request)
+        expected_dict = dict(self.request_cache.restore_get_request(self.request).lists())
         self.assertDictEqual(
-            self.request_cache.restore_get_request(self.request).dict(),
+            expected_dict,
             self.request_data
         )
 

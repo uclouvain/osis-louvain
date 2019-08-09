@@ -23,23 +23,44 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+
 from django import template
-from django.template.defaultfilters import date
-from django.utils.translation import ugettext_lazy as _
+from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
+
+from base.models import learning_unit_year
 
 register = template.Library()
 
 
-@register.filter
-def date_in_form_format(value):
-    pattern = str(_('date_format_string'))
-    if type(value).__name__ == 'str':
-        return value
-    else:
-        return date(value, pattern)
+@register.simple_tag
+def prerequisite_string(prerequisite, learning_unit_year_parent):
+    display_method = functools.partial(_get_acronym_as_href, learning_unit_year_parent)
+    return mark_safe(prerequisite._get_acronyms_string(display_method=display_method)) if prerequisite else '-'
 
 
-@register.filter
-def addstr(arg1, arg2):
-    """concatenate arg1 & arg2"""
-    return str(arg1) + str(arg2)
+def _get_acronym_as_href(learning_unit_year_parent, prerequisite_item, academic_yr):
+    luy = learning_unit_year.search(
+        academic_year_id=academic_yr.id,
+        learning_unit=prerequisite_item.learning_unit,
+    ).first()
+
+    if luy:
+        return "<a href='/learning_units/{}/' title=\"{}\">{}</a>".format(
+            luy.id,
+            _get_acronym_tooltip(luy, learning_unit_year_parent),
+            prerequisite_item.learning_unit.acronym
+        )
+    return ''
+
+
+def _get_acronym_tooltip(luy, learning_unit_year_parent):
+    parent = learning_unit_year_parent.get(luy.id)
+    relative_credits = str(parent.relative_credits) if parent else "-"
+    return "{}\n{} : {} / {}".format(
+        luy.complete_title,
+        _('Cred. rel./abs.'),
+        relative_credits,
+        luy.credits.normalize()
+    )

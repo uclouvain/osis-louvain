@@ -29,6 +29,7 @@ from django.test import TestCase
 from base.business.learning_unit_proposal import compute_proposal_state
 from base.models.enums import proposal_state
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
+from base.tests.factories.group import CentralManagerGroupFactory, FacultyManagerGroupFactory
 from base.tests.factories.person import PersonFactory
 
 
@@ -40,6 +41,7 @@ def create_person_in_group(group_name):
 
 class TestComputeProposalState(TestCase):
     def test_when_person_is_faculty_manager(self):
+        FacultyManagerGroupFactory()
         faculty_manager = create_person_in_group(FACULTY_MANAGER_GROUP)
 
         expected_state = proposal_state.ProposalState.FACULTY.name
@@ -47,6 +49,7 @@ class TestComputeProposalState(TestCase):
         self.assertEqual(expected_state, actual_state)
 
     def test_when_person_is_central_manager(self):
+        CentralManagerGroupFactory()
         central_manager = create_person_in_group(CENTRAL_MANAGER_GROUP)
 
         expected_state = proposal_state.ProposalState.CENTRAL.name

@@ -51,15 +51,6 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            let warning_nodes = $(".has-warning");
-            if (warning_nodes.length > 0) {
-
-                warning_nodes.each(
-                    function () {
-                        $(this).parent().removeClass("has-error").addClass("has-warning");
-                    }
-                );
-            }
             let tab_identification = document.getElementById('tab_identification');
             let tab_diploma = document.getElementById('tab_diploma');
             let spn_identification_errors = $("#spn_identification_errors");

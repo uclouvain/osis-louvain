@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import uuid
-from copy import copy
+from copy import deepcopy
 from unittest.mock import patch
 
 from django.conf import settings
@@ -33,7 +33,7 @@ from django.test import TestCase
 
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm, TeachingMaterialModelForm
 from base.models.enums.learning_unit_year_subtypes import FULL
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
@@ -50,7 +50,7 @@ class LearningUnitPedagogyContextMixin(TestCase):
         self.language = LanguageFactory(code="EN")
         self.person = PersonFactory()
         self.person.user.user_permissions.add(Permission.objects.get(codename="can_edit_learningunit_pedagogy"))
-        self.current_ac = create_current_academic_year()
+        self.current_ac = AcademicYearFactory(current=True)
         self.ac_years_containers = GenerateAcademicYear(start_year=self.current_ac.year + 1,
                                                         end_year=self.current_ac.year + 5)
         self.current_luy = LearningUnitYearFactory(
@@ -176,7 +176,7 @@ def _duplicate_learningunityears(luy_to_duplicate, academic_years):
     # Duplicate learning unit year with different academic year
     luys = {}
     for ac_year in academic_years:
-        new_luy = copy(luy_to_duplicate)
+        new_luy = deepcopy(luy_to_duplicate)
         new_luy.pk = None
         new_luy.uuid = uuid.uuid4()
         new_luy.academic_year = ac_year

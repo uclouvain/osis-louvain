@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import datetime
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 
 from django.test import TestCase
 
@@ -52,7 +52,6 @@ class TestSendAcademicCalendarNotifications(TestCase):
         notification_middleware.set_notifications_last_read_as_now_for_user = Mock()
         notification_middleware.get_notifications_last_time_read_for_user = Mock()
 
-
     def tearDown(self):
         notification_middleware.set_notifications_last_read_as_now_for_user = self.method_set
         notification_middleware.get_notifications_last_time_read_for_user = self.method_get
@@ -65,13 +64,14 @@ class TestSendAcademicCalendarNotifications(TestCase):
         notification_middleware.set_notifications_last_read_as_now_for_user.assert_called_once_with(self.user)
         notification_middleware.get_notifications_last_time_read_for_user.assert_called_once_with(self.user)
 
-
     def test_create_notifications_of_academic_calendar_events_within_2_weeks_if_no_last_read(self):
         notification_middleware.get_notifications_last_time_read_for_user.return_value = None
         notification_middleware.send_academic_calendar_notifications(self.user)
 
-        self.assertCountEqual([notif.verb for notif in self.user.notifications.unread()],
-                         [str(self.academic_calendar_today), str(self.academic_calendar_in_1_week)])
+        self.assertCountEqual(
+            [notif.verb for notif in self.user.notifications.unread()],
+            [str(self.academic_calendar_today), str(self.academic_calendar_in_1_week)]
+        )
 
         notification_middleware.set_notifications_last_read_as_now_for_user.assert_called_once_with(self.user)
         notification_middleware.get_notifications_last_time_read_for_user.assert_called_once_with(self.user)

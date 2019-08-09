@@ -1,5 +1,5 @@
 {% extends "education_group/learning_unit/layout_detail.html" %}
-{% load i18n %}
+{% load i18n dictionnary prerequisite %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -36,7 +36,7 @@
 
             <div class="row">
                 <div class="col-md-7">
-                    <p>{{ prerequisite.prerequisite_string_as_href|safe|default:"-" }}</p>
+                    <p>{% prerequisite_string prerequisite learning_unit_years_parent %}</p>
                 </div>
                 <div class="col-md-5">
                     {% if can_modify_prerequisite %}
@@ -51,8 +51,6 @@
                     {% endif %}
                 </div>
             </div>
-
-
         </div>
     </div>
     {% if is_prerequisites_list %}
@@ -62,17 +60,28 @@
                     <a href="{% url 'learning_unit' learning_unit_year.pk %}">
                         <ins>{{ learning_unit_year.acronym }}</ins>
                     </a>
-                    {% trans 'is a prereqisite of' %}:
+                    {% trans 'is a prereqisite of' %} :
                 </p>
-
-                {% for p in is_prerequisites_list %}
-                    <a href="{% url 'learning_unit' p.learning_unit_year.pk %}">{{ p.learning_unit_year.acronym }}</a>
-                    {% if is_prerequisites_list|length > 1 %}
-                        {% if not forloop.last %}
-                            ,
-                        {% endif %}
-                    {% endif %}
-                {% endfor %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>{% trans 'Acronym' %}</th>
+                            <th>{% trans 'Title' %}</th>
+                            <th>{% trans 'Cred. rel./abs.' %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in is_prerequisites_list %}
+                            {% with learning_unit_years_parent|get_item:p.learning_unit_year.id as link %}
+                            <tr>
+                                <td><a href="{% url 'learning_unit' p.learning_unit_year.pk %}">{{ p.learning_unit_year.acronym }}</a></td>
+                                <td>{{ p.learning_unit_year.complete_title }}</td>
+                                <td>{{ link.relative_credits }} / {{ p.learning_unit_year.credits.normalize }}</td>
+                            </tr>
+                            {% endwith %}
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
     {% endif %}

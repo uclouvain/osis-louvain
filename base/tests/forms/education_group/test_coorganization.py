@@ -23,20 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
+
 from django.contrib.auth.models import Permission
 from django.test import TestCase
+from django.utils.translation import gettext_lazy as _
 
+from base.forms.education_group.coorganization import CoorganizationEditForm, OrganizationFormset
 from base.models.enums import education_group_categories, diploma_coorganization
+from base.models.enums.diploma_coorganization import DiplomaCoorganizationTypes
 from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
-from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
-from base.tests.factories.entity import EntityFactory
 from reference.tests.factories.country import CountryFactory
-from base.forms.education_group.coorganization import CoorganizationEditForm
 
 
 class TestCoorganizationForm(TestCase):
@@ -86,3 +91,71 @@ class TestCoorganizationForm(TestCase):
         self.assertFalse(form['enrollment_place'].value())
         self.assertFalse(form['is_producing_cerfificate'].value())
         self.assertFalse(form['is_producing_annexe'].value())
+
+    def test_formset_valid(self):
+        organization = OrganizationFactory()
+        address = OrganizationAddressFactory(organization=organization, is_main=True)
+        data = {
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 0,
+            'form-0-diploma': random.choice(DiplomaCoorganizationTypes.get_names()),
+            'form-0-country': address.country.pk,
+            'form-0-organization': organization.pk
+        }
+        form = OrganizationFormset(
+            data,
+            form_kwargs={'education_group_year': EducationGroupYearFactory()},
+        )
+        self.assertTrue(form.is_valid())
+
+    def test_formset_missing_diploma(self):
+        organization = OrganizationFactory()
+        address = OrganizationAddressFactory(organization=organization, is_main=True)
+        data = {
+            'first_name': 'First',
+            'last_name': 'Last',
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 0,
+            'form-0-country': address.country.pk,
+            'form-0-organization': organization.pk
+        }
+        form = OrganizationFormset(
+            data,
+            form_kwargs={'education_group_year': EducationGroupYearFactory()},
+        )
+        self.assertFalse(form.is_valid(), form.errors)
+        self.assertEqual(
+            form.errors,
+            [
+                {'diploma': [_("This field is required.")]}
+            ]
+        )
+
+    def test_formset_with_organization_already_attached_to_egy(self):
+        egy = EducationGroupYearFactory()
+        organization = OrganizationFactory()
+        egy_organization = EducationGroupOrganizationFactory(
+            organization=organization,
+            education_group_year=egy
+        )
+        address = OrganizationAddressFactory(organization=organization, is_main=True)
+        data = {
+            'first_name': 'First',
+            'last_name': 'Last',
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 0,
+            'form-0-diploma': random.choice(DiplomaCoorganizationTypes.get_names()),
+            'form-0-country': address.country.pk,
+            'form-0-organization': egy_organization.organization.pk
+        }
+        form = OrganizationFormset(
+            data,
+            form_kwargs={'education_group_year': egy},
+        )
+        self.assertFalse(form.is_valid(), form.errors)
+        self.assertEqual(
+            form.errors,
+            [
+                {'organization': [_('There is already a coorganization with this organization')]}
+            ]
+        )

@@ -119,7 +119,7 @@ class TestFetchEducationGroupToPostpone(TestCase):
         self.assertEqual(result[0].groupelementyear_set.count(), 1)
 
     def test_egy_to_not_duplicated(self):
-        # The learning unit is over
+        # The education group is over
         self.education_group.end_year = self.academic_years[-2].year
         self.education_group.save()
 
@@ -128,7 +128,11 @@ class TestFetchEducationGroupToPostpone(TestCase):
             academic_year=self.academic_years[-2],
         )
         self.assertEqual(EducationGroupYear.objects.count(), 1)
-        result, errors = EducationGroupAutomaticPostponementToN6().postpone()
+        postponement = EducationGroupAutomaticPostponementToN6()
+
+        self.assertQuerysetEqual(postponement.to_duplicate, [])
+
+        result, errors = postponement.postpone()
         self.assertEqual(len(result), 0)
         self.assertFalse(errors)
 

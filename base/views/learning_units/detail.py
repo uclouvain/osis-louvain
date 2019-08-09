@@ -85,20 +85,28 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         return current_academic_year()
 
     def get_queryset(self):
-        qs_learningcomponentyear = LearningComponentYear.objects.order_by('type', 'acronym')
-        prefetch = Prefetch('learningcomponentyear_set', queryset=qs_learningcomponentyear)
         return super().get_queryset().select_related(
             'learning_container_year__academic_year',
             'academic_year', 'learning_unit',
-            'campus__organization', 'externallearningunityear'
-        ).prefetch_related(prefetch)
+            'campus__organization', 'externallearningunityear',
+        ).prefetch_related(
+            Prefetch(
+                'learningcomponentyear_set',
+                queryset=LearningComponentYear.objects.order_by('type', 'acronym')
+            ),
+            Prefetch(
+                'learning_unit__learningunityear_set',
+                queryset=LearningUnitYear.objects.select_related('academic_year')
+            )
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
         context['current_academic_year'] = self.current_academic_year
         context['is_person_linked_to_entity'] = self.person.is_linked_to_entity_in_charge_of_learning_unit_year(
-            self.object)
+            self.object
+        )
 
         context['warnings'] = self.object.warnings
 

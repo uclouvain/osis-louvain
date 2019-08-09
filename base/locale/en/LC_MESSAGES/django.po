@@ -350,7 +350,7 @@ msgstr ""
 #: templates/academic_calendar/academic_calendars.html:50
 #: templates/education_group/pdf_content.html:17
 #: templates/learning_unit/blocks/panel/proposal.html:10
-#: templates/learning_unit/identification.html:250 templates/offers.html:43
+#: templates/learning_unit/identification.html:256 templates/offers.html:43
 #: templates/offers.html:77
 msgid "Academic year"
 msgstr ""
@@ -534,7 +534,7 @@ msgstr ""
 #: forms/learning_unit/learning_unit_create.py:281
 #: models/enums/entity_container_year_link_type.py:46
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:51
-#: templates/learning_unit/identification.html:245 views/learning_unit.py:241
+#: templates/learning_unit/identification.html:251 views/learning_unit.py:241
 #: views/learning_unit.py:361 views/learning_unit.py:379
 msgid "Additional requirement entity 1"
 msgstr ""
@@ -542,7 +542,7 @@ msgstr ""
 #: forms/learning_unit/learning_unit_create.py:305
 #: models/enums/entity_container_year_link_type.py:47
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:53
-#: templates/learning_unit/identification.html:246
+#: templates/learning_unit/identification.html:252
 #: tests/forms/test_learning_unit_postponement.py:677
 #: views/learning_unit.py:244 views/learning_unit.py:362
 #: views/learning_unit.py:380
@@ -761,7 +761,7 @@ msgid "Attribution duration"
 msgstr ""
 
 #: models/enums/entity_container_year_link_type.py:45
-#: templates/learning_unit/identification.html:244
+#: templates/learning_unit/identification.html:250
 msgid "Attribution entity"
 msgstr ""
 
@@ -992,7 +992,7 @@ msgstr ""
 msgid "City"
 msgstr ""
 
-#: templates/learning_unit/identification.html:220
+#: templates/learning_unit/identification.html:226
 msgid "City of institution"
 msgstr ""
 
@@ -1178,7 +1178,7 @@ msgstr ""
 #: forms/learning_unit/learning_unit_create.py:202
 #: forms/learning_unit/search_form.py:410 models/organization_address.py:48
 #: templates/learning_unit/external/read.html:58
-#: templates/learning_unit/identification.html:219
+#: templates/learning_unit/identification.html:225
 #: templates/organization/organization_address.html:62
 msgid "Country"
 msgstr ""
@@ -1612,7 +1612,7 @@ msgstr ""
 
 #: forms/learning_unit/learning_unit_create.py:105
 #: forms/learning_unit/learning_unit_create.py:190
-#: templates/learning_unit/identification.html:124
+#: templates/learning_unit/identification.html:130
 #: tests/model_forms/learning_unit/test_learning_unit_year.py:78
 msgid "English title proper to the partim"
 msgstr ""
@@ -1900,7 +1900,7 @@ msgstr ""
 #: templates/education_group/tab_administrative_data.html:57
 #: templates/education_group/tab_administrative_data.html:65
 #: templates/education_group/tab_administrative_data.html:73
-#: templatetags/learning_unit.py:53 templatetags/learning_unit.py:59
+#: templatetags/learning_unit.py:54 templatetags/learning_unit.py:60
 #: tests/models/test_learning_unit.py:83 tests/models/test_learning_unit.py:86
 msgid "From"
 msgstr ""
@@ -2047,7 +2047,7 @@ msgstr ""
 #: templates/learning_unit/learning_unit_layout.html:101
 #: templates/learning_unit/simple/creation.html:116
 #: templates/learning_unit/simple/creation.html:118
-#: templatetags/learning_unit.py:43
+#: templatetags/learning_unit.py:44
 msgid ""
 "If the partner university does not use ECTS credit units, enter below the "
 "number of credit units according to the local system."
@@ -2117,7 +2117,7 @@ msgstr ""
 #: templates/learning_unit/blocks/institution.html:11
 #: templates/learning_unit/by_external.html:48
 #: templates/learning_unit/external/read.html:60
-#: templates/learning_unit/identification.html:232 templates/mandates.html:29
+#: templates/learning_unit/identification.html:238 templates/mandates.html:29
 #: templates/organization/organization.html:29
 #: templates/organization/organization_address.html:30
 #: templates/organization/organization_address_form.html:29
@@ -2153,7 +2153,7 @@ msgstr ""
 
 #: templates/learning_unit/blocks/panel/proposal.html:25
 #: templates/learning_unit/external/read.html:67
-#: templates/learning_unit/identification.html:262
+#: templates/learning_unit/identification.html:268
 msgid "Introduced by"
 msgstr ""
 
@@ -2316,7 +2316,7 @@ msgstr ""
 #: business/proposal_xls.py:72 models/education_group_year.py:272
 #: models/learning_unit_year.py:169 templates/learning_unit/comparison.html:110
 #: templates/learning_unit/external/read.html:59
-#: templates/learning_unit/identification.html:233
+#: templates/learning_unit/identification.html:239
 #: tests/business/test_proposal_xls.py:125
 msgid "Learning location"
 msgstr ""
@@ -2846,6 +2846,10 @@ msgstr ""
 
 #: templates/learning_unit/proposal_comparison.html:44
 msgid "New value"
+msgstr ""
+
+#: templates/learning_unit/identification.html:98
+msgid "Newly"
 msgstr ""
 
 #: templates/home.html:62
@@ -3657,7 +3661,7 @@ msgstr ""
 #: forms/learning_unit/external_learning_unit.py:98
 #: models/education_group_organization.py:48
 #: templates/education_group/blocks/coorganization.html:38
-#: templates/learning_unit/identification.html:221
+#: templates/learning_unit/identification.html:227
 msgid "Reference institution"
 msgstr ""
 
@@ -3743,7 +3747,7 @@ msgstr ""
 #: forms/learning_unit/learning_unit_create.py:234
 #: models/enums/entity_container_year_link_type.py:44
 #: templates/learning_unit/blocks/form/simplified_volumes_management_form.html:49
-#: templates/learning_unit/identification.html:243
+#: templates/learning_unit/identification.html:249
 #: tests/forms/test_learning_unit_postponement.py:596
 #: views/learning_unit.py:238 views/learning_unit.py:360
 #: views/learning_unit.py:378
@@ -3996,7 +4000,7 @@ msgstr ""
 
 #: models/proposal_learning_unit.py:65
 #: templates/learning_unit/blocks/panel/proposal.html:21
-#: templates/learning_unit/identification.html:105
+#: templates/learning_unit/identification.html:111
 msgid "State"
 msgstr ""
 
@@ -4137,7 +4141,7 @@ msgstr ""
 #: templates/learning_unit/blocks/panel/proposal.html:28
 #: templates/learning_unit/blocks/proposal_user.html:16
 #: templates/learning_unit/external/read.html:68
-#: templates/learning_unit/identification.html:263
+#: templates/learning_unit/identification.html:269
 msgid "The"
 msgstr ""
 
@@ -4675,7 +4679,7 @@ msgstr ""
 msgid "Thesis"
 msgstr ""
 
-#: forms/learning_achievement.py:123
+#: forms/learning_achievement.py:104
 #: tests/forms/test_learning_achievement.py:66
 msgid "This code already exists for this learning unit"
 msgstr ""
@@ -4785,7 +4789,7 @@ msgstr ""
 
 #: forms/learning_unit/learning_unit_create.py:104
 #: forms/learning_unit/learning_unit_create.py:189
-#: templates/learning_unit/identification.html:122
+#: templates/learning_unit/identification.html:128
 #: tests/model_forms/learning_unit/test_learning_unit_year.py:77
 msgid "Title proper to the partim"
 msgstr ""
@@ -5018,7 +5022,7 @@ msgstr ""
 msgid "Validity"
 msgstr ""
 
-#: templatetags/learning_unit.py:42
+#: templatetags/learning_unit.py:43
 #: tests/views/test_learning_unit_proposal.py:82
 msgid "Value before proposal"
 msgstr ""
@@ -5764,7 +5768,7 @@ msgstr ""
 msgid "no"
 msgstr ""
 
-#: templatetags/learning_unit.py:59 tests/models/test_learning_unit.py:86
+#: templatetags/learning_unit.py:60 tests/models/test_learning_unit.py:86
 msgid "no planned end"
 msgstr ""
 
@@ -5967,7 +5971,7 @@ msgstr ""
 #: templates/education_group/tab_administrative_data.html:67
 #: templates/education_group/tab_administrative_data.html:75
 #: templates/learning_unit/blocks/modal/modal_warning_state_modification.html:33
-#: templatetags/learning_unit.py:55 tests/models/test_learning_unit.py:83
+#: templatetags/learning_unit.py:56 tests/models/test_learning_unit.py:83
 msgid "to"
 msgstr ""
 
@@ -6068,8 +6072,8 @@ msgstr ""
 #: templates/learning_unit/comparison.html:136
 #: templates/learning_unit/comparison.html:142
 #: templates/learning_unit/comparison.html:148
-#: templates/learning_unit/identification.html:115
-#: templates/learning_unit/identification.html:173
-#: templates/learning_unit/identification.html:176
+#: templates/learning_unit/identification.html:121
+#: templates/learning_unit/identification.html:179
+#: templates/learning_unit/identification.html:182
 msgid "yes,no"
 msgstr ""

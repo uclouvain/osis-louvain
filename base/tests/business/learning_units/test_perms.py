@@ -32,10 +32,8 @@ from base.business.learning_units.perms import MSG_NOT_ELIGIBLE_TO_MODIFY_END_YE
     is_eligible_for_modification, can_update_learning_achievement, is_eligible_to_update_learning_unit_pedagogy
 from base.business.learning_units.perms import is_eligible_to_modify_end_year_by_proposal, \
     is_eligible_to_modify_by_proposal, MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
-from base.models.entity import Entity
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -56,7 +54,7 @@ class TestPerms(TestCase):
             container_type=learning_container_year_types.COURSE,
             requirement_entity=EntityVersionFactory().entity
         )
-        self.central_manager = CentralManagerFactory()
+        self.central_manager = CentralManagerFactory('can_edit_learningunit_pedagogy')
         self.luy = LearningUnitYearFactory(
             learning_unit=self.learning_unit,
             learning_container_year=self.lcy,

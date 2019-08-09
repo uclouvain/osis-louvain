@@ -27,13 +27,12 @@ import datetime
 from unittest import mock
 
 from django.contrib import messages
-from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
-from django.urls import reverse
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
 from django.test import TestCase, RequestFactory
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
@@ -46,11 +45,10 @@ from base.forms.learning_unit_proposal import ProposalLearningUnitForm
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm
 from base.models import entity_version
 from base.models import proposal_learning_unit
-from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_component_year_type
+from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import organization_type, entity_type, \
     learning_unit_year_subtypes, proposal_type, learning_container_year_types, proposal_state
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories import campus as campus_factory, \
@@ -61,13 +59,15 @@ from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.group import CentralManagerGroupFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, \
+    FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
@@ -450,10 +450,9 @@ class TestGroupActionsOnProposals(TestCase):
 class TestLearningUnitProposalCancellation(TestCase):
     def setUp(self):
         create_current_academic_year()
-        self.person = PersonFactory()
+        self.person = FacultyManagerFactory()
         self.permission = Permission.objects.get(codename="can_propose_learningunit")
         self.person.user.user_permissions.add(self.permission)
-        self.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
 
         self.learning_unit_proposal = _create_proposal_learning_unit("LOSIS1211")
         self.learning_unit_year = self.learning_unit_proposal.learning_unit_year
@@ -764,7 +763,7 @@ class TestEditProposal(TestCase):
         self.assertEqual(self.proposal.state, 'FACULTY')
 
     def test_edit_proposal_post_wrong_data(self):
-        self.person.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
+        self.person.user.groups.add(CentralManagerGroupFactory())
 
         response = self.client.post(self.url, data=self.get_faulty_data())
 

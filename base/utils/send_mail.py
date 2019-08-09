@@ -101,7 +101,7 @@ def send_mail_before_annual_procedure_of_automatic_postponement_of_luy(statistic
     html_template_ref = 'luy_before_auto_postponement_html'
     txt_template_ref = 'luy_before_auto_postponement_txt'
 
-    permission = Permission.objects.filter(codename='can_receive_emails_about_automatic_postponement')
+    permission = Permission.objects.get(codename='can_receive_emails_about_automatic_postponement')
     managers = Person.objects.filter(Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)) \
         .distinct()
 
@@ -125,7 +125,7 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_luy(
     html_template_ref = 'luy_after_auto_postponement_html'
     txt_template_ref = 'luy_after_auto_postponement_txt'
 
-    permission = Permission.objects.filter(codename='can_receive_emails_about_automatic_postponement')
+    permission = Permission.objects.get(codename='can_receive_emails_about_automatic_postponement')
     managers = Person.objects.filter(Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)) \
         .distinct()
 
@@ -149,9 +149,10 @@ def send_mail_before_annual_procedure_of_automatic_postponement_of_egy(statistic
     html_template_ref = 'egy_before_auto_postponement_html'
     txt_template_ref = 'egy_before_auto_postponement_txt'
 
-    permission = Permission.objects.filter(codename='can_receive_emails_about_automatic_postponement')
-    managers = Person.objects.filter(Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)) \
-        .distinct()
+    permission = Permission.objects.get(codename='can_receive_emails_about_automatic_postponement')
+    managers = Person.objects.filter(
+        Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)
+    ).distinct()
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
     template_base_data = {
         'previous_academic_year': statistics_context['max_academic_year_to_postpone'].past().year,
@@ -173,7 +174,7 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_egy(
     html_template_ref = 'egy_after_auto_postponement_html'
     txt_template_ref = 'egy_after_auto_postponement_txt'
 
-    permission = Permission.objects.filter(codename='can_receive_emails_about_automatic_postponement')
+    permission = Permission.objects.get(codename='can_receive_emails_about_automatic_postponement')
     managers = Person.objects.filter(Q(user__groups__permissions=permission) | Q(user__user_permissions=permission)) \
         .distinct()
 

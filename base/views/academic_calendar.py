@@ -169,13 +169,7 @@ def academic_calendar_form(request, academic_calendar_id):
         if academic_cal_form.is_valid():
             academic_cal_form.save()
             return academic_calendar_read(request, academic_cal_form.instance.id)
-    return render(
-        request,
-        "academic_calendar/academic_calendar_form.html",
-        {
-            'form': academic_cal_form,
-        }
-    )
+    return render(request, "academic_calendar/academic_calendar_form.html", {'form': academic_cal_form})
 
 
 def can_delete_academic_calendar(user, academic_calendar):
