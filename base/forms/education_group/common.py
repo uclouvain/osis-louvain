@@ -275,7 +275,7 @@ class CommonBaseForm:
 
         if self._is_creation() and not educ_group_form.instance.start_year:
             # Specific case, because start_date is hidden when creation, we should test start_date [validite] > end_date
-            educ_group_form.instance.start_year = self.education_group_year_form.cleaned_data['academic_year'].year
+            educ_group_form.instance.start_year = self.education_group_year_form.cleaned_data['academic_year']
             try:
                 educ_group_form.instance.clean()
             except ValidationError as error:
