@@ -44,6 +44,9 @@ from base.tests.factories.user import SuperUserFactory
 
 
 class EducationGroupTest(TestCase):
+    def setUp(self):
+        self.academic_year = AcademicYearFactory(year=1999)
+        self.academic_year_2 = AcademicYearFactory(year=2000)
 
     def test_most_recent_acronym(self):
         education_group = EducationGroupFactory()
@@ -56,24 +59,24 @@ class EducationGroupTest(TestCase):
 
     def test_clean_case_start_year_greater_than_end_year_error(self):
         education_group = EducationGroupFactory.build(
-            start_year=2000,
-            end_year=1999
+            start_year=self.academic_year_2,
+            end_year=self.academic_year
         )
         with self.assertRaises(ValidationError):
             education_group.clean()
 
     def test_clean_case_start_year_equals_to_end_year_no_error(self):
         education_group = EducationGroupFactory.build(
-            start_year=2000,
-            end_year=2000
+            start_year=self.academic_year_2,
+            end_year=self.academic_year_2
         )
         education_group.clean()
         education_group.save()
 
     def test_clean_case_start_year_lower_to_end_year_no_error(self):
         education_group = EducationGroupFactory.build(
-            start_year=1999,
-            end_year=2000
+            start_year=self.academic_year,
+            end_year=self.academic_year_2
         )
         education_group.clean()
         education_group.save()
@@ -143,6 +146,8 @@ class TestEducationGroupConstraintEndYearOn2M(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
+        cls.academic_year_2 = AcademicYearFactory(year=2019)
+        cls.academic_year_3 = AcademicYearFactory(year=2020)
 
     def setUp(self):
         # Create 2m pgrm structure as
@@ -172,7 +177,7 @@ class TestEducationGroupConstraintEndYearOn2M(TestCase):
         self.master_120_didactic = GroupFactory(
             academic_year=self.academic_year,
             education_group_type__name=TrainingType.MASTER_MD_120.name,
-            education_group__end_year=2019
+            education_group__end_year=self.academic_year_2
         )
         GroupElementYearFactory(parent=self.finality_group, child_branch=self.master_120_didactic)
 
@@ -180,7 +185,7 @@ class TestEducationGroupConstraintEndYearOn2M(TestCase):
         """
         In this test, we ensure that a root 2M can have end date which are greater or equals than his finalities
         """
-        self.master_120_specialized.education_group.end_year = 2019
+        self.master_120_specialized.education_group.end_year = self.academic_year_2
         self.master_120_specialized.education_group.save()
         self.master_120_specialized.refresh_from_db()
 
@@ -192,7 +197,7 @@ class TestEducationGroupConstraintEndYearOn2M(TestCase):
         end year of his finalities
         """
         # Set root 2M to 2019
-        self.master_120.education_group.end_year = 2019
+        self.master_120.education_group.end_year = self.academic_year_2
         self.master_120.education_group.save()
         self.master_120.refresh_from_db()
 
@@ -201,13 +206,13 @@ class TestEducationGroupConstraintEndYearOn2M(TestCase):
 
     def test_check_end_year_constraints_case_finality_end_year_greater_than_2m(self):
         for edy in [self.master_120_didactic, self.master_120_specialized, self.master_120]:
-            edy.education_group.end_year = 2019
+            edy.education_group.end_year = self.academic_year_2
             edy.education_group.save()
             edy.education_group.refresh_from_db()
 
         self.master_120_didactic.education_group._check_end_year_constraints_on_2m()
 
-        self.master_120_didactic.education_group.end_year = 2020
+        self.master_120_didactic.education_group.end_year = self.academic_year_3
         self.master_120_didactic.education_group.save()
         self.master_120_didactic.education_group.refresh_from_db()
         with self.assertRaises(ValidationError):
