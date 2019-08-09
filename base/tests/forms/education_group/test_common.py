@@ -246,7 +246,7 @@ class TestCommonBaseFormSave(TestCase):
         education_group_type = MiniTrainingEducationGroupTypeFactory()
         initial_educ_group_year = EducationGroupYearFactory(academic_year=current_academic_year(),
                                                             management_entity=entity_version.entity,
-                                                            education_group__start_year=current_academic_year().year,
+                                                            education_group__start_year=current_academic_year(),
                                                             education_group_type=education_group_type)
 
         initial_educ_group = initial_educ_group_year.education_group
@@ -316,7 +316,7 @@ class TestCommonBaseFormSave(TestCase):
         initial_educ_group_year = EducationGroupYearFactory(
             management_entity=entity_version.entity,
             academic_year=self.expected_educ_group_year.academic_year,
-            education_group__start_year=current_academic_year().year
+            education_group__start_year=current_academic_year()
         )
 
         GroupElementYearFactory(parent=parent, child_branch=initial_educ_group_year)
@@ -374,7 +374,7 @@ def _get_valid_post_data(category):
         management_entity=entity_version.entity,
         main_teaching_campus=campus,
         education_group_type=education_group_type,
-        education_group__start_year=current_academic_year.year,
+        education_group__start_year=current_academic_year,
         constraint_type=CREDITS,
         credits=10
     )
