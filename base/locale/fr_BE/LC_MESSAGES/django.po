@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-08 16:10+0200\n"
+"POT-Creation-Date: 2019-08-09 08:46+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1615,10 +1615,6 @@ msgstr "Ouverture informations pédagoqiques"
 msgid "Elaboration and management of the formation catalogue."
 msgstr "Elaboration et gestion du catalogue des formations."
 
-#: templates/base/person_list.html:46
-msgid "Encodage des notes"
-msgstr ""
-
 #: templates/education_group/identification_mini_training_details.html:39
 #: templates/education_group/identification_training_details.html:99
 msgid "End"
@@ -1725,6 +1721,10 @@ msgstr "Entrez le texte à rechercher"
 msgid "Entities"
 msgstr "Entités"
 
+#: templates/base/person_list.html:43
+msgid "Entities for DAFs + designation of note holders and program managers"
+msgstr "Entités pour DAFs + désignation responsables de notes et gestionnaires de programme"
+
 #: business/education_group.py:49 forms/education_groups.py:77
 #: templates/education_group/blocks/contacts_general_informations.html:30
 #: templates/education_group/search.html:148 templates/offers.html:51
@@ -1739,12 +1739,6 @@ msgstr "Entités de charges"
 #: templates/base/person_list.html:43
 msgid "Entity managers"
 msgstr "Gestionnaires d'entités"
-
-#: templates/base/person_list.html:43
-msgid ""
-"Entités pour DAFs + désignation responsables de notes et gestionnaires de "
-"programme"
-msgstr ""
 
 #: templates/blocks/navbar_top.html:81 templates/studies.html:50
 msgid "Evaluations"
@@ -3082,6 +3076,10 @@ msgstr ""
 msgid "Not required"
 msgstr "Non requis"
 
+#: templates/base/person_list.html:46
+msgid "Note encoding"
+msgstr "Encodage des notes"
+
 #: templates/blocks/notifications.html:10
 #, python-format
 msgid "Notification%(number_unread_notifications|pluralize)s"
@@ -3090,10 +3088,6 @@ msgstr "Notification%(number_unread_notifications|pluralize)s"
 #: models/enums/constraint_type.py:33
 msgid "Number of elements"
 msgstr "Nombre d'éléments"
-
-#: templates/base/person_list.html:44
-msgid "OF + UE"
-msgstr ""
 
 #: tests/models/test_prerequisite_item.py:172
 #: tests/models/test_prerequisite_item.py:175
@@ -4999,6 +4993,10 @@ msgstr "Type d'OF"
 #: templates/learning_unit/proposal/tabs.html:45
 msgid "Trainings"
 msgstr "Formations"
+
+#: templates/base/person_list.html:44
+msgid "Trainings and learning units"
+msgstr "Formations et unités d&apos;enseignement"
 
 #: models/enums/proposal_type.py:35
 msgid "Transformation"

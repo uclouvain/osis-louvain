@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-08 16:10+0200\n"
+"POT-Creation-Date: 2019-08-09 08:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1559,10 +1559,6 @@ msgstr ""
 msgid "Elaboration and management of the formation catalogue."
 msgstr ""
 
-#: templates/base/person_list.html:46
-msgid "Encodage des notes"
-msgstr ""
-
 #: templates/education_group/identification_mini_training_details.html:39
 #: templates/education_group/identification_training_details.html:99
 msgid "End"
@@ -1668,6 +1664,10 @@ msgstr ""
 msgid "Entities"
 msgstr ""
 
+#: templates/base/person_list.html:43
+msgid "Entities for DAFs + designation of note holders and program managers"
+msgstr ""
+
 #: business/education_group.py:49 forms/education_groups.py:77
 #: templates/education_group/blocks/contacts_general_informations.html:30
 #: templates/education_group/search.html:148 templates/offers.html:51
@@ -1681,12 +1681,6 @@ msgstr ""
 
 #: templates/base/person_list.html:43
 msgid "Entity managers"
-msgstr ""
-
-#: templates/base/person_list.html:43
-msgid ""
-"Entités pour DAFs + désignation responsables de notes et gestionnaires de "
-"programme"
 msgstr ""
 
 #: templates/blocks/navbar_top.html:81 templates/studies.html:50
@@ -2993,6 +2987,10 @@ msgstr ""
 msgid "Not required"
 msgstr ""
 
+#: templates/base/person_list.html:46
+msgid "Note encoding"
+msgstr ""
+
 #: templates/blocks/notifications.html:10
 #, python-format
 msgid "Notification%(number_unread_notifications|pluralize)s"
@@ -3000,10 +2998,6 @@ msgstr ""
 
 #: models/enums/constraint_type.py:33
 msgid "Number of elements"
-msgstr ""
-
-#: templates/base/person_list.html:44
-msgid "OF + UE"
 msgstr ""
 
 #: tests/models/test_prerequisite_item.py:172
@@ -4825,6 +4819,10 @@ msgstr ""
 #: templates/learning_unit/formations.html:47
 #: templates/learning_unit/proposal/tabs.html:45
 msgid "Trainings"
+msgstr ""
+
+#: templates/base/person_list.html:44
+msgid "Trainings and learning units"
 msgstr ""
 
 #: models/enums/proposal_type.py:35
