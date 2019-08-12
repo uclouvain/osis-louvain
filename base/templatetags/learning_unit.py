@@ -138,7 +138,8 @@ def dl_tooltip(context, instance, key, **kwargs):
 
 
 def get_style_of_value(style, title, value):
-    value = "<p style='{style}' title='{title}'>{value}</p>".format(style=style, title=_(title), value=value)
+    value = "<p style='{style}' title='{title}'>{value}</p>".format(style=style, title=_(title),
+                                                                    value=value or DEFAULT_VALUE_FOR_NONE)
     return value
 
 
