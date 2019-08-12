@@ -132,7 +132,7 @@ class TestComputeEndPostponement(EducationGroupPostponementTestCase):
         EducationGroupYear.objects.filter(academic_year__year__gt=self.current_academic_year.year).delete()
 
         result = _compute_end_year(self.education_group_year.education_group)
-        self.assertEqual(result, self.education_group_year.education_group.end_year)
+        self.assertEqual(result, self.education_group_year.education_group.end_year.year)
 
     def test_compute_end_postponement_case_specific_end_date_and_data_in_future_gte(self):
         next_academic_year = AcademicYearFactory(year=self.current_academic_year.year + 2)
