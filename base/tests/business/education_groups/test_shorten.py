@@ -181,7 +181,7 @@ class TestCheckEducationGroupEndDate(EducationGroupShortenContext):
     def test_check_education_group_end_date_valid_case(self):
         self.assertTrue(check_education_group_end_date(
             education_group=self.education_group_year.education_group,
-            end_year=self.ac_year_in_future.year
+            end_year=self.ac_year_in_future
         ))
 
     def test_check_education_group_end_date_with_protected_data(self):
