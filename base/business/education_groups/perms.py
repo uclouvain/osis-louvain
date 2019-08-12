@@ -28,8 +28,7 @@ from django.core.exceptions import PermissionDenied
 from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext
 
-from base.business.group_element_years import management
-from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
+from base.business.group_element_years import management, postponement
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import starting_academic_year
 from base.models.education_group import EducationGroup
@@ -98,8 +97,8 @@ def is_eligible_to_postpone_education_group(person, education_group, raise_excep
 
     try:
         # Check if the education group is valid
-        PostponeContent(education_group.previous_year())
-    except NotPostponeError as e:
+        postponement.PostponeContent(education_group.previous_year())
+    except postponement.NotPostponeError as e:
         result = False
         if raise_exception:
             raise PermissionDenied(str(e))

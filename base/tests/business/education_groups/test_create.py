@@ -174,16 +174,16 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
         edy_type = EducationGroupType.objects.get(name=GroupType.FINALITY_120_LIST_CHOICE.name)
         _get_or_create_branch(edy_type, "TITLE", "PARTIAL", self.egy)
         child_edy = EducationGroupYear.objects.get(
-            education_group__start_year=self.egy.academic_year.year,
-            education_group__end_year=self.egy.academic_year.year
+            education_group__start_year=self.egy.academic_year,
+            education_group__end_year=self.egy.academic_year
         )
         self.assertTrue(GroupElementYear.objects.filter(parent=self.egy, child_branch=child_edy).exists())
 
     def test_should_not_create_group_element_year_if_existing(self):
         edy_type = EducationGroupType.objects.get(name=GroupType.FINALITY_120_LIST_CHOICE.name)
         ed = EducationGroup.objects.create(
-            start_year=self.egy.academic_year.year,
-            end_year=self.egy.academic_year.year
+            start_year=self.egy.academic_year,
+            end_year=self.egy.academic_year
         )
         child_egy = EducationGroupYear.objects.create(
             academic_year=self.egy.academic_year,

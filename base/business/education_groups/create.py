@@ -150,7 +150,7 @@ def _duplicate_branch(child_education_group_type, parent_egy, last_child):
     if existing_grp_ele:
         return existing_grp_ele
 
-    academic_year = parent_egy.academic_year.year
+    academic_year = parent_egy.academic_year
     # child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
     last_child.education_group.end_year = academic_year
     last_child.education_group.save()
