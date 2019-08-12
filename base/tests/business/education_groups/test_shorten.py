@@ -33,7 +33,7 @@ from base.business.education_groups.shorten import _get_formated_error_msg, chec
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import entity_type
 from base.models.enums import organization_type
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
@@ -70,7 +70,7 @@ class TestStartShortenEducationGroupYear(EducationGroupShortenContext):
             academic_year__year__gt=self.current_academic_year.year
         ).delete()
 
-        result = shorten.start(self.education_group_year.education_group, self.current_academic_year.year)
+        result = shorten.start(self.education_group_year.education_group, self.current_academic_year)
         self.assertIsInstance(result, list)
         self.assertFalse(result)
 
@@ -84,7 +84,7 @@ class TestStartShortenEducationGroupYear(EducationGroupShortenContext):
                 academic_year=ac_year,
             )
 
-        result = shorten.start(self.education_group_year.education_group, self.current_academic_year.year)
+        result = shorten.start(self.education_group_year.education_group, self.current_academic_year)
 
         self.assertIsInstance(result, list)
         self.assertEqual(len(result), 10)
@@ -185,6 +185,8 @@ class TestCheckEducationGroupEndDate(EducationGroupShortenContext):
         ))
 
     def test_check_education_group_end_date_with_protected_data(self):
+        previous_academic_year = AcademicYearFactory(year=self.ac_year_in_future.year - 1)
+
         edy = EducationGroupYearFactory(
             education_group=self.education_group_year.education_group,
             management_entity=self.entity,
@@ -197,5 +199,5 @@ class TestCheckEducationGroupEndDate(EducationGroupShortenContext):
         with self.assertRaises(ValidationError):
             check_education_group_end_date(
                 education_group=self.education_group_year.education_group,
-                end_year=self.ac_year_in_future.year-1
+                end_year=previous_academic_year
             )

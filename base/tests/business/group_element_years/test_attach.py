@@ -144,30 +144,31 @@ class TestAttachOptionEducationGroupYearStrategy(TestCase):
 class TestAttachFinalityEducationGroupYearStrategy(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.academic_year_1 = AcademicYearFactory(year=2018)
+        cls.academic_year_2 = AcademicYearFactory(year=2020)
         cls.master_120 = TrainingFactory(
             education_group_type__name=TrainingType.PGRM_MASTER_120.name,
-            academic_year=cls.academic_year,
-            education_group__end_year=2020
+            academic_year=cls.academic_year_1,
+            education_group__end_year=cls.academic_year_2
         )
 
         cls.finality_group = GroupFactory(
             education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
-            academic_year=cls.academic_year
+            academic_year=cls.academic_year_1
         )
         GroupElementYearFactory(parent=cls.master_120, child_branch=cls.finality_group)
 
         cls.master_120_specialized = TrainingFactory(
             education_group_type__name=TrainingType.MASTER_MS_120.name,
-            academic_year=cls.academic_year,
-            education_group__end_year=2020
+            academic_year=cls.academic_year_1,
+            education_group__end_year=cls.academic_year_2
         )
         GroupElementYearFactory(parent=cls.finality_group, child_branch=cls.master_120_specialized)
 
     def test_is_valid_case_attach_finality_which_have_end_year_lower_than_root(self):
         master_120_didactic = TrainingFactory(
             education_group_type__name=TrainingType.MASTER_MD_120.name,
-            academic_year=self.academic_year,
+            academic_year=self.academic_year_1,
             education_group__end_year=self.master_120.education_group.end_year - 1
         )
 
@@ -180,7 +181,7 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
     def test_is_not_valid_case_attach_finality_which_have_end_year_greater_than_root(self):
         master_120_didactic = TrainingFactory(
             education_group_type__name=TrainingType.MASTER_MD_120.name,
-            academic_year=self.academic_year,
+            academic_year=self.academic_year_1,
             education_group__end_year=self.master_120.education_group.end_year + 1
         )
 
@@ -194,7 +195,7 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
     def test_is_not_valid_case_attach_finality_which_have_end_year_undetermined(self):
         master_120_didactic = TrainingFactory(
             education_group_type__name=TrainingType.MASTER_MD_120.name,
-            academic_year=self.academic_year,
+            academic_year=self.academic_year_1,
             education_group__end_year=None
         )
 
@@ -206,16 +207,16 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
             self.assertTrue(strategy.is_valid())
 
     def test_is_not_valid_case_attach_groups_which_contains_finalities_which_have_end_year_greater_than_root(self):
-        subgroup = GroupFactory(education_group_type__name=GroupType.SUB_GROUP.name, academic_year=self.academic_year)
+        subgroup = GroupFactory(education_group_type__name=GroupType.SUB_GROUP.name, academic_year=self.academic_year_1)
         master_120_didactic = TrainingFactory(
             education_group_type__name=TrainingType.MASTER_MD_120.name,
-            academic_year=self.academic_year,
+            academic_year=self.academic_year_1,
             education_group__end_year=self.master_120.education_group.end_year + 1
         )
         GroupElementYearFactory(parent=subgroup, child_branch=master_120_didactic)
         master_120_deepening = TrainingFactory(
             education_group_type__name=TrainingType.MASTER_MA_120.name,
-            academic_year=self.academic_year,
+            academic_year=self.academic_year_1,
             education_group__end_year=None
         )
         GroupElementYearFactory(parent=subgroup, child_branch=master_120_deepening)
@@ -230,7 +231,7 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
     def test_is_case_attach_finality_which_child_branch_duplicate(self):
         master_120_didactic = TrainingFactory(
             education_group_type__name=TrainingType.MASTER_MD_120.name,
-            academic_year=self.academic_year,
+            academic_year=self.academic_year_1,
             education_group__end_year=self.master_120.education_group.end_year - 1
         )
 
