@@ -46,6 +46,7 @@ from base.tests.factories.academic_year import get_current_year
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.group import FacultyManagerGroupFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.views.learning_units.proposal.create import get_proposal_learning_unit_creation_form
 from reference.tests.factories.language import LanguageFactory
@@ -55,6 +56,7 @@ from reference.tests.factories.language import LanguageFactory
 class LearningUnitViewTestCase(TestCase):
     def setUp(self):
         today = datetime.date.today()
+        FacultyManagerGroupFactory()
         self.faculty_user = factory_user.UserFactory()
         self.faculty_user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
         self.faculty_person = factory_person.PersonFactory(user=self.faculty_user)

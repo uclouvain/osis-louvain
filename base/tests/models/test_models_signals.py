@@ -37,6 +37,7 @@ from base.models.entity_manager import EntityManager
 from base.models.structure import Structure
 from base.models import models_signals as mdl_signals, person as mdl_person
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.group import TutorGroupFactory, ProgramManagerGroupFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 
@@ -143,6 +144,10 @@ class UpdatePersonIfNecessary(TestCase):
 
 
 class AddToGroupsSignalsTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        TutorGroupFactory()
+        ProgramManagerGroupFactory()
 
     def is_member(self, group):
         return self.user_foo.groups.filter(name=group).exists()

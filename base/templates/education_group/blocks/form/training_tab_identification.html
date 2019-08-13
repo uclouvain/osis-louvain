@@ -25,12 +25,14 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 <ul class="nav nav-tabs" role="tablist">
-    <li role="presentation" {% if not request.GET.tab_to_show or request.GET.tab_to_show != 'diplomas_certificates'%}class="active"{% endif %}>
+    <li role="presentation"
+        {% if not request.GET.tab_to_show or request.GET.tab_to_show != 'diplomas_certificates' %}class="active"{% endif %}>
         <a data-toggle="tab" href="#tab_identification" role="tab">
-            {% trans 'Identification'%} <span id="spn_identification_errors" class="error"></span>
+            {% trans 'Identification' %} <span id="spn_identification_errors" class="error"></span>
         </a>
     </li>
-    <li role="presentation" {% if request.GET.tab_to_show and request.GET.tab_to_show == 'diplomas_certificates'%}class="active"{% endif %}>
+    <li role="presentation"
+        {% if request.GET.tab_to_show and request.GET.tab_to_show == 'diplomas_certificates' %}class="active"{% endif %}>
         <a data-toggle="tab" href="#tab_diploma" role="tab" id="lnk_diplomas_certificats" name="test">
             {% trans 'Diplomas /  Certificates' %} <span id="spn_diploma_errors" class="error"></span>
         </a>
@@ -40,24 +42,27 @@
 
 <div class="tab-content">
 
-    <div id="tab_identification" class="tab-pane {% if not request.GET.tab_to_show or request.GET.tab_to_show != 'diplomas_certificates'%}active{% else %}fade{% endif %}" >
+    <div id="tab_identification"
+         class="tab-pane {% if not request.GET.tab_to_show or request.GET.tab_to_show != 'diplomas_certificates' %}active{% else %}fade{% endif %}">
         <div class="row">
             <div class="col-md-7">
                 <div class="panel panel-default">
                     <div class="panel-body">
                         <div class="row">
-                             <div class="col-md-6">
+                            <div class="col-md-6">
                                 {% bootstrap_label form_education_group_year.acronym.label %}<b>*</b>
-                                 <abbr title="{{ form_education_group_year.acronym.help_text | safe}}" data-toggle='tooltip' data-html='true'>
+                                <abbr title="{{ form_education_group_year.acronym.help_text | safe }}"
+                                      data-toggle='tooltip' data-html='true'>
                                     <span class="glyphicon glyphicon-question-sign" style="font-size: 14pt;"></span>
-                                 </abbr>
-                                 {% bootstrap_field form_education_group_year.acronym show_label=False show_help=False %}
+                                </abbr>
+                                {% bootstrap_field form_education_group_year.acronym show_label=False show_help=False %}
                             </div>
                             <div class="col-md-6">
                                 {% bootstrap_label form_education_group_year.partial_acronym.label %}<b>*</b>
-                                <abbr title="{{ form_education_group_year.partial_acronym.help_text | safe }}" data-toggle='tooltip' data-html='true'>
+                                <abbr title="{{ form_education_group_year.partial_acronym.help_text | safe }}"
+                                      data-toggle='tooltip' data-html='true'>
                                     <span class="glyphicon glyphicon-question-sign" style="font-size: 14pt;"></span>
-                                 </abbr>
+                                </abbr>
                                 {% bootstrap_field form_education_group_year.partial_acronym show_label=False show_help=False %}
                             </div>
                         </div>
@@ -176,9 +181,13 @@
                 </div>
             </div>
         </div>
+        {% if show_coorganization %}
+            {% include 'education_group/blocks/coorganization_edit.html' %}
+        {% endif %}
     </div>
 
-    <div id="tab_diploma" class="tab-pane {% if request.GET.tab_to_show or request.GET.tab_to_show == 'diplomas_certificates'%}active{% else %}fade{% endif %}">
+    <div id="tab_diploma"
+         class="tab-pane {% if request.GET.tab_to_show or request.GET.tab_to_show == 'diplomas_certificates' %}active{% else %}fade{% endif %}">
         {% include "education_group/blocks/form/training_tab_diploma.html" %}
     </div>
 </div>

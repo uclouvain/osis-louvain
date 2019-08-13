@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+import json
 from unittest import mock
 
 from django.contrib.auth.models import Permission
@@ -36,9 +37,12 @@ from django.utils.translation import ugettext_lazy as _
 from base import utils
 from base.forms.education_groups import EducationGroupFilter
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory, MiniTrainingEducationGroupTypeFactory, \
+    GroupEducationGroupTypeFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, MiniTrainingFactory, \
+    GroupFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
@@ -46,7 +50,7 @@ from base.tests.factories.user import UserFactory
 from base.utils.cache import RequestCache
 from education_group.api.serializers.education_group import EducationGroupSerializer
 
-FILTER_DATA = {"acronym": "LBIR", "title": "dummy filter"}
+FILTER_DATA = {"acronym": ["LBIR"], "title": ["dummy filter"]}
 
 
 class TestEducationGroupSearchView(TestCase):
@@ -311,3 +315,30 @@ class TestEducationGroupDataSearchFilter(TestCase):
             str(response.content, encoding='utf8'),
             {'object_list': data_serialized.data}
         )
+
+
+class TestEducationGroupTypeAutoComplete(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.trainings = EducationGroupTypeFactory.create_batch(2)
+        cls.minitrainings = MiniTrainingEducationGroupTypeFactory.create_batch(3)
+        cls.groups = GroupEducationGroupTypeFactory.create_batch(1)
+
+        cls.url = reverse("education_group_type_autocomplete")
+        cls.person = PersonFactory()
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
+
+    def test_without_category(self):
+        response = self.client.get(self.url)
+        json_response = response.json()
+        self.assertEqual(6, len(json_response["results"]))
+
+    def test_with_category_set(self):
+        tuples_category_woth_expected_result = [(TRAINING, 2), (MINI_TRAINING, 3), (GROUP, 1)]
+        for category, expected_result in tuples_category_woth_expected_result:
+            with self.subTest(category=category):
+                response = self.client.get(self.url, data={"forward": json.dumps({"category": category})})
+                json_response = response.json()
+                self.assertEqual(expected_result, len(json_response["results"]))

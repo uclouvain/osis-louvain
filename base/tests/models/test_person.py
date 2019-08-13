@@ -39,6 +39,8 @@ from base.models.person import get_user_interface_language, \
     change_language
 from base.tests.factories import user
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
+from base.tests.factories.group import CentralManagerGroupFactory, FacultyManagerGroupFactory, \
+    ProgramManagerGroupFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory, SICFactory, \
@@ -76,6 +78,9 @@ class PersonTest(PersonTestCase):
         self.person_with_user = PersonFactory(user=self.user_for_person, language="fr-be", first_name="John",
                                               last_name="Doe")
         self.person_without_user = PersonWithoutUserFactory()
+        CentralManagerGroupFactory()
+        FacultyManagerGroupFactory()
+        ProgramManagerGroupFactory()
 
     def test_find_by_id(self):
         tmp_person = PersonFactory()

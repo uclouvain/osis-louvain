@@ -60,7 +60,7 @@
                 </td>
             {% endif %}
             <td width="12%">{{ group.relative_credits | default_if_none:'-' }}
-                /{{ group.child.credits|floatformat:-2 | default_if_none:'-' }}</td>
+                / {{ group.child.credits|floatformat:-2 | default_if_none:'-' }}</td>
             <td width="6%">{{ group.is_mandatory | yesno }}</td>
             <td width="6%">{{ group.block | default_if_none:'-' }}</td>
             <td width="14%">{{ group.get_link_type_display|default_if_none:'-' }}</td>

@@ -26,13 +26,12 @@
 from django.conf.urls import url, include
 
 from base.views import education_group
-from base.views.education_groups.coorganization import CreateEducationGroupOrganizationView, \
-    UpdateEducationGroupOrganizationView, CoorganizationDeleteView
 from base.views.education_groups.group_element_year.read import pdf_content
 from base.views.education_groups.learning_unit import detail as learning_unit_detail, update as learning_unit_update
 from base.views.education_groups.publication_contact import CreateEducationGroupPublicationContactView, \
     UpdateEducationGroupPublicationContactView, EducationGroupPublicationContactDeleteView, \
     UpdateEducationGroupEntityPublicationContactView
+from base.views.education_groups.search import EducationGroupTypeAutoComplete
 from base.views.education_groups.select import education_group_select, learning_unit_select
 from base.views.education_groups.update import CertificateAimAutocomplete, PostponeGroupElementYearView
 from . import search, create, detail, update, delete, group_element_year
@@ -43,6 +42,11 @@ urlpatterns = [
         r'^certificate_aim_autocomplete/$',
         CertificateAimAutocomplete.as_view(),
         name='certificate_aim_autocomplete',
+    ),
+    url(
+        r'^education_group_type_autocomplete/$',
+        EducationGroupTypeAutoComplete.as_view(),
+        name='education_group_type_autocomplete'
     ),
 
     url(r'^$', search.education_groups, name='education_groups'),
@@ -143,19 +147,6 @@ urlpatterns = [
         url(r'^pdf_content/(?P<language>[a-z\-]+)', pdf_content, name="pdf_content"),
 
         url(r'^postpone/', PostponeGroupElementYearView.as_view(), name="postpone_education_group"),
-
-
-        url(r'^coorganization/', include([
-            url(r'^create/$',
-                CreateEducationGroupOrganizationView.as_view(),
-                name="coorganization_create"),
-            url(r'^edit/(?P<coorganization_id>[0-9]+)/$',
-                UpdateEducationGroupOrganizationView.as_view(),
-                name="coorganization_edit"),
-            url(r'^delete/(?P<coorganization_id>[0-9]+)$',
-                CoorganizationDeleteView.as_view(),
-                name="coorganization_delete"),
-        ])),
 
         url(r'^publication_contact/', include([
             url(r'^edit_entity/$',

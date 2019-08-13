@@ -58,6 +58,8 @@
                 {% if root == education_group_year %}
                     <label>
                         <select class="form-control"
+                                name="academic_year"
+                                id="id_academic_year_search"
                                 onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
                             {% for edy in education_group_year.education_group.educationgroupyear_set.all %}
                                 <option value="{% url "education_group_read" edy.pk edy.pk %}"

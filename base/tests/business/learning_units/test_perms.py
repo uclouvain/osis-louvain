@@ -56,7 +56,7 @@ class TestPerms(TestCase):
             container_type=learning_container_year_types.COURSE,
             requirement_entity=EntityVersionFactory().entity
         )
-        self.central_manager = CentralManagerFactory()
+        self.central_manager = CentralManagerFactory('can_edit_learningunit_pedagogy')
         self.luy = LearningUnitYearFactory(
             learning_unit=self.learning_unit,
             learning_container_year=self.lcy,

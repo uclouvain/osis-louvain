@@ -34,6 +34,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
@@ -176,7 +177,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     class Meta:
         unique_together = (('learning_unit', 'academic_year'), ('acronym', 'academic_year'))
-        ordering = 'acronym',
+        ordering = ('academic_year', 'acronym')
         verbose_name = _("Learning unit year")
         permissions = (
             ("can_receive_emails_about_automatic_postponement", "Can receive emails about automatic postponement"),
@@ -419,12 +420,16 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         all_components = components_queryset.order_by('acronym') \
             .select_related('learning_unit_year')
         for learning_component_year in all_components:
-            _warnings.extend(learning_component_year.warnings)
+            if not self.is_partim() or learning_component_year.learning_unit_year == self:
+                _warnings.extend(learning_component_year.warnings)
 
         return _warnings
 
     def _check_learning_container_year_warnings(self):
-        return self.learning_container_year.warnings
+        if not self.is_partim():
+            return self.learning_container_year.warnings
+        else:
+            return get_learning_container_year_warnings(self.learning_container_year, self.id)
 
     def is_external(self):
         return hasattr(self, "externallearningunityear")
@@ -592,6 +597,14 @@ def find_lt_learning_unit_year_with_different_acronym(a_learning_unit_yr):
                                            academic_year__year__lt=a_learning_unit_yr.academic_year.year,
                                            proposallearningunit__isnull=True) \
         .order_by('-academic_year') \
+        .exclude(acronym__iexact=a_learning_unit_yr.acronym).first()
+
+
+def find_gt_learning_unit_year_with_different_acronym(a_learning_unit_yr):
+    return LearningUnitYear.objects.filter(learning_unit__id=a_learning_unit_yr.learning_unit.id,
+                                           academic_year__year__gt=a_learning_unit_yr.academic_year.year,
+                                           proposallearningunit__isnull=True) \
+        .order_by('academic_year') \
         .exclude(acronym__iexact=a_learning_unit_yr.acronym).first()
 
 

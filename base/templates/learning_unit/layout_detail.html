@@ -40,9 +40,24 @@
         {% include "learning_unit/deletion_msg.html" %}
     {% endif %}
     <div class="panel panel-default">
-        <div class="panel-heading text-right">
-            {% block action_top %}
-            {% endblock %}
+        <div class="panel-heading">
+            <div class="row">
+                <label style="margin-left: 15px;">
+                    <select class="form-control"
+                            onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
+                        {% for luy in learning_unit_year.learning_unit.learningunityear_set.all %}
+                            <option value="{% url request.resolver_match.url_name luy.pk %}"
+                                    {% if luy == learning_unit_year %} selected="selected" {% endif %}>
+                                {{ luy.academic_year }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <div class="pull-right" style="margin-right: 15px;">
+                    {% block action_top %}
+                    {% endblock %}
+                </div>
+            </div>
         </div>
         <div class="panel-body" id="tabs">
             {% block tabs %}

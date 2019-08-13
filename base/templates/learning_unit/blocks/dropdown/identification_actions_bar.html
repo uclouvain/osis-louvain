@@ -33,8 +33,6 @@
     {% features_or "learning_unit_create" "learning_unit_update" "learning_unit_delete" "learning_unit_external_create" "learning_unit_proposal_create" "learning_unit_proposal_update" "learning_unit_proposal_delete" as show_button %}
 
     {% if show_button %}
-        <div class="row">
-            <div class="col-md-2 pull-right">
                 <div class="dropdown {{ dropdirection }}">
                     <button id="dLabel" class="btn btn-default" type="button" data-toggle="dropdown"
                             aria-haspopup="true" aria-expanded="false">
@@ -126,8 +124,6 @@
                         {% endflag %}
                     </ul>
                 </div>
-            </div>
-        </div>
     {% endif %}
 {% endif %}
 

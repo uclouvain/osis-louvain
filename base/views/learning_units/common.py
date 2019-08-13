@@ -26,6 +26,7 @@
 import re
 
 from django.contrib.auth.decorators import login_required, permission_required
+from django.db.models import Prefetch
 from django.http import JsonResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404
 
@@ -114,7 +115,15 @@ def get_learning_unit_identification_context(learning_unit_year_id, person):
 
 
 def get_common_context_learning_unit_year(learning_unit_year_id, person):
-    query_set = LearningUnitYear.objects.all().select_related('learning_unit', 'learning_container_year')
+    query_set = LearningUnitYear.objects.all().select_related(
+        'learning_unit',
+        'learning_container_year'
+    ).prefetch_related(
+        Prefetch(
+            'learning_unit__learningunityear_set',
+            queryset=LearningUnitYear.objects.select_related('academic_year')
+        )
+    )
     learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
     return {
         'learning_unit_year': learning_unit_year,

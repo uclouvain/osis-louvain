@@ -24,7 +24,6 @@
     * at the root of the source code of this program.  If not,
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
-
 <div class="panel panel-default">
     <div class="panel-body" id="panel_coorganization">
         <label>{% trans 'Program organized with other institutes' %}</label>
@@ -39,8 +38,6 @@
                     <th>{% trans 'UCL Diploma' %}</th>
                     <th>{% trans 'Producing certificat' %}</th>
                     <th>{% trans 'Producing annexe' %}</th>
-                    <th></th>
-                    <th></th>
                 </tr>
                 </thead>
                 <tbody>
@@ -48,8 +45,9 @@
                     <tr>
                         <td>
                             <span id="coorganization_id_{{ coorganization.id }}">
-                                {{ coorganization.address.country.name }} - {{ coorganization.address.city }}<br>
-                            {{ coorganization.organization.name }}
+                                {{ coorganization.address.country.name }} - {{ coorganization.address.city }}
+                                <br>
+                                {{ coorganization.organization.name }}
                             </span>
                         </td>
                         <td>
@@ -73,25 +71,6 @@
                         </td>
                         <td>
                             {{ coorganization.is_producing_annexe | yesno | title }}
-                        </td>
-                        <td>
-                            {% if  can_change_education_group %}
-                                <a title="{% trans 'Edit' %}"
-                                   class="btn coorganization-edit-btn trigger_modal" role="button"
-                                   data-url="{% url 'coorganization_edit' root_id=root.pk education_group_year_id=education_group_year.id coorganization_id=coorganization.id %}">
-                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                                </a>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if  can_change_education_group %}
-                                <a class="trigger_modal btn"
-                                   data-url="{% url 'coorganization_delete' root.pk education_group_year.id coorganization.pk %}"
-                                   id="btn_delete_coorganization_{{ coorganization.id }}"
-                                   title="{% trans 'delete' %}">
-                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                </a>
-                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
@@ -99,8 +78,8 @@
                     <tr class="text-primary">
                         <td>
                             <span id="coorganization_id_{{ coorganization.id }}">
-                            {{ coorganization.address.country.name }} - {{ coorganization.address.city }}<br>
-                            {{ coorganization.organization.name }}
+                                {{ coorganization.address.country.name }} - {{ coorganization.address.city }}<br>
+                                {{ coorganization.organization.name }}
                             </span>
                         </td>
                         <td>
@@ -125,38 +104,10 @@
                         <td>
                             {{ coorganization.is_producing_annexe | yesno | title }}
                         </td>
-                        <td>
-                            {% if can_change_coorganization %}
-                                <a title="{% trans 'Edit' %}"
-                                   class="btn coorganization-edit-btn trigger_modal" role="button"
-                                   data-url="{% url 'coorganization_edit' root_id=root.pk education_group_year_id=education_group_year.id coorganization_id=coorganization.id %}">
-                                    <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                                </a>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if can_change_coorganization %}
-                                <a class="trigger_modal btn"
-                                   data-url="{% url 'coorganization_delete' root.pk education_group_year.id coorganization.pk %}"
-                                   id="btn_delete_coorganization_{{ coorganization.id }}"
-                                   title="{% trans 'delete' %}">
-                                    <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                                </a>
-                            {% endif %}
-                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
-        <br>
-        {% if can_change_coorganization %}
-            <a class="btn btn-info btn-sm coorganization-edit-btn trigger_modal"
-               data-url="{% url 'coorganization_create' root_id=root.pk education_group_year_id=education_group_year.id %}"
-               title="{% trans 'Create' %}"
-               style="margin-top:10px;">
-                {% trans 'Add another' %}
-            </a>
         {% endif %}
     </div>
 </div>

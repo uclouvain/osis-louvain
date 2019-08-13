@@ -21,7 +21,7 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.utils.text import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_groups.perms import can_raise_exception, \
     is_eligible_to_change_education_group

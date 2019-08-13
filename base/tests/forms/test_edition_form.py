@@ -34,7 +34,7 @@ from base.forms.learning_unit.edition_volume import VolumeEditionForm, VolumeEdi
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, CentralManagerFactory, FacultyManagerFactory
 
 
 class TestVolumeEditionForm(TestCase):
@@ -226,10 +226,8 @@ class TestVolumeEditionFormsetContainer(TestCase):
 
         self.learning_unit_year_full = self.generated_container_year.learning_unit_year_full
         self.learning_unit_year_partim = self.generated_container_year.learning_unit_year_partim
-        self.central_manager = PersonFactory()
-        self.central_manager.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
-        self.faculty_manager = PersonFactory()
-        self.faculty_manager.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
+        self.central_manager = CentralManagerFactory()
+        self.faculty_manager = FacultyManagerFactory()
 
     def test_get_volume_edition_formset_container(self):
         request_factory = RequestFactory()

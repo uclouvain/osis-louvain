@@ -31,7 +31,8 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units.comparison import DEFAULT_VALUE_FOR_NONE
 from base.models.enums.learning_unit_year_subtypes import PARTIM
-from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym
+from base.models.learning_unit_year import find_lt_learning_unit_year_with_different_acronym, \
+    find_gt_learning_unit_year_with_different_acronym
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.utils.utils import get_verbose_field_value
 from osis_common.utils.numbers import normalize_fraction
@@ -155,6 +156,15 @@ def get_previous_acronym(luy):
     else:
         previous_luy = find_lt_learning_unit_year_with_different_acronym(luy)
         return previous_luy.acronym if previous_luy else None
+
+
+@register.filter
+def get_next_acronym(luy):
+    if has_proposal(luy):
+        return _get_acronym_from_proposal(luy)
+    else:
+        next_luy = find_gt_learning_unit_year_with_different_acronym(luy)
+        return next_luy.acronym if next_luy else None
 
 
 def _get_acronym_from_proposal(luy):

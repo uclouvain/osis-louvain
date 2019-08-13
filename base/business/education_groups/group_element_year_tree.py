@@ -22,8 +22,8 @@
 #  see http://www.gnu.org/licenses/.                                                     #
 # ########################################################################################
 from django.conf import settings
-from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.db.models import OuterRef, Exists
+from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
@@ -49,6 +49,7 @@ class EducationGroupHierarchy:
                  cache_hierarchy: dict = None, tab_to_show: str = None):
 
         self.children = []
+        self.included_group_element_years = []
         self.root = root
         self.group_element_year = link_attributes
         self.reference = self.group_element_year.link_type == LinkTypes.REFERENCE.name \
@@ -76,7 +77,7 @@ class EducationGroupHierarchy:
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
                 node = EducationGroupHierarchy(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
                                                tab_to_show=self.tab_to_show)
-
+                self.included_group_element_years.extend(node.included_group_element_years)
             elif group_element_year.child_leaf:
                 node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
                                       tab_to_show=self.tab_to_show)
@@ -85,6 +86,7 @@ class EducationGroupHierarchy:
                 continue
 
             self.children.append(node)
+            self.included_group_element_years.append(group_element_year)
 
     def get_queryset(self):
         has_prerequisite = PrerequisiteItem.objects.filter(
@@ -132,6 +134,9 @@ class EducationGroupHierarchy:
                 'detach_msg': escape(self.detach_perm.errors[0]) if self.detach_perm.errors else "",
                 'modification_disabled': not self.modification_perm.is_permitted(),
                 'modification_msg': escape(self.modification_perm.errors[0]) if self.modification_perm.errors else "",
+                'search_url': reverse('quick_search_education_group')+'?academic_year={}'.format(
+                    self.education_group_year.academic_year.pk
+                ),
             },
         }
 

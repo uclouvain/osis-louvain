@@ -31,7 +31,7 @@ from django.utils.safestring import mark_safe
 
 from base.enums.component_detail import VOLUME_Q1
 from base.templatetags.learning_unit import get_difference_css, has_proposal, get_previous_acronym, value_label, \
-    DIFFERENCE_CSS, normalize_fraction, get_component_volume_css, dl_component_tooltip, changed_label
+    DIFFERENCE_CSS, normalize_fraction, get_component_volume_css, dl_component_tooltip, changed_label, get_next_acronym
 from base.templatetags.learning_unit import th_tooltip, CSS_PROPOSAL_VALUE, LABEL_VALUE_BEFORE_PROPOSAL
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
@@ -105,6 +105,41 @@ class LearningUnitTagTest(TestCase):
                                     initial_data={'learning_unit_year': {'acronym': initial_acronym}})
 
         self.assertEqual(get_previous_acronym(l_unit), initial_acronym)
+
+    def test_next_acronym(self):
+        learning_unit = LearningUnitFactory()
+        dict_learning_unit_year = create_learning_units_year(2013, 2015, learning_unit)
+
+        lu_yr_1 = dict_learning_unit_year.get(2013)
+        lu_yr_1.acronym = "LBIR1212"
+        lu_yr_1.save()
+
+        lu_yr_2 = dict_learning_unit_year.get(2014)
+        lu_yr_2.acronym = "LBIR1213"
+        lu_yr_2.save()
+
+        lu_yr_3 = dict_learning_unit_year.get(2015)
+        lu_yr_3.acronym = "LBIR1214"
+        lu_yr_3.save()
+
+        self.assertEqual(get_next_acronym(lu_yr_1), 'LBIR1213')
+        self.assertEqual(get_next_acronym(lu_yr_2), 'LBIR1214')
+        self.assertIsNone(get_next_acronym(lu_yr_3))
+
+    def test_next_acronym_with_acronym(self):
+        learning_unit = LearningUnitFactory()
+        dict_learning_unit_year = create_learning_units_year(2013, 2013, learning_unit)
+
+        l_unit = dict_learning_unit_year.get(2013)
+        initial_acronym = l_unit.acronym
+        new_acronym = "{}9".format(l_unit.acronym)
+        l_unit.acronym = new_acronym
+        l_unit.save()
+
+        ProposalLearningUnitFactory(learning_unit_year=l_unit,
+                                    initial_data={'learning_unit_year': {'acronym': initial_acronym}})
+
+        self.assertEqual(get_next_acronym(l_unit), initial_acronym)
 
     def test_value_label_equal_values(self):
         data = self.get_dict_data()

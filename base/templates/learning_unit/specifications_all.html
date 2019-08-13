@@ -217,11 +217,12 @@
                     </div>
 
                     {% if forloop.last and perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
-                        <a class="btn btn-primary trigger_modal"
+
+                        <a class="btn btn-primary btn-sm trigger_modal"
                            data-url="{% url 'achievement_create' learning_unit_year_id=learning_unit_year.id learning_achievement_id=achievement.id %}"
                            data-modal_class="modal-lg" title="{% trans 'Create' %}"
                            style="margin-top:10px;">
-                            {% trans 'Add' %}
+                            {% trans 'Add another' %}
                         </a>
                     {% else %}
                         <hr>

@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.conf.urls import url, include
-from django.views.i18n import javascript_catalog
+from django.views.i18n import JavaScriptCatalog
 
 from assessments.views import score_encoding, upload_xls_utils, pgm_manager_administration, score_sheet
 from assessments.views import scores_responsible
@@ -68,7 +68,7 @@ urlpatterns = [
             upload_xls_utils.upload_scores_file, name='upload_encoding'),
     ])),
 
-    url(r'^jsi18n/', javascript_catalog, js_info_dict),
+    url(r'^jsi18n/', JavaScriptCatalog.as_view(), js_info_dict),
 
     url(r'^offers/', include([
         url(r'^(?P<offer_year_id>[0-9]+)/', include([

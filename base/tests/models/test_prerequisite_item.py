@@ -27,12 +27,11 @@ from django.db import IntegrityError
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
-from base.models import prerequisite_item
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
-from base.tests.factories.academic_year import create_current_academic_year
 
 
 class TestPrerequisiteItem(TestCase):
@@ -80,13 +79,8 @@ class TestPrerequisiteString(TestCase):
             self.prerequisite.prerequisite_string,
             ""
         )
-        self.assertEqual(
-            self.prerequisite.prerequisite_string_as_href,
-            ""
-        )
 
     def test_get_prerequisite_string_representation_2_groupq_2_items(self):
-
         PrerequisiteItemFactory(
             prerequisite=self.prerequisite,
             learning_unit=self.luy_prerequisite_item_1_1.learning_unit,
@@ -100,28 +94,16 @@ class TestPrerequisiteString(TestCase):
             group_number=2,
             position=1
         )
-        expected_as_href = "{} {} {}".format(
-            "<a href='/learning_units/{}/'>{}</a>".format(self.luy_prerequisite_item_1_1.id,
-                                                          self.luy_prerequisite_item_1_1.acronym),
+
+        expected_string = "{} {} {}".format(
+            self.luy_prerequisite_item_1_1.acronym,
             _('AND'),
-            "<a href='/learning_units/{}/'>{}</a>".format(self.luy_prerequisite_item_2_1.id,
-                                                          self.luy_prerequisite_item_2_1.acronym)
-
+            self.luy_prerequisite_item_2_1.acronym
         )
-
-        self.assertEqual(
-            self.prerequisite.prerequisite_string_as_href,
-            expected_as_href
-        )
-
-        expected_as_href = "%s %s %s" % (self.luy_prerequisite_item_1_1.acronym,
-                                         _('AND'),
-                                         self.luy_prerequisite_item_2_1.acronym
-                                         )
 
         self.assertEqual(
             self.prerequisite.prerequisite_string,
-            expected_as_href
+            expected_string
         )
 
     def test_get_prerequisite_string_representation_two_groups(self):
@@ -163,38 +145,11 @@ class TestPrerequisiteString(TestCase):
             position=3
         )
 
-        expected_as_href = \
-            "(<a href='/learning_units/{}/'>{}</a> {} <a href='/learning_units/{}/'>{}</a> {} " \
-            "<a href='/learning_units/{}/'>{}</a>) {} (<a href='/learning_units/{}/'>{}</a> {} " \
-            "<a href='/learning_units/{}/'>{}</a> {} <a href='/learning_units/{}/'>{}</a>)".format(
-                self.luy_prerequisite_item_1_1.id,
-                self.luy_prerequisite_item_1_1.acronym,
-                _('OR'),
-                self.luy_prerequisite_item_1_2.id,
-                self.luy_prerequisite_item_1_2.acronym,
-                _('OR'),
-                self.luy_prerequisite_item_1_3.id,
-                self.luy_prerequisite_item_1_3.acronym,
-                _('AND'),
-                self.luy_prerequisite_item_2_1.id,
-                self.luy_prerequisite_item_2_1.acronym,
-                _('OR'),
-                self.luy_prerequisite_item_2_2.id,
-                self.luy_prerequisite_item_2_2.acronym,
-                _('OR'),
-                self.luy_prerequisite_item_2_3.id,
-                self.luy_prerequisite_item_2_3.acronym
-            )
-
-        self.assertEqual(
-            self.prerequisite.prerequisite_string_as_href,
-            expected_as_href
-        )
 
         expected = \
             "(%s %s %s %s " \
             "%s) %s (%s %s " \
-            "%s %s %s)" %(
+            "%s %s %s)" % (
                 self.luy_prerequisite_item_1_1.acronym,
                 _('OR'),
                 self.luy_prerequisite_item_1_2.acronym,

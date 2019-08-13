@@ -128,7 +128,11 @@ class TestFetchEducationGroupToPostpone(TestCase):
             academic_year=self.academic_years[-2],
         )
         self.assertEqual(EducationGroupYear.objects.count(), 1)
-        result, errors = EducationGroupAutomaticPostponementToN6().postpone()
+        postponement = EducationGroupAutomaticPostponementToN6()
+
+        self.assertQuerysetEqual(postponement.to_duplicate, [])
+
+        result, errors = postponement.postpone()
         self.assertEqual(len(result), 0)
         self.assertFalse(errors)
 

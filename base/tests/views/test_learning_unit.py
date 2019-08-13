@@ -86,7 +86,8 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
     LearningUnitYearFullFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerFactory, \
+    UEFacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
@@ -120,8 +121,6 @@ class LearningUnitViewCreateFullTestCase(TestCase):
     def test_create_full_form_when_user_not_logged(self):
         self.client.logout()
         response = self.client.get(self.url)
-        from django.utils.encoding import uri_to_iri
-        self.assertEqual(uri_to_iri(uri_to_iri(response.url)), '/login/?next={}'.format(self.url))
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
     def test_create_full_form_when_user_doesnt_have_perms(self):
@@ -672,15 +671,17 @@ class LearningUnitViewTestCase(TestCase):
 
         learning_unit_year.learning_unit.end_year = None
         learning_unit_year.learning_unit.save()
-        ue_manager = create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_edit_learningunit')
-        ue_manager.user.user_permissions.add(Permission.objects.get(codename='can_access_learningunit'))
+        ue_manager = UEFacultyManagerFactory(
+            'can_edit_learningunit',
+            'can_access_learningunit',
+            'can_edit_learningunit_date'
+        )
         managers = [
-            create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),
+            FacultyManagerFactory('can_edit_learningunit', 'can_access_learningunit', 'can_edit_learningunit_date'),
             ue_manager
         ]
 
         for manager in managers:
-            manager.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
             PersonEntityFactory(
                 entity=learning_container_year.requirement_entity,
                 person=manager
@@ -714,6 +715,7 @@ class LearningUnitViewTestCase(TestCase):
         ]
         for manager in managers:
             manager.user.user_permissions.add(Permission.objects.get(codename='can_edit_learningunit_date'))
+            manager.user.user_permissions.add(Permission.objects.get(codename='can_access_learningunit'))
             PersonEntityFactory(entity=learning_container_year.requirement_entity, person=manager)
             url = reverse("learning_unit", args=[learning_unit_year.id])
             self.client.force_login(manager.user)
@@ -734,8 +736,7 @@ class LearningUnitViewTestCase(TestCase):
         learning_unit_year.learning_unit.end_year = None
         learning_unit_year.learning_unit.save()
         managers = [
-            FacultyManagerFactory(),
-            create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP, 'can_access_learningunit')
+            FacultyManagerFactory('can_access_learningunit'),
         ]
         for manager in managers:
             PersonEntityFactory(entity=learning_container_year.requirement_entity, person=manager)

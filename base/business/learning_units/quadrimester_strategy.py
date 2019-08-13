@@ -20,14 +20,14 @@ class LearningComponentYearQuadriNoStrategy(LearningComponentYearQuadriStrategy)
 
 class LearningComponentYearQ1Strategy(LearningComponentYearQuadriStrategy):
     def is_valid(self):
-        if not self.lcy.hourly_volume_partial_q1 or self.lcy.hourly_volume_partial_q2:
+        if self.lcy.hourly_volume_partial_q2:
             raise ValidationError(_('Only the volume Q1 must have a value'))
         return True
 
 
 class LearningComponentYearQ2Strategy(LearningComponentYearQuadriStrategy):
     def is_valid(self):
-        if not self.lcy.hourly_volume_partial_q2 or self.lcy.hourly_volume_partial_q1:
+        if self.lcy.hourly_volume_partial_q1:
             raise ValidationError(_('Only the volume Q2 must have a value'))
         return True
 

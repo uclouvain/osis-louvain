@@ -39,6 +39,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_calendar import EntityCalendarFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.group import FacultyManagerGroupFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
 
@@ -107,7 +108,7 @@ class TestUserCanEditEntityCalendarEducationalInformation(TestCase):
         person_entity = PersonEntityFactory()
         cls.user = person_entity.person.user
         cls.entity = person_entity.entity
-
+        FacultyManagerGroupFactory()
         cls.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))
 
         cls.user_not_faculty_manager = PersonEntityFactory(entity=cls.entity).person.user

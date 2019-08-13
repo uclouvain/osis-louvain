@@ -97,19 +97,20 @@ class GetAllTrainingTestCase(APITestCase):
         ordering_managed = ['acronym', 'partial_acronym', 'title', 'title_english']
 
         for order in ordering_managed:
-            query_string = {api_settings.ORDERING_PARAM: order}
-            response = self.client.get(self.url, kwargs=query_string)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
+            with self.subTest(ordering=order):
+                query_string = {api_settings.ORDERING_PARAM: order}
+                response = self.client.get(self.url, data=query_string)
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-            trainings = EducationGroupYear.objects.filter(
-                education_group_type__category=education_group_categories.TRAINING,
-            ).order_by(order)
-            serializer = TrainingListSerializer(
-                trainings,
-                many=True,
-                context={'request': RequestFactory().get(self.url, query_string)},
-            )
-            self.assertEqual(response.data['results'], serializer.data)
+                trainings = EducationGroupYear.objects.filter(
+                    education_group_type__category=education_group_categories.TRAINING,
+                ).order_by(order)
+                serializer = TrainingListSerializer(
+                    trainings,
+                    many=True,
+                    context={'request': RequestFactory().get(self.url, query_string)},
+                )
+                self.assertEqual(response.data['results'], serializer.data)
 
 
 class FilterTrainingTestCase(APITestCase):

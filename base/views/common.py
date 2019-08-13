@@ -30,7 +30,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, logout
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
-from django.contrib.auth.views import login as django_login
+from django.contrib.auth.views import LoginView
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import redirect, render
 from django.utils import translation
@@ -45,25 +45,25 @@ ITEMS_PER_PAGE = 25
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
-def page_not_found(request):
+def page_not_found(request, **kwargs):
     response = render(request, 'page_not_found.html', {})
     response.status_code = 404
     return response
 
 
-def method_not_allowed(request):
+def method_not_allowed(request, **kwargs):
     response = render(request, 'method_not_allowed.html', {})
     response.status_code = 405
     return response
 
 
-def access_denied(request, exception):
+def access_denied(request, exception, **kwargs):
     response = render(request, 'access_denied.html', {'exception': exception})
     response.status_code = 403
     return response
 
 
-def server_error(request):
+def server_error(request, **kwargs):
     response = render(request, 'server_error.html', {})
     response.status_code = 500
     return response
@@ -119,7 +119,7 @@ def login(request):
                 request.session[translation.LANGUAGE_SESSION_KEY] = user_language
     elif settings.OVERRIDED_LOGIN_URL:
         return redirect(settings.OVERRIDED_LOGIN_URL)
-    return django_login(request)
+    return LoginView.as_view()(request)
 
 
 @login_required

@@ -79,14 +79,14 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView):
         context = super().get_context_data(**kwargs)
 
         root = self.get_root()
+        self.hierarchy = EducationGroupHierarchy(root, tab_to_show=self.request.GET.get("tab_to_show"))
 
         # TODO remove parent in context
         context['person'] = self.get_person()
         context['root'] = root
         context['root_id'] = root.pk
         context['parent'] = root
-        context['tree'] = json.dumps(EducationGroupHierarchy(root,
-                                                             tab_to_show=self.request.GET.get("tab_to_show")).to_json())
+        context['tree'] = json.dumps(self.hierarchy.to_json())
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['show_prerequisites'] = self.show_prerequisites(root)
         return context
@@ -134,10 +134,16 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
             context["root"]
         )
 
+        context["learning_unit_years_parent"] = {}
+        for grp in self.hierarchy.included_group_element_years:
+            if not grp.child_leaf:
+                continue
+            context["learning_unit_years_parent"].setdefault(grp.child_leaf.id, grp)
+
         context['is_prerequisites_list'] = Prerequisite.objects.filter(
             prerequisiteitem__learning_unit=luy.learning_unit,
             education_group_year=root
-        )
+        ).select_related('learning_unit_year')
         return context
 
     def render_to_response(self, context, **response_kwargs):

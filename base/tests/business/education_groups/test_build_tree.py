@@ -24,7 +24,7 @@
 #
 ##############################################################################
 
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _

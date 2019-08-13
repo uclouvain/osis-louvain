@@ -28,12 +28,14 @@ from django.test import TestCase, override_settings
 
 from base.context_processors.settings import virtual_desktop
 from base.models.enums.groups import PROGRAM_MANAGER_GROUP
+from base.tests.factories.group import ProgramManagerGroupFactory
 from base.tests.factories.person import PersonFactory
 
 
 class TestFindcontextualSettings(TestCase):
     def setUp(self):
         self.person = PersonFactory()
+        ProgramManagerGroupFactory()
 
     def test_with_simple_person(self):
         self.request = self.client.get('')

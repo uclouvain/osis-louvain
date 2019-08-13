@@ -46,6 +46,7 @@ from base.models.learning_container_year import find_last_entity_version_grouped
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
+from base.tests.factories.group import FacultyManagerGroupFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
@@ -90,6 +91,8 @@ class LearningUnitPostponementFormContextMixin(TestCase):
         self.person = PersonFactory()
         for entity in self.learn_unit_structure.entities:
             PersonEntityFactory(person=self.person, entity=entity)
+
+        FacultyManagerGroupFactory()
 
 
 class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMixin):

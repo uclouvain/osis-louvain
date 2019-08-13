@@ -51,10 +51,11 @@ from base.tests.factories.education_group_type import GroupEducationGroupTypeFac
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory, LecturingLearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year, \
+    LearningUnitYearPartimFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.tutor import TutorFactory
 
@@ -438,6 +439,10 @@ class LearningUnitYearWarningsTest(TestCase):
             _('At least a partim volume value is greater than corresponding volume of parent'))
         self.assertIn(excepted_error, self.luy_full.learning_container_year.warnings)
         self.assertIn(excepted_error, self.luy_full.warnings)
+        excepted_error = "{} ({})".format(
+            _('Volumes are inconsistent'),
+            _('a partim volume value is greater than corresponding volume of parent'))
+
         self.assertIn(excepted_error, luy_partim.warnings)
 
     def test_warning_one_volume_partim_greater_than_full(self):
@@ -468,6 +473,9 @@ class LearningUnitYearWarningsTest(TestCase):
             _('At least a partim volume value is greater than corresponding volume of parent'))
         self.assertIn(excepted_error, self.luy_full.learning_container_year.warnings)
         self.assertIn(excepted_error, self.luy_full.warnings)
+        excepted_error = "{} ({})".format(
+            _('Volumes are inconsistent'),
+            _('a partim volume value is greater than corresponding volume of parent'))
         self.assertIn(excepted_error, luy_partim.warnings)
 
     def test_warning_when_volumes_ok_but_other_component_of_partim_has_higher_values(self):
@@ -568,7 +576,7 @@ class LearningUnitYearWarningsTest(TestCase):
         self.assertFalse(result)
 
     def test_warning_when_credits_is_not_an_interger(self):
-        """In this test, we ensure that the warning of credits is not interger"""
+        """In this test, we ensure that the warning of credits is not integer"""
         self.luy_full.credits = Decimal(5.5)
         self.luy_full.save()
         expected_result = [
@@ -578,7 +586,7 @@ class LearningUnitYearWarningsTest(TestCase):
         self.assertEqual(result, expected_result)
 
     def test_no_warning_when_credits_is_an_interger(self):
-        """In this test, we ensure that the warning is not displayed when of credits is an interger"""
+        """In this test, we ensure that the warning is not displayed when of credits is an integer"""
         self.luy_full.credits = Decimal(5)
         self.luy_full.save()
         self.assertFalse(self.luy_full._check_credits_is_integer())
@@ -626,6 +634,43 @@ class LearningUnitYearWarningsTest(TestCase):
             self.luy_full._check_learning_component_year_warnings(),
             [excepted_error])
         self.assertIn(excepted_error, self.luy_full._check_learning_component_year_warnings())
+
+    def test_warning_multiple_partims(self):
+        """In this test, we ensure that the warnings of partim_b doesn't show up while viewing partim_a identification information"""
+
+        learning_unit_container_year = LearningContainerYearFactory(
+            academic_year=self.generated_ac_years[0]
+        )
+        LearningUnitYearFactory(
+            acronym="LCHIM1210",
+            learning_container_year=learning_unit_container_year,
+            subtype=learning_unit_year_subtypes.FULL,
+            academic_year=self.generated_ac_years[0]
+        )
+        partim_a_with_warnings = LearningUnitYearFactory(
+            acronym="LCHIM1210A",
+            learning_container_year=learning_unit_container_year,
+            subtype=learning_unit_year_subtypes.PARTIM,
+            academic_year=self.generated_ac_years[0]
+        )
+        LecturingLearningComponentYearFactory(learning_unit_year=partim_a_with_warnings,
+                                              hourly_volume_partial_q1=10,
+                                              hourly_volume_partial_q2=10,
+                                              hourly_volume_total_annual=10)
+        partim_b_with_warnings = LearningUnitYearFactory(
+            acronym="LCHIM1210B",
+            learning_container_year=learning_unit_container_year,
+            subtype=learning_unit_year_subtypes.PARTIM,
+            academic_year=self.generated_ac_years[0]
+        )
+        LecturingLearningComponentYearFactory(learning_unit_year=partim_b_with_warnings,
+                                              hourly_volume_partial_q1=10,
+                                              hourly_volume_partial_q2=10,
+                                              hourly_volume_total_annual=10)
+
+        warning_messages = ''.join(str(e) for e in partim_a_with_warnings._check_learning_component_year_warnings())
+        self.assertIn(partim_a_with_warnings.acronym, warning_messages)
+        self.assertNotIn(partim_b_with_warnings.acronym, warning_messages)
 
 
 class TestQuadriConsistency(TestCase):
@@ -696,7 +741,6 @@ class TestQuadriConsistency(TestCase):
 
         test_cases = [
             {'vol_q1': None, 'vol_q2': 20, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
-            {'vol_q1': None, 'vol_q2': None, 'vol_tot_annual': None, 'planned_classes': None, 'vol_tot_global': None}
         ]
 
         for case in test_cases:
@@ -741,8 +785,7 @@ class TestQuadriConsistency(TestCase):
         self.luy_full.save()
 
         test_cases = [
-            {'vol_q1': 20, 'vol_q2': None, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
-            {'vol_q1': None, 'vol_q2': None, 'vol_tot_annual': None, 'planned_classes': None, 'vol_tot_global': None}
+            {'vol_q1': 20, 'vol_q2': None, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20}
         ]
 
         for case in test_cases:

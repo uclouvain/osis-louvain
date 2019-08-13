@@ -47,6 +47,7 @@ from base.tests.factories.education_group_type import GroupEducationGroupTypeFac
     MiniTrainingEducationGroupTypeFactory, EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, GroupFactory, \
     MiniTrainingFactory, EducationGroupYearCommonFactory, EducationGroupYearCommonAgregationFactory
+from base.tests.factories.group import CentralManagerGroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -181,6 +182,7 @@ class TestReadEducationGroup(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory()
+        CentralManagerGroupFactory()
         cls.person = PersonFactory(user=cls.user)
         cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
         cls.academic_year = AcademicYearFactory(current=True)
