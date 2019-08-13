@@ -453,9 +453,9 @@ class TestSelectAttach(TestCase):
     def setUpTestData(self):
         self.person = PersonFactory()
         self.academic_year = create_current_academic_year()
-        self.next_academic_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
-        self.double_next_academic_year = AcademicYearFactory(year=self.current_academic_year.year + 2)
-        self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year - 1)
+        self.next_academic_year = AcademicYearFactory(year=self.academic_year.year + 1)
+        self.double_next_academic_year = AcademicYearFactory(year=self.academic_year.year + 2)
+        self.previous_academic_year = AcademicYearFactory(year=self.academic_year.year - 1)
         self.child_education_group_year = EducationGroupYearFactory(
             academic_year=self.academic_year,
             education_group__end_year=self.next_academic_year
