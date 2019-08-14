@@ -29,7 +29,7 @@ from django.utils import timezone
 
 from django.utils.translation import ugettext_lazy as _
 
-from base.business.xls import convert_boolean
+from base.business.xls import convert_boolean, _get_all_columns_reference
 
 
 class TestXls(TestCase):
@@ -40,3 +40,7 @@ class TestXls(TestCase):
         self.assertEqual(convert_boolean(None), _('no'))
         self.assertEqual(convert_boolean(True), _('yes'))
         self.assertEqual(convert_boolean(False), _('no'))
+
+    def test_get_all_columns_reference(self):
+        self.assertCountEqual(_get_all_columns_reference(0), [])
+        self.assertCountEqual(_get_all_columns_reference(2), ['A', 'B'])

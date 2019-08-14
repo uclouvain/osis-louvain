@@ -32,7 +32,6 @@ from django.utils.translation import ugettext_lazy as _
 from base import models as mdl_base
 from base.business.entity import get_entity_calendar
 from base.business.learning_unit_year_with_context import volume_learning_component_year
-from base.business.xls import get_name_or_username
 from base.models import learning_achievement
 from base.models.academic_calendar import AcademicCalendar
 from base.models.enums import academic_calendar_type
@@ -44,14 +43,7 @@ from base.models.learning_container_year import find_last_entity_version_grouped
 from base.models.utils.utils import get_object_or_none
 from cms import models as mdl_cms
 from cms.enums import entity_name
-from osis_common.document import xls_build
 from osis_common.utils.datetime import convert_date_to_datetime
-
-# List of key that a user can modify
-
-WORKSHEET_TITLE = _('Learning units list')
-XLS_FILENAME = _('LearningUnitsList')
-XLS_DESCRIPTION = _('Learning units list')
 
 CMS_LABEL_SPECIFICATIONS = ['themes_discussed', 'prerequisite']
 
@@ -63,40 +55,6 @@ CMS_LABEL_PEDAGOGY = CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_PEDAGOGY_FR_ONLY
 CMS_LABEL_SUMMARY = ['resume']
 
 COLORED = 'COLORED_ROW'
-
-
-def learning_unit_titles_part2():
-    return [
-        str(_('Periodicity')),
-        str(_('Active')),
-        "{} - {}".format(_('Lecturing vol.'), _('Annual')),
-        "{} - {}".format(_('Lecturing vol.'), _('1st quadri')),
-        "{} - {}".format(_('Lecturing vol.'), _('2nd quadri')),
-        "{}".format(_('Lecturing planned classes')),
-        "{} - {}".format(_('Practical vol.'), _('Annual')),
-        "{} - {}".format(_('Practical vol.'), _('1st quadri')),
-        "{} - {}".format(_('Practical vol.'), _('2nd quadri')),
-        "{}".format(_('Practical planned classes')),
-        str(_('Quadrimester')),
-        str(_('Session derogation')),
-        str(_('Language')),
-    ]
-
-
-def learning_unit_titles_part1():
-    return [
-        str(_('Code')),
-        str(_('Ac yr.')),
-        str(_('Title')),
-        str(_('Type')),
-        str(_('Subtype')),
-        str(_('Req. Entity')),
-        str(_('Proposal type')),
-        str(_('Proposal status')),
-        str(_('Credits')),
-        str(_('Alloc. Ent.')),
-        str(_('Title in English')),
-    ]
 
 
 def get_same_container_year_components(learning_unit_year):
@@ -195,37 +153,8 @@ def _is_used_by_full_learning_unit_year(a_learning_class_year):
     return a_learning_class_year.learning_component_year.learning_unit_year.is_full()
 
 
-def prepare_xls_content(found_learning_units):
-    return [extract_xls_data_from_learning_unit(lu) for lu in found_learning_units]
-
-
-def extract_xls_data_from_learning_unit(learning_unit_yr):
-    return [
-        learning_unit_yr.academic_year.name, learning_unit_yr.acronym, learning_unit_yr.complete_title,
-        xls_build.translate(learning_unit_yr.learning_container_year.container_type)
-        # FIXME Condition to remove when the LearningUnitYear.learning_continer_year_id will be null=false
-        if learning_unit_yr.learning_container_year else "",
-        xls_build.translate(learning_unit_yr.subtype),
-        learning_unit_yr.entity_allocation,
-        learning_unit_yr.entity_requirement,
-        learning_unit_yr.credits, xls_build.translate(learning_unit_yr.status)
-    ]
-
-
 def get_entity_acronym(an_entity):
     return an_entity.acronym if an_entity else None
-
-
-def create_xls(user, found_learning_units, filters):
-    titles = learning_unit_titles_part1() + learning_unit_titles_part2()
-    working_sheets_data = prepare_xls_content(found_learning_units)
-    parameters = {xls_build.DESCRIPTION: XLS_DESCRIPTION,
-                  xls_build.USER: get_name_or_username(user),
-                  xls_build.FILENAME: XLS_FILENAME,
-                  xls_build.HEADER_TITLES: titles,
-                  xls_build.WS_TITLE: WORKSHEET_TITLE}
-
-    return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
 
 
 def is_summary_submission_opened():

@@ -349,7 +349,7 @@ class TestCommonBaseFormSave(TestCase):
         created_education_group_year = form.save()
 
         self.assertEqual(created_education_group_year.education_group.start_year,
-                         created_education_group_year.academic_year.year)
+                         created_education_group_year.academic_year)
 
     @patch('base.business.education_groups.create.create_initial_group_element_year_structure', return_value=[])
     def test_assert_create_initial_group_element_year_structure_called(self, mock_create_initial_group_element_year):
@@ -385,7 +385,6 @@ def _get_valid_post_data(category):
         'remark_english': str(fake_education_group_year.remark_english),
         'title_english': str(fake_education_group_year.title_english),
         'partial_acronym': str(fake_education_group_year.partial_acronym),
-        'end_year': str(fake_education_group_year.education_group.end_year),
         'start_year': str(fake_education_group_year.education_group.start_year),
         'title': str(fake_education_group_year.title),
         'credits': str(fake_education_group_year.credits),
