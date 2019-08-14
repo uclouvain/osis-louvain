@@ -38,7 +38,7 @@ from django.utils.translation import ugettext as _
 from waffle.testutils import override_flag
 
 from base.business.group_element_years import management
-from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
+#from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
 from base.forms.education_group.group import GroupYearModelForm
 from base.models.enums import education_group_categories, internship_presence
 from base.models.enums.active_status import ACTIVE
@@ -85,8 +85,10 @@ class TestUpdate(TestCase):
                                                     year=self.current_academic_year.year + 2)
         academic_year_2.save()
 
-        self.academic_year_3 = AcademicYearFactory.build(start_date=self.start_date_ay_2,
-                                                    end_date=self.end_date_ay_2,
+        self.start_date_ay_3 = self.current_academic_year.start_date.replace(year=self.current_academic_year.year + 8)
+        self.end_date_ay_3 = self.current_academic_year.end_date.replace(year=self.current_academic_year.year + 9)
+        self.academic_year_3 = AcademicYearFactory.build(start_date=self.start_date_ay_3,
+                                                    end_date=self.end_date_ay_3,
                                                     year=self.current_academic_year.year + 8)
         self.academic_year_3.save()
 
@@ -740,7 +742,7 @@ class TestSelectAttach(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), _("Please select an item before attach it"))
 
-    @mock.patch.object(AttachEducationGroupYearStrategy, 'is_valid', side_effect=ValidationError('Dummy message'))
+    #@mock.patch.object(AttachEducationGroupYearStrategy, 'is_valid', side_effect=ValidationError('Dummy message'))
     def test_attach_a_not_valid_case(self, mock_attach_strategy):
         ElementCache(self.person.user).save_element_selected(self.child_education_group_year)
         response = self.client.get(
