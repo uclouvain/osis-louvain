@@ -154,7 +154,7 @@ class TestGroupForm(TestCase):
 
         self.assertEqual(
             education_group_year.education_group.start_year,
-            self.expected_educ_group_year.academic_year.year
+            self.expected_educ_group_year.academic_year
         )
 
         self.assertEqual(
