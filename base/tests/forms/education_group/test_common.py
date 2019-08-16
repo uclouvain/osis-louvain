@@ -349,7 +349,7 @@ class TestCommonBaseFormSave(TestCase):
         created_education_group_year = form.save()
 
         self.assertEqual(created_education_group_year.education_group.start_year,
-                         created_education_group_year.academic_year.year)
+                         created_education_group_year.academic_year)
 
     @patch('base.business.education_groups.create.create_initial_group_element_year_structure', return_value=[])
     def test_assert_create_initial_group_element_year_structure_called(self, mock_create_initial_group_element_year):
