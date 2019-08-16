@@ -26,7 +26,7 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from base.business import group_element_years
+from base.business.group_element_years.attach import AttachEducationGroupYearStrategy, AttachLearningUnitYearStrategy
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
@@ -62,7 +62,7 @@ class TestAttachOptionEducationGroupYearStrategy(TestCase):
         In this test, we ensure that we can add an option at specialized finality because
         it is present in root master 2m level
         """
-        strategy = group_element_years.attach.AttachEducationGroupYearStrategy(
+        strategy = AttachEducationGroupYearStrategy(
             parent=self.master_120_specialized,
             child=self.option_in_parent
         )
@@ -76,7 +76,7 @@ class TestAttachOptionEducationGroupYearStrategy(TestCase):
         subgroup = GroupFactory(education_group_type__name=GroupType.SUB_GROUP.name, academic_year=self.academic_year)
         GroupElementYearFactory(parent=subgroup, child_branch=self.option_in_parent)
 
-        strategy = group_element_years.attach.AttachEducationGroupYearStrategy(
+        strategy = AttachEducationGroupYearStrategy(
             parent=self.master_120_specialized,
             child=subgroup
         )
@@ -89,7 +89,7 @@ class TestAttachOptionEducationGroupYearStrategy(TestCase):
         """
         option_which_are_not_in_2m = MiniTrainingFactory(education_group_type__name=MiniTrainingType.OPTION.name,
                                                          academic_year=self.academic_year)
-        strategy = group_element_years.attach.AttachEducationGroupYearStrategy(
+        strategy = AttachEducationGroupYearStrategy(
             parent=self.master_120_specialized,
             child=option_which_are_not_in_2m
         )
@@ -110,7 +110,7 @@ class TestAttachOptionEducationGroupYearStrategy(TestCase):
         # Good case (present in 2M)
         GroupElementYearFactory(parent=subgroup, child_branch=self.option_in_parent)
 
-        strategy = group_element_years.attach.AttachEducationGroupYearStrategy(
+        strategy = AttachEducationGroupYearStrategy(
             parent=self.master_120_specialized,
             child=subgroup
         )
@@ -133,7 +133,7 @@ class TestAttachOptionEducationGroupYearStrategy(TestCase):
         # Good case (present in 2M)
         GroupElementYearFactory(parent=finality, child_branch=self.option_in_parent)
 
-        strategy = group_element_years.attach.AttachEducationGroupYearStrategy(
+        strategy = AttachEducationGroupYearStrategy(
             parent=self.finality_group,
             child=finality
         )
@@ -172,10 +172,10 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
         master_120_didactic = TrainingFactory(
             education_group_type__name=TrainingType.MASTER_MD_120.name,
             academic_year=self.academic_year_2,
-            education_group__end_year=self.academic_year_2
+            education_group__end_year=self.academic_year_1
         )
 
-        strategy = group_element_years.attach.AttachEducationGroupYearStrategy(
+        strategy = AttachEducationGroupYearStrategy(
             parent=self.finality_group,
             child=master_120_didactic
         )
@@ -185,10 +185,10 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
         master_120_didactic = TrainingFactory(
             education_group_type__name=TrainingType.MASTER_MD_120.name,
             academic_year=self.academic_year_2,
-            education_group__end_year=self.academic_year_1
+            education_group__end_year=self.academic_year_3
         )
 
-        strategy = group_element_years.attach.AttachEducationGroupYearStrategy(
+        strategy = AttachEducationGroupYearStrategy(
             parent=self.finality_group,
             child=master_120_didactic
         )
@@ -202,7 +202,7 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
             education_group__end_year=None
         )
 
-        strategy = group_element_years.attach.AttachEducationGroupYearStrategy(
+        strategy = AttachEducationGroupYearStrategy(
             parent=self.finality_group,
             child=master_120_didactic
         )
@@ -224,7 +224,7 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
         )
         GroupElementYearFactory(parent=subgroup, child_branch=master_120_deepening)
 
-        strategy = group_element_years.attach.AttachEducationGroupYearStrategy(
+        strategy = AttachEducationGroupYearStrategy(
             parent=self.finality_group,
             child=subgroup
         )
@@ -240,14 +240,14 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
 
         ge = GroupElementYearFactory(parent=self.finality_group, child_branch=master_120_didactic)
 
-        duplicate = group_element_years.attach.AttachEducationGroupYearStrategy(
+        duplicate = AttachEducationGroupYearStrategy(
             parent=self.finality_group,
             child=master_120_didactic
         )
         with self.assertRaises(ValidationError):
             self.assertTrue(duplicate.is_valid())
 
-        update = group_element_years.attach.AttachEducationGroupYearStrategy(
+        update = AttachEducationGroupYearStrategy(
             parent=self.finality_group,
             child=master_120_didactic,
             instance=ge
@@ -259,7 +259,7 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
 
         GroupElementYearFactory(parent=self.finality_group, child_leaf=child_leaf, child_branch=None)
 
-        duplicate = group_element_years.attach.AttachLearningUnitYearStrategy(
+        duplicate = AttachLearningUnitYearStrategy(
             parent=self.finality_group,
             child=child_leaf
         )
