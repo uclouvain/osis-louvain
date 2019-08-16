@@ -46,7 +46,7 @@ import reference.models.language
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business import learning_unit as learning_unit_business
-from base.business.learning_unit import learning_unit_titles_part1, learning_unit_titles_part2
+from base.business.learning_unit_xls import learning_unit_titles_part2, learning_unit_titles_part_1, create_xls
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES
@@ -1063,7 +1063,7 @@ class LearningUnitViewTestCase(TestCase):
                          '{}, {}'.format(last_name, first_name))
 
     def test_prepare_xls_content_no_data(self):
-        self.assertEqual(base.business.learning_unit.prepare_xls_content([]), [])
+        self.assertEqual(base.business.learning_unit_xls.prepare_ue_xls_content([]), [])
 
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ])
     def test_find_inexisting_language_in_settings(self):
@@ -1144,7 +1144,7 @@ class TestCreateXls(TestCase):
 
     @mock.patch("osis_common.document.xls_build.generate_xls")
     def test_generate_xls_data_with_no_data(self, mock_generate_xls):
-        learning_unit_business.create_xls(self.user, [], None)
+        create_xls(self.user, [], None)
         expected_argument = _generate_xls_build_parameter([], self.user)
         mock_generate_xls.assert_called_with(expected_argument, None)
 
@@ -1153,7 +1153,7 @@ class TestCreateXls(TestCase):
         a_form = LearningUnitYearForm({"acronym": self.learning_unit_year.acronym}, service_course_search=False)
         self.assertTrue(a_form.is_valid())
         found_learning_units = a_form.get_activity_learning_units()
-        learning_unit_business.create_xls(self.user, found_learning_units, None)
+        create_xls(self.user, found_learning_units, None)
         xls_data = [[self.learning_unit_year.academic_year.name, self.learning_unit_year.acronym,
                      self.learning_unit_year.complete_title,
                      xls_build.translate(self.learning_unit_year.learning_container_year.container_type),
@@ -1164,16 +1164,16 @@ class TestCreateXls(TestCase):
 
 
 def _generate_xls_build_parameter(xls_data, user):
-    titles = learning_unit_titles_part1()
+    titles = learning_unit_titles_part_1()
     titles.extend(learning_unit_titles_part2())
     return {
-        xls_build.LIST_DESCRIPTION_KEY: _(learning_unit_business.XLS_DESCRIPTION),
-        xls_build.FILENAME_KEY: _(learning_unit_business.XLS_FILENAME),
+        xls_build.LIST_DESCRIPTION_KEY: _(base.business.learning_unit_xls.XLS_DESCRIPTION),
+        xls_build.FILENAME_KEY: _(base.business.learning_unit_xls.XLS_FILENAME),
         xls_build.USER_KEY: user.username,
         xls_build.WORKSHEETS_DATA: [{
             xls_build.CONTENT_KEY: xls_data,
             xls_build.HEADER_TITLES_KEY: titles,
-            xls_build.WORKSHEET_TITLE_KEY: _(learning_unit_business.WORKSHEET_TITLE),
+            xls_build.WORKSHEET_TITLE_KEY: _(base.business.learning_unit_xls.WORKSHEET_TITLE),
             xls_build.STYLED_CELLS: None,
             xls_build.COLORED_ROWS: None,
         }]

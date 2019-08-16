@@ -157,22 +157,37 @@
         {% if programs %}
             <div role="tabpanel" class="tab-pane" id="program">
                 <br>
+                <label>
+                    {% trans 'Managed programs' %}
+                    <span class="badge">{{ programs|length }}</span>
+                </label>
+                <br>
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th>{% trans 'Managed programs' %}</th>
+                            <th>{% trans 'Acronym' %}</th>
+                            <th>{% trans 'Code' %}</th>
+                            <th>{% trans 'Title' %}</th>
                         </tr>
                     </thead>
                     {% for program in programs %}
                             {% with program.education_group.current_egy|first as egy %}
                                 {% if egy %}
+
                                     <tr>
                                         <td>
                                             <a href="{% url 'education_group_read' root_id=egy.id education_group_year_id=egy.id %}"
                                                id="lnk_program_managed_{{ egy.id }}">
-                                                {{ egy }} - {{ egy.title }}
+                                                {{ egy.acronym }}
                                             </a>
                                         </td>
+                                        <td>
+                                            {{  egy.partial_acronym|default:'' }}
+                                        </td>
+                                        <td>
+                                            {{  egy.title|default:'' }}
+                                        </td>
+
                                     </tr>
                                 {% endif %}
                             {% endwith %}

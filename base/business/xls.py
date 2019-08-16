@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.utils.translation import ugettext_lazy as _
+from openpyxl.utils import get_column_letter
 
 from base import models as mdl_base
 
@@ -35,3 +36,12 @@ def get_name_or_username(a_user):
 
 def convert_boolean(a_boolean_value):
     return _('yes') if a_boolean_value else _('no')
+
+
+def _get_all_columns_reference(nb_columns):
+    letters = []
+    nb_col = 1
+    while nb_col < nb_columns+1:
+        letters.append(get_column_letter(nb_col))
+        nb_col += 1
+    return letters

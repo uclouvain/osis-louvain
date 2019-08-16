@@ -142,7 +142,8 @@ def _get_data(request):
             ).select_related('academic_year'),
             to_attr='current_egy'
         )
-    )
+    ).order_by('education_group__educationgroupyear__acronym').distinct()
+
     return {'person': person,
             'addresses': mdl.person_address.find_by_person(person),
             'tutor': tutor,

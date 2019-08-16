@@ -62,6 +62,12 @@
                                 &nbsp;{% trans 'List of learning units with comparison' %}
                             </a>
                         </li>
+                        <li>
+                            <a id="btn_produce_xls_detailled_attributions"
+                               style="margin-right:10px;" title="{% trans 'Produce a xls of learning units with one line per attribution' %}">
+                                &nbsp;{% trans 'List of learning units with with one line per attribution' %}
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 <form id="download_xls" action="{{ request.path }}" method="post">
