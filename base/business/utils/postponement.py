@@ -130,7 +130,7 @@ class AutomaticPostponementToN6(AutomaticPostponement):
                     last_year = obj.end_year or self.last_academic_year
                     obj_to_copy = getattr(obj, self.annualized_set + "_set").latest('academic_year__year')
                     copied_objs = []
-                    for year in range(obj.last_year + 1, last_year.year + 1):
+                    for year in range(obj.last_year + 1, last_year + 1):
                         new_obj = self.extend_obj(obj_to_copy, AcademicYear.objects.get(year=year))
                         copied_objs.append(new_obj)
 

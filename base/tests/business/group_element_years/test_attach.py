@@ -157,7 +157,7 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
         cls.finality_group = GroupFactory(
             education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
             academic_year=cls.academic_year_2,
-            education_group__end_year=cls.academic_year_4
+            education_group__end_year=cls.academic_year_3
         )
         GroupElementYearFactory(parent=cls.master_120, child_branch=cls.finality_group)
 

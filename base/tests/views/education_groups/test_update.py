@@ -38,7 +38,7 @@ from django.utils.translation import ugettext as _
 from waffle.testutils import override_flag
 
 from base.business.group_element_years import management
-from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
+#from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
 from base.forms.education_group.group import GroupYearModelForm
 from base.models.enums import education_group_categories, internship_presence
 from base.models.enums.active_status import ACTIVE
@@ -390,8 +390,8 @@ class TestUpdate(TestCase):
             'schedule_type': DAILY,
             "internship": internship_presence.NO,
             "primary_language": LanguageFactory().pk,
-            "start_year": self.training_education_group_year.academic_year,
-            "end_year": self.academic_year_3,
+            "start_year": self.training_education_group_year.academic_year.pk,
+            "end_year": self.training_education_group_year.academic_year.pk,
             "constraint_type": "",
             "diploma_printing_title": "Diploma Title",
         }
@@ -742,7 +742,7 @@ class TestSelectAttach(TestCase):
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), _("Please select an item before attach it"))
 
-    @mock.patch.object(AttachEducationGroupYearStrategy, 'is_valid', side_effect=ValidationError('Dummy message'))
+    #@mock.patch.object(AttachEducationGroupYearStrategy, 'is_valid', side_effect=ValidationError('Dummy message'))
     def test_attach_a_not_valid_case(self, mock_attach_strategy):
         ElementCache(self.person.user).save_element_selected(self.child_education_group_year)
         response = self.client.get(
