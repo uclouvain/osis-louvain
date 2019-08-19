@@ -1,4 +1,4 @@
-##############################################################################
+#############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,24 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django import template
 
-from django.test import TestCase
-from django.utils import timezone
-
-from django.utils.translation import ugettext_lazy as _
-
-from base.business.xls import convert_boolean, _get_all_columns_reference
+register = template.Library()
 
 
-class TestXls(TestCase):
-    def setUp(self):
-        self.now = timezone.now()
-
-    def test_convert_boolean(self):
-        self.assertEqual(convert_boolean(None), _('no'))
-        self.assertEqual(convert_boolean(True), _('yes'))
-        self.assertEqual(convert_boolean(False), _('no'))
-
-    def test_get_all_columns_reference(self):
-        self.assertCountEqual(_get_all_columns_reference(0), [])
-        self.assertCountEqual(_get_all_columns_reference(2), ['A', 'B'])
+@register.filter
+def has_permission_can_read_persons_roles(the_user):
+    if the_user:
+        return the_user.has_perm("base.can_read_persons_roles")
+    return False

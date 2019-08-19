@@ -3653,5 +3653,23 @@
                 ]
             ]
         }
+    },
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "administrator_for_user",
+            "permissions": [
+                [
+                    "is_institution_administrator",
+                    "base",
+                    "person"
+                ],
+                [
+                    "can_read_persons_roles",
+                    "base",
+                    "person"
+                ]
+            ]
+        }
     }
 ]

@@ -33,7 +33,7 @@ from django.db.models import Subquery, OuterRef
 from django.utils.translation import ugettext_lazy as _
 from openpyxl.styles import Style, Alignment
 
-from base.business.learning_unit import XLS_DESCRIPTION, XLS_FILENAME
+from base.business.learning_unit_xls import XLS_DESCRIPTION, XLS_FILENAME
 from base.business.xls import get_name_or_username
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText

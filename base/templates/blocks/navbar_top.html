@@ -140,6 +140,14 @@
                                         </a>
                                     </li>
                                 {% endif %}
+                                {% if perms.base.can_read_persons_roles %}
+                                    <li>
+                                        <a href="{% url 'academic_actors_list' %}" id="lnk_academic_actors_list">
+                                            <span class="fa fa-users"></span>
+                                            {% trans 'List of users' %}
+                                        </a>
+                                    </li>
+                                {% endif %}
                             </ul>
                         </li>
                     {% endif %}

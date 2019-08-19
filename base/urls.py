@@ -38,7 +38,7 @@ import base.views.learning_units.proposal.delete
 import base.views.learning_units.search
 import base.views.learning_units.update
 from attribution.views import attribution, tutor_application
-from base.views import learning_achievement, search, education_groups
+from base.views import learning_achievement, search, education_groups, user_list
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, notifications
 from base.views import teaching_material
@@ -91,7 +91,11 @@ urlpatterns = [
         name='campus-autocomplete'),
     url(r'^employee-autocomplete/$', EmployeeAutocomplete.as_view(),
         name='employee_autocomplete'),
-    url(r'^academic_actors/$', institution.academic_actors, name='academic_actors'),
+    url(r'^list-of-users/$', user_list.UserListView.as_view(), name='academic_actors_list'),
+
+    url(r'^academic_actors/', include([
+        url(r'^$', institution.academic_actors, name='academic_actors'),
+    ])),
 
     url(r'^academic_calendars/', include([
         url(r'^$', academic_calendar.academic_calendars, name='academic_calendars'),

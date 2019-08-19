@@ -34,14 +34,16 @@ from openpyxl.utils import get_column_letter
 
 from attribution.business import attribution_charge_new
 from attribution.models.enums.function import Functions
-from base.business.learning_unit import learning_unit_titles_part2, XLS_DESCRIPTION, XLS_FILENAME, \
-    WORKSHEET_TITLE
-from base.business.xls import get_name_or_username
+from base.business.xls import get_name_or_username, _get_all_columns_reference
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from osis_common.document import xls_build
+
+XLS_DESCRIPTION = _('Learning units list')
+XLS_FILENAME = _('LearningUnitsList')
+WORKSHEET_TITLE = _('Learning units list')
 
 TRANSFORMATION_AND_MODIFICATION_COLOR = Color('808000')
 TRANSFORMATION_COLOR = Color('ff6600')
@@ -68,6 +70,8 @@ PROPOSAL_LINE_STYLES = {
 WRAP_TEXT_STYLE = Style(alignment=Alignment(wrapText=True, vertical="top"), )
 WITH_ATTRIBUTIONS = 'with_attributions'
 WITH_GRP = 'with_grp'
+
+COLUMNS_REFERENCE_WITH_ATTRIBUTIONS = ['A', 'B', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
 
 
 def learning_unit_titles_part1():
@@ -137,7 +141,7 @@ def annotate_qs(learning_unit_years):
 def create_xls_with_parameters(user, learning_units, filters, extra_configuration):
     with_grp = extra_configuration.get(WITH_GRP)
     with_attributions = extra_configuration.get(WITH_ATTRIBUTIONS)
-    titles_part1 = learning_unit_titles_part1()
+    titles_part1 = learning_unit_titles_part_1()
     titles_part2 = learning_unit_titles_part2()
 
     if with_grp:
@@ -324,3 +328,141 @@ def _get_data_part1(learning_unit_yr):
         learning_unit_yr.complete_title_english,
     ]
     return lu_data_part1
+
+
+def learning_unit_titles_part2():
+    return [
+        str(_('Periodicity')),
+        str(_('Active')),
+        "{} - {}".format(_('Lecturing vol.'), _('Annual')),
+        "{} - {}".format(_('Lecturing vol.'), _('1st quadri')),
+        "{} - {}".format(_('Lecturing vol.'), _('2nd quadri')),
+        "{}".format(_('Lecturing planned classes')),
+        "{} - {}".format(_('Practical vol.'), _('Annual')),
+        "{} - {}".format(_('Practical vol.'), _('1st quadri')),
+        "{} - {}".format(_('Practical vol.'), _('2nd quadri')),
+        "{}".format(_('Practical planned classes')),
+        str(_('Quadrimester')),
+        str(_('Session derogation')),
+        str(_('Language')),
+    ]
+
+
+def learning_unit_titles_part_1():
+    return [
+        str(_('Code')),
+        str(_('Ac yr.')),
+        str(_('Title')),
+        str(_('Type')),
+        str(_('Subtype')),
+        str(_('Req. Entity')),
+        str(_('Proposal type')),
+        str(_('Proposal status')),
+        str(_('Credits')),
+        str(_('Alloc. Ent.')),
+        str(_('Title in English')),
+    ]
+
+
+def prepare_ue_xls_content(found_learning_units):
+    return [extract_xls_data_from_learning_unit(lu) for lu in found_learning_units]
+
+
+def extract_xls_data_from_learning_unit(learning_unit_yr):
+    return [
+        learning_unit_yr.academic_year.name, learning_unit_yr.acronym, learning_unit_yr.complete_title,
+        xls_build.translate(learning_unit_yr.learning_container_year.container_type)
+        # FIXME Condition to remove when the LearningUnitYear.learning_container_year_id will be null=false
+        if learning_unit_yr.learning_container_year else "",
+        xls_build.translate(learning_unit_yr.subtype),
+        learning_unit_yr.entity_allocation,
+        learning_unit_yr.entity_requirement,
+        learning_unit_yr.credits, xls_build.translate(learning_unit_yr.status)
+    ]
+
+
+def create_xls(user, found_learning_units, filters):
+    titles = learning_unit_titles_part_1() + learning_unit_titles_part2()
+    working_sheets_data = prepare_ue_xls_content(found_learning_units)
+    parameters = {xls_build.DESCRIPTION: XLS_DESCRIPTION,
+                  xls_build.USER: get_name_or_username(user),
+                  xls_build.FILENAME: XLS_FILENAME,
+                  xls_build.HEADER_TITLES: titles,
+                  xls_build.WS_TITLE: WORKSHEET_TITLE}
+
+    return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
+
+
+def create_xls_attributions(user, found_learning_units, filters):
+    titles = learning_unit_titles_part1() + learning_unit_titles_part2() + [str(_('Tutor')),
+                                                                            str(_('Function')),
+                                                                            str(_('Substitute')),
+                                                                            str(_('Beg. of attribution')),
+                                                                            str(_('Attribution duration')),
+                                                                            str(_('Attrib. vol1')),
+                                                                            str(_('Attrib. vol2')),
+                                                                            ]
+    xls_data = prepare_xls_content_with_attributions(found_learning_units, len(titles))
+    working_sheets_data = xls_data.get('data')
+    cells_with_top_border = xls_data.get('cells_with_top_border')
+    cells_with_white_font = xls_data.get('cells_with_white_font')
+    parameters = {xls_build.DESCRIPTION: _('Learning units list with attributions'),
+                  xls_build.USER: get_name_or_username(user),
+                  xls_build.FILENAME: XLS_FILENAME,
+                  xls_build.HEADER_TITLES: titles,
+                  xls_build.WS_TITLE: WORKSHEET_TITLE,
+                  xls_build.STYLED_CELLS: {xls_build.STYLE_BORDER_TOP: cells_with_top_border,
+                                           Style(font=Font(color=Color('00FFFFFF')),): cells_with_white_font},
+                  }
+
+    return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
+
+
+def prepare_xls_content_with_attributions(found_learning_units, nb_columns):
+    data = []
+    qs = annotate_qs(found_learning_units)
+    cells_with_top_border = []
+    cells_with_white_font = []
+    line = 2
+
+    for learning_unit_yr in qs:
+        first = True
+        cells_with_top_border.extend(["{}{}".format(letter, line) for letter in _get_all_columns_reference(nb_columns)])
+
+        lu_data_part1 = _get_data_part1(learning_unit_yr)
+        lu_data_part2 = _get_data_part2(learning_unit_yr, False)
+
+        lu_data_part1.extend(lu_data_part2)
+
+        attributions_values = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
+            learning_unit_yr).values()
+        if attributions_values:
+            for value in attributions_values:
+                data.append(lu_data_part1+_get_attribution_detail(value))
+                line += 1
+                if not first:
+                    cells_with_white_font.extend(
+                        ["{}{}".format(letter, line-1) for letter in _get_all_columns_reference(24)]
+                    )
+                first = False
+        else:
+            data.append(lu_data_part1)
+            line += 1
+
+    return {
+        'data': data,
+        'cells_with_top_border': cells_with_top_border or None,
+        'cells_with_white_font': cells_with_white_font or None,
+    }
+
+
+def _get_attribution_detail(an_attribution):
+    return [
+        an_attribution.get('person').full_name,
+        Functions[an_attribution['function']].value if 'function' in an_attribution else '',
+        an_attribution.get('substitute') if an_attribution.get('substitute') else '',
+        an_attribution.get('start_year'),
+        an_attribution.get('duration') if an_attribution.get('duration') else '',
+        an_attribution.get('LECTURING'),
+        an_attribution.get('PRACTICAL_EXERCISES')
+    ]

@@ -34,6 +34,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
@@ -419,12 +420,16 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         all_components = components_queryset.order_by('acronym') \
             .select_related('learning_unit_year')
         for learning_component_year in all_components:
-            _warnings.extend(learning_component_year.warnings)
+            if not self.is_partim() or learning_component_year.learning_unit_year == self:
+                _warnings.extend(learning_component_year.warnings)
 
         return _warnings
 
     def _check_learning_container_year_warnings(self):
-        return self.learning_container_year.warnings
+        if not self.is_partim():
+            return self.learning_container_year.warnings
+        else:
+            return get_learning_container_year_warnings(self.learning_container_year, self.id)
 
     def is_external(self):
         return hasattr(self, "externallearningunityear")

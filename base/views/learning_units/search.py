@@ -33,8 +33,8 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from base.business import learning_unit_proposal as proposal_business
-from base.business.learning_unit import create_xls
-from base.business.learning_unit_xls import create_xls_with_parameters, WITH_ATTRIBUTIONS, WITH_GRP
+from base.business.learning_unit_xls import create_xls_with_parameters, WITH_ATTRIBUTIONS, WITH_GRP, \
+    create_xls_attributions, create_xls
 from base.business.learning_units.xls_comparison import create_xls_comparison, get_academic_year_of_reference, \
     create_xls_proposal_comparison
 from base.business.proposal_xls import create_xls as create_xls_proposal
@@ -104,6 +104,9 @@ def learning_units_search(request, search_type):
                 WITH_ATTRIBUTIONS: request.POST.get('with_attributions') == 'true'
             }
         )
+
+    if request.POST.get('xls_status') == "xls_attributions":
+        return create_xls_attributions(request.user, found_learning_units, _get_filter(form, search_type))
 
     form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
 

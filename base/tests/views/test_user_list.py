@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,24 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.contrib.auth.models import Permission
+from django.http import HttpResponse
 from django.test import TestCase
-from django.utils import timezone
+from rest_framework.reverse import reverse
 
-from django.utils.translation import ugettext_lazy as _
-
-from base.business.xls import convert_boolean, _get_all_columns_reference
+from base.tests.factories.person import PersonFactory
 
 
-class TestXls(TestCase):
+class UserListViewTestCase(TestCase):
+
     def setUp(self):
-        self.now = timezone.now()
+        self.user = PersonFactory().user
+        self.permission = Permission.objects.get(codename='can_read_persons_roles')
+        self.client.force_login(self.user)
 
-    def test_convert_boolean(self):
-        self.assertEqual(convert_boolean(None), _('no'))
-        self.assertEqual(convert_boolean(True), _('yes'))
-        self.assertEqual(convert_boolean(False), _('no'))
+    def test_user_list_forbidden(self):
+        url = reverse('academic_actors_list')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 403)
 
-    def test_get_all_columns_reference(self):
-        self.assertCountEqual(_get_all_columns_reference(0), [])
-        self.assertCountEqual(_get_all_columns_reference(2), ['A', 'B'])
+    def test_user_list_with_permission(self):
+        url = reverse('academic_actors_list')
+        self.user.user_permissions.add(self.permission)
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)

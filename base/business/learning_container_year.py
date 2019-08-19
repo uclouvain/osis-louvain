@@ -50,20 +50,27 @@ def _check_entity_version_exists(learning_container_year) -> list:
     return warnings
 
 
-def get_learning_container_year_warnings(learning_container_year):
+def get_learning_container_year_warnings(learning_container_year, partim_id=None):
     _warnings = []
     learning_unit_years_with_context = \
         learning_unit_year_with_context.get_with_context(learning_container_year_id=learning_container_year.id)
 
     luy_full = next(luy for luy in learning_unit_years_with_context
                     if luy.subtype == learning_unit_year_subtypes.FULL)
-    luy_partims = [luy for luy in learning_unit_years_with_context
-                   if luy.subtype == learning_unit_year_subtypes.PARTIM]
+    if partim_id:
+        msg_part_2 = _('a partim volume value is greater than corresponding volume of parent')
+
+        luy_partims = [luy for luy in learning_unit_years_with_context
+                       if luy.subtype == learning_unit_year_subtypes.PARTIM and luy.id == partim_id]
+    else:
+        msg_part_2 = _('At least a partim volume value is greater than corresponding volume of parent')
+        luy_partims = [luy for luy in learning_unit_years_with_context
+                       if luy.subtype == learning_unit_year_subtypes.PARTIM]
 
     if any(volumes_are_inconsistent_between_partim_and_full(partim, luy_full) for partim in luy_partims):
         _warnings.append("{} ({})".format(
             _('Volumes are inconsistent'),
-            _('At least a partim volume value is greater than corresponding volume of parent')
+            msg_part_2
         ))
 
     _warnings += _check_entity_version_exists(learning_container_year)

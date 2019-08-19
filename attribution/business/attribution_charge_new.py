@@ -34,7 +34,7 @@ from base.models.enums import learning_component_year_type
 def find_attribution_charge_new(learning_unit_year):
     return attribution_charge_new.AttributionChargeNew.objects \
         .filter(learning_component_year__learning_unit_year=learning_unit_year) \
-        .select_related('learning_component_year', 'attribution__tutor__person')
+        .select_related('learning_component_year', 'attribution__tutor__person').order_by('attribution__tutor__person')
 
 
 def find_attribution_charge_new_by_learning_unit_year_as_dict(learning_unit_year):
