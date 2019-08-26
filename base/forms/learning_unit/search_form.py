@@ -129,6 +129,9 @@ class LearningUnitSearchForm(BaseSearchForm):
         )
         queryset = self.get_filter_learning_container_ids(queryset)
 
+        if queryset.count() > self.MAX_RECORDS:
+            raise TooManyResultsException
+
         return queryset
 
     def clean_container_type(self):

@@ -43,7 +43,7 @@ from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search_form import LearningUnitYearForm, ExternalLearningUnitYearForm
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm, ProposalStateModelForm
 from base.forms.search.search_form import get_research_criteria
-from base.models.academic_year import current_academic_year, get_last_academic_years, starting_academic_year
+from base.models.academic_year import get_last_academic_years, starting_academic_year
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear
@@ -81,7 +81,7 @@ def learning_units_search(request, search_type):
             check_if_display_message(request, found_learning_units)
 
     except TooManyResultsException:
-        display_error_messages(request, _('Too many results'))
+        display_error_messages(request, _('Too many results : Please be more specific on the search criteria.'))
     if request.POST.get('xls_status') == "xls":
         return create_xls(request.user, found_learning_units, _get_filter(form, search_type))
 
