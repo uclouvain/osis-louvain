@@ -49,7 +49,7 @@ class AutomaticPostponement(ABC):
         self.to_not_duplicate = self.get_to_not_duplicated()
         self.ending_on_max_adjournment = self.get_ending_on_max_adjournment()
 
-        if self.already_duplicated and self.to_not_duplicate:
+        if self.already_duplicated or self.to_not_duplicate:
             self.to_duplicate = self.queryset.difference(self.already_duplicated, self.to_not_duplicate)
         else:
             self.to_duplicate = self.queryset
@@ -155,9 +155,7 @@ class AutomaticPostponementToN6(AutomaticPostponement):
         )
 
     def get_already_duplicated(self):
-        return self.queryset.filter(
-            Q(last_year__gte=self.last_academic_year.year) | Q(last_year__gte=F('end_year'))
-        )
+        return self.queryset.filter(last_year__gte=self.last_academic_year.year)
 
     def get_to_not_duplicated(self):
         """ We cannot postpone an education_group in the past """

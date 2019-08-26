@@ -38,6 +38,13 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import SuperUserFactory
+from base.tests.factories.education_group_year import MiniTrainingFactory
+from base.models.enums.education_group_types import MiniTrainingType
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
+from base.models.enums import education_group_categories
+from base.models.enums import education_group_types
+from base.models.group_element_year import GroupElementYear
+from base.tests.factories.education_group_year import GroupFactory
 
 
 class TestRead(TestCase):
@@ -110,3 +117,50 @@ class TestRead(TestCase):
             _("credits"),
         )
         self.assertEqual(self.group_element_year_2.verbose, verbose_leaf)
+
+
+class TestReadTree(TestCase):
+
+    def setUp(self):
+        academic_year = AcademicYearFactory()
+        minor_list_type = EducationGroupTypeFactory(
+            category=education_group_categories.GROUP,
+            name=education_group_types.GroupType.MINOR_LIST_CHOICE.name,
+        )
+        common_type = EducationGroupTypeFactory(
+            category=education_group_categories.GROUP,
+            name=education_group_types.GroupType.COMMON_CORE,
+        )
+
+        self.base_1 = GroupFactory(education_group_type=common_type,
+                                   acronym="BASE",
+                                   academic_year=academic_year)
+        child_1 = GroupFactory(education_group_type=common_type,
+                               acronym="CHILD",
+                               academic_year=academic_year)
+        minor_list_choice = GroupFactory(education_group_type=minor_list_type,
+                                         acronym="MINOR LIST",
+                                         academic_year=academic_year)
+
+        minor_content_1 = MiniTrainingFactory(education_group_type=minor_list_type,
+                                              academic_year=academic_year)
+        minor_content_2 = MiniTrainingFactory(education_group_type=minor_list_type,
+                                              academic_year=academic_year)
+
+        self.groupe_element_yr_1 = GroupElementYearFactory(parent=self.base_1, child_branch=minor_list_choice)
+        self.groupe_element_yr_2 = GroupElementYearFactory(parent=self.base_1, child_branch=child_1)
+        self.groupe_element_yr_3 = GroupElementYearFactory(parent=minor_list_choice, child_branch=minor_content_1)
+        self.groupe_element_yr_4 = GroupElementYearFactory(parent=minor_list_choice, child_branch=minor_content_2)
+
+    def test_minor_list_detail_in_pdf_tree(self):
+        result = EducationGroupHierarchy(self.base_1, pdf_content=True).to_list()
+        self.assertCountEqual(result, [self.groupe_element_yr_1, self.groupe_element_yr_2])
+
+    def test_minor_list_detail_in_tree(self):
+        result = EducationGroupHierarchy(self.base_1).to_list()
+        self.assertCountEqual(result, [self.groupe_element_yr_1,
+                                       self.groupe_element_yr_2,
+                                       [self.groupe_element_yr_3, self.groupe_element_yr_4]]
+                              )
+
+

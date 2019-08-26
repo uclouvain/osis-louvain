@@ -216,10 +216,7 @@ class GroupElementYear(OrderedModel):
     @property
     def verbose(self):
         if self.child_branch:
-            return "{} ({} {})".format(
-                self.child.title, self.relative_credits or self.child_branch.credits or 0, _("credits")
-            )
-
+            return self._verbose_credits()
         else:
             components = LearningComponentYear.objects.filter(
                 learning_unit_year=self.child_leaf).annotate(
@@ -289,6 +286,14 @@ class GroupElementYear(OrderedModel):
         if self.child:
             return False
         return True
+
+    def _verbose_credits(self):
+        if self.relative_credits or self.child_branch.credits:
+            return "{} ({} {})".format(
+                self.child.title, self.relative_credits or self.child_branch.credits or 0, _("credits")
+            )
+        else:
+            return "{}".format(self.child.title)
 
 
 def find_learning_unit_formations(objects, parents_as_instances=False, with_parents_of_parents=False):

@@ -41,7 +41,7 @@ from osis_common.document.pdf_build import render_pdf
 @waffle_switch('education_group_year_generate_pdf')
 def pdf_content(request, root_id, education_group_year_id, language):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    tree = EducationGroupHierarchy(education_group_year).to_list()
+    tree = EducationGroupHierarchy(root=education_group_year, pdf_content=True).to_list()
     context = {
         'root': education_group_year,
         'tree': tree,

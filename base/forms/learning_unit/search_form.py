@@ -226,6 +226,11 @@ class LearningUnitYearForm(LearningUnitSearchForm):
             raise ValidationError(_('LU_ERRORS_INVALID_REGEX_SYNTAX'))
         return acronym
 
+    def clean_faculty_borrowing_acronym(self):
+        data_cleaned = self.cleaned_data.get('faculty_borrowing_acronym')
+        if data_cleaned:
+            return data_cleaned.upper()
+
     def clean(self):
         return get_clean_data(self.cleaned_data)
 

@@ -196,6 +196,8 @@ class EntityVersion(SerializableModel):
 
     def save(self, *args, **kwargs):
         if self.can_save_entity_version():
+            # FIXME: Create UpperCharField
+            self.acronym = self.acronym.upper()
             super(EntityVersion, self).save()
         else:
             raise AttributeError('EntityVersion invalid parameters')
