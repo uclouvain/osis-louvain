@@ -114,7 +114,7 @@ def learning_units_summary_list(request):
         'search_type': SUMMARY_LIST,
         'is_faculty_manager': a_user_person.is_faculty_manager,
         'form_comparison': form_comparison,
-        'page_obj': paginate_queryset(found_learning_units, request.GET),
+        'page_obj': found_learning_units,
     }
 
     return render(request, "learning_units.html", context)
