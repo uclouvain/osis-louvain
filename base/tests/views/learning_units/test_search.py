@@ -23,16 +23,21 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest.mock import patch
+
 from django.contrib.auth.models import Permission
+from django.contrib.messages import get_messages
+from django.http.response import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
-from django.http.response import HttpResponseForbidden
+from django.utils.translation import gettext_lazy as _
 
+from base.forms.common import TooManyResultsException
+from base.models.enums import learning_container_year_types
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.views.learning_units.search import BORROWED_COURSE, EXTERNAL_SEARCH
-from base.tests.factories.academic_year import create_current_academic_year
 
 
 class TestSearchBorrowedLearningUnits(TestCase):
@@ -102,3 +107,29 @@ class TestSearchExternalLearningUnits(TestCase):
         context = response.context
         self.assertEqual(context["search_type"], EXTERNAL_SEARCH)
         self.assertTemplateUsed(response, "learning_unit/by_external.html")
+
+
+class TestSearchLearningUnitsSimple(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonFactory()
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
+        cls.url = reverse("learning_units")
+        cls.academic_year = create_current_academic_year()
+
+    @patch('base.forms.learning_unit.search_form.LearningUnitYearForm.get_activity_learning_units')
+    def test_search_too_many_results_displays_warning(self, mock_get_activity_learning_units):
+        mock_get_activity_learning_units.side_effect = TooManyResultsException()
+        self.client.force_login(self.person.user)
+
+        search_data = {
+            "academic_year_id": str(self.academic_year.id),
+            "container_type": learning_container_year_types.COURSE
+        }
+        response = self.client.get(self.url, search_data)
+
+        messages = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertEqual(
+            messages[0],
+            _('Too many results : Please be more specific on the search criteria.')
+        )
