@@ -339,8 +339,7 @@ class TestUpdate(TestCase):
 
     def test_post_training_with_a_coorganization(self):
         new_entity_version = MainEntityVersionFactory()
-        egy = EducationGroupYearFactory(
-            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+        egy = TrainingFactory(
             management_entity=new_entity_version.entity,
             administration_entity=new_entity_version.entity
         )
