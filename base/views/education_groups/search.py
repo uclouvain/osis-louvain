@@ -103,6 +103,10 @@ class EducationGroupTypeAutoComplete(LoginRequiredMixin, autocomplete.Select2Que
         category = self.forwarded.get('category', None)
         if category:
             qs = qs.filter(category=category)
+        if self.q:
+            # Filtering must be done in python because translated value.
+            ids_to_keep = {result.pk for result in qs if self.q.lower() in result.get_name_display().lower()}
+            qs = qs.filter(id__in=ids_to_keep)
 
         qs = qs.order_by_translated_name()
         return qs

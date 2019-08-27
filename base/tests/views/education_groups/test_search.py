@@ -342,3 +342,18 @@ class TestEducationGroupTypeAutoComplete(TestCase):
                 response = self.client.get(self.url, data={"forward": json.dumps({"category": category})})
                 json_response = response.json()
                 self.assertEqual(expected_result, len(json_response["results"]))
+
+    def test_with_search_query_case_insentive_on_display_value_set(self):
+        education_group_type = self.trainings[0]
+        search_term = education_group_type.get_name_display().upper()
+
+        response = self.client.get(self.url, data={"forward": json.dumps({"category": TRAINING}), "q": search_term})
+        json_response = response.json()
+
+        expected_response = {
+            'id': str(education_group_type.pk),
+            'selected_text': education_group_type.get_name_display(),
+            'text': education_group_type.get_name_display()
+        }
+        self.assertEqual(len(json_response["results"]), 1)
+        self.assertEqual(json_response["results"][0], expected_response)
