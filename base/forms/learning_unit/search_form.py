@@ -176,7 +176,7 @@ class LearningUnitSearchForm(BaseSearchForm):
 
 
 class LearningUnitYearForm(LearningUnitSearchForm):
-    MAX_RECORDS = 2000
+    MAX_RECORDS = 5000
     container_type = forms.ChoiceField(
         label=_('Type'),
         choices=LearningUnitSearchForm.ALL_CHOICES + LearningContainerYearType.choices()
