@@ -16,11 +16,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='learningunit',
             name='new_end_year',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='new_end_years', to='base.AcademicYear', verbose_name='Last year of organization'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='ue_end_years', to='base.AcademicYear', verbose_name='Last year of organization'),
         ),
         migrations.AddField(
             model_name='learningunit',
             name='new_start_year',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='new_start_years', to='base.AcademicYear', verbose_name='Start'),
+            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='ue_start_years', to='base.AcademicYear', verbose_name='Start'),
         ),
     ]

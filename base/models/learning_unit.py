@@ -94,7 +94,7 @@ class LearningUnit(SerializableModel):
         blank=True,
         null=True,
         verbose_name=_('Start'),
-        related_name='start_years',
+        related_name='ue_start_years',
         on_delete=models.PROTECT
     )
     end_year = models.ForeignKey(
@@ -102,7 +102,7 @@ class LearningUnit(SerializableModel):
         blank=True,
         null=True,
         verbose_name=_('Last year of organization'),
-        related_name='end_years',
+        related_name='ue_end_years',
         on_delete=models.PROTECT
     )
     faculty_remark = models.TextField(blank=True, null=True, verbose_name=_('Faculty remark'))
