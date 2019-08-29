@@ -89,11 +89,23 @@ class LearningUnit(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     learning_container = models.ForeignKey('LearningContainer', blank=True, null=True, on_delete=models.CASCADE)
     changed = models.DateTimeField(null=True, auto_now=True)
-    start_year = models.IntegerField(_('Starting year'))
-    end_year = models.IntegerField(blank=True, null=True, verbose_name=_('End year'))
-
+    start_year = models.ForeignKey(
+        'AcademicYear',
+        blank=True,
+        null=True,
+        verbose_name=_('Start'),
+        related_name='start_years',
+        on_delete=models.PROTECT
+    )
+    end_year = models.ForeignKey(
+        'AcademicYear',
+        blank=True,
+        null=True,
+        verbose_name=_('Last year of organization'),
+        related_name='end_years',
+        on_delete=models.PROTECT
+    )
     faculty_remark = models.TextField(blank=True, null=True, verbose_name=_('Faculty remark'))
-
     other_remark = models.TextField(
         blank=True,
         null=True,
@@ -120,7 +132,7 @@ class LearningUnit(SerializableModel):
         return self.most_recent_learning_unit_year().specific_title
 
     def delete(self, *args, **kwargs):
-        if self.start_year < 2015:
+        if self.start_year.year < 2015:
             raise IntegrityError(_('Prohibition to delete a learning unit before 2015.'))
         return super().delete(*args, **kwargs)
 
@@ -169,8 +181,8 @@ class LearningUnit(SerializableModel):
     @property
     def max_end_year(self):
         """ Compute the maximal possible end_year value when the end_year is None """
-        if self.end_year:
-            return self.end_year
+        if self.new_end_year:
+            return self.new_end_year
 
         return AcademicYear.objects.filter(learningunityear__learning_unit=self).aggregate(Max('year'))['year__max']
 
