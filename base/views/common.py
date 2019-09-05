@@ -112,11 +112,10 @@ def login(request):
         user = authenticate(username=username, password=password)
         person = mdl.person.find_by_user(user)
         # ./manage.py createsuperuser (in local) doesn't create automatically a Person associated to User
-        if person:
-            if person.language:
-                user_language = person.language
-                translation.activate(user_language)
-                request.session[translation.LANGUAGE_SESSION_KEY] = user_language
+        if person and person.language:
+            user_language = person.language
+            translation.activate(user_language)
+            request.session[translation.LANGUAGE_SESSION_KEY] = user_language
     elif settings.OVERRIDED_LOGIN_URL:
         return redirect(settings.OVERRIDED_LOGIN_URL)
     return LoginView.as_view()(request)
@@ -235,8 +234,9 @@ def display_messages_by_level(request, messages_by_level):
         display_messages(request, msgs, level, extra_tags='safe')
 
 
-def paginate_queryset(qs, request_get):
-    paginator = Paginator(qs, ITEMS_PER_PAGE)
+def paginate_queryset(qs, request_get, items_per_page=None):
+    items_per_page = items_per_page or ITEMS_PER_PAGE
+    paginator = Paginator(qs, items_per_page)
 
     page = request_get.get('page')
     try:

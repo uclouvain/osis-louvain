@@ -57,7 +57,6 @@ class ProposalLearningUnitForm(forms.ModelForm):
 
         if hasattr(self.instance, 'entity'):
             self.initial['entity'] = get_last_version(self.instance.entity)
-
         self.person = person
         if self.person.is_central_manager:
             self.enable_field('state')
@@ -81,10 +80,11 @@ class ProposalLearningUnitForm(forms.ModelForm):
         }
 
     def save(self, commit=True):
-        if hasattr(self.instance, 'learning_unit_year'):
-            # When we save a creation_proposal, we do not need to save the initial_data
-            if self.instance.type != ProposalType.CREATION.name and not self.instance.initial_data:
-                self.instance.initial_data = copy_learning_unit_data(get_by_id(self.instance.learning_unit_year.id))
+        # When we save a creation_proposal, we do not need to save the initial_data
+        if hasattr(self.instance, 'learning_unit_year') and self.instance.type != ProposalType.CREATION.name \
+                and not self.instance.initial_data:
+            self.instance.initial_data = copy_learning_unit_data(get_by_id(self.instance.learning_unit_year.id))
+
         return super().save(commit)
 
 
@@ -103,6 +103,7 @@ class ProposalBaseForm:
         initial = self._get_initial()
 
         ac_year = default_ac_year or learning_unit_year.academic_year
+
         if not learning_unit_year or learning_unit_year.subtype == learning_unit_year_subtypes.FULL:
             learning_unit = learning_unit_year.learning_unit if learning_unit_year else None
             start_year = default_ac_year.year if default_ac_year else None

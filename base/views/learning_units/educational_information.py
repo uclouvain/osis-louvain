@@ -23,109 +23,43 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.core.exceptions import ObjectDoesNotExist
-from django.forms import formset_factory
-from django.http import JsonResponse, HttpResponseRedirect
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
-from waffle.decorators import waffle_flag
+from django_filters.views import FilterView
 
-from base.business.learning_units.educational_information import get_responsible_and_learning_unit_yr_list
-from base.business.learning_units.perms import can_learning_unit_year_educational_information_be_udpated
-from base.business.learning_units.xls_comparison import get_academic_year_of_reference
 from base.business.learning_units.xls_generator import generate_xls_teaching_material
-from base.forms.common import TooManyResultsException
-from base.forms.learning_unit.comparison import SelectComparisonYears
-from base.forms.learning_unit.educational_information.mail_reminder import MailReminderRow, MailReminderFormset
-from base.forms.learning_unit.search_form import LearningUnitYearForm
-from base.models.academic_year import starting_academic_year
+from base.forms.learning_unit.search_form import LearningUnitDescriptionFicheFilter
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.person import Person
-from base.utils.cache import cache_filter
-from base.utils.send_mail import send_mail_for_educational_information_update
-from base.views.common import check_if_display_message, display_warning_messages, display_error_messages
+from base.utils.cache import CacheFilterMixin
+from base.views.common import display_warning_messages
 from base.views.learning_units.search import SUMMARY_LIST
 
-SUCCESS_MESSAGE = _('Reminding mails sent')
 
+class LearningUnitDescriptionFicheSearch(PermissionRequiredMixin, CacheFilterMixin, FilterView):
+    model = LearningUnitYear
+    paginate_by = 2000
+    template_name = "learning_units.html"
+    raise_exception = True
 
-@login_required
-@waffle_flag('educational_information_mailing')
-@permission_required('base.can_access_learningunit', raise_exception=True)
-def send_email_educational_information_needs_update(request):
-    if request.is_ajax():
-        list_mail_reminder_formset = formset_factory(form=MailReminderRow,
-                                                     formset=MailReminderFormset)
-        formset = list_mail_reminder_formset(data=request.POST)
+    filterset_class = LearningUnitDescriptionFicheFilter
+    permission_required = 'base.can_access_learningunit'
+    cache_exclude_params = 'xls_status',
 
-        if formset.is_valid():
-            responsible_person_ids = formset.get_checked_responsibles()
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'form': context['filter'].form,
+            'is_faculty_manager': self.request.user.person.is_faculty_manager,
+            'search_type': SUMMARY_LIST,
+            'learning_units_count': context['paginator'].count
+        })
+        return context
 
-            _send_email_to_responsibles(responsible_person_ids)
-            return JsonResponse({'as_messages_info': SUCCESS_MESSAGE})
-
-    return HttpResponseRedirect(reverse('learning_units_summary'))
-
-
-@login_required
-@cache_filter(exclude_params=["xls_status"])
-@permission_required('base.can_access_learningunit', raise_exception=True)
-def learning_units_summary_list(request):
-    a_user_person = request.user.person
-    found_learning_units = LearningUnitYear.objects.none()
-
-    initial_academic_year = starting_academic_year()
-
-    search_form = LearningUnitYearForm(request.GET or None, initial={'academic_year_id': initial_academic_year,
-                                                                     'with_entity_subordinated': True})
-    try:
-        if search_form.is_valid():
-            found_learning_units = search_form.get_learning_units_and_summary_status(
-                requirement_entities=a_user_person.find_main_entities_version,
-            )
-            check_if_display_message(request, found_learning_units)
-    except TooManyResultsException:
-        display_error_messages(request, 'too_many_results')
-
-    responsible_and_learning_unit_yr_list = get_responsible_and_learning_unit_yr_list(found_learning_units)
-
-    for luy in found_learning_units:
-        luy.errors = can_learning_unit_year_educational_information_be_udpated(learning_unit_year_id=luy)
-
-    if request.GET.get('xls_status') == "xls_teaching_material":
-        try:
-            return generate_xls_teaching_material(request.user, found_learning_units)
-        except ObjectDoesNotExist:
-            display_warning_messages(request, _("the list to generate is empty.").capitalize())
-
-    form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
-
-    context = {
-        'form': search_form,
-        'formset': _get_formset(request, responsible_and_learning_unit_yr_list),
-        'learning_units_count': found_learning_units.count(),
-        'search_type': SUMMARY_LIST,
-        'is_faculty_manager': a_user_person.is_faculty_manager,
-        'form_comparison': form_comparison,
-        'page_obj': found_learning_units,
-    }
-
-    return render(request, "learning_units.html", context)
-
-
-def _send_email_to_responsibles(responsible_person_ids):
-    for a_responsible_person_id in responsible_person_ids:
-        a_person = get_object_or_404(Person, pk=a_responsible_person_id.get('person'))
-        send_mail_for_educational_information_update([a_person],
-                                                     a_responsible_person_id.get('learning_unit_years'))
-
-
-def _get_formset(request, responsible_and_learning_unit_yr_list):
-    if responsible_and_learning_unit_yr_list:
-        list_mail_reminder_formset = formset_factory(form=MailReminderRow,
-                                                     formset=MailReminderFormset,
-                                                     extra=len(responsible_and_learning_unit_yr_list))
-        return list_mail_reminder_formset(request.POST or None, list_responsible=responsible_and_learning_unit_yr_list)
-    return None
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.GET.get('xls_status') == "xls_teaching_material":
+            try:
+                return generate_xls_teaching_material(self.request.user, context['object_list'])
+            except ObjectDoesNotExist:
+                display_warning_messages(self.request, _("the list to generate is empty.").capitalize())
+        return super().render_to_response(context, **response_kwargs)

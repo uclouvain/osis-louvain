@@ -262,7 +262,7 @@
                     {% include 'learning_unit/blocks/panel/proposal.html' %}
                 {% endblock %}
                 {% block panel_external_author %}
-                    {% if object.is_external_with_co_graduation %}
+                    {% if object.is_external_with_co_graduation and learning_unit_year.externallearningunityear.author %}
                         <div class="panel panel-default">
                             <div class="panel-body">
                                 <p>{% trans 'Introduced by' %} {{ learning_unit_year.externallearningunityear.author }}</p>

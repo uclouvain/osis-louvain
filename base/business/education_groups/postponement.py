@@ -64,7 +64,7 @@ def _compute_end_year(education_group):
 
     if education_group.end_year:
         # Get the min [Prevent education_group.end_year > academic_year.year provided by system]
-        max_postponement_end_year = min(max_postponement_end_year, education_group.end_year)
+        max_postponement_end_year = min(max_postponement_end_year, education_group.end_year.year)
 
     # Lookup on database, get the latest existing education group year [Prevent desync end_date and data]
     latest_egy = education_group.educationgroupyear_set.select_related('academic_year') \

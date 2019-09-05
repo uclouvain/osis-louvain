@@ -272,9 +272,6 @@ class TestPartimFormIsValid(LearningUnitPartimFormContextMixin):
 class TestPartimFormSave(LearningUnitPartimFormContextMixin):
     """Unit tests for save() for save"""
     def test_save(self):
-
-
-
         learning_container_year_full = self.learning_unit_year_full.learning_container_year
         a_new_learning_unit_partim = LearningUnitYearFactory.build(
             academic_year=self.current_academic_year,
@@ -323,6 +320,38 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
         self.assertEqual(LearningUnitYear.objects.filter(acronym=partim_acronym,
                                                          academic_year=self.current_academic_year).count(), 1)
         self.assertEqual(LearningUnit.objects.filter(learningunityear__acronym=partim_acronym).count(), 1)
+
+    def test_save_method_create_new_instance_with_start_anac(self):
+        partim_acronym = FULL_ACRONYM+"B"
+        start_year = self.current_academic_year.year + 2
+        a_new_learning_unit_partim = LearningUnitYearFactory.build(
+            academic_year__year=start_year,
+            acronym=FULL_ACRONYM,
+            subtype=learning_unit_year_subtypes.PARTIM,
+            language=self.learning_unit_year_full.language
+        )
+        post_data = get_valid_form_data(a_new_learning_unit_partim)
+        person = PersonFactory()
+        form = PartimForm(
+            person,
+            self.learning_unit_year_full.learning_unit,
+            self.learning_unit_year_full.academic_year,
+            data=post_data,
+            learning_unit_instance=None,
+            start_anac=start_year
+        )
+
+        self.assertTrue(form.is_valid(), form.errors)
+        form.save()
+
+        # Check all related object is created
+        self.assertEqual(LearningUnitYear.objects.filter(acronym=partim_acronym,
+                                                         academic_year=self.current_academic_year).count(), 1)
+        self.assertEqual(LearningUnit.objects.filter(learningunityear__acronym=partim_acronym).count(), 1)
+        self.assertEqual(
+            LearningUnit.objects.filter(learningunityear__acronym=partim_acronym).first().start_year,
+            start_year
+        )
 
     def test_save_method_update_instance(self):
         post_data = get_valid_form_data(self.learning_unit_year_partim)
@@ -390,7 +419,7 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
 
 
 def get_valid_form_data(learning_unit_year_partim):
-    acronym_splited = acronym_field.split_acronym(learning_unit_year_partim.acronym)
+    acronym_field.split_acronym(learning_unit_year_partim.acronym)
     return {
         # Learning unit year data model form
         'acronym_2': 'B',

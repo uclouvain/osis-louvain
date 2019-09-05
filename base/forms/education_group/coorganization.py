@@ -29,13 +29,14 @@ from django.core.exceptions import ImproperlyConfigured
 from django.forms import ModelChoiceField, modelformset_factory, BaseModelFormSet
 from django.utils.translation import ugettext_lazy as _
 
+from base.forms.education_group.common import PermissionFieldTrainingMixin
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
 from base.models.education_group_organization import EducationGroupOrganization
 from base.models.organization import Organization
 from reference.models.country import Country
 
 
-class CoorganizationEditForm(forms.ModelForm):
+class CoorganizationEditForm(PermissionFieldTrainingMixin, forms.ModelForm):
     country = ModelChoiceField(
         queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),
         label=_("Country"),
@@ -66,6 +67,7 @@ class CoorganizationEditForm(forms.ModelForm):
         )
 
     def __init__(self, education_group_year=None, *args, **kwargs):
+        self.user = kwargs.get('user')
         if not education_group_year and not kwargs.get('instance'):
             raise ImproperlyConfigured("Provide an education_group_year or an instance")
 

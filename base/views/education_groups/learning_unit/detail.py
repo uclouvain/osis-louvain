@@ -80,7 +80,6 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView):
 
         root = self.get_root()
         self.hierarchy = EducationGroupHierarchy(root, tab_to_show=self.request.GET.get("tab_to_show"))
-
         # TODO remove parent in context
         context['person'] = self.get_person()
         context['root'] = root

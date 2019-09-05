@@ -270,7 +270,7 @@ class EntityVersion(SerializableModel):
         return EntityVersion.objects.descendants([self.entity], date)
 
     def find_faculty_version(self, academic_yr):
-        if self.entity_type == entity_type.FACULTY:
+        if self.entity_type == entity_type.FACULTY or self.acronym in PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS:
             return self
         # There is no faculty above the sector
         elif self.entity_type == entity_type.SECTOR:

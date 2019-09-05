@@ -51,6 +51,7 @@ from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
 from base.tests.factories.education_group_year_domain import EducationGroupYearDomainFactory
 from base.tests.factories.entity_version import MainEntityVersionFactory
+from base.tests.factories.group import GroupFactory
 from base.tests.factories.hops import HopsFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
@@ -66,6 +67,7 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=get_current_year())
+        cls.central_manager = GroupFactory(name='central_managers')
 
     def setUp(self):
         self.education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
@@ -87,6 +89,7 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
             entity=management_entity_version.entity
         )
         user = person.user
+        user.groups.add(self.central_manager)
 
         parent_education_group_year = TrainingFactory(academic_year=self.academic_year,
                                                       education_group_type=self.education_group_type,
@@ -158,6 +161,7 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
                 'ares_graca': 2,
                 'ares_ability': 3,
             },
+            user=self.user,
             instance=self.hops
         )
         self.assertFalse(form_education_group_year.fields["ares_study"].required)
@@ -169,6 +173,7 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
             data={
                 'ares_study': 1,
             },
+            user=self.user,
             instance=self.hops)
         self.assertFalse(form_education_group_year.is_valid())
         self.assertEqual(list(form_education_group_year.errors['ares_study'])[0],
@@ -181,6 +186,7 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
                 'ares_graca': 20,
                 'ares_ability': 30,
             },
+            user=self.user,
             instance=self.hops
         )
         if form_education_group_year.is_valid():
@@ -193,6 +199,7 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
     def test_save_hopsform_without_ares_data(self):
         form_education_group_year = HopsEducationGroupYearModelForm(
             data={},
+            user=self.user,
             instance=self.hops
         )
         self.assertTrue(form_education_group_year.is_valid())

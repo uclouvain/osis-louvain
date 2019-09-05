@@ -40,8 +40,14 @@
                 <th>{% trans 'Duration' %}</th>
             {% endif %}
             {% if learning_unit_year.is_partim %}
-                <th>Volume 1 (partim : {{ partim_vol1.hourly_volume_total_annual | default_if_none:"0" }})</th>
-                <th>Volume 2 (partim : {{ partim_vol2.hourly_volume_total_annual | default_if_none:"0" }})</th>
+                <th>
+                    <abbr title="{% trans 'Lecturing' %}">PM</abbr>
+                    (partim : {{ partim_vol1.hourly_volume_total_annual | default_if_none:"0" }})
+                </th>
+                <th>
+                    <abbr title="{% trans 'Practical exercises' %}">PP</abbr>
+                    (partim : {{ partim_vol2.hourly_volume_total_annual | default_if_none:"0" }})
+                </th>
             {% endif %}
             <th>{% trans 'Substitute' %}</th>
             </thead>

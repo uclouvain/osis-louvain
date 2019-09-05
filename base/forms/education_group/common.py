@@ -41,7 +41,7 @@ from base.models.education_group_type import find_authorized_types, EducationGro
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import find_pedagogical_entities_version, get_last_version
 from base.models.enums import academic_calendar_type, education_group_categories
-from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_categories import Categories, TRAINING
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from reference.models.language import Language
 from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT, \
@@ -117,6 +117,18 @@ class PermissionFieldEducationGroupMixin(PermissionFieldMixin):
         return super().get_context()
 
 
+class PermissionFieldTrainingMixin(PermissionFieldEducationGroupMixin):
+    """
+    Permission Field for Hops(year) and for Coorganization
+
+    This mixin will get allowed field on reference_field model according to perm's
+    """
+
+    def __init__(self, *args, **kwargs):
+        self.category = TRAINING
+        super().__init__(*args, **kwargs)
+
+
 class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, PermissionFieldEducationGroupMixin,
                                   forms.ModelForm):
     category = None
@@ -139,9 +151,8 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
             raise ImproperlyConfigured("Provide an education_group_type or an instance")
 
         self.education_group_type = education_group_type
-        if self.education_group_type:
-            if education_group_type not in find_authorized_types(self.category, self.parent):
-                raise PermissionDenied("Unauthorized type {} for {}".format(education_group_type, self.category))
+        if self.education_group_type and education_group_type not in find_authorized_types(self.category, self.parent):
+            raise PermissionDenied("Unauthorized type {} for {}".format(education_group_type, self.category))
 
         super().__init__(*args, **kwargs)
         self._set_initial_values()
@@ -214,10 +225,11 @@ class EducationGroupModelForm(PermissionFieldEducationGroupMixin, forms.ModelFor
     class Meta:
         model = EducationGroup
         fields = ("start_year", "end_year")
-        widgets = {
-            "start_year": forms.TextInput(),
-            "end_year": forms.TextInput(),
-        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['end_year'].queryset = \
+            self.fields['end_year'].queryset.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
 
     def save(self, *args, start_year=None, **kwargs):
         if start_year:
@@ -279,7 +291,7 @@ class CommonBaseForm:
 
         if self._is_creation() and not educ_group_form.instance.start_year:
             # Specific case, because start_date is hidden when creation, we should test start_date [validite] > end_date
-            educ_group_form.instance.start_year = self.education_group_year_form.cleaned_data['academic_year'].year
+            educ_group_form.instance.start_year = self.education_group_year_form.cleaned_data['academic_year']
             try:
                 educ_group_form.instance.clean()
             except ValidationError as error:
@@ -291,7 +303,7 @@ class CommonBaseForm:
     def save(self):
         start_year = None
         if self._is_creation() and not self.education_group_form.instance.start_year:
-            start_year = self.education_group_year_form.cleaned_data['academic_year'].year
+            start_year = self.education_group_year_form.cleaned_data['academic_year']
 
         education_group = self.education_group_form.save(start_year=start_year)
         self.education_group_year_form.instance.education_group = education_group
@@ -344,13 +356,13 @@ class EducationGroupTypeForm(forms.Form):
 
     def clean_name(self):
         education_group_type = self.cleaned_data.get("name")
-        if education_group_type:
-            if self.parent and management.is_max_child_reached(self.parent, education_group_type.name):
-                raise ValidationError(_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
-                                        "has already reached the limit.") % {
-                    'child_type': education_group_type,
-                    'parent': self.parent
-                })
+        if education_group_type and self.parent \
+                and management.is_max_child_reached(self.parent, education_group_type.name):
+            raise ValidationError(_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
+                                    "has already reached the limit.") % {
+                'child_type': education_group_type,
+                'parent': self.parent
+            })
         return education_group_type
 
 

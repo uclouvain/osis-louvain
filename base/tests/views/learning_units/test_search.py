@@ -24,15 +24,14 @@
 #
 ##############################################################################
 from django.contrib.auth.models import Permission
+from django.http.response import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
-from django.http.response import HttpResponseForbidden
 
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.views.learning_units.search import BORROWED_COURSE, EXTERNAL_SEARCH
-from base.tests.factories.academic_year import create_current_academic_year
 
 
 class TestSearchBorrowedLearningUnits(TestCase):
@@ -42,7 +41,8 @@ class TestSearchBorrowedLearningUnits(TestCase):
         cls.person = PersonFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
         cls.url = reverse("learning_units_borrowed_course")
-        create_current_academic_year()
+        ac = create_current_academic_year()
+        AcademicYearFactory(year=ac.year + 1)
 
     def setUp(self):
         self.client.force_login(self.person.user)

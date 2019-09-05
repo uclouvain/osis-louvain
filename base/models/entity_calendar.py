@@ -29,7 +29,7 @@ from django.db import models
 from base.models import academic_calendar
 from base.models import entity_version
 from base.models.abstracts.abstract_calendar import AbstractCalendar
-from base.models.academic_year import current_academic_year, starting_academic_year
+from base.models.academic_year import starting_academic_year
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -88,7 +88,10 @@ def build_calendar_by_entities(ac_year, reference):
         }
         entities_id.remove(entity_calendar.entity_id)
 
-    default_dates = {'start_date': ac_calendar.start_date, 'end_date': ac_calendar.end_date}
+    default_dates = {
+        'start_date': getattr(ac_calendar, 'start_date', None),
+        'end_date': getattr(ac_calendar, 'end_date', None)
+    }
     entity_calendar_computed.update({
         entity_id: _get_start_end_date_of_parent(entity_id, entity_structure, entity_calendar_computed, default_dates)
         for entity_id in entities_id

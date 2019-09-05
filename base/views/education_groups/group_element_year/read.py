@@ -36,17 +36,24 @@ from base.models.education_group_year import EducationGroupYear
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.document.pdf_build import render_pdf
 
+CURRENT_SIZE_FOR_ANNUAL_COLUMN = 15
+MAIN_PART_INIT_SIZE = 650
+PADDING = 10
+USUAL_NUMBER_OF_BLOCKS = 3
+
 
 @login_required
 @waffle_switch('education_group_year_generate_pdf')
 def pdf_content(request, root_id, education_group_year_id, language):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    tree = EducationGroupHierarchy(root=education_group_year, pdf_content=True).to_list()
+    tree_object = EducationGroupHierarchy(root=education_group_year, pdf_content=True)
     context = {
         'root': education_group_year,
-        'tree': tree,
+        'tree': tree_object.to_list(),
         'language': language,
         'created': datetime.datetime.now(),
+        'max_block': tree_object.max_block,
+        'main_part_col_length': get_main_part_col_length(tree_object.max_block),
     }
     with translation.override(language):
         return render_pdf(
@@ -68,3 +75,10 @@ class ReadEducationGroupTypeView(FlagMixin, AjaxTemplateMixin, FormView):
 
     def get_success_url(self):
         return reverse(pdf_content, kwargs=self.kwargs)
+
+
+def get_main_part_col_length(max_block):
+    if max_block <= USUAL_NUMBER_OF_BLOCKS:
+        return MAIN_PART_INIT_SIZE
+    else:
+        return MAIN_PART_INIT_SIZE - ((max_block-USUAL_NUMBER_OF_BLOCKS) * (CURRENT_SIZE_FOR_ANNUAL_COLUMN + PADDING))

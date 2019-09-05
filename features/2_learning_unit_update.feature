@@ -131,12 +131,12 @@ Feature: Mise à jour en gestion journalière
     When Cliquer sur l'onglet Enseignant·e·s
     And Cliquer sur le bouton « Gérer la répartition »
     And Cliquer sur « Ajouter sur l’année en cours » sur la ligne 1
-    And Encoder 2.0 comme Volume 2
+    And Encoder 2.0 comme PP
     And Cliquer sur le bouton « Enregistrer »
     Then Vérifier que à la ligne 2, l'enseignant a comme fonction Co-titulaire avec un volume en Q1 de 2,00 et en Q2 de 2,00
 
     When  Cliquer sur le bouton « Modifier » sur la ligne 1
-    And Encoder 2.0 comme Volume 1
+    And Encoder 2.0 comme PM
     And Cliquer sur le bouton « Enregistrer »
     Then Vérifier que à la ligne 1, l'enseignant a comme fonction Coordinateur(trice) avec un volume en Q1 de 2,00 et en Q2 de 0,00
 

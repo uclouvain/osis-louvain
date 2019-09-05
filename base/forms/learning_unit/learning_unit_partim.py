@@ -100,7 +100,7 @@ class PartimForm(LearningUnitBaseForm):
 
     form_cls_to_validate = [LearningUnitPartimModelForm, LearningUnitYearModelForm, SimplifiedVolumeManagementForm]
 
-    def __init__(self, person, learning_unit_full_instance, academic_year, learning_unit_instance=None,
+    def __init__(self, person, learning_unit_full_instance, academic_year, learning_unit_instance=None, start_anac=None,
                  data=None, *args, **kwargs):
         if not isinstance(learning_unit_full_instance, LearningUnit):
             raise AttributeError('learning_unit_full arg should be an instance of {}'.format(LearningUnit))
@@ -110,6 +110,7 @@ class PartimForm(LearningUnitBaseForm):
         self.academic_year = academic_year
         self.learning_unit_full_instance = learning_unit_full_instance
         self.learning_unit_instance = learning_unit_instance
+        self.start_anac = start_anac
 
         self.learning_unit_year_full = self.learning_unit_full_instance.learningunityear_set.filter(
             academic_year=self.academic_year,
@@ -201,7 +202,7 @@ class PartimForm(LearningUnitBaseForm):
         lcy = self.learning_unit_year_full.learning_container_year
         # Save learning unit
         learning_unit = self.learning_unit_form.save(
-            start_year=start_year,
+            start_year=self.start_anac if self.start_anac else start_year,
             learning_container=lcy.learning_container,
             commit=commit
         )

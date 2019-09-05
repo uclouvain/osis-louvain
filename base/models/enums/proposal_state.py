@@ -34,3 +34,8 @@ class ProposalState(ChoiceEnum):
     SUSPENDED = _("Suspended")
     ACCEPTED = _("Accepted")
     REFUSED = _("Refused")
+
+
+class LimitedProposalState(ChoiceEnum):
+    FACULTY = _("Faculty")
+    CENTRAL = _("Central")

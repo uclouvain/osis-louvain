@@ -43,7 +43,8 @@ def start(education_group, until_year):
 
 
 def check_education_group_end_date(education_group, end_year):
-    education_group_years_to_delete = delete.get_education_group_years_to_delete(education_group, end_year=end_year)
+    education_group_years_to_delete = delete.get_education_group_years_to_delete(education_group,
+                                                                                 end_year=end_year)
     protected_messages = _get_protected_messages(education_group_years_to_delete)
     if protected_messages:
         error_msg = _get_formated_error_msg(end_year, protected_messages)

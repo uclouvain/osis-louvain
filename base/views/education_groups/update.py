@@ -111,7 +111,7 @@ def _common_success_redirect(request, form, root):
 
     success_msgs = []
     if not education_group_year.education_group.end_year or \
-            education_group_year.education_group.end_year >= education_group_year.academic_year.year:
+            education_group_year.education_group.end_year.year >= education_group_year.academic_year.year:
         success_msgs = [_get_success_message_for_update_education_group_year(root.pk, education_group_year)]
 
     if hasattr(form, 'education_group_year_postponed'):
@@ -188,7 +188,7 @@ def _update_training(request, education_group_year, root):
     if show_coorganization(education_group_year):
         coorganization_formset = OrganizationFormset(
             data=request.POST or None,
-            form_kwargs={'education_group_year': education_group_year},
+            form_kwargs={'education_group_year': education_group_year, 'user': request.user},
             queryset=education_group_year.coorganizations
         )
         if form_education_group_year.is_valid() and coorganization_formset.is_valid():

@@ -207,9 +207,10 @@ class EducationGroupXlsTestCase(TestCase):
 class EducationGroupXlsAdministrativeDataTestCase(TestCase):
     def setUp(self):
         self.academic_year = create_current_academic_year()
+        self.next_academic_year = AcademicYearFactory(year=self.academic_year.year + 1)
         self.education_group_type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
-        self.education_group = EducationGroupFactory(start_year=self.academic_year.year,
-                                                     end_year=self.academic_year.year + 1)
+        self.education_group = EducationGroupFactory(start_year=self.academic_year,
+                                                     end_year=self.next_academic_year)
         self.education_group_year_1 = EducationGroupYearFactory(academic_year=self.academic_year, acronym="PREMIER",
                                                                 education_group=self.education_group,
                                                                 weighting=True)

@@ -56,8 +56,8 @@ class EducationGroupFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
         queryset=AcademicYear.objects.all(),
         required=False,
+        label=_('Ac yr.'),
         empty_label=pgettext_lazy("plural", "All"),
-        label=_('Ac yr.')
     )
     category = filters.ChoiceFilter(
         choices=list(Categories.choices()),

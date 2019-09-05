@@ -37,6 +37,7 @@ from base.tests.factories.education_group_organization import EducationGroupOrga
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
+from base.tests.factories.group import GroupFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
 from base.tests.factories.person import PersonFactory
@@ -46,7 +47,9 @@ from reference.tests.factories.country import CountryFactory
 
 class TestCoorganizationForm(TestCase):
     def setUp(self):
+        self.group = GroupFactory(name='central_managers')
         self.user = UserFactory()
+        self.user.groups.add(self.group)
         self.client.force_login(self.user)
         self.person = PersonFactory(user=self.user)
         self.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
@@ -71,7 +74,7 @@ class TestCoorganizationForm(TestCase):
         )
 
     def test_fields(self):
-        form = CoorganizationEditForm(None, instance=self.education_group_organization)
+        form = CoorganizationEditForm(None, instance=self.education_group_organization, user=self.user)
         expected_fields = [
             'country',
             'organization',
@@ -104,7 +107,7 @@ class TestCoorganizationForm(TestCase):
         }
         form = OrganizationFormset(
             data=data,
-            form_kwargs={'education_group_year': EducationGroupYearFactory()},
+            form_kwargs={'education_group_year': EducationGroupYearFactory(), 'user': self.user},
         )
         self.assertTrue(form.is_valid())
 
@@ -121,7 +124,7 @@ class TestCoorganizationForm(TestCase):
         }
         form = OrganizationFormset(
             data=data,
-            form_kwargs={'education_group_year': EducationGroupYearFactory()},
+            form_kwargs={'education_group_year': EducationGroupYearFactory(), 'user': self.user},
         )
         self.assertFalse(form.is_valid(), form.errors)
         self.assertEqual(
@@ -150,7 +153,7 @@ class TestCoorganizationForm(TestCase):
         }
         form = OrganizationFormset(
             data=data,
-            form_kwargs={'education_group_year': egy},
+            form_kwargs={'education_group_year': egy, 'user': self.user},
         )
         self.assertFalse(form.is_valid(), form.errors)
         self.assertEqual(

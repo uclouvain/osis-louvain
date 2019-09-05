@@ -24,31 +24,35 @@
 #
 ##############################################################################
 import itertools
+from distutils.util import strtobool
 
 from django import forms
 from django.core.exceptions import ValidationError
-from django.db.models import OuterRef, Subquery, Exists, Prefetch
-from django.db.models.fields import BLANK_CHOICE_DASH
+from django.db.models import OuterRef, Subquery, Exists, Case, When, Q, Value, CharField
+from django.db.models.fields import BLANK_CHOICE_DASH, BooleanField
+from django.db.models.functions import Concat
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
+from django_filters import FilterSet, filters
 
-from attribution.models.attribution import Attribution
 from base import models as mdl
+from base.business.education_groups.general_information_sections import MOBILITY
 from base.business.entity import get_entities_ids, build_entity_container_prefetch
 from base.business.entity_version import SERVICE_COURSE
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY, _set_summary_status_on_luy
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY
 from base.business.learning_unit_year_with_context import append_latest_entities
 from base.forms.common import get_clean_data, treat_empty_or_str_none_as_none, TooManyResultsException
 from base.forms.search.search_form import BaseSearchForm
 from base.forms.utils.choice_field import add_blank
 from base.forms.utils.dynamic_field import DynamicChoiceField
-from base.models import learning_unit_year, group_element_year
-from base.models.academic_year import AcademicYear
+from base.models import learning_unit_year, group_element_year, entity_calendar
+from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.campus import Campus
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
 from base.models.enums import entity_container_year_link_type, learning_unit_year_subtypes, active_status, \
     entity_type, learning_container_year_types, quadrimesters
+from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.enums.learning_container_year_types import LearningContainerYearType
-from base.models.learning_unit_year import convert_status_bool, LearningUnitYear
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
 from base.models.organization_address import find_distinct_by_country
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -272,42 +276,6 @@ class LearningUnitYearForm(LearningUnitSearchForm):
 
         return learning_units
 
-    def get_learning_units_and_summary_status(self, requirement_entities=None, luy_status=None):
-        self.cleaned_data['status'] = self._set_status(luy_status)
-
-        if requirement_entities:
-            self.cleaned_data['requirement_entities'] = requirement_entities
-
-        queryset = self.get_queryset()
-        if self.cleaned_data and queryset.count() > self.MAX_RECORDS:
-            raise TooManyResultsException
-
-        queryset = queryset.prefetch_related(
-            build_entity_container_prefetch(entity_container_year_link_type.ALLOCATION_ENTITY),
-            build_entity_container_prefetch(entity_container_year_link_type.REQUIREMENT_ENTITY),
-            Prefetch(
-                'attribution_set',
-                queryset=Attribution.objects.filter(summary_responsible=True),
-                to_attr='summary_responsibles'
-            )
-        )
-
-        cms_list = TranslatedText.objects.filter(
-            entity=LEARNING_UNIT_YEAR,
-            text_label__label__in=CMS_LABEL_PEDAGOGY,
-            changed__isnull=False,
-            reference__in=queryset.values_list('pk', flat=True)
-        ).select_related('text_label')
-
-        for learning_unit_yr in queryset:
-            append_latest_entities(learning_unit_yr)
-            _set_summary_status_on_luy(cms_list, learning_unit_yr)
-
-        return queryset
-
-    def _set_status(self, luy_status):
-        return convert_status_bool(luy_status) if luy_status else self.cleaned_data['status']
-
     def _filter_borrowed_learning_units(self, qs_learning_units):
         faculty_borrowing_id = None
         faculty_borrowing_acronym = self.cleaned_data.get('faculty_borrowing_acronym')
@@ -458,3 +426,161 @@ class ExternalLearningUnitYearForm(LearningUnitYearForm):
             'campus__organization'
         )
         return learning_units
+
+
+class LearningUnitDescriptionFicheFilter(FilterSet):
+    academic_year = filters.ModelChoiceFilter(
+        queryset=AcademicYear.objects.all(),
+        required=True,
+        label=_('Ac yr.')
+    )
+    acronym = filters.CharFilter(
+        field_name="acronym",
+        lookup_expr='icontains',
+        max_length=40,
+        required=False,
+        label=_('Code'),
+    )
+    learning_unit_title = filters.CharFilter(
+        field_name='full_title',
+        lookup_expr='icontains',
+        label=_('Title'),
+    )
+    container_type = filters.ChoiceFilter(
+        field_name='learning_container_year__container_type',
+        choices=LearningContainerYearType.choices() + ((MOBILITY, _('Mobility')),),
+        label=_('Type'),
+        empty_label=pgettext_lazy("plural", "All")
+    )
+    subtype = filters.ChoiceFilter(
+        choices=learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES,
+        label=_('Subtype'),
+        empty_label=pgettext_lazy("plural", "All")
+    )
+    status = filters.TypedChoiceFilter(
+        choices=(('', _("All")), ('true', _("Active")), ('false', _("Inactive"))),
+        label=_('Status'),
+        coerce=strtobool,
+    )
+    quadrimester = filters.ChoiceFilter(
+        choices=quadrimesters.LEARNING_UNIT_YEAR_QUADRIMESTERS,
+        label=_('Quadri'),
+        empty_label=pgettext_lazy("plural", "All")
+    )
+    tutor = filters.CharFilter(
+        method='filter_tutor',
+        label=_('Tutor'),
+    )
+    requirement_entity = filters.CharFilter(
+        method='filter_requirement_entity_with_entity_subordinated',
+        label=_('Req. Entity')
+    )
+    allocation_entity = filters.CharFilter(
+        method='filter_allocation_entity_with_entity_subordinated',
+        label=_('Alloc. Ent.')
+    )
+    with_entity_subordinated = filters.BooleanFilter(
+        method=lambda queryset, *args, **kwargs: queryset,
+        label=_('Include subordinate entities'),
+        widget=forms.CheckboxInput
+    )
+
+    class Meta:
+        model = LearningUnitYear
+        fields = []
+
+    def __init__(self, data=None, queryset=None, *, request=None, prefix=None):
+        translated_text_qs = TranslatedText.objects.filter(
+            entity=LEARNING_UNIT_YEAR,
+            text_label__label__in=CMS_LABEL_PEDAGOGY,
+            changed__isnull=False,
+            reference=OuterRef('pk')
+        ).order_by("-changed")
+
+        queryset = LearningUnitYear.objects.all().annotate(
+            full_title=Case(
+                When(
+                    Q(learning_container_year__common_title__isnull=True) |
+                    Q(learning_container_year__common_title__exact=''),
+                    then='specific_title'
+                ),
+                When(
+                    Q(specific_title__isnull=True) | Q(specific_title__exact=''),
+                    then='learning_container_year__common_title'
+                ),
+                default=Concat('learning_container_year__common_title', Value(' - '), 'specific_title'),
+                output_field=CharField(),
+            ),
+            last_translated_text_changed=Subquery(translated_text_qs.values('changed')[:1]),
+        )
+        super(LearningUnitDescriptionFicheFilter, self).__init__(
+            data=data,
+            queryset=queryset,
+            request=request,
+            prefix=prefix,
+        )
+        self.form.fields['academic_year'].initial = starting_academic_year()
+        self.form.fields['with_entity_subordinated'].initial = True
+
+    def filter_tutor(self, queryset, name, value):
+        return queryset.filter(
+            Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__icontains=value)
+            | Q(learningcomponentyear__attributionchargenew__attribution__tutor__person__last_name__icontains=value)
+        )
+
+    def filter_requirement_entity_with_entity_subordinated(self, queryset, name, value):
+        with_subordinated = self.form.cleaned_data['with_entity_subordinated']
+        if value:
+            entity_ids = get_entities_ids(value, with_subordinated)
+            queryset = queryset.filter(learning_container_year__requirement_entity__in=entity_ids)
+        return queryset
+
+    def filter_allocation_entity_with_entity_subordinated(self, queryset, name, value):
+        with_subordinated = self.form.cleaned_data['with_entity_subordinated']
+        if value:
+            entity_ids = get_entities_ids(value, with_subordinated)
+            queryset = queryset.filter(learning_container_year__allocation_entity__in=entity_ids)
+        return queryset
+
+    @property
+    def qs(self):
+        queryset = super(LearningUnitDescriptionFicheFilter, self).qs
+        if self.is_bound:
+            queryset = self._compute_summary_status(queryset)
+            queryset = queryset.select_related('learning_container_year__academic_year', 'academic_year')
+        return queryset
+
+    def _compute_summary_status(self, queryset):
+        """
+        This function will compute the summary status. First, we will take the entity calendar
+        (or entity calendar parent and so one) of the requirement entity. If not found, the summary status is
+        computed with the general Academic Calendar Object
+        """
+        entity_calendars_computed = entity_calendar.build_calendar_by_entities(
+            self.form.cleaned_data['academic_year'].past(),
+            SUMMARY_COURSE_SUBMISSION,
+        )
+        requirement_entities_ids = queryset.values_list('learning_container_year__requirement_entity', flat=True)
+
+        summary_status_case_statment = [When(last_translated_text_changed__isnull=True, then=False)]
+        for requirement_entity_id in set(requirement_entities_ids):
+            start_summary_course_submission = entity_calendars_computed.get(requirement_entity_id, {}).get('start_date')
+            if start_summary_course_submission is None:
+                continue
+
+            summary_status_case_statment.append(
+                When(
+                    learning_container_year__requirement_entity=requirement_entity_id,
+                    last_translated_text_changed__gte=start_summary_course_submission,
+                    then=True
+                )
+            )
+
+        queryset = queryset.annotate(
+            summary_status=Case(
+                *summary_status_case_statment,
+                default=Value(False),
+                output_field=BooleanField()
+            )
+        )
+        return queryset

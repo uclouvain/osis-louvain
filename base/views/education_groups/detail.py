@@ -143,8 +143,9 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
-            context['tree'] = json.dumps(EducationGroupHierarchy(
-                self.root, tab_to_show=self.request.GET.get('tab_to_show')).to_json())
+            education_group_hierarchy_tree = EducationGroupHierarchy(self.root,
+                                                                     tab_to_show=self.request.GET.get('tab_to_show'))
+            context['tree'] = json.dumps(education_group_hierarchy_tree.to_json())
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
             person=self.person,

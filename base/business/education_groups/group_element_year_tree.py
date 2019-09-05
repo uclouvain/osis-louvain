@@ -54,6 +54,7 @@ class EducationGroupHierarchy:
 
     def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear = None,
                  cache_hierarchy: dict = None, tab_to_show: str = None, pdf_content: bool = False,
+                 max_block: int = 0,
                  cache_structure=None,
                  cache_entity_parent_root: str = None):
 
@@ -69,6 +70,7 @@ class EducationGroupHierarchy:
         self._cache_entity_parent_root = cache_entity_parent_root
         self.tab_to_show = tab_to_show
         self.pdf_content = pdf_content
+        self.max_block = max_block
 
         if not self.pdf_content or \
                 (not (self.group_element_year and
@@ -102,13 +104,16 @@ class EducationGroupHierarchy:
 
     def generate_children(self):
         for group_element_year in self.cache_hierarchy.get(self.education_group_year.id) or []:
+            self._check_max_block(group_element_year.block)
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
                 node = EducationGroupHierarchy(self.root, group_element_year,
                                                cache_hierarchy=self.cache_hierarchy,
                                                tab_to_show=self.tab_to_show,
                                                pdf_content=self.pdf_content,
+                                               max_block=self.max_block,
                                                cache_structure=self.cache_structure,
                                                cache_entity_parent_root=self.cache_entity_parent_root)
+                self._check_max_block(node.max_block)
                 self.included_group_element_years.extend(node.included_group_element_years)
             elif group_element_year.child_leaf:
                 node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
@@ -305,6 +310,12 @@ class EducationGroupHierarchy:
             return set(list_entities_from_root) & set(list_entities_children_from_self) == set()
         except AttributeError:
             return False
+
+    def _check_max_block(self, group_element_year_block):
+        if group_element_year_block:
+            block = str(group_element_year_block)[-1:]
+            if int(block) > self.max_block:
+                self.max_block = int(block)
 
 
 class NodeLeafJsTree(EducationGroupHierarchy):

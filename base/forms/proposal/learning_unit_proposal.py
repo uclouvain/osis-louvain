@@ -30,7 +30,7 @@ from base import models as mdl
 from base.business.learning_unit_year_with_context import append_latest_entities
 from base.forms.learning_unit.search_form import LearningUnitSearchForm
 from base.models.entity import Entity
-from base.models.enums.proposal_state import ProposalState
+from base.models.enums.proposal_state import ProposalState, LimitedProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.proposal_learning_unit import ProposalLearningUnit
 
@@ -92,3 +92,8 @@ class ProposalStateModelForm(forms.ModelForm):
     class Meta:
         model = ProposalLearningUnit
         fields = ['state']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args)
+        if kwargs.pop('is_faculty_manager', False):
+            self.fields['state'].choices = LimitedProposalState.choices()

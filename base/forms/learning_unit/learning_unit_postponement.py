@@ -123,35 +123,8 @@ class LearningUnitPostponementForm:
         return min(end_year, max_postponement_year) if end_year else max_postponement_year
 
     def _compute_forms_to_insert_update_delete(self, data):
-        if self._has_proposal(self.learning_unit_instance) and \
-                (self.person.is_faculty_manager and not self.person.is_central_manager):
-            proposal = ProposalLearningUnit.objects.filter(
-                learning_unit_year__learning_unit=self.learning_unit_instance
-            ).order_by('learning_unit_year__academic_year__year').first()
-            max_postponement_year = proposal.learning_unit_year.academic_year.year
-            ac_year_postponement_range = AcademicYear.objects.filter(
-                year__gte=self.start_postponement.year,
-                year__lt=proposal.learning_unit_year.academic_year.year
-            )
-
-            existing_learn_unit_years = LearningUnitYear.objects \
-                .filter(academic_year__year__gte=self.start_postponement.year) \
-                .filter(academic_year__year__lt=max_postponement_year) \
-                .filter(learning_unit=self.learning_unit_instance) \
-                .select_related('learning_container_year', 'learning_unit', 'academic_year') \
-                .order_by('academic_year__year')
-        else:
-            max_postponement_year = self._compute_max_postponement_year()
-            ac_year_postponement_range = AcademicYear.objects.min_max_years(
-                self.start_postponement.year,
-                max_postponement_year
-            )
-            existing_learn_unit_years = LearningUnitYear.objects.filter(
-                academic_year__year__gte=self.start_postponement.year,
-                learning_unit=self.learning_unit_instance,
-            ).select_related(
-                'learning_container_year', 'learning_unit', 'academic_year'
-            ).order_by('academic_year__year')
+        ac_year_postponement_range, existing_learn_unit_years, max_postponement_year = \
+            self._get_existings_learning_unit_years_and_postponent_data()
         to_delete = to_update = to_insert = []
 
         if self.start_postponement.is_past:
@@ -188,6 +161,38 @@ class LearningUnitPostponementForm:
 
         self._forms_to_delete = to_delete
         self._forms_to_upsert = to_update + to_insert
+
+    def _get_existings_learning_unit_years_and_postponent_data(self):
+        if self._has_proposal(self.learning_unit_instance) and \
+                (self.person.is_faculty_manager and not self.person.is_central_manager):
+            proposal = ProposalLearningUnit.objects.filter(
+                learning_unit_year__learning_unit=self.learning_unit_instance
+            ).order_by('learning_unit_year__academic_year__year').first()
+            max_postponement_year = proposal.learning_unit_year.academic_year.year
+            ac_year_postponement_range = AcademicYear.objects.filter(
+                year__gte=self.start_postponement.year,
+                year__lt=proposal.learning_unit_year.academic_year.year
+            )
+
+            existing_learn_unit_years = LearningUnitYear.objects \
+                .filter(academic_year__year__gte=self.start_postponement.year) \
+                .filter(academic_year__year__lt=max_postponement_year) \
+                .filter(learning_unit=self.learning_unit_instance) \
+                .select_related('learning_container_year', 'learning_unit', 'academic_year') \
+                .order_by('academic_year__year')
+        else:
+            max_postponement_year = self._compute_max_postponement_year()
+            ac_year_postponement_range = AcademicYear.objects.min_max_years(
+                self.start_postponement.year,
+                max_postponement_year
+            )
+            existing_learn_unit_years = LearningUnitYear.objects.filter(
+                academic_year__year__gte=self.start_postponement.year,
+                learning_unit=self.learning_unit_instance,
+            ).select_related(
+                'learning_container_year', 'learning_unit', 'academic_year'
+            ).order_by('academic_year__year')
+        return ac_year_postponement_range, existing_learn_unit_years, max_postponement_year
 
     def _init_forms_in_past(self, luy_queryset, data):
         if self._is_update_action() and luy_queryset.exists():
@@ -241,7 +246,8 @@ class LearningUnitPostponementForm:
             'start_year': start_year,
             'data': data.copy() if data else None,
             'learning_unit_full_instance': self.learning_unit_full_instance,
-            'postposal': not data
+            'postposal': not data,
+            'start_anac': self.start_postponement.year if self.subtype == learning_unit_year_subtypes.PARTIM else None
         }
         if self.external:
             return ExternalLearningUnitBaseForm(
@@ -270,7 +276,6 @@ class LearningUnitPostponementForm:
             current_learn_unit_year = self._forms_to_upsert[0].save()
             learning_unit = current_learn_unit_year.learning_unit
             self._luy_upserted.append(current_learn_unit_year)
-
             if len(self._forms_to_upsert) > 1:
                 for form in self._forms_to_upsert[1:]:
                     if self.consistency_errors and form.academic_year in self.consistency_errors:
@@ -278,7 +283,6 @@ class LearningUnitPostponementForm:
 
                     form.learning_unit_form.instance = learning_unit
                     self._luy_upserted.append(form.save())
-
         return self._luy_upserted
 
     def _check_consistency(self):

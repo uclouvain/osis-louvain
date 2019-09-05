@@ -28,157 +28,230 @@ from io import BytesIO
 from unittest.mock import patch
 
 from django.contrib.messages import get_messages
-from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseNotAllowed
-from django.http.response import HttpResponseForbidden, HttpResponseRedirect
-from django.test import TestCase, RequestFactory
+from django.http.response import HttpResponseForbidden, HttpResponseRedirect, HttpResponse
+from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from openpyxl import load_workbook
-from waffle.testutils import override_flag
 
-from attribution.tests.factories.attribution import AttributionFactory
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
-from base.models.academic_year import current_academic_year, starting_academic_year
-from base.models.enums import academic_calendar_type
-from base.models.enums import learning_container_year_types, organization_type
+from base.models.enums import academic_calendar_type, entity_type
+from base.models.enums import organization_type
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateAcademicYear
-from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_calendar import EntityCalendarFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, FacultyManagerFactory
+from base.tests.factories.person import FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
-from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
-from base.views.learning_units.educational_information import learning_units_summary_list, \
-    send_email_educational_information_needs_update
-from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit
 from base.views.learning_units.search import SUMMARY_LIST
 from cms.enums import entity_name
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
-from reference.tests.factories.country import CountryFactory
 
 
 class LearningUnitPedagogyTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        now = datetime.datetime.now()
+
+        cls.academic_year = create_current_academic_year()
+        cls.previous_academic_year = GenerateAcademicYear(
+            cls.academic_year.year - 1,
+            cls.academic_year.year - 1
+        ).academic_years[0]
+        AcademicCalendarFactory(
+            academic_year=cls.previous_academic_year,
+            start_date=now - datetime.timedelta(days=5),
+            end_date=now + datetime.timedelta(days=15),
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+        )
+
+        cls.requirement_entity_version = EntityVersionFactory(
+            entity__organization__type=organization_type.MAIN,
+            start_date=now,
+            end_date=datetime.datetime(now.year + 1, 9, 15),
+            entity_type=entity_type.INSTITUTE
+        )
+        cls.learning_unit_year = LearningUnitYearFactory(
+            acronym="LBIR1100",
+            academic_year=cls.academic_year,
+            learning_container_year__academic_year=cls.academic_year,
+            learning_container_year__acronym="LBIR1100",
+            learning_container_year__requirement_entity=cls.requirement_entity_version.entity
+        )
+        cls.url = reverse('learning_units_summary')
+        cls.faculty_person = FacultyManagerFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
+        PersonEntityFactory(person=cls.faculty_person, entity=cls.requirement_entity_version.entity)
+
     def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        self.previous_academic_year = \
-            GenerateAcademicYear(self.current_academic_year.year-1, self.current_academic_year.year-1).academic_years[0]
-        self.next_academic_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
-        self.organization = OrganizationFactory(type=organization_type.MAIN)
-        self.country = CountryFactory()
-        self.url = reverse(learning_units_summary_list)
-        self.faculty_person = FacultyManagerFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
-        self.faculty_user = self.faculty_person.user
+        self.client.force_login(self.faculty_person.user)
 
-        self.an_entity = EntityFactory(country=self.country, organization=self.organization)
-        PersonEntityFactory(person=self.faculty_person, entity=self.an_entity)
-
-    def test_learning_units_summary_list_no_access(self):
-        request_factory = RequestFactory()
-        a_user = UserFactory()
-        request = request_factory.get(self.url)
-        request.user = a_user
-        self.client.force_login(a_user)
-        with self.assertRaises(PermissionDenied):
-            learning_units_summary_list(request)
-
-    def test_learning_units_summary_list_no_entity_calendar(self):
-        EntityVersionFactory(entity=self.an_entity)
-
-        self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1100")
-        self.client.force_login(self.faculty_user)
+    def test_user_not_logged(self):
+        self.client.logout()
         response = self.client.get(self.url)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
-        self.assertEqual(response.context['search_type'], SUMMARY_LIST)
-        self.assertEqual(response.context['learning_units_count'], 0)
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    def test_learning_units_summary_list(self):
+    def test_user_has_no_right_to_access_summary_learning_unit(self):
+        user_with_no_rights = UserFactory()
+        self.client.force_login(user_with_no_rights)
+
+        response = self.client.get(self.url)
+
+        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_learning_units_summary_list_filter_academic_year(self):
+        response = self.client.get(self.url, data={'academic_year': self.learning_unit_year.academic_year.pk})
+
+        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTrue(response.context['is_faculty_manager'])
+        self.assertEqual(response.context['search_type'], SUMMARY_LIST)
+        self.assertEqual(response.context['learning_units_count'], 1)
+
+        self.assertEqual(response.context['object_list'].first(), self.learning_unit_year)
+
+    def test_learning_units_summary_list_filter_on_requirement_entity(self):
+        now = datetime.datetime.now()
+        another_requirement_entity_version = EntityVersionFactory(
+            entity__organization__type=organization_type.MAIN,
+            start_date=now,
+            end_date=datetime.datetime(now.year + 1, 9, 15),
+            entity_type=entity_type.SCHOOL,
+            parent=self.requirement_entity_version.entity
+        )
+        LearningUnitYearFactory(
+            acronym="LDROI1500",
+            academic_year=self.academic_year,
+            learning_container_year__academic_year=self.academic_year,
+            learning_container_year__acronym="LDROI1500",
+            learning_container_year__requirement_entity=another_requirement_entity_version.entity
+        )
+
+        # Without ent. sub
+        response = self.client.get(
+            self.url,
+            data={
+                'academic_year': self.learning_unit_year.academic_year.pk,
+                'requirement_entity': self.requirement_entity_version.acronym,
+                'with_entity_subordinated': False
+            }
+        )
+        self.assertEqual(response.context['learning_units_count'], 1)
+        self.assertEqual(response.context['object_list'].first(), self.learning_unit_year)
+
+        # With ent. sub
+        response = self.client.get(
+            self.url,
+            data={
+                'academic_year': self.learning_unit_year.academic_year.pk,
+                'requirement_entity': self.requirement_entity_version.acronym,
+                'with_entity_subordinated': True
+            }
+        )
+        self.assertEqual(response.context['learning_units_count'], 2)
+
+
+class LearningUnitPedagogyExportXLSTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
         now = datetime.datetime.now()
 
-        EntityVersionFactory(entity=self.an_entity,
-                             start_date=now,
-                             end_date=datetime.datetime(now.year+1, 9, 15),
-                             entity_type='INSTITUTE')
+        cls.academic_year = create_current_academic_year()
+        cls.previous_academic_year = GenerateAcademicYear(
+            cls.academic_year.year - 1,
+            cls.academic_year.year - 1
+        ).academic_years[0]
+        AcademicCalendarFactory(
+            academic_year=cls.previous_academic_year,
+            start_date=now - datetime.timedelta(days=5),
+            end_date=now + datetime.timedelta(days=15),
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+        )
 
-        lu = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1100")
-        person_lu = PersonFactory()
-        tutor_lu_1 = TutorFactory(person=person_lu)
-        self.attribution_lu = AttributionFactory(learning_unit_year=lu, tutor=tutor_lu_1, summary_responsible=True)
-        self._create_entity_calendar(self.an_entity)
-        self.client.force_login(self.faculty_user)
+        cls.requirement_entity_version = EntityVersionFactory(
+            entity__organization__type=organization_type.MAIN,
+            start_date=now,
+            end_date=datetime.datetime(now.year + 1, 9, 15),
+            entity_type=entity_type.INSTITUTE
+        )
 
-        response = self.client.get(self.url, data={'academic_year_id': starting_academic_year().id})
-        self.assertTemplateUsed(response, 'learning_units.html')
-        context = response.context
-        self.assertEqual(context['search_type'], SUMMARY_LIST)
-        self.assertEqual(context['learning_units_count'], 1)
-        self.assertTrue(context['is_faculty_manager'])
+        cls.url = reverse('learning_units_summary')
+        cls.faculty_person = FacultyManagerFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
+        PersonEntityFactory(person=cls.faculty_person, entity=cls.requirement_entity_version.entity)
 
-    def test_learning_units_summary_list_by_client(self):
-        self.client.force_login(self.faculty_user)
-        response = self.client.get(self.url, data={'academic_year_id': current_academic_year().id})
+        # Generate data for XLS export
+        cls.learning_unit_year_with_mandatory_teaching_materials = LearningUnitYearFactory(
+            acronym="LBIR1100",
+            academic_year=cls.academic_year,
+            learning_container_year__academic_year=cls.academic_year,
+            learning_container_year__acronym="LBIR1100",
+            learning_container_year__requirement_entity=cls.requirement_entity_version.entity
+        )
+        TeachingMaterialFactory(
+            learning_unit_year=cls.learning_unit_year_with_mandatory_teaching_materials,
+            title="Magic wand",
+            mandatory=True,
+        )
+        TeachingMaterialFactory(
+            learning_unit_year=cls.learning_unit_year_with_mandatory_teaching_materials,
+            title="Broomsticks",
+            mandatory=False,
+        )
 
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "learning_units.html")
+        cls.learning_unit_year_without_mandatory_teaching_materials = LearningUnitYearFactory(
+            acronym="LDROI1600",
+            academic_year=cls.academic_year,
+            learning_container_year__academic_year=cls.academic_year,
+            learning_container_year__acronym="LDROI1600",
+            learning_container_year__requirement_entity=cls.requirement_entity_version.entity
+        )
+        TeachingMaterialFactory(
+            learning_unit_year=cls.learning_unit_year_without_mandatory_teaching_materials,
+            title="cauldron",
+            mandatory=False,
+        )
+
+    def setUp(self):
+        self.client.force_login(self.faculty_person.user)
 
     def test_learning_units_summary_list_by_client_xls(self):
-        # Generate data
-        now = datetime.datetime.now()
-        EntityVersionFactory(entity=self.an_entity,
-                             start_date=now,
-                             end_date=datetime.datetime(now.year+1, 9, 15),
-                             entity_type='INSTITUTE')
-
-        luy = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1100")
-        self._create_entity_calendar(self.an_entity)
-
-        TeachingMaterialFactory(learning_unit_year=luy, title="Magic wand", mandatory=True)
-        TeachingMaterialFactory(learning_unit_year=luy, title="Broomsticks", mandatory=False)
-
-        luy_without_mandatory_teaching_material = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1101")
-        TeachingMaterialFactory(learning_unit_year=luy_without_mandatory_teaching_material, title="cauldron", mandatory=False)
-        bibliography = TranslatedTextFactory(
+        TranslatedTextFactory(
             text_label=TextLabelFactory(label='bibliography'),
             entity=LEARNING_UNIT_YEAR,
             text="<ul><li>Test</li></ul>",
-            reference=luy.pk,
+            reference=self.learning_unit_year_with_mandatory_teaching_materials.pk,
             language='fr-be'
         )
-        online_resources = TranslatedTextFactory(
+        TranslatedTextFactory(
             text_label=TextLabelFactory(label='online_resources'),
             entity=LEARNING_UNIT_YEAR,
             text="<a href='test_url'>TestURL</a>",
-            reference=luy.pk,
+            reference=self.learning_unit_year_with_mandatory_teaching_materials.pk,
             language='fr-be'
         )
-        online_resources_en = TranslatedTextFactory(
+        TranslatedTextFactory(
             text_label=TextLabelFactory(label='online_resources'),
             entity=LEARNING_UNIT_YEAR,
             text="<a href='test_url'>TestURL EN</a>",
-            reference=luy.pk,
+            reference=self.learning_unit_year_with_mandatory_teaching_materials.pk,
             language='en'
         )
 
-        # Test the view
-        self.client.force_login(self.faculty_user)
         response = self.client.get(self.url, data={
-            'academic_year_id': starting_academic_year().id,
+            'academic_year': self.academic_year.pk,
             'xls_status': 'xls_teaching_material'
         })
 
-        # OK, the server returned the xls file
-        self.assertEqual(response.status_code, 200)
+        # The server returned the xls file
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         wb = load_workbook(BytesIO(response.content), read_only=True)
 
         sheet = wb.active
@@ -201,9 +274,9 @@ class LearningUnitPedagogyTestCase(TestCase):
         first_luy = next(data)
         first_luy_values = list(t.value for t in first_luy)
         self.assertEqual(first_luy_values, [
-            luy.acronym,
-            luy.complete_title,
-            str(luy.requirement_entity),
+            self.learning_unit_year_with_mandatory_teaching_materials.acronym,
+            self.learning_unit_year_with_mandatory_teaching_materials.complete_title,
+            str(self.learning_unit_year_with_mandatory_teaching_materials.requirement_entity),
             "Test\n",
             "Magic wand",
             "TestURL - [test_url] \n",
@@ -215,87 +288,69 @@ class LearningUnitPedagogyTestCase(TestCase):
             next(data)
 
     def test_learning_units_summary_list_by_client_xls_empty(self):
-        # Generate data
-        now = datetime.datetime.now()
-        EntityVersionFactory(entity=self.an_entity,
-                             start_date=now,
-                             end_date=datetime.datetime(now.year+1, 9, 15),
-                             entity_type='INSTITUTE')
-
-        luy = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1100")
-        self._create_entity_calendar(self.an_entity)
-
-        TeachingMaterialFactory(learning_unit_year=luy, title="Magic wand", mandatory=False)
-        TeachingMaterialFactory(learning_unit_year=luy, title="Broomsticks", mandatory=False)
-
-        luy_without_mandatory_teaching_material = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1101")
-        TeachingMaterialFactory(learning_unit_year=luy_without_mandatory_teaching_material, title="cauldron", mandatory=False)
-
-        # Test the view
-        self.client.force_login(self.faculty_user)
         response = self.client.get(self.url, data={
-            'academic_year_id': starting_academic_year().id,
+            'acronym': self.learning_unit_year_without_mandatory_teaching_materials.acronym,
             'xls_status': 'xls_teaching_material'
         })
 
         # OK, the server will stay in the page
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
 
         # A warning message should be generated
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), _("the list to generate is empty.").capitalize())
 
-    def _create_entity_calendar(self, an_entity):
-        an_academic_calendar = AcademicCalendarFactory(academic_year=self.previous_academic_year,
-                                                       start_date=self.previous_academic_year.start_date,
-                                                       end_date=self.previous_academic_year.end_date,
-                                                       reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
-        EntityCalendarFactory(entity=an_entity, academic_calendar=an_academic_calendar,
-                              start_date=an_academic_calendar.start_date,
-                              end_date=an_academic_calendar.end_date)
 
-    def _create_learning_unit_year_for_entity(self, an_entity, acronym):
-        l_container_yr = LearningContainerYearFactory(
-            acronym=acronym,
-            academic_year=self.current_academic_year,
-            container_type=learning_container_year_types.COURSE,
-            requirement_entity=an_entity,
+class LearningUnitPedagogyEditTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        now = datetime.datetime.now()
+
+        cls.academic_year = create_current_academic_year()
+        cls.previous_academic_year = GenerateAcademicYear(
+            cls.academic_year.year - 1,
+            cls.academic_year.year - 1
+        ).academic_years[0]
+        AcademicCalendarFactory(
+            academic_year=cls.previous_academic_year,
+            start_date=now - datetime.timedelta(days=5),
+            end_date=now + datetime.timedelta(days=15),
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
-        return LearningUnitYearFactory(acronym=acronym,
-                                       learning_container_year=l_container_yr,
-                                       academic_year=self.current_academic_year)
 
-    @override_flag('educational_information_mailing', active=True)
-    def test_send_email_educational_information_needs_update_no_access(self):
-        request_factory = RequestFactory()
-        a_user = UserFactory()
-        request = request_factory.get(self.url)
-        request.user = a_user
-        self.client.force_login(a_user)
-        with self.assertRaises(PermissionDenied):
-            send_email_educational_information_needs_update(request)
-
-    def test_learning_unit_pedagogy_edit(self):
-        luy = self._create_learning_unit_year_for_entity(self.an_entity, "LBIR1100")
-        edit_url = reverse(learning_unit_pedagogy_edit, kwargs={'learning_unit_year_id': luy.id})
-
-        text_label_bibliography = TextLabelFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            label='bibliography'
+        cls.requirement_entity_version = EntityVersionFactory(
+            entity__organization__type=organization_type.MAIN,
+            start_date=now,
+            end_date=datetime.datetime(now.year + 1, 9, 15),
+            entity_type=entity_type.INSTITUTE
         )
+        cls.learning_unit_year = LearningUnitYearFactory(
+            acronym="LBIR1100",
+            academic_year=cls.academic_year,
+            learning_container_year__academic_year=cls.academic_year,
+            learning_container_year__acronym="LBIR1100",
+            learning_container_year__requirement_entity=cls.requirement_entity_version.entity
+        )
+        cls.url = reverse('learning_unit_pedagogy_edit', kwargs={'learning_unit_year_id': cls.learning_unit_year.pk})
+        cls.faculty_person = FacultyManagerFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
+        PersonEntityFactory(person=cls.faculty_person, entity=cls.requirement_entity_version.entity)
+
+    def setUp(self):
         TranslatedTextFactory(
             entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=luy.id,
+            reference=self.learning_unit_year.pk,
             language='fr-be',
-            text_label=text_label_bibliography,
-            text='Some random text'
+            text='Some random text',
+            text_label__entity=entity_name.LEARNING_UNIT_YEAR,
+            text_label__label='bibliography',
         )
+        self.client.force_login(self.faculty_person.user)
 
-        self.client.force_login(self.faculty_user)
-        response = self.client.get(edit_url, data={'label': 'bibliography', 'language': 'fr-be'})
+    def test_learning_unit_pedagogy_edit(self):
+        response = self.client.get(self.url, data={'label': 'bibliography', 'language': 'fr-be'})
 
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'learning_unit/pedagogy_edit.html')
         self.assertTemplateUsed(response, 'learning_unit/blocks/modal/modal_pedagogy_edit.html')
         self.assertEqual(response.context["cms_label_pedagogy_fr_only"], CMS_LABEL_PEDAGOGY_FR_ONLY)

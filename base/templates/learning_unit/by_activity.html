@@ -128,6 +128,11 @@
                         </tr>
                     {% endfor %}
                 </table>
+
+                <div class="text-center">
+                    {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+                </div>
+
             {% endif %}
         </div>
     </div>

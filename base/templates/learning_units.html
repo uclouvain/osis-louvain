@@ -39,7 +39,7 @@
     {% url 'learning_unit_create_external' academic_year=request.GET.academic_year_id as create_external_url%}
 {% else %}
     {% url 'learning_unit_create' academic_year_id=current_academic_year.id as create_learning_unit_url%}
-    {% url 'proposal_learning_unit_creation_form' academic_year=current_academic_year.id as create_proposal_url%}
+    {% url 'proposal_learning_unit_creation_form' academic_year=proposal_academic_year.id as create_proposal_url%}
     {% url 'learning_unit_create_external' academic_year=current_academic_year.id as create_external_url%}
 {% endif %}
 
@@ -91,14 +91,14 @@
 {% if search_type == 3 %}
     {% include 'learning_unit/by_proposal.html' %}
 {% elif search_type == 4 %}
-        {% include 'learning_unit/summary_list.html' %}
+    {% include 'learning_unit/summary_list.html' %}
 {% elif search_type == 6 %}
     {% include 'learning_unit/by_external.html' %}
 {% else %}
     {% include 'learning_unit/by_activity.html' %}
+    {% include "learning_unit/blocks/modal/modal_comparison.html" %}
+    {% include "learning_unit/blocks/modal/modal_xls_with_parameters.html" %}
 {% endif %}
-{% include "learning_unit/blocks/modal/modal_comparison.html" %}
-{% include "learning_unit/blocks/modal/modal_xls_with_parameters.html" %}
 {% endblock %}
 
 {% block script %}

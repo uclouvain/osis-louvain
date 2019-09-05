@@ -30,20 +30,15 @@ from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
 
 from base import models as mdl_base
-from base.business.entity import get_entity_calendar
 from base.business.learning_unit_year_with_context import volume_learning_component_year
 from base.models import learning_achievement
-from base.models.academic_calendar import AcademicCalendar
 from base.models.enums import academic_calendar_type
 from base.models.enums import entity_container_year_link_type
-from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import find_last_entity_version_grouped_by_linktypes
-from base.models.utils.utils import get_object_or_none
 from cms import models as mdl_cms
 from cms.enums import entity_name
-from osis_common.utils.datetime import convert_date_to_datetime
 
 CMS_LABEL_SPECIFICATIONS = ['themes_discussed', 'prerequisite']
 
@@ -178,36 +173,6 @@ def get_entities(container_year):
     }
 
 
-def _get_summary_status(a_calendar, cms_list, lu):
-    for educational_information in cms_list:
-        if educational_information.reference == lu.id \
-                and _changed_in_period(a_calendar.start_date, educational_information.changed):
-            return True
-    return False
-
-
-def _get_calendar(academic_yr, an_entity_version):
-    """ Try to fetch the academic calendar for the entity. If it is not found, return the academic calendar. """
-    a_calendar = get_entity_calendar(an_entity_version, academic_yr)  # TODO slow method...
-    if a_calendar is None:
-        a_calendar = get_object_or_none(
-            AcademicCalendar, reference=SUMMARY_COURSE_SUBMISSION, academic_year=academic_yr
-        )
-    return a_calendar
-
-
-def _changed_in_period(start_date, changed_date):
-    return convert_date_to_datetime(start_date) <= changed_date
-
-
-def _set_summary_status_on_luy(cms_list, learning_unit_yr):
-    requirement_entity = learning_unit_yr.entities.get('REQUIREMENT_ENTITY', None)
-    if requirement_entity:
-        a_calendar = _get_calendar(learning_unit_yr.academic_year.past(), requirement_entity)
-        if a_calendar:
-            learning_unit_yr.summary_status = _get_summary_status(a_calendar, cms_list, learning_unit_yr)
-
-
 def get_achievements_group_by_language(learning_unit_year):
     achievement_grouped = {}
     all_achievements = learning_achievement.find_by_learning_unit_year(learning_unit_year)
@@ -215,14 +180,3 @@ def get_achievements_group_by_language(learning_unit_year):
         key = 'achievements_{}'.format(achievement.language.code)
         achievement_grouped.setdefault(key, []).append(achievement)
     return achievement_grouped
-
-
-def get_learning_unit_comparison_context(learning_unit_year):
-    context = dict({'learning_unit_year': learning_unit_year})
-    context['campus'] = learning_unit_year.campus
-    context['organization'] = get_organization_from_learning_unit_year(learning_unit_year)
-    components = get_components_identification(learning_unit_year)
-    context['components'] = components.get('components')
-    context['learning_container_year_partims'] = learning_unit_year.get_partims_related()
-    context.update(learning_unit_year.learning_container_year.get_map_entity_by_type())
-    return context

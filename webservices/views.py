@@ -485,6 +485,7 @@ def get_contacts(education_group_year, language_code):
     contacts = business.get_contacts_group_by_types(education_group_year, language_code)
     intro_content = business.get_contacts_intro_text(education_group_year, language_code)
     entity_version = education_group_year.publication_contact_entity_version
+    management_entity_version = education_group_year.management_entity_version
 
     return {
         'id': business.CONTACTS_KEY,
@@ -492,6 +493,7 @@ def get_contacts(education_group_year, language_code):
         'content': {
             'text': intro_content,
             'entity': entity_version.acronym if entity_version else None,
+            'management_entity': management_entity_version.acronym if management_entity_version else None,
             'contacts': contacts
         }
     }

@@ -43,14 +43,15 @@ from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search_form import LearningUnitYearForm, ExternalLearningUnitYearForm
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm, ProposalStateModelForm
 from base.forms.search.search_form import get_research_criteria
-from base.models.academic_year import current_academic_year, get_last_academic_years, starting_academic_year
+from base.models.academic_year import get_last_academic_years, starting_academic_year
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils.cache import cache_filter
-from base.views.common import check_if_display_message, display_messages_by_level, display_error_messages
+from base.views.common import check_if_display_message, display_messages_by_level, display_error_messages, \
+    paginate_queryset
 
 SIMPLE_SEARCH = 1
 SERVICE_COURSES_SEARCH = 2
@@ -62,6 +63,8 @@ EXTERNAL_SEARCH = 6
 ACTION_BACK_TO_INITIAL = "back_to_initial"
 ACTION_CONSOLIDATE = "consolidate"
 ACTION_FORCE_STATE = "force_state"
+
+ITEMS_PER_PAGES = 2000
 
 
 def learning_units_search(request, search_type):
@@ -108,7 +111,7 @@ def learning_units_search(request, search_type):
         return create_xls_attributions(request.user, found_learning_units, _get_filter(form, search_type))
 
     form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
-
+    starting_ac = starting_academic_year()
     context = {
         'form': form,
         'academic_years': get_last_academic_years(),
@@ -117,11 +120,12 @@ def learning_units_search(request, search_type):
         'learning_units_count': len(found_learning_units)
         if isinstance(found_learning_units, list) else
         found_learning_units.count(),
-        'current_academic_year': starting_academic_year(),
+        'current_academic_year': starting_ac,
+        'proposal_academic_year': starting_ac.next(),
         'search_type': search_type,
         'is_faculty_manager': request.user.person.is_faculty_manager,
         'form_comparison': form_comparison,
-        'page_obj': found_learning_units,
+        'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES),
     }
 
     return render(request, "learning_units.html", context)
@@ -190,14 +194,14 @@ def learning_units_proposal_search(request):
 
     context = {
         'form': search_form,
-        'form_proposal_state': ProposalStateModelForm(),
+        'form_proposal_state': ProposalStateModelForm(is_faculty_manager=user_person.is_faculty_manager),
         'academic_years': get_last_academic_years(),
         'current_academic_year': starting_ac_year,
         'search_type': PROPOSAL_SEARCH,
         'learning_units_count': found_learning_units.count(),
-        'is_faculty_manager': user_person.is_faculty_manager,
+        'can_change_proposal_state': user_person.is_faculty_manager or user_person.is_central_manager,
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
-        'page_obj': found_learning_units,
+        'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES),
     }
     return render(request, "learning_units.html", context)
 
@@ -258,6 +262,6 @@ def learning_units_external_search(request):
         'learning_units_count': found_learning_units.count(),
         'is_faculty_manager': user_person.is_faculty_manager,
         'form_comparison': SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units)),
-        'page_obj': found_learning_units,
+        'page_obj': paginate_queryset(found_learning_units, request.GET, items_per_page=ITEMS_PER_PAGES),
     }
     return render(request, "learning_units.html", context)

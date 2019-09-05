@@ -30,6 +30,7 @@ from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.business.learning_unit_year_with_context import is_service_course
 from base.forms.learning_unit import search_form
+from base.models.entity_version import PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS
 from base.models.enums import entity_type
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -156,6 +157,16 @@ class TestLearningUnitForm(TestCase):
         self.assertTrue(
             is_service_course(self.academic_yr, self.list_entity_version[0], self.list_entity_version[1])
         )
+
+    def test_is_service_course_pedagogical_exception(self):
+        exception_entity = [
+            self._create_entity_version(entity_type=entity_type.SCHOOL, acronym=acronym)
+            for acronym in PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS
+        ]
+        for entity in exception_entity:
+            self.assertTrue(
+                is_service_course(self.academic_yr, entity, self.list_entity_version[0])
+            )
 
     def test_is_not_service_course(self):
         self.assertFalse(

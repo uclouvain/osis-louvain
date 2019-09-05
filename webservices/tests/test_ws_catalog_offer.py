@@ -86,7 +86,7 @@ class WsCatalogOfferPostTestCase(TestCase, Helper):
         self.common_education_group_year = EducationGroupYearCommonFactory(
             academic_year=self.education_group_year.academic_year
         )
-        ac = AdmissionConditionFactory(
+        AdmissionConditionFactory(
             education_group_year=common_master_education_group_year
         )
 
@@ -1279,6 +1279,7 @@ class GetContactsTestCase(TestCase):
         self.assertTrue('content' in context)
         self.assertTrue('entity' in context['content'])
         self.assertEqual(context['content']['entity'], self.entity_version.acronym)
+        self.assertEqual(context['content']['management_entity'], self.education_group_year.management_entity_version)
         self.assertTrue('contacts' in context['content'])
         self.assertTrue('text' in context['content'])
 

@@ -52,9 +52,10 @@ class TestRead(TestCase):
         cls.person = PersonFactory()
         cls.education_group_year_1 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
         cls.education_group_year_2 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
-        cls.education_group_year_3 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
+        cls.education_group_year_3 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year,
+                                                               acronym='ed3')
         cls.learning_unit_year_1 = LearningUnitYearFactory(specific_title_english="")
-        cls.learning_unit_year_2 = LearningUnitYearFactory(specific_title_english="")
+        cls.learning_unit_year_2 = LearningUnitYearFactory(specific_title_english="", acronym="luy2")
         cls.learning_component_year_1 = LearningComponentYearFactory(
             learning_unit_year=cls.learning_unit_year_1, hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=10)
@@ -64,21 +65,25 @@ class TestRead(TestCase):
         cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year_1,
                                                            child_branch=cls.education_group_year_2,
                                                            comment="commentaire",
-                                                           comment_english="english")
+                                                           comment_english="english",
+                                                           block=1)
         cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year_2,
                                                            child_branch=None,
                                                            child_leaf=cls.learning_unit_year_1,
                                                            comment="commentaire",
-                                                           comment_english="english")
+                                                           comment_english="english",
+                                                           block=6)
         cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year_1,
                                                            child_branch=cls.education_group_year_3,
                                                            comment="commentaire",
-                                                           comment_english="english")
+                                                           comment_english="english",
+                                                           block=1)
         cls.group_element_year_4 = GroupElementYearFactory(parent=cls.education_group_year_3,
                                                            child_branch=None,
                                                            child_leaf=cls.learning_unit_year_2,
                                                            comment="commentaire",
-                                                           comment_english="english")
+                                                           comment_english="english",
+                                                           block=123)
         cls.a_superuser = SuperUserFactory()
 
     @override_switch('education_group_year_generate_pdf', active=True)
@@ -115,6 +120,13 @@ class TestRead(TestCase):
             _("credits"),
         )
         self.assertEqual(self.group_element_year_2.verbose, verbose_leaf)
+
+    def test_max_block(self):
+        result = EducationGroupHierarchy(self.education_group_year_1)
+        self.assertEqual(result.max_block, 6)
+
+        result = EducationGroupHierarchy(self.education_group_year_3)
+        self.assertEqual(result.max_block, 3)
 
 
 class TestReadTree(TestCase):

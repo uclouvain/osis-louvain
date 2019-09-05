@@ -83,7 +83,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         if finalities_to_add_qs.exists() and root_2m_qs.exists():
             root_2m_early_end_date = root_2m_qs.first()
             invalid_finalities_acronyms = finalities_to_add_qs.filter(
-                Q(education_group__end_year__gt=root_2m_early_end_date.education_group.end_year) |
+                Q(education_group__end_year__year__gt=root_2m_early_end_date.education_group.end_year.year) |
                 Q(education_group__end_year__isnull=True)
             ).values_list('acronym', flat=True)
 

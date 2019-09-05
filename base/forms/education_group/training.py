@@ -34,7 +34,7 @@ from django.utils.translation import ugettext_lazy as _
 from base.business.education_groups import shorten
 from base.business.education_groups.postponement import PostponementEducationGroupYearMixin
 from base.forms.education_group.common import CommonBaseForm, EducationGroupModelForm, \
-    MainEntitiesVersionChoiceField, EducationGroupYearModelForm
+    MainEntitiesVersionChoiceField, EducationGroupYearModelForm, PermissionFieldTrainingMixin
 from base.forms.utils.choice_field import add_blank
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_certificate_aim import EducationGroupCertificateAim
@@ -56,7 +56,7 @@ def _get_section_choices():
     return add_blank(CertificateAim.objects.values_list('section', 'section').distinct().order_by('section'))
 
 
-class HopsEducationGroupYearModelForm(forms.ModelForm):
+class HopsEducationGroupYearModelForm(PermissionFieldTrainingMixin, forms.ModelForm):
 
     class Meta:
         model = Hops
@@ -75,6 +75,7 @@ class HopsEducationGroupYearModelForm(forms.ModelForm):
         return super(HopsEducationGroupYearModelForm, self).is_valid() and self._valid_hops()
 
     def __init__(self, *args, **kwargs):
+        self.user = kwargs.get('user')
         super().__init__(*args, **kwargs)
         self.fields["ares_study"].required = False
         self.fields["ares_graca"].required = False
@@ -300,7 +301,7 @@ class TrainingForm(PostponementEducationGroupYearMixin, CommonBaseForm):
         super().__init__(*args, **kwargs)
 
         education_group_yr_hops = getattr(kwargs.pop('instance', None), 'hops', Hops())
-        self.hops_form = self.hops_form_class(data=args[0],
+        self.hops_form = self.hops_form_class(data=args[0], user=kwargs['user'],
                                               instance=education_group_yr_hops)
 
     def _post_save(self):

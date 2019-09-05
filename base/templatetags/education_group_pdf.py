@@ -68,6 +68,9 @@ CHILD_LEAF = """\
     <td style="text-align: center;">{an_1}</td>
     <td style="text-align: center;">{an_2}</td>
     <td style="text-align: center;">{an_3}</td>
+    <td style="text-align: center;">{an_4}</td>
+    <td style="text-align: center;">{an_5}</td>
+    <td style="text-align: center;">{an_6}</td>
 </tr>
 """
 
@@ -106,27 +109,31 @@ def walk_items(item_list):
         item_iterator = iter(item_list)
         try:
             item = next(item_iterator)
-            while True:
-                try:
-                    next_item = next(item_iterator)
-                except StopIteration:
-                    yield item, None
-                    break
-                if not isinstance(next_item, six.string_types):
-                    try:
-                        iter(next_item)
-                    except TypeError:
-                        pass
-                    else:
-                        yield item, next_item
-                        item = next(item_iterator)
-                        continue
-                yield item, None
-                item = next_item
+            yield from _iterate_items(item, item_iterator)
         except StopIteration:
             pass
     else:
         return ""
+
+
+def _iterate_items(item, item_iterator):
+    while True:
+        try:
+            next_item = next(item_iterator)
+        except StopIteration:
+            yield item, None
+            break
+        if not isinstance(next_item, six.string_types):
+            try:
+                iter(next_item)
+            except TypeError:
+                pass
+            else:
+                yield item, next_item
+                item = next(item_iterator)
+                continue
+        yield item, None
+        item = next_item
 
 
 def list_formatter(item_list, tabs=1, depth=None):
@@ -160,7 +167,10 @@ def append_output(item, output, padding, sublist):
                               sublist=sublist,
                               an_1=check_block(item, 1),
                               an_2=check_block(item, 2),
-                              an_3=check_block(item, 3)
+                              an_3=check_block(item, 3),
+                              an_4=check_block(item, 4),
+                              an_5=check_block(item, 5),
+                              an_6=check_block(item, 6),
                               )
         )
     else:
@@ -203,9 +213,7 @@ def get_case_picture(item):
     if item.child_leaf.status:
         if item.child_leaf.periodicity == ANNUAL:
             return VALIDATE_CASE_JPG
-        elif item.child_leaf.periodicity == BIENNIAL_EVEN and item.child_leaf.academic_year.is_even:
-            return VALIDATE_CASE_JPG
-        elif item.child_leaf.periodicity == BIENNIAL_ODD and item.child_leaf.academic_year.is_odd:
+        elif item.child_leaf.periodicity in [BIENNIAL_EVEN, BIENNIAL_ODD] and item.child_leaf.academic_year.is_even:
             return VALIDATE_CASE_JPG
     return INVALIDATE_CASE_JPG
 

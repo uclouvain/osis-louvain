@@ -356,17 +356,16 @@ def prepare_xls_content_for_comparison(luy_with_proposals):
         proposal = luy_with_proposal.proposallearningunit
         initial_luy_data = proposal.initial_data
 
-        if initial_luy_data:
+        if initial_luy_data and initial_luy_data.get('learning_unit'):
             initial_data = _get_data_from_initial_data(luy_with_proposal.proposallearningunit.initial_data)
             data.append(initial_data)
+            modified_cells_no_border.extend(
+                _check_changes(initial_data,
+                               data_proposal,
+                               line_index + 2))
+            line_index = line_index + 2
         else:
-            initial_data = []
-
-        modified_cells_no_border.extend(
-            _check_changes(initial_data,
-                           data_proposal,
-                           line_index + 2))
-        line_index = line_index + 2
+            line_index = line_index + 1
 
     return {
         DATA: data,
@@ -376,47 +375,53 @@ def prepare_xls_content_for_comparison(luy_with_proposals):
 
 
 def _get_data_from_initial_data(initial_data):
-    learning_unit_yr = get_by_id(initial_data.get('learning_unit_year')['id'])
-    learning_container_year = initial_data.get('learning_container_year') or {}
+    luy_initial = initial_data.get('learning_unit_year', {})
+    lcy_initial = initial_data.get('learning_container_year', {})
+    lu_initial = initial_data.get('learning_unit', {})
 
-    requirement_entity = find_by_id(learning_container_year['requirement_entity'])
-    allocation_entity = find_by_id(learning_container_year['allocation_entity'])
-    add1_requirement_entity = find_by_id(learning_container_year['additional_entity_1'])
-    add2_requirement_entity = find_by_id(learning_container_year['additional_entity_2'])
-    campus = find_campus_by_id(initial_data.get('learning_unit_year')['campus'])
+    if luy_initial.get('id'):
+        learning_unit_yr = get_by_id(luy_initial.get('id'))
+    else:
+        learning_unit_yr = None
 
-    organization = get_organization_from_learning_unit_year(learning_unit_yr)
-    language = find_language_by_id(initial_data.get('learning_unit_year')['language'])
-    lu_initial = initial_data.get('learning_unit', None)
-    luy_initial = initial_data.get('learning_unit_year', None)
-    lcy_initial = initial_data.get('learning_container_year', None)
+    requirement_entity = find_by_id(lcy_initial.get('requirement_entity'))
+    allocation_entity = find_by_id(lcy_initial.get('allocation_entity'))
+    add1_requirement_entity = find_by_id(lcy_initial.get('additional_entity_1'))
+    add2_requirement_entity = find_by_id(lcy_initial.get('additional_entity_2'))
+    campus = find_campus_by_id(luy_initial.get('campus'))
+
+    organization = None
+    if learning_unit_yr:
+        organization = get_organization_from_learning_unit_year(learning_unit_yr)
+    language = find_language_by_id(luy_initial.get('language'))
+
     data = [
         str(_('Initial data')),
-        luy_initial['acronym'],
-        learning_unit_yr.academic_year.name,
-        dict(LearningContainerYearType.choices())[lcy_initial['container_type']] if
-        lcy_initial['container_type'] else '-',
-        translate_status(luy_initial['status']),
-        learning_unit_yr.get_subtype_display(),
-        get_translation(luy_initial['internship_subtype']),
-        volume_format(Decimal(luy_initial['credits'])) if luy_initial['credits'] else '',
+        luy_initial.get('acronym', ''),
+        learning_unit_yr.academic_year.name if learning_unit_yr else '',
+        dict(LearningContainerYearType.choices())[lcy_initial.get('container_type')] if
+        lcy_initial.get('container_type') else '-',
+        translate_status(luy_initial.get('status')),
+        learning_unit_yr.get_subtype_display() if learning_unit_yr else '',
+        get_translation(luy_initial.get('internship_subtype')),
+        volume_format(Decimal(luy_initial['credits'])) if luy_initial.get('credits') else '',
         language.name if language else EMPTY_VALUE,
-        dict(PERIODICITY_TYPES)[luy_initial['periodicity']] if luy_initial['periodicity'] else BLANK_VALUE,
-        get_translation(luy_initial['quadrimester']),
-        get_translation(luy_initial['session']),
-        get_representing_string(lcy_initial['common_title']),
-        get_representing_string(luy_initial['specific_title']),
-        get_representing_string(lcy_initial['common_title_english']),
-        get_representing_string(luy_initial['specific_title_english']),
+        dict(PERIODICITY_TYPES)[luy_initial['periodicity']] if luy_initial.get('periodicity') else BLANK_VALUE,
+        get_translation(luy_initial.get('quadrimester')),
+        get_translation(luy_initial.get('session')),
+        get_representing_string(lcy_initial.get('common_title')),
+        get_representing_string(luy_initial.get('specific_title')),
+        get_representing_string(lcy_initial.get('common_title_english')),
+        get_representing_string(luy_initial.get('specific_title_english')),
         requirement_entity.most_recent_acronym if requirement_entity else BLANK_VALUE,
         allocation_entity.most_recent_acronym if allocation_entity else BLANK_VALUE,
-        add1_requirement_entity.most_recent_acronym if add1_requirement_entity else BLANK_VALUE,
-        add2_requirement_entity.most_recent_acronym if add2_requirement_entity else BLANK_VALUE,
-        _('Yes') if luy_initial['professional_integration'] else _('No'),
+        add1_requirement_entity.most_recent_acronym if add1_requirement_entity else '',
+        add2_requirement_entity.most_recent_acronym if add2_requirement_entity else '',
+        _('Yes') if luy_initial.get('professional_integration') else _('No'),
         organization.name if organization else BLANK_VALUE,
         campus if campus else BLANK_VALUE,
-        get_representing_string(lu_initial['faculty_remark']),
-        get_representing_string(lu_initial['other_remark']),
+        get_representing_string(lu_initial.get('faculty_remark')),
+        get_representing_string(lu_initial.get('other_remark')),
         _('Yes') if lcy_initial.get('team') else _('No'),
         _('Yes') if lcy_initial.get('is_vacant') else _('No'),
         dict(vacant_declaration_type.DECLARATION_TYPE)[lcy_initial.get('type_declaration_vacant')] if lcy_initial.get(
@@ -436,7 +441,7 @@ def _check_changes(initial_data, proposal_data, line_index):
 
 
 def get_representing_string(value):
-    return value or BLANK_VALUE
+    return value or ''
 
 
 def create_xls_proposal_comparison(user, learning_units_with_proposal, filters):

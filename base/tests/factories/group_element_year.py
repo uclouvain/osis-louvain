@@ -31,6 +31,8 @@ import factory.fuzzy
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
+BLOCKS = [None, 6, 34, 345, 12, 123, 2, 1, 3, 23, 234, 4, 5, 1234]
+
 
 class GroupElementYearFactory(factory.django.DjangoModelFactory):
     class Meta:
@@ -45,6 +47,7 @@ class GroupElementYearFactory(factory.django.DjangoModelFactory):
     is_mandatory = False
     link_type = None
     order = None
+    block = factory.fuzzy.FuzzyChoice(BLOCKS)
 
 
 class GroupElementYearChildLeafFactory(GroupElementYearFactory):

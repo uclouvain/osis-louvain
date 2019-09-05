@@ -246,7 +246,7 @@ class TestCommonBaseFormSave(TestCase):
         education_group_type = MiniTrainingEducationGroupTypeFactory()
         initial_educ_group_year = EducationGroupYearFactory(academic_year=current_academic_year(),
                                                             management_entity=entity_version.entity,
-                                                            education_group__start_year=current_academic_year().year,
+                                                            education_group__start_year=current_academic_year(),
                                                             education_group_type=education_group_type)
 
         initial_educ_group = initial_educ_group_year.education_group
@@ -316,7 +316,7 @@ class TestCommonBaseFormSave(TestCase):
         initial_educ_group_year = EducationGroupYearFactory(
             management_entity=entity_version.entity,
             academic_year=self.expected_educ_group_year.academic_year,
-            education_group__start_year=current_academic_year().year
+            education_group__start_year=current_academic_year()
         )
 
         GroupElementYearFactory(parent=parent, child_branch=initial_educ_group_year)
@@ -349,7 +349,7 @@ class TestCommonBaseFormSave(TestCase):
         created_education_group_year = form.save()
 
         self.assertEqual(created_education_group_year.education_group.start_year,
-                         created_education_group_year.academic_year.year)
+                         created_education_group_year.academic_year)
 
     @patch('base.business.education_groups.create.create_initial_group_element_year_structure', return_value=[])
     def test_assert_create_initial_group_element_year_structure_called(self, mock_create_initial_group_element_year):
@@ -374,7 +374,7 @@ def _get_valid_post_data(category):
         management_entity=entity_version.entity,
         main_teaching_campus=campus,
         education_group_type=education_group_type,
-        education_group__start_year=current_academic_year.year,
+        education_group__start_year=current_academic_year,
         constraint_type=CREDITS,
         credits=10
     )
@@ -385,8 +385,8 @@ def _get_valid_post_data(category):
         'remark_english': str(fake_education_group_year.remark_english),
         'title_english': str(fake_education_group_year.title_english),
         'partial_acronym': str(fake_education_group_year.partial_acronym),
-        'end_year': str(fake_education_group_year.education_group.end_year),
         'start_year': str(fake_education_group_year.education_group.start_year),
+        'end_year': fake_education_group_year.education_group.end_year,
         'title': str(fake_education_group_year.title),
         'credits': str(fake_education_group_year.credits),
         'academic_year': str(fake_education_group_year.academic_year.id),

@@ -39,8 +39,8 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateAcademicYear
-from base.tests.factories.entity import EntityFactory
 from base.tests.factories.campus import CampusFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -140,9 +140,6 @@ class TestSearchForm(TestCase):
 
         with self.assertRaises(TooManyResultsException):
             form.get_learning_units()
-
-        with self.assertRaises(TooManyResultsException):
-            form.get_learning_units_and_summary_status()
 
     def test_search_too_many_results_is_not_raised_when_borrowed_course_search(self):
         random_luy = LearningUnitYearFactory(academic_year=self.academic_years[0])

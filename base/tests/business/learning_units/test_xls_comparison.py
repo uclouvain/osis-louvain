@@ -50,10 +50,10 @@ from osis_common.document import xls_build
 class TestComparisonXls(TestCase):
     def setUp(self):
         self.user = UserFactory()
-        generatorContainer = GenerateContainer(datetime.date.today().year-2, datetime.date.today().year)
-        self.previous_learning_unit_year = generatorContainer.generated_container_years[0].learning_unit_year_full
-        self.partim = generatorContainer.generated_container_years[0].learning_unit_year_partim
-        self.learning_unit_year_1 = generatorContainer.generated_container_years[1].learning_unit_year_full
+        generator_container = GenerateContainer(datetime.date.today().year-2, datetime.date.today().year)
+        self.previous_learning_unit_year = generator_container.generated_container_years[0].learning_unit_year_full
+        self.partim = generator_container.generated_container_years[0].learning_unit_year_partim
+        self.learning_unit_year_1 = generator_container.generated_container_years[1].learning_unit_year_full
 
         self.academic_year = self.learning_unit_year_1.academic_year
         self.previous_academic_year = self.previous_learning_unit_year.academic_year
@@ -138,12 +138,12 @@ class TestPropositionComparisonXls(TestCase):
     def setUp(self):
         self.user = UserFactory()
 
-        generatorContainer = GenerateContainer(datetime.date.today().year, datetime.date.today().year)
-        self.partim = generatorContainer.generated_container_years[0].learning_unit_year_partim
-        self.learning_unit_year_1 = generatorContainer.generated_container_years[0].learning_unit_year_full
-        self.entity_1 = generatorContainer.entities[0]
+        generator_container = GenerateContainer(datetime.date.today().year, datetime.date.today().year)
+        self.partim = generator_container.generated_container_years[0].learning_unit_year_partim
+        self.learning_unit_year_1 = generator_container.generated_container_years[0].learning_unit_year_full
+        self.entity_1 = generator_container.entities[0]
         self.entity_version_1 = EntityVersionFactory(entity=self.entity_1, acronym="AGRO")
-        self.entity_2 = generatorContainer.entities[0]
+        self.entity_2 = generator_container.entities[0]
         self.entity_version_2 = EntityVersionFactory(entity=self.entity_2, acronym="DRT")
 
         self.learning_unit_year_1.entities = {REQUIREMENT_ENTITY: self.entity_version_1,
@@ -219,14 +219,14 @@ class TestPropositionComparisonXls(TestCase):
 
     def test_check_changes(self):
         line_number = 0
-        #First 2 columns are unmutable
+        # First 2 columns are unmutable
         self.assertEqual(_check_changes(['elt1', 'elt2', 'elt3', 'elt4'],
                                         ['elt1', 'elt2 bis', 'elt3 bis', 'elt4'],
                                         line_number), ['C{}'.format(line_number)])
 
     def test_get_represen_string(self):
-        self.assertEqual(get_representing_string(None), "-")
-        self.assertEqual(get_representing_string(""), "-")
+        self.assertEqual(get_representing_string(None), "")
+        self.assertEqual(get_representing_string(""), "")
         self.assertEqual(get_representing_string("test"), "test")
 
 
