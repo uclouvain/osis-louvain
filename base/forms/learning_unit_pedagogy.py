@@ -30,7 +30,7 @@ from django.db.transaction import atomic
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
-from base.business.learning_units.pedagogy import is_pedagogy_data_must_be_postponed, save_teaching_material
+from base.business.learning_units.pedagogy import save_teaching_material
 from base.models import learning_unit_year
 from base.models.teaching_material import TeachingMaterial
 from cms.enums import entity_name
@@ -58,8 +58,7 @@ class LearningUnitPedagogyEditForm(forms.Form):
         start_luy = learning_unit_year.get_by_id(trans_text.reference)
 
         reference_ids = [start_luy.id]
-        if is_pedagogy_data_must_be_postponed(start_luy):
-            reference_ids += [luy.id for luy in start_luy.find_gt_learning_units_year()]
+        reference_ids += [luy.id for luy in start_luy.find_gt_learning_units_year()]
 
         for reference_id in reference_ids:
             if trans_text.text_label.label in CMS_LABEL_PEDAGOGY_FR_ONLY:
