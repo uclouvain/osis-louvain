@@ -25,6 +25,7 @@
 ##############################################################################
 
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from base.forms.learning_unit.external_learning_unit import ExternalLearningUnitBaseForm, \
     LearningContainerYearExternalModelForm, CograduationExternalLearningUnitModelForm, \
@@ -32,6 +33,7 @@ from base.forms.learning_unit.external_learning_unit import ExternalLearningUnit
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm, \
     LearningUnitModelForm
 from base.forms.learning_unit.search_form import ExternalLearningUnitYearForm
+from base.models.academic_year import AcademicYear
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import organization_type
 from base.models.enums.learning_container_year_types import EXTERNAL
@@ -39,6 +41,7 @@ from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.entities import create_entities_hierarchy
+from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -50,6 +53,7 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from reference.tests.factories.language import LanguageFactory
 
+YEAR_LIMIT_LUE_MODIFICATION = 2018
 NAMEN = 'Namur'
 
 
@@ -117,9 +121,12 @@ def get_valid_external_learning_unit_form_data(academic_year, person, learning_u
 class TestExternalLearningUnitForm(TestCase):
     def setUp(self):
         self.person = PersonFactory()
-        self.academic_year = create_current_academic_year()
+        starting_year = YEAR_LIMIT_LUE_MODIFICATION
+        self.academic_years = GenerateAcademicYear(starting_year, starting_year + 6).academic_years
+        self.academic_year = self.academic_years[1]
         self.language = LanguageFactory(code='FR')
 
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=YEAR_LIMIT_LUE_MODIFICATION)
     def test_external_learning_unit_form_init(self):
         form = ExternalLearningUnitBaseForm(person=self.person, academic_year=self.academic_year)
 
@@ -130,6 +137,7 @@ class TestExternalLearningUnitForm(TestCase):
         self.assertIsInstance(context['learning_container_year_form'], LearningContainerYearExternalModelForm)
         self.assertIsInstance(context['learning_unit_external_form'], CograduationExternalLearningUnitModelForm)
 
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=YEAR_LIMIT_LUE_MODIFICATION)
     def test_external_learning_unit_form_is_valid(self):
         data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)
         form = ExternalLearningUnitBaseForm(person=self.person, academic_year=self.academic_year, data=data)
@@ -148,11 +156,18 @@ class TestExternalLearningUnitForm(TestCase):
         self.assertEqual(luy.externallearningunityear.author, self.person)
         self.assertEqual(luy.learning_unit.start_year, self.academic_year.year)
 
+    def test_creation(self):
+        data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)
+        form = LearningUnitYearForExternalModelForm(person=self.person, data=data, subtype=learning_unit_year_subtypes.FULL, initial={})
+        self.assertCountEqual(list(form.fields['academic_year'].queryset), self.academic_years[1:])
+
 
 class TestExternalPartimForm(TestCase):
     def setUp(self):
         self.person = PersonFactory()
-        self.academic_year = create_current_academic_year()
+        starting_year = YEAR_LIMIT_LUE_MODIFICATION
+        academic_years = GenerateAcademicYear(starting_year, starting_year + 6).academic_years
+        self.academic_year = academic_years[1]
         self.language = LanguageFactory(code='FR')
         organization = OrganizationFactory(type=organization_type.MAIN)
         campus = CampusFactory(organization=organization)

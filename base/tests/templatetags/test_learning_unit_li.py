@@ -39,6 +39,7 @@ from base.business.learning_units.perms import MSG_EXISTING_PROPOSAL_IN_EPC, MSG
     MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES, \
     MSG_CAN_DELETE_ACCORDING_TO_TYPE, can_modify_end_year_by_proposal, can_modify_by_proposal, \
     MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR, MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
+from base.models.academic_year import AcademicYear
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
@@ -56,6 +57,7 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory
+from django.utils.translation import ugettext_lazy as _
 
 ID_LINK_EDIT_LU = "link_edit_lu"
 ID_LINK_EDIT_DATE_LU = "link_edit_date_lu"
@@ -82,6 +84,7 @@ class LearningUnitTagLiEditTest(TestCase):
         self.current_academic_year = create_current_academic_year()
         self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year - 1)
         self.next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year + 1)
+
         AcademicYearFactory(year=self.current_academic_year.year + 2)
         AcademicYearFactory(year=self.current_academic_year.year + 3)
         AcademicYearFactory(year=self.current_academic_year.year + 4)
@@ -124,6 +127,7 @@ class LearningUnitTagLiEditTest(TestCase):
 
         self.client.force_login(user=self.central_manager_person.user)
         self.url_edit = reverse('edit_learning_unit', args=[self.learning_unit_year.id])
+        self.url_edit_non_editable = reverse('edit_learning_unit', args=[self.previous_learning_unit_year.id])
         self.request = RequestFactory().get("")
         self.context = {
             "learning_unit_year": self.learning_unit_year,
@@ -150,7 +154,7 @@ class LearningUnitTagLiEditTest(TestCase):
                     'id_li': ID_LINK_EDIT_LU,
                     'url': "#",
                     'title': "{}.  {}".format("You can't modify learning unit under year : %(year)d" %
-                                              {"year": settings.YEAR_LIMIT_LUE_MODIFICATION},
+                                              {"year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1},
                                               "Modifications should be made in EPC for year %(year)d" %
                                               {"year": self.previous_learning_unit_year.academic_year.year}),
                     'class_li': DISABLED,
@@ -237,10 +241,12 @@ class LearningUnitTagLiEditTest(TestCase):
             result, self._get_result_data_expected(ID_LINK_EDIT_DATE_LU, url=self.url_edit)
         )
 
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_li_edit_date_person_test_is_eligible_to_modify_end_date_based_on_container_type(self):
+        current_academic_yr = AcademicYear.objects.get(year=settings.YEAR_LIMIT_LUE_MODIFICATION+1)
         lu = LearningUnitFactory(existing_proposal_in_epc=False)
         learning_unit_year_without_proposal = LearningUnitYearFactory(
-            academic_year=self.current_academic_year,
+            academic_year=current_academic_yr,
             learning_unit=lu,
         )
         person_faculty_managers = [
@@ -433,15 +439,17 @@ class LearningUnitTagLiEditTest(TestCase):
 
         self.assertEqual(result, expected)
 
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_li_delete_all_lu_everything_ok(self):
-        result = li_delete_all_lu(self.context, self.url_edit, '', "#modalDeleteLuy")
+        result = li_delete_all_lu(self.context, self.url_edit_non_editable, '', "#modalDeleteLuy")
 
         expected = {
             'class_li': 'disabled',
             'load_modal': False,
             'url': '#',
             'id_li': 'link_delete_lus',
-            'title': "Vous ne pouvez pas supprimer une unité d'enseignement existant avant 2018",
+            'title': _("You cannot delete a learning unit which is existing before %(limit_year)s") % {
+                "limit_year": settings.YEAR_LIMIT_LUE_MODIFICATION},
             'text': '',
             'data_target': ''
         }

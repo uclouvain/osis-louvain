@@ -47,6 +47,11 @@ def get_current_year():
     return start_date.year
 
 
+def create_editable_academic_year():
+    now = datetime.datetime.now()
+    return AcademicYearFactory(year=now.year)
+
+
 class AcademicYearFactory(DjangoModelFactory):
     class Meta:
         model = "base.AcademicYear"

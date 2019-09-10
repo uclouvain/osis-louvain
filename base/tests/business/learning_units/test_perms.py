@@ -27,6 +27,7 @@ from unittest import mock
 
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
+from django.test.utils import override_settings
 
 from base.business.learning_units.perms import MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR, \
     is_eligible_for_modification, can_update_learning_achievement, is_eligible_to_update_learning_unit_pedagogy
@@ -140,6 +141,7 @@ class TestPerms(TestCase):
         self.assertFalse(is_eligible_for_modification(luy, administrative_manager))
 
     @mock.patch('waffle.models.Flag.is_active_for_user', return_value=True)
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_is_not_eligible_to_update_learning_achievement_cause_before_2018(self, mock_flag):
         self.luy.academic_year = AcademicYearFactory(year=2015)
         self.assertFalse(can_update_learning_achievement(self.luy, self.central_manager))
@@ -149,6 +151,7 @@ class TestPerms(TestCase):
         self.luy.academic_year = AcademicYearFactory(year=2019)
         self.assertTrue(can_update_learning_achievement(self.luy, self.central_manager))
 
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_is_not_eligible_to_update_learning_pedagogy_cause_before_2018(self):
         self.luy.academic_year = AcademicYearFactory(year=2015)
         self.assertFalse(is_eligible_to_update_learning_unit_pedagogy(self.luy, self.central_manager))

@@ -81,9 +81,9 @@ class TeachingMaterialUpdateTestCase(TestCase):
         )
         self.teaching_material = TeachingMaterialFactory(learning_unit_year=self.learning_unit_year)
         self.url = reverse('teaching_material_edit', kwargs={
-                               'learning_unit_year_id': self.learning_unit_year.id,
-                               'teaching_material_id': self.teaching_material.id
-                           })
+            'learning_unit_year_id': self.learning_unit_year.id,
+            'teaching_material_id': self.teaching_material.id
+        })
         self.person = _get_central_manager_person_with_permission()
         self.client.force_login(self.person.user)
 

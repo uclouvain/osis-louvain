@@ -5498,8 +5498,7 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas modifier la date de fin de cette unité d'enseignement. "
 "Vous devriez être gestionnaire central ou l'unité d'enseignement devrait "
-"être un partim ou encore l'unité d'enseignement devrait être un cours/"
-"mémoire/stage"
+"être un partim ou encore l'unité d'enseignement devrait être un autre collectif/autre individuel/thèse"
 
 #: templates/logged_out.html:36
 msgid "You are succesfully logout."

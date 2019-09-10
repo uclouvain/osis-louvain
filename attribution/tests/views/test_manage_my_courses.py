@@ -31,6 +31,7 @@ from django.contrib.auth.models import Permission
 from django.http import HttpResponse, HttpResponseNotFound
 from django.test import RequestFactory
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils import timezone
 from waffle.testutils import override_flag
@@ -207,7 +208,8 @@ class TestManageEducationalInformation(TestCase):
         self.assertTrue(mock_edit_learning_unit_pedagogy.called)
 
     @mock.patch("attribution.views.manage_my_courses.edit_learning_unit_pedagogy", return_value=HttpResponse())
-    def test_should_not_call_edit_learning_unit_pedagogy_method_before_2018_(self, mock_edit_learning_unit_pedagogy):
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
+    def test_should_not_call_edit_learning_unit_pedagogy_method_before_2018(self, mock_edit_learning_unit_pedagogy):
         self.attribution.learning_unit_year.academic_year = AcademicYearFactory(year=2015)
         self.attribution.learning_unit_year.save()
         self.client.get(self.url)
