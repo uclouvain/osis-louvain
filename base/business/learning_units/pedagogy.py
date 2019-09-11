@@ -25,7 +25,6 @@
 ##############################################################################
 from django.conf import settings
 
-from base.models import academic_year
 from cms.enums import entity_name
 from cms.models import text_label, translated_text
 

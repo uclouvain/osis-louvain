@@ -27,13 +27,16 @@ from gettext import ngettext
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, IntegrityError
-from django.db.models import Max
+from django.db.models import Max, Subquery, OuterRef, Exists, Prefetch
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
+from base.models import learning_unit_year
+from cms.enums import entity_name
+from cms.models.translated_text import TranslatedText
 from osis_common.models.serializable_model import SerializableModel, \
     SerializableModelAdmin
 
@@ -59,7 +62,8 @@ class LearningUnitAdmin(VersionAdmin, SerializableModelAdmin):
     list_filter = ('start_year',)
 
     actions = [
-        'apply_learning_unit_year_postponement'
+        'apply_learning_unit_year_postponement',
+        'apply_pedagogy_informations_postponement'
     ]
 
     def apply_learning_unit_year_postponement(self, request, queryset):
@@ -82,6 +86,51 @@ class LearningUnitAdmin(VersionAdmin, SerializableModelAdmin):
             ))
 
     apply_learning_unit_year_postponement.short_description = _("Apply postponement on learning unit year")
+
+    def apply_pedagogy_informations_postponement(self, request, queryset):
+        ac_year = starting_academic_year()
+        qs = queryset.prefetch_related(
+            Prefetch(
+                "learningunityear_set",
+                queryset=learning_unit_year.LearningUnitYear.objects.filter(
+                    academic_year__year__gte=ac_year.year
+                ).order_by("academic_year__year"),
+                to_attr="luys"
+            ),
+        )
+        for lu in qs:
+            luy = lu.luys[0]
+            translated_text_qs = TranslatedText.objects.filter(
+                entity=entity_name.LEARNING_UNIT_YEAR,
+                reference=luy.id
+            )
+            for tt in translated_text_qs:
+                TranslatedText.objects.get_or_create(
+                    entity=entity_name.LEARNING_UNIT_YEAR,
+                    reference=lu.luys[1].id,
+                    text_label=tt.text_label,
+                    language=tt.language,
+                    defaults={"text": tt.text}
+                )
+
+            luy = lu.luys[1]
+            translated_text_qs = TranslatedText.objects.filter(
+                entity=entity_name.LEARNING_UNIT_YEAR,
+                reference=luy.id
+            )
+            for tt in translated_text_qs:
+                for other_luy in lu.luys[2:]:
+                    TranslatedText.objects.update_or_create(
+                        entity=entity_name.LEARNING_UNIT_YEAR,
+                        reference=other_luy.id,
+                        text_label=tt.text_label,
+                        language=tt.language,
+                        defaults={"text": tt.text}
+                    )
+
+
+    apply_pedagogy_informations_postponement.short_description = _("Apply postponement on learning unit year "
+                                                                   "pedagogy informations")
 
 
 class LearningUnit(SerializableModel):
