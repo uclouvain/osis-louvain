@@ -30,20 +30,15 @@ from django.db.models import Prefetch
 from django.utils.translation import ugettext_lazy as _
 
 from base import models as mdl_base
-from base.business.entity import get_entity_calendar
 from base.business.learning_unit_year_with_context import volume_learning_component_year
 from base.models import learning_achievement
-from base.models.academic_calendar import AcademicCalendar
 from base.models.enums import academic_calendar_type
 from base.models.enums import entity_container_year_link_type
-from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import find_last_entity_version_grouped_by_linktypes
-from base.models.utils.utils import get_object_or_none
 from cms import models as mdl_cms
 from cms.enums import entity_name
-from osis_common.utils.datetime import convert_date_to_datetime
 
 CMS_LABEL_SPECIFICATIONS = ['themes_discussed', 'prerequisite']
 

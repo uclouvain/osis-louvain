@@ -27,18 +27,13 @@ from gettext import ngettext
 
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, IntegrityError
-from django.db.models import Max, Subquery, OuterRef, Exists, Prefetch
+from django.db.models import Max
 from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from base.business.learning_unit import CMS_LABEL_PEDAGOGY
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
-from base.models import learning_unit_year
-from base.models import teaching_material
-from cms.enums import entity_name
-from cms.models.translated_text import TranslatedText
 from osis_common.models.serializable_model import SerializableModel, \
     SerializableModelAdmin
 
@@ -88,14 +83,6 @@ class LearningUnitAdmin(VersionAdmin, SerializableModelAdmin):
             ))
 
     apply_learning_unit_year_postponement.short_description = _("Apply postponement on learning unit year")
-
-    def apply_pedagogy_informations_postponement(self, request, queryset):
-        pedagogy_information_postponement(queryset)
-        teaching_material_postponement(queryset)
-
-
-    apply_pedagogy_informations_postponement.short_description = _("Apply postponement on learning unit year "
-                                                                   "pedagogy informations")
 
 
 class LearningUnit(SerializableModel):
@@ -195,74 +182,3 @@ def get_by_acronym_with_highest_academic_year(acronym):
     ).order_by(
         'learningunityear__academic_year__year'
     ).last()
-
-
-def pedagogy_information_postponement(queryset):
-    ac_year = starting_academic_year()
-    qs = queryset.prefetch_related(
-        Prefetch(
-            "learningunityear_set",
-            queryset=learning_unit_year.LearningUnitYear.objects.filter(
-                academic_year__year__gte=ac_year.year
-            ).order_by("academic_year__year"),
-            to_attr="luys"
-        ),
-    )
-    for lu in qs:
-        luy = lu.luys[0]
-        translated_text_qs = TranslatedText.objects.filter(
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=luy.id,
-            text_label__label__in=CMS_LABEL_PEDAGOGY
-        )
-        for tt in translated_text_qs:
-            TranslatedText.objects.get_or_create(
-                entity=entity_name.LEARNING_UNIT_YEAR,
-                reference=lu.luys[1].id,
-                text_label=tt.text_label,
-                language=tt.language,
-                defaults={"text": tt.text}
-            )
-
-        luy = lu.luys[1]
-        translated_text_qs = TranslatedText.objects.filter(
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=luy.id
-        )
-        for tt in translated_text_qs:
-            for other_luy in lu.luys[2:]:
-                TranslatedText.objects.update_or_create(
-                    entity=entity_name.LEARNING_UNIT_YEAR,
-                    reference=other_luy.id,
-                    text_label=tt.text_label,
-                    language=tt.language,
-                    defaults={"text": tt.text}
-                )
-
-def teaching_material_postponement(queryset):
-    ac_year = starting_academic_year()
-    qs = queryset.prefetch_related(
-        Prefetch(
-            "learningunityear_set",
-            queryset=learning_unit_year.LearningUnitYear.objects.filter(
-                academic_year__year__gte=ac_year.year
-            ).prefetch_related(
-                Prefetch(
-                    "teachingmaterial_set",
-                    to_attr="materials"
-                )
-            ).order_by(
-                "academic_year__year"
-            ),
-            to_attr="luys"
-        ),
-    )
-
-    for lu in qs:
-        luy = lu.luys[0]
-        next_luy = lu.luys[1]
-        if len(next_luy.materials) == 0:
-            teaching_material.postpone_teaching_materials(luy)
-        else:
-            teaching_material.postpone_teaching_materials(next_luy)
-

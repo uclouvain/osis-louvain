@@ -34,8 +34,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.models import learning_unit
 from base.models.enums import learning_unit_year_subtypes
-from base.models.learning_unit import LearningUnitAdmin, LearningUnit, pedagogy_information_postponement, \
-    teaching_material_postponement
 from base.models.teaching_material import TeachingMaterial
 from base.templatetags.learning_unit import academic_years, academic_year
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
@@ -43,10 +41,8 @@ from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.user import SuperUserFactory
 from cms.enums import entity_name
-from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import PedagogyTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
 
@@ -166,141 +162,3 @@ class TestLearningUnitAdmin(TestCase):
             "%(count)d learning unit has been postponed with success",
             "%(count)d learning units have been postponed with success", 6
         ) % {'count': 6})
-
-
-class TestApplyPedagogyInformationsPostponement(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        academic_years = AcademicYearFactory.produce_in_future(quantity=6)
-        learning_unit = LearningUnitFactory()
-        cls.luys = [LearningUnitYearFactory(academic_year=academic_year, learning_unit=learning_unit)
-                for academic_year in academic_years]
-
-        cls.queryset = LearningUnit.objects.filter(pk=learning_unit.pk)
-
-
-    def test_do_not_postpone_text_which_is_not_pedagogical(self):
-        translated_text = TranslatedTextRandomFactory(
-            text_label__label="not_pedagogical",
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=self.luys[0].id
-        )
-
-        pedagogy_information_postponement(self.queryset)
-
-        self.assertQuerysetEqual(
-            TranslatedText.objects.all(),
-            [translated_text.id],
-            transform=lambda obj: obj.id
-        )
-
-    def test_do_not_overwrite_text_of_next_academic_year_with_the_current_one(self):
-        translated_text_of_current_academic_year = TranslatedTextRandomFactory(
-            text_label=PedagogyTextLabelFactory(),
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=self.luys[0].id
-        )
-        translated_text_of_next_academic_year = TranslatedTextRandomFactory(
-            text_label=translated_text_of_current_academic_year.text_label,
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=self.luys[1].id
-        )
-
-        pedagogy_information_postponement(self.queryset)
-
-        translated_text_of_next_academic_year.refresh_from_db()
-        self.assertNotEqual(
-            translated_text_of_next_academic_year.text,
-            translated_text_of_current_academic_year.text
-        )
-
-    def test_should_create_text_for_the_next_academic_year_based_on_the_current_one_if_not_existent(self):
-        translated_text_of_current_academic_year = TranslatedTextRandomFactory(
-            text_label=PedagogyTextLabelFactory(),
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=self.luys[0].id
-        )
-
-        pedagogy_information_postponement(self.queryset)
-
-        translated_text_of_next_academic_year = TranslatedText.objects.get(
-            reference=self.luys[1].id,
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            text_label=translated_text_of_current_academic_year.text_label
-        )
-        self.assertEqual(
-            translated_text_of_current_academic_year.text,
-            translated_text_of_next_academic_year.text
-        )
-
-    def test_should_postpone_text_for_each_learning_unit_year_from_next_academic_year(self):
-        translated_text_of_current_academic_year = TranslatedTextRandomFactory(
-            text_label=PedagogyTextLabelFactory(),
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=self.luys[0].id
-        )
-        translated_text_of_next_academic_year = TranslatedTextRandomFactory(
-            text_label=translated_text_of_current_academic_year.text_label,
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=self.luys[1].id
-        )
-
-        pedagogy_information_postponement(self.queryset)
-
-        translated_texts = TranslatedText.objects.filter(
-            text_label=translated_text_of_next_academic_year.text_label,
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference__in=[luy.id for luy in self.luys[2:]]
-        )
-        self.assertEqual(
-            [tt.text for tt in translated_texts],
-            [translated_text_of_next_academic_year.text] * 4,
-        )
-
-
-class TestApplyTeachingMaterialPostponement(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        academic_years = AcademicYearFactory.produce_in_future(quantity=6)
-        learning_unit = LearningUnitFactory()
-        cls.luys = [LearningUnitYearFactory(academic_year=academic_year, learning_unit=learning_unit)
-                for academic_year in academic_years]
-
-        cls.queryset = LearningUnit.objects.filter(pk=learning_unit.pk)
-
-    def test_do_not_overwrite_teaching_material_of_next_academic_year_with_the_current_one(self):
-        tm_current_year = TeachingMaterialFactory(learning_unit_year=self.luys[0])
-        tm_next_year = TeachingMaterialFactory(learning_unit_year=self.luys[1])
-
-        teaching_material_postponement(self.queryset)
-
-        tm_next_year.refresh_from_db()
-        self.assertNotEqual(
-            tm_current_year.title,
-            tm_next_year.title
-        )
-
-    def test_should_create_teaching_material_for_the_next_academic_year_based_on_the_current_one_if_not_existent(self):
-        tm_current_year = TeachingMaterialFactory(learning_unit_year=self.luys[0])
-
-        teaching_material_postponement(self.queryset)
-
-        tm_next_year = TeachingMaterial.objects.get(learning_unit_year=self.luys[1])
-
-        self.assertEqual(
-            tm_current_year.title,
-            tm_next_year.title
-        )
-
-    def test_should_postpone_teaching_material_for_each_learning_unit_year_from_next_academic_year(self):
-        tm_current_year = TeachingMaterialFactory(learning_unit_year=self.luys[0])
-        tm_next_year = TeachingMaterialFactory(learning_unit_year=self.luys[1])
-
-        teaching_material_postponement(self.queryset)
-
-        teaching_materials = TeachingMaterial.objects.filter(learning_unit_year__in=self.luys[2:])
-        self.assertEqual(
-            [tm.title for tm in teaching_materials],
-            [tm_next_year.title] * 4
-        )
-
