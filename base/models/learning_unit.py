@@ -36,6 +36,7 @@ from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
 from base.models import learning_unit_year
+from base.models import teaching_material
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from osis_common.models.serializable_model import SerializableModel, \
@@ -90,6 +91,7 @@ class LearningUnitAdmin(VersionAdmin, SerializableModelAdmin):
 
     def apply_pedagogy_informations_postponement(self, request, queryset):
         pedagogy_information_postponement(queryset)
+        teaching_material_postponement(queryset)
 
 
     apply_pedagogy_informations_postponement.short_description = _("Apply postponement on learning unit year "
@@ -236,3 +238,31 @@ def pedagogy_information_postponement(queryset):
                     language=tt.language,
                     defaults={"text": tt.text}
                 )
+
+def teaching_material_postponement(queryset):
+    ac_year = starting_academic_year()
+    qs = queryset.prefetch_related(
+        Prefetch(
+            "learningunityear_set",
+            queryset=learning_unit_year.LearningUnitYear.objects.filter(
+                academic_year__year__gte=ac_year.year
+            ).prefetch_related(
+                Prefetch(
+                    "teachingmaterial_set",
+                    to_attr="materials"
+                )
+            ).order_by(
+                "academic_year__year"
+            ),
+            to_attr="luys"
+        ),
+    )
+
+    for lu in qs:
+        luy = lu.luys[0]
+        next_luy = lu.luys[1]
+        if len(next_luy.materials) == 0:
+            teaching_material.postpone_teaching_materials(luy)
+        else:
+            teaching_material.postpone_teaching_materials(next_luy)
+
