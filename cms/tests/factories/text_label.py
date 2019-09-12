@@ -25,6 +25,8 @@
 ##############################################################################
 import factory
 import factory.fuzzy
+
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY
 from cms.enums import entity_name
 import operator
 
@@ -38,3 +40,7 @@ class TextLabelFactory(factory.django.DjangoModelFactory):
     label = factory.fuzzy.FuzzyText(prefix="Label ", length=20)
     order = factory.fuzzy.FuzzyInteger(1, 10)
     published = factory.Iterator([True, False])
+
+
+class PedagogyTextLabelFactory(TextLabelFactory):
+    label = factory.fuzzy.FuzzyChoice(CMS_LABEL_PEDAGOGY)
