@@ -29,12 +29,12 @@ from django.contrib.messages.api import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.test import TestCase
 
-from base.models import tutor
-from base.tests.factories.tutor import TutorFactory
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.user import UserFactory
 from attribution.tests.models import test_attribution
+from base.models import tutor
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.person import PersonFactory
+from base.tests.factories.tutor import TutorFactory
+from base.tests.factories.user import UserFactory
 
 
 class TestTutor(TestCase):

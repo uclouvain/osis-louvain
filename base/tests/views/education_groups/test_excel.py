@@ -31,19 +31,28 @@ from base.tests.factories.person import PersonWithPermissionsFactory
 from osis_common.document.xls_build import CONTENT_TYPE_XLS
 
 
-class TestGetLearningUnitPrerequisitesExcel(TestCase):
+class TestGetLearningUnitPrerequisiteExcel(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonWithPermissionsFactory("can_access_education_group")
         cls.education_group_year = EducationGroupYearFactory()
 
-        cls.url = reverse("education_group_learning_units_prerequisites", args=[cls.education_group_year.pk])
+        cls.url_prerequisites = reverse("education_group_learning_units_prerequisites",
+                                        args=[cls.education_group_year.pk])
+        cls.url_is_prerequisite = reverse("education_group_learning_units_is_prerequisite_for",
+                                          args=[cls.education_group_year.pk])
 
     def setUp(self):
         self.client.force_login(self.person.user)
 
-    def test_return_excel_file(self):
-        response = self.client.get(self.url)
+    def test_return_excel_file_prerequisites(self):
+        response = self.client.get(self.url_prerequisites)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], CONTENT_TYPE_XLS)
+
+    def test_return_excel_file_is_prerequisite(self):
+        response = self.client.get(self.url_is_prerequisite)
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], CONTENT_TYPE_XLS)

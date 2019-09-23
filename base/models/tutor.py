@@ -23,9 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
 from django.contrib import messages
 from django.contrib.auth.models import Group
+from django.db import models
 from django.db.models import Q
 
 from attribution.models import attribution

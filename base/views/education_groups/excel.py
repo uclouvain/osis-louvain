@@ -28,7 +28,8 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
-from base.business.education_groups.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel
+from base.business.education_groups.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, \
+    EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel
 from base.models.education_group_year import EducationGroupYear
 from osis_common.document.xls_build import CONTENT_TYPE_XLS
 
@@ -41,6 +42,22 @@ def get_learning_unit_prerequisites_excel(request, education_group_year_pk):
     response = HttpResponse(excel, content_type=CONTENT_TYPE_XLS)
     filename = "{workbook_name}.xlsx".format(
         workbook_name=str(_("prerequisites-%(year)s-%(acronym)s") % {
+            "year": education_group_year.academic_year.year,
+            "acronym": education_group_year.acronym
+        })
+    )
+    response['Content-Disposition'] = "%s%s" % ("attachment; filename=", filename)
+    return response
+
+
+@login_required
+@permission_required('base.can_access_education_group', raise_exception=True)
+def get_learning_units_is_prerequisite_for_excel(request, education_group_year_pk):
+    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_pk)
+    excel = EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel(education_group_year).to_excel()
+    response = HttpResponse(excel, content_type=CONTENT_TYPE_XLS)
+    filename = "{workbook_name}.xlsx".format(
+        workbook_name=str(_("is_prerequisite_of-%(year)s-%(acronym)s") % {
             "year": education_group_year.academic_year.year,
             "acronym": education_group_year.acronym
         })

@@ -48,13 +48,7 @@ from base.models.prerequisite import Prerequisite
 from base.models.utils.utils import get_object_or_none
 from base.views.common import display_warning_messages
 
-NO_PREREQUISITES = [
-    TrainingType.MASTER_MA_120.name,
-    TrainingType.MASTER_MD_120.name,
-    TrainingType.MASTER_MS_120.name,
-    TrainingType.MASTER_MA_180_240.name,
-    TrainingType.MASTER_MD_180_240.name,
-    TrainingType.MASTER_MS_180_240.name,
+NO_PREREQUISITES = TrainingType.finality_types() + [
     MiniTrainingType.OPTION.name,
     MiniTrainingType.MOBILITY_PARTNERSHIP.name,
 ] + GroupType.get_names()

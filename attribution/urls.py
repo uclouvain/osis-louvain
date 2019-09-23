@@ -27,7 +27,6 @@ from django.conf.urls import url, include
 
 from attribution.views import manage_my_courses
 
-
 urlpatterns = [
     url(r'^manage_my_courses/', include([
         url(r'^$', manage_my_courses.list_my_attributions_summary_editable,

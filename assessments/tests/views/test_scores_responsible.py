@@ -28,6 +28,7 @@ import datetime
 from django.contrib.auth.models import Permission
 from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.urls import reverse
 
 from attribution.models.attribution import Attribution
@@ -292,6 +293,7 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
         })
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2015)
     def test_assert_template_used(self):
         response = self.client.get(self.url, data=self.get_data)
 

@@ -34,7 +34,7 @@ from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, L
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import build_current_entity_version_structure_in_memory, EntityVersion, \
     get_entity_version_parent_or_itself_from_type, get_structure_of_entity_version
-from base.models.enums.education_group_types import MiniTrainingType, GroupType
+from base.models.enums.education_group_types import MiniTrainingType, GroupType, TrainingType
 from base.models.enums.entity_type import SECTOR, FACULTY, SCHOOL, DOCTORAL_COMMISSION
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
@@ -268,6 +268,12 @@ class EducationGroupHierarchy:
         return [
             element.child_branch for element in self.to_list(flat=True, pruning_function=pruning_function)
             if element.child_branch.education_group_type.name == MiniTrainingType.OPTION.name
+        ]
+
+    def get_finality_list(self):
+        return [
+            element.child_branch for element in self.to_list(flat=True)
+            if element.child_branch and element.child_branch.education_group_type.name in TrainingType.finality_types()
         ]
 
     def get_learning_unit_year_list(self):

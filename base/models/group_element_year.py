@@ -452,3 +452,13 @@ def get_or_create_group_element_year(parent, child_branch=None, child_leaf=None)
     elif child_leaf:
         return GroupElementYear.objects.get_or_create(parent=parent, child_leaf=child_leaf)
     return AttributeError('child branch OR child leaf params must be set')
+
+
+def get_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict:
+    if queryset.model != GroupElementYear:
+        raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
+
+    elements = fetch_row_sql([root.id])
+
+    distinct_group_elem_ids = {elem['id'] for elem in elements}
+    return queryset.filter(pk__in=distinct_group_elem_ids)

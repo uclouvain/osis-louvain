@@ -28,7 +28,6 @@ from django.db.models import Q, Exists, OuterRef
 from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
-
 from base.business.education_groups import postponement
 from base.business.group_element_years import attach
 from base.business.utils.model import update_related_object

@@ -35,7 +35,7 @@ from waffle.testutils import override_switch
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models import entity_version
 from base.models.enums import organization_type
-from base.models.enums.education_group_types import MiniTrainingType, GroupType
+from base.models.enums.education_group_types import MiniTrainingType, GroupType, TrainingType
 from base.models.enums.link_type import LinkTypes
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -750,3 +750,71 @@ class TestGetOptionList(TestCase):
 
         node = EducationGroupHierarchy(self.root)
         self.assertListEqual(node.get_option_list(), [option_1])
+
+
+class TestGetFinalityList(TestCase):
+    def setUp(self):
+        self.academic_year = AcademicYearFactory(current=True)
+        self.root = EducationGroupYearFactory(academic_year=self.academic_year)
+
+    def test_get_finality_list_case_no_result(self):
+        node = EducationGroupHierarchy(self.root)
+        self.assertListEqual(node.get_finality_list(), [])
+
+    def test_get_finality_list_case_result_found(self):
+        finality_list = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE
+        )
+        finality_1 = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__name=TrainingType.MASTER_MS_120.name
+        )
+        GroupElementYearFactory(parent=self.root, child_branch=finality_list)
+        GroupElementYearFactory(parent=finality_list, child_branch=finality_1)
+        node = EducationGroupHierarchy(self.root)
+
+        self.assertListEqual(node.get_finality_list(), [finality_1])
+
+    def test_get_finality_list_case_reference_link(self):
+        """
+          This test ensure that the tree will not be pruned when the link of child is reference
+        """
+        reference_group_child = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__name=GroupType.SUB_GROUP.name
+        )
+        GroupElementYearFactory(
+            parent=self.root,
+            child_branch=reference_group_child,
+            link_type=LinkTypes.REFERENCE.name,
+        )
+
+        finality_1 = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__name=TrainingType.MASTER_MS_120.name
+        )
+
+        GroupElementYearFactory(parent=reference_group_child, child_branch=finality_1)
+        node = EducationGroupHierarchy(self.root)
+
+        self.assertListEqual(node.get_finality_list(), [finality_1])
+
+    def test_get_finality_list_case_multiple_result_found_on_different_children(self):
+        list_finality = []
+        for _ in range(5):
+            group_child = EducationGroupYearFactory(
+                academic_year=self.academic_year,
+                education_group_type__name=GroupType.SUB_GROUP.name
+            )
+            GroupElementYearFactory(parent=self.root, child_branch=group_child)
+
+            finality = EducationGroupYearFactory(
+                academic_year=self.academic_year,
+                education_group_type__name=TrainingType.MASTER_MS_120.name
+            )
+            list_finality.append(finality)
+            GroupElementYearFactory(parent=group_child, child_branch=finality)
+
+        node = EducationGroupHierarchy(self.root)
+        self.assertCountEqual(node.get_finality_list(), list_finality)

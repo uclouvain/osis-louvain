@@ -26,10 +26,11 @@
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
-from base.business.education_groups.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel
+from base.business.education_groups.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, \
+    EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel, _get_blocks_prerequisite_of
 from base.models.enums.prerequisite_operator import AND, OR
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory
+from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory, GroupElementYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 
 
@@ -63,9 +64,12 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
                 (cls.luy_children[4], cls.luy_children[5])
             )
         )
-
-        cls.workbook = EducationGroupYearLearningUnitsPrerequisitesToExcel(cls.education_group_year)._to_workbook()
-        cls.sheet = cls.workbook.worksheets[0]
+        cls.workbook_prerequisites = \
+            EducationGroupYearLearningUnitsPrerequisitesToExcel(cls.education_group_year)._to_workbook()
+        cls.workbook_is_prerequisite = \
+            EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel(cls.education_group_year)._to_workbook()
+        cls.sheet_prerequisites = cls.workbook_prerequisites.worksheets[0]
+        cls.sheet_is_prerequisite = cls.workbook_is_prerequisite.worksheets[0]
 
     def test_header_lines(self):
         expected_headers = [
@@ -73,7 +77,9 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
             [_("Official"), None]
         ]
 
-        headers = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A1:B2")]
+        headers = [row_to_value(row) for row in self.sheet_prerequisites.iter_rows(range_string="A1:B2")]
+        self.assertListEqual(headers, expected_headers)
+        headers = [row_to_value(row) for row in self.sheet_is_prerequisite.iter_rows(range_string="A1:B2")]
         self.assertListEqual(headers, expected_headers)
 
     def test_when_learning_unit_year_has_one_prerequisite(self):
@@ -88,7 +94,7 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
              _("Yes") if self.child_leaves[1].is_mandatory else _("No")]
         ]
 
-        content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A3:G4")]
+        content = [row_to_value(row) for row in self.sheet_prerequisites.iter_rows(range_string="A3:G4")]
         self.assertListEqual(expected_content, content)
 
     def test_when_learning_unit_year_has_multiple_prerequisites(self):
@@ -113,23 +119,14 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
              _("Yes") if self.child_leaves[5].is_mandatory else _("No")
              ]
         ]
-        content = [row_to_value(row) for row in self.sheet.iter_rows(range_string="A5:G8")]
+        content = [row_to_value(row) for row in self.sheet_prerequisites.iter_rows(range_string="A5:G8")]
         self.assertListEqual(expected_content, content)
 
-    @staticmethod
-    def get_luy_line(luy):
-        return [luy.acronym, luy.complete_title, None, None, None, None, None]
-
-    @staticmethod
-    def get_item_line(luy, grp, operator, first_item=False):
-        return [
-            (_("has as prerequisite") + " :") if first_item else None,
-            operator,
-            luy.acronym,
-            luy.complete_title_i18n,
-            "{} / {}".format(grp.relative_credits, luy.credits),
-            str(grp.block),
-            _("Yes") if grp.is_mandatory else _("No")]
+    def test_get_blocks_prerequisite_of(self):
+        gey = GroupElementYearFactory(block=123)
+        self.assertEqual(_get_blocks_prerequisite_of(gey), '1 ; 2 ; 3')
+        gey = GroupElementYearFactory(block=1)
+        self.assertEqual(_get_blocks_prerequisite_of(gey), '1')
 
 
 def row_to_value(sheet_row):

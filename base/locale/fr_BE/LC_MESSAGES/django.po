@@ -1273,6 +1273,9 @@ msgstr "Générer le PDF n'est pas disponible. Veuillez utiliser EPC."
 msgid "Generate pdf"
 msgstr "Générer le pdf"
 
+msgid "Generate xls of learning units that are prerequisites for"
+msgstr "Générer xls des cours qui sont des prérequis"
+
 msgid "Generate xls of learning units that have prerequisites"
 msgstr "Générer xls des cours qui ont des prérequis"
 
@@ -1588,6 +1591,9 @@ msgstr "Liste de comparaison entre les propositions et les UE"
 
 msgid "List of learning units with comparison"
 msgstr "Comparaison entre unités d'enseignement"
+
+msgid "List of learning units with educational information and specifications"
+msgstr "Liste des UE avec la fiche descriptive et le cahier des charges"
 
 msgid "List of learning units with with one line per attribution"
 msgstr "Liste des UE avec une attribution par ligne"
@@ -2230,6 +2236,13 @@ msgstr "Produire Excel"
 
 msgid "Produce a customizable xls of learning units"
 msgstr "Produire une liste personnalisable des unités d'enseignement"
+
+
+msgid ""
+"Produce a xls of learning units with educational information and "
+"specifications"
+msgstr ""
+"Produire une liste des UE avec la fiche descriptive et le cahier des charges"
 
 msgid "Produce a xls of learning units with one line per attribution"
 msgstr ""
@@ -3381,6 +3394,15 @@ msgstr "Accueil"
 msgid "Which type of %(category)s do you want to create ?"
 msgstr "Quel type de %(category)s voulez-vous créer ?"
 
+msgid "Xls"
+msgstr "Xls"
+
+msgid "Xls UE/proposals comparison"
+msgstr "Xls de comparaison UE/proposition"
+
+msgid "Xls with proposals"
+msgstr "Xls avec les propositions"
+
 msgid "Yes"
 msgstr "Oui"
 
@@ -3456,15 +3478,12 @@ msgstr ""
 msgid "You are succesfully logout."
 msgstr "Vous êtes à présent déconnecté."
 
-#: business/group_element_years/attach.py:167
 #, python-format
 msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
 msgstr ""
 "Vous ne pouvez pas attacher une unité d'enseignement à un/une %(category)s "
 "de type %(type)s."
 
-#: business/group_element_years/attach.py:154
-#: business/group_element_years/attach.py:175
 msgid "You can not attach the same child several times."
 msgstr "Vous ne pouvez pas attacher plusieurs fois le même enfant."
 
@@ -3762,11 +3781,14 @@ msgstr "volume horaire total annuel"
 msgid "initial value"
 msgstr "valeur initiale"
 
-msgid "is a prereqisite of"
+msgid "is a prerequisite of"
 msgstr "est un prérequis de"
 
 msgid "is using in"
 msgstr "est utilisée dans"
+
+msgid "is_prerequisite_of-%(year)s-%(acronym)s"
+msgstr "est_prérequis_de-%(year)s-%(acronym)s"
 
 msgid "learning unit year"
 msgstr "unité d'enseignement annualisé"

@@ -37,6 +37,8 @@ from base.business.learning_unit_xls import create_xls_with_parameters, WITH_ATT
     create_xls_attributions, create_xls
 from base.business.learning_units.xls_comparison import create_xls_comparison, get_academic_year_of_reference, \
     create_xls_proposal_comparison
+from base.business.learning_units.xls_educational_information_and_specifications import \
+    create_xls_educational_information_and_specifications
 from base.business.proposal_xls import create_xls as create_xls_proposal
 from base.forms.common import TooManyResultsException
 from base.forms.learning_unit.comparison import SelectComparisonYears
@@ -111,6 +113,9 @@ def learning_units_search(request, search_type):
 
     if request.POST.get('xls_status') == "xls_attributions":
         return create_xls_attributions(request.user, found_learning_units, _get_filter(form, search_type))
+
+    if request.POST.get('xls_status') == "xls_educational_specifications":
+        return create_xls_educational_information_and_specifications(request.user, found_learning_units, request)
 
     form_comparison = SelectComparisonYears(academic_year=get_academic_year_of_reference(found_learning_units))
     starting_ac = starting_academic_year()
