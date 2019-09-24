@@ -48,7 +48,7 @@ from base.business.education_group import can_user_edit_administrative_data, sho
 from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
-    MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE
+    MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE, CONTACTS
 from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import starting_academic_year
@@ -286,14 +286,14 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         )
         texts = self.get_translated_texts(sections_to_display, common_education_group_year, self.user_language_code)
 
-        show_contacts = CONTACT_INTRO_KEY in sections_to_display['specific']
+        show_contacts = CONTACTS in sections_to_display['specific']
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
             'sections_with_translated_labels': self.get_sections_with_translated_labels(
                 sections_to_display,
                 texts
             ),
-            'contacts': self.get_contacts_section(sections_to_display, texts),
+            'contacts': self._get_publication_contacts_group_by_type(),
             'show_contacts': show_contacts,
             'can_edit_information': perms.is_eligible_to_edit_general_information(context['person'], context['object'])
         })
@@ -354,6 +354,8 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         }
 
     def get_translated_texts(self, sections_to_display, common_edy, user_language):
+        if CONTACTS in sections_to_display['specific']:
+            sections_to_display['specific'] += [CONTACT_INTRO_KEY]
         specific_texts = TranslatedText.objects.filter(
             text_label__label__in=sections_to_display['specific'],
             entity=entity_name.OFFER_YEAR,
@@ -373,13 +375,6 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         ).select_related("text_label")
 
         return {'common': common_texts, 'specific': specific_texts, 'labels': labels}
-
-    def get_contacts_section(self, sections_to_display, texts):
-        introduction = self.get_texts_for_label(CONTACT_INTRO_KEY, sections_to_display, texts)
-        return {
-            'contact_intro': introduction,
-            'contacts_grouped': self._get_publication_contacts_group_by_type()
-        }
 
     def _get_publication_contacts_group_by_type(self):
         contacts_by_type = {}
