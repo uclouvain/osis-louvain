@@ -57,9 +57,11 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
         model = Prerequisite
         fields = ()
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, luys_that_can_be_prerequisite=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['prerequisite_string'].initial = self.instance.prerequisite_string
+        self.luys_that_can_be_prerequisite = luys_that_can_be_prerequisite or []
+        self._acronyms_accepted_as_item = [luy.acronym for luy in self.luys_that_can_be_prerequisite]
 
     def clean_prerequisite_string(self):
         prerequisite_string = self.cleaned_data['prerequisite_string']
@@ -106,19 +108,24 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
 
         for item in group:
             lu = learning_unit.get_by_acronym_with_highest_academic_year(acronym=item)
-            if lu and lu == self.instance.learning_unit_year.learning_unit:
-                self.add_error(
-                    'prerequisite_string',
-                    _("A learning unit cannot be prerequisite to itself : %(acronym)s") % {'acronym': item}
-                )
-            elif lu:
-                # TODO :: Check that lu has a luy which is present in the education_group_year's tree
-                group_of_learning_units.append(lu)
-            else:
+            if not lu:
                 self.add_error(
                     'prerequisite_string',
                     _("No match has been found for this learning unit :  %(acronym)s") % {'acronym': item}
                 )
+            elif lu == self.instance.learning_unit_year.learning_unit:
+                self.add_error(
+                    'prerequisite_string',
+                    _("A learning unit cannot be prerequisite to itself : %(acronym)s") % {'acronym': item}
+                )
+            elif item not in self._acronyms_accepted_as_item:
+                self.add_error(
+                    'prerequisite_string',
+                    _("The learning unit %(acronym)s is not contained inside the formation") % {'acronym': item}
+                )
+            else:
+                group_of_learning_units.append(lu)
+
         return group_of_learning_units
 
 

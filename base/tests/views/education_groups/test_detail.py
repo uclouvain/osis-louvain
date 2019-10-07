@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import timedelta, datetime
+import datetime
 from http import HTTPStatus
 
 import reversion
@@ -273,16 +273,21 @@ class TestReadEducationGroup(TestCase):
 
     def test_fetching_starting_academic_year(self):
         current_academic_year = self.academic_year
+        today = datetime.date.today()
+        today.replace(year=current_academic_year.year - 1)
         starting_academic_year, created = AcademicYear.objects.update_or_create(
-            year=current_academic_year.year + 1,
-            defaults={'start_date': datetime.now() - timedelta(days=10)},
+            year=current_academic_year.year-1,
+            defaults={
+                'start_date': current_academic_year.start_date.replace(year=current_academic_year.year - 1),
+                'end_date': current_academic_year.end_date.replace(year=current_academic_year.year)
+            },
         )
 
         training = TrainingFactory()
         url = reverse("education_group_read", args=[training.pk, training.pk])
         response = self.client.get(url)
-        self.assertEqual(response.context["current_academic_year"], starting_academic_year)
-        self.assertNotEqual(response.context["current_academic_year"], current_academic_year)
+        self.assertNotEqual(response.context["current_academic_year"], starting_academic_year)
+        self.assertEqual(response.context["current_academic_year"], current_academic_year)
 
     def test_main_common_show_only_identification_and_general_information(self):
         main_common = EducationGroupYearCommonFactory(

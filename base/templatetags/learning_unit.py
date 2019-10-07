@@ -76,7 +76,7 @@ def get_difference_css(differences, parameter, default_if_none=""):
         return mark_safe(
             ' data-toggle=tooltip title="{} : {}" class="{}" '.format(
                 LABEL_VALUE_BEFORE_PROPOSAL,
-                normalize_fraction(Decimal(value)) if parameter == "credits"
+                normalize_fraction(Decimal(value)) if parameter == "credits" and differences[parameter] != '-'
                 else value or default_if_none,
                 CSS_PROPOSAL_VALUE
             )

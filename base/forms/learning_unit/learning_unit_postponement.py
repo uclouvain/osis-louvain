@@ -217,7 +217,7 @@ class LearningUnitPostponementForm:
     def _update_form_set_data(data_to_postpone, luy_to_update):
         learning_component_years = LearningComponentYear.objects.filter(learning_unit_year=luy_to_update)
         for learning_component_year in learning_component_years:
-            if learning_component_year.type == LECTURING:
+            if learning_component_year.type in (LECTURING, None):
                 data_to_postpone['component-0-id'] = learning_component_year.id
             else:
                 data_to_postpone['component-1-id'] = learning_component_year.id

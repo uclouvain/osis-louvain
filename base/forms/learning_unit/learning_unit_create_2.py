@@ -228,7 +228,7 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
 
     @property
     def simplified_volume_management_form(self):
-        return self.forms.get(SimplifiedVolumeManagementForm)
+        return self.forms[SimplifiedVolumeManagementForm]
 
     def __iter__(self):
         """Yields the forms in the order they should be rendered"""

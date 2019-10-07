@@ -666,7 +666,7 @@ base.validationrule,base_educationgroupyear.title.osis.education_group_type_JY,R
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_2M120,REQUIRED,Master [120] en,^(Master \[120\] )(.*)$,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MA120,REQUIRED,"Master [120] en , à finalité approfondie","^(Master \[120\] )(.*)(\, à finalité approfondie)(.*)$",,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MD120,REQUIRED,"Master [120] en , à finalité didactique","^(Master \[120\] )(.*)(\, à finalité didactique)(.*)$",,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MS120,REQUIRED,"Master [120] en , à finalité spécialisée","^(Master \[120\] )(.*)(\, à finalité spécialisée)(.*)$",,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MS120,REQUIRED,"Master [120] en , à finalité spécialisée",^(Master \[120\] )(.*)$,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_2M180,REQUIRED,Master [180] en,^(Master \[180\] )(.*)$,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MA180,REQUIRED,"Master [180] en , à finalité approfondie","^(Master \[180\] )(.*)(\, à finalité approfondie)(.*)$",,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MD180,REQUIRED,"Master [180] en , à finalité didactique","^(Master \[180\] )(.*)(\, à finalité didactique)(.*)$",,,,

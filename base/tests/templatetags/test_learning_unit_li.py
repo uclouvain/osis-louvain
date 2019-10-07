@@ -30,6 +30,7 @@ from django.core.exceptions import PermissionDenied
 from django.test import TestCase, RequestFactory
 from django.test.utils import override_settings
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from base.business.learning_units.perms import MSG_EXISTING_PROPOSAL_IN_EPC, MSG_NO_ELIGIBLE_TO_MODIFY_END_DATE, \
     MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY, \
@@ -57,7 +58,6 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory
-from django.utils.translation import ugettext_lazy as _
 
 ID_LINK_EDIT_LU = "link_edit_lu"
 ID_LINK_EDIT_DATE_LU = "link_edit_date_lu"
@@ -65,7 +65,7 @@ ID_LINK_EDIT_DATE_LU = "link_edit_date_lu"
 
 @override_settings(LANGUAGES=[('en', 'English'), ], LANGUAGE_CODE='en')
 class LearningUnitTagLiEditTest(TestCase):
-
+    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def setUp(self):
         self.user = UserFactory()
         self.central_manager_person = create_person_with_permission_and_group(
@@ -82,7 +82,7 @@ class LearningUnitTagLiEditTest(TestCase):
         self.learning_unit = LearningUnitFactory()
         self.previous_learning_unit = LearningUnitFactory(existing_proposal_in_epc=False)
         self.current_academic_year = create_current_academic_year()
-        self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year - 1)
+        self.previous_academic_year = AcademicYearFactory(year=settings.YEAR_LIMIT_LUE_MODIFICATION-1)
         self.next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year + 1)
 
         AcademicYearFactory(year=self.current_academic_year.year + 2)

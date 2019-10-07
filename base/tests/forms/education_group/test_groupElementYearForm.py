@@ -43,7 +43,10 @@ class TestGroupElementYearForm(TestCase):
         cls.academic_year = AcademicYearFactory()
 
     def setUp(self):
-        self.parent = TrainingFactory(academic_year=self.academic_year)
+        self.parent = TrainingFactory(
+            academic_year=self.academic_year,
+            education_group_type__learning_unit_child_allowed=True
+        )
         self.child_leaf = LearningUnitYearFactory()
         self.child_branch = MiniTrainingFactory(academic_year=self.academic_year)
 
@@ -68,7 +71,7 @@ class TestGroupElementYearForm(TestCase):
             child_leaf=self.child_leaf
         )
 
-        self.assertTrue(form.is_valid())
+        self.assertTrue(form.is_valid(), form.errors)
         self.assertTrue("link_type" not in form.fields)
 
     def test_clean_link_type_reference_with_authorized_relationship(self):

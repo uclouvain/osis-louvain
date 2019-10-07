@@ -379,12 +379,11 @@ class SimplifiedVolumeForm(forms.ModelForm):
 
     def save(self, commit=True):
         if self.need_to_create_untyped_component():
-            self.instance.acronym = DEFAULT_ACRONYM_COMPONENT[None]
-            self.instance.type = None
             # In case of untyped component, we just need to create only 1 component (not more)
             if self.index != 0:
                 return None
-
+            self.instance.acronym = DEFAULT_ACRONYM_COMPONENT[None]
+            self.instance.type = None
         self.instance.learning_unit_year = self._learning_unit_year
         self._assert_repartition_volumes_consistency()
         return super().save(commit)

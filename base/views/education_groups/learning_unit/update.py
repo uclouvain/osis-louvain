@@ -32,6 +32,7 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import UpdateView
 
@@ -64,6 +65,10 @@ class LearningUnitGenericUpdateView(RulesRequiredMixin, SuccessMessageMixin, Upd
     def get_root(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
+    @cached_property
+    def education_group_year_hierarchy(self):
+        return EducationGroupHierarchy(self.get_root())
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -72,7 +77,7 @@ class LearningUnitGenericUpdateView(RulesRequiredMixin, SuccessMessageMixin, Upd
         context['root'] = root
         context['root_id'] = self.kwargs.get("root_id")
         context['parent'] = root
-        context['tree'] = json.dumps(EducationGroupHierarchy(root).to_json())
+        context['tree'] = json.dumps(self.education_group_year_hierarchy.to_json())
 
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         return context
@@ -92,7 +97,13 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
                 education_group_year=self.get_root(),
                 learning_unit_year=self.object
             )
+        leaf_children = self.education_group_year_hierarchy.to_list(
+            flat=True,
+            pruning_function=lambda node: node.group_element_year.child_leaf is not None
+        )
+        luys_contained_in_formation = set(grp.child_leaf for grp in leaf_children)
         form_kwargs["instance"] = instance
+        form_kwargs["luys_that_can_be_prerequisite"] = luys_contained_in_formation
         return form_kwargs
 
     def get_context_data(self, **kwargs):

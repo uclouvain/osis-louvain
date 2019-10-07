@@ -163,6 +163,11 @@ class AttachLearningUnitYearStrategy(AttachStrategy):
     def is_valid(self):
         if not self.instance:
             self._check_new_attach_is_not_duplication()
+        if not self.parent.education_group_type.learning_unit_child_allowed:
+            raise ValidationError(gettext("You can not attach a learning unit to a %(category)s of type %(type)s.") % {
+                'category': self.parent.education_group_type.get_category_display(),
+                'type': self.parent.education_group_type.get_name_display()
+            })
         return True
 
     def _check_new_attach_is_not_duplication(self):

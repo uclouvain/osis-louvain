@@ -33,7 +33,7 @@ from django.utils.translation import ugettext_lazy as _
 from base.models.prerequisite import Prerequisite
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory, LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
@@ -111,6 +111,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
     def test_post_data_simple_prerequisite(self):
         luy_1 = LearningUnitYearFactory(acronym='LSINF1111', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_1)
 
         form_data = {
             "prerequisite_string": "LSINF1111"
@@ -136,8 +137,11 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
     def test_post_data_complex_prerequisite_AND(self):
         luy_1 = LearningUnitYearFactory(acronym='LSINF1111', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_1)
         luy_2 = LearningUnitYearFactory(acronym='LDROI1200', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_2)
         luy_3 = LearningUnitYearFactory(acronym='LEDPH1200', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_3)
 
         form_data = {
             "prerequisite_string": "LSINF1111 ET (LDROI1200 OU LEDPH1200)"
@@ -157,8 +161,11 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
     def test_post_data_complex_prerequisite_OR(self):
         luy_1 = LearningUnitYearFactory(acronym='LSINF1111', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_1)
         luy_2 = LearningUnitYearFactory(acronym='LDROI1200', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_2)
         luy_3 = LearningUnitYearFactory(acronym='LEDPH1200', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_3)
 
         form_data = {
             "prerequisite_string": "(LSINF1111 ET LDROI1200) OU LEDPH1200"
@@ -178,7 +185,9 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
     def test_post_data_with_prerequisite_in_lower_case(self):
         luy_1 = LearningUnitYearFactory(acronym='LSINF1111', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_1)
         luy_2 = LearningUnitYearFactory(acronym='LDROI1200', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_2)
 
         form_data = {
             "prerequisite_string": "lsinf1111 et ldroi1200"
@@ -197,7 +206,9 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
     def test_post_data_prerequisite_accept_duplicates(self):
         luy_1 = LearningUnitYearFactory(acronym='LDROI1200', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_1)
         luy_2 = LearningUnitYearFactory(acronym='LEDPH1200', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_2)
 
         form_data = {
             "prerequisite_string": "(LDROI1200 ET LEDPH1200) OU LDROI1200"
@@ -216,9 +227,12 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         )
 
     def test_post_data_prerequisite_learning_units_not_found(self):
-        LearningUnitYearFactory(acronym='LDROI1200')
-        LearningUnitYearFactory(acronym='LEDPH1200')
-        LearningUnitYearFactory(acronym='LSINF1111')
+        luy_1 = LearningUnitYearFactory(acronym='LDROI1200', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_1)
+        luy_2 = LearningUnitYearFactory(acronym='LEDPH1200', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_2)
+        luy_3 = LearningUnitYearFactory(acronym='LSINF1111', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_3)
 
         form_data = {
             "prerequisite_string": "(LDROI1200 ET LEDPH1200) OU LZZZ9876 OU (LZZZ6789 ET LSINF1111)"
@@ -259,6 +273,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
     def test_post_data_modify_existing_prerequisite(self):
         LearningUnitYearFactory(acronym='LSINF1111', academic_year=self.academic_year)
         luy_2 = LearningUnitYearFactory(acronym='LSINF1112', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_2)
 
         form_data = {
             "prerequisite_string": "LSINF1111"
@@ -280,3 +295,12 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
             prerequisite.prerequisite_string,
             "LSINF1112"
         )
+
+    def test_should_not_accept_prerequisite_which_is_not_part_of_the_formation(self):
+        LearningUnitYearFactory(acronym='LSINF1111', academic_year=self.academic_year)
+        form_data = {
+            "prerequisite_string": "LSINF1111"
+        }
+        response = self.client.post(self.url, data=form_data)
+        form = response.context["form"]
+        self.assertFalse(form.is_valid())
