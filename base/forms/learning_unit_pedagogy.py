@@ -56,7 +56,7 @@ class LearningUnitPedagogyEditForm(forms.Form):
     def save(self):
         trans_text = self._get_or_create_translated_text()
         start_luy = learning_unit_year.get_by_id(trans_text.reference)
-        self.luys = [start_luy] + [start_luy.find_gt_learning_units_year()]
+        self.luys = [start_luy] + list(start_luy.find_gt_learning_units_year())
 
         reference_ids = [luy.id for luy in self.luys]
 
