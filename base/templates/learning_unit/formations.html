@@ -81,12 +81,8 @@
                                             </ul>
                                         </td>
                                         <td class="text-center">
-                                            {% if group_element_year.relative_credits == group_element_year.child_leaf.credits %}
-                                                -
-                                            {% else %}
-                                                {{ group_element_year.relative_credits | default_if_none:'-' }}
-                                            {% endif %}
-                                            / {{ group_element_year.child_leaf.credits | default_if_none:'-' }}
+                                            {{ group_element_year.relative_credits | default_if_none:'-' }}
+                                            / {{ group_element_year.child_leaf.credits.normalize | default_if_none:'-' }}
                                         </td>
                                     </tr>
                                 {% endfor %}

@@ -33,7 +33,7 @@
                 </a>
                 {% trans 'is using in' %} :
             </p>
-            {% include "education_group/blocks/table_utilizations.html" %}
+            {% include "education_group/blocks/table_utilizations.html" with learning_unit_year=learning_unit_year %}
         </div>
     </div>
 {% endblock %}

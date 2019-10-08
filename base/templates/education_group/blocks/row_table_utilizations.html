@@ -38,7 +38,7 @@
     <td>{{ group_element_year.parent.title | default_if_none:'' }}</td>
     <td>
         {{ group_element_year.relative_credits | default_if_none:'-' }} /
-        {{ group_element_year.parent.credits | default_if_none:'-' }}
+        {{ learning_unit_year.credits.normalize | default_if_none:'-' }}
     </td>
     <td>{{ group_element_year.min_credits | default_if_none:'-' }}</td>
     <td>{{ group_element_year.max_credits | default_if_none:'-' }}</td>

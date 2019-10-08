@@ -28,12 +28,28 @@
 
 {% trans 'certificate aims'|capfirst as label_certificate_aims %}
 
-<form class="certificate_aims-form" role="form" method="POST" action="{{ request.path }}" class="form">
+<form id="certificate_aims-form_id" class="certificate_aims-form" role="form" method="POST" action="{{ request.path }}" class="form">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">×</button>
         <h4>{% bootstrap_label label_certificate_aims %}</h4>
     </div>
     <div class="modal-body">
+        {% if form_certificate_aims.errors %}
+            <div>
+            {% for field in form_certificate_aims %}
+                {% for error in field.errors %}
+                    <div class="alert alert-danger">
+                        <strong>{{ error|escape }}</strong>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            {% for error in form_certificate_aims.non_field_errors %}
+                <div class="alert alert-danger">
+                    <strong>{{ error|escape }}</strong>
+                </div>
+            {% endfor %}
+            </div>
+        {% endif %}
         {% csrf_token %}
         <div>
             {% trans 'filter by section'|capfirst as label_section %}
@@ -50,5 +66,4 @@
         <button type="submit" class="btn" data-dismiss="modal">{% trans 'cancel' %}</button>
     </div>
 </form>
-
 {{ form_certificate_aims.media }}

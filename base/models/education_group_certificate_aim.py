@@ -23,12 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.translation import ugettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from base.models.certificate_aim import CertificateAim
-from base.models.education_group_year import EducationGroupYear
 from osis_common.models.osis_model_admin import OsisModelAdmin
+
+MAX_NUMBER_CERTIFICATE_TYPE_2 = 1
 
 
 class EducationGroupCertificateAimAdmin(VersionAdmin, OsisModelAdmin):
@@ -52,12 +54,12 @@ class EducationGroupCertificateAim(models.Model):
     )
 
     education_group_year = models.ForeignKey(
-        EducationGroupYear,
+        'EducationGroupYear',
         on_delete=models.CASCADE,
     )
 
     certificate_aim = models.ForeignKey(
-        CertificateAim,
+        'CertificateAim',
         on_delete=models.PROTECT,
     )
 
@@ -66,3 +68,11 @@ class EducationGroupCertificateAim(models.Model):
 
     def __str__(self):
         return "{} - {}".format(self.education_group_year, self.certificate_aim)
+
+    @staticmethod
+    def check_certificate_aims(cleaned_data):
+        certificate_aims = cleaned_data["certificate_aims"]
+        certificate_aims_type_2 = [ca for ca in certificate_aims if ca.section == 2]
+        if len(certificate_aims_type_2) > MAX_NUMBER_CERTIFICATE_TYPE_2:
+            raise ValidationError(_("There can only be one type 2 expectation"))
+        return certificate_aims

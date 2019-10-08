@@ -97,11 +97,8 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
                 education_group_year=self.get_root(),
                 learning_unit_year=self.object
             )
-        leaf_children = self.education_group_year_hierarchy.to_list(
-            flat=True,
-            pruning_function=lambda node: node.group_element_year.child_leaf is not None
-        )
-        luys_contained_in_formation = set(grp.child_leaf for grp in leaf_children)
+        leaf_children = self.education_group_year_hierarchy.to_list(flat=True)
+        luys_contained_in_formation = set(grp.child_leaf for grp in leaf_children if grp.child_leaf)
         form_kwargs["instance"] = instance
         form_kwargs["luys_that_can_be_prerequisite"] = luys_contained_in_formation
         return form_kwargs

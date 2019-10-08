@@ -42,9 +42,9 @@
     {% for group_element_year in group_element_years %}
         {% with ref_parent=group_element_year.parent|get_parent_of_reference_link %}
             {% with formations|get_item:group_element_year.parent.id as parent_formations %}
-                {% include "education_group/blocks/row_table_utilizations.html" with group_element_year=group_element_year formations=parent_formations only %}
+                {% include "education_group/blocks/row_table_utilizations.html" with learning_unit_year=learning_unit_year group_element_year=group_element_year formations=parent_formations only %}
                 {% if ref_parent %}
-                    {% include "education_group/blocks/row_table_utilizations.html" with group_element_year=ref_parent is_reference=True only %}
+                    {% include "education_group/blocks/row_table_utilizations.html" with learning_unit_year=learning_unit_year group_element_year=ref_parent is_reference=True only %}
                 {% endif %}
             {% endwith %}
         {% endwith %}
