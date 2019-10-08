@@ -26,6 +26,7 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
 from base import models as mdl
@@ -66,6 +67,14 @@ def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
         form = LearningUnitPedagogyEditForm(request.POST)
         if form.is_valid():
             form.save()
+            last_year_reported = form.luys[-1].academic_year.year
+            display_success_messages(
+                request,
+                _("The section you modified have been saved and "
+                  "reported up to %(last_year_reported)s with success.") % {
+                 "last_year_reported": last_year_reported
+                }
+            )
         return redirect(redirect_url)
 
     context = get_common_context_learning_unit_year(
