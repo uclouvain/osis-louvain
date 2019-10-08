@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-13 11:40+0200\n"
+"POT-Creation-Date: 2019-10-08 15:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -61,7 +61,7 @@ msgid_plural "%(count)d education groups have been updated with success."
 msgstr[0] ""
 msgstr[1] ""
 
-#: models/learning_unit.py:74 tests/models/test_learning_unit.py:158
+#: models/learning_unit.py:75 tests/models/test_learning_unit.py:162
 #, python-format
 msgid "%(count)d learning unit has been postponed with success"
 msgid_plural "%(count)d learning units have been postponed with success"
@@ -218,7 +218,7 @@ msgid "<b>prolong</b> the learning unit of the same acronym"
 msgstr ""
 
 #: forms/prerequisite.py:119
-#: tests/views/education_groups/learning_unit/test_update.py:270
+#: tests/views/education_groups/learning_unit/test_update.py:274
 #, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
 msgstr ""
@@ -657,7 +657,7 @@ msgstr ""
 msgid "Apply postponement on education group year"
 msgstr ""
 
-#: models/learning_unit.py:84
+#: models/learning_unit.py:85
 msgid "Apply postponement on learning unit year"
 msgstr ""
 
@@ -1591,7 +1591,7 @@ msgstr ""
 msgid "End of cycle"
 msgstr ""
 
-#: forms/learning_unit/learning_unit_partim.py:78 models/learning_unit.py:93
+#: forms/learning_unit/learning_unit_partim.py:78 models/learning_unit.py:94
 msgid "End year"
 msgstr ""
 
@@ -1634,7 +1634,7 @@ msgstr ""
 msgid "Enrolled"
 msgstr ""
 
-#: templates/learning_unit/formations.html:118
+#: templates/learning_unit/formations.html:114
 msgid "Enrolled to learning unit"
 msgstr ""
 
@@ -1650,11 +1650,11 @@ msgstr ""
 msgid "Enrollment enabled"
 msgstr ""
 
-#: templates/learning_unit/formations.html:108
+#: templates/learning_unit/formations.html:104
 msgid "Enrollments to learning unit"
 msgstr ""
 
-#: templates/learning_unit/formations.html:117
+#: templates/learning_unit/formations.html:113
 msgid "Enrollments to training"
 msgstr ""
 
@@ -1666,7 +1666,7 @@ msgstr ""
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
-#: forms/education_group/training.py:202
+#: forms/education_group/training.py:200
 msgid "Enter text to search"
 msgstr ""
 
@@ -1780,7 +1780,7 @@ msgstr ""
 msgid "Faculty borrowing"
 msgstr ""
 
-#: business/proposal_xls.py:78 models/learning_unit.py:95
+#: business/proposal_xls.py:78 models/learning_unit.py:96
 #: tests/business/test_proposal_xls.py:133
 msgid "Faculty remark"
 msgstr ""
@@ -1913,7 +1913,7 @@ msgstr ""
 #: templates/education_group/tab_administrative_data.html:65
 #: templates/education_group/tab_administrative_data.html:73
 #: templatetags/learning_unit.py:54 templatetags/learning_unit.py:60
-#: tests/models/test_learning_unit.py:83 tests/models/test_learning_unit.py:86
+#: tests/models/test_learning_unit.py:87 tests/models/test_learning_unit.py:90
 msgid "From"
 msgstr ""
 
@@ -2187,7 +2187,7 @@ msgstr ""
 msgid "Is current partner"
 msgstr ""
 
-#: forms/learning_unit_pedagogy.py:101 models/teaching_material.py:45
+#: forms/learning_unit_pedagogy.py:100 models/teaching_material.py:42
 msgid "Is this teaching material mandatory?"
 msgstr ""
 
@@ -2336,7 +2336,7 @@ msgstr ""
 msgid "Learning location"
 msgstr ""
 
-#: models/learning_unit.py:145 templates/learning_unit/breadcrumb.html:30
+#: models/learning_unit.py:146 templates/learning_unit/breadcrumb.html:30
 #: templates/learning_unit/comparison.html:31
 #: templates/learning_unit/proposal_comparison.html:31
 #: templates/learning_units.html:62 templates/my_osis/profile.html:132
@@ -2886,7 +2886,7 @@ msgstr ""
 #: business/learning_units/xls_comparison.py:420
 #: business/learning_units/xls_comparison.py:425
 #: business/learning_units/xls_comparison.py:426
-#: forms/learning_unit_pedagogy.py:99
+#: forms/learning_unit_pedagogy.py:98
 #: templates/learning_unit/blocks/modal/modal_modification_ask_to_report.html:37
 #: templates/learning_unit/proposal_comparison.html:56
 #: templates/learning_unit/proposal_comparison.html:67
@@ -2936,13 +2936,13 @@ msgstr ""
 msgid "No difference"
 msgstr ""
 
-#: templates/learning_unit/formations.html:141
+#: templates/learning_unit/formations.html:137
 msgid "No enrollment for this learning unit"
 msgstr ""
 
 #: forms/prerequisite.py:114
-#: tests/views/education_groups/learning_unit/test_update.py:248
 #: tests/views/education_groups/learning_unit/test_update.py:252
+#: tests/views/education_groups/learning_unit/test_update.py:256
 #, python-format
 msgid "No match has been found for this learning unit :  %(acronym)s"
 msgstr ""
@@ -3178,7 +3178,7 @@ msgstr ""
 msgid "Other languages activities"
 msgstr ""
 
-#: business/proposal_xls.py:79 models/learning_unit.py:100
+#: business/proposal_xls.py:79 models/learning_unit.py:101
 #: tests/business/test_proposal_xls.py:134
 msgid "Other remark"
 msgstr ""
@@ -3386,7 +3386,7 @@ msgstr[1] ""
 msgid "Prerequisites are invalid"
 msgstr ""
 
-#: views/education_groups/learning_unit/update.py:135
+#: views/education_groups/learning_unit/update.py:132
 msgid "Prerequisites saved."
 msgstr ""
 
@@ -3499,7 +3499,7 @@ msgstr ""
 msgid "Programs/gathering"
 msgstr ""
 
-#: models/learning_unit.py:124
+#: models/learning_unit.py:125
 msgid "Prohibition to delete a learning unit before 2015."
 msgstr ""
 
@@ -3880,7 +3880,7 @@ msgstr ""
 msgid "Search type"
 msgstr ""
 
-#: forms/education_group/training.py:187 forms/education_group/training.py:275
+#: forms/education_group/training.py:185 forms/education_group/training.py:269
 msgid "Search..."
 msgstr ""
 
@@ -3984,7 +3984,7 @@ msgstr ""
 msgid "Specifications"
 msgstr ""
 
-#: forms/education_group/training.py:220 models/education_group.py:86
+#: forms/education_group/training.py:218 models/education_group.py:86
 #: models/education_group.py:119
 #: templates/education_group/identification_mini_training_details.html:38
 #: templates/education_group/identification_training_details.html:98
@@ -4010,7 +4010,7 @@ msgstr ""
 msgid "Start date must be lower than end date"
 msgstr ""
 
-#: models/learning_unit.py:92
+#: models/learning_unit.py:93
 msgid "Starting year"
 msgstr ""
 
@@ -4132,6 +4132,13 @@ msgstr ""
 #: templates/learning_unit/blocks/panel/educational_informations.html:70
 #: templates/learning_unit/teaching_material/modal_edit.html:31
 msgid "Teaching material"
+msgstr ""
+
+#: views/teaching_material.py:105
+#, python-format
+msgid ""
+"Teaching materials has been saved and reported up to %(last_year_reported)s "
+"with success"
 msgstr ""
 
 #: business/education_groups/general_information_sections.py:74
@@ -4308,7 +4315,7 @@ msgstr ""
 msgid "The field can contain only one value."
 msgstr ""
 
-#: forms/education_group/training.py:101
+#: forms/education_group/training.py:99
 #: tests/forms/education_group/test_training.py:180
 msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
@@ -4317,7 +4324,7 @@ msgstr ""
 msgid "The following education groups ended with error"
 msgstr ""
 
-#: models/learning_unit.py:80
+#: models/learning_unit.py:81
 msgid "The following learning units ended with error"
 msgstr ""
 
@@ -4358,7 +4365,7 @@ msgstr ""
 msgid "The learning unit %(acronym)s is not contained inside the formation"
 msgstr ""
 
-#: templates/learning_unit/formations.html:101
+#: templates/learning_unit/formations.html:97
 #, python-format
 msgid "The learning unit %(acronym)s is not included in any education group"
 msgstr ""
@@ -4545,6 +4552,13 @@ msgstr ""
 msgid "The root does not exist in the next academic year."
 msgstr ""
 
+#: views/learning_units/pedagogy/update.py:73
+#, python-format
+msgid ""
+"The section you modified have been saved and reported up to "
+"%(last_year_reported)s with success."
+msgstr ""
+
 #: business/learning_units/edition.py:123
 #: tests/business/test_learning_unit_edition.py:532
 #, python-format
@@ -4568,6 +4582,13 @@ msgstr ""
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
 "the volume of parent learning unit for this professor"
+msgstr ""
+
+#: views/teaching_material.py:92
+#, python-format
+msgid ""
+"The teaching material has been deleted up to %(last_year_reported)s with "
+"success"
 msgstr ""
 
 #: business/education_groups/perms.py:269
@@ -4658,7 +4679,7 @@ msgstr ""
 msgid "There are warnings in the form."
 msgstr ""
 
-#: forms/education_group/training.py:235
+#: models/education_group_certificate_aim.py:77
 msgid "There can only be one type 2 expectation"
 msgstr ""
 
@@ -4775,7 +4796,7 @@ msgstr ""
 #: business/learning_units/xls_generator.py:51 business/proposal_xls.py:38
 #: forms/education_groups.py:99 forms/entity.py:38
 #: forms/learning_unit/search_form.py:202
-#: forms/learning_unit/search_form.py:447 models/teaching_material.py:44
+#: forms/learning_unit/search_form.py:447 models/teaching_material.py:41
 #: templates/academic_calendar/academic_calendar.html:47
 #: templates/academic_calendar/academic_calendar_form.html:64
 #: templates/education_group/blocks/content_default_table.html:32
@@ -4824,7 +4845,7 @@ msgid "Too many results"
 msgstr ""
 
 #: business/education_group.py:61 models/enums/education_group_categories.py:36
-#: templates/learning_unit/formations.html:116
+#: templates/learning_unit/formations.html:112
 msgid "Training"
 msgstr ""
 
@@ -5205,7 +5226,7 @@ msgstr ""
 #: business/learning_units/xls_comparison.py:420
 #: business/learning_units/xls_comparison.py:425
 #: business/learning_units/xls_comparison.py:426
-#: forms/learning_unit_pedagogy.py:98
+#: forms/learning_unit_pedagogy.py:97
 #: templates/learning_unit/blocks/modal/modal_modification_ask_to_report.html:39
 #: templates/learning_unit/proposal_comparison.html:54
 #: templates/learning_unit/proposal_comparison.html:65
@@ -5356,7 +5377,7 @@ msgid ""
 msgstr ""
 
 #: business/group_element_years/management.py:150
-#: tests/forms/education_group/test_groupElementYearForm.py:166
+#: tests/forms/education_group/test_groupElementYearForm.py:169
 #, python-format
 msgid ""
 "You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type "
@@ -5400,7 +5421,7 @@ msgstr ""
 msgid "You have the choice between"
 msgstr ""
 
-#: views/education_groups/learning_unit/update.py:125
+#: views/education_groups/learning_unit/update.py:122
 #, python-format
 msgid ""
 "You must be in the context of a training to modify the prerequisites to a "
@@ -5540,7 +5561,7 @@ msgstr ""
 #: templates/academic_calendar/academic_calendar_form.html:129
 #: templates/academic_calendar/blocks/modal/modal_confirm_delete.html:36
 #: templates/blocks/forms/create_cancel_buttons_modal.html:27
-#: templates/education_group/blocks/form/training_certificate.html:50
+#: templates/education_group/blocks/form/training_certificate.html:66
 #: templates/education_group/blocks/form/update_achievement_inner.html:58
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:64
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:53
@@ -5706,7 +5727,7 @@ msgstr ""
 msgid "field reference"
 msgstr ""
 
-#: templates/education_group/blocks/form/training_certificate.html:39
+#: templates/education_group/blocks/form/training_certificate.html:55
 #: templates/education_group/blocks/form/training_tab_diploma.html:42
 msgid "filter by section"
 msgstr ""
@@ -5797,7 +5818,7 @@ msgstr ""
 msgid "no"
 msgstr ""
 
-#: templatetags/learning_unit.py:60 tests/models/test_learning_unit.py:86
+#: templatetags/learning_unit.py:60 tests/models/test_learning_unit.py:90
 msgid "no planned end"
 msgstr ""
 
@@ -5904,7 +5925,7 @@ msgstr ""
 #: templates/academic_calendar/academic_calendar_form.html:125
 #: templates/academic_calendar/academic_calendar_form.html:126
 #: templates/blocks/forms/create_cancel_buttons_modal.html:31
-#: templates/education_group/blocks/form/training_certificate.html:49
+#: templates/education_group/blocks/form/training_certificate.html:65
 #: templates/education_group/blocks/form/update_achievement_inner.html:59
 #: templates/education_group/blocks/modal/modal_condition_line_edit.html:63
 #: templates/education_group/blocks/modal/modal_condition_text_edit.html:52
@@ -5930,7 +5951,7 @@ msgstr ""
 msgid "search"
 msgstr ""
 
-#: forms/education_group/training.py:115 models/education_group_year.py:456
+#: forms/education_group/training.py:113 models/education_group_year.py:456
 #: templates/education_group/identification_training_details.html:75
 msgid "secondary domains"
 msgstr ""
@@ -6000,7 +6021,7 @@ msgstr ""
 #: templates/education_group/tab_administrative_data.html:67
 #: templates/education_group/tab_administrative_data.html:75
 #: templates/learning_unit/blocks/modal/modal_warning_state_modification.html:33
-#: templatetags/learning_unit.py:56 tests/models/test_learning_unit.py:83
+#: templatetags/learning_unit.py:56 tests/models/test_learning_unit.py:87
 msgid "to"
 msgstr ""
 

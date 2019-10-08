@@ -25,21 +25,9 @@
 ##############################################################################
 from django.conf import settings
 
+from base.models.teaching_material import find_by_learning_unit_year, TeachingMaterial
 from cms.enums import entity_name
 from cms.models import text_label, translated_text
-
-
-def update_bibliography_changed_field_in_cms(learning_unit_year):
-    txt_label = text_label.get_by_label_or_none('bibliography')
-    if txt_label:
-        for language in settings.LANGUAGES:
-            translated_text.update_or_create(
-                entity=entity_name.LEARNING_UNIT_YEAR,
-                reference=learning_unit_year.id,
-                text_label=txt_label,
-                language=language[0],
-                defaults={}
-            )
 
 
 def save_teaching_material(teach_material):
@@ -56,8 +44,41 @@ def delete_teaching_material(teach_material):
     return result
 
 
-def postpone_teaching_materials(luy):
-    from base.models import teaching_material
-    teaching_material.postpone_teaching_materials(luy)
+def postpone_teaching_materials(luy, commit=True):
+    """
+        This function override all teaching materials from start_luy until latest version of this luy
+        :param start_luy: The learning unit year which we want to start postponement
+        :param commit:
+        :return:
+        """
+    teaching_materials = find_by_learning_unit_year(luy)
+    for next_luy in [luy for luy in luy.find_gt_learning_units_year()]:
+        # Remove all previous teaching materials
+        next_luy.teachingmaterial_set.all().delete()
+        # Inserts all teaching materials comes from start_luy
+        to_inserts = [TeachingMaterial(title=tm.title, mandatory=tm.mandatory, learning_unit_year=next_luy)
+                      for tm in teaching_materials]
+        bulk_save(to_inserts, commit)
+
+        # For sync purpose, we need to trigger an update of the bibliography when we update teaching materials
+        update_bibliography_changed_field_in_cms(next_luy)
     # For sync purpose, we need to trigger an update of the bibliography when we update teaching materials
     update_bibliography_changed_field_in_cms(luy)
+
+
+def bulk_save(teaching_materials, commit=True):
+    for teaching_material in teaching_materials:
+        teaching_material.save(commit)
+
+
+def update_bibliography_changed_field_in_cms(learning_unit_year):
+    txt_label = text_label.get_by_label_or_none('bibliography')
+    if txt_label:
+        for language in settings.LANGUAGES:
+            translated_text.update_or_create(
+                entity=entity_name.LEARNING_UNIT_YEAR,
+                reference=learning_unit_year.id,
+                text_label=txt_label,
+                language=language[0],
+                defaults={}
+            )

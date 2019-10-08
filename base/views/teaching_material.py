@@ -26,11 +26,13 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
 from base.business.learning_units import perms
 from base.business.learning_units.pedagogy import delete_teaching_material
 from base.forms.learning_unit_pedagogy import TeachingMaterialModelForm
+from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.teaching_material import TeachingMaterial
 from base.views.common import display_success_messages
@@ -83,13 +85,25 @@ def delete_view(request, learning_unit_year_id, teaching_material_id, success_ur
     teach_material = get_object_or_404(TeachingMaterial, pk=teaching_material_id,
                                        learning_unit_year_id=learning_unit_year_id)
     if request.method == 'POST':
+        last_year_reported = teach_material.learning_unit_year.find_gt_learning_units_year().last().year
         delete_teaching_material(teach_material)
-        display_success_messages(request, "The teaching material has been deleted")
+        display_success_messages(
+            request,
+            _("The teaching material has been deleted up to %(last_year_reported)s with success") % {
+                "last_year_reported": last_year_reported
+            }
+        )
         return redirect(success_url)
     return render(request, "learning_unit/teaching_material/modal_delete.html", {})
 
 
 def _save_and_redirect(request, form, learning_unit_year, success_url):
     form.save(learning_unit_year=learning_unit_year)
-    display_success_messages(request, "Teaching materials has been updated")
+    last_year_reported = learning_unit_year.find_gt_learning_units_year().last().year
+    display_success_messages(
+        request,
+        _("Teaching materials has been saved and reported up to %(last_year_reported)s with success") % {
+            "last_year_reported": last_year_reported
+        }
+    )
     return redirect(success_url)
