@@ -6,7 +6,7 @@ omit =
     venv/*
     */tests/*
     features/*
-    *__init__*
+    */__init__.py
 
 [report]
 fail_under = 100
