@@ -68,6 +68,13 @@
                                 &nbsp;{% trans 'List of learning units with with one line per attribution' %}
                             </a>
                         </li>
+
+                        <li>
+                            <a id="btn_produce_xls_educational_specifications"
+                               style="margin-right:10px;" title="{% trans 'Produce a xls of learning units with educational information and specifications' %}">
+                                &nbsp;{% trans 'List of learning units with educational information and specifications' %}
+                            </a>
+                        </li>
                     </ul>
                 </div>
                 <form id="download_xls" action="{{ request.path }}" method="post">
@@ -76,6 +83,8 @@
                     <input type="hidden" id="comparison_year" name="comparison_year">
                     <input type="hidden" id="hdn_with_grp" name="with_grp">
                     <input type="hidden" id="hdn_with_attributions" name="with_attributions">
+                    <input type="hidden" id="hdn_with_educational_specifications"
+                           name="with_educational_and_specifications">
                 </form>
 
                 <table id="table_learning_units" class="table table-striped table-hover">

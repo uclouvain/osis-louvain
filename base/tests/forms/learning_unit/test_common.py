@@ -30,6 +30,7 @@ from django.urls import reverse
 
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_unit_year_subtypes import FULL
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -40,7 +41,9 @@ from base.tests.factories.user import SuperUserFactory
 class LearningUnitCheckAcronymViewTestCase(TestCase):
     def setUp(self):
         today = datetime.date.today()
-        self.academic_years = GenerateAcademicYear(start_year=today.year+1, end_year=today.year+7)
+        start_year = AcademicYearFactory(year=today.year+1)
+        end_year = AcademicYearFactory(year=today.year+7)
+        self.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year)
 
         self.a_superuser = SuperUserFactory()
         self.person = PersonFactory(user=self.a_superuser)

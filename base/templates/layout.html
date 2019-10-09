@@ -71,6 +71,7 @@
 
     <script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jquery-ui.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/spinner.js' %}"></script>
     <script>
         /*** Handle jQuery plugin naming conflict between jQuery UI and Bootstrap ***/
         $.widget.bridge('uibutton', $.ui.button);
@@ -112,6 +113,9 @@
 {% endif %}>
 {% hijack_notification %}
 {% analytical_body_top %}
+<div id="overlay" class="overlay"></div>
+<div id="overlay_fadein" class="overlay fadein"></div>
+<div id="loader"></div>
 
 
 {% block layout_navbar_top %}

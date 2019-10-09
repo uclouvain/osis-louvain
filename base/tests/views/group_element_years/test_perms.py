@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import code
 
 from django.contrib.auth.models import Permission
 from django.core.exceptions import PermissionDenied
@@ -40,7 +39,6 @@ from base.tests.factories.education_group_year import TrainingFactory, GroupFact
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.person import PersonFactory, FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.user import UserFactory
 from base.views.education_groups.group_element_year.perms import can_update_group_element_year, \
     can_detach_group_element_year
 
@@ -84,12 +82,12 @@ class TestCanUpdateGroupElementYear(TestCase):
         self.assertTrue(can_update_group_element_year(person_entity.person.user, self.group_element_year))
 
     def test_true_if_person_is_faculty_manager_and_period_open(self):
-        OpenAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION, academic_year=self.current_acy)
+        OpenAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION, academic_year=self.current_acy, data_year=self.current_acy)
 
         self.assertTrue(can_update_group_element_year(self.faculty_manager.user, self.group_element_year))
 
     def test_raise_permission_denied_if_person_is_faculty_manager_and_period_closed(self):
-        CloseAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION, academic_year=self.current_acy)
+        CloseAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION, academic_year=self.current_acy, data_year=self.current_acy)
 
         with self.assertRaises(PermissionDenied):
             can_update_group_element_year(self.faculty_manager.user, self.group_element_year)
@@ -109,7 +107,7 @@ class TestCanUpdateGroupElementYear(TestCase):
                     can_update_group_element_year(self.faculty_manager.user, group_element_year)
 
     def test_detach(self):
-        calendar = OpenAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION, academic_year=self.current_acy)
+        calendar = OpenAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION, academic_year=self.current_acy, data_year=self.current_acy)
         group_element_year = GroupElementYearFactory(parent=self.group_element_year.parent)
 
         can_detach_group_element_year(self.faculty_manager.user, group_element_year)

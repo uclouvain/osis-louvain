@@ -35,10 +35,10 @@ from django.utils.translation import gettext_lazy as _
 
 from base import models as mdl
 from base.business.institution import can_user_edit_educational_information_submission_dates_for_entity
+from base.business.perms import view_academicactors
 from base.forms.entity import EntityVersionFilter
 from base.forms.entity_calendar import EntityCalendarEducationalInformationForm
 from base.models import entity_version as entity_version_mdl
-from base.models.entity_manager import has_perm_entity_manager
 from base.models.entity_version import EntityVersion
 from base.views.common import display_success_messages, paginate_queryset
 
@@ -48,7 +48,11 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 @login_required
 @permission_required('base.is_institution_administrator', raise_exception=True)
 def institution(request):
-    return render(request, "institution.html", {'section': 'institution'})
+    context = {
+        'section': 'institution',
+        'view_academicactors': view_academicactors(request.user)
+    }
+    return render(request, "institution.html", context)
 
 
 @login_required
@@ -58,7 +62,7 @@ def mandates(request):
 
 
 @login_required
-@user_passes_test(has_perm_entity_manager)
+@user_passes_test(view_academicactors)
 def academic_actors(request):
     return render(request, "academic_actors.html", {})
 

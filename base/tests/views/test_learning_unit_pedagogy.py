@@ -28,10 +28,10 @@ from io import BytesIO
 from unittest.mock import patch
 
 from django.contrib.messages import get_messages
-from django.urls import reverse
 from django.http import HttpResponseNotAllowed
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect, HttpResponse
 from django.test import TestCase
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from openpyxl import load_workbook
 
@@ -40,7 +40,7 @@ from base.models.enums import academic_calendar_type, entity_type
 from base.models.enums import organization_type
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -61,9 +61,10 @@ class LearningUnitPedagogyTestCase(TestCase):
         now = datetime.datetime.now()
 
         cls.academic_year = create_current_academic_year()
+        cls.old_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
         cls.previous_academic_year = GenerateAcademicYear(
-            cls.academic_year.year - 1,
-            cls.academic_year.year - 1
+            cls.old_academic_year,
+            cls.old_academic_year
         ).academic_years[0]
         AcademicCalendarFactory(
             academic_year=cls.previous_academic_year,
@@ -165,9 +166,10 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
         now = datetime.datetime.now()
 
         cls.academic_year = create_current_academic_year()
+        cls.old_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
         cls.previous_academic_year = GenerateAcademicYear(
-            cls.academic_year.year - 1,
-            cls.academic_year.year - 1
+            cls.old_academic_year,
+            cls.old_academic_year
         ).academic_years[0]
         AcademicCalendarFactory(
             academic_year=cls.previous_academic_year,
@@ -308,9 +310,10 @@ class LearningUnitPedagogyEditTestCase(TestCase):
         now = datetime.datetime.now()
 
         cls.academic_year = create_current_academic_year()
+        cls.old_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
         cls.previous_academic_year = GenerateAcademicYear(
-            cls.academic_year.year - 1,
-            cls.academic_year.year - 1
+            cls.old_academic_year,
+            cls.old_academic_year
         ).academic_years[0]
         AcademicCalendarFactory(
             academic_year=cls.previous_academic_year,

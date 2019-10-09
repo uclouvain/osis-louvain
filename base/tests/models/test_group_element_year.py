@@ -28,6 +28,7 @@ from unittest import mock
 
 from django.core.exceptions import ValidationError
 from django.test import TestCase
+from django.utils.translation import ugettext_lazy as _
 
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
@@ -60,10 +61,6 @@ class TestFindBuildParentListByEducationGroupYearId(TestCase):
         GroupElementYearFactory(parent=self.child_branch, child_branch=None, child_leaf=self.child_leaf)
 
     def test_with_filters(self):
-        filters = {
-
-            'parent__education_group_type__category': [education_group_categories.TRAINING]
-        }
         result = group_element_year._build_parent_list_by_education_group_year_id(self.child_leaf.academic_year)
 
         expected_result = {
@@ -479,7 +476,9 @@ class TestFetchGroupElementsBehindHierarchy(TestCase):
                                                   child_leaf=None)
         self.link_2 = GroupElementYearFactory(parent=finality_list, child_branch=formation_master_md, child_leaf=None)
         self.link_3 = GroupElementYearFactory(parent=formation_master_md, child_branch=common_core, child_leaf=None)
-        self.link_4 = GroupElementYearFactory(parent=common_core, child_leaf=LearningUnitYearFactory(), child_branch=None)
+        self.link_4 = GroupElementYearFactory(parent=common_core,
+                                              child_leaf=LearningUnitYearFactory(),
+                                              child_branch=None)
 
     def test_with_one_root_id(self):
         queryset = GroupElementYear.objects.all().select_related(
@@ -576,3 +575,33 @@ class TestLinkTypeGroupElementYear(TestCase):
         link = GroupElementYear(parent=major_list_choice, child_branch=major, link_type=None)
         link._clean_link_type()
         self.assertEqual(link.link_type, LinkTypes.REFERENCE.name)
+
+
+class TestGroupElementYearProperty(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
+
+    def setUp(self):
+        self.egy = EducationGroupYearFactory(academic_year=self.academic_year,
+                                             title="Title FR",
+                                             credits=15)
+        self.group_element_year = GroupElementYearFactory(parent__academic_year=self.academic_year,
+                                                          child_branch=self.egy,
+                                                          relative_credits=10)
+
+    def test_verbose_credit(self):
+        self.assertEqual(self.group_element_year.verbose, "{} ({} {})".format(
+            self.group_element_year.child.title, self.group_element_year.relative_credits, _("credits")))
+
+        self.group_element_year.relative_credits = None
+        self.group_element_year.save()
+
+        self.assertEqual(self.group_element_year.verbose, "{} ({} {})".format(
+            self.group_element_year.child.title, self.group_element_year.child_branch.credits, _("credits")))
+
+        self.egy.credits = None
+        self.egy.save()
+
+        self.assertEqual(self.group_element_year.verbose, "{}".format(
+            self.group_element_year.child.title))

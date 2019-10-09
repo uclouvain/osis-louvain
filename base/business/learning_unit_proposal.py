@@ -41,7 +41,7 @@ from base.business.learning_units.edition import edit_learning_unit_end_date, up
 from base.business.learning_units.simple import deletion as business_deletion
 from base.models import campus
 from base.models.academic_year import find_academic_year_by_year
-from base.models.entity import find_by_id, Entity, get_by_internal_id
+from base.models.entity import find_by_id, get_by_internal_id
 from base.models.enums import proposal_state, proposal_type
 from base.models.enums import vacant_declaration_type, attribution_procedure
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
@@ -342,7 +342,7 @@ def _consolidate_accepted_proposal(proposal):
 
 
 def _consolidate_creation_proposal_accepted(proposal):
-    proposal.learning_unit_year.learning_unit.end_year = proposal.learning_unit_year.academic_year.year
+    proposal.learning_unit_year.learning_unit.end_year = proposal.learning_unit_year.academic_year
 
     results = {SUCCESS: edit_learning_unit_end_date(proposal.learning_unit_year.learning_unit, None)}
     return results
@@ -352,10 +352,9 @@ def _consolidate_suppression_proposal_accepted(proposal):
     initial_end_year = proposal.initial_data["learning_unit"]["end_year"]
     new_end_year = proposal.learning_unit_year.learning_unit.end_year
 
-    proposal.learning_unit_year.learning_unit.end_year = initial_end_year
-    new_academic_year = find_academic_year_by_year(new_end_year)
+    proposal.learning_unit_year.learning_unit.end_year = find_academic_year_by_year(initial_end_year)
     try:
-        results = {SUCCESS: edit_learning_unit_end_date(proposal.learning_unit_year.learning_unit, new_academic_year)}
+        results = {SUCCESS: edit_learning_unit_end_date(proposal.learning_unit_year.learning_unit, new_end_year)}
     except IntegrityError as err:
         results = {ERROR: err.args[0]}
     return results

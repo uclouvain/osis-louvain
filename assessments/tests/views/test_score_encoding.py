@@ -29,9 +29,9 @@ from unittest.mock import patch
 
 from django.contrib.auth.models import Permission, Group
 from django.contrib.auth.models import User
-from django.urls import reverse
 from django.http import Http404
 from django.test import TestCase, RequestFactory, TransactionTestCase
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext
 from django.utils.translation import ugettext_lazy as _
@@ -389,6 +389,7 @@ class OutsideEncodingPeriodTest(AcademicYearMockMixin, SessionExamCalendarMockMi
         # Create submission of score encoding - 2 [Start in 100 days]
         ac = AcademicCalendarFactory.build(title="Submission of score encoding - 2",
                                            academic_year=self.academic_year,
+                                           data_year=self.academic_year,
                                            start_date=self.academic_calendar.end_date + timedelta(days=100),
                                            end_date=self.academic_calendar.end_date + timedelta(days=130),
                                            reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)

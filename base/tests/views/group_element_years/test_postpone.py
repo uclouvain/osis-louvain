@@ -27,12 +27,12 @@ from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import ugettext as _, ngettext
+from django.utils.translation import ugettext as _
 from waffle.testutils import override_flag
 
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
-from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
+from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
@@ -51,7 +51,7 @@ class TestPostpone(TestCase):
 
         self.client.force_login(self.person.user)
 
-        self.education_group = EducationGroupFactory(end_year=self.next_academic_year.year)
+        self.education_group = EducationGroupFactory(end_year=self.next_academic_year)
         self.education_group_year = TrainingFactory(academic_year=self.current_academic_year,
                                                     education_group=self.education_group)
 

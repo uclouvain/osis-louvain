@@ -47,9 +47,3 @@ def _get_entity_version(learning_container_year_prefetched):
         return find_entity_version_according_academic_year(entity.entity_versions,
                                                            learning_container_year_prefetched.academic_year)
     return None
-
-
-def _set_summary_responsible_to_true(attributions):
-    for a_attribution in attributions:
-        a_attribution.summary_responsible = True
-        a_attribution.save()

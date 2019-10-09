@@ -185,16 +185,6 @@ def find_all_responsible_by_learning_unit_year(learning_unit_year, responsibles_
         .order_by("tutor__person")
 
 
-def find_all_summary_responsibles_by_learning_unit_years(learning_unit_years):
-    summary_responsibles_group_by_luy = {}
-    all_attributions = Attribution.objects.filter(
-        learning_unit_year__in=learning_unit_years,
-        summary_responsible=True).select_related('tutor__person')
-    for attribution in all_attributions:
-        summary_responsibles_group_by_luy.setdefault(attribution.learning_unit_year_id, []).append(attribution.tutor)
-    return summary_responsibles_group_by_luy
-
-
 def find_by_tutor(tutor):
     if tutor:
         return [att.learning_unit_year for att in list(search(tutor=tutor))]
@@ -204,10 +194,6 @@ def find_by_tutor(tutor):
 
 def clear_scores_responsible_by_learning_unit_year(learning_unit_year_pk):
     _clear_attributions_field_of_learning__unit_year(learning_unit_year_pk, "score_responsible")
-
-
-def clear_summary_responsible_by_learning_unit_year(learning_unit_year_pk):
-    _clear_attributions_field_of_learning__unit_year(learning_unit_year_pk, "summary_responsible")
 
 
 def _clear_attributions_field_of_learning__unit_year(learning_unit_year_pk, field_to_clear):

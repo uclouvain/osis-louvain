@@ -27,14 +27,19 @@ from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
+from waffle import switch_is_active
 
 from base.business.education_groups import perms as education_group_perms
 from base.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import MiniTrainingType, GroupType
+from base.models.entity_version import build_current_entity_version_structure_in_memory, EntityVersion, \
+    get_entity_version_parent_or_itself_from_type, get_structure_of_entity_version
+from base.models.enums.education_group_types import MiniTrainingType, GroupType, TrainingType
+from base.models.enums.entity_type import SECTOR, FACULTY, SCHOOL, DOCTORAL_COMMISSION
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from base.models.group_element_year import GroupElementYear, fetch_all_group_elements_in_tree
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite_item import PrerequisiteItem
 from base.models.proposal_learning_unit import ProposalLearningUnit
 
@@ -44,9 +49,14 @@ class EducationGroupHierarchy:
     element_type = EDUCATION_GROUP_YEAR
 
     _cache_hierarchy = None
+    _cache_structure = None
+    _cache_entity_parent_root = None
 
     def __init__(self, root: EducationGroupYear, link_attributes: GroupElementYear = None,
-                 cache_hierarchy: dict = None, tab_to_show: str = None):
+                 cache_hierarchy: dict = None, tab_to_show: str = None, pdf_content: bool = False,
+                 max_block: int = 0,
+                 cache_structure=None,
+                 cache_entity_parent_root: str = None):
 
         self.children = []
         self.included_group_element_years = []
@@ -56,8 +66,16 @@ class EducationGroupHierarchy:
             if self.group_element_year else False
         self.icon = self._get_icon()
         self._cache_hierarchy = cache_hierarchy
+        self._cache_structure = cache_structure
+        self._cache_entity_parent_root = cache_entity_parent_root
         self.tab_to_show = tab_to_show
-        self.generate_children()
+        self.pdf_content = pdf_content
+        self.max_block = max_block
+
+        if not self.pdf_content or \
+                (not (self.group_element_year and
+                      self.group_element_year.child.type == GroupType.MINOR_LIST_CHOICE.name)):
+            self.generate_children()
 
         self.modification_perm = ModificationPermission(self.root, self.group_element_year)
         self.attach_perm = AttachPermission(self.root, self.group_element_year)
@@ -69,18 +87,38 @@ class EducationGroupHierarchy:
             self._cache_hierarchy = self._init_cache()
         return self._cache_hierarchy
 
+    @property
+    def cache_structure(self):
+        if self._cache_structure is None:
+            self._cache_structure = build_current_entity_version_structure_in_memory()
+        return self._cache_structure
+
+    @property
+    def cache_entity_parent_root(self) -> EntityVersion:
+        if self._cache_entity_parent_root is None:
+            self._cache_entity_parent_root = self.root.management_entity.most_recent_entity_version
+        return self._cache_entity_parent_root
+
     def _init_cache(self):
         return fetch_all_group_elements_in_tree(self.education_group_year, self.get_queryset()) or {}
 
     def generate_children(self):
         for group_element_year in self.cache_hierarchy.get(self.education_group_year.id) or []:
+            self._check_max_block(group_element_year.block)
             if group_element_year.child_branch and group_element_year.child_branch != self.root:
-                node = EducationGroupHierarchy(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
-                                               tab_to_show=self.tab_to_show)
+                node = EducationGroupHierarchy(self.root, group_element_year,
+                                               cache_hierarchy=self.cache_hierarchy,
+                                               tab_to_show=self.tab_to_show,
+                                               pdf_content=self.pdf_content,
+                                               max_block=self.max_block,
+                                               cache_structure=self.cache_structure,
+                                               cache_entity_parent_root=self.cache_entity_parent_root)
+                self._check_max_block(node.max_block)
                 self.included_group_element_years.extend(node.included_group_element_years)
             elif group_element_year.child_leaf:
                 node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
-                                      tab_to_show=self.tab_to_show)
+                                      tab_to_show=self.tab_to_show, cache_structure=self.cache_structure,
+                                      cache_entity_parent_root=self.cache_entity_parent_root)
 
             else:
                 continue
@@ -104,14 +142,24 @@ class EducationGroupHierarchy:
             .annotate(is_prerequisite=Exists(is_prerequisite)) \
             .select_related('child_branch__academic_year',
                             'child_branch__education_group_type',
+                            'child_branch__administration_entity',
+                            'child_branch__management_entity',
                             'child_leaf__academic_year',
                             'child_leaf__learning_container_year',
+                            'child_leaf__learning_container_year__requirement_entity',
+                            'child_leaf__learning_container_year__allocation_entity',
                             'child_leaf__proposallearningunit',
-                            'parent').order_by("order", "parent__partial_acronym")
+                            'child_leaf__externallearningunityear',
+                            'parent')\
+            .prefetch_related('child_branch__administration_entity__entityversion_set',
+                              'child_branch__management_entity__entityversion_set',
+                              'child_leaf__learning_container_year__requirement_entity__entityversion_set',
+                              'child_leaf__learning_container_year__allocation_entity__entityversion_set')\
+            .order_by("order", "parent__partial_acronym")
 
     def to_json(self):
         return {
-            'text': self.education_group_year.verbose,
+            'text': self._get_acronym(),
             'icon': self.icon,
             'children': [child.to_json() for child in self.children],
             'a_attr': {
@@ -139,6 +187,16 @@ class EducationGroupHierarchy:
                 ),
             },
         }
+
+    def _get_acronym(self):
+        acronym = ''
+        if switch_is_active('egy_show_borrowed_classes') and self.is_borrowed():
+            acronym += '|E'
+        if acronym != '':
+            acronym += '| {}'.format(self.education_group_year.verbose)
+        else:
+            acronym = self.education_group_year.verbose
+        return acronym
 
     def to_list(self, flat=False, pruning_function=None):
         """ Generate list of group_element_year without reference link
@@ -212,8 +270,58 @@ class EducationGroupHierarchy:
             if element.child_branch.education_group_type.name == MiniTrainingType.OPTION.name
         ]
 
+    def get_finality_list(self):
+        return [
+            element.child_branch for element in self.to_list(flat=True)
+            if element.child_branch and element.child_branch.education_group_type.name in TrainingType.finality_types()
+        ]
+
     def get_learning_unit_year_list(self):
         return [element.child_leaf for element in self.to_list(flat=True) if element.child_leaf]
+
+    def get_learning_unit_years(self):
+        luy_ids = [element.child_leaf.id for element in self.to_list(flat=True) if element.child_leaf]
+        return LearningUnitYear.objects.filter(id__in=luy_ids)
+
+    def is_borrowed(self) -> bool:
+        try:
+            if isinstance(self, NodeLeafJsTree):
+                if getattr(self.learning_unit_year, 'externallearningunityear', None) and \
+                        self.learning_unit_year.externallearningunityear.mobility:
+                    return False
+                to_compare = self.learning_unit_year.requirement_entity.most_recent_acronym
+            else:
+                to_compare = self.education_group_year.management_entity.most_recent_acronym
+            case = {SCHOOL: FACULTY, DOCTORAL_COMMISSION: FACULTY}
+            entity = case.get(self.cache_entity_parent_root.entity_type, self.cache_entity_parent_root.entity_type)
+            root = get_entity_version_parent_or_itself_from_type(
+                self.cache_structure,
+                self.cache_entity_parent_root.acronym,
+                entity)
+            if not root:
+                root = get_entity_version_parent_or_itself_from_type(
+                    self.cache_structure,
+                    self.cache_entity_parent_root.acronym,
+                    SECTOR)
+            else:
+                root = self.cache_entity_parent_root
+            root_entities = get_structure_of_entity_version(self.cache_structure, root.acronym)
+            list_entities_from_root = [e for e in root_entities.get('all_children')]
+            list_entities_from_root.append(root_entities.get('entity_version'))
+            entities = get_structure_of_entity_version(self.cache_structure, to_compare)
+            list_entities_children_from_self = [e for e in entities.get('all_children', [])]
+            list_entities_children_from_self.append(entities.get('entity_version'))
+            if entities.get('entity_version') and entities.get('entity_version').entity_type != root.entity_type:
+                list_entities_children_from_self.append(entities.get('entity_version_parent'))
+            return set(list_entities_from_root) & set(list_entities_children_from_self) == set()
+        except AttributeError:
+            return False
+
+    def _check_max_block(self, group_element_year_block):
+        if group_element_year_block:
+            block = str(group_element_year_block)[-1:]
+            if int(block) > self.max_block:
+                self.max_block = int(block)
 
 
 class NodeLeafJsTree(EducationGroupHierarchy):
@@ -280,9 +388,18 @@ class NodeLeafJsTree(EducationGroupHierarchy):
         """
             When the LU year is different than its education group, we have to display the year in the title.
         """
+        acronym = ''
         if self.learning_unit_year.academic_year != self.root.academic_year:
-            return "|{}| {}".format(self.learning_unit_year.academic_year.year, self.learning_unit_year.acronym)
-        return self.learning_unit_year.acronym
+            acronym += '|{}'.format(self.learning_unit_year.academic_year.year)
+        if switch_is_active('luy_show_borrowed_classes') and self.is_borrowed():
+            acronym += '|E'
+        if switch_is_active('luy_show_service_classes') and self.learning_unit_year.is_service(self.cache_structure):
+            acronym += '|S'
+        if acronym != '':
+            acronym += '| {}'.format(self.learning_unit_year.acronym)
+        else:
+            acronym = self.learning_unit_year.acronym
+        return acronym
 
     def _get_class(self):
         try:

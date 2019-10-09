@@ -74,7 +74,7 @@ def learning_unit_select(request, learning_unit_year_id):
 
 
 def build_success_message(obj):
-    return """{} : "{}" """.format(
+    return "<strong>{}</strong><br>{}".format(
         _("Selected element"),
         str(obj)
     )

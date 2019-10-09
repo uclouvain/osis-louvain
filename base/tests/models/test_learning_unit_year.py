@@ -37,7 +37,6 @@ from base.business.learning_units.quadrimester_strategy import LearningComponent
     LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy, \
     LearningComponentYearQuadriStrategy, LearningComponentYearQuadriNoStrategy
 from base.models import learning_unit_year
-from base.models.enums import learning_unit_year_periodicity, entity_container_year_link_type
 from base.models.enums import learning_unit_year_periodicity, entity_container_year_link_type, quadrimesters
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
@@ -51,11 +50,11 @@ from base.tests.factories.education_group_type import GroupEducationGroupTypeFac
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory, LecturingLearningComponentYearFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory, \
+    LecturingLearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year, \
-    LearningUnitYearPartimFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.tutor import TutorFactory
 
@@ -221,10 +220,12 @@ class LearningUnitYearTest(TestCase):
         self.assertEqual(self.learning_unit_year.container_common_title, '')
 
     def test_can_be_updated_by_faculty_manager(self):
-        previous_academic_years = GenerateAcademicYear(start_year=self.academic_year.year - 3,
-                                                       end_year=self.academic_year.year - 1).academic_years
-        next_academic_years = GenerateAcademicYear(start_year=self.academic_year.year + 1,
-                                                   end_year=self.academic_year.year + 3).academic_years
+        start_year = AcademicYearFactory(year=self.academic_year.year - 3)
+        end_year = AcademicYearFactory(year=self.academic_year.year - 1)
+        previous_academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
+        next_start_year = AcademicYearFactory(year=self.academic_year.year + 1)
+        next_end_year = AcademicYearFactory(year=self.academic_year.year + 3)
+        next_academic_years = GenerateAcademicYear(start_year=next_start_year, end_year=next_end_year).academic_years
         previous_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=self.learning_unit_year.learning_unit)
                          for ac in previous_academic_years]
         next_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=self.learning_unit_year.learning_unit)
@@ -321,8 +322,8 @@ class LearningUnitYearFindLearningUnitYearByAcademicYearTutorAttributionsTest(Te
 
 class LearningUnitYearWarningsTest(TestCase):
     def setUp(self):
-        self.start_year = 2010
-        self.end_year = 2020
+        self.start_year = AcademicYearFactory(year=2010)
+        self.end_year = AcademicYearFactory(year=2020)
         self.generated_ac_years = GenerateAcademicYear(self.start_year, self.end_year)
         self.generated_container = GenerateContainer(self.start_year, self.end_year)
         self.luy_full = self.generated_container.generated_container_years[0].learning_unit_year_full

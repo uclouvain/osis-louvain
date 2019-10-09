@@ -24,15 +24,11 @@
 #
 ##############################################################################
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
 
-from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm
-from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.learning_unit_year_periodicity import BIENNIAL_EVEN, ANNUAL
+from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class TestLearningUnitModelFormInit(TestCase):
@@ -65,7 +61,7 @@ class TestLearningUnitModelFormSave(TestCase):
         self.learning_container = LearningContainerFactory()
         self.form = LearningUnitModelForm(self.post_data)
         self.save_kwargs = {'learning_container': self.learning_container,
-                            'start_year': self.current_academic_year.year}
+                            'start_year': self.current_academic_year}
 
     def test_case_missing_learning_container_kwarg(self):
         with self.assertRaises(KeyError):
@@ -83,7 +79,7 @@ class TestLearningUnitModelFormSave(TestCase):
 
     def test_case_update_correctly_saved(self):
         learning_unit_to_update = LearningUnitFactory(learning_container=self.learning_container,
-                                                      start_year=self.current_academic_year.year)
+                                                      start_year=self.current_academic_year)
         self.form = LearningUnitModelForm(self.post_data, instance=learning_unit_to_update)
         self.assertTrue(self.form.is_valid(), self.form.errors)
         lu = self.form.save(**self.save_kwargs)

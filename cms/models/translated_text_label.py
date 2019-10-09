@@ -48,6 +48,9 @@ class TranslatedTextLabel(models.Model):
     text_label = models.ForeignKey(TextLabel, on_delete=models.CASCADE)
     label = models.CharField(max_length=255)
 
+    class Meta:
+        unique_together = ('language', 'text_label')
+
     def __str__(self):
         return self.label
 

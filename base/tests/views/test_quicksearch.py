@@ -24,9 +24,9 @@
 from django.test import TestCase
 from django.urls import reverse
 
-from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.user import SuperUserFactory
@@ -39,6 +39,7 @@ class TestQuickSearchView(TestCase):
         cls.luy_to_find = LearningUnitYearFactory(acronym='CYN', specific_title='Drop dead cynical')
         cls.egy_to_find = EducationGroupYearFactory(acronym='RAV', title='The Ravenlord')
         cls.user = SuperUserFactory()
+        cls.next_academic_year = AcademicYearFactory(year=cls.luy_to_find.academic_year.year + 1)
 
     def setUp(self) -> None:
         self.client.force_login(self.user)
@@ -58,9 +59,8 @@ class TestQuickSearchView(TestCase):
                                    data={'academic_year': self.luy_to_find.academic_year.pk})
         self.assertIn(self.luy_to_find, response.context['object_list'])
 
-        other_anac = AcademicYear.objects.exclude(pk=self.luy_to_find.academic_year.pk).first()
         response = self.client.get(reverse('quick_search_learning_unit'),
-                                   data={'academic_year': other_anac.pk})
+                                   data={'academic_year': self.next_academic_year.pk})
         self.assertNotIn(self.luy_to_find, response.context['object_list'])
 
     def test_education_group_search_text_filter(self):

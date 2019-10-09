@@ -29,11 +29,10 @@ from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import cache, ElementCache
@@ -80,7 +79,7 @@ class TestMoveGroupElementYearView(TestCase):
         self.next_academic_year = AcademicYearFactory(current=True)
         self.root_egy = EducationGroupYearFactory(academic_year=self.next_academic_year)
         self.group_element_year = GroupElementYearFactory(parent__academic_year=self.next_academic_year)
-        self.selected_egy = EducationGroupYearFactory(
+        self.selected_egy = GroupFactory(
             academic_year=self.next_academic_year
         )
 

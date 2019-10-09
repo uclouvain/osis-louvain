@@ -91,8 +91,8 @@ def get_valid_form_data(academic_year, person, learning_unit_year=None):
 
         learning_unit_full = LearningUnitFactory(
             learning_container=learning_container,
-            start_year=academic_year.year,
-            end_year=academic_year.year,
+            start_year=academic_year,
+            end_year=academic_year,
         )
 
         learning_unit_year = LearningUnitYearFactory.build(
@@ -170,14 +170,14 @@ class LearningUnitFullFormContextMixin(TestCase):
         self.person = PersonFactory()
         self.post_data = get_valid_form_data(self.current_academic_year, person=self.person)
         # Creation of a LearningContainerYear and all related models
-        self.learn_unit_structure = GenerateContainer(self.current_academic_year.year, self.current_academic_year.year)
+        self.learn_unit_structure = GenerateContainer(self.current_academic_year, self.current_academic_year)
         self.learning_unit_year = LearningUnitYear.objects.get(
             learning_unit=self.learn_unit_structure.learning_unit_full,
             academic_year=self.current_academic_year
         )
-
-        self.acs = GenerateAcademicYear(
-            start_year=self.current_academic_year.year - 3, end_year=self.current_academic_year.year + 7).academic_years
+        start_year = AcademicYearFactory(year=self.current_academic_year.year - 3)
+        end_year = AcademicYearFactory(year=self.current_academic_year.year + 7)
+        self.acs = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
         del self.acs[3]
         for ac in self.acs:
             LearningUnitYearFactory(academic_year=ac, learning_unit=self.learning_unit_year.learning_unit)
@@ -536,7 +536,7 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
         post_data = get_valid_form_data(self.current_academic_year, person=self.person,
                                         learning_unit_year=new_learning_unit_year)
         form = _instanciate_form(self.current_academic_year, post_data=post_data, person=self.person,
-                                 start_year=self.current_academic_year.year)
+                                 start_year=self.current_academic_year)
         self.assertTrue(form.is_valid(), form.errors)
         saved_luy = form.save()
         self.assertEqual(LearningUnitYear.objects.filter(acronym='LAGRO1200').count(), 1)
@@ -565,7 +565,7 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
 
         form = FullForm(self.person,
                         self.learning_unit_year.academic_year,
-                        start_year=self.current_academic_year.year,
+                        start_year=self.current_academic_year,
                         data=self.post_data)
 
         self.assertTrue(form.is_valid(), form.errors)
@@ -595,7 +595,7 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
 
         form = FullForm(self.person,
                         self.learning_unit_year.academic_year,
-                        start_year=self.current_academic_year.year,
+                        start_year=self.current_academic_year,
                         data=self.post_data)
 
         self.assertTrue(form.is_valid(), form.errors)

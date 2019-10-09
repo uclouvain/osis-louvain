@@ -79,23 +79,27 @@ class EducationGroup(SerializableModel):
     objects = EducationGroupManager()
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-
-    start_year = models.PositiveIntegerField(
+    start_year = models.ForeignKey(
+        'AcademicYear',
         blank=True,
         null=True,
-        verbose_name=_('Start')
+        verbose_name=_('Start academic year'),
+        related_name='start_years',
+        on_delete=models.PROTECT
     )
-
-    end_year = models.PositiveIntegerField(
+    end_year = models.ForeignKey(
+        'AcademicYear',
         blank=True,
         null=True,
-        verbose_name=_('end')
+        verbose_name=_('Last year of organization'),
+        related_name='end_years',
+        on_delete=models.PROTECT
     )
 
     @property
     def most_recent_acronym(self):
-        most_recent_education_group = self.educationgroupyear_set.filter(education_group_id=self.id)\
-                                                                 .latest('academic_year__year')
+        most_recent_education_group = self.educationgroupyear_set.filter(education_group_id=self.id) \
+            .latest('academic_year__year')
         return most_recent_education_group.acronym
 
     def __str__(self):
@@ -112,10 +116,10 @@ class EducationGroup(SerializableModel):
     def clean(self):
         # Check end_year should be greater of equals to start_year
         if self.start_year and self.end_year:
-            if self.start_year > self.end_year:
+            if self.start_year.year > self.end_year.year:
                 raise ValidationError({
                     'end_year': _("%(max)s must be greater or equals than %(min)s") % {
-                        "max": _("end").title(),
+                        "max": _("Last year of organization").title(),
                         "min": _("Start"),
                     }
                 })
@@ -157,9 +161,9 @@ class EducationGroup(SerializableModel):
         qs = EducationGroupYear.hierarchy.filter(pk=root_2m_egy.pk) \
             .get_children() \
             .filter(
-                Q(education_group__end_year__gt=self.end_year) | Q(education_group__end_year__isnull=True),
-                education_group_type__name__in=TrainingType.finality_types(),
-            )
+            Q(education_group__end_year__gt=self.end_year) | Q(education_group__end_year__isnull=True),
+            education_group_type__name__in=TrainingType.finality_types(),
+        )
 
         for invalid_finality in qs:
             raise ValidationError({

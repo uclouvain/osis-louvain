@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-08 10:40+0200\n"
+"POT-Creation-Date: 2019-08-21 15:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,246 +17,138 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: business/xls_build.py:42
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:7
 msgid "Ac yr."
 msgstr "Anac."
 
-#: templates/summary_responsible.html:31
-#: templates/summary_responsible_edit.html:30
 msgid "Academic actors"
 msgstr "Acteurs académiques"
 
-#: templates/manage_my_courses/list_my_courses_summary_editable.html:66
 msgid "Activate to sort column by ascending order"
 msgstr "Activer pour trier la colonne par ordre croissant"
 
-#: templates/manage_my_courses/list_my_courses_summary_editable.html:67
 msgid "Activate to sort column by descending order"
 msgstr "Activer pour trier la colonne par ordre décroissant"
 
-#: business/xls_build.py:50
-msgid "Active"
-msgstr "Actif"
-
-#: business/xls_build.py:48
-msgid "Alloc. Ent."
-msgstr "Ent. attrib."
-
-#: templates/summary_responsible_edit.html:71
 msgid "Cancel"
 msgstr "Annuler"
 
-#: models/enums/function.py:45
 msgid "Co-holder"
 msgstr "Co-titulaire"
 
-#: business/xls_build.py:43
-msgid "Code"
-msgstr "Code"
-
-#: models/enums/function.py:43
 msgid "Coordinator"
 msgstr "Coordinateur(trice)"
 
-#: templates/summary_responsible.html:54 templates/summary_responsible.html:87
 msgid "Course code"
 msgstr "Code cours"
 
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:8
 msgid "Courses"
 msgstr "Cours"
 
-#: business/xls_build.py:49
-msgid "Credits"
-msgstr "Crédits"
-
-#: models/enums/function.py:46
 msgid "Deputy"
 msgstr "Suppléant"
 
-#: models/enums/function.py:47
 msgid "Deputy authority"
 msgstr "Suppléant d'autorité"
 
-#: models/enums/function.py:48
 msgid "Deputy sabbatical"
 msgstr "Suppléant sabbatique"
 
-#: models/enums/function.py:49
 msgid "Deputy temporary"
 msgstr "Suppléant temporaire"
 
-#: templates/manage_my_courses/educational_information.html:32
 msgid "Description fiche"
 msgstr "Fiche descriptive"
 
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:12
-#: templates/manage_my_courses/blocks/submission_dates.html:34
 msgid "Description fiche ending"
 msgstr "Fermeture fiches descriptives"
 
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:11
-#: templates/manage_my_courses/blocks/submission_dates.html:29
 msgid "Description fiche opening"
 msgstr "Ouverture fiches descriptives"
 
-#: templates/summary_responsible.html:109
 msgid "Display all tutors for this learning unit"
 msgstr "Afficher tous les enseignants pour ce cours"
 
-#: business/xls_build.py:39
-msgid "Duration"
-msgstr "Durée"
-
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:13
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:37
 msgid "Editable"
 msgstr "Modifiable"
 
-#: templates/summary_responsible.html:86
 msgid "Entity"
 msgstr "Entité"
 
-#: business/xls_build.py:38 models/attribution_new.py:57
 msgid "Function"
 msgstr "Fonction"
 
-#: models/enums/function.py:44
 msgid "Holder"
 msgstr "Titulaire"
 
-#: templates/manage_my_courses/educational_information.html:47
 msgid "Information approved and updatable by the Commission of Program"
 msgstr "Informations avalisées et modifiables via la Commission de Programme"
 
-#: templates/manage_my_courses/educational_information.html:54
 msgid "Informations updatable by teachers"
 msgstr "Informations modifiables par les enseignants"
 
-#: templates/summary_responsible.html:30
-#: templates/summary_responsible_edit.html:29
 msgid "Institution"
 msgstr "Institution"
 
-#: models/enums/function.py:52
 msgid "Internship co-supervisor"
 msgstr "Co-directeur de stage"
 
-#: models/enums/function.py:51
 msgid "Internship supervisor"
 msgstr "Directeur de stage"
 
-#: business/xls_build.py:38
-msgid "LECTURING"
-msgstr ""
-
-#: templates/summary_responsible.html:59 templates/summary_responsible.html:88
 msgid "Learning unit title"
 msgstr "Intitulé du cours"
 
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:22
-#: templates/manage_my_courses/blocks/tabs.html:32
-#: templates/manage_my_courses/educational_information.html:30
-#: templates/manage_my_courses/list_my_courses_summary_editable.html:31
-#: templates/manage_my_courses/list_my_courses_summary_editable.html:36
 msgid "Manage description fiche"
 msgstr "Gérer les fiches descriptives"
 
-#: templates/summary_responsible.html:80
 msgid "No result"
 msgstr "Pas de résultat"
 
-#: business/xls_build.py:39
-msgid "PRACTICAL_EXERCISES"
-msgstr ""
-
-#: models/enums/function.py:50
 msgid "Professor"
 msgstr "Professeur"
 
-#: models/tutor_application.py:48
 msgid "Publish application to portal"
 msgstr "Publier la candidature sur portal"
 
-#: models/attribution_new.py:49
 msgid "Publish attribution to portal"
 msgstr "Publier l'attribution sur portal"
 
-#: business/xls_build.py:47
-msgid "Req. Entity"
-msgstr "Ent. charge"
-
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:10
 msgid "Requirement entity"
 msgstr "Entité resp. cahier des charges"
 
-#: templates/summary_responsible_edit.html:69
 msgid "Save"
 msgstr "Enregistrer"
 
-#: templates/summary_responsible.html:75
 msgid "Search"
 msgstr "Recherche"
 
-#: models/attribution_new.py:60
 msgid "Start"
 msgstr "Début"
 
-#: business/xls_build.py:39
-msgid "Start year"
-msgstr "Année début"
-
-#: templates/summary_responsible_edit.html:46
 msgid "Status"
 msgstr "Statut"
 
-#: business/xls_build.py:38
-msgid "Substitute"
-msgstr "Suppléé"
-
-#: business/xls_build.py:46
-msgid "Subtype"
-msgstr "Sous-type"
-
-#: templates/summary_responsible.html:69
-#: templates/summary_responsible_edit.html:31
-#: templates/summary_responsible_edit.html:47
 msgid "Summary responsible"
 msgstr "Responsable des fiches descriptives"
 
-#: templates/summary_responsible.html:32 templates/summary_responsible.html:36
 msgid "Summary responsibles"
 msgstr "Responsables des fiches descriptives"
 
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:46
 msgid "There is no course for which you can edit description fiche"
 msgstr ""
 "Il n'existe aucun cours dont vous pouvez modifier les fiches descriptives."
 
-#: business/xls_build.py:44
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:9
 msgid "Title"
 msgstr "Intitulé"
 
-#: business/xls_build.py:38 templates/summary_responsible.html:64
-#: templates/summary_responsible.html:89
-#: templates/summary_responsible_edit.html:45
 msgid "Tutor"
 msgstr "Enseignant·e"
 
-#: templates/summary_responsible_edit.html:36
 msgid "Tutors of the course"
 msgstr "Enseignant·e·s du cours"
 
-#: business/xls_build.py:45
-msgid "Type"
-msgstr "Type"
-
-#: templates/summary_responsible_edit.html:69
 msgid "Update"
 msgstr "Modifier"
 
-#: templates/summary_responsible.html:123
 msgid "Without attribution"
 msgstr "Sans attribution"

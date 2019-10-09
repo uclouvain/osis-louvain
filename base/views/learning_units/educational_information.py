@@ -29,11 +29,10 @@ from django.utils.translation import ugettext_lazy as _
 from django_filters.views import FilterView
 
 from base.business.learning_units.xls_generator import generate_xls_teaching_material
-
 from base.forms.learning_unit.search_form import LearningUnitDescriptionFicheFilter
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
-from base.views.common import display_warning_messages
+from base.views.common import display_warning_messages, remove_from_session
 from base.views.learning_units.search import SUMMARY_LIST
 
 
@@ -49,6 +48,8 @@ class LearningUnitDescriptionFicheSearch(PermissionRequiredMixin, CacheFilterMix
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        self.request.session['ue_search_type'] = str(_('Description fiche status'))
+        remove_from_session(self.request, 'search_url')
         context.update({
             'form': context['filter'].form,
             'is_faculty_manager': self.request.user.person.is_faculty_manager,

@@ -38,10 +38,10 @@ from osis_common.models.serializable_model import SerializableModel, Serializabl
 
 
 class AcademicCalendarAdmin(VersionAdmin, SerializableModelAdmin):
-    list_display = ('academic_year', 'title', 'start_date', 'end_date')
-    list_display_links = None
-    readonly_fields = ('academic_year', 'title', 'start_date', 'end_date')
-    list_filter = ('academic_year', 'reference')
+    list_display = ('academic_year', 'title', 'start_date', 'end_date', 'data_year')
+    list_display_links = ('title', 'data_year')
+    readonly_fields = ('academic_year', 'title', 'data_year')
+    list_filter = ('academic_year', 'reference', 'data_year')
     search_fields = ['title']
     ordering = ('start_date',)
 
@@ -76,6 +76,9 @@ class AcademicCalendar(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
     academic_year = models.ForeignKey('AcademicYear', on_delete=models.PROTECT)
+    data_year = models.ForeignKey(
+        'AcademicYear', on_delete=models.PROTECT, related_name='related_academic_calendar_data', blank=True, null=True
+    )
     title = models.CharField(max_length=50, blank=True, null=True)
     description = models.TextField(blank=True, null=True)
     start_date = models.DateField(auto_now=False, blank=True, null=True, auto_now_add=False)
@@ -161,3 +164,18 @@ def is_academic_calendar_has_started(academic_year, reference, date=None):
 
 def _list_types(calendar_types):
     return [calendar_type[0] for calendar_type in calendar_types]
+
+
+def get_academic_calendar_by_date_and_reference_and_data_year(data_year, reference, date=None):
+    if date is None:
+        date = timezone.now()
+
+    try:
+        return AcademicCalendar.objects.get(
+            data_year=data_year,
+            reference=reference,
+            start_date__lte=date,
+            end_date__gte=date,
+        )
+    except AcademicCalendar.DoesNotExist:
+        return None

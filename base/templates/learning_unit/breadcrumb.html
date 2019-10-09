@@ -27,4 +27,9 @@
 
 <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
 <li><a href="{% url 'learning_units' %}" id="lnk_learning_units">{% trans 'Learning units' %}</a></li>
+{% with search_url=request.session.search_url search_tab=request.session.ue_search_type %}
+    {% if search_url and search_tab %}
+        <li><a href="{{ search_url }}" id="lnk_learning_units">{{ search_tab }}</a></li>
+    {% endif %}
+{% endwith %}
 <li class="active">{% if learning_unit_year.id %}{{ learning_unit_year.acronym }}{% else %}{% trans 'Learning unit' %}{% endif %}</li>

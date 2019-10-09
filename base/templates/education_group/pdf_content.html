@@ -1,4 +1,4 @@
-{% load education_group education_group_pdf %}
+{% load education_group education_group_pdf range%}
 {% load staticfiles %}
 {% load i18n %}
 <!doctype html>
@@ -154,10 +154,10 @@
         <table cellpadding="5px">
             <thead>
             <tr>
-                <th style="width:650px;"></th>
-                <th style="width:15px;text-align: center;">An 1</th>
-                <th style="width:15px;text-align: center;">An 2</th>
-                <th style="width:15px;text-align: center;">An 3</th>
+                <th style="width:{{ main_part_col_length }}px;"></th>
+                {% for cpt in 1|range_for:max_block %}
+                    <th style="width:15px;text-align: center;">An {{ cpt }}</th>
+                {% endfor %}
             </tr>
             </thead>
             <tbody>

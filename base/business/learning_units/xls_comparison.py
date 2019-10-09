@@ -191,12 +191,19 @@ def _component_data(components, learning_component_yr_type):
             EMPTY_VALUE, EMPTY_VALUE]
 
 
-def _get_data(learning_unit_yr, new_line, first_data, partims=True):
+def _get_data(learning_unit_yr, new_line, first_data, partims=True, proposal_comparison=False):
     organization = get_organization_from_learning_unit_year(learning_unit_yr)
+    if proposal_comparison:
+        academic_year = _format_academic_year(
+            learning_unit_yr.academic_year.name,
+            learning_unit_yr.learning_unit.end_year.name if learning_unit_yr.learning_unit.end_year else None
+        )
+    else:
+        academic_year = learning_unit_yr.academic_year.name
 
     data = [
         _get_acronym(learning_unit_yr, new_line, first_data),
-        learning_unit_yr.academic_year.name,
+        academic_year,
         learning_unit_yr.learning_container_year.get_container_type_display()
         if learning_unit_yr.learning_container_year.container_type else EMPTY_VALUE,
         translate_status(learning_unit_yr.status),
@@ -357,15 +364,15 @@ def prepare_xls_content_for_comparison(luy_with_proposals):
         initial_luy_data = proposal.initial_data
 
         if initial_luy_data and initial_luy_data.get('learning_unit'):
-            initial_data = _get_data_from_initial_data(luy_with_proposal.proposallearningunit.initial_data)
+            initial_data = _get_data_from_initial_data(luy_with_proposal.proposallearningunit.initial_data, True)
             data.append(initial_data)
             modified_cells_no_border.extend(
                 _check_changes(initial_data,
                                data_proposal,
                                line_index + 2))
-            line_index = line_index + 2
+            line_index += 2
         else:
-            line_index = line_index + 1
+            line_index += 1
 
     return {
         DATA: data,
@@ -374,7 +381,7 @@ def prepare_xls_content_for_comparison(luy_with_proposals):
     }
 
 
-def _get_data_from_initial_data(initial_data):
+def _get_data_from_initial_data(initial_data, proposal_comparison=False):
     luy_initial = initial_data.get('learning_unit_year', {})
     lcy_initial = initial_data.get('learning_container_year', {})
     lu_initial = initial_data.get('learning_unit', {})
@@ -395,10 +402,16 @@ def _get_data_from_initial_data(initial_data):
         organization = get_organization_from_learning_unit_year(learning_unit_yr)
     language = find_language_by_id(luy_initial.get('language'))
 
+    if proposal_comparison:
+        academic_year = _format_academic_year(learning_unit_yr.academic_year.name,
+                                              lu_initial.get('end_year') or None)
+    else:
+        academic_year = learning_unit_yr.academic_year.name
+
     data = [
         str(_('Initial data')),
         luy_initial.get('acronym', ''),
-        learning_unit_yr.academic_year.name if learning_unit_yr else '',
+        academic_year,
         dict(LearningContainerYearType.choices())[lcy_initial.get('container_type')] if
         lcy_initial.get('container_type') else '-',
         translate_status(luy_initial.get('status')),
@@ -502,7 +515,7 @@ def _get_components_data(learning_unit_yr):
 
 
 def _get_proposal_data(learning_unit_yr):
-    data_proposal = [_('Proposal')] + _get_data(learning_unit_yr, False, None, False)
+    data_proposal = [_('Proposal')] + _get_data(learning_unit_yr, False, None, False, True)
     data_proposal.extend(_get_components_data(learning_unit_yr))
     return data_proposal
 
@@ -524,3 +537,8 @@ def _get_data_from_components_initial_data(data_without_components, initial_data
         data = data + _get_component_data_by_type(volumes.get(LECTURING), LECTURING)
         data = data + _get_component_data_by_type(volumes.get(PRACTICAL_EXERCISES), PRACTICAL_EXERCISES)
     return data
+
+
+def _format_academic_year(start_year, end_year):
+    return "{}{}".format(start_year,
+                         "   ({} {})".format(_('End').lower(), end_year if end_year else '-'))

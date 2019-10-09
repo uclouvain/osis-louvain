@@ -23,12 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission, Group
 from django.http import HttpResponse
 from django.test import TestCase
 from rest_framework.reverse import reverse
 
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, TUTOR
 from base.tests.factories.person import PersonFactory
+from base.tests.factories.student import StudentFactory
+from base.views.user_list import UserListView
 
 
 class UserListViewTestCase(TestCase):
@@ -48,3 +51,25 @@ class UserListViewTestCase(TestCase):
         self.user.user_permissions.add(self.permission)
         response = self.client.get(url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
+
+    def test_donot_return_teacher_only_in_tutor_group(self):
+        a_tutor_person = PersonFactory()
+        a_tutor_person.user.groups.add(Group.objects.get(name=TUTOR))
+        a_tutor_person.save()
+        self.assertCountEqual(UserListView().get_queryset(), [])
+
+    def test_tutor_in_several_groups(self):
+        a_tutor_person = PersonFactory()
+        a_tutor_person.user.groups.add(Group.objects.get(name=TUTOR))
+        a_tutor_person.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
+        a_tutor_person.save()
+
+        self.assertCountEqual(UserListView().get_queryset(), [a_tutor_person])
+
+    def test_donot_return_student_in_no_groups(self):
+        StudentFactory()
+        a_central_manager_person = PersonFactory()
+        a_central_manager_person.user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
+        a_central_manager_person.save()
+
+        self.assertCountEqual(UserListView().get_queryset(), [a_central_manager_person])

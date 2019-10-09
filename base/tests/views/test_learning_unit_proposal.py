@@ -27,13 +27,12 @@ import datetime
 from unittest import mock
 
 from django.contrib import messages
-from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
-from django.urls import reverse
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
 from django.test import TestCase, RequestFactory
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
@@ -46,17 +45,16 @@ from base.forms.learning_unit_proposal import ProposalLearningUnitForm
 from base.forms.proposal.learning_unit_proposal import LearningUnitProposalForm
 from base.models import entity_version
 from base.models import proposal_learning_unit
-from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import learning_component_year_type
+from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import organization_type, entity_type, \
     learning_unit_year_subtypes, proposal_type, learning_container_year_types, proposal_state
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
 from base.models.enums.proposal_state import ProposalState, LimitedProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories import campus as campus_factory, \
     organization as organization_factory
 from base.tests.factories.academic_year import create_current_academic_year, \
-    get_current_year, AcademicYearFactory
+    AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
@@ -348,7 +346,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
         )
 
         self.learning_unit.refresh_from_db()
-        self.assertEqual(self.learning_unit.end_year, self.next_academic_year.year)
+        self.assertEqual(self.learning_unit.end_year, self.next_academic_year)
 
 
 class TestLearningUnitProposalSearch(TestCase):
@@ -664,10 +662,9 @@ class TestEditProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
         today = datetime.date.today()
-        start_year = get_current_year()
-        end_year = start_year + 10
         cls.academic_years = AcademicYearFactory.produce_in_future(quantity=5)
         cls.current_academic_year = cls.academic_years[0]
+        end_year = AcademicYearFactory(year=cls.current_academic_year.year + 10)
         cls.language = LanguageFactory(code='FR')
         cls.organization = organization_factory.OrganizationFactory(type=organization_type.MAIN)
         cls.campus = campus_factory.CampusFactory(organization=cls.organization, is_administration=True)
@@ -676,7 +673,7 @@ class TestEditProposal(TestCase):
                                                   start_date=today.replace(year=1900),
                                                   end_date=None)
 
-        cls.generated_container = GenerateContainer(start_year, end_year)
+        cls.generated_container = GenerateContainer(cls.current_academic_year, end_year)
         cls.generated_container_first_year = cls.generated_container.generated_container_years[1]
         cls.learning_unit_year = cls.generated_container_first_year.learning_unit_year_full
 
@@ -862,8 +859,8 @@ class TestLearningUnitProposalDisplay(TestCase):
         cls.initial_data_learning_unit_year = {'credits': cls.initial_credits, 'periodicity': cls.initial_periodicity}
 
         cls.initial_language_en = cls.language_it
-        cls.generator_learning_container = GenerateContainer(start_year=cls.academic_year.year,
-                                                             end_year=cls.academic_year.year + 1)
+        end_year = AcademicYearFactory(year=cls.academic_year.year + 1)
+        cls.generator_learning_container = GenerateContainer(start_year=cls.academic_year, end_year=end_year)
         cls.l_container_year_with_entities = cls.generator_learning_container.generated_container_years[0]
 
     def test_is_foreign_key(self):

@@ -139,11 +139,15 @@
                         {% bootstrap_field form_education_group_year.management_entity %}
                         {% bootstrap_field form_education_group_year.administration_entity %}
                         {% bootstrap_field form_education_group_year.academic_year %}
-                        <div class="row">
-                            {% bootstrap_field form_education_group.start_year form_group_class="col-md-6" %}
-                            {% bootstrap_field form_education_group.end_year form_group_class="col-md-6" %}
-                        </div>
+                        {% if form_education_group.start_year.is_hidden %}
+                            {% bootstrap_field form_education_group.end_year %}
+                        {% else %}
+                            <div class="row">
+                                {% bootstrap_field form_education_group.start_year form_group_class="col-md-6" %}
+                                {% bootstrap_field form_education_group.end_year form_group_class="col-md-6" %}
+                            </div>
                         <br>
+                        {% endif %}
                         {% bootstrap_field form_education_group_year.enrollment_campus %}
                         {% bootstrap_field form_education_group_year.main_teaching_campus %}
                         {% bootstrap_field form_education_group_year.other_campus_activities %}

@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import factory.fuzzy
+from django.conf import settings
 
 from .text_label import TextLabelFactory
 
@@ -32,7 +33,7 @@ class TranslatedTextFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "cms.TranslatedText"
 
-    language = 'fr-be'  # French default
+    language = settings.LANGUAGE_CODE_FR  # French default
     text_label = factory.SubFactory(TextLabelFactory)
     entity = factory.fuzzy.FuzzyText(prefix="Entity ", length=15)
     reference = factory.fuzzy.FuzzyInteger(1, 10)
@@ -44,4 +45,4 @@ class TranslatedTextRandomFactory(TranslatedTextFactory):
 
 
 class EnglishTranslatedTextRandomFactory(TranslatedTextRandomFactory):
-    language = 'en'
+    language = settings.LANGUAGE_CODE_EN

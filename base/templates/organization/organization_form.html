@@ -46,11 +46,11 @@
                 {% csrf_token %}
                 {% bootstrap_form form %}
                 <div class=pull-right>
-                    <button type="submit" class="btn btn-primary" title="{% trans 'save'%}" id="bt_organization_save">
-                        <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save'%}
+                    <button type="submit" class="btn btn-primary" title="{% trans 'Save'%}" id="bt_organization_save">
+                        <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save'%}
                     </button>
                     <a class="btn btn-default" id="lnk_organization_cancel" href="{% url 'organizations' %}">
-                        <span class="glyphicon glyphicon-cancel" aria-hidden="true"></span> {% trans 'cancel'%}</a>
+                        <span class="glyphicon glyphicon-cancel" aria-hidden="true"></span> {% trans 'Cancel'%}</a>
                 </div>
             </form>
         </div>

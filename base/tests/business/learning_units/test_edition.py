@@ -292,9 +292,6 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertIsInstance(error_list, list)
         self.assertEqual(len(error_list), 2)
 
-        # invalidate cache
-        del self.requirement_entity.most_recent_acronym
-
         generic_error = "The value of field '%(field)s' is different between year %(year)s - %(value)s " \
                         "and year %(next_year)s - %(next_value)s"
         # Error : Requirement entity diff

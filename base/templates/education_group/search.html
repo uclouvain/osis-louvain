@@ -56,6 +56,7 @@
                 <div class="row">
                     <div class="col-md-2">
                        {% bootstrap_field form.academic_year %}
+                        {{ form.media }}
                     </div>
                     <div class="col-md-2">
                        {% bootstrap_field form.acronym %}
@@ -191,26 +192,8 @@
                     "type": "GET",
                     "dataSrc": "object_list",
                     "data": function (d){
-                        let formdata = $('#search_form').serializeArray();
-                        let queryString = {};
-                        $(formdata).each(function(index, obj){
-                            if (!queryString.hasOwnProperty(obj.name)){
-                                queryString[obj.name] = [obj.value];
-                            } else {
-                                queryString[obj.name].push([obj.value]);
-                            }
-                        });
-
-                        // Append ordering to querystring
-                        let columnName = domTable.DataTable().settings().init().columnDefs[d.order[0]['column']].name;
-                        let direction = (d.order[0]['dir'] == 'asc') ? '' : '-';
-                        let ordering = direction + columnName;
-                        queryString['ordering'] = ordering;
-                        $('#id_ordering').val(ordering);
-
-                        // Append page to querystring
-                        queryString['page'] = {{ object_list.number }}
-                        return queryString;
+                        let pageNumber = {{ object_list.number }};
+                        return getDataAjaxTable(domTable, d, pageNumber);
                     },
                     "traditional": true
                 },

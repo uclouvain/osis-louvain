@@ -29,19 +29,21 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.forms.learning_unit.learning_unit_create import CRUCIAL_YEAR_FOR_CREDITS_VALIDATION
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm
+from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.person import PersonFactory
-from base.models.enums import learning_unit_year_subtypes
 from base.tests.forms.test_learning_unit_create_2 import get_valid_form_data
 
 
 class TestCreditsValidation(TestCase):
 
     def setUp(self):
-        self.academic_years = GenerateAcademicYear(CRUCIAL_YEAR_FOR_CREDITS_VALIDATION - 1,
-                                                   CRUCIAL_YEAR_FOR_CREDITS_VALIDATION + 1).academic_years
-        self.learn_unit_structure = GenerateContainer(self.academic_years[0].year, self.academic_years[2].year)
+        start_year = AcademicYearFactory(year=CRUCIAL_YEAR_FOR_CREDITS_VALIDATION - 1)
+        end_year = AcademicYearFactory(year=CRUCIAL_YEAR_FOR_CREDITS_VALIDATION + 1)
+        self.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
+        self.learn_unit_structure = GenerateContainer(self.academic_years[0], self.academic_years[2])
         self.learning_unit_year_2017 = LearningUnitYear.objects.get(
             learning_unit=self.learn_unit_structure.learning_unit_full,
             academic_year=self.academic_years[0]

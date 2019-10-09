@@ -51,7 +51,7 @@
                 <form method="post" style="display: inline;">
                     {% csrf_token %}
                     <input type="hidden" name="learning_unit_id" value="{{ learning_unit.id }}" />
-                    <button type="button" onclick="javascript:history.back()" class="btn btn-default">{% trans 'cancel' %}</button>
+                    <button type="button" onclick="javascript:history.back()" class="btn btn-default">{% trans 'Cancel' %}</button>
                     <button type="submit" class="btn btn-danger">{% trans 'Yes, I confirm.' %}</button>
                 </form>
             </div>

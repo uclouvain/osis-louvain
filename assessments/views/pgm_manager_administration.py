@@ -28,8 +28,8 @@ from collections import OrderedDict
 
 from dal import autocomplete
 from django import forms
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
@@ -38,7 +38,6 @@ from django.views.generic import ListView, DeleteView, FormView
 from django.views.generic.edit import BaseUpdateView
 
 from base import models as mdl
-from base.models.entity_manager import is_entity_manager, has_perm_entity_manager
 from base.models.offer_type import OfferType
 from base.models.offer_year import OfferYear
 from base.models.person import Person
@@ -77,13 +76,11 @@ class ProgramManagerListView(ListView):
         return context
 
 
-class ProgramManagerMixin(UserPassesTestMixin, AjaxTemplateMixin):
+class ProgramManagerMixin(PermissionRequiredMixin, AjaxTemplateMixin):
     model = ProgramManager
     success_url = reverse_lazy('manager_list')
     partial_reload = '#pnl_managers'
-
-    def test_func(self):
-        return is_entity_manager(self.request.user)
+    permission_required = 'base.change_programmanager'
 
     @property
     def offer_years(self) -> list:
@@ -185,7 +182,7 @@ class ProgramManagerCreateView(ProgramManagerMixin, FormView):
 
 
 @login_required
-@user_passes_test(has_perm_entity_manager)
+@permission_required('base.view_programmanager', raise_exception=True)
 def pgm_manager_administration(request):
     administrator_entities = get_administrator_entities(request.user)
     current_academic_yr = mdl.academic_year.current_academic_year()
@@ -195,7 +192,8 @@ def pgm_manager_administration(request):
         'entities_managed_root': administrator_entities,
         'offer_types': OfferType.objects.exclude(name__in=EXCLUDE_OFFER_TYPE_SEARCH),
         'managers': _get_entity_program_managers(administrator_entities, current_academic_yr),
-        'init': '1'})
+        'init': '1'
+    })
 
 
 @login_required

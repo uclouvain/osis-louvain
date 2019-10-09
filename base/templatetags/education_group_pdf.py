@@ -68,6 +68,9 @@ CHILD_LEAF = """\
     <td style="text-align: center;">{an_1}</td>
     <td style="text-align: center;">{an_2}</td>
     <td style="text-align: center;">{an_3}</td>
+    <td style="text-align: center;">{an_4}</td>
+    <td style="text-align: center;">{an_5}</td>
+    <td style="text-align: center;">{an_6}</td>
 </tr>
 """
 
@@ -160,7 +163,10 @@ def append_output(item, output, padding, sublist):
                               sublist=sublist,
                               an_1=check_block(item, 1),
                               an_2=check_block(item, 2),
-                              an_3=check_block(item, 3)
+                              an_3=check_block(item, 3),
+                              an_4=check_block(item, 4),
+                              an_5=check_block(item, 5),
+                              an_6=check_block(item, 6),
                               )
         )
     else:

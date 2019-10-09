@@ -43,14 +43,12 @@ def extend_education_groups():
 @celery_app.task
 def check_academic_calendar() -> dict:
     open_calendar = AcademicCalendar.objects.filter(start_date=datetime.now().date()).first()
-    if open_calendar:
-
-        if open_calendar.reference == EDUCATION_GROUP_EDITION:
-            # Copy the education group data of the open academic year.
-            process = ReddotEducationGroupAutomaticPostponement(
-                EducationGroupYear.objects.filter(academic_year=open_calendar.academic_year)
-            )
-            process.postpone()
-            return {"Copy of Reddot data": process.serialize_postponement_results()}
+    if open_calendar and open_calendar.reference == EDUCATION_GROUP_EDITION:
+        # Copy the education group data of the open academic year.
+        process = ReddotEducationGroupAutomaticPostponement(
+            EducationGroupYear.objects.filter(academic_year=open_calendar.academic_year)
+        )
+        process.postpone()
+        return {"Copy of Reddot data": process.serialize_postponement_results()}
 
     return {}

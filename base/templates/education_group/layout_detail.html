@@ -97,13 +97,26 @@
             {% endblock %}
         </div>
     </div>
-
+    <div id="clipboard" class="alert alert-info" role="alert" {% if not selected_element_clipboard %}hidden="hidden"{% endif %}>
+        <button type="button" class="close" id="close_clipboard"><span aria-hidden="true">&nbsp;&times;</span></button>
+        <strong>{% trans "Selected element" %}</strong>
+        <br>
+        {{ selected_element_clipboard }}
+    </div>
 
     <script>
         const root_id = "{{ root_id }}";
         const url_resolver_match = "{% url_resolver_match %}";
         const tree = JSON.parse('{{ tree | escapejs }}');
         const management_url = "{% url "education_groups_management" %}";
+        /*
+        * Custom alert close function.
+        * Can't use Bootstrap's default which removes alert from DOM and prohibit to re-display it on item selection.
+        */
+        let close_clipboard = document.getElementById("close_clipboard");
+        close_clipboard.addEventListener("click", function(){
+          $("#clipboard").hide();
+        });
     </script>
     <script type="text/javascript" src="{% static 'js/education_group/education_group_tree.js' %}">
     </script>

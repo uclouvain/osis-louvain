@@ -207,9 +207,10 @@ class EducationGroupXlsTestCase(TestCase):
 class EducationGroupXlsAdministrativeDataTestCase(TestCase):
     def setUp(self):
         self.academic_year = create_current_academic_year()
+        self.next_academic_year = AcademicYearFactory(year=self.academic_year.year + 1)
         self.education_group_type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
-        self.education_group = EducationGroupFactory(start_year=self.academic_year.year,
-                                                     end_year=self.academic_year.year + 1)
+        self.education_group = EducationGroupFactory(start_year=self.academic_year,
+                                                     end_year=self.next_academic_year)
         self.education_group_year_1 = EducationGroupYearFactory(academic_year=self.academic_year, acronym="PREMIER",
                                                                 education_group=self.education_group,
                                                                 weighting=True)
@@ -382,6 +383,7 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE),
             xls_build.STYLED_CELLS: None,
             xls_build.COLORED_ROWS: None,
+            xls_build.ROW_HEIGHT: None,
         }]
     }
 
@@ -397,6 +399,7 @@ def _generate_xls_administrative_data_build_parameter(xls_data, user):
             xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE_ADMINISTRATIVE),
             xls_build.STYLED_CELLS: None,
             xls_build.COLORED_ROWS: None,
+            xls_build.ROW_HEIGHT: None,
         }]
     }
 

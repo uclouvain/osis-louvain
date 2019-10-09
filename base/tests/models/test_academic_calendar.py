@@ -32,8 +32,10 @@ from django.utils.translation import ugettext_lazy as _
 from faker import Faker
 
 from base.models import academic_calendar
-from base.models.academic_calendar import is_academic_calendar_has_started
+from base.models.academic_calendar import is_academic_calendar_has_started, \
+    get_academic_calendar_by_date_and_reference_and_data_year, AcademicCalendar
 from base.models.enums import academic_calendar_type
+from base.models.enums.academic_calendar_type import EXAM_ENROLLMENTS, SCORES_EXAM_SUBMISSION
 from base.models.exceptions import StartDateHigherThanEndDateException
 from base.signals.publisher import compute_all_scores_encodings_deadlines
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory, \
@@ -53,9 +55,9 @@ class AcademicCalendarTest(TestCase):
 
     def test_find_highlight_academic_calendar(self):
         open_academic_calendar = OpenAcademicCalendarFactory()
-        close_academic_calendar = CloseAcademicCalendarFactory()
-        academic_calendar_without_description = OpenAcademicCalendarFactory(highlight_description=None)
-        academic_calendar_with_empty_title = OpenAcademicCalendarFactory(highlight_title="")
+        CloseAcademicCalendarFactory()
+        OpenAcademicCalendarFactory(highlight_description=None)
+        OpenAcademicCalendarFactory(highlight_title="")
 
         self.assertQuerysetEqual(
             academic_calendar.find_highlight_academic_calendar(),
@@ -75,6 +77,35 @@ class AcademicCalendarTest(TestCase):
         with mock.patch.object(compute_all_scores_encodings_deadlines, 'send') as mock_method:
             AcademicCalendarFactory()
             self.assertTrue(mock_method.called)
+
+    def test_get_academic_calendar_by_date_and_reference_and_data_year_exists(self):
+        fake = Faker()
+        data_year = AcademicYearFactory()
+        cal = AcademicCalendarFactory(
+            start_date=fake.past_date(),
+            end_date=fake.future_date(),
+            reference=EXAM_ENROLLMENTS,
+            data_year=data_year
+        )
+        self.assertEqual(
+            get_academic_calendar_by_date_and_reference_and_data_year(data_year, EXAM_ENROLLMENTS),
+            cal
+        )
+
+    def test_get_academic_calendar_by_date_and_reference_and_data_year_none(self):
+        AcademicCalendar.objects.filter(reference=EXAM_ENROLLMENTS).delete()
+        fake = Faker()
+        data_year = AcademicYearFactory()
+        AcademicCalendarFactory(
+            start_date=fake.past_date(),
+            end_date=fake.future_date(),
+            reference=SCORES_EXAM_SUBMISSION,
+            data_year=data_year
+        )
+        self.assertEqual(
+            get_academic_calendar_by_date_and_reference_and_data_year(data_year, EXAM_ENROLLMENTS),
+            None
+        )
 
 
 class TestIsAcademicCalendarHasStarted(TestCase):

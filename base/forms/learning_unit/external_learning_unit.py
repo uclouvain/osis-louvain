@@ -376,7 +376,7 @@ class ExternalPartimForm(LearningUnitBaseForm):
         return {
             'data': data,
             'instance': self.instance.learning_unit if self.instance else None,
-            'start_year': self.learning_unit_year_full.academic_year.year,
+            'start_year': self.learning_unit_year_full.academic_year,
             'max_end_year': self.learning_unit_year_full.learning_unit.max_end_year
         }
 

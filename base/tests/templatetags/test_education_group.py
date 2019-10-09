@@ -41,12 +41,13 @@ from base.templatetags.education_group import li_with_deletion_perm, \
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
+from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
 from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 
 DELETE_MSG = _("delete education group")
-PERMISSION_DENIED_MSG = _("The education group edition period is not open.")
+PERMISSION_DENIED_MSG = _("This education group is not editable during this period.")
 UNAUTHORIZED_TYPE_MSG = "No type of %(child_category)s can be created as child of %(category)s of type %(type)s"
 
 CUSTOM_LI_TEMPLATE = """
@@ -338,6 +339,7 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
             start_date=timezone.now(),
             end_date=timezone.now() + timedelta(weeks=+1),
             academic_year=academic_year,
+            data_year=academic_year,
         )
 
         self.client.force_login(user=self.person.user)
@@ -363,6 +365,37 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
                 'url': "#",
                 'text': DELETE_MSG
             }
+        )
+
+    def test_li_tag_case_education_group_edition_period_within_the_past(self):
+        academic_years = []
+        education_group = EducationGroupFactory(start_year=AcademicYearFactory(year=2013))
+        edys = []
+        for i in range(2014, AcademicYearFactory(current=True).year + 1):
+            aca_year = AcademicYearFactory(year=i)
+            academic_years.append(aca_year)
+            edys.append(TrainingFactory(academic_year=aca_year,
+                                        education_group=education_group,
+                                        management_entity=self.education_group_year.management_entity))
+
+        url = reverse('delete_education_group', args=[edys[-1].id, edys[-1].id])
+        context = {
+            "person": self.person,
+            "root": edys[-1],
+            "education_group_year": edys[-1],
+            "request": RequestFactory().get("")
+        }
+        result = li_with_deletion_perm(context, url, DELETE_MSG)
+        self.assertEqual(
+            {
+                'load_modal': False,
+                'title': PERMISSION_DENIED_MSG,
+                'class_li': 'disabled',
+                'id_li': 'link_delete',
+                'url': "#",
+                'text': DELETE_MSG
+            },
+            result
         )
 
     def test_li_tag_case_inside_education_group_edition_period(self):

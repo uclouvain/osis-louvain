@@ -33,12 +33,11 @@ from django.utils.translation import ugettext as _
 from attribution.models import attribution
 from base.models import person, session_exam_deadline, \
     academic_year as academic_yr, offer_year, program_manager, tutor
-from base.models.enums import exam_enrollment_state as enrollment_states, \
-    exam_enrollment_justification_type as justification_types
+from base.models.enums import exam_enrollment_justification_type as justification_types
+from base.models.enums import exam_enrollment_state as enrollment_states
 from base.models.exceptions import JustificationValueException
 from base.models.utils.admin_extentions import remove_delete_action
 from osis_common.models.osis_model_admin import OsisModelAdmin
-from base.models.enums import exam_enrollment_state as enrollment_states
 
 JUSTIFICATION_ABSENT_FOR_TUTOR = _('Absent')
 SCORE_BETWEEN_0_AND_20 = _("Scores must be between 0 and 20")
@@ -344,12 +343,13 @@ def find_for_score_encodings(session_exam_number,
     :return: All filtered examEnrollments.
     """
     if not academic_year:
-        academic_year = academic_yr.current_academic_year()
+        academic_year = academic_yr.starting_academic_year()
 
     queryset = ExamEnrollment.objects.filter(
         session_exam__number_session=session_exam_number,
         learning_unit_enrollment__learning_unit_year__academic_year=academic_year
     )
+
     if only_enrolled:
         queryset = queryset.filter(enrollment_state=enrollment_states.ENROLLED)
 

@@ -93,8 +93,8 @@
                                 <br>
                             {% endif %}
                         {% endwith %}
-                        {% with new_acronym=learning_unit_year|get_next_acronym %}
-                            {% if new_acronym %}
+                        {% with new_acronym=learning_unit_year|get_next_acronym has_proposal=learning_unit_year|has_proposal %}
+                            {% if new_acronym and not has_proposal %}
                                 <div>({% trans 'Newly' %} : {{ new_acronym }})</div>
                                 <br>
                             {% endif %}

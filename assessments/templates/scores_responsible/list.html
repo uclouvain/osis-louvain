@@ -1,0 +1,165 @@
+{% extends "layout.html" %}
+{% load staticfiles bootstrap3 i18n %}
+
+{% comment "License" %}
+ * OSIS stands for Open Student Information System. It's an application
+ * designed to manage the core business of higher education institutions,
+ * such as universities, faculties, institutes and professional schools.
+ * The core business involves the administration of students, teachers,
+ * courses, programs and so on.
+ *
+ * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of this license - GNU General Public License - is available
+ * at the root of the source code of this program.  If not,
+ * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+    <li id="lnk_institution"><a href="{% url 'institution' %}" id ="lnk_home_institution">{% trans 'Institution' %}</a></li>
+    <li id="lnk_studies"><a href="{% url 'academic_actors' %}">{% trans 'Academic actors' %}</a></li>
+    <li class="active">{% trans 'Scores responsibles' %}</li>
+{% endblock %}
+
+{% block content %}
+     <div class="page-header">
+        <h2>{% trans 'Scores responsibles' %} - {{ filter.academic_year }}</h2>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-heading">
+             <form id="search_form" method="GET" action="{% url 'scores_responsible_list' %}">
+                 <div class="row">
+                    {% bootstrap_field filter.form.acronym form_group_class="col-md-2" %}
+                    {% bootstrap_field filter.form.learning_unit_title form_group_class="col-md-3" %}
+                    {% bootstrap_field filter.form.tutor form_group_class="col-md-3" %}
+                    {% bootstrap_field filter.form.scores_responsible form_group_class="col-md-3" %}
+                    {% bootstrap_field filter.form.ordering %}
+                    <div class="col-md-1 form-group" style="margin-top:25px">
+                        <button type="submit" id="bt_submit_search" class="btn btn-primary" role="button"
+                                title="{% trans 'Search' %}">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                    </div>
+                 </div>
+             </form>
+        </div>
+         <div class="panel-body">
+            <table id="tb_scores_responsible" class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>{% trans 'Entity' %}</th>
+                        <th>{% trans 'Acronym' %}</th>
+                        <th>{% trans 'Learning unit title' %}</th>
+                        <th>{% trans 'Tutor' %}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+            </table>
+            <div class="text-center">
+                {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        $(document).ready(function() {
+            let domTable =  $('#tb_scores_responsible');
+            domTable.DataTable({
+                "columnDefs": [
+                    {"name": "requirement_entity", "targets": 0, "data": "requirement_entity"},
+                    {"name": "acronym", "targets": 1, "data": "acronym"},
+                    {"name": "learning_unit_title", "targets": 2, "data": "learning_unit_title"},
+                    {
+                        "name": "attributions",
+                        "targets": 3,
+                        "data": "attributions",
+                        "orderable": false,
+                        "render": function(data, type, row, meta) {
+                            let htmlRendered = "";
+                            for (i=0; i<row['attributions'].length; i++) {
+                                const tutorHtmlRendered = getTutorHtmlRendered(row['attributions'][i]);
+                                if (i===0){
+                                    htmlRendered += tutorHtmlRendered;
+                                }else{
+                                    htmlRendered += "<p>" + tutorHtmlRendered + "</p>";
+                                }
+
+                                //Collapsible div which contains attributions
+                                if (row['attributions'].length > 1) {
+                                    if(i===0) {
+                                        const targetId = row['pk'];
+                                        htmlRendered += getCollapseHtmlRendered(targetId);
+                                        htmlRendered += "<div id='list_" + targetId + "' class='panel-collapse collapse'>";
+                                    }
+                                    if(i===row['attributions'].length-1){
+                                        htmlRendered += "</div>";
+                                    }
+                                }
+                            }
+                            return htmlRendered;
+                        }
+                    },
+                    {
+                        "name": "actions",
+                        "targets": 4,
+                        "orderable": false,
+                        "render" : function (data, type, row, meta) {
+                            const href = "{% url 'scores_responsible_management'%}?{{request.GET.urlencode}}&learning_unit_year=learning_unit_year_" + row['pk'];
+                            return "<a href='"+ href + "'> <span class='glyphicon glyphicon-edit'></span></a>";
+                        }
+                    }
+                ],
+                "stateSave": true,
+                "paging": false,
+                "orderMulti": false,
+                "ordering": true,
+                "serverSide": true,
+                "ajax" : {
+                    "url": "{% url 'scores_responsible_list' %}",
+                    "type": "GET",
+                    "dataSrc": "object_list",
+                    "data": function(d) {
+                        let pageNumber = {{ page_obj.number }};
+                        return getDataAjaxTable(domTable, d, pageNumber);
+                    },
+                    "traditional": true
+                },
+                "info"  : false,
+                "searching" : false,
+                "language": {
+                    "oAria":{
+                        "sSortAscending":  "{% trans 'Datatable sort ascending'%}",
+                        "sSortDescending": "{% trans 'Datatable sort descending'%}"
+                    }
+                }
+            });
+        });
+
+        function getTutorHtmlRendered(attributionRow) {
+            if (attributionRow['score_responsible']) {
+                return "<strong>" + attributionRow['tutor'] + "</strong>";
+            }else{
+                return attributionRow['tutor'];
+            }
+        }
+
+        function getCollapseHtmlRendered(targetId) {
+            return "<a role='button' data-toggle='collapse' data-target='#list_" + targetId + "' aria-expanded='false' " +
+                "style='margin-left: 5px;' aria-controls='tutors_by_course'> " +
+                "   <span class='glyphicon glyphicon-list' aria-hidden='true'></span>" +
+                "</a>"
+        }
+    </script>
+{% endblock %}

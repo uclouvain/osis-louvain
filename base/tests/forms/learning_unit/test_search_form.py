@@ -37,10 +37,10 @@ from base.models.enums import entity_type, learning_container_year_types
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
-from base.tests.factories.entity import EntityFactory
 from base.tests.factories.campus import CampusFactory
+from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -58,7 +58,9 @@ class TestSearchForm(TestCase):
     @classmethod
     def setUpTestData(cls):
         current_year = datetime.date.today().year
-        cls.academic_years = GenerateAcademicYear(current_year - 2, current_year + 2).academic_years
+        start_year = AcademicYearFactory(year=current_year - 2)
+        end_year = AcademicYearFactory(year=current_year + 2)
+        cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
 
     def test_get_research_criteria(self):
         data = QueryDict(mutable=True)

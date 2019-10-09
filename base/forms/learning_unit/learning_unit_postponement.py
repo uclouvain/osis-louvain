@@ -102,9 +102,10 @@ class LearningUnitPostponementForm:
     def _get_academic_end_year(self, end_postponement):
         if end_postponement is None:
             if self.learning_unit_instance and self.learning_unit_instance.end_year:
-                end_postponement = academic_year.find_academic_year_by_year(self.learning_unit_instance.end_year)
+                end_postponement = academic_year.find_academic_year_by_year(self.learning_unit_instance.end_year.year)
             elif self.learning_unit_full_instance and self.learning_unit_full_instance.end_year:
-                end_postponement = academic_year.find_academic_year_by_year(self.learning_unit_full_instance.end_year)
+                end_postponement = academic_year.find_academic_year_by_year(
+                    self.learning_unit_full_instance.end_year.year)
         return end_postponement
 
     def _compute_max_postponement_year(self) -> int:
@@ -223,7 +224,7 @@ class LearningUnitPostponementForm:
                 data_to_postpone['component-1-id'] = learning_component_year.id
 
     def _instantiate_base_form_as_insert(self, ac_year, data):
-        return self._get_learning_unit_base_form(ac_year, data=data, start_year=self.start_postponement.year)
+        return self._get_learning_unit_base_form(ac_year, data=data, start_year=self.start_postponement)
 
     @staticmethod
     def _get_data_to_postpone(lunit_year, data):

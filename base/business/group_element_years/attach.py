@@ -30,7 +30,7 @@ from django.db.models import Q
 from django.utils.functional import cached_property
 from django.utils.translation import ngettext, gettext
 
-from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
+from base.business.education_groups import group_element_year_tree
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.group_element_year import GroupElementYear
@@ -83,7 +83,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         if finalities_to_add_qs.exists() and root_2m_qs.exists():
             root_2m_early_end_date = root_2m_qs.first()
             invalid_finalities_acronyms = finalities_to_add_qs.filter(
-                Q(education_group__end_year__gt=root_2m_early_end_date.education_group.end_year) |
+                Q(education_group__end_year__year__gt=root_2m_early_end_date.education_group.end_year.year) |
                 Q(education_group__end_year__isnull=True)
             ).values_list('acronym', flat=True)
 
@@ -111,7 +111,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         """
         options_missing_by_finality = {}
 
-        options_to_add = EducationGroupHierarchy(root=self.child).get_option_list()
+        options_to_add = group_element_year_tree.EducationGroupHierarchy(root=self.child).get_option_list()
         if self.child.education_group_type.name == MiniTrainingType.OPTION.name:
             options_to_add += [self.child]
 
@@ -127,7 +127,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
             )
 
             for root in root_2m_qs:
-                options_in_2m = EducationGroupHierarchy(root=root).get_option_list()
+                options_in_2m = group_element_year_tree.EducationGroupHierarchy(root=root).get_option_list()
                 options_missing_by_finality[root] = set(options_to_add) - set(options_in_2m)
         return options_missing_by_finality
 

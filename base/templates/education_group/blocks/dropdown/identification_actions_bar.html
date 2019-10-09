@@ -112,6 +112,17 @@
                         <span>{% trans 'Search' %}</span>
                     </a>
                 </li>
+                <li class="divider"></li>
+                <li>
+                    <a href="{% url "education_group_learning_units_prerequisites" education_group_year_pk=education_group_year.pk %}">
+                        <span>{% trans 'Generate xls of learning units that have prerequisites' %}</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="{% url "education_group_learning_units_is_prerequisite_for" education_group_year_pk=education_group_year.pk %}">
+                        <span>{% trans 'Generate xls of learning units that are prerequisites for' %}</span>
+                    </a>
+                </li>
 
             </ul>
         </div>
@@ -127,7 +138,7 @@
                 data: {'element_id': {{ education_group_year.id }}},
                 dataType: 'json',
                 success: function (jsonResponse) {
-                    displayInfoMessage(jsonResponse, 'message_info_container');
+                    displayInfoMessage(jsonResponse, 'clipboard');
                 }
             });
         }

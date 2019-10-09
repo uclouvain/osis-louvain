@@ -40,7 +40,9 @@ from base.business.learning_units import perms
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy
 from base.models.person import Person
 from base.models.teaching_material import TeachingMaterial
+from base.views.common import add_to_session
 from base.views.learning_units.common import get_common_context_learning_unit_year
+from base.views.learning_units.detail import SEARCH_URL_PART
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
@@ -49,6 +51,8 @@ from cms.models.translated_text_label import TranslatedTextLabel
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
 def learning_unit_pedagogy(request, learning_unit_year_id):
+    if SEARCH_URL_PART in request.META.get('HTTP_REFERER', ''):
+        add_to_session(request, 'search_url', request.META.get('HTTP_REFERER'))
     return read_learning_unit_pedagogy(request, learning_unit_year_id, {}, "learning_unit/pedagogy.html")
 
 

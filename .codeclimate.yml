@@ -5,7 +5,7 @@ checks:
     enabled: false
   method-complexity:
     config:
-      threshold: 8
+      threshold: 15
 
 plugins:
   pep8:

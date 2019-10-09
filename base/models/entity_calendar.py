@@ -29,7 +29,7 @@ from django.db import models
 from base.models import academic_calendar
 from base.models import entity_version
 from base.models.abstracts.abstract_calendar import AbstractCalendar
-from base.models.academic_year import current_academic_year, starting_academic_year
+from base.models.academic_year import starting_academic_year
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 

@@ -31,12 +31,12 @@ from unittest import mock
 import factory.fuzzy
 import reversion
 from django.contrib.auth.models import Permission
-from django.urls import reverse
 from django.http import HttpResponse, HttpResponseForbidden
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
 from django.test import TestCase, RequestFactory, Client
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
@@ -83,6 +83,7 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
     LecturingLearningComponentYearFactory, PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
     LearningUnitYearFullFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
@@ -96,6 +97,7 @@ from base.views.learning_unit import learning_unit_components, learning_unit_spe
     learning_unit_proposal_comparison
 from base.views.learning_unit import learning_unit_specifications_edit
 from base.views.learning_units.create import create_partim_form
+from base.views.learning_units.detail import SEARCH_URL_PART
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.search import learning_units_service_course
 from cms.enums import entity_name
@@ -331,13 +333,16 @@ class LearningUnitViewTestCase(TestCase):
         today = datetime.date.today()
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
 
+        cls.learning_unit = LearningUnitFactory(start_year=cls.current_academic_year)
+
         cls.learning_container_yr = LearningContainerYearFactory(
             academic_year=cls.current_academic_year,
             requirement_entity=cls.entities[0],
         )
         cls.luy = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,
-            learning_container_year=cls.learning_container_yr
+            learning_container_year=cls.learning_container_yr,
+            learning_unit=cls.learning_unit
         )
         cls.learning_component_yr = LearningComponentYearFactory(learning_unit_year=cls.luy,
                                                                  hourly_volume_total_annual=10,
@@ -572,10 +577,12 @@ class LearningUnitViewTestCase(TestCase):
                                                      learning_container_year=learning_container_year,
                                                      subtype=learning_unit_year_subtypes.FULL)
 
-        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
+        header = {'HTTP_REFERER': SEARCH_URL_PART}
+        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]), **header)
 
         self.assertTemplateUsed(response, 'learning_unit/identification.html')
         self.assertEqual(response.context['learning_unit_year'], learning_unit_year)
+        self.assertEqual(self.client.session['search_url'], SEARCH_URL_PART)
 
     def test_learning_unit_read_versions(self):
         learning_unit_year = LearningUnitYearFullFactory(
@@ -1079,10 +1086,11 @@ class LearningUnitViewTestCase(TestCase):
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                      learning_container_year=self.learning_container_yr,
                                                      subtype=learning_unit_year_subtypes.FULL)
-
-        response = self.client.get(reverse(learning_unit_pedagogy, args=[learning_unit_year.pk]))
+        header = {'HTTP_REFERER': SEARCH_URL_PART}
+        response = self.client.get(reverse(learning_unit_pedagogy, args=[learning_unit_year.pk]), **header)
 
         self.assertTemplateUsed(response, 'learning_unit/pedagogy.html')
+        self.assertEqual(self.client.session['search_url'], SEARCH_URL_PART)
 
     def test_learning_unit_specification(self):
         learning_unit_year = LearningUnitYearFactory()
@@ -1176,14 +1184,17 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.WORKSHEET_TITLE_KEY: _(base.business.learning_unit_xls.WORKSHEET_TITLE),
             xls_build.STYLED_CELLS: None,
             xls_build.COLORED_ROWS: None,
+            xls_build.ROW_HEIGHT: None,
         }]
     }
 
 
 class TestLearningUnitComponents(TestCase):
     def setUp(self):
-        self.academic_years = GenerateAcademicYear(start_year=2010, end_year=2020).academic_years
-        self.generated_container = GenerateContainer(start_year=2010, end_year=2020)
+        start_year = AcademicYearFactory(year=2010)
+        end_year = AcademicYearFactory(year=2020)
+        self.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
+        self.generated_container = GenerateContainer(start_year=start_year, end_year=end_year)
         self.a_superuser = SuperUserFactory()
         self.client.force_login(self.a_superuser)
         self.person = PersonFactory(user=self.a_superuser)

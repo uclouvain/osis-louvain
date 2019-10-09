@@ -190,7 +190,7 @@ class PostponeContent:
             raise NotPostponeError(_("You are not allowed to postpone this training in the future."))
 
         end_year = self.instance.education_group.end_year
-        if end_year and end_year < self.next_academic_year.year:
+        if end_year and end_year.year < self.next_academic_year.year:
             raise NotPostponeError(_("The end date of the education group is smaller than the year of postponement."))
 
         if not self.instance.groupelementyear_set.exists():
@@ -337,7 +337,8 @@ class PostponeContent:
 
     def _duplication_education_group_year(self, old_gr: GroupElementYear, old_egy: EducationGroupYear):
         if old_egy.education_group_type.category != Categories.GROUP.name:
-            if old_egy.education_group.end_year and old_egy.education_group.end_year < self.next_academic_year.year:
+            if old_egy.education_group.end_year and \
+                    old_egy.education_group.end_year.year < self.next_academic_year.year:
                 self.warnings.append(EducationGroupEndYearWarning(old_egy, self.next_academic_year))
                 return None
 

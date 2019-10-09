@@ -23,11 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.conf.urls import include, url
 from django.contrib import admin
-from django.conf import settings
+
 from base.views import common
-from django.views.i18n import JavaScriptCatalog
 
 packages = ('assessments', 'base')
 

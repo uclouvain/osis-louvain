@@ -26,6 +26,7 @@
 from django.conf.urls import url, include
 
 from base.views import education_group
+from base.views.education_groups import excel as education_group_excel
 from base.views.education_groups.group_element_year.read import pdf_content
 from base.views.education_groups.learning_unit import detail as learning_unit_detail, update as learning_unit_update
 from base.views.education_groups.publication_contact import CreateEducationGroupPublicationContactView, \
@@ -174,4 +175,14 @@ urlpatterns = [
             learning_unit_update.LearningUnitPrerequisite.as_view(),
             name='learning_unit_prerequisite_update'),
     ])),
+    url(
+        r'reporting/(?P<education_group_year_pk>[0-9]+)/prerequisites/$',
+        education_group_excel.get_learning_unit_prerequisites_excel,
+        name="education_group_learning_units_prerequisites"
+    ),
+    url(
+        r'reporting/(?P<education_group_year_pk>[0-9]+)/is_prerequisite_of/$',
+        education_group_excel.get_learning_units_is_prerequisite_for_excel,
+        name="education_group_learning_units_is_prerequisite_for"
+    )
 ]
