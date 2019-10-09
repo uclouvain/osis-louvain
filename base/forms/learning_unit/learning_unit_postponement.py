@@ -242,7 +242,7 @@ class LearningUnitPostponementForm:
             'data': data.copy() if data else None,
             'learning_unit_full_instance': self.learning_unit_full_instance,
             'postposal': not data,
-            'start_anac': self.start_postponement.year if self.subtype == learning_unit_year_subtypes.PARTIM else None
+            'start_anac': self.start_postponement if self.subtype == learning_unit_year_subtypes.PARTIM else None
         }
         if self.external:
             return ExternalLearningUnitBaseForm(
