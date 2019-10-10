@@ -143,12 +143,8 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         luy_3 = LearningUnitYearFactory(acronym='LEDPH1200', academic_year=self.academic_year)
         GroupElementYearChildLeafFactory(parent=self.education_group_year_parents[0], child_leaf=luy_3)
 
-        sub_parent_group = GroupElementYearFactory(parent=self.education_group_year_parents[0],)
-        luy_4 = LearningUnitYearFactory(acronym='LEDPH9900', academic_year=self.academic_year)
-        GroupElementYearChildLeafFactory(parent=sub_parent_group.child_branch, child_leaf=luy_4)
-
         form_data = {
-            "prerequisite_string": "LSINF1111 ET (LDROI1200 OU LEDPH1200) ET LEDPH9900"
+            "prerequisite_string": "LSINF1111 ET (LDROI1200 OU LEDPH1200)"
         }
         self.client.post(self.url, data=form_data)
 
@@ -160,7 +156,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertTrue(prerequisite)
         self.assertEqual(
             prerequisite.prerequisite_string,
-            "LSINF1111 ET (LDROI1200 OU LEDPH1200) ET LEDPH9900"
+            "LSINF1111 ET (LDROI1200 OU LEDPH1200)"
         )
 
     def test_post_data_complex_prerequisite_OR(self):
