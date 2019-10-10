@@ -98,21 +98,18 @@ def edit_educational_information(request, learning_unit_year_id):
 @require_http_methods(['POST', 'GET'])
 @PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
 def create_teaching_material(request, learning_unit_year_id):
-    success_url = reverse(view_educational_information, kwargs={'learning_unit_year_id': learning_unit_year_id})
-    return teaching_material.create_view(request, learning_unit_year_id, success_url)
+    return teaching_material.create_view(request, learning_unit_year_id)
 
 
 @login_required
 @require_http_methods(['POST', 'GET'])
 @PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
 def update_teaching_material(request, learning_unit_year_id, teaching_material_id):
-    success_url = reverse(view_educational_information, kwargs={'learning_unit_year_id': learning_unit_year_id})
-    return teaching_material.update_view(request, learning_unit_year_id, teaching_material_id, success_url)
+    return teaching_material.update_view(request, learning_unit_year_id, teaching_material_id)
 
 
 @login_required
 @require_http_methods(['POST', 'GET'])
 @PermissionDecorator(is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
 def delete_teaching_material(request, learning_unit_year_id, teaching_material_id):
-    success_url = reverse(view_educational_information, kwargs={'learning_unit_year_id': learning_unit_year_id})
-    return teaching_material.delete_view(request, learning_unit_year_id, teaching_material_id, success_url)
+    return teaching_material.delete_view(request, learning_unit_year_id, teaching_material_id)
