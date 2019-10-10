@@ -161,7 +161,7 @@ class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
         if self.q:
             qs = qs.filter(Q(organization__name__icontains=self.q) | Q(name__icontains=self.q))
 
-        return qs.select_related('organization').order_by('organization__name').distinct()
+        return qs.select_related('organization').order_by('organization__name')
 
     def get_result_label(self, result):
         return "{} ({})".format(result.organization.name, result.name)
