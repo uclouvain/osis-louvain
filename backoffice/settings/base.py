@@ -43,10 +43,12 @@ ADMIN_URL = os.environ['ADMIN_URL']
 ENVIRONMENT = os.environ['ENVIRONMENT']
 CSRF_COOKIE_SECURE = os.environ.get('CSRF_COOKIE_SECURE', 'False').lower() == 'true'
 
+
 # Base configuration
 ROOT_URLCONF = os.environ.get('ROOT_URLCONF', 'backoffice.urls')
 WSGI_APPLICATION = os.environ.get('WSGI_APPLICATION', 'backoffice.wsgi.application')
 MESSAGE_STORAGE = os.environ.get('MESSAGE_STORAGE', 'django.contrib.messages.storage.fallback.FallbackStorage')
+
 
 # Application definition
 # Common apps for all environments
@@ -63,7 +65,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.postgres',
-    'django_unused',
     'analytical',
     'localflavor',
     'ckeditor',
@@ -91,31 +92,11 @@ INSTALLED_APPS = (
     'reversion',
 )
 
-LOCAL_APPS = (
-    'osis_common',
-    'reference',
-    'rules_management',
-    'base',
-    'education_group',
-    'learning_unit',
-    'program_management',
-    'attribution',
-    'assistant',
-    'continuing_education',
-    'dissertation',
-    'internship',
-    'assessments',
-    'cms',
-    'webservices',
-    'backoffice'
-)
-
 
 class CustomLocaleMiddleware(LocaleMiddleware):
     """
         Set default language normally except if there is a query_param equal to 'lang'
     """
-
     def process_request(self, request):
         language = request.GET.get('lang')
         if language:
@@ -140,12 +121,13 @@ MIDDLEWARE = (
     'base.middlewares.reversion_middleware.BaseRevisionMiddleware'
 )
 
+
 INTERNAL_IPS = ()
 # check if we are testing right now
 TESTING = 'test' in sys.argv
 if TESTING:
     # add test packages that have specific models for tests
-    INSTALLED_APPS += ('osis_common.tests',)
+    INSTALLED_APPS += ('osis_common.tests', )
     # Speed up test because default hasher is slow by design
     # https://docs.djangoproject.com/en/1.11/topics/testing/overview/#password-hashing
     PASSWORD_HASHERS = [
@@ -197,7 +179,7 @@ DATABASES = {
         'PASSWORD': os.environ.get("POSTGRES_PASSWORD", 'osis'),
         'HOST': os.environ.get("POSTGRES_HOST", '127.0.0.1'),
         'PORT': os.environ.get("POSTGRES_PORT", '5432'),
-        'ATOMIC_REQUESTS': os.environ.get('DATABASE_ATOMIC_REQUEST', 'True').lower() == 'true'
+        'ATOMIC_REQUESTS':  os.environ.get('DATABASE_ATOMIC_REQUEST', 'True').lower() == 'true'
     },
 }
 
@@ -224,7 +206,7 @@ STATIC_URL = os.environ.get('STATIC_URL', '/static/')
 STATICI18N_ROOT = os.path.join(BASE_DIR, os.environ.get('STATICI18N', 'base/static'))
 
 MEDIA_ROOT = os.environ.get('MEDIA_ROOT', os.path.join(BASE_DIR, "uploads"))
-MEDIA_URL = os.environ.get('MEDIA_URL', '/media/')
+MEDIA_URL = os.environ.get('MEDIA_URL',  '/media/')
 CONTENT_TYPES = ['application/csv', 'application/doc', 'application/pdf', 'application/xls', 'application/xml',
                  'application/zip', 'image/jpeg', 'image/gif', 'image/png', 'text/html', 'text/plain']
 MAX_UPLOAD_SIZE = int(os.environ.get('MAX_UPLOAD_SIZE', 5242880))
@@ -278,6 +260,7 @@ LOGO_OSIS_URL = os.environ.get('LOGO_OSIS_URL', '')
 # See in settings.dev.example to configure the queues
 QUEUES = {}
 
+
 # Celery settings
 CELERY_BROKER_URL = "amqp://{user}:{password}@{host}:{port}".format(
     user=os.environ.get('RABBITMQ_USER', 'guest'),
@@ -291,6 +274,7 @@ CELERY_RESULT_BACKEND = os.environ.get('CELERY_RESULT_BACKEND', 'django-db')
 # Additionnal Locale Path
 # Add local path in your environment settings (ex: dev.py)
 LOCALE_PATHS = ()
+
 
 # Apps Settings
 CDN_URL = os.environ.get("CDN_URL", "")
@@ -326,16 +310,12 @@ CKEDITOR_CONFIGS = {
             {'name': 'colors', 'items': ['TextColor', 'BGColor']},
             '/',
             {'name': 'insert', 'items': ['Table']},
-            {
-                'name': 'paragraph',
-                'items': ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-',
-                          'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock']
-            },
-            {
-                'name': 'forms',
-                'items': ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton',
-                          'HiddenField']
-            },
+            {'name': 'paragraph',
+             'items': ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'Blockquote', 'CreateDiv', '-',
+                       'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock']},
+            {'name': 'forms',
+             'items': ['Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton',
+                       'HiddenField']},
             {'name': 'about', 'items': ['About']},
         ],
         'autoParagraph': False
@@ -426,10 +406,10 @@ REST_FRAMEWORK = {
     'TEST_REQUEST_DEFAULT_FORMAT': 'json',
     'DEFAULT_PAGINATION_CLASS': 'backoffice.settings.rest_framework.pagination.LimitOffsetPaginationWithUpperBound',
     'PAGE_SIZE': 25,
-    'DEFAULT_FILTER_BACKENDS': (
+    'DEFAULT_FILTER_BACKENDS':	(
         'django_filters.rest_framework.DjangoFilterBackend',  # Allow advanced searching
         'rest_framework.filters.OrderingFilter',  # Allow ordering collections
-        'rest_framework.filters.SearchFilter',  # Search based on admin
+        'rest_framework.filters.SearchFilter',   # Search based on admin
     ),
 }
 
@@ -460,13 +440,14 @@ BOOTSTRAP3 = {
     'success_css_class': '',
     'required_css_class': "required_field",
     "field_renderers": {
-        "default": "base.utils.renderers.OsisBootstrap3FieldRenderer",
-        "inline": "bootstrap3.renderers.InlineFieldRenderer",
-    },
+            "default": "base.utils.renderers.OsisBootstrap3FieldRenderer",
+            "inline": "bootstrap3.renderers.InlineFieldRenderer",
+        },
 }
 
 # Ajax select is not allowed to load external js libs
 AJAX_SELECT_BOOTSTRAP = False
+
 
 BACKEND_CACHE = os.environ.get("BACKEND_CACHE", "locmem").lower()
 if BACKEND_CACHE == 'locmem':
@@ -488,9 +469,12 @@ elif BACKEND_CACHE == 'redis':
 else:
     raise ImproperlyConfigured("Cache configuration error: invalid BACKEND_CACHE")
 
+
 CACHES = {"default": CACHE_CONFIG}
 
+
 WAFFLE_FLAG_DEFAULT = os.environ.get("WAFFLE_FLAG_DEFAULT", "False").lower() == 'true'
+
 
 # HIJACK
 HIJACK_LOGIN_REDIRECT_URL = '/'  # Where admins are redirected to after hijacking a user
