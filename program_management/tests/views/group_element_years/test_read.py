@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.models import Permission
 from django.db.models import F, When, Case
 from django.http import HttpResponse
 from django.test import TestCase

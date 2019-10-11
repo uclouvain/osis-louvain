@@ -24,14 +24,13 @@
 #
 ##############################################################################
 from django.test import TestCase
+
 from base.models import student
-from base.tests.models import test_person
-from base.tests.factories.person import PersonFactory, PersonWithoutUserFactory
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.student import StudentFactory
-from base.tests.factories.offer import OfferFactory
-from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
+from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.person import PersonWithoutUserFactory
+from base.tests.factories.student import StudentFactory
+from base.tests.models import test_person
 
 
 def create_student(first_name, last_name, registration_id):

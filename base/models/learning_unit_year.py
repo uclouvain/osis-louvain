@@ -37,8 +37,8 @@ from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
-from base.models import entity_version
 from base.business.learning_container_year import get_learning_container_year_warnings
+from base.models import entity_version
 from base.models import group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year

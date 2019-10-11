@@ -23,9 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
-from osis_common.models import osis_model_admin
 from django.core import serializers
+from django.db import models
+
+from osis_common.models import osis_model_admin
 
 
 class CurrencyAdmin(osis_model_admin.OsisModelAdmin):

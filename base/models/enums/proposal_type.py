@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from enum import Enum
 from django.utils.translation import ugettext_lazy as _
 
 from base.models.utils.utils import ChoiceEnum

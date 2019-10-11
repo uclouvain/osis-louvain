@@ -23,14 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.tests.factories.offer import OfferFactory
 from django.test import TestCase
-from django.utils import timezone
+
 from base.models import offer_year
-from base.tests.models import test_offer
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories import academic_year
+from base.tests.models import test_offer
 
 
 def create_offer_year(acronym, title, academic_year):

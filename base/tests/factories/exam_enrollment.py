@@ -23,16 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from faker import Faker
-import factory
-import factory.fuzzy
 import string
 
-from base.tests.factories.session_examen import SessionExamFactory
-from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
-from base.models.enums import exam_enrollment_state
-from osis_common.utils.datetime import get_tzinfo
+import factory.fuzzy
+from faker import Faker
 
+from base.models.enums import exam_enrollment_state
+from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
+from base.tests.factories.session_examen import SessionExamFactory
+from osis_common.utils.datetime import get_tzinfo
 
 fake = Faker()
 

@@ -28,13 +28,13 @@ import datetime
 from django.test import TestCase
 
 from base.models import exam_enrollment, exceptions
-from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.models import test_student, test_offer_enrollment, test_learning_unit_enrollment, \
-    test_session_exam, test_academic_year, test_offer_year
-from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactory
 from base.models.enums import exam_enrollment_state as enrollment_states
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactory
+from base.tests.models import test_student, test_offer_enrollment, test_learning_unit_enrollment, \
+    test_session_exam, test_offer_year
 
 
 def create_exam_enrollment(session_exam, learning_unit_enrollment):

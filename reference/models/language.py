@@ -30,7 +30,6 @@ from django.db import models
 
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
-
 # FIXME Should use language codes enumeration of base
 EN_CODE_LANGUAGE = 'EN'
 FR_CODE_LANGUAGE = 'FR'

@@ -27,7 +27,6 @@ from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.urls import reverse
 
-from base.models import education_group_year
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory

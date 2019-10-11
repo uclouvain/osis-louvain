@@ -23,15 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver, Signal
+
 from base import models as mdl
 from osis_common.models.serializable_model import SerializableModel
-from django.contrib.auth.models import Permission
 from osis_common.models.signals.authentication import user_created_signal, user_updated_signal
-from django.conf import settings
-
 
 person_created = Signal(providing_args=['person'])
 

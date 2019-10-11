@@ -28,7 +28,7 @@ from django import forms
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from base.models.learning_achievement import LearningAchievement, search
+from base.models.learning_achievement import LearningAchievement
 from cms.enums import entity_name
 from cms.models import text_label, translated_text
 from reference.models import language

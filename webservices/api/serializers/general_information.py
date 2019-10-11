@@ -29,7 +29,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Value, CharField
 from rest_framework import serializers
 
-from program_management.business.group_element_years import group_element_year_tree
 from base.business.education_groups.general_information_sections import SECTIONS_PER_OFFER_TYPE, \
     SKILLS_AND_ACHIEVEMENTS, ADMISSION_CONDITION, CONTACTS, CONTACT_INTRO, INTRODUCTION
 from base.models.education_group_year import EducationGroupYear
@@ -38,6 +37,7 @@ from base.models.group_element_year import GroupElementYear
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from program_management.business.group_element_years import group_element_year_tree
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
     AdmissionConditionSectionSerializer, ContactsSectionSerializer
 from webservices.business import EVALUATION_KEY, get_evaluation_text

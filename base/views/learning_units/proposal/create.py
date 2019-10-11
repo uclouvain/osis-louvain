@@ -30,7 +30,7 @@ from django.utils.translation import ugettext_lazy as _
 from waffle.decorators import waffle_flag
 
 from base.forms.learning_unit_proposal import CreationProposalBaseForm
-from base.models.academic_year import AcademicYear, current_academic_year
+from base.models.academic_year import AcademicYear
 from base.models.person import Person
 from base.views.common import display_success_messages
 

@@ -26,10 +26,8 @@
 
 from django.test import TestCase
 
-from base.models.enums import proposal_type, proposal_state
-from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from base.forms.learning_unit.educational_information import mail_reminder
+from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 
 ACRONYM_2 = 'LBCTR1001'
 ACRONYM_1 = 'LARKE1001'

@@ -28,7 +28,6 @@ import html
 
 from bs4 import BeautifulSoup
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Subquery, OuterRef
 from django.utils.translation import ugettext_lazy as _
 from openpyxl.styles import Style, Alignment

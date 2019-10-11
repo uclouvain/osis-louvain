@@ -29,9 +29,9 @@ from django.http import QueryDict
 from django.test import TestCase
 from django.utils.translation import ugettext_lazy as _
 
+from base.forms.learning_unit.search.borrowed import BorrowedLearningUnitSearch, filter_is_borrowed_learning_unit_year
 from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
 from base.forms.learning_unit.search.external import ExternalLearningUnitFilter
-from base.forms.learning_unit.search.borrowed import BorrowedLearningUnitSearch, filter_is_borrowed_learning_unit_year
 from base.forms.learning_unit.search.simple import LearningUnitFilter, MOBILITY
 from base.forms.search.search_form import get_research_criteria
 from base.models.enums import entity_type, learning_container_year_types

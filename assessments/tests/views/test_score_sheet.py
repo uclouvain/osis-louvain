@@ -26,8 +26,8 @@
 import datetime
 from unittest import mock
 
-from django.urls import reverse
 from django.test import TestCase
+from django.urls import reverse
 
 from assessments.forms.score_sheet_address import ScoreSheetAddressForm
 from assessments.views import score_sheet

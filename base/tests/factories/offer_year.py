@@ -23,13 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
 import factory.fuzzy
+
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.offer import OfferFactory
-from base.tests.factories.structure import StructureFactory
 from base.tests.factories.offer_type import OfferTypeFactory
+from base.tests.factories.structure import StructureFactory
 
 
 class OfferYearFactory(factory.django.DjangoModelFactory):

@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.db import migrations, models
+from django.db import migrations
 
 
 def update_justifications_forwards(apps,shema_editor):

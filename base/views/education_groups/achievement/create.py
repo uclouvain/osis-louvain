@@ -27,9 +27,9 @@ from django.views.generic import CreateView
 
 from base.business.education_groups.perms import is_eligible_to_add_achievement
 from base.forms.education_group.achievement import EducationGroupAchievementForm, EducationGroupDetailedAchievementForm
-from base.views.mixins import AjaxTemplateMixin
 from base.views.education_groups.achievement.common import EducationGroupAchievementMixin, \
     EducationGroupDetailedAchievementMixin
+from base.views.mixins import AjaxTemplateMixin
 
 
 class CreateEducationGroupAchievement(AjaxTemplateMixin, EducationGroupAchievementMixin, CreateView):

@@ -26,8 +26,8 @@
 from django import template
 from django.core.exceptions import PermissionDenied
 
-from program_management.business.group_element_years.perms import is_eligible_to_update_group_element_year
 from base.templatetags.education_group import ICONS
+from program_management.business.group_element_years.perms import is_eligible_to_update_group_element_year
 
 register = template.Library()
 

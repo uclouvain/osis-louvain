@@ -27,8 +27,6 @@ from unittest import mock
 
 from django.test import TestCase
 
-from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy
-from program_management.business.group_element_years.management import CheckAuthorizedRelationshipDetach
 from base.models.enums import education_group_types
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.prerequisite import Prerequisite
@@ -38,6 +36,8 @@ from base.tests.factories.education_group_year import TrainingFactory, GroupFact
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
+from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy
+from program_management.business.group_element_years.management import CheckAuthorizedRelationshipDetach
 
 
 class TestOptionDetachEducationGroupYearStrategy(TestCase):

@@ -26,12 +26,13 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 
-from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy, AttachLearningUnitYearStrategy
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy, \
+    AttachLearningUnitYearStrategy
 
 
 class TestAttachOptionEducationGroupYearStrategy(TestCase):

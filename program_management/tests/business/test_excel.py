@@ -26,12 +26,12 @@
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
-from program_management.business.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, \
-    EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel, _get_blocks_prerequisite_of
 from base.models.enums.prerequisite_operator import AND, OR
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory, GroupElementYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
+from program_management.business.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, \
+    EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel, _get_blocks_prerequisite_of
 
 
 class TestGeneratePrerequisitesWorkbook(TestCase):

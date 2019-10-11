@@ -30,11 +30,11 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import UpdateView, CreateView, DeleteView
 
+from base.business.education_groups import perms as business_perms
 from base.forms.education_group.publication_contact import EducationGroupPublicationContactForm, \
     EducationGroupEntityPublicationContactForm
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
-from base.business.education_groups import perms as business_perms
 from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
 
 

@@ -26,7 +26,6 @@
 
 from django.test import TestCase
 from django.utils import timezone
-
 from django.utils.translation import ugettext_lazy as _
 
 from base.business.xls import convert_boolean, _get_all_columns_reference

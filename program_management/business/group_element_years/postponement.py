@@ -29,7 +29,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext as _
 
 from base.business.education_groups import postponement
-from program_management.business.group_element_years import attach
 from base.business.utils.model import update_related_object
 from base.models.academic_year import starting_academic_year, AcademicYear
 from base.models.authorized_relationship import AuthorizedRelationship
@@ -42,6 +41,7 @@ from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
+from program_management.business.group_element_years import attach
 
 
 class CopyWarning(Warning):

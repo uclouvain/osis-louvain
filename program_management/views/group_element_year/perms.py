@@ -26,8 +26,8 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 
-from program_management.business.group_element_years import perms as business_perms
 from base.models import person
+from program_management.business.group_element_years import perms as business_perms
 
 
 def can_update_group_element_year(user, group_element_year, raise_exception=False):

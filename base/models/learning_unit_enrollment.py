@@ -24,8 +24,8 @@
 #
 ##############################################################################
 from django.db import models
-from base.models.enums import learning_unit_enrollment_state
 
+from base.models.enums import learning_unit_enrollment_state
 from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
 

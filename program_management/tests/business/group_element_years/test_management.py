@@ -26,13 +26,14 @@
 
 from django.test import TestCase
 
-from program_management.business.group_element_years.management import _compute_number_children_by_education_group_type, \
-    CheckAuthorizedRelationshipDetach, CheckAuthorizedRelationshipAttach
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
+from program_management.business.group_element_years.management import \
+    _compute_number_children_by_education_group_type, \
+    CheckAuthorizedRelationshipDetach, CheckAuthorizedRelationshipAttach
 
 
 class TestAuthorizedRelationshipCheck(TestCase):

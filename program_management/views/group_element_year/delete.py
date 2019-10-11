@@ -28,9 +28,9 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import DeleteView
 
+from base.views.common import display_error_messages, display_success_messages, display_warning_messages
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
-from base.views.common import display_error_messages, display_success_messages, display_warning_messages
 from program_management.views.group_element_year import perms as group_element_year_perms
 from program_management.views.group_element_year.common import GenericGroupElementYearMixin
 

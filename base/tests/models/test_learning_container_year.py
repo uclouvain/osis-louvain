@@ -23,14 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models import learning_container
+from django.test import TestCase
+
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
-from base.models.learning_container_year import LearningContainerYear
-from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.learning_container import LearningContainerFactory
-from django.test import TestCase
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 
 

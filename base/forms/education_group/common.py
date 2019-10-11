@@ -31,7 +31,6 @@ from django.utils.translation import ugettext_lazy as _
 
 from base.business.education_groups import create
 from base.business.event_perms import EventPermEducationGroupEdition
-from program_management.business.group_element_years import management
 from base.forms.common import ValidationRuleMixin
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models import campus, group_element_year
@@ -43,6 +42,7 @@ from base.models.entity_version import find_pedagogical_entities_version, get_la
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories, TRAINING
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
+from program_management.business.group_element_years import management
 from reference.models.language import Language
 from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT, \
     MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT, GROUP_PGRM_ENCODING_PERIOD, \

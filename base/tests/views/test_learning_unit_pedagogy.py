@@ -27,7 +27,6 @@ import datetime
 from io import BytesIO
 from unittest.mock import patch
 
-from django.contrib.messages import get_messages
 from django.http import HttpResponseNotAllowed
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect, HttpResponse
 from django.test import TestCase

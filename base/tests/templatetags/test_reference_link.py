@@ -26,11 +26,10 @@
 from django.test import TestCase
 
 from base.models.enums.link_type import LinkTypes
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.templatetags.reference_link import get_parent_of_reference_link
-from base.models.enums import link_type
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 
 
 class ReferenceLinkTagTests(TestCase):

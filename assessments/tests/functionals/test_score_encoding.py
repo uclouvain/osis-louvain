@@ -24,8 +24,10 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.support.ui import Select
 
 from attribution.tests.factories.attribution import AttributionFactory
-from base.tests.factories.academic_calendar import (AcademicCalendarExamSubmissionFactory,
-                                                    AcademicCalendarFactory)
+from base.tests.factories.academic_calendar import (
+    AcademicCalendarExamSubmissionFactory,
+    AcademicCalendarFactory
+)
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
 from base.tests.factories.learning_unit import LearningUnitFactory

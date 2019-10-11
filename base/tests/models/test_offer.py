@@ -24,8 +24,10 @@
 #
 ##############################################################################
 from django.test import TestCase
+
 from base.models import offer
 from base.tests.factories.offer import OfferFactory
+
 
 def create_offer(title):
     return OfferFactory(title=title)

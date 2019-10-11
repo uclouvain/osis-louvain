@@ -29,7 +29,6 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from attribution.models.enums.function import Functions
 from attribution.tests.factories.attribution import AttributionNewFactory

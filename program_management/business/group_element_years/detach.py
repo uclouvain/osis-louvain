@@ -30,14 +30,14 @@ from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _, ngettext
 
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
-from program_management.business.group_element_years.management import CheckAuthorizedRelationshipDetach
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
+from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
+from program_management.business.group_element_years.management import CheckAuthorizedRelationshipDetach
 
 
 class DetachStrategy(metaclass=abc.ABCMeta):

@@ -29,8 +29,8 @@ import csv
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand
 
-from reference.models.country import Country
 from reference.models.continent import Continent
+from reference.models.country import Country
 
 
 class Command(BaseCommand):

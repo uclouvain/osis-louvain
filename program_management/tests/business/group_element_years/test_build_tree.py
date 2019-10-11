@@ -32,7 +32,6 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_switch
 
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from base.models import entity_version
 from base.models.enums import organization_type
 from base.models.enums.education_group_types import MiniTrainingType, GroupType, TrainingType
@@ -49,6 +48,7 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from osis_common.utils.datetime import get_tzinfo
+from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from reference.tests.factories.country import CountryFactory
 
 

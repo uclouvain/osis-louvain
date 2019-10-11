@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
 import factory.fuzzy
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory

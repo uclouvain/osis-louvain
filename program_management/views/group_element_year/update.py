@@ -32,12 +32,6 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import UpdateView
 from waffle.decorators import waffle_flag
 
-from base.views.education_groups.detail import EducationGroupGenericDetailView
-from base.views.education_groups.perms import can_change_education_group
-from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
-from program_management.business.group_element_years.postponement import PostponeContent, NotPostponeError
-
-from program_management.forms.group_element_year import GroupElementYearForm
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -45,9 +39,14 @@ from base.models.utils.utils import get_object_or_none
 from base.utils.cache import ElementCache
 from base.views.common import display_success_messages, display_warning_messages, display_error_messages
 from base.views.education_groups import perms
+from base.views.education_groups.detail import EducationGroupGenericDetailView
+from base.views.education_groups.perms import can_change_education_group
+from base.views.education_groups.select import build_success_message, build_success_json_response
+from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
+from program_management.business.group_element_years.postponement import PostponeContent, NotPostponeError
+from program_management.forms.group_element_year import GroupElementYearForm
 from program_management.views.group_element_year import perms as group_element_year_perms
 from program_management.views.group_element_year.common import GenericGroupElementYearMixin
-from base.views.education_groups.select import build_success_message, build_success_json_response
 
 
 @login_required

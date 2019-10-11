@@ -26,7 +26,6 @@
 from django.db.models import F
 from django.test import TestCase
 
-from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.tests.factories.person import PersonFactory

@@ -42,7 +42,6 @@ from base.business import learning_unit_proposal as proposal_business
 from base.business.learning_unit_proposal import INITIAL_DATA_FIELDS, copy_learning_unit_data
 from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit_proposal import ProposalLearningUnitForm
-from base.forms.proposal.learning_unit_proposal import ProposalLearningUnitFilter
 from base.models import entity_version
 from base.models import proposal_learning_unit
 from base.models.enums import learning_component_year_type
@@ -75,7 +74,6 @@ from base.tests.factories.user import UserFactory
 from base.views.learning_units.proposal.update import update_learning_unit_proposal, \
     learning_unit_modification_proposal, \
     learning_unit_suppression_proposal
-from base.views.learning_units.search.common import PROPOSAL_SEARCH
 from base.views.learning_units.search.proposal import ACTION_CONSOLIDATE, ACTION_BACK_TO_INITIAL, ACTION_FORCE_STATE
 from reference.tests.factories.language import LanguageFactory
 

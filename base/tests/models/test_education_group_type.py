@@ -25,15 +25,15 @@
 ##############################################################################
 import json
 
-from django.test import TestCase
 from django.core import serializers
+from django.test import TestCase
 
 from base.models.education_group_type import find_authorized_types
 from base.models.enums import education_group_categories
+from base.models.enums import education_group_types
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.models.enums import education_group_types
 
 
 class TestAuthorizedTypes(TestCase):

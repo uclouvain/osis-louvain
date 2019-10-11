@@ -23,14 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from ckeditor.fields import RichTextField
 from django.conf import settings
 from django.db import models
 from django.db.models import F
 from django.utils.translation import ugettext_lazy as _
-
-from ckeditor.fields import RichTextField
 from ordered_model.admin import OrderedModelAdmin
-
 from ordered_model.models import OrderedModel
 
 

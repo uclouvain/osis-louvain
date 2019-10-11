@@ -24,15 +24,17 @@
 #
 ##############################################################################
 import datetime
+
 from django.test import TestCase
+
 from base.models import learning_unit_enrollment
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
+from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.student import StudentFactory
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 def create_learning_unit_enrollment(learning_unit_year, offer_enrollment):

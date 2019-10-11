@@ -33,7 +33,6 @@ from django.http import HttpResponseForbidden
 from django.http import HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.tests.factories.academic_year import AcademicYearFactory

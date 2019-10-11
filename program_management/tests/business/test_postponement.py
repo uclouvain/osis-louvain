@@ -27,8 +27,6 @@ from django.test import TestCase
 from django.utils.translation import ugettext as _
 
 from base.business.education_groups.postponement import EDUCATION_GROUP_MAX_POSTPONE_YEARS, _compute_end_year
-from program_management.business.group_element_years.postponement import PostponeContent, NotPostponeError, \
-    ReuseOldLearningUnitYearWarning
 from base.business.utils.model import model_to_dict_fk
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import entity_type
@@ -50,6 +48,8 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
+from program_management.business.group_element_years.postponement import PostponeContent, NotPostponeError, \
+    ReuseOldLearningUnitYearWarning
 
 
 class EducationGroupPostponementTestCase(TestCase):

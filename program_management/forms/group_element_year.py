@@ -26,11 +26,11 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
+from base.models.enums import education_group_categories
+from base.models.group_element_year import GroupElementYear
 from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy, \
     AttachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import CheckAuthorizedRelationshipAttach
-from base.models.enums import education_group_categories
-from base.models.group_element_year import GroupElementYear
 
 
 class GroupElementYearForm(forms.ModelForm):

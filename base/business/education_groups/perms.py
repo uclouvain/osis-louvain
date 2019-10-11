@@ -29,11 +29,11 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _, pgettext
 
 from base.business.event_perms import EventPermEducationGroupEdition
-from program_management.business.group_element_years import postponement, management
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
+from program_management.business.group_element_years import postponement, management
 
 ERRORS_MSG = {
     "base.add_educationgroup": _("The user has not permission to create education groups."),

@@ -24,6 +24,3 @@
 #
 ##############################################################################
 
-from base.models.enums import internship_subtypes
-from base.models.enums import learning_unit_management_sites
-from base.models.enums import learning_unit_year_session

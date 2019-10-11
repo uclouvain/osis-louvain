@@ -41,7 +41,6 @@ from base.forms.my_message import MyMessageActionForm, MyMessageForm
 from base.models.academic_year import starting_academic_year
 from base.models.education_group_year import EducationGroupYear
 from osis_common.models import message_history as message_history_mdl
-from operator import itemgetter
 
 
 @login_required

@@ -25,6 +25,7 @@
 ##############################################################################
 import datetime
 from unittest import mock
+
 from django.test import TestCase
 
 from base.signals.publisher import compute_student_score_encoding_deadline

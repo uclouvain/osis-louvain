@@ -25,9 +25,9 @@
 ##############################################################################
 import datetime
 
-from django.urls import reverse
 from django.http import HttpResponseForbidden
 from django.test import TestCase
+from django.urls import reverse
 
 from base.forms.academic_calendar import AcademicCalendarForm
 from base.models.academic_calendar import AcademicCalendar

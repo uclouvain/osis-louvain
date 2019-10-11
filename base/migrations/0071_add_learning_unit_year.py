@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
 
-from django.db import migrations, models
-from base.models import learning_unit_year
 import django.db.models.deletion
+from django.db import migrations, models
 
 
 class Migration(migrations.Migration):

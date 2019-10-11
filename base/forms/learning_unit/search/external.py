@@ -24,17 +24,15 @@
 #
 ##############################################################################
 from django import forms
-from django.db.models import BLANK_CHOICE_DASH, OuterRef, Subquery, Exists
+from django.db.models import BLANK_CHOICE_DASH, OuterRef, Exists
 from django.utils.translation import ugettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
-from base.forms.utils.choice_field import add_blank
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.campus import Campus
-from base.models.entity_version import EntityVersion
 from base.models.enums import active_status
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
-from base.models.organization_address import find_distinct_by_country, OrganizationAddress
+from base.models.organization_address import OrganizationAddress
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from reference.models.country import Country
 

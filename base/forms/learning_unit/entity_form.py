@@ -26,6 +26,7 @@
 from django import forms
 from django.db.models import Q
 from django.utils import timezone
+
 from base.models.entity_version import EntityVersion
 from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
 

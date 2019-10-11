@@ -32,8 +32,8 @@ from base.models.enums import learning_unit_year_subtypes
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from reference.tests.factories.language import LanguageFactory
 from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
+from reference.tests.factories.language import LanguageFactory
 
 
 class TestLearningAchievementView(TestCase):

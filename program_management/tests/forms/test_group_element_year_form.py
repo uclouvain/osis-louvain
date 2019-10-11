@@ -26,7 +26,6 @@
 from django.test import TestCase
 from django.utils.translation import gettext as _
 
-from program_management.forms.group_element_year import GroupElementYearForm
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -35,6 +34,7 @@ from base.tests.factories.education_group_year import TrainingFactory, MiniTrain
     GroupFactory, EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from program_management.forms.group_element_year import GroupElementYearForm
 
 
 class TestGroupElementYearForm(TestCase):

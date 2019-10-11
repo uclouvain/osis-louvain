@@ -28,6 +28,7 @@ import datetime
 from django.test import TestCase
 
 from base.business import learning_unit_year_with_context
+from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, VOLUME_REQUIREMENT_ENTITY
 from base.models.enums import organization_type
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
@@ -35,7 +36,6 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from reference.tests.factories.country import CountryFactory
-from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, VOLUME_REQUIREMENT_ENTITY
 
 
 class LearningUnitYearWithContextTestCase(TestCase):

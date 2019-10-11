@@ -24,11 +24,11 @@
 #
 ##############################################################################
 from django.test import TestCase
-from django.core.exceptions import ValidationError
-from cms.tests.factories.text_label import TextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
+
 from cms.enums import entity_name
 from cms.models import translated_text
+from cms.tests.factories.text_label import TextLabelFactory
+from cms.tests.factories.translated_text import TranslatedTextFactory
 
 REFERENCE = 2502
 

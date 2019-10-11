@@ -31,7 +31,6 @@ from program_management.views.excel import get_learning_unit_prerequisites_excel
 from program_management.views.group_element_year import update, create, delete, read
 from program_management.views.learning_unit import detail as learning_unit_detail, update as learning_unit_update
 
-
 urlpatterns = [
     url(r'^management/$', update.management, name='education_groups_management'),
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([

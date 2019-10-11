@@ -26,14 +26,13 @@
 from unittest import mock
 from unittest.mock import Mock
 
-from django.contrib.auth.models import Permission
-from django.urls import reverse
 from django.test import TestCase, RequestFactory
+from django.urls import reverse
 from requests.exceptions import RequestException
 
-from base.tests.factories.student import StudentFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
+from base.tests.factories.student import StudentFactory
 
 
 class StudentsViewTest(TestCase):

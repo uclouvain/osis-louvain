@@ -24,10 +24,10 @@
 #
 ##############################################################################
 
-from django.urls import reverse
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
+from django.urls import reverse
 
 from attribution.tests.factories.attribution import AttributionFactory
 from base.models.enums import academic_calendar_type

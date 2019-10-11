@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.utils.translation import ugettext_lazy as _
+
 from osis_common.utils.enumerations import ChoiceEnum
 
 

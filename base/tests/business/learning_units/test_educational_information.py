@@ -26,11 +26,11 @@
 
 from django.test import TestCase
 
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from attribution.tests.factories.attribution import AttributionFactory
 from base.business.learning_units.educational_information import get_responsible_and_learning_unit_yr_list, PERSON, \
     LEARNING_UNIT_YEARS, _update_responsible_data_with_new_learning_unit_yr
+from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.tutor import TutorFactory
 
 

@@ -43,7 +43,8 @@ from base.tests.factories.academic_year import AcademicYearFactory, create_curre
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, \
     EducationGroupYearCommonBachelorFactory, TrainingFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, SICFactory, \
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, \
+    SICFactory, \
     FacultyManagerFactory, UEFacultyManagerFactory, AdministrativeManagerFactory
 from base.tests.factories.user import UserFactory
 

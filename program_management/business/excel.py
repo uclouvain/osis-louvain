@@ -35,7 +35,6 @@ from openpyxl.styles.colors import RED, GREEN
 from openpyxl.writer.excel import save_virtual_workbook
 
 from backoffice.settings.base import LEARNING_UNIT_PORTAL_URL
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.prerequisite_operator import OR, AND
 from base.models.group_element_year import fetch_row_sql, GroupElementYear, get_all_group_elements_in_tree
@@ -44,6 +43,7 @@ from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
     STYLED_CELLS, STYLE_NO_GRAY
+from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 
 STYLE_BORDER_BOTTOM = Style(
     border=Border(

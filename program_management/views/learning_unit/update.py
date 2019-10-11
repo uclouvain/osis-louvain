@@ -36,7 +36,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import ugettext_lazy as _
 from django.views.generic import UpdateView
 
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from base.forms.prerequisite import LearningUnitPrerequisiteForm
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
@@ -45,6 +44,7 @@ from base.models.person import Person
 from base.models.prerequisite import Prerequisite
 from base.views.education_groups import perms
 from base.views.mixins import RulesRequiredMixin
+from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 
 
 @method_decorator(login_required, name='dispatch')

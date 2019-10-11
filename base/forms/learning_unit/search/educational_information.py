@@ -23,8 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import OuterRef, Case, When, Q, Value, CharField, Subquery, BooleanField
-from django.db.models.functions import Concat
+from django.db.models import OuterRef, Case, When, Value, Subquery, BooleanField
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY
 from base.forms.learning_unit.search.simple import LearningUnitFilter

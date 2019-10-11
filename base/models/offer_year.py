@@ -25,6 +25,7 @@
 ##############################################################################
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+
 from base.models import offer, program_manager, academic_year
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 

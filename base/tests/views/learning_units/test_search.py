@@ -31,7 +31,7 @@ from django.urls import reverse
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from base.views.learning_units.search.common import BORROWED_COURSE, EXTERNAL_SEARCH
+from base.views.learning_units.search.common import BORROWED_COURSE
 
 
 class TestSearchBorrowedLearningUnits(TestCase):

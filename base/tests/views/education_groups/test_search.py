@@ -39,7 +39,8 @@ from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.education_group_type import EducationGroupTypeFactory, MiniTrainingEducationGroupTypeFactory, \
+from base.tests.factories.education_group_type import EducationGroupTypeFactory, \
+    MiniTrainingEducationGroupTypeFactory, \
     GroupEducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory

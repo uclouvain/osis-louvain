@@ -24,11 +24,9 @@
 #
 ##############################################################################
 from unittest import mock
-from unittest.mock import Mock
 
 from django.test import TestCase, RequestFactory
 from django.views.generic import TemplateView
-from django.views.generic.base import View
 
 from base.tests.factories.user import UserFactory
 from base.utils.cache import cache, RequestCache, CacheFilterMixin

@@ -39,7 +39,6 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 
 from base.business.education_groups import general_information_sections
-from program_management.business.group_element_years import group_element_year_tree
 from base.business.education_groups.general_information_sections import SECTIONS_PER_OFFER_TYPE
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
 from base.models.education_group_year import EducationGroupYear
@@ -49,6 +48,7 @@ from cms.enums.entity_name import OFFER_YEAR
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from program_management.business.group_element_years import group_element_year_tree
 from webservices import business
 from webservices.business import get_evaluation_text, get_common_evaluation_text
 from webservices.utils import convert_sections_to_list_of_dict

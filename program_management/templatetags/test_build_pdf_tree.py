@@ -26,7 +26,6 @@
 from django.template import Context, Template
 from django.test import TestCase
 
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_periodicity import BIENNIAL_ODD, BIENNIAL_EVEN
 from base.templatetags.education_group_pdf import pdf_tree_list
@@ -35,6 +34,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 
 
 def _build_correct_tree_list(tree):
