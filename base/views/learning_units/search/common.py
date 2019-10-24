@@ -113,7 +113,7 @@ def _create_xls_comparison(view_obj, context, **response_kwargs):
     user = view_obj.request.user
     luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
-    comparison_year = view_obj.request.POST.get('comparison_year')
+    comparison_year = view_obj.request.GET.get('comparison_year')
     return create_xls_comparison(user, luys, filters, comparison_year)
 
 
@@ -122,8 +122,8 @@ def _create_xls_with_parameters(view_obj, context, **response_kwargs):
     luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
     other_params = {
-        WITH_GRP: view_obj.request.POST.get('with_grp') == 'true',
-        WITH_ATTRIBUTIONS: view_obj.request.POST.get('with_attributions') == 'true'
+        WITH_GRP: view_obj.request.GET.get('with_grp') == 'true',
+        WITH_ATTRIBUTIONS: view_obj.request.GET.get('with_attributions') == 'true'
     }
     return create_xls_with_parameters(user, luys, filters, other_params)
 
