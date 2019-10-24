@@ -1139,10 +1139,10 @@ msgid "Generate pdf"
 msgstr "Générer le pdf"
 
 msgid "Generate xls of learning units that are prerequisites for"
-msgstr "Générer xls des cours qui sont des prérequis"
+msgstr "Liste des UE qui sont des prérequis"
 
 msgid "Generate xls of learning units that have prerequisites"
-msgstr "Générer xls des cours qui ont des prérequis"
+msgstr "Liste des UE qui ont des prérequis"
 
 msgid "Get back to initial data"
 msgstr "Retour à l'état initial"
