@@ -34,6 +34,8 @@ from base.business import learning_unit_year_with_context
 from base.business.learning_unit_xls import create_xls, create_xls_with_parameters, WITH_GRP, WITH_ATTRIBUTIONS, \
     create_xls_attributions
 from base.business.learning_units.xls_comparison import create_xls_comparison, create_xls_proposal_comparison
+from base.business.learning_units.xls_educational_information_and_specifications import \
+    create_xls_educational_information_and_specifications
 from base.business.proposal_xls import create_xls as create_xls_proposal
 from base.forms.search.search_form import get_research_criteria
 from base.models.academic_year import starting_academic_year
@@ -99,6 +101,12 @@ def __create(context, view_obj, method):
     luys = context["filter"].qs
     filters = _get_filter(context["form"], view_obj.search_type)
     return method(user, luys, filters)
+
+
+def _create_xls_educational_specifications(view_obj, context, **response_kwargs):
+    user = view_obj.request.user
+    luys = context["filter"].qs
+    return create_xls_educational_information_and_specifications(user, luys, view_obj.request)
 
 
 def _create_xls_comparison(view_obj, context, **response_kwargs):
