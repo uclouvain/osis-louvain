@@ -42,6 +42,7 @@ from base.business.learning_units.simple import deletion as business_deletion
 from base.models import campus
 from base.models.academic_year import find_academic_year_by_year
 from base.models.entity import find_by_id, get_by_internal_id
+from base.models.enums import organization_type
 from base.models.enums import proposal_state, proposal_type
 from base.models.enums import vacant_declaration_type, attribution_procedure
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
@@ -168,11 +169,7 @@ def _get_old_value_of_foreign_key(key, initial_value):
     if key == 'language':
         return _get_name_attribute(language.find_by_id(initial_value))
 
-    if '_ENTITY' in key:
-        an_entity = find_by_id(initial_value)
-        return an_entity.most_recent_acronym if an_entity else None
-
-    return None
+    return _get_special_old_value(key, initial_value)
 
 
 def _is_foreign_key(key, current_data):
@@ -507,3 +504,18 @@ def _get_volumes_for_initial(learning_unit_year):
         volumes_for_initial[component_key.acronym] = volume_data
 
     return volumes_for_initial
+
+
+def _get_special_old_value(key, initial_value):
+    if key == 'ADDITIONAL_REQUIREMENT_ENTITY_1' or key == 'ADDITIONAL_REQUIREMENT_ENTITY_2':
+        an_entity = find_by_id(initial_value)
+        if an_entity.organization.type != organization_type.MAIN:
+            return an_entity.most_recent_entity_version.title if an_entity else None
+        else:
+            return an_entity.most_recent_acronym if an_entity else None
+    else:
+        if '_ENTITY' in key:
+            an_entity = find_by_id(initial_value)
+            return an_entity.most_recent_acronym if an_entity else None
+
+    return None

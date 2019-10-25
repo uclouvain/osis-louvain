@@ -248,8 +248,18 @@
 
                             {% dl_tooltip requirement_entity 'REQUIREMENT_ENTITY' label_text=_('Requirement entity') inherited=learning_unit_year.subtype default_if_none="-" value=requirement_entity.acronym title=requirement_entity.title url=url_entity_requirement %}
                             {% dl_tooltip allocation_entity 'ALLOCATION_ENTITY' label_text=_('Attribution entity') inherited=learning_unit_year.subtype default_if_none="-" value=allocation_entity.acronym title=allocation_entity.title url=url_entity_allocation %}
-                            {% dl_tooltip additional_requirement_entity_1 'ADDITIONAL_REQUIREMENT_ENTITY_1' label_text=_('Additional requirement entity 1') inherited=learning_unit_year.subtype title=additional_requirement_entity_1.title value=additional_requirement_entity_1.acronym url=url_additional_requirement_entity_1 default_if_none="-" %}
-                            {% dl_tooltip additional_requirement_entity_2 'ADDITIONAL_REQUIREMENT_ENTITY_2' label_text=_('Additional requirement entity 2') inherited=learning_unit_year.subtype title=additional_requirement_entity_2.title value=additional_requirement_entity_2.acronym url=url_additional_requirement_entity_2 default_if_none="-" %}
+                            {% if additional_requirement_entity_1.entity.organization.type  == 'MAIN' %}
+                                {% dl_tooltip additional_requirement_entity_1 'ADDITIONAL_REQUIREMENT_ENTITY_1' label_text=_('Additional requirement entity 1') inherited=learning_unit_year.subtype title=additional_requirement_entity_1.title value=additional_requirement_entity_1.acronym url=url_additional_requirement_entity_1 default_if_none="-" %}
+                            {% else %}
+                                {% dl_tooltip additional_requirement_entity_1 'ADDITIONAL_REQUIREMENT_ENTITY_1' label_text=_('Additional requirement entity 1') inherited=learning_unit_year.subtype title=additional_requirement_entity_1.title value=additional_requirement_entity_1.title url=url_additional_requirement_entity_1 default_if_none="-" %}
+                            {% endif %}
+
+                            {% if additional_requirement_entity_2 and additional_requirement_entity_2.entity.organization.type  == 'MAIN' %}
+                                {% dl_tooltip additional_requirement_entity_2 'ADDITIONAL_REQUIREMENT_ENTITY_2' label_text=_('Additional requirement entity 2') inherited=learning_unit_year.subtype title=additional_requirement_entity_2.title value=additional_requirement_entity_2.acronym url=url_additional_requirement_entity_2 default_if_none="-" %}
+                            {% else %}
+                                {% dl_tooltip additional_requirement_entity_2 'ADDITIONAL_REQUIREMENT_ENTITY_2' label_text=_('Additional requirement entity 2') inherited=learning_unit_year.subtype title=additional_requirement_entity_2.title value=additional_requirement_entity_2.title url=url_additional_requirement_entity_2 default_if_none="-" %}
+                            {% endif %}
+
                         {% endblock institution %}
 
                         {% block edit_academic_year %}

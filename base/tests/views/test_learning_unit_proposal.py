@@ -875,6 +875,12 @@ class TestLearningUnitProposalDisplay(TestCase):
         end_year = AcademicYearFactory(year=cls.academic_year.year + 1)
         cls.generator_learning_container = GenerateContainer(start_year=cls.academic_year, end_year=end_year)
         cls.l_container_year_with_entities = cls.generator_learning_container.generated_container_years[0]
+        organization_main = OrganizationFactory(type=organization_type.MAIN)
+        cls.entity_from_main_organization = EntityFactory(organization=organization_main)
+        cls.entity_version = EntityVersionFactory(entity=cls.entity_from_main_organization)
+        organization_not_main = OrganizationFactory(type=organization_type.ACADEMIC_PARTNER)
+        cls.entity_from_not_main_organization = EntityFactory(organization=organization_not_main)
+        cls.entity_version_not_main = EntityVersionFactory(entity=cls.entity_from_not_main_organization)
 
     def test_is_foreign_key(self):
         current_data = {"language{}".format(proposal_business.END_FOREIGN_KEY_NAME): self.language_it.pk}
@@ -949,6 +955,16 @@ class TestLearningUnitProposalDisplay(TestCase):
     def test_get_old_value_of_foreign_key_for_language(self):
         differences = proposal_business._get_old_value_of_foreign_key('language', self.language_it.pk)
         self.assertEqual(differences, str(self.language_it))
+
+    def test_get_old_value_of_foreign_key_for_additional_requirement_entity_main_organization(self):
+        differences = proposal_business._get_old_value_of_foreign_key('ADDITIONAL_REQUIREMENT_ENTITY_1',
+                                                                      self.entity_from_main_organization.pk)
+        self.assertEqual(differences, str(self.entity_from_main_organization.most_recent_entity_version.acronym))
+
+    def test_get_old_value_of_foreign_key_for_additional_requirement_entity_not_main_organization(self):
+        differences = proposal_business._get_old_value_of_foreign_key('ADDITIONAL_REQUIREMENT_ENTITY_1',
+                                                                      self.entity_from_not_main_organization.pk)
+        self.assertEqual(differences, str(self.entity_from_not_main_organization.most_recent_entity_version.title))
 
     def test_get_status_initial_value(self):
         self.assertEqual(proposal_business._get_status_initial_value(True),
