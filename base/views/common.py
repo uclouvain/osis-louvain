@@ -250,5 +250,5 @@ def paginate_queryset(qs, request_get, items_per_page=None):
 
 
 def show_error_message_for_form_invalid(request):
-    msg = _("Error(s) in form: The modification is not saved")
+    msg = _("Error(s) in form: The modifications are not saved")
     display_error_messages(request, msg)
