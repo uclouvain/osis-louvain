@@ -49,7 +49,8 @@ from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
-from base.views.common import display_success_messages, display_warning_messages, display_error_messages
+from base.views.common import display_success_messages, display_warning_messages, display_error_messages, \
+    show_error_message_for_form_invalid
 from base.views.education_groups.detail import EducationGroupGenericDetailView
 from base.views.education_groups.perms import can_change_education_group
 from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
@@ -169,8 +170,11 @@ def _update_group(request, education_group_year, root):
     form_education_group_year = GroupForm(request.POST or None, instance=education_group_year, user=request.user)
     html_page = "education_group/update_groups.html"
 
-    if form_education_group_year.is_valid():
-        return _common_success_redirect(request, form_education_group_year, root)
+    if request.method == 'POST':
+        if form_education_group_year.is_valid():
+            return _common_success_redirect(request, form_education_group_year, root)
+        else:
+            show_error_message_for_form_invalid(request)
 
     return render(request, html_page, {
         "education_group_year": education_group_year,
@@ -191,12 +195,18 @@ def _update_training(request, education_group_year, root):
             form_kwargs={'education_group_year': education_group_year, 'user': request.user},
             queryset=education_group_year.coorganizations
         )
-        if form_education_group_year.is_valid() and coorganization_formset.is_valid():
-            coorganization_formset.save()
-            return _common_success_redirect(request, form_education_group_year, root)
+        if request.method == 'POST':
+            if form_education_group_year.is_valid() and coorganization_formset.is_valid():
+                coorganization_formset.save()
+                return _common_success_redirect(request, form_education_group_year, root)
+            else:
+                show_error_message_for_form_invalid(request)
     else:
-        if form_education_group_year.is_valid():
-            return _common_success_redirect(request, form_education_group_year, root)
+        if request.method == 'POST':
+            if form_education_group_year.is_valid():
+                return _common_success_redirect(request, form_education_group_year, root)
+            else:
+                show_error_message_for_form_invalid(request)
 
     return render(request, "education_group/update_trainings.html", {
         "education_group_year": education_group_year,
@@ -240,8 +250,11 @@ def _update_mini_training(request, education_group_year, root):
     # TODO :: IMPORTANT :: Need to upodate form to filter on list of parents, not only on the first direct parent
     form = MiniTrainingForm(request.POST or None, instance=education_group_year, user=request.user)
 
-    if form.is_valid():
-        return _common_success_redirect(request, form, root)
+    if request.method == 'POST':
+        if form.is_valid():
+            return _common_success_redirect(request, form, root)
+        else:
+            show_error_message_for_form_invalid(request)
 
     return render(request, "education_group/update_minitrainings.html", {
         "form_education_group_year": form.forms[forms.ModelForm],

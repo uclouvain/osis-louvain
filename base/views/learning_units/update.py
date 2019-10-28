@@ -47,7 +47,8 @@ from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITI
 from base.models.enums.organization_type import MAIN
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
-from base.views.common import display_error_messages, display_success_messages, display_warning_messages
+from base.views.common import display_error_messages, display_success_messages, display_warning_messages, \
+    show_error_message_for_form_invalid
 from base.views.learning_unit import learning_unit_components
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context, \
@@ -115,10 +116,13 @@ def update_learning_unit(request, learning_unit_year_id):
         external=learning_unit_year.is_external(),
     )
 
-    if postponement_form.is_valid():
-        # Update current learning unit year
-        _save_form_and_display_messages(request, postponement_form)
-        return redirect('learning_unit', learning_unit_year_id=learning_unit_year_id)
+    if request.method == 'POST':
+        if postponement_form.is_valid():
+            # Update current learning unit year
+            _save_form_and_display_messages(request, postponement_form)
+            return redirect('learning_unit', learning_unit_year_id=learning_unit_year_id)
+        else:
+            show_error_message_for_form_invalid(request)
 
     context = postponement_form.get_context()
     context["learning_unit_year"] = learning_unit_year
