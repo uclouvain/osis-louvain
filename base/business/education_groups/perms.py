@@ -69,7 +69,9 @@ def _is_eligible_to_add_education_group(person, education_group, category, educa
 
 def is_eligible_to_change_education_group(person, education_group, raise_exception=False):
     return check_permission(person, "base.change_educationgroup", raise_exception) and \
-           _is_eligible_education_group(person, education_group, raise_exception) and \
+           (check_link_to_management_entity(education_group, person, raise_exception) and
+            (person.is_central_manager or (person.is_faculty_manager and not person.is_faculty_manager_for_ue))
+            ) and \
            _is_year_editable(education_group, raise_exception)
 
 

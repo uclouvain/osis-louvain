@@ -26,7 +26,6 @@
 
 from dal import autocomplete
 from django import forms
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -42,11 +41,9 @@ from base.forms.education_group.coorganization import OrganizationFormset
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
 from base.forms.education_group.training import TrainingForm, CertificateAimsForm
-from base.models.academic_year import starting_academic_year
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.views.common import display_success_messages, display_warning_messages
 from base.views.education_groups.perms import can_change_education_group
 
@@ -61,9 +58,9 @@ def update_education_group(request, root_id, education_group_year_id):
     education_group_year.root = root_id
 
     year = education_group_year.academic_year.year
-    if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and \
-            settings.YEAR_LIMIT_EDG_MODIFICATION <= year <= starting_academic_year().year:
-        return update_certificate_aims(request, root_id, education_group_year)
+    # if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and \
+    #         settings.YEAR_LIMIT_EDG_MODIFICATION <= year <= starting_academic_year().year:
+    #     return update_certificate_aims(request, root_id, education_group_year)
 
     # Proctect the view
     can_change_education_group(request.user, education_group_year)
