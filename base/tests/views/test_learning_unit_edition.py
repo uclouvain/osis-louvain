@@ -312,6 +312,15 @@ class TestEditLearningUnit(TestCase):
         self.learning_unit_year.refresh_from_db()
         self.assertEqual(self.learning_unit_year.credits, credits)
 
+    def test_invalid_post_request(self):
+        credits = None
+        form_data = self._get_valid_form_data()
+        form_data['credits'] = credits
+        form_data['container_type'] = learning_container_year_types.COURSE
+        response = self.client.post(self.url, data=form_data)
+
+        self.assertEqual(self.url, response.request['PATH_INFO'])
+
     def _get_valid_form_data(self):
         form_data = {
             "acronym_0": self.learning_unit_year.acronym[0],
