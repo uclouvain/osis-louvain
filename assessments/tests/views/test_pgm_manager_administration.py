@@ -26,45 +26,46 @@
 
 from unittest import mock
 
-from django.urls import reverse
+from django.contrib.auth.models import Permission
 from django.db import IntegrityError
 from django.test import TestCase, RequestFactory
+from django.urls import reverse
 
 from assessments.views import pgm_manager_administration
 from base.models.program_manager import ProgramManager
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
-from base.tests.factories.group import ProgramManagerGroupFactory
+from base.tests.factories.group import ProgramManagerGroupFactory, EntityManagerGroupFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.structure import StructureFactory
-from base.tests.factories.user import SuperUserFactory
 
 
 class PgmManagerAdministrationTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         ProgramManagerGroupFactory()
+        group = EntityManagerGroupFactory()
+        group.permissions.add(Permission.objects.get(codename='view_programmanager'))
+        group.permissions.add(Permission.objects.get(codename='change_programmanager'))
 
-        cls.user = SuperUserFactory()
-        cls.person = PersonFactory()
-
+        # FIXME: Old structure model [To remove]
         cls.structure_parent1 = StructureFactory(acronym='SSH')
-
         cls.structure_child1 = StructureFactory(acronym='TECO', part_of=cls.structure_parent1)
         cls.structure_child11 = StructureFactory(acronym='TEBI', part_of=cls.structure_child1)
-
         cls.structure_child2 = StructureFactory(acronym='ESPO', part_of=cls.structure_parent1)
         cls.structure_child21 = StructureFactory(acronym='ECON', part_of=cls.structure_child2)
         cls.structure_child22 = StructureFactory(acronym='COMU', part_of=cls.structure_child2)
-        EntityManagerFactory(person__user=cls.user, structure=cls.structure_parent1)
 
+        cls.entity_manager = EntityManagerFactory(structure=cls.structure_parent1)
         cls.academic_year_previous, cls.academic_year_current = AcademicYearFactory.produce_in_past(quantity=2)
+        cls.person = PersonFactory()
 
     def setUp(self) -> None:
-        self.client.force_login(self.user)
+        user = self.entity_manager.person.user
+        self.client.force_login(user)
 
     def test_find_children_entities_from_acronym(self):
         self.assertIsNone(pgm_manager_administration.get_managed_entities(None))
@@ -185,28 +186,22 @@ class PgmManagerAdministrationTest(TestCase):
         self.assertEqual(len(pgm_manager_administration._get_entity_program_managers([{'root': a_management_entity}],
                                                                                      self.academic_year_current)), 1)
 
-    def test_get_administrator_entities(self):
-        a_person = PersonFactory(user=self.user)
-        root_acronyms = ['A', 'B']
-        child_acronyms = ['AA', 'BB']
+    def test_get_administrator_entities_ensure_order(self):
+        structure_root_1 = StructureFactory(acronym='SST')
+        StructureFactory(acronym='EPL', part_of=structure_root_1)
+        StructureFactory(acronym='AGRO', part_of=structure_root_1)
+        structure_root_2 = StructureFactory(acronym='SIMM')
 
-        structure_root_1 = StructureFactory(acronym=root_acronyms[0])
+        EntityManagerFactory(person=self.entity_manager.person, structure=structure_root_1)
+        EntityManagerFactory(person=self.entity_manager.person, structure=structure_root_2)
 
-        StructureFactory(acronym=child_acronyms[0], part_of=structure_root_1)
-        StructureFactory(acronym=child_acronyms[1], part_of=structure_root_1)
-
-        structure_root_2 = StructureFactory(acronym=root_acronyms[1])
-
-        EntityManagerFactory(person=a_person,
-                             structure=structure_root_1)
-        EntityManagerFactory(person=a_person,
-                             structure=structure_root_2)
-
-        data = pgm_manager_administration.get_administrator_entities(self.user)
-        self.assertEqual(data[0]['root'], structure_root_1)
-        self.assertEqual(len(data[0]['structures']), 3)
-        self.assertEqual(data[1]['root'], structure_root_2)
-        self.assertEqual(len(data[1]['structures']), 1)
+        data = pgm_manager_administration.get_administrator_entities(self.entity_manager.person.user)
+        self.assertEqual(data[0]['root'], structure_root_2)  # SIMM
+        self.assertEqual(len(data[0]['structures']), 1)
+        self.assertEqual(data[1]['root'], self.structure_parent1)  # SSH
+        self.assertEqual(len(data[1]['structures']), 6)
+        self.assertEqual(data[2]['root'], structure_root_1)  # SST
+        self.assertEqual(len(data[2]['structures']), 3)
 
     def test_get_entity_root(self):
         a_structure = StructureFactory()
@@ -299,8 +294,8 @@ def set_post_request(mock_decorators, data_dict, url):
 class TestAddSaveProgramManager(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person = PersonFactory()
         ProgramManagerGroupFactory()
+        cls.person = PersonFactory()
         cls.offer_year_without_equivalent_education_group_year = OfferYearFactory(
             corresponding_education_group_year=None
         )
@@ -322,7 +317,7 @@ class TestAddSaveProgramManager(TestCase):
     def test_when_offer_year_has_an_equivalent_education_group_year(self):
         pgm_manager = ProgramManager(offer_year=self.offer_year, person=self.person)
         pgm_manager.save()
-        self.assertTrue(pgm_manager.id)
+        self.assertTrue(pgm_manager.pk)
         self.assertEqual(pgm_manager.person, self.person)
         self.assertEqual(pgm_manager.offer_year, self.offer_year)
         self.assertEqual(pgm_manager.education_group, self.education_group_year.education_group)

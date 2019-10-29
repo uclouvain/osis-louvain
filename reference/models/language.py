@@ -24,12 +24,10 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.core import serializers
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
-
 
 # FIXME Should use language codes enumeration of base
 EN_CODE_LANGUAGE = 'EN'
@@ -60,12 +58,6 @@ class Language(SerializableModel):
     def __str__(self):
         return self.name
 
-    def is_french(self):
-        return self.code == FR_CODE_LANGUAGE
-
-    def is_english(self):
-        return self.code == EN_CODE_LANGUAGE
-
 
 def find_by_id(language_id):
     try:
@@ -76,16 +68,6 @@ def find_by_id(language_id):
 
 def find_by_code(code):
     return Language.objects.get(code=code)
-
-
-def serialize_list(list_languages):
-    """
-    Serialize a list of "Language" objects using the json format.
-    Use to send data to osis-portal.
-    :param list_languages: a list of "Language" objects
-    :return: the serialized list (a json)
-    """
-    return serializers.serialize("json", list_languages)
 
 
 def find_all_languages():

@@ -25,7 +25,7 @@
 ############################################################################
 from ckeditor.widgets import CKEditorWidget
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 from base.business.learning_units.achievement import UP, DOWN

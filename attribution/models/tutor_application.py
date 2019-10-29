@@ -25,9 +25,10 @@
 ##############################################################################
 from django.contrib import admin
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from attribution.models.enums.function import Functions
+from base.models.utils.utils import filter_with_list_or_object
 
 
 class TutorApplicationAdmin(admin.ModelAdmin):
@@ -66,13 +67,10 @@ class TutorApplication(models.Model):
 
 def search(*args, **kwargs):
     qs = TutorApplication.objects.all()
+    if "learning_container_year" in kwargs:
+        qs = filter_with_list_or_object('learning_container_year', TutorApplication, **kwargs)
     if "tutor" in kwargs:
         qs = qs.filter(tutor=kwargs['tutor'])
-    if "learning_container_year" in kwargs:
-        if isinstance(kwargs['learning_container_year'], list):
-            qs = qs.filter(learning_container_year__in=kwargs['learning_container_year'])
-        else:
-            qs = qs.filter(learning_container_year=kwargs['learning_container_year'])
     if "global_id" in kwargs:
         if isinstance(kwargs['global_id'], list):
             qs = qs.filter(tutor__person__global_id__in=kwargs['global_id'])

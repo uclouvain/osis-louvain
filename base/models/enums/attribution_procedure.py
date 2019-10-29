@@ -23,9 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models.utils.utils import ChoiceEnum
-from django.utils.translation import ugettext_lazy as _
-
+from django.utils.translation import gettext_lazy as _
 
 INTERNAL_TEAM = "INTERNAL_TEAM"
 EXTERNAL = "EXTERNAL"
@@ -33,8 +31,3 @@ EXTERNAL = "EXTERNAL"
 ATTRIBUTION_PROCEDURES = (
     (INTERNAL_TEAM, _("Internal team")),
     (EXTERNAL, _("External")))
-
-
-class AttributionProcedures(ChoiceEnum):
-    INTERNAL_TEAM = "INTERNAL_TEAM"
-    EXTERNAL = "EXTERNAL"

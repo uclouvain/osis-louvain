@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-02 13:56+0200\n"
+"POT-Creation-Date: 2019-10-08 16:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -11,90 +11,77 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: static/js/moment.min.js:1
 msgid ": "
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:123
 msgid "Attach"
 msgstr "Attacher"
 
-#: static/js/education_group/education_group_tree.js:182
 msgid "Close all"
 msgstr "Fermer tout"
 
-#: static/js/osis.js:191
 msgid "Collapse"
 msgstr "Fermer"
 
-#: static/js/education_group/education_group_tree.js:146
 msgid "Detach"
 msgstr "Détacher"
 
-#: static/js/learning_unit_creation.js:3
 msgid "Existed code for "
 msgstr "Code a déjà existé pour "
 
-#: static/js/learning_unit_creation.js:4
 msgid "Existing code in "
 msgstr "Code déjà existant en "
 
-#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:8
 msgid "Insertion of a link to a CDN document"
 msgstr "Insertion d'un lien vers un document du CDN"
 
-#: static/js/learning_unit_creation.js:5
 msgid "Invalid code"
 msgstr "Code non valide"
 
-#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:23
 msgid "Link to CDN Doc"
 msgstr "Lien vers document du CDN"
 
-#: static/js/education_group/education_group_tree.js:100
+msgid "Loading..."
+msgstr "Chargement en cours..."
+
 msgid "Modify"
 msgstr "Modifier"
 
-#: static/js/osis.js:186
 msgid "Open"
 msgstr "Ouvrir"
 
-#: static/js/education_group/education_group_tree.js:175
 msgid "Open all"
 msgstr "Ouvrir tout"
 
-#: static/js/learning_unit_creation.js:164
 msgid "Please enter a valid URL."
 msgstr "Entrez une URL valide."
 
-#: static/js/learning_unit_creation.js:7
 msgid "Please enter a value greater than or equal to 0."
 msgstr "Veuillez entrer une valeur supérieure ou égale à 0."
 
-#: static/js/learning_unit_creation.js:8
 msgid "Please enter a value less than or equal to 500."
 msgstr "Veuillez entrer une valeur inférieure ou égale à 500."
 
-#: static/js/learning_unit_creation.js:9
 msgid "Please enter a value that is a multiple of 0.5."
 msgstr "Veuillez entrer une valeur qui est un multiple de 0,5."
 
-#: static/js/education_group/education_group_tree.js:191
 msgid "Search"
 msgstr "Rechercher"
 
-#: static/js/education_group/education_group_tree.js:78
 msgid "Select"
 msgstr "Sélectionner"
 
-#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:15
 msgid "Selection of target files"
 msgstr "Sélection du fichier cible"
 
-#: static/js/learning_unit_creation.js:6
 msgid "This field is required"
 msgstr "Ce champ est obligatoire."
 
-#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:32
 msgid "You should make a selection before clicking 'ok'"
 msgstr "Vous devez faire une séléction avant de cliquer sur 'ok'"
+
+msgid "activate to sort column ascending"
+msgstr "activer pour trier la colonne par ordre croissant"
+
+msgid "activate to sort column descending"
+msgstr "activer pour trier la colonne par ordre décroissant"

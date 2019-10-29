@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core import serializers
 from django.db import models
 
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
@@ -60,25 +59,3 @@ class Domain(SerializableModel):
 
     class Meta:
         ordering = ('-decree__name', 'code', 'name')
-
-
-def find_all_for_sync():
-    """
-    :return: All records in the 'Domain' model (table). Used to synchronize date from Osis to Osis-portal.
-    """
-    print("Retrieving data from " + str(Domain) + "...")
-    # Necessary fields for Osis-portal
-    fields = ['id', 'external_id', 'name', 'parent_id']
-    # list() to force the evaluation of the queryset
-    return list(Domain.objects.values(*fields).order_by('name'))
-
-
-def serialize_list(list_domains):
-    """
-    Serialize a list of "Domain" objects using the json format.
-    Use to send data to osis-portal.
-    :param list_domains: a list of "Domain" objects
-    :return: the serialized list (a json)
-    """
-    fields = ('id', 'external_id', 'name', 'parent')
-    return serializers.serialize("json", list_domains, fields=fields)

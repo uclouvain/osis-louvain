@@ -28,7 +28,6 @@ from dal import autocomplete
 from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.html import format_html
@@ -38,7 +37,6 @@ from waffle.decorators import waffle_flag
 from base import models as mdl_base
 from base.business.education_group import show_coorganization
 from base.business.education_groups import perms
-from base.business.group_element_years.postponement import PostponeContent, NotPostponeError
 from base.forms.education_group.common import EducationGroupModelForm
 from base.forms.education_group.coorganization import OrganizationFormset
 from base.forms.education_group.group import GroupForm
@@ -49,10 +47,8 @@ from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
-from base.views.common import display_success_messages, display_warning_messages, display_error_messages
-from base.views.education_groups.detail import EducationGroupGenericDetailView
+from base.views.common import display_success_messages, display_warning_messages
 from base.views.education_groups.perms import can_change_education_group
-from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
 
 
 @login_required
@@ -111,7 +107,7 @@ def _common_success_redirect(request, form, root):
 
     success_msgs = []
     if not education_group_year.education_group.end_year or \
-            education_group_year.education_group.end_year >= education_group_year.academic_year.year:
+            education_group_year.education_group.end_year.year >= education_group_year.academic_year.year:
         success_msgs = [_get_success_message_for_update_education_group_year(root.pk, education_group_year)]
 
     if hasattr(form, 'education_group_year_postponed'):
@@ -248,45 +244,3 @@ def _update_mini_training(request, education_group_year, root):
         "education_group_year": education_group_year,
         "form_education_group": form.forms[EducationGroupModelForm]
     })
-
-
-class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, EducationGroupGenericDetailView):
-    template_name = "education_group/group_element_year/confirm_postpone_content_inner.html"
-
-    # FlagMixin
-    flag = "education_group_update"
-
-    # RulesRequiredMixin
-    rules = [can_change_education_group]
-
-    with_tree = False
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["warning_message"] = _("Are you sure you want to postpone the content in %(root)s?") % {
-            "root": self.root
-        }
-        return context
-
-    def post(self, request, **kwargs):
-        try:
-            postponer = PostponeContent(self.root.previous_year())
-            postponer.postpone()
-            success = _("%(count_elements)s OF(s) and %(count_links)s link(s) have been postponed with success.") % {
-                'count_elements': postponer.number_elements_created,
-                'count_links': postponer.number_links_created
-            }
-            display_success_messages(request, success)
-            display_warning_messages(request, postponer.warnings)
-
-        except NotPostponeError as e:
-            display_error_messages(request, str(e))
-
-        return JsonResponse({
-            'success_url': reverse(
-                "education_group_read",
-                args=[
-                    kwargs["root_id"],
-                    kwargs["education_group_year_id"]
-                ]
-            )})

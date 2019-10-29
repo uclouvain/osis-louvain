@@ -1,13 +1,46 @@
 [
-{
-    "model": "waffle.switch",
-    "pk": 1,
-    "fields": {
-        "name": "education_group_year_generate_pdf",
-        "active": false,
-        "note": "Fonctionnalit\u00e9 \"G\u00e9n\u00e9rer le pdf\" pour les offres",
-        "created": "2019-07-11T11:25:22",
-        "modified": "2019-07-11T11:34:40.995"
+    {
+        "model": "waffle.switch",
+        "pk": 1,
+        "fields": {
+            "name": "education_group_year_generate_pdf",
+            "active": false,
+            "note": "Fonctionnalit\u00e9 \"G\u00e9n\u00e9rer le pdf\" pour les offres",
+            "created": "2019-07-11T11:25:22",
+            "modified": "2019-07-11T11:34:40.995"
+        }
+    },
+    {
+        "model": "waffle.switch",
+        "pk": 2,
+        "fields": {
+            "name": "luy_show_service_classes",
+            "active": false,
+            "note": "Fonctionnalit\u00e9 afficher les cours de service dans arbre",
+            "created": "2019-08-27T11:40:00",
+            "modified": "2019-08-27T11:40:00"
+        }
+    },
+    {
+        "model": "waffle.switch",
+        "pk": 3,
+        "fields": {
+            "name": "luy_show_borrowed_classes",
+            "active": false,
+            "note": "Fonctionnalit\u00e9 pour afficher les cours emprunt\u00e9s",
+            "created": "2019-07-11T11:25:22",
+            "modified": "2019-07-11T11:34:40.995"
+        }
+    },
+    {
+        "model": "waffle.switch",
+        "pk": 4,
+        "fields": {
+            "name": "egy_show_borrowed_classes",
+            "active": false,
+            "note": "Fonctionnalité pour afficher les groupements/mini-formations empruntés",
+            "created": "2019-07-11T11:25:22",
+            "modified": "2019-07-11T11:34:40.995"
+        }
     }
-}
 ]

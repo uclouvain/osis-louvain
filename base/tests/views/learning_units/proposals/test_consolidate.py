@@ -31,9 +31,9 @@ from django.test import TestCase
 from rest_framework.reverse import reverse
 from waffle.testutils import override_flag
 
+import base.models as mdl_base
 from base.models.enums import proposal_state, learning_unit_year_subtypes, \
     proposal_type
-import base.models as mdl_base
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory

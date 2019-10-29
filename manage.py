@@ -1,11 +1,18 @@
 #!/usr/bin/env python
+import logging
 import os
 import sys
+
 import dotenv
 
 if __name__ == "__main__":
     if 'test' in sys.argv:
         os.environ.setdefault('TESTING', 'True')
+        if '--no-logs' in sys.argv:
+            print('> Disabling logging levels of ERROR and below.')
+            sys.argv.remove('--no-logs')
+            logging.disable(logging.ERROR)
+
     dotenv.read_dotenv()
 
     SETTINGS_FILE = os.environ.get('DJANGO_SETTINGS_MODULE', 'backoffice.settings.local')

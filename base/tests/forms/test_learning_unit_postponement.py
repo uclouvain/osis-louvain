@@ -28,7 +28,7 @@ from unittest import mock
 
 from django.contrib.auth.models import Group
 from django.test import TestCase
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelForm
 from base.forms.learning_unit.learning_unit_create_2 import FullForm
@@ -60,12 +60,13 @@ class LearningUnitPostponementFormContextMixin(TestCase):
 
     def setUp(self):
         self.current_academic_year = create_current_academic_year()
-        self.generated_ac_years = GenerateAcademicYear(self.current_academic_year.year + 1,
-                                                       self.current_academic_year.year + 10)
+        start_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
+        end_year_6 = AcademicYearFactory(year=self.current_academic_year.year + 6)
+        end_year = AcademicYearFactory(year=self.current_academic_year.year + 10)
+        self.generated_ac_years = GenerateAcademicYear(start_year, end_year)
 
         # Creation of a LearingContainerYear and all related models - FOR 6 years
-        self.learn_unit_structure = GenerateContainer(self.current_academic_year.year,
-                                                      self.current_academic_year.year + 6)
+        self.learn_unit_structure = GenerateContainer(self.current_academic_year, end_year_6)
         # Build in Generated Container [first index = start Generate Container ]
         self.generated_container_year = self.learn_unit_structure.generated_container_years[0]
 
@@ -123,7 +124,7 @@ class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMi
         self.assertFalse(form._forms_to_delete)
 
     def test_forms_property_end_year_is_current_year(self):
-        self.learn_unit_structure.learning_unit_full.end_year = self.current_academic_year.year
+        self.learn_unit_structure.learning_unit_full.end_year = self.current_academic_year
         self.learn_unit_structure.learning_unit_full.save()
         instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
         form = _instanciate_postponement_form(self.person, self.learning_unit_year_full.academic_year,
@@ -135,7 +136,8 @@ class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMi
         self.assertEqual(len(form._forms_to_delete), 6)
 
     def test_forms_property_end_year_is_more_than_current_and_less_than_none(self):
-        self.learn_unit_structure.learning_unit_full.end_year = self.current_academic_year.year + 2
+        end_year = AcademicYearFactory(year=self.current_academic_year.year + 2)
+        self.learn_unit_structure.learning_unit_full.end_year = end_year
         self.learn_unit_structure.learning_unit_full.save()
 
         instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_full, self.person)
@@ -167,7 +169,7 @@ class TestLearningUnitPostponementFormInit(LearningUnitPostponementFormContextMi
         self.assertFalse(diff)
 
     def test_get_end_postponement_partim(self):
-        self.learn_unit_structure.learning_unit_partim.end_year = self.current_academic_year.year
+        self.learn_unit_structure.learning_unit_partim.end_year = self.current_academic_year
         self.learn_unit_structure.learning_unit_partim.save()
         instance_luy_base_form = _instantiate_base_learning_unit_form(self.learning_unit_year_partim, self.person)
 

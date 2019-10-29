@@ -27,7 +27,7 @@ from operator import itemgetter
 
 from django import forms
 from django.db.models.fields import BLANK_CHOICE_DASH
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.forms import bootstrap
 from base.models import offer_year_calendar, academic_year

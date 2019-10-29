@@ -27,15 +27,6 @@ LEARNING_UNIT_YEARS = 'learning_unit_years'
 PERSON = 'person'
 
 
-def get_responsible_and_learning_unit_yr_list(learning_units_found):
-    responsible_and_learning_unit_yr_list = []
-    for learning_unit_yr in learning_units_found:
-        if not learning_unit_yr.summary_status:
-            responsible_and_learning_unit_yr_list = \
-                _update_responsible_and_learning_unit_yr_list(learning_unit_yr, responsible_and_learning_unit_yr_list)
-    return responsible_and_learning_unit_yr_list
-
-
 def _update_responsible_data_with_new_learning_unit_yr(a_responsible_person, learning_unit_yr,
                                                        responsible_and_learning_unit_yr_list_param):
     responsible_and_learning_unit_yr_list = responsible_and_learning_unit_yr_list_param

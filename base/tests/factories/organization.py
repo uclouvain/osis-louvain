@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import factory
+
 from base.models.enums import organization_type
 from osis_common.utils.datetime import get_tzinfo
 

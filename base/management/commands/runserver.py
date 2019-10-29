@@ -23,10 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from voluptuous import Schema, Required, Range, All, Length
-
 from django.conf import settings
 from django.contrib.staticfiles.management.commands.runserver import Command as StaticfilesRunserverCommand
+from voluptuous import Schema, Required, Range, All, Length
 
 
 class Command(StaticfilesRunserverCommand):

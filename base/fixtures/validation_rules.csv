@@ -116,22 +116,22 @@ Examples: <i>ACTU IS, SC IS/G, SC IN</i>","Sigle d’un Cours isolés est compos
 <li>2-4 lettres </li> <li> espace </li> <li> <b>IS</b> <u>OU</u> <b>IS/</b> + lettres <u>OU</u> <b>IN</b></li>
 </ul>
 Exemples: <i>ACTU IS, SC IS/G, SC IN</i>","Ex: ACTU IS,SC IS/G,SC IN"
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3DP,REQUIRED,3DP,"^([A-Za-z]{2,4})(3)([Dd])([Pp])$",,"Acronym of PhD is composed of:
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3DP,REQUIRED,3DP,"^([A-Za-z]{2,4})(3)(([Dd][Pp])|([Dd]))$",,"Acronym of PhD is composed of:
 <ul>
-<li>2-4 letters + <b>3DP</b></li>
+<li>2-4 letters + <b>3DP</b> or <b>3D</b></li>
 </ul>
 Examples: <i>AGRO3DP, ART3DP, ESP3DP</i>","Sigle d’un Doctorat est composé de:
 <ul>
-<li>2-4 lettres + <b>3DP</b></li>
+<li>2-4 lettres + <b>3DP</b> ou <b>3D</b></li>
 </ul>
 Exemples: <i>AGRO3DP, ART3DP, ESP3DP</i>",Ex: ART3DP
-base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3FP,REQUIRED,3FP,"^([A-Za-z]{2,4})(3)([Ff])([Pp])$",,"Acronym of Formation PhD is composed of:
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_3FP,REQUIRED,3FP,"^([A-Za-z]{2,4})(3)((([Ff])([Pp]))|(([Ff])([Dd])))$",,"Acronym of Formation PhD is composed of:
 <ul>
-<li>2-4 letters + <b>3FP</b></li>
+<li>2-4 letters + <b>3FP</b> or <b>3FD</b></li>
 </ul>
 Examples: <i>ART3FD</i>","Sigle d’une Formation doctorale est composé de:
 <ul>
-<li>2-4 lettres + <b>3FP</b></li>
+<li>2-4 lettres + <b>3FP</b> ou <b>3FD</b></li>
 </ul>
 Exemples: <i>ART3FD</i>",Ex: ART3FD
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_JY,REQUIRED,JY,"^([A-Za-z]{2,4})[ ]([Jj])([Yy])$",,"Acronym of Junior year is composed of:
@@ -647,33 +647,33 @@ Examples: <i>LDRT100H, LMD100H, LTECO100H</i>","Code d’un Stagiaire est compos
 <li><b>H</b></li>
 </ul>
 Exemples: <i>LDRT100H, LMD100H, LTECO100H</i>",Ex: LDRT100H
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2A,REQUIRED,Agrégation de l'enseignement secondaire supérieur (),^(Agrégation de l'enseignement secondaire supérieur \()(.*)(\))$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_8FC,REQUIRED,Attestation de participation :,^(Attestation de participation :)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_7FC,REQUIRED,Attestation de réussite :,^(Attestation de réussite :)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_9FC,REQUIRED,Attestation d'obtention de crédits :,^(Attestation d'obtention de crédits :)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_1BA,REQUIRED,Bachelier en,^(Bachelier en)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2CE,REQUIRED,Certificat,^(Certificat)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_CE,REQUIRED,Certificat,^(Certificat)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_3CE,REQUIRED,Certificat de recherche en,^(Certificat de recherche en)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_1FC,REQUIRED,Certificat d'université :,^(Certificat d'université :)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2FC,REQUIRED,Certificat,^(Certificat)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_CA,REQUIRED,Préparation concours d'accès,^(Préparation concours d'accès)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_LV,REQUIRED,Langue,^(.*)(Langue)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_IS,REQUIRED,Cours isolé(s),,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_3DP,REQUIRED,Doctorat en,^(Doctorat en)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_3FP,REQUIRED,Formation doctorale en,^(Formation doctorale en)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_JY,REQUIRED,Baccalauréat par affiliation,^(Baccalauréat par affiliation)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2M120,REQUIRED,Master [120] en,^(Master \[120\] )(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MA120,REQUIRED,"Master [120] en , à finalité approfondie","^(Master \[120\] )(.*)(\, à finalité approfondie)(.*)$",,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MD120,REQUIRED,"Master [120] en , à finalité didactique","^(Master \[120\] )(.*)(\, à finalité didactique)(.*)$",,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MS120,REQUIRED,"Master [120] en , à finalité spécialisée",^(Master \[120\] )(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2M180,REQUIRED,Master [180] en,^(Master \[180\] )(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MA180,REQUIRED,"Master [180] en , à finalité approfondie","^(Master \[180\] )(.*)(\, à finalité approfondie)(.*)$",,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MD180,REQUIRED,"Master [180] en , à finalité didactique","^(Master \[180\] )(.*)(\, à finalité didactique)(.*)$",,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MS180,REQUIRED,"Master [180] en , à finalité spécialisée","^(Master \[180\] )(.*)(\, à finalité spécialisée)(.*)$",,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2M1,REQUIRED,Master [60] en,^(Master \[60\] )(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MC,REQUIRED,Master de spécialisation en,^(Master de spécialisation )(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_ST,REQUIRED,Stagiaire,^(Stagiaire)(.*)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_2A,REQUIRED,Agrégation de l'enseignement secondaire supérieur (),^(Agrégation de l'enseignement secondaire supérieur \()(.+)(\))$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_8FC,REQUIRED,Attestation de participation : ,^(Attestation de participation : )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_7FC,REQUIRED,Attestation de réussite : ,^(Attestation de réussite : )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_9FC,REQUIRED,Attestation d'obtention de crédits : ,^(Attestation d'obtention de crédits : )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_1BA,REQUIRED,Bachelier en ,^(Bachelier en )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_2CE,REQUIRED,Certificat ,^(Certificat )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_CE,REQUIRED,Certificat ,^(Certificat )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_3CE,REQUIRED,Certificat de recherche en ,^(Certificat de recherche )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_1FC,REQUIRED,Certificat d'université : ,^(Certificat d'université : )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_2FC,REQUIRED,Certificat,^(Certificat )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_CA,REQUIRED,Préparation concours d'accès ,^(Préparation concours d'accès)(.*)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_LV,REQUIRED,Langue ,,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_IS,REQUIRED,Cours isolé(s) ,,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_3DP,REQUIRED,Doctorat en ,^(Doctorat en )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_3FP,REQUIRED,Formation doctorale en ,^(Formation doctorale en )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_JY,REQUIRED,Baccalauréat par affiliation ,^(Baccalauréat par affiliation)(.*)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_2M120,REQUIRED,Master [120] en ,^(Master \[120\] )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MA120,REQUIRED,"Master [120] en , à finalité approfondie ","^(Master \[120\] )(.+)(\, à finalité approfondie)(.*)$",,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MD120,REQUIRED,"Master [120] en , à finalité didactique ","^(Master \[120\] )(.+)(\, à finalité didactique)(.*)$",,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MS120,REQUIRED,"Master [120] en , à finalité spécialisée ",^(Master \[120\] )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_2M180,REQUIRED,Master [180] en,^(Master \[)(180|240)(\] )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MA180,REQUIRED,"Master [180] en , à finalité approfondie ","^(Master \[)(180|240)(\] )(.+)(\, à finalité approfondie)(.*)$",,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MD180,REQUIRED,"Master [180] en , à finalité didactique ","^(Master \[)(180|240)(\] )(.+)(\, à finalité didactique)(.*)$",,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MS180,REQUIRED,"Master [180] en , à finalité spécialisée ","^(Master \[)(180|240)(\] )(.+)(\, à finalité spécialisée)(.*)$",,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_2M1,REQUIRED,Master [60] en ,^(Master \[60\] )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_2MC,REQUIRED,Master de spécialisation en ,^(Master de spécialisation )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_ST,REQUIRED,Stagiaire ,^(Stagiaire)(.*)$,,,,
 base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_2A,REQUIRED,True,,,,,
 base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_8FC,REQUIRED,True,,,,,
 base.validationrule,base_educationgroupyear.enrollment_enabled.osis.education_group_type_7FC,REQUIRED,True,,,,,
@@ -1358,7 +1358,7 @@ base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_fi
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_finality180listchoice,REQUIRED,,,,,,Ex: FINALITESBIOL2M
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,,,,,,Ex: PARTENARIATS
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_subgroup,REQUIRED,,,,,,Ex: TPCHOIX
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_commoncore,REQUIRED,Partie de base,,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_commoncore,REQUIRED,Contenu:,,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_complementarymodule,REQUIRED,Enseignements supplémentaires préparatoires,,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_minorlistchoice,REQUIRED,Liste au choix Mineures,,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_majorlistchoice,REQUIRED,Liste au choix Majeures,,,,,
@@ -1505,11 +1505,11 @@ base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_fs
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_option,REQUIRED,,,,,,Ex: OPTLAFR2M1/LA
 base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,Ex: PSP - CH GENEVE01
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_deepening,REQUIRED,Approfondissement en,^(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_sociatyminor,REQUIRED,Mineure en,^(Mineure en)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_accessminor,REQUIRED,Mineure en,^(Mineure en)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_openminor,REQUIRED,Mineure en,^(Mineure en)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_disciplinarycomplementminor,REQUIRED,Mineure en,^(Mineure en)(.*)$,,,,
-base.validationrule,base_educationgroupyear.title.osis.education_group_type_fsaspeciality,REQUIRED,Majeure en,^(Majeure en)(.*)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_sociatyminor,REQUIRED,Mineure en ,^(Mineure en )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_accessminor,REQUIRED,Mineure en ,^(Mineure en )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_openminor,REQUIRED,Mineure en ,^(Mineure en )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_disciplinarycomplementminor,REQUIRED,Mineure en ,^(Mineure en )(.+)$,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_fsaspeciality,REQUIRED,Majeure en ,^(Majeure en )(.+)$,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_option,REQUIRED,,,,,,
 base.validationrule,base_educationgroupyear.title.osis.education_group_type_mobilitypartnership,REQUIRED,,,,,,
 base.validationrule,base_educationgroupyear.credits.osis.education_group_type_deepening,REQUIRED,30,,,,,

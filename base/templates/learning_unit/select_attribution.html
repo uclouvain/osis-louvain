@@ -1,5 +1,5 @@
 {% extends "learning_unit/layout_detail.html" %}
-{% load staticfiles i18n %}
+{% load static i18n %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -81,7 +81,7 @@
             </p>
         {% endif %}
         <a href="{% url 'learning_unit_attributions' learning_unit_year.id %}" class="btn btn-default" role="button">
-            {% trans "cancel" %}
+            {% trans "Cancel" %}
         </a>
     </div>
 {% endblock %}

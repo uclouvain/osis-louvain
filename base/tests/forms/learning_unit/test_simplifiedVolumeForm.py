@@ -30,7 +30,7 @@ from base.forms.learning_unit.edition_volume import SimplifiedVolumeForm, Simpli
 from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.learning_component_year import LearningComponentYear
-from base.tests.factories.academic_year import get_current_year
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.person import PersonFactory
@@ -51,7 +51,8 @@ class TestSimplifiedVolumeManagementForm(TestCase):
             'component-0-planned_classes': 1,
             'component-1-planned_classes': 1,
         }
-        generator = GenerateContainer(get_current_year(), get_current_year())
+        current_academic_year = create_current_academic_year()
+        generator = GenerateContainer(current_academic_year, current_academic_year)
         self.learning_unit_year = generator[0].learning_unit_year_full
         self.entity_container_years = generator[0].list_repartition_volume_entities
         self.person = PersonFactory()

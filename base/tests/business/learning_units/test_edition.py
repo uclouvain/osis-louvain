@@ -29,7 +29,7 @@ from decimal import Decimal
 from uuid import uuid4
 
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units import edition as business_edition
 from base.enums.component_detail import COMPONENT_DETAILS
@@ -291,9 +291,6 @@ class LearningUnitEditionTestCase(TestCase):
 
         self.assertIsInstance(error_list, list)
         self.assertEqual(len(error_list), 2)
-
-        # invalidate cache
-        del self.requirement_entity.most_recent_acronym
 
         generic_error = "The value of field '%(field)s' is different between year %(year)s - %(value)s " \
                         "and year %(next_year)s - %(next_value)s"

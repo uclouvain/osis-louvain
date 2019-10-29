@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import datetime
-from unittest.mock import MagicMock, Mock
+from unittest.mock import Mock
 
 from django.test import TestCase
 

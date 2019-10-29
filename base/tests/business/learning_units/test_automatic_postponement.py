@@ -55,7 +55,7 @@ class TestFetchLearningUnitToPostpone(TestCase):
 
     def test_luy_to_not_duplicated(self):
         # The learning unit is over
-        self.learning_unit.end_year = self.academic_years[-2].year
+        self.learning_unit.end_year = self.academic_years[-2]
         self.learning_unit.save()
 
         LearningUnitYearFactory(

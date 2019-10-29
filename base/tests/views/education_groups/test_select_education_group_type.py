@@ -28,7 +28,7 @@ from unittest import mock
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.models.enums import education_group_categories

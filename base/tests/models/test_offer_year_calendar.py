@@ -30,13 +30,11 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
-from base.tests.factories.offer_year import OfferYearFactory
-
 from base.signals.publisher import compute_scores_encodings_deadlines
-
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 
 YEAR_CALENDAR = timezone.now().year
 

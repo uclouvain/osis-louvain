@@ -25,15 +25,16 @@
 ##############################################################################
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.models import Group
 from django.db.models import Prefetch
 from django.db.models import Subquery, OuterRef
-from django.http import Http404
 from django.views.generic import ListView
 
 from base.models.academic_year import current_academic_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_manager import EntityManager
 from base.models.entity_version import EntityVersion
+from base.models.enums.groups import TUTOR
 from base.models.person import Person
 from base.models.person_entity import PersonEntity
 from base.models.program_manager import ProgramManager
@@ -41,7 +42,6 @@ from base.models.program_manager import ProgramManager
 
 class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
     model = Person
-    paginate_by = "20"
     ordering = 'last_name', 'first_name', 'global_id'
     permission_required = 'base.can_read_persons_roles'
     raise_exception = True
@@ -89,9 +89,8 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
                 prefetch_personentity
             ).filter(
                 user__is_active=True,
-                student__isnull=True,
-                tutor__isnull=True,
-            )
+                user__groups__in=Group.objects.exclude(name=TUTOR)
+            ).distinct()
 
         if 'partnership' in settings.INSTALLED_APPS:
             from partnership.models import PartnershipEntityManager
@@ -105,14 +104,3 @@ class UserListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
             )
 
         return qs
-
-    def paginate_queryset(self, queryset, page_size):
-        """ The cache can store a wrong page number,
-        In that case, we return to the first page.
-        """
-        try:
-            return super().paginate_queryset(queryset, page_size)
-        except Http404:
-            self.kwargs['page'] = 1
-
-        return super().paginate_queryset(queryset, page_size)

@@ -29,7 +29,7 @@ from django.contrib.auth.models import Group, Permission
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
@@ -42,7 +42,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.tests.factories import campus as campus_factory, \
     organization as organization_factory, person as factory_person, user as factory_user
-from base.tests.factories.academic_year import get_current_year
+from base.tests.factories.academic_year import get_current_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -64,7 +64,9 @@ class LearningUnitViewTestCase(TestCase):
         self.faculty_user.user_permissions.add(Permission.objects.get(codename='can_create_learningunit'))
         self.super_user = factory_user.SuperUserFactory()
         self.person = factory_person.PersonFactory(user=self.super_user)
-        self.academic_years = GenerateAcademicYear(get_current_year(), get_current_year() + 7).academic_years
+        start_year = AcademicYearFactory(year=get_current_year())
+        end_year = AcademicYearFactory(year= get_current_year() + 7)
+        self.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
         self.current_academic_year = self.academic_years[0]
         self.next_academic_year = self.academic_years[1]
 

@@ -27,7 +27,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.db import IntegrityError, transaction
 from django.db.models.deletion import ProtectedError
 from django.shortcuts import redirect, get_object_or_404
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_POST
 from waffle.decorators import waffle_flag
 

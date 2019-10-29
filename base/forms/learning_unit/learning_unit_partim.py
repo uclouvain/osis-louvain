@@ -58,7 +58,7 @@ class YearChoiceField(forms.ChoiceField):
         if not end_year:
             end_year = start_year + LEARNING_UNIT_CREATION_SPAN_YEARS
 
-        self.choices = [(year, self.academic_year_str(year)) for year in range(start_year, end_year + 1)]
+        self.choices = [(year, self.academic_year_str(year)) for year in range(start_year.year, end_year.year + 1)]
         self.choices = add_blank(self.choices)
 
     @staticmethod
@@ -162,7 +162,7 @@ class PartimForm(LearningUnitBaseForm):
         return {
             'data': data,
             'instance': self.instance.learning_unit if self.instance else None,
-            'start_year': self.learning_unit_year_full.academic_year.year,
+            'start_year': self.learning_unit_year_full.academic_year,
             'max_end_year': self.learning_unit_year_full.learning_unit.max_end_year
         }
 

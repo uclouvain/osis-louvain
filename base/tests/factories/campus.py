@@ -29,7 +29,6 @@ import string
 import factory.fuzzy
 
 from base.tests.factories.organization import OrganizationFactory
-from osis_common.utils.datetime import get_tzinfo
 
 
 class CampusFactory(factory.DjangoModelFactory):

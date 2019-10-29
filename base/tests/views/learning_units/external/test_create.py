@@ -29,7 +29,7 @@ from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
@@ -49,8 +49,9 @@ class TestCreateExternalLearningUnitView(TestCase):
         self.user.user_permissions.add(Permission.objects.get(codename="add_externallearningunityear"))
         self.person = PersonFactory(user=self.user)
         self.client.force_login(self.user)
-        starting_year = YEAR_LIMIT_LUE_MODIFICATION
-        self.academic_years = GenerateAcademicYear(starting_year, starting_year + 1).academic_years
+        starting_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
+        end_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION + 1)
+        self.academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
         self.academic_year = self.academic_years[1]
         self.language = LanguageFactory(code='FR')
         self.data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)

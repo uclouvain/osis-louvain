@@ -34,7 +34,7 @@ from django.contrib.auth.views import LoginView
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import redirect, render
 from django.utils import translation
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base import models as mdl
 from base.models.utils import native
@@ -45,7 +45,7 @@ ITEMS_PER_PAGE = 25
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
-def page_not_found(request, **kwargs):
+def page_not_found(request, exception, **kwargs):
     response = render(request, 'page_not_found.html', {})
     response.status_code = 404
     return response
@@ -247,3 +247,13 @@ def paginate_queryset(qs, request_get, items_per_page=None):
     except EmptyPage:
         paginated_qs = paginator.page(paginator.num_pages)
     return paginated_qs
+
+
+def remove_from_session(request, session_key):
+    if session_key in request.session:
+        del request.session[session_key]
+
+
+def add_to_session(request, session_key, value):
+    if session_key not in request.session:
+        request.session[session_key] = value

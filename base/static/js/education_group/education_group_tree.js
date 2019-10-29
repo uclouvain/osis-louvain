@@ -91,7 +91,7 @@ $(document).ready(function () {
                                     },
                                     type: 'POST',
                                     success: function (jsonResponse) {
-                                        displayInfoMessage(jsonResponse, 'message_info_container')
+                                        displayInfoMessage(jsonResponse, 'clipboard')
                                     }
                                 });
                             }

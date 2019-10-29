@@ -26,7 +26,7 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db import transaction
 from django.shortcuts import redirect, get_object_or_404, render
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from waffle.decorators import waffle_flag
 
 from base.business.learning_unit_proposal import compute_proposal_state
@@ -36,7 +36,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.views.common import display_success_messages, display_warning_messages
+from base.views.common import display_success_messages
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context
 

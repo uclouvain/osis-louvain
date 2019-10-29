@@ -25,9 +25,9 @@
 ##############################################################################
 import datetime
 
-from django.urls import reverse
 from django.http import HttpResponseForbidden
 from django.test import TestCase
+from django.urls import reverse
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory

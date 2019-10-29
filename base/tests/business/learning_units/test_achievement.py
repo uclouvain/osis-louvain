@@ -26,14 +26,13 @@
 
 from django.test import TestCase
 
-from base.business.learning_units.achievement import get_code_name, get_anchor_reference, DELETE, \
-    get_previous_achievement, HTML_ANCHOR
+from base.business.learning_units.achievement import get_anchor_reference, DELETE, get_previous_achievement, HTML_ANCHOR
 from base.models.enums import learning_unit_year_subtypes
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from reference.tests.factories.language import LanguageFactory
 from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
+from reference.tests.factories.language import LanguageFactory
 
 
 class TestLearningAchievementView(TestCase):
@@ -47,29 +46,6 @@ class TestLearningAchievementView(TestCase):
 
         self.language_fr = LanguageFactory(code=FR_CODE_LANGUAGE)
         self.language_en = LanguageFactory(code=EN_CODE_LANGUAGE)
-
-    def test_get_code_name_for_first_en_achievement_one_fr_exists(self):
-        achievement_fr = LearningAchievementFactory(language=self.language_fr,
-                                                    learning_unit_year=self.learning_unit_year)
-        self.assertEqual(get_code_name(achievement_fr, FR_CODE_LANGUAGE), '')
-        self.assertEqual(get_code_name(achievement_fr, EN_CODE_LANGUAGE), achievement_fr.code_name)
-
-    def test_get_code_name_for_first_en_achievement_two_fr_exists(self):
-        achievement_fr_0 = LearningAchievementFactory(language=self.language_fr,
-                                                      learning_unit_year=self.learning_unit_year)
-        LearningAchievementFactory(language=self.language_fr,
-                                   learning_unit_year=self.learning_unit_year)
-        self.assertEqual(get_code_name(achievement_fr_0, EN_CODE_LANGUAGE), achievement_fr_0.code_name)
-
-    def test_get_code_name_for_second_en_achievement_two_fr_exists(self):
-        achievement_fr_0 = LearningAchievementFactory(language=self.language_fr,
-                                                      learning_unit_year=self.learning_unit_year)
-        achievement_fr_1 = LearningAchievementFactory(language=self.language_fr,
-                                                      learning_unit_year=self.learning_unit_year)
-        LearningAchievementFactory(language=self.language_en,
-                                   learning_unit_year=self.learning_unit_year)
-
-        self.assertEqual(get_code_name(achievement_fr_0, EN_CODE_LANGUAGE), achievement_fr_1.code_name)
 
     def test_get_anchor_reference_for_delete(self):
         achievement_fr_0 = LearningAchievementFactory(language=self.language_fr,

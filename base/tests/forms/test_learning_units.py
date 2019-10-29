@@ -26,10 +26,11 @@
 from django.test import TestCase
 from django.utils import timezone
 
+import base.forms.learning_unit.search.service_course
+import base.forms.learning_unit.search.simple
 from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.business.learning_unit_year_with_context import is_service_course
-from base.forms.learning_unit import search_form
 from base.models.entity_version import PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS
 from base.models.enums import entity_type
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -175,73 +176,73 @@ class TestLearningUnitForm(TestCase):
 
     def get_valid_data(self):
         return {
-            "academic_year_id": self.academic_yr.pk,
+            "academic_year": self.academic_yr.pk,
             "acronym": "LDROI1001"
         }
 
     def test_get_service_courses_by_empty_requirement_and_allocation_entity(self):
-        form_data = {}
+        form_data = {"academic_year": self.academic_yr.pk}
 
-        form = search_form.LearningUnitYearForm(form_data, service_course_search=True)
-        self.assertTrue(form.is_valid())
+        service_course_filter = base.forms.learning_unit.search.service_course.ServiceCourseFilter(form_data)
+        self.assertTrue(service_course_filter.is_valid())
         self.assertEqual(
-            list(form.get_activity_learning_units()),
-            [self.list_learning_unit_year[0], self.list_learning_unit_year[1]]
+            [self.list_learning_unit_year[0], self.list_learning_unit_year[1]],
+            list(service_course_filter.qs)
         )
 
     def test_get_service_courses_by_allocation_acronym(self):
         form_data = {
-            "allocation_entity_acronym": self.list_entity_version[1].acronym
+            "allocation_entity": self.list_entity_version[1].acronym
         }
 
-        form = search_form.LearningUnitYearForm(form_data, service_course_search=True)
-        self.assertTrue(form.is_valid())
-        self.assertEqual(list(form.get_activity_learning_units()), [self.list_learning_unit_year[0]])
+        service_course_filter = base.forms.learning_unit.search.service_course.ServiceCourseFilter(form_data)
+        self.assertTrue(service_course_filter.is_valid())
+        self.assertEqual([self.list_learning_unit_year[0]], list(service_course_filter.qs))
 
     def test_get_service_courses_by_allocation_acronym_with_no_faculty_as_parent(self):
         form_data = {
-            "requirement_entity_acronym": self.list_entity_version[3].acronym,
-            "allocation_entity_acronym": self.list_entity_version[5].acronym
+            "requirement_entity": self.list_entity_version[3].acronym,
+            "allocation_entity": self.list_entity_version[5].acronym
         }
 
-        form = search_form.LearningUnitYearForm(form_data, service_course_search=True)
-        self.assertTrue(form.is_valid())
-        self.assertEqual(list(form.get_activity_learning_units()), [])
+        service_course_filter = base.forms.learning_unit.search.service_course.ServiceCourseFilter(form_data)
+        self.assertTrue(service_course_filter.is_valid())
+        self.assertEqual(list(service_course_filter.qs), [])
 
     def test_get_service_courses_by_requirement_acronym(self):
         form_data = {
-            "requirement_entity_acronym": self.list_entity_version[0].acronym
+            "requirement_entity": self.list_entity_version[0].acronym
         }
 
-        form = search_form.LearningUnitYearForm(form_data, service_course_search=True)
-        self.assertTrue(form.is_valid())
-        self.assertEqual(list(form.get_activity_learning_units()), [self.list_learning_unit_year[0]])
+        service_course_filter = base.forms.learning_unit.search.service_course.ServiceCourseFilter(form_data)
+        self.assertTrue(service_course_filter.is_valid())
+        self.assertEqual(list(service_course_filter.qs), [self.list_learning_unit_year[0]])
 
     def test_get_service_courses_by_requirement_and_allocation_acronym(self):
         form_data = {
-            "requirement_entity_acronym": self.list_entity_version[0].acronym,
-            "allocation_entity_acronym": self.list_entity_version[1].acronym
+            "requirement_entity": self.list_entity_version[0].acronym,
+            "allocation_entity": self.list_entity_version[1].acronym
         }
 
-        form = search_form.LearningUnitYearForm(form_data, service_course_search=True)
-        self.assertTrue(form.is_valid())
-        self.assertEqual(len(form.get_activity_learning_units()), 1)
+        service_course_filter = base.forms.learning_unit.search.service_course.ServiceCourseFilter(form_data)
+        self.assertTrue(service_course_filter.is_valid())
+        self.assertEqual(len(service_course_filter.qs), 1)
 
     def test_get_service_courses_by_requirement_and_allocation_acronym_within_same_faculty(self):
         form_data = {
-            "requirement_entity_acronym": self.list_entity_version[2].acronym,
-            "allocation_entity_acronym": self.list_entity_version[3].acronym
+            "requirement_entity": self.list_entity_version[2].acronym,
+            "allocation_entity": self.list_entity_version[3].acronym
         }
 
-        form = search_form.LearningUnitYearForm(form_data, service_course_search=True)
-        self.assertTrue(form.is_valid())
-        self.assertEqual(list(form.get_activity_learning_units()), [])
+        service_course_filter = base.forms.learning_unit.search.service_course.ServiceCourseFilter(form_data)
+        self.assertTrue(service_course_filter.is_valid())
+        self.assertEqual(list(service_course_filter.qs), [])
 
     def test_search_learning_units_by_tutor(self):
         form_data = {
             "tutor": self.tutor.person.first_name,
         }
 
-        form = search_form.LearningUnitYearForm(form_data)
-        self.assertTrue(form.is_valid())
-        self.assertEqual(list(form.get_activity_learning_units()), [self.list_learning_unit_year[0]])
+        service_course_filter = base.forms.learning_unit.search.simple.LearningUnitFilter(form_data)
+        self.assertTrue(service_course_filter.is_valid())
+        self.assertEqual(list(service_course_filter.qs), [self.list_learning_unit_year[0]])

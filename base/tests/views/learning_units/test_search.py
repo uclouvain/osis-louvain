@@ -31,7 +31,7 @@ from django.urls import reverse
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from base.views.learning_units.search import BORROWED_COURSE, EXTERNAL_SEARCH
+from base.views.learning_units.search.common import BORROWED_COURSE
 
 
 class TestSearchBorrowedLearningUnits(TestCase):
@@ -47,12 +47,6 @@ class TestSearchBorrowedLearningUnits(TestCase):
     def setUp(self):
         self.client.force_login(self.person.user)
 
-    def test_user_not_logged(self):
-        self.client.logout()
-        response = self.client.get(self.url)
-
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
-
     def test_user_has_not_permission(self):
         person_without_permission = PersonFactory()
         self.client.force_login(person_without_permission.user)
@@ -67,7 +61,7 @@ class TestSearchBorrowedLearningUnits(TestCase):
 
         context = response.context
         self.assertEqual(context["search_type"], BORROWED_COURSE)
-        self.assertTemplateUsed(response, "learning_unit/by_activity.html")
+        self.assertTemplateUsed(response, "learning_unit/search/base.html")
 
 
 class TestSearchExternalLearningUnits(TestCase):
@@ -76,16 +70,10 @@ class TestSearchExternalLearningUnits(TestCase):
         cls.person = PersonFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_externallearningunityear"))
         cls.url = reverse("learning_units_external")
-        create_current_academic_year()
+        AcademicYearFactory.produce_in_future(quantity=2)
 
     def setUp(self):
         self.client.force_login(self.person.user)
-
-    def test_user_not_logged(self):
-        self.client.logout()
-        response = self.client.get(self.url)
-
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
 
     def test_user_has_not_permission(self):
         person_without_permission = PersonFactory()
@@ -99,6 +87,4 @@ class TestSearchExternalLearningUnits(TestCase):
     def test_get_request(self):
         response = self.client.get(self.url)
 
-        context = response.context
-        self.assertEqual(context["search_type"], EXTERNAL_SEARCH)
-        self.assertTemplateUsed(response, "learning_unit/by_external.html")
+        self.assertTemplateUsed(response, "learning_unit/search/external.html")

@@ -26,14 +26,13 @@
 from collections import OrderedDict
 from operator import itemgetter
 
-from django.db.models import Prefetch, Max
-from django.utils.translation import ugettext_lazy as _
+from django.db.models import Prefetch
+from django.utils.translation import gettext_lazy as _
 
 from base import models as mdl_base
 from base.business.learning_unit_year_with_context import volume_learning_component_year
-from base.models import learning_achievement, academic_year
-from base.models.academic_year import AcademicYear
-from base.models.enums import academic_calendar_type, learning_unit_year_subtypes
+from base.models import learning_achievement
+from base.models.enums import academic_calendar_type
 from base.models.enums import entity_container_year_link_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
 from base.models.learning_component_year import LearningComponentYear
@@ -49,8 +48,6 @@ CMS_LABEL_PEDAGOGY_FR_ONLY = ['bibliography', 'mobility']
 CMS_LABEL_PEDAGOGY = CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_PEDAGOGY_FR_ONLY
 
 CMS_LABEL_SUMMARY = ['resume']
-
-COLORED = 'COLORED_ROW'
 
 
 def get_same_container_year_components(learning_unit_year):
@@ -108,14 +105,14 @@ def get_all_attributions(learning_unit_year):
 
 def get_cms_label_data(cms_label, user_language):
     cms_label_data = OrderedDict()
-    translated_labels = mdl_cms.translated_text_label.search(
-        text_entity=entity_name.LEARNING_UNIT_YEAR,
-        labels=cms_label,
-        language=user_language
-    )
+    translated_labels = mdl_cms.translated_text_label.search(text_entity=entity_name.LEARNING_UNIT_YEAR,
+                                                             labels=cms_label,
+                                                             language=user_language)
+
     for label in cms_label:
         translated_text = next((trans.label for trans in translated_labels if trans.text_label.label == label), None)
         cms_label_data[label] = translated_text
+
     return cms_label_data
 
 
@@ -149,10 +146,6 @@ def _is_used_by_full_learning_unit_year(a_learning_class_year):
     return a_learning_class_year.learning_component_year.learning_unit_year.is_full()
 
 
-def get_entity_acronym(an_entity):
-    return an_entity.acronym if an_entity else None
-
-
 def is_summary_submission_opened():
     current_academic_year = mdl_base.academic_year.starting_academic_year()
     return mdl_base.academic_calendar. \
@@ -181,30 +174,3 @@ def get_achievements_group_by_language(learning_unit_year):
         key = 'achievements_{}'.format(achievement.language.code)
         achievement_grouped.setdefault(key, []).append(achievement)
     return achievement_grouped
-
-
-def get_academic_year_postponement_range(luy):
-    end_postponement = academic_year.find_academic_year_by_year(
-        luy.learning_unit.end_year
-    ) if luy.learning_unit else None
-    max_postponement_year = compute_max_postponement_year(luy.learning_unit, luy.subtype, end_postponement)
-    academic_year_postponement_range = AcademicYear.objects.min_max_years(
-        luy.academic_year.year + 1,
-        max_postponement_year
-    )
-    return academic_year_postponement_range
-
-
-def compute_max_postponement_year(learning_unit, subtype, end_postponement) -> int:
-    """ Compute the maximal year for the postponement of the learning unit
-
-    If the learning unit is a partim, the max year is the max year of the full
-    """
-    if subtype == learning_unit_year_subtypes.PARTIM:
-        max_postponement_year = learning_unit.learningunityear_set.aggregate(
-            Max('academic_year__year')
-        )['academic_year__year__max']
-    else:
-        max_postponement_year = academic_year.compute_max_academic_year_adjournment()
-    end_year = end_postponement.year if end_postponement else None
-    return min(end_year, max_postponement_year) if end_year else max_postponement_year

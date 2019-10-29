@@ -24,12 +24,13 @@
 #
 ############################################################################
 import factory.fuzzy
+from factory.django import DjangoModelFactory
+from faker import Faker
 
 from base.tests.factories.certificate_aim import CertificateAimFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from osis_common.utils.datetime import get_tzinfo
-from factory.django import DjangoModelFactory
-from faker import Faker
+
 fake = Faker()
 
 

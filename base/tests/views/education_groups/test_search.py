@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
 import json
 from unittest import mock
 
@@ -32,17 +31,18 @@ from django.core.cache import cache
 from django.http import HttpResponseForbidden, HttpResponse
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base import utils
 from base.forms.education_groups import EducationGroupFilter
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_type import EducationGroupTypeFactory, MiniTrainingEducationGroupTypeFactory, \
+from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.education_group_type import EducationGroupTypeFactory, \
+    MiniTrainingEducationGroupTypeFactory, \
     GroupEducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, MiniTrainingFactory, \
-    GroupFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
@@ -100,12 +100,8 @@ class TestEducationGroupDataSearchFilter(TestCase):
     """
     @classmethod
     def setUpTestData(cls):
-        today = datetime.date.today()
-        cls.academic_year = AcademicYearFactory(start_date=today, end_date=today.replace(year=today.year + 1),
-                                                year=today.year)
-        cls.previous_academic_year = AcademicYearFactory(start_date=today.replace(year=today.year - 1),
-                                                         end_date=today - datetime.timedelta(days=1),
-                                                         year=today.year - 1)
+        cls.current_academic_year = create_current_academic_year()
+        cls.previous_academic_year = AcademicYearFactory(year=cls.current_academic_year.year - 1)
 
         cls.type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
         cls.type_minitraining = EducationGroupTypeFactory(category=education_group_categories.MINI_TRAINING)
@@ -115,20 +111,23 @@ class TestEducationGroupDataSearchFilter(TestCase):
         envi_entity = EntityFactory()
 
         cls.education_group_edph2 = EducationGroupYearFactory(
-            acronym='EDPH2', academic_year=cls.academic_year,
+            acronym='EDPH2', academic_year=cls.current_academic_year,
             partial_acronym='EDPH2_SCS',
+            education_group__start_year=cls.previous_academic_year,
             education_group_type=cls.type_group,
             management_entity=envi_entity
         )
 
         cls.education_group_arke2a = EducationGroupYearFactory(
-            acronym='ARKE2A', academic_year=cls.academic_year,
+            acronym='ARKE2A', academic_year=cls.current_academic_year,
+            education_group__start_year=cls.previous_academic_year,
             education_group_type=cls.type_training,
             management_entity=oph_entity
         )
 
         cls.education_group_hist2a = EducationGroupYearFactory(
-            acronym='HIST2A', academic_year=cls.academic_year,
+            acronym='HIST2A', academic_year=cls.current_academic_year,
+            education_group__start_year=cls.previous_academic_year,
             education_group_type=cls.type_group,
             management_entity=oph_entity
         )
@@ -136,6 +135,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         cls.education_group_arke2a_previous_year = EducationGroupYearFactory(
             acronym='ARKE2A',
             academic_year=cls.previous_academic_year,
+            education_group__start_year=cls.previous_academic_year,
             education_group_type=cls.type_training,
             management_entity=oph_entity
         )
@@ -181,7 +181,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         response = self.client.get(self.url)
 
         form = response.context["form"]
-        self.assertEqual(form.fields["academic_year"].initial, self.academic_year)
+        self.assertEqual(form.fields["academic_year"].initial, self.current_academic_year)
         self.assertEqual(form.fields["category"].initial, education_group_categories.TRAINING)
 
     def test_with_empty_search_result(self):
@@ -206,7 +206,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
                               [self.education_group_arke2a, self.education_group_arke2a_previous_year])
 
     def test_search_with_academic_year_only(self):
-        response = self.client.get(self.url, data={"academic_year": self.academic_year.id})
+        response = self.client.get(self.url, data={"academic_year": self.current_academic_year.id})
 
         self.assertTemplateUsed(response, "education_group/search.html")
 
@@ -282,7 +282,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
     def test_with_multiple_criteria(self):
         response = self.client.get(
             self.url, data={
-                "academic_year": self.academic_year.id,
+                "academic_year": self.current_academic_year.id,
                 "acronym": self.education_group_arke2a.acronym,
                 "management_entity": self.envi_entity_v.acronym,
                 "with_entity_subordinated": True
@@ -299,7 +299,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
 
         response = self.client.get(self.url, data={
-                "academic_year": self.academic_year.id,
+                "academic_year": self.current_academic_year.id,
                 "acronym": self.education_group_arke2a.acronym,
                 "management_entity": self.envi_entity_v.acronym,
                 "with_entity_subordinated": True
@@ -352,6 +352,7 @@ class TestEducationGroupTypeAutoComplete(TestCase):
 
         expected_response = {
             'id': str(education_group_type.pk),
+            'selected_text': education_group_type.get_name_display(),
             'text': education_group_type.get_name_display()
         }
         self.assertEqual(len(json_response["results"]), 1)

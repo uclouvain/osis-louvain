@@ -23,11 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
 from django.db import IntegrityError
+from django.test import TestCase
 
-from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.education_group_organization import EducationGroupOrganizationFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.organization import OrganizationFactory
 
 

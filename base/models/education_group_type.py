@@ -27,7 +27,7 @@ import collections
 
 from django.db import models
 from django.db.models import Case, When
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models.enums import education_group_types

@@ -24,8 +24,9 @@
 #
 ##############################################################################
 from decimal import Decimal
-from django.test import TestCase
+
 from django.template import Context, Template
+from django.test import TestCase
 
 
 class ScoreDisplayTagTests(TestCase):

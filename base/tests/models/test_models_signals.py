@@ -25,17 +25,12 @@
 ##############################################################################
 from django.contrib.auth.models import User
 from django.test import TestCase
-from django.utils import timezone
-from base.models.academic_year import AcademicYear
-from base.models.offer import Offer
-from base.models.offer_year import OfferYear
-from base.models.person import Person
-from base.models.program_manager import ProgramManager
-from base.models.student import Student
-from base.models.tutor import Tutor
-from base.models.entity_manager import EntityManager
-from base.models.structure import Structure
+
 from base.models import models_signals as mdl_signals, person as mdl_person
+from base.models.entity_manager import EntityManager
+from base.models.person import Person
+from base.models.structure import Structure
+from base.models.tutor import Tutor
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group import TutorGroupFactory, ProgramManagerGroupFactory
 from base.tests.factories.offer_year import OfferYearFactory

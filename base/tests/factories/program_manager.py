@@ -41,10 +41,8 @@ class ProgramManagerFactory(factory.django.DjangoModelFactory):
         exclude = ('group', )
 
     group = factory.SubFactory(ProgramManagerGroupFactory)
-
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),datetime.datetime(2017, 3, 1))
-
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     person = factory.SubFactory(PersonFactory)
     offer_year = factory.SubFactory(OfferYearFactory)
     education_group = factory.SubFactory(EducationGroupFactory)

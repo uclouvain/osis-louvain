@@ -38,7 +38,7 @@ from django.db.utils import OperationalError as DjangoOperationalError, Interfac
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse, reverse_lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from psycopg2._psycopg import OperationalError as PsycopOperationalError, InterfaceError as  PsycopInterfaceError
 
 from assessments.business import score_encoding_progress, score_encoding_list, score_encoding_export
@@ -224,13 +224,7 @@ def online_encoding_form(request, learning_unit_year_id=None):
             request,
             scores_list_encoded.enrollments)
 
-        try:
-            updated_enrollments = score_encoding_list.update_enrollments(
-                scores_encoding_list=scores_list_encoded,
-                user=request.user)
-        except Exception as e:
-            error_msg = e.messages[0] if isinstance(e, ValidationError) else e.args[0]
-            messages.add_message(request, messages.ERROR, _(error_msg))
+        updated_enrollments = _update_enrollments(request, scores_list_encoded, updated_enrollments)
 
         context = _get_common_encoding_context(request, learning_unit_year_id)
         if messages.get_messages(request):
@@ -308,13 +302,7 @@ def specific_criteria_submission(request):
     updated_enrollments = None
     scores_list_encoded = _get_score_encoding_list_with_only_enrollment_modified(request)
 
-    try:
-        updated_enrollments = score_encoding_list.update_enrollments(
-            scores_encoding_list=scores_list_encoded,
-            user=request.user)
-    except Exception as e:
-        error_msg = e.messages[0] if isinstance(e, ValidationError) else e.args[0]
-        messages.add_message(request, messages.ERROR, _(error_msg))
+    updated_enrollments = _update_enrollments(request, scores_list_encoded, updated_enrollments)
 
     if messages.get_messages(request):
         context = _get_specific_criteria_context(request)
@@ -366,13 +354,7 @@ def online_double_encoding_validation(request, learning_unit_year_id=None):
         updated_enrollments = None
         scores_list_encoded = _get_score_encoding_list_with_only_enrollment_modified(request, learning_unit_year_id)
 
-        try:
-            updated_enrollments = score_encoding_list.update_enrollments(
-                scores_encoding_list=scores_list_encoded,
-                user=request.user)
-        except Exception as e:
-            error_msg = e.messages[0] if isinstance(e, ValidationError) else e.args[0]
-            messages.add_message(request, messages.ERROR, _(error_msg))
+        updated_enrollments = _update_enrollments(request, scores_list_encoded, updated_enrollments)
 
         if updated_enrollments:
             is_program_manager = mdl.program_manager.is_program_manager(request.user)
@@ -385,6 +367,17 @@ def online_double_encoding_validation(request, learning_unit_year_id=None):
                                                       updated_enrollments)
 
     return HttpResponseRedirect(reverse('online_encoding', args=(learning_unit_year_id,)))
+
+
+def _update_enrollments(request, scores_list_encoded, updated_enrollments):
+    try:
+        updated_enrollments = score_encoding_list.update_enrollments(
+            scores_encoding_list=scores_list_encoded,
+            user=request.user)
+    except Exception as e:
+        error_msg = e.messages[0] if isinstance(e, ValidationError) else e.args[0]
+        messages.add_message(request, messages.ERROR, _(error_msg))
+    return updated_enrollments
 
 
 @login_required

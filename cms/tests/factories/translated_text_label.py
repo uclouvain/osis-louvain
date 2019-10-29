@@ -23,14 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
 import factory.fuzzy
+
 from .text_label import TextLabelFactory
 
 
 class TranslatedTextLabelFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "cms.TranslatedTextLabel"
+        django_get_or_create = ('language', 'text_label')
 
     language = "fr-be"  # French default
     text_label = factory.SubFactory(TextLabelFactory)

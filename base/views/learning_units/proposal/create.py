@@ -26,11 +26,11 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.shortcuts import redirect, get_object_or_404, render
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from waffle.decorators import waffle_flag
 
 from base.forms.learning_unit_proposal import CreationProposalBaseForm
-from base.models.academic_year import AcademicYear, current_academic_year
+from base.models.academic_year import AcademicYear
 from base.models.person import Person
 from base.views.common import display_success_messages
 

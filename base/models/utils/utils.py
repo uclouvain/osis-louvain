@@ -27,7 +27,7 @@ from enum import Enum
 
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
 class ChoiceEnum(Enum):
@@ -67,3 +67,10 @@ def get_verbose_field_value(instance, key):
     else:
         value = getattr(instance, key, "")
     return value
+
+
+def filter_with_list_or_object(fk_name, model, **kwargs):
+    return model.objects.all().filter(**{
+        fk_name + ('__in' if isinstance(kwargs[fk_name], list) else ''):
+            kwargs[fk_name]
+    })

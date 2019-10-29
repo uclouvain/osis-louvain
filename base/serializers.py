@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from rest_framework import serializers
+
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 

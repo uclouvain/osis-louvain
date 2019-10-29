@@ -27,13 +27,14 @@ import datetime
 
 from django.test import TestCase
 from django.utils import timezone
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
+
 from assessments.business import score_encoding_sheet
 from assessments.models.enums import score_sheet_address_choices
 from assessments.tests.factories.score_sheet_address import ScoreSheetAddressFactory
 from attribution.tests.factories.attribution import AttributionFactory
+from base.models.enums import exam_enrollment_state as enrollment_states
 from base.models.exam_enrollment import ExamEnrollment
-
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
@@ -46,12 +47,11 @@ from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.offer_year_entity import OfferYearEntityFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_address import PersonAddressFactory
-from base.tests.factories.session_examen import SessionExamFactory
 from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactory
+from base.tests.factories.session_examen import SessionExamFactory
 from base.tests.factories.student import StudentFactory
 from base.tests.factories.tutor import TutorFactory
 from reference.tests.factories.country import CountryFactory
-from base.models.enums import exam_enrollment_state as enrollment_states
 
 
 class ScoreSheetAddressTest(TestCase):

@@ -24,20 +24,21 @@
 #
 ##############################################################################
 import datetime
-from django.test import TestCase
-from django.db.utils import IntegrityError
-from django.core.exceptions import ValidationError
 
-from base.models.session_exam_calendar import get_number_session_by_academic_calendar
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
-from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
-from base.tests.factories.offer_year import  OfferYearFactory
+from django.core.exceptions import ValidationError
+from django.db.utils import IntegrityError
+from django.test import TestCase
+from django.test.utils import override_settings
+
+from base.models import academic_year
 from base.models import session_exam_calendar
 from base.models.enums import number_session, academic_calendar_type
-from base.models import academic_year
-from django.test.utils import override_settings
+from base.models.session_exam_calendar import get_number_session_by_academic_calendar
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
+from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 
 
 class SessionExamCalendarTest(TestCase):

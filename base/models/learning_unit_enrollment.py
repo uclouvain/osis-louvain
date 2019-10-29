@@ -24,8 +24,8 @@
 #
 ##############################################################################
 from django.db import models
-from base.models.enums import learning_unit_enrollment_state
 
+from base.models.enums import learning_unit_enrollment_state
 from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
 
@@ -60,12 +60,6 @@ class LearningUnitEnrollment(SerializableModel):
 
     def __str__(self):
         return u"%s - %s" % (self.learning_unit_year, self.offer_enrollment.student)
-
-
-def find_by_learningunit_enrollment(learning_unit_year):
-    return LearningUnitEnrollment.objects.filter(learning_unit_year=learning_unit_year) \
-                                         .order_by('offer_enrollment__student__person__last_name',
-                                                   'offer_enrollment__student__person__first_name')
 
 
 def find_by_learning_unit_year(a_learning_unit_year):

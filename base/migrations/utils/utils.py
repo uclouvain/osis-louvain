@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from django.core.exceptions import FieldDoesNotExist
 
 import uuid
+
+from django.core.exceptions import FieldDoesNotExist
+
 
 def set_uuids_model(apps, model):
     base = apps.get_app_config('base')

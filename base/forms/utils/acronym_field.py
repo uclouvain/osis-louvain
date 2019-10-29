@@ -26,7 +26,7 @@
 import re
 
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.forms.utils.choice_field import add_blank
 from base.models.enums import learning_unit_year_subtypes

@@ -34,7 +34,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_types, education_group_categories
 from base.models.enums.education_group_types import GroupType
 from base.models.group_element_year import GroupElementYear
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -61,7 +61,8 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
             external_id="osis.education_group_type_majorlistchoice"
         )
 
-        cls.current_academic_year, cls.next_academic_year = AcademicYearFactory.produce_in_future(quantity=2)
+        cls.current_academic_year = create_current_academic_year()
+        cls.next_academic_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
 
         cls.auth_rel = AuthorizedRelationshipFactory(
             parent_type=cls.master_type,
@@ -153,11 +154,11 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
         child_egy = create_initial_group_element_year_structure([self.egy])[self.egy.id][0].child_branch
         self.assertEqual(
             child_egy.education_group.start_year,
-            self.egy.academic_year.year
+            self.egy.academic_year
         )
         self.assertEqual(
             child_egy.education_group.end_year,
-            self.egy.academic_year.year
+            self.egy.academic_year
         )
 
     def test_should_increment_cnum_of_child_partial_acronym_to_avoid_conflicted_acronyms(self):
@@ -174,16 +175,16 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
         edy_type = EducationGroupType.objects.get(name=GroupType.FINALITY_120_LIST_CHOICE.name)
         _get_or_create_branch(edy_type, "TITLE", "PARTIAL", self.egy)
         child_edy = EducationGroupYear.objects.get(
-            education_group__start_year=self.egy.academic_year.year,
-            education_group__end_year=self.egy.academic_year.year
+            education_group__start_year=self.egy.academic_year,
+            education_group__end_year=self.egy.academic_year
         )
         self.assertTrue(GroupElementYear.objects.filter(parent=self.egy, child_branch=child_edy).exists())
 
     def test_should_not_create_group_element_year_if_existing(self):
         edy_type = EducationGroupType.objects.get(name=GroupType.FINALITY_120_LIST_CHOICE.name)
         ed = EducationGroup.objects.create(
-            start_year=self.egy.academic_year.year,
-            end_year=self.egy.academic_year.year
+            start_year=self.egy.academic_year,
+            end_year=self.egy.academic_year
         )
         child_egy = EducationGroupYear.objects.create(
             academic_year=self.egy.academic_year,
@@ -213,8 +214,8 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
         EducationGroupYearFactory(
             acronym=acronym,
             education_group=EducationGroupFactory(
-                start_year=self.egy.academic_year.year,
-                end_year=self.egy.academic_year.year
+                start_year=self.egy.academic_year,
+                end_year=self.egy.academic_year
             )
         )
         self.assertEqual(EducationGroup.objects.filter(educationgroupyear__acronym=acronym).count(), 1)

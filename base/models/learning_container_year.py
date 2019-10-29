@@ -24,12 +24,12 @@
 #
 ##############################################################################
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.business.learning_container_year import get_learning_container_year_warnings
-from base.models import learning_unit_year
-from base.models.entity import Entity
+from base.models import learning_unit_year, entity_version
 from base.models.enums import learning_unit_year_subtypes, entity_container_year_link_type
 from base.models.enums import vacant_declaration_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
@@ -111,6 +111,18 @@ class LearningContainerYear(SerializableModel):
         if self._warnings is None:
             self._warnings = get_learning_container_year_warnings(self)
         return self._warnings
+
+    @cached_property
+    def requirement_entity_version(self):
+        return entity_version.find_entity_version_according_academic_year(
+            self.requirement_entity, self.academic_year
+        )
+
+    @cached_property
+    def allocation_entity_version(self):
+        return entity_version.find_entity_version_according_academic_year(
+            self.allocation_entity, self.academic_year
+        )
 
     def get_partims_related(self):
         return learning_unit_year.search(learning_container_year_id=self,

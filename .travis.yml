@@ -10,11 +10,12 @@ install:
   - "pip install -r requirements.txt"
 
 before_script:
+  - "psql -d template1 -c 'create extension unaccent;' -U postgres"
   - "curl -L https://codeclimate.com/downloads/test-reporter/test-reporter-latest-linux-amd64 > ./cc-test-reporter"
   - "chmod +x ./cc-test-reporter"
   - "./cc-test-reporter before-build"
 
-script: "python3 manage.py compilemessages && coverage run manage.py test --exclude-tag=selenium"
+script: "python3 manage.py compilemessages && coverage run manage.py test --exclude-tag=selenium --no-logs"
 
 after_script:
   - "coverage xml"

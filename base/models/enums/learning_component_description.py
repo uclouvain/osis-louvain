@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 LECTURING_COMPLETE = "LECTURING_COMPLETE"
 LECTURING_INCOMPLETE = "LECTURING_INCOMPLETE"

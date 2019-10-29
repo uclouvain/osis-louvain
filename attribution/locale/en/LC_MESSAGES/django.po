@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-04-08 10:40+0200\n"
+"POT-Creation-Date: 2019-08-21 15:21+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,245 +17,137 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: business/xls_build.py:42
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:7
 msgid "Ac yr."
 msgstr ""
 
-#: templates/summary_responsible.html:31
-#: templates/summary_responsible_edit.html:30
 msgid "Academic actors"
 msgstr ""
 
-#: templates/manage_my_courses/list_my_courses_summary_editable.html:66
 msgid "Activate to sort column by ascending order"
 msgstr ""
 
-#: templates/manage_my_courses/list_my_courses_summary_editable.html:67
 msgid "Activate to sort column by descending order"
 msgstr ""
 
-#: business/xls_build.py:50
-msgid "Active"
-msgstr ""
-
-#: business/xls_build.py:48
-msgid "Alloc. Ent."
-msgstr ""
-
-#: templates/summary_responsible_edit.html:71
 msgid "Cancel"
 msgstr ""
 
-#: models/enums/function.py:45
 msgid "Co-holder"
 msgstr ""
 
-#: business/xls_build.py:43
-msgid "Code"
-msgstr ""
-
-#: models/enums/function.py:43
 msgid "Coordinator"
 msgstr ""
 
-#: templates/summary_responsible.html:54 templates/summary_responsible.html:87
 msgid "Course code"
 msgstr ""
 
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:8
 msgid "Courses"
 msgstr ""
 
-#: business/xls_build.py:49
-msgid "Credits"
-msgstr ""
-
-#: models/enums/function.py:46
 msgid "Deputy"
 msgstr ""
 
-#: models/enums/function.py:47
 msgid "Deputy authority"
 msgstr ""
 
-#: models/enums/function.py:48
 msgid "Deputy sabbatical"
 msgstr ""
 
-#: models/enums/function.py:49
 msgid "Deputy temporary"
 msgstr ""
 
-#: templates/manage_my_courses/educational_information.html:32
 msgid "Description fiche"
 msgstr ""
 
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:12
-#: templates/manage_my_courses/blocks/submission_dates.html:34
 msgid "Description fiche ending"
 msgstr ""
 
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:11
-#: templates/manage_my_courses/blocks/submission_dates.html:29
 msgid "Description fiche opening"
 msgstr ""
 
-#: templates/summary_responsible.html:109
 msgid "Display all tutors for this learning unit"
 msgstr ""
 
-#: business/xls_build.py:39
-msgid "Duration"
-msgstr ""
-
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:13
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:37
 msgid "Editable"
 msgstr ""
 
-#: templates/summary_responsible.html:86
 msgid "Entity"
 msgstr ""
 
-#: business/xls_build.py:38 models/attribution_new.py:57
 msgid "Function"
 msgstr ""
 
-#: models/enums/function.py:44
 msgid "Holder"
 msgstr ""
 
-#: templates/manage_my_courses/educational_information.html:47
 msgid "Information approved and updatable by the Commission of Program"
 msgstr ""
 
-#: templates/manage_my_courses/educational_information.html:54
 msgid "Informations updatable by teachers"
 msgstr ""
 
-#: templates/summary_responsible.html:30
-#: templates/summary_responsible_edit.html:29
 msgid "Institution"
 msgstr ""
 
-#: models/enums/function.py:52
 msgid "Internship co-supervisor"
 msgstr ""
 
-#: models/enums/function.py:51
 msgid "Internship supervisor"
 msgstr ""
 
-#: business/xls_build.py:38
-msgid "LECTURING"
-msgstr ""
-
-#: templates/summary_responsible.html:59 templates/summary_responsible.html:88
 msgid "Learning unit title"
 msgstr ""
 
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:22
-#: templates/manage_my_courses/blocks/tabs.html:32
-#: templates/manage_my_courses/educational_information.html:30
-#: templates/manage_my_courses/list_my_courses_summary_editable.html:31
-#: templates/manage_my_courses/list_my_courses_summary_editable.html:36
 msgid "Manage description fiche"
 msgstr ""
 
-#: templates/summary_responsible.html:80
 msgid "No result"
 msgstr ""
 
-#: business/xls_build.py:39
-msgid "PRACTICAL_EXERCISES"
-msgstr ""
-
-#: models/enums/function.py:50
 msgid "Professor"
 msgstr ""
 
-#: models/tutor_application.py:48
 msgid "Publish application to portal"
 msgstr ""
 
-#: models/attribution_new.py:49
 msgid "Publish attribution to portal"
 msgstr ""
 
-#: business/xls_build.py:47
-msgid "Req. Entity"
-msgstr ""
-
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:10
 msgid "Requirement entity"
 msgstr ""
 
-#: templates/summary_responsible_edit.html:69
 msgid "Save"
 msgstr ""
 
-#: templates/summary_responsible.html:75
 msgid "Search"
 msgstr ""
 
-#: models/attribution_new.py:60
 msgid "Start"
 msgstr ""
 
-#: business/xls_build.py:39
-msgid "Start year"
-msgstr ""
-
-#: templates/summary_responsible_edit.html:46
 msgid "Status"
 msgstr ""
 
-#: business/xls_build.py:38
-msgid "Substitute"
-msgstr ""
-
-#: business/xls_build.py:46
-msgid "Subtype"
-msgstr ""
-
-#: templates/summary_responsible.html:69
-#: templates/summary_responsible_edit.html:31
-#: templates/summary_responsible_edit.html:47
 msgid "Summary responsible"
 msgstr ""
 
-#: templates/summary_responsible.html:32 templates/summary_responsible.html:36
 msgid "Summary responsibles"
 msgstr ""
 
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:46
 msgid "There is no course for which you can edit description fiche"
 msgstr ""
 
-#: business/xls_build.py:44
-#: templates/manage_my_courses/blocks/list/learning_units_summary_editable.html:9
 msgid "Title"
 msgstr ""
 
-#: business/xls_build.py:38 templates/summary_responsible.html:64
-#: templates/summary_responsible.html:89
-#: templates/summary_responsible_edit.html:45
 msgid "Tutor"
 msgstr ""
 
-#: templates/summary_responsible_edit.html:36
 msgid "Tutors of the course"
 msgstr ""
 
-#: business/xls_build.py:45
-msgid "Type"
-msgstr ""
-
-#: templates/summary_responsible_edit.html:69
 msgid "Update"
 msgstr ""
 
-#: templates/summary_responsible.html:123
 msgid "Without attribution"
 msgstr ""

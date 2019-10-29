@@ -25,7 +25,7 @@
 ##############################################################################
 from django.contrib.auth.models import Permission, Group
 from django.core.exceptions import ImproperlyConfigured
-from django.db.models import Prefetch, Case, When, Value, BooleanField, Subquery, Exists, OuterRef
+from django.db.models import Prefetch
 from django.utils.translation import gettext_lazy as _
 
 from rules_management.models import FieldReference

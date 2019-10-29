@@ -28,9 +28,8 @@ import html
 
 from bs4 import BeautifulSoup
 from django.conf import settings
-from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Subquery, OuterRef
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Style, Alignment
 
 from base.business.learning_unit_xls import XLS_DESCRIPTION, XLS_FILENAME
@@ -84,9 +83,6 @@ def _filter_required_teaching_material(learning_units):
             continue
 
         result.append(_build_line(learning_unit))
-
-    if not result:
-        raise ObjectDoesNotExist
 
     return result
 

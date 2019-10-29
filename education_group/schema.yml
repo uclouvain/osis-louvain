@@ -84,13 +84,19 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
       - trainings
-  /trainings/{uuid}:
+  /trainings/{year}/{acronym}:
     get:
       description: Return the detail of the training
       operationId: trainings_read
       parameters:
       - in: path
-        name: uuid
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: path
+        name: acronym
         required: true
         schema:
           description: ''
@@ -110,6 +116,283 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
       - trainings
+  /trainings/{year}/{acronym}/tree:
+    get:
+      description: Return the tree of the training
+      operationId: trainings_tree
+      parameters:
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: path
+        name: acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tree'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - trainings
+  /trainings/{year}/{acronym}/title:
+    get:
+      description: Return the title of the training
+      operationId: trainingstitle_read
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - trainings
+  /groups/{year}/{partial_acronym}:
+    get:
+      description: Return the detail of the group
+      operationId: groups_read
+      parameters:
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: path
+        name: partial_acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupDetailed'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - groups
+  /groups/{year}/{partial_acronym}/tree:
+    get:
+      description: Return the tree of the group
+      operationId: groups_tree
+      parameters:
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: path
+        name: partial_acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tree'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - groups
+  /groups/{year}/{partial_acronym}/title:
+    get:
+      description: Return the title of the group
+      operationId: groupstitle_read
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: partial_acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - groups
+  /mini_trainings/{year}/{partial_acronym}:
+    get:
+      description: Return the detail of the mini-training
+      operationId: minitrainings_read
+      parameters:
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: path
+        name: partial_acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MiniTrainingDetailed'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - mini_trainings
+  /mini_trainings/{year}/{partial_acronym}/tree:
+    get:
+      description: Return the tree of the mini-training
+      operationId: minitraining_tree
+      parameters:
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: path
+        name: partial_acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tree'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - mini_trainings
+  /mini_trainings/{year}/{partial_acronym}/title:
+    get:
+      description: Return the title of the mini training
+      operationId: minitrainingstitle_read
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: partial_acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - mini_trainings
 components:
   securitySchemes:
     Token:
@@ -156,8 +439,6 @@ components:
         code:
           type: string
         title:
-          type: string
-        title_english:
           type: string
         academic_year:
           type: number
@@ -288,6 +569,106 @@ components:
               type: number
             web_re_registration:
               type: boolean
+    GroupDetailed:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        acronym:
+          type: string
+        code:
+          type: string
+        management_entity:
+          type: string
+        academic_year:
+          type: number
+        education_group_type:
+          $ref: '#/components/schemas/GroupTypeEnum'
+        education_group_type_text:
+          type: string
+        title:
+          type: string
+        credits:
+          type: integer
+          minimum: 1
+        min_constraint:
+          type: integer
+          minimum: 1
+        max_constraint:
+          type: integer
+          minimum: 1
+        constraint_type:
+          $ref: '#/components/schemas/ConstraintTypeEnum'
+        constraint_type_text:
+          type: string
+        remark:
+          type: string
+        campus:
+          $ref: '#/components/schemas/Campus'
+    MiniTrainingDetailed:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        acronym:
+          type: string
+        code:
+          type: string
+        management_entity:
+          type: string
+        academic_year:
+          type: number
+        education_group_type:
+          $ref: '#/components/schemas/MiniTrainingTypeEnum'
+        education_group_type_text:
+          type: string
+        title:
+          type: string
+        credits:
+          type: integer
+          minimum: 1
+        min_constraint:
+          type: integer
+          minimum: 1
+        max_constraint:
+          type: integer
+          minimum: 1
+        constraint_type:
+          $ref: '#/components/schemas/ConstraintTypeEnum'
+        constraint_type_text:
+          type: string
+        remark:
+          type: string
+        campus:
+          $ref: '#/components/schemas/Campus'
+        keywords:
+          type: string
+        active:
+          $ref: '#/components/schemas/ActiveEnum'
+        active_text:
+          type: string
+        schedule_type:
+          $ref: '#/components/schemas/ScheduleTypeEnum'
+        schedule_type_text:
+          type: string
+    Tree:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        acronym:
+          type: string
+        title:
+          type: string
+        type:
+          $ref: '#/components/schemas/NodeTypeEnum'
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Node'
     Campus:
       type: object
       properties:
@@ -295,12 +676,57 @@ components:
           type: string
         is_administration:
           type: boolean
+        organization:
+          type: string
+    Node:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        acronym:
+          type: string
+        title:
+          type: string
+        node_type:
+          $ref: '#/components/schemas/NodeTypeEnum'
+        relative_credits:
+          type: number
+        is_mandatory:
+          type: boolean
+        block:
+          type: array
+          items:
+            type: integer
+        access_condition:
+          type: boolean
+        comment:
+          type: string
+        link_type:
+          $ref: '#/components/schemas/NodeLinkTypeEnum'
+        link_type_text:
+          type: string
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/Node'
     ActiveEnum:
       type: string
       enum:
        - ACTIVE
        - INACTIVE
        - RE_REGISTRATION
+    NodeTypeEnum:
+      type: string
+      enum:
+        - GROUP
+        - TRAINING
+        - MINI_TRAINING
+        - LEARNING_UNIT
+    NodeLinkTypeEnum:
+      type: string
+      enum:
+        - REFERENCE
     InternshipPresenceEnum:
       type: string
       enum:
@@ -411,6 +837,29 @@ components:
         - MASTER_M1
         - MASTER_MC
         - INTERNSHIP
+    GroupTypeEnum:
+      type: string
+      enum:
+        - COMMON_CORE
+        - MINOR_LIST_CHOICE
+        - MAJOR_LIST_CHOICE
+        - OPTION_LIST_CHOICE
+        - FINALITY_120_LIST_CHOICE
+        - FINALITY_180_LIST_CHOICE
+        - MOBILITY_PARTNERSHIP_LIST_CHOICE
+        - COMPLEMENTARY_MODULE
+        - SUB_GROUP
+    MiniTrainingTypeEnum:
+      type: string
+      enum:
+        - DEEPENING
+        - SOCIETY_MINOR
+        - ACCESS_MINOR
+        - OPEN_MINOR
+        - DISCIPLINARY_COMPLEMENT_MINOR
+        - FSA_SPECIALITY
+        - OPTION
+        - MOBILITY_PARTNERSHIP
     AcademicTypeEnum:
       type: string
       enum:

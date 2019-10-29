@@ -24,11 +24,11 @@
 #
 ##############################################################################
 
-from django.test import TestCase
 from django.http import HttpResponse
+from django.test import TestCase
 
-from reference.tests.factories.country import CountryFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
+from reference.tests.factories.country import CountryFactory
 
 KWARGS = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
 

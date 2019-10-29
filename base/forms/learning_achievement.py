@@ -28,14 +28,11 @@ from django import forms
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from base.business.learning_unit import get_academic_year_postponement_range
 from base.models.learning_achievement import LearningAchievement
-from base.models.learning_unit_year import LearningUnitYear
-from base.models.utils.utils import get_object_or_none
 from cms.enums import entity_name
 from cms.models import text_label, translated_text
 from reference.models import language
-from reference.models.language import EN_CODE_LANGUAGE
+from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
 
 
 def update_themes_discussed_changed_field_in_cms(learning_unit_year):
@@ -52,12 +49,18 @@ def update_themes_discussed_changed_field_in_cms(learning_unit_year):
 
 
 class LearningAchievementEditForm(forms.ModelForm):
-    text_fr = forms.CharField(widget=CKEditorWidget(
-        config_name='minimal_plus_headers'), required=False, label=_('French')
+    text_fr = forms.CharField(
+        widget=CKEditorWidget(config_name='minimal_plus_headers'),
+        required=False,
+        label=_('French')
     )
     text_en = forms.CharField(
-        widget=CKEditorWidget(config_name='minimal_plus_headers'), required=False, label=_('English')
+        widget=CKEditorWidget(config_name='minimal_plus_headers'),
+        required=False,
+        label=_('English')
     )
+    lua_fr_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
+    lua_en_id = forms.IntegerField(widget=forms.HiddenInput, required=True)
 
     class Meta:
         model = LearningAchievement
@@ -65,9 +68,9 @@ class LearningAchievementEditForm(forms.ModelForm):
 
     def __init__(self, data=None, initial=None, **kwargs):
         initial = initial or {}
-        self.postponement = bool(int(data['postpone'])) if data else False
+
         self.luy = kwargs.pop('luy', None)
-        self.code = kwargs.pop('code', '')
+        self.code = kwargs.pop('code', None)
         super().__init__(data, initial=initial, **kwargs)
 
         self._get_code_name_disabled_status()
@@ -76,76 +79,46 @@ class LearningAchievementEditForm(forms.ModelForm):
         self.load_initial()
 
     def load_initial(self):
-        self.value = None
-        for code, label in settings.LANGUAGES:
-            value = get_object_or_none(
-                LearningAchievement,
-                learning_unit_year__id=self.luy.id,
-                code_name=self.code,
-                language=language.find_by_code(code[:2].upper())
-            )
-            if value:
-                self.value = value
-                self.fields['text_{}'.format(code[:2])].initial = self.value.text
-                self.fields['code_name'].initial = self.value.code_name
+        self.value_fr, _ = LearningAchievement.objects.get_or_create(
+            learning_unit_year_id=self.luy.id,
+            code_name=self.code if self.code else '',
+            language=language.find_by_code(FR_CODE_LANGUAGE)
+        )
+        value_en, _ = LearningAchievement.objects.get_or_create(
+            learning_unit_year_id=self.luy.id,
+            code_name=self.code if self.code else '',
+            language=language.find_by_code(EN_CODE_LANGUAGE)
+        )
+        self.fields['text_fr'].initial = self.value_fr.text
+        self.fields['text_en'].initial = value_en.text
+        self.fields['lua_fr_id'].initial = self.value_fr.id
+        self.fields['lua_en_id'].initial = value_en.id
+        self.fields['code_name'].initial = self.value_fr.code_name
 
     def _get_code_name_disabled_status(self):
         if self.instance.pk and self.instance.language.code == EN_CODE_LANGUAGE:
             self.fields["code_name"].disabled = True
 
     def save(self, commit=True):
-        return self._save_translated_text()
+        text_fr = LearningAchievement.objects.get(id=self.cleaned_data['lua_fr_id'])
+        text_en = LearningAchievement.objects.get(id=self.cleaned_data['lua_en_id'])
+        text_fr.code_name = self.cleaned_data.get('code_name')
+        text_en.code_name = self.cleaned_data.get('code_name')
+        text_fr.text = self.cleaned_data.get('text_fr')
+        text_en.text = self.cleaned_data.get('text_en')
 
-    def _save_translated_text(self):
-        for code, label in settings.LANGUAGES:
-            self.text, _ = LearningAchievement.objects.select_related(
-                'learning_unit_year__academic_year').prefetch_related(
-                'learning_unit_year__learning_unit__learningunityear_set'
-            ).get_or_create(
-                learning_unit_year_id=self.luy.id,
-                code_name=self.code,
-                language=language.find_by_code(code[:2].upper())
-            )
-            self.old_code_name = self.text.code_name
-            self.text.code_name = self.cleaned_data.get('code_name')
-            self.text.text = self.cleaned_data.get('text_{}'.format(code[:2]))
-            self.text.save()
+        # For sync purpose, we need to trigger an update of the THEMES_DISCUSSED cms when we update learning achievement
+        update_themes_discussed_changed_field_in_cms(text_fr.learning_unit_year)
 
-            self.last_postponed_academic_year = None
-            if not self.text.learning_unit_year.academic_year.is_past and self.postponement:
-                ac_year_postponement_range = get_academic_year_postponement_range(self.text.learning_unit_year)
-                self.last_postponed_academic_year = ac_year_postponement_range.last()
-                self._update_future_luy(ac_year_postponement_range, self.text)
-
-        # For sync purpose, we need to trigger for the first year
-        # an update of the THEMES_DISCUSSED cms when we update learning achievement
-        update_themes_discussed_changed_field_in_cms(self.text.learning_unit_year)
-        return self.text, self.last_postponed_academic_year
+        text_fr.save()
+        text_en.save()
+        # # Needs a refactoring of its model to include all languages in a single row.
+        return text_fr
 
     def clean_code_name(self):
         code_name = self.cleaned_data.pop('code_name')
-        objects = LearningAchievement.objects.filter(
-            code_name=code_name,
-            learning_unit_year_id=self.luy.id,
-        )
-        if objects.exists() and self.value not in objects:
+        luy_id = self.luy.id
+        objects = LearningAchievement.objects.filter(code_name=code_name, learning_unit_year_id=luy_id)
+        if len(objects) > 0 and self.value_fr not in objects:
             raise forms.ValidationError(_("This code already exists for this learning unit"), code='invalid')
         return code_name
-
-    def _update_future_luy(self, ac_year_postponement_range, text):
-        for ac in ac_year_postponement_range:
-            # For sync purpose, we need to trigger for the following years
-            # an update of the THEMES_DISCUSSED cms when we update learning achievement
-            update_themes_discussed_changed_field_in_cms(text.learning_unit_year)
-            luy = text.learning_unit_year
-            next_luy, created = LearningUnitYear.objects.get_or_create(
-                academic_year=ac,
-                acronym=luy.acronym,
-                learning_unit=luy.learning_unit
-            )
-            LearningAchievement.objects.update_or_create(
-                code_name=self.old_code_name,
-                language=text.language,
-                learning_unit_year=next_luy,
-                defaults={'text': text.text, 'code_name': self.cleaned_data.get('code_name')}
-            )

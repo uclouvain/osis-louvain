@@ -24,8 +24,8 @@
 #
 ##############################################################################
 
-from base.models.enums import exam_enrollment_state as enrollment_states
 from base import models as mdl
+from base.models.enums import exam_enrollment_state as enrollment_states
 
 ENROLLED_LATE_COLOR = '#dff0d8'
 NOT_ENROLLED_COLOR = '#f2dede'

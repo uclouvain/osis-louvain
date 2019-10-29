@@ -35,6 +35,7 @@ class BootstrapModelForm(forms.ModelForm):
         set_form_control(self)
 
 
+# Why ? Still used
 @deprecated
 def set_form_control(self):
     for field in iter(self.fields):

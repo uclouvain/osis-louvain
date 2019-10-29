@@ -28,25 +28,26 @@ import datetime
 from django.db.models.expressions import RawSQL, Subquery, OuterRef
 from django.template.defaultfilters import yesno
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from attribution.business import attribution_charge_new
+from attribution.models.enums.function import COORDINATOR
 from attribution.models.enums.function import Functions
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPOSAL_LINE_STYLES, \
     _get_significant_volume, _prepare_legend_ws_data, _get_wrapped_cells, \
-    _get_colored_rows, _get_attribution_line, _get_col_letter, _add_training_data, \
+    _get_colored_rows, _get_attribution_line, _add_training_data, \
     _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
     _get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
     prepare_xls_content_with_attributions
+from base.business.learning_unit_xls import _get_col_letter
 from base.models.entity_version import EntityVersion
 from base.models.enums import education_group_categories
 from base.models.enums import entity_type, organization_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_periodicity
 from base.models.enums import proposal_type, proposal_state
-from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY
 from base.models.learning_unit_year import LearningUnitYear, SQL_RECURSIVE_QUERY_EDUCATION_GROUP_TO_CLOSEST_TRAININGS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
@@ -62,7 +63,6 @@ from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFact
 from base.tests.factories.tutor import TutorFactory
 from base.tests.factories.user import UserFactory
 from osis_common.document import xls_build
-from attribution.models.enums.function import COORDINATOR
 
 COL_TEACHERS_LETTER = 'L'
 COL_PROGRAMS_LETTER = 'Z'
@@ -74,9 +74,9 @@ ROOT_ACRONYM = 'DRTI'
 
 class TestLearningUnitXls(TestCase):
     def setUp(self):
-        self.current_academic_year = AcademicYearFactory(year=2017)
-        self.learning_container_luy1 = LearningContainerYearFactory(academic_year=self.current_academic_year)
-        self.learning_unit_yr_1 = LearningUnitYearFactory(academic_year=self.current_academic_year,
+        self.academic_year = AcademicYearFactory(year=2017)
+        self.learning_container_luy1 = LearningContainerYearFactory(academic_year=self.academic_year)
+        self.learning_unit_yr_1 = LearningUnitYearFactory(academic_year=self.academic_year,
                                                           learning_container_year=self.learning_container_luy1,
                                                           credits=50)
         self.learning_unit_yr_2 = LearningUnitYearFactory()
@@ -91,7 +91,7 @@ class TestLearningUnitXls(TestCase):
         )
         direct_parent_type = EducationGroupTypeFactory(name='Bachelor', category=education_group_categories.TRAINING)
 
-        self.an_education_group_parent = EducationGroupYearFactory(academic_year=self.current_academic_year,
+        self.an_education_group_parent = EducationGroupYearFactory(academic_year=self.academic_year,
                                                                    education_group_type=direct_parent_type,
                                                                    acronym=ROOT_ACRONYM)
         self.group_element_child = GroupElementYearFactory(
@@ -99,7 +99,7 @@ class TestLearningUnitXls(TestCase):
             child_branch=None,
             child_leaf=self.learning_unit_yr_1
         )
-        self.an_education_group = EducationGroupYearFactory(academic_year=self.current_academic_year,
+        self.an_education_group = EducationGroupYearFactory(academic_year=self.academic_year,
                                                             acronym=PARENT_ACRONYM,
                                                             title=PARENT_TITLE,
                                                             partial_acronym=PARENT_PARTIAL_ACRONYM)
@@ -108,7 +108,9 @@ class TestLearningUnitXls(TestCase):
             parent=self.an_education_group,
             child_branch=self.group_element_child.parent,
         )
-        generatorContainer = GenerateContainer(datetime.date.today().year - 2, datetime.date.today().year)
+        self.old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
+        self.current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
+        generatorContainer = GenerateContainer(self.old_academic_year, self.current_academic_year)
         self.learning_unit_year_with_entities = generatorContainer.generated_container_years[0].learning_unit_year_full
         entities = [
             EntityVersionFactory(
@@ -125,8 +127,8 @@ class TestLearningUnitXls(TestCase):
             state=proposal_state.ProposalState.ACCEPTED.name,
             type=proposal_type.ProposalType.CREATION.name,
         )
-        self.learning_container_luy = LearningContainerYearFactory(academic_year=self.current_academic_year)
-        self.luy_with_attribution = LearningUnitYearFactory(academic_year=self.current_academic_year,
+        self.learning_container_luy = LearningContainerYearFactory(academic_year=self.academic_year)
+        self.luy_with_attribution = LearningUnitYearFactory(academic_year=self.academic_year,
                                                             learning_container_year=self.learning_container_luy,
                                                             periodicity=learning_unit_year_periodicity.ANNUAL,
                                                             status=True,
@@ -235,7 +237,7 @@ class TestLearningUnitXls(TestCase):
             'PRACTICAL_EXERCISES': 15,
             'person': a_person,
             'function': 'CO_HOLDER',
-            'start_year': 2017
+            'start_year': self.academic_year
         }
         self.assertEqual(
             _get_attribution_line(attribution_dict),
@@ -243,7 +245,7 @@ class TestLearningUnitXls(TestCase):
                 'SMITH, Aaron', _('Function'),
                 _('Co-holder'), _('Substitute'),
                 '', _('Beg. of attribution'),
-                2017, _('Attribution duration'),
+                self.academic_year, _('Attribution duration'),
                 3, _('Attrib. vol1'),
                 10, _('Attrib. vol2'),
                 15,
@@ -309,8 +311,8 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(param.get(xls_build.STYLED_CELLS), {WRAP_TEXT_STYLE: ['C2', 'C3']})
 
     def test_get_data_part2(self):
-        learning_container_luy = LearningContainerYearFactory(academic_year=self.current_academic_year)
-        luy = LearningUnitYearFactory(academic_year=self.current_academic_year,
+        learning_container_luy = LearningContainerYearFactory(academic_year=self.academic_year)
+        luy = LearningUnitYearFactory(academic_year=self.academic_year,
                                       learning_container_year=learning_container_luy,
                                       periodicity=learning_unit_year_periodicity.ANNUAL,
                                       status=True,
@@ -453,14 +455,14 @@ class TestLearningUnitXls(TestCase):
             'PRACTICAL_EXERCISES': 15,
             'person': a_person,
             'function': 'CO_HOLDER',
-            'start_year': 2017
+            'start_year': self.academic_year
         }
         self.assertCountEqual(
             _get_attribution_detail(attribution_dict),
             ['Smith Aaron',
              _('Co-holder'),
              '',
-             2017,
+             self.academic_year,
              3,
              10,
              15]

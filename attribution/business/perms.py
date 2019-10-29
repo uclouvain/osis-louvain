@@ -24,8 +24,8 @@
 #
 ##############################################################################
 
-from osis_common.utils.perms import conjunction
 from base.models.learning_unit_year import LearningUnitYear
+from osis_common.utils.perms import conjunction
 
 
 def can_tutor_view_educational_information(user, learning_unit_year_id):

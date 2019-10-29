@@ -26,7 +26,7 @@
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
 from django.utils import formats
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from reversion.admin import VersionAdmin
 
 from base.models.abstracts.abstract_calendar import AbstractCalendar
@@ -73,13 +73,6 @@ class OfferYearCalendar(AbstractCalendar):
 
     def __str__(self):
         return u"%s - %s" % (self.academic_calendar, self.offer_year)
-
-
-def find_offer_year_events(offer_yr):
-    return OfferYearCalendar.objects.filter(offer_year=offer_yr,
-                                            start_date__isnull=False,
-                                            end_date__isnull=False).order_by('start_date',
-                                                                             'academic_calendar__title')
 
 
 def find_by_offer_year(offer_yr, academic_calendar_type=None):

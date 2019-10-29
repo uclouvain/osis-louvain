@@ -25,7 +25,7 @@
 ##############################################################################
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 import base.templatetags.prerequisite
 from base.models import prerequisite

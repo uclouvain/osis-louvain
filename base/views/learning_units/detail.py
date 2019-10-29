@@ -27,7 +27,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView
 from reversion.models import Version
 
@@ -43,7 +43,9 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.utils.utils import get_object_or_none
-from base.views.common import display_warning_messages
+from base.views.common import display_warning_messages, add_to_session
+
+SEARCH_URL_PART = 'learning_units/by_'
 
 
 class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
@@ -61,13 +63,16 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         self.object = self.get_object()
 
         # Change template and permissions for external learning units and co_graduation is false.
-        if self.object.is_external_mobility():
+        if self.object.is_external_of_mobility():
             self.template_name = "learning_unit/external/read.html"
         if self.object.is_external():
             self.permission_required = "base.can_access_externallearningunityear"
         return super().dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
+        if SEARCH_URL_PART in self.request.META.get('HTTP_REFERER', ''):
+            add_to_session(request, 'search_url', self.request.META.get('HTTP_REFERER'))
+
         # Get does not need to fetch self.object again
         context = self.get_context_data(object=self.object)
 
@@ -129,6 +134,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         context.update(self.get_context_permission(proposal))
         context["versions"] = self.get_versions()
         context["has_partim"] = self.object.get_partims_related().exists()
+
         return context
 
     def get_context_permission(self, proposal):
