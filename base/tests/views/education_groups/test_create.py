@@ -215,6 +215,26 @@ class TestCreateForm(TestCase):
         response = self.client.post(url, data=data)
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
+    def test_redirect_after_creation_failed(self):
+        url = reverse('new_education_group', args=[self.education_group_types[1].category,
+                                                   self.education_group_types[1].id])
+        data = {
+            'acronym': 'YOLO1BA',
+            'partial_acronym': 'LYOLO1B',
+            'active': 'ACTIVE',
+            'schedule_type': 'DAILY',
+            'credits': None,
+            'title': 'Bachelier en',
+            'academic_year': self.current_academic_year.id,
+            'management_entity': self.entity_version.id,
+            'administration_entity': self.entity_version.id,
+            'internship': ['NO'],
+            'primary_language': self.language.id,
+            'diploma_printing_title': "title",
+        }
+        response = self.client.post(url, data=data)
+        self.assertEqual(url, response.request['PATH_INFO'])
+
 
 class TestValidateField(TestCase):
     @classmethod

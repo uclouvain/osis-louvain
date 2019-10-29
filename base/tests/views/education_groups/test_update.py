@@ -337,6 +337,43 @@ class TestUpdate(TestCase):
         )
         self.assertNotIn(old_domain, self.education_group_year.secondary_domains.all())
 
+    def test_post_invalid_training(self):
+        old_domain = DomainFactory()
+        EducationGroupYearDomainFactory(
+            education_group_year=self.training_education_group_year,
+            domain=old_domain
+        )
+
+        new_entity_version = MainEntityVersionFactory()
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        list_domains = [domain.pk for domain in self.domains]
+        isced_domain = DomainIscedFactory()
+        data = {
+            'title': 'Cours au choix',
+            'title_english': 'deaze',
+            'education_group_type': self.an_training_education_group_type.pk,
+            'credits': None,
+            'acronym': 'CRSCHOIXDVLD',
+            'partial_acronym': 'LDVLD101R',
+            'management_entity': new_entity_version.pk,
+            'administration_entity': new_entity_version.pk,
+            'main_teaching_campus': "",
+            'academic_year': self.training_education_group_year.academic_year.pk,
+            'secondary_domains': ['|' + ('|'.join([str(domain.pk) for domain in self.domains])) + '|'],
+            'isced_domain': isced_domain.pk,
+            'active': ACTIVE,
+            'schedule_type': DAILY,
+            "internship": internship_presence.NO,
+            "primary_language": LanguageFactory().pk,
+            "start_year": 2010,
+            "constraint_type": "",
+            "diploma_printing_title": "Diploma Title",
+            'form-TOTAL_FORMS': 0,
+            'form-INITIAL_FORMS': 0,
+        }
+        response = self.client.post(self.training_url, data=data)
+        self.assertEqual(self.training_url, response.request['PATH_INFO'])
+
     def test_post_training_with_a_coorganization(self):
         new_entity_version = MainEntityVersionFactory()
         egy = TrainingFactory(
@@ -379,6 +416,43 @@ class TestUpdate(TestCase):
         self.assertEqual(coorganizations.count(), 1)
         self.assertEqual(coorganizations.first().organization, organization)
         self.assertEqual(coorganizations.first().diploma, diploma_choice)
+
+    def test_post_invalid_training_with_a_coorganization(self):
+        new_entity_version = MainEntityVersionFactory()
+        egy = TrainingFactory(
+            education_group_type__name=TrainingType.AGGREGATION.name,
+            management_entity=new_entity_version.entity,
+            administration_entity=new_entity_version.entity
+        )
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        organization = OrganizationFactory()
+        address = OrganizationAddressFactory(organization=organization, is_main=True)
+        diploma_choice = random.choice(DiplomaCoorganizationTypes.get_names())
+
+        data = {
+            'title': 'Cours au choix',
+            'education_group_type': egy.education_group_type.pk,
+            'acronym': '',
+            'partial_acronym': '',
+            'management_entity': new_entity_version.pk,
+            'administration_entity': new_entity_version.pk,
+            'academic_year': egy.academic_year.pk,
+            'active': ACTIVE,
+            'schedule_type': DAILY,
+            "internship": internship_presence.NO,
+            "primary_language": LanguageFactory().pk,
+            "constraint_type": "",
+            "diploma_printing_title": "Diploma Title",
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 0,
+            'form-0-country': address.country.pk,
+            'form-0-organization': organization.pk,
+            'form-0-diploma': diploma_choice
+        }
+
+        url = reverse(update_education_group, args=[egy.pk, egy.pk])
+        response = self.client.post(url, data=data)
+        self.assertEqual(url, response.request['PATH_INFO'])
 
     def test_post_training_removing_coorganization(self):
         new_entity_version = MainEntityVersionFactory()
@@ -462,6 +536,35 @@ class TestUpdate(TestCase):
         self.assertEqual(self.mini_training_education_group_year.acronym, 'CRSCHOIXDVLD')
         self.assertEqual(self.mini_training_education_group_year.partial_acronym, 'LDVLD101R')
         self.assertEqual(self.mini_training_education_group_year.management_entity, new_entity_version.entity)
+
+    def test_post_invalid_mini_training(self):
+        old_domain = DomainFactory()
+        EducationGroupYearDomainFactory(
+            education_group_year=self.mini_training_education_group_year,
+            domain=old_domain
+        )
+
+        new_entity_version = MainEntityVersionFactory()
+        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        data = {
+            'title': 'Cours au choix',
+            'title_english': 'deaze',
+            'education_group_type': self.a_mini_training_education_group_type.pk,
+            'credits': None,
+            'acronym': 'CRSCHOIXDVLD',
+            'partial_acronym': 'LDVLD101R',
+            'management_entity': new_entity_version.pk,
+            'main_teaching_campus': "",
+            'academic_year': self.mini_training_education_group_year.academic_year.pk,
+            'active': ACTIVE,
+            'schedule_type': DAILY,
+            "primary_language": LanguageFactory().pk,
+            "start_year": 2010,
+            "constraint_type": "",
+            "diploma_printing_title": "Diploma Title",
+        }
+        response = self.client.post(self.mini_training_url, data=data)
+        self.assertEqual(self.mini_training_url, response.request['PATH_INFO'])
 
     def test_post_training_with_end_year(self):
         new_entity_version = MainEntityVersionFactory()
