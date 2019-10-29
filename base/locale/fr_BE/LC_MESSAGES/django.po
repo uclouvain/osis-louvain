@@ -2256,7 +2256,7 @@ msgstr "Code non valide"
 msgid "Is current partner"
 msgstr ""
 
-#: forms/learning_unit_pedagogy.py:101 models/teaching_material.py:45
+#: forms/learning_unit_pedagogy.py:102 models/teaching_material.py:42
 msgid "Is this teaching material mandatory?"
 msgstr "Ce support de cours est-il obligatoire ?"
 
@@ -2979,7 +2979,7 @@ msgstr "Suivant"
 #: business/learning_units/xls_comparison.py:420
 #: business/learning_units/xls_comparison.py:425
 #: business/learning_units/xls_comparison.py:426
-#: forms/learning_unit_pedagogy.py:99
+#: forms/learning_unit_pedagogy.py:100
 #: templates/learning_unit/blocks/modal/modal_modification_ask_to_report.html:37
 #: templates/learning_unit/proposal_comparison.html:56
 #: templates/learning_unit/proposal_comparison.html:67
@@ -4279,6 +4279,15 @@ msgstr "Stage d’enseignement"
 msgid "Teaching material"
 msgstr "Supports de cours"
 
+#: views/teaching_material.py:104
+#, python-format
+msgid ""
+"Teaching material has been saved and reported up to %(last_year_reported)s "
+"with success"
+msgstr ""
+"Le support de cours que vous avez modifié a été sauvegardé jusqu'en "
+"%(last_year_reported)s avec succès"
+
 #: business/education_groups/general_information_sections.py:74
 msgid "Teaching profile"
 msgstr "Profil d'enseignement"
@@ -4734,6 +4743,20 @@ msgstr ""
 msgid "The root does not exist in the next academic year."
 msgstr "La racine n'existe pas dans l'anné academique suivante."
 
+#: views/learning_units/pedagogy/update.py:75
+#, python-format
+msgid ""
+"The section you modified have been saved and reported up to "
+"%(last_year_reported)s with success."
+msgstr ""
+"Les rubriques que vous avez modifiées ont été sauvegardées et reportées "
+"jusqu'en %(last_year_reported)s avec succès"
+
+#: views/learning_units/pedagogy/update.py:81
+msgid "The section you modified have been saved with success."
+msgstr ""
+"Les rubriques que vous avez modifiées ont été sauvegardées avec succès"
+
 #: business/learning_units/edition.py:123
 #: tests/business/test_learning_unit_edition.py:532
 #, python-format
@@ -4764,6 +4787,25 @@ msgid ""
 msgstr ""
 "La somme des volumes des partims pour le professeur %(tutor)s est supérieure "
 "au volume de l'unité d'apprentissage parent pour ce professeur"
+
+#: views/teaching_material.py:88
+#, python-format
+msgid ""
+"The teaching material has been deleted up to %(last_year_reported)s with "
+"success"
+msgstr ""
+"Le support de cours a été supprimé jusqu'en %(last_year_reported)s avec "
+"succès"
+
+#: views/teaching_material.py:93
+msgid "The teaching material has been deleted with success"
+msgstr ""
+"Le support de cours a été supprimé avec succès"
+
+#: views/teaching_material.py:109
+msgid "The teaching material has been saved with success"
+msgstr ""
+"Le support de cours a été modifié avec succès"
 
 #: business/education_groups/perms.py:269
 msgid "The user cannot modify data which are greater than N+1"
@@ -4991,7 +5033,7 @@ msgstr "La formation n'a pas de contenu à reporter."
 #: business/learning_units/xls_generator.py:51 business/proposal_xls.py:38
 #: forms/education_groups.py:99 forms/entity.py:38
 #: forms/learning_unit/search_form.py:202
-#: forms/learning_unit/search_form.py:447 models/teaching_material.py:44
+#: forms/learning_unit/search_form.py:447 models/teaching_material.py:41
 #: templates/academic_calendar/academic_calendar.html:47
 #: templates/academic_calendar/academic_calendar_form.html:64
 #: templates/education_group/blocks/content_default_table.html:32
@@ -5421,7 +5463,7 @@ msgstr "Xls avec les propositions"
 #: business/learning_units/xls_comparison.py:420
 #: business/learning_units/xls_comparison.py:425
 #: business/learning_units/xls_comparison.py:426
-#: forms/learning_unit_pedagogy.py:98
+#: forms/learning_unit_pedagogy.py:99
 #: templates/learning_unit/blocks/modal/modal_modification_ask_to_report.html:39
 #: templates/learning_unit/proposal_comparison.html:54
 #: templates/learning_unit/proposal_comparison.html:65

@@ -26,10 +26,12 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
 from base import models as mdl
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
+from base.business.learning_units.pedagogy import is_pedagogy_data_must_be_postponed
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm
 from base.models import learning_unit_year
@@ -66,6 +68,17 @@ def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
         form = LearningUnitPedagogyEditForm(request.POST)
         if form.is_valid():
             form.save()
+            last_academic_year_reported = form.luys[-1].academic_year if len(form.luys) >= 2 else None
+            if last_academic_year_reported and is_pedagogy_data_must_be_postponed(form.luys[0]):
+                display_success_messages(
+                    request,
+                    _("The section you modified have been saved and "
+                      "reported up to %(last_year_reported)s with success.") % {
+                        "last_year_reported": str(last_academic_year_reported)
+                    }
+                )
+            else:
+                display_success_messages(request, _("The section you modified have been saved with success."))
         return redirect(redirect_url)
 
     context = get_common_context_learning_unit_year(

@@ -30,6 +30,7 @@ from unittest import mock
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase
 
+from base.business.education_groups import perms
 from base.business.education_groups.perms import is_education_group_edit_period_opened, check_permission, \
     check_authorized_type, is_eligible_to_edit_general_information, is_eligible_to_edit_admission_condition, \
     GeneralInformationPerms, CommonEducationGroupStrategyPerms, AdmissionConditionPerms, \
@@ -40,9 +41,11 @@ from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, \
-    EducationGroupYearCommonBachelorFactory, TrainingFactory
+    EducationGroupYearCommonBachelorFactory, TrainingFactory, MiniTrainingFactory, GroupFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, SICFactory, \
     FacultyManagerFactory, UEFacultyManagerFactory, AdministrativeManagerFactory
+from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
 
 
@@ -58,6 +61,55 @@ class TestPerms(TestCase):
 
         person_with_right = PersonWithPermissionsFactory("add_educationgroup")
         self.assertTrue(check_permission(person_with_right, "base.add_educationgroup"))
+
+    def test_faculty_manager_modify_certificates_aims(self):
+        today = datetime.date.today()
+        entity_version = EntityVersionFactory()
+        entity = entity_version.entity
+        person = FacultyManagerFactory()
+        PersonEntityFactory(entity=entity, person=person, with_child=True)
+
+        AcademicCalendarFactory(
+            start_date=today + datetime.timedelta(days=1),
+            end_date=today + datetime.timedelta(days=3),
+            academic_year=self.current_academic_year,
+            reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
+        )
+
+        test_cases = (
+            {'edy': MiniTrainingFactory(academic_year=self.current_academic_year,
+                                        management_entity=entity,
+                                        administration_entity=entity),
+             'person': person,
+             'expected_result': False
+             },
+            {'edy': GroupFactory(academic_year=self.current_academic_year,
+                                 management_entity=entity,
+                                 administration_entity=entity),
+             'person': person,
+             'expected_result': False
+             },
+            {'edy': TrainingFactory(academic_year=self.current_academic_year,
+                                    management_entity=entity,
+                                    administration_entity=entity),
+             'person': person,
+             'expected_result': True
+             },
+        )
+
+        for case in test_cases:
+            with self.subTest(msg="{} with raise_exception False".format(case['edy'].education_group_type.category)):
+                self.assertEqual(case['expected_result'], perms._is_eligible_certificate_aims(case['person'],
+                                                                                              case['edy'],
+                                                                                              False))
+
+        for case in test_cases[:-1]:
+            with self.subTest(msg="{} with raise_exception True".format(case['edy'].education_group_type.category)):
+                self.assertRaises(PermissionDenied,
+                                  perms._is_eligible_certificate_aims,
+                                  case['person'],
+                                  case['edy'],
+                                  True)
 
     def test_is_education_group_edit_period_opened_case_period_closed(self):
         today = datetime.date.today()
