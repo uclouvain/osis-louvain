@@ -38,6 +38,7 @@ from reversion.admin import VersionAdmin
 
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models import entity_version
+from base.models.academic_year import starting_academic_year
 from base.models.entity import Entity
 from base.models.enums import academic_type, internship_presence, schedule_type, activity_presence, \
     diploma_printing_orientation, active_status, duration_unit, decree_category, rate_code
@@ -694,6 +695,9 @@ class EducationGroupYear(SerializableModel):
 
     def get_absolute_url(self):
         return reverse("education_group_read", args=[self.pk, self.pk])
+
+    def is_in_editable_year(self):
+        return settings.YEAR_LIMIT_EDG_MODIFICATION <= self.academic_year.year <= starting_academic_year().year
 
     @property
     def str_domains(self):

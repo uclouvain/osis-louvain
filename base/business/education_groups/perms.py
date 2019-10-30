@@ -29,12 +29,10 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _, pgettext
 
 from base.business.event_perms import EventPermEducationGroupEdition
-from base.models.academic_year import starting_academic_year
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
-from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from program_management.business.group_element_years import postponement, management
 
 ERRORS_MSG = {
@@ -131,9 +129,8 @@ def is_eligible_to_delete_education_group_year(person, education_group_yr, raise
 
 def _is_eligible_education_group(person, education_group, raise_exception):
     period_dependant = not(
-            person.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and
-            settings.YEAR_LIMIT_EDG_MODIFICATION <= education_group.academic_year.year <= starting_academic_year().year
-    ) if education_group and education_group.education_group_type.category == TRAINING else True
+            person.is_faculty_manager and not person.is_faculty_manager_for_ue and education_group.is_in_editable_year()
+    ) if education_group and education_group.is_training() else True
     is_faculty_eligible = EventPermEducationGroupEdition.is_open(
         education_group=education_group,
         raise_exception=raise_exception
