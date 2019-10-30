@@ -2699,49 +2699,6 @@
 {
     "model": "auth.group",
     "fields": {
-        "name": "expert_users",
-        "permissions": [
-            [
-                "can_access_learningclassyear",
-                "base",
-                "learningclassyear"
-            ],
-            [
-                "can_access_learningunitcomponentyear",
-                "base",
-                "learningcomponentyear"
-            ],
-            [
-                "can_access_learningcontaineryear",
-                "base",
-                "learningcontaineryear"
-            ],
-            [
-                "can_access_learningunit",
-                "base",
-                "learningunit"
-            ],
-            [
-                "can_access_externallearningunityear",
-                "base",
-                "externallearningunityear"
-            ],
-            [
-                "can_access_learningunitcomponentclass",
-                "base",
-                "learningunitcomponentclass"
-            ],
-            [
-                "can_access_catalog",
-                "base",
-                "offer"
-            ]
-        ]
-    }
-},
-{
-    "model": "auth.group",
-    "fields": {
         "name": "assistant_administrators",
         "permissions": [
             [
