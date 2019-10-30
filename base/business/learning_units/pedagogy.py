@@ -26,8 +26,52 @@
 from django.conf import settings
 
 from base.models import academic_year
+from base.models.teaching_material import TeachingMaterial, find_by_learning_unit_year
 from cms.enums import entity_name
 from cms.models import text_label, translated_text
+
+
+def save_teaching_material(teach_material):
+    teach_material.save()
+    luy = teach_material.learning_unit_year
+    if is_pedagogy_data_must_be_postponed(luy):
+        postpone_teaching_materials(luy)
+    return teach_material
+
+
+def delete_teaching_material(teach_material):
+    luy = teach_material.learning_unit_year
+    result = teach_material.delete()
+    if is_pedagogy_data_must_be_postponed(luy):
+        postpone_teaching_materials(luy)
+    return result
+
+
+def postpone_teaching_materials(luy, commit=True):
+    """
+        from base.models import teaching_material
+        This function override all teaching materials from start_luy until latest version of this luy
+        teaching_material.postpone_teaching_materials(luy)
+        :param start_luy: The learning unit year which we want to start postponement
+        :param commit:
+        :return:
+        """
+    teaching_materials = find_by_learning_unit_year(luy)
+    for next_luy in [luy for luy in luy.find_gt_learning_units_year()]:
+        # Remove all previous teaching materials
+        next_luy.teachingmaterial_set.all().delete()
+        # Inserts all teaching materials comes from start_luy
+        to_inserts = [TeachingMaterial(title=tm.title, mandatory=tm.mandatory, learning_unit_year=next_luy)
+                      for tm in teaching_materials]
+        bulk_save(to_inserts, commit)
+
+        # For sync purpose, we need to trigger an update of the bibliography when we update teaching materials
+        update_bibliography_changed_field_in_cms(next_luy)
+
+
+def bulk_save(teaching_materials, commit=True):
+    for teaching_material in teaching_materials:
+        teaching_material.save(commit)
 
 
 def update_bibliography_changed_field_in_cms(learning_unit_year):
@@ -44,28 +88,4 @@ def update_bibliography_changed_field_in_cms(learning_unit_year):
 
 
 def is_pedagogy_data_must_be_postponed(learning_unit_year):
-    # We must postpone pedagogy information, if we modify data form N+1
-    current_academic_year = academic_year.starting_academic_year()
-    return learning_unit_year.academic_year.year > current_academic_year.year
-
-
-def save_teaching_material(teach_material):
-    teach_material.save()
-    luy = teach_material.learning_unit_year
-    check_teaching_materials_postponement(luy)
-    return teach_material
-
-
-def delete_teaching_material(teach_material):
-    luy = teach_material.learning_unit_year
-    result = teach_material.delete()
-    check_teaching_materials_postponement(luy)
-    return result
-
-
-def check_teaching_materials_postponement(luy):
-    if is_pedagogy_data_must_be_postponed(luy):
-        from base.models import teaching_material
-        teaching_material.postpone_teaching_materials(luy)
-    # For sync purpose, we need to trigger an update of the bibliography when we update teaching materials
-    update_bibliography_changed_field_in_cms(luy)
+    return learning_unit_year.academic_year.year >= academic_year.starting_academic_year().year

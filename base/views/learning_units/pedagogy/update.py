@@ -26,10 +26,12 @@
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
 from base import models as mdl
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
+from base.business.learning_units.pedagogy import is_pedagogy_data_must_be_postponed
 from base.business.learning_units.perms import is_eligible_to_update_learning_unit_pedagogy
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm
 from base.models import learning_unit_year
@@ -63,9 +65,7 @@ def learning_unit_pedagogy_edit(request, learning_unit_year_id):
 
 def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
     if request.method == 'POST':
-        form = LearningUnitPedagogyEditForm(request.POST)
-        if form.is_valid():
-            form.save()
+        _post_learning_unit_pedagogy_form(request)
         return redirect(redirect_url)
 
     context = get_common_context_learning_unit_year(
@@ -88,3 +88,20 @@ def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
     context['label_name'] = label_name
     return render(request, "learning_unit/pedagogy_edit.html", context)
+
+
+def _post_learning_unit_pedagogy_form(request):
+    form = LearningUnitPedagogyEditForm(request.POST)
+    if form.is_valid():
+        form.save()
+        last_academic_year_reported = form.luys[-1].academic_year if len(form.luys) >= 2 else None
+        if last_academic_year_reported and is_pedagogy_data_must_be_postponed(form.luys[0]):
+            display_success_messages(
+                request,
+                _("The sections you modified have been saved and "
+                  "reported up to %(last_year_reported)s with success.") % {
+                    "last_year_reported": str(last_academic_year_reported)
+                }
+            )
+        else:
+            display_success_messages(request, _("The sections you modified have been saved with success."))

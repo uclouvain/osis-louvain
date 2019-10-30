@@ -149,7 +149,13 @@ def _is_eligible_education_group(person, education_group, raise_exception):
 
 
 def _is_eligible_certificate_aims(person, education_group, raise_exception):
-    return check_link_to_management_entity(education_group, person, raise_exception)
+    result = check_link_to_management_entity(education_group, person, raise_exception)
+    if education_group.education_group_type.category != TRAINING:
+        if raise_exception:
+            raise PermissionDenied(_("This education group is not editable during this period.").capitalize())
+        return False
+
+    return result
 
 
 def _is_eligible_to_add_education_group_with_category(person, education_group, category, raise_exception):

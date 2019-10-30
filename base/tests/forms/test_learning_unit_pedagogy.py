@@ -52,8 +52,8 @@ class LearningUnitPedagogyContextMixin(TestCase):
         self.person = PersonFactory()
         self.person.user.user_permissions.add(Permission.objects.get(codename="can_edit_learningunit_pedagogy"))
         self.current_ac = AcademicYearFactory(current=True)
-        self.ac_years_containers = GenerateAcademicYear(start_year=self.current_ac.year + 1,
-                                                        end_year=self.current_ac.year + 5)
+        self.past_ac_years = AcademicYearFactory.produce_in_past(self.current_ac.year - 1, 5)
+        self.future_ac_years = AcademicYearFactory.produce_in_future(self.current_ac.year + 1, 5)
         self.current_luy = LearningUnitYearFactory(
             learning_container_year__academic_year=self.current_ac,
             academic_year=self.current_ac,
@@ -62,7 +62,7 @@ class LearningUnitPedagogyContextMixin(TestCase):
         )
         self.luys = {self.current_ac.year: self.current_luy}
         self.luys.update(
-            _duplicate_learningunityears(self.current_luy, academic_years=self.ac_years_containers.academic_years)
+            _duplicate_learningunityears(self.current_luy, academic_years=self.past_ac_years + self.future_ac_years)
         )
 
 
@@ -71,7 +71,7 @@ class TestValidation(LearningUnitPedagogyContextMixin):
         super().setUp()
         self.cms_translated_text = TranslatedTextFactory(
             entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=self.luys[self.current_ac.year].id,
+            reference=self.luys[self.current_ac.year - 1].id,
             language='EN',
             text='Text random'
         )
@@ -89,7 +89,7 @@ class TestValidation(LearningUnitPedagogyContextMixin):
 
     @patch("cms.models.translated_text.update_or_create")
     def test_save_without_postponement(self, mock_update_or_create):
-        """In this test, we ensure that if we modify UE of N or N-... => The postponement is not done for CMS data"""
+        """In this test, we ensure that if we modify UE of N-1 or N-... => The postponement is not done for CMS data"""
         form = LearningUnitPedagogyEditForm(self.valid_form_data)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
@@ -101,7 +101,7 @@ class TestValidation(LearningUnitPedagogyContextMixin):
 
     @patch("cms.models.translated_text.update_or_create")
     def test_save_with_postponement(self, mock_update_or_create):
-        """In this test, we ensure that if we modify UE of N+1 or N+X => The postponement until the lastest UE"""
+        """In this test, we ensure that if we modify UE of N or N+X => The postponement until the lastest UE"""
         luy_in_future = self.luys[self.current_ac.year + 1]
         cms_pedagogy_future = TranslatedTextFactory(
             entity=entity_name.LEARNING_UNIT_YEAR,
@@ -118,21 +118,22 @@ class TestValidation(LearningUnitPedagogyContextMixin):
 
 
 class TestTeachingMaterialForm(LearningUnitPedagogyContextMixin):
-    @patch('base.models.teaching_material.postpone_teaching_materials', side_effect=lambda *args: None)
+    @patch('base.business.learning_units.pedagogy.postpone_teaching_materials', side_effect=lambda *args: None)
     def test_save_without_postponement(self, mock_postpone_teaching_materials):
-        """In this test, we ensure that if we modify UE of N or N-... => The postponement is not done for teaching
+        """In this test, we ensure that if we modify UE of N-1 or N-X => The postponement is not done for teaching
            materials"""
-        teaching_material = TeachingMaterialFactory.build(learning_unit_year=self.current_luy,
+        luy_in_past = self.luys[self.current_ac.year - 1]
+        teaching_material = TeachingMaterialFactory.build(learning_unit_year=luy_in_past,
                                                           mandatory=True)
         post_data = _get_valid_teaching_material_form_data(teaching_material)
         teaching_material_form = TeachingMaterialModelForm(post_data)
         self.assertTrue(teaching_material_form.is_valid(), teaching_material_form.errors)
-        teaching_material_form.save(learning_unit_year=self.current_luy)
+        teaching_material_form.save(learning_unit_year=luy_in_past)
         self.assertFalse(mock_postpone_teaching_materials.called)
 
-    @patch('base.models.teaching_material.postpone_teaching_materials', side_effect=lambda *args: None)
+    @patch('base.business.learning_units.pedagogy.postpone_teaching_materials', side_effect=lambda *args: None)
     def test_save_with_postponement(self, mock_postpone_teaching_materials):
-        """In this test, we ensure that if we modify UE of N+1 or N+X => The postponement until the lastest UE"""
+        """In this test, we ensure that if we modify UE of N or N+X => The postponement until the lastest UE"""
         luy_in_future = self.luys[self.current_ac.year + 1]
         teaching_material = TeachingMaterialFactory.build(learning_unit_year=luy_in_future)
         post_data = _get_valid_teaching_material_form_data(teaching_material)
