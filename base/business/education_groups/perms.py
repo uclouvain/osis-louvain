@@ -29,10 +29,12 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _, pgettext
 
 from base.business.event_perms import EventPermEducationGroupEdition
+from base.models.academic_year import starting_academic_year
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
+from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from program_management.business.group_element_years import postponement, management
 
 ERRORS_MSG = {
@@ -69,10 +71,8 @@ def _is_eligible_to_add_education_group(person, education_group, category, educa
 
 def is_eligible_to_change_education_group(person, education_group, raise_exception=False):
     return check_permission(person, "base.change_educationgroup", raise_exception) and \
-           (check_link_to_management_entity(education_group, person, raise_exception) and
-            (person.is_central_manager or (person.is_faculty_manager and not person.is_faculty_manager_for_ue))
-            ) and \
-           _is_year_editable(education_group, raise_exception)
+           _is_year_editable(education_group, raise_exception) and \
+           _is_eligible_education_group(person, education_group, raise_exception)
 
 
 def _is_year_editable(education_group, raise_exception):
@@ -130,10 +130,18 @@ def is_eligible_to_delete_education_group_year(person, education_group_yr, raise
 
 
 def _is_eligible_education_group(person, education_group, raise_exception):
-    return (check_link_to_management_entity(education_group, person, raise_exception) and
-            (person.is_central_manager or EventPermEducationGroupEdition.is_open(education_group=education_group,
-                                                                                 raise_exception=raise_exception))
-            )
+    period_dependant = not(
+            person.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and
+            settings.YEAR_LIMIT_EDG_MODIFICATION <= education_group.academic_year.year <= starting_academic_year().year
+    ) if education_group and education_group.education_group_type.category == TRAINING else True
+    is_faculty_eligible = EventPermEducationGroupEdition.is_open(
+        education_group=education_group,
+        raise_exception=raise_exception
+    ) if period_dependant else person.is_faculty_manager and not person.is_faculty_manager_for_ue
+    return (
+            check_link_to_management_entity(education_group, person, raise_exception) and
+            (person.is_central_manager or is_faculty_eligible)
+    )
 
 
 def _is_eligible_certificate_aims(person, education_group, raise_exception):

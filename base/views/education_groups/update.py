@@ -52,15 +52,9 @@ from base.views.education_groups.perms import can_change_education_group
 @waffle_flag("education_group_update")
 def update_education_group(request, root_id, education_group_year_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-
     # Store root in the instance to avoid to pass the root in methods
     # it will be used in the templates.
     education_group_year.root = root_id
-
-    year = education_group_year.academic_year.year
-    # if request.user.groups.filter(name=FACULTY_MANAGER_GROUP).exists() and \
-    #         settings.YEAR_LIMIT_EDG_MODIFICATION <= year <= starting_academic_year().year:
-    #     return update_certificate_aims(request, root_id, education_group_year)
 
     # Proctect the view
     can_change_education_group(request.user, education_group_year)
