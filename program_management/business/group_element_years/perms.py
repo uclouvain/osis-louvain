@@ -29,7 +29,12 @@ from base.models.enums.education_group_types import GroupType
 
 
 def is_eligible_to_update_group_element_year(person, group_element_year, raise_exception):
-    return is_eligible_to_change_education_group(person, group_element_year.parent, raise_exception) and \
+    return is_eligible_to_change_education_group(
+        person,
+        group_element_year.parent,
+        raise_exception,
+        group_element_year=True
+    ) and \
            (not group_element_year.child_branch
             or _can_user_update_education_group_year_child(person, group_element_year.child_branch, raise_exception))
 
@@ -50,4 +55,9 @@ def _can_user_update_education_group_year_child(person, egy_child, raise_excepti
 
 
 def is_eligible_to_detach_group_element_year(person, group_element_year, raise_exception):
-    return is_eligible_to_change_education_group(person, group_element_year.parent, raise_exception)
+    return is_eligible_to_change_education_group(
+        person,
+        group_element_year.parent,
+        raise_exception,
+        group_element_year=True
+    )

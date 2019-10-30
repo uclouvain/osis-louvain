@@ -67,10 +67,10 @@ def _is_eligible_to_add_education_group(person, education_group, category, educa
             else check_authorized_type(education_group, category, raise_exception))
 
 
-def is_eligible_to_change_education_group(person, education_group, raise_exception=False):
+def is_eligible_to_change_education_group(person, education_group, raise_exception=False, group_element_year=False):
     return check_permission(person, "base.change_educationgroup", raise_exception) and \
            _is_year_editable(education_group, raise_exception) and \
-           _is_eligible_education_group(person, education_group, raise_exception)
+           _is_eligible_education_group(person, education_group, raise_exception, group_element_year)
 
 
 def _is_year_editable(education_group, raise_exception):
@@ -127,18 +127,26 @@ def is_eligible_to_delete_education_group_year(person, education_group_yr, raise
     return can_delete_all_education_group(person.user, education_group_yr.education_group)
 
 
-def _is_eligible_education_group(person, education_group, raise_exception):
-    period_dependant = not(
-            person.is_faculty_manager and not person.is_faculty_manager_for_ue and education_group.is_in_editable_year()
-    ) if education_group and education_group.is_training() else True
-    is_faculty_eligible = EventPermEducationGroupEdition.is_open(
-        education_group=education_group,
-        raise_exception=raise_exception
-    ) if period_dependant else person.is_faculty_manager and not person.is_faculty_manager_for_ue
+def _is_eligible_education_group(person, education_group, raise_exception, group_element_year=False):
     return (
             check_link_to_management_entity(education_group, person, raise_exception) and
-            (person.is_central_manager or is_faculty_eligible)
+            (person.is_central_manager or __is_faculty_eligible_education_group(
+                education_group,
+                person,
+                raise_exception,
+                group_element_year
+            ))
     )
+
+
+def __is_faculty_eligible_education_group(education_group, person, raise_exception, group_element_year=False):
+    is_faculty = person.is_faculty_manager and not person.is_faculty_manager_for_ue
+    period_dependant = not(is_faculty and education_group.is_in_editable_year()) \
+        if education_group and education_group.is_training() and not group_element_year else True
+    return EventPermEducationGroupEdition.is_open(
+        education_group=education_group,
+        raise_exception=raise_exception
+    ) if period_dependant else is_faculty
 
 
 def _is_eligible_certificate_aims(person, education_group, raise_exception):
