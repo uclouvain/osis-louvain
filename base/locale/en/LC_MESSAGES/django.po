@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-11 10:28+0200\n"
+"POT-Creation-Date: 2019-10-29 11:15+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,7 +29,7 @@ msgid "%(access_value)s is not an accepted value"
 msgstr ""
 
 #: business/education_groups/postponement.py:286
-#: tests/forms/education_group/test_training.py:384
+#: tests/forms/education_group/test_training.py:385
 #, python-format
 msgid "%(col_name)s has been already modified."
 msgstr ""
@@ -1142,13 +1142,13 @@ msgstr ""
 
 #: business/education_groups/postponement.py:294
 #: forms/learning_unit/learning_unit_postponement.py:320
-#: tests/forms/education_group/test_training.py:346
+#: tests/forms/education_group/test_training.py:347
 #, python-format
 msgid "Consistency error in %(academic_year)s : %(error)s"
 msgstr ""
 
 #: business/education_groups/postponement.py:301
-#: tests/forms/education_group/test_training.py:390
+#: tests/forms/education_group/test_training.py:391
 #, python-format
 msgid "Consistency error in %(academic_year)s with %(model)s: %(error)s"
 msgstr ""
@@ -2972,7 +2972,7 @@ msgstr ""
 msgid "No result!"
 msgstr ""
 
-#: business/education_groups/perms.py:214
+#: business/education_groups/perms.py:220
 #, python-format
 msgctxt "female"
 msgid ""
@@ -4333,16 +4333,16 @@ msgstr ""
 msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr ""
 
-#: business/education_groups/perms.py:338
+#: business/education_groups/perms.py:344
 msgid "The faculty manager cannot modify admission which are lower than N"
 msgstr ""
 
-#: business/education_groups/perms.py:306
+#: business/education_groups/perms.py:312
 msgid ""
 "The faculty manager cannot modify general information which are lower than N"
 msgstr ""
 
-#: business/education_groups/perms.py:340
+#: business/education_groups/perms.py:346
 msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
@@ -4439,7 +4439,7 @@ msgid "The learning unit has been updated (without report)."
 msgstr ""
 
 #: forms/learning_unit/learning_unit_postponement.py:314
-#: views/learning_units/update.py:188
+#: views/learning_units/update.py:184
 #, python-format
 msgid "The learning unit has been updated until %(year)s."
 msgstr ""
@@ -4590,15 +4590,15 @@ msgstr ""
 msgid "The root does not exist in the next academic year."
 msgstr ""
 
-#: views/learning_units/pedagogy/update.py:75
+#: views/learning_units/pedagogy/update.py:101
 #, python-format
 msgid ""
-"The section you modified have been saved and reported up to "
+"The sections you modified have been saved and reported up to "
 "%(last_year_reported)s with success."
 msgstr ""
 
-#: views/learning_units/pedagogy/update.py:81
-msgid "The section you modified have been saved with success."
+#: views/learning_units/pedagogy/update.py:107
+msgid "The sections you modified have been saved with success."
 msgstr ""
 
 #: business/learning_units/edition.py:123
@@ -4641,15 +4641,15 @@ msgstr ""
 msgid "The teaching material has been saved with success"
 msgstr ""
 
-#: business/education_groups/perms.py:269
+#: business/education_groups/perms.py:275
 msgid "The user cannot modify data which are greater than N+1"
 msgstr ""
 
-#: business/education_groups/perms.py:318
+#: business/education_groups/perms.py:324
 msgid "The user doesn't have right to update admission condition"
 msgstr ""
 
-#: business/education_groups/perms.py:286
+#: business/education_groups/perms.py:292
 msgid "The user doesn't have right to update general information"
 msgstr ""
 
@@ -4665,7 +4665,7 @@ msgctxt "female"
 msgid "The user has not permission to create a %(category)s."
 msgstr ""
 
-#: business/education_groups/perms.py:165
+#: business/education_groups/perms.py:171
 #, python-format
 msgctxt "male"
 msgid "The user has not permission to create a %(category)s."
@@ -4679,8 +4679,8 @@ msgstr ""
 msgid "The user has not permission to delete education groups."
 msgstr ""
 
-#: business/education_groups/perms.py:182
-#: business/education_groups/perms.py:271
+#: business/education_groups/perms.py:188
+#: business/education_groups/perms.py:277
 msgid "The user is not attached to the management entity"
 msgstr ""
 
@@ -4772,6 +4772,7 @@ msgid "This code already exists for this learning unit"
 msgstr ""
 
 #: business/education_groups/perms.py:139
+#: business/education_groups/perms.py:155
 msgid "This education group is not editable during this period."
 msgstr ""
 
