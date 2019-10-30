@@ -118,6 +118,8 @@ class TestUpdate(TestCase):
         self.mocked_perm = self.perm_patcher.start()
 
         self.an_training_education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
+        self.education_group_type_pgrm_master_120 = EducationGroupTypeFactory(
+            category=education_group_categories.TRAINING, name=TrainingType.PGRM_MASTER_120.name)
 
         self.previous_training_education_group_year = TrainingFactory(
             academic_year=self.previous_academic_year,
@@ -308,10 +310,9 @@ class TestUpdate(TestCase):
 
     def test_post_training(self):
         old_domain = DomainFactory()
-        education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING,
-                                                         name=TrainingType.PGRM_MASTER_120.name)
+
         egy = TrainingFactory(
-            education_group_type=education_group_type,
+            education_group_type=self.education_group_type_pgrm_master_120,
             management_entity=self.training_education_group_year.management_entity,
             administration_entity=self.training_education_group_year.administration_entity,
             academic_year=self.current_academic_year,
@@ -331,7 +332,7 @@ class TestUpdate(TestCase):
         data = {
             'title': 'Cours au choix',
             'title_english': 'deaze',
-            'education_group_type': education_group_type.pk,
+            'education_group_type': self.education_group_type_pgrm_master_120.pk,
             'credits': 42,
             'acronym': 'CRSCHOIXDVLD',
             'partial_acronym': 'LDVLD101R',
@@ -371,10 +372,9 @@ class TestUpdate(TestCase):
 
     def test_post_invalid_training(self):
         old_domain = DomainFactory()
-        education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING,
-                                                         name=TrainingType.PGRM_MASTER_120.name)
+
         egy = TrainingFactory(
-            education_group_type=education_group_type,
+            education_group_type=self.education_group_type_pgrm_master_120,
             management_entity=self.training_education_group_year.management_entity,
             administration_entity=self.training_education_group_year.administration_entity,
             academic_year=self.current_academic_year,
@@ -389,12 +389,11 @@ class TestUpdate(TestCase):
 
         new_entity_version = MainEntityVersionFactory()
         PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
-        list_domains = [domain.pk for domain in self.domains]
         isced_domain = DomainIscedFactory()
         data = {
             'title': 'Cours au choix',
             'title_english': 'deaze',
-            'education_group_type': education_group_type.pk,
+            'education_group_type': self.education_group_type_pgrm_master_120.pk,
             'credits': None,
             'acronym': 'CRSCHOIXDVLD',
             'partial_acronym': 'LDVLD101R',
