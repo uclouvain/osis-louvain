@@ -66,7 +66,7 @@ class AcademicCalendarForm(bootstrap.BootstrapModelForm):
 
     class Meta:
         model = AcademicCalendar
-        exclude = ['external_id', 'changed']
+        exclude = ['external_id', 'changed', 'data_year']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

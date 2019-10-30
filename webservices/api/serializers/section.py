@@ -30,7 +30,8 @@ from base.models.enums.education_group_types import TrainingType
 from webservices.api.serializers.achievement import AchievementsSerializer
 from webservices.api.serializers.admission_condition import AdmissionConditionsSerializer, \
     BachelorAdmissionConditionsSerializer, SpecializedMasterAdmissionConditionsSerializer, \
-    AggregationAdmissionConditionsSerializer, MasterAdmissionConditionsSerializer
+    AggregationAdmissionConditionsSerializer, MasterAdmissionConditionsSerializer, \
+    ContinuingEducationTrainingAdmissionConditionsSerializer
 from webservices.api.serializers.contacts import ContactsSerializer
 
 
@@ -87,9 +88,17 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
             TrainingType.AGGREGATION.name: AggregationAdmissionConditionsSerializer,
             TrainingType.PGRM_MASTER_120.name: MasterAdmissionConditionsSerializer,
             TrainingType.PGRM_MASTER_180_240.name: MasterAdmissionConditionsSerializer,
-            TrainingType.MASTER_M1.name: MasterAdmissionConditionsSerializer
+            TrainingType.MASTER_M1.name: MasterAdmissionConditionsSerializer,
+            TrainingType.CERTIFICATE_OF_PARTICIPATION.name: ContinuingEducationTrainingAdmissionConditionsSerializer,
+            TrainingType.CERTIFICATE_OF_SUCCESS.name: ContinuingEducationTrainingAdmissionConditionsSerializer,
+            TrainingType.CERTIFICATE_OF_HOLDING_CREDITS.name: ContinuingEducationTrainingAdmissionConditionsSerializer,
+            TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name:
+                ContinuingEducationTrainingAdmissionConditionsSerializer,
+            TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name:
+                ContinuingEducationTrainingAdmissionConditionsSerializer,
         }
         serializer = admission_condition_serializers.get(egy.education_group_type.name)
+
         if serializer:
             return serializer(egy.admissioncondition, context=self.context).data
         return AdmissionConditionsSerializer(egy.admissioncondition, context=self.context).data

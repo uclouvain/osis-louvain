@@ -73,13 +73,12 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
 
     def test_header_lines(self):
         expected_headers = [
-            [self.education_group_year.acronym, self.education_group_year.title],
-            [_("Official"), None]
+            [self.education_group_year.acronym, self.education_group_year.title, _('Code'), _('Title'),
+             _('Cred. rel./abs.'), _('Block'), _('Mandatory')],
+            [_("Official"), None, None, None, None, None, None]
         ]
 
-        headers = [row_to_value(row) for row in self.sheet_prerequisites.iter_rows(range_string="A1:B2")]
-        self.assertListEqual(headers, expected_headers)
-        headers = [row_to_value(row) for row in self.sheet_is_prerequisite.iter_rows(range_string="A1:B2")]
+        headers = [row_to_value(row) for row in self.sheet_prerequisites.iter_rows(range_string="A1:G2")]
         self.assertListEqual(headers, expected_headers)
 
     def test_when_learning_unit_year_has_one_prerequisite(self):

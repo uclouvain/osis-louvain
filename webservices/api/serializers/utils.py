@@ -61,7 +61,7 @@ class DynamicLanguageFieldsModelSerializer(serializers.ModelSerializer):
         return data
 
     def _get_source(self, field_name, is_admission_condition, language):
-        specific_fields = ['free_text', 'text']
+        specific_fields = ['free_text', 'text', 'personalized_access', 'admission_enrollment_procedures']
 
         prefix = 'text_' if is_admission_condition else ''
 

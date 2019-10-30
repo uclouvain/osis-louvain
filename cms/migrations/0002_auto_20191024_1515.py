@@ -6,14 +6,10 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cms', '0001_initial_squashed_0012_auto_20180807_1229'),
+        ('cms', '0002_auto_20191011_1133'),
     ]
 
     operations = [
-        migrations.AlterUniqueTogether(
-            name='translatedtext',
-            unique_together={('entity', 'reference', 'text_label', 'language')},
-        ),
         migrations.AlterUniqueTogether(
             name='translatedtextlabel',
             unique_together={('language', 'text_label')},

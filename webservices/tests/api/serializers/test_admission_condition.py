@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
+
 from django.conf import settings
 from django.test import TestCase
 
@@ -33,7 +35,8 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory,
     EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonMasterFactory, TrainingFactory
 from webservices.api.serializers.admission_condition import AdmissionConditionsSerializer, \
     BachelorAdmissionConditionsSerializer, SpecializedMasterAdmissionConditionsSerializer, \
-    AggregationAdmissionConditionsSerializer, MasterAdmissionConditionsSerializer
+    AggregationAdmissionConditionsSerializer, MasterAdmissionConditionsSerializer, \
+    ContinuingEducationTrainingAdmissionConditionsSerializer
 
 
 class AdmissionConditionsSerializerTestCase(TestCase):
@@ -149,3 +152,25 @@ class MasterAdmissionConditionsSerializerTestCase(TestCase):
         ]
 
         self.assertCountEqual(list(self.serializer.data['sections'].keys()), expected_fields)
+
+
+class ContinuingEducationTrainingAdmissionConditionsSerializerTestCase(TestCase):
+    def test_contains_expected_fields_in_certificate(self):
+        egy_type = random.choice([
+            TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE,
+            TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE,
+            TrainingType.CERTIFICATE_OF_HOLDING_CREDITS,
+            TrainingType.CERTIFICATE_OF_SUCCESS,
+            TrainingType.CERTIFICATE_OF_PARTICIPATION
+        ])
+        egy = EducationGroupYearFactory(education_group_type__name=egy_type.name)
+        ac = AdmissionConditionFactory(education_group_year=egy)
+        serializer = ContinuingEducationTrainingAdmissionConditionsSerializer(ac, context={
+            'lang': settings.LANGUAGE_CODE_EN,
+            'egy': egy
+        })
+        expected_fields = [
+            'admission_enrollment_procedures',
+            'personalized_access',
+        ]
+        self.assertListEqual(list(serializer.data.keys()), expected_fields)

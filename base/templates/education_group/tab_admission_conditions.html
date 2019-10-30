@@ -116,12 +116,12 @@
                         <table class="table table-bordered">
                             <thead>
                             <tr>
-                                <th width="30%">{% trans 'Diploma' %}</th>
-                                <th width="20%">{% trans 'Conditions' %}</th>
-                                <th width="150px">{% trans 'Access' %}</th>
+                                <th style="width:30%">{% trans 'Diploma' %}</th>
+                                <th style="width:20%">{% trans 'Conditions' %}</th>
+                                <th style="width:150px">{% trans 'Access' %}</th>
                                 <th>{% trans 'Remarks' %}</th>
                                 {% if can_edit_information %}
-                                    <th width="10%">{% trans 'Actions' %}</th>{% endif %}
+                                    <th style="width:10%">{% trans 'Actions' %}</th>{% endif %}
                             </tr>
                             </thead>
                             <tbody>
@@ -165,12 +165,12 @@
                         <table class="table table-bordered">
                             <thead>
                             <tr>
-                                <th width="30%">{% trans 'Diploma' %}</th>
-                                <th width="20%">{% trans 'Conditions' %}</th>
-                                <th width="150px">{% trans 'Access' %}</th>
+                                <th style="width:30%">{% trans 'Diploma' %}</th>
+                                <th style="width:20%">{% trans 'Conditions' %}</th>
+                                <th style="width:150px">{% trans 'Access' %}</th>
                                 <th>{% trans 'Remarks' %}</th>
                                 {% if can_edit_information %}
-                                    <th width="10%">{% trans 'Actions' %}</th>{% endif %}
+                                    <th style="width:10%">{% trans 'Actions' %}</th>{% endif %}
                             </tr>
                             </thead>
                             <tbody>
@@ -187,13 +187,14 @@
                     {% include 'education_group/blocks/admission_condition_text.html' with section_name="adults_taking_up_university_training" text=_("Adults taking up their university training") field=common_conditions.text_adults_taking_up_university_training field_en=common_conditions.text_adults_taking_up_university_training_en can_edit=False %}
                 {% endif %}
                 {% include 'education_group/blocks/admission_condition_text.html' with section_name="adults_taking_up_university_training" text=_("Adults taking up their university training") field=admission_condition.text_adults_taking_up_university_training field_en=admission_condition.text_adults_taking_up_university_training_en can_edit=True %}
-
-                {% if common_conditions %}
+            {% endif %}
+            {% if info.is_master or info.is_iufc %}
+                {% if common_conditions and info.is_master %}
                     {% include 'education_group/blocks/admission_condition_text.html' with section_name="personalized_access" text=_("Personalized access") field=common_conditions.text_personalized_access field_en=common_conditions.text_personalized_access_en can_edit=False %}
                 {% endif %}
                 {% include 'education_group/blocks/admission_condition_text.html' with section_name="personalized_access" text=_("Personalized access") field=admission_condition.text_personalized_access field_en=admission_condition.text_personalized_access_en can_edit=True %}
 
-                {% if common_conditions %}
+                {% if common_conditions and info.is_master %}
                     {% include 'education_group/blocks/admission_condition_text.html' with section_name="admission_enrollment_procedures" text=_("Admission and Enrolment Procedures for general registration") field=common_conditions.text_admission_enrollment_procedures field_en=common_conditions.text_admission_enrollment_procedures_en can_edit=False %}
                 {% endif %}
                 {% include 'education_group/blocks/admission_condition_text.html' with section_name="admission_enrollment_procedures" text=_("Admission and Enrolment Procedures for general registration") field=admission_condition.text_admission_enrollment_procedures field_en=admission_condition.text_admission_enrollment_procedures_en can_edit=True %}

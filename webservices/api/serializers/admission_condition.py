@@ -141,3 +141,17 @@ class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
         lang = '' if language == settings.LANGUAGE_CODE_FR else '_' + language
         text = getattr(ac, 'text_' + field + lang)
         return text if text else None
+
+
+class ContinuingEducationTrainingAdmissionConditionsSerializer(AdmissionConditionsSerializer):
+    admission_enrollment_procedures = serializers.CharField(read_only=True)
+    personalized_access = serializers.CharField(read_only=True)
+
+    class Meta:
+        model = AdmissionCondition
+
+        fields = (
+            'alert_message',
+            'admission_enrollment_procedures',
+            'personalized_access',
+        )

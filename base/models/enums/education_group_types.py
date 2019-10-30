@@ -66,6 +66,25 @@ class TrainingType(ChoiceEnum):
         ]
 
     @classmethod
+    def attestation_types(cls):
+        return [
+            cls.CERTIFICATE_OF_PARTICIPATION.name,
+            cls.CERTIFICATE_OF_SUCCESS.name,
+            cls.CERTIFICATE_OF_HOLDING_CREDITS.name,
+        ]
+
+    @classmethod
+    def university_certificate_types(cls):
+        return [
+            cls.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
+            cls.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name
+        ]
+
+    @classmethod
+    def continuing_education_types(cls):
+        return cls.attestation_types() + cls.university_certificate_types()
+
+    @classmethod
     def root_master_2m_types(cls):
         return [cls.PGRM_MASTER_120.name, cls.PGRM_MASTER_180_240.name]
 
@@ -91,6 +110,9 @@ class TrainingType(ChoiceEnum):
             cls.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
             cls.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name,
             cls.CAPAES.name,
+            cls.CERTIFICATE_OF_PARTICIPATION.name,
+            cls.CERTIFICATE_OF_SUCCESS.name,
+            cls.CERTIFICATE_OF_HOLDING_CREDITS.name
         ]
 
     @classmethod
@@ -104,6 +126,11 @@ class TrainingType(ChoiceEnum):
             cls.AGGREGATION.name,
             cls.CERTIFICATE.name,
             cls.RESEARCH_CERTIFICATE.name,
+            cls.CERTIFICATE_OF_PARTICIPATION.name,
+            cls.CERTIFICATE_OF_HOLDING_CREDITS.name,
+            cls.CERTIFICATE_OF_SUCCESS.name,
+            cls.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
+            cls.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name
         ]
 
 

@@ -593,6 +593,14 @@ class EducationGroupYear(SerializableModel):
         return self.type in TrainingType.finality_types()
 
     @property
+    def is_attestation(self):
+        return self.type in TrainingType.attestation_types()
+
+    @property
+    def is_continuing_education_education_group_year(self):
+        return self.acronym.endswith('FC')
+
+    @property
     def is_minor(self):
         return self.type in MiniTrainingType.minors()
 
