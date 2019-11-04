@@ -40,7 +40,7 @@ from base.views.common import display_success_messages
 @permission_required('base.can_propose_learningunit', raise_exception=True)
 def get_proposal_learning_unit_creation_form(request, academic_year):
     person = get_object_or_404(Person, user=request.user)
-    academic_year_pk = request.POST.get('academic_year', academic_year) if person.is_faculty_manager else academic_year
+    academic_year_pk = request.POST.get('academic_year', academic_year)
     academic_year = get_object_or_404(AcademicYear, pk=academic_year_pk)
 
     proposal_form = CreationProposalBaseForm(request.POST or None, person, academic_year)
