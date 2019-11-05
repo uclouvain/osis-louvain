@@ -141,6 +141,9 @@ class UpdateGroupElementYearView(GenericGroupElementYearMixin, UpdateView):
 
     rules = [group_element_year_perms.can_update_group_element_year]
 
+    def _call_rule(self, rule):
+        return rule(self.request.user, self.get_object())
+
     def dispatch(self, request, *args, **kwargs):
         try:
             self.rules[0](self.request.user, self.get_object())
