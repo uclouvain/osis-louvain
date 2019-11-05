@@ -38,6 +38,8 @@ from base.models.education_group_year import EducationGroupYear
 from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import render
 
 
 class AttachTypeDialogView(GenericGroupElementYearMixin, TemplateView):
@@ -56,6 +58,18 @@ class AttachTypeDialogView(GenericGroupElementYearMixin, TemplateView):
             warning_msg = _("Please select an item before attach it")
             display_warning_messages(self.request, warning_msg)
         return context
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            for rule in self.rules:
+                perm = self.rules[0](self.request.user, self.education_group_year)
+                if not perm:
+                    break
+
+        except PermissionDenied as e:
+            return render(request, 'education_group/blocks/modal/modal_access_denied.html', {'access_message': e})
+
+        return super(AttachTypeDialogView, self).dispatch(request, *args, **kwargs)
 
 
 class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):

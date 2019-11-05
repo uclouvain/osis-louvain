@@ -32,6 +32,8 @@ from base.business.group_element_years.detach import DetachEducationGroupYearStr
 from base.views.common import display_error_messages, display_success_messages, display_warning_messages
 from base.views.education_groups.group_element_year import perms as group_element_year_perms
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import render
 
 
 class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
@@ -39,8 +41,17 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
 
     rules = [group_element_year_perms.can_detach_group_element_year]
 
-    def _call_rule(self, rule):
-        return rule(self.request.user, self.get_object())
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.rules[0](self.request.user, self.get_object())
+
+        except PermissionDenied:
+
+            return render(request,
+                          'education_group/blocks/modal/modal_access_denied.html',
+                          {'access_message': _('You are not eligible to detach group element year')})
+
+        return super(DetachGroupElementYearView, self).dispatch(request, *args, **kwargs)
 
     @cached_property
     def strategy(self):

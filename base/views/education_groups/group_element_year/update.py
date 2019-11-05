@@ -41,6 +41,8 @@ from base.views.education_groups import perms
 from base.views.education_groups.group_element_year import perms as group_element_year_perms
 from base.views.education_groups.group_element_year.common import GenericGroupElementYearMixin
 from base.views.education_groups.select import build_success_message, build_success_json_response
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import render
 
 
 @login_required
@@ -139,8 +141,16 @@ class UpdateGroupElementYearView(GenericGroupElementYearMixin, UpdateView):
 
     rules = [group_element_year_perms.can_update_group_element_year]
 
-    def _call_rule(self, rule):
-        return rule(self.request.user, self.get_object())
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.rules[0](self.request.user, self.get_object())
+
+        except PermissionDenied:
+            return render(request,
+                          'education_group/blocks/modal/modal_access_denied.html',
+                          {'access_message': _('Your are not eligible to update the group element year')})
+
+        return super(UpdateGroupElementYearView, self).dispatch(request, *args, **kwargs)
 
     # SuccessMessageMixin
     def get_success_message(self, cleaned_data):
