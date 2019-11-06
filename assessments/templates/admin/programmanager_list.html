@@ -29,13 +29,16 @@
             <td>
                 <input type="checkbox" name="all_main"
                        data-url="{% url 'update_main_person' person.pk %}?offer_year={{ offer_years|join:',' }}"
-                       data-target=".{{ person|slugify }}_checkbox">
+                       data-target=".{{ person|slugify }}_checkbox"
+                {% if not perms.base.change_programmanager %} disabled {% endif %}>
             </td>
             <td>
-                <a class="btn btn-default pull-right trigger_modal"
-                   data-url="{% url 'delete_manager_person' person.pk %}?offer_year={{ offer_years|join:',' }}">
-                    <span class="fa fa-minus"></span>
-                </a>
+                {% if perms.base.change_programmanager %}
+                    <a class="btn btn-default pull-right trigger_modal"
+                       data-url="{% url 'delete_manager_person' person.pk %}?offer_year={{ offer_years|join:',' }}">
+                        <span class="fa fa-minus"></span>
+                    </a>
+                {% endif %}
             </td>
         </tr>
         {% for obj in object_list %}
@@ -45,13 +48,16 @@
                 <td>
                     <input type="checkbox" class="{{ person|slugify }}_checkbox"
                            name="is_main" {% if obj.is_main %}checked{% endif %}
-                           data-url="{% url 'update_main' obj.pk %}?offer_year={{ offer_years|join:',' }}">
+                           data-url="{% url 'update_main' obj.pk %}?offer_year={{ offer_years|join:',' }}"
+                        {% if not perms.base.change_programmanager %} disabled {% endif %}>
                 </td>
                 <td>
-                    <a class="btn btn-default btn-sm pull-right trigger_modal"
-                       data-url="{% url 'delete_manager' obj.pk %}?offer_year={{ offer_years|join:',' }}">
-                        <span class="fa fa-minus"></span>
-                    </a>
+                    {% if perms.base.change_programmanager %}
+                        <a class="btn btn-default btn-sm pull-right trigger_modal"
+                           data-url="{% url 'delete_manager' obj.pk %}?offer_year={{ offer_years|join:',' }}">
+                            <span class="fa fa-minus"></span>
+                        </a>
+                    {% endif %}
                 </td>
             </tr>
         {% endfor %}
@@ -61,7 +67,7 @@
     </tbody>
 </table>
 <br>
-{% if offer_years %}
+{% if offer_years and perms.base.change_programmanager  %}
     <a class="btn btn-primary pull-right trigger_modal"
        title="{% trans 'Add manager' %}"
        data-url="{% url 'create_manager_person' %}?offer_year={{ offer_years|join:',' }}">

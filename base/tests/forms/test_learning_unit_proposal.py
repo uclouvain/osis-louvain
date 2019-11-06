@@ -30,6 +30,7 @@ from django.contrib.auth.models import Group
 from django.test import TestCase
 
 from base.forms.learning_unit_proposal import ProposalBaseForm
+from base.forms.proposal import learning_unit_proposal
 from base.models import proposal_learning_unit
 from base.models.enums import organization_type, proposal_type, proposal_state, entity_type, \
     learning_container_year_types, quadrimesters, entity_container_year_link_type, \
@@ -334,3 +335,9 @@ def build_initial_data(learning_unit_year, entity):
         "volumes": {}
     }
     return initial_data_expected
+
+
+class TestProposalLearningUnitFilter(TestCase):
+    def test_initial_value_with_entity_subordinated(self):
+        proposal_filter = learning_unit_proposal.ProposalLearningUnitFilter()
+        self.assertTrue(proposal_filter.form.fields['with_entity_subordinated'].initial)

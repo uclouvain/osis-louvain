@@ -23,14 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.tests.factories.offer import OfferFactory
-from django.test import TestCase
-from django.utils import timezone
 from base.models import offer_year
 from base.tests.models import test_offer
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories import academic_year
 
 
 def create_offer_year(acronym, title, academic_year):
@@ -39,21 +33,3 @@ def create_offer_year(acronym, title, academic_year):
                                          acronym=acronym, title=title)
     an_offer_year.save()
     return an_offer_year
-
-
-class OfferYearTest(TestCase):
-
-    def test_get_last_offer_year_by_offer(self):
-        an_offer = test_offer.create_offer("test_offer")
-        academic_years = [
-            AcademicYearFactory(year=2015+x) for x in range(3)
-        ]
-        offer_years = [
-                OfferYearFactory(
-                    offer=an_offer,
-                    academic_year=academic_years[x],
-                )
-                for x in range(3)
-            ]
-        self.assertEqual(offer_year.get_last_offer_year_by_offer(an_offer), offer_years[2])
-

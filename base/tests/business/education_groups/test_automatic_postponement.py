@@ -120,7 +120,7 @@ class TestFetchEducationGroupToPostpone(TestCase):
 
     def test_egy_to_not_duplicated(self):
         # The education group is over
-        self.education_group.end_year = self.academic_years[-2].year
+        self.education_group.end_year = self.academic_years[-2]
         self.education_group.save()
 
         EducationGroupYearFactory(

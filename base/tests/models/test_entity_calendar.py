@@ -23,16 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
 from base.models import entity_calendar
-from base.models.entity_calendar import find_by_entity_and_reference
+from base.models.entity_calendar import find_by_entity_and_reference, EntityCalendar
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION, EXAM_ENROLLMENTS
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity_calendar import EntityCalendarFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+
+
+class TestEntityCalendar(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        current_academic_year = create_current_academic_year()
+
+        cls.aca_calendar = AcademicCalendarFactory(academic_year=current_academic_year,
+                                                   reference=SUMMARY_COURSE_SUBMISSION)
+        cls.entity_version = EntityVersionFactory()
+
+    def test_raise_exception_create_entity_calendar_not_authorized(self):
+        entity_calendar = EntityCalendar(academic_calendar=self.aca_calendar, entity=self.entity_version.entity)
+        self.assertRaises(ValidationError, entity_calendar.clean)
 
 
 class TestFindByReferenceForCurrentAcademicYear(TestCase):

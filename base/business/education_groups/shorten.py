@@ -25,7 +25,7 @@
 ##############################################################################
 from django.core.exceptions import ValidationError, NON_FIELD_ERRORS
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups import delete
 
@@ -43,7 +43,8 @@ def start(education_group, until_year):
 
 
 def check_education_group_end_date(education_group, end_year):
-    education_group_years_to_delete = delete.get_education_group_years_to_delete(education_group, end_year=end_year)
+    education_group_years_to_delete = delete.get_education_group_years_to_delete(education_group,
+                                                                                 end_year=end_year)
     protected_messages = _get_protected_messages(education_group_years_to_delete)
     if protected_messages:
         error_msg = _get_formated_error_msg(end_year, protected_messages)

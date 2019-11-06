@@ -23,13 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
-import factory.fuzzy
 import string
-from osis_common.utils.datetime import get_tzinfo
+
+import factory.fuzzy
 from django.utils import timezone
 from factory.django import DjangoModelFactory
 from faker import Faker
+
+from base.tests.factories.academic_year import AcademicYearFactory
+from osis_common.utils.datetime import get_tzinfo
 
 fake = Faker()
 
@@ -40,6 +42,5 @@ class EducationGroupFactory(DjangoModelFactory):
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
-    start_year = factory.fuzzy.FuzzyInteger(2000, timezone.now().year)
-    end_year = factory.LazyAttribute(lambda obj: factory.fuzzy.FuzzyInteger(obj.start_year + 1,
-                                                                            obj.start_year + 9).fuzz())
+    start_year = factory.SubFactory(AcademicYearFactory, year=factory.fuzzy.FuzzyInteger(2000, timezone.now().year))
+    end_year = None

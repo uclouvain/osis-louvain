@@ -23,11 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils.translation import gettext_lazy
 
 from assessments.models.enums import score_sheet_address_choices
-from django.core.exceptions import ObjectDoesNotExist
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 

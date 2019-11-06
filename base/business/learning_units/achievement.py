@@ -23,26 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models.learning_achievement import LearningAchievement, find_learning_unit_achievement, \
-    find_previous_achievements
+from base.models.learning_achievement import find_previous_achievements
 
 HTML_ANCHOR = "#anchor_"
 UP = 'up'
 DOWN = 'down'
 DELETE = 'delete'
 AVAILABLE_ACTIONS = [DELETE, UP, DOWN]
-
-
-def get_code_name(previous_achievement_fr, a_language_code):
-    if not LearningAchievement.objects.filter(
-            language__code=a_language_code,
-            learning_unit_year=previous_achievement_fr.learning_unit_year).exists():
-        return previous_achievement_fr.code_name
-    else:
-        achievement_fr_next = find_learning_unit_achievement(previous_achievement_fr.learning_unit_year,
-                                                             previous_achievement_fr.language.code,
-                                                             previous_achievement_fr.order + 1)
-        return achievement_fr_next.code_name if achievement_fr_next else ''
 
 
 def get_previous_achievement(achievement_fr):

@@ -24,23 +24,22 @@
 #
 ##############################################################################
 
-from django.contrib.auth.models import Group
 from django.test import TestCase, RequestFactory
 from django.utils.translation import gettext
 
 from base.business.learning_unit_year_with_context import get_with_context
 from base.forms.learning_unit.edition_volume import VolumeEditionForm, VolumeEditionBaseFormset, \
     VolumeEditionFormsetContainer
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.person import PersonFactory, CentralManagerFactory, FacultyManagerFactory
+from base.tests.factories.person import CentralManagerFactory, FacultyManagerFactory
 
 
 class TestVolumeEditionForm(TestCase):
     def setUp(self):
-        self.start_year = 2010
-        self.end_year = 2020
+        self.start_year = AcademicYearFactory(year=2010)
+        self.end_year = AcademicYearFactory(year=2020)
         self.generated_ac_years = GenerateAcademicYear(self.start_year, self.end_year)
         self.generated_container = GenerateContainer(self.start_year, self.end_year)
         self.first_learning_unit_year = self.generated_container.generated_container_years[0].learning_unit_year_full
@@ -134,18 +133,6 @@ class TestVolumeEditionForm(TestCase):
                 entities=self.learning_unit_with_context.entities)
             self.assertTrue(form.is_valid())
 
-    def test_get_entity_fields(self):
-        for component, component_values in self.learning_unit_with_context.components.items():
-            component_values = VolumeEditionBaseFormset._clean_component_keys(component_values)
-            form = VolumeEditionForm(
-                data=_get_valid_partim_data_alter(),
-                learning_unit_year=self.learning_unit_with_context,
-                initial=component_values,
-                component=component,
-                entities=self.learning_unit_with_context.entities)
-            actual_entity_fields = form.get_entity_fields()
-            self.assertEqual(len(actual_entity_fields), 3)
-
 
 def _get_wrong_data_empty_field():
     data = _get_valid_data()
@@ -215,8 +202,8 @@ def _get_valid_partim_data_alter():
 
 class TestVolumeEditionFormsetContainer(TestCase):
     def setUp(self):
-        self.start_year = 2010
-        self.end_year = 2020
+        self.start_year = AcademicYearFactory(year=2010)
+        self.end_year = AcademicYearFactory(year=2020)
         self.generated_ac_years = GenerateAcademicYear(self.start_year, self.end_year)
         self.generated_container = GenerateContainer(self.start_year, self.end_year)
         self.generated_container_year = self.generated_container.generated_container_years[0]

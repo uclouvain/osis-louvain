@@ -24,11 +24,11 @@
 #
 ##############################################################################
 import datetime
-from django.utils import timezone
 
 from django.contrib.auth.models import Group
 from django.http import Http404
 from django.test import TestCase
+from django.utils import timezone
 
 from base.business.institution import find_summary_course_submission_dates_for_entity_version, \
     can_user_edit_educational_information_submission_dates_for_entity

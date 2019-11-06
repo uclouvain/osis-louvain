@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
 import factory.fuzzy
+
 from base.models.enums import education_group_language
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from reference.tests.factories.language import LanguageFactory

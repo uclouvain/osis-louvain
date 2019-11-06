@@ -23,10 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
-import factory.fuzzy
-from cms.enums import entity_name
 import operator
+
+import factory.fuzzy
+
+from cms.enums import entity_name
 
 
 class TextLabelFactory(factory.django.DjangoModelFactory):

@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% load staticfiles %}
+{% load static %}
 {% load i18n %}
 
 {% comment "License" %}
@@ -28,7 +28,7 @@
 {% block breadcrumb %}
 <li id="lnk_institution">{% trans 'Institution' %}</li>
 <li id="lnk_studies"><a href="{% url 'academic_actors' %}">{% trans 'Academic actors' %}</a></li>
-<li><a href="{% url 'scores_responsible' %}" id="lnk_scores_responsible">{% trans 'Scores responsibles' %}</a></li>
+<li><a href="{% url 'scores_responsible_list' %}" id="lnk_scores_responsible">{% trans 'Scores responsibles' %}</a></li>
 <li class="active">{{ learning_unit_year.acronym }}</li>
 {% endblock %}
 {% block content %}

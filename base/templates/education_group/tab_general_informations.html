@@ -1,6 +1,6 @@
 {% extends "education_group/layout_detail.html" %}
 {% load i18n getattr %}
-{% load staticfiles education_group format %}
+{% load static education_group format %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -27,7 +27,7 @@
 
 {% block top_action_bar %}
     {% if can_edit_information %}
-       {% include  "education_group/blocks/refresh_publication_button.html" %}
+        {% include  "education_group/blocks/refresh_publication_button.html" %}
     {% endif %}
 {% endblock %}
 {% block details %}
@@ -46,22 +46,22 @@
                         {% endif %}
                     {% endfor %}
                 </div>
-        {% if not forloop.last or not show_contacts %}
-            </div>
-        {% endif %}
+                {% if not forloop.last or not show_contacts %}
+                    </div>
+                {% endif %}
         {% endfor %}
 
 
         {% if show_contacts %}
-                <hr/>
-                <div class="container-fluid">
-                    <div class="row">
-                        {% include  "education_group/blocks/contacts_general_informations.html" %}
-                    </div>
+            <hr/>
+            <div class="container-fluid">
+                <div class="row">
+                    {% include  "education_group/blocks/contacts_general_informations.html" %}
                 </div>
             </div>
-        {% endif %}
             </div>
+        {% endif %}
+    </div>
     </div>
 
     <div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>

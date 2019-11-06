@@ -40,8 +40,7 @@ from osis_common.utils.datetime import get_tzinfo
 class TestPerms(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.attribution = AttributionFactory(summary_responsible=True,
-                                             learning_unit_year__summary_locked=False)
+        cls.attribution = AttributionFactory(learning_unit_year__summary_locked=False)
         cls.tutor = cls.attribution.tutor
         cls.learning_unit_year = cls.attribution.learning_unit_year
 

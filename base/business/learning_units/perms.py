@@ -27,7 +27,7 @@ import datetime
 
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from waffle.models import Flag
 
 from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
@@ -62,8 +62,6 @@ MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY = _("You can only modify a learning unit whe
                                         "entity")
 MSG_LEARNING_UNIT_IS_OR_HAS_PREREQUISITE = _("You cannot delete a learning unit which is prerequisite or has "
                                              "prerequisite(s)")
-MSG_LEARNING_UNIT_EXIST_IN_PAST = _("You cannot delete a learning unit which is existing before %(limit_year)s") % {
-                "limit_year": settings.YEAR_LIMIT_LUE_MODIFICATION}
 MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE = _("Person not in accordance with proposal state")
 MSG_NOT_PROPOSAL_STATE_FACULTY = _("You are faculty manager and the proposal state is not 'Faculty', so you can't edit")
 MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL = _("You are not eligible to cancel proposal")
@@ -71,7 +69,6 @@ MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL = _("You are not eligible to edit proposal")
 MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY = _("You are not attached to initial or current requirement entity, so you "
                                             "can't edit proposal")
 MSG_NOT_GOOD_RANGE_OF_YEARS = _("Not in range of years which can be edited by you")
-MSG_NOT_ELIGIBLE_TO_CONSOLIDATE_PROPOSAL = _("You are not eligible to consolidate proposal")
 MSG_NO_RIGHTS_TO_CONSOLIDATE = _("You don't have the rights to consolidate")
 MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES = _("Proposal not in eligible state for consolidation")
 MSG_CAN_DELETE_ACCORDING_TO_TYPE = _("Can delete according to the type of the learning unit")
@@ -155,7 +152,7 @@ def is_eligible_to_create_modification_proposal(learning_unit_year, person, rais
         not(is_learning_unit_year_a_partim(learning_unit_year, person, raise_exception))and \
         _is_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception)and \
         not(is_learning_unit_year_in_proposal(learning_unit_year, person, raise_exception))and \
-        is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person, raise_exception) and \
+        is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person) and \
         is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
     #  TODO detail why button is disabled
     can_raise_exception(
@@ -547,12 +544,6 @@ class can_user_edit_educational_information(BasePerm):
     )
 
 
-class can_learning_unit_year_educational_information_be_udpated(BasePerm):
-    predicates = (
-        _is_learning_unit_year_summary_editable,
-    )
-
-
 def is_year_editable(learning_unit_year, raise_exception):
     result = learning_unit_year.academic_year.year > settings.YEAR_LIMIT_LUE_MODIFICATION
     msg = "{}.  {}".format(
@@ -575,23 +566,13 @@ def can_raise_exception(raise_exception, result, msg):
 def is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise_exception=False):
     result = False
     if person:
-        result = is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person, raise_exception)
+        result = is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person)
 
     can_raise_exception(
         raise_exception,
         result,
         MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY
         )
-    return result
-
-
-def is_not_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception):
-    result = negation(_is_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception))
-    can_raise_exception(
-        raise_exception,
-        result,
-        _("This learning unit is not eligible for proposal creation/modification")
-    )
     return result
 
 

@@ -26,6 +26,7 @@
 import datetime
 
 from django.db import models
+
 from base.models.enums import number_session
 from base.signals.publisher import compute_student_score_encoding_deadline
 from osis_common.models.osis_model_admin import OsisModelAdmin

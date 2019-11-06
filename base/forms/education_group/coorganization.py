@@ -27,7 +27,7 @@ from dal import autocomplete
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
 from django.forms import ModelChoiceField, modelformset_factory, BaseModelFormSet
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.forms.education_group.common import PermissionFieldTrainingMixin
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY

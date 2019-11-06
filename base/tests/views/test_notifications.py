@@ -23,13 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock, skip
+from unittest import mock
 
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotAllowed
 from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.user import UserFactory
+
 
 class TestNotificationsViewMixin:
     def test_user_must_be_logged(self):

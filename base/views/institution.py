@@ -28,19 +28,16 @@ import logging
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
-from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
-from django.utils.translation import gettext_lazy as _
 
 from base import models as mdl
-from base.business.institution import can_user_edit_educational_information_submission_dates_for_entity
+from base.business.institution import find_summary_course_submission_dates_for_entity_version
+from base.business.perms import view_academicactors
 from base.forms.entity import EntityVersionFilter
-from base.forms.entity_calendar import EntityCalendarEducationalInformationForm
 from base.models import entity_version as entity_version_mdl
-from base.models.entity_manager import has_perm_entity_manager
 from base.models.entity_version import EntityVersion
-from base.views.common import display_success_messages, paginate_queryset
+from base.views.common import paginate_queryset
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -48,7 +45,11 @@ logger = logging.getLogger(settings.DEFAULT_LOGGER)
 @login_required
 @permission_required('base.is_institution_administrator', raise_exception=True)
 def institution(request):
-    return render(request, "institution.html", {'section': 'institution'})
+    context = {
+        'section': 'institution',
+        'view_academicactors': view_academicactors(request.user)
+    }
+    return render(request, "institution.html", context)
 
 
 @login_required
@@ -58,7 +59,7 @@ def mandates(request):
 
 
 @login_required
-@user_passes_test(has_perm_entity_manager)
+@user_passes_test(view_academicactors)
 def academic_actors(request):
     return render(request, "academic_actors.html", {})
 
@@ -77,20 +78,11 @@ def entities_search(request):
 @login_required
 def entity_read(request, entity_version_id):
     entity_version = get_object_or_404(EntityVersion, id=entity_version_id)
-    can_user_post = can_user_edit_educational_information_submission_dates_for_entity(request.user,
-                                                                                      entity_version.entity)
-    if request.method == "POST" and not can_user_post:
-        logger.warning("User {} has no sufficient right to modify submission dates of educational information.".
-                       format(request.user))
-        raise PermissionDenied()
 
     entity_parent = entity_version.get_parent_version()
     descendants = entity_version.descendants
 
-    form = EntityCalendarEducationalInformationForm(entity_version, request.POST or None)
-    if form.is_valid():
-        display_success_messages(request, _("Description fiche submission dates updated"))
-        form.save_entity_calendar(entity_version.entity)
+    calendar_summary_course_submission = find_summary_course_submission_dates_for_entity_version(entity_version)
 
     # TODO Remove locals
     return render(request, "entity/identification.html", locals())
@@ -108,7 +100,7 @@ def entities_version(request, entity_version_id):
 @login_required
 def entity_diagram(request, entity_version_id):
     entity_version = mdl.entity_version.find_by_id(entity_version_id)
-    entities_version_as_json = json.dumps(entity_version.get_organogram_data())
+    entities_version_as_json = json.dumps(entity_version.get_organigram_data())
 
     return render(
         request, "entity/organogram.html",

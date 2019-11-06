@@ -25,12 +25,12 @@
 ##############################################################################
 import datetime
 import logging
+
 from django.conf import settings
 
 from base.models import session_exam_calendar, offer_year_calendar
 from base.models.enums import academic_calendar_type as ac_type
 from base.models.session_exam_deadline import SessionExamDeadline
-
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 

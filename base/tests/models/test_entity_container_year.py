@@ -23,8 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
 import datetime
+
+from django.test import TestCase
 
 import base.models.learning_container_year
 from base.models.enums import entity_container_year_link_type

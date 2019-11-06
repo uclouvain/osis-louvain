@@ -191,3 +191,26 @@ function collapseWarnings() {
         expand_button.attr("title", gettext("Collapse"));
     });
 }
+
+
+function getDataAjaxTable(domTable, d, pageNumber) {
+    let formdata = $('#search_form').serializeArray();
+    let queryString = {};
+    $(formdata).each(function(index, obj){
+        if (!queryString.hasOwnProperty(obj.name)){
+            queryString[obj.name] = [obj.value];
+        } else {
+            queryString[obj.name].push([obj.value]);
+        }
+    });
+
+     // Append ordering to querystring
+    let columnName = domTable.DataTable().settings().init().columnDefs[d.order[0]['column']].name;
+    let direction = (d.order[0]['dir'] == 'asc') ? '' : '-';
+    let ordering = direction + columnName;
+    queryString['ordering'] = ordering;
+    $('#id_ordering').val(ordering);
+
+    queryString['page'] = pageNumber;
+    return queryString;
+}

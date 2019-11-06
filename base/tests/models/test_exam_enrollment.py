@@ -28,13 +28,13 @@ import datetime
 from django.test import TestCase
 
 from base.models import exam_enrollment, exceptions
-from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.models import test_student, test_offer_enrollment, test_learning_unit_enrollment, \
-    test_session_exam, test_academic_year, test_offer_year
-from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactory
 from base.models.enums import exam_enrollment_state as enrollment_states
+from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactory
+from base.tests.models import test_student, test_offer_enrollment, test_learning_unit_enrollment, \
+    test_session_exam, test_offer_year
 
 
 def create_exam_enrollment(session_exam, learning_unit_enrollment):
@@ -145,11 +145,6 @@ class ExamEnrollmentTest(TestCase):
                                    number_session=self.session_exam.number_session,
                                    offer_enrollment=self.offer_enrollment)
         self.assertTrue(exam_enrollment.is_deadline_tutor_reached(self.exam_enrollment))
-
-    def test_find_by_student(self):
-        self.assertCountEqual(exam_enrollment.find_by_student(None), [])
-        self.exam_enrollment.save()
-        self.assertCountEqual(exam_enrollment.find_by_student(self.student), [self.exam_enrollment])
 
     def test_find_for_score_encodings_for_all_enrollement_state(self):
         self.assertCountEqual(exam_enrollment.find_for_score_encodings(

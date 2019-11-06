@@ -33,7 +33,6 @@ from django.test import RequestFactory
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
-from django.utils import timezone
 from waffle.testutils import override_flag
 
 from attribution.tests.factories.attribution import AttributionFactory
@@ -60,8 +59,9 @@ class ManageMyCoursesViewTestCase(TestCase):
         cls.user = cls.person.user
         cls.tutor = TutorFactory(person=cls.person)
         cls.current_ac_year = create_current_academic_year()
-        ac_year_in_future = GenerateAcademicYear(start_year=cls.current_ac_year.year + 1,
-                                                 end_year=cls.current_ac_year.year + 5)
+        start_year = AcademicYearFactory(year=cls.current_ac_year.year + 1)
+        end_year = AcademicYearFactory(year=cls.current_ac_year.year + 5)
+        ac_year_in_future = GenerateAcademicYear(start_year=start_year, end_year=end_year)
         cls.academic_calendar = AcademicCalendarFactory(academic_year=cls.current_ac_year,
                                                         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
 
@@ -224,8 +224,11 @@ class ManageMyCoursesMixin(TestCase):
         cls.current_academic_year = create_current_academic_year()
         cls.academic_calendar = AcademicCalendarFactory(academic_year=cls.current_academic_year,
                                                         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
-                                                        start_date=datetime.date(timezone.now().year - 1, 9, 30),
-                                                        end_date=datetime.date(timezone.now().year + 1, 9, 30))
+                                                        start_date=datetime.date(
+                                                            cls.current_academic_year.year - 1, 9, 30),
+                                                        end_date=datetime.date(
+                                                            cls.current_academic_year.year + 1, 9, 30)
+                                                        )
         cls.academic_year_in_future = AcademicYearFactory(year=cls.current_academic_year.year + 1)
         a_valid_entity_version = EntityVersionFactory(entity_type=FACULTY)
         cls.learning_unit_year = LearningUnitYearFactory(

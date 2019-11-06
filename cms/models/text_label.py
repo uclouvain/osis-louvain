@@ -38,7 +38,7 @@ class TextLabelAdmin(osis_model_admin.OsisModelAdmin):
     ordering = ('entity',)
     list_filter = ('published',)
 
-    def delete_selected(self, request, obj):
+    def delete_selected(self, obj):
         for text_label in obj.all():
             text_label.delete()
             reorganise_order(text_label.parent)

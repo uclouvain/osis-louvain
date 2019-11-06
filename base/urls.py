@@ -32,10 +32,14 @@ import base.views.education_groups.create
 import base.views.learning_units.common
 import base.views.learning_units.create
 import base.views.learning_units.delete
-import base.views.learning_units.educational_information
 import base.views.learning_units.proposal.consolidate
 import base.views.learning_units.proposal.delete
-import base.views.learning_units.search
+import base.views.learning_units.search.borrowed
+import base.views.learning_units.search.educational_information
+import base.views.learning_units.search.external
+import base.views.learning_units.search.proposal
+import base.views.learning_units.search.service_course
+import base.views.learning_units.search.simple
 import base.views.learning_units.update
 from attribution.views import attribution, tutor_application
 from base.views import learning_achievement, search, education_groups, user_list
@@ -138,17 +142,18 @@ urlpatterns = [
     ])),
 
     url(r'^learning_units/', include([
-        url(r'^by_activity/', base.views.learning_units.search.learning_units, name='learning_units'),
-        url(r'^by_service_course/', base.views.learning_units.search.learning_units_service_course,
+        url(r'^by_activity/', base.views.learning_units.search.simple.LearningUnitSearch.as_view(),
+            name='learning_units'),
+        url(r'^by_service_course/', base.views.learning_units.search.service_course.ServiceCourseSearch.as_view(),
             name='learning_units_service_course'),
-        url(r'^by_proposal/', base.views.learning_units.search.learning_units_proposal_search,
+        url(r'^by_proposal/', base.views.learning_units.search.proposal.SearchLearningUnitProposal.as_view(),
             name='learning_units_proposal'),
-        url(r'^by_borrowed_course/', base.views.learning_units.search.learning_units_borrowed_course,
+        url(r'^by_borrowed_course/', base.views.learning_units.search.borrowed.BorrowedLearningUnitSearch.as_view(),
             name='learning_units_borrowed_course'),
         url(r'^by_summary/',
-            base.views.learning_units.educational_information.LearningUnitDescriptionFicheSearch.as_view(),
+            base.views.learning_units.search.educational_information.LearningUnitDescriptionFicheSearch.as_view(),
             name='learning_units_summary'),
-        url(r'^by_external/', base.views.learning_units.search.learning_units_external_search,
+        url(r'^by_external/', base.views.learning_units.search.external.ExternalLearningUnitSearch.as_view(),
             name='learning_units_external'),
         url(r'^new/', include([
             url(r'^academic_year_id=(?P<academic_year_id>[0-9]+)$',
@@ -241,7 +246,7 @@ urlpatterns = [
         ])),
         url(r'^check/(?P<subtype>[A-Z]+)$', base.views.learning_units.common.check_acronym, name="check_acronym"),
     ])),
-    url(r'^proposals/search/$', base.views.learning_units.search.learning_units_proposal_search,
+    url(r'^proposals/search/$', base.views.learning_units.search.proposal.SearchLearningUnitProposal.as_view(),
         name="learning_unit_proposal_search"),
 
     url(r'^my_osis/', include([

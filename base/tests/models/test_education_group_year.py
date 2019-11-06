@@ -26,7 +26,7 @@
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.test import TestCase, override_settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.models.education_group_year import search, find_with_enrollments_count
 from base.models.enums import education_group_categories, duration_unit
@@ -143,10 +143,6 @@ class EducationGroupYearTest(TestCase):
         group = GroupFactory(academic_year=self.academic_year)
         GroupElementYearFactory(child_branch=group, parent=self.education_group_year_2)
         self.assertIsNone(group.parent_by_training())
-
-    def test_children_group_element_years_property(self):
-        children_group_element_years = self.education_group_year_1.children_group_element_years
-        self.assertListEqual(list(children_group_element_years), [])
 
     def test_direct_parents_of_branch(self):
         GroupElementYearFactory(

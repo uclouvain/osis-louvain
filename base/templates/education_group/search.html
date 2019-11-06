@@ -1,5 +1,5 @@
 {% extends "education_group/layout.html" %}
-{% load staticfiles %}
+{% load static %}
 {% load i18n bootstrap3 %}
 {% load waffle_tags %}
 
@@ -56,6 +56,7 @@
                 <div class="row">
                     <div class="col-md-2">
                        {% bootstrap_field form.academic_year %}
+                        {{ form.media }}
                     </div>
                     <div class="col-md-2">
                        {% bootstrap_field form.acronym %}
@@ -118,6 +119,7 @@
                             <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
                                 <li>
                                     <a id="btn_produce_xls"
+                                       class="no_spinner"
                                        style="margin-right:10px;"
                                        title="{% trans 'Produce xls with a list of trainings' %}">
                                         &nbsp;{% trans 'List of trainings' %}
@@ -125,6 +127,7 @@
                                 </li>
                                 <li>
                                     <a id="btn_produce_xls_administrative_data"
+                                       class="no_spinner"
                                        style="margin-right:10px;"
                                        title="{% trans 'Produce xls of trainings with administrative data' %}">
                                         &nbsp;{% trans 'List of trainings with administrative data' %}
@@ -133,7 +136,7 @@
                             </ul>
                             <form id="download_xls" action="{{ request.path }}" method="post">
                                 {% csrf_token %}
-                                <input type="hidden" id="xls_status" name="xls_status">
+                                <input type="hidden" id="xls_status" class="no_spinner" name="xls_status">
                             </form>
                         </div>
                     </div>
@@ -162,111 +165,59 @@
 
 
 {% block script %}
+    <script src="{% static "js/osis_datatable.js" %}"></script>
     <script>
         $(document).ready(function () {
-            let domTable = $('#table_education_groups');
-            domTable.DataTable({
-                columnDefs: [
-                    {"name": "academic_year", "targets": 0, "data": "academic_year"},
-                    {
-                        "name": "acronym",
-                        "targets": 1,
-                        "data": "acronym",
-                        "render": function ( data, type, row, meta ) {
-                            return '<a href="'+ row['url'] +'">'+ data + '</a>';
-                        }
-                    },
-                    {"name": "title", "targets": 2, "data": "title"},
-                    {"name": "type", "targets": 3,  "data": "education_group_type_text"},
-                    {"name": "management_entity", "targets": 4, "data": "management_entity"},
-                    {"name": "code", "targets": 5, "data": "code"}
-                ],
-                "stateSave": true,
-                "paging": false,
-                "orderMulti": false,
-                "ordering": true,
-                "serverSide": true,
-                "ajax" : {
-                    "url": "{% url 'education_groups' %}",
-                    "type": "GET",
-                    "dataSrc": "object_list",
-                    "data": function (d){
-                        let formdata = $('#search_form').serializeArray();
-                        let queryString = {};
-                        $(formdata).each(function(index, obj){
-                            if (!queryString.hasOwnProperty(obj.name)){
-                                queryString[obj.name] = [obj.value];
-                            } else {
-                                queryString[obj.name].push([obj.value]);
-                            }
-                        });
-
-                        // Append ordering to querystring
-                        let columnName = domTable.DataTable().settings().init().columnDefs[d.order[0]['column']].name;
-                        let direction = (d.order[0]['dir'] == 'asc') ? '' : '-';
-                        let ordering = direction + columnName;
-                        queryString['ordering'] = ordering;
-                        $('#id_ordering').val(ordering);
-
-                        // Append page to querystring
-                        queryString['page'] = {{ object_list.number }}
-                        return queryString;
-                    },
-                    "traditional": true
-                },
-                "info": false,
-                "searching": false,
-                "language": {
-                    "oAria": {
-                        "sSortAscending": "{% trans 'activate to sort column ascending'%}",
-                        "sSortDescending": "{% trans 'activate to sort column descending'%}"
+            let columnDefs = [
+                {"name": "academic_year", "targets": 0, "data": "academic_year"},
+                {
+                    "name": "acronym",
+                    "targets": 1,
+                    "data": "acronym",
+                    "render": function ( data, type, row, meta ) {
+                        return '<a href="'+ row['url'] +'">'+ data + '</a>';
                     }
-                }
-            });
+                },
+                {"name": "title", "targets": 2, "data": "title"},
+                {"name": "type", "targets": 3,  "data": "education_group_type_text"},
+                {"name": "management_entity", "targets": 4, "data": "management_entity"},
+                {"name": "code", "targets": 5, "data": "code"}
+            ];
+
+            initializeDataTable("table_education_groups", "educationGroupIds", {{ object_list.number }},
+                50, "{% url 'education_groups' %}", columnDefs);
         });
 
         // FIXME remove xls_order_col / xls_order ==> USE ordering params
-        $("#btn_produce_xls").click(function (e) {
-            e.preventDefault();
-            var status = $("#xls_status");
-            status.val('xls');
-            var table = $('#table_education_groups').DataTable();
-            var order = table.order();
+        $("#btn_produce_xls, #btn_produce_xls_administrative_data").click(function (e) {
+            let table = $('#table_education_groups').DataTable();
+            let order = table.order();
             $("#xls_order_col").val(get_ordering_column(order));
             $("#xls_order").val(order[0][1]);
-            $("#search_form").submit();
-            status.val('');
-            $("#xls_order").val('');
-            $("#xls_order_col").val('');
-        });
 
-         // FIXME remove xls_order_col / xls_order ==> USE ordering params
-        $("#btn_produce_xls_administrative_data").click(function (e) {
-            e.preventDefault();
-            var status = $("#xls_status");
-            status.val('xls_administrative');
-            var table = $('#table_education_groups').DataTable();
-            var order = table.order();
-            $("#xls_order_col").val(get_ordering_column(order));
-            $("#xls_order").val(order[0][1]);
-            $("#search_form").submit();
-            status.val('');
+            let action_value;
+            if ($(this).attr('id') === 'btn_produce_xls') {
+                action_value = 'xls';
+            } else if ( $(this).attr('id') === 'btn_produce_xls_administrative_data' ) {
+                action_value = 'xls_administrative';
+            }
+            prepare_xls(e, action_value);
             $("#xls_order").val('');
             $("#xls_order_col").val('');
         });
 
         // FIXME remove xls_order_col / xls_order ==> USE ordering params
         function get_ordering_column(order) {
-            var id_search = 'th_' + order[0][0] + '_';
-            var id_string = '[id^=' + id_search + ']';
-            var element = document.querySelector(id_string).id;
-            var field_name = element.replace(id_search, "");
+            let id_search = 'th_' + order[0][0] + '_';
+            let id_string = '[id^=' + id_search + ']';
+            let element = document.querySelector(id_string).id;
+            let field_name = element.replace(id_search, "");
             return field_name;
         }
 
         // Disable typing on education group type select input
         $('#id_education_group_type').on('select2:opening select2:closing', function( event ) {
-            var $searchfield = $(this).parent().find('.select2-search__field');
+            let $searchfield = $(this).parent().find('.select2-search__field');
             $searchfield.prop('disabled', true);
         });
     </script>

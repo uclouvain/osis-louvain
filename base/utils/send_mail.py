@@ -32,7 +32,7 @@ import datetime
 from django.contrib.auth.models import Permission
 from django.contrib.messages import ERROR
 from django.db.models import Q
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 

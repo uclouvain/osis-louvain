@@ -25,11 +25,11 @@
 ##############################################################################
 import waffle
 from django import template
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext as _
-from django.conf import settings
+from django.utils.translation import gettext as _
 
 from base.business.education_group import can_user_edit_administrative_data
 from base.business.education_groups.perms import is_eligible_to_change_education_group, is_eligible_to_add_training, \

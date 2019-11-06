@@ -26,8 +26,8 @@
 
 from django.test import TestCase
 
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.forms.education_groups import EducationGroupFilter
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
 
 
 class TestEducationGroupTypeOrderingForm(TestCase):

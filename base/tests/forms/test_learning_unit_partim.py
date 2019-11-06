@@ -42,7 +42,7 @@ from base.models.enums.learning_unit_year_periodicity import ANNUAL, BIENNIAL_EV
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -56,11 +56,12 @@ class LearningUnitPartimFormContextMixin(TestCase):
     """This mixin is used in this test file in order to setup an environment for testing PARTIM FORM"""
     def setUp(self):
         self.current_academic_year = create_current_academic_year()
-        self.generated_ac_years = GenerateAcademicYear(self.current_academic_year.year + 1,
-                                                       self.current_academic_year.year + 10)
+        start_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
+        end_year = AcademicYearFactory(year=self.current_academic_year.year + 10)
+        self.generated_ac_years = GenerateAcademicYear(start_year, end_year)
 
         # Creation of a LearingContainerYear and all related models
-        self.learn_unit_structure = GenerateContainer(self.current_academic_year.year, self.current_academic_year.year)
+        self.learn_unit_structure = GenerateContainer(self.current_academic_year, self.current_academic_year)
         # Build in Generated Container [first index = start Generate Container ]
         self.generated_container_year = self.learn_unit_structure.generated_container_years[0]
 
@@ -323,9 +324,9 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
 
     def test_save_method_create_new_instance_with_start_anac(self):
         partim_acronym = FULL_ACRONYM+"B"
-        start_year = self.current_academic_year.year + 2
+        start_year = AcademicYearFactory(year=self.current_academic_year.year + 2)
         a_new_learning_unit_partim = LearningUnitYearFactory.build(
-            academic_year__year=start_year,
+            academic_year=start_year,
             acronym=FULL_ACRONYM,
             subtype=learning_unit_year_subtypes.PARTIM,
             language=self.learning_unit_year_full.language

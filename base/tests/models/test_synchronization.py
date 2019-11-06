@@ -26,8 +26,8 @@
 import datetime
 
 from django.core.exceptions import ObjectDoesNotExist
-from django.utils import timezone
 from django.test import TestCase
+from django.utils import timezone
 
 from base.models import synchronization
 

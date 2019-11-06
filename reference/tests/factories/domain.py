@@ -24,8 +24,8 @@
 #
 ##############################################################################
 import factory
-
 from factory import DjangoModelFactory
+
 from reference.models.enums import domain_type
 from reference.tests.factories.decree import DecreeFactory
 

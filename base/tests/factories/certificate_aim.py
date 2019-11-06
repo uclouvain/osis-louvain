@@ -23,11 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-import factory.fuzzy
 import string
-from osis_common.utils.datetime import get_tzinfo
+
+import factory.fuzzy
 from factory.django import DjangoModelFactory
 from faker import Faker
+
+from osis_common.utils.datetime import get_tzinfo
+
 fake = Faker()
 
 

@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.db.models import Case, When, Q, F
 from django.utils import timezone
@@ -59,10 +58,17 @@ class Entity(SerializableModel):
     @cached_property
     def most_recent_acronym(self):
         try:
-            most_recent_entity_version = self.entityversion_set.filter(entity_id=self.id).latest('start_date')
-            return most_recent_entity_version.acronym
+            most_recent_entity_version = sorted(self.entityversion_set.all(), key=lambda x: x.start_date)
+            return most_recent_entity_version[-1].acronym
+        except IndexError:
+            return None
 
-        except ObjectDoesNotExist:
+    @property
+    def most_recent_entity_version(self):
+        try:
+            most_recent_entity_version = sorted(self.entityversion_set.all(), key=lambda x: x.start_date)
+            return most_recent_entity_version[-1]
+        except IndexError:
             return None
 
     class Meta:

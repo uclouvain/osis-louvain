@@ -239,3 +239,65 @@ div:target{
 .show_collapse a.a_show_collapse:not(.collapsed):after {
     content: "\f077";
 }
+
+.select2-container {
+    width: 100% !important;
+    padding: 0;
+}
+
+#loader {
+    position: fixed;
+    left: calc(50% - 40px);
+    top: calc(50% - 40px);
+    z-index: 10001;
+    border: 10px solid #C90081;
+    border-top: 10px solid transparent;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.overlay {
+    position: fixed; /* Sit on top of the page content */
+    width: 100%; /* Full width (cover the whole page) */
+    height: 100%; /* Full height (cover the whole page) */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.1); /* Black background with opacity */
+    z-index: 10000; /* Specify a stack order in case you're using a different order for other elements */
+}
+
+.overlay.fadein {
+    display: none;
+    animation: fadein 3s;
+}
+
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/*
+ * Datatable css overwrite
+ */
+
+/* Display processing message on middle of page */
+div.dataTables_wrapper div.dataTables_processing {
+    position: fixed;
+    top: 50%;
+}
+
+#clipboard{
+    position: fixed;
+    bottom: 0;
+    z-index: 1000;
+}

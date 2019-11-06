@@ -23,11 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models import entity_version, offer_year_entity
 from base.models import entity
+from base.models import entity_version, offer_year_entity
 
 SERVICE_COURSE = 'SERVICE_COURSE'
-PARENT_FACULTY = 'PARENT_FACULTY'
 
 
 def find_from_offer_year(offer_year):

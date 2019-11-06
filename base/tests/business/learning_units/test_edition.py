@@ -29,7 +29,7 @@ from decimal import Decimal
 from uuid import uuid4
 
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units import edition as business_edition
 from base.enums.component_detail import COMPONENT_DETAILS
@@ -46,6 +46,7 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from reference.tests.factories.language import LanguageFactory
+from base.models.enums.component_type import COMPONENT_TYPES
 
 
 class LearningUnitEditionTestCase(TestCase):
@@ -292,9 +293,6 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertIsInstance(error_list, list)
         self.assertEqual(len(error_list), 2)
 
-        # invalidate cache
-        del self.requirement_entity.most_recent_acronym
-
         generic_error = "The value of field '%(field)s' is different between year %(year)s - %(value)s " \
                         "and year %(next_year)s - %(next_value)s"
         # Error : Requirement entity diff
@@ -409,7 +407,7 @@ class LearningUnitEditionTestCase(TestCase):
                                   {
                                       'field': COMPONENT_DETAILS[test.get('field')].lower(),
                                       'acronym': another_learning_container_year.acronym,
-                                      'component_type': _(learning_component_year_type.LECTURING),
+                                      'component_type': _(dict(COMPONENT_TYPES)[learning_component_year_type.LECTURING]),
                                       'year': self.learning_container_year.academic_year,
                                       'value': test.get('value'),
                                       'next_year': another_learning_container_year.academic_year,

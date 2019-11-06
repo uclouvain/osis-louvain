@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
@@ -48,18 +49,19 @@ class TrainingListSerializerTestCase(TestCase):
             administration_entity=cls.entity_version.entity,
         )
         url = reverse('education_group_api_v1:training-list')
-        cls.serializer = TrainingListSerializer(cls.training, context={'request': RequestFactory().get(url)})
+        cls.serializer = TrainingListSerializer(cls.training, context={
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
 
     def test_contains_expected_fields(self):
         expected_fields = [
+            'title',
             'url',
-            'uuid',
             'acronym',
             'code',
             'education_group_type',
             'education_group_type_text',
-            'title',
-            'title_english',
             'academic_year',
             'administration_entity',
             'management_entity',
@@ -93,19 +95,23 @@ class TrainingDetailSerializerTestCase(TestCase):
             management_entity=cls.entity_version.entity,
             administration_entity=cls.entity_version.entity,
         )
-        url = reverse('education_group_api_v1:training-detail', kwargs={'uuid': cls.training.uuid})
-        cls.serializer = TrainingDetailSerializer(cls.training, context={'request': RequestFactory().get(url)})
+        url = reverse('education_group_api_v1:training_read', kwargs={
+            'acronym': cls.training.acronym,
+            'year': cls.academic_year.year
+        })
+        cls.serializer = TrainingDetailSerializer(cls.training, context={
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
 
     def test_contains_expected_fields(self):
         expected_fields = [
+            'title',
             'url',
-            'uuid',
             'acronym',
             'code',
             'education_group_type',
             'education_group_type_text',
-            'title',
-            'title_english',
             'academic_year',
             'administration_entity',
             'management_entity',

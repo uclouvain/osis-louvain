@@ -26,11 +26,11 @@
 
 from django.test import TestCase
 
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from attribution.tests.factories.attribution import AttributionFactory
-from base.business.learning_units.educational_information import get_responsible_and_learning_unit_yr_list, PERSON, \
-    LEARNING_UNIT_YEARS, _update_responsible_data_with_new_learning_unit_yr
+from base.business.learning_units.educational_information import PERSON, LEARNING_UNIT_YEARS, \
+    _update_responsible_data_with_new_learning_unit_yr
+from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.tutor import TutorFactory
 
 
@@ -60,30 +60,6 @@ class TestEducationalInformation(TestCase):
         self.attribution_lu3 = AttributionFactory(learning_unit_year=self.learning_unit_year_3, tutor=self.tutor_lu1_1)
         self.learning_unit_year_3.summary_status = False
         self.learning_unit_year_3.summary_responsibles = [self.attribution_lu3]
-
-    def test_get_learning_unit_yr_list_with_one_responsible(self):
-        learning_units = get_responsible_and_learning_unit_yr_list([self.learning_unit_year_1])
-        self.assertCountEqual(learning_units, [
-            {PERSON: self.attribution_lu1.tutor.person, LEARNING_UNIT_YEARS: [self.learning_unit_year_1]}])
-
-    def test_get_learning_unit_yr_list_with_two_responsibles(self):
-        learning_units = get_responsible_and_learning_unit_yr_list([self.learning_unit_year_2])
-        self.assertCountEqual(learning_units, [
-            {PERSON: self.attribution_lu2_1.tutor.person, LEARNING_UNIT_YEARS: [self.learning_unit_year_2]},
-            {PERSON: self.attribution_lu2_2.tutor.person, LEARNING_UNIT_YEARS: [self.learning_unit_year_2]}])
-
-    def test_get_learning_unit_yr_one_person_with_several_learning_unit_for_which_he_is_responsible(self):
-        learning_units = get_responsible_and_learning_unit_yr_list(
-            [self.learning_unit_year_1, self.learning_unit_year_3])
-        self.assertCountEqual(learning_units, [
-            {PERSON: self.tutor_lu1_1.person,
-             LEARNING_UNIT_YEARS: [self.learning_unit_year_1, self.learning_unit_year_3]}])
-
-    def test_get_learning_unit_yr_list_with_summary_already_updated(self):
-        learning_unit_year_updated = LearningUnitYearFakerFactory()
-        learning_unit_year_updated.summary_status = True
-        learning_units = get_responsible_and_learning_unit_yr_list([learning_unit_year_updated])
-        self.assertCountEqual(learning_units, [])
 
     def test_update_responsible_data_with_new_learning_unit_yr(self):
         list_before_update = [{PERSON: self.person_lu_2,

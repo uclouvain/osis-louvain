@@ -9,11 +9,17 @@ function redirect_after_success(modal, xhr) {
     }
 }
 
+function addDispatchEventOnSubmitAjaxForm(e) {
+    document.dispatchEvent(new CustomEvent("formAjaxSubmit:onSubmit", {
+        "detail": $(e.target).find("button[type='submit']")
+    }));
+}
+
 var formAjaxSubmit = function (form, modal) {
     form.submit(function (e) {
-        // Added preventDefaut so as to not add anchor "href" to address bar
+        // Added preventDefault so as to not add anchor "href" to address bar
         e.preventDefault();
-
+        addDispatchEventOnSubmitAjaxForm(e);
         $.ajax({
             type: $(this).attr('method'),
             url: $(this).attr('action'),
@@ -23,13 +29,10 @@ var formAjaxSubmit = function (form, modal) {
                 //Stay on the form if there are errors.
                 if ($(xhr).find('.has-error,.alert-danger,.stay_in_modal').length > 0) {
                     $(modal).find('.modal-content').html(xhr);
-
                     // Add compatibility with ckeditor and related textareas
                     bindTextArea();
-
                     // Refresh the form node because the modal content has changed.
                     form = $("#"+form.attr('id'));
-
                     // Binding the new content with submit method.
                     formAjaxSubmit(form, modal);
                     this.dispatchEvent(new CustomEvent("formAjaxSubmit:error", {}));

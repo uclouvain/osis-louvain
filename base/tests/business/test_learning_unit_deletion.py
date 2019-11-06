@@ -28,7 +28,7 @@ import datetime
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 import base.business.learning_units.perms
 from assistant.models.tutoring_learning_unit_year import TutoringLearningUnitYear
@@ -67,7 +67,7 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 class LearningUnitYearDeletion(TestCase):
     def setUp(self):
         self.academic_year = create_current_academic_year()
-        self.learning_unit = LearningUnitFactory(start_year=1900)
+        self.learning_unit = LearningUnitFactory(start_year__year=1900)
 
     def test_check_related_partims_deletion(self):
         l_container_year = LearningContainerYearFactory()
@@ -176,7 +176,7 @@ class LearningUnitYearDeletion(TestCase):
         ])
 
     def test_delete_next_years(self):
-        l_unit = LearningUnitFactory(start_year=1900)
+        l_unit = LearningUnitFactory(start_year__year=1900)
 
         dict_learning_units = {}
         for year in range(2000, 2017):
@@ -189,22 +189,22 @@ class LearningUnitYearDeletion(TestCase):
                                                          learning_unit=l_unit).count(),
                          0)
         self.assertEqual(len(msg), 2017 - year_to_delete)
-        self.assertEqual(l_unit.end_year, year_to_delete - 1)
+        self.assertEqual(l_unit.end_year.year, year_to_delete - 1)
 
     def test_delete_partim_from_full(self):
         l_container_year = LearningContainerYearFactory(academic_year=self.academic_year)
         l_unit_year = LearningUnitYearFactory(subtype=learning_unit_year_subtypes.FULL,
                                               learning_container_year=l_container_year,
-                                              learning_unit=LearningUnitFactory(start_year=1900),
+                                              learning_unit=LearningUnitFactory(start_year__year=1900),
                                               academic_year=l_container_year.academic_year)
 
         l_unit_partim_1 = LearningUnitYearFactory(subtype=learning_unit_year_subtypes.PARTIM,
                                                   learning_container_year=l_container_year,
-                                                  learning_unit=LearningUnitFactory(start_year=1900),
+                                                  learning_unit=LearningUnitFactory(start_year__year=1900),
                                                   academic_year=l_container_year.academic_year)
         l_unit_partim_2 = LearningUnitYearFactory(subtype=learning_unit_year_subtypes.PARTIM,
                                                   learning_container_year=l_container_year,
-                                                  learning_unit=LearningUnitFactory(start_year=1900),
+                                                  learning_unit=LearningUnitFactory(start_year__year=1900),
                                                   academic_year=l_container_year.academic_year)
 
         deletion.delete_from_given_learning_unit_year(l_unit_year)
@@ -218,7 +218,8 @@ class LearningUnitYearDeletion(TestCase):
     def test_delete_learning_component_class(self):
         # Composant annualisé est associé à son composant et à son conteneur annualisé
         learning_component_year = LearningComponentYearFactory(acronym="/C",
-                                                               comment="TEST")
+                                                               comment="TEST",
+                                                               learning_unit_year__learning_unit__start_year__year=1900)
         learning_container_year = learning_component_year.learning_unit_year.learning_container_year
 
         number_classes = 10
@@ -226,7 +227,6 @@ class LearningUnitYearDeletion(TestCase):
             LearningClassYearFactory(learning_component_year=learning_component_year)
 
         learning_unit_year = learning_component_year.learning_unit_year
-        learning_unit_year.learning_unit.start_year = 1900
         learning_unit_year.subtype = learning_unit_year_subtypes.PARTIM
         learning_unit_year.save()
 
@@ -256,15 +256,15 @@ class LearningUnitYearDeletion(TestCase):
 
         learning_unit_year_full = LearningUnitYearFactory(learning_container_year=learning_container_year,
                                                           subtype=learning_unit_year_subtypes.FULL,
-                                                          learning_unit=LearningUnitFactory(start_year=1900),
+                                                          learning_unit=LearningUnitFactory(start_year__year=1900),
                                                           academic_year=learning_container_year.academic_year)
         learning_unit_year_partim = LearningUnitYearFactory(learning_container_year=learning_container_year,
                                                             subtype=learning_unit_year_subtypes.PARTIM,
-                                                            learning_unit=LearningUnitFactory(start_year=1900),
+                                                            learning_unit=LearningUnitFactory(start_year__year=1900),
                                                             academic_year=learning_container_year.academic_year)
         learning_unit_year_to_delete = LearningUnitYearFactory(learning_container_year=learning_container_year,
                                                                subtype=learning_unit_year_subtypes.PARTIM,
-                                                               learning_unit=LearningUnitFactory(start_year=1900),
+                                                               learning_unit=LearningUnitFactory(start_year__year=1900),
                                                                academic_year=learning_container_year.academic_year)
 
         deletion.delete_from_given_learning_unit_year(learning_unit_year_to_delete)

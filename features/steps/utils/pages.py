@@ -25,6 +25,7 @@ import time
 from abc import ABC
 
 import pypom
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver import ActionChains
 from selenium.webdriver.common.by import By
 
@@ -32,7 +33,6 @@ from base.models.entity_version import EntityVersion
 from features.steps.utils.fields import InputField, SubmitField, SelectField, ButtonField, \
     Checkbox, Select2Field, Link, \
     CkeditorField, RadioField, Field, SelectEntityVersionField
-from selenium.common.exceptions import NoSuchElementException
 
 
 class AjaxModal(pypom.Page, ABC):

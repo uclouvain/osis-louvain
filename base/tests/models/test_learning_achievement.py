@@ -23,15 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
 from django.db import IntegrityError
+from django.test import TestCase
 
 from base.models import learning_achievement
 from base.tests.factories.academic_year import create_current_academic_year
-from reference.tests.factories.language import LanguageFactory
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.learning_achievement import LearningAchievementFactory
-
+from reference.tests.factories.language import LanguageFactory
 
 A_CODE_NAME = 'AA 1'
 A2_CODE_NAME = 'AA 2'
@@ -41,8 +40,7 @@ class LearningAchievementTest(TestCase):
 
     def setUp(self):
         current_academic_year = create_current_academic_year()
-        generated_container = GenerateContainer(start_year=current_academic_year.year,
-                                                end_year=current_academic_year.year)
+        generated_container = GenerateContainer(start_year=current_academic_year, end_year=current_academic_year)
         generated_container_first_year = generated_container.generated_container_years[0]
         self.luy = generated_container_first_year.learning_unit_year_full
         self.language_fr = LanguageFactory(code='FR')

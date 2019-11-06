@@ -26,7 +26,7 @@
 import factory
 
 from base.models.enums.groups import FACULTY_MANAGER_GROUP, CENTRAL_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP, \
-    ADMINISTRATIVE_MANAGER_GROUP, PROGRAM_MANAGER_GROUP
+    ADMINISTRATIVE_MANAGER_GROUP, ENTITY_MANAGER_GROUP, PROGRAM_MANAGER_GROUP, TUTOR
 
 
 class GroupFactory(factory.django.DjangoModelFactory):
@@ -50,11 +50,15 @@ class CentralManagerGroupFactory(GroupFactory):
 
 
 class TutorGroupFactory(GroupFactory):
-    name = "tutors"
+    name = TUTOR
 
 
 class ProgramManagerGroupFactory(GroupFactory):
     name = PROGRAM_MANAGER_GROUP
+
+
+class EntityManagerGroupFactory(GroupFactory):
+    name = ENTITY_MANAGER_GROUP
 
 
 class AdministrativeManagerGroupFactory(GroupFactory):

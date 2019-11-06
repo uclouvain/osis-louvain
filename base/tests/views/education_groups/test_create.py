@@ -58,8 +58,9 @@ class TestCreate(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
-        cls.generated_ac_years = GenerateAcademicYear(cls.current_academic_year.year + 1,
-                                                      cls.current_academic_year.year + 10)
+        start_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
+        end_year = AcademicYearFactory(year=cls.current_academic_year.year + 10)
+        cls.generated_ac_years = GenerateAcademicYear(start_year, end_year)
         cls.parent_education_group_year = EducationGroupYearFactory(academic_year=cls.current_academic_year)
 
         cls.test_categories = [
@@ -171,8 +172,9 @@ class TestCreate(TestCase):
 class TestCreateForm(TestCase):
     def setUp(self):
         self.current_academic_year = create_current_academic_year()
-        self.generated_ac_years = GenerateAcademicYear(self.current_academic_year.year + 1,
-                                                       self.current_academic_year.year + 10)
+        start_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
+        end_year = AcademicYearFactory(year=self.current_academic_year.year + 10)
+        self.generated_ac_years = GenerateAcademicYear(start_year, end_year)
         self.parent_education_group_year = EducationGroupYearFactory(academic_year=self.current_academic_year)
         self.test_categories = [
             education_group_categories.GROUP,

@@ -27,10 +27,12 @@ import datetime
 import string
 
 import factory.fuzzy
+from factory import post_generation
 
 from base.models.enums import prerequisite_operator
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
+from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 
 
 class PrerequisiteFactory(factory.django.DjangoModelFactory):
@@ -43,3 +45,22 @@ class PrerequisiteFactory(factory.django.DjangoModelFactory):
     learning_unit_year = factory.SubFactory(LearningUnitYearFakerFactory)
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
     main_operator = prerequisite_operator.AND
+
+    @post_generation
+    def items(obj, create, extracted, groups=None, **kwargs):
+        """
+        Generate PrerequisiteItems for to this Prerequisite based on the argument groups.
+        :param groups: A tuple of tuples of LearningUnitYear. Ex: ((LSINF1101,), (LOSIS1254, LOSIS2569))
+                       Each tuple contained corresponds to a different group.
+        """
+        if groups is None:
+            groups = tuple()
+
+        for index, group in enumerate(groups):
+            for group_index, luy in enumerate(group):
+                PrerequisiteItemFactory(
+                    learning_unit=luy.learning_unit,
+                    prerequisite=obj,
+                    group_number=index+1,
+                    position=group_index+1
+                )

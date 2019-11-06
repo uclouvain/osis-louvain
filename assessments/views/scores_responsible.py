@@ -23,65 +23,45 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required, user_passes_test
-from django.urls import reverse
-from django.http import HttpResponseRedirect
+from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import render
+from django.urls import reverse
+from django_filters.views import FilterView
 
+from assessments.api.serializers.scores_responsible import ScoresResponsibleListSerializer
+from assessments.forms.scores_responsible import ScoresResponsibleFilter
 from attribution import models as mdl_attr
-from attribution.business.attribution import get_attributions_list
-from attribution.business.entity_manager import _append_entity_version
-from attribution.business.summary_responsible import get_attributions_data
+from attribution.business.score_responsible import get_attributions_data
 from base import models as mdl_base
-from base.models.entity_manager import is_entity_manager, find_entities_with_descendants_from_entity_managers, \
-    has_perm_entity_manager
+from base.models.learning_unit_year import LearningUnitYear
+from base.utils.cache import CacheFilterMixin
+
+
+class ScoresResponsibleSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFilterMixin, FilterView):
+    model = LearningUnitYear
+    paginate_by = 20
+    template_name = "scores_responsible/list.html"
+
+    filterset_class = ScoresResponsibleFilter
+    permission_required = 'assessments.view_scoresresponsible'
+
+    def get_filterset_kwargs(self, filterset_class):
+        return {
+            **super().get_filterset_kwargs(filterset_class),
+            'academic_year': mdl_base.academic_year.current_academic_year()
+        }
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.is_ajax():
+            serializer = ScoresResponsibleListSerializer(context['object_list'], many=True)
+            return JsonResponse({'object_list': serializer.data})
+        return super().render_to_response(context, **response_kwargs)
 
 
 @login_required
-@user_passes_test(has_perm_entity_manager)
-def scores_responsible(request):
-    entities_manager = mdl_base.entity_manager.find_by_user(request.user)
-    academic_year = mdl_base.academic_year.current_academic_year()
-    _append_entity_version(entities_manager, academic_year)
-    return render(request, 'scores_responsible.html', {"entities_manager": entities_manager,
-                                                       "academic_year": academic_year,
-                                                       "init": "0"})
-
-
-@login_required
-@user_passes_test(is_entity_manager)
-def scores_responsible_search(request):
-    entities_manager = mdl_base.entity_manager.find_by_user(request.user)
-    academic_year = mdl_base.academic_year.current_academic_year()
-    _append_entity_version(entities_manager, academic_year)
-
-    if request.GET:
-        entities_with_descendants = find_entities_with_descendants_from_entity_managers(entities_manager)
-        attributions = list(mdl_attr.attribution.search_scores_responsible(
-            learning_unit_title=request.GET.get('learning_unit_title'),
-            course_code=request.GET.get('course_code'),
-            entities=entities_with_descendants,
-            tutor=request.GET.get('tutor'),
-            responsible=request.GET.get('scores_responsible')
-        ))
-        dict_attribution = get_attributions_list(attributions, "-score_responsible")
-        return render(request, 'scores_responsible.html', {"entities_manager": entities_manager,
-                                                           "academic_year": academic_year,
-                                                           "dict_attribution": dict_attribution,
-                                                           "learning_unit_title": request.GET.get(
-                                                               'learning_unit_title'),
-                                                           "course_code": request.GET.get('course_code'),
-                                                           "tutor": request.GET.get('tutor'),
-                                                           "scores_responsible": request.GET.get('scores_responsible'),
-                                                           "init": "1"})
-    else:
-        return render(request, 'scores_responsible.html', {"entities_manager": entities_manager,
-                                                           "academic_year": academic_year,
-                                                           "init": "0"})
-
-
-@login_required
-@user_passes_test(is_entity_manager)
+@permission_required('assessments.change_scoresresponsible', raise_exception=True)
 def scores_responsible_management(request):
     context = {
         'course_code': request.GET.get('course_code'),
@@ -96,7 +76,7 @@ def scores_responsible_management(request):
 
 
 @login_required
-@user_passes_test(is_entity_manager)
+@permission_required('assessments.change_scoresresponsible', raise_exception=True)
 def scores_responsible_add(request, pk):
     if request.POST.get('action') == "add":
         mdl_attr.attribution.clear_scores_responsible_by_learning_unit_year(pk)
@@ -109,9 +89,4 @@ def scores_responsible_add(request, pk):
             for a_attribution in attributions:
                 a_attribution.score_responsible = True
                 a_attribution.save()
-    url = reverse('scores_responsible_search')
-    return HttpResponseRedirect(url + "?course_code=%s&learning_unit_title=%s&tutor=%s&scores_responsible=%s"
-                                % (request.POST.get('course_code'),
-                                   request.POST.get('learning_unit_title'),
-                                   request.POST.get('tutor'),
-                                   request.POST.get('scores_responsible')))
+    return HttpResponseRedirect(reverse('scores_responsible_list'))

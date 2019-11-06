@@ -95,11 +95,11 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
     if existing_grp_ele:
         return existing_grp_ele
 
-    year = parent_egy.academic_year.year
+    academic_year = parent_egy.academic_year
     previous_grp_ele = utils.get_object_or_none(
         GroupElementYear,
         parent__education_group=parent_egy.education_group,
-        parent__academic_year__year__in=[year - 1, year],
+        parent__academic_year__year__in=[academic_year.year - 1, academic_year.year],
         child_branch__education_group_type=child_education_group_type
     )
     edy_acronym = "{child_title}{parent_acronym}".format(
@@ -114,7 +114,7 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
         if ed.exists():
             child_eg = ed.first()
         else:
-            child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
+            child_eg = EducationGroup.objects.create(start_year=academic_year, end_year=academic_year)
     else:
         child_eg = previous_grp_ele.child_branch.education_group
 
@@ -150,9 +150,9 @@ def _duplicate_branch(child_education_group_type, parent_egy, last_child):
     if existing_grp_ele:
         return existing_grp_ele
 
-    year = parent_egy.academic_year.year
+    academic_year = parent_egy.academic_year
     # child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
-    last_child.education_group.end_year = year
+    last_child.education_group.end_year = academic_year
     last_child.education_group.save()
 
     child_egy = model.duplicate_object(last_child)

@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.models.education_group_type import EducationGroupType
 from osis_common.models.osis_model_admin import OsisModelAdmin

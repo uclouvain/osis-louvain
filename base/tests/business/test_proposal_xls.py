@@ -27,7 +27,7 @@ import datetime
 from unittest import mock
 
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business import proposal_xls
 from base.business.learning_unit_year_with_context import append_latest_entities
@@ -58,7 +58,7 @@ class TestProposalXls(TestCase):
 
     def setUp(self):
         academic_year = create_current_academic_year()
-        self.learning_unit = LearningUnitFactory(start_year=1900)
+        self.learning_unit = LearningUnitFactory(start_year__year=1900)
 
         l_container_year = LearningContainerYearFactory(acronym="LBIR1212", academic_year=academic_year)
         self.l_unit_yr_1 = LearningUnitYearFactory(acronym="LBIR1212", learning_container_year=l_container_year,
@@ -224,6 +224,7 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE),
             xls_build.STYLED_CELLS: None,
             xls_build.COLORED_ROWS: None,
+            xls_build.ROW_HEIGHT: None,
         }]
     }
 

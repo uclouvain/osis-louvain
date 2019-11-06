@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units.edition import filter_biennial, edit_learning_unit_end_date
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
@@ -37,7 +37,7 @@ class LearningUnitEndDateForm(forms.Form):
     academic_year = forms.ModelChoiceField(required=True,
                                            queryset=AcademicYear.objects.none(),
                                            empty_label=BLANK_CHOICE_DISPLAY,
-                                           label=_('Academic end year')
+                                           label=_('Last year of organization')
                                            )
 
     def __init__(self, data, learning_unit_year, *args, max_year=None, **kwargs):
@@ -60,10 +60,7 @@ class LearningUnitEndDateForm(forms.Form):
             self.fields['academic_year'].required = True
 
     def _set_initial_value(self, end_year):
-        try:
-            self.fields['academic_year'].initial = AcademicYear.objects.get(year=end_year)
-        except (AcademicYear.DoesNotExist, AcademicYear.MultipleObjectsReturned):
-            self.fields['academic_year'].initial = None
+        self.fields['academic_year'].initial = end_year
 
     def _get_academic_years(self, max_year):
         current_academic_year = academic_year.starting_academic_year()
@@ -72,8 +69,8 @@ class LearningUnitEndDateForm(forms.Form):
         if not max_year:
             max_year = compute_max_academic_year_adjournment()
 
-        if self.learning_unit.start_year > min_year:
-            min_year = self.learning_unit.start_year
+        if self.learning_unit.start_year.year > min_year:
+            min_year = self.learning_unit.start_year.year
 
         if self.learning_unit.is_past():
             raise ValueError(

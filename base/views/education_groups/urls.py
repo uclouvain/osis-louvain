@@ -26,15 +26,13 @@
 from django.conf.urls import url, include
 
 from base.views import education_group
-from base.views.education_groups.group_element_year.read import pdf_content
-from base.views.education_groups.learning_unit import detail as learning_unit_detail, update as learning_unit_update
 from base.views.education_groups.publication_contact import CreateEducationGroupPublicationContactView, \
     UpdateEducationGroupPublicationContactView, EducationGroupPublicationContactDeleteView, \
     UpdateEducationGroupEntityPublicationContactView
 from base.views.education_groups.search import EducationGroupTypeAutoComplete
 from base.views.education_groups.select import education_group_select, learning_unit_select
-from base.views.education_groups.update import CertificateAimAutocomplete, PostponeGroupElementYearView
-from . import search, create, detail, update, delete, group_element_year
+from base.views.education_groups.update import CertificateAimAutocomplete
+from . import search, create, detail, update, delete
 from .achievement.urls import urlpatterns as urlpatterns_achievement
 
 urlpatterns = [
@@ -80,7 +78,6 @@ urlpatterns = [
         create.SelectEducationGroupTypeView.as_view(),
         name='select_education_group_type'
     ),
-    url(r'^management/$', group_element_year.update.management, name='education_groups_management'),
 
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
 
@@ -104,18 +101,6 @@ urlpatterns = [
         url(r'^select/$', education_group_select, name='education_group_select'),
         url(r'^content/', include([
             url(u'^$', detail.EducationGroupContent.as_view(), name='education_group_content'),
-            url(u'^attach/', group_element_year.create.AttachTypeDialogView.as_view(),
-                name='education_group_attach'),
-            url(u'^create/$', group_element_year.create.CreateGroupElementYearView.as_view(),
-                name='group_element_year_create'),
-            url(r'^(?P<group_element_year_id>[0-9]+)/', include([
-                url(r'^delete/$', group_element_year.delete.DetachGroupElementYearView.as_view(),
-                    name='group_element_year_delete'),
-                url(r'^move/$', group_element_year.create.MoveGroupElementYearView.as_view(),
-                    name='group_element_year_move'),
-                url(r'^update/$', group_element_year.update.UpdateGroupElementYearView.as_view(),
-                    name="group_element_year_update")
-            ]))
         ])),
         url(r'^utilization/$', detail.EducationGroupUsing.as_view(), name='education_group_utilization'),
 
@@ -143,10 +128,6 @@ urlpatterns = [
             education_group.education_group_year_admission_condition_tab_lang_edit,
             name='tab_lang_edit'),
         url(r'^delete/$', delete.DeleteGroupEducationView.as_view(), name="delete_education_group"),
-        url(r'^group_content/', group_element_year.read.ReadEducationGroupTypeView.as_view(), name="group_content"),
-        url(r'^pdf_content/(?P<language>[a-z\-]+)', pdf_content, name="pdf_content"),
-
-        url(r'^postpone/', PostponeGroupElementYearView.as_view(), name="postpone_education_group"),
 
         url(r'^publication_contact/', include([
             url(r'^edit_entity/$',
@@ -162,16 +143,5 @@ urlpatterns = [
                 EducationGroupPublicationContactDeleteView.as_view(),
                 name="publication_contact_delete"),
         ])),
-    ])),
-    url(r'^(?P<root_id>[0-9]+)/(?P<learning_unit_year_id>[0-9]+)/learning_unit/', include([
-        url(r'^utilization/$',
-            learning_unit_detail.LearningUnitUtilization.as_view(),
-            name='learning_unit_utilization'),
-        url(r'^prerequisite/$',
-            learning_unit_detail.LearningUnitPrerequisite.as_view(),
-            name='learning_unit_prerequisite'),
-        url(r'^prerequisite/update/$',
-            learning_unit_update.LearningUnitPrerequisite.as_view(),
-            name='learning_unit_prerequisite_update'),
     ])),
 ]

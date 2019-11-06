@@ -24,11 +24,12 @@
 #
 ##############################################################################
 from datetime import timedelta, datetime
-
-from django.test import TestCase
 from unittest import mock
 
+from django.test import TestCase
+
 from assessments.business import scores_encodings_deadline
+from base.models.enums import number_session, academic_calendar_type
 from base.models.session_exam_deadline import SessionExamDeadline
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -38,7 +39,6 @@ from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactory
-from base.models.enums import number_session, academic_calendar_type
 from base.tests.factories.student import StudentFactory
 
 

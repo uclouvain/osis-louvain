@@ -35,6 +35,7 @@ from base.models.prerequisite import Prerequisite, prerequisite_syntax_validator
     MULTIPLE_PREREQUISITES_REGEX_AND
 
 
+# TODO: Only used in program_management => move to it?
 class LearningUnitPrerequisiteForm(forms.ModelForm):
     main_operator = None
 

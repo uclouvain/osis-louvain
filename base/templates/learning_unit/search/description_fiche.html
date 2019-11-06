@@ -1,0 +1,171 @@
+{% extends "learning_unit/search/base.html" %}
+{% load i18n static %}
+{% load bootstrap3 %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block panel %}
+    {% include "learning_unit/blocks/form/search_form_summary_list.html" %}
+
+        <div style="margin-top:10px;">
+
+            {% if learning_units_count %}
+                <div class="row">
+
+                    <div class="col-md-3">
+                        <strong style="margin-left:10px;color:grey;">
+                            {% blocktrans with start_index=page_obj.start_index end_index=page_obj.end_index total_counts=learning_units_count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} learning units{% endblocktrans %}
+                        </strong>
+                    </div>
+
+                    <div class="col-md-9">
+                        <div class="dropdown {{ dropdirection }} pull-right">
+                            <button id="dLabel" class="btn btn-default" type="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                    style="margin-right:10px;"
+                                    title="{% trans 'Export' %}">
+                                <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-large row pull-right">
+                                <li>
+                                    {% trans 'list of required teaching materials' as title_material %}
+                                    <a id="btn_teaching_material_xls"
+                                       class="no_spinner"
+                                       title="{{ title_material|capfirst }}">
+                                        {{ title_material|capfirst }}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="pull-right" style="margin-right: 10px">
+                            {% pagination_size_select %}
+                        </div>
+                    </div>
+                </div>
+
+                <table id="table_learning_units" class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th id="th_0_academic_year.year">{% trans 'Ac yr.' %}</th>
+                            <th id="th_1_acronym">{% trans 'Code' %}</th>
+                            <th id="th_2_title">{% trans 'Title' %}</th>
+                            <th id="th_3_type">{% trans 'Type' %}</th>
+                            <th id="th_4_subtype">{% trans 'Subtype' %}</th>
+                            <th id="th_5_status">{% trans 'Status' %}</th>
+                            <th id="th_6_summary_status"><span data-toggle="tooltip" data-placement="right" title="{% trans 'Modified' %}">{% trans 'M.' %}</span></th>
+                        </tr>
+                    </thead>
+                </table>
+                <div style="text-align:center">
+                    {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+                </div>
+
+            {% endif %}
+        </div>
+{% endblock panel %}
+
+{% block script %}
+    <script src="{% static "js/osis_datatable.js" %}"></script>
+    <script>
+        $(document).ready(function()
+        {
+            columnDefs = [
+                {
+                    "name": "academic_year",
+                    "targets": 0,
+                    "data": "academic_year",
+                    "render": function(data, type, row, meta){
+                        let year = data;
+                        let nextYear = data + 1;
+                        return `${year}-${nextYear.toString().slice(2)}`;
+                    }
+                },
+                {
+                    "name": "acronym",
+                    "targets": 1,
+                    "data": "acronym",
+                    "render": function ( data, type, row, meta ) {
+                        return '<a href="'+ row['osis_url'] +'">'+ data + '</a>';
+                    }
+                },
+                {
+                    "name": "title",
+                    "targets": 2,
+                    "data": "title"
+                },
+                {"name": "type", "targets": 3,  "data": "type_text"},
+                {"name": "subtype", "targets": 4,  "data": "subtype_text"},
+                {
+                    "name": "status",
+                    "targets": 5,
+                    "data": "status",
+                    "render": function(data, type, row, meta){
+                        if (data === true){
+                            return "<span class=\"glyphicon glyphicon-ok-circle\" aria-hidden=\"true\" style=\"color: limegreen;\"\n" +
+                                "                                          title=\"{% trans 'Active' %}\"></span>\n" +
+                                "                                    <div style=\"display:none;\">1</div>"
+                        }
+                        return "<span class=\"glyphicon glyphicon-remove-circle\" aria-hidden=\"true\" style=\"color: red;\"\n" +
+                            "                                          title=\"{% trans 'Inactive' %}\"></span>\n" +
+                            "                                    <div style=\"display:none;\">0</div>"
+                    }
+                },
+                {
+                    "name": "summary_status",
+                    "targets": 6,
+                    "data": "summary_status",
+                    "render": function(data, type, row, meta){
+                        const not_modified_msg = "{% trans "Not modified" %}";
+                        const modified_msg = "{% trans "Modified" %}";
+                        const blocked_msg = "{% trans "Blocked" %}";
+
+                        if (data === modified_msg) {
+                            return "<span class='glyphicon glyphicon-check' aria-hidden='true' style='color:limegreen;' " +
+                            "data-toggle='tooltip' data-html='true' title='" +
+                            data +
+                            "' ><span style='display:None;'>2</span></span>"
+                        }
+                        else if (data === not_modified_msg) {
+                            return "<span class='glyphicon glyphicon-unchecked' aria-hidden='true' style='color:red;' " +
+                            "data-toggle='tooltip' data-html='true' title='" +
+                            data +
+                            "' ><span style='display:None;'>0</span></span>"
+                        }
+                        return "<span class='glyphicon glyphicon-minus-sign' aria-hidden='true' style='color:red;' " +
+                            "data-toggle='tooltip' data-html='true' title='" +
+                            data +
+                            "' ><span style='display:None;'>1</span></span>"
+                    }
+                },
+            ];
+            initializeDataTable("table_learning_units", "learningUnitIds", {{ page_obj.number }},
+                        {{ items_per_page }}, "{{ request.path }}", columnDefs);
+        });
+        $("#btn_teaching_material_xls").click(function (e) {
+            prepare_xls(e, 'xls_teaching_material');
+        });
+    </script>
+{% endblock %}
+

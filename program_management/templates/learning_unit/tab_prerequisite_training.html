@@ -1,0 +1,88 @@
+{% extends "learning_unit/tree_layout_detail.html" %}
+{% load i18n dictionnary prerequisite %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block details %}
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <p>
+                <a href="{% url 'learning_unit' learning_unit_year.pk %}">
+                    <ins>{{ learning_unit_year.acronym }}</ins>
+                </a>
+                {% trans "has the following prerequisites" %} :
+            </p>
+
+            <div class="row">
+                <div class="col-md-7">
+                    <p>{% prerequisite_string prerequisite learning_unit_years_parent %}</p>
+                </div>
+                <div class="col-md-5">
+                    {% if can_modify_prerequisite %}
+                        <a class="btn btn-default"
+                           href=
+                                   {% url 'learning_unit_prerequisite_update' root_id=root_id learning_unit_year_id=learning_unit_year.id %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}"
+                           role="button">
+                            {% trans 'Modify prerequisites' %}
+                        </a>
+                    {% else %}
+                        <button class="btn btn-default" disabled>{% trans 'Modify prerequisites' %}</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% if is_prerequisites_list %}
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <p>
+                    <a href="{% url 'learning_unit' learning_unit_year.pk %}">
+                        <ins>{{ learning_unit_year.acronym }}</ins>
+                    </a>
+                    {% trans 'is a prerequisite of' %} :
+                </p>
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>{% trans 'Acronym' %}</th>
+                            <th>{% trans 'Title' %}</th>
+                            <th>{% trans 'Cred. rel./abs.' %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in is_prerequisites_list %}
+                            {% with learning_unit_years_parent|get_item:p.learning_unit_year.id as link %}
+                            <tr>
+                                <td><a href="{% url 'learning_unit' p.learning_unit_year.pk %}">{{ p.learning_unit_year.acronym }}</a></td>
+                                <td>{{ p.learning_unit_year.complete_title }}</td>
+                                <td>{{ link.relative_credits }} / {{ p.learning_unit_year.credits.normalize }}</td>
+                            </tr>
+                            {% endwith %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

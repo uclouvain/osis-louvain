@@ -24,9 +24,8 @@
 #
 ##############################################################################
 import string
-import factory
-import factory.fuzzy
 
+import factory.fuzzy
 from factory import DjangoModelFactory
 
 

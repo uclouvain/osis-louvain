@@ -29,12 +29,12 @@ from django.contrib.messages.api import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
 from django.test import TestCase
 
-from base.models import tutor
-from base.tests.factories.tutor import TutorFactory
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.user import UserFactory
 from attribution.tests.models import test_attribution
+from base.models import tutor
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.person import PersonFactory
+from base.tests.factories.tutor import TutorFactory
+from base.tests.factories.user import UserFactory
 
 
 class TestTutor(TestCase):
@@ -47,8 +47,7 @@ class TestTutor(TestCase):
         self.learning_unit_year = LearningUnitYearFactory()
         self.attribution = test_attribution.create_attribution(tutor=self.tutor,
                                                                learning_unit_year=self.learning_unit_year,
-                                                               score_responsible=False,
-                                                               summary_responsible=True)
+                                                               score_responsible=False)
 
     def test_find_by_person(self):
         self.assertEqual(self.tutor, tutor.find_by_person(self.person))
@@ -75,10 +74,6 @@ class TestTutor(TestCase):
 
     def test_find_by_id_wrong_id(self):
         self.assertIsNone(tutor.find_by_id(-1))
-
-    def test_find_all_summary_responsibles_by_learning_unit_year(self):
-        responsibles = tutor.find_all_summary_responsibles_by_learning_unit_year(self.learning_unit_year)
-        self.assertCountEqual(responsibles, [self.tutor])
 
 
 class MockRequest:

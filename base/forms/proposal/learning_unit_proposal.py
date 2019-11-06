@@ -24,68 +24,199 @@
 #
 ##############################################################################
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.db.models import Q, OuterRef, Subquery, Exists
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
+from django_filters import FilterSet, filters, OrderingFilter
 
-from base import models as mdl
-from base.business.learning_unit_year_with_context import append_latest_entities
-from base.forms.learning_unit.search_form import LearningUnitSearchForm
+from base.business.entity import get_entities_ids
+from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.entity import Entity
+from base.models.entity_version import EntityVersion
 from base.models.enums.proposal_state import ProposalState, LimitedProposalState
 from base.models.enums.proposal_type import ProposalType
+from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
 
 
 def _get_sorted_choices(tuple_of_choices):
-    return LearningUnitSearchForm.ALL_CHOICES + tuple(sorted(tuple_of_choices, key=lambda item: item[1]))
+    return tuple(sorted(tuple_of_choices, key=lambda item: item[1]))
 
 
-class LearningUnitProposalForm(LearningUnitSearchForm):
+class ProposalLearningUnitOrderingFilter(OrderingFilter):
+    def filter(self, qs, value):
+        queryset = super().filter(qs, value)
+        if value and 'folder' in value:
+            queryset = queryset.order_by("entity_folder", "proposallearningunit__folder_id")
+        elif value and '-folder' in value:
+            queryset = queryset.order_by("-entity_folder", "-proposallearningunit__folder_id")
+        return queryset
 
-    entity_folder_id = forms.ChoiceField(
-        label=_('Folder entity'),
-        required=False
+
+class ProposalLearningUnitFilter(FilterSet):
+    academic_year = filters.ModelChoiceFilter(
+        queryset=AcademicYear.objects.all(),
+        required=False,
+        label=_('Ac yr.'),
+        empty_label=pgettext_lazy("plural", "All"),
     )
-
-    folder_id = forms.IntegerField(
+    acronym = filters.CharFilter(
+        field_name="acronym",
+        lookup_expr="icontains",
+        max_length=40,
+        required=False,
+        label=_('Code'),
+    )
+    requirement_entity = filters.CharFilter(
+        method='filter_entity',
+        max_length=20,
+        label=_('Req. Entity'),
+    )
+    with_entity_subordinated = filters.BooleanFilter(
+        method=lambda queryset, *args, **kwargs: queryset,
+        label=_('Include subordinate entities'),
+        widget=forms.CheckboxInput,
+        initial='True'
+    )
+    tutor = filters.CharFilter(
+        method="filter_tutor",
+        max_length=40,
+        label=_('Tutor'),
+    )
+    entity_folder = filters.ChoiceFilter(
+        field_name="proposallearningunit__entity_id",
+        label=_('Folder entity'),
+        required=False,
+        empty_label=pgettext_lazy("plural", "All"),
+    )
+    folder = filters.NumberFilter(
+        field_name="proposallearningunit__folder_id",
         min_value=0,
         required=False,
         label=_('Folder num.'),
         widget=forms.TextInput()
     )
-
-    proposal_type = forms.ChoiceField(
+    proposal_type = filters.ChoiceFilter(
+        field_name="proposallearningunit__type",
         label=_('Proposal type'),
         choices=_get_sorted_choices(ProposalType.choices()),
-        required=False
+        required=False,
+        empty_label=pgettext_lazy("plural", "All"),
     )
-
-    proposal_state = forms.ChoiceField(
+    proposal_state = filters.ChoiceFilter(
+        field_name="proposallearningunit__state",
         label=_('Proposal status'),
         choices=_get_sorted_choices(ProposalState.choices()),
-        required=False
+        required=False,
+        empty_label=pgettext_lazy("plural", "All"),
     )
 
-    def __init__(self, data, person, *args, **kwargs):
-        super().__init__(data, *args, **kwargs)
-        self._get_entity_folder_id_linked_ordered_by_acronym(person)
+    order_by_field = 'ordering'
+    ordering = ProposalLearningUnitOrderingFilter(
+        fields=(
+            ('academic_year__year', 'academic_year'),
+            ('acronym', 'acronym'),
+            ('full_title', 'title'),
+            ('learning_container_year__container_type', 'type'),
+            ('entity_requirement', 'requirement_entity'),
+            ('proposallearningunit__type', 'proposal_type'),
+            ('proposallearningunit__state', 'proposal_state'),
+            ('proposallearningunit__folder_id', 'folder'),  # Overrided by ProposalLearningUnitOrderingFilter
+        ),
+        widget=forms.HiddenInput
+    )
+
+    class Meta:
+        model = LearningUnitYear
+        fields = [
+            "academic_year",
+            "acronym",
+            "subtype",
+            "requirement_entity",
+        ]
+
+    def __init__(self, *args, person=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.person = person
+        self.queryset = self.get_queryset
+        self.form.fields["academic_year"].initial = starting_academic_year()
+        self._get_entity_folder_id_linked_ordered_by_acronym(self.person)
 
     def _get_entity_folder_id_linked_ordered_by_acronym(self, person):
-        entities = Entity.objects.filter(proposallearningunit__isnull=False).distinct()
-        entities_sorted_by_acronym = sorted(list(entities.filter(id__in=person.linked_entities)),
-                                            key=lambda t: t.most_recent_acronym)
-        self.fields['entity_folder_id'].choices = [LearningUnitSearchForm.ALL_LABEL] + \
-                                                  [(ent.pk, ent.most_recent_acronym)
-                                                   for ent in entities_sorted_by_acronym]
+        most_recent_acronym = EntityVersion.objects.filter(
+            entity__id=OuterRef('id'),
+        ).order_by(
+            "-start_date"
+        ).values('acronym')[:1]
 
-    def get_proposal_learning_units(self):
-        learning_units = self.get_queryset().filter(proposallearningunit__isnull=False)
+        entities = Entity.objects.filter(
+            proposallearningunit__isnull=False
+        ).annotate(
+            entity_acronym=Subquery(most_recent_acronym)
+        ).distinct().order_by(
+            "entity_acronym"
+        )
 
-        learning_units = mdl.proposal_learning_unit.filter_proposal_fields(learning_units, **self.cleaned_data)
+        self.form.fields['entity_folder'].choices = [(ent.pk, ent.entity_acronym)
+                                                     for ent in entities]
 
-        for learning_unit in learning_units:
-            append_latest_entities(learning_unit, False)
+    def filter_entity(self, queryset, name, value):
+        with_subordinated = self.form.cleaned_data['with_entity_subordinated']
+        lookup_expression = "__".join(["learning_container_year", name, "in"])
+        if value:
+            entity_ids = get_entities_ids(value, with_subordinated)
+            queryset = queryset.filter(**{lookup_expression: entity_ids})
+        return queryset
 
-        return learning_units
+    def filter_tutor(self, queryset, name, value):
+        for tutor_name in value.split():
+            filter_by_first_name = Q(
+                learningcomponentyear__attributionchargenew__attribution__tutor__person__first_name__iregex=tutor_name
+            )
+            filter_by_last_name = Q(
+                learningcomponentyear__attributionchargenew__attribution__tutor__person__last_name__iregex=tutor_name
+            )
+            queryset = queryset.filter(
+                filter_by_first_name | filter_by_last_name
+            ).distinct()
+        return queryset
+
+    @property
+    def get_queryset(self):
+        # Need this close so as to return empty query by default when form is unbound
+        if not self.data:
+            return LearningUnitYear.objects.none()
+
+        entity_folder = EntityVersion.objects.filter(
+            entity=OuterRef('proposallearningunit__entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+
+        has_proposal = ProposalLearningUnit.objects.filter(
+            learning_unit_year=OuterRef('pk'),
+        )
+
+        queryset = LearningUnitYear.objects_with_container.filter(
+            proposallearningunit__isnull=False
+        ).select_related(
+            'academic_year',
+            'learning_container_year__academic_year',
+            'language',
+            'externallearningunityear',
+            'campus',
+            'proposallearningunit',
+            'campus__organization',
+        ).prefetch_related(
+            "learningcomponentyear_set",
+        ).annotate(
+            has_proposal=Exists(has_proposal),
+            entity_folder=Subquery(entity_folder),
+        )
+
+        queryset = LearningUnitYearQuerySet.annotate_full_title_class_method(queryset)
+        queryset = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(queryset)
+
+        return queryset
 
 
 class ProposalStateModelForm(forms.ModelForm):

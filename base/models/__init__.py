@@ -34,10 +34,10 @@ from base.models import education_group
 from base.models import education_group_certificate_aim
 from base.models import education_group_language
 from base.models import education_group_organization
+from base.models import education_group_publication_contact
 from base.models import education_group_type
 from base.models import education_group_year
 from base.models import education_group_year_domain
-from base.models import education_group_publication_contact
 from base.models import entity
 from base.models import entity_calendar
 from base.models import entity_manager

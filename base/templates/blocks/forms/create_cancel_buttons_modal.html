@@ -24,10 +24,10 @@
 {% endcomment %}
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "cancel" %}</button>
+    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
     <button type="submit" {% if btn_submit_name %} name="{{ btn_submit_name }}" {% endif %}
-            class="btn btn-primary pull-right" title="{% trans 'Add' %}">
+            class="btn btn-primary pull-right no_spinner" title="{% trans 'Add' %}">
         <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>
-        {% trans 'save' %}
+        {% trans 'Save' %}
     </button>
 </div>

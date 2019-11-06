@@ -24,13 +24,14 @@
 #
 ##############################################################################
 import datetime
-from django.test import TestCase
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
 
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
-from base.tests.factories.offer_year import OfferYearFactory
+from django.test import TestCase
+
 from base.templatetags import offer_year_calendar_display as offer_year_calendar_display_tag
+from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.offer_year import OfferYearFactory
+from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 
 today = datetime.date.today()
 today2 = datetime.datetime.today()
