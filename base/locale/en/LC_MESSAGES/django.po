@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-04 09:18+0100\n"
+"POT-Creation-Date: 2019-11-06 17:25+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -716,9 +716,6 @@ msgid "Description fiche"
 msgstr ""
 
 msgid "Description fiche status"
-msgstr ""
-
-msgid "Description fiche submission dates updated"
 msgstr ""
 
 msgid "Detach"
@@ -1857,12 +1854,6 @@ msgstr ""
 msgid "Pending"
 msgstr ""
 
-msgid "Periodic courses not taught"
-msgstr ""
-
-msgid "Periodic courses taught during"
-msgstr ""
-
 msgid "Periodicity"
 msgstr ""
 
@@ -2432,9 +2423,6 @@ msgstr ""
 msgid "The"
 msgstr ""
 
-msgid "The %(acronym)s has been moved"
-msgstr ""
-
 #, python-format
 msgid "The '%(field)s' field content has been successfully saved"
 msgstr ""
@@ -2621,10 +2609,6 @@ msgstr ""
 msgid "The program aim has been updated"
 msgstr ""
 
-#: templates/education_group/pdf_content.html:62
-msgid "The registration form is available at the Secretariat of"
-msgstr ""
-
 #, python-format
 msgid ""
 "The repartition volume of %(col_name)s has been already modified. "
@@ -2637,7 +2621,7 @@ msgid ""
 "%(last_year_reported)s with success."
 msgstr ""
 
-msgid "The section you modified have been saved with success."
+msgid "The sections you modified have been saved with success."
 msgstr ""
 
 #, python-format
@@ -2858,6 +2842,9 @@ msgid "UCL Bachelors"
 msgstr ""
 
 msgid "UCL Diploma"
+msgstr ""
+
+msgid "UE full"
 msgstr ""
 
 msgid "URL of the learning unit"
@@ -3092,6 +3079,9 @@ msgid ""
 "prerequisite(s)"
 msgstr ""
 
+msgid "You cannot have a specific summary course submission event."
+msgstr ""
+
 msgid "You don't have the rights to consolidate"
 msgstr ""
 
@@ -3181,9 +3171,6 @@ msgid "biennial odd"
 msgstr ""
 
 msgid "blocked update for tutor"
-msgstr ""
-
-msgid "cancel"
 msgstr ""
 
 msgid "cannot be canceled"
@@ -3380,9 +3367,6 @@ msgid "role (english)"
 msgstr ""
 
 msgid "role (french)"
-msgstr ""
-
-msgid "save"
 msgstr ""
 
 msgid "score(s) saved"
