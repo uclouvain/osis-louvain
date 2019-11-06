@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-29 11:15+0100\n"
+"POT-Creation-Date: 2019-10-31 09:48+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -1472,7 +1472,6 @@ msgid "Documentation"
 msgstr ""
 
 #: templates/education_group/blocks/admission_condition_table_row.html:70
-#: templates/education_group/blocks/content_actions.html:38
 #: templates/education_group/blocks/form/achievement_action_bar.html:19
 #: templates/learning_unit/specifications_all.html:145
 msgid "Down"
@@ -2000,6 +1999,14 @@ msgstr ""
 
 #: templates/academic_calendar/academic_calendar.html:73 templates/home.html:50
 msgid "Go"
+msgstr ""
+
+#: templates/education_group/blocks/content_actions.html:38
+msgid "Go down"
+msgstr ""
+
+#: templates/education_group/blocks/content_actions.html:37
+msgid "Go up"
 msgstr ""
 
 #: templates/education_group/tab_admission_conditions.html:177
@@ -2930,7 +2937,9 @@ msgstr ""
 #: business/learning_units/edition.py:446
 #: business/learning_units/edition.py:448
 #: business/learning_units/edition.py:572
-#: business/learning_units/edition.py:574 templates/my_osis/profile.html:151
+#: business/learning_units/edition.py:574
+#: templates/education_group/tab_content.html:55
+#: templates/my_osis/profile.html:151
 #: templates/student/exams_enrollments.html:70
 #: templates/student/learning_units_enrollments.html:58
 #: templates/student/offers_enrollments.html:61
@@ -5047,7 +5056,6 @@ msgid "Unscheduled events"
 msgstr ""
 
 #: templates/education_group/blocks/admission_condition_table_row.html:64
-#: templates/education_group/blocks/content_actions.html:37
 #: templates/education_group/blocks/form/achievement_action_bar.html:14
 #: templates/learning_unit/specifications_all.html:139
 msgid "Up"
@@ -5541,12 +5549,16 @@ msgstr ""
 "Subdivision with one character"
 
 #: templates/education_group/identification_training_details.html:140
-#: templates/education_group/search.html:221 templates/learning_units.html:123
+#: templates/education_group/search.html:221
+#: templates/education_group/tab_content.html:57
+#: templates/learning_units.html:123
 msgid "activate to sort column ascending"
 msgstr ""
 
 #: templates/education_group/identification_training_details.html:141
-#: templates/education_group/search.html:222 templates/learning_units.html:124
+#: templates/education_group/search.html:222
+#: templates/education_group/tab_content.html:58
+#: templates/learning_units.html:124
 msgid "activate to sort column descending"
 msgstr ""
 

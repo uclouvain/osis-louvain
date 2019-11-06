@@ -80,14 +80,14 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
         elif initial.get("campus"):
             self.fields["country_external_institution"].initial = initial["campus"].organization.country and\
                                                                   initial["campus"].organization.country.pk
-        if not instance:
-            self.data['acronym_0'] = LearningUnitExternalSite.E.value
-
         if not self.instance.pk:
+            self.data['acronym_0'] = LearningUnitExternalSite.E.value
             self.fields['academic_year'].queryset = AcademicYear.objects.filter(
                 year__gt=settings.YEAR_LIMIT_LUE_MODIFICATION,
                 year__lte=compute_max_academic_year_adjournment()).order_by('year')
             self.fields['academic_year'].empty_label = None
+        else:
+            self.data['acronym_0'] = self.instance.acronym[0]
 
     class Meta(LearningUnitYearModelForm.Meta):
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',
