@@ -62,6 +62,7 @@ from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.vacant_declaration_type import DECLARATION_TYPE
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
+from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
 from base.views.common import display_warning_messages, display_success_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from cms.models import text_label
@@ -158,8 +159,10 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
             )
         return HttpResponse()
     else:
-        context = get_common_context_learning_unit_year(learning_unit_year_id,
-                                                        get_object_or_404(Person, user=request.user))
+        context = get_common_context_learning_unit_year(
+            learning_unit_year_id,
+            get_object_or_404(Person, user=request.user)
+        )
         label_name = request.GET.get('label')
         text_lb = text_label.get_by_name(label_name)
         form = LearningUnitSpecificationsEditForm(**{
@@ -169,6 +172,7 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
         form.load_initial()  # Load data from database
         context['form'] = form
         context['text_label_translated'] = get_text_label_translated(text_lb, get_language())
+        context['is_luy_in_proposal'] = is_learning_unit_year_in_proposal(context['learning_unit_year'])
         return render(request, "learning_unit/specifications_edit.html", context)
 
 
