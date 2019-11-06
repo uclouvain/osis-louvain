@@ -3651,21 +3651,3 @@ msgstr "oui"
 
 msgid "yes,no"
 msgstr "oui,non"
-
-#~ msgid "Description fiche submission dates updated"
-#~ msgstr "Date de soumission des fiches descriptives mis à jour"
-
-#~ msgid "Periodic courses not taught"
-#~ msgstr "Activité cyclique non dispensée en"
-
-#~ msgid "Periodic courses taught during"
-#~ msgstr "Activité cyclique dispensée en"
-
-#~ msgid "The registration form is available at the Secretariat of"
-#~ msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
-
-#~ msgid "cancel"
-#~ msgstr "annuler"
-
-#~ msgid "save"
-#~ msgstr "enregistrer"
