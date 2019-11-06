@@ -76,15 +76,18 @@ def _update_or_create_proposal(request, learning_unit_year, proposal=None):
 
     proposal_base_form = ProposalBaseForm(request.POST or None, person, learning_unit_year, proposal)
 
-    if proposal_base_form.is_valid():
-        proposal = proposal_base_form.save()
-        display_success_messages(
-            request, _("You proposed a modification of type %(type)s for the learning unit %(acronym)s.") % {
-                'type': proposal.get_type_display(),
-                'acronym': learning_unit_year.acronym
-            }
-        )
-        return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
+    if request.method == 'POST':
+        if proposal_base_form.is_valid():
+            proposal = proposal_base_form.save()
+            display_success_messages(
+                request, _("You proposed a modification of type %(type)s for the learning unit %(acronym)s.") % {
+                    'type': proposal.get_type_display(),
+                    'acronym': learning_unit_year.acronym
+                }
+            )
+            return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
+        else:
+            show_error_message_for_form_invalid(request)
 
     context = proposal_base_form.get_context()
     if proposal:

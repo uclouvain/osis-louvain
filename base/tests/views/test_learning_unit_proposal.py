@@ -30,6 +30,7 @@ from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
+from django.core.exceptions import ValidationError
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
@@ -827,6 +828,20 @@ class TestEditProposal(TestCase):
 
         self.proposal.refresh_from_db()
         self.assertEqual(self.proposal.folder_id, 12)
+
+    def test_edit_suppression_proposal_wrong_post(self):
+        self.proposal.type = ProposalType.SUPPRESSION.name
+        self.proposal.save()
+
+        request_factory = RequestFactory()
+        request = request_factory.post(self.url, data={"academic_year": self.academic_years[3].id,
+                                                       "entity": self.entity_version.id})
+
+        request.user = self.person.user
+        request.session = 'session'
+        request._messages = FallbackStorage(request)
+
+        self.assertRaises(ValidationError, update_learning_unit_proposal, request, self.learning_unit_year.id)
 
 
 class TestLearningUnitProposalDisplay(TestCase):
