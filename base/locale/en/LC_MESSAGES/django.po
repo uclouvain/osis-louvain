@@ -3079,6 +3079,9 @@ msgid ""
 "prerequisite(s)"
 msgstr ""
 
+msgid "You cannot have a specific summary course submission event."
+msgstr ""
+
 msgid "You don't have the rights to consolidate"
 msgstr ""
 

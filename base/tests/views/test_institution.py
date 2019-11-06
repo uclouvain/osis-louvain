@@ -32,7 +32,6 @@ from django.test import TestCase
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from base.forms.entity_calendar import EntityCalendarEducationalInformationForm
 from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -94,16 +93,6 @@ class EntityViewTestCase(APITestCase):
         url = reverse('entity_read', args=[self.entity_version.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-
-        context = response.context
-        self.assertIsInstance(context["form"], EntityCalendarEducationalInformationForm)
-
-    def test_entity_read_with_post_when_no_sufficient_right(self):
-        self.client.force_login(self.user)
-        url = reverse('entity_read', args=[self.entity_version.id])
-        response = self.client.post(url)
-        self.assertTemplateUsed(response, "access_denied.html")
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_entity_diagram(self):
         self.client.force_login(self.user)

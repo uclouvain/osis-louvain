@@ -84,20 +84,16 @@
                         {% endif %}
                     </div>
 
-                    {% if can_user_post %}
-                        {% include "entity/blocks/educational_summary_calendar_widget.html" %}
-                    {% else %}
-                        <div class="row">
-                            <dl class="col-md-4">
-                                <dt>{{ form.start_date.label }}</dt>
-                                <dd>{{ form.start_date.initial|date:"d/m/Y"|default:"-" }}</dd>
-                            </dl>
-                            <dl class="col-md-4">
-                                <dt>{{ form.end_date.label }}</dt>
-                                <dd>{{ form.end_date.initial|date:"d/m/Y"|default:"-" }}</dd>
-                            </dl>
-                        </div>
-                    {% endif %}
+                    <div class="row">
+                        <dl class="col-md-4">
+                            <dt>{% trans "Educational information opening" %}</dt>
+                            <dd>{{ calendar_summary_course_submission.start_date|date:"d/m/Y"|default:"-" }}</dd>
+                        </dl>
+                        <dl class="col-md-4">
+                            <dt>{% trans "Educational information ending" %}</dt>
+                            <dd>{{ calendar_summary_course_submission.end_date|date:"d/m/Y"|default:"-" }}</dd>
+                        </dl>
+                    </div>
 
                     {% if descendants %}
                         <br>

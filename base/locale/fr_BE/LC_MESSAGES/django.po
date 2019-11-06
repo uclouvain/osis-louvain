@@ -3245,6 +3245,11 @@ msgstr ""
 "Vous ne pouvez pas supprimer une unité d'enseignement qui a des prérequis ou "
 "qui est prérequis."
 
+msgid "You cannot have a specific summary course submission event."
+msgstr ""
+"Vous ne pouvez pas avoir d'événement spécifique pour la soumission "
+"d'informations pédagogiques"
+
 msgid "You don't have the rights to consolidate"
 msgstr "Vous n'avez pas le droit de consolider"
 
