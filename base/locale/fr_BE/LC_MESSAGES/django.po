@@ -2731,8 +2731,6 @@ msgstr ""
 "Les rubriques que vous avez modifiées ont été sauvegardées et reportées "
 "jusqu'en %(last_year_reported)s avec succès"
 
-#, fuzzy
-#| msgid "The section you modified have been saved with success."
 msgid "The sections you modified have been saved with success."
 msgstr "Les rubriques que vous avez modifiées ont été sauvegardées avec succès"
 
