@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% load staticfiles %}
+{% load static %}
 {% load i18n %}
 {% load dictionnary %}
 {% load format %}
@@ -122,11 +122,11 @@
                 <p><div id="pnl_shortcut"></div></p>
             </div>
             <div class="pull-right">
-                <button type="submit" class="btn btn-primary" title="{% trans 'save'%}" id="bt_academic_calendar_save">
-                    <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'save'%}
+                <button type="submit" class="btn btn-primary" title="{% trans 'Save'%}" id="bt_academic_calendar_save">
+                    <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save'%}
                 </button>
                 <a class="btn btn-default" href="{% url 'academic_calendars' %}" role="button" id="lnk_cancel_academic_calendar">
-                    <span class="glyphicon glyphicon-cancel" aria-hidden="true"></span> {% trans 'cancel' %}
+                    <span class="glyphicon glyphicon-cancel" aria-hidden="true"></span> {% trans 'Cancel' %}
                 </a>
             </div>
         </form>

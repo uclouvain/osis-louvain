@@ -25,7 +25,7 @@
 ##############################################################################
 from django import template
 from django.core.exceptions import PermissionDenied
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units.perms import is_eligible_for_modification, is_eligible_for_modification_end_date, \
     is_eligible_to_edit_proposal, is_eligible_for_cancel_of_proposal, \

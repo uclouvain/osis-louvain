@@ -30,7 +30,7 @@ from django.contrib.messages import get_messages
 from django.db import DatabaseError
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.models import learning_unit
 from base.models.enums import learning_unit_year_subtypes
@@ -48,9 +48,14 @@ def create_learning_unit(acronym, title):
 
 
 class LearningUnitTest(TestCase):
+    def setUp(self):
+        self.start_year_2014 = AcademicYearFactory(year=2014)
+        self.start_year_2015 = AcademicYearFactory(year=2015)
+        self.start_year_2017 = AcademicYearFactory(year=2017)
+        self.end_year_2018 = AcademicYearFactory(year=2018)
 
     def test_create_learning_unit_with_start_year_higher_than_end_year(self):
-        l_unit = LearningUnitFactory.build(start_year=2000, end_year=1999)
+        l_unit = LearningUnitFactory.build(start_year=self.start_year_2017, end_year=self.start_year_2015)
         with self.assertRaises(AttributeError):
             l_unit.save()
 
@@ -80,34 +85,34 @@ class LearningUnitTest(TestCase):
         self.assertEqual(len(all_partims_container_year_2), 0)
 
     def test_academic_years_tags(self):
-        self.assertEqual(academic_years(2017, 2018), _('From').title() + " 2017-18 " + _('to').lower() + " 2018-19")
-        self.assertEqual(academic_years(None, 2018), "-")
-        self.assertEqual(academic_years(2017, None),
+        self.assertEqual(academic_years(self.start_year_2017, self.end_year_2018), _('From').title() + " 2017-18 " + _('to').lower() + " 2018-19")
+        self.assertEqual(academic_years(None, self.end_year_2018), "-")
+        self.assertEqual(academic_years(self.start_year_2017, None),
                          _('From').title() + " 2017-18 (" + _('no planned end').lower() + ")")
         self.assertEqual(academic_years(None, None), "-")
 
     def test_academic_year_tags(self):
-        self.assertEqual(academic_year(2017), "2017-18")
+        self.assertEqual(academic_year(self.start_year_2017), "2017-18")
         self.assertEqual(academic_year(None), "-")
 
     def test_learning_unit_start_end_year_constraint(self):
         # Case same year for start/end
-        LearningUnitFactory(start_year=2017, end_year=2017)
+        LearningUnitFactory(start_year=self.start_year_2017, end_year=self.start_year_2017)
 
         # Case end_year < start year
         with self.assertRaises(AttributeError):
-            LearningUnitFactory(start_year=2017, end_year=2016)
+            LearningUnitFactory(start_year=self.start_year_2017, end_year=self.start_year_2015)
 
         # Case end year > start year
-        LearningUnitFactory(start_year=2017, end_year=2018)
+        LearningUnitFactory(start_year=self.start_year_2017, end_year=self.end_year_2018)
 
     def test_delete_before_2015(self):
-        lu = LearningUnitFactory(start_year=2014, end_year=2018)
+        lu = LearningUnitFactory(start_year=self.start_year_2014, end_year=self.start_year_2017)
 
         with self.assertRaises(DatabaseError):
             lu.delete()
 
-        lu.start_year = 2015
+        lu.start_year = self.start_year_2015
         lu.delete()
 
     def test_properties_acronym_and_title(self):
@@ -139,7 +144,9 @@ class TestLearningUnitAdmin(TestCase):
     def test_apply_learning_unit_year_postponement(self):
         """ Postpone to N+6 in Learning Unit Admin """
         current_year = get_current_year()
-        academic_years = GenerateAcademicYear(current_year, current_year + 6)
+        start_year = AcademicYearFactory(year=current_year)
+        end_year = AcademicYearFactory(year=current_year + 6)
+        academic_years = GenerateAcademicYear(start_year, end_year)
 
         lu = LearningUnitFactory(end_year=None)
         LearningUnitYearFactory(

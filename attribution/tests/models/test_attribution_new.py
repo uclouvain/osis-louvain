@@ -25,12 +25,8 @@
 ##############################################################################
 from django.test import TestCase
 
-from attribution.models import attribution_charge_new, attribution_new
-from attribution.models.enums import function
-from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.models import attribution_new
 from attribution.tests.factories.attribution_new import AttributionNewFactory
-from base.models.enums import component_type
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.tutor import TutorFactory

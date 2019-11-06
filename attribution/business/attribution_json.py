@@ -24,19 +24,17 @@
 #
 ##############################################################################
 import logging
-import pika
-import pika.exceptions
 import time
 
+import pika
+import pika.exceptions
 from django.conf import settings
 from django.db.models import Prefetch
 from django.utils import timezone
 
-from osis_common.queue import queue_sender
-
 from attribution import models as mdl_attribution
 from base import models as mdl_base
-
+from osis_common.queue import queue_sender
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 

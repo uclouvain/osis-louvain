@@ -79,10 +79,6 @@ class LearningUnitYearWithContextTestCase(TestCase):
         self.assertIsInstance(self.component_without_repartition.vol_global, float)
         self.assertEqual(self.component_without_repartition.vol_global, 45.0)
 
-    def test_get_repartition_volume(self):
-        repartition_value = self.component_with_repartition.get_repartition_volume(entity_types.ADDITIONAL_REQUIREMENT_ENTITY_1)
-        self.assertEqual(repartition_value, 10.0)
-
     def test_set_repartition_volume(self):
         new_repartition_value = 1.0
 

@@ -288,7 +288,7 @@ def step_impl(context):
     context.current_page = context.current_page.proposal_suppression.click()
 
 
-@step("Cliquer sur « Editer la proposition »")
+@step("Cliquer sur « Modifier la proposition »")
 def step_impl(context):
     """
     :type context: behave.runner.Context

@@ -30,7 +30,6 @@ from base.models.entity_calendar import EntityCalendar
 from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 
 

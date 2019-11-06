@@ -23,11 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import string
-import factory
-import factory.fuzzy
 import datetime
+import string
 
+import factory.fuzzy
 from factory import DjangoModelFactory
 
 

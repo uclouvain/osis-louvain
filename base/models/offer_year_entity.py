@@ -27,6 +27,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
 from base.models.enums import offer_year_entity_type
+from base.models.utils.utils import filter_with_list_or_object
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -56,11 +57,7 @@ def search(**kwargs):
     queryset = OfferYearEntity.objects
 
     if 'entity' in kwargs:
-        if isinstance(kwargs['entity'], list):
-            queryset = queryset.filter(entity__in=kwargs['entity'])
-        else:
-            queryset = queryset.filter(entity=kwargs['entity'])
-
+        queryset = filter_with_list_or_object('entity', OfferYearEntity, **kwargs)
     if 'offer_year' in kwargs:
         queryset = queryset.filter(offer_year=kwargs['offer_year'])
 

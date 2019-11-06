@@ -29,7 +29,7 @@ from unittest.mock import patch
 from django import forms
 from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups.postponement import FIELD_TO_EXCLUDE_IN_SET
 from base.business.utils.model import model_to_dict_fk
@@ -214,15 +214,18 @@ class TestPostponementEducationGroupYear(TestCase):
 
         self.education_group_year = TrainingFactory(
             academic_year=create_current_academic_year(),
-            education_group_type__name=education_group_types.TrainingType.AGGREGATION,
+            education_group_type__name=education_group_types.TrainingType.BACHELOR,
             management_entity=management_entity_version.entity,
             administration_entity=administration_entity_version.entity,
         )
         self.education_group_type = EducationGroupTypeFactory(
-            category=education_group_categories.TRAINING
+            category=education_group_categories.TRAINING,
+            name=education_group_types.TrainingType.BACHELOR
         )
 
-        self.list_acs = GenerateAcademicYear(get_current_year(), get_current_year() + 40).academic_years
+        start_year = AcademicYearFactory(year=get_current_year())
+        end_year = AcademicYearFactory(year=get_current_year() + 40)
+        self.list_acs = GenerateAcademicYear(start_year, end_year).academic_years
 
         self.data = {
             'title': 'Métamorphose',

@@ -26,7 +26,7 @@
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.forms import formset_factory
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.forms.utils.datefield import DateRangeField, DatePickerInput, DATE_FORMAT, DateTimePickerInput
 from base.models import offer_year_calendar

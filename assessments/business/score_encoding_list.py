@@ -24,13 +24,13 @@
 #
 ##############################################################################
 import copy
-from decimal import Decimal, Context, Inexact
 import unicodedata
+from decimal import Decimal, Context, Inexact
 
 from django.db import transaction
 
 from base.models import academic_year, session_exam_calendar, exam_enrollment, program_manager, tutor, offer_year, \
-                        learning_unit_year
+    learning_unit_year
 from base.models.enums import exam_enrollment_justification_type
 
 

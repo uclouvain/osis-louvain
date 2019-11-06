@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.test import TestCase
 
 from cms.enums import entity_name
@@ -38,7 +39,7 @@ class TranslatedTextLabelTest(TestCase):
             label='TEST_LABEL'
         )
         TranslatedTextLabelFactory(
-            language='fr-be',
+            language=settings.LANGUAGE_CODE_FR,
             text_label=text_label,
             label='TEST_LABEL_TRANSLATED'
         )
@@ -46,7 +47,7 @@ class TranslatedTextLabelTest(TestCase):
             get_label_translation(
                 text_entity=entity_name.OFFER_YEAR,
                 label='TEST_LABEL',
-                language='fr-be'
+                language=settings.LANGUAGE_CODE_FR
             ),
             'TEST_LABEL_TRANSLATED'
         )

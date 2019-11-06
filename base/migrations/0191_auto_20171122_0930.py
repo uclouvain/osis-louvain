@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 from django.core.management.sql import emit_post_migrate_signal
-
 from django.db import migrations
 
 

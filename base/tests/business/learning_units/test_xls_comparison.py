@@ -27,7 +27,7 @@ import datetime
 from unittest import mock
 
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units.xls_comparison import prepare_xls_content, \
     _get_learning_unit_yrs_on_2_different_years, translate_status, create_xls_comparison, \
@@ -40,6 +40,7 @@ from base.models.enums.component_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1
 from base.models.learning_component_year import LearningComponentYear
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
@@ -50,11 +51,12 @@ from osis_common.document import xls_build
 class TestComparisonXls(TestCase):
     def setUp(self):
         self.user = UserFactory()
-        generatorContainer = GenerateContainer(datetime.date.today().year-2, datetime.date.today().year)
+        self.old_academic_year = AcademicYearFactory(year=datetime.date.today().year-2)
+        self.current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
+        generatorContainer = GenerateContainer(self.old_academic_year, self.current_academic_year)
         self.previous_learning_unit_year = generatorContainer.generated_container_years[0].learning_unit_year_full
         self.partim = generatorContainer.generated_container_years[0].learning_unit_year_partim
         self.learning_unit_year_1 = generatorContainer.generated_container_years[1].learning_unit_year_full
-
         self.academic_year = self.learning_unit_year_1.academic_year
         self.previous_academic_year = self.previous_learning_unit_year.academic_year
 
@@ -137,8 +139,8 @@ class TestComparisonXls(TestCase):
 class TestPropositionComparisonXls(TestCase):
     def setUp(self):
         self.user = UserFactory()
-
-        generatorContainer = GenerateContainer(datetime.date.today().year, datetime.date.today().year)
+        self.current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
+        generatorContainer = GenerateContainer(self.current_academic_year, self.current_academic_year)
         self.partim = generatorContainer.generated_container_years[0].learning_unit_year_partim
         self.learning_unit_year_1 = generatorContainer.generated_container_years[0].learning_unit_year_full
         self.entity_1 = generatorContainer.entities[0]
@@ -168,7 +170,10 @@ class TestPropositionComparisonXls(TestCase):
 
         self.assertEqual(data[0], _('Proposal'))
         self.assertEqual(data[1], self.learning_unit_year_1.acronym)
-        self.assertEqual(data[2], self.learning_unit_year_1.academic_year.name)
+        self.assertEqual(data[2], "{}   ({} {})".format(self.learning_unit_year_1.academic_year.name,
+                                                        _('End').lower(),
+                                                        self.learning_unit_year_1.learning_unit.end_year.name)
+                         )
         self.assertEqual(data[3], self.learning_unit_year_1.learning_container_year.get_container_type_display())
         self.assertEqual(data[4], translate_status(self.learning_unit_year_1.status))
         self.assertEqual(data[5], self.learning_unit_year_1.get_subtype_display())
@@ -241,6 +246,7 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE),
             xls_build.STYLED_CELLS: None,
             xls_build.COLORED_ROWS: None,
+            xls_build.ROW_HEIGHT: None,
         }]
     }
 

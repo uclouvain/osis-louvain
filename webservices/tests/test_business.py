@@ -24,14 +24,13 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.db.models import QuerySet
 from django.test import TestCase
 
 from base.models.enums.publication_contact_type import PublicationContactType
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
 from base.tests.factories.education_group_detailed_achievement import EducationGroupDetailedAchievementFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
 from cms.enums import entity_name
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
@@ -145,14 +144,14 @@ class GetEvaluationTestCase(TestCase):
 
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='evaluation')
         TranslatedTextLabelFactory(text_label=text_label,
-                                   language='fr-be')
+                                   language=settings.LANGUAGE_CODE_FR)
         self.evaluation = TranslatedTextRandomFactory(text_label=text_label,
-                                                      language='fr-be',
+                                                      language=settings.LANGUAGE_CODE_FR,
                                                       reference=self.education_group_year.id,
                                                       entity=text_label.entity)
 
         self.common = TranslatedTextRandomFactory(text_label=text_label,
-                                                  language='fr-be',
+                                                  language=settings.LANGUAGE_CODE_FR,
                                                   reference=common_education_group_year.id,
                                                   entity=text_label.entity)
 

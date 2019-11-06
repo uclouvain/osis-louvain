@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.db import models
+
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 

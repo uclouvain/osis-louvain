@@ -1,4 +1,3 @@
-from django.contrib.postgres.operations import TrigramExtension
 from django.db import migrations
 
 

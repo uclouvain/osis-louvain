@@ -30,7 +30,6 @@ from attribution.models.enums.function import Functions
 from base.models import person
 from base.models.academic_year import current_academic_year
 from base.models.entity import Entity
-from base.models.learning_unit_year import LearningUnitYear
 from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
 
@@ -92,15 +91,6 @@ def find_all_responsibles_by_learning_unit_year(a_learning_unit_year):
     return [attribution.tutor for attribution in attribution_list]
 
 
-def find_all_tutors_by_learning_unit_year(a_learning_unit_year, responsibles_order=""):
-    result = find_all_responsible_by_learning_unit_year(a_learning_unit_year, responsibles_order=responsibles_order)\
-        .order_by(responsibles_order, "tutor__person")
-    return [
-        [attribution.tutor, attribution.score_responsible, attribution.summary_responsible]
-        for attribution in result
-    ]
-
-
 def find_responsible(a_learning_unit_year):
     tutors_list = find_all_responsibles_by_learning_unit_year(a_learning_unit_year)
     if tutors_list:
@@ -113,45 +103,6 @@ def is_score_responsible(user, learning_unit_year):
                                       score_responsible=True,
                                       tutor__person__user=user)\
                               .count() > 0
-
-
-def search_scores_responsible(learning_unit_title, course_code, entities, tutor, responsible):
-    queryset = search_by_learning_unit_this_year(course_code, learning_unit_title)
-    if tutor and responsible:
-        queryset = queryset \
-            .filter(learning_unit_year__id__in=LearningUnitYear.objects
-                    .filter(attribution__id__in=Attribution.objects
-                            .filter(score_responsible=True,
-                                    tutor__person__in=person.find_by_firstname_or_lastname(responsible)))) \
-            .filter(tutor__person__in=person.find_by_firstname_or_lastname(tutor))
-    else:
-        if tutor:
-            queryset = _filter_by_tutor(queryset, tutor)
-        if responsible:
-            queryset = queryset \
-                .filter(score_responsible=True, tutor__person__in=person.find_by_firstname_or_lastname(responsible))
-    if entities:
-        queryset = filter_by_entities(queryset, entities)
-
-    queryset = _prefetch_entity_version(queryset)
-
-    return queryset.select_related('learning_unit_year')\
-                   .distinct("learning_unit_year")
-
-
-def filter_attributions(attributions_queryset, entities, tutor, responsible):
-    queryset = attributions_queryset
-    if tutor:
-        queryset = _filter_by_tutor(queryset, tutor)
-    if responsible:
-        queryset = queryset \
-            .filter(summary_responsible=True, tutor__person__in=person.find_by_firstname_or_lastname(responsible))
-    if entities:
-        queryset = filter_by_entities(queryset, entities)
-
-    queryset = _prefetch_entity_version(queryset)
-
-    return queryset.select_related('learning_unit_year').distinct("learning_unit_year")
 
 
 def search_by_learning_unit_this_year(code, specific_title, academic_year=None):
@@ -185,16 +136,6 @@ def find_all_responsible_by_learning_unit_year(learning_unit_year, responsibles_
         .order_by("tutor__person")
 
 
-def find_all_summary_responsibles_by_learning_unit_years(learning_unit_years):
-    summary_responsibles_group_by_luy = {}
-    all_attributions = Attribution.objects.filter(
-        learning_unit_year__in=learning_unit_years,
-        summary_responsible=True).select_related('tutor__person')
-    for attribution in all_attributions:
-        summary_responsibles_group_by_luy.setdefault(attribution.learning_unit_year_id, []).append(attribution.tutor)
-    return summary_responsibles_group_by_luy
-
-
 def find_by_tutor(tutor):
     if tutor:
         return [att.learning_unit_year for att in list(search(tutor=tutor))]
@@ -204,10 +145,6 @@ def find_by_tutor(tutor):
 
 def clear_scores_responsible_by_learning_unit_year(learning_unit_year_pk):
     _clear_attributions_field_of_learning__unit_year(learning_unit_year_pk, "score_responsible")
-
-
-def clear_summary_responsible_by_learning_unit_year(learning_unit_year_pk):
-    _clear_attributions_field_of_learning__unit_year(learning_unit_year_pk, "summary_responsible")
 
 
 def _clear_attributions_field_of_learning__unit_year(learning_unit_year_pk, field_to_clear):
@@ -223,14 +160,6 @@ def search_by_learning_unit_year_pk(learning_unit_year_pk):
 
 def find_by_id(attribution_id):
     return Attribution.objects.get(pk=attribution_id)
-
-
-def find_by_learning_unit_year(learning_unit_year=None):
-    queryset = Attribution.objects
-    if learning_unit_year:
-        queryset = queryset.filter(learning_unit_year=learning_unit_year)
-    return queryset.select_related('tutor__person', 'learning_unit_year') \
-        .order_by('tutor__person__last_name', 'tutor__person__first_name')
 
 
 def _filter_by_tutor(queryset, tutor):

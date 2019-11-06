@@ -144,6 +144,19 @@ Before moving forward, make sure you installed PostgreSQL, as explained in the s
       =# \q
 
 [[installing-django]]
+
+=== Installing PostgreSQL extensions ('unaccent' case)
+
+Some project submodules require specific extensions (e.g. 'unaccent'). In order to enable an extension, add it to the database with the following command:
+
+    $ psql -d osis_local -c 'create extension unaccent;'   
+
+If you encounter problems occuring with the specific extensions in your tests, you might need to enable this extension on the database template (used by PostgreSQL for building a new db from scratch) with the following command:
+
+    $ psql -d template1 -c 'create extension unaccent;'
+
+If you are usually launching tests with --keep-db (-k) parameter, do not forget to remove it temporarily in order to regenerate the test db.
+
 === Installing and Configuring Django
 
 Django is a modern and lightweight web framework to support our back office and front office applications. The choice for Django was made thanks to the following advantages:

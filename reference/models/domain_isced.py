@@ -24,8 +24,9 @@
 #
 ##############################################################################
 from django.db import models
+from django.utils.translation import gettext_lazy as _
+
 from osis_common.models.osis_model_admin import OsisModelAdmin
-from django.utils.translation import ugettext_lazy as _
 
 
 class DomainIscedAdmin(OsisModelAdmin):

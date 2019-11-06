@@ -30,7 +30,6 @@ import factory.fuzzy
 
 from base.models.enums import learning_container_year_types
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.entity import EntityFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 
 

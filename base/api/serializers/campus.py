@@ -29,9 +29,12 @@ from base.models.campus import Campus
 
 
 class CampusDetailSerializer(serializers.ModelSerializer):
+    organization = serializers.CharField(source='organization.name', read_only=True)
+
     class Meta:
         model = Campus
         fields = (
             'name',
             'is_administration',
+            'organization'
         )

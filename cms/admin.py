@@ -1,4 +1,5 @@
 from django.contrib import admin
+
 from .models import text_label, translated_text, translated_text_label
 
 # Register your models here.

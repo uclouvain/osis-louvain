@@ -29,7 +29,7 @@ from dal import autocomplete
 from django import forms
 from django.db.models import Q
 from django.utils.functional import lazy
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups import shorten
 from base.business.education_groups.postponement import PostponementEducationGroupYearMixin

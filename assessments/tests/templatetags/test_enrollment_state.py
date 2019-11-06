@@ -26,15 +26,13 @@
 
 from django.test import TestCase
 
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
-from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
-from base.tests.factories.session_examen import SessionExamFactory
-from base.models.enums import number_session, academic_calendar_type
-from base.models.enums import exam_enrollment_state as enrollment_states
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
-from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from assessments.templatetags.enrollment_state import enrolled_exists
+from base.models.enums import exam_enrollment_state as enrollment_states
+from base.models.enums import number_session
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.exam_enrollment import ExamEnrollmentFactory
+from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
+from base.tests.factories.session_examen import SessionExamFactory
 
 
 class EnrollmentTests(TestCase):

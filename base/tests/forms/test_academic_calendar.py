@@ -27,7 +27,7 @@ import datetime
 
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.forms.academic_calendar import AcademicCalendarForm
 from base.tests.factories.academic_calendar import AcademicCalendarFactory

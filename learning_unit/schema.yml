@@ -1,0 +1,770 @@
+openapi: 3.0.0
+servers:
+ - url: https://{environment}.osis.uclouvain.be/api/v1/learning_unit/
+   variables:
+     environment:
+       default: dev
+       enum:
+         - dev # Development server
+         - qa # Staging server
+         - test # Test server
+ - url: https://osis.uclouvain.be/api/v1/learning_unit/
+   description: Production server
+info:
+  version: '1'
+  title: Learning Unit Service
+  description: |-
+    A set of API endpoints that allow you to get information about learning unit
+paths:
+  /learning_units:
+    get:
+      description: Return a list of all the learning unit with optional filtering.
+      operationId: learningunits_list
+      parameters:
+      - in: query
+        name: limit
+        schema:
+          description: Number of results to return per page.
+          type: integer
+      - in: query
+        name: offset
+        schema:
+          description: The initial index from which to return the results.
+          type: integer
+      - in: query
+        name: acronym
+        schema:
+          description: Filter acronym in exact match
+          type: string
+      - in: query
+        name: acronym_like
+        schema:
+          description: Filter acronym in contains match case insensitive
+          type: string
+      - in: query
+        name: year
+        schema:
+          type: integer
+      - in: query
+        name: lang
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LearningUnit'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+      - learning_units
+  /learning_units/{year}/{acronym}:
+    get:
+      description: Return the detail of the learning unit
+      operationId: learningunits_read
+      parameters:
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
+      - in: path
+        name: acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: lang
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                oneOf:
+                  - $ref: '#/components/schemas/LearningUnitDetailed'
+                  - $ref: '#/components/schemas/ExternalLearningUnit'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - learning_units
+  /learning_units/{year}/{acronym}/title:
+    get:
+      description: Return the title of the learning unit
+      operationId: learningunitstitle_read
+      parameters:
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
+      - in: path
+        name: acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: lang
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - learning_units
+  /learning_units/{year}/{acronym}/attributions:
+    get:
+      description: Return all attributions assign to the learning unit
+      operationId: learningunitattributions_read
+      parameters:
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
+      - in: path
+        name: acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: lang
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LearningUnitAttribution'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - learning_units
+  /learning_units/{year}/{acronym}/education_group_roots:
+    get:
+      description: Return all education groups root which utilize the learning unit specified
+      operationId: learningunitutilization_read
+      parameters:
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
+      - in: path
+        name: acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: lang
+        schema:
+          type: string	
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EducationGroupRoot'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - learning_units
+  /learning_units/{year}/{acronym}/achievements:
+    get:
+      description: Return all achievement in order according of the learning unit specified.
+      operationId: learningunitachievements_read
+      parameters:
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
+      - in: path
+        name: acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: lang
+        schema:
+          type: string 
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LearningUnitAchievement'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - learning_units
+  /learning_units/{year}/{acronym}/summary_specification:
+    get:
+      description: Return all summary and specification information of the learning unit specified
+      operationId: learningunitsummaryspecification_read
+      parameters:
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
+      - in: path
+        name: acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: lang
+        schema:
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearningUnitSummarySpecification'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - learning_units
+  /learning_units/{year}/{acronym}/prerequisites:
+    get:
+      description: Returns all education groups for which this learning unit year had prerequisites
+      operationId: learningunitprerequisites_read
+      parameters:
+      - in: path
+        name: year
+        required: true
+        schema:
+          description: ''
+          type: integer
+      - in: path
+        name: acronym
+        required: true
+        schema:
+          description: ''
+          type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LearningUnitPrerequisite'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+      - learning_units
+  /learning_units/{year}/{acronym}/teaching_materials:
+    get:
+      description: Return all teaching materials of the learning unit
+      operationId: learningunitteachingmaterials_read
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: lang
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LearningUnitTeachingMaterial'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - learning_units
+components:
+  securitySchemes:
+    Token:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Enter your token in the format **Token &lt;token>**
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    LearningUnit:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        osis_url:
+          type: string
+          format: uri
+        acronym:
+          type: string
+        credit:
+          type: number
+          multipleOf: 0.01
+        status:
+          type: boolean
+        has_proposal:
+          type: boolean
+        title:
+          type: string
+        type:
+          $ref: '#/components/schemas/LearningUnitTypeEnum'
+        type_text:
+          type: string
+        subtype:
+          $ref: '#/components/schemas/LearningUnitSubtypeEnum'
+        subtype_text:
+          type: string
+        requirement_entity:
+          type: string
+        allocation_entity:
+          type: string
+        academic_year:
+          type: integer
+          example: 2014
+    LearningUnitDetailed:
+      allOf:
+        - $ref: '#/components/schemas/LearningUnit'
+        - type: object
+          properties:
+            credits:
+              type: number
+              multipleOf: 0.01
+            quadrimester:
+              $ref: '#/components/schemas/QuadrimesterEnum'
+            quadrimester_text:
+              type: string
+            periodicity:
+              $ref: '#/components/schemas/PeriodicityEnum'
+            periodicity_text:
+              type: string
+            campus:
+              $ref: '#/components/schemas/LearningUnitCampus'
+            components:
+              type: array
+              items:
+                $ref: '#/components/schemas/LearningUnitComponent'
+            partims:
+              type: array
+              items:
+                type: string
+                format: uri
+            parent:
+              type: string
+              format: uri
+            team:
+              type: boolean
+            language:
+              type: string
+              description: |
+                The language code according to ISO 639-1 specification (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
+            proposal:
+              type: object
+              properties:
+                folder:
+                  type: string
+                type:
+                  type: string
+                status:
+                  type: string
+            summary_status:
+              type: string
+    ExternalLearningUnit:
+      allOf:
+        - $ref: '#/components/schemas/LearningUnitDetailed'
+        - type: object
+          properties:
+            local_code:
+              type: string
+            local_url:
+              type: string
+              format: uri
+    LearningUnitComponent:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/ComponentTypeEnum'
+        type_text:
+          type: string
+        planned_classes:
+          type: integer
+          format: int32
+        hourly_volume_total_annual:
+          type: number
+          multipleOf: 0.01
+        hourly_volume_total_annual_computed:
+          type: number
+          multipleOf: 0.01
+    LearningUnitCampus:
+      type: object
+      properties:
+        name:
+          type: string
+        organization:
+          type: string
+    LearningUnitAttribution:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        function:
+          $ref: '#/components/schemas/AttributionFunctionEnum'
+        function_text:
+          type: string
+        global_id:
+          type: string
+        last_name:
+          type: string
+        middle_name:
+          type: string
+        first_name:
+          type: string
+        substitute:
+          type: object
+          properties:
+            email:
+              type: string
+              format: email
+            global_id:
+              type: string
+            last_name:
+              type: string
+            middle_name:
+              type: string
+            first_name:
+              type: string
+    EducationGroupRoot:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        acronym:
+          type: string
+        credits:
+          type: number
+          multipleOf: 0.01
+        title:
+          type: string
+        decree_category:
+          $ref: '#/components/schemas/DecreeCategoryEnum'
+        decree_category_text:
+          type: string
+        duration:
+          type: integer
+          minimum: 1
+        duration_unit:
+          $ref: '#/components/schemas/DurationUnitEnum'
+        duration_unit_text:
+          type: string
+        education_group_type:
+          $ref: '#/components/schemas/EducationGroupTypeEnum'
+        education_group_type_text:
+          type: string
+        academic_year:
+          type: number
+          example: 2014
+    LearningUnitAchievement:
+      type: object
+      properties:
+        code_name:
+          type: string
+          example: '1.0'
+        achievement:
+          type: string
+    LearningUnitSummarySpecification:
+      type: object
+      properties:
+        bibliography:
+          type: string
+        resume:
+          type: string
+        evaluation_methods:
+          type: string
+        other_informations:
+          type: string
+        online_resources:
+          type: string
+        teaching_methods:
+          type: string
+        themes_discussed:
+          type: string
+        prerequisite:
+          type: string
+        mobility:
+          type: string
+      required:
+        - bibliography
+        - resume
+        - evaluation_methods
+        - other_informations
+        - online_resources
+        - teaching_methods
+        - themes_discussed
+        - prerequisite
+        - mobility
+    LearningUnitPrerequisite:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        title:
+          type: string
+        acronym:
+          type: string
+        code:
+          type: string
+        education_group_type:
+          type: string
+        education_group_type_text:
+          type: string
+        academic_year:
+          type: integer
+        prerequisites:
+          type: string
+    LearningUnitTeachingMaterial:
+      type: array
+      items:
+        type: object
+        properties:
+          title:
+            type: string
+          mandatory:
+            type: boolean
+    LearningUnitTypeEnum:
+      type: string
+      enum:
+        - COURSE
+        - INTERNSHIP
+        - DISSERTATION
+        - OTHER_COLLECTIVE
+        - OTHER_INDIVIDUAL
+        - MASTER_THESIS
+        - EXTERNAL
+    LearningUnitSubtypeEnum:
+      type: string
+      enum:
+        - FULL
+        - PARTIM
+    QuadrimesterEnum:
+      type: string
+      enum:
+       - Q1
+       - Q2
+       - Q3
+       - Q1and2
+       - Q1or2
+    PeriodicityEnum:
+      type: string
+      enum:
+       - ANNUAL
+       - BIENNIAL_EVEN
+       - BIENNIAL_ODD
+    ComponentTypeEnum:
+      type: string
+      enum:
+        - LECTURING
+        - PRACTICAL_EXERCISES
+    AttributionFunctionEnum:
+      type: string
+      enum:
+        - COORDINATOR
+        - HOLDER
+        - CO_HOLDER
+        - DEPUTY
+        - DEPUTY_AUTHORITY
+        - DEPUTY_SABBATICAL
+        - DEPUTY_TEMPORARY
+        - PROFESSOR
+        - INTERNSHIP_SUPERVISOR
+        - INTERNSHIP_CO_SUPERVISOR
+    DecreeCategoryEnum:
+      type: string
+      enum:
+        - FCONT
+        - BAS1
+        - BAS2
+        - AESS
+        - DEC1
+        - DEC2
+        - DES
+        - DEA
+        - DOC
+        - AES
+        - AUTRE
+        - BAC
+        - AP2C
+        - MA1
+        - MA2X
+        - MA2D
+        - MA2S
+        - MA2A
+        - MA2M
+        - AS2C
+        - MACO
+        - AESSB
+        - CAPS
+        - AS3C
+        - FODO
+        - DOCB
+        - CEMC
+        - MED
+        - VETE
+    DurationUnitEnum:
+      type: string
+      enum:
+        - QUADRIMESTER
+        - TRIMESTER
+        - MONTH
+        - WEEK
+        - DAY
+    EducationGroupTypeEnum:
+      type: string
+      enum:
+        - AGGREGATION
+        - CERTIFICATE_OF_PARTICIPATION
+        - CERTIFICATE_OF_SUCCESS
+        - CERTIFICATE_OF_HOLDING_CREDITS
+        - BACHELOR
+        - CERTIFICATE
+        - CAPAES
+        - RESEARCH_CERTIFICATE
+        - UNIVERSITY_FIRST_CYCLE_CERTIFICATE
+        - UNIVERSITY_SECOND_CYCLE_CERTIFICATE
+        - ACCESS_CONTEST
+        - LANGUAGE_CLASS
+        - ISOLATED_CLASS
+        - PHD
+        - FORMATION_PHD
+        - JUNIOR_YEAR
+        - PGRM_MASTER_120
+        - MASTER_MA_120
+        - MASTER_MD_120
+        - MASTER_MS_120
+        - PGRM_MASTER_180_240
+        - MASTER_MA_180_240
+        - MASTER_MD_180_240
+        - MASTER_MS_180_240
+        - MASTER_M1
+        - MASTER_MC
+        - INTERNSHIP
+        - DEEPENING
+        - SOCIETY_MINOR
+        - ACCESS_MINOR
+        - OPEN_MINOR
+        - DISCIPLINARY_COMPLEMENT_MINOR
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+      - code
+      - message
+security:
+  - Token: []

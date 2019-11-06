@@ -2,10 +2,13 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import F
-from django.utils.translation import ugettext_lazy as _
+from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import TrainingType
 from osis_common.models import osis_model_admin
 
 
@@ -74,6 +77,22 @@ class AdmissionCondition(models.Model):
         permissions = (
             ("change_commonadmissioncondition", "Can change common admission condition"),
         )
+
+    @cached_property
+    def common_admission_condition(self):
+        admission_condition_common = None
+        egy = self.education_group_year
+        egy_type = egy.education_group_type.name
+        if egy.has_common_admission_condition:
+            if egy.is_master60 or egy.is_master180:
+                egy_type = TrainingType.PGRM_MASTER_120.name
+            common_education_group_year = EducationGroupYear.objects.get(
+                acronym__icontains='common',
+                education_group_type__name=egy_type,
+                academic_year=egy.academic_year
+            )
+            admission_condition_common = common_education_group_year.admissioncondition
+        return admission_condition_common
 
 
 class AdmissionConditionAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):

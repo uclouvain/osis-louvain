@@ -50,8 +50,6 @@ CMS_LABEL_PEDAGOGY = CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_PEDAGOGY_FR_ONLY
 
 CMS_LABEL_SUMMARY = ['resume']
 
-COLORED = 'COLORED_ROW'
-
 
 def get_same_container_year_components(learning_unit_year):
     learning_container_year = learning_unit_year.learning_container_year
@@ -149,10 +147,6 @@ def _is_used_by_full_learning_unit_year(a_learning_class_year):
     return a_learning_class_year.learning_component_year.learning_unit_year.is_full()
 
 
-def get_entity_acronym(an_entity):
-    return an_entity.acronym if an_entity else None
-
-
 def is_summary_submission_opened():
     current_academic_year = mdl_base.academic_year.starting_academic_year()
     return mdl_base.academic_calendar. \
@@ -185,7 +179,7 @@ def get_achievements_group_by_language(learning_unit_year):
 
 def get_academic_year_postponement_range(luy):
     end_postponement = academic_year.find_academic_year_by_year(
-        luy.learning_unit.end_year
+        luy.learning_unit.end_year.year
     ) if luy.learning_unit else None
     max_postponement_year = compute_max_postponement_year(luy.learning_unit, luy.subtype, end_postponement)
     academic_year_postponement_range = AcademicYear.objects.min_max_years(

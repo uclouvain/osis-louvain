@@ -25,6 +25,7 @@
 ##############################################################################
 
 from django import template
+
 from base.models import entity_version
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY
 

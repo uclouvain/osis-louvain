@@ -28,7 +28,7 @@ from unittest.mock import patch
 
 from django.db.models import QuerySet
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from attribution.models import attribution
 from attribution.models.enums.function import COORDINATOR, CO_HOLDER
@@ -37,25 +37,23 @@ from base.business.learning_units.quadrimester_strategy import LearningComponent
     LearningComponentYearQ2Strategy, LearningComponentYearQ1and2Strategy, LearningComponentYearQ1or2Strategy, \
     LearningComponentYearQuadriStrategy, LearningComponentYearQuadriNoStrategy
 from base.models import learning_unit_year
-from base.models.enums import learning_unit_year_periodicity, entity_container_year_link_type
 from base.models.enums import learning_unit_year_periodicity, entity_container_year_link_type, quadrimesters
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit_year import find_max_credits_of_related_partims, check_if_acronym_regex_is_valid, \
-    find_learning_unit_years_by_academic_year_tutor_attributions
+from base.models.learning_unit_year import find_learning_unit_years_by_academic_year_tutor_attributions
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
 from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory, LecturingLearningComponentYearFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory, \
+    LecturingLearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year, \
-    LearningUnitYearPartimFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.tutor import TutorFactory
 
@@ -103,26 +101,6 @@ class LearningUnitYearTest(TestCase):
         a_container_year.in_charge = True
 
         self.assertTrue(self.learning_unit_year.in_charge)
-
-    def test_find_gte_learning_units_year(self):
-        learning_unit = LearningUnitFactory()
-        dict_learning_unit_year = create_learning_units_year(2000, 2017, learning_unit)
-
-        selected_learning_unit_year = dict_learning_unit_year[2007]
-
-        result = list(selected_learning_unit_year.find_gte_learning_units_year().values_list('academic_year__year',
-                                                                                             flat=True))
-        self.assertListEqual(result, list(range(2007, 2018)))
-
-    def test_find_gte_learning_units_year_case_no_future(self):
-        learning_unit = LearningUnitFactory()
-        dict_learning_unit_year = create_learning_units_year(2000, 2017, learning_unit)
-
-        selected_learning_unit_year = dict_learning_unit_year[2017]
-
-        result = list(selected_learning_unit_year.find_gte_learning_units_year().values_list('academic_year__year',
-                                                                                             flat=True))
-        self.assertEqual(result, [2017])
 
     def test_find_gt_learning_unit_year(self):
         learning_unit = LearningUnitFactory()
@@ -176,21 +154,7 @@ class LearningUnitYearTest(TestCase):
         self.assertEqual(learning_unit_year.search(title=common_part)[0], luy)
         self.assertEqual(learning_unit_year.search(title=a_specific_title)[0], luy)
 
-    def test_find_max_credits_of_partims(self):
-        self.partim_1 = LearningUnitYearFactory(academic_year=self.academic_year,
-                                                learning_container_year=self.learning_unit_year.learning_container_year,
-                                                subtype=learning_unit_year_subtypes.PARTIM, credits=15)
-        self.partim_2 = LearningUnitYearFactory(academic_year=self.academic_year,
-                                                learning_container_year=self.learning_unit_year.learning_container_year,
-                                                subtype=learning_unit_year_subtypes.PARTIM, credits=20)
-        max_credits = find_max_credits_of_related_partims(self.learning_unit_year)
-        self.assertEqual(max_credits, 20)
-
-    def test_find_max_credits_of_partims_when_no_partims_related(self):
-        max_credits = find_max_credits_of_related_partims(self.learning_unit_year)
-        self.assertEqual(max_credits, None)
-
-    def test_ccomplete_title_when_no_learning_container_year(self):
+    def test_complete_title_when_no_learning_container_year(self):
         specific_title = 'part 1: Vertebrate'
 
         luy = LearningUnitYearFactory(specific_title=specific_title, learning_container_year=None)
@@ -221,10 +185,12 @@ class LearningUnitYearTest(TestCase):
         self.assertEqual(self.learning_unit_year.container_common_title, '')
 
     def test_can_be_updated_by_faculty_manager(self):
-        previous_academic_years = GenerateAcademicYear(start_year=self.academic_year.year - 3,
-                                                       end_year=self.academic_year.year - 1).academic_years
-        next_academic_years = GenerateAcademicYear(start_year=self.academic_year.year + 1,
-                                                   end_year=self.academic_year.year + 3).academic_years
+        start_year = AcademicYearFactory(year=self.academic_year.year - 3)
+        end_year = AcademicYearFactory(year=self.academic_year.year - 1)
+        previous_academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
+        next_start_year = AcademicYearFactory(year=self.academic_year.year + 1)
+        next_end_year = AcademicYearFactory(year=self.academic_year.year + 3)
+        next_academic_years = GenerateAcademicYear(start_year=next_start_year, end_year=next_end_year).academic_years
         previous_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=self.learning_unit_year.learning_unit)
                          for ac in previous_academic_years]
         next_luys = [LearningUnitYearFactory(academic_year=ac, learning_unit=self.learning_unit_year.learning_unit)
@@ -247,13 +213,6 @@ class LearningUnitYearTest(TestCase):
     def test_is_not_external(self):
         luy = LearningUnitYearFactory()
         self.assertFalse(luy.is_external())
-
-    def test_check_if_acronym_regex_is_valid(self):
-        self.assertTrue(check_if_acronym_regex_is_valid('TEST*'))
-        self.assertTrue(check_if_acronym_regex_is_valid('TE*ST'))
-        self.assertFalse(check_if_acronym_regex_is_valid('*TEST'))
-        self.assertFalse(check_if_acronym_regex_is_valid('?TEST'))
-        self.assertFalse(check_if_acronym_regex_is_valid(self.learning_unit_year))
 
 
 class LearningUnitYearGetEntityTest(TestCase):
@@ -321,8 +280,8 @@ class LearningUnitYearFindLearningUnitYearByAcademicYearTutorAttributionsTest(Te
 
 class LearningUnitYearWarningsTest(TestCase):
     def setUp(self):
-        self.start_year = 2010
-        self.end_year = 2020
+        self.start_year = AcademicYearFactory(year=2010)
+        self.end_year = AcademicYearFactory(year=2020)
         self.generated_ac_years = GenerateAcademicYear(self.start_year, self.end_year)
         self.generated_container = GenerateContainer(self.start_year, self.end_year)
         self.luy_full = self.generated_container.generated_container_years[0].learning_unit_year_full
@@ -636,7 +595,10 @@ class LearningUnitYearWarningsTest(TestCase):
         self.assertIn(excepted_error, self.luy_full._check_learning_component_year_warnings())
 
     def test_warning_multiple_partims(self):
-        """In this test, we ensure that the warnings of partim_b doesn't show up while viewing partim_a identification information"""
+        """
+            In this test, we ensure that the warnings of partim_b doesn't show up while
+            viewing partim_a identification information
+        """
 
         learning_unit_container_year = LearningContainerYearFactory(
             academic_year=self.generated_ac_years[0]

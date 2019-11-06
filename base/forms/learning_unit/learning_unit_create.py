@@ -29,7 +29,7 @@ from dal import autocomplete
 from django import forms
 from django.core.exceptions import ValidationError
 from django.utils.functional import lazy, cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices, \
     EntitiesVersionChoiceField
@@ -183,17 +183,6 @@ class LearningUnitYearModelForm(PermissionFieldMixin, forms.ModelForm):
             if not float(credits_).is_integer():
                 raise ValidationError(_('The credits value should be an integer'))
         return credits_
-
-
-class LearningUnitYearPartimModelForm(LearningUnitYearModelForm):
-    class Meta(LearningUnitYearModelForm.Meta):
-        labels = {
-            'specific_title': _('Title proper to the partim'),
-            'specific_title_english': _('English title proper to the partim')
-        }
-        field_classes = {
-            'acronym': PartimAcronymField
-        }
 
 
 class CountryEntityField(forms.ChoiceField):

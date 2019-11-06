@@ -26,7 +26,7 @@
 from django.contrib.auth.decorators import login_required, permission_required
 from django.db import transaction
 from django.shortcuts import redirect, get_object_or_404, render
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from waffle.decorators import waffle_flag
 
 from base.business.learning_unit_proposal import compute_proposal_state

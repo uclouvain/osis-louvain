@@ -25,7 +25,7 @@
 ##############################################################################
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from osis_common.models.osis_model_admin import OsisModelAdmin

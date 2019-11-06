@@ -57,13 +57,6 @@ def can_change_education_group(user, education_group):
     return True
 
 
-def can_delete_education_group(user, education_group):
-    pers = get_object_or_404(Person, user=user)
-    if not business_perms.is_eligible_to_delete_education_group(pers, education_group, raise_exception=True):
-        raise PermissionDenied
-    return True
-
-
 def can_change_general_information(view_func):
     def f_can_change_general_information(request, *args, **kwargs):
         person = get_object_or_404(Person, user=request.user)

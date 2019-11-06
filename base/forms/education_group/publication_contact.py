@@ -25,7 +25,7 @@
 ##############################################################################
 from django import forms
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models.education_group_publication_contact import EducationGroupPublicationContact, ROLE_REQUIRED_FOR_TYPES

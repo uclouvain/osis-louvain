@@ -23,8 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models.enums import mandate_type as mandate_types
 from django.db import models
+
+from base.models.enums import mandate_type as mandate_types
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 

@@ -26,7 +26,7 @@
 from django.db.models import Prefetch
 from django.db.models.functions import Concat
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import TemplateView
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
@@ -103,22 +103,6 @@ class AddChargeRepartition(EditAttributionView):
         copy_attribution.save()
         return copy_attribution
 
-    def lecturing_charge_form_valid(self, lecturing_charge_form):
-        lecturing_charge_form.save(attribution=self.get_copy_attribution)
-
-    def practical_charge_form_valid(self, practical_charge_form):
-        practical_charge_form.save(attribution=self.get_copy_attribution)
-
-    def get_lecturing_charge_form_initial(self):
-        lecturing_allocation_charge = self.attribution.lecturing_charges[0].allocation_charge \
-            if self.attribution.lecturing_charges else None
-        return {"allocation_charge": lecturing_allocation_charge}
-
-    def get_practical_charge_form_initial(self):
-        practical_allocation_charge = self.attribution.practical_charges[0].allocation_charge \
-            if self.attribution.practical_charges else None
-        return {"allocation_charge": practical_allocation_charge}
-
     def get_instance_form(self, form_name):
         return None
 
@@ -126,3 +110,9 @@ class AddChargeRepartition(EditAttributionView):
         return _("Repartition added for %(tutor)s (%(function)s)") %\
                         {"tutor": self.attribution.tutor.person,
                          "function": _(self.attribution.get_function_display())}
+
+    def lecturing_charge_form_valid(self, lecturing_charge_form):
+        lecturing_charge_form.save(attribution=self.get_copy_attribution)
+
+    def practical_charge_form_valid(self, practical_charge_form):
+        practical_charge_form.save(attribution=self.get_copy_attribution)

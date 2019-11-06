@@ -106,7 +106,7 @@ class ProposalBaseForm:
 
         if not learning_unit_year or learning_unit_year.subtype == learning_unit_year_subtypes.FULL:
             learning_unit = learning_unit_year.learning_unit if learning_unit_year else None
-            start_year = default_ac_year.year if default_ac_year else None
+            start_year = default_ac_year or None
             self.learning_unit_form_container = FullForm(person, ac_year, learning_unit_instance=learning_unit,
                                                          data=data, start_year=start_year, proposal=True,
                                                          proposal_type=proposal_type)

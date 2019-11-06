@@ -29,7 +29,6 @@ import string
 import factory.fuzzy
 
 from base.tests.factories.learning_unit import LearningUnitFakerFactory
-from base.tests.factories.prerequisite import PrerequisiteFactory
 
 
 class PrerequisiteItemFactory(factory.django.DjangoModelFactory):
@@ -40,6 +39,6 @@ class PrerequisiteItemFactory(factory.django.DjangoModelFactory):
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     learning_unit = factory.SubFactory(LearningUnitFakerFactory)
-    prerequisite = factory.SubFactory(PrerequisiteFactory)
+    prerequisite = factory.SubFactory("base.tests.factories.prerequisite.PrerequisiteFactory")
     group_number = factory.Sequence(lambda n: n)
     position = factory.Sequence(lambda n: n)

@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% load staticfiles %}
+{% load static %}
 {% load i18n academic_actors %}
 
 {% comment "License" %}
@@ -38,29 +38,38 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="row">
-                <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
-                <div class="col-md-5">
-                    <h4 class="media-heading">
-                        <a href="{% url 'pgm_manager' %}" id="lnk_pgm_managers">{% trans 'Program Managers' %}</a>
-                    </h4>
-                    <p>{% trans 'Management of the program managers' %}</p>
-                </div>
-                <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
-                <div class="col-md-5">
-                    <h4 class="media-heading"><a href="{% url 'scores_responsible' %}"
-                                                 id="lnk_srm_managers">{% trans 'Scores responsibles' %}</a></h4>
-                    <p>{% trans 'Management of the scores responsibles managers' %}</p>
-                </div>
+                {% if perms.base.view_programmanager %}
+                    <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
+                    <div class="col-md-5">
+                        <h4 class="media-heading">
+                            <a href="{% url 'pgm_manager' %}" id="lnk_pgm_managers">{% trans 'Program Managers' %}</a>
+                        </h4>
+                        <p>{% trans 'Management of the program managers' %}</p>
+                    </div>
+                {% endif %}
+
+                {% if "assessments" in installed_apps and perms.assessments.view_scoresresponsible %}
+                    <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
+                    <div class="col-md-5">
+                        <h4 class="media-heading">
+                            <a href="{% url 'scores_responsible_list' %}" id="lnk_srm_managers">{% trans 'Scores responsibles' %}</a>
+                        </h4>
+                        <p>{% trans 'Management of the scores responsibles managers' %}</p>
+                    </div>
+                {% endif %}
             </div>
             <br>
-            <div class="row">
-                <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
-                <div class="col-md-5">
-                    <h4 class="media-heading"><a
-                            href="{% url 'offer_propositions' %}">{% trans 'Dissertation Managers' %}</a></h4>
-                    <p>{% trans 'Management of the dissertation managers' %}</p>
+            {% if "dissertation" in installed_apps and perms.dissertation.change_offerproposition %}
+                <div class="row">
+                    <div class="col-md-1"><i class="fa fa-users" style="font-size: 400%; color: #6699FF;"></i></div>
+                    <div class="col-md-5">
+                        <h4 class="media-heading">
+                            <a href="{% url 'offer_propositions' %}">{% trans 'Dissertation Managers' %}</a>
+                        </h4>
+                        <p>{% trans 'Management of the dissertation managers' %}</p>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
         </div>
     </div>
 {% endblock %}

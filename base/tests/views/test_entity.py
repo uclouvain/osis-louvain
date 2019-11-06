@@ -24,8 +24,7 @@
 #
 ##############################################################################
 import json
-from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.user import UserFactory
+
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
@@ -33,6 +32,8 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
+from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.user import UserFactory
 from base.views.entity import post_entities
 
 

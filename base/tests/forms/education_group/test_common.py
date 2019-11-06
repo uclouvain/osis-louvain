@@ -31,23 +31,24 @@ from django.test import TestCase, override_settings
 
 from base.forms.education_group.common import EducationGroupModelForm, CommonBaseForm
 from base.forms.education_group.mini_training import MiniTrainingYearModelForm, MiniTrainingForm
-from base.models.academic_year import current_academic_year, AcademicYear
+from base.models.academic_year import current_academic_year, AcademicYear, starting_academic_year
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import EntityVersion
-from base.models.enums import organization_type, education_group_categories
+from base.models.enums import organization_type, education_group_categories, academic_calendar_type
 from base.models.enums.constraint_type import CREDITS
 from base.models.enums.education_group_categories import TRAINING
 from base.models.group_element_year import GroupElementYear
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory, MiniTrainingEducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, MiniTrainingFactory
 from base.tests.factories.entity_version import MainEntityVersionFactory, EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 
 
@@ -221,13 +222,16 @@ class TestCommonBaseFormSave(TestCase):
     """Unit tests on CommonBaseForm.save()"""
 
     def setUp(self):
+        self.academic_years = AcademicYearFactory.produce(number_past=0, number_future=6)
+        OpenAcademicCalendarFactory(reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
+                                    data_year=current_academic_year())
         category = education_group_categories.MINI_TRAINING  # Could take GROUP or TRAINING, the result is the same
         self.form_class = MiniTrainingForm  # Could also take GROUP or TRAINING, the result is the same
         self.expected_educ_group_year, self.post_data = _get_valid_post_data(category)
         self.education_group_type = self.expected_educ_group_year.education_group_type
 
         # Create user and attached it to management entity
-        person = PersonFactory()
+        person = FacultyManagerFactory()
         PersonEntityFactory(person=person, entity=self.expected_educ_group_year.management_entity)
         self.user = person.user
 
@@ -246,7 +250,7 @@ class TestCommonBaseFormSave(TestCase):
         education_group_type = MiniTrainingEducationGroupTypeFactory()
         initial_educ_group_year = EducationGroupYearFactory(academic_year=current_academic_year(),
                                                             management_entity=entity_version.entity,
-                                                            education_group__start_year=current_academic_year().year,
+                                                            education_group__start_year=current_academic_year(),
                                                             education_group_type=education_group_type)
 
         initial_educ_group = initial_educ_group_year.education_group
@@ -278,8 +282,8 @@ class TestCommonBaseFormSave(TestCase):
         self.assertTrue(form.is_valid(), form.errors)
         created_education_group_year = form.save()
 
-        self.assertEqual(EducationGroupYear.objects.all().count(), 1)
-        self.assertEqual(EducationGroup.objects.all().count(), 1)
+        self.assertEqual(7, EducationGroupYear.objects.all().count(), EducationGroupYear.objects.all())
+        self.assertEqual(1, EducationGroup.objects.all().count(), EducationGroup.objects.all())
 
         self._assert_all_fields_correctly_saved(created_education_group_year)
         self.assertEqual(initial_count, GroupElementYear.objects.all().count())
@@ -313,10 +317,10 @@ class TestCommonBaseFormSave(TestCase):
         )
 
         entity_version = MainEntityVersionFactory()
-        initial_educ_group_year = EducationGroupYearFactory(
+        initial_educ_group_year = MiniTrainingFactory(
             management_entity=entity_version.entity,
             academic_year=self.expected_educ_group_year.academic_year,
-            education_group__start_year=current_academic_year().year
+            education_group__start_year=starting_academic_year()
         )
 
         GroupElementYearFactory(parent=parent, child_branch=initial_educ_group_year)
@@ -349,7 +353,7 @@ class TestCommonBaseFormSave(TestCase):
         created_education_group_year = form.save()
 
         self.assertEqual(created_education_group_year.education_group.start_year,
-                         created_education_group_year.academic_year.year)
+                         created_education_group_year.academic_year)
 
     @patch('base.business.education_groups.create.create_initial_group_element_year_structure', return_value=[])
     def test_assert_create_initial_group_element_year_structure_called(self, mock_create_initial_group_element_year):
@@ -374,7 +378,7 @@ def _get_valid_post_data(category):
         management_entity=entity_version.entity,
         main_teaching_campus=campus,
         education_group_type=education_group_type,
-        education_group__start_year=current_academic_year.year,
+        education_group__start_year=current_academic_year,
         constraint_type=CREDITS,
         credits=10
     )
@@ -385,8 +389,8 @@ def _get_valid_post_data(category):
         'remark_english': str(fake_education_group_year.remark_english),
         'title_english': str(fake_education_group_year.title_english),
         'partial_acronym': str(fake_education_group_year.partial_acronym),
-        'end_year': str(fake_education_group_year.education_group.end_year),
         'start_year': str(fake_education_group_year.education_group.start_year),
+        'end_year': fake_education_group_year.education_group.end_year,
         'title': str(fake_education_group_year.title),
         'credits': str(fake_education_group_year.credits),
         'academic_year': str(fake_education_group_year.academic_year.id),

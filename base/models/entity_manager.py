@@ -27,7 +27,6 @@ from django.db import models
 from django.db.models import Prefetch
 from reversion.admin import VersionAdmin
 
-from base.models import entity_version
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
@@ -60,17 +59,8 @@ def find_by_user(a_user, with_entity_version=True):
     return qs
 
 
-def is_entity_manager(user):
-    return EntityManager.objects.filter(person__user=user).count() > 0
-
-
-def has_perm_entity_manager(user):
-    return user.has_perm('base.is_entity_manager')
-
-
-def find_entities_with_descendants_from_entity_managers(entities_manager):
+def find_entities_with_descendants_from_entity_managers(entities_manager, entities_by_id):
     entities_with_descendants = []
-    entities_by_id = entity_version.build_current_entity_version_structure_in_memory()
     for entity_manager in entities_manager:
         entities_with_descendants.append(entity_manager.entity)
         entities_with_descendants += [

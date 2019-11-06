@@ -28,9 +28,10 @@ from gettext import ngettext
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models, IntegrityError
 from django.db.models import Max
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.models import academic_year
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.enums.learning_container_year_types import EXTERNAL
 from base.models.enums.learning_unit_year_subtypes import PARTIM, FULL
@@ -89,11 +90,23 @@ class LearningUnit(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     learning_container = models.ForeignKey('LearningContainer', blank=True, null=True, on_delete=models.CASCADE)
     changed = models.DateTimeField(null=True, auto_now=True)
-    start_year = models.IntegerField(_('Starting year'))
-    end_year = models.IntegerField(blank=True, null=True, verbose_name=_('End year'))
-
+    start_year = models.ForeignKey(
+        'AcademicYear',
+        blank=True,
+        null=True,
+        verbose_name=_('Start academic year'),
+        related_name='learning_unit_start_years',
+        on_delete=models.PROTECT
+    )
+    end_year = models.ForeignKey(
+        'AcademicYear',
+        blank=True,
+        null=True,
+        verbose_name=_('Last year of organization'),
+        related_name='learning_unit_end_years',
+        on_delete=models.PROTECT
+    )
     faculty_remark = models.TextField(blank=True, null=True, verbose_name=_('Faculty remark'))
-
     other_remark = models.TextField(
         blank=True,
         null=True,
@@ -104,7 +117,7 @@ class LearningUnit(SerializableModel):
         return self.acronym
 
     def save(self, *args, **kwargs):
-        if self.end_year and self.end_year < self.start_year:
+        if self.end_year and self.end_year.year < self.start_year.year:
             raise AttributeError("Start date should be before the end date")
         super(LearningUnit, self).save(*args, **kwargs)
 
@@ -120,12 +133,12 @@ class LearningUnit(SerializableModel):
         return self.most_recent_learning_unit_year().specific_title
 
     def delete(self, *args, **kwargs):
-        if self.start_year < 2015:
+        if self.start_year.year < 2015:
             raise IntegrityError(_('Prohibition to delete a learning unit before 2015.'))
         return super().delete(*args, **kwargs)
 
     def is_past(self):
-        return self.end_year and starting_academic_year().year > self.end_year
+        return self.end_year and starting_academic_year().year > self.end_year.year
 
     def most_recent_learning_unit_year(self):
         return self.learningunityear_set.latest('academic_year__year')
@@ -171,8 +184,8 @@ class LearningUnit(SerializableModel):
         """ Compute the maximal possible end_year value when the end_year is None """
         if self.end_year:
             return self.end_year
-
-        return AcademicYear.objects.filter(learningunityear__learning_unit=self).aggregate(Max('year'))['year__max']
+        end_year = AcademicYear.objects.filter(learningunityear__learning_unit=self).aggregate(Max('year'))['year__max']
+        return academic_year.find_academic_year_by_year(end_year)
 
 
 def get_by_acronym_with_highest_academic_year(acronym):

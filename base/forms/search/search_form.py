@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django import forms
+from django_filters import fields as django_filter_fields
 
 
 class BaseSearchForm(forms.Form):
@@ -46,7 +47,7 @@ def get_research_criteria(search_form):
         if not search_form.cleaned_data[field_name]:
             continue
         tuple_to_append = (str(field.label), search_form.cleaned_data[field_name])
-        if type(field) == forms.ChoiceField:
+        if type(field) == forms.ChoiceField or type(field) == django_filter_fields.ChoiceField:
             dict_choices = {str(key): value for key, value in field.choices}
             label_choice = dict_choices[search_form.cleaned_data[field_name]]
             tuple_to_append = (str(field.label), label_choice)

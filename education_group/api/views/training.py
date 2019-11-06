@@ -23,11 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import generics
 from django_filters import rest_framework as filters
+from rest_framework import generics
+from rest_framework.generics import get_object_or_404
 
+from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 
 
@@ -41,7 +44,7 @@ class TrainingFilter(filters.FilterSet):
         fields = ['acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year']
 
 
-class TrainingList(generics.ListAPIView):
+class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
        Return a list of all the training with optional filtering.
     """
@@ -52,6 +55,8 @@ class TrainingList(generics.ListAPIView):
         .prefetch_related(
         'administration_entity__entityversion_set',
         'management_entity__entityversion_set'
+    ).exclude(
+        acronym__icontains='common'
     )
     serializer_class = TrainingListSerializer
     filter_class = TrainingFilter
@@ -73,24 +78,52 @@ class TrainingList(generics.ListAPIView):
     )  # Default ordering
 
 
-class TrainingDetail(generics.RetrieveAPIView):
+class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     """
         Return the detail of the training
     """
-    name = 'training-detail'
-    queryset = EducationGroupYear.objects.filter(
-        education_group_type__category=education_group_categories.TRAINING
-    ).select_related(
-        'education_group_type',
-        'academic_year',
-        'main_teaching_campus',
-        'enrollment_campus',
-        'primary_language',
-    ).prefetch_related(
-        'administration_entity__entityversion_set',
-        'management_entity__entityversion_set',
-    )
+    name = 'training_read'
     serializer_class = TrainingDetailSerializer
-    lookup_field = 'uuid'
     pagination_class = None
     filter_backends = ()
+
+    def get_object(self):
+        acronym = self.kwargs['acronym']
+        year = self.kwargs['year']
+        egy = get_object_or_404(
+            EducationGroupYear.objects.filter(
+                education_group_type__category=education_group_categories.TRAINING
+            ).select_related(
+                'education_group_type',
+                'academic_year',
+                'main_teaching_campus',
+                'enrollment_campus',
+                'primary_language',
+            ).prefetch_related(
+                'administration_entity__entityversion_set',
+                'management_entity__entityversion_set',
+            ),
+            acronym__iexact=acronym,
+            academic_year__year=year
+        )
+        return egy
+
+
+class TrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
+    """
+        Return the title of the training
+    """
+    name = 'trainingstitle_read'
+    serializer_class = EducationGroupTitleSerializer
+
+    def get_object(self):
+        acronym = self.kwargs['acronym']
+        year = self.kwargs['year']
+        egy = get_object_or_404(
+            EducationGroupYear.objects.all().select_related(
+                'academic_year',
+            ),
+            acronym__iexact=acronym,
+            academic_year__year=year
+        )
+        return egy

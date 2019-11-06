@@ -43,14 +43,15 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 
 
 @override_settings(ESB_API_URL="api.esb.com",
-                   ESB_AUTHORIZATION="Basic dummy:1234", ESB_REFRESH_PEDAGOGY_ENDPOINT="offer/{year}/{code}/refresh",
+                   ESB_AUTHORIZATION="Basic dummy:1234",
+                   ESB_REFRESH_PEDAGOGY_ENDPOINT="offer/{year}/{code}/refresh",
                    ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT='offer/{year}/common/refresh',
                    ESB_REFRESH_COMMON_ADMISSION_ENDPOINT='offer/{year}/common_admission/refresh')
 class TestPublishGeneralInformation(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = create_current_academic_year()
-        cls.training = TrainingFactory()
+        cls.training = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
 
     @override_settings(ESB_REFRESH_PEDAGOGY_ENDPOINT=None)
     def test_publish_case_missing_settings(self):

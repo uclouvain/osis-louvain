@@ -72,11 +72,10 @@ class AttributionCreationForm(AttributionForm):
             url='employee_autocomplete',
             attrs={
                 'data-theme': 'bootstrap',
-                'data-width': 'null',
-                'data-placeholder': _('Indicate the name or the FGS')
+                'data-placeholder': _('Indicate the name or the FGS'),
             }
         ),
-        label=_('Tutor'),
+        label='',
     )
 
     class Meta:
@@ -91,7 +90,7 @@ class AttributionCreationForm(AttributionForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         instance.learning_container_year = self.learning_unit_year.learning_container_year
-        tutor, create = Tutor.objects.get_or_create(person=self.cleaned_data["person"])
+        tutor, _ = Tutor.objects.get_or_create(person=self.cleaned_data["person"])
         instance.tutor = tutor
         if commit:
             instance.save()

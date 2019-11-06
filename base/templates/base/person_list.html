@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% load staticfiles %}
+{% load static %}
 {% load i18n bootstrap3 %}
 
 {% comment "License" %}
@@ -39,94 +39,78 @@
         <div class="panel-body">
             <table class="table table-striped table-hover">
                 <thead>
-                    <tr>
-                        <th>{% trans 'Lastname' %}</th>
-                        <th>{% trans 'Firstname' %}</th>
-                        <th>{% trans 'Global ID' %}</th>
-                        <th>{% trans 'Groups' %}</th>
-                        <th><span id="entity_manager" data-toggle="popover" data-trigger="hover" data-placement="top" data-title="{% trans 'Entity managers' %}" data-content='{% trans "Entities for DAFs + designation of note holders and program managers" %}'>{% trans 'Entity managers' %}</span></th>
-                        <th><span id="person_entities" data-toggle="popover" data-trigger="hover" data-placement="top" data-title="{% trans 'Person entities' %}" data-content='{% trans "Trainings and learning units" %}'>{% trans 'Person entities' %}</span></th>
-                        {% if 'partnership' in installed_apps %}
+                <tr>
+                    <th>{% trans 'Lastname' %}</th>
+                    <th>{% trans 'Firstname' %}</th>
+                    <th>{% trans 'Global ID' %}</th>
+                    <th>{% trans 'Groups' %}</th>
+                    <th><span id="entity_manager" data-toggle="popover" data-trigger="hover" data-placement="top"
+                              data-title="{% trans 'Entity managers' %}"
+                              data-content='{% trans "Entities for DAFs + designation of note holders and program managers" %}'>{% trans 'Entity managers' %}</span>
+                    </th>
+                    <th><span id="person_entities" data-toggle="popover" data-trigger="hover" data-placement="top"
+                              data-title="{% trans 'Person entities' %}"
+                              data-content='{% trans "Trainings and learning units" %}'>{% trans 'Person entities' %}</span>
+                    </th>
+                    {% if 'partnership' in installed_apps %}
                         <th>{% trans 'Partnership entities' %}</th>
-                        {% endif %}
-                        <th><span id="program_manager" data-toggle="popover" data-trigger="hover" data-placement="top" data-title="{% trans 'Program managers' %}" data-content='{% trans "Note encoding" %}'>{% trans 'Program managers' %}</span></th>
-                    </tr>
+                    {% endif %}
+                    <th><span id="program_manager" data-toggle="popover" data-trigger="hover" data-placement="top"
+                              data-title="{% trans 'Program managers' %}"
+                              data-content='{% trans "Note encoding" %}'>{% trans 'Program managers' %}</span></th>
+                </tr>
                 </thead>
                 <tbody>
-                    {% for object in object_list %}
-                        <tr>
-                            <td>{{ object.last_name }}</td>
-                            <td>{{ object.first_name }}</td>
-                            <td>{{ object.global_id }}</td>
-                            <td>
-                                <ul>{% for group in object.user.groups.all %}
-                                    <li>{{ group.name }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </td>
-                            <td>
-                                <ul>{% for entity in object.entitymanager_set.all %}
+                {% for object in object_list %}
+                    <tr>
+                        <td>{{ object.last_name }}</td>
+                        <td>{{ object.first_name }}</td>
+                        <td>{{ object.global_id }}</td>
+                        <td>
+                            <ul>{% for group in object.user.groups.all %}
+                                <li>{{ group.name }}</li>
+                            {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>{% for entity in object.entitymanager_set.all %}
+                                <li>{{ entity.entity_recent_acronym }}</li>
+                            {% endfor %}
+                            </ul>
+                        </td>
+                        <td>
+                            <ul>
+                                {% for entity in object.personentity_set.all %}
                                     <li>{{ entity.entity_recent_acronym }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </td>
-                            <td>
-                                <ul>{% for entity in object.personentity_set.all %}
-                                    <li>{{ entity.entity_recent_acronym }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </td>
-                            {% if 'partnership' in installed_apps %}
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        {% if 'partnership' in installed_apps %}
                             <td>
                                 <ul>{% for entity in object.partnershipentitymanager_set.all %}
                                     <li>{{ entity.entity }}</li>
-                                    {% endfor %}
+                                {% endfor %}
                                 </ul>
                             </td>
-                            {% endif %}
-                            <td>
-                                <ul>{% for ed in object.programmanager_set.all %}
+                        {% endif %}
+                        <td>
+                            <ul>
+                                {% for ed in object.programmanager_set.all %}
                                     <li>{{ ed.most_recent_acronym }}</li>
-                                    {% endfor %}
-                                </ul>
-                            </td>
-                        </tr>
-                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
                 </tbody>
             </table>
-
-            <div class="text-center">
-                <ul class="pagination">
-                    {% if page_obj.has_previous %}
-                        <li><a href="?page={{ page_obj.previous_page_number }}">&laquo;</a>
-                        </li>
-                    {% else %}
-                        <li class="disabled"><span>&laquo;</span></li>
-                    {% endif %}
-                    {% for i in page_obj.paginator.page_range %}
-                        {% if i <= page_obj.number|add:5 and i >= page_obj.number|add:-5 %}
-
-                            {% if page_obj.number == i %}
-                                <li class="active"><span>{{ i }} <span class="sr-only">(current)</span></span></li>
-                            {% else %}
-                                <li><a href="?page={{ i }}">{{ i }}</a></li>
-                            {% endif %}
-                        {% endif %}
-                    {% endfor %}
-                    {% if page_obj.has_next %}
-                        <li><a href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
-                    {% else %}
-                        <li class="disabled"><span>&raquo;</span></li>
-                    {% endif %}
-                </ul>
-            </div>
         </div>
     </div>
 
     <script>
-        $('#entity_manager').popover({ trigger: "hover" });
-        $('#program_manager').popover({ trigger: "hover" });
-        $('#person_entities').popover({ trigger: "hover" });
+        $('#entity_manager').popover({trigger: "hover"});
+        $('#program_manager').popover({trigger: "hover"});
+        $('#person_entities').popover({trigger: "hover"});
     </script>
 
 {% endblock %}

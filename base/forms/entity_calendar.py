@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django import forms
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.forms.utils.datefield import DatePickerInput, DATE_FORMAT

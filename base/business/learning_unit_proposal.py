@@ -30,7 +30,7 @@ from django.contrib.messages import ERROR, SUCCESS
 from django.contrib.messages import INFO
 from django.db import IntegrityError
 from django.forms import model_to_dict
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base import models as mdl_base
 from base.business import learning_unit_year_with_context
@@ -41,7 +41,8 @@ from base.business.learning_units.edition import edit_learning_unit_end_date, up
 from base.business.learning_units.simple import deletion as business_deletion
 from base.models import campus
 from base.models.academic_year import find_academic_year_by_year
-from base.models.entity import find_by_id, Entity, get_by_internal_id
+from base.models.entity import find_by_id, get_by_internal_id
+from base.models.enums import organization_type
 from base.models.enums import proposal_state, proposal_type
 from base.models.enums import vacant_declaration_type, attribution_procedure
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
@@ -49,13 +50,13 @@ from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES
 from base.models.enums.proposal_type import ProposalType
 from base.utils import send_mail as send_mail_util
 from reference.models import language
+from base.models.enums import entity_container_year_link_type
 
 BOOLEAN_FIELDS = ('professional_integration', 'is_vacant', 'team')
 FOREIGN_KEY_NAME = (
     'language', 'campus', 'requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2',
 )
 
-APP_BASE_LABEL = 'base'
 END_FOREIGN_KEY_NAME = "_id"
 NO_PREVIOUS_VALUE = '-'
 # TODO : VALUES_WHICH_NEED_TRANSLATION ?
@@ -146,10 +147,6 @@ def get_difference_of_proposal(proposal, learning_unit_year):
     return _get_differences_of_proposal_components(differences, proposal)
 
 
-def _replace_key_of_foreign_key(data):
-    return {key_name.replace(END_FOREIGN_KEY_NAME, ''): data[key_name] for key_name in data.keys()}
-
-
 def _get_the_old_value(key, current_data, initial_data):
     initial_value = initial_data.get(key) or NO_PREVIOUS_VALUE
 
@@ -173,11 +170,7 @@ def _get_old_value_of_foreign_key(key, initial_value):
     if key == 'language':
         return _get_name_attribute(language.find_by_id(initial_value))
 
-    if '_ENTITY' in key:
-        an_entity = find_by_id(initial_value)
-        return an_entity.most_recent_acronym if an_entity else None
-
-    return None
+    return _get_special_old_value(key, initial_value)
 
 
 def _is_foreign_key(key, current_data):
@@ -206,14 +199,6 @@ def _get_old_value_when_not_foreign_key(initial_value, key):
             old_value = _('No')
 
     return old_value
-
-
-def _get_rid_of_blank_value(data):
-    clean_data = data.copy()
-    for key, value in clean_data.items():
-        if value == '':
-            clean_data[key] = None
-    return clean_data
 
 
 def force_state_of_proposals(proposals, author, new_state):
@@ -342,7 +327,7 @@ def _consolidate_accepted_proposal(proposal):
 
 
 def _consolidate_creation_proposal_accepted(proposal):
-    proposal.learning_unit_year.learning_unit.end_year = proposal.learning_unit_year.academic_year.year
+    proposal.learning_unit_year.learning_unit.end_year = proposal.learning_unit_year.academic_year
 
     results = {SUCCESS: edit_learning_unit_end_date(proposal.learning_unit_year.learning_unit, None)}
     return results
@@ -352,10 +337,9 @@ def _consolidate_suppression_proposal_accepted(proposal):
     initial_end_year = proposal.initial_data["learning_unit"]["end_year"]
     new_end_year = proposal.learning_unit_year.learning_unit.end_year
 
-    proposal.learning_unit_year.learning_unit.end_year = initial_end_year
-    new_academic_year = find_academic_year_by_year(new_end_year)
+    proposal.learning_unit_year.learning_unit.end_year = find_academic_year_by_year(initial_end_year)
     try:
-        results = {SUCCESS: edit_learning_unit_end_date(proposal.learning_unit_year.learning_unit, new_academic_year)}
+        results = {SUCCESS: edit_learning_unit_end_date(proposal.learning_unit_year.learning_unit, new_end_year)}
     except IntegrityError as err:
         results = {ERROR: err.args[0]}
     return results
@@ -521,3 +505,18 @@ def _get_volumes_for_initial(learning_unit_year):
         volumes_for_initial[component_key.acronym] = volume_data
 
     return volumes_for_initial
+
+
+def _get_special_old_value(key, initial_value):
+    if key in (entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
+               entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2):
+        an_entity = find_by_id(initial_value)
+        if an_entity.organization.type != organization_type.MAIN:
+            return an_entity.most_recent_entity_version.title if an_entity else None
+        else:
+            return an_entity.most_recent_acronym if an_entity else None
+    elif '_ENTITY' in key:
+        an_entity = find_by_id(initial_value)
+        return an_entity.most_recent_acronym if an_entity else None
+
+    return None

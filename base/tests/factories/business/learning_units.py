@@ -31,9 +31,9 @@ import factory.fuzzy
 
 from base.models import academic_year as mdl_academic_year
 from base.models.academic_year import LEARNING_UNIT_CREATION_SPAN_YEARS, compute_max_academic_year_adjournment
-from base.models.enums import entity_container_year_link_type, learning_container_year_types, \
-    learning_unit_year_periodicity, learning_unit_year_subtypes, component_type
 from base.models.enums import entity_type
+from base.models.enums import learning_container_year_types, \
+    learning_unit_year_periodicity, learning_unit_year_subtypes, component_type
 from base.models.enums import learning_unit_year_session
 from base.models.enums import organization_type
 from base.models.enums import quadrimesters
@@ -52,20 +52,6 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 from reference.tests.factories.language import LanguageFactory
 
 
-def create_learning_unit_with_context(academic_year, structure, entity, acronym):
-    learning_container_year = LearningContainerYearFactory(
-        academic_year=academic_year,
-        acronym=acronym,
-        allocation_entity=entity,
-    )
-    learning_unit_year = LearningUnitYearFactory(structure=structure,
-                                                 acronym=acronym,
-                                                 learning_container_year=learning_container_year,
-                                                 academic_year=academic_year)
-
-    return learning_unit_year
-
-
 class LearningUnitsMixin:
     this_year = start_year = last_year = starting_academic_year = None
     old_academic_year = last_academic_year = oldest_academic_year = latest_academic_year = None
@@ -80,9 +66,8 @@ class LearningUnitsMixin:
 
     def setup_academic_years(self):
         self.this_year = datetime.datetime.now().year
-        self.start_year = self.this_year - LEARNING_UNIT_CREATION_SPAN_YEARS * 2
-        self.last_year = self.this_year + LEARNING_UNIT_CREATION_SPAN_YEARS * 2
-
+        self.start_year = AcademicYearFactory(year=self.this_year - LEARNING_UNIT_CREATION_SPAN_YEARS * 2)
+        self.last_year = AcademicYearFactory(year=self.this_year + LEARNING_UNIT_CREATION_SPAN_YEARS * 2)
         self.list_of_academic_years = self.create_list_of_academic_years(self.start_year, self.last_year)
         self.starting_academic_year = mdl_academic_year.starting_academic_year()
         index_of_current_academic_year_in_list = self.list_of_academic_years.index(self.starting_academic_year)
@@ -107,7 +92,7 @@ class LearningUnitsMixin:
     def create_list_of_academic_years(start_year, end_year):
         results = None
         if start_year and end_year:
-            results = [AcademicYearFactory(year=year) for year in range(start_year, end_year + 1)]
+            results = [AcademicYearFactory(year=year) for year in range(start_year.year, end_year.year + 1)]
         return results
 
     @staticmethod
@@ -134,8 +119,8 @@ class LearningUnitsMixin:
                                  periodicity):
         create = False
         result = None
-        end_year = learning_unit.end_year or compute_max_academic_year_adjournment()
-        if learning_unit.start_year <= academic_year.year <= end_year:
+        end_year = learning_unit.end_year or AcademicYearFactory(year=compute_max_academic_year_adjournment())
+        if learning_unit.start_year.year <= academic_year.year <= end_year.year:
             if periodicity == learning_unit_year_periodicity.BIENNIAL_ODD:
                 if not (academic_year.year % 2):
                     create = True
@@ -259,7 +244,7 @@ class GenerateContainer:
                 campus=self.campus,
                 language=self.language
             )
-            for year in range(self.start_year, self.end_year + 1)
+            for year in range(self.start_year.year, self.end_year.year + 1)
         ]
 
     def _setup_entities(self):

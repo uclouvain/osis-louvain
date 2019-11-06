@@ -23,9 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from assessments.models import *
 from django.contrib import admin
 
+from assessments.models import *
 
 admin.site.register(score_sheet_address.ScoreSheetAddress,
                     score_sheet_address.ScoreSheetAddressAdmin)

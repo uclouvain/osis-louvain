@@ -28,11 +28,10 @@ import json
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
-from django.db.models import Prefetch
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from waffle.decorators import waffle_flag
 
@@ -100,12 +99,6 @@ def education_group_edit_administrative_data(request, root_id, education_group_y
         return HttpResponseRedirect(reverse('education_group_administrative', args=[root_id, education_group_year_id]))
 
     return render(request, "education_group/tab_edit_administrative_data.html", locals())
-
-
-def find_root_by_name(text_label_name):
-    return TextLabel.objects.prefetch_related(
-        Prefetch('translatedtextlabel_set', to_attr="translated_text_labels")
-    ).get(label=text_label_name, parent__isnull=True)
 
 
 def education_group_year_pedagogy_edit_post(request, education_group_year_id, root_id):

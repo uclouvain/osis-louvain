@@ -25,7 +25,7 @@
 ############################################################################
 from ckeditor.fields import RichTextField
 from django.db import models
-from django.utils.translation import ugettext_lazy as _, get_language
+from django.utils.translation import gettext_lazy as _, get_language
 
 from base.models.enums.field_status import FIELD_STATUS, NOT_REQUIRED
 from base.models.enums.language_code import LanguageCodes

@@ -23,9 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
-import factory.fuzzy
 import string
+
+import factory.fuzzy
 
 
 class OfferTypeFactory(factory.django.DjangoModelFactory):

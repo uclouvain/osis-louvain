@@ -91,6 +91,13 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
 
 
 class EducationGroupYearQueryset(SerializableQuerySet):
+    def get_queryset(self):
+        return self.get_queryset().select_related('administration_entity',
+                                                  'management_entity',
+                                                  'management_entity_version')\
+            .prefetch_related('administration_entity.entityversion_set',
+                              'management_entity.entityversion_set')
+
     def get_nearest_years(self, year):
         return self.aggregate(
             futur=Min(
@@ -585,6 +592,14 @@ class EducationGroupYear(SerializableModel):
         return self.type in TrainingType.finality_types()
 
     @property
+    def is_attestation(self):
+        return self.type in TrainingType.attestation_types()
+
+    @property
+    def is_continuing_education_education_group_year(self):
+        return self.acronym.endswith('FC')
+
+    @property
     def is_minor(self):
         return self.type in MiniTrainingType.minors()
 
@@ -609,6 +624,10 @@ class EducationGroupYear(SerializableModel):
         return self.acronym == 'common'
 
     @property
+    def is_a_master(self):
+        return any([self.is_master60, self.is_master120, self.is_master180])
+
+    @property
     def is_master120(self):
         return self.type == TrainingType.PGRM_MASTER_120.name
 
@@ -631,6 +650,10 @@ class EducationGroupYear(SerializableModel):
     @property
     def is_master180(self):
         return self.type == TrainingType.PGRM_MASTER_180_240.name
+
+    @property
+    def has_common_admission_condition(self):
+        return any([self.is_bachelor, self.is_a_master, self.is_aggregation, self.is_specialized_master])
 
     @property
     def verbose(self):
@@ -728,20 +751,6 @@ class EducationGroupYear(SerializableModel):
     @cached_property
     def children(self):
         return self.groupelementyear_set.select_related('child_branch', 'child_leaf')
-
-    @cached_property
-    def children_group_element_years(self):
-        """ Return groupelementyears with a child_branch """
-        return self.children.exclude(child_leaf__isnull=False)
-
-    @cached_property
-    def group_element_year_branches(self):
-        return self.groupelementyear_set.filter(child_branch__isnull=False).select_related("child_branch")
-
-    @cached_property
-    def group_element_year_leaves(self):
-        return self.groupelementyear_set.filter(child_leaf__isnull=False). \
-            select_related("child_leaf", "child_leaf__learning_container_year")
 
     @cached_property
     def coorganizations(self):

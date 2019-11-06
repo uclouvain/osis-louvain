@@ -23,11 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import models
 
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
-from base.models import person
 
 
 class StudentAdmin(SerializableModelAdmin):
@@ -90,11 +89,6 @@ def find_by_person(a_person):
         return student
     except ObjectDoesNotExist:
         return None
-
-
-def find_by_offer(offers):
-    return Student.objects.filter(offerenrollment__offer_year__offer__in=offers)\
-                          .order_by('person__last_name', 'person__first_name').distinct()
 
 
 def find_by_offer_year(offer_y):

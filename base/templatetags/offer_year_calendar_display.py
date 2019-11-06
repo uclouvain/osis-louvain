@@ -23,9 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import template
 from datetime import date
 
+from django import template
 
 CURRENT_EVENT_CSS_STYLE = "font-weight:bold;"
 NOT_CURRENT_EVENT_CSS_STYLE = ""

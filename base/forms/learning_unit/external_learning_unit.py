@@ -30,7 +30,7 @@ from django import forms
 from django.conf import settings
 from django.db import transaction
 from django.forms import ModelChoiceField
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningContainerModelForm, \
@@ -376,7 +376,7 @@ class ExternalPartimForm(LearningUnitBaseForm):
         return {
             'data': data,
             'instance': self.instance.learning_unit if self.instance else None,
-            'start_year': self.learning_unit_year_full.academic_year.year,
+            'start_year': self.learning_unit_year_full.academic_year,
             'max_end_year': self.learning_unit_year_full.learning_unit.max_end_year
         }
 

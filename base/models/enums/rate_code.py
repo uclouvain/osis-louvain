@@ -23,9 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from enum import Enum
-from base.models.utils.utils import ChoiceEnum
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 NO_ADDITIONAL_FEES = "NO_ADDITIONAL_FEES"
 AESS_CAPAES = "AESS_CAPAES"
@@ -47,14 +45,3 @@ RATE_CODE = (
     (UNIVERSITY_CERTIFICATE_30_CREDITS, _("University certificate 30 credits")),
     (CERTIFICATE_MEDECINE_COMPETENCE, _("Certificate medicine competence"))
 )
-
-
-class RateCodes(ChoiceEnum):
-    NO_ADDITIONAL_FEES = "NO_ADDITIONAL_FEES"
-    AESS_CAPAES = "AESS_CAPAES"
-    MINERVAL_COMPLETE = "MINERVAL_COMPLETE"
-    UNIVERSITY_CERTIFICATE = "UNIVERSITY_CERTIFICATE"
-    ADVANCED_MASTER_IN_MEDICAL_SPECIALIZATION = "ADVANCED_MASTER_IN_MEDICAL_SPECIALIZATION"
-    ACCESS_CONTEST = "ACCESS_CONTEST"
-    UNIVERSITY_CERTIFICATE_30_CREDITS = "UNIVERSITY_CERTIFICATE_30_CREDITS"
-    CERTIFICATE_MEDECINE_COMPETENCE = "CERTIFICATE_MEDECINE_COMPETENCE"

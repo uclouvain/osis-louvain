@@ -23,9 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db import models
 from django.contrib import messages
 from django.contrib.auth.models import Group
+from django.db import models
 from django.db.models import Q
 
 from attribution.models import attribution
@@ -116,8 +116,3 @@ def search(**criterias):
         for name in full_name.split():
             queryset = queryset.filter(Q(person__first_name__icontains=name) | Q(person__last_name__icontains=name))
     return queryset.distinct().select_related("person")
-
-
-def find_all_summary_responsibles_by_learning_unit_year(a_learning_unit_year):
-    return Tutor.objects.filter(attribution__learning_unit_year=a_learning_unit_year,
-                                attribution__summary_responsible=True)

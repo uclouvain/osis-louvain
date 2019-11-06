@@ -1,5 +1,5 @@
 {% extends "education_group/layout.html" %}
-{% load education_group format i18n staticfiles %}
+{% load education_group format i18n static %}
 
 {% block title %}
     <title>OSIS - {{ education_group_year.acronym }} {{ learning_unit_year.acronym }}</title>
@@ -17,15 +17,9 @@
 
 {% block header_content %}
     <div class="page-header">
-        <h2>
-            {% if education_group_year.education_group_type.category == "TRAINING" %}
-                {{ education_group_year.acronym }}
-            {% else %}
-                {{ education_group_year.partial_acronym }}
-            {% endif %}
-                - {{ education_group_year.academic_year }}
-        </h2>
-    <h3>{{ education_group_year.title }}</h3>
+    {% with disabled_nav=False %}
+        {% include "education_group/blocks/header.html" %}
+    {% endwith %}
     </div>
 {% endblock %}
 
@@ -97,13 +91,26 @@
             {% endblock %}
         </div>
     </div>
-
+    <div id="clipboard" class="alert alert-info" role="alert" {% if not selected_element_clipboard %}hidden="hidden"{% endif %}>
+        <button type="button" class="close" id="close_clipboard"><span aria-hidden="true">&nbsp;&times;</span></button>
+        <strong>{% trans "Selected element" %}</strong>
+        <br>
+        {{ selected_element_clipboard }}
+    </div>
 
     <script>
         const root_id = "{{ root_id }}";
         const url_resolver_match = "{% url_resolver_match %}";
         const tree = JSON.parse('{{ tree | escapejs }}');
         const management_url = "{% url "education_groups_management" %}";
+        /*
+        * Custom alert close function.
+        * Can't use Bootstrap's default which removes alert from DOM and prohibit to re-display it on item selection.
+        */
+        let close_clipboard = document.getElementById("close_clipboard");
+        close_clipboard.addEventListener("click", function(){
+          $("#clipboard").hide();
+        });
     </script>
     <script type="text/javascript" src="{% static 'js/education_group/education_group_tree.js' %}">
     </script>
