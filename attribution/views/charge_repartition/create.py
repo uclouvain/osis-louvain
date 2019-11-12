@@ -40,7 +40,7 @@ from base.models.enums import learning_component_year_type
 
 
 class SelectAttributionView(AttributionBaseViewMixin, TemplateView):
-    template_name = "learning_unit/select_attribution.html"
+    template_name = "attribution/charge_repartition/select_attribution.html"
 
     @cached_property
     def attributions(self):
