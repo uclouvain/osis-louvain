@@ -73,7 +73,7 @@ def learning_unit_attributions(request, learning_unit_year_id):
     )
     warning_msgs = get_charge_repartition_warning_messages(context["learning_unit_year"].learning_container_year)
     display_warning_messages(request, warning_msgs)
-    return render(request, "learning_unit/attributions.html", context)
+    return render(request, "attribution/attributions.html", context)
 
 
 def get_charge_repartition_warning_messages(learning_container_year):
