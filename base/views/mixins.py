@@ -244,5 +244,9 @@ class MultiFormsSuccessMessageMixin:
             messages.success(self.request, success_message)
         return response
 
+    def forms_invalid(self, forms):
+        response = super().forms_invalid(forms)
+        return response
+
     def get_success_message(self, forms):
         return ""

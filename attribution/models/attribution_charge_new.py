@@ -24,9 +24,13 @@
 #
 ##############################################################################
 from django.contrib import admin
+from django.core import validators
 from django.db import models
 
 from base.models.utils.utils import filter_with_list_or_object
+
+
+MIN_ALLOCATION_CHARGE = 0
 
 
 class AttributionChargeNewAdmin(admin.ModelAdmin):
@@ -44,7 +48,8 @@ class AttributionChargeNew(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
     attribution = models.ForeignKey('AttributionNew', on_delete=models.CASCADE)
     learning_component_year = models.ForeignKey('base.LearningComponentYear', on_delete=models.CASCADE)
-    allocation_charge = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)
+    allocation_charge = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True,
+                                            validators=[validators.MinValueValidator(MIN_ALLOCATION_CHARGE)])
 
     def __str__(self):
         return u"%s" % self.attribution

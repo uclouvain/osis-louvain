@@ -32,7 +32,7 @@ from django.utils.translation import gettext_lazy as _
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from attribution.models.enums.function import Functions
-from base.models.enums import learning_component_year_type
+from base.models.enums import learning_component_year_type, learning_container_year_types
 from base.models.learning_component_year import LearningComponentYear
 from base.models.person import Person
 from base.models.tutor import Tutor
@@ -49,14 +49,16 @@ class AttributionForm(forms.ModelForm):
         self.learning_unit_year = kwargs.pop("learning_unit_year")
         super().__init__(*args, **kwargs)
 
-        if self.learning_unit_year.is_for_faculty_or_partim():
+        if self.learning_unit_year.is_for_faculty_or_partim() or \
+                self.learning_unit_year.learning_container_year.container_type == learning_container_year_types.EXTERNAL:
             del self.fields["start_year"]
             del self.fields["duration"]
             self.fields["function"].choices = Functions.choices_without_professor()
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        if not self.learning_unit_year.is_for_faculty_or_partim():
+        if not self.learning_unit_year.is_for_faculty_or_partim() and \
+                self.learning_unit_year.learning_container_year.container_type != learning_container_year_types.EXTERNAL:
             instance.end_year = instance.start_year + self.cleaned_data["duration"] - 1
 
         if commit:
