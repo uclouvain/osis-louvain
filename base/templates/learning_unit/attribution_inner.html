@@ -47,7 +47,7 @@
             {% bootstrap_field attribution_form.function form_group_class="col-md-6" %}
         </div>
         <br>
-        {% if learning_unit_year.learning_container_year.container_type == "COOURSE" %}
+        {% if learning_unit_year.learning_container_year.container_type == "COOURSE" and not learning_unit_year.is_partim %}
             <div class="row">
                 {% bootstrap_field attribution_form.start_year form_group_class="col-md-6" %}
                 {% bootstrap_field attribution_form.duration form_group_class="col-md-6" %}

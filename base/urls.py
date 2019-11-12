@@ -48,7 +48,9 @@ from base.views import learning_unit, offer, common, institution, organization, 
     my_osis, entity, student, notifications
 from base.views import teaching_material
 from base.views.filter import filter_cities_by_country, filter_campus_by_city
-from base.views.learning_units.attribution import DeleteAttribution, EditAttributionView, AddAttribution
+from attribution.views.learning_unit.update import UpdateAttributionView
+from attribution.views.learning_unit.delete import DeleteAttribution
+from attribution.views.learning_unit.create import CreateAttribution
 from base.views.learning_units.charge_repartition import AddChargeRepartition, \
     EditChargeRepartition, SelectAttributionView
 from base.views.learning_units.detail import DetailLearningUnitYearView
@@ -183,9 +185,9 @@ urlpatterns = [
                 url(r'^$', base.views.learning_units.attribution.learning_unit_attributions,
                     name="learning_unit_attributions"),
                 url(r'^select/$', SelectAttributionView.as_view(), name="select_attribution"),
-                url(r'^update/(?P<attribution_id>[0-9]+)/$', EditAttributionView.as_view(),
+                url(r'^update/(?P<attribution_id>[0-9]+)/$', UpdateAttributionView.as_view(),
                     name="update_attribution"),
-                url(r'^create/$', AddAttribution.as_view(),
+                url(r'^create/$', CreateAttribution.as_view(),
                     name="add_attribution"),
                 url(r'^remove/(?P<attribution_id>[0-9]+)/$', DeleteAttribution.as_view(),
                     name="remove_attribution"),

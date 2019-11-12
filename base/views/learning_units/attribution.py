@@ -25,29 +25,19 @@
 ##############################################################################
 import itertools
 
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
-from django.db.models import Prefetch, Q, Sum
-from django.shortcuts import get_object_or_404, render
-from django.urls import reverse
-from django.utils.functional import cached_property
+from django.db.models import Sum
+from django.shortcuts import render
 from django.utils.translation import gettext_lazy as _, ugettext_lazy as _
-from django.views.generic import DeleteView
 
 from attribution.business import attribution_charge_new
 from attribution.models.attribution_charge_new import AttributionChargeNew
-from attribution.models.attribution_new import AttributionNew
 from attribution.models.enums.function import Functions
-from base.business.learning_units import perms, perms as business_perms
-from base.forms.learning_unit.attribution_charge_repartition import AttributionForm, LecturingAttributionChargeForm, \
-    PracticalAttributionChargeForm, AttributionCreationForm
-from base.models.enums import learning_component_year_type, learning_unit_year_subtypes
-from base.models.learning_component_year import LearningComponentYear
-from base.models.learning_unit_year import LearningUnitYear
+from base.business.learning_units import perms as business_perms
+from base.models.enums import learning_unit_year_subtypes
 from base.models.person import Person
 from base.views.common import display_warning_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year
-from base.views.mixins import AjaxTemplateMixin, RulesRequiredMixin, MultiFormsView, MultiFormsSuccessMessageMixin
 
 
 @login_required
@@ -65,179 +55,6 @@ def learning_unit_attributions(request, learning_unit_year_id):
     warning_msgs = get_charge_repartition_warning_messages(context["learning_unit_year"].learning_container_year)
     display_warning_messages(request, warning_msgs)
     return render(request, "learning_unit/attributions.html", context)
-
-
-class AttributionBaseViewMixin(RulesRequiredMixin):
-    """ Generic Mixin for the update/create of Attribution """
-
-    rules = [perms.is_eligible_to_manage_charge_repartition]
-
-    def _call_rule(self, rule):
-        return rule(self.luy, get_object_or_404(Person, user=self.request.user))
-
-    @cached_property
-    def luy(self):
-        return get_object_or_404(LearningUnitYear, id=self.kwargs["learning_unit_year_id"])
-
-    @cached_property
-    def parent_luy(self):
-        return self.luy.parent
-
-    @cached_property
-    def attribution(self):
-        lecturing_charges = AttributionChargeNew.objects \
-            .filter(Q(learning_component_year__type=learning_component_year_type.LECTURING)
-                    | Q(learning_component_year__type__isnull=True))
-        prefetch_lecturing_charges = Prefetch("attributionchargenew_set", queryset=lecturing_charges,
-                                              to_attr="lecturing_charges")
-
-        practical_charges = AttributionChargeNew.objects \
-            .filter(learning_component_year__type=learning_component_year_type.PRACTICAL_EXERCISES)
-        prefetch_practical_charges = Prefetch("attributionchargenew_set", queryset=practical_charges,
-                                              to_attr="practical_charges")
-
-        attribution = AttributionNew.objects \
-            .prefetch_related(prefetch_lecturing_charges) \
-            .prefetch_related(prefetch_practical_charges) \
-            .select_related("tutor__person") \
-            .get(id=self.kwargs["attribution_id"])
-        return attribution
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["learning_unit_year"] = self.luy
-        return context
-
-    def get_success_url(self):
-        return reverse("learning_unit_attributions", args=[self.kwargs["learning_unit_year_id"]])
-
-    def get_form_kwargs(self, form_name):
-        kwargs = super().get_form_kwargs(form_name)
-        kwargs["learning_unit_year"] = self.luy
-        return kwargs
-
-
-class EditAttributionView(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSuccessMessageMixin, MultiFormsView):
-    rules = [perms.is_eligible_to_manage_attributions]
-    template_name = "learning_unit/attribution_inner.html"
-    form_classes = {
-        "attribution_form": AttributionForm,
-        "lecturing_charge_form": LecturingAttributionChargeForm,
-        "practical_charge_form": PracticalAttributionChargeForm
-    }
-    prefixes = {
-        "attribution_form": "attribution_form",
-        "lecturing_charge_form": "lecturing_form",
-        "practical_charge_form": "practical_form"
-    }
-
-    def get_form_classes(self):
-        form_classes = self.form_classes.copy()
-        if LearningComponentYear.objects.filter(learning_unit_year=self.luy, type=None).exists():
-            del form_classes["practical_charge_form"]
-        return form_classes
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["attribution"] = self.attribution
-
-        if self.luy.is_partim():
-            qs_partim = self.luy.learningcomponentyear_set.all()
-            context['partim_vol1'] = qs_partim.filter(type=learning_component_year_type.LECTURING).first()
-            context['partim_vol2'] = qs_partim.filter(type=learning_component_year_type.PRACTICAL_EXERCISES).first()
-
-        return context
-
-    def get_form_kwargs(self, form_name):
-        form_kwargs = super().get_form_kwargs(form_name)
-        form_kwargs["instance"] = self.get_instance_form(form_name)
-        return form_kwargs
-
-    def get_instance_form(self, form_name):
-        return {
-            "attribution_form": self.attribution,
-            "lecturing_charge_form": self.attribution.lecturing_charges[0] if self.attribution.lecturing_charges
-            else None,
-            "practical_charge_form": self.attribution.practical_charges[0] if self.attribution.practical_charges
-            else None
-        }.get(form_name)
-
-    def get_success_message(self, forms):
-        return _("Attribution modified for %(tutor)s (%(function)s)") % {"tutor": self.attribution.tutor.person,
-                                                                         "function": _(self.attribution.function)}
-
-    def attribution_form_valid(self, attribution_form):
-        attribution_form.save()
-
-    def lecturing_charge_form_valid(self, lecturing_charge_form):
-        lecturing_charge_form.save(attribution=self.attribution)
-
-    def practical_charge_form_valid(self, practical_charge_form):
-        practical_charge_form.save(attribution=self.attribution)
-
-
-class AddAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSuccessMessageMixin, MultiFormsView):
-    rules = [perms.is_eligible_to_manage_attributions]
-    template_name = "learning_unit/attribution_inner.html"
-    form_classes = {
-        "attribution_form": AttributionCreationForm,
-        "lecturing_charge_form": LecturingAttributionChargeForm,
-        "practical_charge_form": PracticalAttributionChargeForm
-    }
-    prefixes = {
-        "attribution_form": "attribution_form",
-        "lecturing_charge_form": "lecturing_form",
-        "practical_charge_form": "practical_form"
-    }
-
-    def get_form_classes(self):
-        form_classes = self.form_classes.copy()
-        if LearningComponentYear.objects.filter(learning_unit_year=self.luy, type=None).exists():
-            del form_classes["practical_charge_form"]
-        return form_classes
-
-    def forms_valid(self, forms):
-        attribution_form = forms["attribution_form"]
-        attribution_form.save()
-        return super().forms_valid(forms)
-
-    def get_success_message(self, forms):
-        attribution = forms["attribution_form"].instance
-        return _("Attribution added for %(tutor)s (%(function)s)") % {"tutor": attribution.tutor.person,
-                                                                      "function": _(attribution.get_function_display())}
-
-    def lecturing_charge_form_valid(self, lecturing_charge_form):
-        attribution_form = self.instantiated_forms["attribution_form"]
-        lecturing_charge_form.save(attribution=attribution_form.instance)
-
-    def practical_charge_form_valid(self, practical_charge_form):
-        attribution_form = self.instantiated_forms["attribution_form"]
-        practical_charge_form.save(attribution=attribution_form.instance)
-
-
-class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView):
-    rules = [lambda luy, person: perms.is_eligible_to_manage_charge_repartition(luy, person)
-             or perms.is_eligible_to_manage_attributions(luy, person)]
-    model = AttributionNew
-    template_name = "learning_unit/remove_charge_repartition_confirmation_inner.html"
-    pk_url_kwarg = "attribution_id"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["attribution"] = self.attribution
-        return context
-
-    def delete(self, request, *args, **kwargs):
-        success_message = self.get_success_message()
-        response = super().delete(request, *args, **kwargs)
-        if success_message:
-            messages.success(self.request, success_message)
-        return response
-
-    def get_success_message(self):
-        return _("Attribution removed for %(tutor)s (%(function)s)") % \
-               {"tutor": self.attribution.tutor.person,
-                "function": _(self.attribution.get_function_display())}
 
 
 def get_charge_repartition_warning_messages(learning_container_year):

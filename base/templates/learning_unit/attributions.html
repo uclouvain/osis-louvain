@@ -33,7 +33,7 @@
             <tr>
                 <th>{% trans 'Tutors' %}</th>
                 <th>{% trans 'Function' %}</th>
-                {% if learning_unit_year.learning_container_year.container_type == "COOURSE" %}
+                {% if learning_unit_year.learning_container_year.container_type == "COOURSE" and not learning_unit_year.is_partim %}
                     <th>{% trans 'Start' %}</th>
                     <th>{% trans 'Duration' %}</th>
                 {% endif %}
@@ -52,7 +52,7 @@
                 <tr>
                     <td>{{ attribution.tutor.person }}</td>
                     <td>{{ attribution.get_function_display }}</td>
-                    {% if learning_unit_year.learning_container_year.container_type == "COOURSE" %}
+                    {% if learning_unit_year.learning_container_year.container_type == "COOURSE" and not learning_unit_year.is_partim %}
                         <td>{{ attribution.start_year | default_if_none:'' }}</td>
                         <td>{{ attribution.duration | default_if_none:'' }}</td>
                     {% endif %}

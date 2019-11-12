@@ -35,7 +35,8 @@ from base.business.learning_units import perms
 from base.forms.learning_unit.attribution_charge_repartition import LecturingAttributionChargeForm, \
     PracticalAttributionChargeForm
 from base.models.enums import learning_component_year_type
-from base.views.learning_units.attribution import AttributionBaseViewMixin, EditAttributionView
+from attribution.views.learning_unit.update import UpdateAttributionView
+from attribution.views.learning_unit.common import AttributionBaseViewMixin
 
 
 class SelectAttributionView(AttributionBaseViewMixin, TemplateView):
@@ -73,7 +74,7 @@ class SelectAttributionView(AttributionBaseViewMixin, TemplateView):
         return context
 
 
-class EditChargeRepartition(EditAttributionView):
+class EditChargeRepartition(UpdateAttributionView):
     rules = [perms.is_eligible_to_manage_charge_repartition]
     template_name = "learning_unit/add_charge_repartition_inner.html"
     form_classes = {
@@ -87,7 +88,7 @@ class EditChargeRepartition(EditAttributionView):
                          "function": _(self.attribution.get_function_display())}
 
 
-class AddChargeRepartition(EditAttributionView):
+class AddChargeRepartition(UpdateAttributionView):
     rules = [perms.is_eligible_to_manage_charge_repartition]
     template_name = "learning_unit/add_charge_repartition_inner.html"
     form_classes = {
