@@ -23,36 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib import messages
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DeleteView
 
-from attribution.models.attribution_new import AttributionNew
-from attribution.views.learning_unit.common import AttributionBaseViewMixin
+from attribution.views.learning_unit.update import UpdateAttributionView
 from base.business.learning_units import perms
-from base.views.mixins import AjaxTemplateMixin
+from base.forms.learning_unit.attribution_charge_repartition import LecturingAttributionChargeForm, \
+    PracticalAttributionChargeForm
 
 
-class DeleteAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, DeleteView):
-    rules = [lambda luy, person: perms.is_eligible_to_manage_charge_repartition(luy, person)
-             or perms.is_eligible_to_manage_attributions(luy, person)]
-    model = AttributionNew
-    template_name = "learning_unit/remove_charge_repartition_confirmation_inner.html"
-    pk_url_kwarg = "attribution_id"
+class EditChargeRepartition(UpdateAttributionView):
+    rules = [perms.is_eligible_to_manage_charge_repartition]
+    template_name = "learning_unit/add_charge_repartition_inner.html"
+    form_classes = {
+        "lecturing_charge_form": LecturingAttributionChargeForm,
+        "practical_charge_form": PracticalAttributionChargeForm
+    }
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["attribution"] = self.attribution
-        return context
-
-    def delete(self, request, *args, **kwargs):
-        success_message = self.get_success_message()
-        response = super().delete(request, *args, **kwargs)
-        if success_message:
-            messages.success(self.request, success_message)
-        return response
-
-    def get_success_message(self):
-        return _("Attribution removed for %(tutor)s (%(function)s)") % \
-               {"tutor": self.attribution.tutor.person,
-                "function": _(self.attribution.get_function_display())}
+    def get_success_message(self, forms):
+        return _("Repartition modified for %(tutor)s (%(function)s)") %\
+                        {"tutor": self.attribution.tutor.person,
+                         "function": _(self.attribution.get_function_display())}

@@ -50,7 +50,7 @@ class AttributionForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
 
         if self.learning_unit_year.learning_container_year.container_type != learning_container_year_types.COURSE or \
-            self.learning_unit_year.is_partim():
+                self.learning_unit_year.is_partim():
             del self.fields["start_year"]
             del self.fields["duration"]
             self.fields["function"].choices = Functions.choices_without_professor()
@@ -58,7 +58,7 @@ class AttributionForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         if self.learning_unit_year.learning_container_year.container_type == learning_container_year_types.COURSE and \
-            not self.learning_unit_year.is_partim():
+                not self.learning_unit_year.is_partim():
             instance.end_year = instance.start_year + self.cleaned_data["duration"] - 1
 
         if commit:

@@ -27,16 +27,16 @@ from django.db.models import Prefetch
 from django.db.models.functions import Concat
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.views.generic.base import TemplateView
+from django.views.generic import TemplateView
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
+from attribution.views.learning_unit.common import AttributionBaseViewMixin
+from attribution.views.learning_unit.update import UpdateAttributionView
 from base.business.learning_units import perms
 from base.forms.learning_unit.attribution_charge_repartition import LecturingAttributionChargeForm, \
     PracticalAttributionChargeForm
 from base.models.enums import learning_component_year_type
-from attribution.views.learning_unit.update import UpdateAttributionView
-from attribution.views.learning_unit.common import AttributionBaseViewMixin
 
 
 class SelectAttributionView(AttributionBaseViewMixin, TemplateView):
@@ -72,20 +72,6 @@ class SelectAttributionView(AttributionBaseViewMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         context["attributions"] = self.attributions
         return context
-
-
-class EditChargeRepartition(UpdateAttributionView):
-    rules = [perms.is_eligible_to_manage_charge_repartition]
-    template_name = "learning_unit/add_charge_repartition_inner.html"
-    form_classes = {
-        "lecturing_charge_form": LecturingAttributionChargeForm,
-        "practical_charge_form": PracticalAttributionChargeForm
-    }
-
-    def get_success_message(self, forms):
-        return _("Repartition modified for %(tutor)s (%(function)s)") %\
-                        {"tutor": self.attribution.tutor.person,
-                         "function": _(self.attribution.get_function_display())}
 
 
 class AddChargeRepartition(UpdateAttributionView):

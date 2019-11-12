@@ -29,7 +29,6 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 
 import base.views.education_groups.create
-import base.views.learning_units.attribution
 import base.views.learning_units.common
 import base.views.learning_units.create
 import base.views.learning_units.delete
@@ -43,16 +42,16 @@ import base.views.learning_units.search.service_course
 import base.views.learning_units.search.simple
 import base.views.learning_units.update
 from attribution.views import attribution, tutor_application
+from attribution.views.charge_repartition.create import SelectAttributionView, AddChargeRepartition
+from attribution.views.charge_repartition.update import EditChargeRepartition
+from attribution.views.learning_unit.create import CreateAttribution
+from attribution.views.learning_unit.delete import DeleteAttribution
+from attribution.views.learning_unit.update import UpdateAttributionView
 from base.views import learning_achievement, search, education_groups, user_list
 from base.views import learning_unit, offer, common, institution, organization, academic_calendar, \
     my_osis, entity, student, notifications
 from base.views import teaching_material
 from base.views.filter import filter_cities_by_country, filter_campus_by_city
-from attribution.views.learning_unit.update import UpdateAttributionView
-from attribution.views.learning_unit.delete import DeleteAttribution
-from attribution.views.learning_unit.create import CreateAttribution
-from base.views.learning_units.charge_repartition import AddChargeRepartition, \
-    EditChargeRepartition, SelectAttributionView
 from base.views.learning_units.detail import DetailLearningUnitYearView
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
@@ -180,23 +179,6 @@ urlpatterns = [
                 url(r'^edit/$', learning_unit_pedagogy_edit, name="learning_unit_pedagogy_edit"),
                 url(r'^toggle_summary_locked/$', toggle_summary_locked,
                     name="learning_unit_pedagogy_toggle_summary_locked")
-            ])),
-            url(r'^attributions/', include([
-                url(r'^$', base.views.learning_units.attribution.learning_unit_attributions,
-                    name="learning_unit_attributions"),
-                url(r'^select/$', SelectAttributionView.as_view(), name="select_attribution"),
-                url(r'^update/(?P<attribution_id>[0-9]+)/$', UpdateAttributionView.as_view(),
-                    name="update_attribution"),
-                url(r'^create/$', CreateAttribution.as_view(),
-                    name="add_attribution"),
-                url(r'^remove/(?P<attribution_id>[0-9]+)/$', DeleteAttribution.as_view(),
-                    name="remove_attribution"),
-                url(r'^charge_repartition/', include([
-                    url(r'^add/(?P<attribution_id>[0-9]+)/$', AddChargeRepartition.as_view(),
-                        name="add_charge_repartition"),
-                    url(r'^edit/(?P<attribution_id>[0-9]+)/$', EditChargeRepartition.as_view(),
-                        name="edit_charge_repartition"),
-                ])),
             ])),
             url(r'^proposal/', include([
                 url(r'^modification/$', update.learning_unit_modification_proposal,

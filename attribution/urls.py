@@ -25,7 +25,12 @@
 ##############################################################################
 from django.conf.urls import url, include
 
-from attribution.views import manage_my_courses
+from attribution.views import manage_my_courses, attribution
+from attribution.views.charge_repartition.create import SelectAttributionView, AddChargeRepartition
+from attribution.views.charge_repartition.update import EditChargeRepartition
+from attribution.views.learning_unit.create import CreateAttribution
+from attribution.views.learning_unit.delete import DeleteAttribution
+from attribution.views.learning_unit.update import UpdateAttributionView
 
 urlpatterns = [
     url(r'^manage_my_courses/', include([
@@ -45,5 +50,22 @@ urlpatterns = [
                     name="tutor_teaching_material_delete")
             ])),
         ]))
+    ])),
+    url(r'^(?P<learning_unit_year_id>[0-9]+)/attributions/', include([
+        url(r'^$', attribution.learning_unit_attributions,
+            name="learning_unit_attributions"),
+        url(r'^select/$', SelectAttributionView.as_view(), name="select_attribution"),
+        url(r'^update/(?P<attribution_id>[0-9]+)/$', UpdateAttributionView.as_view(),
+            name="update_attribution"),
+        url(r'^create/$', CreateAttribution.as_view(),
+            name="add_attribution"),
+        url(r'^remove/(?P<attribution_id>[0-9]+)/$', DeleteAttribution.as_view(),
+            name="remove_attribution"),
+        url(r'^charge_repartition/', include([
+            url(r'^add/(?P<attribution_id>[0-9]+)/$', AddChargeRepartition.as_view(),
+                name="add_charge_repartition"),
+            url(r'^edit/(?P<attribution_id>[0-9]+)/$', EditChargeRepartition.as_view(),
+                name="edit_charge_repartition"),
+        ])),
     ])),
 ]
