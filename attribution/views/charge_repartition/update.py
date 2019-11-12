@@ -33,7 +33,7 @@ from base.forms.learning_unit.attribution_charge_repartition import LecturingAtt
 
 class EditChargeRepartition(UpdateAttributionView):
     rules = [perms.is_eligible_to_manage_charge_repartition]
-    template_name = "learning_unit/add_charge_repartition_inner.html"
+    template_name = "attribution/charge_repartition/add_charge_repartition_inner.html"
     form_classes = {
         "lecturing_charge_form": LecturingAttributionChargeForm,
         "practical_charge_form": PracticalAttributionChargeForm

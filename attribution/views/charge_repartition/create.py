@@ -76,7 +76,7 @@ class SelectAttributionView(AttributionBaseViewMixin, TemplateView):
 
 class AddChargeRepartition(UpdateAttributionView):
     rules = [perms.is_eligible_to_manage_charge_repartition]
-    template_name = "learning_unit/add_charge_repartition_inner.html"
+    template_name = "attribution/charge_repartition/add_charge_repartition_inner.html"
     form_classes = {
         "lecturing_charge_form": LecturingAttributionChargeForm,
         "practical_charge_form": PracticalAttributionChargeForm
