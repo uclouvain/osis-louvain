@@ -35,7 +35,7 @@ from base.views.mixins import AjaxTemplateMixin, MultiFormsSuccessMessageMixin, 
 
 class CreateAttribution(AttributionBaseViewMixin, AjaxTemplateMixin, MultiFormsSuccessMessageMixin, MultiFormsView):
     rules = [perms.is_eligible_to_manage_attributions]
-    template_name = "learning_unit/attribution_inner.html"
+    template_name = "attribution/learning_unit/attribution_inner.html"
     form_classes = {
         "attribution_form": AttributionCreationForm,
         "lecturing_charge_form": LecturingAttributionChargeForm,
