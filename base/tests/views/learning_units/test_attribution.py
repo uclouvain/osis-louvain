@@ -28,6 +28,7 @@ from unittest.mock import patch
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import ugettext_lazy as _
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
@@ -36,12 +37,14 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.models.enums.learning_container_year_types import LearningContainerYearType, COURSE
 from base.models.enums.learning_unit_year_subtypes import PARTIM
+from base.models.person import Person
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, LearningUnitYearPartimFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.tutor import TutorFactory
+from base.views.learning_units.attribution import get_charge_repartition_warning_messages
 from base.views.mixins import RulesRequiredMixin
 
 
@@ -107,7 +110,7 @@ class TestEditAttribution(TestCase):
     def setUp(self):
 
         self.learning_unit_year = LearningUnitYearFullFactory(
-            learning_container_year = self.learning_container_year
+            learning_container_year=self.learning_container_year
         )
         self.lecturing_component = LecturingLearningComponentYearFactory(
             learning_unit_year=self.learning_unit_year)
@@ -253,3 +256,104 @@ class TestAddAttribution(TestCase):
         ).exists())
 
         self.assertRedirects(response, reverse("learning_unit_attributions", args=[self.learning_unit_year.id]))
+
+
+class TestGetChargeRepartitionWarningMessage(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.full_luy = LearningUnitYearFullFactory()
+        cls.partim_luy_1 = LearningUnitYearPartimFactory(academic_year=cls.full_luy.academic_year,
+                                                         learning_container_year=cls.full_luy.learning_container_year)
+        cls.partim_luy_2 = LearningUnitYearPartimFactory(academic_year=cls.full_luy.academic_year,
+                                                         learning_container_year=cls.full_luy.learning_container_year)
+        cls.attribution_full = AttributionNewFactory(
+            learning_container_year=cls.full_luy.learning_container_year
+        )
+        cls.full_lecturing_component = LecturingLearningComponentYearFactory(learning_unit_year=cls.full_luy)
+        cls.full_practical_component = PracticalLearningComponentYearFactory(learning_unit_year=cls.full_luy)
+
+        cls.partim_1_lecturing_component = \
+            LecturingLearningComponentYearFactory(learning_unit_year=cls.partim_luy_1)
+        cls.partim_1_practical_component = \
+            PracticalLearningComponentYearFactory(learning_unit_year=cls.partim_luy_1)
+
+        cls.partim_2_lecturing_component = \
+            LecturingLearningComponentYearFactory(learning_unit_year=cls.partim_luy_2)
+        cls.partim_2_practical_component = \
+            PracticalLearningComponentYearFactory(learning_unit_year=cls.partim_luy_2)
+
+        cls.charge_lecturing = AttributionChargeNewFactory(
+            attribution=cls.attribution_full,
+            learning_component_year=cls.full_lecturing_component,
+            allocation_charge=20
+        )
+        cls.charge_practical = AttributionChargeNewFactory(
+            attribution=cls.attribution_full,
+            learning_component_year=cls.full_practical_component,
+            allocation_charge=20
+        )
+
+        cls.attribution_partim_1 = cls.attribution_full
+        cls.attribution_partim_1.id = None
+        cls.attribution_partim_1.save()
+
+        cls.attribution_partim_2 = cls.attribution_full
+        cls.attribution_partim_2.id = None
+        cls.attribution_partim_2.save()
+
+    def setUp(self):
+        self.charge_lecturing_1 = AttributionChargeNewFactory(
+            attribution=self.attribution_partim_1,
+            learning_component_year=self.partim_1_lecturing_component,
+            allocation_charge=10
+        )
+        self.charge_practical_1 = AttributionChargeNewFactory(
+            attribution=self.attribution_partim_1,
+            learning_component_year=self.partim_1_practical_component,
+            allocation_charge=10
+        )
+
+        self.charge_lecturing_2 = AttributionChargeNewFactory(
+            attribution=self.attribution_partim_2,
+            learning_component_year=self.partim_2_lecturing_component,
+            allocation_charge=10
+        )
+        self.charge_practical_2 = AttributionChargeNewFactory(
+            attribution=self.attribution_partim_2,
+            learning_component_year=self.partim_2_practical_component,
+            allocation_charge=10
+        )
+
+    def test_should_not_give_warning_messages_when_volume_partim_inferior_or_equal_to_volume_parent(self):
+        msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
+
+        self.assertEqual(msgs,
+                         [])
+
+    def test_should_not_fail_when_no_charges(self):
+        self.charge_lecturing_1.allocation_charge = None
+        self.charge_lecturing_1.save()
+        self.charge_lecturing_2.allocation_charge = None
+        self.charge_lecturing_2.save()
+        self.charge_practical_1.allocation_charge = None
+        self.charge_practical_1.save()
+        self.charge_practical_2.allocation_charge = None
+        self.charge_practical_2.save()
+
+        msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
+
+        self.assertEqual(msgs,
+                         [])
+
+    def test_should_give_warning_messages_when_volume_partim_superior_to_volume_parent(self):
+        self.charge_lecturing_1.allocation_charge = 50
+        self.charge_lecturing_1.save()
+
+        msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
+        tutor_name = Person.get_str(self.attribution_full.tutor.person.first_name,
+                                    self.attribution_full.tutor.person.middle_name,
+                                    self.attribution_full.tutor.person.last_name)
+        tutor_name_with_function = "{} ({})".format(tutor_name, _(self.attribution_full.get_function_display()))
+        self.assertListEqual(msgs, [_("The sum of volumes for the partims for professor %(tutor)s is superior to the "
+                                      "volume of parent learning unit for this professor") % {
+                                        "tutor": tutor_name_with_function}])

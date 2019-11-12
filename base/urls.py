@@ -29,6 +29,7 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 
 import base.views.education_groups.create
+import base.views.learning_units.attribution
 import base.views.learning_units.common
 import base.views.learning_units.create
 import base.views.learning_units.delete
@@ -179,7 +180,8 @@ urlpatterns = [
                     name="learning_unit_pedagogy_toggle_summary_locked")
             ])),
             url(r'^attributions/', include([
-                url(r'^$', learning_unit.learning_unit_attributions, name="learning_unit_attributions"),
+                url(r'^$', base.views.learning_units.attribution.learning_unit_attributions,
+                    name="learning_unit_attributions"),
                 url(r'^select/$', SelectAttributionView.as_view(), name="select_attribution"),
                 url(r'^update/(?P<attribution_id>[0-9]+)/$', EditAttributionView.as_view(),
                     name="update_attribution"),

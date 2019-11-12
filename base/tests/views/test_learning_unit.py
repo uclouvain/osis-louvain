@@ -44,8 +44,6 @@ from waffle.testutils import override_flag
 import base.business.learning_unit
 import base.business.xls
 import reference.models.language
-from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business import learning_unit as learning_unit_business
 from base.business.learning_unit_xls import learning_unit_titles_part2, learning_unit_titles_part_1, create_xls
 from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLANNED_CLASSES, \
@@ -66,7 +64,6 @@ from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.person import Person
 from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year, get_current_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -79,13 +76,12 @@ from base.tests.factories.external_learning_unit_year import ExternalLearningUni
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_class_year import LearningClassYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory, \
-    LecturingLearningComponentYearFactory, PracticalLearningComponentYearFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearPartimFactory, \
-    LearningUnitYearFullFactory, LearningUnitYearFakerFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory, \
+    LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerFactory, \
     UEFacultyManagerFactory
@@ -93,7 +89,7 @@ from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.views.learning_unit import learning_unit_components, learning_unit_specifications, \
-    get_charge_repartition_warning_messages, learning_unit_attributions, learning_unit_comparison, \
+    learning_unit_comparison, \
     learning_unit_proposal_comparison
 from base.views.learning_unit import learning_unit_specifications_edit
 from base.views.learning_units.create import create_partim_form
@@ -1116,7 +1112,6 @@ class LearningUnitViewTestCase(TestCase):
         self.assertCountEqual(response.context['achievements_FR'], [learning_unit_achievements_fr])
         self.assertCountEqual(response.context['achievements_EN'], [learning_unit_achievements_en])
 
-
     def test_learning_unit_specifications_edit(self):
         a_label = 'label'
         learning_unit_year = LearningUnitYearFactory()
@@ -1297,107 +1292,6 @@ class TestLearningAchievements(TestCase):
         for code_language in self.code_languages:
             key = "achievements_{}".format(code_language)
             self.assertTrue(result[key])
-
-
-class TestGetChargeRepartitionWarningMessage(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.full_luy = LearningUnitYearFullFactory()
-        cls.partim_luy_1 = LearningUnitYearPartimFactory(academic_year=cls.full_luy.academic_year,
-                                                         learning_container_year=cls.full_luy.learning_container_year)
-        cls.partim_luy_2 = LearningUnitYearPartimFactory(academic_year=cls.full_luy.academic_year,
-                                                         learning_container_year=cls.full_luy.learning_container_year)
-        cls.attribution_full = AttributionNewFactory(
-            learning_container_year=cls.full_luy.learning_container_year
-        )
-        cls.full_lecturing_component = LecturingLearningComponentYearFactory(learning_unit_year=cls.full_luy)
-        cls.full_practical_component = PracticalLearningComponentYearFactory(learning_unit_year=cls.full_luy)
-
-        cls.partim_1_lecturing_component = \
-            LecturingLearningComponentYearFactory(learning_unit_year=cls.partim_luy_1)
-        cls.partim_1_practical_component = \
-            PracticalLearningComponentYearFactory(learning_unit_year=cls.partim_luy_1)
-
-        cls.partim_2_lecturing_component = \
-            LecturingLearningComponentYearFactory(learning_unit_year=cls.partim_luy_2)
-        cls.partim_2_practical_component = \
-            PracticalLearningComponentYearFactory(learning_unit_year=cls.partim_luy_2)
-
-        cls.charge_lecturing = AttributionChargeNewFactory(
-            attribution=cls.attribution_full,
-            learning_component_year=cls.full_lecturing_component,
-            allocation_charge=20
-        )
-        cls.charge_practical = AttributionChargeNewFactory(
-            attribution=cls.attribution_full,
-            learning_component_year=cls.full_practical_component,
-            allocation_charge=20
-        )
-
-        cls.attribution_partim_1 = cls.attribution_full
-        cls.attribution_partim_1.id = None
-        cls.attribution_partim_1.save()
-
-        cls.attribution_partim_2 = cls.attribution_full
-        cls.attribution_partim_2.id = None
-        cls.attribution_partim_2.save()
-
-    def setUp(self):
-        self.charge_lecturing_1 = AttributionChargeNewFactory(
-            attribution=self.attribution_partim_1,
-            learning_component_year=self.partim_1_lecturing_component,
-            allocation_charge=10
-        )
-        self.charge_practical_1 = AttributionChargeNewFactory(
-            attribution=self.attribution_partim_1,
-            learning_component_year=self.partim_1_practical_component,
-            allocation_charge=10
-        )
-
-        self.charge_lecturing_2 = AttributionChargeNewFactory(
-            attribution=self.attribution_partim_2,
-            learning_component_year=self.partim_2_lecturing_component,
-            allocation_charge=10
-        )
-        self.charge_practical_2 = AttributionChargeNewFactory(
-            attribution=self.attribution_partim_2,
-            learning_component_year=self.partim_2_practical_component,
-            allocation_charge=10
-        )
-
-    def test_should_not_give_warning_messages_when_volume_partim_inferior_or_equal_to_volume_parent(self):
-        msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
-
-        self.assertEqual(msgs,
-                         [])
-
-    def test_should_not_fail_when_no_charges(self):
-        self.charge_lecturing_1.allocation_charge = None
-        self.charge_lecturing_1.save()
-        self.charge_lecturing_2.allocation_charge = None
-        self.charge_lecturing_2.save()
-        self.charge_practical_1.allocation_charge = None
-        self.charge_practical_1.save()
-        self.charge_practical_2.allocation_charge = None
-        self.charge_practical_2.save()
-
-        msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
-
-        self.assertEqual(msgs,
-                         [])
-
-    def test_should_give_warning_messages_when_volume_partim_superior_to_volume_parent(self):
-        self.charge_lecturing_1.allocation_charge = 50
-        self.charge_lecturing_1.save()
-
-        msgs = get_charge_repartition_warning_messages(self.full_luy.learning_container_year)
-        tutor_name = Person.get_str(self.attribution_full.tutor.person.first_name,
-                                    self.attribution_full.tutor.person.middle_name,
-                                    self.attribution_full.tutor.person.last_name)
-        tutor_name_with_function = "{} ({})".format(tutor_name, _(self.attribution_full.get_function_display()))
-        self.assertListEqual(msgs, [_("The sum of volumes for the partims for professor %(tutor)s is superior to the "
-                                      "volume of parent learning unit for this professor") % {
-                                        "tutor": tutor_name_with_function}])
 
 
 class TestLearningUnitProposalComparison(TestCase):
