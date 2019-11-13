@@ -1,0 +1,70 @@
+{% load static i18n bootstrap3 static %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="modal-content" id="form-modal-content">
+    {# We do not display the form if those are warnings or errors #}
+    {% if not messages %}
+        <div class="modal-header">
+             <button type="button" class="close" data-dismiss="modal">×</button>
+             <h4>{% trans 'Attach' %} {{ object_to_attach.acronym }}</h4>
+        </div>
+
+        <div id="form-modal-body" class="modal-body">
+           <div id="attach_info">
+            {% if source_link %}
+                {% blocktrans with object_acronym=object_to_attach.acronym parent_acronym=source_link.parent.acronym%}Do you want to copy or to move {{ object_acronym }} from {{ parent_acronym }} ?{% endblocktrans %}
+            {% else %}
+                {% blocktrans with object_acronym=object_to_attach.acronym parent_acronym=source_link.parent.acronym%}Do you want to attach {{ object_acronym }} ?{% endblocktrans %}
+            {% endif %}
+           </div>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
+            {% if source_link %}
+                <a class="trigger_modal btn btn-danger"
+                   data-url="{% url "group_element_year_move" root education_group_year_parent.id source_link.id %}?{{ request.GET.urlencode }}">
+                    {% trans "Move" %}
+                </a>
+            {% endif %}
+            <a class="trigger_modal btn btn-primary"
+               data-url="{% url "group_element_year_create" root education_group_year_parent.id  %}?{{  request.GET.urlencode }}">
+                {% trans "Copy" %}
+            </a>
+        </div>
+    {% else %}
+        <div class="panel-body">
+            {% include 'template_messages.html' %}
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    bind_trigger_modal();
+</script>

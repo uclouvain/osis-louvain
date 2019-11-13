@@ -1,5 +1,5 @@
 <!doctype html>
-{% load staticfiles i18n %}
+{% load static i18n %}
 {% load statici18n analytical hijack_tags %}
 
 {% comment "License" %}
@@ -62,15 +62,17 @@
     <link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
     <link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+    <link rel="stylesheet" href="{% static 'css/dataTables.bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/osis.css' %}">
     <link rel="stylesheet" href="{% static 'fontawesome-free-5.7.2-web/css/all.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/tree.css' %}">
     <link rel="stylesheet" href="{% static 'css/jstree.min.css' %}">
-    <link rel="stylesheet" href="{% static 'css/dataTables.bootstrap.min.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'hijack/hijack-styles.css' %}"/>
 
     <script src="{% static 'js/jquery-2.1.4.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jquery-ui.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/spinner.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/prepareXls.js' %}"></script>
     <script>
         /*** Handle jQuery plugin naming conflict between jQuery UI and Bootstrap ***/
         $.widget.bridge('uibutton', $.ui.button);
@@ -112,6 +114,9 @@
 {% endif %}>
 {% hijack_notification %}
 {% analytical_body_top %}
+<div id="overlay" class="overlay"></div>
+<div id="overlay_fadein" class="overlay fadein"></div>
+<div id="loader"></div>
 
 
 {% block layout_navbar_top %}

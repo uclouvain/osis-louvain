@@ -28,10 +28,10 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 
-from rules_management.tests.fatories import PermissionFactory, FieldReferenceFactory
-from rules_management.mixins import PermissionFieldMixin
 from base.tests.factories.user import UserFactory
 from reference.models.country import Country
+from rules_management.mixins import PermissionFieldMixin
+from rules_management.tests.fatories import PermissionFactory, FieldReferenceFactory
 
 
 class CountryForm(PermissionFieldMixin, forms.ModelForm):

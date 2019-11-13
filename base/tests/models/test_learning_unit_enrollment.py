@@ -23,45 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-from django.test import TestCase
-from base.models import learning_unit_enrollment
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.student import StudentFactory
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 def create_learning_unit_enrollment(learning_unit_year, offer_enrollment):
     return LearningUnitEnrollmentFactory(learning_unit_year=learning_unit_year,
                                          offer_enrollment=offer_enrollment)
-
-
-class LearningUnitEnrollmentTest(TestCase):
-    def setUp(self):
-        academic_year = AcademicYearFactory(year=datetime.datetime.now().year)
-        offer_year = OfferYearFactory(academic_year=academic_year)
-        student_1 = StudentFactory(person=PersonFactory(last_name='Durant', first_name='Thomas'))
-        student_2 = StudentFactory(person=PersonFactory(last_name='Dupont', first_name='Raph'))
-        student_3 = StudentFactory(person=PersonFactory(last_name='Duclou', first_name='Paul'))
-        offer_enrollement_1 = OfferEnrollmentFactory(offer_year=offer_year,student=student_1)
-        offer_enrollement_2 = OfferEnrollmentFactory(offer_year=offer_year, student=student_2)
-        offer_enrollement_3 = OfferEnrollmentFactory(offer_year=offer_year,student=student_3)
-        self.l_unit_year = LearningUnitYearFactory(academic_year=academic_year)
-        LearningUnitEnrollmentFactory(learning_unit_year=self.l_unit_year, offer_enrollment=offer_enrollement_1)
-        LearningUnitEnrollmentFactory(learning_unit_year=self.l_unit_year, offer_enrollment=offer_enrollement_2)
-        LearningUnitEnrollmentFactory(learning_unit_year=self.l_unit_year, offer_enrollment=offer_enrollement_3)
-
-    def test_find_by_learningunit_enrollment_order_by_last_name_first_name(self):
-        request = learning_unit_enrollment.find_by_learningunit_enrollment(self.l_unit_year)
-        self.assertEqual(len(request), 3)
-        self.assertEqual(request[0].student.person.last_name, "Duclou")
-        self.assertEqual(request[1].student.person.last_name, "Dupont")
-        self.assertEqual(request[2].student.person.last_name, "Durant")
-
-    def test_find_by_learningunit_enrollement_bad_value(self):
-        with self.assertRaises(ValueError):
-            learning_unit_enrollment.find_by_learningunit_enrollment("BAD VALUE")

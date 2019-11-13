@@ -116,6 +116,7 @@ def find_deliberation_date(nb_session, offer_year):
     return None
 
 
+# FIXME: Only used in tests
 def find_by_session_and_academic_year(nb_session, an_academic_year):
     return SessionExamCalendar.objects.filter(
         number_session=nb_session,

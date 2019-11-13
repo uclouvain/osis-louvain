@@ -24,16 +24,15 @@
 #
 ##############################################################################
 from datetime import date
-
 from decimal import Decimal
-from django.test import TestCase
 
-from base.models.enums import learning_component_year_type, learning_unit_year_subtypes
+from django.test import TestCase
 
 from attribution.business import attribution_json
 from attribution.models.enums import function
 from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from base.models.enums import learning_component_year_type, learning_unit_year_subtypes
 from base.models.learning_component_year import LearningComponentYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory

@@ -27,7 +27,7 @@
 from django.db import IntegrityError, transaction, Error
 from django.db.models import F
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base import models as mdl_base
 from base.business import learning_unit_year_with_context
@@ -35,7 +35,7 @@ from base.business.learning_units.simple.deletion import delete_from_given_learn
     check_learning_unit_year_deletion
 from base.business.utils.model import update_instance_model_from_data, update_related_object
 from base.enums.component_detail import COMPONENT_DETAILS
-from base.models import learning_class_year
+from base.models import learning_class_year, academic_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from base.models.entity import Entity
 from base.models.enums import learning_unit_year_periodicity, learning_unit_year_subtypes
@@ -64,9 +64,9 @@ def edit_learning_unit_end_date(learning_unit_to_edit, new_academic_year, propag
 
 def _update_learning_unit_year_end_date(learning_unit_to_edit, new_academic_year, new_end_year):
     end_year = _get_actual_end_year(learning_unit_to_edit)
-    if new_end_year is None or new_end_year > end_year:
+    if new_end_year is None or new_end_year.year > end_year.year:
         return extend_learning_unit(learning_unit_to_edit, new_academic_year)
-    elif new_end_year < end_year:
+    elif new_end_year.year < end_year.year:
         return shorten_learning_unit(learning_unit_to_edit, new_academic_year)
     return []
 
@@ -118,7 +118,7 @@ def _check_extend_partim(last_learning_unit_year, new_academic_year):
 
     lu_parent = last_learning_unit_year.parent
     if last_learning_unit_year.is_partim() and lu_parent:
-        if _get_actual_end_year(lu_parent.learning_unit) < new_academic_year.year:
+        if _get_actual_end_year(lu_parent.learning_unit).year < new_academic_year.year:
             raise IntegrityError(
                 _('The selected end year (%(partim_end_year)s) is greater '
                   'than the end year of the parent %(lu_parent)s') % {
@@ -168,7 +168,7 @@ def _duplicate_external(old_learning_unit_year, new_learning_unit_year):
 
 def _duplicate_learning_container_year(new_learn_unit_year, new_academic_year, old_learn_unit_year):
     duplicated_lcy = _get_or_create_container_year(new_learn_unit_year, new_academic_year)
-    _duplicate_learning_component_year(duplicated_lcy, new_learn_unit_year, old_learn_unit_year)
+    _duplicate_learning_component_year(new_learn_unit_year, old_learn_unit_year)
     duplicated_lcy.save()
     return duplicated_lcy
 
@@ -211,8 +211,7 @@ def _raise_if_entity_version_does_not_exist(new_lcy, new_academic_year):
                 })
 
 
-# TODO :: remove unused param
-def _duplicate_learning_component_year(new_learn_container_year, new_learn_unit_year, old_learn_unit_year):
+def _duplicate_learning_component_year(new_learn_unit_year, old_learn_unit_year):
     old_components = old_learn_unit_year.learningcomponentyear_set.all()
     for old_component in old_components:
         new_component = update_related_object(old_component, 'learning_unit_year', new_learn_unit_year)
@@ -247,7 +246,7 @@ def _check_shorten_partims(learning_unit_to_edit, new_academic_year):
 
 
 def _check_shorten_partim(learning_unit_to_edit, new_academic_year, partim):
-    if _get_actual_end_year(partim.learning_unit) > new_academic_year.year:
+    if _get_actual_end_year(partim.learning_unit).year > new_academic_year.year:
         raise IntegrityError(
             _('The learning unit %(learning_unit)s has a partim %(partim)s with '
               'an end year greater than %(year)s') % {
@@ -259,15 +258,16 @@ def _check_shorten_partim(learning_unit_to_edit, new_academic_year, partim):
 
 
 def _get_actual_end_year(learning_unit_to_edit):
-    return learning_unit_to_edit.end_year or compute_max_academic_year_adjournment() + 1
+    return learning_unit_to_edit.end_year or \
+           academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1)
 
 
 def _get_new_end_year(new_academic_year):
-    return new_academic_year.year if new_academic_year else None
+    return new_academic_year if new_academic_year else None
 
 
 def get_next_academic_years(learning_unit_to_edit, year):
-    range_years = list(range(learning_unit_to_edit.end_year + 1, year + 1))
+    range_years = list(range(learning_unit_to_edit.end_year.year + 1, year + 1))
     return AcademicYear.objects.filter(year__in=range_years).order_by('year')
 
 
@@ -346,7 +346,9 @@ def _update_learning_unit_year(luy_to_update, fields_to_update, with_report, ent
             fields_to_update,
             exclude=fields_to_exclude
         )
-
+        acronym_full = fields_to_update.get("acronym")
+        if acronym_full:
+            update_partim_acronym(acronym_full, luy_to_update)
     update_instance_model_from_data(luy_to_update, fields_to_update,
                                     exclude=fields_to_exclude + ("in_charge",))
 
@@ -597,3 +599,12 @@ def create_learning_unit_year_creation_message(learning_unit_year_created):
     return _("Learning Unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
              "successfuly created.") % {'link': link, 'acronym': learning_unit_year_created.acronym,
                                         'academic_year': learning_unit_year_created.academic_year}
+
+
+def update_partim_acronym(acronym_full, luy_to_update):
+    partims = luy_to_update.get_partims_related()
+    if partims:
+        for partim in partims:
+            new_acronym = acronym_full + str(partim.acronym[-1])
+            partim.acronym = new_acronym
+            partim.save()

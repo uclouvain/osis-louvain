@@ -28,7 +28,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django.views.decorators.http import require_http_methods
 from waffle.decorators import waffle_flag
 
@@ -74,7 +74,7 @@ def learning_unit_select(request, learning_unit_year_id):
 
 
 def build_success_message(obj):
-    return """{} : "{}" """.format(
+    return "<strong>{}</strong><br>{}".format(
         _("Selected element"),
         str(obj)
     )

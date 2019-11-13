@@ -23,9 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from attribution.models import *
 from django.contrib import admin
 
+from attribution.models import *
 
 admin.site.register(attribution.Attribution,
                     attribution.AttributionAdmin)

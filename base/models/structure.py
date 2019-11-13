@@ -26,6 +26,7 @@
 from itertools import chain
 
 from django.db import models
+
 from base.models.enums import structure_type
 from base.models.utils.utils import get_object_or_none
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -74,10 +75,6 @@ class Structure(models.Model):
         )
 
 
-def find_structures():
-    return Structure.objects.all().order_by('acronym')
-
-
 def find_by_id(structure_id):
     return get_object_or_none(Structure, pk=structure_id)
 
@@ -97,14 +94,6 @@ def search(acronym=None, title=None, type=None):
     return queryset
 
 
-def find_by_type(type):
-    return Structure.objects.filter(type__icontains=type)
-
-
-def find_by_types(types):
-    return Structure.objects.filter(type__in=types).order_by('type', 'acronym')
-
-
 def find_faculty(a_structure):
     if a_structure.type == structure_type.FACULTY:
         return a_structure
@@ -118,22 +107,8 @@ def find_faculty(a_structure):
         return None
 
 
-def find_first(acronym=None, title=None, type=None):
-    return search(acronym, title, type).first()
-
-
 def find_by_acronyms(acronym_list):
     return Structure.objects.filter(acronym__in=acronym_list).order_by("acronym")
-
-
-def find_all_structure_parents(entities_manager):
-    structures_list = list()
-    for entity_manager in entities_manager:
-        structures = Structure.objects.filter(acronym=entity_manager.structure.acronym)
-        for structure in structures:
-            family_list = list(chain(structures, find_all_structure_children(structure)))
-            structures_list = list(chain(structures_list, family_list))
-    return structures_list
 
 
 def find_all_structure_children(structure):

@@ -23,9 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import template
-
 import waffle
+from django import template
 
 register = template.Library()
 

@@ -129,7 +129,7 @@ Feature: Propositions d’UE
 
     And Aller sur la page de detail de l'ue: <acronym> en <year>
     When Cliquer sur le menu « Actions »
-    And Cliquer sur « Editer la proposition »
+    And Cliquer sur « Modifier la proposition »
     And Encoder <value> comme <field>
     And Cliquer sur le bouton « Enregistrer »
     Then Vérifier que une proposition de <proposal_type> a été faite pour l'unité d'enseignement <acronym>
@@ -184,7 +184,7 @@ Feature: Propositions d’UE
     And L’utilisateur est attaché à l’entité EPL
     And Aller sur la page de detail de l'ue: <acronym> en <year>
     When Cliquer sur le menu « Actions »
-    And Cliquer sur « Editer la proposition »
+    And Cliquer sur « Modifier la proposition »
     And Encoder Accepté comme Etat
     And Cliquer sur le bouton « Enregistrer »
 

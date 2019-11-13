@@ -28,17 +28,16 @@ from decimal import *
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import When, Case, Q, Sum, Count, IntegerField, F
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from attribution.models import attribution
 from base.models import person, session_exam_deadline, \
     academic_year as academic_yr, offer_year, program_manager, tutor
-from base.models.enums import exam_enrollment_state as enrollment_states, \
-    exam_enrollment_justification_type as justification_types
+from base.models.enums import exam_enrollment_justification_type as justification_types
+from base.models.enums import exam_enrollment_state as enrollment_states
 from base.models.exceptions import JustificationValueException
 from base.models.utils.admin_extentions import remove_delete_action
 from osis_common.models.osis_model_admin import OsisModelAdmin
-from base.models.enums import exam_enrollment_state as enrollment_states
 
 JUSTIFICATION_ABSENT_FOR_TUTOR = _('Absent')
 SCORE_BETWEEN_0_AND_20 = _("Scores must be between 0 and 20")
@@ -117,10 +116,6 @@ class ExamEnrollment(models.Model):
         return self.score_draft is not None or self.justification_draft
 
     @property
-    def is_score_missing_as_program_manager(self):
-        return not self.is_final
-
-    @property
     def to_validate_by_program_manager(self):
         sc_reencoded = None
         if self.score_reencoded is not None:
@@ -162,14 +157,6 @@ class ExamEnrollment(models.Model):
             return _(self.justification_reencoded)
         else:
             return None
-
-    @property
-    def is_score_missing_as_tutor(self):
-        return not self.is_final and not self.is_draft
-
-
-def find_by_ids(ids):
-    return ExamEnrollment.objects.filter(pk__in=ids)
 
 
 def get_session_exam_deadline(enrollment):
@@ -344,12 +331,13 @@ def find_for_score_encodings(session_exam_number,
     :return: All filtered examEnrollments.
     """
     if not academic_year:
-        academic_year = academic_yr.current_academic_year()
+        academic_year = academic_yr.starting_academic_year()
 
     queryset = ExamEnrollment.objects.filter(
         session_exam__number_session=session_exam_number,
         learning_unit_enrollment__learning_unit_year__academic_year=academic_year
     )
+
     if only_enrolled:
         queryset = queryset.filter(enrollment_state=enrollment_states.ENROLLED)
 
@@ -406,13 +394,6 @@ def find_for_score_encodings(session_exam_number,
         .select_related('session_exam') \
         .select_related('learning_unit_enrollment__offer_enrollment__student__person') \
         .select_related('learning_unit_enrollment__learning_unit_year')
-
-
-def find_by_student(a_student):
-    return ExamEnrollment.objects.filter(learning_unit_enrollment__offer_enrollment__student=a_student) \
-        .order_by('-learning_unit_enrollment__learning_unit_year__academic_year__year',
-                  'session_exam__number_session',
-                  'learning_unit_enrollment__learning_unit_year__acronym')
 
 
 def _get_enrolled_enrollments(enrollments):

@@ -23,22 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import re
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef
+from django.db.models.functions import Concat
 from django.urls import reverse
+from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_container_year import get_learning_container_year_warnings
+from base.models import entity_version
 from base.models import group_element_year
 from base.models.academic_year import compute_max_academic_year_adjournment, AcademicYear, \
     MAX_ACADEMIC_YEAR_FACULTY, starting_academic_year
-from base.models.entity import Entity
+from base.models.entity_version import get_entity_version_parent_or_itself_from_type
 from base.models.enums import active_status, learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes, internship_subtypes, \
     learning_unit_year_session, entity_container_year_link_type, quadrimesters, attribution_procedure
@@ -47,7 +50,8 @@ from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, 
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
 from base.models.prerequisite_item import PrerequisiteItem
-from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
+    SerializableQuerySet
 
 AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
@@ -111,21 +115,84 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
     ]
 
 
+class LearningUnitYearQuerySet(SerializableQuerySet):
+    def annotate_full_title(self):
+        return self.annotate_full_title_class_method(self)
+
+    @classmethod
+    def annotate_full_title_class_method(cls, queryset):
+        return queryset.annotate(
+            full_title=Case(
+                When(
+                    Q(learning_container_year__common_title__isnull=True) |
+                    Q(learning_container_year__common_title__exact=''),
+                    then='specific_title'
+                ),
+                When(
+                    Q(specific_title__isnull=True) | Q(specific_title__exact=''),
+                    then='learning_container_year__common_title'
+                ),
+                default=Concat('learning_container_year__common_title', Value(' - '), 'specific_title'),
+                output_field=CharField(),
+            ),
+            full_title_en=Case(
+                When(
+                    Q(learning_container_year__common_title_english__isnull=True) |
+                    Q(learning_container_year__common_title_english__exact=''),
+                    then='specific_title_english'
+                ),
+                When(
+                    Q(specific_title_english__isnull=True) | Q(specific_title_english__exact=''),
+                    then='learning_container_year__common_title_english'
+                ),
+                default=Concat('learning_container_year__common_title_english', Value(' - '), 'specific_title_english'),
+                output_field=CharField(),
+            ),
+        )
+
+    @classmethod
+    def annotate_entity_requirement_acronym(cls, queryset):
+        entity_requirement = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__requirement_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+        return queryset.annotate(
+            entity_requirement=Subquery(entity_requirement)
+        )
+
+    @classmethod
+    def annotate_entity_allocation_acronym(cls, queryset):
+        entity_allocation = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('learning_container_year__allocation_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+
+        return queryset.annotate(
+            entity_allocation=Subquery(entity_allocation)
+        )
+
+    @classmethod
+    def annotate_entities_allocation_and_requirement_acronym(cls, queryset):
+        return cls.annotate_entity_allocation_acronym(
+            cls.annotate_entity_requirement_acronym(queryset)
+        )
+
+
+class BaseLearningUnitYearManager(SerializableModelManager):
+    def get_queryset(self):
+        return LearningUnitYearQuerySet(self.model, using=self._db)
+
+
 class LearningUnitYearWithContainerManager(models.Manager):
     def get_queryset(self):
         # FIXME For the moment, the learning_unit_year without container must be hide !
-        return super().get_queryset().filter(learning_container_year__isnull=False)
+        return super().get_queryset().select_related('learning_container_year')\
+            .filter(learning_container_year__isnull=False)
 
 
-class ExtraManagerLearningUnitYear(models.Model):
-    # This class ensure that the default manager (from serializable model) is not override by this manager
-    objects_with_container = LearningUnitYearWithContainerManager()
-
-    class Meta:
-        abstract = True
-
-
-class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
+class LearningUnitYear(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     academic_year = models.ForeignKey(AcademicYear, verbose_name=_('Academic year'),
                                       validators=[academic_year_validator], on_delete=models.PROTECT)
@@ -173,6 +240,10 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
 
     periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
                                    verbose_name=_('Periodicity'))
+
+    objects = BaseLearningUnitYearManager()
+    objects_with_container = LearningUnitYearWithContainerManager()
+
     _warnings = None
 
     class Meta:
@@ -201,12 +272,6 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
             ).get()
         return None
 
-    @property
-    def same_container_learning_unit_years(self):
-        return LearningUnitYear.objects.filter(
-            learning_container_year=self.learning_container_year
-        ).order_by('acronym')
-
     @cached_property
     def allocation_entity(self):
         return self.get_entity(entity_container_year_link_type.ALLOCATION_ENTITY)
@@ -214,6 +279,20 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     @cached_property
     def requirement_entity(self):
         return self.get_entity(entity_container_year_link_type.REQUIREMENT_ENTITY)
+
+    def is_service(self, entities_version, *args, **kwargs):
+        if getattr(self, 'externallearningunityear', None):
+            if self.externallearningunityear.mobility:
+                return False
+        if self.requirement_entity and self.allocation_entity:
+            return get_entity_version_parent_or_itself_from_type(entities_version,
+                                                                 entity=self.requirement_entity.most_recent_acronym,
+                                                                 entity_type='FACULTY') \
+                   != get_entity_version_parent_or_itself_from_type(entities_version,
+                                                                    entity=self.allocation_entity.most_recent_acronym,
+                                                                    entity_type='FACULTY')
+        else:
+            return False
 
     @property
     def complete_title(self):
@@ -231,6 +310,13 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
                 self.specific_title_english,
             ]))
         return complete_title_english
+
+    @property
+    def complete_title_i18n(self):
+        complete_title = self.complete_title
+        if translation.get_language() == LANGUAGE_CODE_EN:
+            complete_title = self.complete_title_english or complete_title
+        return complete_title
 
     @property
     def container_common_title(self):
@@ -294,19 +380,10 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         return self.get_internship_subtype_display()
 
     @property
-    def get_previous_acronym(self):
-        return find_lt_learning_unit_year_with_different_acronym(self)
-
-    @property
     def periodicity_verbose(self):
         if self.periodicity:
             return _(self.periodicity)
         return None
-
-    def find_gte_learning_units_year(self):
-        return LearningUnitYear.objects.filter(learning_unit=self.learning_unit,
-                                               academic_year__year__gte=self.academic_year.year) \
-            .order_by('academic_year__year')
 
     def find_gt_learning_units_year(self):
         return LearningUnitYear.objects.filter(learning_unit=self.learning_unit,
@@ -338,9 +415,7 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
         # @TODO: Remove this condition when classes will be removed from learning unit year
         if self.learning_container_year:
             entity = self.learning_container_year.get_entity_from_type(entity_type)
-            if entity:
-                # TODO :: prefetch entityversion_set before call to this function
-                return Entity.objects.filter(pk=entity.pk).prefetch_related('entityversion_set').get()
+            return entity
 
     def clean(self):
         learning_unit_years = find_gte_year_acronym(self.academic_year, self.acronym)
@@ -437,9 +512,6 @@ class LearningUnitYear(SerializableModel, ExtraManagerLearningUnitYear):
     def is_external_with_co_graduation(self):
         return self.is_external() and self.externallearningunityear.co_graduation
 
-    def is_external_mobility(self):
-        return self.is_external() and self.externallearningunityear.mobility
-
     def is_prerequisite(self):
         return PrerequisiteItem.objects.filter(
             Q(learning_unit=self.learning_unit) | Q(prerequisite__learning_unit_year=self)
@@ -469,6 +541,7 @@ def search(academic_year_id=None, acronym=None, learning_container_year_id=None,
            title=None, subtype=None, status=None, container_type=None, tutor=None,
            summary_responsible=None, requirement_entities=None, learning_unit_year_id=None, *args, **kwargs):
     queryset = LearningUnitYear.objects_with_container
+    queryset = LearningUnitYearQuerySet.annotate_full_title_class_method(queryset)
 
     if learning_unit_year_id:
         queryset = queryset.filter(id=learning_unit_year_id)
@@ -567,17 +640,6 @@ def find_gte_year_acronym(academic_yr, acronym):
 def find_lt_year_acronym(academic_yr, acronym):
     return LearningUnitYear.objects.filter(academic_year__year__lt=academic_yr.year,
                                            acronym__iexact=acronym).order_by('academic_year')
-
-
-def check_if_acronym_regex_is_valid(acronym):
-    return isinstance(acronym, str) and \
-           not acronym.startswith('*') and \
-           not acronym.startswith('+') and \
-           re.fullmatch(REGEX_ACRONYM_CHARSET, acronym.upper()) is not None
-
-
-def find_max_credits_of_related_partims(a_learning_unit_year):
-    return a_learning_unit_year.get_partims_related().aggregate(max_credits=models.Max("credits"))["max_credits"]
 
 
 def find_partims_with_active_status(a_learning_unit_year):

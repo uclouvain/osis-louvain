@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.db import models
-from django.core import serializers
+
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
@@ -47,13 +47,3 @@ class Decree(SerializableModel):
 
     def __str__(self):
         return self.name
-
-
-def serialize_list(list_decrees):
-    """
-    Serialize a list of "Decree" objects using the json format.
-    Use to send data to osis-portal.
-    :param list_decrees: a list of "Decree" objects
-    :return: the serialized list (a json)
-    """
-    return serializers.serialize("json", list_decrees)

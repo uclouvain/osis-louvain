@@ -25,8 +25,7 @@
 ##############################################################################
 from dal import autocomplete
 from django import forms
-from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _, pgettext_lazy
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
 
 from base.business.entity import get_entities_ids
@@ -37,27 +36,12 @@ from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import Categories
 
 
-class SelectMultipleWithData(forms.SelectMultiple):
-    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-        label = _(label)
-        option_dict = super().create_option(name, value, label, selected, index,
-                                            subindex=subindex, attrs=attrs)
-        group_type = self.data_attrs.get(value)
-        if group_type:
-            option_dict['attrs']['data-category'] = group_type.category
-        return option_dict
-
-    @cached_property
-    def data_attrs(self):
-        return {obj.pk: obj for obj in self.choices.queryset}
-
-
 class EducationGroupFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
         queryset=AcademicYear.objects.all(),
         required=False,
+        label=_('Ac yr.'),
         empty_label=pgettext_lazy("plural", "All"),
-        label=_('Ac yr.')
     )
     category = filters.ChoiceFilter(
         choices=list(Categories.choices()),

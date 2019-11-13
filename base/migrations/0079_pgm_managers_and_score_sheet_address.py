@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 
 from django.db import migrations, connection
 
-
 origin_year = 2015
 destination_year = 2016
 

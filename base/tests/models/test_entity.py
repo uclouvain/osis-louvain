@@ -23,11 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase
+import datetime
+
 import factory
 import factory.fuzzy
-import datetime
+from django.test import TestCase
 from django.utils import timezone
+
 from base.models import entity
 from base.models.entity import find_versions_from_entites
 from base.models.entity_version import EntityVersion

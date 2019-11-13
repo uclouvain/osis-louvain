@@ -23,10 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy
-from django.utils.translation import ugettext_lazy as _
-
-from base.models.enums import learning_component_year_type
+from django.utils.translation import gettext_lazy as _
 
 FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON = ['acronym', 'internship_subtype', 'credits', 'periodicity',
                                           'status', 'language', 'professional_integration', 'specific_title',
@@ -34,17 +31,8 @@ FIELDS_FOR_LEARNING_UNIT_YR_COMPARISON = ['acronym', 'internship_subtype', 'cred
                                           'session', 'attribution_procedure']
 FIELDS_FOR_LEARNING_CONTAINER_YR_COMPARISON = ['team', 'is_vacant', 'type_declaration_vacant', 'common_title',
                                                'common_title_english']
-FIELDS_FOR_LEARNING_COMPONENT_COMPARISON = ['acronym', 'real_classes', 'planned_classes']
 DEFAULT_VALUE_FOR_NONE = '-'
 LEARNING_COMPONENT_YEAR = 'learning_component_year'
-
-
-def get_keys(list1, list2):
-    keys = list1
-    for k in list2:
-        if k not in keys:
-            keys.append(k)
-    return sorted(keys, key=ugettext_lazy)
 
 
 def get_value(model, data, field_name):
@@ -97,30 +85,6 @@ def compare_volumes(current_data, prev_data, next_data):
                if _is_key_to_compare(key, vol) and (value != prev_volumes.get(key) or value != next_volumes.get(key))
                }
     return vol
-
-
-def get_components_changes(previous_components, current_components, next_components):
-    component_types = [learning_component_year_type.PRACTICAL_EXERCISES, learning_component_year_type.LECTURING]
-
-    changed_values_by_component_type = []
-    for a_component_type in component_types:
-        current_learning_comp_yr = get_learning_component_yr_by_type(current_components, a_component_type)
-        previous_learning_comp_yr = get_learning_component_yr_by_type(previous_components, a_component_type)
-        next_learning_comp_yr = get_learning_component_yr_by_type(next_components, a_component_type)
-        learning_component_yr_changes = compare_learning_component_year(
-            current_learning_comp_yr.get(LEARNING_COMPONENT_YEAR),
-            previous_learning_comp_yr.get(LEARNING_COMPONENT_YEAR),
-            next_learning_comp_yr.get(LEARNING_COMPONENT_YEAR))
-
-        volume_changes = compare_volumes(current_learning_comp_yr,
-                                         previous_learning_comp_yr,
-                                         next_learning_comp_yr)
-
-        if component_has_changed(learning_component_yr_changes, volume_changes):
-            learning_component_yr_changes.update({'type': _(a_component_type).lower()})
-            changed_values_by_component_type.append(
-                dict(list(learning_component_yr_changes.items()) + list(volume_changes.items())))
-    return changed_values_by_component_type
 
 
 def get_learning_component_yr_by_type(data, learning_component_yr_type):

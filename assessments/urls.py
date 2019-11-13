@@ -31,6 +31,7 @@ from assessments.views import scores_responsible
 from assessments.views.pgm_manager_administration import ProgramManagerListView, ProgramManagerDeleteView, \
     ProgramManagerCreateView, PersonAutocomplete, MainProgramManagerUpdateView, MainProgramManagerPersonUpdateView, \
     ProgramManagerPersonDeleteView
+from assessments.views.scores_responsible import ScoresResponsibleSearch
 
 js_info_dict = {
     'packages': ('assessments',)
@@ -92,10 +93,7 @@ urlpatterns = [
     ])),
 
     url(r'^srm_manager/', include([
-        url(r'^$', scores_responsible.scores_responsible,
-            name='scores_responsible'),
-        url(r'^scores_responsible_search$', scores_responsible.scores_responsible_search,
-            name='scores_responsible_search'),
+        url(r'^list/$', ScoresResponsibleSearch.as_view(), name='scores_responsible_list'),
         url(r'^scores_responsible_management/edit/$', scores_responsible.scores_responsible_management,
             name='scores_responsible_management'),
         url(r'^scores_responsible_add/(?P<pk>[0-9]+)/$', scores_responsible.scores_responsible_add,

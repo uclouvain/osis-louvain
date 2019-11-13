@@ -25,7 +25,7 @@
 ##############################################################################
 from django.core.exceptions import PermissionDenied, MultipleObjectsReturned
 from django.db.models import Prefetch
-from django.utils.translation import ugettext_lazy as _, pgettext_lazy
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
 from base.business.education_groups import perms
 from base.business.xls import get_name_or_username, convert_boolean
@@ -101,11 +101,6 @@ EDUCATION_GROUP_TITLES_ADMINISTRATIVE = [
     EXAM_BOARD_SIGNATORY_COL,
     SIGNATORY_QUALIFICATION_COL,
 ]
-
-SIGNATORIES = 'signatories'
-SECRETARIES = 'secretaries'
-PRESIDENTS = 'presidents'
-NUMBER_SESSIONS = 3
 
 
 def can_user_edit_administrative_data(a_user, an_education_group_year, raise_exception=False):

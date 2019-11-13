@@ -70,12 +70,6 @@ class PermissionDecorator:
         return self.permission_method(obj, person)
 
 
-class PermissionDecoratorWithUser(PermissionDecorator):
-    def _call_permission_method(self, request, obj):
-        """ Sometime the signature method needs user instead of person """
-        return self.permission_method(request.user, obj)
-
-
 def can_delete_learning_unit_year(view_func):
     def f_can_delete_learning_unit_year(request, learning_unit_year_id):
         learn_unit_year = get_object_or_404(learning_unit_year.LearningUnitYear, pk=learning_unit_year_id)

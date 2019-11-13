@@ -27,7 +27,7 @@ from decimal import Decimal
 
 from django import template
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units.comparison import DEFAULT_VALUE_FOR_NONE
 from base.models.enums.learning_unit_year_subtypes import PARTIM
@@ -51,21 +51,23 @@ def academic_years(start_year, end_year):
         str_start_year = ''
         str_end_year = ''
         if start_year:
-            str_start_year = "{} {}-{}".format(_('From').title(), start_year, str(start_year + 1)[-2:])
+            str_start_year = "{} {}-{}".format(_('From').title(), start_year.year, str(start_year.year + 1)[-2:])
         if end_year:
-            str_end_year = "{} {}-{}".format(_('to'), end_year, str(end_year + 1)[-2:])
+            str_end_year = "{} {}-{}".format(_('to'), end_year.year, str(end_year.year + 1)[-2:])
         return "{} {}".format(str_start_year, str_end_year)
     else:
         if start_year and not end_year:
-            return "{} {}-{} ({})".format(_('From'), start_year, str(start_year + 1)[-2:], _('no planned end'))
+            return "{} {}-{} ({})".format(_('From'), start_year.year,
+                                          str(start_year.year + 1)[-2:],
+                                          _('no planned end'))
         else:
             return "-"
 
 
 @register.filter
-def academic_year(year):
-    if year:
-        return "{}-{}".format(year, str(year + 1)[-2:])
+def academic_year(academic_year):
+    if academic_year:
+        return "{}-{}".format(academic_year.year, str(academic_year.year + 1)[-2:])
     return "-"
 
 

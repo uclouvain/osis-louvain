@@ -24,14 +24,14 @@
 #
 ##############################################################################
 import logging
-import pika
-import pika.exceptions
 from decimal import Decimal
 
-from attribution import models as mdl_attribution
+import pika
+import pika.exceptions
 from django.conf import settings
-from osis_common.queue import queue_sender
 
+from attribution import models as mdl_attribution
+from osis_common.queue import queue_sender
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 

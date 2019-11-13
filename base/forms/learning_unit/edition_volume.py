@@ -28,7 +28,7 @@ from collections import OrderedDict
 from django import forms
 from django.db import transaction
 from django.forms import formset_factory, modelformset_factory
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups.volume_strategy import VolumeEditionNoFacultyStrategy, \
     CompleteVolumeEditionFacultyStrategy, SimpleVolumeEditionFacultyStrategy
@@ -101,9 +101,6 @@ class VolumeEditionForm(forms.Form):
         self.title_help += self.component.acronym
 
         super().__init__(*args, **kwargs)
-        help_volume_global = "{} = {} * {}".format(_('volume total global'),
-                                                   _('Volume total annual'),
-                                                   _('Planned classes'))
 
         # Append dynamic fields
         entities_to_add = [entity for entity in REQUIREMENT_ENTITIES if entity in self.entities]
@@ -160,11 +157,6 @@ class VolumeEditionForm(forms.Form):
         strategy[self.is_faculty_manager](self, input_names).is_valid()
 
         return cleaned_data
-
-    def get_entity_fields(self):
-        entity_keys = [self.requirement_entity_key, self.additional_requirement_entity_1_key,
-                       self.additional_requirement_entity_2_key]
-        return [self.fields[key] for key in entity_keys if key in self.fields]
 
     def save(self, postponement):
         if not self.changed_data:

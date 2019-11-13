@@ -24,96 +24,105 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-
 {% if disabled_nav %}
     <h2 style="margin:40px 0 40px;">{{ header_title|default_if_none:'' }}</h2>
-    {% else %}
-<div class="row" style="margin:0 -15px 5px; padding:0;">
-    <div class="col-md-1">
-        <ul class="pager">
-            <li class="previous disabled" >
-                <a id="previousNavLink" data-toggle="tooltip" data-placement="top" title="">
-                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-                </a>
-            </li>
-        </ul>
+{% else %}
+    <div class="row" style="margin:0 -15px 5px; padding:0;">
+        <div class="col-md-1">
+            <ul class="pager">
+                <li class="previous disabled">
+                    <a id="previousNavLink" data-toggle="tooltip" data-placement="top" title="">
+                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="col-md-10">
+            <h2>{{ acronym|default_if_none:'' }} &mdash; {{ current_yr|default_if_none:'' }}</h2>
+            <h4 style="margin-top: 0;">{{ complete_title }}</h4>
+        </div>
+        <div class="col-md-1">
+            <ul class="pager">
+                <li class="next disabled">
+                    <a id="nextNavLink" data-toggle="tooltip" data-placement="top" title="">
+                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
     </div>
-    <div class="col-md-10">
-        <h2>{{ acronym|default_if_none:'' }} &mdash; {{ current_yr|default_if_none:'' }}</h2>
-        <h4 style="margin-top: 0;">{{ complete_title }}</h4>
-    </div>
-    <div class="col-md-1">
-        <ul class="pager">
-            <li class="next disabled">
-                <a id="nextNavLink" data-toggle="tooltip" data-placement="top" title="">
-                    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-                </a>
-            </li>
-        </ul>
-    </div>
-</div>
 
-<script type="text/javascript">
-    var removeNavButtons = function() {
-        var previousElem = document.getElementById("previousNavLink")
-        previousElem.style.display = "none";
-        var nextElem = document.getElementById("nextNavLink")
-        nextElem.style.display = "none";
-    }
-    var findCurrentIndex = function(objectIds) {
-        var currentId = {{ current_id|default:'undefined' }}
-        if (currentId && objectIds) {
-            currentId = parseInt(currentId)
-            for (var i = 0, len = objectIds.length; i < len; i++) {
-                if (parseInt(objectIds[i].id) === currentId){
-                    return i;
+    <script type="text/javascript">
+        let removeNavButtons = function () {
+            let previousElem = document.getElementById("previousNavLink");
+            previousElem.style.display = "none";
+            let nextElem = document.getElementById("nextNavLink");
+            nextElem.style.display = "none";
+        };
+        let findCurrentIndex = function (objectIds) {
+            let currentId = {{ current_id|default:'undefined' }};
+            if (currentId && objectIds) {
+                currentId = parseInt(currentId);
+                for (let  i = 0, len = objectIds.length; i < len; i++) {
+                    if (getIdFromUrl(objectIds[i].id) === currentId) {
+                        return i;
+                    }
                 }
             }
-        }
-        return undefined;
-    }
-    var enableNavLink = function(domId, url, title){
-        if (url != undefined){
-            var elem = document.getElementById(domId);
-            elem.setAttribute('href', url)
-            elem.setAttribute('title', title)
-            //Remove disabled property
-            elem.parentElement.classList.remove('disabled');
-        }
-    }
-    var setPreviousLink = function(objectIds, currentIndex) {
-        if (currentIndex > 0) {
-            previousObject =  objectIds[currentIndex - 1];
-            previousUrl = "{{request.path}}".replace(objectIds[currentIndex].id, previousObject.id);
-            previousTitle = previousObject.value;
-            enableNavLink('previousNavLink', previousUrl, previousTitle);
-        }
-    }
-    var setNextLink = function(objectIds, currentIndex) {
-        if (currentIndex + 1 < objectIds.length) {
-            nextObject =  objectIds[currentIndex + 1];
-            nextUrl = "{{request.path}}".replace(objectIds[currentIndex].id, nextObject.id);
-            nextTitle = nextObject.value;
-            enableNavLink('nextNavLink', nextUrl, nextTitle);
-        }
-    }
-    if(typeof localStorage!='undefined') {
-        var key = "{{local_storage_key|default:'undefined'}}";
-        if(key && key in localStorage){
-            objectIds = JSON.parse(localStorage.getItem(key));
-            currentIndex = findCurrentIndex(objectIds);
-            if (currentIndex != undefined) {
-                setPreviousLink(objectIds, currentIndex);
-                setNextLink(objectIds, currentIndex);
+            return undefined;
+        };
+        let enableNavLink = function (domId, url, title) {
+            if (url != undefined) {
+                let elem = document.getElementById(domId);
+                elem.setAttribute('href', url);
+                elem.setAttribute('title', title);
+                //Remove disabled property
+                elem.parentElement.classList.remove('disabled');
             }
-        } else{
-            //Key not found on localstorage
+        };
+        let setPreviousLink = function (objectIds, currentIndex) {
+            if (currentIndex > 0) {
+                let previousObject = objectIds[currentIndex - 1];
+                let previousUrl = previousObject.id;
+                let previousTitle = previousObject.value;
+                enableNavLink('previousNavLink', previousUrl, previousTitle);
+            }
+        };
+        let setNextLink = function (objectIds, currentIndex) {
+            if (currentIndex + 1 < objectIds.length) {
+                let nextObject = objectIds[currentIndex + 1];
+                let nextUrl = nextObject.id;
+                let nextTitle = nextObject.value;
+                enableNavLink('nextNavLink', nextUrl, nextTitle);
+            }
+        };
+        if (typeof localStorage != 'undefined') {
+            let key = "{{local_storage_key|default:'undefined'}}";
+            if (key && key in localStorage) {
+                let objectIds = JSON.parse(localStorage.getItem(key));
+                currentIndex = findCurrentIndex(objectIds);
+                if (currentIndex !== undefined) {
+                    setPreviousLink(objectIds, currentIndex);
+                    setNextLink(objectIds, currentIndex);
+                }
+            } else {
+                //Key not found on localstorage
+                removeNavButtons();
+            }
+        } else {
+            //localstorage not supported by navigator
             removeNavButtons();
         }
-    } else {
-        //localstorage not supported by navigator
-        removeNavButtons();
-    }
-</script>
+
+        function getIdFromUrl(url){
+            let split = url.split("/");
+            for(let i=split.length-1; i--; i >= 0){
+                if(!isNaN(split[i])){
+                    return parseInt(split[i]);
+                }
+            }
+            return NaN;
+        }
+    </script>
 
 {% endif %}

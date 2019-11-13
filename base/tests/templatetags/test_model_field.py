@@ -26,8 +26,8 @@
 from django.test import TestCase
 from django.test.utils import override_settings
 
-from base.templatetags.model_field import get_attribute
 from base.models.enums import quadrimesters
+from base.templatetags.model_field import get_attribute
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 TITLE = 'title'

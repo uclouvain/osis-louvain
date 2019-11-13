@@ -27,17 +27,17 @@ import datetime
 import json
 from unittest import mock
 
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, HttpResponse
+from django.test import TestCase
 from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
-from base.forms.entity_calendar import EntityCalendarEducationalInformationForm
 from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.views import institution
 from base.views.institution import entities_search
 from reference.tests.factories.country import CountryFactory
@@ -94,17 +94,6 @@ class EntityViewTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        context = response.context
-        self.assertIsInstance(context["form"], EntityCalendarEducationalInformationForm)
-
-    def test_entity_read_with_post_when_no_sufficient_right(self):
-        self.client.force_login(self.user)
-        url = reverse('entity_read', args=[self.entity_version.id])
-        response = self.client.post(url)
-        self.assertTemplateUsed(response, "access_denied.html")
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-
-
     def test_entity_diagram(self):
         self.client.force_login(self.user)
         url = reverse('entity_diagram', args=[self.entity_version.id])
@@ -150,3 +139,35 @@ class EntityViewTestCase(APITestCase):
         self.assertIsNotNone(data.get('recipient'))
         for field_name in address_data:
             self.assertEqual(getattr(entity, field_name), data['address'].get(field_name))
+
+
+class InstitutionViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonWithPermissionsFactory("is_institution_administrator")
+        cls.url = reverse('institution')
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
+
+    def test_with_user_not_logged(self):
+        self.client.logout()
+        response = self.client.get(self.url)
+
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    def test_when_user_has_not_permission(self):
+        a_person = PersonFactory()
+        self.client.force_login(a_person.user)
+
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, 'access_denied.html')
+
+    def test_context_contains_mandatory_keys(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue('section' in response.context)
+        self.assertTrue('view_academicactors' in response.context)

@@ -24,11 +24,12 @@
 #
 ##############################################################################
 import datetime
-from django.utils import timezone
+
 from django.test import TestCase
+from django.utils import timezone
+
 from base.models import academic_year
 from base.models.academic_year import AcademicYear
-
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 
 now = datetime.datetime.now()

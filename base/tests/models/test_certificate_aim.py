@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.test import TestCase
+
 from base.tests.factories.certificate_aim import CertificateAimFactory
 
 

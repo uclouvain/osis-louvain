@@ -27,7 +27,6 @@ from unittest.mock import patch
 
 from django.test import TestCase
 
-from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.education_group_year import EducationGroupYearFactory

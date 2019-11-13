@@ -32,7 +32,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.urls import reverse
 from django.utils import translation
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 import base.business.learning_unit
 from attribution import models as mdl_attr
@@ -41,7 +41,6 @@ from base.forms.my_message import MyMessageActionForm, MyMessageForm
 from base.models.academic_year import starting_academic_year
 from base.models.education_group_year import EducationGroupYear
 from osis_common.models import message_history as message_history_mdl
-from operator import itemgetter
 
 
 @login_required

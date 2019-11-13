@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ from decimal import Decimal
 from uuid import uuid4
 
 from django.test import TestCase
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_units import edition as business_edition
 from base.enums.component_detail import COMPONENT_DETAILS
@@ -37,6 +37,7 @@ from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, VOLU
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_subtypes
+from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.learning_component_year import LearningComponentYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
@@ -292,9 +293,6 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertIsInstance(error_list, list)
         self.assertEqual(len(error_list), 2)
 
-        # invalidate cache
-        del self.requirement_entity.most_recent_acronym
-
         generic_error = "The value of field '%(field)s' is different between year %(year)s - %(value)s " \
                         "and year %(next_year)s - %(next_value)s"
         # Error : Requirement entity diff
@@ -409,7 +407,8 @@ class LearningUnitEditionTestCase(TestCase):
                                   {
                                       'field': COMPONENT_DETAILS[test.get('field')].lower(),
                                       'acronym': another_learning_container_year.acronym,
-                                      'component_type': _(learning_component_year_type.LECTURING),
+                                      'component_type': _(
+                                          dict(COMPONENT_TYPES)[learning_component_year_type.LECTURING]),
                                       'year': self.learning_container_year.academic_year,
                                       'value': test.get('value'),
                                       'next_year': another_learning_container_year.academic_year,

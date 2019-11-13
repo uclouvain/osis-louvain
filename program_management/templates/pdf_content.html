@@ -1,0 +1,215 @@
+{% load education_group education_group_pdf range%}
+{% load static %}
+{% load i18n %}
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>
+        {{ root.verbose_title }}
+    </title>
+    <style type="text/css">
+        @page {
+            size: A4 portrait;
+            margin: 2cm 1cm 2cm 1cm;
+
+            @top-right {
+                content: "{% trans 'Academic year' %} {{ root.academic_year }} \A {{ root.verbose_title|safe }}";
+                white-space: pre-line;
+                font-size: 11px;
+            }
+
+            @top-left {
+                background: url("{% static 'img/logo_uclouvain.png' %}") no-repeat;
+                display: inline-block;
+                width: 92mm;
+                padding-top: 65px;
+                font-size: 9px;
+                text-align: center;
+                content: "";
+            }
+
+            @bottom-left {
+                content: "({{ created | date:'d/m/y' }})";
+                font-size: 11px;
+            }
+
+            @bottom-right {
+                content: "Page " counter(page);
+                font-size: 11px;
+            }
+
+        }
+
+        td, th, tr {
+            font-size: 11px;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="list-group">
+        <div class="container" style="font-size: 11px;">
+            <div style="font-weight: bold;text-decoration: underline; ">
+                {% trans "Registration form for the content of" %} {{ root.verbose_title }}
+            </div>
+            <br>
+            <div>
+                {% if not root.is_minor %}
+                    {% trans "This form must be submitted to the secretariat of your faculty" %}
+                {% else %}
+                    {% trans "The registration form is available at the Secretariat of" %}
+                    {{ root.administration_entity_version.acronym }}
+                    <br>
+                    {% trans "This form must be signed by the designated authority and delivered to the secretariat of your faculty." %}
+                {% endif %}
+            </div>
+            <br>
+            <div style="font-weight: bold;">
+                {% trans "Student's contact information" %}
+            </div>
+            <table style="margin-left: 100px;" cellpadding="5px">
+                <tbody>
+                <tr>
+                    <td>{% trans "training"|title %}</td>
+                    <td style="width:170px;"> .....</td>
+                    <td>{% trans "Mobile phone" %}</td>
+                    <td style="width:170px;"> .....</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Firstname" %}</td>
+                    <td style="width:170px;"> .....</td>
+                    <td>{% trans "email" %}</td>
+                    <td style="width:170px;"> .....</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Name" %}</td>
+                    <td style="width:170px;"> .....</td>
+                    <td>{% trans "faculty number"|title %}</td>
+                    <td style="width:170px;"> .....</td>
+                </tr>
+                <tr>
+                    <td>{% trans "Registration ID" %}</td>
+                    <td style="width:170px;"> .....</td>
+                    <td>({% trans "optional" %})</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <div class="container" style="font-size: 11px;margin-left: 15%">
+            <table style="border: 1px solid;">
+                <tbody>
+                <tr style="padding-top:0;">
+                    <td colspan="4" style="padding-top:0;padding-bottom:3px;">{% trans 'Legend' %}</td>
+                </tr>
+                <tr>
+                    <td style="padding:0;">
+                        <img src="{% static "img/education_group_year/mandatory.png" %}" width="12"
+                             height="12">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">{% trans 'Mandatory' %}</td>
+                    <td style="padding-left:5px;">
+                        <img src="{% static "img/education_group_year/optional.png" %}" width="12"
+                             height="12">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">{% trans 'Optional' %}</td>
+                </tr>
+                <tr>
+                    <td style="padding:0;">
+                        <img src="{% static "img/education_group_year/delta.png" %}"
+                             width="12" height="12">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">
+                        {% trans 'Courses not taught' %} {{ root.academic_year }}
+                    </td>
+                    <td style="padding-left:5px;">
+                        <img src="{% static "img/education_group_year/bisannual_odd.png" %}"
+                             width="12" height="12">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">{% trans 'Periodic courses not taught' %} {{ root.academic_year }}
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding:0;">
+                        <img src="{% static "img/education_group_year/bisannual_even.png" %}"
+                             width="12" height="12">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">{% trans 'Periodic courses taught during' %}
+                        {{ root.academic_year }}
+                    </td>
+                    <td style="padding-left:5px;">
+                        <img src="{% static "img/education_group_year/prerequis.gif" %}"
+                             width="6" height="6">
+                    </td>
+                    <td style="padding:0;font-size: 10px;">{% trans 'Activities with prerequisites (in preparation)' %}</td>
+                </tr>
+                <tr>
+                    <td style="padding:0;font-size: 10px;"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <table cellpadding="5px">
+            <thead>
+            <tr>
+                <th style="width:{{ main_part_col_length }}px;"></th>
+                {% for cpt in 1|range_for:max_block %}
+                    <th style="width:15px;text-align: center;">An {{ cpt }}</th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% if root.constraint_type %}
+                <tr>
+                    <td>
+                        <div style="font-style: italic;font-size: 11px;">
+                            {{ root.verbose_constraint }}
+                        </div>
+                    </td>
+                </tr>
+            {% endif %}
+            <tr>
+                <td>
+                    <img src="{% static 'img/education_group_year/mandatory.png' %}" height="10" width="10">
+                    {{ root.verbose_credit }}
+                    {% if root.verbose_remark %}
+                        <div style="word-break: keep-all;margin-left: 14px;">
+                            {{ root.verbose_remark }}
+                        </div>
+                    {% endif %}
+                </td>
+            </tr>
+            {{ tree|pdf_tree_list }}
+            </tbody>
+        </table>
+        <br>
+        <div class="container" style="font-size: 11px;">
+            <div>{% trans 'Add potential courses' %}</div>
+            <div style="border: solid;height: 70px;"></div>
+            <br>
+            <div style="display: inline;margin-left: 50px;">
+                {% trans 'Made in' %} ...................&emsp;&emsp;
+                {% trans 'on' %} ......./......./.......
+            </div>&emsp; &emsp;
+            {% if root.is_minor %}
+                <div style="display: inline;margin-left: 110px;">
+                    {% trans 'For approval,' %}
+                </div>
+            {% endif %}
+            <br>&emsp;
+            <br>
+            <div style="display: inline;margin-left: 50px;">
+                {% trans "Student's signature" %}
+            </div>
+            {% if root.is_minor %}
+                <div style="display: inline;margin-left: 227px;">
+                    {% trans "Name of the teacher responsible" %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+</body>
+</html>

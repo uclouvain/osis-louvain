@@ -35,11 +35,9 @@ from django.core.exceptions import ValidationError
 from django.http import HttpResponseForbidden, HttpResponseRedirect
 from django.test import TestCase, Client
 from django.urls import reverse
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from waffle.testutils import override_flag
 
-from base.business.group_element_years import management
-from base.business.group_element_years.attach import AttachEducationGroupYearStrategy
 from base.forms.education_group.group import GroupYearModelForm
 from base.models.enums import education_group_categories, internship_presence
 from base.models.enums.active_status import ACTIVE
@@ -66,8 +64,9 @@ from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
 from base.utils.cache import ElementCache
-from base.views.education_groups.update import _get_success_redirect_url, \
-    update_education_group
+from base.views.education_groups.update import _get_success_redirect_url, update_education_group
+from program_management.business.group_element_years import management
+from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory
 from reference.tests.factories.language import LanguageFactory
@@ -76,22 +75,22 @@ from reference.tests.factories.language import LanguageFactory
 @override_flag('education_group_update', active=True)
 class TestUpdate(TestCase):
     def setUp(self):
+        self.start_academic_year = AcademicYearFactory(year=1968)
+        self.academic_year_2010 = AcademicYearFactory(year=2012)
+        self.academic_year_2019 = AcademicYearFactory(year=2018)
         self.current_academic_year = create_current_academic_year()
         FacultyManagerGroupFactory()
         self.start_date_ay_1 = self.current_academic_year.start_date.replace(year=self.current_academic_year.year + 1)
         self.end_date_ay_1 = self.current_academic_year.end_date.replace(year=self.current_academic_year.year + 2)
         self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year - 1)
-        academic_year_1 = AcademicYearFactory.build(start_date=self.start_date_ay_1,
-                                                    end_date=self.end_date_ay_1,
-                                                    year=self.current_academic_year.year + 1)
-        academic_year_1.save()
-
+        self.academic_year_1 = AcademicYearFactory(start_date=self.start_date_ay_1,
+                                                   end_date=self.end_date_ay_1,
+                                                   year=self.current_academic_year.year + 1)
         self.start_date_ay_2 = self.current_academic_year.start_date.replace(year=self.current_academic_year.year + 2)
         self.end_date_ay_2 = self.current_academic_year.end_date.replace(year=self.current_academic_year.year + 3)
-        academic_year_2 = AcademicYearFactory.build(start_date=self.start_date_ay_2,
-                                                    end_date=self.end_date_ay_2,
-                                                    year=self.current_academic_year.year + 2)
-        academic_year_2.save()
+        academic_year_2 = AcademicYearFactory(start_date=self.start_date_ay_2,
+                                              end_date=self.end_date_ay_2,
+                                              year=self.current_academic_year.year + 2)
 
         self.education_group_year = GroupFactory()
 
@@ -122,7 +121,7 @@ class TestUpdate(TestCase):
         self.previous_training_education_group_year = TrainingFactory(
             academic_year=self.previous_academic_year,
             education_group_type=self.an_training_education_group_type,
-            education_group__start_year=1968
+            education_group__start_year=self.start_academic_year
         )
 
         EntityVersionFactory(entity=self.previous_training_education_group_year.management_entity,
@@ -134,11 +133,11 @@ class TestUpdate(TestCase):
         self.training_education_group_year = TrainingFactory(
             academic_year=self.current_academic_year,
             education_group_type=self.an_training_education_group_type,
-            education_group__start_year=1968
+            education_group__start_year=self.start_academic_year
         )
 
         self.training_education_group_year_1 = TrainingFactory(
-            academic_year=academic_year_1,
+            academic_year=self.academic_year_1,
             education_group_type=self.an_training_education_group_type,
             education_group=self.training_education_group_year.education_group
         )
@@ -313,7 +312,7 @@ class TestUpdate(TestCase):
             'schedule_type': DAILY,
             "internship": internship_presence.NO,
             "primary_language": LanguageFactory().pk,
-            "start_year": 2010,
+            "start_year": self.academic_year_2010,
             "constraint_type": "",
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 0,
@@ -348,7 +347,7 @@ class TestUpdate(TestCase):
         organization = OrganizationFactory()
         address = OrganizationAddressFactory(organization=organization, is_main=True)
         diploma_choice = random.choice(DiplomaCoorganizationTypes.get_names())
-
+        self.assertEqual(egy.coorganizations.count(), 0)
         data = {
             'title': 'Cours au choix',
             'education_group_type': egy.education_group_type.pk,
@@ -388,13 +387,17 @@ class TestUpdate(TestCase):
             administration_entity=new_entity_version.entity
         )
         PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
-        address = OrganizationAddressFactory(organization=OrganizationFactory(), is_main=True)
-        egy_organization = EducationGroupOrganizationFactory(
-            organization=OrganizationFactory(),
-            education_group_year=egy
-        )
-        diploma_choice = random.choice(DiplomaCoorganizationTypes.get_names())
+        orga = OrganizationFactory()
+        address = OrganizationAddressFactory(organization=orga, is_main=True)
 
+        diploma_choice = random.choice(DiplomaCoorganizationTypes.get_names())
+        egy_organization = EducationGroupOrganizationFactory(
+            organization=orga,
+            education_group_year=egy,
+            diploma=diploma_choice
+        )
+
+        self.assertEqual(egy.coorganizations.count(), 1)
         data = {
             'title': 'Cours au choix',
             'education_group_type': egy.education_group_type.pk,
@@ -412,7 +415,7 @@ class TestUpdate(TestCase):
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 1,
             'form-0-country': address.country.pk,
-            'form-0-organization': egy_organization.organization.pk,
+            'form-0-organization': orga.pk,
             'form-0-diploma': diploma_choice,
             'form-0-DELETE': 'on',
             'form-0-id': egy_organization.pk
@@ -448,7 +451,7 @@ class TestUpdate(TestCase):
             'active': ACTIVE,
             'schedule_type': DAILY,
             "primary_language": LanguageFactory().pk,
-            "start_year": 2010,
+            "start_year": self.academic_year_2010,
             "constraint_type": "",
             "diploma_printing_title": "Diploma Title",
         }
@@ -482,8 +485,8 @@ class TestUpdate(TestCase):
             'schedule_type': DAILY,
             "internship": internship_presence.NO,
             "primary_language": LanguageFactory().pk,
-            "start_year": self.current_academic_year.year-8,
-            "end_year": self.current_academic_year.year,
+            "start_year": self.academic_year_2010.pk,
+            "end_year": self.current_academic_year.pk,
             "constraint_type": "",
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 0,
@@ -512,11 +515,9 @@ class TestGetSuccessRedirectUrl(TestCase):
         self.education_group_year = EducationGroupYearFactory(
             academic_year=self.current_academic_year
         )
-
-        self.ac_year_in_future = GenerateAcademicYear(
-            start_year=self.current_academic_year.year + 1,
-            end_year=self.current_academic_year.year + 5,
-        )
+        start_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
+        end_year = AcademicYearFactory(year=self.current_academic_year.year + 5)
+        self.ac_year_in_future = GenerateAcademicYear(start_year=start_year, end_year=end_year)
 
         self.education_group_year_in_future = []
         for ac_in_future in self.ac_year_in_future.academic_years:
@@ -549,21 +550,24 @@ class TestSelectAttach(TestCase):
     def setUpTestData(self):
         self.person = PersonFactory()
         self.academic_year = create_current_academic_year()
+        self.previous_academic_year = AcademicYearFactory(year=self.academic_year.year - 1)
+        self.next_academic_year_1 = AcademicYearFactory(year=self.academic_year.year + 1)
+        self.next_academic_year_2 = AcademicYearFactory(year=self.academic_year.year + 2)
         self.child_education_group_year = EducationGroupYearFactory(
             academic_year=self.academic_year,
-            education_group__end_year=self.academic_year.year + 1
+            education_group__end_year=self.next_academic_year_1
         )
         self.learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
         self.initial_parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
         self.new_parent_education_group_year = EducationGroupYearFactory(
             academic_year=self.academic_year,
             education_group_type__learning_unit_child_allowed=True,
-            education_group__end_year=self.academic_year.year + 2
+            education_group__end_year=self.next_academic_year_2
         )
         self.bad_parent = EducationGroupYearFactory(
             academic_year=self.academic_year,
             education_group_type__learning_unit_child_allowed=True,
-            education_group__end_year=self.academic_year.year - 1
+            education_group__end_year=self.previous_academic_year
         )
 
         self.initial_group_element_year = GroupElementYearFactory(

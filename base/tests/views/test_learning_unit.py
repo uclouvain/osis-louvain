@@ -25,18 +25,19 @@
 ##############################################################################
 import datetime
 import json
+import random
 from decimal import Decimal
 from unittest import mock
 
 import factory.fuzzy
 import reversion
 from django.contrib.auth.models import Permission
-from django.urls import reverse
 from django.http import HttpResponse, HttpResponseForbidden
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
 from django.test import TestCase, RequestFactory, Client
 from django.test.utils import override_settings
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from waffle.testutils import override_flag
 
@@ -51,7 +52,6 @@ from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, PLAN
     VOLUME_REQUIREMENT_ENTITY, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1, VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_2, \
     VOLUME_TOTAL_REQUIREMENT_ENTITIES, REAL_CLASSES
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm
-from base.forms.learning_unit.search_form import LearningUnitYearForm
 from base.forms.learning_unit_specifications import LearningUnitSpecificationsForm, LearningUnitSpecificationsEditForm
 from base.models.academic_year import AcademicYear
 from base.models.enums import active_status, education_group_categories, \
@@ -64,8 +64,6 @@ from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
-from base.models.enums.learning_container_year_types import LearningContainerYearType
-from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
@@ -99,13 +97,14 @@ from base.views.learning_unit import learning_unit_components, learning_unit_spe
     learning_unit_proposal_comparison
 from base.views.learning_unit import learning_unit_specifications_edit
 from base.views.learning_units.create import create_partim_form
+from base.views.learning_units.detail import SEARCH_URL_PART
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
-from base.views.learning_units.search import learning_units_service_course
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
+from learning_unit.api.views.learning_unit import LearningUnitFilter
 from osis_common.document import xls_build
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory
@@ -336,13 +335,16 @@ class LearningUnitViewTestCase(TestCase):
         today = datetime.date.today()
         cls.current_academic_year, *cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
 
+        cls.learning_unit = LearningUnitFactory(start_year=cls.current_academic_year)
+
         cls.learning_container_yr = LearningContainerYearFactory(
             academic_year=cls.current_academic_year,
             requirement_entity=cls.entities[0],
         )
         cls.luy = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,
-            learning_container_year=cls.learning_container_yr
+            learning_container_year=cls.learning_container_yr,
+            learning_unit=cls.learning_unit
         )
         cls.learning_component_yr = LearningComponentYearFactory(learning_unit_year=cls.luy,
                                                                  hourly_volume_total_annual=10,
@@ -419,72 +421,79 @@ class LearningUnitViewTestCase(TestCase):
         response = self.client.get(reverse('learning_units'))
 
         context = response.context
-        self.assertTemplateUsed(response, 'learning_units.html')
-        self.assertEqual(context['academic_years'].count(), len(self.academic_years) + 1)
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
-        self.assertEqual(len(context['types']),
-                         len(learning_unit_year_subtypes.LEARNING_UNIT_YEAR_SUBTYPES))
-        self.assertEqual(len(context['container_types']), len(LearningContainerYearType.choices()))
         self.assertEqual(context['learning_units_count'], 0)
 
     def test_learning_units_search_with_acronym_filtering(self):
         self._prepare_context_learning_units_search()
 
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
+            'academic_year': self.current_academic_year.id,
             'acronym': 'LBIR',
-            'status': active_status.ACTIVE
+            'status': True
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(len(response.context['page_obj']), 3)
+
+    def test_learning_units_search_with_type_filtering(self):
+        lcy_type = random.choice(learning_container_year_types.LearningContainerYearType.get_names())
+        self._prepare_context_learning_units_search()
+        filter_data = {
+            'container_type': lcy_type,
+        }
+        response = self.client.get(reverse('learning_units'), data=filter_data)
+
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
+        expected_count = LearningUnitYear.objects.filter(learning_container_year__container_type=lcy_type).count()
+        self.assertEqual(len(response.context['page_obj']), expected_count)
 
     def test_learning_units_search_by_acronym_with_valid_regex(self):
         self._prepare_context_learning_units_search()
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
+            'academic_year': self.current_academic_year.id,
             'acronym': '^DRT.+A'
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(len(response.context['page_obj']), 1)
 
     def test_learning_units_search_by_acronym_with_invalid_regex(self):
         self._prepare_context_learning_units_search()
 
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
+            'academic_year': self.current_academic_year.id,
             'acronym': '^LB(+)2+',
             'status': active_status.ACTIVE
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
-        self.assertEqual(response.context['form'].errors['acronym'], [_('LU_ERRORS_INVALID_REGEX_SYNTAX')])
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
 
     def test_learning_units_search_with_requirement_entity(self):
         self._prepare_context_learning_units_search()
 
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'requirement_entity_acronym': 'ENVI'
+            'academic_year': self.current_academic_year.id,
+            'requirement_entity': 'ENVI'
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(response.context['learning_units_count'], 1)
 
     def test_learning_units_search_with_requirement_entity_and_subord(self):
         self._prepare_context_learning_units_search()
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'requirement_entity_acronym': 'AGRO',
+            'academic_year': self.current_academic_year.id,
+            'requirement_entity': 'AGRO',
             'with_entity_subordinated': True
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
 
         self.assertEqual(response.context['learning_units_count'], 6)
 
@@ -492,30 +501,30 @@ class LearningUnitViewTestCase(TestCase):
         self._prepare_context_learning_units_search()
         request_factory = RequestFactory()
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'allocation_entity_acronym': 'AGES'
+            'academic_year': self.current_academic_year.id,
+            'allocation_entity': 'AGES'
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(len(response.context['page_obj']), 1)
 
     def test_learning_units_search_with_requirement_and_allocation_entity(self):
         self._prepare_context_learning_units_search()
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'requirement_entity_acronym': 'ENVI',
-            'allocation_entity_acronym': 'AGES'
+            'academic_year': self.current_academic_year.id,
+            'requirement_entity': 'ENVI',
+            'allocation_entity': 'AGES'
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(response.context['learning_units_count'], 1)
 
     def test_learning_units_search_with_service_course_no_result(self):
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'requirement_entity_acronym': 'AGRO',
+            'academic_year': self.current_academic_year.id,
+            'requirement_entity': 'AGRO',
             'with_entity_subordinated': True
         }
         number_of_results = 0
@@ -523,8 +532,8 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_units_search_with_service_course_without_entity_subordinated(self):
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'requirement_entity_acronym': 'ELOG',
+            'academic_year': self.current_academic_year.id,
+            'requirement_entity': 'ELOG',
             'with_entity_subordinated': False
         }
         number_of_results = 1
@@ -532,8 +541,8 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_units_search_with_service_course_with_entity_subordinated(self):
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'requirement_entity_acronym': 'PSP',
+            'academic_year': self.current_academic_year.id,
+            'requirement_entity': 'PSP',
             'with_entity_subordinated': True
         }
 
@@ -542,9 +551,9 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_lu_search_with_service_course_with_entity_subordinated_requirement_and_wrong_allocation(self):
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
-            'requirement_entity_acronym': 'PSP',
-            'allocation_entity_acronym': 'ELOG',
+            'academic_year': self.current_academic_year.id,
+            'requirement_entity': 'PSP',
+            'allocation_entity': 'ELOG',
             'with_entity_subordinated': True
         }
         number_of_results = 0
@@ -552,9 +561,9 @@ class LearningUnitViewTestCase(TestCase):
 
     def service_course_search(self, filter_data, number_of_results):
         self._prepare_context_learning_units_search()
-        response = self.client.get(reverse(learning_units_service_course), data=filter_data)
+        response = self.client.get(reverse("learning_units_service_course"), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(response.context['learning_units_count'], number_of_results)
 
     def test_learning_units_search_quadrimester(self):
@@ -562,13 +571,13 @@ class LearningUnitViewTestCase(TestCase):
         self.luy_LBIR1100C.quadrimester = quadrimesters.Q1and2
         self.luy_LBIR1100C.save()
         filter_data = {
-            'academic_year_id': self.current_academic_year.id,
+            'academic_year': self.current_academic_year.id,
             'quadrimester': quadrimesters.Q1and2,
             'acronym': 'LBIR1100C',
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
-        self.assertTemplateUsed(response, 'learning_units.html')
+        self.assertTemplateUsed(response, 'learning_unit/search/base.html')
         self.assertEqual(response.context['learning_units_count'], 1)
 
     def test_learning_unit_read(self):
@@ -577,10 +586,12 @@ class LearningUnitViewTestCase(TestCase):
                                                      learning_container_year=learning_container_year,
                                                      subtype=learning_unit_year_subtypes.FULL)
 
-        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]))
+        header = {'HTTP_REFERER': SEARCH_URL_PART}
+        response = self.client.get(reverse('learning_unit', args=[learning_unit_year.pk]), **header)
 
         self.assertTemplateUsed(response, 'learning_unit/identification.html')
         self.assertEqual(response.context['learning_unit_year'], learning_unit_year)
+        self.assertEqual(self.client.session['search_url'], SEARCH_URL_PART)
 
     def test_learning_unit_read_versions(self):
         learning_unit_year = LearningUnitYearFullFactory(
@@ -1084,10 +1095,11 @@ class LearningUnitViewTestCase(TestCase):
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                      learning_container_year=self.learning_container_yr,
                                                      subtype=learning_unit_year_subtypes.FULL)
-
-        response = self.client.get(reverse(learning_unit_pedagogy, args=[learning_unit_year.pk]))
+        header = {'HTTP_REFERER': SEARCH_URL_PART}
+        response = self.client.get(reverse(learning_unit_pedagogy, args=[learning_unit_year.pk]), **header)
 
         self.assertTemplateUsed(response, 'learning_unit/pedagogy.html')
+        self.assertEqual(self.client.session['search_url'], SEARCH_URL_PART)
 
     def test_learning_unit_specification(self):
         learning_unit_year = LearningUnitYearFactory()
@@ -1137,9 +1149,10 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_unit_specifications_save_with_postponement(self):
         year_range = 5
+        academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, year_range)]
         learning_unit_year = LearningUnitYearFactory(
             academic_year=create_current_academic_year(),
-            learning_unit=LearningUnitFactory(start_year=get_current_year(), end_year=get_current_year()+year_range)
+            learning_unit=LearningUnitFactory(start_year=academic_years[0], end_year=academic_years[-1])
         )
         future_learning_unit_years = [LearningUnitYearFactory(
             academic_year=AcademicYearFactory(year=create_current_academic_year().year+i),
@@ -1197,14 +1210,17 @@ class TestCreateXls(TestCase):
 
     @mock.patch("osis_common.document.xls_build.generate_xls")
     def test_generate_xls_data_with_a_learning_unit(self, mock_generate_xls):
-        a_form = LearningUnitYearForm({"acronym": self.learning_unit_year.acronym}, service_course_search=False)
-        self.assertTrue(a_form.is_valid())
-        found_learning_units = a_form.get_activity_learning_units()
+        learning_unit_filter = LearningUnitFilter({"acronym": self.learning_unit_year.acronym})
+        self.assertTrue(learning_unit_filter.is_valid())
+        found_learning_units = learning_unit_filter.qs
         create_xls(self.user, found_learning_units, None)
         xls_data = [[self.learning_unit_year.academic_year.name, self.learning_unit_year.acronym,
                      self.learning_unit_year.complete_title,
                      xls_build.translate(self.learning_unit_year.learning_container_year.container_type),
-                     xls_build.translate(self.learning_unit_year.subtype), None, None, self.learning_unit_year.credits,
+                     xls_build.translate(self.learning_unit_year.subtype),
+                     self.learning_unit_year.learning_container_year.allocation_entity,
+                     self.learning_unit_year.learning_container_year.requirement_entity,
+                     self.learning_unit_year.credits,
                      xls_build.translate(self.learning_unit_year.status)]]
         expected_argument = _generate_xls_build_parameter(xls_data, self.user)
         mock_generate_xls.assert_called_with(expected_argument, None)
@@ -1223,14 +1239,17 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.WORKSHEET_TITLE_KEY: _(base.business.learning_unit_xls.WORKSHEET_TITLE),
             xls_build.STYLED_CELLS: None,
             xls_build.COLORED_ROWS: None,
+            xls_build.ROW_HEIGHT: None,
         }]
     }
 
 
 class TestLearningUnitComponents(TestCase):
     def setUp(self):
-        self.academic_years = GenerateAcademicYear(start_year=2010, end_year=2020).academic_years
-        self.generated_container = GenerateContainer(start_year=2010, end_year=2020)
+        start_year = AcademicYearFactory(year=2010)
+        end_year = AcademicYearFactory(year=2020)
+        self.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
+        self.generated_container = GenerateContainer(start_year=start_year, end_year=end_year)
         self.a_superuser = SuperUserFactory()
         self.client.force_login(self.a_superuser)
         self.person = PersonFactory(user=self.a_superuser)
@@ -1516,9 +1535,12 @@ class TestLearningUnitProposalComparison(TestCase):
                  "hourly_volume_partial_q1": self.learning_component_year_practical.hourly_volume_partial_q1,
                  "hourly_volume_partial_q2": self.learning_component_year_practical.hourly_volume_partial_q2,
                  "hourly_volume_total_annual": self.learning_component_year_practical.hourly_volume_total_annual,
-                 "repartition_volume_requirement_entity": self.learning_component_year_practical.repartition_volume_requirement_entity,
-                 "repartition_volume_additional_entity_1": self.learning_component_year_practical.repartition_volume_additional_entity_1,
-                 "repartition_volume_additional_entity_2": self.learning_component_year_practical.repartition_volume_additional_entity_2
+                 "repartition_volume_requirement_entity": self.learning_component_year_practical.
+                     repartition_volume_requirement_entity,
+                 "repartition_volume_additional_entity_1": self.learning_component_year_practical.
+                     repartition_volume_additional_entity_1,
+                 "repartition_volume_additional_entity_2": self.learning_component_year_practical.
+                     repartition_volume_additional_entity_2
                  }
             ],
             "volumes": {

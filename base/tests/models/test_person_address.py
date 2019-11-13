@@ -25,11 +25,12 @@
 ##############################################################################
 
 from django.test import TestCase
+
 from base.models import person_address
 from base.models.enums import person_address_type
+from base.tests.factories import user
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_address import PersonAddressFactory
-from base.tests.factories import user
 
 
 class PersonAddressTestCase(TestCase):

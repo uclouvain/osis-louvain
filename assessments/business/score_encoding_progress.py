@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.models import offer_year, exam_enrollment, tutor
 from attribution.models import attribution
+from base.models import offer_year, exam_enrollment, tutor
 
 
 def get_scores_encoding_progress(user, offer_year_id, number_session, academic_year, learning_unit_year_ids=None):

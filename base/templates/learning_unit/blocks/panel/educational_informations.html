@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load static %}
 {% load statici18n i18n bootstrap3 %}
 {% load getattr %}
 
@@ -32,16 +32,19 @@
     <div class="row well" style="margin-left: 10px;margin-right: 10px">
         <div class="col-md-6">
             {% if attributions %}
-                <label>{% trans 'Tutors' %} : </label>
-                <br>
                 <table class="table" style="border-bottom: 1px solid #ddd">
+                    <thead>
+                    <tr>
+                        <th>{% trans 'Tutors' %} :</th>
+                    </tr>
+                    </thead>
                     <tbody>
-                        {% for attribution in attributions %}
-                            <tr>
-                                <td>{{ attribution.tutor }}</td>
-                                <td>{{ attribution.get_function_display }}</td>
-                            </tr>
-                        {% endfor %}
+                    {% for attribution in attributions %}
+                        <tr>
+                            <td>{{ attribution.tutor }}</td>
+                            <td>{{ attribution.get_function_display }}</td>
+                        </tr>
+                    {% endfor %}
                     </tbody>
                 </table>
             {% endif %}
@@ -130,7 +133,7 @@
                 <div class="col-md-12">
                     {% for translated_label in  cms_labels_translated %}
                         {% if translated_label.text_label.label == "mobility" %}
-                            {{ translated_label.text_label.text_fr.0.text|default_if_none:"" }}
+                            {{ translated_label.text_label.text_fr.0.text|default_if_none:""|safe }}
                         {% endif %}
                     {% endfor %}
                 </div>

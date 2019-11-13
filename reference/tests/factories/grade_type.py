@@ -23,10 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory
-import factory.fuzzy
-import string
 import operator
+import string
+
+import factory.fuzzy
+
 from reference.models.enums import grade_type_coverage, institutional_grade_type as enum_institutional_grade_type
 
 

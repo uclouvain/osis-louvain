@@ -28,7 +28,7 @@ from django.contrib.messages import get_messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.urls import reverse
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory

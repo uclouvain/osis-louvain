@@ -22,7 +22,7 @@
 #  see http://www.gnu.org/licenses/.                                                               #
 # ##################################################################################################
 from django.db.models import Q
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from base.business.learning_units.edition import duplicate_learning_unit_year
 from base.business.utils.postponement import AutomaticPostponementToN6

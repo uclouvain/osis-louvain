@@ -1,6 +1,6 @@
 {% extends "scores_encoding_mgr_layout.html" %}
 {% load i18n %}
-{% load staticfiles %}
+{% load static %}
 {% load dictionnary %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -58,7 +58,7 @@
             </div>
             <div class="row">
                 <div class="col-md-3">
-                    <label>{% trans 'Offer' %} {{ offer_sel }}</label><br>
+                    <label>{% trans 'Training' %} {{ offer_sel }}</label><br>
                     <select id="slt_offer_list_selection" name="offer" class="form-control">
                         <option value="">{% trans 'All'%}</option>
                         {% for o in offer_list %}

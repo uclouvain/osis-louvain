@@ -25,9 +25,9 @@
 ##############################################################################
 
 from django.contrib.auth.models import User, Permission
-from django.urls import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.urls import reverse
 
 from base.tests.factories.user import UserFactory
 from base.views.common import home

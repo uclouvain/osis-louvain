@@ -23,11 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.test import TestCase
+
 from base.models import learning_container
 from base.models.learning_container_year import LearningContainerYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
-from django.test import TestCase
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 
 

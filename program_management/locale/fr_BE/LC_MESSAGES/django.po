@@ -1,0 +1,502 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2019-11-06 08:56+0100\n"
+"PO-Revision-Date: 2019-04-15 08:35+0200\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Language: fr_BE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+"X-Generator: Poedit 2.2.1\n"
+
+#, python-format
+msgid "\"%(child)s\" has been detached from \"%(parent)s\""
+msgstr "\"%(child)s\" a été détaché de \"%(parent)s\""
+
+#, python-format
+msgid ""
+"%(count_elements)s OF(s) and %(count_links)s link(s) have been postponed "
+"with success."
+msgstr ""
+"%(count_elements)s OF(s) et %(count_links)s lien(s) ont été reportés avec "
+"succès."
+
+#, python-format
+msgid ""
+"%(education_group_year)s (reference link) has not been copied. Its content "
+"is empty."
+msgstr ""
+"%(education_group_year)s (lien de référence) n'a pas été encore recopié. Son "
+"contenu est encore vide."
+
+#, python-format
+msgid ""
+"%(education_group_year)s has already been copied in %(academic_year)s in "
+"another program. It may have been already modified."
+msgstr ""
+"%(education_group_year)s a déjà été recopié en  %(academic_year)s dans un "
+"autre programme. Il pourrait donc avoir déjà été modifié."
+
+#, python-format
+msgid ""
+"%(education_group_year)s is closed in %(end_year)s. This element will not be "
+"copied in %(academic_year)s."
+msgstr ""
+"%(education_group_year)s est clôturé en %(end_year)s. Cet élément n'est pas "
+"recopié en %(academic_year)s."
+
+#, python-format
+msgid ""
+"%(learning_unit_year)s is not anymore contained in "
+"%(education_group_year_root)s => the prerequisite for %(learning_unit_year)s "
+"is not copied."
+msgstr ""
+"%(learning_unit_year)s n'est plus dans %(education_group_year_root)s => le "
+"prérequis de %(learning_unit_year)s n'est pas copié."
+
+#, python-format
+msgid ""
+"%(prerequisite_item)s is not anymore contained in "
+"%(education_group_year_root)s => the prerequisite for %(learning_unit_year)s "
+"having %(prerequisite_item)s as prerequisite is not copied."
+msgstr ""
+"%(prerequisite_item)s n'est plus dans %(education_group_year_root)s => le "
+"prérequis de %(learning_unit_year)s contenant %(prerequisite_item)s n'est "
+"pas copié."
+
+#, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
+msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s unités d'enseignement"
+
+#, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s offers"
+msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
+
+#, python-format
+msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
+msgstr ""
+"Une unité d'enseignement ne peut pas être prérequis à elle-même : %(acronym)s"
+
+msgid "Ac yr."
+msgstr "Anac."
+
+msgid "Academic year"
+msgstr "Année académique"
+
+msgid "Acronym"
+msgstr "Sigle"
+
+msgid "Acronym/Short title"
+msgstr "Sigle/Intitulé abrégé"
+
+msgid "Activities with prerequisites (in preparation)"
+msgstr "Activité avec prérequis (en préparation)"
+
+msgid "Add potential courses"
+msgstr "Ajouts de cours éventuels"
+
+#, python-format
+msgid "Are you sure you want to detach %(acronym)s ?"
+msgstr "Êtes-vous sûr·e de vouloir détacher %(acronym)s ?"
+
+#, python-format
+msgid "Are you sure you want to postpone the content in %(root)s?"
+msgstr "Êtes-vous sûr·e de vouloir reporter le contenu dans %(root)s?"
+
+msgid "Attach"
+msgstr "Attacher"
+
+msgid "Block"
+msgstr "Bloc"
+
+msgid "Cancel"
+msgstr "Annuler"
+
+msgid "Cannot attach element to learning unit"
+msgstr "Interdit d'attacher des élèments à une UE"
+
+msgid "Cannot detach due to prerequisites."
+msgstr "Interdit de détacher à cause des prérequis."
+
+#, python-format
+msgid ""
+"Cannot detach education group year %(acronym)s as the following learning "
+"units are prerequisite in %(formation)s: %(learning_units)s"
+msgstr ""
+"L'organisation de formations annualisée %(acronym)s ne peut pas être "
+"détachée car les unités d'enseignement suivantes sont des prérequis dans "
+"%(formation)s: %(learning_units)s"
+
+#, python-format
+msgid ""
+"Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a "
+"prerequisite."
+msgstr ""
+"L'unité d'enseignement %(acronym)s dispose de prérequis ou est prerequis et "
+"ne peut pas être détachée."
+
+#, python-format
+msgid "Cannot perform action on a education group before %(limit_year)s"
+msgstr ""
+"Interdit de réaliser des actions sur une organisation de formation "
+"antérieure à %(limit_year)s"
+
+msgid "Cannot perform detach action on root."
+msgstr "Interdit de détacher la racine."
+
+msgid "Cannot perform modification action on root."
+msgstr "Interdit de modifier la racine."
+
+msgid "Code"
+msgstr "Code"
+
+msgid "Copy"
+msgstr "Copier"
+
+msgid "Courses not taught"
+msgstr "Activité non dispensée en"
+
+msgid "Cred. rel./abs."
+msgstr "Créd. rel./abs."
+
+#, python-format
+msgid "Do you want to attach %(object_acronym)s ?"
+msgstr "Voulez-vous attacher %(object_acronym)s ?"
+
+#, python-format
+msgid ""
+"Do you want to copy or to move %(object_acronym)s from %(parent_acronym)s ?"
+msgstr ""
+"Voulez-vous copier ou déplacer %(object_acronym)s depuis %(parent_acronym)s ?"
+
+#, python-format
+msgid "Element selected %(element)s"
+msgstr "Elément sélectionné %(element)s"
+
+#, python-format
+msgid ""
+"Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
+"program."
+msgid_plural ""
+"Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s "
+"program."
+msgstr[0] ""
+"La finalité \"%(acronym)s\" a une date de fin plus grande que le programme "
+"%(root_acronym)s."
+msgstr[1] ""
+"Les finalités \"%(acronym)s\" ont une date de fin plus grande que le "
+"programme %(root_acronym)s."
+
+msgid "Firstname"
+msgstr "Prénom"
+
+msgid "For approval,"
+msgstr "Pour accord,"
+
+msgid "Formation catalogue"
+msgstr "Catalogue des formations"
+
+#, python-format
+msgid ""
+"Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
+"Learning unit is postponed with academic year of "
+"%(learning_unit_academic_year)s."
+msgstr ""
+"L'unité d'enseignement %(learning_unit_year)s n’existe pas en "
+"%(academic_year)s => L'unité d'enseignement est recopiée avec année de "
+"référence %(learning_unit_academic_year)s."
+
+msgid "Learning units"
+msgstr "Unités d'enseignement"
+
+msgid "Legend"
+msgstr "Légende"
+
+msgid "Made in"
+msgstr "Fait à"
+
+msgid "Mandatory"
+msgstr "Obligatoire"
+
+msgid "Mobile phone"
+msgstr "Téléphone mobile (GSM)"
+
+msgid "Modify prerequisites"
+msgstr "Modifier les prérequis"
+
+msgid "Move"
+msgstr "Déplacer"
+
+msgid "Name"
+msgstr "Nom"
+
+msgid "Name of the teacher responsible"
+msgstr "Nom du professeur responsable de programme"
+
+msgid "No"
+msgstr "Non"
+
+#, python-format
+msgid "No match has been found for this learning unit :  %(acronym)s"
+msgstr ""
+"Aucune correspondance n'a été trouvée pour cette unité d'enseignement : "
+"%(acronym)s"
+
+msgid "Official"
+msgstr "Officiel"
+
+#, python-format
+msgid ""
+"Option \"%(acronym)s\" cannot be detach because it is contained in "
+"%(finality_acronym)s program."
+msgid_plural ""
+"Options \"%(acronym)s\" cannot be detach because they are contained in "
+"%(finality_acronym)s program."
+msgstr[0] ""
+"L'option \"%(acronym)s\" ne peut pas être détachée car elle est présente "
+"dans le programme %(finality_acronym)s."
+msgstr[1] ""
+"Les options \"%(acronym)s\" ne peuvent pas être détachées car elles sont "
+"présentes dans le programme %(finality_acronym)s."
+
+#, python-format
+msgid "Option \"%(acronym)s\" must be present in %(root_acronym)s program."
+msgid_plural ""
+"Options \"%(acronym)s\" must be present in %(root_acronym)s program."
+msgstr[0] ""
+"L'option \"%(acronym)s\" doit être présente dans le programme "
+"%(root_acronym)s."
+msgstr[1] ""
+"Les options \"%(acronym)s\" doivent être présentes dans le programme "
+"%(root_acronym)s."
+
+msgid "Optional"
+msgstr "Au choix"
+
+msgid "Periodic courses not taught"
+msgstr "Activité cyclique non dispensée en"
+
+msgid "Periodic courses taught during"
+msgstr "Activité cyclique dispensée en"
+
+msgid "Please select an item before attach it"
+msgstr "Veuillez Sélectionner ou Déplacer un élément avant d'Attacher"
+
+msgid "Prerequisite"
+msgid_plural "Prerequisites"
+msgstr[0] "Prérequis"
+msgstr[1] "Prérequis"
+
+msgid "Prerequisites saved."
+msgstr "Prérequis enregistrés."
+
+msgid "Registration ID"
+msgstr "NOMA"
+
+msgid "Registration form for the content of"
+msgstr "Formulaire d'inscription au contenu de"
+
+msgid "Required"
+msgstr "Obligatoire"
+
+msgid "Save"
+msgstr "Enregistrer"
+
+msgid "Search"
+msgstr "Recherche"
+
+msgid "Student's contact information"
+msgstr "Coordonnées de l'étudiant.e"
+
+msgid "Student's signature"
+msgstr "Signature de l'étudiant.e"
+
+#, python-format
+msgid "The %(acronym)s has been moved"
+msgstr "%(acronym)s a été déplacé"
+
+msgid "The content has already been postponed."
+msgstr "Le contenu a déjà été reporté."
+
+msgid ""
+"The end date of the education group is smaller than the year of postponement."
+msgstr "La date de fin de la formation est plus petite que l'année de report."
+
+msgid "The learning unit has prerequisites"
+msgstr "L'UE a des prérequis"
+
+msgid "The learning unit has prerequisites and is a prerequisite"
+msgstr "L'UE a des prérequis et est un prérequis"
+
+msgid "The learning unit is a prerequisite"
+msgstr "L'UE est un prérequis"
+
+#, python-format
+msgid "The link of %(acronym)s has been created"
+msgstr "Le lien de %(acronym)s ont été mis à jour"
+
+#, python-format
+msgid "The link of %(acronym)s has been updated"
+msgstr "Le lien de %(acronym)s ont été mis à jour"
+
+#, python-format
+msgid ""
+"The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" has "
+"already reached the limit."
+msgstr ""
+"Le nombre d'enfants de type(s) \"%(child_types)s\" pour \"%(parent)s\" a "
+"atteint la limite maximum."
+
+#, python-format
+msgid ""
+"The option %(education_group_year_option)s is not anymore accessible in "
+"%(education_group_year_root)s in %(academic_year)s => It is retired of the "
+"finality %(education_group_year_finality)s."
+msgstr ""
+"L'option %(education_group_year_option)s  n'est plus accessible dans "
+"%(education_group_year_root)s en %(academic_year)s => elle est retiré de la "
+"finalité %(education_group_year_finality)s."
+
+#, python-format
+msgid "The parent must have at least one child of type(s) \"%(types)s\"."
+msgstr "Le parent doit au moins avoir un enfant de type(s) \"%(types)s\"."
+
+#, python-format
+msgid ""
+"The prerequisites %(prerequisites)s for the learning unit %(learning_unit)s "
+"are not inside the selected training %(root)s"
+msgstr ""
+"Les prérequis %(prerequisites)s pour l'unité d'enseignement "
+"%(learning_unit)s ne sont pas dans la formation sélectionnée %(root)s"
+
+#, python-format
+msgid ""
+"The prerequisites for the following learning units contained in education "
+"group year %(acronym)s will we deleted: %(learning_units)s"
+msgstr ""
+"Les prérequis des unités d'enseignement suivantes contenues dans "
+"l'organisation de formation annualisé %(acronym)s seront supprimés: "
+"%(learning_units)s"
+
+msgid "The registration form is available at the Secretariat of"
+msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
+
+msgid "The root does not exist in the next academic year."
+msgstr "La racine n'existe pas dans l'anné academique suivante."
+
+msgid ""
+"This form must be signed by the designated authority and delivered to the "
+"secretariat of your faculty."
+msgstr ""
+"Ce formulaire doit être revêtu de la signature de l'autorité désignée et "
+"remis au secrétariat de votre faculté."
+
+msgid "This form must be submitted to the secretariat of your faculty"
+msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
+
+msgid "This training has no content to postpone."
+msgstr "La formation n'a pas de contenu à reporter."
+
+msgid "Title"
+msgstr "Intitulé"
+
+msgid "Trainings"
+msgstr "Formations"
+
+msgid "Utilizations"
+msgstr "Utilisations"
+
+msgid "Yes"
+msgstr "Oui"
+
+msgid "Yes, I confirm."
+msgstr "Oui, je confirme."
+
+msgid ""
+"You are not allowed to copy the content of this kind of education group."
+msgstr ""
+"Vous n'êtes pas autorisé à copier le contenu de ce type d'organisation de "
+"formation."
+
+msgid "You are not allowed to postpone this training in the future."
+msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le futur."
+
+msgid "You are not allowed to postpone this training in the past."
+msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le passé."
+
+#, python-format
+msgid "You can not attach a learning unit to a %(category)s of type %(type)s."
+msgstr ""
+"Vous ne pouvez pas attacher une unité d'enseignement à un/une %(category)s "
+"de type %(type)s."
+
+msgid "You can not attach the same child several times."
+msgstr "Vous ne pouvez pas attacher plusieurs fois le même enfant."
+
+#, python-format
+msgid ""
+"You cannot attach \"%(child_types)s\" to \"%(parent)s\" (type "
+"\"%(parent_type)s\")"
+msgstr ""
+"Vous ne pouvez pas attacher \"%(child_types)s\" à \"%(parent)s\" (de type "
+"\"%(parent_type)s\")"
+
+#, python-format
+msgid "You cannot modify content for %(education_group_types)s"
+msgstr "Vous ne pouvez pas modifier le contenu pour %(education_group_types)s"
+
+#, python-format
+msgid ""
+"You must be in the context of a training to modify the prerequisites to a "
+"learning unit (current context: %(partial_acronym)s - %(acronym)s)"
+msgstr ""
+"Vous devez être dans le contexte d'une formation pour modifier les prérequis "
+"d'une unité d'enseignement(contexte actuel: %(partial_acronym)s - "
+"%(acronym)s)"
+
+msgid "credits"
+msgstr "crédits"
+
+msgid "email"
+msgstr "email"
+
+msgid "faculty number"
+msgstr "n° facultaire"
+
+msgid "has as prerequisite"
+msgstr "a comme prérequis"
+
+msgid "has the following prerequisites"
+msgstr "a des prérequis"
+
+msgid "is a prerequisite of"
+msgstr "est un prérequis de"
+
+msgid "is using in"
+msgstr "est utilisée dans"
+
+#, python-format
+msgid "is_prerequisite_of-%(year)s-%(acronym)s"
+msgstr "est_prérequis_de-%(year)s-%(acronym)s"
+
+msgid "on"
+msgstr "le"
+
+msgid "optional"
+msgstr "optionnel"
+
+#, python-format
+msgid "prerequisites-%(year)s-%(acronym)s"
+msgstr "prérequis-%(year)s-%(acronym)s"
+
+msgid "training"
+msgstr "formation"

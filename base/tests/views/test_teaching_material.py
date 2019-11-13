@@ -26,14 +26,15 @@
 from unittest import mock
 
 from django.contrib.auth.models import Permission
-from django.http import HttpResponseNotAllowed
+from django.http import HttpResponseNotAllowed, HttpResponse
 from django.http import HttpResponseRedirect
 from django.test import TestCase
 from django.urls import reverse
 
 from base.forms.learning_unit_pedagogy import TeachingMaterialModelForm
 from base.models.enums.learning_unit_year_subtypes import FULL
-from base.tests.factories.academic_year import create_current_academic_year
+from base.models.teaching_material import TeachingMaterial
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
@@ -41,12 +42,11 @@ from base.tests.factories.teaching_material import TeachingMaterialFactory
 
 class TeachingMaterialCreateTestCase(TestCase):
     def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        self.learning_unit_year = LearningUnitYearFactory(
-            subtype=FULL,
-            academic_year=self.current_academic_year,
-            learning_container_year__academic_year=self.current_academic_year
-        )
+        self.current_academic_year, *self.future_academic_years = AcademicYearFactory.produce_in_future(quantity=6)
+        self.learning_unit_year, *self.future_learning_unit_years = [
+            LearningUnitYearFactory(subtype=FULL, academic_year=acy)
+            for acy in ([self.current_academic_year] + self.future_academic_years)
+        ]
         self.url = reverse('teaching_material_create', kwargs={'learning_unit_year_id': self.learning_unit_year.id})
         self.person = _get_central_manager_person_with_permission()
         self.client.force_login(self.person.user)
@@ -70,15 +70,24 @@ class TeachingMaterialCreateTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/teaching_material/modal_edit.html')
         self.assertIsInstance(response.context['form'], TeachingMaterialModelForm)
 
+    @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
+    def test_should_create_teaching_material_when_successfull_post(self,  mock_is_linked_to_entity_charge):
+        mock_is_linked_to_entity_charge.return_value = True
+        response = self.client.post(self.url, data={"mandatory": "True", "title": "This is a test"})
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue(
+            TeachingMaterial.objects.get(mandatory=True, title="This is a test")
+        )
+
 
 class TeachingMaterialUpdateTestCase(TestCase):
     def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        self.learning_unit_year = LearningUnitYearFactory(
-            subtype=FULL,
-            academic_year=self.current_academic_year,
-            learning_container_year__academic_year=self.current_academic_year
-        )
+        self.current_academic_year, *self.future_academic_years = AcademicYearFactory.produce_in_future(quantity=6)
+        self.learning_unit_year, *self.future_learning_unit_years = [
+            LearningUnitYearFactory(subtype=FULL, academic_year=acy)
+            for acy in ([self.current_academic_year] + self.future_academic_years)
+        ]
         self.teaching_material = TeachingMaterialFactory(learning_unit_year=self.learning_unit_year)
         self.url = reverse('teaching_material_edit', kwargs={
             'learning_unit_year_id': self.learning_unit_year.id,
@@ -107,15 +116,24 @@ class TeachingMaterialUpdateTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/teaching_material/modal_edit.html')
         self.assertIsInstance(response.context['form'], TeachingMaterialModelForm)
 
+    @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
+    def test_should_update_teaching_material_when_successfull_post(self,  mock_is_linked_to_entity_charge):
+        mock_is_linked_to_entity_charge.return_value = True
+        response = self.client.post(self.url, data={"mandatory": "True", "title": "This is a test"})
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue(
+            TeachingMaterial.objects.get(mandatory=True, title="This is a test")
+        )
+
 
 class TeachingMaterialDeleteTestCase(TestCase):
     def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        self.learning_unit_year = LearningUnitYearFactory(
-            subtype=FULL,
-            academic_year=self.current_academic_year,
-            learning_container_year__academic_year=self.current_academic_year
-        )
+        self.current_academic_year, *self.future_academic_years = AcademicYearFactory.produce_in_future(quantity=6)
+        self.learning_unit_year, *self.future_learning_unit_years = [
+            LearningUnitYearFactory(subtype=FULL, academic_year=acy)
+            for acy in ([self.current_academic_year] + self.future_academic_years)
+        ]
         self.teaching_material = TeachingMaterialFactory(learning_unit_year=self.learning_unit_year)
         self.url = reverse('teaching_material_delete', kwargs={
             'learning_unit_year_id': self.learning_unit_year.id,
@@ -141,6 +159,16 @@ class TeachingMaterialDeleteTestCase(TestCase):
         mock_is_linked_to_entity_charge.return_value = True
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, 'learning_unit/teaching_material/modal_delete.html')
+
+    @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
+    def test_should_delete_teaching_material_when_successfull_post(self,  mock_is_linked_to_entity_charge):
+        mock_is_linked_to_entity_charge.return_value = True
+        response = self.client.post(self.url, data={})
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertFalse(
+            TeachingMaterial.objects.filter(id=self.teaching_material.id).exists()
+        )
 
 
 def _get_central_manager_person_with_permission():

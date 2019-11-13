@@ -29,7 +29,7 @@ from collections import OrderedDict
 from django.db import transaction
 from django.db.models import Max
 from django.http import QueryDict
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 
 from base.business.learning_unit import compute_max_postponement_year
 from base.business.learning_units.edition import duplicate_learning_unit_year
@@ -103,9 +103,10 @@ class LearningUnitPostponementForm:
     def _get_academic_end_year(self, end_postponement):
         if end_postponement is None:
             if self.learning_unit_instance and self.learning_unit_instance.end_year:
-                end_postponement = academic_year.find_academic_year_by_year(self.learning_unit_instance.end_year)
+                end_postponement = academic_year.find_academic_year_by_year(self.learning_unit_instance.end_year.year)
             elif self.learning_unit_full_instance and self.learning_unit_full_instance.end_year:
-                end_postponement = academic_year.find_academic_year_by_year(self.learning_unit_full_instance.end_year)
+                end_postponement = academic_year.find_academic_year_by_year(
+                    self.learning_unit_full_instance.end_year.year)
         return end_postponement
 
     def _compute_forms_to_insert_update_delete(self, data):
@@ -212,7 +213,7 @@ class LearningUnitPostponementForm:
                 data_to_postpone['component-1-id'] = learning_component_year.id
 
     def _instantiate_base_form_as_insert(self, ac_year, data):
-        return self._get_learning_unit_base_form(ac_year, data=data, start_year=self.start_postponement.year)
+        return self._get_learning_unit_base_form(ac_year, data=data, start_year=self.start_postponement)
 
     @staticmethod
     def _get_data_to_postpone(lunit_year, data):
@@ -231,7 +232,7 @@ class LearningUnitPostponementForm:
             'data': data.copy() if data else None,
             'learning_unit_full_instance': self.learning_unit_full_instance,
             'postposal': not data,
-            'start_anac': self.start_postponement.year if self.subtype == learning_unit_year_subtypes.PARTIM else None
+            'start_anac': self.start_postponement if self.subtype == learning_unit_year_subtypes.PARTIM else None
         }
         if self.external:
             return ExternalLearningUnitBaseForm(

@@ -25,8 +25,8 @@
 ##############################################################################
 from unittest.mock import Mock
 
-from django.test import TestCase
 from django.template import Context, Template
+from django.test import TestCase
 
 
 class CheckTagTests(TestCase):

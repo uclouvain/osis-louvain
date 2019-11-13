@@ -23,10 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
-from reference.models.enums import grade_type_coverage, institutional_grade_type as enum_institutional_grade_type
+
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from reference.models.enums import grade_type_coverage, institutional_grade_type as enum_institutional_grade_type
 
 
 class GradeTypeAdmin(SerializableModelAdmin):
@@ -49,11 +49,3 @@ class GradeType(SerializableModel):
 
     def readable_institutional_grade_type(self):
         return enum_institutional_grade_type.translate_by_key(self.institutional_grade_type)
-
-
-def find_by_id(gt_id):
-    try:
-        return GradeType.objects.get(id=gt_id)
-    except ObjectDoesNotExist:
-        return None
-

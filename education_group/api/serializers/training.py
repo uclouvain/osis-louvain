@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from rest_framework import serializers
 
 from base.api.serializers.campus import CampusDetailSerializer
@@ -30,11 +31,13 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
+from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField
 from reference.models.language import Language
 
 
-class TrainingListSerializer(serializers.HyperlinkedModelSerializer):
-    url = serializers.HyperlinkedIdentityField(view_name='education_group_api_v1:training-detail', lookup_field='uuid')
+class TrainingListSerializer(EducationGroupTitleSerializer, serializers.HyperlinkedModelSerializer):
+    url = TrainingHyperlinkedIdentityField(read_only=True)
     code = serializers.CharField(source='partial_acronym')
     academic_year = serializers.SlugRelatedField(slug_field='year', queryset=AcademicYear.objects.all())
     education_group_type = serializers.SlugRelatedField(
@@ -47,17 +50,14 @@ class TrainingListSerializer(serializers.HyperlinkedModelSerializer):
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
 
-    class Meta:
+    class Meta(EducationGroupTitleSerializer.Meta):
         model = EducationGroupYear
-        fields = (
+        fields = EducationGroupTitleSerializer.Meta.fields + (
             'url',
-            'uuid',
             'acronym',
             'code',
             'education_group_type',
             'education_group_type_text',
-            'title',
-            'title_english',
             'academic_year',
             'administration_entity',
             'management_entity',

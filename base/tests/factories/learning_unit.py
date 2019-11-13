@@ -26,12 +26,12 @@
 import datetime
 import string
 
-import factory
 import factory.fuzzy
 from django.utils import timezone
 from factory.django import DjangoModelFactory
 from faker import Faker
 
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 
 fake = Faker()
@@ -45,11 +45,10 @@ class LearningUnitFactory(DjangoModelFactory):
     learning_container = factory.SubFactory(LearningContainerFactory)
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-    start_year = factory.fuzzy.FuzzyInteger(2015, timezone.now().year)
-    end_year = factory.LazyAttribute(lambda obj: factory.fuzzy.FuzzyInteger(obj.start_year + 1, obj.start_year + 9).fuzz())
+    start_year = factory.SubFactory(AcademicYearFactory, year=factory.fuzzy.FuzzyInteger(2000, timezone.now().year))
+    end_year = None
     faculty_remark = factory.fuzzy.FuzzyText(length=255)
     other_remark = factory.fuzzy.FuzzyText(length=255)
-    existing_proposal_in_epc = False
 
 
 class LearningUnitFakerFactory(DjangoModelFactory):
@@ -60,7 +59,7 @@ class LearningUnitFakerFactory(DjangoModelFactory):
     learning_container = factory.SubFactory(LearningContainerFactory)
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = fake.date_time_this_decade(before_now=True, after_now=True)
-    start_year = factory.fuzzy.FuzzyInteger(2015, timezone.now().year)
-    end_year = factory.LazyAttribute(lambda obj: factory.fuzzy.FuzzyInteger(obj.start_year + 1, obj.start_year + 9).fuzz())
+    start_year = factory.SubFactory(AcademicYearFactory, year=factory.fuzzy.FuzzyInteger(2000, timezone.now().year))
+    end_year = None
     faculty_remark = factory.fuzzy.FuzzyText(length=255)
     other_remark = factory.fuzzy.FuzzyText(length=255)

@@ -27,7 +27,7 @@ from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.conf import settings
 from django.db.transaction import atomic
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY
 from base.business.learning_units.pedagogy import is_pedagogy_data_must_be_postponed, save_teaching_material
@@ -56,10 +56,11 @@ class LearningUnitPedagogyEditForm(forms.Form):
     def save(self):
         trans_text = self._get_or_create_translated_text()
         start_luy = learning_unit_year.get_by_id(trans_text.reference)
+        self.luys = [start_luy] + list(start_luy.find_gt_learning_units_year())
 
         reference_ids = [start_luy.id]
         if is_pedagogy_data_must_be_postponed(start_luy):
-            reference_ids += [luy.id for luy in start_luy.find_gt_learning_units_year()]
+            reference_ids = [luy.id for luy in self.luys]
 
         for reference_id in reference_ids:
             if trans_text.text_label.label in CMS_LABEL_PEDAGOGY_FR_ONLY:

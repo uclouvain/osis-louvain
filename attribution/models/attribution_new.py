@@ -28,6 +28,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from attribution.models.enums.function import Functions
+from base.models.utils.utils import filter_with_list_or_object
 
 
 class AttributionNewAdmin(admin.ModelAdmin):
@@ -74,14 +75,10 @@ class AttributionNew(models.Model):
 
 def search(*args, **kwargs):
     qs = AttributionNew.objects.all()
-
+    if "learning_container_year" in kwargs:
+        qs = filter_with_list_or_object('learning_container_year', AttributionNew, **kwargs)
     if "tutor" in kwargs:
         qs = qs.filter(tutor=kwargs['tutor'])
-    if "learning_container_year" in kwargs:
-        if isinstance(kwargs['learning_container_year'], list):
-            qs = qs.filter(learning_container_year__in=kwargs['learning_container_year'])
-        else:
-            qs = qs.filter(learning_container_year=kwargs['learning_container_year'])
     if "score_responsible" in kwargs:
         qs = qs.filter(score_responsible=kwargs['score_responsible'])
     if "global_id" in kwargs:

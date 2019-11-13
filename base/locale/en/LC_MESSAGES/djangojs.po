@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-02 13:56+0200\n"
+"POT-Creation-Date: 2019-10-08 16:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -11,90 +11,77 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: static/js/moment.min.js:1
 msgid ": "
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:123
 msgid "Attach"
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:182
 msgid "Close all"
 msgstr ""
 
-#: static/js/osis.js:191
 msgid "Collapse"
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:146
 msgid "Detach"
 msgstr ""
 
-#: static/js/learning_unit_creation.js:3
 msgid "Existed code for "
 msgstr ""
 
-#: static/js/learning_unit_creation.js:4
 msgid "Existing code in "
 msgstr ""
 
-#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:8
 msgid "Insertion of a link to a CDN document"
 msgstr ""
 
-#: static/js/learning_unit_creation.js:5
 msgid "Invalid code"
 msgstr ""
 
-#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:23
 msgid "Link to CDN Doc"
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:100
+msgid "Loading..."
+msgstr ""
+
 msgid "Modify"
 msgstr ""
 
-#: static/js/osis.js:186
 msgid "Open"
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:175
 msgid "Open all"
 msgstr ""
 
-#: static/js/learning_unit_creation.js:164
 msgid "Please enter a valid URL."
 msgstr ""
 
-#: static/js/learning_unit_creation.js:7
 msgid "Please enter a value greater than or equal to 0."
 msgstr ""
 
-#: static/js/learning_unit_creation.js:8
 msgid "Please enter a value less than or equal to 500."
 msgstr ""
 
-#: static/js/learning_unit_creation.js:9
 msgid "Please enter a value that is a multiple of 0.5."
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:191
 msgid "Search"
 msgstr ""
 
-#: static/js/education_group/education_group_tree.js:78
 msgid "Select"
 msgstr ""
 
-#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:15
 msgid "Selection of target files"
 msgstr ""
 
-#: static/js/learning_unit_creation.js:6
 msgid "This field is required"
 msgstr ""
 
-#: static/ckeditor/ckeditor/plugins/cdn/cdnDialog.js:32
 msgid "You should make a selection before clicking 'ok'"
+msgstr ""
+
+msgid "activate to sort column ascending"
+msgstr ""
+
+msgid "activate to sort column descending"
 msgstr ""

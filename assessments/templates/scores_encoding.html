@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% load i18n %}
-{% load staticfiles %}
+{% load static %}
 {% load dictionnary %}
 {% load format %}
 {% comment "License" %}
@@ -61,7 +61,7 @@
                     <form method="get" action="{% url 'scores_encoding' %}" id="form_search_scores_by_offer">
                         <div class="col-md-10">
                             <div class="form-group">
-                                <label>{% trans 'Offer' %}</label><br>
+                                <label>{% trans 'Training' %}</label><br>
                                 <select id="slt_offer_list_selection" name="offer" class="form-control">
                                     <option value="">{% trans 'All'%}</option>
                                     {% for offer_year in offer_year_list %}

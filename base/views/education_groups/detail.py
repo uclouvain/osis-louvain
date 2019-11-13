@@ -38,7 +38,7 @@ from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from django.views.generic import DetailView
 from reversion.models import Version
@@ -48,8 +48,7 @@ from base.business.education_group import can_user_edit_administrative_data, sho
 from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
-    MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE
-from base.business.education_groups.group_element_year_tree import EducationGroupHierarchy
+    MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE, CONTACTS
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import starting_academic_year
 from base.models.admission_condition import AdmissionCondition, AdmissionConditionLine
@@ -63,10 +62,11 @@ from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.group_element_year import find_learning_unit_formations, GroupElementYear
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
 from base.models.program_manager import ProgramManager
-from base.utils.cache import cache
+from base.utils.cache import cache, ElementCache
 from base.utils.cache_keys import get_tab_lang_keys
 from base.views.common import display_error_messages, display_success_messages
 from cms.enums import entity_name
@@ -85,9 +85,22 @@ SECTIONS_WITH_TEXT = (
 
 NUMBER_SESSIONS = 3
 
+LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
+EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
+
+
+class CatalogGenericDetailView:
+    def get_selected_element_for_clipboard(self):
+        selected_data = ElementCache(self.request.user).cached_data
+        if selected_data and selected_data.get('modelname') == LEARNING_UNIT_YEAR:
+            return LearningUnitYear.objects.get(id=selected_data.get('id'))
+        elif selected_data and selected_data.get('modelname') == EDUCATION_GROUP_YEAR:
+            return EducationGroupYear.objects.get(id=selected_data.get('id'))
+        return None
+
 
 @method_decorator(login_required, name='dispatch')
-class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
+class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, CatalogGenericDetailView):
     # DetailView
     model = EducationGroupYear
     context_object_name = "education_group_year"
@@ -99,7 +112,8 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
 
     limited_by_category = None
 
-    with_tree = True
+    # FIXME: resolve dependency in other ways
+    with_tree = 'program_management' in settings.INSTALLED_APPS
 
     def get_queryset(self):
         return super().get_queryset().select_related(
@@ -143,8 +157,11 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
-            context['tree'] = json.dumps(EducationGroupHierarchy(
-                self.root, tab_to_show=self.request.GET.get('tab_to_show')).to_json())
+            # FIXME: resolve dependency in other way
+            from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
+            education_group_hierarchy_tree = EducationGroupHierarchy(self.root,
+                                                                     tab_to_show=self.request.GET.get('tab_to_show'))
+            context['tree'] = json.dumps(education_group_hierarchy_tree.to_json())
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
             person=self.person,
@@ -156,6 +173,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView):
         )
         context['enums'] = mdl.enums.education_group_categories
         context['current_academic_year'] = self.starting_academic_year
+        context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
         return context
 
     def get(self, request, *args, **kwargs):
@@ -285,15 +303,14 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             {'specific': [], 'common': []}
         )
         texts = self.get_translated_texts(sections_to_display, common_education_group_year, self.user_language_code)
-
-        show_contacts = CONTACT_INTRO_KEY in sections_to_display['specific']
+        show_contacts = CONTACTS in sections_to_display['specific']
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
             'sections_with_translated_labels': self.get_sections_with_translated_labels(
                 sections_to_display,
                 texts
             ),
-            'contacts': self.get_contacts_section(sections_to_display, texts),
+            'contacts': self._get_publication_contacts_group_by_type(),
             'show_contacts': show_contacts,
             'can_edit_information': perms.is_eligible_to_edit_general_information(context['person'], context['object'])
         })
@@ -354,6 +371,8 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         }
 
     def get_translated_texts(self, sections_to_display, common_edy, user_language):
+        if CONTACTS in sections_to_display['specific']:
+            sections_to_display['specific'] += [CONTACT_INTRO_KEY]
         specific_texts = TranslatedText.objects.filter(
             text_label__label__in=sections_to_display['specific'],
             entity=entity_name.OFFER_YEAR,
@@ -373,13 +392,6 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         ).select_related("text_label")
 
         return {'common': common_texts, 'specific': specific_texts, 'labels': labels}
-
-    def get_contacts_section(self, sections_to_display, texts):
-        introduction = self.get_texts_for_label(CONTACT_INTRO_KEY, sections_to_display, texts)
-        return {
-            'contact_intro': introduction,
-            'contacts_grouped': self._get_publication_contacts_group_by_type()
-        }
 
     def _get_publication_contacts_group_by_type(self):
         contacts_by_type = {}
@@ -474,19 +486,6 @@ def get_sessions_dates(education_group_year):
     return sessions_dates_by_calendar_type
 
 
-def get_dates(an_academic_calendar_type, an_education_group_year):
-    try:
-        dates = OfferYearCalendar.objects.get(
-            education_group_year=an_education_group_year,
-            academic_calendar__reference=an_academic_calendar_type,
-            academic_calendar__academic_year=an_education_group_year.academic_year
-        )
-    except OfferYearCalendar.DoesNotExist:
-        dates = None
-
-    return {"dates": dates} if dates else {}
-
-
 class EducationGroupContent(EducationGroupGenericDetailView):
     template_name = "education_group/tab_content.html"
 
@@ -535,6 +534,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         is_master = acronym.endswith(('2m', '2m1'))
         is_aggregation = acronym.endswith('2a')
         is_mc = acronym.endswith('2mc')
+        is_iufc = acronym.endswith('fc')
         common_conditions = get_appropriate_common_admission_condition(self.object)
 
         class AdmissionConditionForm(forms.Form):
@@ -556,6 +556,7 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
                 'is_common': is_common,
                 'is_bachelor': is_bachelor,
                 'is_master': is_master,
+                'is_iufc': is_iufc,
                 'show_components_for_agreg': is_aggregation,
                 'show_components_for_agreg_and_mc': is_aggregation or is_mc,
                 'show_free_text': self._show_free_text()
@@ -572,9 +573,12 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
         return context
 
     def _show_free_text(self):
+        concerned_training_types = list(
+            set(TrainingType.with_admission_condition()) - set(TrainingType.continuing_education_types())
+        )
         return not self.object.is_common and self.object.education_group_type.name in itertools.chain(
-            TrainingType.with_admission_condition(),
-            MiniTrainingType.with_admission_condition()
+            concerned_training_types,
+            MiniTrainingType.with_admission_condition(),
         )
 
 

@@ -27,15 +27,15 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
-from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_version import EntityVersionFactory
 from base.models import proposal_learning_unit
 from base.models.enums import proposal_state, proposal_type
+from base.models.learning_unit_year import LearningUnitYear
+from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 
 
 class TestSearch(TestCase):

@@ -57,12 +57,17 @@ def cache_filter(exclude_params=None, **default_values):
 
 class CacheFilterMixin:
     cache_exclude_params = None
+    timeout = None
 
     # Mixin that keep the cache for cbv.
     def get(self, request, *args, **kwargs):
         request_cache = RequestCache(user=request.user, path=request.path)
         if request.GET:
-            request_cache.save_get_parameters(request, parameters_to_exclude=self.cache_exclude_params)
+            request_cache.save_get_parameters(
+                request,
+                parameters_to_exclude=self.cache_exclude_params,
+                timeout=self.timeout
+            )
         request.GET = request_cache.restore_get_request(request)
         return super().get(request, *args, **kwargs)
 
@@ -96,10 +101,10 @@ class RequestCache(OsisCache):
     def key(self):
         return "_".join([self.PREFIX_KEY, str(self.user.id), self.path])
 
-    def save_get_parameters(self, request, parameters_to_exclude=None):
+    def save_get_parameters(self, request, parameters_to_exclude=None, timeout=None):
         parameters_to_exclude = parameters_to_exclude or []
         param_to_cache = {key: value for key, value in request.GET.lists() if key not in parameters_to_exclude}
-        self.set_cached_data(param_to_cache)
+        self.set_cached_data(param_to_cache, timeout=timeout)
 
     def restore_get_request(self, request, **default_values):
         cached_value = self.cached_data or default_values

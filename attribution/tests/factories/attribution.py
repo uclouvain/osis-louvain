@@ -28,7 +28,6 @@ import string
 import factory.fuzzy
 from faker import Faker
 
-from attribution.models.enums import function
 from attribution.models.enums.function import Functions
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory

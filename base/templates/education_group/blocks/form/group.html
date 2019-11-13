@@ -1,4 +1,4 @@
-{% load staticfiles bootstrap3 %}
+{% load static bootstrap3 %}
 {% load i18n %}
 
 {% comment "License" %}
@@ -29,7 +29,7 @@
       id="UpdateGroupForm"
       class="education_group_form"
       data-validate-url="
-              {% if educatoin_group_year %}{% url 'validate_education_group_field' form_education_group_year.category education_group_year.pk %} {% else %}{% url 'validate_education_group_field' form_education_group_year.category %}{% endif %}">
+              {% if education_group_year %}{% url 'validate_education_group_field' form_education_group_year.category education_group_year.pk %} {% else %}{% url 'validate_education_group_field' form_education_group_year.category %}{% endif %}">
     {% csrf_token %}
     <div class="panel panel-default">
         <div class="panel-heading">
@@ -84,6 +84,7 @@
                     <div class="panel panel-default">
                         <div class="panel-body">
                             {% bootstrap_field form_education_group_year.management_entity %}
+                            {{ form_education_group_year.media }}
                             {% bootstrap_field form_education_group_year.academic_year %}
                             {% bootstrap_field form_education_group_year.main_teaching_campus %}
                         </div>

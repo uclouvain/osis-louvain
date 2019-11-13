@@ -43,6 +43,7 @@ class AcademicCalendarFactory(factory.DjangoModelFactory):
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
 
     academic_year = factory.SubFactory(AcademicYearFactory)
+    data_year = factory.SubFactory(AcademicYearFactory)
     title = factory.Sequence(lambda n: 'Academic Calendar - %d' % n)
     start_date = factory.SelfAttribute("academic_year.start_date")
     end_date = factory.SelfAttribute("academic_year.end_date")

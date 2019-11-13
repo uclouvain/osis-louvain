@@ -27,7 +27,6 @@ from django.contrib import admin
 
 from reference.models import *
 
-
 admin.site.register(continent.Continent,
                     continent.ContinentAdmin)
 

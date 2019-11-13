@@ -33,7 +33,7 @@ from django.db import models, connection
 from django.db.models import Q, F, Case, When
 from django.utils import translation
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
@@ -165,7 +165,7 @@ class GroupElementYear(OrderedModel):
     )
 
     is_mandatory = models.BooleanField(
-        default=False,
+        default=True,
         verbose_name=_("Mandatory"),
     )
 
@@ -216,10 +216,7 @@ class GroupElementYear(OrderedModel):
     @property
     def verbose(self):
         if self.child_branch:
-            return "{} ({} {})".format(
-                self.child.title, self.relative_credits or self.child_branch.credits or 0, _("credits")
-            )
-
+            return self._verbose_credits()
         else:
             components = LearningComponentYear.objects.filter(
                 learning_unit_year=self.child_leaf).annotate(
@@ -285,10 +282,13 @@ class GroupElementYear(OrderedModel):
     def child(self):
         return self.child_branch or self.child_leaf
 
-    def is_deletable(self):
-        if self.child:
-            return False
-        return True
+    def _verbose_credits(self):
+        if self.relative_credits or self.child_branch.credits:
+            return "{} ({} {})".format(
+                self.child.title, self.relative_credits or self.child_branch.credits or 0, _("credits")
+            )
+        else:
+            return "{}".format(self.child.title)
 
 
 def find_learning_unit_formations(objects, parents_as_instances=False, with_parents_of_parents=False):
@@ -447,3 +447,13 @@ def get_or_create_group_element_year(parent, child_branch=None, child_leaf=None)
     elif child_leaf:
         return GroupElementYear.objects.get_or_create(parent=parent, child_leaf=child_leaf)
     return AttributeError('child branch OR child leaf params must be set')
+
+
+def get_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict:
+    if queryset.model != GroupElementYear:
+        raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
+
+    elements = fetch_row_sql([root.id])
+
+    distinct_group_elem_ids = {elem['id'] for elem in elements}
+    return queryset.filter(pk__in=distinct_group_elem_ids)

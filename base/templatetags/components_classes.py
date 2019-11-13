@@ -40,6 +40,10 @@ def get_css_class(planned_classes, real_classes):
     if real_classes:
         real_classes_int = real_classes
 
+    # FIXME :: Temporary solution - Waiting for real classes in OSIS
+    if planned_classes_int > 0 and real_classes_int == 0:
+        real_classes_int += 1
+
     if planned_classes_int == real_classes_int:
         return "success-color"
     else:

@@ -28,7 +28,7 @@ from collections import OrderedDict
 
 from django.db import transaction
 from django.utils.functional import cached_property
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
@@ -201,14 +201,6 @@ class LearningUnitBaseForm(metaclass=ABCMeta):
             'learning_container_year_form': self.learning_container_year_form,
             'simplified_volume_management_form': self.simplified_volume_management_form
         }
-
-    def _validate_no_empty_title(self, common_title):
-        specific_title = self.learning_unit_year_form.cleaned_data["specific_title"]
-        if not common_title and not specific_title:
-            self.learning_container_year_form.add_error(
-                "common_title", _("You must either set the common title or the specific title"))
-            return False
-        return True
 
     @property
     def learning_container_form(self):

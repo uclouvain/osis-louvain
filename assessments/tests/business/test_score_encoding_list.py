@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import decimal
+
 from django.test import TestCase
 
 from assessments.business import score_encoding_list

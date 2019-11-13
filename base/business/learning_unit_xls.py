@@ -71,8 +71,6 @@ WRAP_TEXT_STYLE = Style(alignment=Alignment(wrapText=True, vertical="top"), )
 WITH_ATTRIBUTIONS = 'with_attributions'
 WITH_GRP = 'with_grp'
 
-COLUMNS_REFERENCE_WITH_ATTRIBUTIONS = ['A', 'B', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
-
 
 def learning_unit_titles_part1():
     return [
@@ -288,7 +286,7 @@ def _get_data_part2(learning_unit_yr, with_attributions):
                  for value in attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
                     learning_unit_yr
                 ).values()
-                 ]
+                ]
             )
         )
 
@@ -375,8 +373,8 @@ def extract_xls_data_from_learning_unit(learning_unit_yr):
         # FIXME Condition to remove when the LearningUnitYear.learning_container_year_id will be null=false
         if learning_unit_yr.learning_container_year else "",
         xls_build.translate(learning_unit_yr.subtype),
-        learning_unit_yr.entity_allocation,
-        learning_unit_yr.entity_requirement,
+        learning_unit_yr.allocation_entity,
+        learning_unit_yr.requirement_entity,
         learning_unit_yr.credits, xls_build.translate(learning_unit_yr.status)
     ]
 

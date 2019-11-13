@@ -32,9 +32,9 @@
             <h3>{% trans 'Do you want to get back to initial data?' %}</h3>
             <div class='alert alert-warning' id="alert_warning" style="display: none;"></div>
         </div>
-        {% if has_partim %}
+        {% if list_partims %}
             <div class="modal-body">
-                <div>{% trans "The learning unit have partim" %}</div>
+                <div>{% trans "The learning unit have partim" %} : {{ list_partims|join:", " }}</div>
              </div>
         {% endif %}
          <div class="modal-footer">

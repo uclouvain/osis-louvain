@@ -54,31 +54,40 @@
                     <div class="panel-body">
                         <div class="row">
                             {% block content_row1 %}
-
-                                <div class="col-md-3">
-                                    {# FIXME Use dl_tooltip for all label/span #}
-                                    <label {{ differences|get_difference_css:'acronym' }}>{% trans 'Code' %}</label><br>
-                                    {% if learning_unit_year.parent %}
+                                {% if learning_unit_year.parent %}
+                                    <div class="col-md-3">
+                                        {# FIXME Use dl_tooltip for all label/span #}
+                                        <label {{ differences|get_difference_css:'acronym' }}>
+                                            {% trans 'Code' %}
+                                        </label>
+                                        <br>
+                                        {{ learning_unit_year.acronym }}
+                                    </div>
+                                    <div class="col-md-3">
+                                        <label class="d-block">{% trans 'UE full' %}</label>
                                         <a id="full_acronym"
                                            href="{% url 'learning_unit' learning_unit_year.parent.id %}" {{ differences|get_difference_css:'acronym' }}>
                                             {{ learning_unit_year.learning_container_year.acronym }}</a>
-                                        {{ learning_unit_year.subdivision }}
-                                    {% else %}
+                                    </div>
+                                {% else %}
+                                    <div class="col-md-3">
+                                        {# FIXME Use dl_tooltip for all label/span #}
+                                        <label class="d-block" {{ differences|get_difference_css:'acronym' }}>{% trans 'Code' %}</label>
                                         <span {{ differences|get_difference_css:'acronym' }}
                                                 id="id_acronym">{{ learning_unit_year.acronym }}</span>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-3">
-                                    <label>{% trans 'Partims' %}</label><br>
-                                    <div id="list_partims">
-                                        {% for partim in learning_container_year_partims %}
-                                            {% if forloop.counter > 1 %}
-                                                ,
-                                            {% endif %}
-                                            <a href="{% url 'learning_unit' partim.id %}">{{ partim.subdivision }}</a>
-                                        {% endfor %}
                                     </div>
-                                </div>
+                                    <div class="col-md-3">
+                                        <label class="d-block">{% trans 'Partims' %}</label>
+                                        <div id="list_partims">
+                                            {% for partim in learning_container_year_partims %}
+                                                {% if forloop.counter > 1 %}
+                                                    ,
+                                                {% endif %}
+                                                <a href="{% url 'learning_unit' partim.id %}">{{ partim.subdivision }}</a>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                {% endif %}
                                 <div class="col-md-3">
                                     {% dl_tooltip learning_unit_year.learning_container_year 'container_type' inherited=learning_unit_year.subtype value=learning_unit_year.container_type_verbose %}
                                 </div>
@@ -93,8 +102,8 @@
                                 <br>
                             {% endif %}
                         {% endwith %}
-                        {% with new_acronym=learning_unit_year|get_next_acronym %}
-                            {% if new_acronym %}
+                        {% with new_acronym=learning_unit_year|get_next_acronym has_proposal=learning_unit_year|has_proposal %}
+                            {% if new_acronym and not has_proposal %}
                                 <div>({% trans 'Newly' %} : {{ new_acronym }})</div>
                                 <br>
                             {% endif %}
@@ -248,8 +257,17 @@
 
                             {% dl_tooltip requirement_entity 'REQUIREMENT_ENTITY' label_text=_('Requirement entity') inherited=learning_unit_year.subtype default_if_none="-" value=requirement_entity.acronym title=requirement_entity.title url=url_entity_requirement %}
                             {% dl_tooltip allocation_entity 'ALLOCATION_ENTITY' label_text=_('Attribution entity') inherited=learning_unit_year.subtype default_if_none="-" value=allocation_entity.acronym title=allocation_entity.title url=url_entity_allocation %}
-                            {% dl_tooltip additional_requirement_entity_1 'ADDITIONAL_REQUIREMENT_ENTITY_1' label_text=_('Additional requirement entity 1') inherited=learning_unit_year.subtype title=additional_requirement_entity_1.title value=additional_requirement_entity_1.acronym url=url_additional_requirement_entity_1 default_if_none="-" %}
-                            {% dl_tooltip additional_requirement_entity_2 'ADDITIONAL_REQUIREMENT_ENTITY_2' label_text=_('Additional requirement entity 2') inherited=learning_unit_year.subtype title=additional_requirement_entity_2.title value=additional_requirement_entity_2.acronym url=url_additional_requirement_entity_2 default_if_none="-" %}
+                            {% if additional_requirement_entity_1.entity.organization.type  == 'MAIN' %}
+                                {% dl_tooltip additional_requirement_entity_1 'ADDITIONAL_REQUIREMENT_ENTITY_1' label_text=_('Additional requirement entity 1') inherited=learning_unit_year.subtype title=additional_requirement_entity_1.title value=additional_requirement_entity_1.acronym url=url_additional_requirement_entity_1 default_if_none="-" %}
+                            {% else %}
+                                {% dl_tooltip additional_requirement_entity_1 'ADDITIONAL_REQUIREMENT_ENTITY_1' label_text=_('Additional requirement entity 1') inherited=learning_unit_year.subtype title=additional_requirement_entity_1.title value=additional_requirement_entity_1.title url=url_additional_requirement_entity_1 default_if_none="-" %}
+                            {% endif %}
+
+                            {% if additional_requirement_entity_2 and additional_requirement_entity_2.entity.organization.type  == 'MAIN' %}
+                                {% dl_tooltip additional_requirement_entity_2 'ADDITIONAL_REQUIREMENT_ENTITY_2' label_text=_('Additional requirement entity 2') inherited=learning_unit_year.subtype title=additional_requirement_entity_2.title value=additional_requirement_entity_2.acronym url=url_additional_requirement_entity_2 default_if_none="-" %}
+                            {% else %}
+                                {% dl_tooltip additional_requirement_entity_2 'ADDITIONAL_REQUIREMENT_ENTITY_2' label_text=_('Additional requirement entity 2') inherited=learning_unit_year.subtype title=additional_requirement_entity_2.title value=additional_requirement_entity_2.title url=url_additional_requirement_entity_2 default_if_none="-" %}
+                            {% endif %}
                         {% endblock institution %}
 
                         {% block edit_academic_year %}

@@ -23,14 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from assistant.models import tutoring_learning_unit_year
 from attribution.models.attribution import Attribution
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY, CMS_LABEL_SUMMARY
-from base.models import learning_unit_enrollment, learning_class_year, learning_unit_year as learn_unit_year_model
+from base.models import learning_unit_enrollment, learning_class_year, learning_unit_year as learn_unit_year_model, \
+    academic_year
 from base.models import proposal_learning_unit
 from cms.enums import entity_name
 from cms.models import translated_text
@@ -183,8 +184,8 @@ def _decrement_end_year_learning_unit(learning_unit_year):
 
     start_year = learning_unit_to_edit.start_year
     new_end_year = learning_unit_year.academic_year.year - 1
-    if new_end_year >= start_year:
-        learning_unit_to_edit.end_year = new_end_year
+    if new_end_year >= start_year.year:
+        learning_unit_to_edit.end_year = academic_year.find_academic_year_by_year(new_end_year)
         learning_unit_to_edit.save()
 
 

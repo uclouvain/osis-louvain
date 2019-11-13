@@ -25,7 +25,9 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.models.teaching_material import postpone_teaching_materials, TeachingMaterial, find_by_learning_unit_year
+from base.business.learning_units.pedagogy import postpone_teaching_materials
+from base.models.teaching_material import TeachingMaterial, find_by_learning_unit_year
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -35,7 +37,9 @@ from base.tests.factories.teaching_material import TeachingMaterialFactory
 
 class TeachingMaterialTest(TestCase):
     def setUp(self):
-        self.ac_years_containers = GenerateAcademicYear(start_year=2015, end_year=2020)
+        start_year = AcademicYearFactory(year=2015)
+        end_year = AcademicYearFactory(year=2020)
+        self.ac_years_containers = GenerateAcademicYear(start_year=start_year, end_year=end_year)
         self.learning_container = LearningContainerFactory()
         self.learning_unit = LearningUnitFactory(learning_container=self.learning_container)
         self.luys = {}

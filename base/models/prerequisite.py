@@ -114,6 +114,7 @@ class Prerequisite(models.Model):
     def prerequisite_string(self):
         return self._get_acronyms_string()
 
+    # FIXME Merge method with base/business/education_groups/excel.py and base/templatetags/prerequisite.py
     def _get_acronyms_string(self, display_method=None):
         prerequisite_items = self.prerequisiteitem_set.all().order_by('group_number', 'position')
         prerequisites_fragments = []

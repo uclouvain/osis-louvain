@@ -1,0 +1,69 @@
+{% load bootstrap3 osis_bootstrap3 i18n %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+
+<div class="modal-content" id="form-modal-content">
+    {# We do not display the form if those are warnings or errors #}
+    {% if not messages %}
+        <div class="modal-header">
+            <h4 class="text-center">{{ form.instance.child.partial_acronym }} - {{ form.instance.child.acronym }}</h4>
+        </div>
+
+        <div id="form-modal-body" class="modal-body">
+            <form method="post" id="form_comment_update" action="{{ request.path }}?{{ request.GET.urlencode }}">
+                {% bootstrap_form_errors form %}
+
+                {% csrf_token %}
+                {% if form.link_type %}
+                    {% bootstrap_row field_0=form.link_type form_group_class_0="col-md-5" field_1=form.block form_group_class_1="col-md-4" field_2=form.is_mandatory label_2=_('Required') form_group_class_2="col-md-3"%}
+                {% else %}
+                    {% bootstrap_row field_0=form.relative_credits form_group_class_0="col-md-5" field_1=form.block form_group_class_1="col-md-4" field_2=form.is_mandatory label_2=_('Required') form_group_class_2="col-md-3"%}
+                {% endif %}
+
+                {% bootstrap_row field_0=form.comment form_group_class_0="col-md-12" %}
+
+                {% bootstrap_row field_0=form.comment_english form_group_class_0="col-md-12" %}
+
+                {% bootstrap_row field_0=form.access_condition form_group_class_0="col-md-4" %}
+            </form>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+            <button type="submit" onclick="$('#form_comment_update').submit();" class="btn btn-primary pull-right">
+                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
+            </button>
+        </div>
+    {% else %}
+        <div class="panel-body">
+            {% include 'template_messages.html' %}
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+        </div>
+    {% endif %}
+
+</div>
+

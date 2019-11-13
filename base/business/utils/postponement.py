@@ -27,7 +27,7 @@ from abc import ABC
 
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import transaction, Error
-from django.db.models import Max, Q, F
+from django.db.models import Max, Q
 from django.utils.translation import gettext as _
 
 from base.business.education_groups.postponement import ConsistencyError
@@ -49,7 +49,7 @@ class AutomaticPostponement(ABC):
         self.to_not_duplicate = self.get_to_not_duplicated()
         self.ending_on_max_adjournment = self.get_ending_on_max_adjournment()
 
-        if self.already_duplicated and self.to_not_duplicate:
+        if self.already_duplicated or self.to_not_duplicate:
             self.to_duplicate = self.queryset.difference(self.already_duplicated, self.to_not_duplicate)
         else:
             self.to_duplicate = self.queryset
@@ -127,7 +127,7 @@ class AutomaticPostponementToN6(AutomaticPostponement):
         for obj in self.to_duplicate:
             try:
                 with transaction.atomic():
-                    last_year = obj.end_year or self.last_academic_year.year
+                    last_year = obj.end_year.year if obj.end_year else self.last_academic_year.year
                     obj_to_copy = getattr(obj, self.annualized_set + "_set").latest('academic_year__year')
                     copied_objs = []
                     for year in range(obj.last_year + 1, last_year + 1):
@@ -155,9 +155,7 @@ class AutomaticPostponementToN6(AutomaticPostponement):
         )
 
     def get_already_duplicated(self):
-        return self.queryset.filter(
-            Q(last_year__gte=self.last_academic_year.year) | Q(last_year__gte=F('end_year'))
-        )
+        return self.queryset.filter(last_year__gte=self.last_academic_year.year)
 
     def get_to_not_duplicated(self):
         """ We cannot postpone an education_group in the past """

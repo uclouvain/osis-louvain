@@ -1,4 +1,4 @@
-{% load staticfiles %}
+{% load static %}
 {% load i18n format education_group group_element_year %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -34,8 +34,8 @@
             <input type="hidden" name="element_id" value="{{ group.child.id }}"/>
             <input type="hidden" name="group_element_year_id" value="{{ group.id }}"/>
             {% csrf_token %}
-            {% button_order_with_permission _("Up") "btn_operation_up_"|addstr:group.id "up" %}
-            {% button_order_with_permission _("Down") "btn_operation_down_"|addstr:group.id "down" %}
+            {% button_order_with_permission _("Go up") "btn_operation_up_"|addstr:group.id "up" %}
+            {% button_order_with_permission _("Go down") "btn_operation_down_"|addstr:group.id "down" %}
         </form>
     {% endif %}
     {% url 'group_element_year_delete' root.pk education_group_year.pk group.pk as detach_url %}

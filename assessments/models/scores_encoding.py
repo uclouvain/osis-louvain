@@ -25,10 +25,15 @@
 ##############################################################################
 from django.db import models
 
+
 class ScoresEncoding(models.Model):
     class Meta:
         managed = False
 
         permissions = (
             ("can_access_scoreencoding", "Can access scoreencoding"),
+
+            # FIXME: Refactor score responsibles [Actually in attribution]
+            ("change_scoresresponsible", "Can change scores responsible"),
+            ("view_scoresresponsible", "Can view scores responsible"),
         )

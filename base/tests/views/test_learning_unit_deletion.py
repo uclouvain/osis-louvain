@@ -30,9 +30,9 @@ from django.contrib.auth.models import Permission, Group
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages.api import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
-from django.urls import reverse
 from django.test import TestCase, RequestFactory
-from django.utils.translation import ugettext_lazy as _
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
 from attribution.tests.factories.attribution import AttributionFactory, AttributionNewFactory
@@ -54,6 +54,8 @@ from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
 from base.views.learning_units.delete import delete_all_learning_units_year
 
+YEAR_LIMIT_LUE_MODIFICATION = 2018
+
 
 @override_flag('learning_unit_delete', active=True)
 class LearningUnitDelete(TestCase):
@@ -68,13 +70,13 @@ class LearningUnitDelete(TestCase):
                                                    start_date=datetime.date(year=1990, month=1, day=1),
                                                    end_date=None)
         PersonEntityFactory(person=person, entity=self.entity_version.entity, with_child=True)
+        self.start_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
+        self.learning_unit_year_list = self.create_learning_unit_years_and_dependencies(self.start_year)
 
-        self.learning_unit_year_list = self.create_learning_unit_years_and_dependencies()
-
-    def create_learning_unit_years_and_dependencies(self):
+    def create_learning_unit_years_and_dependencies(self, start_year):
         academic_year = create_editable_academic_year()
         acronym = "LDROI1004"
-        l1 = LearningUnitFactory(start_year=academic_year.year)
+        l1 = LearningUnitFactory(start_year=start_year)
 
         learning_unit_years = []
         for year in range(4):
@@ -131,7 +133,7 @@ class LearningUnitDelete(TestCase):
     def test_delete_all_learning_units_year_case_error_start_date(self):
         learning_unit_years = self.learning_unit_year_list
         request_factory = RequestFactory()
-        learning_unit_years[1].learning_unit.start_year = 2014
+        learning_unit_years[1].learning_unit.start_year = AcademicYearFactory(year=2014)
         learning_unit_years[1].learning_unit.save()
 
         request = request_factory.post(reverse(delete_all_learning_units_year, args=[learning_unit_years[1].id]))

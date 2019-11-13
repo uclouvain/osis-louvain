@@ -4,6 +4,7 @@ from __future__ import unicode_literals
 
 from django.db import migrations
 
+
 # WARNING !!!! This file is very important to ensure the consistancy !
 # Don't FORGET to use it if you merge migration file
 

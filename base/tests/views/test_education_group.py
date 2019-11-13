@@ -25,6 +25,7 @@
 ##############################################################################
 import datetime
 import json
+import random
 import urllib
 from http import HTTPStatus
 from itertools import product
@@ -35,9 +36,9 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import Permission, Group
 from django.contrib.messages import get_messages
-from django.urls import reverse
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse, HttpResponseRedirect
 from django.test import TestCase, RequestFactory
+from django.urls import reverse
 from waffle.testutils import override_flag
 
 from base.business.education_groups.general_information import PublishException
@@ -829,7 +830,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         request = RequestFactory().get('/?{}'.format(urllib.parse.urlencode(info)))
 
         from base.views.education_group import education_group_year_admission_condition_update_line_get
-        response = education_group_year_admission_condition_update_line_get(request)
+        education_group_year_admission_condition_update_line_get(request)
 
         mock_get_content.assert_called_once_with('read', admission_condition_line, '')
 
@@ -845,7 +846,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         request = RequestFactory().get('/?section={section}&language={language}'.format(**info))
 
         from base.views.education_group import education_group_year_admission_condition_update_line_get
-        response = education_group_year_admission_condition_update_line_get(request)
+        education_group_year_admission_condition_update_line_get(request)
 
         mock_get_content.not_called()
 
@@ -862,7 +863,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
             'access': CONDITION_ADMISSION_ACCESSES[2][0],
         })
 
-        request = RequestFactory().get('/')
+        RequestFactory().get('/')
 
         queryset = AdmissionConditionLine.objects.filter(admission_condition=admission_condition)
         self.assertEqual(queryset.count(), 0)
@@ -945,9 +946,11 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
             'access': CONDITION_ADMISSION_ACCESSES[2][0]
         }
         request = RequestFactory().post('/', form)
-        result = education_group_year_admission_condition_update_line_post(request,
-                                                                           self.education_group_parent.id,
-                                                                           self.education_group_child.id)
+        education_group_year_admission_condition_update_line_post(
+            request,
+            self.education_group_parent.id,
+            self.education_group_child.id
+        )
 
         education_group_id, creation_mode, unused = mock_save_form.call_args[0]
         self.assertEqual(education_group_id, self.education_group_child.id)
@@ -1179,3 +1182,15 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         )
         result = get_appropriate_common_admission_condition(edy)
         self.assertEqual(result, self.special_master_adm_cond)
+
+    def test_not_show_free_text_for_continuing_education_types(self):
+        egy_type = random.choice(TrainingType.continuing_education_types())
+
+        egy = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type__name=egy_type,
+        )
+        url = reverse("education_group_year_admission_condition_edit", args=[egy.pk, egy.pk])
+        response = self.client.get(url)
+
+        self.assertFalse(response.context['info']['show_free_text'])

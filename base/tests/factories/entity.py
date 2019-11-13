@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import factory
+
 from base.tests.factories.organization import OrganizationFactory
 from reference.tests.factories.country import CountryFactory
 

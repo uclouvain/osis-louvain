@@ -1,0 +1,163 @@
+{% load static i18n %}
+{% load bootstrap3 %}
+
+
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal">&times;</button>
+    <h4 class="modal-title">{% trans "Search" %}</h4>
+</div>
+
+<div class="modal-body">
+    {% include "template_messages.html" %}
+    <div id="message_info_modal" class="alert alert-danger" role="alert" style="visibility: hidden; display: none;"></div>
+
+    {% block navbar %}
+
+
+    {% endblock navbar %}
+
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active">
+            <div class="panel panel-default">
+
+                <div class="panel-body" style="border-bottom: 1px solid #ddd;">
+                    <form method="get" id="form-modal" action="{{ request.path }}" class="stay_in_modal" style="padding-top: 10px;">
+                        <input type="hidden" name="page" value="{{ page_obj.number }}">
+                        <div class="row">
+                            {% block form_field %}
+
+
+                            {% endblock form_field %}
+                            <br>
+                            <div class="col-md-2">
+                                <button type="submit" onclick="$('#form-modal').submit();" class="btn btn-primary" name="search-eg" title="search">
+                                    <em class="fa fa-search"></em>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div style="margin-top:10px;">
+
+                    {% if paginator.count %}
+                        <div class="row">
+                            <div class="col-md-6">
+                                {% block count_message %}
+
+                                {% endblock count_message %}
+                            </div>
+                            <div class="cold-md-6">
+                                <div class="pull-right" style="margin-right: 20px">
+                                    <button class="btn btn-primary" id="button-attach">{% trans 'Attach' %}</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <table id="table-objects" class="table table-striped table-responsive" style="width: 100%;">
+                            <thead>
+                            <tr>
+                                {% block table_header %}
+
+
+                                {% endblock table_header %}
+                            </tr>
+                            </thead>
+                        </table>
+                        <div style="text-align:center" id="search-pagination">
+                            {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block script %}
+    {# Must define column_def variable in js and also quick_search_url #}
+<script src="{% static "js/osis_datatable.js" %}"></script>
+<script>
+    $(document).ready(function()
+    {
+        document.getElementById("modal_dialog_id").classList.add("modal-lg");
+
+        initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
+            {{ paginator.per_page }}, "{{ quick_search_url }}", columnDefs);
+
+        let checkUrl = "{% url 'check_education_group_attach' root_id education_group_year_id %}";
+        let attachUrl = "{% url 'education_group_attach' root_id education_group_year_id %}";
+
+        $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
+
+        $("#search-pagination li a[href]").each(function(index, paginationAnchor){
+            paginationAnchor.addEventListener('click', function submitWithPage(e){
+                e.preventDefault();
+                const paginationHref = paginationAnchor.getAttribute("href");
+                const searchParams = new URLSearchParams(paginationHref);
+                const page = searchParams.get("page");
+                $("input[name='page']").val(page);
+                $('#form-modal').submit();
+            });
+        });
+
+        function attachElementSelected(checkUrl, attachUrl){
+            return function(){
+                const elementUrl = $("input[name=selected-item]:checked").attr("data-url") || "";
+                const parameters = extract_id_and_content_type_parameters(elementUrl);
+                const paramString = new URLSearchParams(parameters);
+
+                $.ajax({
+                    url: `${checkUrl}?${paramString.toString()}`,
+                }).done(function(jsonResponse){
+                    const error_messages = jsonResponse["error_messages"];
+                    if (error_messages.length > 0){
+                        const $span_messages = $("#message_info_modal");
+                        $span_messages.removeAttr("style");
+                        $span_messages.text("");
+                        error_messages.forEach(function(message){
+                            $span_messages.append(`<p>${message}</p>`);
+                        });
+                    } else {
+                        document.getElementById("modal_dialog_id").classList.add("modal-lg");
+                        $('#form-modal-ajax-content').load(`${attachUrl}?${paramString.toString()}`, function (response, status, xhr) {
+                            if (status === "success") {
+                                let form = $(this).find('form').first();
+                                formAjaxSubmit(form, '#form-ajax-modal');
+                            }
+                        });
+                    }
+                });
+            };
+        }
+
+        function extract_id_and_content_type_parameters(url){
+            let contentType = "";
+            if (url.includes("learning_units")){
+                contentType = "base_learningunityear";
+            }else if(url.includes("educationgroups")){
+                contentType = "base_educationgroupyear";
+            }
+
+            let object_id = getIdFromUrl(url).toString();
+
+            return {"id": object_id, "content_type": contentType};
+        }
+
+        // FIXME This method is copy pasted. Should be extracted in a common file.
+        // Also will be suppressed when we will slugify urls.
+        function getIdFromUrl(url){
+            let split = url.split("/");
+            for(let i=split.length-1; i--; i >= 0){
+                if(!isNaN(split[i])){
+                    return parseInt(split[i]);
+                }
+            }
+            return NaN;
+        }
+
+        bind_trigger_modal();
+    });
+</script>
+{% endblock script %}
+
