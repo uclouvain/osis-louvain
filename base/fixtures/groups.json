@@ -3653,6 +3653,11 @@
                     "can_edit_learningunit_specification",
                     "base",
                     "learningunit"
+                ],
+                [
+                    "can_access_catalog",
+                    "base",
+                    "offer"
                 ]
             ]
         }
