@@ -172,7 +172,7 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
         form.load_initial()  # Load data from database
         context['form'] = form
         context['text_label_translated'] = get_text_label_translated(text_lb, get_language())
-        context['is_luy_in_proposal'] = is_in_proposal_of_creation(context['learning_unit_year'])
+        context['is_luy_in_proposal_of_creation'] = is_in_proposal_of_creation(context['learning_unit_year'])
         return render(request, "learning_unit/specifications_edit.html", context)
 
 

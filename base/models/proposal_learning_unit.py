@@ -132,4 +132,4 @@ def is_in_proposal_of_transformation(luy):
 
 
 def is_in_proposal_of_creation(luy):
-    return ProposalLearningUnit.objects.filter(learning_unit_year=luy, type=ProposalType.CREATION).exists()
+    return ProposalLearningUnit.objects.filter(learning_unit_year=luy, type=ProposalType.CREATION.name).exists()

@@ -74,7 +74,7 @@
     <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
     <input type="submit" value="{% trans "Save" %}" title="{% trans "Save and do not postpone changes" %}"
            class="btn btn-primary" onclick="CKupdate(); submitForm(0)"/>
-    {% if not form.learning_unit_year.is_past and not is_luy_in_proposal %}
+    {% if not form.learning_unit_year.is_past and not is_luy_in_proposal_of_creation %}
     <input type="submit" value="{% trans "Save and postpone" %}" id="saveAndPostpone"
            title="{% trans "Save and postpone changes on next years" %}" class="btn btn-primary"
            onclick="CKupdate(); submitForm(1)"/>
