@@ -35,7 +35,7 @@ from base.business.learning_units.achievement import get_anchor_reference, DELET
 from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.learning_achievement import LearningAchievement, find_learning_unit_achievement
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
+from base.models.proposal_learning_unit import is_in_proposal_of_creation
 from base.views.common import display_success_messages
 from base.views.learning_unit import learning_unit_specifications
 from base.views.learning_units import perms
@@ -124,7 +124,7 @@ def update(request, learning_unit_year_id, learning_achievement_id):
         'learning_unit_year': learning_unit_year,
         'learning_achievement': learning_achievement,
         'form': form,
-        'is_luy_in_proposal': is_learning_unit_year_in_proposal(learning_unit_year)
+        'is_luy_in_proposal_of_creation': is_in_proposal_of_creation(learning_unit_year)
     }
 
     return render(request, "learning_unit/achievement_edit.html", context)
@@ -151,7 +151,7 @@ def create(request, learning_unit_year_id, learning_achievement_id):
         'form': form,
         'language_code': a_language_code,
         'create': True,
-        'is_luy_in_proposal': is_learning_unit_year_in_proposal(learning_unit_yr)
+        'is_luy_in_proposal_of_creation': is_in_proposal_of_creation(learning_unit_yr)
     }
 
     return render(request, "learning_unit/achievement_edit.html", context)
@@ -193,7 +193,7 @@ def create_first(request, learning_unit_year_id):
         'learning_unit_year': learning_unit_yr,
         'form': form,
         'language_code': FR_CODE_LANGUAGE,
-        'is_luy_in_proposal': is_learning_unit_year_in_proposal(learning_unit_yr)
+        'is_luy_in_proposal_of_creation': is_in_proposal_of_creation(learning_unit_yr)
     }
 
     return render(request, "learning_unit/achievement_edit.html", context)
