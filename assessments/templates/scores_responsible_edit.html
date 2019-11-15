@@ -66,7 +66,9 @@
             </table>
             <div class="panel-body">
                 <button type="submit" id="scores_responsible_add" class="btn btn-primary" name="action" value="add" role="button"
-                        title="{% trans 'Add' %}">{% trans 'Save' %}</button>
+                        title="{% trans 'Add' %}">
+                    <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>{% trans 'Save' %}
+                </button>
                 <button type="submit" id="scores_responsible_cancel" class="btn btn-default" role="button"
                         title="{% trans 'Cancel' %}">{% trans 'Cancel' %}</button>
             </div>
