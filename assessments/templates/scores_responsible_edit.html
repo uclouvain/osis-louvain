@@ -3,51 +3,53 @@
 {% load i18n %}
 
 {% comment "License" %}
- * OSIS stands for Open Student Information System. It's an application
- * designed to manage the core business of higher education institutions,
- * such as universities, faculties, institutes and professional schools.
- * The core business involves the administration of students, teachers,
- * courses, programs and so on.
- *
- * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * A copy of this license - GNU General Public License - is available
- * at the root of the source code of this program.  If not,
- * see http://www.gnu.org/licenses/.
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
 {% endcomment %}
 {% block breadcrumb %}
-<li id="lnk_institution">{% trans 'Institution' %}</li>
-<li id="lnk_studies"><a href="{% url 'academic_actors' %}">{% trans 'Academic actors' %}</a></li>
-<li><a href="{% url 'scores_responsible_list' %}" id="lnk_scores_responsible">{% trans 'Scores responsibles' %}</a></li>
-<li class="active">{{ learning_unit_year.acronym }}</li>
+    <li id="lnk_institution">{% trans 'Institution' %}</li>
+    <li id="lnk_studies"><a href="{% url 'academic_actors' %}">{% trans 'Academic actors' %}</a></li>
+    <li><a href="{% url 'scores_responsible_list' %}" id="lnk_scores_responsible">{% trans 'Scores responsibles' %}</a>
+    </li>
+    <li class="active">{{ learning_unit_year.acronym }}</li>
 {% endblock %}
 {% block content %}
-<div class="page-header">
-    <h2>{% trans 'Tutors of the course' %} <label>{{ learning_unit_year.acronym }}</label> ({{ academic_year }})</h2>
-</div>
-<div class="panel panel-default">
-    <div class="panel-body">
-        <form method="post" action="{% url 'scores_responsible_add' pk=learning_unit_year.id %}">
-            {% csrf_token %}
-            <table class="table table-hover">
-                <thead>
+    <div class="page-header">
+        <h2>{% trans 'Tutors of the course' %} <label>{{ learning_unit_year.acronym }}</label> ({{ academic_year }})
+        </h2>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <form method="post" action="{% url 'scores_responsible_add' pk=learning_unit_year.id %}">
+                {% csrf_token %}
+                <table class="table table-hover">
+                    <thead>
                     <tr>
                         <th>{% trans 'Tutor' %}</th>
                         <th>{% trans 'Status' %}</th>
                         <th>{% trans 'Scores responsible' %}</th>
                     </tr>
-                </thead>
-                <tbody>
+                    </thead>
+                    <tbody>
                     {% for attribution in attributions %}
                         <tr>
                             <td>{{ attribution.tutor }}</td>
@@ -57,28 +59,31 @@
                                 {% endwith %}
                             </td>
                             <td>
-                                <input id="txt_attribution"  name="attribution" value="attribution_{{ attribution.id }}"
+                                <input id="txt_attribution" name="attribution" value="attribution_{{ attribution.id }}"
                                        type="radio" {% if attribution.score_responsible == True %} checked {% endif %} >
                             </td>
                         </tr>
-                    {% endfor%}
-                </tbody>
-            </table>
-            <div class="panel-body">
-                <button type="submit" id="scores_responsible_add" class="btn btn-primary" name="action" value="add" role="button"
-                        title="{% trans 'Add' %}">
-                    <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>{% trans 'Save' %}
-                </button>
-                <button type="submit" id="scores_responsible_cancel" class="btn btn-default" role="button"
-                        title="{% trans 'Cancel' %}">
-                    <span class="glyphicon glyphicon-cancel" aria-hidden="true"></span>{% trans 'Cancel' %}
-                </button>
-            </div>
-            <input type="hidden" id="hdn_course_code" name="course_code" value="{{ request.GET.course_code }}">
-            <input type="hidden" id="hdn_learning_unit_title" name="learning_unit_title" value="{{ request.GET.learning_unit_title }}">
-            <input type="hidden" id="hdn_tutor" name="tutor" value="{{ request.GET.tutor }}">
-            <input type="hidden" id="hdn_scores_responsible" name="scores_responsible" value="{{ request.GET.scores_responsible }}">
-        </form>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <div class="panel-body">
+                    <button type="submit" id="scores_responsible_cancel" class="btn btn-default" role="button"
+                            title="{% trans 'Cancel' %}">
+                        <span class="glyphicon glyphicon-cancel" aria-hidden="true"></span>{% trans 'Cancel' %}
+                    </button>
+                    <button type="submit" id="scores_responsible_add" class="btn btn-primary" name="action" value="add"
+                            role="button"
+                            title="{% trans 'Add' %}">
+                        <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>{% trans 'Save' %}
+                    </button>
+                </div>
+                <input type="hidden" id="hdn_course_code" name="course_code" value="{{ request.GET.course_code }}">
+                <input type="hidden" id="hdn_learning_unit_title" name="learning_unit_title"
+                       value="{{ request.GET.learning_unit_title }}">
+                <input type="hidden" id="hdn_tutor" name="tutor" value="{{ request.GET.tutor }}">
+                <input type="hidden" id="hdn_scores_responsible" name="scores_responsible"
+                       value="{{ request.GET.scores_responsible }}">
+            </form>
+        </div>
     </div>
-</div>
 {% endblock %}
