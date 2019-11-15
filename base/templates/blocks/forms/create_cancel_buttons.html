@@ -27,7 +27,7 @@
         <div class="pull-right">
             <a href="{{ cancel_url }}" class="btn btn-default"
                style="margin-left: 10px;" role="button">
-                {% trans 'Cancel' %}
+                <span class="glyphicon glyphicon-cancel" aria-hidden="true"></span>{% trans 'Cancel' %}
             </a>
             <button type="submit" id="btn-confirm" {% if btn_submit_name %} name="{{ btn_submit_name }}" {% endif %}
                     class="btn btn-primary" title="{% trans 'Add' %}">

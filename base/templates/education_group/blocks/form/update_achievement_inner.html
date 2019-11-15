@@ -55,7 +55,9 @@
 
 {% if request.is_ajax %}
     <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">
+            <span class="glyphicon glyphicon-cancel" aria-hidden="true"></span>{% trans 'Cancel' %}
+        </button>
         <input type="submit" value="{% trans "Save" %}" class="btn btn-primary"
                onclick="CKupdate();$('#form_achievement').submit();"/>
     </div>

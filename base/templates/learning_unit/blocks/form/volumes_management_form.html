@@ -82,7 +82,7 @@
             </button>
             <a class="btn btn-default"
                href="{% url luy_url learning_unit_year_id=learning_unit_year.id %}">
-                {% trans 'Cancel' %}
+                <span class="glyphicon glyphicon-cancel" aria-hidden="true"></span>{% trans 'Cancel' %}
             </a>
         </div>
         {% include "learning_unit/blocks/modal/modal_modification_ask_to_report.html" %}
