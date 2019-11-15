@@ -65,7 +65,9 @@
 </div>
 
 <div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
+    <button type="button" class="btn btn-default" data-dismiss="modal">
+        <span class="glyphicon glyphicon-cancel" aria-hidden="true"></span>{% trans 'Cancel' %}
+    </button>
     <input type="submit" value="{% trans "Save" %}" class="btn btn-primary"
            onclick="$('#form_change_attribution').submit();"/>
 </div>

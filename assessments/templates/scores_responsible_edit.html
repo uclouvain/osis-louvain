@@ -70,7 +70,9 @@
                     <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>{% trans 'Save' %}
                 </button>
                 <button type="submit" id="scores_responsible_cancel" class="btn btn-default" role="button"
-                        title="{% trans 'Cancel' %}">{% trans 'Cancel' %}</button>
+                        title="{% trans 'Cancel' %}">
+                    <span class="glyphicon glyphicon-cancel" aria-hidden="true"></span>{% trans 'Cancel' %}
+                </button>
             </div>
             <input type="hidden" id="hdn_course_code" name="course_code" value="{{ request.GET.course_code }}">
             <input type="hidden" id="hdn_learning_unit_title" name="learning_unit_title" value="{{ request.GET.learning_unit_title }}">
