@@ -17,7 +17,7 @@
     {% endwith %}
     {% buttons %}
         <a href="{% url 'learning_unit' learning_unit_year_id=learning_unit_year.id %}" class="btn btn-default">
-            <span class="glyphicon glyphicon-cancel" aria-hidden="true"></span>{% trans 'Cancel' %}
+            <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>{% trans 'Cancel' %}
         </a>
         <button type="submit" id="btn-confirm" class="btn btn-danger">{% trans 'Yes, I confirm.' %}</button>
     {% endbuttons %}

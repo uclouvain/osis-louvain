@@ -33,7 +33,9 @@
             {% trans "Are you sure you want to delete the event" %}"{{ academic_calendar }} ?
          </div>
          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">
+                <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>{% trans "Cancel" %}
+            </button>
             <button type="submit" class="btn btn-danger">
                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                 {% trans "delete" %}

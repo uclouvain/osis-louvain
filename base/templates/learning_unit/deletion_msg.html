@@ -52,7 +52,7 @@
                     {% csrf_token %}
                     <input type="hidden" name="learning_unit_id" value="{{ learning_unit.id }}" />
                     <button type="button" onclick="javascript:history.back()" class="btn btn-default">
-                        <span class="glyphicon glyphicon-cancel" aria-hidden="true"></span>{% trans 'Cancel' %}
+                        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>{% trans 'Cancel' %}
                     </button>
                     <button type="submit" class="btn btn-danger">{% trans 'Yes, I confirm.' %}</button>
                 </form>
