@@ -60,7 +60,9 @@
                 {% bootstrap_field form.section %}
             </div>
             <div class="modal-footer">
-               <button class="btn btn-primary" type="submit">{% trans 'Save' %}</button>
+               <button class="btn btn-primary" type="submit">
+                   <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>{% trans 'Save' %}
+               </button>
                <button type="submit" class="btn" data-dismiss="modal">{% trans 'Cancel' %}</button>
           </div>
         </form>
