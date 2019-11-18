@@ -23,11 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import shortcuts
-
-from osis_common.decorators.deprecated import deprecated
+from django.db import models
 
 
-@deprecated
-def render(request, template, values):
-    return shortcuts.render(request, template, values)
+class UserGroup(models.Model):
+    user = models.ForeignKey('auth.User', on_delete=models.PROTECT)
+    group = models.ForeignKey('auth.Group', on_delete=models.PROTECT)
+
+    def __str__(self):
+        return u"%s (%s)" % (self.user, self.group)
+
+    class Meta:
+        managed = False
+        db_table = 'auth_user_groups'

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-21 15:21+0200\n"
+"POT-Creation-Date: 2019-11-13 10:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,14 +20,41 @@ msgstr ""
 msgid "Ac yr."
 msgstr "Anac."
 
-msgid "Academic actors"
-msgstr "Acteurs académiques"
-
 msgid "Activate to sort column by ascending order"
 msgstr "Activer pour trier la colonne par ordre croissant"
 
 msgid "Activate to sort column by descending order"
 msgstr "Activer pour trier la colonne par ordre décroissant"
+
+msgid "Add"
+msgstr "Ajouter"
+
+msgid "Add attribution"
+msgstr "Ajouter attribution"
+
+msgid "Add current year teacher"
+msgstr "Ajouter enseignant année en cours"
+
+msgid "Add over the current year"
+msgstr "Ajouter sur l’année en cours"
+
+msgid "Are you sure?"
+msgstr "Êtes-vous sûr·e?"
+
+#, python-format
+msgid "Attribution added for %(tutor)s (%(function)s)"
+msgstr "Attribution ajoutée pour %(tutor)s (%(function)s)"
+
+#, python-format
+msgid "Attribution modified for %(tutor)s (%(function)s)"
+msgstr "Attribution modifiée pour %(tutor)s (%(function)s)"
+
+#, python-format
+msgid "Attribution removed for %(tutor)s (%(function)s)"
+msgstr "Attribution supprimée pour %(tutor)s (%(function)s)"
+
+msgid "Attributions"
+msgstr "Attributions"
 
 msgid "Cancel"
 msgstr "Annuler"
@@ -37,9 +64,6 @@ msgstr "Co-titulaire"
 
 msgid "Coordinator"
 msgstr "Coordinateur(trice)"
-
-msgid "Course code"
-msgstr "Code cours"
 
 msgid "Courses"
 msgstr "Cours"
@@ -65,14 +89,11 @@ msgstr "Fermeture fiches descriptives"
 msgid "Description fiche opening"
 msgstr "Ouverture fiches descriptives"
 
-msgid "Display all tutors for this learning unit"
-msgstr "Afficher tous les enseignants pour ce cours"
+msgid "Duration"
+msgstr "Durée"
 
 msgid "Editable"
 msgstr "Modifiable"
-
-msgid "Entity"
-msgstr "Entité"
 
 msgid "Function"
 msgstr "Fonction"
@@ -86,23 +107,26 @@ msgstr "Informations avalisées et modifiables via la Commission de Programme"
 msgid "Informations updatable by teachers"
 msgstr "Informations modifiables par les enseignants"
 
-msgid "Institution"
-msgstr "Institution"
-
 msgid "Internship co-supervisor"
 msgstr "Co-directeur de stage"
 
 msgid "Internship supervisor"
 msgstr "Directeur de stage"
 
-msgid "Learning unit title"
-msgstr "Intitulé du cours"
+msgid "Lecturing"
+msgstr "Partie magistrale"
 
 msgid "Manage description fiche"
 msgstr "Gérer les fiches descriptives"
 
-msgid "No result"
-msgstr "Pas de résultat"
+msgid "Manage repartition"
+msgstr "Gérer la répartition"
+
+msgid "No attributions exist for the parent learning unit"
+msgstr "Aucune attribution n'existe pour l'UE parent"
+
+msgid "Practical exercises"
+msgstr "Partie pratique"
 
 msgid "Professor"
 msgstr "Professeur"
@@ -113,26 +137,33 @@ msgstr "Publier la candidature sur portal"
 msgid "Publish attribution to portal"
 msgstr "Publier l'attribution sur portal"
 
+#, python-format
+msgid "Repartition added for %(tutor)s (%(function)s)"
+msgstr "Répartition ajoutée pour %(tutor)s (%(function)s)"
+
+#, python-format
+msgid "Repartition modified for %(tutor)s (%(function)s)"
+msgstr "Répartition modifiée pour %(tutor)s (%(function)s)"
+
 msgid "Requirement entity"
 msgstr "Entité resp. cahier des charges"
 
 msgid "Save"
 msgstr "Enregistrer"
 
-msgid "Search"
-msgstr "Recherche"
-
 msgid "Start"
 msgstr "Début"
 
-msgid "Status"
-msgstr "Statut"
+msgid "Substitute"
+msgstr "Suppléé"
 
-msgid "Summary responsible"
-msgstr "Responsable des fiches descriptives"
-
-msgid "Summary responsibles"
-msgstr "Responsables des fiches descriptives"
+#, python-format
+msgid ""
+"The sum of volumes for the partims for professor %(tutor)s is superior to "
+"the volume of parent learning unit for this professor"
+msgstr ""
+"La somme des volumes des partims pour le professeur %(tutor)s est supérieure "
+"au volume de l'unité d'apprentissage parent pour ce professeur"
 
 msgid "There is no course for which you can edit description fiche"
 msgstr ""
@@ -144,11 +175,14 @@ msgstr "Intitulé"
 msgid "Tutor"
 msgstr "Enseignant·e"
 
-msgid "Tutors of the course"
-msgstr "Enseignant·e·s du cours"
+msgid "Tutor for parent LU"
+msgstr "Enseignant·e UE parent"
 
-msgid "Update"
-msgstr "Modifier"
+msgid "Tutors"
+msgstr "Enseignant·e·s"
 
-msgid "Without attribution"
-msgstr "Sans attribution"
+msgid "Yes, I confirm."
+msgstr "Oui, je confirme."
+
+msgid "delete"
+msgstr "supprimer"

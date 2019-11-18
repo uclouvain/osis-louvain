@@ -211,4 +211,5 @@ $(document).ready(function() {
             $("#LearningUnitYearForm").submit();
         }
     });
+    $('#id_credits').removeAttr('required');
 });

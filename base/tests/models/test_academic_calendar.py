@@ -27,7 +27,6 @@ import datetime
 from unittest import mock
 
 from django.test import TestCase
-from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from faker import Faker
 
@@ -63,14 +62,6 @@ class AcademicCalendarTest(TestCase):
             [open_academic_calendar],
             transform=lambda rec: rec
         )
-
-    def test_find_academic_calendar_by_academic_year_with_dates(self):
-        tmp_academic_year = AcademicYearFactory(year=timezone.now().year)
-        tmp_academic_calendar = AcademicCalendarFactory(academic_year=tmp_academic_year)
-        db_academic_calendar = list(academic_calendar.find_academic_calendar_by_academic_year_with_dates
-                                    (tmp_academic_year.id))[0]
-        self.assertIsNotNone(db_academic_calendar)
-        self.assertEqual(db_academic_calendar, tmp_academic_calendar)
 
     def test_compute_deadline_is_called_case_academic_calendar_save(self):
         with mock.patch.object(compute_all_scores_encodings_deadlines, 'send') as mock_method:

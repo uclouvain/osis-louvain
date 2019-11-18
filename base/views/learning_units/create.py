@@ -32,6 +32,7 @@ from base.forms.learning_unit.learning_unit_postponement import LearningUnitPost
 from base.models.academic_year import AcademicYear
 from base.models.learning_unit_year import LearningUnitYear, find_latest_by_learning_unit
 from base.models.person import Person
+from base.views.common import show_error_message_for_form_invalid
 from base.views.learning_units import perms
 from base.views.learning_units.common import show_success_learning_unit_year_creation_message
 
@@ -50,8 +51,11 @@ def create_learning_unit(request, academic_year_id):
         start_postponement=academic_year,
         data=request.POST or None
     )
-    if postponement_form.is_valid():
-        return _save_and_redirect(postponement_form, request)
+    if request.method == 'POST':
+        if postponement_form.is_valid():
+            return _save_and_redirect(postponement_form, request)
+        else:
+            show_error_message_for_form_invalid(request)
 
     return render(request, "learning_unit/simple/creation.html", postponement_form.get_context())
 

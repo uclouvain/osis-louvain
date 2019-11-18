@@ -184,7 +184,7 @@
                 {"name": "code", "targets": 5, "data": "code"}
             ];
 
-            initializeDataTable("table_education_groups", "educationGroupIds", {{ object_list.number }},
+            initializeDataTable("search_form", "table_education_groups", "educationGroupIds", {{ object_list.number }},
                 50, "{% url 'education_groups' %}", columnDefs);
         });
 

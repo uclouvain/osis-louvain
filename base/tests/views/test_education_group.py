@@ -455,8 +455,10 @@ class EducationGroupAdministrativedata(TestCase):
         self.person.user.user_permissions.add(self.permission_edit)
 
         self.education_group_year = EducationGroupYearFactory()
-        self.program_manager = ProgramManagerFactory(person=self.person,
-                                                     education_group=self.education_group_year.education_group)
+        self.program_manager = ProgramManagerFactory(
+            person=self.person,
+            education_group=self.education_group_year.education_group,
+        )
 
         self.url = reverse('education_group_administrative', args=[
             self.education_group_year.id, self.education_group_year.id

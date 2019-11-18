@@ -37,7 +37,8 @@ from base.models import academic_year
 from base.models.academic_year import MAX_ACADEMIC_YEAR_FACULTY, MAX_ACADEMIC_YEAR_CENTRAL, AcademicYear
 from base.models.campus import Campus
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY
+from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_FOR_FACULTY, \
+    LCY_TYPES_WITH_FIXED_ACRONYM
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -279,7 +280,7 @@ class FullForm(LearningUnitBaseForm):
             self.disable_fields(FULL_READ_ONLY_FIELDS)
 
     def _disable_fields_as_central_manager(self):
-        if self.proposal:
+        if self.proposal or self.instance.learning_container_year.container_type not in LCY_TYPES_WITH_FIXED_ACRONYM:
             self.disable_fields(FULL_PROPOSAL_READ_ONLY_FIELDS)
         else:
             self.disable_fields(FULL_READ_ONLY_FIELDS)

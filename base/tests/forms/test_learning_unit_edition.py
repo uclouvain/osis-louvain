@@ -54,16 +54,6 @@ class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
         form = LearningUnitEndDateForm(None, learning_unit_year=self.learning_unit_year)
         self.assertEqual(list(form.fields['academic_year'].queryset), self.list_of_academic_years_after_now)
 
-    def test_edit_end_date_send_dates_with_end_date_not_defined_and_periodicity_biennal_even(self):
-        self.learning_unit_year.periodicity = learning_unit_year_periodicity.BIENNIAL_EVEN
-        form = LearningUnitEndDateForm(None, learning_unit_year=self.learning_unit_year)
-        self.assertEqual(list(form.fields['academic_year'].queryset), self.list_of_even_academic_years)
-
-    def test_edit_end_date_send_dates_with_end_date_not_defined_and_periodicity_biennal_odd(self):
-        self.learning_unit_year.periodicity = learning_unit_year_periodicity.BIENNIAL_ODD
-        form = LearningUnitEndDateForm(None, learning_unit_year=self.learning_unit_year)
-        self.assertEqual(list(form.fields['academic_year'].queryset), self.list_of_odd_academic_years)
-
     def test_edit_end_date_send_dates_with_end_date_defined(self):
         self.learning_unit.end_year = self.last_academic_year
         form = LearningUnitEndDateForm(None, learning_unit_year=self.learning_unit_year)

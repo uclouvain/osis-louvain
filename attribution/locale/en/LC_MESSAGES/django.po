@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-21 15:21+0200\n"
+"POT-Creation-Date: 2019-11-13 10:30+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,13 +20,40 @@ msgstr ""
 msgid "Ac yr."
 msgstr ""
 
-msgid "Academic actors"
-msgstr ""
-
 msgid "Activate to sort column by ascending order"
 msgstr ""
 
 msgid "Activate to sort column by descending order"
+msgstr ""
+
+msgid "Add"
+msgstr ""
+
+msgid "Add attribution"
+msgstr ""
+
+msgid "Add current year teacher"
+msgstr ""
+
+msgid "Add over the current year"
+msgstr ""
+
+msgid "Are you sure?"
+msgstr ""
+
+#, python-format
+msgid "Attribution added for %(tutor)s (%(function)s)"
+msgstr ""
+
+#, python-format
+msgid "Attribution modified for %(tutor)s (%(function)s)"
+msgstr ""
+
+#, python-format
+msgid "Attribution removed for %(tutor)s (%(function)s)"
+msgstr ""
+
+msgid "Attributions"
 msgstr ""
 
 msgid "Cancel"
@@ -36,9 +63,6 @@ msgid "Co-holder"
 msgstr ""
 
 msgid "Coordinator"
-msgstr ""
-
-msgid "Course code"
 msgstr ""
 
 msgid "Courses"
@@ -65,13 +89,10 @@ msgstr ""
 msgid "Description fiche opening"
 msgstr ""
 
-msgid "Display all tutors for this learning unit"
+msgid "Duration"
 msgstr ""
 
 msgid "Editable"
-msgstr ""
-
-msgid "Entity"
 msgstr ""
 
 msgid "Function"
@@ -86,22 +107,25 @@ msgstr ""
 msgid "Informations updatable by teachers"
 msgstr ""
 
-msgid "Institution"
-msgstr ""
-
 msgid "Internship co-supervisor"
 msgstr ""
 
 msgid "Internship supervisor"
 msgstr ""
 
-msgid "Learning unit title"
+msgid "Lecturing"
 msgstr ""
 
 msgid "Manage description fiche"
 msgstr ""
 
-msgid "No result"
+msgid "Manage repartition"
+msgstr ""
+
+msgid "No attributions exist for the parent learning unit"
+msgstr ""
+
+msgid "Practical exercises"
 msgstr ""
 
 msgid "Professor"
@@ -113,25 +137,30 @@ msgstr ""
 msgid "Publish attribution to portal"
 msgstr ""
 
+#, python-format
+msgid "Repartition added for %(tutor)s (%(function)s)"
+msgstr ""
+
+#, python-format
+msgid "Repartition modified for %(tutor)s (%(function)s)"
+msgstr ""
+
 msgid "Requirement entity"
 msgstr ""
 
 msgid "Save"
 msgstr ""
 
-msgid "Search"
-msgstr ""
-
 msgid "Start"
 msgstr ""
 
-msgid "Status"
+msgid "Substitute"
 msgstr ""
 
-msgid "Summary responsible"
-msgstr ""
-
-msgid "Summary responsibles"
+#, python-format
+msgid ""
+"The sum of volumes for the partims for professor %(tutor)s is superior to "
+"the volume of parent learning unit for this professor"
 msgstr ""
 
 msgid "There is no course for which you can edit description fiche"
@@ -143,11 +172,14 @@ msgstr ""
 msgid "Tutor"
 msgstr ""
 
-msgid "Tutors of the course"
+msgid "Tutor for parent LU"
 msgstr ""
 
-msgid "Update"
+msgid "Tutors"
 msgstr ""
 
-msgid "Without attribution"
+msgid "Yes, I confirm."
+msgstr ""
+
+msgid "delete"
 msgstr ""

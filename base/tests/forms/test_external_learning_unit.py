@@ -36,6 +36,7 @@ from base.forms.learning_unit.search.external import ExternalLearningUnitFilter
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums import organization_type
 from base.models.enums.learning_container_year_types import EXTERNAL
+from base.models.enums.learning_unit_external_sites import LearningUnitExternalSite
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
@@ -235,6 +236,21 @@ class TestLearningUnitYearForExternalModelForm(TestCase):
             person=self.person, data=None,
             subtype=FULL, instance=luy, initial={})
         self.assertEqual(form.fields["country_external_institution"].initial, address.country.pk)
+
+    def test_fill_acronym_initial_letter_instance(self):
+        luy = LearningUnitYearFullFactory(campus=CampusFactory())
+        form = LearningUnitYearForExternalModelForm(
+            person=self.person, data=None,
+            subtype=FULL, instance=luy, initial={}
+        )
+        self.assertEqual(form.data['acronym_0'], luy.acronym[0])
+
+    def test_fill_external_initial_letter_no_instance(self):
+        form = LearningUnitYearForExternalModelForm(
+            person=self.person, data=None,
+            subtype=FULL, instance=None, initial={}
+        )
+        self.assertEqual(form.data['acronym_0'], LearningUnitExternalSite.E.value)
 
 
 class TestExternalLearningUnitSearchForm(TestCase):

@@ -68,7 +68,7 @@ class LearningUnitAdmin(VersionAdmin, SerializableModelAdmin):
         from base.business.learning_units.automatic_postponement import LearningUnitAutomaticPostponementToN6
         from base.views.common import display_success_messages, display_error_messages
 
-        result, errors = LearningUnitAutomaticPostponementToN6(queryset).postpone()
+        result, errors = LearningUnitAutomaticPostponementToN6().postpone()
         count = len(result)
         display_success_messages(
             request, ngettext(

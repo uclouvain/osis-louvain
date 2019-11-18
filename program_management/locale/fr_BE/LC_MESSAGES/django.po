@@ -74,14 +74,29 @@ msgstr ""
 "pas copié."
 
 #, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
+msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s unités d'enseignement"
+
+#, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s offers"
+msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
+
+#, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
-msgstr "Une unité d'enseignement ne peut pas être prérequis à elle-même : %(acronym)s"
+msgstr ""
+"Une unité d'enseignement ne peut pas être prérequis à elle-même : %(acronym)s"
+
+msgid "Ac yr."
+msgstr "Anac."
 
 msgid "Academic year"
 msgstr "Année académique"
 
 msgid "Acronym"
 msgstr "Sigle"
+
+msgid "Acronym/Short title"
+msgstr "Sigle/Intitulé abrégé"
 
 msgid "Activities with prerequisites (in preparation)"
 msgstr "Activité avec prérequis (en préparation)"
@@ -164,6 +179,10 @@ msgstr ""
 "Voulez-vous copier ou déplacer %(object_acronym)s depuis %(parent_acronym)s ?"
 
 #, python-format
+msgid "Element selected %(element)s"
+msgstr "Elément sélectionné %(element)s"
+
+#, python-format
 msgid ""
 "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
 "program."
@@ -195,6 +214,9 @@ msgstr ""
 "L'unité d'enseignement %(learning_unit_year)s n’existe pas en "
 "%(academic_year)s => L'unité d'enseignement est recopiée avec année de "
 "référence %(learning_unit_academic_year)s."
+
+msgid "Learning units"
+msgstr "Unités d'enseignement"
 
 msgid "Legend"
 msgstr "Légende"
@@ -288,6 +310,9 @@ msgstr "Obligatoire"
 
 msgid "Save"
 msgstr "Enregistrer"
+
+msgid "Search"
+msgstr "Recherche"
 
 msgid "Student's contact information"
 msgstr "Coordonnées de l'étudiant.e"
@@ -399,7 +424,7 @@ msgstr "Oui, je confirme."
 msgid ""
 "You are not allowed to copy the content of this kind of education group."
 msgstr ""
-"Vous n'êtes pas autorisé de copier le contenu de ce type d'organisation de "
+"Vous n'êtes pas autorisé à copier le contenu de ce type d'organisation de "
 "formation."
 
 msgid "You are not allowed to postpone this training in the future."

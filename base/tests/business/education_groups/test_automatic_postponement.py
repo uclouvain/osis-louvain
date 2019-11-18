@@ -36,7 +36,7 @@ from base.models.education_group_detailed_achievement import EducationGroupDetai
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import MINI_TRAINING
-from base.models.enums.education_group_types import MiniTrainingType
+from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, get_current_year
 from base.tests.factories.admission_condition import AdmissionConditionLineFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
@@ -44,7 +44,7 @@ from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_detailed_achievement import EducationGroupDetailedAchievementFactory
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from cms.enums.entity_name import OFFER_YEAR
@@ -135,6 +135,16 @@ class TestFetchEducationGroupToPostpone(TestCase):
         result, errors = postponement.postpone()
         self.assertEqual(len(result), 0)
         self.assertFalse(errors)
+
+    def test_do_not_duplicate_11BA(self):
+        TrainingFactory(
+            education_group_type__name=TrainingType.BACHELOR.name,
+            acronym="OSIS11BA"
+        )
+
+        postponement = EducationGroupAutomaticPostponementToN6()
+
+        self.assertQuerysetEqual(postponement.queryset, [])
 
     def test_egy_already_duplicated(self):
         EducationGroupYearFactory(

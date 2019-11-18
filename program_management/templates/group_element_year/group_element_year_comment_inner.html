@@ -32,7 +32,7 @@
         </div>
 
         <div id="form-modal-body" class="modal-body">
-            <form method="post" id="form_comment_update" action="{{ request.path }}">
+            <form method="post" id="form_comment_update" action="{{ request.path }}?{{ request.GET.urlencode }}">
                 {% bootstrap_form_errors form %}
 
                 {% csrf_token %}

@@ -35,6 +35,7 @@ from waffle.testutils import override_flag
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
     LearningContainerYearModelForm
 from base.forms.learning_unit_proposal import ProposalLearningUnitForm, CreationProposalBaseForm
+from base.models.academic_year import AcademicYear
 from base.models.enums import learning_unit_year_subtypes, learning_container_year_types, organization_type, \
     entity_type, learning_unit_year_periodicity
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
@@ -87,7 +88,7 @@ class LearningUnitViewTestCase(TestCase):
             'acronym_1': 'TAU2000',
             "subtype": learning_unit_year_subtypes.FULL,
             "container_type": learning_container_year_types.COURSE,
-            "academic_year": self.next_academic_year.id,
+            "academic_year": self.academic_years[3].id,
             "status": True,
             "credits": "5",
             "campus": self.campus.id,
@@ -223,3 +224,19 @@ class LearningUnitViewTestCase(TestCase):
                           ('DISSERTATION', 'Mémoire'),
                           ('INTERNSHIP', 'Stage')]
                          )
+
+    def test_academic_year_from_form_equal_to_data(self):
+        full_form = CreationProposalBaseForm(self.get_valid_data(),
+                                             person=self.faculty_person,
+                                             default_ac_year=AcademicYear.objects.get(
+                                                 pk=self.get_valid_data()['academic_year']))
+
+        self.assertEqual(self.get_valid_data()['academic_year'],
+                         full_form.learning_unit_form_container.academic_year.id)
+
+    def test_academic_year_default_from_form_equal(self):
+        full_form = CreationProposalBaseForm(self.get_valid_data(),
+                                             person=self.faculty_person)
+
+        self.assertEqual(self.next_academic_year.id,
+                         full_form.learning_unit_form_container.academic_year.id)

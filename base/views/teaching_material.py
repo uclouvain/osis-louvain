@@ -24,17 +24,17 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render
+from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
 from base.business.learning_units import perms
-from base.business.learning_units.pedagogy import delete_teaching_material
+from base.business.learning_units.pedagogy import delete_teaching_material, is_pedagogy_data_must_be_postponed
 from base.forms.learning_unit_pedagogy import TeachingMaterialModelForm
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.teaching_material import TeachingMaterial
 from base.views.common import display_success_messages
-from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.perms import PermissionDecorator
 
 
@@ -42,54 +42,69 @@ from base.views.learning_units.perms import PermissionDecorator
 @require_http_methods(['POST', 'GET'])
 @PermissionDecorator(perms.is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
 def create(request, learning_unit_year_id):
-    success_url = reverse(learning_unit_pedagogy, kwargs={'learning_unit_year_id': learning_unit_year_id})
-    return create_view(request, learning_unit_year_id, success_url)
+    return create_view(request, learning_unit_year_id)
 
 
 @login_required
 @require_http_methods(['POST', 'GET'])
 @PermissionDecorator(perms.is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
 def update(request, learning_unit_year_id, teaching_material_id):
-    success_url = reverse(learning_unit_pedagogy, kwargs={'learning_unit_year_id': learning_unit_year_id})
-    return update_view(request, learning_unit_year_id, teaching_material_id, success_url)
+    return update_view(request, learning_unit_year_id, teaching_material_id)
 
 
 @login_required
 @require_http_methods(['POST', 'GET'])
 @PermissionDecorator(perms.is_eligible_to_update_learning_unit_pedagogy, "learning_unit_year_id", LearningUnitYear)
 def delete(request, learning_unit_year_id, teaching_material_id):
-    success_url = reverse(learning_unit_pedagogy, kwargs={'learning_unit_year_id': learning_unit_year_id})
-    return delete_view(request, learning_unit_year_id, teaching_material_id, success_url)
+    return delete_view(request, learning_unit_year_id, teaching_material_id)
 
 
-def create_view(request, learning_unit_year_id, success_url):
+def create_view(request, learning_unit_year_id):
     learning_unit_yr = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     form = TeachingMaterialModelForm(request.POST or None)
     if form.is_valid():
-        return _save_and_redirect(request, form, learning_unit_yr, success_url)
+        return _save_and_return_response(request, form, learning_unit_yr)
     return render(request, "learning_unit/teaching_material/modal_edit.html", {'form': form})
 
 
-def update_view(request, learning_unit_year_id, teaching_material_id, success_url):
+def update_view(request, learning_unit_year_id, teaching_material_id):
     teach_material = get_object_or_404(TeachingMaterial, pk=teaching_material_id,
                                        learning_unit_year_id=learning_unit_year_id)
     form = TeachingMaterialModelForm(request.POST or None, instance=teach_material)
     if form.is_valid():
-        return _save_and_redirect(request, form, teach_material.learning_unit_year, success_url)
+        return _save_and_return_response(request, form, teach_material.learning_unit_year)
     return render(request, "learning_unit/teaching_material/modal_edit.html", {'form': form})
 
 
-def delete_view(request, learning_unit_year_id, teaching_material_id, success_url):
+def delete_view(request, learning_unit_year_id, teaching_material_id):
     teach_material = get_object_or_404(TeachingMaterial, pk=teaching_material_id,
                                        learning_unit_year_id=learning_unit_year_id)
     if request.method == 'POST':
+        last_luy_reported = teach_material.learning_unit_year.find_gt_learning_units_year().last()
         delete_teaching_material(teach_material)
-        display_success_messages(request, "The teaching material has been deleted")
-        return redirect(success_url)
+        if last_luy_reported and is_pedagogy_data_must_be_postponed(teach_material.learning_unit_year):
+            display_success_messages(
+                request,
+                _("The teaching material has been deleted up to %(last_year_reported)s with success") % {
+                    "last_year_reported": str(last_luy_reported.academic_year)
+                }
+            )
+        else:
+            display_success_messages(request, _("The teaching material has been deleted with success"))
+        return JsonResponse({})
     return render(request, "learning_unit/teaching_material/modal_delete.html", {})
 
 
-def _save_and_redirect(request, form, learning_unit_year, success_url):
+def _save_and_return_response(request, form, learning_unit_year):
     form.save(learning_unit_year=learning_unit_year)
-    display_success_messages(request, "Teaching materials has been updated")
-    return redirect(success_url)
+    last_luy_reported = learning_unit_year.find_gt_learning_units_year().last()
+    if last_luy_reported and is_pedagogy_data_must_be_postponed(learning_unit_year):
+        display_success_messages(
+            request,
+            _("Teaching material has been saved and reported up to %(last_year_reported)s with success") % {
+                "last_year_reported": str(last_luy_reported.academic_year)
+            }
+        )
+    else:
+        display_success_messages(request, _("The teaching material has been saved with success"))
+    return JsonResponse({})

@@ -264,15 +264,6 @@ msgstr ""
 msgid "Add another"
 msgstr ""
 
-msgid "Add attribution"
-msgstr ""
-
-msgid "Add current year teacher"
-msgstr ""
-
-msgid "Add over the current year"
-msgstr ""
-
 msgid "Add the English content of this paragraph"
 msgstr ""
 
@@ -417,22 +408,10 @@ msgstr ""
 msgid "Attrib. vol2"
 msgstr ""
 
-#, python-format
-msgid "Attribution added for %(tutor)s (%(function)s)"
-msgstr ""
-
 msgid "Attribution duration"
 msgstr ""
 
 msgid "Attribution entity"
-msgstr ""
-
-#, python-format
-msgid "Attribution modified for %(tutor)s (%(function)s)"
-msgstr ""
-
-#, python-format
-msgid "Attribution removed for %(tutor)s (%(function)s)"
 msgstr ""
 
 msgid "Attributions"
@@ -718,9 +697,6 @@ msgstr ""
 msgid "Description fiche status"
 msgstr ""
 
-msgid "Description fiche submission dates updated"
-msgstr ""
-
 msgid "Detach"
 msgstr ""
 
@@ -897,9 +873,6 @@ msgstr ""
 msgid "Enrollments to learning unit"
 msgstr ""
 
-msgid "Enrollments to training"
-msgstr ""
-
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
@@ -920,6 +893,9 @@ msgid "Entity charges"
 msgstr ""
 
 msgid "Entity managers"
+msgstr ""
+
+msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
 
 msgid "Evaluations"
@@ -1100,6 +1076,12 @@ msgid "Global ID"
 msgstr ""
 
 msgid "Go"
+msgstr ""
+
+msgid "Go down"
+msgstr ""
+
+msgid "Go up"
 msgstr ""
 
 msgid "Graduates"
@@ -1443,9 +1425,6 @@ msgid "Major list choice"
 msgstr ""
 
 msgid "Male"
-msgstr ""
-
-msgid "Manage repartition"
 msgstr ""
 
 msgid "Manage volumes"
@@ -1819,6 +1798,9 @@ msgstr ""
 msgid "Page not found."
 msgstr ""
 
+msgid "Parent"
+msgstr ""
+
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
 msgstr ""
@@ -1906,6 +1888,11 @@ msgid "Pole"
 msgstr ""
 
 msgid "Postal code"
+msgstr ""
+
+msgid ""
+"Postponement will not be possible as the chosen code already exists for "
+"future academic years"
 msgstr ""
 
 msgid ""
@@ -2157,14 +2144,6 @@ msgstr ""
 msgid "Remarks"
 msgstr ""
 
-#, python-format
-msgid "Repartition added for %(tutor)s (%(function)s)"
-msgstr ""
-
-#, python-format
-msgid "Repartition modified for %(tutor)s (%(function)s)"
-msgstr ""
-
 msgid "Req. Entities"
 msgstr ""
 
@@ -2205,6 +2184,15 @@ msgid "SQL command"
 msgstr ""
 
 msgid "Save"
+msgstr ""
+
+msgid "Save and do not postpone changes"
+msgstr ""
+
+msgid "Save and postpone"
+msgstr ""
+
+msgid "Save and postpone changes on next years"
 msgstr ""
 
 msgid "Save and do not postpone changes"
@@ -2397,6 +2385,12 @@ msgid "Teaching internship"
 msgstr ""
 
 msgid "Teaching material"
+msgstr ""
+
+#, python-format
+msgid ""
+"Teaching material has been saved and reported up to %(last_year_reported)s "
+"with success"
 msgstr ""
 
 msgid "Teaching profile"
@@ -2618,6 +2612,15 @@ msgstr ""
 
 #, python-format
 msgid ""
+"The sections you modified have been saved and reported up to "
+"%(last_year_reported)s with success."
+msgstr ""
+
+msgid "The sections you modified have been saved with success."
+msgstr ""
+
+#, python-format
+msgid ""
 "The selected end year (%(partim_end_year)s) is greater than the end year of "
 "the parent %(lu_parent)s"
 msgstr ""
@@ -2631,8 +2634,14 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The sum of volumes for the partims for professor %(tutor)s is superior to "
-"the volume of parent learning unit for this professor"
+"The teaching material has been deleted up to %(last_year_reported)s with "
+"success"
+msgstr ""
+
+msgid "The teaching material has been deleted with success"
+msgstr ""
+
+msgid "The teaching material has been saved with success"
 msgstr ""
 
 msgid "The user cannot modify data which are greater than N+1"
@@ -2770,6 +2779,12 @@ msgstr ""
 msgid "To complete"
 msgstr ""
 
+msgid "Total"
+msgstr ""
+
+msgid "Total enrollments to training"
+msgstr ""
+
 msgid "Training"
 msgstr ""
 
@@ -2800,9 +2815,6 @@ msgstr ""
 msgid "Tutor"
 msgstr ""
 
-msgid "Tutor for parent LU"
-msgstr ""
-
 msgid "Tutors"
 msgstr ""
 
@@ -2822,6 +2834,9 @@ msgid "UCL Bachelors"
 msgstr ""
 
 msgid "UCL Diploma"
+msgstr ""
+
+msgid "UE full"
 msgstr ""
 
 msgid "URL of the learning unit"
@@ -3056,6 +3071,9 @@ msgid ""
 "prerequisite(s)"
 msgstr ""
 
+msgid "You cannot have a specific summary course submission event."
+msgstr ""
+
 msgid "You don't have the rights to consolidate"
 msgstr ""
 
@@ -3120,6 +3138,10 @@ msgid "agreements"
 msgstr ""
 
 msgid "aim number"
+msgstr ""
+
+#, python-format
+msgid "and postponed until %(year)s"
 msgstr ""
 
 #, python-format

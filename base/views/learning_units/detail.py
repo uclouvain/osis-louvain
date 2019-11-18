@@ -133,7 +133,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
 
         context.update(self.get_context_permission(proposal))
         context["versions"] = self.get_versions()
-        context["has_partim"] = self.object.get_partims_related().exists()
+        context["list_partims"] = self.object.get_partims_related().values_list('acronym', flat=True)
 
         return context
 

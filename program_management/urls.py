@@ -29,6 +29,8 @@ from django.urls import include
 from program_management.views import groupelementyear_create, groupelementyear_delete, groupelementyear_update, \
     groupelementyear_read, prerequisite_update, prerequisite_read, element_utilization, groupelementyear_postpone, \
     groupelementyear_management, excel
+from program_management.views.quick_search import QuickSearchLearningUnitYearView, \
+    QuickSearchLearningUnitYearSerializer, QuickSearchEducationGroupYearView, QuickSearchEducationGroupYearSerializer
 
 urlpatterns = [
     url(r'^management/$', groupelementyear_management.management, name='education_groups_management'),
@@ -36,6 +38,8 @@ urlpatterns = [
         url(r'^content/', include([
             url(u'^attach/', groupelementyear_create.AttachTypeDialogView.as_view(),
                 name='education_group_attach'),
+            url(r'^check_attach/', groupelementyear_create.AttachCheckView.as_view(),
+                name="check_education_group_attach"),
             url(u'^create/$', groupelementyear_create.CreateGroupElementYearView.as_view(),
                 name='group_element_year_create'),
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
@@ -51,6 +55,16 @@ urlpatterns = [
         url(r'^pdf_content/(?P<language>[a-z\-]+)', groupelementyear_read.pdf_content, name="pdf_content"),
         url(r'^postpone/', groupelementyear_postpone.PostponeGroupElementYearView.as_view(),
             name="postpone_education_group"),
+        url(r'^quick_search/', include([
+            url(r'^learning_unit/$', QuickSearchLearningUnitYearView.as_view(),
+                name="quick_search_learning_unit"),
+            url(r'^learning_unit_serializer/$', QuickSearchLearningUnitYearSerializer.as_view(),
+                name="quick_search_learning_unit_serializer"),
+            url(r'^education_group/$', QuickSearchEducationGroupYearView.as_view(),
+                name="quick_search_education_group"),
+            url(r'^education_group_serializer/$', QuickSearchEducationGroupYearSerializer.as_view(),
+                name="quick_search_education_group_serializer"),
+        ])),
     ])),
     url(r'^(?P<root_id>[0-9]+)/(?P<learning_unit_year_id>[0-9]+)/learning_unit/', include([
         url(r'^utilization/$',

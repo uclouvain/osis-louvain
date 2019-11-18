@@ -42,8 +42,16 @@ LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
 
 
-def extract_child_from_cache(parent, user):
-    selected_data = ElementCache(user).cached_data
+def extract_child(parent, request):
+    object_id = request.GET.get("id")
+    content_type = request.GET.get("content_type")
+    if object_id and content_type:
+        selected_data = {"id": object_id, "modelname": content_type}
+    elif object_id or content_type:
+        selected_data = {}
+    else:
+        selected_data = ElementCache(request.user).cached_data
+
     if not selected_data:
         raise ObjectDoesNotExist
 

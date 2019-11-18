@@ -46,12 +46,12 @@
             <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
             {% if source_link %}
                 <a class="trigger_modal btn btn-danger"
-                   data-url="{% url "group_element_year_move" root education_group_year_parent.id source_link.id %}">
+                   data-url="{% url "group_element_year_move" root education_group_year_parent.id source_link.id %}?{{ request.GET.urlencode }}">
                     {% trans "Move" %}
                 </a>
             {% endif %}
             <a class="trigger_modal btn btn-primary"
-               data-url="{% url "group_element_year_create" root education_group_year_parent.id  %}">
+               data-url="{% url "group_element_year_create" root education_group_year_parent.id  %}?{{  request.GET.urlencode }}">
                 {% trans "Copy" %}
             </a>
         </div>

@@ -130,14 +130,22 @@ def send_mail_after_annual_procedure_of_automatic_postponement_of_luy(
         .distinct()
 
     receivers = [message_config.create_receiver(manager.id, manager.email, manager.language) for manager in managers]
+    print(luys_with_errors)
+    distinct_luys_postponed = [luy for luy in luys_postponed
+                               if luy.academic_year_id == statistics_context['max_academic_year_to_postpone'].pk]
     template_base_data = {
         'academic_year':  statistics_context['max_academic_year_to_postpone'].past().year,
         'end_academic_year': statistics_context['max_academic_year_to_postpone'].year,
 
         # Use len instead of count() (it's buggy when a queryset is built with a difference())
-        'luys_postponed': len(luys_postponed),
+        'luys_postponed': len(distinct_luys_postponed),
+        'luys_postponed_qs': distinct_luys_postponed,
         'luys_already_existing': statistics_context['already_duplicated'].count(),
+        'luys_already_existing_qs': statistics_context['already_duplicated'].order_by("learningunityear__acronym"),
         'luys_ending_this_year': statistics_context['ending_on_max_academic_year'].count(),
+        'luys_ending_this_year_qs': statistics_context['ending_on_max_academic_year'].order_by(
+            "learningunityear__acronym"
+        ),
         'luys_with_errors': luys_with_errors
     }
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,

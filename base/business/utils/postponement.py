@@ -47,7 +47,7 @@ class AutomaticPostponement(ABC):
 
         self.already_duplicated = self.get_already_duplicated()
         self.to_not_duplicate = self.get_to_not_duplicated()
-        self.ending_on_max_adjournment = self.get_ending_on_max_adjournment()
+        self.ending_before_max_adjournment = self.get_ending_before_max_adjournment()
 
         if self.already_duplicated or self.to_not_duplicate:
             self.to_duplicate = self.queryset.difference(self.already_duplicated, self.to_not_duplicate)
@@ -72,7 +72,7 @@ class AutomaticPostponement(ABC):
     def get_to_not_duplicated(self):
         return self.model.objects.none()
 
-    def get_ending_on_max_adjournment(self):
+    def get_ending_before_max_adjournment(self):
         return self.model.objects.none()
 
     def serialize_postponement_results(self):
@@ -105,11 +105,8 @@ class AutomaticPostponementToN6(AutomaticPostponement):
     def __init__(self, queryset=None):
         # Fetch the N and N+6 academic_years
         self.last_academic_year = AcademicYear.objects.max_adjournment()
-        self.current_year = AcademicYear.objects.current()
 
         super().__init__(queryset)
-
-        self.queryset = self.get_queryset(queryset)
 
     def postpone(self):
         # send statistics to the managers
@@ -160,11 +157,11 @@ class AutomaticPostponementToN6(AutomaticPostponement):
     def get_to_not_duplicated(self):
         """ We cannot postpone an education_group in the past """
         return self.queryset.filter(
-            Q(last_year__lt=self.current_year.year) | Q(end_year__lt=self.last_academic_year.year)
+            Q(last_year__lt=self.current_year.year) | Q(end_year__year__lt=self.last_academic_year.year)
         )
 
-    def get_ending_on_max_adjournment(self):
-        return self.queryset.filter(end_year=self.last_academic_year.year)
+    def get_ending_before_max_adjournment(self):
+        return self.queryset.filter(end_year__year=self.last_academic_year.year-1)
 
     def get_statistics_context(self):
         """ Override if you need to add additional values to statistics"""
@@ -173,5 +170,5 @@ class AutomaticPostponementToN6(AutomaticPostponement):
             'to_duplicate': self.to_duplicate,
             'already_duplicated':  self.already_duplicated,
             'to_ignore': self.to_not_duplicate,
-            'ending_on_max_academic_year': self.ending_on_max_adjournment,
+            'ending_on_max_academic_year': self.ending_before_max_adjournment,
         }

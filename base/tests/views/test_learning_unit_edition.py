@@ -312,6 +312,15 @@ class TestEditLearningUnit(TestCase):
         self.learning_unit_year.refresh_from_db()
         self.assertEqual(self.learning_unit_year.credits, credits)
 
+    def test_invalid_post_request(self):
+        credits = ''
+        form_data = self._get_valid_form_data()
+        form_data['credits'] = credits
+        form_data['container_type'] = learning_container_year_types.COURSE
+        response = self.client.post(self.url, data=form_data)
+
+        self.assertEqual(self.url, response.request['PATH_INFO'])
+
     def _get_valid_form_data(self):
         form_data = {
             "acronym_0": self.learning_unit_year.acronym[0],
@@ -479,8 +488,7 @@ class TestLearningUnitVolumesManagement(TestCase):
         self.assertEqual(learning_component_year.repartition_volume_additional_entity_2, 0.5)
 
     @mock.patch('base.models.program_manager.is_program_manager')
-    @mock.patch('base.views.layout.render')
-    def test_learning_unit_volumes_management_post_wrong_data(self, mock_render, mock_program_manager):
+    def test_learning_unit_volumes_management_post_wrong_data(self, mock_program_manager):
         mock_program_manager.return_value = True
 
         request_factory = RequestFactory()

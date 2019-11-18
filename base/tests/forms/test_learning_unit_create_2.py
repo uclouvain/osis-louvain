@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import collections
-from unittest import mock
 
 import factory.fuzzy
 from django.test import TestCase
@@ -328,23 +327,17 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
                               'type_declaration_vacant', 'team', 'is_vacant']
         self._assert_equal_values(form_instance.instance, self.post_data, fields_to_validate)
 
-    @mock.patch('base.forms.learning_unit.learning_unit_create.LearningUnitModelForm.is_valid',
-                side_effect=lambda *args: False)
-    def test_creation_case_wrong_learning_unit_data(self, mock_is_valid):
+    def test_creation_case_wrong_learning_unit_data(self):
         form = _instanciate_form(self.current_academic_year, post_data=self.post_data,
                                  start_year=self.current_academic_year.year)
         self.assertFalse(form.is_valid())
 
-    @mock.patch('base.forms.learning_unit.learning_unit_create.LearningUnitYearModelForm.is_valid',
-                side_effect=lambda *args: False)
-    def test_creation_case_wrong_learning_unit_year_data(self, mock_is_valid):
+    def test_creation_case_wrong_learning_unit_year_data(self):
         form = _instanciate_form(self.current_academic_year, post_data=self.post_data,
                                  start_year=self.current_academic_year.year)
         self.assertFalse(form.is_valid())
 
-    @mock.patch('base.forms.learning_unit.learning_unit_create.LearningContainerYearModelForm.is_valid',
-                side_effect=lambda *args: False)
-    def test_creation_case_wrong_learning_container_year_data(self, mock_is_valid):
+    def test_creation_case_wrong_learning_container_year_data(self):
         form = _instanciate_form(self.current_academic_year, post_data=self.post_data,
                                  start_year=self.current_academic_year.year)
         self.assertFalse(form.is_valid())
@@ -384,23 +377,17 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
                                  learning_unit_instance=self.learning_unit_year.learning_unit, person=self.person)
         self.assertTrue(form.is_valid(), form.errors)
 
-    @mock.patch('base.forms.learning_unit.learning_unit_create.LearningUnitModelForm.is_valid',
-                side_effect=lambda *args: False)
-    def test_update_case_wrong_learning_unit_data(self, mock_is_valid):
+    def test_update_case_wrong_learning_unit_data(self):
         form = _instanciate_form(self.learning_unit_year.academic_year, post_data=self.post_data,
                                  learning_unit_instance=self.learning_unit_year.learning_unit)
         self.assertFalse(form.is_valid())
 
-    @mock.patch('base.forms.learning_unit.learning_unit_create.LearningUnitYearModelForm.is_valid',
-                side_effect=lambda *args: False)
-    def test_update_case_wrong_learning_unit_year_data(self, mock_is_valid):
+    def test_update_case_wrong_learning_unit_year_data(self):
         form = _instanciate_form(self.learning_unit_year.academic_year, post_data=self.post_data,
                                  learning_unit_instance=self.learning_unit_year.learning_unit)
         self.assertFalse(form.is_valid())
 
-    @mock.patch('base.forms.learning_unit.learning_unit_create.LearningContainerYearModelForm.is_valid',
-                side_effect=lambda *args: False)
-    def test_update_case_wrong_learning_container_year_data(self, mock_is_valid):
+    def test_update_case_wrong_learning_container_year_data(self):
         form = _instanciate_form(self.learning_unit_year.academic_year, post_data=self.post_data,
                                  learning_unit_instance=self.learning_unit_year.learning_unit)
         self.assertFalse(form.is_valid())
@@ -612,15 +599,13 @@ class TestFullFormSave(LearningUnitFullFormContextMixin):
         self.assertEqual(learning_component_year.type, None)
 
     def _assert_correctly_create_records_in_all_learning_unit_structure(self, initial_counts):
-        # NUMBER_OF_POSTPONMENTS = 7
-        NUMBER_OF_ENTITIES_BY_CONTAINER = 2
-        NUMBER_OF_COMPONENTS = 2  # container_type == COURSE ==> 1 TP / 1 CM
+        number_of_components = 2  # container_type == COURSE ==> 1 TP / 1 CM
         self.assertEqual(self._count_records(LearningContainer), initial_counts[LearningContainer] + 1)
         self.assertEqual(self._count_records(LearningContainerYear), initial_counts[LearningContainerYear] + 1)
         self.assertEqual(self._count_records(LearningUnit), initial_counts[LearningUnit] + 1)
         self.assertEqual(self._count_records(LearningUnitYear), initial_counts[LearningUnitYear] + 1)
         self.assertEqual(self._count_records(LearningComponentYear),
-                         initial_counts[LearningComponentYear] + NUMBER_OF_COMPONENTS)
+                         initial_counts[LearningComponentYear] + number_of_components)
 
     @staticmethod
     def _count_records(model_class):

@@ -132,7 +132,7 @@
                     "dataSrc": "object_list",
                     "data": function(d) {
                         let pageNumber = {{ page_obj.number }};
-                        return getDataAjaxTable(domTable, d, pageNumber);
+                        return getDataAjaxTable("search_form", domTable, d, pageNumber);
                     },
                     "traditional": true
                 },

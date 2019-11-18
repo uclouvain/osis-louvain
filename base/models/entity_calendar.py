@@ -23,13 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.db import models
+from django.utils.translation import gettext as _
 
 from base.models import academic_calendar
 from base.models import entity_version
 from base.models.abstracts.abstract_calendar import AbstractCalendar
 from base.models.academic_year import starting_academic_year
+from base.models.enums import academic_calendar_type
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -47,6 +49,16 @@ class EntityCalendar(AbstractCalendar):
 
     def __str__(self):
         return "{} - {}".format(self.academic_calendar, self.entity)
+
+    def clean(self):
+        super().clean()
+        self._check_not_summary_course_submission()
+
+    def _check_not_summary_course_submission(self):
+        if self.academic_calendar.reference == academic_calendar_type.SUMMARY_COURSE_SUBMISSION:
+            raise ValidationError({
+                "academic_calendar": _('You cannot have a specific summary course submission event.')
+            })
 
 
 def find_by_entity_and_reference(entity_id, reference, academic_year=None):

@@ -49,7 +49,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums.groups import FACULTY_MANAGER_GROUP
 from base.models.group_element_year import GroupElementYear
-from base.views.common import display_success_messages, display_warning_messages
+from base.views.common import display_success_messages, display_warning_messages, show_error_message_for_form_invalid
 from base.views.education_groups.perms import can_change_education_group
 from program_management.forms.group_element_year import GroupElementYearFormset
 
@@ -203,8 +203,12 @@ def _update_group(request, education_group_year, root, groupelementyear_formset)
     # TODO :: IMPORTANT :: Need to update form to filter on list of parents, not only on the first direct parent
     form_education_group_year = GroupForm(request.POST or None, instance=education_group_year, user=request.user)
     html_page = "education_group/update_groups.html"
-    if form_education_group_year.is_valid() and groupelementyear_formset.is_valid():
-        return _common_success_redirect(request, form_education_group_year, root, groupelementyear_formset)
+
+    if request.method == 'POST':
+        if form_education_group_year.is_valid() and groupelementyear_formset.is_valid():
+            return _common_success_redirect(request, form_education_group_year, root, groupelementyear_formset)
+        else:
+            show_error_message_for_form_invalid(request)
 
     return render(request, html_page, {
         "education_group_year": education_group_year,
@@ -228,10 +232,13 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
             queryset=education_group_year.coorganizations
         )
         forms_valid = forms_valid and coorganization_formset.is_valid()
-    if forms_valid:
-        if has_coorganization(education_group_year):
-            coorganization_formset.save()
-        return _common_success_redirect(request, form_education_group_year, root, groupelementyear_formset)
+    if request.method == 'POST':
+        if forms_valid:
+            if has_coorganization(education_group_year):
+                coorganization_formset.save()
+            return _common_success_redirect(request, form_education_group_year, root, groupelementyear_formset)
+        else:
+            show_error_message_for_form_invalid(request)
 
     return render(request, "education_group/update_trainings.html", {
         "education_group_year": education_group_year,
@@ -275,8 +282,12 @@ def _update_mini_training(request, education_group_year, root, groupelementyear_
     # TODO :: IMPORTANT :: Fix urls patterns to get the GroupElementYear_id and the root_id in the url path !
     # TODO :: IMPORTANT :: Need to upodate form to filter on list of parents, not only on the first direct parent
     form = MiniTrainingForm(request.POST or None, instance=education_group_year, user=request.user)
-    if form.is_valid() and groupelementyear_formset.is_valid():
-        return _common_success_redirect(request, form, root, groupelementyear_formset)
+
+    if request.method == 'POST':
+        if form.is_valid() and groupelementyear_formset.is_valid():
+            return _common_success_redirect(request, form, root, groupelementyear_formset)
+        else:
+            show_error_message_for_form_invalid(request)
 
     return render(request, "education_group/update_minitrainings.html", {
         "form_education_group_year": form.forms[forms.ModelForm],

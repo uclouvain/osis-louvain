@@ -23,7 +23,7 @@
 # ############################################################################
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 from django.db import transaction, Error
-from django.db.models import Q
+from django.db.models import OuterRef, Exists
 from django.utils.translation import gettext as _
 
 from base.business.education_groups.create import create_initial_group_element_year_structure
@@ -50,11 +50,23 @@ class EducationGroupAutomaticPostponementToN6(AutomaticPostponementToN6):
     msg_result = _("%(number_extended)s education group(s) extended and %(number_error)s error(s)")
 
     def get_queryset(self, queryset=None):
+        mini_training_to_postpone = EducationGroupYear.objects.filter(
+            education_group=OuterRef("pk"),
+            education_group_type__name__in=MiniTrainingType.to_postpone()
+        )
+        training_to_postpone = EducationGroupYear.objects.filter(
+            education_group=OuterRef("pk"),
+            education_group_type__category=TRAINING
+        ).exclude(
+            acronym__icontains="11BA"
+        )
+        education_group_years_to_postpone = mini_training_to_postpone | training_to_postpone
         # We need to postpone only trainings and some mini trainings
-        return super().get_queryset(queryset).filter(
-            Q(educationgroupyear__education_group_type__category=TRAINING) |
-            Q(educationgroupyear__education_group_type__name__in=MiniTrainingType.to_postpone())
-        ).distinct()
+        return super().get_queryset(queryset).annotate(
+            to_postpone=Exists(education_group_years_to_postpone)
+        ).filter(
+            to_postpone=True
+        )
 
     def post_extend(self, original_object, list_postponed_objects):
         """ After the main postponement, we need to create the structure of the education_group_years """

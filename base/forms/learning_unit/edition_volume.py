@@ -38,7 +38,7 @@ from base.forms.utils.emptyfield import EmptyField
 from base.models.enums import entity_container_year_link_type as entity_types
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT, COMPONENT_TYPES
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITIES
-from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY, \
+from base.models.enums.learning_container_year_types import LCY_TYPES_WITH_FIXED_ACRONYM, \
     CONTAINER_TYPE_WITH_DEFAULT_COMPONENT
 from base.models.learning_component_year import LearningComponentYear
 from osis_common.forms.widgets import DecimalFormatInput
@@ -124,7 +124,7 @@ class VolumeEditionForm(forms.Form):
         if self.is_faculty_manager \
                 and self.learning_unit_year.is_full() \
                 and self.learning_unit_year.learning_container_year.container_type \
-                in LEARNING_CONTAINER_YEAR_TYPES_CANT_UPDATE_BY_FACULTY:
+                in LCY_TYPES_WITH_FIXED_ACRONYM:
             self._disable_central_manager_fields()
 
     def _disable_central_manager_fields(self):

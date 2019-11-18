@@ -250,13 +250,13 @@ class ManageMyCoursesMixin(TestCase):
         self.client.force_login(self.tutor.person.user)
 
 
-class TestManageMyCoursesTeachingMaterialsRedirection(ManageMyCoursesMixin):
+class TestManageMyCoursesTeachingMaterials(ManageMyCoursesMixin):
     def setUp(self):
         super().setUp()
         self.teaching_material = TeachingMaterialFactory(learning_unit_year=self.learning_unit_year)
 
     @patch('base.views.teaching_material.create_view')
-    def test_redirection_create_teaching_material(self, mock_create_view):
+    def test_call_view_create_teaching_material(self, mock_create_view):
         url = reverse('tutor_teaching_material_create', kwargs={'learning_unit_year_id': self.learning_unit_year.id})
         request = _prepare_request(url, self.tutor.person.user)
 
@@ -264,12 +264,10 @@ class TestManageMyCoursesTeachingMaterialsRedirection(ManageMyCoursesMixin):
         create_teaching_material(request, learning_unit_year_id=self.learning_unit_year.pk)
         self.assertTrue(mock_create_view.called)
 
-        expected_redirection = reverse(view_educational_information,
-                                       kwargs={'learning_unit_year_id': self.learning_unit_year.pk})
-        mock_create_view.assert_called_once_with(request, self.learning_unit_year.pk, expected_redirection)
+        mock_create_view.assert_called_once_with(request, self.learning_unit_year.pk)
 
     @patch('base.views.teaching_material.update_view')
-    def test_redirection_update_teaching_material(self, mock_update_view):
+    def test_call_view_update_teaching_material(self, mock_update_view):
         url = reverse('tutor_teaching_material_edit', kwargs={'learning_unit_year_id': self.learning_unit_year.id,
                                                               'teaching_material_id': self.teaching_material.id})
         request = _prepare_request(url, self.tutor.person.user)
@@ -281,13 +279,11 @@ class TestManageMyCoursesTeachingMaterialsRedirection(ManageMyCoursesMixin):
             teaching_material_id=self.teaching_material.id
         )
         self.assertTrue(mock_update_view.called)
-        expected_redirection = reverse(view_educational_information,
-                                       kwargs={'learning_unit_year_id': self.learning_unit_year.pk})
-        mock_update_view.assert_called_once_with(request, self.learning_unit_year.pk, self.teaching_material.id,
-                                                 expected_redirection)
+
+        mock_update_view.assert_called_once_with(request, self.learning_unit_year.pk, self.teaching_material.id)
 
     @patch('base.views.teaching_material.delete_view')
-    def test_redirection_delete_teaching_material(self, mock_delete_view):
+    def test_call_view_delete_teaching_material(self, mock_delete_view):
         url = reverse('tutor_teaching_material_delete', kwargs={'learning_unit_year_id': self.learning_unit_year.id,
                                                                 'teaching_material_id': self.teaching_material.id})
         request = _prepare_request(url, self.tutor.person.user)
@@ -300,10 +296,7 @@ class TestManageMyCoursesTeachingMaterialsRedirection(ManageMyCoursesMixin):
         )
         self.assertTrue(mock_delete_view.called)
 
-        expected_redirection = reverse(view_educational_information,
-                                       kwargs={'learning_unit_year_id': self.learning_unit_year.pk})
-        mock_delete_view.assert_called_once_with(request, self.learning_unit_year.pk, self.teaching_material.id,
-                                                 expected_redirection)
+        mock_delete_view.assert_called_once_with(request, self.learning_unit_year.pk, self.teaching_material.id)
 
 
 def _prepare_request(url, user):

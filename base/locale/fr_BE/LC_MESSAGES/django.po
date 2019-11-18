@@ -288,15 +288,6 @@ msgstr "Ajouter"
 msgid "Add another"
 msgstr "Ajouter un autre"
 
-msgid "Add attribution"
-msgstr "Ajouter attribution"
-
-msgid "Add current year teacher"
-msgstr "Ajouter enseignant année en cours"
-
-msgid "Add over the current year"
-msgstr "Ajouter sur l’année en cours"
-
 msgid "Add the English content of this paragraph"
 msgstr "Ajouter le contenu Anglais de ce paragraphe"
 
@@ -445,23 +436,11 @@ msgstr "Attrib. vol1"
 msgid "Attrib. vol2"
 msgstr "Attrib. vol2"
 
-#, python-format
-msgid "Attribution added for %(tutor)s (%(function)s)"
-msgstr "Attribution ajoutée pour %(tutor)s (%(function)s)"
-
 msgid "Attribution duration"
 msgstr "Durée attribution"
 
 msgid "Attribution entity"
 msgstr "Entité d'attribution"
-
-#, python-format
-msgid "Attribution modified for %(tutor)s (%(function)s)"
-msgstr "Attribution modifiée pour %(tutor)s (%(function)s)"
-
-#, python-format
-msgid "Attribution removed for %(tutor)s (%(function)s)"
-msgstr "Attribution supprimée pour %(tutor)s (%(function)s)"
 
 msgid "Attributions"
 msgstr "Attributions"
@@ -747,9 +726,6 @@ msgstr "Fiche descriptive"
 msgid "Description fiche status"
 msgstr "Statut des fiches descriptives"
 
-msgid "Description fiche submission dates updated"
-msgstr "Date de soumission des fiches descriptives mis à jour"
-
 msgid "Detach"
 msgstr "Détacher"
 
@@ -933,9 +909,6 @@ msgstr "Inscriptible"
 msgid "Enrollments to learning unit"
 msgstr "Inscriptions à l'UE"
 
-msgid "Enrollments to training"
-msgstr "Inscrits à la formation"
-
 #, python-format
 msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
@@ -960,6 +933,10 @@ msgstr "Entités de charges"
 
 msgid "Entity managers"
 msgstr "Gestionnaires d'entités"
+
+msgid "Error(s) in form: The modifications are not saved"
+msgstr ""
+"Erreur(s) dans le formulaire: Les modifications n'ont pas été enregistrées"
 
 msgid "Evaluations"
 msgstr "Évaluations"
@@ -1140,6 +1117,12 @@ msgstr "Matricule FGS"
 
 msgid "Go"
 msgstr "Continuer"
+
+msgid "Go down"
+msgstr "Descendre"
+
+msgid "Go up"
+msgstr "Monter"
 
 msgid "Graduates"
 msgstr "Diplômés"
@@ -1349,7 +1332,7 @@ msgstr ""
 "a> créée avec succès."
 
 msgid "Learning achievement content has been successfully saved"
-msgstr "Le contenu de l'unité d'enseignement a été mis à jour avec succès."
+msgstr "Le contenu de l'acquis d'apprentissage a été enregistré avec succès"
 
 msgid "Learning achievements"
 msgstr "Acquis d'apprentissage"
@@ -1495,9 +1478,6 @@ msgstr "Liste au choix Majeures"
 
 msgid "Male"
 msgstr "Masculin"
-
-msgid "Manage repartition"
-msgstr "Gérer la répartition"
 
 msgid "Manage volumes"
 msgstr "Gérer les volumes"
@@ -1823,8 +1803,7 @@ msgid "Operation"
 msgstr "Opération"
 
 msgid "Operation on learning achievement has been successfully completed"
-msgstr ""
-"Les opérations sur les acquis d'apprentissage ont été complétées avec succès"
+msgstr "Le traitement sur l'acquis d'apprentissage a été effectué avec succès"
 
 msgid "Option"
 msgstr "Option"
@@ -1885,6 +1864,9 @@ msgstr "P."
 
 msgid "Page not found."
 msgstr "Page inexistante."
+
+msgid "Parent"
+msgstr ""
 
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
@@ -1983,6 +1965,8 @@ msgid ""
 "Postponement will not be possible as the chosen code already exists for "
 "future academic years"
 msgstr ""
+"Le report ne sera pas possible car le code choisi existe déjà pour les "
+"années académiques futures"
 
 msgid "Practical exercises"
 msgstr "Partie pratique"
@@ -2234,14 +2218,6 @@ msgstr "Release"
 msgid "Remarks"
 msgstr "Remarques"
 
-#, python-format
-msgid "Repartition added for %(tutor)s (%(function)s)"
-msgstr "Répartition ajoutée pour %(tutor)s (%(function)s)"
-
-#, python-format
-msgid "Repartition modified for %(tutor)s (%(function)s)"
-msgstr "Répartition modifiée pour %(tutor)s (%(function)s)"
-
 msgid "Req. Entities"
 msgstr "Ent. charges"
 
@@ -2291,7 +2267,7 @@ msgid "Save and postpone"
 msgstr "Enregistrer et reporter"
 
 msgid "Save and postpone changes on next years"
-msgstr "Enregistrer et reporter les changements sur les années suivantes"
+msgstr "Enregistrer et reporter les changements sur les années futures"
 
 msgid "Schedule type"
 msgstr "Type horaire"
@@ -2476,6 +2452,14 @@ msgstr "Stage d’enseignement"
 msgid "Teaching material"
 msgstr "Supports de cours"
 
+#, python-format
+msgid ""
+"Teaching material has been saved and reported up to %(last_year_reported)s "
+"with success"
+msgstr ""
+"Le support de cours que vous avez modifié a été sauvegardé jusqu'en "
+"%(last_year_reported)s avec succès"
+
 msgid "Teaching profile"
 msgstr "Profil d'enseignement"
 
@@ -2496,7 +2480,7 @@ msgstr "Le"
 
 #, python-format
 msgid "The '%(field)s' field content has been successfully saved"
-msgstr "Le contenu du champ '%(field)s a été enregistré avec succès"
+msgstr "Le contenu du champ '%(field)s' a été enregistré avec succès"
 
 msgid "The acronym <b>already exists</b>."
 msgstr "L’acronyme <b>existe déjà</b>."
@@ -2722,6 +2706,17 @@ msgstr ""
 
 #, python-format
 msgid ""
+"The sections you modified have been saved and reported up to "
+"%(last_year_reported)s with success."
+msgstr ""
+"Les rubriques que vous avez modifiées ont été sauvegardées et reportées "
+"jusqu'en %(last_year_reported)s avec succès"
+
+msgid "The sections you modified have been saved with success."
+msgstr "Les rubriques que vous avez modifiées ont été sauvegardées avec succès"
+
+#, python-format
+msgid ""
 "The selected end year (%(partim_end_year)s) is greater than the end year of "
 "the parent %(lu_parent)s"
 msgstr ""
@@ -2739,11 +2734,17 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The sum of volumes for the partims for professor %(tutor)s is superior to "
-"the volume of parent learning unit for this professor"
+"The teaching material has been deleted up to %(last_year_reported)s with "
+"success"
 msgstr ""
-"La somme des volumes des partims pour le professeur %(tutor)s est supérieure "
-"au volume de l'unité d'apprentissage parent pour ce professeur"
+"Le support de cours a été supprimé jusqu'en %(last_year_reported)s avec "
+"succès"
+
+msgid "The teaching material has been deleted with success"
+msgstr "Le support de cours a été supprimé avec succès"
+
+msgid "The teaching material has been saved with success"
+msgstr "Le support de cours a été modifié avec succès"
 
 msgid "The user cannot modify data which are greater than N+1"
 msgstr "L’utilisateur ne peut pas modifier les données supérieures à N + 1"
@@ -2897,6 +2898,12 @@ msgstr "Intitulé propre au partim"
 msgid "To complete"
 msgstr "A compléter"
 
+msgid "Total"
+msgstr "Total"
+
+msgid "Total enrollments to training"
+msgstr "Total d'inscrits à la formation"
+
 msgid "Training"
 msgstr "Formation"
 
@@ -2927,9 +2934,6 @@ msgstr "Trimestre"
 msgid "Tutor"
 msgstr "Enseignant·e"
 
-msgid "Tutor for parent LU"
-msgstr "Enseignant·e UE parent"
-
 msgid "Tutors"
 msgstr "Enseignant·e·s"
 
@@ -2950,6 +2954,9 @@ msgstr "Bacheliers UCL"
 
 msgid "UCL Diploma"
 msgstr "Diplôme avec l'UCL"
+
+msgid "UE full"
+msgstr "UE complète"
 
 msgid "URL of the learning unit"
 msgstr "URL de l'unité d'enseignement"
@@ -3214,6 +3221,9 @@ msgstr ""
 "Vous ne pouvez pas supprimer une unité d'enseignement qui a des prérequis ou "
 "qui est prérequis."
 
+msgid "You cannot have a specific summary course submission event."
+msgstr ""
+
 msgid "You don't have the rights to consolidate"
 msgstr "Vous n'avez pas le droit de consolider"
 
@@ -3291,7 +3301,7 @@ msgstr "numéro de l'attendu"
 
 #, python-format
 msgid "and postponed until %(year)s"
-msgstr ""
+msgstr "et reporté jusque %(year)s"
 
 msgid "at"
 msgstr "à"

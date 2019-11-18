@@ -61,7 +61,7 @@
                     <form method="get" action="{% url 'scores_encoding' %}" id="form_search_scores_by_offer">
                         <div class="col-md-10">
                             <div class="form-group">
-                                <label>{% trans 'Offer' %}</label><br>
+                                <label>{% trans 'Training' %}</label><br>
                                 <select id="slt_offer_list_selection" name="offer" class="form-control">
                                     <option value="">{% trans 'All'%}</option>
                                     {% for offer_year in offer_year_list %}
@@ -142,7 +142,7 @@
                     </div>
                     <div role="tabpanel" class="tab-pane fade" id="tab_via_paper_{{forloop.counter0}}">
                         <br>
-                        <a class="btn btn-default"
+                        <a class="btn btn-default no_spinner"
                            href="{% url 'notes_printing_all' %}"
                            role="button" id="lnk_notes_printing_all_{{learning_unit_year.id}}">
                             <span class="glyphicon glyphicon-print" aria-hidden="true"></span> {% trans 'Print all courses' %}</a>
@@ -177,7 +177,7 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <a class="btn btn-default"
+                                    <a class="btn btn-default no_spinner"
                                        href="{% url 'notes_printing' note_detail.learning_unit_year_id %}"
                                        role="button" id="lnk_notes_printing_{{note_detail.learning_unit_year_id}}"
                                        data-toggle="tooltip" data-placement="right"
@@ -219,7 +219,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td><a class="btn btn-default"
+                                <td><a class="btn btn-default no_spinner"
                                        href="{% url 'scores_encoding_download' note_detail.learning_unit_year_id %}"
                                        role="button"
                                        id="lnk_scores_encoding_download_{{lu.id}}"

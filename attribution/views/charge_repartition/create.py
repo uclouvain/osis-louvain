@@ -27,19 +27,19 @@ from django.db.models import Prefetch
 from django.db.models.functions import Concat
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.views.generic.base import TemplateView
+from django.views.generic import TemplateView
 
+from attribution.forms.attributions import LecturingAttributionChargeForm, PracticalAttributionChargeForm
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
+from attribution.views.learning_unit.common import AttributionBaseViewMixin
+from attribution.views.learning_unit.update import UpdateAttributionView
 from base.business.learning_units import perms
-from base.forms.learning_unit.attribution_charge_repartition import LecturingAttributionChargeForm, \
-    PracticalAttributionChargeForm
 from base.models.enums import learning_component_year_type
-from base.views.learning_units.attribution import AttributionBaseViewMixin, EditAttributionView
 
 
 class SelectAttributionView(AttributionBaseViewMixin, TemplateView):
-    template_name = "learning_unit/select_attribution.html"
+    template_name = "attribution/charge_repartition/select_attribution.html"
 
     @cached_property
     def attributions(self):
@@ -73,23 +73,9 @@ class SelectAttributionView(AttributionBaseViewMixin, TemplateView):
         return context
 
 
-class EditChargeRepartition(EditAttributionView):
+class AddChargeRepartition(UpdateAttributionView):
     rules = [perms.is_eligible_to_manage_charge_repartition]
-    template_name = "learning_unit/add_charge_repartition_inner.html"
-    form_classes = {
-        "lecturing_charge_form": LecturingAttributionChargeForm,
-        "practical_charge_form": PracticalAttributionChargeForm
-    }
-
-    def get_success_message(self, forms):
-        return _("Repartition modified for %(tutor)s (%(function)s)") %\
-                        {"tutor": self.attribution.tutor.person,
-                         "function": _(self.attribution.get_function_display())}
-
-
-class AddChargeRepartition(EditAttributionView):
-    rules = [perms.is_eligible_to_manage_charge_repartition]
-    template_name = "learning_unit/add_charge_repartition_inner.html"
+    template_name = "attribution/charge_repartition/add_charge_repartition_inner.html"
     form_classes = {
         "lecturing_charge_form": LecturingAttributionChargeForm,
         "practical_charge_form": PracticalAttributionChargeForm

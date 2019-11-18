@@ -124,12 +124,7 @@ def login(request):
 
 @login_required
 def home(request):
-    academic_yr = mdl.academic_year.current_academic_year()
-    calendar_events = None
-    if academic_yr:
-        calendar_events = mdl.academic_calendar.find_academic_calendar_by_academic_year_with_dates(academic_yr.id)
     return render(request, "home.html", {
-        'academic_calendar': calendar_events,
         'highlights': mdl.academic_calendar.find_highlight_academic_calendar()
     })
 
@@ -257,3 +252,8 @@ def remove_from_session(request, session_key):
 def add_to_session(request, session_key, value):
     if session_key not in request.session:
         request.session[session_key] = value
+
+
+def show_error_message_for_form_invalid(request):
+    msg = _("Error(s) in form: The modifications are not saved")
+    display_error_messages(request, msg)

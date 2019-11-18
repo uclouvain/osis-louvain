@@ -378,5 +378,25 @@
         "groups": [],
         "users": []
     }
+},
+{
+    "model": "waffle.flag",
+    "pk": 21,
+    "fields": {
+        "name": "notifications_bell",
+        "everyone": false,
+        "percent": null,
+        "testing": false,
+        "superusers": false,
+        "staff": false,
+        "authenticated": false,
+        "languages": "",
+        "rollout": false,
+        "note": "Used in \"/base/templates/blocks/navbar_top.html\"",
+        "created": "2019-11-08T15:00:00",
+        "modified": "2019-11-08T15:00:00.000",
+        "groups": [],
+        "users": []
+    }
 }
 ]

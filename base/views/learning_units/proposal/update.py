@@ -36,7 +36,7 @@ from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, show_error_message_for_form_invalid
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_learning_unit_identification_context
 
@@ -76,15 +76,18 @@ def _update_or_create_proposal(request, learning_unit_year, proposal=None):
 
     proposal_base_form = ProposalBaseForm(request.POST or None, person, learning_unit_year, proposal)
 
-    if proposal_base_form.is_valid():
-        proposal = proposal_base_form.save()
-        display_success_messages(
-            request, _("You proposed a modification of type %(type)s for the learning unit %(acronym)s.") % {
-                'type': proposal.get_type_display(),
-                'acronym': learning_unit_year.acronym
-            }
-        )
-        return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
+    if request.method == 'POST':
+        if proposal_base_form.is_valid():
+            proposal = proposal_base_form.save()
+            display_success_messages(
+                request, _("You proposed a modification of type %(type)s for the learning unit %(acronym)s.") % {
+                    'type': proposal.get_type_display(),
+                    'acronym': learning_unit_year.acronym
+                }
+            )
+            return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
+        else:
+            show_error_message_for_form_invalid(request)
 
     context = proposal_base_form.get_context()
     if proposal:
@@ -104,20 +107,23 @@ def _update_or_create_suppression_proposal(request, learning_unit_year, proposal
     form_proposal = ProposalLearningUnitForm(request.POST or None, person=person, instance=proposal,
                                              initial=initial)
 
-    if form_end_date.is_valid() and form_proposal.is_valid():
-        with transaction.atomic():
-            form_proposal.save()
+    if request.method == 'POST':
+        if form_end_date.is_valid() and form_proposal.is_valid():
+            with transaction.atomic():
+                form_proposal.save()
 
-            # For the proposal, we do not update learning_unit_year
-            form_end_date.save(update_learning_unit_year=False)
+                # For the proposal, we do not update learning_unit_year
+                form_end_date.save(update_learning_unit_year=False)
 
-            display_success_messages(
-                request, _("You proposed a modification of type %(type)s for the learning unit %(acronym)s.") % {
-                    'type': ProposalType.SUPPRESSION.value, 'acronym': learning_unit_year.acronym
-                }
-            )
+                display_success_messages(
+                    request, _("You proposed a modification of type %(type)s for the learning unit %(acronym)s.") % {
+                        'type': ProposalType.SUPPRESSION.value, 'acronym': learning_unit_year.acronym
+                    }
+                )
 
-        return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
+            return redirect('learning_unit', learning_unit_year_id=learning_unit_year.id)
+        else:
+            show_error_message_for_form_invalid(request)
 
     context = get_learning_unit_identification_context(learning_unit_year.id, person)
     context.update({

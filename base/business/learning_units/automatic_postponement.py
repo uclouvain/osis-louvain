@@ -21,12 +21,13 @@
 #  at the root of the source code of this program.  If not,                                        #
 #  see http://www.gnu.org/licenses/.                                                               #
 # ##################################################################################################
-from django.db.models import Q
+from django.db.models import Exists, OuterRef
 from django.utils.translation import gettext as _
 
 from base.business.learning_units.edition import duplicate_learning_unit_year
 from base.business.utils.postponement import AutomaticPostponementToN6
 from base.models.learning_unit import LearningUnit
+from base.models.learning_unit_year import LearningUnitYear
 from base.utils.send_mail import send_mail_before_annual_procedure_of_automatic_postponement_of_luy, \
     send_mail_after_annual_procedure_of_automatic_postponement_of_luy
 
@@ -41,11 +42,18 @@ class LearningUnitAutomaticPostponementToN6(AutomaticPostponementToN6):
     msg_result = _("%(number_extended)s learning unit(s) extended and %(number_error)s error(s)")
 
     def get_queryset(self, queryset=None):
-        return super().get_queryset(queryset).filter(
-            # Ignoring classes - FIXME :: remove this when classes are in separate Model
-            learningunityear__learning_container_year__isnull=False
+        learning_unit_year_with_containers = LearningUnitYear.objects.filter(
+            learning_unit=OuterRef("pk"),
+            learning_container_year__isnull=False
+        )
+        external_learning_unit_year_that_are_not_mobility = LearningUnitYear.objects.filter(
+            learning_unit=OuterRef("pk"),
+            externallearningunityear__mobility=True
+        )
+        return super().get_queryset(queryset).annotate(
+            has_container=Exists(learning_unit_year_with_containers),
+            is_mobility=Exists(external_learning_unit_year_that_are_not_mobility)
         ).filter(
-            # Ignoring external learning units of "mobility" (too much dirty data - to clean into EPC)
-            Q(learningunityear__externallearningunityear__mobility=False)
-            | Q(learningunityear__externallearningunityear__isnull=True)
-        ).distinct()
+         has_container=True,
+         is_mobility=False
+        )

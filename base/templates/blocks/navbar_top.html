@@ -1,4 +1,5 @@
 {% load i18n static perms %}
+{% load waffle_tags %}
 
 <nav class="navbar navbar-default navbar-fixed-top  justify-content-start flex-nowrap">
     <div class="container-fluid ">
@@ -193,18 +194,6 @@
                 </ul>
             {% endif %}
             <ul class="nav navbar-nav navbar-right" id="">
-                <li>
-                    {% if request.session.quick_search_model == 'LearningUnitYear' %}
-                        {% url 'quick_search_learning_unit' as quick_search_url %}
-                    {% else %}
-                        {% url 'quick_search_education_group' as quick_search_url %}
-                    {% endif %}
-                    <a class="trigger_modal" id="quick-search" data-url="{{ quick_search_url }}"
-                       data-modal_class="modal-lg" title="{% trans 'Search' %}">
-                        <i class="fa fa-search"></i>
-                        <span class="visible-xs-inline">{% trans 'Search' %}</span>
-                    </a>
-                </li>
                 {% if request.user.is_authenticated %}
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button"
@@ -253,9 +242,11 @@
                             </li>
                         </ul>
                     </li>
+                    {% flag "notifications_bell" %}
                     <li>
                         {% include "blocks/notifications.html" %}
                     </li>
+                    {% endflag %}
                     <li>
                         <a href="{{ user_manual.global }}" role="button" id="bt_help" title="{% trans 'Help' %}">
                             <span class="glyphicon glyphicon-question-sign"></span>

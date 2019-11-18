@@ -33,7 +33,7 @@
             <tr>
                 <th>{% trans 'Tutors' %}</th>
                 <th>{% trans 'Function' %}</th>
-                {% if not learning_unit_year.is_for_faculty_or_partim %}
+                {% if learning_unit_year.learning_container_year.container_type == "COURSE" and not learning_unit_year.is_partim %}
                     <th>{% trans 'Start' %}</th>
                     <th>{% trans 'Duration' %}</th>
                 {% endif %}
@@ -52,7 +52,7 @@
                 <tr>
                     <td>{{ attribution.tutor.person }}</td>
                     <td>{{ attribution.get_function_display }}</td>
-                    {% if not learning_unit_year.is_for_faculty_or_partim %}
+                    {% if learning_unit_year.learning_container_year.container_type == "COURSE" and not learning_unit_year.is_partim %}
                         <td>{{ attribution.start_year | default_if_none:'' }}</td>
                         <td>{{ attribution.duration | default_if_none:'' }}</td>
                     {% endif %}
@@ -93,10 +93,10 @@
                role="button" id="manage_repartition"
                data-url="{% url "add_attribution" learning_unit_year.id %}"
                data-modal_class="modal-lg">
-                {% if learning_unit_year.learning_container_year.is_type_for_faculty %}
-                    {% trans "Add current year teacher" %}
-                {% else %}
+                {% if learning_unit_year.learning_container_year.container_type == "COURSE" %}
                     {% trans "Add attribution" %}
+                {% else %}
+                    {% trans "Add current year teacher" %}
                 {% endif %}
             </a>
         {% endif %}

@@ -60,6 +60,8 @@ INTRODUCTION = 'intro'
 CONTACTS = 'contacts'
 CONTACT_INTRO = 'contact_intro'
 ADMISSION_CONDITION = 'conditions_admission'
+CAREER_DEVELOPMENT = 'career_development'
+TUITION_FEES = 'tuition_fees'
 
 Section = namedtuple('Section', 'title labels')
 
@@ -100,12 +102,14 @@ SECTION_LIST = [
                 PEDAGOGY,
                 EVALUATION,
                 MOBILITY,
+                CAREER_DEVELOPMENT,
                 FURTHER_TRAININGS,
                 CERTIFICATES,
             ]),
     Section(title=_('In practice'),
             labels=[
                 PRACTICAL_INFO,
+                TUITION_FEES,
                 CONTACT_INTRO,
             ]),
 ]
@@ -157,9 +161,11 @@ SECTIONS_PER_OFFER_TYPE = {
             ACCESS_TO_PROFESSIONS,
             PEDAGOGY,
             EVALUATION,
+            CAREER_DEVELOPMENT,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             CONTACTS,
+            TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
@@ -178,9 +184,11 @@ SECTIONS_PER_OFFER_TYPE = {
             ACCESS_TO_PROFESSIONS,
             PEDAGOGY,
             EVALUATION,
+            CAREER_DEVELOPMENT,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             CONTACTS,
+            TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
@@ -199,9 +207,11 @@ SECTIONS_PER_OFFER_TYPE = {
             ACCESS_TO_PROFESSIONS,
             PEDAGOGY,
             EVALUATION,
+            CAREER_DEVELOPMENT,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             CONTACTS,
+            TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
@@ -277,9 +287,11 @@ SECTIONS_PER_OFFER_TYPE = {
             ACCESS_TO_PROFESSIONS,
             PEDAGOGY,
             EVALUATION,
+            CAREER_DEVELOPMENT,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             CONTACTS,
+            TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,
@@ -299,9 +311,11 @@ SECTIONS_PER_OFFER_TYPE = {
             ACCESS_TO_PROFESSIONS,
             PEDAGOGY,
             EVALUATION,
+            CAREER_DEVELOPMENT,
             FURTHER_TRAININGS,
             PRACTICAL_INFO,
             CONTACTS,
+            TUITION_FEES,
             CONTACT_INTRO,
             SKILLS_AND_ACHIEVEMENTS,
             ADMISSION_CONDITION,

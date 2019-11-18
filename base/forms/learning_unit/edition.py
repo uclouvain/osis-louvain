@@ -26,7 +26,7 @@
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from base.business.learning_units.edition import filter_biennial, edit_learning_unit_end_date
+from base.business.learning_units.edition import edit_learning_unit_end_date
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
 from base.models import academic_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
@@ -49,10 +49,7 @@ class LearningUnitEndDateForm(forms.Form):
         self._set_initial_value(end_year)
 
         try:
-            queryset = self._get_academic_years(max_year)
-
-            periodicity = self.learning_unit_year.periodicity
-            self.fields['academic_year'].queryset = filter_biennial(queryset, periodicity)
+            self.fields['academic_year'].queryset = self._get_academic_years(max_year)
         except ValueError:
             self.fields['academic_year'].disabled = True
 

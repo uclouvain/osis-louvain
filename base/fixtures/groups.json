@@ -1903,11 +1903,6 @@
                 "scoresencoding"
             ],
             [
-                "can_access_academic_calendar",
-                "base",
-                "academiccalendar"
-            ],
-            [
                 "can_access_academicyear",
                 "base",
                 "academicyear"
@@ -3625,6 +3620,39 @@
                     "can_read_persons_roles",
                     "base",
                     "person"
+                ],
+                [
+                    "can_access_academicyear",
+                    "base",
+                    "academicyear"
+                ],
+                [
+                    "can_access_academic_calendar",
+                    "base",
+                    "academiccalendar"
+                ]
+            ]
+        }
+    },
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "student_update_UE_AA",
+            "permissions": [
+                [
+                    "can_access_learningunit",
+                    "base",
+                    "learningunit"
+                ],
+                [
+                    "can_edit_learningunit_pedagogy",
+                    "base",
+                    "learningunit"
+                ],
+                [
+                    "can_edit_learningunit_specification",
+                    "base",
+                    "learningunit"
                 ]
             ]
         }

@@ -58,7 +58,7 @@
             </div>
             <div class="row">
                 <div class="col-md-3">
-                    <label>{% trans 'Offer' %} {{ offer_sel }}</label><br>
+                    <label>{% trans 'Training' %} {{ offer_sel }}</label><br>
                     <select id="slt_offer_list_selection" name="offer" class="form-control">
                         <option value="">{% trans 'All'%}</option>
                         {% for o in offer_list %}
@@ -275,7 +275,7 @@
                         </div>
                     </td>
                     <td>
-                        <a class="btn btn-default"
+                        <a class="btn btn-default no_spinner"
                            href="{% url 'scores_encoding_download' note_detail.learning_unit_year_id %}"
                            role="button"
                            id="lnk_scores_encoding_download_{{note_detail.learning_unit_year_id}}"
@@ -290,7 +290,7 @@
         </div>
                 <div role="tabpanel" class="tab-pane fade" id="tab_via_paper">
             <br>
-            <a class="btn btn-default {% if not tutor_id or tutor_id == -1 %}disabled{%endif%}"
+            <a class="btn btn-default no_spinner {% if not tutor_id or tutor_id == -1 %}disabled{%endif%}"
                href="{%if tutor_id and tutor_id != -1 and offer_year_id %}
                         {% url 'notes_printing_all' tutor_id=tutor_id offer_id=offer_year_id %}
                      {%else%}
@@ -362,7 +362,7 @@
                         </div>
                     </td>
                     <td>
-                        <a class="btn btn-default"
+                        <a class="btn btn-default no_spinner"
                            href="{% url 'notes_printing' note_detail.learning_unit_year_id%}"
                            role="button" id="lnk_notes_printing_{{note_detail.learning_unit_year_id}}"
                            data-toggle="tooltip" data-placement="right"

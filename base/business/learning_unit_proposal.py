@@ -37,7 +37,8 @@ from base.business import learning_unit_year_with_context
 from base.business.learning_unit import compose_components_dict
 from base.business.learning_unit_year_with_context import volume_from_initial_learning_component_year
 from base.business.learning_units import perms
-from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report
+from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report, \
+    update_partim_acronym
 from base.business.learning_units.simple import deletion as business_deletion
 from base.models import campus
 from base.models.academic_year import find_academic_year_by_year
@@ -346,6 +347,7 @@ def _consolidate_suppression_proposal_accepted(proposal):
 
 
 def _consolidate_modification_proposal_accepted(proposal):
+    update_partim_acronym(proposal.learning_unit_year.acronym, proposal.learning_unit_year)
     next_luy = proposal.learning_unit_year.get_learning_unit_next_year()
     if next_luy:
         fields_to_update = {}

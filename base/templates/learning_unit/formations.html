@@ -40,12 +40,12 @@
                             <table class="table">
                                 <thead>
                                 <tr>
-                                <th>{% trans 'Code' %}</th>
-                                <th>{% trans 'Title' %}</th>
-                                <th>{% trans "Training type" %}</th>
-                                <th>{% trans 'Block' %}</th>
-                                <th>{% trans 'Trainings' %}</th>
-                                <th class="text-nowrap text-center">{% trans 'Relative / Absolute <br>credits' %}</th>
+                                    <th>{% trans 'Code' %}</th>
+                                    <th>{% trans 'Title' %}</th>
+                                    <th>{% trans "Training type" %}</th>
+                                    <th>{% trans 'Block' %}</th>
+                                    <th>{% trans 'Trainings' %}</th>
+                                    <th class="text-nowrap text-center">{% trans 'Relative / Absolute <br>credits' %}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -65,16 +65,19 @@
                                                 {% for training in formations_by_educ_group_year|get_item:group_element_year.parent_id %}
                                                     {% url 'education_group_read' training.id training.id as url_education_group_yr %}
                                                     <li>
-                                                        <a href="{{ url_education_group_yr }}">{{ training.acronym }} - {{ training.title }}</a>
+                                                        <a href="{{ url_education_group_yr }}">{{ training.acronym }}
+                                                            - {{ training.title }}</a>
                                                         {% if formations_by_educ_group_year|get_item:training.id %}
-                                                            <ul><li>
-                                                                {% trans 'Included in' %} :
-                                                                {% for parent_training in formations_by_educ_group_year|get_item:training.id %}
-                                                                    {% url 'education_group_read' parent_training.id parent_training.id as url_parent_training %}
-                                                                    <a href="{{ url_parent_training }}">{{ parent_training.acronym }}</a>
-                                                                    {% if not forloop.last %} - {% endif %}
-                                                                {% endfor %}
-                                                            </li></ul>
+                                                            <ul>
+                                                                <li>
+                                                                    {% trans 'Included in' %} :
+                                                                    {% for parent_training in formations_by_educ_group_year|get_item:training.id %}
+                                                                        {% url 'education_group_read' parent_training.id parent_training.id as url_parent_training %}
+                                                                        <a href="{{ url_parent_training }}">{{ parent_training.acronym }}</a>
+                                                                        {% if not forloop.last %} - {% endif %}
+                                                                    {% endfor %}
+                                                                </li>
+                                                            </ul>
                                                         {% endif %}
                                                     </li>
                                                 {% endfor %}
@@ -110,8 +113,8 @@
                                 <thead>
                                 <tr>
                                     <th>{% trans 'Training' %}</th>
-                                    <th>{% trans 'Enrollments to training' %}</th>
                                     <th>{% trans 'Enrolled to learning unit' %}</th>
+                                    <th>{% trans 'Total enrollments to training' %}</th>
                                 </tr>
                                 </thead>
                                 <tbody>
@@ -123,10 +126,15 @@
                                                 {{ education_group_year.acronym }}
                                             </a>
                                         </td>
-                                        <td>{{ education_group_year.count_formation_enrollments }}</td>
                                         <td>{{ education_group_year.count_learning_unit_enrollments }}</td>
+                                        <td>{{ education_group_year.count_formation_enrollments }}</td>
                                     </tr>
                                 {% endfor %}
+                                <tr>
+                                    <td><strong>{% trans 'Total' %}</strong></td>
+                                    <td><strong>{{ total_learning_unit_enrollments }}</strong></td>
+                                    <td><strong>{{ total_formation_enrollments }}</strong></td>
+                                </tr>
                                 </tbody>
                             </table>
                         </div>

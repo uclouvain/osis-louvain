@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ from base.enums.component_detail import VOLUME_TOTAL, VOLUME_Q1, VOLUME_Q2, VOLU
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_subtypes
-from base.models.enums.component_type import COMPONENT_TYPES, LECTURING
+from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.learning_component_year import LearningComponentYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
@@ -407,7 +407,8 @@ class LearningUnitEditionTestCase(TestCase):
                                   {
                                       'field': COMPONENT_DETAILS[test.get('field')].lower(),
                                       'acronym': another_learning_container_year.acronym,
-                                      'component_type': _(dict(COMPONENT_TYPES)[LECTURING]),
+                                      'component_type': _(
+                                          dict(COMPONENT_TYPES)[learning_component_year_type.LECTURING]),
                                       'year': self.learning_container_year.academic_year,
                                       'value': test.get('value'),
                                       'next_year': another_learning_container_year.academic_year,

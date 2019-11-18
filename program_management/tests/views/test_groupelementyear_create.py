@@ -23,10 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import json
 from unittest import mock
 
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.models.enums.link_type import LinkTypes
@@ -36,6 +38,49 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory,
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.utils.cache import cache, ElementCache
+from program_management.business.group_element_years.management import EDUCATION_GROUP_YEAR
+
+
+@override_flag('education_group_update', active=True)
+class TestAttachCheckView(TestCase):
+    def setUp(self):
+        self.egy = EducationGroupYearFactory()
+        self.next_academic_year = AcademicYearFactory(current=True)
+        self.group_element_year = GroupElementYearFactory(parent__academic_year=self.next_academic_year)
+        self.selected_egy = EducationGroupYearFactory(
+            academic_year=self.next_academic_year
+        )
+
+        self.url = reverse("check_education_group_attach", args=[self.egy.id, self.egy.id])
+
+        self.person = PersonFactory()
+
+        self.client.force_login(self.person.user)
+        self.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
+                                       return_value=True)
+        self.mocked_perm = self.perm_patcher.start()
+
+        self.addCleanup(self.perm_patcher.stop)
+        self.addCleanup(cache.clear)
+
+    def test_when_no_element_selected(self):
+        response = self.client.get(self.url)
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {"error_messages": [_("Please select an item before attach it")]}
+        )
+
+    def test_when_all_parameters_not_set(self):
+        response = self.client.get(self.url, data={"id": self.egy.id, "content_type": ""})
+        self.assertJSONEqual(
+            str(response.content, encoding='utf8'),
+            {"error_messages": [_("Please select an item before attach it")]}
+        )
+
+    def test_when_element_selected_and_error(self):
+        response = self.client.get(self.url, data={"id": self.egy.id, "content_type": EDUCATION_GROUP_YEAR})
+        data = json.loads(response.content.decode('utf-8'))
+        self.assertEqual(len(data), 1)
 
 
 @override_flag('education_group_update', active=True)

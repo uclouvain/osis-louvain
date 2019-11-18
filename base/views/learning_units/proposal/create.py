@@ -32,7 +32,7 @@ from waffle.decorators import waffle_flag
 from base.forms.learning_unit_proposal import CreationProposalBaseForm
 from base.models.academic_year import AcademicYear
 from base.models.person import Person
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, show_error_message_for_form_invalid
 
 
 @waffle_flag('learning_unit_proposal_create')
@@ -40,19 +40,23 @@ from base.views.common import display_success_messages
 @permission_required('base.can_propose_learningunit', raise_exception=True)
 def get_proposal_learning_unit_creation_form(request, academic_year):
     person = get_object_or_404(Person, user=request.user)
-    academic_year_pk = request.POST.get('academic_year', academic_year) if person.is_faculty_manager else academic_year
+    academic_year_pk = request.POST.get('academic_year', academic_year)
     academic_year = get_object_or_404(AcademicYear, pk=academic_year_pk)
 
     proposal_form = CreationProposalBaseForm(request.POST or None, person, academic_year)
-    if proposal_form.is_valid():
-        proposal = proposal_form.save()
-        success_msg = _(
-            "Proposal learning unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfuly created.") % {
-                'link': reverse("learning_unit", kwargs={'learning_unit_year_id': proposal.learning_unit_year.id}),
-                'acronym': proposal.learning_unit_year.acronym,
-                'academic_year': proposal.learning_unit_year.academic_year
-            }
-        display_success_messages(request, success_msg, extra_tags='safe')
-        return redirect('learning_unit', learning_unit_year_id=proposal.learning_unit_year.pk)
+    if request.method == 'POST':
+        if proposal_form.is_valid():
+            proposal = proposal_form.save()
+            success_msg = _(
+                "Proposal learning unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfuly created.")\
+                % {
+                    'link': reverse("learning_unit", kwargs={'learning_unit_year_id': proposal.learning_unit_year.id}),
+                    'acronym': proposal.learning_unit_year.acronym,
+                    'academic_year': proposal.learning_unit_year.academic_year
+                }
+            display_success_messages(request, success_msg, extra_tags='safe')
+            return redirect('learning_unit', learning_unit_year_id=proposal.learning_unit_year.pk)
+        else:
+            show_error_message_for_form_invalid(request)
 
     return render(request, "learning_unit/proposal/creation.html", proposal_form.get_context())

@@ -45,7 +45,7 @@ from base.models.enums import education_group_categories
 from base.models.exceptions import ValidationWarning
 from base.models.utils.utils import get_object_or_none
 from base.utils.cache import RequestCache
-from base.views.common import display_success_messages
+from base.views.common import display_success_messages, show_error_message_for_form_invalid
 from base.views.education_groups.perms import can_create_education_group
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.decorators.ajax import ajax_required
@@ -111,8 +111,11 @@ def create_education_group(request, category, education_group_type_pk, root_id=N
         initial={'academic_year': initial_academic_year}
     )
 
-    if form_education_group_year.is_valid():
-        return _common_success_redirect(request, form_education_group_year, root_id)
+    if request.method == 'POST':
+        if form_education_group_year.is_valid():
+            return _common_success_redirect(request, form_education_group_year, root_id)
+        else:
+            show_error_message_for_form_invalid(request)
 
     data = {
         "form_education_group_year": form_education_group_year.forms[forms.ModelForm],

@@ -131,16 +131,6 @@ def find_highlight_academic_calendar():
         .order_by('end_date')
 
 
-def find_academic_calendar_by_academic_year_with_dates(academic_year_id):
-    now = timezone.now()
-    return AcademicCalendar.objects.filter(academic_year=academic_year_id,
-                                           start_date__isnull=False,
-                                           end_date__isnull=False) \
-                                   .filter(models.Q(start_date__lte=now, end_date__gte=now) |
-                                           models.Q(start_date__gte=now, end_date__gte=now)) \
-                                   .order_by('start_date')
-
-
 def get_by_reference_and_academic_year(a_reference, an_academic_year):
     return get_object_or_none(AcademicCalendar, reference=a_reference, academic_year=an_academic_year)
 

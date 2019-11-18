@@ -29,7 +29,6 @@
 {% url 'learning_unit_components' learning_unit_year_id=learning_unit_year.id as url_components %}
 {% url 'learning_unit_pedagogy' learning_unit_year_id=learning_unit_year.id as url_pedagogy %}
 {% url 'learning_unit_attributions' learning_unit_year_id=learning_unit_year.id as url_attributions %}
-{% url 'select_attribution' learning_unit_year_id=learning_unit_year.id as url_select_attributions %}
 {% url 'learning_unit_specifications' learning_unit_year_id=learning_unit_year.id as url_specifications %}
 
 {% if learning_unit_year.is_external_mobility %}
@@ -76,11 +75,15 @@
                 {% trans 'Utilizations' %}
             </a>
         </li>
+
+        {% if "attribution" in installed_apps %}
+        {% url 'select_attribution' learning_unit_year_id=learning_unit_year.id as url_select_attributions %}
         <li role="presentation" {% if request.path == url_attributions or request.path == url_select_attributions %}
             class="active" {% endif %}>
             <a id="attributions_link" href="{% url 'learning_unit_attributions' learning_unit_year.id %}" role="tab">
                 {% trans 'Tutors' %}
             </a>
         </li>
+        {% endif %}
     </ul>
 {% endif %}

@@ -193,8 +193,8 @@ function collapseWarnings() {
 }
 
 
-function getDataAjaxTable(domTable, d, pageNumber) {
-    let formdata = $('#search_form').serializeArray();
+function getDataAjaxTable(formId, domTable, d, pageNumber) {
+    let formdata = $('#' + formId).serializeArray();
     let queryString = {};
     $(formdata).each(function(index, obj){
         if (!queryString.hasOwnProperty(obj.name)){

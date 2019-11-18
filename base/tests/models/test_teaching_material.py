@@ -25,7 +25,8 @@
 ##############################################################################
 from django.test import TestCase
 
-from base.models.teaching_material import postpone_teaching_materials, TeachingMaterial, find_by_learning_unit_year
+from base.business.learning_units.pedagogy import postpone_teaching_materials
+from base.models.teaching_material import TeachingMaterial, find_by_learning_unit_year
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.learning_container import LearningContainerFactory

@@ -102,27 +102,6 @@
         <br>
     </div>
 </div>
-{% if request.user.is_authenticated %}
-  {% if academic_calendar|length > 0%}
-  <div class="panel panel-default">
-      <div class="panel-heading"><h3 class="panel-title">{% trans 'Academic calendar'%}</h3></div>
-      <div class="panel-body">
-        <dl>
-          {% for academic_event in academic_calendar %}
-            {% ifchanged academic_event.start_date|date:"M" %}
-              <dt>{{ academic_event.start_date|date:"F Y" }}</dt>
-            {% endifchanged %}
-            <dd>{{ academic_event.start_date| default_if_none:''|date:"d/m/Y" }} -
-                {{ academic_event.end_date| default_if_none:''|date:"d/m/Y" }} :
-                <a href="{% url 'academic_calendar_read' academic_calendar_id=academic_event.id %}"
-                   id="lnk_academic_calendar_edit_{{academic_event.id}}">{% trans academic_event.title %}</a></dd>
-            <br>
-          {% endfor %}
-        </dl>
-      </div>
-  </div>
-  {%endif%}
-{%endif%}
 {% endblock %}
 
 {% block script %}

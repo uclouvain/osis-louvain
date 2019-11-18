@@ -1,7 +1,7 @@
-function initializeDataTable(tableId, storageKey, pageNumber, itemsPerPage, ajaxUrl, columnDefs){
+function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPage, ajaxUrl, columnDefs){
     setEventKeepIds(tableId, storageKey);
     let domTable = $('#' + tableId);
-    domTable.DataTable(
+    return domTable.DataTable(
     {
         'createdRow': function (row, data, dataIndex) {
             let url = "";
@@ -25,7 +25,7 @@ function initializeDataTable(tableId, storageKey, pageNumber, itemsPerPage, ajax
             "type": "GET",
             "dataSrc": "object_list",
             "data": function (d){
-                let querystring = getDataAjaxTable(domTable, d, pageNumber);
+                let querystring = getDataAjaxTable(formId, domTable, d, pageNumber);
                 querystring["paginator_size"] = itemsPerPage;
                 return querystring;
             },

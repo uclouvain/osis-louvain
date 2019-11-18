@@ -47,9 +47,6 @@ from base.views import learning_unit, offer, common, institution, organization, 
     my_osis, entity, student, notifications
 from base.views import teaching_material
 from base.views.filter import filter_cities_by_country, filter_campus_by_city
-from base.views.learning_units.attribution import DeleteAttribution, EditAttributionView, AddAttribution
-from base.views.learning_units.charge_repartition import AddChargeRepartition, \
-    EditChargeRepartition, SelectAttributionView
 from base.views.learning_units.detail import DetailLearningUnitYearView
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
@@ -58,7 +55,6 @@ from base.views.learning_units.proposal import create, update
 from base.views.learning_units.update import update_learning_unit, learning_unit_edition_end_date
 from base.views.organization import OrganizationAutocomplete, CountryAutocomplete, CampusAutocomplete
 from base.views.person import EmployeeAutocomplete
-from base.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
 urlpatterns = [
     url(r'^$', common.home, name='home'),
@@ -179,22 +175,6 @@ urlpatterns = [
                 url(r'^toggle_summary_locked/$', toggle_summary_locked,
                     name="learning_unit_pedagogy_toggle_summary_locked")
             ])),
-            url(r'^attributions/', include([
-                url(r'^$', learning_unit.learning_unit_attributions, name="learning_unit_attributions"),
-                url(r'^select/$', SelectAttributionView.as_view(), name="select_attribution"),
-                url(r'^update/(?P<attribution_id>[0-9]+)/$', EditAttributionView.as_view(),
-                    name="update_attribution"),
-                url(r'^create/$', AddAttribution.as_view(),
-                    name="add_attribution"),
-                url(r'^remove/(?P<attribution_id>[0-9]+)/$', DeleteAttribution.as_view(),
-                    name="remove_attribution"),
-                url(r'^charge_repartition/', include([
-                    url(r'^add/(?P<attribution_id>[0-9]+)/$', AddChargeRepartition.as_view(),
-                        name="add_charge_repartition"),
-                    url(r'^edit/(?P<attribution_id>[0-9]+)/$', EditChargeRepartition.as_view(),
-                        name="edit_charge_repartition"),
-                ])),
-            ])),
             url(r'^proposal/', include([
                 url(r'^modification/$', update.learning_unit_modification_proposal,
                     name="learning_unit_modification_proposal"),
@@ -314,9 +294,7 @@ urlpatterns = [
         url(r'^clear/$', base.views.notifications.clear_user_notifications, name="clear_notifications"),
         url(r'^mark_as_read/$', base.views.notifications.mark_notifications_as_read, name="mark_notifications_as_read"),
     ])),
-    url(r'^quick_search_learning_unit/$', QuickSearchLearningUnitYearView.as_view(), name="quick_search_learning_unit"),
-    url(r'^quick_search_education_group/$', QuickSearchEducationGroupYearView.as_view(),
-        name="quick_search_education_group"),
+
 ]
 
 if settings.DEBUG:

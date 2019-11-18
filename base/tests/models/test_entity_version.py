@@ -36,7 +36,7 @@ from base.models.entity_version import build_current_entity_version_structure_in
     find_parent_of_type_into_entity_structure, get_structure_of_entity_version, \
     get_entity_version_parent_or_itself_from_type
 from base.models.enums import organization_type
-from base.models.enums.entity_type import FACULTY, SCHOOL
+from base.models.enums.entity_type import FACULTY, SCHOOL, INSTITUTE
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -259,9 +259,8 @@ class EntityVersionTest(TestCase):
         self.assertEqual(entity_v.entity, result)
 
     def test_find_parent_of_type_first_parent(self):
-        entity = EntityFactory()
-        EntityVersionFactory(entity=entity, entity_type=FACULTY)
-        entity_v = EntityVersionFactory(parent=entity)
+        parent_version = EntityVersionFactory(entity_type=FACULTY)
+        entity_v = EntityVersionFactory(parent=parent_version.entity, entity_type=INSTITUTE)
         result = find_parent_of_type_into_entity_structure(
             entity_v,
             build_current_entity_version_structure_in_memory(timezone.now().date()),

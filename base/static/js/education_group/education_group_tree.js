@@ -207,6 +207,11 @@ $(document).ready(function () {
 
                                 });
                             },
+                            "_disabled": function (data) {
+                                let __ret = get_data_from_tree(data);
+                                // if no search url should be disabled
+                                return __ret.search_url == null;
+                            }
                         },
                     };
                 }

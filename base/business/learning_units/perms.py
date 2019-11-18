@@ -293,10 +293,9 @@ def is_eligible_to_manage_charge_repartition(learning_unit_year, person):
 
 
 def is_eligible_to_manage_attributions(learning_unit_year, person):
-    container_types = (learning_container_year_types.OTHER_COLLECTIVE, learning_container_year_types.OTHER_INDIVIDUAL,
-                       learning_container_year_types.MASTER_THESIS, learning_container_year_types.INTERNSHIP)
+    luy_container_type = learning_unit_year.learning_container_year.container_type
     return person.user.has_perm("base.can_manage_attribution") and \
-        learning_unit_year.learning_container_year.container_type in container_types and \
+        luy_container_type in learning_container_year_types.TYPE_ALLOWED_FOR_ATTRIBUTIONS and \
         person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year)
 
 

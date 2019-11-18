@@ -69,7 +69,7 @@ class LearningUnitSerializer(LearningUnitTitleSerializer):
     academic_year = serializers.IntegerField(source='academic_year.year')
 
     type = serializers.CharField(source='learning_container_year.container_type')
-    type_text = serializers.CharField(source='learning_container_year.get_container_type_display', read_only=True)
+    type_text = serializers.CharField(source='get_container_type_display', read_only=True)
     subtype_text = serializers.CharField(source='get_subtype_display', read_only=True)
     has_proposal = serializers.SerializerMethodField(read_only=True)
 
