@@ -1895,11 +1895,6 @@ msgid ""
 "future academic years"
 msgstr ""
 
-msgid ""
-"Postponement will not be possible as the chosen code already exists for "
-"future academic years"
-msgstr ""
-
 msgid "Practical exercises"
 msgstr ""
 
@@ -2184,15 +2179,6 @@ msgid "SQL command"
 msgstr ""
 
 msgid "Save"
-msgstr ""
-
-msgid "Save and do not postpone changes"
-msgstr ""
-
-msgid "Save and postpone"
-msgstr ""
-
-msgid "Save and postpone changes on next years"
 msgstr ""
 
 msgid "Save and do not postpone changes"
@@ -3138,10 +3124,6 @@ msgid "agreements"
 msgstr ""
 
 msgid "aim number"
-msgstr ""
-
-#, python-format
-msgid "and postponed until %(year)s"
 msgstr ""
 
 #, python-format
