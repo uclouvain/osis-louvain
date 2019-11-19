@@ -34,7 +34,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, active_status, schedule_type
 from base.models.enums.constraint_type import CREDITS
 from base.models.enums.duration_unit import DURATION_UNIT
-from base.models.enums.education_group_types import TrainingType
+from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
@@ -164,3 +164,8 @@ class EducationGroupYearMasterFactory(EducationGroupYearCommonMasterFactory):
 class EducationGroupYearCommonFactory(EducationGroupYearFactory):
     acronym = 'common'
     partial_acronym = 'common'
+    education_group_type = factory.SubFactory(
+        'base.tests.factories.education_group_type.EducationGroupTypeFactory',
+        name=MiniTrainingType.DEEPENING.name,
+        category=education_group_categories.MINI_TRAINING
+    )
