@@ -697,6 +697,7 @@ class WsCatalogOfferV02PostTestCase(TestCase, Helper):
             if section in response_sections:
                 response_sections.pop(section)
 
+        print(self.education_group_year.education_group_type)
         self.assertEqual(len(response_sections), len(common_sections_set))
 
         for section in common_sections_set:
@@ -706,6 +707,8 @@ class WsCatalogOfferV02PostTestCase(TestCase, Helper):
         self.assertEqual(len(response_sections), 0)
 
     def test_no_translation_for_term(self):
+        print(self.education_group_year.education_group_type)
+
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='welcome_introduction')
         translated_text_label = TranslatedTextLabelFactory(text_label=text_label, language=self.iso_language)
 
