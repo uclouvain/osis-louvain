@@ -689,14 +689,17 @@ class WsCatalogOfferV02PostTestCase(TestCase, Helper):
         response_json = response.json()
 
         sections, conditions_admission_section = remove_conditions_admission(response_json['sections'])
+        print(sections)
         response_sections = convert_sections_list_of_dict_to_dict(sections)
-
+        print(response_sections)
+        print(sections)
         self.assertEqual(len(response_sections), len(sections))
 
         for section in sections_set:
             if section in response_sections:
                 response_sections.pop(section)
-
+        print(common_sections_set)
+        print(response_sections)
         print(self.education_group_year.education_group_type)
         self.assertEqual(len(response_sections), len(common_sections_set))
 
