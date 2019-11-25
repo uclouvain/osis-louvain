@@ -136,15 +136,7 @@ def get_unused_with_vulture(module):
         'property': 0
     }
 
-    while True:
-        output = process.stdout.readline()
-        if output == '' and process.poll() is not None:
-            break
-        if output:
-            for check_type, _ in unuseds.items():
-                if check_type in output:
-                    unuseds[check_type] += 1
-            print(output.strip())
+    _read_output(process, unuseds)
 
     print("Unused attributes : ", unuseds['attribute'])
     print("Unused functions : ", unuseds['function'])
@@ -155,6 +147,18 @@ def get_unused_with_vulture(module):
     print("Ignored names : ", ", ".join(ignored_names))
     print("Excluded patterns : ", ", ".join(excluded_patterns))
     print("Analyzed modules : ", module_to_check)
+
+
+def _read_output(process, unuseds):
+    while True:
+        output = process.stdout.readline()
+        if output == '' and process.poll() is not None:
+            break
+        if output:
+            for check_type, _ in unuseds.items():
+                if check_type in output:
+                    unuseds[check_type] += 1
+            print(output.strip())
 
 
 if __name__ == "__main__":
