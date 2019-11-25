@@ -117,19 +117,12 @@ def get_unused_with_vulture(module):
     ignored_names = ['urlpatterns'] + TEST_IGNORED + CLASS_IGNORED + MEDIA_IGNORED + MODEL_LIST_IGNORED
     excluded_patterns = DJANGO_EXCLUDED + GIT_EXCLUDED + VENV_EXCLUDED
     vulture_osis_modules = OSIS_MODULES + ['templates']
-    module_to_check = '.' if module == all else (' '.join(vulture_osis_modules) if module == 'osis' else module)
+    module_to_check = ' .' if module == 'all' else (' '.join(vulture_osis_modules) if module == 'osis' else module)
     os.system(
-        'vulture --ignore-names ' + ','.join(ignored_names) + ' --exclude ' + ','.join(
-            excluded_patterns) + module_to_check
+        'vulture ' + module_to_check + ' --ignore-names ' + ','.join(ignored_names) + ' --exclude ' + ','.join(
+            excluded_patterns)
     )
 
 
 if __name__ == "__main__":
     main(sys.argv[1:])
-
-    # vulture --ignore-names Meta,setUp,setUpTestData,return_value,mock*,urlpatterns,ordering,template_name,
-    # changed,
-    # model,tearDown,search_fields,raw_id_fields,fieldsets,list_filter,list_display,actions,widgets,Media,
-    # css,*_classes,
-    # get_content,filter_fields,ordering_fields,paginate_by,unique_together,filter_backends,group_by --exclude
-    # migrations/,apps.py,.githooks/,.github/,env/,venv/,zoo/
