@@ -127,16 +127,8 @@ def get_unused_with_vulture(module):
     command = 'vulture ' + module_to_check + ' --ignore-names ' + ','.join(ignored_names) + ' --exclude ' + ','.join(
             excluded_patterns)
     process = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE)
-    unuseds = {
-        'attribute': 0,
-        'function': 0,
-        'variable': 0,
-        'class': 0,
-        'import': 0,
-        'property': 0
-    }
 
-    _read_output(process, unuseds)
+    unuseds = _read_output(process)
 
     print("Unused attributes : ", unuseds['attribute'])
     print("Unused functions : ", unuseds['function'])
@@ -149,11 +141,19 @@ def get_unused_with_vulture(module):
     print("Analyzed modules : ", module_to_check)
 
 
-def _read_output(process, unuseds):
+def _read_output(process):
+    unuseds = {
+        'attribute': 0,
+        'function': 0,
+        'variable': 0,
+        'class': 0,
+        'import': 0,
+        'property': 0
+    }
     while True:
         output = process.stdout.readline()
         if output == '' and process.poll() is not None:
-            break
+            return unuseds
         if output:
             for check_type, _ in unuseds.items():
                 if check_type in output:
