@@ -7,6 +7,8 @@ IF YOU OVERRIDE DJANGO TEMPLATES, THEY MAY APPEAR IN THE LIST AS UNUSED.
 """
 
 import os
+import shlex
+import subprocess
 import sys
 
 MODULES = [
@@ -101,7 +103,7 @@ def main(argv):
     if not to_clean or module not in MODULES:
         print("First parameter should be :")
         print("\t\t'template' to get unused templates or")
-        print("\t\t'vulture' to check unused code (to verify).")
+        print("\t\t'vulture' to check unused code (to verify : a lot of false positive).")
         print("Second parameter (if set) should be:")
         print("\t\ta valid OSIS module or")
         print("\t\t'osis' to exclude submodules")
@@ -118,10 +120,31 @@ def get_unused_with_vulture(module):
     excluded_patterns = DJANGO_EXCLUDED + GIT_EXCLUDED + VENV_EXCLUDED
     vulture_osis_modules = OSIS_MODULES + ['templates']
     module_to_check = ' .' if module == 'all' else (' '.join(vulture_osis_modules) if module == 'osis' else module)
-    os.system(
-        'vulture ' + module_to_check + ' --ignore-names ' + ','.join(ignored_names) + ' --exclude ' + ','.join(
+    command = 'vulture ' + module_to_check + ' --ignore-names ' + ','.join(ignored_names) + ' --exclude ' + ','.join(
             excluded_patterns)
-    )
+    process = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE)
+    unuseds = {
+        'attribute': 0,
+        'function': 0,
+        'variable': 0,
+        'class': 0
+    }
+
+    while True:
+        output = process.stdout.readline()
+        if output == '' and process.poll() is not None:
+            break
+        if output:
+            for check_type, _ in unuseds.items():
+                if check_type in output:
+                    unuseds[check_type] += 1
+            print(output.strip())
+
+    print("Unused attributes : ", unuseds['attribute'])
+    print("Unused functions : ", unuseds['function'])
+    print("Unused variables : ", unuseds['variable'])
+    print("Unused classes : ", unuseds['class'])
+    # test = os.system(command)
 
 
 if __name__ == "__main__":
