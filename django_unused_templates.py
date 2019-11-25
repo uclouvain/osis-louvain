@@ -68,7 +68,6 @@ def _get_templates(html_files):
 
 def get_unused_templates(module):
     print("Start searching unused templates in %s module(s)" % (module))
-    # templates_osis_modules = '.' if module == 'all' else (OSIS_MODULES + ['osis/templates'] if module == 'osis' else [module]
     modules_to_keep = {
         module: '.' if module == 'all' else (OSIS_MODULES if module == 'osis' else [module])
         for module in MODULES
