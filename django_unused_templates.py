@@ -105,7 +105,7 @@ def main(argv):
         print("Second parameter (if set) should be:")
         print("\t\ta valid OSIS module or")
         print("\t\t'osis' to exclude submodules")
-        print("\t\tDEFAULT : osis + submodules")
+        print("\t\tDEFAULT : 'all' = osis + submodules")
         sys.exit()
     if 'template' == to_clean:
         get_unused_templates(module)
