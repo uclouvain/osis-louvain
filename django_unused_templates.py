@@ -127,7 +127,9 @@ def get_unused_with_vulture(module):
         'attribute': 0,
         'function': 0,
         'variable': 0,
-        'class': 0
+        'class': 0,
+        'import': 0,
+        'property': 0
     }
 
     while True:
@@ -144,7 +146,8 @@ def get_unused_with_vulture(module):
     print("Unused functions : ", unuseds['function'])
     print("Unused variables : ", unuseds['variable'])
     print("Unused classes : ", unuseds['class'])
-    # test = os.system(command)
+    print("Unused imports : ", unuseds['import'])
+    print("Unused properties : ", unuseds['property'])
 
 
 if __name__ == "__main__":
