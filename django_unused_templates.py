@@ -74,7 +74,7 @@ def get_unused_templates(module):
         module: '.' if module == 'all' else (OSIS_MODULES if module == 'osis' else [module])
         for module in MODULES
     }[module if module else 'all']
-    print(modules_to_keep)
+    print("Analyzed modules : ", ", ".join(modules_to_keep))
     html_files = _get_files_of_extension('html', modules_to_keep)
     templates = _get_templates(html_files)
     py_files = _get_files_of_extension('py', modules_to_keep)
@@ -116,10 +116,14 @@ def main(argv):
 
 
 def get_unused_with_vulture(module):
+    print("Start searching with vulture in %s module(s)" % (module))
     ignored_names = ['urlpatterns'] + TEST_IGNORED + CLASS_IGNORED + MEDIA_IGNORED + MODEL_LIST_IGNORED
+    print("Ignored names : ", ", ".join(ignored_names))
     excluded_patterns = DJANGO_EXCLUDED + GIT_EXCLUDED + VENV_EXCLUDED
+    print("Excluded patterns : ", ", ".join(excluded_patterns))
     vulture_osis_modules = OSIS_MODULES + ['templates']
     module_to_check = ' .' if module == 'all' else (' '.join(vulture_osis_modules) if module == 'osis' else module)
+    print("Analyzed modules : ", module_to_check)
     command = 'vulture ' + module_to_check + ' --ignore-names ' + ','.join(ignored_names) + ' --exclude ' + ','.join(
             excluded_patterns)
     process = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE)
@@ -148,6 +152,9 @@ def get_unused_with_vulture(module):
     print("Unused classes : ", unuseds['class'])
     print("Unused imports : ", unuseds['import'])
     print("Unused properties : ", unuseds['property'])
+    print("Ignored names : ", ", ".join(ignored_names))
+    print("Excluded patterns : ", ", ".join(excluded_patterns))
+    print("Analyzed modules : ", module_to_check)
 
 
 if __name__ == "__main__":
