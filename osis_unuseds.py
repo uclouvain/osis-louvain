@@ -7,6 +7,7 @@ IF YOU OVERRIDE DJANGO TEMPLATES, THEY MAY APPEAR IN THE LIST AS UNUSED.
 """
 
 import os
+import re
 import shlex
 import subprocess
 import sys
@@ -125,7 +126,7 @@ def get_unused_with_vulture(module):
     module_to_check = ' .' if module == 'all' else (' '.join(vulture_osis_modules) if module == 'osis' else module)
     print("Analyzed modules : ", module_to_check)
     command = 'vulture ' + module_to_check + ' --ignore-names ' + ','.join(ignored_names) + ' --exclude ' + ','.join(
-            excluded_patterns)
+        excluded_patterns)
     process = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE)
 
     unuseds = _read_output(process)
@@ -158,7 +159,13 @@ def _read_output(process):
             for check_type, _ in unuseds.items():
                 if check_type in output:
                     unuseds[check_type] += 1
-            print(output.strip())
+            output_strip = output.strip()
+            regex_result = re.search(
+                r'(?P<file>.*):(?P<line>\d{1,4}).*\bunused\b\s(?P<unused_type>\w+)\s\'(?P<name>.*)\'.*',
+                output_strip
+            )
+            line, file, unused_type, name = regex_result.group('line', 'file', 'unused_type', 'name')
+            print('Unused ' + unused_type + ' ' + name + ' at ' + file + ':' + line)
 
 
 if __name__ == "__main__":
