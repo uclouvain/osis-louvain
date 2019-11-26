@@ -101,12 +101,12 @@ def get_unused_templates(module):
 def main(argv):
     to_clean = argv[0] if argv else None
     module = argv[1] if to_clean and len(argv) > 1 else 'all'
-    if not to_clean or module not in MODULES:
+    if not to_clean or module not in MODULES + OSIS_MODULES:
         print("First parameter should be :")
         print("\t\t'template' to get unused templates or")
         print("\t\t'vulture' to check unused code (to verify : a lot of false positive).")
         print("Second parameter (if set) should be:")
-        print("\t\ta valid OSIS module or")
+        print("\t\ta valid OSIS module/directory or")
         print("\t\t'osis' to exclude submodules")
         print("\t\tDEFAULT : 'all' = osis + submodules")
         sys.exit()
