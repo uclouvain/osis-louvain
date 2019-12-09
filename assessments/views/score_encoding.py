@@ -618,7 +618,7 @@ def _get_score_encoding_list_with_only_enrollment_modified(request, learning_uni
 
 def get_json_data_scores_sheets(tutor_global_id):
     try:
-        person = mdl.person.find_by_global_id(tutor_global_id)
+        person = mdl.person.find_by_global_id(tutor_global_id.decode('utf-8'))
         tutor = mdl.tutor.find_by_person(person)
         number_session = mdl.session_exam_calendar.find_session_exam_number()
         academic_yr = mdl.academic_year.current_academic_year()
