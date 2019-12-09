@@ -95,7 +95,7 @@ class CatalogGenericDetailView:
         cached_data = ElementCache(self.request.user).cached_data
         if cached_data:
             obj = self._get_instance_object_from_cache(cached_data)
-            return get_clipboard_content_display(obj, cached_data.get('action'))
+            return get_clipboard_content_display(obj, cached_data['action'])
         return None
 
     @staticmethod
