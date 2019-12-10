@@ -481,6 +481,9 @@ class GetScoreEncodingViewProgramManagerTest(AcademicYearMockMixin, SessionExamC
         context = response.context[-1]
         self.assertEqual(len(context['notes_list']), 3)
 
+    def test_get_json_data_scores_sheets_with_global_id_is_none(self):
+        self.assertEqual(score_encoding.get_json_data_scores_sheets(None), {})
+
     def _create_context_exam_enrollment(self):
         self.students = []
         for index in range(0, 20):
