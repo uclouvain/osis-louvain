@@ -30,6 +30,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 
+from base.business import event_perms
 from base.business.education_group import can_user_edit_administrative_data
 from base.business.education_groups.perms import is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_postpone_education_group, \
@@ -56,8 +57,8 @@ def li_with_deletion_perm(context, url, message, url_id="link_delete"):
 def li_with_update_perm(context, url, message, url_id="link_update"):
     person = context['person']
 
-    if person.is_program_manager and \
-            not any((person.user.is_superuser, person.is_faculty_manager, person.is_central_manager)):
+    if person.is_program_manager and not any((person.user.is_superuser, person.is_central_manager))\
+            and not event_perms.EventPermEducationGroupEdition(raise_exception=False).is_open():
         return li_with_permission(context, is_eligible_to_edit_certificate_aims, url, message, url_id, load_modal=True)
 
     return li_with_permission(context, is_eligible_to_change_education_group, url, message, url_id)

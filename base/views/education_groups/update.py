@@ -27,8 +27,8 @@
 from dal import autocomplete
 from django import forms
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
 from django.db.models import Prefetch
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.html import format_html
@@ -36,6 +36,7 @@ from django.utils.translation import gettext_lazy as _
 from waffle.decorators import waffle_flag
 
 from base import models as mdl_base
+from base.business import event_perms
 from base.business.education_group import has_coorganization
 from base.business.education_groups import perms
 from base.forms.education_group.common import EducationGroupModelForm
@@ -75,8 +76,10 @@ def update_education_group(request, root_id, education_group_year_id):
     # it will be used in the templates.
     education_group_year.root = root_id
 
-    if program_manager.is_program_manager(request.user, education_group=education_group_year.education_group) \
-       and not any((request.user.is_superuser, person.is_faculty_manager, person.is_central_manager)):
+    if program_manager.is_program_manager(request.user, education_group=education_group_year.education_group)\
+            and not any((request.user.is_superuser, person.is_central_manager))\
+            and not event_perms.EventPermEducationGroupEdition(obj=education_group_year,
+                                                               raise_exception=False).is_open():
         return _update_certificate_aims(request, root_id, education_group_year)
 
     groupelementyear_formset = GroupElementYearFormset(
