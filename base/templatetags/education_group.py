@@ -56,9 +56,10 @@ def li_with_deletion_perm(context, url, message, url_id="link_delete"):
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_update_perm(context, url, message, url_id="link_update"):
     person = context['person']
+    egy = context.get('education_group_year')
 
     if person.is_program_manager and not any((person.user.is_superuser, person.is_central_manager))\
-            and not event_perms.EventPermEducationGroupEdition(raise_exception=False).is_open():
+            and not event_perms.EventPermEducationGroupEdition(obj=egy, raise_exception=False).is_open():
         return li_with_permission(context, is_eligible_to_edit_certificate_aims, url, message, url_id, load_modal=True)
 
     return li_with_permission(context, is_eligible_to_change_education_group, url, message, url_id)
