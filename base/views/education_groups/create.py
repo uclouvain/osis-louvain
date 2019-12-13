@@ -122,6 +122,7 @@ def create_education_group(request, category, education_group_type_pk, root_id=N
         "form_education_group": form_education_group_year.forms[EducationGroupModelForm],
         "parent": parent,
         'root_pk': root_id,
+        "show_diploma_tab": form_education_group_year.show_diploma_tab()
     }
 
     if category == education_group_categories.TRAINING:
