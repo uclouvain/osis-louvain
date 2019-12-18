@@ -28,10 +28,21 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.enums.prerequisite_operator import AND, OR
 from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory, GroupElementYearFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from program_management.business.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, \
-    EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel, _get_blocks_prerequisite_of
+    EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel, _get_blocks_prerequisite_of, FIX_TITLES, _get_headers, \
+    optional_header_for_proposition, optional_header_for_credits, optional_header_for_volume, _get_attribution_line, \
+    _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data,\
+    _build_excel_lines_ues, _get_optional_data, BOLD_FONT
+from program_management.forms.custom_xls import CustomXlsForm
+from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
+    TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
+from openpyxl.styles import Style, Font
+from program_management.business.excel import EducationGroupYearLearningUnitsContainedToExcel
 
 
 class TestGeneratePrerequisitesWorkbook(TestCase):
@@ -130,3 +141,239 @@ class TestGeneratePrerequisitesWorkbook(TestCase):
 
 def row_to_value(sheet_row):
     return [cell.value for cell in sheet_row]
+
+
+class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_year = EducationGroupYearFactory()
+        cls.child_leaves = GroupElementYearChildLeafFactory.create_batch(
+            2,
+            parent=cls.education_group_year,
+            is_mandatory=True
+        )
+        for node, acronym in zip(cls.child_leaves, ["LCORS124" + str(i) for i in range(0, len(cls.child_leaves))]):
+            node.child_leaf.acronym = acronym
+            node.child_leaf.save()
+
+        cls.luy_children = [child.child_leaf for child in cls.child_leaves]
+        cls.workbook_contains = \
+            EducationGroupYearLearningUnitsContainedToExcel(cls.education_group_year, CustomXlsForm({}))._to_workbook()
+        cls.sheet_contains = cls.workbook_contains.worksheets[0]
+
+        generator_container = GenerateContainer(cls.education_group_year.academic_year,
+                                                cls.education_group_year.academic_year)
+        cls.luy = generator_container.generated_container_years[0].learning_unit_year_full
+
+    def test_header_lines_without_optional_titles(self):
+        custom_xls_form = CustomXlsForm({})
+        expected_headers = FIX_TITLES
+
+        self.assertListEqual(_get_headers(custom_xls_form)[0], expected_headers)
+
+    def test_header_lines_with_optional_titles(self):
+        custom_xls_form = CustomXlsForm({'proposition': 'on',
+                                         'credits': 'on',
+                                         'volume': 'on'})
+
+        expected_headers = \
+            FIX_TITLES + optional_header_for_credits + optional_header_for_volume + optional_header_for_proposition
+        self.assertListEqual(_get_headers(custom_xls_form)[0], expected_headers)
+
+    def test_get_attribution_line(self):
+        person = PersonFactory(last_name='Last', first_name='First', middle_name='Middle')
+        self.assertEqual(_get_attribution_line(person), 'LAST First Middle')
+        person = PersonFactory(last_name=None, first_name='First', middle_name='Middle')
+        self.assertEqual(_get_attribution_line(person), 'First Middle')
+        self.assertEqual(_get_attribution_line(None), '')
+
+    def test_fix_data(self):
+        gey = self.child_leaves[0]
+        luy = self.luy_children[0]
+        expected = get_expected_data(gey, luy)
+        res = _fix_data(gey, luy)
+        self.assertEqual(res, expected)
+
+    def test_legend_workbook_exists(self):
+        wb = _get_workbook_for_custom_xls([['header'], [['row1 col1']]], True, {})
+        self.assertEqual(len(wb.worksheets), 2)
+
+    def test_legend_workbook_do_not_exists(self):
+        wb = _get_workbook_for_custom_xls([['header'], [['row1 col1']]], False, {})
+        self.assertEqual(len(wb.worksheets), 1)
+
+    def test_legend_workbook_content(self):
+        expected_content = [[_("Creation")], [_("Modification")], [_("Transformation")],
+                            [_("Transformation and modification")], [_("Suppression")]]
+
+        data = _build_legend_sheet()
+        self.assertListEqual(data.get(LEGEND_WB_CONTENT), expected_content)
+
+    def test_legend_workbook_style(self):
+        data = _build_legend_sheet()
+        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Style(font=Font(color=CREATION_COLOR))), [1])
+        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Style(font=Font(color=MODIFICATION_COLOR))), [2])
+        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Style(font=Font(color=TRANSFORMATION_COLOR))), [3])
+        self.assertListEqual(
+            data.get(LEGEND_WB_STYLE).get(Style(font=Font(color=TRANSFORMATION_AND_MODIFICATION_COLOR))),
+            [4])
+        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Style(font=Font(color=SUPPRESSION_COLOR))), [5])
+
+    def test_no_optional_data_to_add(self):
+        form = CustomXlsForm({})
+        self.assertDictEqual(_optional_data(form),
+                             {'has_required_entity': False,
+                              'has_proposition': False,
+                              'has_credits': False,
+                              'has_allocation_entity': False,
+                              'has_english_title': False,
+                              'has_teacher_list': False,
+                              'has_periodicity': False,
+                              'has_active': False,
+                              'has_volume': False,
+                              'has_quadrimester': False,
+                              'has_session_derogation': False,
+                              'has_language': False,
+                              }
+                             )
+
+    def test_all_optional_data_to_add(self):
+        form = CustomXlsForm({'required_entity': 'on',
+                              'proposition': 'on',
+                              'credits': 'on',
+                              'allocation_entity': 'on',
+                              'english_title': 'on',
+                              'teacher_list': 'on',
+                              'periodicity': 'on',
+                              'active': 'on',
+                              'volume': 'on',
+                              'quadrimester': 'on',
+                              'session_derogation': 'on',
+                              'language': 'on'})
+        self.assertDictEqual(_optional_data(form),
+                             {'has_required_entity': True,
+                              'has_proposition': True,
+                              'has_credits': True,
+                              'has_allocation_entity': True,
+                              'has_english_title': True,
+                              'has_teacher_list': True,
+                              'has_periodicity': True,
+                              'has_active': True,
+                              'has_volume': True,
+                              'has_quadrimester': True,
+                              'has_session_derogation': True,
+                              'has_language': True,
+                              }
+                             )
+
+    def test_data(self):
+        custom_form = CustomXlsForm({})
+        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, custom_form)
+        data = _build_excel_lines_ues(custom_form, exl.learning_unit_years_parent)
+        content = data.get('content')
+        self._assert_content_equals(content, exl)
+        # First line (Header line) is always bold
+        self.assertListEqual(data.get('colored_cells')[Style(font=BOLD_FONT)], [0])
+
+    def _assert_content_equals(self, content, exl):
+        idx = 1
+        for gey in exl.learning_unit_years_parent:
+            luy = gey.child_leaf
+            expected = get_expected_data(gey, luy)
+            self.assertListEqual(content[idx], expected)
+            idx += 1
+
+    def test_get_optional_required_entity(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_required_entity'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.learning_container_year.requirement_entity])
+
+    def test_get_optional_allocation_entity(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_allocation_entity'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.learning_container_year.allocation_entity])
+
+    def test_get_optional_credits(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_credits'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.credits.normalize()])
+
+    def test_get_optional_has_periodicity(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_periodicity'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.get_periodicity_display()])
+
+    def test_get_optional_has_active(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_active'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [_('yes')])
+
+    def test_get_optional_has_quadrimester(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_quadrimester'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.get_quadrimester_display() or ''])
+
+    def test_get_optional_has_session_derogation(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_session_derogation'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.get_session_display() or ''])
+
+    def test_get_optional_has_proposition(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_proposition'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              ['', ''])
+        proposal = ProposalLearningUnitFactory(learning_unit_year=self.luy)
+
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [proposal.get_type_display(), proposal.get_state_display()])
+
+    def test_get_optional_has_english_title(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_english_title'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.complete_title_english])
+
+    def test_get_optional_has_language(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_language'] = True
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+                              [self.luy.language])
+
+
+def get_expected_data(gey, luy):
+    expected = [luy.acronym,
+                luy.academic_year,
+                luy.complete_title_i18n,
+                luy.get_container_type_display(),
+                luy.get_subtype_display(),
+                "{} - {}".format(gey.parent.partial_acronym, gey.parent.title),
+                "{} / {}".format(gey.relative_credits or '-', luy.credits.normalize() or '-'),
+                gey.block or '',
+                _('yes')
+                ]
+    return expected
+
+
+def initialize_optional_data():
+    return {
+        'has_required_entity': False,
+        'has_allocation_entity': False,
+        'has_credits': False,
+        'has_periodicity': False,
+        'has_active': False,
+        'has_quadrimester': False,
+        'has_session_derogation': False,
+        'has_volume': False,
+        'has_teacher_list': False,
+        'has_proposition': False,
+        'has_english_title': False,
+        'has_language': False
+    }

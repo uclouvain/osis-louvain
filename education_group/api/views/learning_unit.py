@@ -46,7 +46,7 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
 
     def get_queryset(self):
         learning_unit_year = get_object_or_404(
-            LearningUnitYear.objects.all(),
+            LearningUnitYear.objects.all().select_related('academic_year'),
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )

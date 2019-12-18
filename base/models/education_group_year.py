@@ -30,6 +30,8 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, connection
 from django.db.models import Count, Min, When, Case, Max
+from django.db.models.signals import post_delete
+from django.dispatch.dispatcher import receiver
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -51,6 +53,8 @@ from base.models.utils.utils import get_object_or_none
 from base.models.validation_rule import ValidationRule
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
     SerializableQuerySet
+from cms.models.translated_text import TranslatedText
+from cms.enums.entity_name import OFFER_YEAR
 
 
 class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
@@ -61,7 +65,7 @@ class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):
         'education_group', 'enrollment_campus',
         'main_teaching_campus', 'primary_language'
     )
-    search_fields = ['acronym', 'partial_acronym', 'title', 'education_group__pk']
+    search_fields = ['acronym', 'partial_acronym', 'title', 'education_group__pk', 'id']
 
     actions = [
         'resend_messages_to_queue',
@@ -980,3 +984,8 @@ def _find_with_learning_unit_enrollment_count(learning_unit_year):
     return EducationGroupYear.objects \
         .filter(offerenrollment__learningunitenrollment__learning_unit_year_id=learning_unit_year) \
         .annotate(count_learning_unit_enrollments=Count('offerenrollment__learningunitenrollment')).order_by('acronym')
+
+
+@receiver(post_delete, sender=EducationGroupYear)
+def _educationgroupyear_delete(sender, instance, **kwargs):
+    TranslatedText.objects.filter(entity=OFFER_YEAR, reference=instance.id).delete()

@@ -23,23 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django import forms
 from django.utils.translation import gettext_lazy as _
 
-CRITERIA_1 = "CRITERIA_1"
-CRITERIA_2 = "CRITERIA_2"
-CRITERIA_3 = "CRITERIA_3"
-CRITERIA_4 = "CRITERIA_4"
-CRITERIA_5 = "CRITERIA_5"
-CRITERIA_6 = "CRITERIA_6"
-CRITERIA_7 = "CRITERIA_7"
 
-ASSIMILATION_CRITERIA_CHOICES = (
-    (CRITERIA_1, _(CRITERIA_1)),
-    (CRITERIA_2, _(CRITERIA_2)),
-    (CRITERIA_3, _(CRITERIA_3)),
-    (CRITERIA_4, _(CRITERIA_4)),
-    (CRITERIA_5, _(CRITERIA_5)),
-    (CRITERIA_6, _(CRITERIA_6)),
-    (CRITERIA_7, _(CRITERIA_7)),
-)
+class CustomXlsForm(forms.Form):
+
+    required_entity = forms.BooleanField(required=False, label=_('Requirement entity'))
+    allocation_entity = forms.BooleanField(required=False, label=_('Attribution entity'))
+    credits = forms.BooleanField(required=False, label=_('Credits'))
+    periodicity = forms.BooleanField(required=False, label=_('Periodicity'))
+    active = forms.BooleanField(required=False, label=_('Active'))
+    quadrimester = forms.BooleanField(required=False, label=_('Quadrimester'))
+    session_derogation = forms.BooleanField(required=False, label=_('Session derogation'))
+    volume = forms.BooleanField(required=False, label=_('Volume'))
+    teacher_list = forms.BooleanField(required=False, label=_('Tutors'))
+    proposition = forms.BooleanField(required=False, label=_('Proposals'))
+    english_title = forms.BooleanField(required=False, label=_('Title in English'))
+    language = forms.BooleanField(required=False, label=_('Language'))
+
+    def get_optional_data(self):
+        data = []
+        if self.is_valid():
+            for field in self.fields:
+                if self.cleaned_data[field]:
+                    data.append(field)
+        return data

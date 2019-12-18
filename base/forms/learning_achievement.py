@@ -35,8 +35,7 @@ from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.utils.utils import get_object_or_none
 from cms.enums import entity_name
 from cms.models import text_label, translated_text
-from reference.models import language
-from reference.models.language import EN_CODE_LANGUAGE
+from reference.models.language import EN_CODE_LANGUAGE, Language
 
 
 def update_themes_discussed_changed_field_in_cms(learning_unit_year):
@@ -88,7 +87,7 @@ class LearningAchievementEditForm(forms.ModelForm):
                 LearningAchievement,
                 learning_unit_year__id=self.luy.id,
                 code_name=self.code,
-                language=language.find_by_code(code[:2].upper())
+                language=Language.objects.get(code=code[:2].upper())
             )
             if value:
                 self.value = value
@@ -110,7 +109,7 @@ class LearningAchievementEditForm(forms.ModelForm):
             ).get_or_create(
                 learning_unit_year_id=self.luy.id,
                 code_name=self.code,
-                language=language.find_by_code(code[:2].upper())
+                language=Language.objects.get(code=code[:2].upper())
             )
             self.old_code_name = self.text.code_name
             self.text.code_name = self.cleaned_data.get('code_name')
@@ -146,11 +145,15 @@ def update_future_luy(ac_year_postponement_range, text, old_code_name, code_name
         # an update of the THEMES_DISCUSSED cms when we update learning achievement
         update_themes_discussed_changed_field_in_cms(text.learning_unit_year)
         luy = text.learning_unit_year
-        next_luy, created = LearningUnitYear.objects.get_or_create(
-            academic_year=ac,
-            acronym=luy.acronym,
-            learning_unit=luy.learning_unit
-        )
+        try:
+            next_luy, created = LearningUnitYear.objects.get_or_create(
+                academic_year=ac,
+                acronym=luy.acronym,
+                learning_unit=luy.learning_unit
+            )
+        except LearningUnitYear.DoesNotExist:
+            continue
+
         LearningAchievement.objects.update_or_create(
             code_name=old_code_name,
             language=text.language,

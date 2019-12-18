@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from unittest import mock
+
 from django.conf import settings
 from django.urls import reverse
 from rest_framework import status
@@ -116,7 +117,12 @@ class GeneralInformationTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        serializer = GeneralInformationSerializer(self.egy, context={'language': self.language})
+        serializer = GeneralInformationSerializer(
+            self.egy, context={
+                'language': self.language,
+                'acronym': self.egy.acronym
+            }
+        )
         self.assertEqual(response.data, serializer.data)
 
     def test_get_results_based_on_egy_with_partial_acronym(self):
@@ -129,5 +135,10 @@ class GeneralInformationTestCase(APITestCase):
         response = self.client.get(url_partial_acronym)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        serializer = GeneralInformationSerializer(self.egy, context={'language': self.language})
+        serializer = GeneralInformationSerializer(
+            self.egy, context={
+                'language': self.language,
+                'acronym': self.egy.partial_acronym
+            }
+        )
         self.assertEqual(response.data, serializer.data)

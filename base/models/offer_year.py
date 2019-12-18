@@ -116,10 +116,6 @@ def find_by_id(offer_year_id):
         return None
 
 
-def find_by_ids(offer_year_ids):
-    return OfferYear.objects.filter(pk__in=offer_year_ids)
-
-
 def search(entity=None, academic_yr=None, acronym=None):
     """
     Offers are organized hierarchically. This function returns only root offers.

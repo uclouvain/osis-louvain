@@ -60,10 +60,6 @@ class TranslatedText(models.Model):
         unique_together = ('entity', 'reference', 'text_label', 'language')
 
 
-def find_by_id(id):
-    return TranslatedText.objects.get(pk=id)
-
-
 def search(entity, reference, text_labels_name=None, language=None):
     queryset = TranslatedText.objects.filter(entity=entity, reference=reference)
 
@@ -81,10 +77,6 @@ def get_or_create(entity, reference, text_label, language):
                                                                     text_label=text_label,
                                                                     language=language)
     return translated_text
-
-
-def find_by_reference(reference):
-    return TranslatedText.objects.filter(reference=reference)
 
 
 def update_or_create(entity, reference, text_label, language, defaults):

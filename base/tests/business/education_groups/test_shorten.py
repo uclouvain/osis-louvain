@@ -43,23 +43,24 @@ from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 
 class EducationGroupShortenContext(TestCase):
     """This class is used in this test file in order to setup an environment for testing EGY SHORTEN"""
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Create several academic year
-        self.current_academic_year = create_current_academic_year()
-        start_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
-        end_year = AcademicYearFactory(year=self.current_academic_year.year + 10)
-        self.generated_ac_years = GenerateAcademicYear(start_year, end_year)
+        cls.current_academic_year = create_current_academic_year()
+        start_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
+        end_year = AcademicYearFactory(year=cls.current_academic_year.year + 10)
+        cls.generated_ac_years = GenerateAcademicYear(start_year, end_year)
         # Create small entities
-        self.entity = EntityFactory(organization__type=organization_type.MAIN)
-        self.entity_version = EntityVersionFactory(
-            entity=self.entity,
+        cls.entity = EntityFactory(organization__type=organization_type.MAIN)
+        cls.entity_version = EntityVersionFactory(
+            entity=cls.entity,
             entity_type=entity_type.SECTOR
         )
 
-        self.education_group_year = EducationGroupYearFactory(
-            management_entity=self.entity,
-            administration_entity=self.entity,
-            academic_year=self.current_academic_year
+        cls.education_group_year = EducationGroupYearFactory(
+            management_entity=cls.entity,
+            administration_entity=cls.entity,
+            academic_year=cls.current_academic_year
         )
 
 

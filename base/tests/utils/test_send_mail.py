@@ -152,10 +152,8 @@ class TestSendMessage(TestCase):
         self.assertEqual(len(args.get('receivers')), 1)
         self.assertIsNone(args.get('attachment'))
 
-        # Ensure that the mail contains only postponed of academic year
-        # (Doesn't contains previous which are technical problem)
         self.assertEqual(args['template_base_data']['egys_postponed'], 2)
-        self.assertEqual(args['template_base_data']['egys_postponed_qs'][0], edgy_same_year)
+        self.assertCountEqual(args['template_base_data']['egys_postponed_qs'], [edgy_same_year, edgy_not_same_year])
 
     @patch("osis_common.messaging.send_message.send_messages")
     def test_with_one_enrollment(self, mock_send_messages):

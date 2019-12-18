@@ -81,7 +81,12 @@ class GeneralInformationSerializerTestCase(TestCase):
                 entity=OFFER_YEAR,
                 language=cls.language
             )
-        cls.serializer = GeneralInformationSerializer(cls.egy, context={'language': cls.language})
+        cls.serializer = GeneralInformationSerializer(
+            cls.egy, context={
+                'language': cls.language,
+                'acronym': cls.egy.acronym
+            }
+        )
 
     def test_contains_expected_fields(self):
         expected_fields = [

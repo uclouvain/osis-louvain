@@ -24,12 +24,8 @@
 #
 ##############################################################################
 from django.db import models
-from django.db.models import Prefetch
 
 from attribution.models.enums.function import Functions
-from base.models import person
-from base.models.academic_year import current_academic_year
-from base.models.entity import Entity
 from osis_common.models.serializable_model import SerializableModelAdmin, SerializableModel
 
 
@@ -105,23 +101,6 @@ def is_score_responsible(user, learning_unit_year):
                               .count() > 0
 
 
-def search_by_learning_unit_this_year(code, specific_title, academic_year=None):
-    if academic_year is None:
-        academic_year = current_academic_year()
-    queryset = Attribution.objects.filter(learning_unit_year__academic_year=academic_year)
-    if specific_title:
-        queryset = queryset.filter(learning_unit_year__specific_title__icontains=specific_title)
-    if code:
-        queryset = queryset.filter(learning_unit_year__acronym__icontains=code)
-    return queryset
-
-
-def filter_by_entities(queryset, entities):
-    entities_ids = [entity.id for entity in entities]
-    queryset = queryset.filter(learning_unit_year__learning_container_year__allocation_entity_id__in=entities_ids)
-    return queryset
-
-
 def find_all_responsible_by_learning_unit_year(learning_unit_year, responsibles_order=None):
     if not responsibles_order:
         # FIXME :: this code fixes wrong database model. The flags summary_responsible and score_responsible should be
@@ -144,32 +123,14 @@ def find_by_tutor(tutor):
 
 
 def clear_scores_responsible_by_learning_unit_year(learning_unit_year_pk):
-    _clear_attributions_field_of_learning__unit_year(learning_unit_year_pk, "score_responsible")
-
-
-def _clear_attributions_field_of_learning__unit_year(learning_unit_year_pk, field_to_clear):
-    attributions = search_by_learning_unit_year_pk(learning_unit_year_pk)
+    attributions = Attribution.objects.filter(learning_unit_year__id=learning_unit_year_pk)
     for attribution in attributions:
-        setattr(attribution, field_to_clear, False)
+        setattr(attribution, 'score_responsible', False)
         attribution.save()
 
 
-def search_by_learning_unit_year_pk(learning_unit_year_pk):
-    return Attribution.objects.filter(learning_unit_year__id=learning_unit_year_pk)
-
-
-def find_by_id(attribution_id):
-    return Attribution.objects.get(pk=attribution_id)
-
-
-def _filter_by_tutor(queryset, tutor):
-    return queryset.filter(tutor__person__in=person.find_by_firstname_or_lastname(tutor))
-
-
-def _prefetch_entity_version(queryset):
-    return queryset.prefetch_related(
-        Prefetch(
-            'learning_unit_year__learning_container_year__allocation_entity',
-            queryset=Entity.objects.all().prefetch_related(Prefetch('entityversion_set', to_attr='entity_versions'))
-        )
-    )
+def _clear_attributions_field_of_learning__unit_year(learning_unit_year_pk, field_to_clear):
+    attributions = Attribution.objects.filter(learning_unit_year__id=learning_unit_year_pk)
+    for attribution in attributions:
+        setattr(attribution, field_to_clear, False)
+        attribution.save()

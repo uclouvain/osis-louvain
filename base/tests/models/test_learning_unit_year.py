@@ -56,6 +56,9 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.tutor import TutorFactory
+from cms.enums import entity_name
+from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.models.translated_text import TranslatedText
 
 
 class LearningUnitYearTest(TestCase):
@@ -992,3 +995,23 @@ class ContainerTypeVerboseTest(TestCase):
             luy.get_subtype_display()
         )
         self.assertEqual(result, expected_result)
+
+
+class LearningUnitYearDeleteCms(TestCase):
+    def setUp(self):
+        self.learning_unit_year = LearningUnitYearFactory()
+        self.translated_text = TranslatedTextFactory(entity=entity_name.LEARNING_UNIT_YEAR,
+                                                     reference=self.learning_unit_year.id)
+
+        self.learning_unit_year_no_cms = LearningUnitYearFactory()
+
+    def test_delete_learning_unit_yr_and_cms(self):
+        luy_id = self.learning_unit_year.id
+        self.learning_unit_year.delete()
+        self.assertCountEqual(list(TranslatedText.objects.filter(id=self.translated_text.id)), [])
+        self.assertCountEqual(list(TranslatedText.objects.filter(reference=luy_id)), [])
+
+    def test_delete_learning_unit_yr_without_cms(self):
+        luy_id = self.learning_unit_year_no_cms.id
+        self.learning_unit_year_no_cms.delete()
+        self.assertCountEqual(list(TranslatedText.objects.filter(reference=luy_id)), [])

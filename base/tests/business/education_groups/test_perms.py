@@ -27,10 +27,10 @@ import datetime
 import random
 from unittest import mock
 
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.test import TestCase, override_settings
 
-from base.business.education_groups import perms
 from base.business.education_groups.perms import check_permission, \
     check_authorized_type, is_eligible_to_edit_general_information, is_eligible_to_edit_admission_condition, \
     GeneralInformationPerms, CommonEducationGroupStrategyPerms, AdmissionConditionPerms, \
@@ -44,10 +44,8 @@ from base.tests.factories.academic_year import AcademicYearFactory, create_curre
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, \
     EducationGroupYearCommonBachelorFactory, TrainingFactory, MiniTrainingFactory, GroupFactory
-from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, CentralManagerFactory, \
     SICFactory, FacultyManagerFactory, UEFacultyManagerFactory, AdministrativeManagerFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
 
@@ -157,6 +155,7 @@ class TestPerms(TestCase):
         self.assertFalse(result)
 
 
+@override_settings(YEAR_LIMIT_EDG_MODIFICATION=2019)
 class TestCommonEducationGroupStrategyPerms(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -192,22 +191,22 @@ class TestCommonEducationGroupStrategyPerms(TestCase):
         with self.assertRaises(PermissionDenied):
             perm.is_eligible(raise_exception=True)
 
-    def test_is_current_academic_year_in_range_of_editable_education_group_year_case_not_in_range(self):
-        """This test ensure that we cannot modify OF which greater than N+1"""
-        training_in_future = TrainingFactory(academic_year__year=self.current_academic_year.year + 2)
+    def test_is_lower_than_limit_edg_year_case_lower(self):
+        """This test ensure that we cannot modify OF which lower than limit year"""
+        training_lower = TrainingFactory(academic_year__year=settings.YEAR_LIMIT_EDG_MODIFICATION - 1)
 
-        perm = CommonEducationGroupStrategyPerms(self.person.user, training_in_future)
-        self.assertFalse(perm._is_current_academic_year_in_range_of_editable_education_group_year())
+        perm = CommonEducationGroupStrategyPerms(self.person.user, training_lower)
+        self.assertTrue(perm._is_lower_than_limit_edg_year())
 
-    def test_is_current_academic_year_in_range_of_editable_education_group_year_case_in_range(self):
-        """This test ensure that we modify OF which lower than N+1"""
-        training_n1 = TrainingFactory(academic_year__year=self.current_academic_year.year + 1)
-        training = TrainingFactory(academic_year=self.current_academic_year)
+    def test_is_lower_than_limit_edg_year_case_greater(self):
+        """This test ensure that we modify OF which greater or equal than limit year"""
+        training_limit_year = TrainingFactory(academic_year__year=settings.YEAR_LIMIT_EDG_MODIFICATION + 1)
+        training_greater = TrainingFactory(academic_year__year=settings.YEAR_LIMIT_EDG_MODIFICATION)
 
-        for education_group_year in [training_n1, training]:
+        for education_group_year in [training_limit_year, training_greater]:
             with self.subTest(msg=education_group_year):
                 perm = CommonEducationGroupStrategyPerms(self.person.user, education_group_year)
-                self.assertTrue(perm._is_current_academic_year_in_range_of_editable_education_group_year())
+                self.assertFalse(perm._is_lower_than_limit_edg_year())
 
     @mock.patch('base.business.education_groups.perms.check_link_to_management_entity', return_value=True)
     def test_is_linked_to_management_entity(self, mock_check_link):
@@ -217,25 +216,33 @@ class TestCommonEducationGroupStrategyPerms(TestCase):
         self.assertTrue(perm._is_linked_to_management_entity())
         self.assertTrue(mock_check_link.called)
 
-    def test_is_eligible_case_user_as_superuser(self):
+    def test_is_eligible_case_user_as_superuser_case_greater_or_equal_limit_year(self):
         super_user = UserFactory(is_superuser=True)
-        training = TrainingFactory()
+        training = TrainingFactory(academic_year__year=settings.YEAR_LIMIT_EDG_MODIFICATION)
 
         perm = CommonEducationGroupStrategyPerms(super_user, training)
         self.assertTrue(perm._is_eligible())
 
+    def test_is_eligible_case_user_as_superuser_case_lower_than_limit_year(self):
+        super_user = UserFactory(is_superuser=True)
+        training = TrainingFactory(academic_year__year=settings.YEAR_LIMIT_EDG_MODIFICATION - 1)
+
+        perm = CommonEducationGroupStrategyPerms(super_user, training)
+        with self.assertRaises(PermissionDenied):
+            perm._is_eligible()
+
     @mock.patch(
-        "base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_current_academic_year_in_range_of_editable_education_group_year",
-        return_value=True)
+        "base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_lower_than_limit_edg_year",
+        return_value=False)
     @mock.patch(
         "base.business.education_groups.perms.CommonEducationGroupStrategyPerms._is_linked_to_management_entity",
         return_value=True)
-    def test_ensure_is_eligible_case_all_submethod_true(self, mock_linked_to_management, mock_is_current_in_range):
+    def test_ensure_is_eligible_case_all_submethod_true(self, mock_linked_to_management, mock_limit_egy_year):
         perm = CommonEducationGroupStrategyPerms(self.person.user, TrainingFactory())
 
         self.assertTrue(perm._is_eligible())
         self.assertTrue(mock_linked_to_management.called)
-        self.assertTrue(mock_is_current_in_range.called)
+        self.assertTrue(mock_limit_egy_year.called)
 
     @mock.patch(
         "base.models.academic_calendar.get_academic_calendar_by_date_and_reference_and_data_year",
@@ -364,19 +371,6 @@ class TestGeneralInformationPerms(TestCase):
         for education_group_year in [self.common_bachelor, self.training]:
             perm = GeneralInformationPerms(sic_manager.user, education_group_year)
             self.assertTrue(perm._is_sic_eligible())
-
-    def test_is_faculty_manager_case_cannot_modify_data_in_past(self):
-        previous_year = self.current_academic_year.year - 1
-
-        training_in_past = TrainingFactory(academic_year__year=previous_year)
-        common_in_past = EducationGroupYearCommonBachelorFactory(academic_year__year=previous_year)
-        faculty_manager = FacultyManagerFactory()
-
-        for education_group_year in [training_in_past, common_in_past]:
-            with self.subTest(msg=education_group_year):
-                perm = GeneralInformationPerms(faculty_manager.user, education_group_year)
-                with self.assertRaises(PermissionDenied):
-                    perm._is_faculty_manager_eligible()
 
     def test_is_faculty_manager_eligible(self):
         faculty_manager = FacultyManagerFactory()

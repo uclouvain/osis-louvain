@@ -23,6 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
 
@@ -68,3 +72,14 @@ class UpdateGroupElementYearView(GenericGroupElementYearMixin, UpdateView):
     def get_success_url(self):
         # We can just reload the page
         return
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.rules[0](self.request.user, self.get_object())
+        except PermissionDenied:
+            return render(request,
+                          'education_group/blocks/modal/modal_access_denied.html',
+                          {'access_message': _('Your are not eligible to update the group element year')})
+
+        return super(UpdateGroupElementYearView, self).dispatch(request, *args, **kwargs)

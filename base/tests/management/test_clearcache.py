@@ -1,4 +1,4 @@
-##############################################################################
+############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,35 +22,20 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from unittest.mock import Mock
+############################################################################
+from io import StringIO
+from django.core.management import call_command
+from django.test import SimpleTestCase
+from django.core.cache import cache
 
-from django.template import Context, Template
-from django.test import TestCase
 
+class ClearCacheTest(SimpleTestCase):
+    def test_empty_cache_content(self):
+        cache.set("key", "value")
 
-class CheckTagTests(TestCase):
-    def test_check_tag_empty(self):
-        out = Template(
-            "{% load check %}"
-            "{{ offers_on|is_checked:pgm_id }}"
-        ).render(Context({
-            'offers_on': [],
-            'pgm_id': 15
-        }))
-        self.assertEqual(out, "")
+        out = StringIO()
+        call_command("clearcache", stdout=out)
 
-    def test_check_tag_checked(self):
-        mock = Mock()
-        mock.id = 56
-        mock_2 = Mock()
-        mock_2.id = 15
+        self.assertIsNone(cache.get("key"))
+        self.assertIn('Successfully clear cache', out.getvalue())
 
-        out = Template(
-            "{% load check %}"
-            "{{ offers_on|is_checked:pgm_id }}"
-        ).render(Context({
-            'offers_on': [mock, mock_2],
-            'pgm_id': 15
-        }))
-        self.assertEqual(out, "checked")

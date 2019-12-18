@@ -124,7 +124,8 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
             'parent',
             'partims',
             'proposal',
-            'summary_status'
+            'summary_status',
+            'professional_integration'
         )
 
     def get_proposal(self, learning_unit_year):

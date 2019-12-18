@@ -42,7 +42,7 @@ from base.models.enums.learning_container_year_types import LEARNING_CONTAINER_Y
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
-from reference.models import language
+from reference.models.language import Language
 
 FULL_READ_ONLY_FIELDS = {"acronym", "academic_year", "container_type"}
 FULL_PROPOSAL_READ_ONLY_FIELDS = {"academic_year", "container_type"}
@@ -328,7 +328,7 @@ class FullForm(LearningUnitBaseForm):
                 'status': True,
                 'academic_year': default_ac_year,
                 # Default language French
-                'language': language.find_by_code('FR')
+                'language': Language.objects.get(code='FR')
             } if not self.instance else None,
             'person': self.person,
             'subtype': self.subtype

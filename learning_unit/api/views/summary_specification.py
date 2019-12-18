@@ -51,27 +51,36 @@ class LearningUnitSummarySpecification(generics.GenericAPIView):
             acronym__iexact=self.kwargs['acronym'],
             academic_year__year=self.kwargs['year']
         )
+        parent = learning_unit_year.parent
+        qs_parent = self._get_translated_texts(parent) if parent else None
+        qs = self._get_translated_texts(learning_unit_year).values('label', 'text')
+
+        summary_specification_grouped = dict.fromkeys(CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS, None)
+        for key in summary_specification_grouped.keys():
+            partim_text = qs.filter(label=key).values_list('text', flat=True).first()
+            parent_text = qs_parent.filter(label=key).values_list('text', flat=True).first() if qs_parent else None
+            summary_specification_grouped[key] = partim_text if partim_text else parent_text
+
+        serializer = self.get_serializer(summary_specification_grouped)
+
+        return Response(serializer.data)
+
+    def _get_translated_texts(self, luy):
         language = self.request.LANGUAGE_CODE
         qs = TranslatedText.objects.filter(
-            reference=learning_unit_year.pk,
+            reference=luy.pk,
             text_label__label__in=CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS
         ).annotate(
             label=F('text_label__label')
         ).filter(
             Q(
                 language=settings.LANGUAGE_CODE_FR if language == settings.LANGUAGE_CODE_FR[:2] else language,
-                text_label__label__in=CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_SPECIFICATIONS
+                label__in=CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_SPECIFICATIONS
             )
             |
             Q(
                 language=settings.LANGUAGE_CODE_FR,
-                text_label__label__in=CMS_LABEL_PEDAGOGY_FR_ONLY
+                label__in=CMS_LABEL_PEDAGOGY_FR_ONLY
             )
-        ).values('label', 'text')
-        summary_specification_grouped = dict.fromkeys(CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS, '')
-        for translated_text in qs:
-            key = translated_text['label']
-            summary_specification_grouped[key] = translated_text['text']
-        serializer = self.get_serializer(summary_specification_grouped)
-
-        return Response(serializer.data)
+        )
+        return qs

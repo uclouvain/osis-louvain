@@ -27,12 +27,12 @@ from rest_framework import serializers
 
 
 class LearningUnitSummarySpecificationSerializer(serializers.Serializer):
-    bibliography = serializers.CharField()
-    resume = serializers.CharField()
-    evaluation_methods = serializers.CharField()
-    other_informations = serializers.CharField()
-    online_resources = serializers.CharField()
-    teaching_methods = serializers.CharField()
-    themes_discussed = serializers.CharField()
-    prerequisite = serializers.CharField()
-    mobility = serializers.CharField(allow_null=True)
+    bibliography = serializers.CharField(read_only=True)
+    resume = serializers.CharField(read_only=True)
+    evaluation_methods = serializers.CharField(read_only=True)
+    other_informations = serializers.CharField(read_only=True)
+    online_resources = serializers.CharField(read_only=True)
+    teaching_methods = serializers.CharField(read_only=True)
+    themes_discussed = serializers.CharField(read_only=True)
+    prerequisite = serializers.CharField(read_only=True)
+    mobility = serializers.CharField(allow_null=True, read_only=True)

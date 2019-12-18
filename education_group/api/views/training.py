@@ -59,7 +59,7 @@ class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
         acronym__icontains='common'
     )
     serializer_class = TrainingListSerializer
-    filter_class = TrainingFilter
+    filterset_class = TrainingFilter
     search_fields = (
         'acronym',
         'partial_acronym',

@@ -54,7 +54,7 @@ class LearningUnitList(LanguageContextSerializerMixin, generics.ListAPIView):
         'learning_container_year__requirement_entity__entityversion_set',
     ).annotate_full_title()
     serializer_class = LearningUnitSerializer
-    filter_class = LearningUnitFilter
+    filterset_class = LearningUnitFilter
     search_fields = None
     ordering_fields = None
     ordering = (

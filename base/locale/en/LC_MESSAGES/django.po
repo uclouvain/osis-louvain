@@ -1078,6 +1078,9 @@ msgstr ""
 msgid "Generate pdf"
 msgstr ""
 
+msgid "Generate xls of learning units in training"
+msgstr ""
+
 msgid "Generate xls of learning units that are prerequisites for"
 msgstr ""
 
@@ -2254,6 +2257,9 @@ msgid "Select a language"
 msgstr ""
 
 msgid "Select action to execute"
+msgstr ""
+
+msgid "Select all"
 msgstr ""
 
 msgid "Select all the messages"

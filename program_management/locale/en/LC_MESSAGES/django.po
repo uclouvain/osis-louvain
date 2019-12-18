@@ -182,6 +182,9 @@ msgstr ""
 msgid "Formation catalogue"
 msgstr ""
 
+msgid "Gathering"
+msgstr ""
+
 #, python-format
 msgid ""
 "Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
@@ -192,7 +195,14 @@ msgstr ""
 msgid "Learning units"
 msgstr ""
 
+#, python-format
+msgid "LearningUnitList-%(year)s-%(acronym)s"
+msgstr ""
+
 msgid "Legend"
+msgstr ""
+
+msgid "List UE"
 msgstr ""
 
 msgid "Link type"
@@ -271,6 +281,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 msgid "Prerequisites saved."
+msgstr ""
+
+msgid "Proposal legend"
 msgstr ""
 
 msgid "Registration ID"
@@ -388,6 +401,9 @@ msgid "You are not allowed to postpone this training in the future."
 msgstr ""
 
 msgid "You are not allowed to postpone this training in the past."
+msgstr ""
+
+msgid "You are not eligible to detach this item"
 msgstr ""
 
 #, python-format
