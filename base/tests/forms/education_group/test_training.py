@@ -58,7 +58,6 @@ from base.tests.factories.hops import HopsFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.language import LanguageFactory
@@ -211,7 +210,16 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
 
 
 class TestPostponementEducationGroupYear(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        start_year = AcademicYearFactory(year=get_current_year())
+        end_year = AcademicYearFactory(year=get_current_year() + 40)
+        cls.list_acs = GenerateAcademicYear(start_year, end_year).academic_years
+
     def setUp(self):
+        # Create user and attached it to management entity
+        self.person = PersonFactory()
+        self.user = self.person.user
         administration_entity_version = MainEntityVersionFactory()
         management_entity_version = MainEntityVersionFactory()
 
@@ -221,14 +229,11 @@ class TestPostponementEducationGroupYear(TestCase):
             management_entity=management_entity_version.entity,
             administration_entity=administration_entity_version.entity,
         )
+        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
         self.education_group_type = EducationGroupTypeFactory(
             category=education_group_categories.TRAINING,
             name=education_group_types.TrainingType.BACHELOR
         )
-
-        start_year = AcademicYearFactory(year=get_current_year())
-        end_year = AcademicYearFactory(year=get_current_year() + 40)
-        self.list_acs = GenerateAcademicYear(start_year, end_year).academic_years
 
         self.data = {
             'title': 'Métamorphose',
@@ -249,11 +254,6 @@ class TestPostponementEducationGroupYear(TestCase):
             "constraint_type": "",
             "diploma_printing_title": 'Diploma title'
         }
-
-        # Create user and attached it to management entity
-        person = PersonFactory()
-        PersonEntityFactory(person=person, entity=self.education_group_year.management_entity)
-        self.user = person.user
 
     def test_init(self):
         # In case of creation
@@ -389,8 +389,8 @@ class TestPostponementEducationGroupYear(TestCase):
         form.save()
         self.assertEqual(len(form.warnings), 1)
         error_msg = _("%(col_name)s has been already modified.") % {
-                    "col_name": _(EducationGroupOrganization._meta.get_field('all_students').verbose_name).title(),
-                }
+            "col_name": _(EducationGroupOrganization._meta.get_field('all_students').verbose_name).title(),
+        }
         self.assertEqual(
             form.warnings,
             [
@@ -491,7 +491,7 @@ class TestPostponeTrainingProperty(TestCase):
             administration_entity=self.entity_version.entity,
             academic_year=self.current_academic_year
         )
-        self.form_data = model_to_dict_fk(self.training, exclude=('secondary_domains', ))
+        self.form_data = model_to_dict_fk(self.training, exclude=('secondary_domains',))
         self.form_data.update({
             'primary_language': self.form_data['primary_language_id'],
             'administration_entity': self.entity_version.pk,
@@ -554,7 +554,7 @@ class TestPostponeCertificateAims(TestCase):
             academic_year=self.current_academic_year
         )
         # Save the training instance will create N+6 data...
-        form_data = model_to_dict_fk(self.training, exclude=('secondary_domains', ))
+        form_data = model_to_dict_fk(self.training, exclude=('secondary_domains',))
         form_data.update({
             'primary_language': form_data['primary_language_id'],
             'administration_entity': self.entity_version.pk,
@@ -631,13 +631,14 @@ class TestPostponeCertificateAims(TestCase):
 
         edgy_postponed_expected = list(
             self.qs_training_futures.exclude(pk=training_in_future.pk)
-                                    .order_by('academic_year__year')
+                .order_by('academic_year__year')
         )
         self.assertEqual(form.education_group_year_postponed, edgy_postponed_expected)
 
 
 class TestPermissionField(TestCase):
     def setUp(self):
+        create_current_academic_year()
         self.permissions = [PermissionFactory() for _ in range(10)]
 
         FieldReferenceFactory(

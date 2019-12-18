@@ -26,6 +26,7 @@
 
 from rest_framework import serializers
 
+from base.models.admission_condition import AdmissionCondition
 from base.models.enums.education_group_types import TrainingType
 from webservices.api.serializers.achievement import AchievementsSerializer
 from webservices.api.serializers.admission_condition import AdmissionConditionsSerializer, \
@@ -80,7 +81,6 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
         )
 
     def get_content(self, obj):
-        egy = self.context.get('egy')
         # FIXME: Bachelor has no admissioncondition
         admission_condition_serializers = {
             TrainingType.BACHELOR.name: BachelorAdmissionConditionsSerializer,
@@ -97,11 +97,20 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
             TrainingType.UNIVERSITY_SECOND_CYCLE_CERTIFICATE.name:
                 ContinuingEducationTrainingAdmissionConditionsSerializer,
         }
-        serializer = admission_condition_serializers.get(egy.education_group_type.name)
+        serializer = admission_condition_serializers.get(
+            self.get_education_group_year().education_group_type.name,
+            AdmissionConditionsSerializer,
+        )
+        return serializer(self.get_admission_condition(), context=self.context).data
 
-        if serializer:
-            return serializer(egy.admissioncondition, context=self.context).data
-        return AdmissionConditionsSerializer(egy.admissioncondition, context=self.context).data
+    def get_education_group_year(self):
+        return self.context['egy']
+
+    def get_admission_condition(self):
+        try:
+            return self.get_education_group_year().admissioncondition
+        except AdmissionCondition.DoesNotExist:
+            return AdmissionCondition.objects.create(education_group_year=self.get_education_group_year())
 
 
 class ContactsSectionSerializer(serializers.Serializer):

@@ -71,6 +71,9 @@ msgstr "Veuillez entrer une valeur inférieure ou égale à 500."
 msgid "Please enter a value that is a multiple of 0.5."
 msgstr "Veuillez entrer une valeur qui est un multiple de 0,5."
 
+msgid "Please use the Ctrl+v shortcut to paste content."
+msgstr "Vous devez utiliser le raccourci Ctrl+V pour coller."
+
 msgid "Search"
 msgstr "Rechercher"
 

@@ -63,9 +63,12 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         lang = kwargs['context']['language']
+        acronym = kwargs['context']['acronym'].upper()
         self.instance.language = lang
         if lang != settings.LANGUAGE_CODE_FR[:2]:
             self.fields['title'] = serializers.CharField(source='title_english', read_only=True)
+        if self.instance.partial_acronym == acronym:
+            self.fields['acronym'] = serializers.CharField(source='partial_acronym', read_only=True)
 
     def get_sections(self, obj):
         datas = []

@@ -57,4 +57,5 @@ class GeneralInformation(generics.RetrieveAPIView):
     def get_serializer_context(self):
         serializer_context = super().get_serializer_context()
         serializer_context['language'] = self.kwargs['language']
+        serializer_context['acronym'] = self.kwargs['acronym']
         return serializer_context

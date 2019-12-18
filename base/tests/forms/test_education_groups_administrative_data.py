@@ -44,23 +44,24 @@ from base.tests.factories.session_exam_calendar import SessionExamCalendarFactor
 
 
 class TestAdministrativeDataForm(TestCase):
-    def setUp(self):
-        self.academic_year = AcademicYearFactory(year=2007)
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2007)
 
-        self.academic_calendars = [
-            AcademicCalendarFactory(reference=i[0], academic_year=self.academic_year)
+        cls.academic_calendars = [
+            AcademicCalendarFactory(reference=i[0], academic_year=cls.academic_year)
             for i in academic_calendar_type.CALENDAR_TYPES
         ]
 
-        self.education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
+        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
 
-        self.offer_year = [
-            OfferYearCalendarFactory(education_group_year=self.education_group_year, academic_calendar=ac)
-            for ac in self.academic_calendars
+        cls.offer_year = [
+            OfferYearCalendarFactory(education_group_year=cls.education_group_year, academic_calendar=ac)
+            for ac in cls.academic_calendars
         ]
 
-        self.session_exam_calendars = [
-            SessionExamCalendarFactory(number_session=1, academic_calendar=ac) for ac in self.academic_calendars
+        cls.session_exam_calendars = [
+            SessionExamCalendarFactory(number_session=1, academic_calendar=ac) for ac in cls.academic_calendars
         ]
 
     def test_initial(self):
@@ -213,9 +214,9 @@ class TestAdministrativeDataForm(TestCase):
 
 
 class TestCourseEnrollmentForm(TestCase):
-
-    def setUp(self):
-        self.academic_year = AcademicYearFactory(year=2007)
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2007)
 
     def test_get_new_course_enrollment_calendar(self):
         education_group_yr = EducationGroupYearFactory(academic_year=self.academic_year)
@@ -279,7 +280,6 @@ class TestCourseEnrollmentForm(TestCase):
 
 
 class TestAdditionalInfoForm(TestCase):
-
     def test_get_new_course_enrollment_calendar(self):
         academic_year = AcademicYearFactory(year=2017)
         education_group_yr = EducationGroupYearFactory(
@@ -297,4 +297,3 @@ class TestAdditionalInfoForm(TestCase):
         updated_education_group_yr = EducationGroupYear.objects.get(pk=education_group_yr.pk)
         self.assertFalse(updated_education_group_yr.weighting)
         self.assertTrue(updated_education_group_yr.default_learning_unit_enrollment)
-

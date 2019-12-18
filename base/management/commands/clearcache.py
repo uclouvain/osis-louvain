@@ -1,4 +1,4 @@
-#############################################################################
+############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,14 +22,12 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from django import template
+############################################################################
+from django.core.management import BaseCommand
+from django.core.cache import cache
 
-register = template.Library()
 
-
-@register.filter
-def has_permission_can_read_persons_roles(the_user):
-    if the_user:
-        return the_user.has_perm("base.can_read_persons_roles")
-    return False
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        cache.clear()
+        self.stdout.write(self.style.SUCCESS('Successfully clear cache'))

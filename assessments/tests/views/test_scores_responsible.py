@@ -39,7 +39,9 @@ from base.tests.factories.business.entities import create_entities_hierarchy
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity_manager import EntityManagerFactory
 from base.tests.factories.group import EntityManagerGroupFactory, ProgramManagerGroupFactory
+from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.tutor import TutorFactory
@@ -280,6 +282,8 @@ class ScoresResponsibleManagementAsProgramManagerTestCase(TestCase):
             administration_entity=cls.root_entity
         )
         cls.program_manager = ProgramManagerFactory(education_group=cls.education_group_year.education_group)
+        offer_enrollment = OfferEnrollmentFactory(education_group_year=cls.education_group_year)
+        LearningUnitEnrollmentFactory(offer_enrollment=offer_enrollment, learning_unit_year=cls.learning_unit_year)
 
     def setUp(self):
         self.client.force_login(self.program_manager.person.user)

@@ -28,6 +28,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required, permission_required
+from django.db.models import Prefetch
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
@@ -59,7 +60,7 @@ from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.views.common import display_success_messages
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
-from cms.models import text_label
+from cms.models.text_label import TextLabel
 from cms.models.translated_text_label import TranslatedTextLabel
 from reference.models.language import find_language_in_settings
 
@@ -146,7 +147,9 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
         context = get_common_context_learning_unit_year(learning_unit_year_id,
                                                         get_object_or_404(Person, user=request.user))
         label_name = request.GET.get('label')
-        text_lb = text_label.get_by_name(label_name)
+        text_lb = TextLabel.objects.prefetch_related(
+            Prefetch('translatedtextlabel_set', to_attr="translated_text_labels")
+        ).get(label=label_name)
         form = LearningUnitSpecificationsEditForm(**{
             'learning_unit_year': context['learning_unit_year'],
             'text_label': text_lb

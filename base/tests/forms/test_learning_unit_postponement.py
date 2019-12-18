@@ -464,13 +464,6 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         container_year.save()
         return initial_status_value, new_entity_value
 
-    def _change_cm_component_value(self, academic_year, new_hourly_total_value):
-        LearningComponentYear.objects.filter(
-            type=LECTURING,
-            learning_unit_year__academic_year=academic_year,
-            learning_unit_year__learning_container_year__learning_container=self.learning_unit_year_full.learning_container_year.learning_container
-        ).update(hourly_volume_total_annual=new_hourly_total_value)
-
     def _change_requirement_entity_repartition_vlume(self, academic_year, repartition_volume):
         qs = LearningComponentYear.objects.filter(
             type=LECTURING,

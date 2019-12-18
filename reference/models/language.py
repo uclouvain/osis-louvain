@@ -66,14 +66,5 @@ def find_by_id(language_id):
         return None
 
 
-def find_by_code(code):
-    return Language.objects.get(code=code)
-
-
-def find_all_languages():
-    languages = Language.objects.all().order_by('name')
-    return languages
-
-
 def find_language_in_settings(language_code):
     return next((lang for lang in settings.LANGUAGES if lang[0] == language_code), None)

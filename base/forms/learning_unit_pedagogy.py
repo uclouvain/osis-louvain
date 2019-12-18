@@ -35,6 +35,7 @@ from base.models import learning_unit_year
 from base.models.teaching_material import TeachingMaterial
 from cms.enums import entity_name
 from cms.models import translated_text
+from cms.models.translated_text import TranslatedText
 
 
 class LearningUnitPedagogyEditForm(forms.Form):
@@ -84,7 +85,7 @@ class LearningUnitPedagogyEditForm(forms.Form):
     def _get_or_create_translated_text(self):
         if hasattr(self, 'cleaned_data'):
             cms_id = self.cleaned_data['cms_id']
-            return translated_text.find_by_id(cms_id)
+            return TranslatedText.objects.get(pk=cms_id)
         return translated_text.get_or_create(
             entity=entity_name.LEARNING_UNIT_YEAR,
             reference=self.learning_unit_year.id,

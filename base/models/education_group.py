@@ -81,8 +81,6 @@ class EducationGroup(SerializableModel):
     changed = models.DateTimeField(null=True, auto_now=True)
     start_year = models.ForeignKey(
         'AcademicYear',
-        blank=True,
-        null=True,
         verbose_name=_('Start academic year'),
         related_name='start_years',
         on_delete=models.PROTECT

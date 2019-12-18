@@ -25,7 +25,6 @@
 ##############################################################################
 from http import HTTPStatus
 from unittest import mock
-
 from django.http import HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse

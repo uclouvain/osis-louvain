@@ -1,0 +1,90 @@
+{% load static bootstrap3 %}
+{% load i18n %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+<div class="modal fade" role="dialog" id="modalCustomXls">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form role="form" method="POST" name="custom_xls_form" id="custom_xls_form"
+                  action="{% url "education_group_learning_units_contains" education_group_year_pk=education_group_year.pk %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <label>{% trans 'Do you want to export the following informations' %}?</label>
+                    <br>
+                    <input type="checkbox" id="chb_select_all_custom"/>
+                    <label>{% trans 'Select all' %}</label>
+                    <br>
+                    <div id="div_xls_choices">
+                    {% for field in form_xls_custom %}
+                        {{ field }}
+                        {{ field.label }}
+                        <br>
+                    {% endfor %}
+                    </div>
+                    <br>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
+                    <button class="btn btn-primary no_spinner" type="submit" id="btn_produce_xls">{% trans 'Produce Xls' %}</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $('#btn_produce_xls').click(function (e) {
+        $('#modalCustomXls').modal('toggle');
+    });
+
+    $("#chb_select_all_custom").click(function(){
+        var chboxes =$('input:checkbox').not(this);
+        var status = this.checked;
+
+        $.each(chboxes, function() {
+                $(this).prop('checked', status);
+        });
+
+    });
+    
+    $("#div_xls_choices").click(function(){
+        var chboxes =$('div#div_xls_choices input:checkbox').not(this);
+        var cpt = 0;
+
+        $.each(chboxes, function() {
+            if ($(this).prop('checked') == false){
+                $("#chb_select_all_custom").prop('checked', false);
+                return false;
+            }else{
+                cpt += 1;
+            }
+        });
+
+        if( cpt == chboxes.length ){
+            $("#chb_select_all_custom").prop('checked', true);
+        }
+    });
+</script>

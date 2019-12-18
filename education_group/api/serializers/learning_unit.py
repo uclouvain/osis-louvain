@@ -57,6 +57,7 @@ class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, seri
         slug_field='name',
         queryset=EducationGroupType.objects.all(),
     )
+    code = serializers.CharField(source='partial_acronym', read_only=True)
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
@@ -68,6 +69,7 @@ class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, seri
         fields = EducationGroupRootsTitleSerializer.Meta.fields + (
             'url',
             'acronym',
+            'code',
             'credits',
             'decree_category',
             'decree_category_text',

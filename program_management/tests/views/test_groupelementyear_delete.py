@@ -28,9 +28,7 @@ from unittest import mock
 from django.contrib.auth.models import Permission
 from django.contrib.messages import constants as MSG
 from django.contrib.messages import get_messages
-from django.http import HttpResponse
-from django.http import HttpResponseForbidden
-from django.http import HttpResponseNotFound
+from django.http import HttpResponse, HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
@@ -86,8 +84,8 @@ class TestDetach(TestCase):
         self.mocked_perm.return_value = False
         response = self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, "education_group/blocks/modal/modal_access_denied.html")
 
     def test_detach_case_get_with_ajax_success(self):
         response = self.client.get(self.url, HTTP_X_REQUESTED_WITH='XMLHttpRequest')

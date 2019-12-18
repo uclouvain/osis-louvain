@@ -362,7 +362,8 @@ class TestEditLearningUnit(TestCase):
 
 @override_flag('learning_unit_update', active=True)
 class TestLearningUnitVolumesManagement(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         start_year = AcademicYearFactory(year=get_current_year())
         end_year = AcademicYearFactory(year=get_current_year() + 10)
 
@@ -373,28 +374,29 @@ class TestLearningUnitVolumesManagement(TestCase):
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
 
-        self.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year)
-        self.generate_container = GenerateContainer(start_year=start_year, end_year=end_year)
-        self.generated_container_year = self.generate_container.generated_container_years[0]
+        cls.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year)
+        cls.generate_container = GenerateContainer(start_year=start_year, end_year=end_year)
+        cls.generated_container_year = cls.generate_container.generated_container_years[0]
 
-        self.container_year = self.generated_container_year.learning_container_year
-        self.learning_unit_year = self.generated_container_year.learning_unit_year_full
-        self.learning_unit_year_partim = self.generated_container_year.learning_unit_year_partim
+        cls.container_year = cls.generated_container_year.learning_container_year
+        cls.learning_unit_year = cls.generated_container_year.learning_unit_year_full
+        cls.learning_unit_year_partim = cls.generated_container_year.learning_unit_year_partim
 
-        self.person = PersonFactory()
+        cls.person = PersonFactory()
 
         edit_learning_unit_permission = Permission.objects.get(codename="can_edit_learningunit")
-        self.person.user.user_permissions.add(edit_learning_unit_permission)
+        cls.person.user.user_permissions.add(edit_learning_unit_permission)
 
-        self.url = reverse('learning_unit_volumes_management', kwargs={
-            'learning_unit_year_id': self.learning_unit_year.id,
+        cls.url = reverse('learning_unit_volumes_management', kwargs={
+            'learning_unit_year_id': cls.learning_unit_year.id,
             'form_type': 'full'
         })
 
+        PersonEntityFactory(entity=cls.generate_container.entities[0], person=cls.person)
+
+    def setUp(self):
         self.client.force_login(self.person.user)
         self.user = self.person.user
-
-        PersonEntityFactory(entity=self.generate_container.entities[0], person=self.person)
 
     @mock.patch('base.models.program_manager.is_program_manager')
     def test_learning_unit_volumes_management_get_full_form(self, mock_program_manager):
@@ -599,11 +601,12 @@ class TestLearningUnitVolumesManagement(TestCase):
 
 
 class TestEntityAutocomplete(TestCase):
-    def setUp(self):
-        self.super_user = SuperUserFactory()
-        self.url = reverse("entity_autocomplete")
+    @classmethod
+    def setUpTestData(cls):
+        cls.super_user = SuperUserFactory()
+        cls.url = reverse("entity_autocomplete")
         today = datetime.date.today()
-        self.external_entity_version = EntityVersionFactory(
+        cls.external_entity_version = EntityVersionFactory(
             entity_type=entity_type.SCHOOL,
             start_date=today.replace(year=1900),
             end_date=None,

@@ -41,7 +41,6 @@ from base.models.enums import learning_container_year_types
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.person import is_person_linked_to_entity_in_charge_of_learning_unit
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from osis_common.utils.datetime import get_tzinfo, convert_date_to_datetime
 from osis_common.utils.perms import conjunction, disjunction, negation, BasePerm
@@ -670,3 +669,10 @@ def can_modify_by_proposal(learning_unit_year, person, raise_exception=False):
         MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
     )
     return result
+
+
+def is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person):
+    requirement_entity = learning_unit_year.learning_container_year.requirement_entity
+    if not requirement_entity:
+        return False
+    return person.is_attached_entities([requirement_entity])

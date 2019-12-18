@@ -26,9 +26,11 @@
 from django.test import TestCase
 
 from base.models import student
+from base.models.student import Student
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.offer_year import OfferYearFactory
-from base.tests.factories.person import PersonWithoutUserFactory
+from base.tests.factories.person import PersonWithoutUserFactory, PersonFactory
 from base.tests.factories.student import StudentFactory
 from base.tests.models import test_person
 
@@ -79,14 +81,6 @@ class StudentTest(TestCase):
         self.assertIsNotNone(db_student)
         self.assertEqual(db_student, tmp_student)
 
-    def test_find_by_offer_year(self):
-        tmp_student = StudentFactory()
-        tmp_offer_year = OfferYearFactory()
-        OfferEnrollmentFactory.create(offer_year=tmp_offer_year, student=tmp_student)
-        db_student = list(student.find_by_offer_year([tmp_offer_year][0]))[0]
-        self.assertIsNotNone(db_student)
-        self.assertEqual(db_student, tmp_student)
-
     def test_find_by_person(self):
         tmp_student = StudentFactory()
         db_student = student.find_by_person(tmp_student.person)
@@ -98,3 +92,17 @@ class StudentTest(TestCase):
         db_student = student.find_by_registration_id(tmp_student.registration_id)
         self.assertIsNotNone(db_student)
         self.assertEqual(db_student, tmp_student)
+
+    def test_students_ordering(self):
+        students_data = [
+            ('A', 'E'),
+            ('D', 'F'),
+            ('C', 'F'),
+            ('B', 'E')
+        ]
+        for first_name, name in students_data:
+            a_person = PersonFactory(first_name=first_name, last_name=name)
+            StudentFactory(person=a_person)
+        expected_order = ['A', 'B', 'C', 'D']
+        result = Student.objects.all().values_list('person__first_name', flat=True)
+        self.assertEqual(list(result), expected_order)

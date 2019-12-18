@@ -32,6 +32,7 @@ from base.tests.factories.offer import OfferFactory
 def create_offer(title):
     return OfferFactory(title=title)
 
+
 class OfferTest(TestCase):
     def test_find_by_id_with_instance(self):
         of = OfferFactory()

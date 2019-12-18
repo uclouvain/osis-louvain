@@ -1,4 +1,4 @@
-##############################################################################
+############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,28 +22,25 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-##############################################################################
-from django import forms
+############################################################################
+from django.test import TestCase
 
-from osis_common.decorators.deprecated import deprecated
+from program_management.forms.custom_xls import CustomXlsForm
 
-
-class BootstrapModelForm(forms.ModelForm):
-
-    def __init__(self, *args, **kwargs):
-        super(BootstrapModelForm, self).__init__(*args, **kwargs)
-        set_form_control(self)
+REQUIRED_ENTITY_FIELD = 'required_entity'
+PROPOSITION_FIELD = 'proposition'
+NON_EXISTING_FIELD = 'any_stupid_think'
 
 
-# Why ? Still used
-@deprecated
-def set_form_control(self):
-    for field in iter(self.fields):
-        attr_class = self.fields[field].widget.attrs.get('class') or ''
-        # Exception because we don't apply form-control on widget checkbox
-        if self.fields[field].widget.template_name != 'django/forms/widgets/checkbox.html':
-            if isinstance(self.fields[field].widget, forms.MultiWidget):
-                for widget in self.fields[field].widget.widgets:
-                    widget.attrs['class'] = ' '.join((widget.attrs.get('class', ''), 'form-control'))
-            else:
-                self.fields[field].widget.attrs['class'] = ' '.join((attr_class, 'form-control'))
+class TestCustomXlsForm(TestCase):
+
+    def test_get_optional_data(self):
+        form = CustomXlsForm({REQUIRED_ENTITY_FIELD: 'on',
+                              PROPOSITION_FIELD: 'on',
+                              NON_EXISTING_FIELD: 'on'})
+
+        self.assertCountEqual(form.get_optional_data(), [REQUIRED_ENTITY_FIELD, PROPOSITION_FIELD])
+
+    def test_get_no_optional_data(self):
+        form = CustomXlsForm()
+        self.assertCountEqual(form.get_optional_data(), [])
