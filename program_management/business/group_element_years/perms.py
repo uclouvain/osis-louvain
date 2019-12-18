@@ -43,6 +43,17 @@ def is_eligible_to_detach_group_element_year(person, group_element_year, raise_e
            _is_eligible_to_change_group_element_year(person, group_element_year, raise_exception)
 
 
+def is_eligible_to_update_group_element_year_content(person, *args, **kwargs):
+    result = not person.is_program_manager and is_eligible_to_update_group_element_year(person, *args, **kwargs)
+    if person.is_program_manager:
+        can_raise_exception(
+            kwargs['raise_exception'],
+            result,
+            _("Program manager is not allowed to change education group content")
+        )
+    return result
+
+
 def _is_eligible_to_change_group_element_year(person, group_element_year, raise_exception):
     return person.is_central_manager or EventPermEducationGroupEdition(
         obj=group_element_year.parent,

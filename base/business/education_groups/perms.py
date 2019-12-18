@@ -74,6 +74,17 @@ def is_eligible_to_change_education_group(person, education_group, raise_excepti
            _is_year_editable(education_group, raise_exception)
 
 
+def is_eligible_to_change_education_group_content(person, *args, **kwargs):
+    result = not person.is_program_manager and is_eligible_to_change_education_group(person, *args, **kwargs)
+    if person.is_program_manager:
+        can_raise_exception(
+            kwargs['raise_exception'],
+            result,
+            _("Program manager is not allowed to change education group content")
+        )
+    return result
+
+
 def _is_year_editable(education_group, raise_exception):
     error_msg = None
     if education_group.academic_year.year < settings.YEAR_LIMIT_EDG_MODIFICATION:

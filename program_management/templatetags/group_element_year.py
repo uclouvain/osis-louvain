@@ -27,7 +27,7 @@ from django import template
 from django.core.exceptions import PermissionDenied
 
 from base.templatetags.education_group import ICONS
-from program_management.business.group_element_years.perms import is_eligible_to_update_group_element_year
+from program_management.business.group_element_years.perms import is_eligible_to_update_group_element_year_content
 
 register = template.Library()
 
@@ -50,7 +50,9 @@ def _get_permission(context, permission):
 
 @register.inclusion_tag("blocks/button/action_template.html", takes_context=True)
 def action_with_permission(context, title, value, url):
-    permission_denied_message, disabled, root = _get_permission(context, is_eligible_to_update_group_element_year)
+    permission_denied_message, disabled, root = _get_permission(
+        context, is_eligible_to_update_group_element_year_content
+    )
     load_modal = True
 
     if disabled:
