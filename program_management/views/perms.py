@@ -32,7 +32,10 @@ from program_management.business.group_element_years import perms as business_pe
 
 def can_update_group_element_year(user, group_element_year, raise_exception=False):
     pers = get_object_or_404(person.Person, user=user)
-    if not business_perms.is_eligible_to_update_group_element_year(pers, group_element_year, raise_exception):
+    is_eligible = business_perms.is_eligible_to_update_group_element_year_content(
+        pers, group_element_year, raise_exception=raise_exception
+    )
+    if not is_eligible:
         raise PermissionDenied
     return True
 
