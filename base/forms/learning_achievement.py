@@ -119,8 +119,7 @@ class LearningAchievementEditForm(forms.ModelForm):
             self.last_postponed_academic_year = None
             if not self.text.learning_unit_year.academic_year.is_past and self.postponement:
                 ac_year_postponement_range = get_academic_year_postponement_range(self.text.learning_unit_year)
-                self.last_postponed_academic_year = ac_year_postponement_range.last()
-                update_future_luy(
+                self.last_postponed_academic_year = update_future_luy(
                     ac_year_postponement_range,
                     self.text,
                     self.old_code_name,
@@ -143,7 +142,8 @@ class LearningAchievementEditForm(forms.ModelForm):
         return code_name
 
 
-def update_future_luy(self, ac_year_postponement_range, text, old_code_name, code_name):
+def update_future_luy(ac_year_postponement_range, text, old_code_name, code_name):
+    last_postponed_academic_year = ac_year_postponement_range.last()
     for ac in ac_year_postponement_range:
         luy = text.learning_unit_year
         try:
@@ -165,4 +165,5 @@ def update_future_luy(self, ac_year_postponement_range, text, old_code_name, cod
             learning_unit_year=next_luy,
             defaults={'text': text.text, 'code_name': code_name}
         )
-        self.last_postponed_academic_year = ac
+        last_postponed_academic_year = ac
+    return last_postponed_academic_year

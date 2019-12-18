@@ -102,15 +102,16 @@ class LearningUnitSpecificationsEditForm(forms.Form):
             self.last_postponed_academic_year = None
             if not self.learning_unit_year.academic_year.is_past and self.postponement:
                 ac_year_postponement_range = get_academic_year_postponement_range(self.learning_unit_year)
-                self.last_postponed_academic_year = ac_year_postponement_range.last()
                 cms = {"language": self.trans_text.language,
                        "text_label": self.text_label,
                        "text": self.trans_text.text
                        }
-                update_future_luy(ac_year_postponement_range, self.learning_unit_year, cms)
+                self.last_postponed_academic_year = update_future_luy(ac_year_postponement_range,
+                                                                      self.learning_unit_year, cms)
 
 
-def update_future_luy(self, ac_year_postponement_range, luy, cms):
+def update_future_luy(ac_year_postponement_range, luy, cms):
+    last_postponed_academic_year = ac_year_postponement_range.last()
     for ac in ac_year_postponement_range:
         try:
             next_luy = LearningUnitYear.objects.get(
@@ -128,4 +129,5 @@ def update_future_luy(self, ac_year_postponement_range, luy, cms):
             text_label=cms.get("text_label"),
             defaults={'text': cms.get("text")}
         )
-        self.last_postponed_academic_year = ac
+        last_postponed_academic_year = ac
+    return last_postponed_academic_year
