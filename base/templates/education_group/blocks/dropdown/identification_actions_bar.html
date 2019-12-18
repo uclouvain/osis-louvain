@@ -69,7 +69,7 @@
                         class="trigger_modal"
                         data-url="{% url 'education_group_attach' parent.id education_group_year.id %}"
                     {% endif %}>
-                        <a>{% trans 'Paste' %}</a>
+                        <a href="#">{% trans 'Paste' %}</a>
                     </li>
                     <li class="divider"></li>
                 {% endflag %}
@@ -113,7 +113,7 @@
 
                 <li>
                     <a class="trigger_modal" data-url="{% url 'quick_search_education_group' root_id=parent.id education_group_year_id=education_group_year.id %}"
-                       data-modal_class="modal-lg" title="{% trans 'Search' %}">
+                       data-modal_class="modal-lg" title="{% trans 'Search' %}" href="#">
                         <span>{% trans 'Search' %}</span>
                     </a>
                 </li>
@@ -128,6 +128,13 @@
                     <a href="{% url "education_group_learning_units_is_prerequisite_for" education_group_year_pk=education_group_year.pk %}"
                         class="no_spinner">
                         <span>{% trans 'Generate xls of learning units that are prerequisites for' %}</span>
+                    </a>
+                </li>
+                <li class="divider"></li>
+                <li>
+                    <a href="#" data-toggle="modal" data-target="#modalCustomXls"
+                       role="button" id="bt_modal_custom_xls" class="no_spinner">
+                        <span>{% trans 'Generate xls of learning units in training' %}</span>
                     </a>
                 </li>
 

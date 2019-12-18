@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
+from django.db.models import Prefetch
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -42,7 +43,7 @@ from base.views.common import display_success_messages
 from base.views.learning_units import perms
 from base.views.learning_units.common import get_common_context_learning_unit_year, get_text_label_translated
 from base.views.learning_units.perms import PermissionDecorator
-from cms.models import text_label
+from cms.models.text_label import TextLabel
 from reference.models.language import find_language_in_settings
 
 
@@ -75,7 +76,9 @@ def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
     )
     label_name = request.GET.get('label')
     language = request.GET.get('language')
-    text_lb = text_label.get_by_name(label_name)
+    text_lb = TextLabel.objects.prefetch_related(
+        Prefetch('translatedtextlabel_set', to_attr="translated_text_labels")
+    ).get(label=label_name)
     form = LearningUnitPedagogyEditForm(**{
         'learning_unit_year': context['learning_unit_year'],
         'language': language,

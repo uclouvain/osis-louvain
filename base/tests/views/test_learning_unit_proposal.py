@@ -30,7 +30,6 @@ from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
-from django.core.exceptions import ValidationError
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
@@ -43,7 +42,6 @@ from base.business import learning_unit_proposal as proposal_business
 from base.business.learning_unit_proposal import INITIAL_DATA_FIELDS, copy_learning_unit_data
 from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit_proposal import ProposalLearningUnitForm
-from base.models import entity_version
 from base.models import proposal_learning_unit
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_periodicity
@@ -986,11 +984,6 @@ class TestLearningUnitProposalDisplay(TestCase):
                                                            {'periodicity': self.initial_periodicity})
         self.assertEqual(differences,
                          dict(learning_unit_year_periodicity.PERIODICITY_TYPES)[self.initial_periodicity])
-
-    def get_an_entity_version(self):
-        other_entity = self.generator_learning_container.generated_container_years[0] \
-            .allocation_entity_container_year.entity
-        return entity_version.get_last_version(other_entity)
 
 
 @override_flag('learning_unit_proposal_delete', active=True)

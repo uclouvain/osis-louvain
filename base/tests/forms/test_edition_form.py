@@ -37,14 +37,15 @@ from base.tests.factories.person import CentralManagerFactory, FacultyManagerFac
 
 
 class TestVolumeEditionForm(TestCase):
-    def setUp(self):
-        self.start_year = AcademicYearFactory(year=2010)
-        self.end_year = AcademicYearFactory(year=2020)
-        self.generated_ac_years = GenerateAcademicYear(self.start_year, self.end_year)
-        self.generated_container = GenerateContainer(self.start_year, self.end_year)
-        self.first_learning_unit_year = self.generated_container.generated_container_years[0].learning_unit_year_full
-        self.learning_unit_with_context = get_with_context(
-            learning_container_year_id=self.first_learning_unit_year.learning_container_year)[0]
+    @classmethod
+    def setUpTestData(cls):
+        cls.start_year = AcademicYearFactory(year=2010)
+        cls.end_year = AcademicYearFactory(year=2020)
+        cls.generated_ac_years = GenerateAcademicYear(cls.start_year, cls.end_year)
+        cls.generated_container = GenerateContainer(cls.start_year, cls.end_year)
+        cls.first_learning_unit_year = cls.generated_container.generated_container_years[0].learning_unit_year_full
+        cls.learning_unit_with_context = get_with_context(
+            learning_container_year_id=cls.first_learning_unit_year.learning_container_year)[0]
 
     def test_get_volume_form(self):
         for component, component_values in self.learning_unit_with_context.components.items():
@@ -201,20 +202,22 @@ def _get_valid_partim_data_alter():
 
 
 class TestVolumeEditionFormsetContainer(TestCase):
-    def setUp(self):
-        self.start_year = AcademicYearFactory(year=2010)
-        self.end_year = AcademicYearFactory(year=2020)
-        self.generated_ac_years = GenerateAcademicYear(self.start_year, self.end_year)
-        self.generated_container = GenerateContainer(self.start_year, self.end_year)
-        self.generated_container_year = self.generated_container.generated_container_years[0]
-        self.learning_container_year = self.generated_container.generated_container_years[0].learning_container_year
-        self.learning_units_with_context = get_with_context(
-            learning_container_year_id=self.learning_container_year)
+    @classmethod
+    def setUpTestData(cls):
+        cls.start_year = AcademicYearFactory(year=2010)
+        cls.end_year = AcademicYearFactory(year=2020)
+        cls.generated_ac_years = GenerateAcademicYear(cls.start_year, cls.end_year)
+        cls.generated_container = GenerateContainer(cls.start_year, cls.end_year)
+        cls.generated_container_year = cls.generated_container.generated_container_years[0]
+        cls.learning_container_year = cls.generated_container.generated_container_years[0].learning_container_year
+        cls.learning_units_with_context = get_with_context(
+            learning_container_year_id=cls.learning_container_year
+        )
 
-        self.learning_unit_year_full = self.generated_container_year.learning_unit_year_full
-        self.learning_unit_year_partim = self.generated_container_year.learning_unit_year_partim
-        self.central_manager = CentralManagerFactory()
-        self.faculty_manager = FacultyManagerFactory()
+        cls.learning_unit_year_full = cls.generated_container_year.learning_unit_year_full
+        cls.learning_unit_year_partim = cls.generated_container_year.learning_unit_year_partim
+        cls.central_manager = CentralManagerFactory()
+        cls.faculty_manager = FacultyManagerFactory()
 
     def test_get_volume_edition_formset_container(self):
         request_factory = RequestFactory()

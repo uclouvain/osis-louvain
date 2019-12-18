@@ -25,7 +25,6 @@
 ##############################################################################
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.db.models import Prefetch
 
 from cms.enums.entity_name import ENTITY_NAME
 from osis_common.models import osis_model_admin
@@ -120,12 +119,6 @@ def reorganise_order(parent):
         if text_label.order != index:
             text_label.order = index
             super(TextLabel, text_label).save()
-
-
-def get_by_name(text_label_name):
-    return TextLabel.objects.prefetch_related(
-        Prefetch('translatedtextlabel_set',to_attr="translated_text_labels")
-    ).get(label=text_label_name)
 
 
 def get_by_label_or_none(label):

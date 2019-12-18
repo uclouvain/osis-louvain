@@ -82,6 +82,12 @@ msgstr ""
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s offers"
 msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 
+msgid "1st quadri"
+msgstr ""
+
+msgid "2nd quadri"
+msgstr ""
+
 #, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
 msgstr ""
@@ -102,11 +108,20 @@ msgstr "Sigle"
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
 
+msgid "Active"
+msgstr ""
+
 msgid "Activities with prerequisites (in preparation)"
 msgstr "Activité avec prérequis (en préparation)"
 
 msgid "Add potential courses"
 msgstr "Ajouts de cours éventuels"
+
+msgid "Alloc. Ent."
+msgstr ""
+
+msgid "Annual"
+msgstr "Annuel"
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
@@ -202,6 +217,9 @@ msgstr "Pour accord,"
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
 
+msgid "Gathering"
+msgstr "Regroupement"
+
 #, python-format
 msgid ""
 "Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
@@ -217,6 +235,12 @@ msgstr "Unités d'enseignement"
 
 msgid "Legend"
 msgstr "Légende"
+
+msgid "LearningUnitList-%(year)s-%(acronym)s"
+msgstr "Liste-UE-%(year)s-%(acronym)s"
+
+msgid "List UE"
+msgstr "Liste UE"
 
 msgid "Link type"
 msgstr "Type de lien"
@@ -301,6 +325,9 @@ msgstr[1] "Prérequis"
 
 msgid "Prerequisites saved."
 msgstr "Prérequis enregistrés."
+
+msgid "Proposal legend"
+msgstr "Légende proposition"
 
 msgid "Registration ID"
 msgstr "NOMA"
@@ -431,6 +458,9 @@ msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le futur."
 
 msgid "You are not allowed to postpone this training in the past."
 msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le passé."
+
+msgid "You are not eligible to detach this item"
+msgstr "Vous n'êtes pas autorisé à détacher cet item"
 
 msgid "You can not add a learning unit to a %(category)s of type %(type)s."
 msgstr ""

@@ -30,11 +30,9 @@ from reversion.admin import VersionAdmin
 
 from base.models.academic_year import current_academic_year
 from base.models.education_group import EducationGroup
-from base.models.education_group_year import EducationGroupYear
 from base.models.entity import Entity
 from base.models.entity_version import find_parent_of_type_into_entity_structure
 from base.models.enums.entity_type import FACULTY
-from base.models.learning_unit_year import LearningUnitYear
 from osis_common.models.osis_model_admin import OsisModelAdmin
 from .learning_unit_enrollment import LearningUnitEnrollment
 
@@ -135,17 +133,31 @@ def get_learning_unit_years_attached_to_program_managers(programs_manager_qs, en
     current_ac = current_academic_year()
     allowed_entities_scopes = set()
 
-    education_group_years = EducationGroupYear.objects.filter(
-        academic_year=current_ac,
-        education_group__in=programs_manager_qs.values_list('education_group', flat=True)
-    ).prefetch_related(
+    offer_enrollments_education_group_year = LearningUnitEnrollment.objects.filter(
+        offer_enrollment__education_group_year__academic_year=current_ac,
+        offer_enrollment__education_group_year__education_group__in=programs_manager_qs.values_list('education_group',
+                                                                                                    flat=True)
+    ).distinct('offer_enrollment__education_group_year') \
+        .prefetch_related(
         Prefetch(
-            'administration_entity',
+            'offer_enrollment__education_group_year__administration_entity',
+            queryset=Entity.objects.all().prefetch_related('entityversion_set')
+        )
+    )
+    lu_enrollments = LearningUnitEnrollment.objects.filter(
+        offer_enrollment__education_group_year__academic_year=current_ac,
+        offer_enrollment__education_group_year__education_group__in=programs_manager_qs.values_list('education_group',
+                                                                                                    flat=True)
+    ).distinct('learning_unit_year') \
+        .prefetch_related(
+        Prefetch(
+            'offer_enrollment__education_group_year__administration_entity',
             queryset=Entity.objects.all().prefetch_related('entityversion_set')
         )
     )
 
-    for education_group_year in education_group_years:
+    for offer_enrollment in offer_enrollments_education_group_year:
+        education_group_year = offer_enrollment.offer_enrollment.education_group_year
         administration_fac_level = find_parent_of_type_into_entity_structure(
            education_group_year.administration_entity_version,
            entity_structure,
@@ -160,6 +172,6 @@ def get_learning_unit_years_attached_to_program_managers(programs_manager_qs, en
             entity_structure[administration_fac_level.pk].get('all_children', [])
         })
 
-    return LearningUnitYear.objects.filter(learning_container_year__requirement_entity__in=allowed_entities_scopes)\
-                                   .values_list('id', flat=True)
-
+    return lu_enrollments.filter(
+        learning_unit_year__learning_container_year__requirement_entity__in=allowed_entities_scopes)\
+        .values_list('learning_unit_year__id', flat=True)

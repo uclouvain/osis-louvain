@@ -25,13 +25,14 @@
 ##############################################################################
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from osis_common.document.xls_build import CONTENT_TYPE_XLS
 
 
-class TestGetLearningUnitPrerequisiteExcel(TestCase):
+class TestGetLearningUnitExcel(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonWithPermissionsFactory("can_access_education_group")
@@ -41,6 +42,8 @@ class TestGetLearningUnitPrerequisiteExcel(TestCase):
                                         args=[cls.education_group_year.pk])
         cls.url_is_prerequisite = reverse("education_group_learning_units_is_prerequisite_for",
                                           args=[cls.education_group_year.pk])
+        cls.url_contains = reverse("education_group_learning_units_contains",
+                                   args=[cls.education_group_year.pk])
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -56,3 +59,17 @@ class TestGetLearningUnitPrerequisiteExcel(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response["Content-Type"], CONTENT_TYPE_XLS)
+
+    def test_return_excel_file_contains(self):
+        response = self.client.get(self.url_contains)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], CONTENT_TYPE_XLS)
+        expected_filename = "{workbook_name}.xlsx".format(
+            workbook_name=str(_("LearningUnitList-%(year)s-%(acronym)s") % {
+                "year": self.education_group_year.academic_year.year,
+                "acronym": self.education_group_year.acronym
+            })
+        )
+        self.assertEqual(response['Content-Disposition'],
+                         "attachment; filename={}".format(expected_filename))

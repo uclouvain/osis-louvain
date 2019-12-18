@@ -44,6 +44,9 @@ from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollment
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.offer_year import OfferYearFactory
+from cms.enums import entity_name
+from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.models.translated_text import TranslatedText
 
 
 class EducationGroupYearTest(TestCase):
@@ -456,3 +459,23 @@ class EducationGroupYearTypeTest(TestCase):
     def test_type_property(self):
         education_group_year = EducationGroupYearFactory()
         self.assertEqual(education_group_year.type, education_group_year.education_group_type.name)
+
+
+class EducationGroupYearDeleteCms(TestCase):
+    def setUp(self):
+        self.education_group_year = EducationGroupYearFactory()
+        self.translated_text = TranslatedTextFactory(entity=entity_name.OFFER_YEAR,
+                                                     reference=self.education_group_year.id)
+
+        self.education_group_year_no_cms = EducationGroupYearFactory()
+
+    def test_delete_education_group_yr_and_cms(self):
+        egy_id = self.education_group_year.id
+        self.education_group_year.delete()
+        self.assertCountEqual(list(TranslatedText.objects.filter(id=self.translated_text.id)), [])
+        self.assertCountEqual(list(TranslatedText.objects.filter(reference=egy_id)), [])
+
+    def test_delete_education_group_yr_without_cms(self):
+        egy_id = self.education_group_year_no_cms.id
+        self.education_group_year_no_cms.delete()
+        self.assertCountEqual(list(TranslatedText.objects.filter(reference=egy_id)), [])

@@ -154,6 +154,7 @@ class LearningUnitDetailedSerializerTestCase(TestCase):
             'partims',
             'proposal',
             'summary_status',
+            'professional_integration'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -214,6 +215,7 @@ class ExternalLearningUnitDetailedSerializerTestCase(TestCase):
             'partims',
             'proposal',
             'summary_status',
+            'professional_integration',
             'local_code',
             'local_url'
         ]

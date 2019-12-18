@@ -179,8 +179,8 @@ def get_achievements_group_by_language(learning_unit_year):
 
 def get_academic_year_postponement_range(luy):
     end_postponement = academic_year.find_academic_year_by_year(
-        luy.learning_unit.end_year.year if luy.learning_unit.end_year else None
-    ) if luy.learning_unit else None
+        luy.learning_unit.end_year.year
+    ) if luy.learning_unit and luy.learning_unit.end_year else None
     max_postponement_year = compute_max_postponement_year(luy.learning_unit, luy.subtype, end_postponement)
     academic_year_postponement_range = AcademicYear.objects.min_max_years(
         luy.academic_year.year + 1,

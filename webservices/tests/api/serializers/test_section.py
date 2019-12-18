@@ -26,10 +26,13 @@
 from django.conf import settings
 from django.test import TestCase
 
+from base.models.admission_condition import AdmissionCondition
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonMasterFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonMasterFactory, \
+    TrainingFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
@@ -125,6 +128,22 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
             'content'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+    def test_ensure_get_education_group_year(self):
+        self.assertIsInstance(self.serializer.get_education_group_year(), EducationGroupYear)
+        self.assertEqual(self.serializer.get_education_group_year(), self.egy)
+
+    def test_ensure_admission_condition_is_created_if_not_exists(self):
+        training_wihtout_admission_condition = TrainingFactory(education_group_type__name=TrainingType.BACHELOR.name)
+
+        serializer = AdmissionConditionSectionSerializer({}, context={
+            'egy': training_wihtout_admission_condition,
+            'lang': self.language
+        })
+
+        new_instance = serializer.get_admission_condition()
+        self.assertIsInstance(new_instance, AdmissionCondition)
+        self.assertEqual(new_instance.education_group_year_id, training_wihtout_admission_condition.pk)
 
 
 class ContactsSectionSerializerTestCase(TestCase):

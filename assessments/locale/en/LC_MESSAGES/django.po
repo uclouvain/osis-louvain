@@ -601,3 +601,6 @@ msgstr ""
 
 msgid "score(s) saved"
 msgstr ""
+
+msgid "End date Prof"
+msgstr ""

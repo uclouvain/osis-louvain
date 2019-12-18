@@ -42,14 +42,14 @@ from attribution import models as mdl_attr
 from base import models as mdl
 from base.models.enums import exam_enrollment_justification_type as justification_types
 
-col_academic_year = HEADER.index('Academic year')
-col_session = HEADER.index('Session')
-col_learning_unit = HEADER.index('Learning unit')
-col_offer = HEADER.index('Program')
-col_registration_id = HEADER.index('Registration number')
-col_email = HEADER.index('Email')
-col_score = HEADER.index('Numbered scores')
-col_justification = HEADER.index('Justification (A,T)')
+col_academic_year = HEADER.index(_('Academic year'))
+col_session = HEADER.index(_('Session'))
+col_learning_unit = HEADER.index(_('Learning unit'))
+col_offer = HEADER.index(_('Program'))
+col_registration_id = HEADER.index(_('Registration number'))
+col_email = HEADER.index(_('Email'))
+col_score = HEADER.index(_('Numbered scores'))
+col_justification = HEADER.index(_('Justification (A,T)'))
 
 REGISTRATION_ID_LENGTH = 8
 

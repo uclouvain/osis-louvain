@@ -48,7 +48,7 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.hops import Hops
 from reference.models.domain import Domain
 from reference.models.enums import domain_type
-from reference.models.language import find_all_languages
+from reference.models.language import Language
 
 
 def _get_section_choices():
@@ -199,7 +199,7 @@ class TrainingEducationGroupYearForm(EducationGroupYearModelForm):
         super().__init__(*args, **kwargs)
 
         self.fields["secondary_domains"].widget.attrs['placeholder'] = _('Enter text to search')
-        self.fields['primary_language'].queryset = find_all_languages()
+        self.fields['primary_language'].queryset = Language.objects.all().order_by('name')
 
         if getattr(self.instance, 'administration_entity', None):
             self.initial['administration_entity'] = get_last_version(self.instance.administration_entity).pk

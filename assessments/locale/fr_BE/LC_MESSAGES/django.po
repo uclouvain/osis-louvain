@@ -649,3 +649,6 @@ msgstr "programme(s)"
 
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
+
+msgid "End date Prof"
+msgstr "Date d'échéance de l'enseignant"

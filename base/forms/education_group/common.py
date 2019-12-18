@@ -34,6 +34,7 @@ from base.business.event_perms import EventPermEducationGroupEdition
 from base.forms.common import ValidationRuleMixin
 from base.forms.learning_unit.entity_form import EntitiesVersionChoiceField
 from base.models import campus, group_element_year
+from base.models.academic_year import current_academic_year
 from base.models.campus import Campus
 from base.models.education_group import EducationGroup
 from base.models.education_group_type import find_authorized_types, EducationGroupType
@@ -232,6 +233,7 @@ class EducationGroupModelForm(PermissionFieldEducationGroupMixin, forms.ModelFor
         super().__init__(*args, **kwargs)
         self.fields['end_year'].queryset = \
             self.fields['end_year'].queryset.filter(year__gte=settings.YEAR_LIMIT_EDG_MODIFICATION)
+        self.fields['start_year'].initial = current_academic_year()
 
     def save(self, *args, start_year=None, **kwargs):
         if start_year:
@@ -277,6 +279,7 @@ class CommonBaseForm:
         if not (self._is_creation()):
             start_year_field.initial = self.education_group_form.instance.start_year
         else:
+            start_year_field.initial = current_academic_year().id
             start_year_field.widget = forms.HiddenInput(attrs={})
 
         start_year_field.disabled = True
@@ -291,7 +294,7 @@ class CommonBaseForm:
     def _post_clean(self):
         educ_group_form = self.education_group_form
 
-        if self._is_creation() and not educ_group_form.instance.start_year:
+        if self._is_creation():
             # Specific case, because start_date is hidden when creation, we should test start_date [validite] > end_date
             educ_group_form.instance.start_year = self.education_group_year_form.cleaned_data['academic_year']
             try:

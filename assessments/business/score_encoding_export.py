@@ -34,8 +34,8 @@ from assessments.business.enrollment_state import get_line_color, ENROLLED_LATE_
 from base import models as mdl
 from base.models.enums import exam_enrollment_justification_type
 
-HEADER = ['Academic year', 'Session', 'Learning unit', 'Program', 'Registration number', 'Lastname',
-          'Firstname', 'Email', 'Numbered scores', 'Justification (A,T)', 'End date Prof']
+HEADER = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'), _('Registration number'), _('Lastname'),
+          _('Firstname'), _('Email'), _('Numbered scores'), _('Justification (A,T)'), _('End date Prof')]
 
 JUSTIFICATION_ALIASES = {
     exam_enrollment_justification_type.ABSENCE_JUSTIFIED: "M",
@@ -108,7 +108,7 @@ def _add_header_and_legend_to_file(exam_enrollments, worksheet):
     _color_legend(worksheet)
     worksheet.append([str('')])
     __columns_resizing(worksheet)
-    header_translate_list = [str(_(elem)) for elem in HEADER]
+    header_translate_list = [str(elem) for elem in HEADER]
     worksheet.append(header_translate_list)
 
 
@@ -141,15 +141,14 @@ def __coloring_non_editable(ws, row_number, score, justification):
     Coloring of the non-editable columns
     """
     pattern_fill_grey = PatternFill(patternType='solid', fgColor=Color('C1C1C1'))
-    style_no_modification = Style(fill=pattern_fill_grey)
     column_number = 1
     while column_number < 12:
         if column_number < 9 or column_number > 10:
-            ws.cell(row=row_number, column=column_number).style = style_no_modification
+            ws.cell(row=row_number, column=column_number).fill = pattern_fill_grey
         else:
             if not(score is None and justification is None):
-                ws.cell(row=row_number, column=9).style = style_no_modification
-                ws.cell(row=row_number, column=10).style = style_no_modification
+                ws.cell(row=row_number, column=9).fill = pattern_fill_grey
+                ws.cell(row=row_number, column=10).fill = pattern_fill_grey
 
         column_number += 1
 
@@ -227,11 +226,11 @@ def _coloring_enrollment_state(ws, row_number, exam_enroll):
     enrollment_state_color = get_line_color(exam_enroll)
     if enrollment_state_color:
         pattern_fill_enrollment_state = PatternFill(patternType='solid',
-                                                    fgColor=Color(enrollment_state_color.lstrip("#")))
+                                                    fgColor=enrollment_state_color.lstrip("#"))
         style_enrollment_state = Style(fill=pattern_fill_enrollment_state)
         column_number = 1
         while column_number < 12:
-            ws.cell(row=row_number, column=column_number).style = style_enrollment_state
+            ws.cell(row=row_number, column=column_number).fill = pattern_fill_enrollment_state
             column_number += 1
 
 
@@ -244,4 +243,8 @@ def _color_legend(ws):
 def __apply_style_to_cells(ws, color_style, row):
     style_enrollment_state = Style(fill=PatternFill(patternType='solid',
                                                     fgColor=Color(color_style.lstrip("#"))))
-    ws.cell(row=row, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).style = style_enrollment_state
+    fill_pattern = PatternFill(
+        patternType='solid',
+        fgColor=Color(color_style.lstrip("#"))
+    )
+    ws.cell(row=row, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).fill = fill_pattern

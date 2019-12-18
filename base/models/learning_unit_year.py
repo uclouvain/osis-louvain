@@ -29,6 +29,8 @@ from django.core.validators import MinValueValidator, MaxValueValidator, RegexVa
 from django.db import models
 from django.db.models import Q, When, CharField, Value, Case, Subquery, OuterRef
 from django.db.models.functions import Concat
+from django.db.models.signals import post_delete
+from django.dispatch.dispatcher import receiver
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -49,6 +51,8 @@ from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, 
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
 from base.models.prerequisite_item import PrerequisiteItem
+from cms.models.translated_text import TranslatedText
+from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
 
@@ -108,7 +112,7 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('external_id', 'acronym', 'specific_title', 'academic_year', 'credits', 'changed', 'structure',
                     'status')
     list_filter = ('academic_year', 'decimal_scores', 'summary_locked')
-    search_fields = ['acronym', 'structure__acronym', 'external_id']
+    search_fields = ['acronym', 'structure__acronym', 'external_id', 'id']
     actions = [
         'resend_messages_to_queue',
     ]
@@ -674,3 +678,8 @@ def toggle_summary_locked(learning_unit_year_id):
     luy.summary_locked = not luy.summary_locked
     luy.save()
     return luy
+
+
+@receiver(post_delete, sender=LearningUnitYear)
+def _learningunityear_delete(sender, instance, **kwargs):
+    TranslatedText.objects.filter(entity=LEARNING_UNIT_YEAR, reference=instance.id).delete()

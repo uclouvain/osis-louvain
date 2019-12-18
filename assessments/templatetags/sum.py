@@ -27,6 +27,7 @@ from django import template
 
 register = template.Library()
 
+
 @register.filter
 def sum(value, args):
     """ Template tag used to sum its two arguments. """

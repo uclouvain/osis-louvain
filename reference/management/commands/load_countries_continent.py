@@ -25,7 +25,9 @@
 ############################################################################
 
 import csv
+import logging
 
+from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand
 
@@ -56,11 +58,12 @@ class Command(BaseCommand):
 
 def _set_country_continent(country_name, country_code, continent_name, continent_code):
     if continent_name:
+        logger = logging.getLogger(settings.DEFAULT_LOGGER)
         try:
             country = Country.objects.filter(iso_code=country_code).get()
             continent, created = Continent.objects.get_or_create(name=continent_name, code=continent_code)
-            print('{} - {}'.format(country, continent))
+            logger.info('{} - {}'.format(country, continent))
             country.continent = continent
             country.save()
         except ObjectDoesNotExist:
-            print('WARNING :: country does not exists : {}'.format(country_name))
+            logger.info('WARNING :: country does not exists : {}'.format(country_name))

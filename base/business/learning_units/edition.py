@@ -24,39 +24,38 @@
 #
 ##############################################################################
 
+from django.conf import settings
 from django.db import IntegrityError, transaction, Error
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from base import models as mdl_base
 from base.business import learning_unit_year_with_context
+from base.business.learning_unit import CMS_LABEL_SUMMARY, CMS_LABEL_PEDAGOGY_FR_AND_EN, \
+    CMS_LABEL_PEDAGOGY_FR_ONLY, CMS_LABEL_SPECIFICATIONS
+from base.business.learning_unit import get_academic_year_postponement_range
+from base.business.learning_units.pedagogy import postpone_teaching_materials
 from base.business.learning_units.simple.deletion import delete_from_given_learning_unit_year, \
     check_learning_unit_year_deletion
 from base.business.utils.model import update_instance_model_from_data, update_related_object
 from base.enums.component_detail import COMPONENT_DETAILS
+from base.forms.learning_achievement import update_future_luy as update_future_luy_achievement
+from base.forms.learning_unit_specifications import update_future_luy
 from base.models import learning_class_year, academic_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from base.models.entity import Entity
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
+from base.models.learning_achievement import LearningAchievement
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
-from cms.models import translated_text
-from osis_common.utils.numbers import normalize_fraction
-from base.business.learning_units.pedagogy import postpone_teaching_materials
-from base.business.learning_unit import get_academic_year_postponement_range
-from base.forms.learning_unit_specifications import update_future_luy
-from django.conf import settings
-from base.business.learning_unit import CMS_LABEL_SUMMARY, CMS_LABEL_PEDAGOGY_FR_AND_EN, \
-    CMS_LABEL_PEDAGOGY_FR_ONLY, CMS_LABEL_SPECIFICATIONS
-from cms.models.translated_text import TranslatedText
-from cms.models.text_label import TextLabel
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
-from base.forms.learning_achievement import update_future_luy as update_future_luy_achievement
-from base.models.learning_achievement import LearningAchievement
-from reference.models.language import find_by_code
+from cms.models.text_label import TextLabel
+from cms.models.translated_text import TranslatedText
+from osis_common.utils.numbers import normalize_fraction
+from reference.models.language import Language
 
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
 
@@ -241,7 +240,7 @@ def _duplicate_teaching_material(duplicated_luy):
 
 
 def _duplicate_cms_data(duplicated_luy):
-    previous_cms_data = translated_text.find_by_reference(duplicated_luy.copied_from.id)
+    previous_cms_data = TranslatedText.objects.filter(reference=duplicated_luy.copied_from.id)
     for item in previous_cms_data:
         update_related_object(item, 'reference', duplicated_luy.id)
 
@@ -620,7 +619,7 @@ def update_partim_acronym(acronym_full, luy_to_update):
 
 def _update_luy_achievements_in_future(ac_year_postponement_range, lu_to_consolidate):
     for code, label in settings.LANGUAGES:
-        language = find_by_code(code[:2].upper())
+        language = Language.objects.filter(code=code[:2].upper())
         texts = LearningAchievement.objects.filter(
             learning_unit_year_id=lu_to_consolidate.id,
             language=language)

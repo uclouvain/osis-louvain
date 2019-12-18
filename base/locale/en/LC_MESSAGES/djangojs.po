@@ -71,6 +71,9 @@ msgstr ""
 msgid "Please enter a value that is a multiple of 0.5."
 msgstr ""
 
+msgid "Please use the Ctrl+v shortcut to paste content."
+msgstr ""
+
 msgid "Search"
 msgstr ""
 

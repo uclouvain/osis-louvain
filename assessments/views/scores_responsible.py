@@ -34,6 +34,7 @@ from assessments.api.serializers.scores_responsible import ScoresResponsibleList
 from assessments.forms.scores_responsible import ScoresResponsibleFilter
 from attribution import models as mdl_attr
 from attribution.business.score_responsible import get_attributions_data
+from attribution.models.attribution import Attribution
 from base import models as mdl_base
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import CacheFilterMixin
@@ -82,7 +83,7 @@ def scores_responsible_add(request, pk):
         mdl_attr.attribution.clear_scores_responsible_by_learning_unit_year(pk)
         if request.POST.get('attribution'):
             attribution_id = request.POST.get('attribution').strip('attribution_')
-            attribution = mdl_attr.attribution.find_by_id(attribution_id)
+            attribution = Attribution.objects.get(pk=attribution_id)
             attributions = mdl_attr.attribution.Attribution.objects \
                 .filter(learning_unit_year=attribution.learning_unit_year) \
                 .filter(tutor=attribution.tutor)

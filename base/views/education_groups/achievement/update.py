@@ -25,6 +25,7 @@
 ############################################################################
 from django.conf import settings
 from django.contrib.messages.views import SuccessMessageMixin
+from django.db.models import Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -42,7 +43,8 @@ from base.views.education_groups.achievement.common import EducationGroupAchieve
 from base.views.education_groups.achievement.detail import CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
 from base.views.mixins import AjaxTemplateMixin, RulesRequiredMixin
 from cms.enums import entity_name
-from cms.models import translated_text, text_label
+from cms.models import translated_text
+from cms.models.text_label import TextLabel
 
 
 class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
@@ -134,7 +136,9 @@ class EducationGroupAchievementProgramAim(EducationGroupAchievementCMS):
 
     @cached_property
     def cms_text_label(self):
-        return text_label.get_by_name(CMS_LABEL_PROGRAM_AIM)
+        return TextLabel.objects.prefetch_related(
+            Prefetch('translatedtextlabel_set', to_attr="translated_text_labels")
+        ).get(label=CMS_LABEL_PROGRAM_AIM)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -151,7 +155,9 @@ class EducationGroupAchievementAdditionalInformation(EducationGroupAchievementCM
 
     @cached_property
     def cms_text_label(self):
-        return text_label.get_by_name(CMS_LABEL_ADDITIONAL_INFORMATION)
+        return TextLabel.objects.prefetch_related(
+            Prefetch('translatedtextlabel_set', to_attr="translated_text_labels")
+        ).get(label=CMS_LABEL_ADDITIONAL_INFORMATION)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -73,7 +73,7 @@ class XlsTests(TestCase):
                                    exam_enrollment)
 
         self.assertEqual(
-            self.worksheet.cell(row=ROW_NUMBER, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).style.fill.fgColor,
+            self.worksheet.cell(row=ROW_NUMBER, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).fill.fgColor,
             Color(rgb=NOT_ENROLLED_COLOR.lstrip('#')))
 
     def test_coloring_enrolled_late(self):
@@ -86,7 +86,7 @@ class XlsTests(TestCase):
                                    exam_enrollment)
 
         self.assertEqual(
-            self.worksheet.cell(row=ROW_NUMBER, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).style.fill.fgColor,
+            self.worksheet.cell(row=ROW_NUMBER, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).fill.fgColor,
             Color(rgb=ENROLLED_LATE_COLOR.lstrip('#')))
 
     def test_coloring_normal_enrollment(self):
@@ -96,18 +96,18 @@ class XlsTests(TestCase):
         _coloring_enrollment_state(self.worksheet, ROW_NUMBER, exam_enrollment)
 
         self.assertEqual(
-            self.worksheet.cell(row=ROW_NUMBER, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).style.fill.fgColor,
+            self.worksheet.cell(row=ROW_NUMBER, column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).fill.fgColor,
             Color(rgb=WHITE_RGB))
 
     def test_color_legend(self):
         _color_legend(self.worksheet)
         self.assertEqual(
             self.worksheet.cell(row=FIRST_ROW_LEGEND_ENROLLMENT_STATUS,
-                                column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).style.fill.fgColor,
+                                column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).fill.fgColor,
             Color(rgb=ENROLLED_LATE_COLOR.lstrip('#')))
         self.assertEqual(
             self.worksheet.cell(row=FIRST_ROW_LEGEND_ENROLLMENT_STATUS+1,
-                                column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).style.fill.fgColor,
+                                column=FIRST_COL_LEGEND_ENROLLMENT_STATUS).fill.fgColor,
             Color(rgb=NOT_ENROLLED_COLOR.lstrip("#")))
 
     def test_add_header_and_legend_to_file(self):
