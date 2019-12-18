@@ -31,10 +31,13 @@ from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
+from base.models.enums.groups import PROGRAM_MANAGER_GROUP
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import CentralManagerFactory
+from base.tests.factories.person import CentralManagerFactory, PersonWithPermissionsFactory
+from program_management.business.group_element_years.perms import is_eligible_to_update_group_element_year_content
+from program_management.templatetags.group_element_year import _get_permission
 
 
 @override_flag('education_group_update', active=True)
@@ -103,6 +106,11 @@ class TestUp(TestCase):
         response = self.client.post(self.url, data=self.post_valid_data, follow=True, HTTP_REFERER=http_referer)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTrue(mock_up.called)
+
+    def test_button_order_disabled_for_program_manager(self):
+        program_manager = PersonWithPermissionsFactory(groups=(PROGRAM_MANAGER_GROUP, ))
+        context = {'person': program_manager, 'group': self.group_element_year_1, 'root': None}
+        self.assertEqual(_get_permission(context, is_eligible_to_update_group_element_year_content)[1], 'disabled')
 
 
 @override_flag('education_group_update', active=True)

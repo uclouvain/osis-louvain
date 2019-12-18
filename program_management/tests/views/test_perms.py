@@ -30,15 +30,16 @@ from django.test import TestCase
 
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_types import GroupType, MiniTrainingType
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP
+from base.models.enums.groups import CENTRAL_MANAGER_GROUP, PROGRAM_MANAGER_GROUP
 from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_calendar import CloseAcademicCalendarFactory, \
     OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
-from base.tests.factories.person import PersonFactory, FacultyManagerFactory
+from base.tests.factories.person import PersonFactory, FacultyManagerFactory, PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.program_manager import ProgramManagerFactory
 from program_management.views.perms import can_update_group_element_year, \
     can_detach_group_element_year
 
@@ -93,6 +94,11 @@ class TestCanUpdateGroupElementYear(TestCase):
 
         with self.assertRaises(PermissionDenied):
             can_update_group_element_year(self.faculty_manager.user, self.group_element_year)
+
+    def test_raise_permission_denied_if_person_is_program_manager(self):
+        program_manager = PersonWithPermissionsFactory(groups=(PROGRAM_MANAGER_GROUP, ))
+        with self.assertRaises(PermissionDenied):
+            can_update_group_element_year(program_manager.user, self.group_element_year)
 
     def test_raise_permission_denied_when_minor_or_major_list_choice_and_person_is_faculty_manager(self):
         OpenAcademicCalendarFactory(reference=EDUCATION_GROUP_EDITION, academic_year=self.current_acy)
