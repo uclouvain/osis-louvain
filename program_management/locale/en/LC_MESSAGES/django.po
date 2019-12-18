@@ -273,6 +273,12 @@ msgstr[1] ""
 msgid "Prerequisites saved."
 msgstr ""
 
+msgid "Program manager is not allowed to change education group content"
+msgstr ""
+
+msgid "Proposal legend"
+msgstr ""
+
 msgid "Registration ID"
 msgstr ""
 
@@ -391,6 +397,9 @@ msgid "You are not allowed to postpone this training in the past."
 msgstr ""
 
 msgid "You are not eligible to detach this item"
+msgstr ""
+
+msgid "You are not eligible to update the group element year"
 msgstr ""
 
 #, python-format

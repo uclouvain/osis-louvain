@@ -80,6 +80,6 @@ class UpdateGroupElementYearView(GenericGroupElementYearMixin, UpdateView):
         except PermissionDenied:
             return render(request,
                           'education_group/blocks/modal/modal_access_denied.html',
-                          {'access_message': _('Your are not eligible to update the group element year')})
+                          {'access_message': _('You are not eligible to update the group element year')})
 
         return super(UpdateGroupElementYearView, self).dispatch(request, *args, **kwargs)
