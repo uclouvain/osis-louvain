@@ -320,9 +320,6 @@ msgstr[1] "Prérequis"
 msgid "Prerequisites saved."
 msgstr "Prérequis enregistrés."
 
-msgid "Program manager is not allowed to change education group content"
-msgstr "Le gestionnaire de parcours étudiant n'a pas la permission de modifier le contenu d'une offre de formation"
-
 msgid "Proposal legend"
 msgstr "Légende proposition"
 
@@ -415,6 +412,9 @@ msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
 
 msgid "The root does not exist in the next academic year."
 msgstr "La racine n'existe pas dans l'anné academique suivante."
+
+msgid "The user is not allowed to change education group content."
+msgstr "L'utilisateur n'a pas la permission de modifier le contenu d'une offre de formation"
 
 msgid ""
 "This form must be signed by the designated authority and delivered to the "

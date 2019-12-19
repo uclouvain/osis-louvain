@@ -273,9 +273,6 @@ msgstr[1] ""
 msgid "Prerequisites saved."
 msgstr ""
 
-msgid "Program manager is not allowed to change education group content"
-msgstr ""
-
 msgid "Proposal legend"
 msgstr ""
 
@@ -358,6 +355,9 @@ msgid "The registration form is available at the Secretariat of"
 msgstr ""
 
 msgid "The root does not exist in the next academic year."
+msgstr ""
+
+msgid "The user is not allowed to change education group content."
 msgstr ""
 
 msgid ""
