@@ -25,15 +25,16 @@
 ##############################################################################
 from unittest import mock
 
-from django.contrib.auth.models import Permission, User
+from django.contrib.auth.models import Permission
+from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
 from base.business.education_groups.perms import is_eligible_to_change_education_group_content
+from base.models.education_group import EducationGroup
 from base.models.enums.groups import PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP
-from base.models.person import Person
 from base.templatetags.education_group import _get_permission
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -120,7 +121,12 @@ class TestUp(TestCase):
         mock_year_editable.return_value = True
         person_with_both_roles = PersonWithPermissionsFactory(groups=(PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP))
         person_with_both_roles.user.user_permissions.add(
-            Permission.objects.get(codename="change_educationgroupcontent"),
+            Permission.objects.get_or_create(
+                codename='change_educationgroupcontent',
+                defaults={
+                    'content_type': ContentType.objects.get_or_create(app_label='base', model='educationgroup')[0]
+                }
+            )[0]
         )
         context = {'person': person_with_both_roles, 'group': self.group_element_year_1, 'root': None}
         self.assertEqual(_get_permission(context, is_eligible_to_change_education_group_content)[1], '')

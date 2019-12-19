@@ -25,6 +25,8 @@
 ##############################################################################
 from http import HTTPStatus
 from unittest import mock
+
+from django.contrib.auth.models import Permission
 from django.http import HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
@@ -68,7 +70,7 @@ class TestEdit(TestCase):
     def setUp(self):
         self.client.force_login(self.person.user)
         self.perm_patcher = mock.patch(
-            "program_management.business.group_element_years.perms.is_eligible_to_update_group_element_year",
+            "program_management.business.group_element_years.perms.is_eligible_to_update_group_element_year_content",
             return_value=True
         )
         self.mocked_perm = self.perm_patcher.start()
