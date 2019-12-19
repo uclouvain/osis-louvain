@@ -110,6 +110,7 @@ class EducationGroup(SerializableModel):
             ("can_access_education_group", "Can access education_group"),
             ("change_commonpedagogyinformation", "Can change common pedagogy information"),
             ("change_pedagogyinformation", "Can change pedagogy information"),
+            ("change_educationgroupcontent", "Can change education group content"),
         )
         verbose_name = _("Education group")
 
