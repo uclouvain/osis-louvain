@@ -25,6 +25,7 @@
 ##############################################################################
 from datetime import timedelta
 
+import mock
 from django.core.exceptions import FieldDoesNotExist
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
@@ -95,7 +96,11 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
             }
         )
 
-    def test_button_order_with_permission(self):
+    @mock.patch('base.business.education_groups.perms.check_permission')
+    @mock.patch('base.business.education_groups.perms.is_eligible_to_change_education_group')
+    def test_button_order_with_permission(self, mock_permission, mock_eligibility):
+        mock_permission.return_value = True
+        mock_eligibility.return_value = True
         result = button_order_with_permission(self.context, "title", "id", "edit")
         self.assertEqual(result, {"title": "title", "id": "id", "value": "edit", 'disabled': "",
                                   'icon': "glyphicon glyphicon-edit"})
