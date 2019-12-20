@@ -58,13 +58,8 @@ class TestCanUpdateGroupElementYear(TestCase):
         cls.faculty_manager = FacultyManagerFactory()
         cls.faculty_manager.user.user_permissions.add(
             Permission.objects.get(codename='change_educationgroup'),
-            Permission.objects.get_or_create(
-                    codename='change_educationgroupcontent',
-                    defaults={
-                        'content_type': ContentType.objects.get_or_create(app_label='base', model='educationgroup')[0]
-                    }
-                )[0]
-            )
+            Permission.objects.get(codename='change_educationgroupcontent')
+        )
         PersonEntityFactory(
             entity=cls.group_element_year.parent.management_entity,
             person=cls.faculty_manager
@@ -115,7 +110,7 @@ class TestCanUpdateGroupElementYear(TestCase):
         mock_permission.return_value = True
         person_with_both_roles = PersonWithPermissionsFactory(groups=(PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP))
         person_with_both_roles.user.user_permissions.add(
-            Permission.objects.get_or_create(codename="change_educationgroupcontent")[0]
+            Permission.objects.get(codename="change_educationgroupcontent")
         )
         self.assertTrue(can_update_group_element_year(person_with_both_roles.user, self.group_element_year))
 

@@ -414,7 +414,7 @@ msgid "The root does not exist in the next academic year."
 msgstr "La racine n'existe pas dans l'anné academique suivante."
 
 msgid "The user is not allowed to change education group content."
-msgstr "L'utilisateur n'a pas la permission de modifier le contenu d'une offre de formation"
+msgstr "L'utilisateur n'a pas la permission de modifier le contenu d'une formation"
 
 msgid ""
 "This form must be signed by the designated authority and delivered to the "

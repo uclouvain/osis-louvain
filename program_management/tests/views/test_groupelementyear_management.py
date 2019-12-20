@@ -109,9 +109,20 @@ class TestUp(TestCase):
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTrue(mock_up.called)
 
+
+class TestOrderingButtons(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
+        cls.group_element_year = GroupElementYearFactory(
+            parent=cls.education_group_year,
+            child_branch__academic_year=cls.academic_year
+        )
+
     def test_button_order_disabled_for_program_manager(self):
         program_manager = PersonWithPermissionsFactory(groups=(PROGRAM_MANAGER_GROUP, ))
-        context = {'person': program_manager, 'group': self.group_element_year_1, 'root': None}
+        context = {'person': program_manager, 'group': self.group_element_year, 'root': None}
         self.assertEqual(_get_permission(context, is_eligible_to_change_education_group_content)[1], 'disabled')
 
     @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
@@ -121,14 +132,9 @@ class TestUp(TestCase):
         mock_year_editable.return_value = True
         person_with_both_roles = PersonWithPermissionsFactory(groups=(PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP))
         person_with_both_roles.user.user_permissions.add(
-            Permission.objects.get_or_create(
-                codename='change_educationgroupcontent',
-                defaults={
-                    'content_type': ContentType.objects.get_or_create(app_label='base', model='educationgroup')[0]
-                }
-            )[0]
+            Permission.objects.get(codename='change_educationgroupcontent')
         )
-        context = {'person': person_with_both_roles, 'group': self.group_element_year_1, 'root': None}
+        context = {'person': person_with_both_roles, 'group': self.group_element_year, 'root': None}
         self.assertEqual(_get_permission(context, is_eligible_to_change_education_group_content)[1], '')
 
 
