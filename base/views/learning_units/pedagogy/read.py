@@ -135,4 +135,5 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
     context['cms_label_pedagogy_fr_only'] = CMS_LABEL_PEDAGOGY_FR_ONLY
     context['attributions'] = attributions
     context["version"] = reversion
+    context['tab_active'] = 'pedagogy'
     return render(request, template, context)

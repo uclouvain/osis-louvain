@@ -71,6 +71,7 @@ def learning_unit_attributions(request, learning_unit_year_id):
     context["can_manage_attribution"] = business_perms.is_eligible_to_manage_attributions(
         context["learning_unit_year"], request.user.person
     )
+    context["tab_active"] = "attributions"
     warning_msgs = get_charge_repartition_warning_messages(context["learning_unit_year"].learning_container_year)
     display_warning_messages(request, warning_msgs)
     return render(request, "attribution/attributions.html", context)

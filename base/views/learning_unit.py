@@ -91,6 +91,7 @@ def learning_unit_formations(request, learning_unit_year_id):
     for root_formation in context['root_formations']:
         context['total_formation_enrollments'] += root_formation.count_formation_enrollments
         context['total_learning_unit_enrollments'] += root_formation.count_learning_unit_enrollments
+    context['tab_active'] = "formations"
     return render(request, "learning_unit/formations.html", context)
 
 
@@ -122,6 +123,7 @@ def learning_unit_specifications(request, learning_unit_year_id):
     context.update(get_achievements_group_by_language(learning_unit_year))
     context.update(get_languages_settings())
     context['can_update_learning_achievement'] = can_update_learning_achievement(learning_unit_year, person)
+    context['tab_active'] = 'specifications'
     return render(request, "learning_unit/specifications.html", context)
 
 

@@ -74,6 +74,14 @@
         let enableNavLink = function (domId, url, title) {
             if (url != undefined) {
                 let elem = document.getElementById(domId);
+                if ("{{ tab_active }}" != "identification") {
+                    if ("{{ tab_active }}" == "attributions") {
+                        url = url.replace("learning_units", "attribution") + "{{ tab_active }}/";
+                    } else {
+                        url = url + "{{ tab_active }}/";
+                    }
+                }
+
                 elem.setAttribute('href', url);
                 elem.setAttribute('title', title);
                 //Remove disabled property
