@@ -153,7 +153,7 @@ def learning_unit_volumes_management(request, learning_unit_year_id, form_type):
             return HttpResponseRedirect(reverse("learning_unit", args=[learning_unit_year_id]))
 
     context['formsets'] = volume_edition_formset_container.formsets
-    context['tab_active'] = 'components'
+    context['tab_active'] = 'learning_unit_components'  # Corresponds to url_name
     context['entity_types_volume'] = REQUIREMENT_ENTITIES
     context['luy_url'] = 'learning_unit_components' if form_type == "full" else 'learning_unit'
     if request.is_ajax():

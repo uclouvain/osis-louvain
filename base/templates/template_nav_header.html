@@ -49,6 +49,9 @@
                     </a>
                 </li>
             </ul>
+            <input id="nav-url"
+                    type="hidden"
+                    data-nav-base-url="{% url tab_active learning_unit_year_id=learning_unit_year.id%}"/>
         </div>
     </div>
 
@@ -71,15 +74,14 @@
             }
             return undefined;
         };
-        let enableNavLink = function (domId, url, title) {
+        let enableNavLink = function (domId, url, title, current_id) {
+
             if (url != undefined) {
                 let elem = document.getElementById(domId);
-                if ("{{ tab_active }}" != "identification") {
-                    if ("{{ tab_active }}" == "attributions") {
-                        url = url.replace("learning_units", "attribution") + "{{ tab_active }}/";
-                    } else {
-                        url = url + "{{ tab_active }}/";
-                    }
+                if(current_id){
+                    var id_to_go_to = getIdFromUrl(url);
+                    var url_by_name = $("#nav-url").attr("data-nav-base-url");
+                    url = url_by_name.replace(current_id, id_to_go_to)
                 }
 
                 elem.setAttribute('href', url);
@@ -93,7 +95,7 @@
                 let previousObject = objectIds[currentIndex - 1];
                 let previousUrl = previousObject.id;
                 let previousTitle = previousObject.value;
-                enableNavLink('previousNavLink', previousUrl, previousTitle);
+                enableNavLink('previousNavLink', previousUrl, previousTitle, getIdFromUrl(objectIds[currentIndex].id));
             }
         };
         let setNextLink = function (objectIds, currentIndex) {
@@ -101,7 +103,7 @@
                 let nextObject = objectIds[currentIndex + 1];
                 let nextUrl = nextObject.id;
                 let nextTitle = nextObject.value;
-                enableNavLink('nextNavLink', nextUrl, nextTitle);
+                enableNavLink('nextNavLink', nextUrl, nextTitle, getIdFromUrl(objectIds[currentIndex].id));
             }
         };
         if (typeof localStorage != 'undefined') {
