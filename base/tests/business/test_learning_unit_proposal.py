@@ -38,7 +38,6 @@ from base.business import learning_unit_proposal as lu_proposal_business
 from base.business.learning_unit_proposal import compute_proposal_type, consolidate_proposal, modify_proposal_state, \
     copy_learning_unit_data
 from base.business.learning_unit_proposal import consolidate_proposals_and_send_report
-from base.business.learning_units.edition import update_partim_acronym
 from base.business.learning_units.perms import PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS
 from base.models.enums import learning_component_year_type
@@ -58,6 +57,8 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from reference.tests.factories.language import LanguageFactory
+from django.test.utils import override_settings
 
 
 class TestLearningUnitProposalCancel(TestCase):
@@ -179,6 +180,12 @@ class TestLearningUnitProposalCancel(TestCase):
 
 
 class TestComputeProposalType(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.language_fr = LanguageFactory(code='FR', name='FRENCH')
+
     def test_return_creation_type_when_creation_is_initial_proposal_type(self):
         proposal = ProposalLearningUnitFactory(type=ProposalType.CREATION.name)
         actual_proposal_type = compute_proposal_type(proposal, proposal.learning_unit_year)
@@ -270,6 +277,12 @@ def mock_message_by_level(*args, **kwargs):
 
 
 class TestConsolidateProposal(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.language_fr = LanguageFactory(code='FR', name='FRENCH')
+
     def test_when_proposal_is_not_accepted_nor_refused(self):
         states = (state for state, value in proposal_state.ProposalState.__members__.items()
                   if state not in PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES)
@@ -348,6 +361,7 @@ class TestConsolidateProposal(TestCase):
         consolidate_proposal(proposal)
         self.assertTrue(mock_update_learning_unit_with_report.called)
 
+    @override_settings(LANGUAGES=[('fr-be', 'French'), ], LANGUAGE_CODE='fr-be')
     def test_when_proposal_of_type_modification_and_accepted_with_partim(self):
         old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
         current_academic_year = AcademicYearFactory(year=datetime.date.today().year)

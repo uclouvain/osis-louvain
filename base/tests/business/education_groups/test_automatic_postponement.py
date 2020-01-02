@@ -50,12 +50,14 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.translated_text import TranslatedTextFactory
+from reference.tests.factories.language import LanguageFactory
 
 
 class TestFetchEducationGroupToPostpone(TestCase):
 
     @classmethod
     def setUpTestData(cls):
+        cls.language_fr = LanguageFactory(code='FR', name='FRENCH')
         cls.current_year = get_current_year()
         cls.academic_years = [AcademicYearFactory(year=i) for i in range(cls.current_year, cls.current_year + 7)]
 

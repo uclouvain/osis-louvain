@@ -58,6 +58,7 @@ from base.tests.factories.person import PersonFactory, FacultyManagerFactory, Ce
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory
+from reference.tests.factories.language import LanguageFactory
 
 TYPES_PROPOSAL_NEEDED_TO_EDIT = (learning_container_year_types.COURSE,
                                  learning_container_year_types.DISSERTATION,
@@ -73,6 +74,7 @@ ALL_TYPES = TYPES_PROPOSAL_NEEDED_TO_EDIT + TYPES_DIRECT_EDIT_PERMITTED
 
 class PermsTestCase(TestCase):
     def setUp(self):
+        self.language_fr = LanguageFactory(code='FR', name='FRENCH')
         self.academic_yr = create_current_academic_year()
         self.academic_yr_1 = AcademicYearFactory.build(year=self.academic_yr.year + 1)
         super(AcademicYear, self.academic_yr_1).save()
@@ -86,7 +88,8 @@ class PermsTestCase(TestCase):
             academic_year=self.academic_yr,
             learning_container_year=self.lunit_container_yr,
             subtype=FULL,
-            learning_unit=LearningUnitFactory(end_year=self.academic_yr)
+            learning_unit=LearningUnitFactory(start_year=self.academic_yr),
+            language=self.language_fr
         )
         AcademicCalendarFactory(
             data_year=self.academic_yr,
