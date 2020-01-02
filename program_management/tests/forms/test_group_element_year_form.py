@@ -41,14 +41,12 @@ class TestGroupElementYearForm(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory()
-
-    def setUp(self):
-        self.parent = TrainingFactory(
-            academic_year=self.academic_year,
+        cls.parent = TrainingFactory(
+            academic_year=cls.academic_year,
             education_group_type__learning_unit_child_allowed=True
         )
-        self.child_leaf = LearningUnitYearFactory()
-        self.child_branch = MiniTrainingFactory(academic_year=self.academic_year)
+        cls.child_leaf = LearningUnitYearFactory()
+        cls.child_branch = MiniTrainingFactory(academic_year=cls.academic_year)
 
     def test_fields_relevant(self):
         form = GroupElementYearForm()

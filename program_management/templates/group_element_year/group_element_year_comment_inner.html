@@ -41,7 +41,7 @@
                             <tr>
                                 <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
                                 <th>{% trans 'Code' %}</th>
-                                {% if group_element_year.parent.is_minor_major_option_list_choice %}
+                                {% if  formset.forms.0.instance.parent.is_minor_major_option_list_choice %}
                                 <th>{% trans 'Access condition' %}</th>
                                 {% else %}
                                 <th>{% trans 'Mandatory' %}</th>
@@ -61,7 +61,7 @@
                                 {{ form.id }}
                                 <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{{ form.instance.child_branch.acronym }}</td>
                                 <td>{{ form.instance.child_branch.partial_acronym }}</td>
-                                {% if group_element_year.parent.is_minor_major_option_list_choice %}
+                                {% if form.instance.parent.is_minor_major_option_list_choice %}
                                 <td>{{ form.access_condition }}</td>
                                 {% else %}
                                 <td>{{ form.is_mandatory }}</td>

@@ -32,7 +32,6 @@ from base.tests.factories.user import SuperUserFactory
 
 
 class TestQuickSearchLearningUnitView(TestCase):
-
     @classmethod
     def setUpTestData(cls):
         cls.root_egy = EducationGroupYearFactory()
@@ -65,7 +64,6 @@ class TestQuickSearchLearningUnitView(TestCase):
 
 
 class TestQuickSearchEducationGroupView(TestCase):
-
     @classmethod
     def setUpTestData(cls):
         cls.root_egy = EducationGroupYearFactory()

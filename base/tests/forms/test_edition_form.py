@@ -218,11 +218,11 @@ class TestVolumeEditionFormsetContainer(TestCase):
         cls.learning_unit_year_partim = cls.generated_container_year.learning_unit_year_partim
         cls.central_manager = CentralManagerFactory()
         cls.faculty_manager = FacultyManagerFactory()
+        cls.request_factory = RequestFactory()
+        cls.data_forms = get_valid_formset_data(cls.learning_unit_year_full.acronym)
 
     def test_get_volume_edition_formset_container(self):
-        request_factory = RequestFactory()
-
-        volume_edition_formset_container = VolumeEditionFormsetContainer(request_factory.get(None),
+        volume_edition_formset_container = VolumeEditionFormsetContainer(self.request_factory.get(None),
                                                                          self.learning_units_with_context,
                                                                          self.central_manager)
 
@@ -237,14 +237,13 @@ class TestVolumeEditionFormsetContainer(TestCase):
                          self.learning_unit_year_full)
 
     def test_post_volume_edition_formset_container(self):
-        request_factory = RequestFactory()
-
-        data_forms = get_valid_formset_data(self.learning_unit_year_full.acronym)
-        data_forms.update(get_valid_formset_data(self.learning_unit_year_partim.acronym, is_partim=True))
-        data_forms.update({'postponement': 1})
+        self.data_forms.update({
+            **get_valid_formset_data(self.learning_unit_year_partim.acronym, is_partim=True),
+            'postponement': 1
+        })
 
         volume_edition_formset_container = VolumeEditionFormsetContainer(
-            request_factory.post(None, data=data_forms),
+            self.request_factory.post(None, data=self.data_forms),
             self.learning_units_with_context, self.central_manager)
 
         self.assertTrue(volume_edition_formset_container.is_valid())
@@ -252,37 +251,31 @@ class TestVolumeEditionFormsetContainer(TestCase):
         volume_edition_formset_container.save()
 
     def test_post_volume_edition_formset_container_wrong_vol_tot_full_must_be_greater_than_partim(self):
-        request_factory = RequestFactory()
-
-        data_forms = get_valid_formset_data(self.learning_unit_year_full.acronym)
-        data_forms.update(get_valid_formset_data(self.learning_unit_year_partim.acronym))
-        data_forms.update({'LDROI1200A-0-volume_total': 3})
-        data_forms.update({'LDROI1200A-0-volume_q2': 3})
-        data_forms.update({'LDROI1200A-0-volume_requirement_entity': 2})
-        data_forms.update({'LDROI1200A-0-volume_total_requirement_entities': 3})
+        self.data_forms.update({
+            **get_valid_formset_data(self.learning_unit_year_partim.acronym),
+            'LDROI1200A-0-volume_total': 3,
+            'LDROI1200A-0-volume_q2': 3,
+            'LDROI1200A-0-volume_requirement_entity': 2,
+            'LDROI1200A-0-volume_total_requirement_entities': 3
+        })
 
         volume_edition_formset_container = VolumeEditionFormsetContainer(
-            request_factory.post(None, data=data_forms),
+            self.request_factory.post(None, data=self.data_forms),
             self.learning_units_with_context, self.central_manager)
 
         self.assertTrue(volume_edition_formset_container.is_valid())  # Volumes of partims can be greater than parent's
 
     def test_post_volume_edition_formset_container__vol_tot_full_can_be_equal_to_partim(self):
-        request_factory = RequestFactory()
-
-        data_forms = get_valid_formset_data(self.learning_unit_year_full.acronym)
-        data_forms.update(get_valid_formset_data(self.learning_unit_year_partim.acronym))
+        self.data_forms.update(get_valid_formset_data(self.learning_unit_year_partim.acronym))
 
         volume_edition_formset_container = VolumeEditionFormsetContainer(
-            request_factory.post(None, data=data_forms),
+            self.request_factory.post(None, data=self.data_forms),
             self.learning_units_with_context, self.central_manager)
 
         self.assertTrue(volume_edition_formset_container.is_valid())
 
     def test_get_volume_edition_formset_container_as_faculty_manager(self):
-        request_factory = RequestFactory()
-
-        volume_edition_formset_container = VolumeEditionFormsetContainer(request_factory.get(None),
+        volume_edition_formset_container = VolumeEditionFormsetContainer(self.request_factory.get(None),
                                                                          self.learning_units_with_context,
                                                                          self.faculty_manager)
 

@@ -104,7 +104,6 @@ def skipUnlessSelenium(func):
 @tag('selenium')
 @skipUnlessSelenium
 class TestEducationGroupYear(SeleniumTestCase):
-    # browsers = ['firefox', 'chrome']
     browser = 'chrome'
 
     @classmethod

@@ -28,7 +28,7 @@ from unittest import mock
 
 from django.contrib.auth.models import Group
 from django.http import Http404
-from django.test import TestCase, Client, TransactionTestCase
+from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -68,9 +68,11 @@ def generate_exam_enrollments(year, with_different_offer=False):
 
     an_academic_calendar = AcademicCalendarFactory(academic_year=academic_year,
                                                    start_date=(
-                                                   datetime.datetime.today() - datetime.timedelta(days=20)).date(),
+                                                           datetime.datetime.today() - datetime.timedelta(
+                                                       days=20)).date(),
                                                    end_date=(
-                                                   datetime.datetime.today() + datetime.timedelta(days=20)).date(),
+                                                           datetime.datetime.today() + datetime.timedelta(
+                                                       days=20)).date(),
                                                    reference=academic_calendar_type.SCORES_EXAM_SUBMISSION)
     session_exam_calendar = SessionExamCalendarFactory(number_session=number_session.ONE,
                                                        academic_calendar=an_academic_calendar)
@@ -102,38 +104,39 @@ def generate_exam_enrollments(year, with_different_offer=False):
     return locals()
 
 
-class MixinTestUploadScoresFile(AcademicYearMockMixin):
-    def setUp(self):
+class MixinTestUploadScoresFile(TestCase, AcademicYearMockMixin):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
         Group.objects.get_or_create(name="tutors")
         data = generate_exam_enrollments(2017)
-        self.academic_year = data["academic_year"]
-        self.exam_enrollments = data["exam_enrollments"]
-        self.attribution = data["attribution"]
-        self.learning_unit_year = data["learning_unit_year"]
-        self.offer_year = data["offer_years"][0]
-        self.students = [enrollment.learning_unit_enrollment.offer_enrollment.student for enrollment
-                         in self.exam_enrollments]
+        cls.academic_year = data["academic_year"]
+        cls.exam_enrollments = data["exam_enrollments"]
+        cls.attribution = data["attribution"]
+        cls.learning_unit_year = data["learning_unit_year"]
+        cls.offer_year = data["offer_years"][0]
+        cls.students = [enrollment.learning_unit_enrollment.offer_enrollment.student for enrollment
+                        in cls.exam_enrollments]
 
-        self.offer_year.acronym = OFFER_ACRONYM
-        self.offer_year.save()
+        cls.offer_year.acronym = OFFER_ACRONYM
+        cls.offer_year.save()
 
         registration_ids = [REGISTRATION_ID_1, REGISTRATION_ID_2]
         mails = [EMAIL_1, EMAIL_2]
         data_to_modify_for_students = list(zip(registration_ids, mails))
         for i in range(0, 2):
             registration_id, email = data_to_modify_for_students[i]
-            student = self.students[i]
+            student = cls.students[i]
             student.registration_id = registration_id
             student.save()
             student.person.email = email
             student.person.save()
 
-        self.client = Client()
+        cls.url = reverse('upload_encoding', kwargs={'learning_unit_year_id': cls.learning_unit_year.id})
+
+    def setUp(self):
         self.a_user = self.attribution.tutor.person.user
         self.client.force_login(user=self.a_user)
-        self.url = reverse('upload_encoding', kwargs={'learning_unit_year_id': self.learning_unit_year.id})
-
-        # Mock academic_year in order to be decouple from system time
         self.mock_academic_year(
             current_academic_year=self.academic_year,
             starting_academic_year=self.academic_year
@@ -153,7 +156,7 @@ class TestTransactionNonAtomicUploadXls(MixinTestUploadScoresFile, TransactionTe
         SCORE_1 = 16
         SCORE_2 = exam_enrollment_justification_type.ABSENCE_UNJUSTIFIED
         with open("assessments/tests/resources/correct_score_sheet.xlsx", 'rb') as score_sheet:
-            response = self.client.post(self.url, {'file': score_sheet}, follow=True)
+            self.client.post(self.url, {'file': score_sheet}, follow=True)
             self.assertTrue(mock_method_that_raise_exception.called)
             self.assert_enrollments_equal(
                 self.exam_enrollments,
@@ -286,7 +289,7 @@ class TestUploadXls(MixinTestUploadScoresFile, TestCase):
             )
 
     def test_with_correct_score_sheet_white_one_empty_email(self):
-        self.students[0].person.email = None
+        self.students[0].person.email = ""
         self.students[0].person.save()
         NUMBER_CORRECT_SCORES = "2"
         with open("assessments/tests/resources/correct_score_sheet_one_empty_email.xlsx", 'rb') as score_sheet:

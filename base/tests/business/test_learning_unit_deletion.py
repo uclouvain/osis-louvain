@@ -65,21 +65,22 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 
 
 class LearningUnitYearDeletion(TestCase):
-    def setUp(self):
-        self.academic_year = create_current_academic_year()
-        self.learning_unit = LearningUnitFactory(start_year__year=1900)
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+        cls.learning_unit = LearningUnitFactory(start_year__year=1900)
+        cls.l_container_year = LearningContainerYearFactory()
+        cls.luy1 = LearningUnitYearFactory(
+            acronym="LBIR1212",
+            learning_container_year=cls.l_container_year,
+            academic_year=cls.academic_year, subtype=learning_unit_year_subtypes.FULL,
+            learning_unit=cls.learning_unit)
 
     def test_check_related_partims_deletion(self):
-        l_container_year = LearningContainerYearFactory()
-        LearningUnitYearFactory(
-            acronym="LBIR1212",
-            learning_container_year=l_container_year,
-            academic_year=self.academic_year, subtype=learning_unit_year_subtypes.FULL,
-            learning_unit=self.learning_unit)
-        msg = deletion._check_related_partims_deletion(l_container_year)
+        msg = deletion._check_related_partims_deletion(self.l_container_year)
         self.assertEqual(len(msg.values()), 0)
 
-        l_unit_2 = LearningUnitYearFactory(acronym="LBIR1213", learning_container_year=l_container_year,
+        l_unit_2 = LearningUnitYearFactory(acronym="LBIR1213", learning_container_year=self.l_container_year,
                                            academic_year=self.academic_year, subtype=learning_unit_year_subtypes.PARTIM)
 
         LearningUnitEnrollmentFactory(learning_unit_year=l_unit_2)
@@ -101,16 +102,19 @@ class LearningUnitYearDeletion(TestCase):
         AttributionChargeNewFactory(learning_component_year=component,
                                     attribution=attribution_2)
 
-        msg = deletion._check_related_partims_deletion(l_container_year)
+        msg = deletion._check_related_partims_deletion(self.l_container_year)
         msg = list(msg.values())
 
         self.assertEqual(len(msg), 5)
-        self.assertIn(_("There is %(count)d enrollments in %(subtype)s %(acronym)s for the year %(year)s")
-                      % {'subtype': _('The partim'),
-                         'acronym': l_unit_2.acronym,
-                         'year': l_unit_2.academic_year,
-                         'count': 3},
-                      msg)
+        self.assertIn(
+            _("There is %(count)d enrollments in %(subtype)s %(acronym)s for the year %(year)s") % {
+                'subtype': _('The partim'),
+                'acronym': l_unit_2.acronym,
+                'year': l_unit_2.academic_year,
+                'count': 3
+            },
+            msg
+        )
 
         msg_delete_tutor = _("%(subtype)s %(acronym)s is assigned to %(tutor)s for the year %(year)s")
         self.assertIn(msg_delete_tutor % {'subtype': _('The partim'),
@@ -140,39 +144,33 @@ class LearningUnitYearDeletion(TestCase):
                       msg)
 
     def test_check_learning_unit_year_deletion(self):
-        l_container_year = LearningContainerYearFactory(acronym="LBIR1212", academic_year=self.academic_year)
-        l_unit_1 = LearningUnitYearFactory(acronym="LBIR1212", learning_container_year=l_container_year,
-                                           academic_year=self.academic_year, subtype=learning_unit_year_subtypes.FULL)
-        msg = deletion.check_learning_unit_year_deletion(l_unit_1)
+        msg = deletion.check_learning_unit_year_deletion(self.luy1)
 
         msg = list(msg.values())
         self.assertEqual(msg, [])
 
-        l_unit_2 = LearningUnitYearFactory(acronym="LBIR1212A", learning_container_year=l_container_year,
+        l_unit_2 = LearningUnitYearFactory(acronym="LBIR1212A", learning_container_year=self.l_container_year,
                                            academic_year=self.academic_year, subtype=learning_unit_year_subtypes.PARTIM)
-        LearningUnitYearFactory(acronym="LBIR1212B", learning_container_year=l_container_year,
+        LearningUnitYearFactory(acronym="LBIR1212B", learning_container_year=self.l_container_year,
                                 academic_year=self.academic_year, subtype=learning_unit_year_subtypes.PARTIM)
 
-        LearningUnitEnrollmentFactory(learning_unit_year=l_unit_1)
+        LearningUnitEnrollmentFactory(learning_unit_year=self.luy1)
         LearningUnitEnrollmentFactory(learning_unit_year=l_unit_2)
 
-        msg = deletion.check_learning_unit_year_deletion(l_unit_1)
+        msg = deletion.check_learning_unit_year_deletion(self.luy1)
 
         msg = list(msg.values())
         self.assertEqual(len(msg), 2)
 
     def test_check_learning_unit_year_deletion_with_proposal(self):
-        l_container_year = LearningContainerYearFactory(acronym="LBIR1212", academic_year=self.academic_year)
-        l_unit_1 = LearningUnitYearFactory(acronym="LBIR1212", learning_container_year=l_container_year,
-                                           academic_year=self.academic_year, subtype=learning_unit_year_subtypes.FULL)
-        ProposalLearningUnitFactory(learning_unit_year=l_unit_1)
-        msg = deletion._check_learning_unit_proposal(l_unit_1)
+        ProposalLearningUnitFactory(learning_unit_year=self.luy1)
+        msg = deletion._check_learning_unit_proposal(self.luy1)
 
         msg = list(msg.values())
         self.assertEqual(msg, [
             _("%(subtype)s %(acronym)s is in proposal for the year %(year)s") % {'subtype': _('The learning unit'),
-                                                                                 'acronym': l_unit_1.acronym,
-                                                                                 'year': l_unit_1.academic_year}
+                                                                                 'acronym': self.luy1.acronym,
+                                                                                 'year': self.luy1.academic_year}
         ])
 
     def test_delete_next_years(self):
@@ -217,13 +215,15 @@ class LearningUnitYearDeletion(TestCase):
 
     def test_delete_learning_component_class(self):
         # Composant annualisé est associé à son composant et à son conteneur annualisé
-        learning_component_year = LearningComponentYearFactory(acronym="/C",
-                                                               comment="TEST",
-                                                               learning_unit_year__learning_unit__start_year__year=1900)
+        learning_component_year = LearningComponentYearFactory(
+            acronym="/C",
+            comment="TEST",
+            learning_unit_year__learning_unit__start_year__year=1900
+        )
         learning_container_year = learning_component_year.learning_unit_year.learning_container_year
 
         number_classes = 10
-        for x in range(number_classes):
+        for __ in range(number_classes):
             LearningClassYearFactory(learning_component_year=learning_component_year)
 
         learning_unit_year = learning_component_year.learning_unit_year
@@ -271,9 +271,9 @@ class LearningUnitYearDeletion(TestCase):
 
         with self.assertRaises(ObjectDoesNotExist):
             LearningUnitYear.objects.get(id=learning_unit_year_to_delete.id)
-        self.assertEqual(learning_unit_year_partim, LearningUnitYear.objects.get(id=learning_unit_year_partim.id))
         self.assertEqual(learning_unit_year_full, LearningUnitYear.objects.get(id=learning_unit_year_full.id))
         self.assertEqual(learning_container_year, LearningContainerYear.objects.get(id=learning_container_year.id))
+        self.assertEqual(learning_unit_year_partim, LearningUnitYear.objects.get(id=learning_unit_year_partim.id))
 
         deletion.delete_from_given_learning_unit_year(learning_unit_year_partim)
 
@@ -393,33 +393,25 @@ class LearningUnitYearDeletion(TestCase):
                                               end_date=None)
         PersonEntityFactory(person=manager, entity=entity_version.entity, with_child=True)
 
-        # Creation UE
-        learning_unit = LearningUnitFactory()
-        l_containeryear = LearningContainerYearFactory(academic_year=self.academic_year,
-                                                       container_type=learning_container_year_types.COURSE,
-                                                       requirement_entity=entity_version.entity)
-        learning_unit_year = LearningUnitYearFactory(learning_unit=learning_unit,
-                                                     academic_year=self.academic_year,
-                                                     learning_container_year=l_containeryear,
-                                                     subtype=learning_unit_year_subtypes.FULL)
-
         # Cannot remove FULL COURSE
         self.assertFalse(
             base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(
-                learning_unit_year,
+                self.luy1,
                 manager
             )
         )
 
         # Can remove PARTIM COURSE
-        learning_unit_year.subtype = learning_unit_year_subtypes.PARTIM
-        learning_unit_year.save()
+        self.luy1.subtype = learning_unit_year_subtypes.PARTIM
+        self.luy1.save()
         self.assertFalse(
             base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(
-                learning_unit_year,
+                self.luy1,
                 manager
             )
         )
+        self.luy1.subtype = learning_unit_year_subtypes.FULL
+        self.luy1.save()
 
 
 def add_to_group(user, group_name):

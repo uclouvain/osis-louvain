@@ -303,6 +303,8 @@ def _check_consistency_data(row):
 
 def _registration_id_matches_email(registration_id, email):
     student_by_registration_id = mdl.student.find_by_registration_id(registration_id)
+    if email == 'None':
+        email = ""
     return str(student_by_registration_id.person.email).strip() == email.strip()
 
 

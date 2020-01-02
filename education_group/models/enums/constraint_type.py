@@ -1,4 +1,4 @@
-############################################################################
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -22,12 +22,15 @@
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-############################################################################
-from django.core.management import BaseCommand
-from django.core.cache import cache
+##############################################################################
+from django.utils.translation import gettext_lazy as _
+
+from base.models.utils.utils import ChoiceEnum
+
+CREDITS = "CREDITS"
+NUMBER_OF_ELEMENTS = "NUMBER_OF_ELEMENTS"
 
 
-class Command(BaseCommand):
-    def handle(self, *args, **options):
-        cache.clear()
-        self.stdout.write(self.style.SUCCESS('Successfully clear cache'))
+class ConstraintTypes(ChoiceEnum):
+    CREDITS = _("credits")
+    NUMBER_OF_ELEMENTS = _("Number of elements")

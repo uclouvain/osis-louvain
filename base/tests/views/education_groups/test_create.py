@@ -55,8 +55,7 @@ from base.tests.factories.person_entity import PersonEntityFactory
 from reference.tests.factories.language import LanguageFactory
 
 
-@override_flag('education_group_create', active=True)
-class TestCreate(TestCase):
+class TestCreateMixin(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
@@ -75,7 +74,19 @@ class TestCreate(TestCase):
             EducationGroupTypeFactory(category=category)
             for category in cls.test_categories
         ]
+        cls.organization = OrganizationFactory(type=organization_type.MAIN)
+        cls.entity = EntityFactory(organization=cls.organization)
+        cls.entity_version = EntityVersionFactory(entity=cls.entity, entity_type=FACULTY, start_date=datetime.now())
+        cls.language = LanguageFactory()
+        cls.person = PersonFactory()
+        PersonEntityFactory(person=cls.person, entity=cls.entity)
 
+
+@override_flag('education_group_create', active=True)
+class TestCreate(TestCreateMixin):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
         cls.urls_without_parent_by_category = {
             education_group_type.category:
                 reverse(
@@ -106,12 +117,6 @@ class TestCreate(TestCase):
             education_group_categories.TRAINING: "education_group/create_trainings.html",
             education_group_categories.MINI_TRAINING: "education_group/create_mini_trainings.html",
         }
-        cls.organization = OrganizationFactory(type=organization_type.MAIN)
-        cls.entity = EntityFactory(organization=cls.organization)
-        cls.entity_version = EntityVersionFactory(entity=cls.entity, entity_type=FACULTY, start_date=datetime.now())
-        cls.language = LanguageFactory()
-        cls.person = PersonFactory()
-        PersonEntityFactory(person=cls.person, entity=cls.entity)
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -175,33 +180,16 @@ class TestCreate(TestCase):
 
 
 @override_flag('education_group_create', active=True)
-class TestCreateForm(TestCase):
-    def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        start_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
-        end_year = AcademicYearFactory(year=self.current_academic_year.year + 10)
-        self.generated_ac_years = GenerateAcademicYear(start_year, end_year)
-        self.parent_education_group_year = EducationGroupYearFactory(academic_year=self.current_academic_year)
-        self.test_categories = [
-            education_group_categories.GROUP,
-            education_group_categories.TRAINING,
-            education_group_categories.MINI_TRAINING,
-        ]
-        self.education_group_types = [
-            EducationGroupTypeFactory(category=category)
-            for category in self.test_categories
-        ]
+class TestCreateForm(TestCreateMixin):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.perm_patcher = mock.patch("base.business.education_groups.perms._is_eligible_to_add_education_group",
+                                      return_value=True)
+        cls.mocked_perm = cls.perm_patcher.start()
 
-        self.organization = OrganizationFactory(type=organization_type.MAIN)
-        self.entity = EntityFactory(organization=self.organization)
-        self.entity_version = EntityVersionFactory(entity=self.entity, entity_type=FACULTY, start_date=datetime.now())
-        self.language = LanguageFactory()
-        self.person = PersonFactory()
-        PersonEntityFactory(person=self.person, entity=self.entity)
+    def setUp(self):
         self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch("base.business.education_groups.perms._is_eligible_to_add_education_group",
-                                       return_value=True)
-        self.mocked_perm = self.perm_patcher.start()
 
     def test_redirect_after_creation(self):
         url = reverse('new_education_group', args=[self.education_group_types[1].category,

@@ -87,7 +87,7 @@ class GeneralInformationTestCase(APITestCase):
             "base.business.education_groups.general_information_sections.SECTIONS_PER_OFFER_TYPE",
             {self.egy.education_group_type.name: self.pertinent_sections}
         )
-        mocked_sections = sections_patcher.start()
+        sections_patcher.start()
         self.addCleanup(sections_patcher.stop)
         self.client.force_authenticate(user=self.person.user)
 

@@ -40,43 +40,44 @@ from base.tests.factories.person_entity import PersonEntityFactory
 
 @override_flag('education_group_update', active=True)
 class TestPostpone(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        cls.next_academic_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
 
-    def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        self.next_academic_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
+        cls.person = CentralManagerFactory()
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="change_educationgroup"))
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
 
-        self.person = CentralManagerFactory()
-        self.person.user.user_permissions.add(Permission.objects.get(codename="change_educationgroup"))
-        self.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.education_group = EducationGroupFactory(end_year=cls.next_academic_year)
+        cls.education_group_year = TrainingFactory(academic_year=cls.current_academic_year,
+                                                   education_group=cls.education_group)
 
-        self.client.force_login(self.person.user)
-
-        self.education_group = EducationGroupFactory(end_year=self.next_academic_year)
-        self.education_group_year = TrainingFactory(academic_year=self.current_academic_year,
-                                                    education_group=self.education_group)
-
-        self.next_education_group_year = TrainingFactory(
-            academic_year=self.next_academic_year,
-            education_group=self.education_group,
-            management_entity=self.education_group_year.management_entity
+        cls.next_education_group_year = TrainingFactory(
+            academic_year=cls.next_academic_year,
+            education_group=cls.education_group,
+            management_entity=cls.education_group_year.management_entity
         )
 
-        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
+        PersonEntityFactory(person=cls.person, entity=cls.education_group_year.management_entity)
 
-        self.group_element_year = GroupElementYearFactory(
-            parent=self.education_group_year,
-            child_branch__academic_year=self.education_group_year.academic_year
+        cls.group_element_year = GroupElementYearFactory(
+            parent=cls.education_group_year,
+            child_branch__academic_year=cls.education_group_year.academic_year
         )
-        self.url = reverse(
+        cls.url = reverse(
             "postpone_education_group",
             kwargs={
-                "root_id": self.next_education_group_year.pk,
-                "education_group_year_id": self.next_education_group_year.pk,
+                "root_id": cls.next_education_group_year.pk,
+                "education_group_year_id": cls.next_education_group_year.pk,
             }
         )
 
-        self.redirect_url = reverse("education_group_read",
-                                    args=[self.next_education_group_year.pk, self.next_education_group_year.pk])
+        cls.redirect_url = reverse("education_group_read",
+                                   args=[cls.next_education_group_year.pk, cls.next_education_group_year.pk])
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
 
     def test_postpone_case_user_not_logged(self):
         self.client.logout()
@@ -105,8 +106,8 @@ class TestPostpone(TestCase):
         message = list(get_messages(response.wsgi_request))[0]
 
         msg = _("%(count_elements)s OF(s) and %(count_links)s link(s) have been postponed with success.") % {
-                'count_elements': 1,
-                'count_links': 1
+            'count_elements': 1,
+            'count_links': 1
         }
 
         self.assertEqual(message.tags, "success")

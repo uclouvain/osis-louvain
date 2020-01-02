@@ -141,15 +141,19 @@ class TextLabelTest(TestCase):
         text_labels.delete()
         self.assertIsNone(text_label.get_by_label_or_none('random'))
 
+
 class TextLabelComplexeStructureTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.A = TextLabelFactory(order=1)
+        cls.C = TextLabelFactory(parent=cls.A, order=2)
+        cls.E = TextLabelFactory(parent=cls.C, order=1)
+        cls.F = TextLabelFactory(parent=cls.C, order=2)
+        cls.G = TextLabelFactory(parent=cls.C, order=3)
+
     def setUp(self):
-        self.A = TextLabelFactory(order=1)
         self.B = TextLabelFactory(parent=self.A, order=1)
-        self.C = TextLabelFactory(parent=self.A, order=2)
         self.D = TextLabelFactory(parent=self.B, order=1)
-        self.E = TextLabelFactory(parent=self.C, order=1)
-        self.F = TextLabelFactory(parent=self.C, order=2)
-        self.G = TextLabelFactory(parent=self.C, order=3)
 
     def test_move_to_root_structure(self):
         self.B.parent = None

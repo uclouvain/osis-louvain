@@ -8,7 +8,7 @@ from django.db import migrations
 
 def add_administrators_group(apps, schema_editor):
     db_alias = schema_editor.connection.alias
-    emit_post_migrate_signal(2, False, db_alias)
+    emit_post_migrate_signal(1, False, db_alias)
     Group = apps.get_model('auth', 'Group')
     Permission = apps.get_model('auth', 'Permission')
     administrators_group, created = Group.objects.get_or_create(name='administrators')
@@ -20,7 +20,7 @@ def add_administrators_group(apps, schema_editor):
 def add_tutors_group(apps, schema_editor):
     # create group
     db_alias = schema_editor.connection.alias
-    emit_post_migrate_signal(2, False, db_alias)
+    emit_post_migrate_signal(1, False, db_alias)
     Group = apps.get_model('auth', 'Group')
     Permission = apps.get_model('auth', 'Permission')
     tutors_group, created = Group.objects.get_or_create(name='tutors')
@@ -37,7 +37,7 @@ def add_tutors_group(apps, schema_editor):
 def add_pgm_managers_group(apps, schema_editor):
     # create group
     db_alias = schema_editor.connection.alias
-    emit_post_migrate_signal(2, False, db_alias)
+    emit_post_migrate_signal(1, False, db_alias)
     Group = apps.get_model('auth', 'Group')
     Permission = apps.get_model('auth', 'Permission')
     pgm_managers_group, created = Group.objects.get_or_create(name='program_managers')
@@ -58,7 +58,7 @@ def add_pgm_managers_group(apps, schema_editor):
 def add_students_group(apps, schema_editor):
     # create group
     db_alias = schema_editor.connection.alias
-    emit_post_migrate_signal(2, False, db_alias)
+    emit_post_migrate_signal(1, False, db_alias)
     Group = apps.get_model('auth', 'Group')
     Permission = apps.get_model('auth', 'Permission')
     student_group, created = Group.objects.get_or_create(name='students')
@@ -70,7 +70,7 @@ def add_students_group(apps, schema_editor):
 
 def add_init_institution_administration_group(apps, schema_editor):
     db_alias = schema_editor.connection.alias
-    emit_post_migrate_signal(2, False, db_alias)
+    emit_post_migrate_signal(1, False, db_alias)
     Group = apps.get_model('auth', 'Group')
     Permission = apps.get_model('auth', 'Permission')
     inst_administrators_group, created = Group.objects.get_or_create(name='institution_administration')

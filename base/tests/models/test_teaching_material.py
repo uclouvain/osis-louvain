@@ -57,7 +57,7 @@ class TeachingMaterialTest(TestCase):
         NB_TO_CREATE = 10
         ac_year_2015 = self.ac_years_containers.academic_years[0]
         start_luy = self.luys[ac_year_2015]
-        for i in range(0, NB_TO_CREATE):
+        for _ in range(0, NB_TO_CREATE):
             TeachingMaterialFactory(learning_unit_year=start_luy)
         # Make postponement
         postpone_teaching_materials(start_luy)

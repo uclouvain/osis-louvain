@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
+
 from django.db.models import F, When, Case
 from django.http import HttpResponse
 from django.test import TestCase
@@ -88,10 +90,8 @@ class TestRead(TestCase):
     @override_switch('education_group_year_generate_pdf', active=True)
     def test_pdf_content(self):
         self.client.force_login(self.a_superuser)
-        url = reverse("pdf_content", args=[self.education_group_year_1.id, self.education_group_year_2.id, "fr-be"])
-        response = self.client.get(url)
-        self.assertTemplateUsed(response, 'pdf_content.html')
-        url = reverse("pdf_content", args=[self.education_group_year_1.id, self.education_group_year_2.id, "en"])
+        lang = random.choice(['fr-be', 'en'])
+        url = reverse("pdf_content", args=[self.education_group_year_1.id, self.education_group_year_2.id, lang])
         response = self.client.get(url)
         self.assertTemplateUsed(response, 'pdf_content.html')
 
@@ -132,16 +132,16 @@ class TestRead(TestCase):
 class TestReadPdfContent(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
-        cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
-                                                         child_branch__academic_year=cls.academic_year)
+        academic_year = AcademicYearFactory()
+        education_group_year = EducationGroupYearFactory(academic_year=academic_year)
+        GroupElementYearFactory(parent=education_group_year,
+                                child_branch__academic_year=academic_year)
         cls.person = CentralManagerFactory("can_access_education_group")
         cls.url = reverse(
             "group_content",
             kwargs={
-                "root_id": cls.education_group_year.id,
-                "education_group_year_id": cls.education_group_year.id
+                "root_id": education_group_year.id,
+                "education_group_year_id": education_group_year.id
             }
         )
         cls.post_valid_data = {'action': 'Generate pdf', 'language': LANGUAGE_CODE_EN}
@@ -161,8 +161,8 @@ class TestReadPdfContent(TestCase):
 
 
 class TestReadTree(TestCase):
-
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         academic_year = AcademicYearFactory()
         minor_list_type = EducationGroupTypeFactory(
             category=education_group_categories.GROUP,
@@ -173,9 +173,9 @@ class TestReadTree(TestCase):
             name=education_group_types.GroupType.COMMON_CORE,
         )
 
-        self.base_1 = GroupFactory(education_group_type=common_type,
-                                   acronym="BASE",
-                                   academic_year=academic_year)
+        cls.base_1 = GroupFactory(education_group_type=common_type,
+                                  acronym="BASE",
+                                  academic_year=academic_year)
         child_1 = GroupFactory(education_group_type=common_type,
                                acronym="CHILD",
                                academic_year=academic_year)
@@ -188,10 +188,10 @@ class TestReadTree(TestCase):
         minor_content_2 = MiniTrainingFactory(education_group_type=minor_list_type,
                                               academic_year=academic_year)
 
-        self.groupe_element_yr_1 = GroupElementYearFactory(parent=self.base_1, child_branch=minor_list_choice)
-        self.groupe_element_yr_2 = GroupElementYearFactory(parent=self.base_1, child_branch=child_1)
-        self.groupe_element_yr_3 = GroupElementYearFactory(parent=minor_list_choice, child_branch=minor_content_1)
-        self.groupe_element_yr_4 = GroupElementYearFactory(parent=minor_list_choice, child_branch=minor_content_2)
+        cls.groupe_element_yr_1 = GroupElementYearFactory(parent=cls.base_1, child_branch=minor_list_choice)
+        cls.groupe_element_yr_2 = GroupElementYearFactory(parent=cls.base_1, child_branch=child_1)
+        cls.groupe_element_yr_3 = GroupElementYearFactory(parent=minor_list_choice, child_branch=minor_content_1)
+        cls.groupe_element_yr_4 = GroupElementYearFactory(parent=minor_list_choice, child_branch=minor_content_2)
 
     def test_minor_list_detail_in_pdf_tree(self):
         result = EducationGroupHierarchy(self.base_1, pdf_content=True).to_list()

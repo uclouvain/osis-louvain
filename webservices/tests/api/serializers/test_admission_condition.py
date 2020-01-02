@@ -170,7 +170,6 @@ class ContinuingEducationTrainingAdmissionConditionsSerializerTestCase(TestCase)
             'egy': egy
         })
         expected_fields = [
-            'admission_enrollment_procedures',
-            'personalized_access',
+            'free_text'
         ]
         self.assertListEqual(list(serializer.data.keys()), expected_fields)

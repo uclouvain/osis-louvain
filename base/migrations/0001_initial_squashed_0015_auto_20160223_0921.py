@@ -3,7 +3,6 @@
 from __future__ import unicode_literals
 
 import django.core.validators
-import django.db.models.deletion
 from django.conf import settings
 from django.db import migrations, models
 
@@ -143,9 +142,9 @@ class Migration(migrations.Migration):
                 ('credits', models.DecimalField(blank=True, decimal_places=2, max_digits=4, null=True)),
                 ('decimal_scores', models.BooleanField(default=False)),
                 ('academic_year',
-                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.AcademicYear')),
+                 models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.AcademicYear')),
                 ('learning_unit',
-                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningUnit')),
+                 models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.LearningUnit')),
             ],
         ),
         migrations.CreateModel(
@@ -173,8 +172,8 @@ class Migration(migrations.Migration):
                 ('acronym', models.CharField(max_length=10)),
                 ('title', models.CharField(max_length=255)),
                 ('academic_year',
-                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.AcademicYear')),
-                ('offer', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Offer')),
+                 models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.AcademicYear')),
+                ('offer', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Offer')),
             ],
         ),
         migrations.CreateModel(
@@ -212,8 +211,8 @@ class Migration(migrations.Migration):
                 ('start_date', models.DateField(blank=True, null=True)),
                 ('end_date', models.DateField(blank=True, null=True)),
                 ('academic_calendar',
-                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.AcademicCalendar')),
-                ('offer_year', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.OfferYear')),
+                 models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.AcademicCalendar')),
+                ('offer_year', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.OfferYear')),
             ],
         ),
         migrations.CreateModel(
@@ -229,7 +228,7 @@ class Migration(migrations.Migration):
                 ('first_name', models.CharField(blank=True, max_length=50, null=True)),
                 ('middle_name', models.CharField(blank=True, max_length=50, null=True)),
                 ('last_name', models.CharField(blank=True, max_length=50, null=True)),
-                ('user', models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE,
+                ('user', models.OneToOneField(null=True, on_delete=models.deletion.CASCADE,
                                               to=settings.AUTH_USER_MODEL)),
             ],
         ),
@@ -248,9 +247,9 @@ class Migration(migrations.Migration):
                 ('status',
                  models.CharField(choices=[('IDLE', 'Idle'), ('OPEN', 'Open'), ('CLOSED', 'Closed')], max_length=10)),
                 ('learning_unit_year',
-                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningUnitYear')),
+                 models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.LearningUnitYear')),
                 ('offer_year_calendar',
-                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.OfferYearCalendar')),
+                 models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.OfferYearCalendar')),
             ],
         ),
         migrations.CreateModel(
@@ -260,7 +259,7 @@ class Migration(migrations.Migration):
                 ('external_id', models.CharField(blank=True, max_length=100, null=True)),
                 ('acronym', models.CharField(max_length=15)),
                 ('title', models.CharField(max_length=255)),
-                ('part_of', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                ('part_of', models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE,
                                               to='base.Structure')),
             ],
         ),
@@ -270,7 +269,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('external_id', models.CharField(blank=True, max_length=100, null=True)),
                 ('registration_id', models.CharField(max_length=10)),
-                ('person', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Person')),
+                ('person', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Person')),
             ],
         ),
         migrations.CreateModel(
@@ -278,68 +277,68 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('external_id', models.CharField(blank=True, max_length=100, null=True)),
-                ('person', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Person')),
+                ('person', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Person')),
             ],
         ),
         migrations.AddField(
             model_name='programmemanager',
             name='faculty',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Structure'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Structure'),
         ),
         migrations.AddField(
             model_name='programmemanager',
             name='person',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Person'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Person'),
         ),
         migrations.AddField(
             model_name='offeryear',
             name='structure',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Structure'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Structure'),
         ),
         migrations.AddField(
             model_name='offerenrollment',
             name='offer_year',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.OfferYear'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.OfferYear'),
         ),
         migrations.AddField(
             model_name='offerenrollment',
             name='student',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Student'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Student'),
         ),
         migrations.AddField(
             model_name='learningunitenrollment',
             name='learning_unit_year',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningUnitYear'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.LearningUnitYear'),
         ),
         migrations.AddField(
             model_name='learningunitenrollment',
             name='offer_enrollment',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.OfferEnrollment'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.OfferEnrollment'),
         ),
         migrations.AddField(
             model_name='examenrollment',
             name='learning_unit_enrollment',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningUnitEnrollment'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.LearningUnitEnrollment'),
         ),
         migrations.AddField(
             model_name='examenrollment',
             name='session_exam',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.SessionExam'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.SessionExam'),
         ),
         migrations.AddField(
             model_name='attribution',
             name='learning_unit',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningUnit'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.LearningUnit'),
         ),
         migrations.AddField(
             model_name='attribution',
             name='tutor',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Tutor'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Tutor'),
         ),
         migrations.AddField(
             model_name='academiccalendar',
             name='academic_year',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.AcademicYear'),
+            field=models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.AcademicYear'),
         ),
         migrations.AlterField(
             model_name='learningunityear',
@@ -433,7 +432,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='structure',
             name='organization',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='base.Organization'),
+            field=models.ForeignKey(null=True, on_delete=models.deletion.CASCADE, to='base.Organization'),
         ),
         migrations.AddField(
             model_name='person',
@@ -451,8 +450,8 @@ class Migration(migrations.Migration):
                     max_length=20, null=True)),
                 ('modification_date', models.DateTimeField(auto_now=True)),
                 ('exam_enrollment',
-                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.ExamEnrollment')),
-                ('person', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Person')),
+                 models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.ExamEnrollment')),
+                ('person', models.ForeignKey(on_delete=models.deletion.CASCADE, to='base.Person')),
             ],
         ),
         migrations.AlterField(
@@ -463,7 +462,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='person',
             name='user',
-            field=models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+            field=models.OneToOneField(blank=True, null=True, on_delete=models.deletion.CASCADE,
                                        to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
@@ -574,7 +573,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='offeryear',
             name='parent',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+            field=models.ForeignKey(blank=True, null=True, on_delete=models.deletion.CASCADE,
                                     related_name='children', to='base.OfferYear'),
         ),
         migrations.AddField(

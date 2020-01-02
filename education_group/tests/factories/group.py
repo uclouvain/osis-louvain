@@ -1,4 +1,4 @@
-############################################################################
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -15,32 +15,32 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
 #    at the root of the source code of this program.  If not,
 #    see http://www.gnu.org/licenses/.
 #
-############################################################################
-from django.test import TestCase
+##############################################################################
+import string
 
-from program_management.forms.custom_xls import CustomXlsForm
+import factory.fuzzy
+from django.utils import timezone
+from factory.django import DjangoModelFactory
+from faker import Faker
 
-REQUIRED_ENTITY_FIELD = 'required_entity'
-PROPOSITION_FIELD = 'proposition'
-NON_EXISTING_FIELD = 'any_stupid_think'
+from base.tests.factories.academic_year import AcademicYearFactory
+from osis_common.utils.datetime import get_tzinfo
+
+fake = Faker()
 
 
-class TestCustomXlsForm(TestCase):
+class GroupFactory(DjangoModelFactory):
+    class Meta:
+        model = "education_group.Group"
 
-    def test_get_optional_data(self):
-        form = CustomXlsForm({REQUIRED_ENTITY_FIELD: 'on',
-                              PROPOSITION_FIELD: 'on',
-                              NON_EXISTING_FIELD: 'on'})
-
-        self.assertCountEqual(form.get_optional_data(), [REQUIRED_ENTITY_FIELD, PROPOSITION_FIELD])
-
-    def test_get_no_optional_data(self):
-        form = CustomXlsForm()
-        self.assertCountEqual(form.get_optional_data(), [])
+    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
+    changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
+    start_year = factory.SubFactory(AcademicYearFactory, year=factory.fuzzy.FuzzyInteger(2000, timezone.now().year))
+    end_year = None

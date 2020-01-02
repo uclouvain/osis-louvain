@@ -188,7 +188,7 @@
                 {% endif %}
                 {% include 'education_group/blocks/admission_condition_text.html' with section_name="adults_taking_up_university_training" text=_("Adults taking up their university training") field=admission_condition.text_adults_taking_up_university_training field_en=admission_condition.text_adults_taking_up_university_training_en can_edit=True %}
             {% endif %}
-            {% if info.is_master or info.is_iufc %}
+            {% if info.is_master %}
                 {% if common_conditions and info.is_master %}
                     {% include 'education_group/blocks/admission_condition_text.html' with section_name="personalized_access" text=_("Personalized access") field=common_conditions.text_personalized_access field_en=common_conditions.text_personalized_access_en can_edit=False %}
                 {% endif %}

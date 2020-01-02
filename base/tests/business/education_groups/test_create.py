@@ -260,7 +260,7 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
             partial_acronym="LTEST503G",
             academic_year=previous_academic_year,
         )
-        previous_grp_ele = GroupElementYearFactory(
+        GroupElementYearFactory(
             parent=previous_egy,
             child_branch=previous_child
         )
@@ -306,7 +306,7 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
             partial_acronym="LTEST503G",
             academic_year=previous_academic_year,
         )
-        previous_grp_ele = GroupElementYearFactory(
+        GroupElementYearFactory(
             parent=previous_egy,
             child_branch=previous_child
         )
@@ -316,7 +316,7 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
             partial_acronym="LTEST504G",
             academic_year=self.current_academic_year,
         )
-        current_grp_ele = GroupElementYearFactory(
+        GroupElementYearFactory(
             parent=self.egy,
             child_branch=current_child
         )

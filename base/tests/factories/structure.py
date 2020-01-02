@@ -35,12 +35,13 @@ from base.models.enums import structure_type
 class StructureFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.Structure'
-        #abstract = False
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
+    changed = factory.fuzzy.FuzzyNaiveDateTime(
+        datetime.datetime(2016, 1, 1),
+        datetime.datetime(2017, 3, 1)
+    )
 
-    acronym = acronym = factory.Sequence(lambda n: 'ACR-%d' % n)
+    acronym = factory.Sequence(lambda n: 'ACR-%d' % n)
     title = factory.Sequence(lambda n: 'TITLE-%d' % n)
     type = factory.Iterator(structure_type.TYPES, getter=operator.itemgetter(0))

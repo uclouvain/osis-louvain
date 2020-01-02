@@ -40,7 +40,7 @@ class GetPersonRolesTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonFactory(global_id=4215)
-        for i in range(2):
+        for _ in range(2):
             entity = EntityFactory()
             EntityVersionFactory(entity=entity)
             PersonEntityFactory(

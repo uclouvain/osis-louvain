@@ -25,7 +25,6 @@
 ##############################################################################
 import datetime
 import json
-import random
 import urllib
 from http import HTTPStatus
 from itertools import product
@@ -1184,15 +1183,3 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         )
         result = get_appropriate_common_admission_condition(edy)
         self.assertEqual(result, self.special_master_adm_cond)
-
-    def test_not_show_free_text_for_continuing_education_types(self):
-        egy_type = random.choice(TrainingType.continuing_education_types())
-
-        egy = EducationGroupYearFactory(
-            academic_year=self.academic_year,
-            education_group_type__name=egy_type,
-        )
-        url = reverse("education_group_year_admission_condition_edit", args=[egy.pk, egy.pk])
-        response = self.client.get(url)
-
-        self.assertFalse(response.context['info']['show_free_text'])

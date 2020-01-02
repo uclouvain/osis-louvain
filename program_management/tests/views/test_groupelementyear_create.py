@@ -46,28 +46,32 @@ from program_management.business.group_element_years.management import EDUCATION
 
 @override_flag('education_group_update', active=True)
 class TestAttachCheckView(TestCase):
-    def setUp(self):
-        self.egy = EducationGroupYearFactory()
-        self.next_academic_year = AcademicYearFactory(current=True)
-        self.group_element_year = GroupElementYearFactory(parent__academic_year=self.next_academic_year)
-        self.selected_egy = EducationGroupYearFactory(
-            academic_year=self.next_academic_year
+    @classmethod
+    def setUpTestData(cls):
+        cls.egy = EducationGroupYearFactory()
+        cls.next_academic_year = AcademicYearFactory(current=True)
+        cls.group_element_year = GroupElementYearFactory(parent__academic_year=cls.next_academic_year)
+        cls.selected_egy = EducationGroupYearFactory(
+            academic_year=cls.next_academic_year
         )
 
-        self.url = reverse("check_education_group_attach", args=[self.egy.id, self.egy.id])
+        cls.url = reverse("check_education_group_attach", args=[cls.egy.id, cls.egy.id])
 
-        self.person = PersonFactory()
+        cls.person = PersonFactory()
 
-        self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
-                                       return_value=True)
-        self.mocked_perm = self.perm_patcher.start()
+        cls.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
+                                      return_value=True)
 
-        self.attach_strategy_patcher = mock.patch(
+        cls.attach_strategy_patcher = mock.patch(
             "program_management.views.groupelementyear_create.AttachEducationGroupYearStrategy"
         )
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
+        self.mocked_perm = self.perm_patcher.start()
         self.mocked_attach_strategy = self.attach_strategy_patcher.start()
 
+    def tearDown(self):
         self.addCleanup(self.perm_patcher.stop)
         self.addCleanup(self.attach_strategy_patcher.stop)
         self.addCleanup(cache.clear)
@@ -96,7 +100,7 @@ class TestAttachCheckView(TestCase):
         self.assertEqual(
             self.mocked_attach_strategy.call_args_list,
             [
-                ({"parent": self.egy, "child": self.egy}, )
+                ({"parent": self.egy, "child": self.egy},)
             ]
         )
 
@@ -113,36 +117,40 @@ class TestAttachCheckView(TestCase):
         self.assertEqual(
             self.mocked_attach_strategy.call_args_list,
             [
-                ({"parent": self.egy, "child": self.egy}, ),
-                ({"parent": self.egy, "child": other_egy}, )
+                ({"parent": self.egy, "child": self.egy},),
+                ({"parent": self.egy, "child": other_egy},)
             ]
         )
 
 
 @override_flag('education_group_update', active=True)
 class TestCreateGroupElementYearView(TestCase):
-    def setUp(self):
-        self.egy = TrainingFactory(academic_year__current=True, education_group_type__name=TrainingType.BACHELOR.name)
-        self.next_academic_year = AcademicYearFactory(current=True)
-        self.group_element_year = GroupElementYearFactory(parent__academic_year=self.next_academic_year)
-        self.selected_egy = EducationGroupYearFactory(
-            academic_year=self.next_academic_year
+    @classmethod
+    def setUpTestData(cls):
+        cls.egy = TrainingFactory(academic_year__current=True, education_group_type__name=TrainingType.BACHELOR.name)
+        cls.next_academic_year = AcademicYearFactory(current=True)
+        cls.group_element_year = GroupElementYearFactory(parent__academic_year=cls.next_academic_year)
+        cls.selected_egy = EducationGroupYearFactory(
+            academic_year=cls.next_academic_year
         )
 
-        self.url = reverse("group_element_year_create", args=[self.egy.id, self.egy.id])
+        cls.url = reverse("group_element_year_create", args=[cls.egy.id, cls.egy.id])
 
-        self.person = PersonFactory()
+        cls.person = PersonFactory()
 
-        self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
-                                       return_value=True)
-        self.mocked_perm = self.perm_patcher.start()
+        cls.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
+                                      return_value=True)
 
-        self.attach_strategy_patcher = mock.patch(
+        cls.attach_strategy_patcher = mock.patch(
             "program_management.views.groupelementyear_create.AttachEducationGroupYearStrategy"
         )
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
+        self.mocked_perm = self.perm_patcher.start()
         self.mocked_attach_strategy = self.attach_strategy_patcher.start()
 
+    def tearDown(self):
         self.addCleanup(self.perm_patcher.stop)
         self.addCleanup(self.attach_strategy_patcher.stop)
         self.addCleanup(cache.clear)
@@ -190,7 +198,7 @@ class TestCreateGroupElementYearView(TestCase):
 
     def test_when_multiple_elements_selected(self):
         other_egy = GroupFactory(academic_year__current=True)
-        other_other_egy = GroupFactory(academic_year__current=True )
+        other_other_egy = GroupFactory(academic_year__current=True)
         AuthorizedRelationshipFactory(
             parent_type=self.egy.education_group_type,
             child_type=other_egy.education_group_type,
@@ -225,26 +233,30 @@ class TestCreateGroupElementYearView(TestCase):
 
 @override_flag('education_group_update', active=True)
 class TestMoveGroupElementYearView(TestCase):
-    def setUp(self):
-        self.next_academic_year = AcademicYearFactory(current=True)
-        self.root_egy = EducationGroupYearFactory(academic_year=self.next_academic_year)
-        self.group_element_year = GroupElementYearFactory(parent__academic_year=self.next_academic_year)
-        self.selected_egy = GroupFactory(
-            academic_year=self.next_academic_year
+    @classmethod
+    def setUpTestData(cls):
+        cls.next_academic_year = AcademicYearFactory(current=True)
+        cls.root_egy = EducationGroupYearFactory(academic_year=cls.next_academic_year)
+        cls.group_element_year = GroupElementYearFactory(parent__academic_year=cls.next_academic_year)
+        cls.selected_egy = GroupFactory(
+            academic_year=cls.next_academic_year
         )
 
-        self.url = reverse(
+        cls.url = reverse(
             "group_element_year_move",
-            args=[self.root_egy.id, self.selected_egy.id, self.group_element_year.id]
+            args=[cls.root_egy.id, cls.selected_egy.id, cls.group_element_year.id]
         )
 
-        self.person = PersonFactory()
+        cls.person = PersonFactory()
 
+        cls.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
+                                      return_value=True)
+
+    def setUp(self):
         self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group",
-                                       return_value=True)
         self.mocked_perm = self.perm_patcher.start()
 
+    def tearDown(self):
         self.addCleanup(self.perm_patcher.stop)
         self.addCleanup(cache.clear)
 

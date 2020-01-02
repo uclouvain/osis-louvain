@@ -26,13 +26,19 @@
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
+from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.tests.factories.attribution_new import AttributionNewFactory
+
 from base.models.enums.prerequisite_operator import AND, OR
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory, GroupElementYearFactory
+from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
+    PracticalLearningComponentYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from base.tests.factories.tutor import TutorFactory
 from program_management.business.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, \
     EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel, _get_blocks_prerequisite_of, FIX_TITLES, _get_headers, \
     optional_header_for_proposition, optional_header_for_credits, optional_header_for_volume, _get_attribution_line, \
@@ -164,6 +170,39 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         generator_container = GenerateContainer(cls.education_group_year.academic_year,
                                                 cls.education_group_year.academic_year)
         cls.luy = generator_container.generated_container_years[0].learning_unit_year_full
+
+        cls.lecturing_component = LecturingLearningComponentYearFactory(
+            learning_unit_year=cls.luy)
+        cls.practical_component = PracticalLearningComponentYearFactory(
+            learning_unit_year=cls.luy)
+        cls.person_1 = PersonFactory(last_name='Dupont', first_name="Marcel", email="dm@gmail.com")
+        cls.person_2 = PersonFactory(last_name='Marseillais', first_name="Pol", email="pm@gmail.com")
+        cls.tutor_1 = TutorFactory(person=cls.person_1)
+        cls.tutor_2 = TutorFactory(person=cls.person_2)
+        cls.attribution_1 = AttributionNewFactory(
+            tutor=cls.tutor_1,
+            learning_container_year=cls.luy.learning_container_year
+        )
+        cls.charge_lecturing = AttributionChargeNewFactory(
+            attribution=cls.attribution_1,
+            learning_component_year=cls.lecturing_component
+        )
+        cls.charge_practical = AttributionChargeNewFactory(
+            attribution=cls.attribution_1,
+            learning_component_year=cls.practical_component
+        )
+        cls.attribution_2 = AttributionNewFactory(
+            tutor=cls.tutor_2,
+            learning_container_year=cls.luy.learning_container_year
+        )
+        cls.charge_lecturing = AttributionChargeNewFactory(
+            attribution=cls.attribution_2,
+            learning_component_year=cls.lecturing_component
+        )
+        cls.charge_practical = AttributionChargeNewFactory(
+            attribution=cls.attribution_2,
+            learning_component_year=cls.practical_component
+        )
 
     def test_header_lines_without_optional_titles(self):
         custom_xls_form = CustomXlsForm({})
@@ -346,6 +385,17 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         optional_data['has_language'] = True
         self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
                               [self.luy.language])
+
+    def test_get_optional_has_teacher_list(self):
+        optional_data = initialize_optional_data()
+        optional_data['has_teacher_list'] = True
+        teacher_data = _get_optional_data([], self.luy, optional_data)
+        self.assertEqual(teacher_data[0], "{} {};{} {}"
+                         .format(self.person_1.last_name.upper(), self.person_1.first_name,
+                                 self.person_2.last_name.upper(), self.person_2.first_name))
+        self.assertEqual(teacher_data[1], "{};{}"
+                         .format(self.person_1.email,
+                                 self.person_2.email))
 
 
 def get_expected_data(gey, luy):

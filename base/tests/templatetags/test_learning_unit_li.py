@@ -65,37 +65,45 @@ ID_LINK_EDIT_LU = "link_edit_lu"
 ID_LINK_EDIT_DATE_LU = "link_edit_date_lu"
 
 
+@override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
 @override_settings(LANGUAGES=[('en', 'English'), ], LANGUAGE_CODE='en')
 class LearningUnitTagLiEditTest(TestCase):
-    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
-    def setUp(self):
-        self.user = UserFactory()
-        self.central_manager_person = create_person_with_permission_and_group(
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.central_manager_person = create_person_with_permission_and_group(
             CENTRAL_MANAGER_GROUP,
             'can_edit_learningunit'
         )
-        self.central_manager_person.user.user_permissions.add(
+        cls.central_manager_person.user.user_permissions.add(
             Permission.objects.get(codename='can_propose_learningunit'),
             Permission.objects.get(codename='can_edit_learningunit_date'),
             Permission.objects.get(codename='can_delete_learningunit')
         )
-        self.person_entity = PersonEntityFactory(person=self.central_manager_person)
+        cls.person_entity = PersonEntityFactory(person=cls.central_manager_person)
 
-        self.learning_unit = LearningUnitFactory()
-        self.previous_learning_unit = LearningUnitFactory(existing_proposal_in_epc=False)
-        self.current_academic_year = create_current_academic_year()
-        self.previous_academic_year = AcademicYearFactory(year=settings.YEAR_LIMIT_LUE_MODIFICATION-1)
-        self.next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year + 1)
+        cls.previous_learning_unit = LearningUnitFactory(existing_proposal_in_epc=False)
+        cls.current_academic_year = create_current_academic_year()
+        cls.next_academic_yr = AcademicYearFactory(year=cls.current_academic_year.year + 1)
 
-        AcademicYearFactory(year=self.current_academic_year.year + 2)
-        AcademicYearFactory(year=self.current_academic_year.year + 3)
-        AcademicYearFactory(year=self.current_academic_year.year + 4)
-        self.later_academic_year = AcademicYearFactory(year=self.current_academic_year.year + 5)
-        self.lcy = LearningContainerYearFactory(
-            academic_year=self.next_academic_yr,
+        AcademicYearFactory(year=cls.current_academic_year.year + 2)
+        AcademicYearFactory(year=cls.current_academic_year.year + 3)
+        AcademicYearFactory(year=cls.current_academic_year.year + 4)
+        cls.later_academic_year = AcademicYearFactory(year=cls.current_academic_year.year + 5)
+        cls.lcy = LearningContainerYearFactory(
+            academic_year=cls.next_academic_yr,
             container_type=learning_container_year_types.COURSE,
-            requirement_entity=self.person_entity.entity
+            requirement_entity=cls.person_entity.entity
         )
+
+        cls.requirement_entity = cls.person_entity.entity
+
+        cls.request = RequestFactory().get("")
+
+    def setUp(self):
+        self.learning_unit = LearningUnitFactory()
+        self.previous_academic_year = AcademicYearFactory(year=settings.YEAR_LIMIT_LUE_MODIFICATION-1)
+
         self.learning_unit_year = LearningUnitYearFactory(
             academic_year=self.next_academic_yr,
             subtype=learning_unit_year_subtypes.FULL,
@@ -107,7 +115,6 @@ class LearningUnitTagLiEditTest(TestCase):
             learning_unit=self.learning_unit,
             learning_container_year__requirement_entity=self.person_entity.entity
         )
-
         self.previous_luy_2 = LearningUnitYearFactory(
             academic_year=self.previous_academic_year,
             subtype=learning_unit_year_subtypes.FULL,
@@ -116,9 +123,8 @@ class LearningUnitTagLiEditTest(TestCase):
                                                                  container_type=learning_container_year_types.COURSE)
         )
 
-        self.previous_proposal = ProposalLearningUnitFactory(learning_unit_year=self.previous_luy_2)
+        self.client.force_login(user=self.central_manager_person.user)
 
-        self.requirement_entity = self.person_entity.entity
         self.proposal = ProposalLearningUnitFactory(
             learning_unit_year=self.learning_unit_year,
             initial_data={
@@ -126,11 +132,10 @@ class LearningUnitTagLiEditTest(TestCase):
                 'entities': {'REQUIREMENT_ENTITY': self.requirement_entity.id}
             },
         )
+        self.previous_proposal = ProposalLearningUnitFactory(learning_unit_year=self.previous_luy_2)
 
-        self.client.force_login(user=self.central_manager_person.user)
         self.url_edit = reverse('edit_learning_unit', args=[self.learning_unit_year.id])
         self.url_edit_non_editable = reverse('edit_learning_unit', args=[self.previous_learning_unit_year.id])
-        self.request = RequestFactory().get("")
         self.context = {
             "learning_unit_year": self.learning_unit_year,
             "request": self.request,
@@ -138,7 +143,6 @@ class LearningUnitTagLiEditTest(TestCase):
             "proposal": self.proposal
         }
 
-    @override_settings(YEAR_LIMIT_LUE_MODIFICATION=2018)
     def test_li_edit_lu_year_non_editable_for_faculty_managers(self):
         faculty_managers = [
             create_person_with_permission_and_group(FACULTY_MANAGER_GROUP, 'can_edit_learningunit'),

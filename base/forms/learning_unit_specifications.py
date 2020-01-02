@@ -128,4 +128,3 @@ def update_future_luy(ac_year_postponement_range, luy, cms):
             text_label=cms.get("text_label"),
             defaults={'text': cms.get("text")}
         )
-

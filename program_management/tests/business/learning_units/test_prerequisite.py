@@ -43,8 +43,9 @@ from program_management.views.generic import NO_PREREQUISITES
 
 
 class TestLearningUnitsAcronymsFromPrerequisite(TestCase):
-    def setUp(self):
-        self.prerequisite = PrerequisiteFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.prerequisite = PrerequisiteFactory()
 
     def test_empty_prerequisite_should_return_empty_list(self):
         self.assertEqual(prerequisite.extract_learning_units_acronym_from_prerequisite(self.prerequisite),

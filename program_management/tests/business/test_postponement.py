@@ -132,7 +132,6 @@ class TestComputeEndPostponement(EducationGroupPostponementTestCase):
 
 
 class TestPostponeContent(TestCase):
-
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
@@ -370,7 +369,7 @@ class TestPostponeContent(TestCase):
         n_minus_1_luy = LearningUnitYearFactory(
             academic_year=self.previous_academic_year
         )
-        n_luy = LearningUnitYearFactory(
+        LearningUnitYearFactory(
             learning_unit=n_minus_1_luy.learning_unit,
             academic_year=self.current_academic_year
         )
@@ -423,7 +422,7 @@ class TestPostponeContent(TestCase):
             prerequisite=prerequisite,
         )
 
-        n1_luy = LearningUnitYearFactory(
+        LearningUnitYearFactory(
             learning_unit=prerequisite.learning_unit_year.learning_unit,
             academic_year=self.next_academic_year,
         )
@@ -469,7 +468,7 @@ class TestPostponeContent(TestCase):
             learning_unit=item_luy.learning_unit
         )
 
-        n1_luy = LearningUnitYearFactory(
+        LearningUnitYearFactory(
             learning_unit=prerequisite.learning_unit_year.learning_unit,
             academic_year=self.next_academic_year,
         )
@@ -503,7 +502,7 @@ class TestPostponeContent(TestCase):
         )
 
         item_luy = LearningUnitYearFactory(academic_year=self.current_academic_year)
-        item_luy_n1 = LearningUnitYearFactory(
+        LearningUnitYearFactory(
             academic_year=self.previous_academic_year,
             learning_unit=item_luy.learning_unit
         )
@@ -657,14 +656,14 @@ class TestPostponeContent(TestCase):
             education_group=root_grp.parent.education_group,
             academic_year=self.next_academic_year
         )
-        child_egy_n1 = EducationGroupYearFactory(
+        EducationGroupYearFactory(
             acronym=child_grp.child_branch.acronym,
             partial_acronym=child_grp.child_branch.partial_acronym,
             education_group_type=child_grp.child_branch.education_group_type,
             education_group=child_grp.child_branch.education_group,
             academic_year=self.next_academic_year,
         )
-        child_child_egy_n1 = EducationGroupYearFactory(
+        EducationGroupYearFactory(
             acronym=child_child_grp.child_branch.acronym,
             partial_acronym=child_child_grp.child_branch.partial_acronym,
             education_group_type=child_child_grp.child_branch.education_group_type,

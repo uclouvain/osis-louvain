@@ -35,7 +35,6 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelF
     LearningUnitModelForm, LearningContainerYearModelForm, LearningContainerModelForm
 from base.forms.learning_unit.learning_unit_partim import PARTIM_FORM_READ_ONLY_FIELD, PartimForm, \
     LearningUnitPartimModelForm
-from base.forms.utils import acronym_field
 from base.models.enums import learning_unit_year_subtypes, organization_type
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_periodicity import ANNUAL, BIENNIAL_EVEN
@@ -420,7 +419,6 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
 
 
 def get_valid_form_data(learning_unit_year_partim):
-    acronym_splited = acronym_field.split_acronym(learning_unit_year_partim.acronym)
     return {
         # Learning unit year data model form
         'acronym_2': 'B',

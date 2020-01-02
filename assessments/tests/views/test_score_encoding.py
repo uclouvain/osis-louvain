@@ -30,7 +30,7 @@ from unittest.mock import patch
 from django.contrib.auth.models import Permission, Group
 from django.contrib.auth.models import User
 from django.http import Http404
-from django.test import TestCase, RequestFactory, TransactionTestCase
+from django.test import TestCase, TransactionTestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import gettext
@@ -64,25 +64,20 @@ class MixinSetupOnlineEncoding(AcademicYearMockMixin, SessionExamCalendarMockMix
     def setUp(self):
         Group.objects.get_or_create(name="tutors")
         Group.objects.get_or_create(name="program_managers")
-        self.request_factory = RequestFactory()
         data = generate_exam_enrollments(2017, with_different_offer=True)
-        self.academic_year = data["academic_year"]
-        self.session_exam_calendar = data["session_exam_calendar"]
         self.learning_unit_year = data["learning_unit_year"]
         self.enrollments = data["exam_enrollments"]
-        self.attribution = data["attribution"]
-        self.offer_years = data["offer_years"]
-        self.tutor = self.attribution.tutor
+        self.tutor = data["attribution"].tutor
         add_permission(self.tutor.person.user, "can_access_scoreencoding")
-        self.program_managers = [ProgramManagerFactory(offer_year=self.offer_years[i]) for i in range(0,2)]
+        self.program_managers = [ProgramManagerFactory(offer_year=data["offer_years"][i]) for i in range(0,2)]
         [add_permission(self.program_managers[i].person.user, "can_access_scoreencoding") for i in range(0,2)]
 
         # Mock academic_year / session_exam_calendar in order to be decouple test from system time
         self.mock_academic_year(
-            current_academic_year=self.academic_year,
-            starting_academic_year=self.academic_year,
+            current_academic_year=data["academic_year"],
+            starting_academic_year=data["academic_year"],
         )
-        self.mock_session_exam_calendar(current_session_exam=self.session_exam_calendar)
+        self.mock_session_exam_calendar(current_session_exam=data["session_exam_calendar"])
 
     def assert_exam_enrollments(self, exam_enrollment, score_draft, score_final, justification_draft,
                                 justification_final):
@@ -199,7 +194,7 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
     def test_tutor_encoding_with_a_student(self):
         self.client.force_login(self.tutor.person.user)
         url = reverse('online_encoding_form', args=[self.learning_unit_year.id])
-        response = self.client.post(url, data=self.get_form_with_one_student_filled())
+        self.client.post(url, data=self.get_form_with_one_student_filled())
 
         self.assert_exam_enrollments(self.enrollments[0], 15, None, None, None)
         self.assert_exam_enrollments(self.enrollments[1], None, None, None, None)
@@ -291,7 +286,7 @@ class OnlineEncodingTest(MixinSetupOnlineEncoding, TestCase):
     def test_encoding_by_specific_criteria_case_no_changes_in_form(self, mock_scores_encoding_list, mock_id_from_post_data):
         mock_scores_encoding_list.return_value = ScoresEncodingList()
         mock_id_from_post_data.return_value = []
-        request = self.request_factory.get(reverse('specific_criteria_submission'))
+        request = self.client.get(reverse('specific_criteria_submission'))
         request.user = self.tutor.person.user
         scores_encoding_object = score_encoding._get_score_encoding_list_with_only_enrollment_modified(request)
         self.assertEqual(scores_encoding_object.enrollments, [])

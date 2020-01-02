@@ -65,7 +65,7 @@ class LearningUnitTest(TestCase):
         l_container_year = LearningContainerYearFactory(academic_year=academic_year)
         l_container_year_2 = LearningContainerYearFactory(academic_year=academic_year)
         # Create learning unit year attached to learning container year
-        learning_unit_year_1 = LearningUnitYearFactory(academic_year=academic_year,
+        LearningUnitYearFactory(academic_year=academic_year,
                                                        learning_container_year=l_container_year,
                                                        subtype=learning_unit_year_subtypes.FULL)
         LearningUnitYearFactory(academic_year=academic_year,
@@ -74,7 +74,7 @@ class LearningUnitTest(TestCase):
         LearningUnitYearFactory(academic_year=academic_year,
                                 learning_container_year=l_container_year,
                                 subtype=learning_unit_year_subtypes.PARTIM)
-        learning_unit_year_2 = LearningUnitYearFactory(academic_year=academic_year,
+        LearningUnitYearFactory(academic_year=academic_year,
                                                        learning_container_year=l_container_year_2,
                                                        subtype=learning_unit_year_subtypes.FULL)
         LearningUnitYearFactory(academic_year=academic_year, learning_container_year=None)

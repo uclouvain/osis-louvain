@@ -54,7 +54,7 @@ class PersonFactory(factory.DjangoModelFactory):
                                       person.user.last_name if person.user else factory.Faker('last_name'))
 
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1))
-    email = factory.LazyAttribute(lambda person: person.user.email if person.user else None)
+    email = factory.LazyAttribute(lambda person: person.user.email if person.user else '')
     phone = factory.Faker('phone_number')
     language = factory.Iterator(settings.LANGUAGES, getter=operator.itemgetter(0))
     gender = factory.Iterator(mdl.person.Person.GENDER_CHOICES, getter=operator.itemgetter(0))

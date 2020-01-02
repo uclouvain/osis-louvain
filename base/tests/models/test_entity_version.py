@@ -546,24 +546,6 @@ class EntityVersionLoadInMemoryTest(TestCase):
         self.assertNotIn(self.MATH.id, result.keys())
 
     def test_build_entity_version_structure_in_memory(self):
-        partial_expected_result = {
-            self.root.entity.id: {
-                'entity_version_parent': None,
-                'direct_children': [self.SC, self.LOCI],
-                'all_children': [self.SC, self.LOCI, self.MATH, self.PHYS, self.URBA, self.BARC],
-            },
-            self.SC.entity.id: {
-                'entity_version_parent': self.root,
-                'direct_children': [self.MATH, self.PHYS],
-                'all_children': [self.MATH, self.PHYS],
-            },
-            self.MATH.entity.id: {
-                'entity_version_parent': self.SC,
-                'direct_children': [],
-                'all_children': [],
-            },
-            # ...
-        }
         result = entity_version.build_current_entity_version_structure_in_memory()
         all_current_entities_version = entity_version.find_all_current_entities_version()
 

@@ -37,14 +37,18 @@ from base.tests.factories.user import SuperUserFactory
 
 
 class OfferScoreSheetTabViewTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        today = datetime.date.today()
+        cls.academic_year = AcademicYearFactory(start_date=today,
+                                                end_date=today.replace(year=today.year + 1),
+                                                year=today.year)
+        cls.offer_year = OfferYearFactory(academic_year=cls.academic_year)
+        cls.COMMON_CONTEXT_KEYS = ['offer_year', 'countries', 'is_program_manager', 'entity_versions']
+        cls.a_superuser = SuperUserFactory()
 
     def setUp(self):
-        today = datetime.date.today()
-        self.academic_year = AcademicYearFactory(start_date=today,
-                                                 end_date=today.replace(year=today.year + 1),
-                                                 year=today.year)
-        self.offer_year = OfferYearFactory(academic_year=self.academic_year)
-        self.COMMON_CONTEXT_KEYS = ['offer_year', 'countries', 'is_program_manager', 'entity_versions']
+        self.client.force_login(self.a_superuser)
 
     def test_get_common_context(self):
         request = mock.Mock(method='GET')
@@ -52,7 +56,6 @@ class OfferScoreSheetTabViewTest(TestCase):
         self.assert_list_contains(list(context.keys()), self.COMMON_CONTEXT_KEYS)
 
     def test_offer_score_encoding_tab(self):
-        self.client.force_login(SuperUserFactory())
         response = self.client.get(reverse('offer_score_encoding_tab', args=[self.offer_year.id]))
 
         self.assertTemplateUsed(response, 'offer/score_sheet_address_tab.html')
@@ -68,8 +71,6 @@ class OfferScoreSheetTabViewTest(TestCase):
     def test_save_score_sheet_address_case_reuse_entity_address(self,
                                                                 mock_add_message,
                                                                 mock_save_address_from_entity):
-        self.a_superuser = SuperUserFactory()
-        self.client.force_login(self.a_superuser)
         url = reverse('save_score_sheet_address', args=[self.offer_year.id])
         response = self.client.post(url, data={'related_entity': 1234})
         self.assertTrue(mock_add_message.called)

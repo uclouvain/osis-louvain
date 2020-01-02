@@ -32,20 +32,20 @@ from base.tests.factories.business.learning_units import LearningUnitsMixin
 
 
 class TestLearningUnitEditionForm(TestCase, LearningUnitsMixin):
-
-    def setUp(self):
-        super().setUp()
-        self.setup_academic_years()
-        self.learning_unit = self.setup_learning_unit(
-            start_year=self.starting_academic_year)
-        self.learning_container_year = self.setup_learning_container_year(
-            academic_year=self.starting_academic_year,
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.setup_academic_years()
+        cls.learning_unit = cls.setup_learning_unit(
+            start_year=cls.starting_academic_year)
+        cls.learning_container_year = cls.setup_learning_container_year(
+            academic_year=cls.starting_academic_year,
             container_type=learning_container_year_types.COURSE
         )
-        self.learning_unit_year = self.setup_learning_unit_year(
-            academic_year=self.starting_academic_year,
-            learning_unit=self.learning_unit,
-            learning_container_year=self.learning_container_year,
+        cls.learning_unit_year = cls.setup_learning_unit_year(
+            academic_year=cls.starting_academic_year,
+            learning_unit=cls.learning_unit,
+            learning_container_year=cls.learning_container_year,
             learning_unit_year_subtype=learning_unit_year_subtypes.FULL,
             periodicity=learning_unit_year_periodicity.ANNUAL
         )
