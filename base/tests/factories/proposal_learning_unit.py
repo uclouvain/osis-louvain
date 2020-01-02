@@ -46,6 +46,7 @@ class ProposalLearningUnitFactory(factory.django.DjangoModelFactory):
     learning_unit_year = factory.SubFactory(LearningUnitYearFakerFactory)
     type = factory.Iterator(ProposalType.choices(), getter=operator.itemgetter(0))
     state = factory.Iterator(ProposalState.choices(), getter=operator.itemgetter(0))
+
     initial_data = {}
     entity = factory.SubFactory(EntityFactory)
     folder_id = factory.fuzzy.FuzzyInteger(100)
