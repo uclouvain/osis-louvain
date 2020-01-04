@@ -21,6 +21,7 @@ def set_coordinators_as_score_responsible(apps, schema_editor):
         cursor.execute("""UPDATE attribution_attribution SET score_responsible = TRUE
                           WHERE function = 'COORDINATOR';""")
 
+
 def set_uuid_field(apps, schema_editor):
     attribution = apps.get_app_config('attribution')
     for model_class in attribution.get_models():
@@ -32,6 +33,7 @@ def set_uuid_field(apps, schema_editor):
                 except FieldDoesNotExist:
                     break
 
+
 def set_deleted_new_field(apps, schema_editor):
     attribution = apps.get_app_config('attribution')
     default_datetime = timezone.now()
@@ -41,9 +43,30 @@ def set_deleted_new_field(apps, schema_editor):
         except (FieldError, FieldDoesNotExist):
             continue
 
-class Migration(migrations.Migration):
 
-    replaces = [('attribution', '0001_initial'), ('attribution', '0002_move_data_from_base_attribution_to_attribution_attribution'), ('attribution', '0003_auto_20161215_1420'), ('attribution', '0004_attribution_score_responsible'), ('attribution', '0005_from_coordinator_to_score_responsible'), ('attribution', '0006_auto_20161216_1338'), ('attribution', '0007_attribution_uuid'), ('attribution', '0008_populate_uuid_values'), ('attribution', '0009_uuid_not_null'), ('attribution', '0010_move_data_from_base_attribution_to_attribution_attribution'), ('attribution', '0011_auto_20170123_1025'), ('attribution', '0012_auto_20170203_0950'), ('attribution', '0013_auto_20170607_1522'), ('attribution', '0014_auto_20170627_1426'), ('attribution', '0015_attribution_deleted'), ('attribution', '0016_auto_20171018_0937'), ('attribution', '0017_auto_20171027_1706'), ('attribution', '0018_auto_20171208_0056'), ('attribution', '0019_auto_20180103_1427'), ('attribution', '0020_auto_20180105_1021'), ('attribution', '0021_attributionnew_substitute'), ('attribution', '0022_auto_20180115_0913'), ('attribution', '0023_auto_20180116_1026'), ('attribution', '0024_auto_20180116_1034'), ('attribution', '0025_auto_20180116_1052'), ('attribution', '0026_auto_20180116_1052'), ('attribution', '0027_auto_20180117_1322'), ('attribution', '0028_auto_20180129_1308'), ('attribution', '0029_WARNING_INDEX_20180129_1441'), ('attribution', '0030_auto_20180228_0856'), ('attribution', '0031_remove_attributionnew_summary_responsible'), ('attribution', '0032_auto_20180327_1458'), ('attribution', '0033_auto_20180327_1513'), ('attribution', '0034_auto_20180807_1229'), ('attribution', '0035_attributionchargenew_changed'), ('attribution', '0036_auto_20181105_1501'), ('attribution', '0037_auto_20181116_1050'), ('attribution', '0038_auto_20191206_1519')]
+class Migration(migrations.Migration):
+    replaces = [('attribution', '0001_initial'),
+                ('attribution', '0002_move_data_from_base_attribution_to_attribution_attribution'),
+                ('attribution', '0003_auto_20161215_1420'), ('attribution', '0004_attribution_score_responsible'),
+                ('attribution', '0005_from_coordinator_to_score_responsible'),
+                ('attribution', '0006_auto_20161216_1338'), ('attribution', '0007_attribution_uuid'),
+                ('attribution', '0008_populate_uuid_values'), ('attribution', '0009_uuid_not_null'),
+                ('attribution', '0010_move_data_from_base_attribution_to_attribution_attribution'),
+                ('attribution', '0011_auto_20170123_1025'), ('attribution', '0012_auto_20170203_0950'),
+                ('attribution', '0013_auto_20170607_1522'), ('attribution', '0014_auto_20170627_1426'),
+                ('attribution', '0015_attribution_deleted'), ('attribution', '0016_auto_20171018_0937'),
+                ('attribution', '0017_auto_20171027_1706'), ('attribution', '0018_auto_20171208_0056'),
+                ('attribution', '0019_auto_20180103_1427'), ('attribution', '0020_auto_20180105_1021'),
+                ('attribution', '0021_attributionnew_substitute'), ('attribution', '0022_auto_20180115_0913'),
+                ('attribution', '0023_auto_20180116_1026'), ('attribution', '0024_auto_20180116_1034'),
+                ('attribution', '0025_auto_20180116_1052'), ('attribution', '0026_auto_20180116_1052'),
+                ('attribution', '0027_auto_20180117_1322'), ('attribution', '0028_auto_20180129_1308'),
+                ('attribution', '0029_WARNING_INDEX_20180129_1441'), ('attribution', '0030_auto_20180228_0856'),
+                ('attribution', '0031_remove_attributionnew_summary_responsible'),
+                ('attribution', '0032_auto_20180327_1458'), ('attribution', '0033_auto_20180327_1513'),
+                ('attribution', '0034_auto_20180807_1229'), ('attribution', '0035_attributionchargenew_changed'),
+                ('attribution', '0036_auto_20181105_1501'), ('attribution', '0037_auto_20181116_1050'),
+                ('attribution', '0038_auto_20191206_1519')]
 
     initial = True
 
@@ -64,8 +87,13 @@ class Migration(migrations.Migration):
                 ('changed', models.DateTimeField(null=True)),
                 ('start_date', models.DateField(blank=True, null=True)),
                 ('end_date', models.DateField(blank=True, null=True)),
-                ('function', models.CharField(blank=True, choices=[('COORDINATOR', 'COORDINATOR'), ('HOLDER', 'HOLDER'), ('CO_HOLDER', 'CO_HOLDER'), ('DEPUTY', 'DEPUTY'), ('PROFESSOR', 'PROFESSOR')], db_index=True, max_length=15, null=True)),
-                ('learning_unit_year', models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.LearningUnitYear')),
+                ('function', models.CharField(blank=True, choices=[('COORDINATOR', 'COORDINATOR'), ('HOLDER', 'HOLDER'),
+                                                                   ('CO_HOLDER', 'CO_HOLDER'), ('DEPUTY', 'DEPUTY'),
+                                                                   ('PROFESSOR', 'PROFESSOR')], db_index=True,
+                                              max_length=15, null=True)),
+                ('learning_unit_year',
+                 models.ForeignKey(blank=True, default=None, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                   to='base.LearningUnitYear')),
                 ('tutor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Tutor')),
                 ('score_responsible', models.BooleanField(default=False)),
             ],
@@ -76,8 +104,10 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('uuid', models.UUIDField(db_index=True, default=uuid.uuid4, editable=False, unique=True)),
                 ('allocation_charge', models.DecimalField(blank=True, decimal_places=2, max_digits=5, null=True)),
-                ('attribution', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='attribution.Attribution')),
-                ('learning_unit_component', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningUnitComponent')),
+                ('attribution',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='attribution.Attribution')),
+                ('learning_unit_component',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningUnitComponent')),
             ],
             options={
                 'abstract': False,
@@ -122,7 +152,15 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='attribution',
             name='function',
-            field=models.CharField(blank=True, choices=[('COORDINATOR', 'COORDINATOR'), ('HOLDER', 'HOLDER'), ('CO_HOLDER', 'CO_HOLDER'), ('DEPUTY', 'DEPUTY'), ('DEPUTY_AUTHORITY', 'DEPUTY_AUTHORITY'), ('DEPUTY_SABBATICAL', 'DEPUTY_SABBATICAL'), ('DEPUTY_TEMPORARY', 'DEPUTY_TEMPORARY'), ('PROFESSOR', 'PROFESSOR'), ('INTERNSHIP_SUPERVISOR', 'INTERNSHIP_SUPERVISOR'), ('INTERNSHIP_CO_SUPERVISOR', 'INTERNSHIP_CO_SUPERVISOR')], db_index=True, max_length=35, null=True),
+            field=models.CharField(blank=True, choices=[('COORDINATOR', 'COORDINATOR'), ('HOLDER', 'HOLDER'),
+                                                        ('CO_HOLDER', 'CO_HOLDER'), ('DEPUTY', 'DEPUTY'),
+                                                        ('DEPUTY_AUTHORITY', 'DEPUTY_AUTHORITY'),
+                                                        ('DEPUTY_SABBATICAL', 'DEPUTY_SABBATICAL'),
+                                                        ('DEPUTY_TEMPORARY', 'DEPUTY_TEMPORARY'),
+                                                        ('PROFESSOR', 'PROFESSOR'),
+                                                        ('INTERNSHIP_SUPERVISOR', 'INTERNSHIP_SUPERVISOR'),
+                                                        ('INTERNSHIP_CO_SUPERVISOR', 'INTERNSHIP_CO_SUPERVISOR')],
+                                   db_index=True, max_length=35, null=True),
         ),
         migrations.AlterField(
             model_name='attribution',
@@ -146,16 +184,23 @@ class Migration(migrations.Migration):
                 ('deleted', models.BooleanField(default=False)),
                 ('external_id', models.CharField(blank=True, max_length=100, null=True)),
                 ('changed', models.DateTimeField(auto_now=True, null=True)),
-                ('function', models.CharField(choices=[('COORDINATOR', 'COORDINATOR'), ('HOLDER', 'HOLDER'), ('CO_HOLDER', 'CO_HOLDER'), ('DEPUTY', 'DEPUTY'), ('DEPUTY_AUTHORITY', 'DEPUTY_AUTHORITY'), ('DEPUTY_SABBATICAL', 'DEPUTY_SABBATICAL'), ('DEPUTY_TEMPORARY', 'DEPUTY_TEMPORARY'), ('PROFESSOR', 'PROFESSOR'), ('INTERNSHIP_SUPERVISOR', 'INTERNSHIP_SUPERVISOR'), ('INTERNSHIP_CO_SUPERVISOR', 'INTERNSHIP_CO_SUPERVISOR')], db_index=True, max_length=35)),
+                ('function', models.CharField(
+                    choices=[('COORDINATOR', 'COORDINATOR'), ('HOLDER', 'HOLDER'), ('CO_HOLDER', 'CO_HOLDER'),
+                             ('DEPUTY', 'DEPUTY'), ('DEPUTY_AUTHORITY', 'DEPUTY_AUTHORITY'),
+                             ('DEPUTY_SABBATICAL', 'DEPUTY_SABBATICAL'), ('DEPUTY_TEMPORARY', 'DEPUTY_TEMPORARY'),
+                             ('PROFESSOR', 'PROFESSOR'), ('INTERNSHIP_SUPERVISOR', 'INTERNSHIP_SUPERVISOR'),
+                             ('INTERNSHIP_CO_SUPERVISOR', 'INTERNSHIP_CO_SUPERVISOR')], db_index=True, max_length=35)),
                 ('start_date', models.DateField(blank=True, null=True)),
                 ('end_date', models.DateField(blank=True, null=True)),
                 ('start_year', models.IntegerField(blank=True, null=True)),
                 ('end_year', models.IntegerField(blank=True, null=True)),
                 ('score_responsible', models.BooleanField(default=False)),
-                ('learning_container_year', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningContainerYear')),
+                ('learning_container_year',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningContainerYear')),
                 ('tutor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Tutor')),
                 ('summary_responsible', models.BooleanField(default=False)),
-                ('substitute', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='base.Person')),
+                ('substitute', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE,
+                                                 to='base.Person')),
                 ('deleted_new', models.DateTimeField(blank=True, db_index=True, default=None, null=True)),
             ],
             options={
@@ -179,8 +224,10 @@ class Migration(migrations.Migration):
                 ('deleted', models.BooleanField(default=False)),
                 ('external_id', models.CharField(blank=True, max_length=100, null=True)),
                 ('allocation_charge', models.DecimalField(blank=True, decimal_places=1, max_digits=6, null=True)),
-                ('attribution', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='attribution.AttributionNew')),
-                ('learning_component_year', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningComponentYear')),
+                ('attribution',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='attribution.AttributionNew')),
+                ('learning_component_year',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningComponentYear')),
                 ('deleted_new', models.DateTimeField(blank=True, db_index=True, default=None, null=True)),
             ],
             options={
@@ -194,10 +241,21 @@ class Migration(migrations.Migration):
                 ('deleted', models.BooleanField(default=False)),
                 ('external_id', models.CharField(blank=True, max_length=100, null=True)),
                 ('changed', models.DateTimeField(auto_now=True, null=True)),
-                ('function', models.CharField(blank=True, choices=[('COORDINATOR', 'COORDINATOR'), ('HOLDER', 'HOLDER'), ('CO_HOLDER', 'CO_HOLDER'), ('DEPUTY', 'DEPUTY'), ('DEPUTY_AUTHORITY', 'DEPUTY_AUTHORITY'), ('DEPUTY_SABBATICAL', 'DEPUTY_SABBATICAL'), ('DEPUTY_TEMPORARY', 'DEPUTY_TEMPORARY'), ('PROFESSOR', 'PROFESSOR'), ('INTERNSHIP_SUPERVISOR', 'INTERNSHIP_SUPERVISOR'), ('INTERNSHIP_CO_SUPERVISOR', 'INTERNSHIP_CO_SUPERVISOR')], db_index=True, max_length=35, null=True)),
+                ('function', models.CharField(blank=True, choices=[('COORDINATOR', 'COORDINATOR'), ('HOLDER', 'HOLDER'),
+                                                                   ('CO_HOLDER', 'CO_HOLDER'), ('DEPUTY', 'DEPUTY'),
+                                                                   ('DEPUTY_AUTHORITY', 'DEPUTY_AUTHORITY'),
+                                                                   ('DEPUTY_SABBATICAL', 'DEPUTY_SABBATICAL'),
+                                                                   ('DEPUTY_TEMPORARY', 'DEPUTY_TEMPORARY'),
+                                                                   ('PROFESSOR', 'PROFESSOR'),
+                                                                   ('INTERNSHIP_SUPERVISOR', 'INTERNSHIP_SUPERVISOR'), (
+                                                                   'INTERNSHIP_CO_SUPERVISOR',
+                                                                   'INTERNSHIP_CO_SUPERVISOR')], db_index=True,
+                                              max_length=35, null=True)),
                 ('volume_lecturing', models.DecimalField(blank=True, decimal_places=1, max_digits=6, null=True)),
-                ('volume_pratical_exercice', models.DecimalField(blank=True, decimal_places=1, max_digits=6, null=True)),
-                ('learning_container_year', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningContainerYear')),
+                (
+                'volume_pratical_exercice', models.DecimalField(blank=True, decimal_places=1, max_digits=6, null=True)),
+                ('learning_container_year',
+                 models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.LearningContainerYear')),
                 ('tutor', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='base.Tutor')),
                 ('course_summary', models.TextField(blank=True, null=True)),
                 ('last_changed', models.DateTimeField(null=True)),
@@ -259,42 +317,54 @@ class Migration(migrations.Migration):
             unique_together={('learning_container_year', 'tutor', 'function', 'deleted')},
         ),
         migrations.RunSQL(
-            sql="CREATE UNIQUE INDEX attributionnew_learningcontaineryearid_tutorid_function_deleted\n                    ON attribution_attributionnew\n                (learning_container_year_id, tutor_id, function, coalesce(deleted,'2000-01-01'));",
-            reverse_sql='DROP INDEX attributionnew_learningcontaineryearid_tutorid_function_deleted',
+            sql="""
+            CREATE UNIQUE INDEX attributionnew_learningcontaineryearid_tutorid_function_deleted
+            ON attribution_attributionnew
+            (learning_container_year_id, tutor_id, function, coalesce(deleted,'2000-01-01'));
+            """,
+            reverse_sql="""DROP INDEX attributionnew_learningcontaineryearid_tutorid_function_deleted""",
         ),
         migrations.RunSQL(
-            sql="CREATE UNIQUE INDEX tutorapplication_learningcontaineryearid_tutorid_function_deleted\n                    ON attribution_tutorapplication\n                (learning_container_year_id, tutor_id, function, coalesce(deleted,'2000-01-01'));",
-            reverse_sql='DROP INDEX tutorapplication_learningcontaineryearid_tutorid_function_deleted',
+            sql="""
+            CREATE UNIQUE INDEX attributionnew_learningcontaineryearid_tutorid_function_deleted
+            ON attribution_attributionnew
+            (learning_container_year_id, tutor_id, function, coalesce(deleted,'2000-01-01'));
+            """,
+            reverse_sql="""DROP INDEX tutorapplication_learningcontaineryearid_tutorid_function_deleted""",
         ),
         migrations.AlterUniqueTogether(
             name='attributionnew',
             unique_together=set(),
         ),
         migrations.RunSQL(
-            sql='DROP INDEX attributionnew_learningcontaineryearid_tutorid_function_deleted',
-            reverse_sql="CREATE UNIQUE INDEX attributionnew_learningcontaineryearid_tutorid_function_deleted\n                    ON attribution_attributionnew\n                (learning_container_year_id, tutor_id, function, coalesce(deleted,'2000-01-01'));",
+            sql="""DROP INDEX attributionnew_learningcontaineryearid_tutorid_function_deleted""",
+            reverse_sql="""
+            CREATE UNIQUE INDEX attributionnew_learningcontaineryearid_tutorid_function_deleted
+            ON attribution_attributionnew
+            (learning_container_year_id, tutor_id, function, coalesce(deleted,'2000-01-01'));
+            """
         ),
         migrations.RemoveField(
             model_name='attributionnew',
             name='summary_responsible',
         ),
         migrations.RunSQL(
-            sql='DELETE FROM attribution_attribution CASCADE WHERE deleted is not null',
+            sql="""DELETE FROM attribution_attribution CASCADE WHERE deleted is not null""",
         ),
         migrations.RunSQL(
-            sql='DELETE FROM attribution_attributionchargenew CASCADE WHERE deleted is not null',
+            sql="""DELETE FROM attribution_attributionchargenew CASCADE WHERE deleted is not null""",
         ),
         migrations.RunSQL(
-            sql='DELETE FROM attribution_attributionnew CASCADE WHERE deleted is not null',
+            sql="""DELETE FROM attribution_attributionnew CASCADE WHERE deleted is not null""",
         ),
         migrations.RunSQL(
-            sql='DELETE FROM attribution_tutorapplication CASCADE WHERE deleted is not null',
+            sql="""DELETE FROM attribution_tutorapplication CASCADE WHERE deleted is not null""",
         ),
         migrations.RunSQL(
-            sql='DROP INDEX IF EXISTS attributionnew_learningcontaineryearid_tutorid_function_deleted',
+            sql="""DROP INDEX IF EXISTS attributionnew_learningcontaineryearid_tutorid_function_deleted""",
         ),
         migrations.RunSQL(
-            sql='DROP INDEX IF EXISTS tutorapplication_learningcontaineryearid_tutorid_function_deleted',
+            sql="""DROP INDEX IF EXISTS tutorapplication_learningcontaineryearid_tutorid_function_deleted""",
         ),
         migrations.AlterUniqueTogether(
             name='tutorapplication',
@@ -344,7 +414,13 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='attributionnew',
             name='function',
-            field=models.CharField(choices=[('COORDINATOR', 'COORDINATOR'), ('HOLDER', 'HOLDER'), ('CO_HOLDER', 'CO_HOLDER'), ('DEPUTY', 'DEPUTY'), ('DEPUTY_AUTHORITY', 'DEPUTY_AUTHORITY'), ('DEPUTY_SABBATICAL', 'DEPUTY_SABBATICAL'), ('DEPUTY_TEMPORARY', 'DEPUTY_TEMPORARY'), ('PROFESSOR', 'PROFESSOR'), ('INTERNSHIP_SUPERVISOR', 'INTERNSHIP_SUPERVISOR'), ('INTERNSHIP_CO_SUPERVISOR', 'INTERNSHIP_CO_SUPERVISOR')], db_index=True, max_length=35, verbose_name='function'),
+            field=models.CharField(
+                choices=[('COORDINATOR', 'COORDINATOR'), ('HOLDER', 'HOLDER'), ('CO_HOLDER', 'CO_HOLDER'),
+                         ('DEPUTY', 'DEPUTY'), ('DEPUTY_AUTHORITY', 'DEPUTY_AUTHORITY'),
+                         ('DEPUTY_SABBATICAL', 'DEPUTY_SABBATICAL'), ('DEPUTY_TEMPORARY', 'DEPUTY_TEMPORARY'),
+                         ('PROFESSOR', 'PROFESSOR'), ('INTERNSHIP_SUPERVISOR', 'INTERNSHIP_SUPERVISOR'),
+                         ('INTERNSHIP_CO_SUPERVISOR', 'INTERNSHIP_CO_SUPERVISOR')], db_index=True, max_length=35,
+                verbose_name='function'),
         ),
         migrations.AlterField(
             model_name='attributionnew',
@@ -354,12 +430,26 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='attribution',
             name='function',
-            field=models.CharField(blank=True, choices=[('COORDINATOR', 'Coordinator'), ('HOLDER', 'Holder'), ('CO_HOLDER', 'Co-holder'), ('DEPUTY', 'Deputy'), ('DEPUTY_AUTHORITY', 'Deputy authority'), ('DEPUTY_SABBATICAL', 'Deputy sabbatical'), ('DEPUTY_TEMPORARY', 'Deputy temporary'), ('PROFESSOR', 'Professor'), ('INTERNSHIP_SUPERVISOR', 'Internship supervisor'), ('INTERNSHIP_CO_SUPERVISOR', 'Internship co-supervisor')], db_index=True, max_length=35, null=True),
+            field=models.CharField(blank=True, choices=[('COORDINATOR', 'Coordinator'), ('HOLDER', 'Holder'),
+                                                        ('CO_HOLDER', 'Co-holder'), ('DEPUTY', 'Deputy'),
+                                                        ('DEPUTY_AUTHORITY', 'Deputy authority'),
+                                                        ('DEPUTY_SABBATICAL', 'Deputy sabbatical'),
+                                                        ('DEPUTY_TEMPORARY', 'Deputy temporary'),
+                                                        ('PROFESSOR', 'Professor'),
+                                                        ('INTERNSHIP_SUPERVISOR', 'Internship supervisor'),
+                                                        ('INTERNSHIP_CO_SUPERVISOR', 'Internship co-supervisor')],
+                                   db_index=True, max_length=35, null=True),
         ),
         migrations.AlterField(
             model_name='attributionnew',
             name='function',
-            field=models.CharField(choices=[('COORDINATOR', 'Coordinator'), ('HOLDER', 'Holder'), ('CO_HOLDER', 'Co-holder'), ('DEPUTY', 'Deputy'), ('DEPUTY_AUTHORITY', 'Deputy authority'), ('DEPUTY_SABBATICAL', 'Deputy sabbatical'), ('DEPUTY_TEMPORARY', 'Deputy temporary'), ('PROFESSOR', 'Professor'), ('INTERNSHIP_SUPERVISOR', 'Internship supervisor'), ('INTERNSHIP_CO_SUPERVISOR', 'Internship co-supervisor')], db_index=True, max_length=35, verbose_name='Function'),
+            field=models.CharField(
+                choices=[('COORDINATOR', 'Coordinator'), ('HOLDER', 'Holder'), ('CO_HOLDER', 'Co-holder'),
+                         ('DEPUTY', 'Deputy'), ('DEPUTY_AUTHORITY', 'Deputy authority'),
+                         ('DEPUTY_SABBATICAL', 'Deputy sabbatical'), ('DEPUTY_TEMPORARY', 'Deputy temporary'),
+                         ('PROFESSOR', 'Professor'), ('INTERNSHIP_SUPERVISOR', 'Internship supervisor'),
+                         ('INTERNSHIP_CO_SUPERVISOR', 'Internship co-supervisor')], db_index=True, max_length=35,
+                verbose_name='Function'),
         ),
         migrations.AlterField(
             model_name='attributionnew',
@@ -369,11 +459,20 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='tutorapplication',
             name='function',
-            field=models.CharField(blank=True, choices=[('COORDINATOR', 'Coordinator'), ('HOLDER', 'Holder'), ('CO_HOLDER', 'Co-holder'), ('DEPUTY', 'Deputy'), ('DEPUTY_AUTHORITY', 'Deputy authority'), ('DEPUTY_SABBATICAL', 'Deputy sabbatical'), ('DEPUTY_TEMPORARY', 'Deputy temporary'), ('PROFESSOR', 'Professor'), ('INTERNSHIP_SUPERVISOR', 'Internship supervisor'), ('INTERNSHIP_CO_SUPERVISOR', 'Internship co-supervisor')], db_index=True, max_length=35, null=True),
+            field=models.CharField(blank=True, choices=[('COORDINATOR', 'Coordinator'), ('HOLDER', 'Holder'),
+                                                        ('CO_HOLDER', 'Co-holder'), ('DEPUTY', 'Deputy'),
+                                                        ('DEPUTY_AUTHORITY', 'Deputy authority'),
+                                                        ('DEPUTY_SABBATICAL', 'Deputy sabbatical'),
+                                                        ('DEPUTY_TEMPORARY', 'Deputy temporary'),
+                                                        ('PROFESSOR', 'Professor'),
+                                                        ('INTERNSHIP_SUPERVISOR', 'Internship supervisor'),
+                                                        ('INTERNSHIP_CO_SUPERVISOR', 'Internship co-supervisor')],
+                                   db_index=True, max_length=35, null=True),
         ),
         migrations.AlterField(
             model_name='attributionchargenew',
             name='allocation_charge',
-            field=models.DecimalField(blank=True, decimal_places=1, max_digits=6, null=True, validators=[django.core.validators.MinValueValidator(0)]),
+            field=models.DecimalField(blank=True, decimal_places=1, max_digits=6, null=True,
+                                      validators=[django.core.validators.MinValueValidator(0)]),
         ),
     ]
