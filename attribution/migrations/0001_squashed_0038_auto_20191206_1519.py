@@ -4,15 +4,42 @@ import uuid
 
 import django.core.validators
 import django.db.models.deletion
-from django.db import migrations, models
-
-
+from django.core.exceptions import FieldDoesNotExist, FieldError
+from django.db import migrations, models, transaction, connection
 # Functions from the following migrations need manual copying.
 # Move them and any dependencies into this file, then update the
 # RunPython operations to refer to the local versions:
 # attribution.migrations.0005_from_coordinator_to_score_responsible
 # attribution.migrations.0008_populate_uuid_values
 # attribution.migrations.0024_auto_20180116_1034
+from django.utils import timezone
+
+
+@transaction.atomic
+def set_coordinators_as_score_responsible(apps, schema_editor):
+    with connection.cursor() as cursor:
+        cursor.execute("""UPDATE attribution_attribution SET score_responsible = TRUE
+                          WHERE function = 'COORDINATOR';""")
+
+def set_uuid_field(apps, schema_editor):
+    attribution = apps.get_app_config('attribution')
+    for model_class in attribution.get_models():
+        ids = model_class.objects.values_list('id', flat=True)
+        if ids:
+            for pk in ids:
+                try:
+                    model_class.objects.filter(pk=pk).update(uuid=uuid.uuid4())
+                except FieldDoesNotExist:
+                    break
+
+def set_deleted_new_field(apps, schema_editor):
+    attribution = apps.get_app_config('attribution')
+    default_datetime = timezone.now()
+    for model_class in attribution.get_models():
+        try:
+            model_class.objects.filter(deleted=True).update(deleted_new=default_datetime)
+        except (FieldError, FieldDoesNotExist):
+            continue
 
 class Migration(migrations.Migration):
 
@@ -57,7 +84,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.RunPython(
-            code=attribution.migrations.0005_from_coordinator_to_score_responsible.set_coordinators_as_score_responsible,
+            code=set_coordinators_as_score_responsible,
         ),
         migrations.AddField(
             model_name='attributioncharge',
@@ -75,7 +102,7 @@ class Migration(migrations.Migration):
             field=models.UUIDField(db_index=True, default=uuid.uuid4, null=True),
         ),
         migrations.RunPython(
-            code=attribution.migrations.0008_populate_uuid_values.set_uuid_field,
+            code=set_uuid_field,
         ),
         migrations.AlterField(
             model_name='attribution',
@@ -182,7 +209,7 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.RunPython(
-            code=attribution.migrations.0024_auto_20180116_1034.set_deleted_new_field,
+            code=set_deleted_new_field,
         ),
         migrations.RemoveField(
             model_name='attribution',
