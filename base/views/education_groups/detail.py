@@ -301,7 +301,9 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         return super().get_queryset().prefetch_related('educationgrouppublicationcontact_set')
 
     def get_context_data(self, **kwargs):
+        anchor = self.kwargs.get("anchor", None)
         context = super().get_context_data(**kwargs)
+
         is_common_education_group_year = self.object.acronym.startswith('common')
         common_education_group_year = None
         if not is_common_education_group_year:
@@ -325,6 +327,8 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             'show_contacts': show_contacts,
             'can_edit_information': perms.is_eligible_to_edit_general_information(context['person'], context['object'])
         })
+        if anchor:
+            context.update({'anchor': anchor})
         return context
 
     @cached_property

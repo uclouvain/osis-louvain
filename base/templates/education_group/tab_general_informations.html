@@ -80,5 +80,15 @@
                 return false;
             });
         {% endif %}
+        $(document).ready(function () {
+        {% if anchor %}
+            var elt_to_focus = "#{{ anchor }}";
+            $(elt_to_focus).attr("tabindex",-1).focus();
+            $(window).scrollTop($(elt_to_focus).position().top);
+
+        {% else %}
+
+        {% endif %}
+        });
     </script>
 {% endblock %}

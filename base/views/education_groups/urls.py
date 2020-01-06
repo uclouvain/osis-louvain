@@ -97,6 +97,8 @@ urlpatterns = [
             name='education_group_diplomas'),
         url(r'^informations/$', detail.EducationGroupGeneralInformation.as_view(),
             name='education_group_general_informations'),
+        url(r'^informations/(?P<anchor>[a-z_]+)/$', detail.EducationGroupGeneralInformation.as_view(),
+            name='education_group_general_informations'),
         url(r'^informations/edit/$', education_group.education_group_year_pedagogy_edit,
             name="education_group_pedagogy_edit"),
         url(r'^informations/publish/$', detail.publish,

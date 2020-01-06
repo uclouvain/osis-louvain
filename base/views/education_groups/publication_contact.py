@@ -37,6 +37,10 @@ from base.models.education_group_publication_contact import EducationGroupPublic
 from base.models.education_group_year import EducationGroupYear
 from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
 
+CONTACTS_HEADER = 'lbl_contacts_header'
+ROOT_ID = "root_id"
+EDUCATION_GROUP_YEAR_ID = "education_group_year_id"
+
 
 class CommonEducationGroupPublicationContactView(RulesRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin):
     model = EducationGroupPublicationContact
@@ -61,13 +65,10 @@ class CommonEducationGroupPublicationContactView(RulesRequiredMixin, AjaxTemplat
         return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
 
     def get_success_url(self):
-        return reverse(
-            'education_group_general_informations',
-            args=[
-                self.kwargs["root_id"],
-                self.kwargs["education_group_year_id"]
-            ]
-        )
+        return reverse_url({
+            ROOT_ID: self.kwargs["root_id"],
+            EDUCATION_GROUP_YEAR_ID: self.kwargs["education_group_year_id"]
+        })
 
 
 class CreateEducationGroupPublicationContactView(CommonEducationGroupPublicationContactView, CreateView):
@@ -80,6 +81,13 @@ class CreateEducationGroupPublicationContactView(CommonEducationGroupPublication
             'education_group_year': self.education_group_year,
             **kwargs
         }
+
+    def get_success_url(self):
+        return reverse_url(
+            {ROOT_ID: self.kwargs["root_id"],
+             EDUCATION_GROUP_YEAR_ID: self.kwargs["education_group_year_id"],
+             "anchor": CONTACTS_HEADER}
+        )
 
 
 class UpdateEducationGroupPublicationContactView(CommonEducationGroupPublicationContactView, UpdateView):
@@ -101,3 +109,10 @@ class UpdateEducationGroupEntityPublicationContactView(CommonEducationGroupPubli
     form_class = EducationGroupEntityPublicationContactForm
     pk_url_kwarg = "education_group_year_id"
     template_name = "education_group/blocks/modal/modal_publication_contact_entity_edit_inner.html"
+
+
+def reverse_url(dict_kwargs):
+    return reverse(
+        'education_group_general_informations',
+        kwargs=dict_kwargs
+        )

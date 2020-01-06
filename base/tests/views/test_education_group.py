@@ -60,6 +60,7 @@ from base.tests.factories.person import PersonFactory, PersonWithPermissionsFact
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.views.education_groups.detail import get_appropriate_common_admission_condition
+from base.views.education_groups.publication_contact import CONTACTS_HEADER
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
@@ -142,6 +143,21 @@ class EducationGroupGeneralInformations(TestCase):
 
         self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
         self.assertEqual(response.status_code, HttpResponse.status_code)
+
+    def test_education_group_general_informations_with_anchor(self):
+        group_education_group_year = EducationGroupYearFactory(
+            academic_year=self.current_academic_year
+        )
+
+        url = reverse(
+            "education_group_general_informations",
+            args=[group_education_group_year.id, group_education_group_year.id, CONTACTS_HEADER]
+        )
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.context_data['anchor'], CONTACTS_HEADER)
 
     def test_case_didactic_offer_ensure_show_finalite_common(self):
         education_group_year = EducationGroupYearFactory(
