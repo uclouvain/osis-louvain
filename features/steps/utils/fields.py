@@ -23,6 +23,7 @@
 # ############################################################################
 import time
 
+from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.select import Select
@@ -41,7 +42,7 @@ class Field:
         self.current_page = None
 
     def __get__(self, obj, owner):
-        self.element = obj.wait.until(lambda obj: obj.find_element(*self.locator))
+        self.element = obj.wait.until(lambda o: obj.find_element(*self.locator))
         self.current_page = obj
         return self
 
@@ -79,6 +80,18 @@ class Link(Field):
 
 
 class InputField(Field):
+    def __set__(self, obj, value):
+        element = obj.wait.until(lambda o: obj.find_element(*self.locator))
+        element.clear()
+        if value is not None:
+            element.send_keys(value)
+
+    @property
+    def text(self):
+        return self.element.get_attribute("value")
+
+
+class TextAreaField(Field):
 
     def __set__(self, obj, value):
         element = obj.wait.until(lambda obj: obj.find_element(*self.locator))
@@ -116,10 +129,10 @@ class CkeditorField(Field):
 class SelectField(Field):
     def __set__(self, obj, value):
         element = Select(obj.find_element(*self.locator))
-        if isinstance(value, str):
-            element.select_by_visible_text(value)
-        else:
+        try:
             element.select_by_value(str(value))
+        except NoSuchElementException:
+            element.select_by_visible_text(value)
 
     @property
     def text(self):

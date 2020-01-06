@@ -208,18 +208,20 @@ class TestFilterIsBorrowedLearningUnitYear(TestCase):
         result = list(filter_is_borrowed_learning_unit_year(qs, self.academic_year.start_date,
                                                             faculty_borrowing=entity.id))
         self.assertCountEqual(result, [obj.id for obj in self.luys_in_different_faculty_than_education_group[:1]])
-        
-        data = {
-            "academic_year": self.academic_year.id,
-            "faculty_borrowing_acronym": entity.most_recent_acronym
-        }
+        acronyms = [entity.most_recent_acronym, entity.most_recent_acronym.lower()]
+        for acronym in acronyms:
+            with self.subTest(msg=acronym):
+                data = {
+                    "academic_year": self.academic_year.id,
+                    "faculty_borrowing_acronym": acronym
+                }
 
-        borrowed_filter = BorrowedLearningUnitSearch(data)
+                borrowed_filter = BorrowedLearningUnitSearch(data)
 
-        borrowed_filter.is_valid()
-        results = list(borrowed_filter.qs)
+                borrowed_filter.is_valid()
+                results = list(borrowed_filter.qs)
 
-        self.assertEqual(results[0].id, self.luys_in_different_faculty_than_education_group[:1][0].id)
+                self.assertEqual(results[0].id, self.luys_in_different_faculty_than_education_group[:1][0].id)
 
     def test_with_faculty_borrowing_set_and_no_entity_version(self):
         group = GroupElementYear.objects.get(child_leaf=self.luys_in_different_faculty_than_education_group[0])

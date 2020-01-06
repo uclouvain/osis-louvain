@@ -57,7 +57,7 @@ class BorrowedLearningUnitSearch(LearningUnitFilter):
         if faculty_borrowing_acronym:
             try:
                 faculty_borrowing_id = EntityVersion.objects.current(academic_year.start_date). \
-                    get(acronym=faculty_borrowing_acronym).entity.id
+                    get(acronym__iexact=faculty_borrowing_acronym).entity.id
             except EntityVersion.DoesNotExist:
                 return LearningUnitYear.objects.none()
 
