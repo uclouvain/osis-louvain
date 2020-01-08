@@ -210,7 +210,7 @@ class CheckAuthorizedRelationship:
     def _link_children_type_count(self, link):
         filter_children_clause = Q(id=link.child_branch.id)
         if link.link_type == LinkTypes.REFERENCE.name:
-            filter_children_clause = Q(child_branch__parent__id=link.child_branch.id)
+            filter_children_clause = filter_children_clause | Q(child_branch__parent__id=link.child_branch.id)
 
         children_type_count_qs = EducationGroupYear.objects.filter(
             filter_children_clause
