@@ -53,7 +53,7 @@ $(document).ready(function () {
         return jQuery.param(data);
     }
 
-    function handleCopyOrCutAction(data, action){
+    function handleCopyOrCutAction(data, action) {
         let __ret = get_data_from_tree(data);
         let element_id = __ret.element_id;
         let group_element_year_id = __ret.group_element_year_id;
@@ -67,7 +67,10 @@ $(document).ready(function () {
             },
             type: 'POST',
             success: function (jsonResponse) {
-                displayInfoMessage(jsonResponse, 'clipboard')
+                let clipboard = document.getElementById("clipboard");
+                clipboard.style.display = "block";
+                let clipboard_content = document.getElementById("clipboard_content");
+                clipboard_content.innerHTML = jsonResponse['success_message'];
             }
         });
     }
@@ -92,12 +95,12 @@ $(document).ready(function () {
             },
             "contextmenu": {
                 "select_node": false,
-                "items": function($node){
+                "items": function ($node) {
                     return {
                         "cut": {
                             "label": gettext("Cut"),
                             "_disabled": function (data) {
-                                return ! get_data_from_tree(data).group_element_year_id;
+                                return !get_data_from_tree(data).group_element_year_id;
                             },
                             "action": function (data) {
                                 handleCopyOrCutAction(data, "cut")
@@ -291,7 +294,7 @@ $(document).mouseup(function () {
     $(document).unbind('mousemove');
 });
 
-$("a[id^='quick-search']").click(function(event) {
+$("a[id^='quick-search']").click(function (event) {
     event.preventDefault();
     $(this).attr('data-url', $('#j1_1_anchor').attr('search_url'));
 });

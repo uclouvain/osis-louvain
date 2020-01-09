@@ -40,7 +40,7 @@ from base.models.enums import learning_unit_year_subtypes, learning_container_ye
 from base.models.enums.component_type import DEFAULT_ACRONYM_COMPONENT
 from base.models.enums.internship_subtypes import TEACHING_INTERNSHIP
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
-from base.models.enums.learning_container_year_types import INTERNSHIP
+from base.models.enums.learning_container_year_types import INTERNSHIP, LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import ANNUAL
 from base.models.enums.organization_type import ACADEMIC_PARTNER
 from base.models.enums.person_source_type import DISSERTATION
@@ -288,6 +288,24 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
                         learning_unit_instance=self.learning_unit_year.learning_unit)
         disabled_fields = {key for key, value in form.fields.items() if value.disabled}
         self.assertEqual(disabled_fields, FULL_READ_ONLY_FIELDS.union({'internship_subtype'}))
+
+    def test_disable_fields_acronym_with_central_manager_and_other_collective(self):
+        self.person.user.groups.add(CentralManagerGroupFactory())
+        self.learning_unit_year.learning_container_year.container_type = LearningContainerYearType.OTHER_COLLECTIVE.name
+        self.learning_unit_year.learning_container_year.save()
+        form = FullForm(self.person, self.learning_unit_year.academic_year,
+                        learning_unit_instance=self.learning_unit_year.learning_unit)
+        disabled_fields = {key for key, value in form.fields.items() if value.disabled}
+        self.assertTrue("acronym" not in disabled_fields)
+
+    def test_disable_fields_acronym_with_faculty_manager_and_other_collective(self):
+        self.person.user.groups.add(FacultyManagerGroupFactory())
+        self.learning_unit_year.learning_container_year.container_type = LearningContainerYearType.OTHER_COLLECTIVE.name
+        self.learning_unit_year.learning_container_year.save()
+        form = FullForm(self.person, self.learning_unit_year.academic_year,
+                        learning_unit_instance=self.learning_unit_year.learning_unit)
+        disabled_fields = {key for key, value in form.fields.items() if value.disabled}
+        self.assertTrue("acronym" not in disabled_fields)
 
 
 class TestFullFormIsValid(LearningUnitFullFormContextMixin):

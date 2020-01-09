@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-21 15:45+0200\n"
+"POT-Creation-Date: 2020-01-07 11:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -187,6 +187,9 @@ msgstr "Encoder les notes"
 msgid "Encoding"
 msgstr "Encodage"
 
+msgid "End date Prof"
+msgstr "Date d'échéance de l'enseignant"
+
 msgid "Enrolled lately"
 msgstr "Inscrit tardivement"
 
@@ -243,6 +246,9 @@ msgstr "Valeur de justification invalide"
 
 msgid "Justification"
 msgstr "Justification"
+
+msgid "Justification (A,T)"
+msgstr "Justification (A,T)"
 
 #, python-format
 msgid "Justification legend: %(justification_label_authorized)s"
@@ -333,9 +339,6 @@ msgstr "Nombre d'inscriptions"
 msgid "Numbered scores"
 msgstr "Notes chiffrées"
 
-msgid "Offer"
-msgstr "Offre"
-
 msgid "Online"
 msgstr "En ligne"
 
@@ -349,7 +352,7 @@ msgid "Online scores encoding"
 msgstr "Encodage en ligne des notes"
 
 msgid "Other tutors"
-msgstr "Autre tuteurs"
+msgstr "Autres enseignants"
 
 #, python-format
 msgid ""
@@ -491,6 +494,9 @@ msgstr "Sélectionner/Dé-sélectionner tout"
 msgid "Selected"
 msgstr "Sélectionné"
 
+msgid "Session"
+msgstr "Session"
+
 msgid "Session number"
 msgstr "Numéro de session"
 
@@ -564,6 +570,9 @@ msgid "This process helps tutor while encoding notes for the exams sessions."
 msgstr ""
 "Cette procédure aide le tuteur durant l'encodage de notes pour les sessions "
 "d'examens."
+
+msgid "Training"
+msgstr ""
 
 msgid "Tutor"
 msgstr "Tuteur"
@@ -649,6 +658,3 @@ msgstr "programme(s)"
 
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
-
-msgid "End date Prof"
-msgstr "Date d'échéance de l'enseignant"

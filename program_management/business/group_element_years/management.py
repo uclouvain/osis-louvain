@@ -185,10 +185,9 @@ class CheckAuthorizedRelationship:
         direct_children = (Q(child_branch__parent=self.parent) & Q(child_branch__link_type=None))
         referenced_children = (Q(child_branch__parent__child_branch__parent=self.parent) &
                                Q(child_branch__parent__child_branch__link_type=LinkTypes.REFERENCE.name))
-        filter_children_clause = direct_children | referenced_children
-
-        children_type_count_qs = EducationGroupYear.objects.filter(
-            filter_children_clause
+        # Use two queries because when using or clause on filter it returns duplicate data
+        direct_children_type_count_qs = EducationGroupYear.objects.filter(
+            direct_children
         ).values(
             "education_group_type__name"
         ).order_by(
@@ -197,7 +196,17 @@ class CheckAuthorizedRelationship:
             count=Count("education_group_type__name")
         ).values_list("education_group_type__name", "count")
 
-        return Counter(dict(children_type_count_qs))
+        referenced_children_type_count_qs = EducationGroupYear.objects.filter(
+            referenced_children
+        ).values(
+            "education_group_type__name"
+        ).order_by(
+            "education_group_type__name"
+        ).annotate(
+            count=Count("education_group_type__name")
+        ).values_list("education_group_type__name", "count")
+
+        return Counter(dict(direct_children_type_count_qs)) + Counter(dict(referenced_children_type_count_qs))
 
     @cached_property
     def _attach_link_children_type_count(self):

@@ -2516,7 +2516,7 @@ msgid "The configuration of you user profile"
 msgstr "Informations liées à votre profil"
 
 msgid "The contact has been created"
-msgstr "Le contact a bien été créee"
+msgstr "Le contact a bien été crée"
 
 msgid "The contacts modifications has been saved"
 msgstr "Les données de contact ont été sauvegardées"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-21 15:45+0200\n"
+"POT-Creation-Date: 2020-01-07 11:50+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -172,6 +172,9 @@ msgstr ""
 msgid "Encoding"
 msgstr ""
 
+msgid "End date Prof"
+msgstr ""
+
 msgid "Enrolled lately"
 msgstr ""
 
@@ -222,6 +225,9 @@ msgid "Invalid justification value"
 msgstr ""
 
 msgid "Justification"
+msgstr ""
+
+msgid "Justification (A,T)"
 msgstr ""
 
 #, python-format
@@ -306,9 +312,6 @@ msgid "Number of enrollments"
 msgstr ""
 
 msgid "Numbered scores"
-msgstr ""
-
-msgid "Offer"
 msgstr ""
 
 msgid "Online"
@@ -460,6 +463,9 @@ msgstr ""
 msgid "Selected"
 msgstr ""
 
+msgid "Session"
+msgstr ""
+
 msgid "Session number"
 msgstr ""
 
@@ -525,6 +531,9 @@ msgid "The selected entity no longer exists today (end date passed)."
 msgstr ""
 
 msgid "This process helps tutor while encoding notes for the exams sessions."
+msgstr ""
+
+msgid "Training"
 msgstr ""
 
 msgid "Tutor"
@@ -600,7 +609,4 @@ msgid "program(s)"
 msgstr ""
 
 msgid "score(s) saved"
-msgstr ""
-
-msgid "End date Prof"
 msgstr ""

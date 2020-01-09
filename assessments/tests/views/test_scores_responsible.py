@@ -57,10 +57,7 @@ class ScoresResponsibleSearchTestCase(TestCase):
 
         cls.tutor = TutorFactory()
         cls.user = cls.tutor.person.user
-        cls.academic_year = AcademicYearFactory(
-            year=datetime.date.today().year,
-            start_date=datetime.date.today() - datetime.timedelta(days=5)
-        )
+        cls.academic_year = AcademicYearFactory(current=True)
 
         # FIXME: Old structure model [To remove]
         cls.structure = structure.StructureFactory()

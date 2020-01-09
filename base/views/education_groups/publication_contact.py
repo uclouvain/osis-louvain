@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.contrib.messages.views import SuccessMessageMixin
+from django.http import QueryDict
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -80,6 +81,25 @@ class CreateEducationGroupPublicationContactView(CommonEducationGroupPublication
             'education_group_year': self.education_group_year,
             **kwargs
         }
+
+    def get_success_url(self):
+        query_dictionary = QueryDict('', mutable=True)
+        query_dictionary.update(
+            {
+                'anchor': True
+            }
+        )
+
+        return '{base_url}?{querystring}'.format(
+            base_url=reverse(
+                'education_group_general_informations',
+                args=[
+                    self.kwargs["root_id"],
+                    self.kwargs["education_group_year_id"]
+                ]
+            ),
+            querystring=query_dictionary.urlencode()
+        )
 
 
 class UpdateEducationGroupPublicationContactView(CommonEducationGroupPublicationContactView, UpdateView):
