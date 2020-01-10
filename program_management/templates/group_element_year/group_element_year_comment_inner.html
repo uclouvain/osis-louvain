@@ -104,6 +104,7 @@
                                 <td>{% bootstrap_field form.comment show_label=False %}</td>
                                 <td>{% bootstrap_field form.comment_english show_label=False %}</td>
                             </tr>
+                            {{ form.warning }}
                         {% endfor %}
                         </tbody>
                     </table>

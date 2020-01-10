@@ -25,7 +25,7 @@
 ##############################################################################
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms import modelformset_factory, BaseFormSet, BaseModelFormSet
+from django.forms import modelformset_factory, BaseModelFormSet
 
 from base.models.enums import education_group_categories
 from base.models.group_element_year import GroupElementYear
@@ -92,24 +92,6 @@ class GroupElementYearForm(forms.ModelForm):
         if self._is_education_group_year_a_minor_major_option_list_choice(obj.parent):
             self._reorder_children_by_partial_acronym(obj.parent)
         return obj
-
-    def clean_link_type(self):
-        """
-        All of these controls only work with child branch.
-        The validation with learning_units (child_leaf) is in the model.
-        """
-        data_cleaned = self.cleaned_data.get('link_type')
-        if not self.instance.child_branch:
-            return data_cleaned
-
-        link = GroupElementYear(pk=self.instance.pk, child_branch=self.instance.child_branch, link_type=data_cleaned)
-        check = CheckAuthorizedRelationshipAttach(
-            self.instance.parent,
-            link_to_attach=link,
-        )
-        if not check.is_valid():
-            raise ValidationError(check.errors)
-        return data_cleaned
 
     def clean(self):
         strategy = AttachEducationGroupYearStrategy if self.instance.child_branch else \

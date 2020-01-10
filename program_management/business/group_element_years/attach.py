@@ -36,6 +36,7 @@ from base.models.enums.education_group_types import MiniTrainingType, TrainingTy
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from program_management.business.group_element_years import group_element_year_tree
+from program_management.business.group_element_years.management import CheckAuthorizedRelationshipAttach
 
 
 class AttachStrategy(metaclass=abc.ABCMeta):
@@ -60,6 +61,16 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
                 self.parents.filter(education_group_type__name__in=TrainingType.root_master_2m_types()).exists():
             self._check_end_year_constraints_on_2m()
             self._check_attach_options_rules()
+
+        if self.child:
+            link_type = self.instance.link_type if self.instance else None
+            link = GroupElementYear(parent=self.parent, child_branch=self.child, link_type=link_type)
+            check = CheckAuthorizedRelationshipAttach(
+                self.parent,
+                link_to_attach=link,
+            )
+            if not check.is_valid():
+                raise ValidationError(check.errors)
 
         if not self.instance:
             self._check_new_attach_is_not_duplication()
