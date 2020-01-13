@@ -24,26 +24,25 @@
 #
 ##############################################################################
 import datetime
+import operator
 import string
 
 import factory.fuzzy
 
+from base.models.enums.offer_enrollment_state import OfferEnrollmentState
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.student import StudentFactory
-from base.models.enums import offer_enrollment_state
 
 
 class OfferEnrollmentFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.OfferEnrollment"
 
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                               datetime.datetime(2017, 3, 1))
-    date_enrollment = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                                       datetime.datetime(2017, 3, 1))
+    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
+    date_enrollment = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     offer_year = factory.SubFactory(OfferYearFactory)
     student = factory.SubFactory(StudentFactory)
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
-    enrollment_state = offer_enrollment_state.SUBSCRIBED
+    enrollment_state = factory.Iterator(OfferEnrollmentState.choices(), getter=operator.itemgetter(0))

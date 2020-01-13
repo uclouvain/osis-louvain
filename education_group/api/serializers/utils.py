@@ -27,6 +27,7 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 
+# FIXME :: deprecated : use EducationGroupYearHyperlinkedIdentityField instead
 class TrainingGetUrlMixin:
     def __init__(self, **kwargs):
         super().__init__(view_name='education_group_api_v1:training_read', **kwargs)
@@ -47,6 +48,7 @@ class TrainingHyperlinkedRelatedField(TrainingGetUrlMixin, serializers.Hyperlink
     pass
 
 
+# FIXME :: deprecated : use EducationGroupYearHyperlinkedIdentityField instead
 class MiniTrainingGetUrlMixin:
     def __init__(self, **kwargs):
         super().__init__(view_name='education_group_api_v1:mini_training_read', **kwargs)
@@ -63,6 +65,7 @@ class MiniTrainingHyperlinkedIdentityField(MiniTrainingGetUrlMixin, serializers.
     pass
 
 
+# FIXME :: deprecated : use EducationGroupYearHyperlinkedIdentityField instead
 class GroupGetUrlMixin:
     def __init__(self, **kwargs):
         super().__init__(view_name='education_group_api_v1:group_read', **kwargs)

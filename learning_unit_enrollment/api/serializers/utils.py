@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,30 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
-
-from base.models.utils.utils import ChoiceEnum
-
-# TODO :: Use OfferEnrollmentState enumeration instead
-SUBSCRIBED = 'SUBSCRIBED'
-PROVISORY = 'PROVISORY'
-PENDING = 'PENDING'
-TERMINATION = 'TERMINATION'
-END_OF_CYCLE = 'END_OF_CYCLE'
-
-# TODO :: Use OfferEnrollmentState enumeration instead
-STATES = (
-    (SUBSCRIBED, _("Subscribed")),
-    (PROVISORY, _("Provisory")),  # TODO this word does not exist
-    (PENDING, _("Pending")),
-    (TERMINATION, _("Termination")),
-    (END_OF_CYCLE, _("End of cycle")),
-)
+from rest_framework import serializers
+from rest_framework.reverse import reverse
 
 
-class OfferEnrollmentState(ChoiceEnum):
-    SUBSCRIBED = _("Subscribed")
-    PROVISORY = _("Provisory")  # TODO this word does not exist
-    PENDING = _("Pending")
-    TERMINATION = _("Termination")
-    END_OF_CYCLE = _("End of cycle")
+class LearningUnitGetUrlMixin:
+    def __init__(self, **kwargs):
+        super().__init__(view_name='learning_unit_api_v1:learningunits_read', **kwargs)
+
+    def get_url(self, obj, view_name, request, format):
+        url_kwargs = {
+            'acronym': obj.learning_unit_year.acronym,
+            'year': obj.learning_unit_year.academic_year.year
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+
+
+class LearningUnitHyperlinkedIdentityField(LearningUnitGetUrlMixin, serializers.HyperlinkedIdentityField):
+    pass
+
+
+class LearningUnitHyperlinkedRelatedField(LearningUnitGetUrlMixin, serializers.HyperlinkedRelatedField):
+    pass

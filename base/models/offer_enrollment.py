@@ -42,7 +42,13 @@ class OfferEnrollment(SerializableModel):
     date_enrollment = models.DateField()
     offer_year = models.ForeignKey('OfferYear', on_delete=models.CASCADE)
     student = models.ForeignKey('Student', on_delete=models.PROTECT)
-    enrollment_state = models.CharField(max_length=15, choices=offer_enrollment_state.STATES, blank=True, null=True)
+    enrollment_state = models.CharField(
+        db_index=True,
+        max_length=15,
+        choices=offer_enrollment_state.STATES,
+        blank=True,
+        null=True,
+    )
     education_group_year = models.ForeignKey('EducationGroupYear', null=True, on_delete=models.PROTECT)
 
     def __str__(self):

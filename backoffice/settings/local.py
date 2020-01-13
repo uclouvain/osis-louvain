@@ -35,7 +35,8 @@ OPTIONAL_APPS = (
     'cms',
     'webservices',
     'behave_django',
-    'backoffice'
+    'backoffice',
+    'learning_unit_enrollment',
 )
 OPTIONAL_MIDDLEWARES = ()
 OPTIONAL_INTERNAL_IPS = ()

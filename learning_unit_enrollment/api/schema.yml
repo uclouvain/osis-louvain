@@ -1,0 +1,190 @@
+openapi: 3.0.0
+servers:
+  - url: https://{environment}.osis.uclouvain.be/api/v1/learning_unit_enrollment/
+    variables:
+      environment:
+        default: dev
+        enum:
+          - dev # Development server
+          - qa # Staging server
+          - test # Test server
+  - url: https://osis.uclouvain.be/api/v1/
+    description: Production server
+info:
+  version: '1'
+  title: Learning Unit Enrollments service
+  description: |-
+    A set of API endpoints that allow you to list learning unit enrollments of students.
+
+paths:
+  /{registration_id}/:
+    get:
+      description: Returns a list of learning unit enrollments of a student with optional filtering.
+      operationId: enrollments-list-by-student
+      parameters:
+        - in: path
+          name: registration_id
+          required: true
+          schema:
+            description: Identification number of a student
+            type: string
+        - in: query
+          name: limit
+          schema:
+            description: Number of results to return per page.
+            type: integer
+        - in: query
+          name: offset
+          schema:
+            description: The initial index from which to return the results.
+            type: integer
+        - in: query
+          name: education_group_acronym
+          schema:
+            type: string
+        - in: query
+          name: year
+          schema:
+            type: integer
+        - in: query
+          name: learning_unit_enrollment_state
+          schema:
+            $ref: '#/components/schemas/LearningUnitEnrollmentStateEnum'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfEnrollment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - learning_unit_enrollments
+  /learning_units/{year}/{acronym}/enrollments:
+    get:
+      description: Returns a list of enrollments for a specific learning unit with optional filtering.
+      operationId: enrollments-list-by-learning-unit
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: integer
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: query
+          name: limit
+          schema:
+            description: Number of results to return per page.
+            type: integer
+        - in: query
+          name: offset
+          schema:
+            description: The initial index from which to return the results.
+            type: integer
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfEnrollment'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - learning_unit_enrollments
+
+components:
+  securitySchemes:
+    Token:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Enter your token in the format **Token &lt;token>**
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    BadRequest:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: The specified resource was not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+  schemas:
+    ArrayOfEnrollment:
+      type: array
+      items:
+        $ref: '#/components/schemas/Enrollment'
+    Enrollment:
+      type: object
+      properties:
+        registration_id:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+        email:
+          type: string
+        learning_unit_acronym:
+          type: string
+        education_group_acronym:
+          type: string
+        academic_year:
+          type: number
+        education_group_url:
+          type: string
+        learning_unit_url:
+          type: string
+        learning_unit_enrollment_state:
+          $ref: '#/components/schemas/LearningUnitEnrollmentStateEnum'
+        offer_enrollment_state:
+          $ref: '#/components/schemas/OfferEnrollmentStateEnum'
+
+    LearningUnitEnrollmentStateEnum:
+      type: string
+      enum:
+        - ENROLLED
+
+    OfferEnrollmentStateEnum:
+      type: string
+      enum:
+        - SUBSCRIBED
+        - PROVISORY
+        - PENDING
+        - TERMINATION
+        - END_OF_CYCLE
+
+
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
+security:
+  - Token: []

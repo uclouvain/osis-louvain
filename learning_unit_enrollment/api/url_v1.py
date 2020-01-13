@@ -23,30 +23,17 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
+from django.conf.urls import url
 
-from base.models.utils.utils import ChoiceEnum
+from learning_unit_enrollment.api.views.learning_unit_enrollment import EnrollmentsByLearningUnit, EnrollmentsByStudent
 
-# TODO :: Use OfferEnrollmentState enumeration instead
-SUBSCRIBED = 'SUBSCRIBED'
-PROVISORY = 'PROVISORY'
-PENDING = 'PENDING'
-TERMINATION = 'TERMINATION'
-END_OF_CYCLE = 'END_OF_CYCLE'
+app_name = "learning_unit_enrollment"
 
-# TODO :: Use OfferEnrollmentState enumeration instead
-STATES = (
-    (SUBSCRIBED, _("Subscribed")),
-    (PROVISORY, _("Provisory")),  # TODO this word does not exist
-    (PENDING, _("Pending")),
-    (TERMINATION, _("Termination")),
-    (END_OF_CYCLE, _("End of cycle")),
-)
-
-
-class OfferEnrollmentState(ChoiceEnum):
-    SUBSCRIBED = _("Subscribed")
-    PROVISORY = _("Provisory")  # TODO this word does not exist
-    PENDING = _("Pending")
-    TERMINATION = _("Termination")
-    END_OF_CYCLE = _("End of cycle")
+urlpatterns = [
+    url(r'^(?P<registration_id>[\w]+)/$', EnrollmentsByStudent.as_view(), name=EnrollmentsByStudent.name),
+    url(
+        r'^learning_units/(?P<year>[\d]{4})/(?P<acronym>[\w]+)/enrollments/$',
+        EnrollmentsByLearningUnit.as_view(),
+        name=EnrollmentsByLearningUnit.name
+    ),
+]

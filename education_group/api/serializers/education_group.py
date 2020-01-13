@@ -24,9 +24,14 @@
 #
 ##############################################################################
 from rest_framework import serializers
+from rest_framework.reverse import reverse
 
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_categories import Categories
+from education_group.api.views.group import GroupDetail
+from education_group.api.views.mini_training import MiniTrainingDetail
+from education_group.api.views.training import TrainingDetail
 
 
 class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
@@ -65,4 +70,48 @@ class EducationGroupSerializer(serializers.HyperlinkedModelSerializer):
             'title',
             'academic_year',
             'management_entity',
+        )
+
+
+class EducationGroupYearHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
+    default_view = 'education_group_api_v1:' + TrainingDetail.name
+
+    lookup_field = None
+
+    def __init__(self, lookup_field=None, **kwargs):
+        self.lookup_field = lookup_field or ''
+        super().__init__(view_name=self.default_view, **kwargs)
+
+    def _get_view_name(self, category):
+        return {
+            Categories.TRAINING.name: self.default_view,
+            Categories.MINI_TRAINING.name: 'education_group_api_v1:' + MiniTrainingDetail.name,
+            Categories.GROUP.name: 'education_group_api_v1:' + GroupDetail.name,
+        }[category]
+
+    @staticmethod
+    def _get_view_kwargs(education_group_year):
+        acronym_key = {
+            Categories.TRAINING.name: 'acronym',
+            Categories.MINI_TRAINING.name: 'partial_acronym',
+            Categories.GROUP.name: 'partial_acronym',
+        }[education_group_year.education_group_type.category]
+        acronym_value = getattr(education_group_year, acronym_key, education_group_year)
+        return {
+            acronym_key: acronym_value,
+            'year': education_group_year.academic_year.year
+        }
+
+    def get_url(self, obj, view_name, request, format):
+        education_group_year = obj
+        for attr in self.lookup_field.split('__'):
+            education_group_year = getattr(education_group_year, attr, education_group_year)
+
+        category = education_group_year.education_group_type.category
+
+        return reverse(
+            self._get_view_name(category),
+            kwargs=self._get_view_kwargs(education_group_year),
+            request=request,
+            format=format
         )

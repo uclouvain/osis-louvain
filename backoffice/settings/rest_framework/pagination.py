@@ -28,3 +28,7 @@ from rest_framework.pagination import LimitOffsetPagination
 
 class LimitOffsetPaginationWithUpperBound(LimitOffsetPagination):
     max_limit = 100
+
+
+class LimitOffsetPaginationForEnrollments(LimitOffsetPagination):
+    max_limit = 1000  # TODO :: remove this class when xls will be produced in Osis
