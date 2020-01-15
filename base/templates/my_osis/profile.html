@@ -87,7 +87,7 @@
             <br>
             <div class="row">
                 <div class="col-md-4">
-                    <label>{% trans 'email' %}</label><br>
+                    <label>{% trans 'Email' %}</label><br>
                     {{ person.email | default_if_none:'-' }}
                 </div>
                 <div class="col-md-3">
@@ -109,7 +109,7 @@
                 <div class="list-group">
                     {% for address in addresses %}
                         <a href="#" class="list-group-item">
-                            <h4 class="list-group-item-heading">{{ address.label | default_if_none:'' }}</h4>
+                            <h4 class="list-group-item-heading">{{ address.get_label_display | default_if_none:'' }}</h4>
                             <p class="list-group-item-text">
                                 <address>
                                     {{ address.location | default_if_none:'' }}<br>
