@@ -159,6 +159,18 @@ class LearningUnitPedagogyTestCase(TestCase):
         )
         self.assertEqual(response.context['learning_units_count'], 2)
 
+    @patch('base.business.learning_units.perms.can_edit_summary_locked_field')
+    def test_tab_active_url(self, mock_can_edit_summary_locked):
+        url = reverse("learning_unit_pedagogy", args=[self.learning_unit_year.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue("tab_active" in response.context)
+        self.assertEqual(response.context["tab_active"], 'learning_unit_pedagogy')
+
+        url_tab_active = reverse(response.context["tab_active"], args=[self.learning_unit_year.id])
+        response = self.client.get(url_tab_active)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
 
 class LearningUnitPedagogyExportXLSTestCase(TestCase):
     @classmethod

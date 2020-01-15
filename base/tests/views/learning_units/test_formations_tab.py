@@ -24,6 +24,7 @@
 #
 ##############################################################################
 
+from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 
@@ -82,9 +83,10 @@ class TestLearningUnitFormationsTab(TestCase):
         )
 
         self.client.force_login(self.person.user)
+        self.url = reverse("learning_unit_formations", args=[self.learning_unit_year.id])
 
     def test_formations_tab(self):
-        self.url = reverse("learning_unit_formations", args=[self.learning_unit_year.id])
+
         response = self.client.get(self.url)
         self.assertCountEqual(response.context['formations_by_educ_group_year'].get(self.education_group_year.pk),
                               [self.education_group_year_formation_parent])
@@ -98,3 +100,13 @@ class TestLearningUnitFormationsTab(TestCase):
             list(response.context['group_elements_years']),
             [self.group_element_year]
         )
+
+    def test_tab_active_url(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue("tab_active" in response.context)
+        self.assertEqual(response.context["tab_active"], 'learning_unit_formations')
+
+        url_tab_active = reverse(response.context["tab_active"], args=[self.learning_unit_year.id])
+        response = self.client.get(url_tab_active)
+        self.assertEqual(response.status_code, HttpResponse.status_code)

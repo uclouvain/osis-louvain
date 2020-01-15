@@ -91,6 +91,7 @@ def learning_unit_formations(request, learning_unit_year_id):
     for root_formation in context['root_formations']:
         context['total_formation_enrollments'] += root_formation.count_formation_enrollments
         context['total_learning_unit_enrollments'] += root_formation.count_learning_unit_enrollments
+    context['tab_active'] = "learning_unit_formations"  # Corresponds to url_name
     return render(request, "learning_unit/formations.html", context)
 
 
@@ -108,6 +109,7 @@ def learning_unit_components(request, learning_unit_year_id):
     context['ADDITIONAL_REQUIREMENT_ENTITY_2'] = data_components.get('ADDITIONAL_REQUIREMENT_ENTITY_2')
     context['tab_active'] = 'components'
     context['can_manage_volume'] = business_perms.is_eligible_for_modification(context["learning_unit_year"], person)
+    context['tab_active'] = 'learning_unit_components'  # Corresponds to url_name
     return render(request, "learning_unit/components.html", context)
 
 
@@ -122,6 +124,7 @@ def learning_unit_specifications(request, learning_unit_year_id):
     context.update(get_achievements_group_by_language(learning_unit_year))
     context.update(get_languages_settings())
     context['can_update_learning_achievement'] = can_update_learning_achievement(learning_unit_year, person)
+    context['tab_active'] = 'learning_unit_specifications'  # Corresponds to url_name
     return render(request, "learning_unit/specifications.html", context)
 
 

@@ -35,19 +35,20 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            {% if perms.base.can_access_organization %}
-                <div class="col-md-1"><i class="fa fa-university" style="font-size: 400%; color: #6699FF;"></i></div>
-                <div class="col-md-5">
-                    <h4 class="media-heading"><a href="{% url 'organizations' %}" id="lnk_organizations">
-                        {% trans 'Organizations'%}</a></h4>
-                    <p>{% trans 'Management of organizations' %}</p>
-                </div>
-            {% endif %}
             {% if perms.base.can_access_structure  %}
                 <div class="col-md-1"><i class="fa fa-sitemap" style="font-size: 400%; color: #6699FF;"></i></div>
                 <div class="col-md-5">
                     <h4 class="media-heading"><a href="{% url 'entities' %}" id="lnk_entities">{% trans 'Entities'%}</a></h4>
                     <p>{% trans 'Management of organizational structure.' %}</p>
+                </div>
+            {% endif %}
+            {% if perms.base.can_read_persons_roles %}
+                <div class="col-md-1"><i class="fa fa-id-card" style="font-size: 400%; color: #6699FF;"></i></div>
+                <div class="col-md-5">
+                    <h4 class="media-heading"><a href="{% url 'academic_actors_list' %}" id="lnk_academic_actors_list">
+                        {% trans 'List of users' %}</a>
+                    </h4>
+                    <p>{% trans 'List of users with their groups and linked entities' %}</p>
                 </div>
             {% endif %}
         </div>
@@ -69,17 +70,6 @@
             {% endif %}
         </div>
         <br/>
-        <div class="row">
-            {% if perms.base.can_read_persons_roles %}
-                <div class="col-md-1"><i class="fa fa-id-card" style="font-size: 400%; color: #6699FF;"></i></div>
-                <div class="col-md-5">
-                    <h4 class="media-heading"><a href="{% url 'academic_actors_list' %}" id="lnk_academic_actors_list">
-                        {% trans 'List of users' %}</a>
-                    </h4>
-                    <p>{% trans 'List of users with their groups and linked entities' %}</p>
-                </div>
-            {% endif %}
-        </div>
     </div>
 </div>
 {% endblock %}

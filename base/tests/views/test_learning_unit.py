@@ -1279,14 +1279,13 @@ class TestLearningUnitComponents(TestCase):
         self.a_superuser = SuperUserFactory()
         self.client.force_login(self.a_superuser)
         self.person = PersonFactory(user=self.a_superuser)
+        self.learning_unit_year = self.generated_container.generated_container_years[0].learning_unit_year_full
 
     @mock.patch('base.models.program_manager.is_program_manager')
     def test_learning_unit_components(self, mock_program_manager):
         mock_program_manager.return_value = True
 
-        learning_unit_year = self.generated_container.generated_container_years[0].learning_unit_year_full
-
-        response = self.client.get(reverse(learning_unit_components, args=[learning_unit_year.id]))
+        response = self.client.get(reverse(learning_unit_components, args=[self.learning_unit_year.id]))
 
         self.assertTemplateUsed(response, 'learning_unit/components.html')
         components = response.context['components']
@@ -1299,6 +1298,17 @@ class TestLearningUnitComponents(TestCase):
             volumes = component['volumes']
             self.assertEqual(volumes[VOLUME_Q1], None)
             self.assertEqual(volumes[VOLUME_Q2], None)
+
+    def test_tab_active_url(self):
+        url = reverse("learning_unit_components", args=[self.learning_unit_year.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue("tab_active" in response.context)
+        self.assertEqual(response.context["tab_active"], 'learning_unit_components')
+
+        url_tab_active = reverse(response.context["tab_active"], args=[self.learning_unit_year.id])
+        response = self.client.get(url_tab_active)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
 
 
 class TestLearningAchievements(TestCase):

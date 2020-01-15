@@ -134,7 +134,7 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
         context.update(self.get_context_permission(proposal))
         context["versions"] = self.get_versions()
         context["list_partims"] = self.object.get_partims_related().values_list('acronym', flat=True)
-
+        context["tab_active"] = "learning_unit"  # Corresponds to url_name
         return context
 
     def get_context_permission(self, proposal):

@@ -597,6 +597,22 @@ class TestLearningUnitVolumesManagement(TestCase):
             [self.learning_unit_year]
         )
 
+    @mock.patch('base.models.program_manager.is_program_manager')
+    def test_tab_active_url(self, mock_program_manager):
+        mock_program_manager.return_value = True
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue("tab_active" in response.context)
+        self.assertEqual(response.context["tab_active"], 'learning_unit_components')
+
+        access_learning_unit_permission = Permission.objects.get(codename="can_access_learningunit")
+        self.person.user.user_permissions.add(access_learning_unit_permission)
+
+        url_tab_active = reverse(response.context["tab_active"], args=[self.learning_unit_year.id])
+        response = self.client.get(url_tab_active)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+
 
 class TestEntityAutocomplete(TestCase):
     def setUp(self):

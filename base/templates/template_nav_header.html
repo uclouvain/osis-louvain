@@ -51,6 +51,11 @@
             </ul>
         </div>
     </div>
+   <input id="nav-url" type="hidden"
+        {% if tab_active %}
+            data-nav-base-url="{% url tab_active learning_unit_year_id=learning_unit_year.id%}"
+        {% endif %}
+        />
 
     <script type="text/javascript">
         let removeNavButtons = function () {
@@ -71,10 +76,19 @@
             }
             return undefined;
         };
-        let enableNavLink = function (domId, url, title) {
-            if (url != undefined) {
+        let enableNavLink = function (domId, url_lu, title, current_id) {
+
+            if (url_lu != undefined) {
                 let elem = document.getElementById(domId);
-                elem.setAttribute('href', url);
+                if(current_id){
+                    var id_to_go_to = getIdFromUrl(url_lu); // id_to_go_to luy id to go to
+                    var url_by_name = $("#nav-url").attr("data-nav-base-url");  //data-nav-base-url = Url name to go to with current luy_id
+                    url = url_by_name.replace(current_id, id_to_go_to) // replace the current luy id by the next/previous one
+                    elem.setAttribute('href', url);
+                }else{
+                    elem.setAttribute('href', url_lu);
+                }
+
                 elem.setAttribute('title', title);
                 //Remove disabled property
                 elem.parentElement.classList.remove('disabled');
@@ -85,7 +99,7 @@
                 let previousObject = objectIds[currentIndex - 1];
                 let previousUrl = previousObject.id;
                 let previousTitle = previousObject.value;
-                enableNavLink('previousNavLink', previousUrl, previousTitle);
+                enableNavLink('previousNavLink', previousUrl, previousTitle, getIdFromUrl(objectIds[currentIndex].id));
             }
         };
         let setNextLink = function (objectIds, currentIndex) {
@@ -93,7 +107,7 @@
                 let nextObject = objectIds[currentIndex + 1];
                 let nextUrl = nextObject.id;
                 let nextTitle = nextObject.value;
-                enableNavLink('nextNavLink', nextUrl, nextTitle);
+                enableNavLink('nextNavLink', nextUrl, nextTitle, getIdFromUrl(objectIds[currentIndex].id));
             }
         };
         if (typeof localStorage != 'undefined') {
