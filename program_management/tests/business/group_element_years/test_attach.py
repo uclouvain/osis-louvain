@@ -28,6 +28,7 @@ from django.test import TestCase
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -57,6 +58,11 @@ class TestAttachOptionEducationGroupYearStrategy(TestCase):
         cls.master_120_specialized = TrainingFactory(education_group_type__name=TrainingType.MASTER_MS_120.name,
                                                      academic_year=cls.academic_year)
         GroupElementYearFactory(parent=cls.finality_group, child_branch=cls.master_120_specialized)
+        AuthorizedRelationshipFactory(
+            parent_type__name=TrainingType.MASTER_MS_120.name,
+            child_type__name=MiniTrainingType.OPTION.name,
+            min_count_authorized=1,
+        )
 
     def test_is_valid_case_attach_option_which_are_within_master_120(self):
         """
@@ -169,6 +175,11 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
             education_group__end_year=cls.academic_year_2020
         )
         GroupElementYearFactory(parent=cls.finality_group, child_branch=cls.master_120_specialized)
+        AuthorizedRelationshipFactory(
+            parent_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
+            child_type__name=TrainingType.MASTER_MD_120.name,
+            min_count_authorized=1,
+        )
 
     def test_is_valid_case_attach_finality_which_have_end_year_lower_than_root(self):
         master_120_didactic = TrainingFactory(
@@ -220,7 +231,8 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
             self.assertTrue(duplicate.is_valid())
 
     def test_is_not_valid_case_attach_groups_which_contains_finalities_which_have_end_year_greater_than_root(self):
-        subgroup = GroupFactory(education_group_type__name=GroupType.SUB_GROUP.name, academic_year=self.academic_year_2018)
+        subgroup = GroupFactory(education_group_type__name=GroupType.SUB_GROUP.name,
+                                academic_year=self.academic_year_2018)
         master_120_didactic = TrainingFactory(
             education_group_type__name=TrainingType.MASTER_MD_120.name,
             academic_year=self.academic_year_2018,

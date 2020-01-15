@@ -617,6 +617,11 @@ class TestUpdate(TestCase):
         )
 
     def test_post_with_edited_content(self):
+        AuthorizedRelationshipFactory(
+            parent_type__name=TrainingType.PGRM_MASTER_120.name,
+            child_type__name=TrainingType.AGGREGATION.name,
+            min_count_authorized=1,
+        )
         new_entity_version = MainEntityVersionFactory()
         egy = TrainingFactory(
             academic_year=self.current_academic_year,
