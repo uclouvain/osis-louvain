@@ -63,6 +63,11 @@ class TestAttachOptionEducationGroupYearStrategy(TestCase):
             child_type__name=MiniTrainingType.OPTION.name,
             min_count_authorized=1,
         )
+        AuthorizedRelationshipFactory(
+            parent_type__name=TrainingType.MASTER_MS_120.name,
+            child_type__name=GroupType.SUB_GROUP.name,
+            min_count_authorized=1,
+        )
 
     def test_is_valid_case_attach_option_which_are_within_master_120(self):
         """
