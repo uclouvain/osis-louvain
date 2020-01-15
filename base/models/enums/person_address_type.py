@@ -23,9 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from osis_common.utils.enumerations import ChoiceEnum
+from django.utils.translation import gettext_lazy as _
+
+from base.models.utils.utils import ChoiceEnum
 
 
 class PersonAddressType(ChoiceEnum):
-    RESIDENTIAL = "RESIDENTIAL"
-    PROFESSIONAL = "PROFESSIONAL"
+    RESIDENTIAL = _("Residential")
+    PROFESSIONAL = _("Professional")
