@@ -133,7 +133,7 @@ def scores_sheet_data(exam_enrollments, tutor=None):
         if scores_responsible:
             person = scores_responsible.person
             scores_responsible_address = person_address.get_by_label(scores_responsible.person,
-                                                                     PersonAddressType.PROFESSIONAL.value)
+                                                                     PersonAddressType.PROFESSIONAL.name)
 
         learn_unit_year_dict['academic_year'] = str(learning_unit_yr.academic_year)
 
