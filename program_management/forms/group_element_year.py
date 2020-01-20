@@ -25,7 +25,7 @@
 ##############################################################################
 from django import forms
 from django.core.exceptions import ValidationError
-from django.forms import modelformset_factory, BaseFormSet, BaseModelFormSet
+from django.forms import modelformset_factory, BaseModelFormSet
 
 from base.models.enums import education_group_categories
 from base.models.group_element_year import GroupElementYear
@@ -54,6 +54,7 @@ class GroupElementYearForm(forms.ModelForm):
         }
 
     def __init__(self, *args, parent=None, child_branch=None, child_leaf=None, **kwargs):
+        self.is_central_manager = kwargs.pop('is_central_manager', False)
         super().__init__(*args, **kwargs)
         # No need to attach FK to an existing GroupElementYear
         if not self.instance.pk:
@@ -74,10 +75,12 @@ class GroupElementYearForm(forms.ModelForm):
         elif self._is_education_group_year_a_minor_major_option_list_choice(self.instance.parent) and \
                 not self._is_education_group_year_a_minor_major_option_list_choice(self.instance.child_branch):
             self._keep_only_fields(["access_condition"])
+            self.fields["access_condition"].disabled = \
+                self.instance.child_branch.is_minor and not self.is_central_manager
 
         elif self.instance.parent.education_group_type.category == education_group_categories.TRAINING and \
                 self._is_education_group_year_a_minor_major_option_list_choice(self.instance.child_branch):
-            self._disable_all_fields(["block"])
+            self._disable_all_fields(["block"]) if self.is_central_manager else self._disable_all_fields([])
 
         elif self.instance.child_leaf:
             self.fields.pop("link_type")
@@ -142,17 +145,21 @@ class GroupElementYearForm(forms.ModelForm):
 
 
 class BaseGroupElementYearFormset(BaseModelFormSet):
+    def __init__(self, *args, **kwargs):
+        self.is_central_manager = kwargs.pop('is_central_manager')
+        super().__init__(*args, **kwargs)
+
+    def get_form_kwargs(self, index):
+        kwargs = super().get_form_kwargs(index)
+        kwargs['is_central_manager'] = self.is_central_manager
+        return kwargs
+
     def changed_forms(self):
         return [f for f in self if f.has_changed()]
 
     def save(self, commit=True):
         for f in self:
             f.save()
-
-    def get_form_kwargs(self, index):
-        if self.form_kwargs:
-            return self.form_kwargs[index]
-        return {}
 
 
 GroupElementYearFormset = modelformset_factory(

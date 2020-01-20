@@ -91,7 +91,11 @@ class TestCoorganizationForm(TestCase):
         self.assertEqual(form['organization'].value(), self.education_group_organization.organization.pk)
         self.assertEqual(form['diploma'].value(), diploma_coorganization.UNIQUE)
         self.assertTrue(form['all_students'].value())
-        self.assertFalse(form['enrollment_place'].value())
+        self.assertFalse(form['enrollment_place'].value())    #
+    # def get_form_kwargs(self, index):
+    #     if self.form_kwargs:
+    #         return self.form_kwargs[index]
+    #     return {}
         self.assertFalse(form['is_producing_cerfificate'].value())
         self.assertFalse(form['is_producing_annexe'].value())
 
