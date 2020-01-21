@@ -139,7 +139,7 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
         # Formset don't use instance parameter
         if "instance" in kwargs:
             del kwargs["instance"]
-        kwargs_form_kwargs = []
+        form_kwargs = []
 
         children = fetch_elements_selected(self.request.GET, self.request.user)
 
@@ -148,14 +148,15 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
             display_error_messages(self.request, messages)
 
         for child in children:
-            kwargs_form_kwargs.append({
+            form_kwargs.append({
                 'parent': self.education_group_year,
                 'child_branch': child if isinstance(child, EducationGroupYear) else None,
                 'child_leaf': child if isinstance(child, LearningUnitYear) else None,
-                'empty_permitted': False
+                'empty_permitted': False,
+                'is_central_manager': self.request.user.person.is_central_manager
             })
 
-        kwargs["form_kwargs"] = kwargs_form_kwargs
+        kwargs["form_kwargs"] = form_kwargs
         kwargs["queryset"] = GroupElementYear.objects.none()
         return kwargs
 

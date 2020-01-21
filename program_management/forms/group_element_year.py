@@ -146,7 +146,7 @@ class GroupElementYearForm(forms.ModelForm):
 
 class BaseGroupElementYearFormset(BaseModelFormSet):
     def __init__(self, *args, **kwargs):
-        self.is_central_manager = kwargs.pop('is_central_manager')
+        self.is_central_manager = kwargs.pop('form_kwargs')[0]['is_central_manager']
         super().__init__(*args, **kwargs)
 
     def get_form_kwargs(self, index):

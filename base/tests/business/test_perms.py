@@ -85,7 +85,10 @@ class PermsTestCase(TestCase):
             academic_year=self.academic_yr,
             learning_container_year=self.lunit_container_yr,
             subtype=FULL,
-            learning_unit=LearningUnitFactory(start_year=self.academic_yr)
+            learning_unit=LearningUnitFactory(
+                start_year=self.academic_yr,
+                end_year=self.academic_yr_1
+            )
         )
         AcademicCalendarFactory(
             data_year=self.academic_yr,
