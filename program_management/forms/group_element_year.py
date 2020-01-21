@@ -76,7 +76,7 @@ class GroupElementYearForm(forms.ModelForm):
                 not self._is_education_group_year_a_minor_major_option_list_choice(self.instance.child_branch):
             self._keep_only_fields(["access_condition"])
             self.fields["access_condition"].disabled = \
-                self.instance.child_branch.is_minor and not self.is_central_manager
+                self.instance.child.is_minor and not self.is_central_manager
 
         elif self.instance.parent.education_group_type.category == education_group_categories.TRAINING and \
                 self._is_education_group_year_a_minor_major_option_list_choice(self.instance.child_branch):
@@ -146,12 +146,15 @@ class GroupElementYearForm(forms.ModelForm):
 
 class BaseGroupElementYearFormset(BaseModelFormSet):
     def __init__(self, *args, **kwargs):
-        self.is_central_manager = kwargs.pop('form_kwargs')[0]['is_central_manager']
+        self.kwargs = kwargs.pop('form_kwargs')[0]
         super().__init__(*args, **kwargs)
 
     def get_form_kwargs(self, index):
         kwargs = super().get_form_kwargs(index)
-        kwargs['is_central_manager'] = self.is_central_manager
+        kwargs['is_central_manager'] = self.kwargs['is_central_manager']
+        kwargs['parent'] = self.kwargs['parent'] or None
+        kwargs['child_branch'] = self.kwargs['child_branch']
+        kwargs['child_leaf'] = self.kwargs['child_leaf']
         return kwargs
 
     def changed_forms(self):

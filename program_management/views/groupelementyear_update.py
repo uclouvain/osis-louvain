@@ -49,7 +49,10 @@ class UpdateGroupElementYearView(GenericGroupElementYearMixin, UpdateView):
         """ For the creation, the group_element_year needs a parent and a child """
         kwargs = super().get_form_kwargs()
         form_kwargs = [{
-            'is_central_manager': self.request.user.person.is_central_manager
+            'parent': self.education_group_year,
+            'child_branch': None,
+            'child_leaf': None,
+            'is_central_manager': self.request.user.person.is_central_manager,
         }]
         # Formset don't use instance parameter
         if "instance" in kwargs:
