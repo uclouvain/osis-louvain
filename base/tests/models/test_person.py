@@ -50,7 +50,7 @@ from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory
 
 
-def create_person(first_name, last_name, email=None):
+def create_person(first_name, last_name, email=""):
     a_person = person.Person(first_name=first_name, last_name=last_name, email=email)
     a_person.save()
     return a_person
@@ -72,15 +72,22 @@ class PersonTestCase(TestCase):
 
 
 class PersonTest(PersonTestCase):
-    def setUp(self):
-        self.an_user = user.UserFactory(username="user_without_person")
-        self.user_for_person = user.UserFactory(username="user_with_person")
-        self.person_with_user = PersonFactory(user=self.user_for_person, language="fr-be", first_name="John",
-                                              last_name="Doe")
-        self.person_without_user = PersonWithoutUserFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.an_user = user.UserFactory(username="user_without_person")
+        cls.user_for_person = user.UserFactory(username="user_with_person")
+        cls.person_without_user = PersonWithoutUserFactory()
         CentralManagerGroupFactory()
         FacultyManagerGroupFactory()
         ProgramManagerGroupFactory()
+
+    def setUp(self):
+        self.person_with_user = PersonFactory(
+            user=self.user_for_person,
+            language="fr-be",
+            first_name="John",
+            last_name="Doe"
+        )
 
     def test_find_by_id(self):
         tmp_person = PersonFactory()

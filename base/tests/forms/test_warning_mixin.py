@@ -41,9 +41,6 @@ class TestForm(WarningFormMixin, forms.ModelForm):
 
 
 class TestValidationRuleMixin(TestCase):
-    def setUp(self):
-        pass
-
     def test_init(self):
         form = TestForm()
 

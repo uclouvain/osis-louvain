@@ -57,18 +57,21 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory, cre
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.tutor import TutorFactory
 from cms.enums import entity_name
-from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.models.translated_text import TranslatedText
+from cms.tests.factories.translated_text import TranslatedTextFactory
 
 
 class LearningUnitYearTest(TestCase):
-    def setUp(self):
-        self.tutor = TutorFactory()
-        self.academic_year = create_current_academic_year()
-        self.learning_unit_year = LearningUnitYearFactory(acronym="LDROI1004",
-                                                          specific_title="Juridic law courses",
-                                                          academic_year=self.academic_year,
-                                                          subtype=learning_unit_year_subtypes.FULL)
+    @classmethod
+    def setUpTestData(cls):
+        cls.tutor = TutorFactory()
+        cls.academic_year = create_current_academic_year()
+        cls.learning_unit_year = LearningUnitYearFactory(
+            acronym="LDROI1004",
+            specific_title="Juridic law courses",
+            academic_year=cls.academic_year,
+            subtype=learning_unit_year_subtypes.FULL
+        )
 
     def test_find_by_tutor_with_none_argument(self):
         self.assertEqual(attribution.find_by_tutor(None), None)
@@ -187,7 +190,6 @@ class LearningUnitYearTest(TestCase):
         self.learning_unit_year.learning_container_year = None
         self.assertEqual(self.learning_unit_year.container_common_title, '')
 
-
     def test_is_external(self):
         luy = LearningUnitYearFactory()
         ExternalLearningUnitYearFactory(learning_unit_year=luy)
@@ -199,11 +201,12 @@ class LearningUnitYearTest(TestCase):
 
 
 class LearningUnitYearGetEntityTest(TestCase):
-    def setUp(self):
-        self.learning_unit_year = LearningUnitYearFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_year = LearningUnitYearFactory(
             learning_container_year__requirement_entity=EntityFactory()
         )
-        self.requirement_entity = self.learning_unit_year.learning_container_year.requirement_entity
+        cls.requirement_entity = cls.learning_unit_year.learning_container_year.requirement_entity
 
     def test_get_entity_case_found_entity_type(self):
         result = self.learning_unit_year.get_entity(entity_type=entity_container_year_link_type.REQUIREMENT_ENTITY)
@@ -218,14 +221,15 @@ class LearningUnitYearGetEntityTest(TestCase):
 
 
 class LearningUnitYearFindLearningUnitYearByAcademicYearTutorAttributionsTest(TestCase):
-    def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        self.learning_unit_year = LearningUnitYearFactory(
-            academic_year=self.current_academic_year,
-            learning_container_year__academic_year=self.current_academic_year,
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        cls.learning_unit_year = LearningUnitYearFactory(
+            academic_year=cls.current_academic_year,
+            learning_container_year__academic_year=cls.current_academic_year,
         )
-        self.tutor = TutorFactory()
-        AttributionFactory(learning_unit_year=self.learning_unit_year, tutor=self.tutor)
+        cls.tutor = TutorFactory()
+        AttributionFactory(learning_unit_year=cls.learning_unit_year, tutor=cls.tutor)
 
     def test_find_learning_unit_years_by_academic_year_tutor_attributions_case_occurrence_found(self):
         result = find_learning_unit_years_by_academic_year_tutor_attributions(
@@ -262,16 +266,20 @@ class LearningUnitYearFindLearningUnitYearByAcademicYearTutorAttributionsTest(Te
 
 
 class LearningUnitYearWarningsTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.start_year = AcademicYearFactory(year=2010)
+        cls.end_year = AcademicYearFactory(year=2020)
+        cls.generated_ac_years = GenerateAcademicYear(cls.start_year, cls.end_year)
+
     def setUp(self):
-        self.start_year = AcademicYearFactory(year=2010)
-        self.end_year = AcademicYearFactory(year=2020)
-        self.generated_ac_years = GenerateAcademicYear(self.start_year, self.end_year)
         self.generated_container = GenerateContainer(self.start_year, self.end_year)
         self.luy_full = self.generated_container.generated_container_years[0].learning_unit_year_full
         self.component_full_lecturing = LearningComponentYear.objects.filter(
             type=LECTURING,
             learning_unit_year=self.luy_full
         ).first()
+
         self.luy_full.quadrimester = None
         self.luy_full.save()
         self.luy_full.get_partims_related().update(quadrimester=None)
@@ -378,7 +386,7 @@ class LearningUnitYearWarningsTest(TestCase):
 
         excepted_error = "{} ({})".format(
             _('Volumes are inconsistent'),
-            _('At least a partim volume value is greater than corresponding volume of parent'))
+            _('At least a partim volume value is greater than corresponding volume of full UE'))
         self.assertIn(excepted_error, self.luy_full.learning_container_year.warnings)
         self.assertIn(excepted_error, self.luy_full.warnings)
         excepted_error = "{} ({})".format(
@@ -412,7 +420,7 @@ class LearningUnitYearWarningsTest(TestCase):
 
         excepted_error = "{} ({})".format(
             _('Volumes are inconsistent'),
-            _('At least a partim volume value is greater than corresponding volume of parent'))
+            _('At least a partim volume value is greater than corresponding volume of full UE'))
         self.assertIn(excepted_error, self.luy_full.learning_container_year.warnings)
         self.assertIn(excepted_error, self.luy_full.warnings)
         excepted_error = "{} ({})".format(
@@ -647,14 +655,7 @@ class TestQuadriConsistency(TestCase):
         ]
 
         for case in test_cases:
-            with self.subTest(case=case):
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
-                self.learning_component_year_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
-                self.learning_component_year_full_lecturing.planned_classes = case.get('planned_classes')
-                self.learning_component_year_full_lecturing.repartition_volume_requirement_entity = case.get(
-                    'vol_tot_global')
-                self.learning_component_year_full_lecturing.save()
+            self._update_lecturing_component_volumes(case)
 
         self.assertTrue(
             LearningComponentYearQuadriNoStrategy(lcy=self.learning_component_year_full_lecturing).is_valid())
@@ -668,14 +669,7 @@ class TestQuadriConsistency(TestCase):
             {'vol_q1': 20, 'vol_q2': None, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
         ]
 
-        with self.subTest(case=test_cases[0]):
-            self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = test_cases[0].get('vol_q1')
-            self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = test_cases[0].get('vol_q2')
-            self.learning_component_year_full_lecturing.hourly_volume_total_annual = test_cases[0].get('vol_tot_annual')
-            self.learning_component_year_full_lecturing.planned_classes = test_cases[0].get('planned_classes')
-            self.learning_component_year_full_lecturing.repartition_volume_requirement_entity = test_cases[0].\
-                get('vol_tot_global')
-            self.learning_component_year_full_lecturing.save()
+        self._update_lecturing_component_volumes(test_cases[0])
 
         self.assertTrue(LearningComponentYearQ1Strategy(lcy=self.learning_component_year_full_lecturing).is_valid())
 
@@ -689,13 +683,7 @@ class TestQuadriConsistency(TestCase):
         ]
 
         for case in test_cases:
-            with self.subTest(case=case):
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
-                self.learning_component_year_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
-                self.learning_component_year_full_lecturing.planned_classes = case.get('planned_classes')
-                self.learning_component_year_full_lecturing.repartition_volume_requirement_entity = case.get('vol_tot_global')
-                self.learning_component_year_full_lecturing.save()
+            self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
                 _('Volumes of {} are inconsistent').format(
@@ -703,6 +691,16 @@ class TestQuadriConsistency(TestCase):
                 _('Only the volume Q1 must have a value'))
 
         self.assertIn(excepted_error, self.luy_full.warnings)
+
+    def _update_lecturing_component_volumes(self, case):
+        with self.subTest(case=case):
+            self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
+            self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
+            self.learning_component_year_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
+            self.learning_component_year_full_lecturing.planned_classes = case.get('planned_classes')
+            self.learning_component_year_full_lecturing.repartition_volume_requirement_entity = case.get(
+                'vol_tot_global')
+            self.learning_component_year_full_lecturing.save()
 
     def test_ok_volumes_for_Q2(self):
         self.luy_full.credits = self.luy_full.credits + 1
@@ -713,14 +711,7 @@ class TestQuadriConsistency(TestCase):
             {'vol_q1': None, 'vol_q2': 20, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
         ]
 
-        with self.subTest(case=test_cases[0]):
-            self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = test_cases[0].get('vol_q1')
-            self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = test_cases[0].get('vol_q2')
-            self.learning_component_year_full_lecturing.hourly_volume_total_annual = test_cases[0].get('vol_tot_annual')
-            self.learning_component_year_full_lecturing.planned_classes = test_cases[0].get('planned_classes')
-            self.learning_component_year_full_lecturing.repartition_volume_requirement_entity = \
-                test_cases[0].get('vol_tot_global')
-            self.learning_component_year_full_lecturing.save()
+        self._update_lecturing_component_volumes(test_cases[0])
 
         self.assertTrue(LearningComponentYearQ2Strategy(lcy=self.learning_component_year_full_lecturing).is_valid())
 
@@ -734,14 +725,7 @@ class TestQuadriConsistency(TestCase):
         ]
 
         for case in test_cases:
-            with self.subTest(case=case):
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
-                self.learning_component_year_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
-                self.learning_component_year_full_lecturing.planned_classes = case.get('planned_classes')
-                self.learning_component_year_full_lecturing.repartition_volume_requirement_entity = case.get(
-                    'vol_tot_global')
-                self.learning_component_year_full_lecturing.save()
+            self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
                 _('Volumes of {} are inconsistent').format(
@@ -759,14 +743,7 @@ class TestQuadriConsistency(TestCase):
             {'vol_q1': 10, 'vol_q2': 10, 'vol_tot_annual': 20, 'planned_classes': 1, 'vol_tot_global': 20},
         ]
 
-        with self.subTest(case=test_cases[0]):
-            self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = test_cases[0].get('vol_q1')
-            self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = test_cases[0].get('vol_q2')
-            self.learning_component_year_full_lecturing.hourly_volume_total_annual = test_cases[0].get('vol_tot_annual')
-            self.learning_component_year_full_lecturing.planned_classes = test_cases[0].get('planned_classes')
-            self.learning_component_year_full_lecturing.repartition_volume_requirement_entity = \
-                test_cases[0].get('vol_tot_global')
-            self.learning_component_year_full_lecturing.save()
+        self._update_lecturing_component_volumes(test_cases[0])
 
         self.assertTrue(LearningComponentYearQ1and2Strategy(lcy=self.learning_component_year_full_lecturing).is_valid())
 
@@ -782,14 +759,7 @@ class TestQuadriConsistency(TestCase):
         ]
 
         for case in test_cases:
-            with self.subTest(case=case):
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
-                self.learning_component_year_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
-                self.learning_component_year_full_lecturing.planned_classes = case.get('planned_classes')
-                self.learning_component_year_full_lecturing.repartition_volume_requirement_entity = case.get(
-                    'vol_tot_global')
-                self.learning_component_year_full_lecturing.save()
+            self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
                 _('Volumes of {} are inconsistent').format(
@@ -809,13 +779,7 @@ class TestQuadriConsistency(TestCase):
         ]
 
         for case in test_cases:
-            with self.subTest(case=case):
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
-                self.learning_component_year_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
-                self.learning_component_year_full_lecturing.planned_classes = case.get('planned_classes')
-                self.learning_component_year_full_lecturing.repartition_volume_requirement_entity = case.get('vol_tot_global')
-                self.learning_component_year_full_lecturing.save()
+            self._update_lecturing_component_volumes(case)
 
         self.assertTrue(LearningComponentYearQ1or2Strategy(lcy=self.learning_component_year_full_lecturing).is_valid())
 
@@ -830,14 +794,7 @@ class TestQuadriConsistency(TestCase):
         ]
 
         for case in test_cases:
-            with self.subTest(case=case):
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
-                self.learning_component_year_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
-                self.learning_component_year_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
-                self.learning_component_year_full_lecturing.planned_classes = case.get('planned_classes')
-                self.learning_component_year_full_lecturing.repartition_volume_requirement_entity = case.get(
-                    'vol_tot_global')
-                self.learning_component_year_full_lecturing.save()
+            self._update_lecturing_component_volumes(case)
 
         excepted_error = "{} ({})".format(
                 _('Volumes of {} are inconsistent').format(
@@ -998,12 +955,15 @@ class ContainerTypeVerboseTest(TestCase):
 
 
 class LearningUnitYearDeleteCms(TestCase):
-    def setUp(self):
-        self.learning_unit_year = LearningUnitYearFactory()
-        self.translated_text = TranslatedTextFactory(entity=entity_name.LEARNING_UNIT_YEAR,
-                                                     reference=self.learning_unit_year.id)
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_year = LearningUnitYearFactory()
+        cls.translated_text = TranslatedTextFactory(
+            entity=entity_name.LEARNING_UNIT_YEAR,
+            reference=cls.learning_unit_year.id
+        )
 
-        self.learning_unit_year_no_cms = LearningUnitYearFactory()
+        cls.learning_unit_year_no_cms = LearningUnitYearFactory()
 
     def test_delete_learning_unit_yr_and_cms(self):
         luy_id = self.learning_unit_year.id

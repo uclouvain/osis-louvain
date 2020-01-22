@@ -32,8 +32,9 @@ from base.business.xls import convert_boolean, _get_all_columns_reference
 
 
 class TestXls(TestCase):
-    def setUp(self):
-        self.now = timezone.now()
+    @classmethod
+    def setUpTestData(cls):
+        cls.now = timezone.now()
 
     def test_convert_boolean(self):
         self.assertEqual(convert_boolean(None), _('no'))

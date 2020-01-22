@@ -33,6 +33,7 @@ from base.business.learning_units import perms
 from base.business.learning_units.pedagogy import delete_teaching_material, is_pedagogy_data_must_be_postponed
 from base.forms.learning_unit_pedagogy import TeachingMaterialModelForm
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.teaching_material import TeachingMaterial
 from base.views.common import display_success_messages
 from base.views.learning_units.perms import PermissionDecorator
@@ -106,5 +107,9 @@ def _save_and_return_response(request, form, learning_unit_year):
             }
         )
     else:
-        display_success_messages(request, _("The teaching material has been saved with success"))
+        msg = _("The teaching material has been saved with success")
+        if ProposalLearningUnit.objects. \
+                filter(learning_unit_year__learning_unit=learning_unit_year.learning_unit).exists():
+            msg = "{}. {}".format(msg, _('It will be done at the consolidation'))
+        display_success_messages(request, msg)
     return JsonResponse({})

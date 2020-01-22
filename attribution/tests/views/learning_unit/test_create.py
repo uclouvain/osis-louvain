@@ -49,11 +49,10 @@ class TestAddAttribution(TestCase):
         cls.practical_component = PracticalLearningComponentYearFactory(learning_unit_year=cls.learning_unit_year)
         cls.person = PersonWithPermissionsFactory('can_access_learningunit')
         cls.tutor = TutorFactory(person=cls.person)
+        cls.url = reverse("add_attribution", args=[cls.learning_unit_year.id])
 
     def setUp(self):
         self.client.force_login(self.person.user)
-        self.url = reverse("add_attribution", args=[self.learning_unit_year.id])
-
         self.patcher = patch.object(RulesRequiredMixin, "test_func", return_value=True)
         self.mocked_permission_function = self.patcher.start()
         self.addCleanup(self.patcher.stop)

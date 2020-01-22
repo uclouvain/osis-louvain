@@ -40,69 +40,65 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.views import institution
 from base.views.institution import entities_search
-from reference.tests.factories.country import CountryFactory
 
 
 class EntityViewTestCase(APITestCase):
-    def setUp(self):
-        self.user = PersonFactory().user
-        today = datetime.date.today()
-        self.current_academic_year = AcademicYearFactory(start_date=today,
-                                                         end_date=today.replace(year=today.year + 1),
-                                                         year=today.year)
-        self.academic_calendar = AcademicCalendarFactory(academic_year=self.current_academic_year,
-                                                         reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
-        self.entity = EntityFactory(country=CountryFactory())
-        self.parent = EntityFactory()
-        self.start_date = datetime.date(2015, 1, 1)
-        self.end_date = datetime.date(2015, 12, 31)
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = PersonFactory().user
+        cls.current_academic_year = AcademicYearFactory(current=True)
+        cls.academic_calendar = AcademicCalendarFactory(academic_year=cls.current_academic_year,
+                                                        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+        cls.entity = EntityFactory()
+        cls.parent = EntityFactory()
+        cls.start_date = datetime.date(2015, 1, 1)
+        cls.end_date = datetime.date(2015, 12, 31)
 
-        self.entity_version = EntityVersionFactory(
-            entity=self.entity,
+        cls.entity_version = EntityVersionFactory(
+            entity=cls.entity,
             acronym="ENTITY_CHILDREN",
             title="This is the entity version ",
             entity_type="FACULTY",
-            parent=self.parent,
-            start_date=self.start_date,
-            end_date=self.end_date
+            parent=cls.parent,
+            start_date=cls.start_date,
+            end_date=cls.end_date
         )
-        self.parent_entity_version = EntityVersionFactory(
-            entity=self.parent,
+        cls.parent_entity_version = EntityVersionFactory(
+            entity=cls.parent,
             acronym="ENTITY_PARENT",
             title="This is the entity parent version",
             entity_type="SECTOR",
-            start_date=self.start_date,
-            end_date=self.end_date
+            start_date=cls.start_date,
+            end_date=cls.end_date
         )
 
-    def test_entities(self):
+    def setUp(self):
         self.client.force_login(self.user)
+
+    def test_entities(self):
         url = reverse('entities')
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_entities_search(self):
-        self.client.force_login(self.user)
         url = reverse(entities_search)
         response = self.client.get(url, data={"acronym": "ENTITY_CHILDREN", "title": "", "entity_type": ""})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['entities_version']), 1)
 
     def test_entity_read(self):
-        self.client.force_login(self.user)
         url = reverse('entity_read', args=[self.entity_version.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     def test_entity_diagram(self):
-        self.client.force_login(self.user)
         url = reverse('entity_diagram', args=[self.entity_version.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
     @mock.patch('base.models.entity_version.find_by_id')
     @mock.patch('django.contrib.auth.decorators')
-    def test_get_entity_address(self,  mock_decorators, mock_find_by_id):
+    def test_get_entity_address(self, mock_decorators, mock_find_by_id):
         mock_decorators.login_required = lambda x: x
         mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
         entity = EntityFactory()
@@ -120,7 +116,7 @@ class EntityViewTestCase(APITestCase):
 
     @mock.patch('base.models.entity_version.find_by_id')
     @mock.patch('django.contrib.auth.decorators')
-    def test_get_entity_address_case_no_current_entity_version_exists(self,  mock_decorators, mock_find_by_id):
+    def test_get_entity_address_case_no_current_entity_version_exists(self, mock_decorators, mock_find_by_id):
         mock_decorators.login_required = lambda x: x
         mock_decorators.permission_required = lambda *args, **kwargs: lambda func: func
         entity = EntityFactory()

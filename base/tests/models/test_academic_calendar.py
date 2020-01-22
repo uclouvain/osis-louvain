@@ -44,12 +44,13 @@ from base.tests.factories.academic_year import AcademicYearFactory, create_curre
 class AcademicCalendarTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        pass
+        fake = Faker()
+        cls.future_date = fake.future_date()
+        cls.past_date = fake.past_date()
 
     def test_start_date_higher_than_end_date(self):
-        fake = Faker()
         with self.assertRaises(StartDateHigherThanEndDateException):
-            AcademicCalendarFactory(start_date=fake.future_date(), end_date=fake.past_date())
+            AcademicCalendarFactory(start_date=self.future_date, end_date=self.past_date)
 
     def test_find_highlight_academic_calendar(self):
         open_academic_calendar = OpenAcademicCalendarFactory()
@@ -69,11 +70,10 @@ class AcademicCalendarTest(TestCase):
             self.assertTrue(mock_method.called)
 
     def test_get_academic_calendar_by_date_and_reference_and_data_year_exists(self):
-        fake = Faker()
         data_year = AcademicYearFactory()
         cal = AcademicCalendarFactory(
-            start_date=fake.past_date(),
-            end_date=fake.future_date(),
+            start_date=self.past_date,
+            end_date=self.future_date,
             reference=EXAM_ENROLLMENTS,
             data_year=data_year
         )
@@ -84,11 +84,10 @@ class AcademicCalendarTest(TestCase):
 
     def test_get_academic_calendar_by_date_and_reference_and_data_year_none(self):
         AcademicCalendar.objects.filter(reference=EXAM_ENROLLMENTS).delete()
-        fake = Faker()
         data_year = AcademicYearFactory()
         AcademicCalendarFactory(
-            start_date=fake.past_date(),
-            end_date=fake.future_date(),
+            start_date=self.past_date,
+            end_date=self.future_date,
             reference=SCORES_EXAM_SUBMISSION,
             data_year=data_year
         )

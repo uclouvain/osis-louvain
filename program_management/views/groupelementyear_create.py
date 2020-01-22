@@ -62,7 +62,7 @@ class AttachCheckView(GenericGroupElementYearMixin, View):
 
         elements_to_attach = fetch_elements_selected(self.request.GET, self.request.user)
         if not elements_to_attach:
-            error_messages.append(_("Please cut or copy an item before attach it"))
+            error_messages.append(_("Please select an item before adding it"))
 
         error_messages.extend(_check_attach(self.education_group_year, elements_to_attach))
 

@@ -53,10 +53,11 @@ from reference.tests.factories.language import LanguageFactory
 
 class TestLearningUnitYearModelFormInit(TestCase):
     """Tests LearningUnitYearModelForm.__init__()"""
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         create_current_academic_year()
-        self.central_manager = CentralManagerFactory()
-        self.faculty_manager = FacultyManagerFactory()
+        cls.central_manager = CentralManagerFactory()
+        cls.faculty_manager = FacultyManagerFactory()
 
     def test_acronym_field_case_partim(self):
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=PARTIM)
@@ -99,7 +100,6 @@ class TestLearningUnitYearModelFormInit(TestCase):
 
 class TestLearningUnitYearModelFormSave(TestCase):
     """Tests LearningUnitYearModelForm.save()"""
-
     def setUp(self):
         self.central_manager = CentralManagerFactory()
         self.faculty_manager = FacultyManagerFactory()

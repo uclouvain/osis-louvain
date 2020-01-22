@@ -130,7 +130,7 @@
                         {% endif %}
                     </div>
                 </div>
-                {% for achievement in achievements_FR %}
+                {% for achievement, achievement_en in achievements %}
                     <a id="anchor_{{ achievement.id }}"></a>
                     <div class="row" style="margin-top:10px;">
                         {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
@@ -157,7 +157,9 @@
                                 </div>
                             </div>
                             <div class="col-md-1">
-                                {{ achievement.code_name }}
+                                <span style="display: inline-block; width: 70%; overflow: hidden; text-overflow: ellipsis;">
+                                    {{ achievement.code_name|default:""}}
+                                </span>
                                 {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
                                     <a class="trigger_modal pull-right" href="#"
                                        data-url="{% url 'achievement_edit' learning_unit_year_id=learning_unit_year.id learning_achievement_id=achievement.id %}"
@@ -169,7 +171,7 @@
                             </div>
                         {% else %}
                             <div class="col-md-2 text-right">
-                                {{ achievement.code_name }}
+                                {{ achievement.code_name|default:"" }}
                             </div>
                         {% endif %}
 
@@ -192,24 +194,22 @@
                                 </div>
                                 <div class="col-md-6 show_collapse" id="div_cms_en_achievement_{{ forloop.counter0 }}"
                                      aria-expanded="false">
-                                    {% with achievement_en=achievements_EN|index:forloop.counter0 %}
-                                        {% if achievement_en %}
-                                            <div class="{{ div_class }}"
-                                                 id="cms_text_en_achievement_{{ forloop.counter0 }}">
-                                                <a id="anchor_{{ achievement_en.id }}"></a>
-                                                {{ achievement_en.text| default_if_none:''|safe }}
-                                            </div>
-                                            {% if  div_class %}
-                                                <a role="button"
-                                                   class="collapsed a_show_collapse"
-                                                   data-toggle="collapse"
-                                                   href="#cms_text_en_achievement_{{ forloop.counter0 }}"
-                                                   aria-expanded="false"
-                                                   aria-controls="cms_text_en_achievement_{{ forloop.counter0 }}">
-                                                </a>
-                                            {% endif %}
+                                    {% if achievement_en %}
+                                        <div class="{{ div_class }}"
+                                             id="cms_text_en_achievement_{{ forloop.counter0 }}">
+                                            <a id="anchor_{{ achievement_en.id }}"></a>
+                                            {{ achievement_en.text| default_if_none:''|safe }}
+                                        </div>
+                                        {% if  div_class %}
+                                            <a role="button"
+                                               class="collapsed a_show_collapse"
+                                               data-toggle="collapse"
+                                               href="#cms_text_en_achievement_{{ forloop.counter0 }}"
+                                               aria-expanded="false"
+                                               aria-controls="cms_text_en_achievement_{{ forloop.counter0 }}">
+                                            </a>
                                         {% endif %}
-                                    {% endwith %}
+                                    {% endif %}
                                 </div>
                             </div>
 

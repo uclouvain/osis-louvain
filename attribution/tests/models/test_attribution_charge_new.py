@@ -36,22 +36,24 @@ from base.tests.factories.tutor import TutorFactory
 
 
 class AttributionChargeNewTest(TestCase):
-    def setUp(self):
-        self.person = PersonFactory(first_name="John", last_name="Doe")
-        self.tutor = TutorFactory(person=self.person)
-        self.attribution_new = AttributionNewFactory(tutor=self.tutor, function=function.PROFESSOR)
-        self.attribution_new_without_attribution_charge = AttributionNewFactory(tutor=self.tutor,
-                                                                                function=function.PROFESSOR)
-        self.learning_component_year_lecturing = LearningComponentYearFactory(type=component_type.LECTURING)
-        self.learning_component_year_practical = LearningComponentYearFactory(type=component_type.PRACTICAL_EXERCISES)
-        self.attribution_charge_new_lecturing = \
-            AttributionChargeNewFactory(attribution=self.attribution_new,
-                                        learning_component_year=self.learning_component_year_lecturing,
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonFactory(first_name="John", last_name="Doe")
+        cls.tutor = TutorFactory(person=cls.person)
+        cls.attribution_new = AttributionNewFactory(tutor=cls.tutor, function=function.PROFESSOR)
+        cls.attribution_new_without_attribution_charge = AttributionNewFactory(tutor=cls.tutor,
+                                                                               function=function.PROFESSOR)
+        cls.learning_component_year_lecturing = LearningComponentYearFactory(type=component_type.LECTURING)
+        cls.learning_component_year_practical = LearningComponentYearFactory(type=component_type.PRACTICAL_EXERCISES)
+        cls.attribution_charge_new_lecturing = \
+            AttributionChargeNewFactory(attribution=cls.attribution_new,
+                                        learning_component_year=cls.learning_component_year_lecturing,
                                         allocation_charge=10)
-        self.attribution_charge_new_practical = \
-            AttributionChargeNewFactory(attribution=self.attribution_new,
-                                        learning_component_year=self.learning_component_year_practical,
+        cls.attribution_charge_new_practical = \
+            AttributionChargeNewFactory(attribution=cls.attribution_new,
+                                        learning_component_year=cls.learning_component_year_practical,
                                         allocation_charge=20)
+
     def test_search_with_attribution(self):
         result = attribution_charge_new.search(attribution=self.attribution_new)
         self.assertCountEqual(result, [self.attribution_charge_new_lecturing, self.attribution_charge_new_practical])

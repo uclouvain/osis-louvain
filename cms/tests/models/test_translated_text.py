@@ -34,7 +34,6 @@ REFERENCE = 2502
 
 
 class TranslatedTextTest(TestCase):
-
     def test_find_by_entity_reference(self):
         text_label_lu_3 = TextLabelFactory(order=1, label='program', entity=entity_name.LEARNING_UNIT_YEAR)
         text_label_oy_1 = TextLabelFactory(order=2, label='introduction', entity=entity_name.OFFER_YEAR)

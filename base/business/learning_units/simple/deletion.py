@@ -30,9 +30,10 @@ from attribution.models.attribution import Attribution
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY, CMS_LABEL_SUMMARY
-from base.models import learning_unit_enrollment, learning_class_year, learning_unit_year as learn_unit_year_model, \
+from base.models import learning_unit_enrollment, learning_unit_year as learn_unit_year_model, \
     academic_year
 from base.models import proposal_learning_unit
+from base.models.learning_class_year import LearningClassYear
 from cms.enums import entity_name
 from cms.models import translated_text
 
@@ -201,12 +202,16 @@ def _delete_learning_container_year(learning_unit_container):
 
 def _delete_learning_component_year(learning_component_year):
     msg = []
-
-    for l_class_year in learning_class_year.find_by_learning_component_year(learning_component_year):
+    learning_class_years = LearningClassYear.objects.filter(
+        learning_component_year=learning_component_year
+    ).order_by("acronym")
+    for l_class_year in learning_class_years:
         l_class_year.delete()
-        msg.append(_("The class %(acronym)s has been deleted for the year %(year)s")
-                   % {'acronym': l_class_year,
-                      'year': learning_component_year.learning_unit_year.academic_year})
+        msg.append(
+            _("The class %(acronym)s has been deleted for the year %(year)s") % {
+                'acronym': l_class_year,
+                'year': learning_component_year.learning_unit_year.academic_year
+            })
     learning_component_year.delete()
 
     return msg

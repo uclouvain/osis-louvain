@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models.abstracts.abstract_achievement import AbstractAchievement, AbstractAchievementAdmin
+from base.models.utils.utils import get_object_or_none
 
 
 class LearningAchievementAdmin(VersionAdmin, AbstractAchievementAdmin):
@@ -49,8 +49,8 @@ class LearningAchievement(AbstractAchievement):
     )
     order_with_respect_to = ('learning_unit_year', 'language')
 
-    class Meta:
-        unique_together = ("code_name", "learning_unit_year", "language")
+    class Meta(AbstractAchievement.Meta):
+        unique_together = ("consistency_id", "learning_unit_year", "language")
 
     def __str__(self):
         return u'{} - {} (order {})'.format(self.learning_unit_year, self.code_name, self.order)
@@ -62,13 +62,14 @@ def find_by_learning_unit_year(learning_unit_yr):
         .order_by('order', 'language__code')
 
 
-def find_learning_unit_achievement(learning_unit_yr, a_language_code, position):
-    try:
-        return LearningAchievement.objects.get(learning_unit_year=learning_unit_yr,
-                                               language__code=a_language_code,
-                                               order=position)
-    except ObjectDoesNotExist:
-        return None
+def find_learning_unit_achievement(consistency_id, learning_unit_yr, a_language_code, position):
+    return get_object_or_none(
+        LearningAchievement,
+        consistency_id=consistency_id,
+        learning_unit_year=learning_unit_yr,
+        language__code=a_language_code,
+        order=position
+    )
 
 
 def search(learning_unit_yr=None, position=None):

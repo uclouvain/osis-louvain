@@ -47,6 +47,8 @@ from webservices.business import EVALUATION_KEY, get_evaluation_text
 class GeneralInformationSerializer(serializers.ModelSerializer):
     language = serializers.CharField(read_only=True)
     year = serializers.IntegerField(source='academic_year.year', read_only=True)
+    education_group_type = serializers.CharField(source='education_group_type.name', read_only=True)
+    education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
     sections = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -57,7 +59,9 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             'acronym',
             'title',
             'year',
-            'sections'
+            'education_group_type',
+            'education_group_type_text',
+            'sections',
         )
 
     def __init__(self, *args, **kwargs):

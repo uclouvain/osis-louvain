@@ -35,6 +35,8 @@ from base.business.learning_units.achievement import get_anchor_reference, DELET
 from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.learning_achievement import LearningAchievement, find_learning_unit_achievement
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.proposal_learning_unit import ProposalLearningUnit
+from base.models.utils.utils import get_object_or_none
 from base.views.common import display_success_messages
 from base.views.learning_unit import learning_unit_specifications
 from base.views.learning_units import perms
@@ -48,17 +50,22 @@ def operation(request, learning_achievement_id, operation_str):
     )
     lu_yr_id = achievement_fr.learning_unit_year.id
 
-    achievement_en = find_learning_unit_achievement(achievement_fr.learning_unit_year,
-                                                    EN_CODE_LANGUAGE,
-                                                    achievement_fr.order)
+    achievement_en = find_learning_unit_achievement(
+        achievement_fr.consistency_id,
+        achievement_fr.learning_unit_year,
+        EN_CODE_LANGUAGE,
+        achievement_fr.order
+    )
     anchor = get_anchor_reference(operation_str, achievement_fr)
     filtered_achievements = list(filter(None, [achievement_fr, achievement_en]))
     last_academic_year = execute_operation(filtered_achievements, operation_str)
     default_success_msg = _("Operation on learning achievement has been successfully completed")
     if last_academic_year and last_academic_year.year <= achievement_fr.learning_unit_year.academic_year.year:
-        display_success_messages(request, _build_postponement_success_message(default_success_msg))
+        display_success_messages(request, _build_postponement_success_message(default_success_msg, None, lu_yr_id))
     else:
-        display_success_messages(request, _build_postponement_success_message(default_success_msg, last_academic_year))
+        display_success_messages(request, _build_postponement_success_message(default_success_msg,
+                                                                              last_academic_year,
+                                                                              lu_yr_id))
 
     return HttpResponseRedirect(reverse(learning_unit_specifications,
                                         kwargs={'learning_unit_year_id': lu_yr_id}) + anchor)
@@ -67,25 +74,60 @@ def operation(request, learning_achievement_id, operation_str):
 def execute_operation(achievements, operation_str):
     last_academic_year = None
     for an_achievement in achievements:
+        curr_order = an_achievement.order
         next_luy = an_achievement.learning_unit_year
+        neighbouring_achievements = _get_neighbouring_achievements(an_achievement)
         func = getattr(an_achievement, operation_str)
         func()
-        if not next_luy.is_past() and an_achievement.code_name:
-            last_academic_year = _postpone_operation(an_achievement, next_luy, operation_str)
+        if not next_luy.is_past():
+            last_academic_year = _postpone_operation(neighbouring_achievements, next_luy, operation_str, curr_order)
     return last_academic_year
 
 
-def _postpone_operation(an_achievement, next_luy, operation_str):
+def _get_neighbouring_achievements(achievement):
+    kwargs = {'learning_unit_year': achievement.learning_unit_year, 'language': achievement.language}
+    previous_achievement = get_object_or_none(LearningAchievement, order=achievement.order - 1, **kwargs)
+    next_achievement = get_object_or_none(LearningAchievement, order=achievement.order + 1, **kwargs)
+    return previous_achievement, achievement, next_achievement
+
+
+def _postpone_operation(neighbouring_achievements, next_luy, operation_str, curr_order):
+    _, achievement, _ = neighbouring_achievements
     while next_luy.get_learning_unit_next_year():
+        current_luy = next_luy
         next_luy = next_luy.get_learning_unit_next_year()
-        next_achievement = LearningAchievement.objects.filter(
+        next_luy_achievement = get_object_or_none(
+            LearningAchievement,
             learning_unit_year=next_luy,
-            code_name=an_achievement.code_name,
-            language=an_achievement.language
-        ).first()
-        if next_achievement:
-            getattr(next_achievement, operation_str)()
+            consistency_id=achievement.consistency_id,
+            language=achievement.language
+        )
+        if next_luy_achievement and \
+                _operation_is_postponable(next_luy_achievement, neighbouring_achievements, operation_str, curr_order):
+            getattr(next_luy_achievement, operation_str)()
+        else:
+            return current_luy.academic_year
     return next_luy.academic_year
+
+
+def _operation_is_postponable(next_luy_achievement, neighbouring_achievements, operation_str, current_order):
+    # order operation is postponable only if neighbouring achievements order is the same in future years
+    previous_achievement, achievement, next_achievement = neighbouring_achievements
+    if operation_str in [DOWN, UP]:
+        neighbour_current_order = current_order + 1 if operation_str == DOWN else current_order - 1
+        neighbour_achievement = next_achievement if operation_str == DOWN else previous_achievement
+        return _has_same_order_in_future(achievement, current_order, next_luy_achievement) and \
+            _has_same_order_in_future(neighbour_achievement, neighbour_current_order, next_luy_achievement)
+    return True
+
+
+def _has_same_order_in_future(achievement, current_order, next_luy_achievement):
+    return LearningAchievement.objects.filter(
+        consistency_id=achievement.consistency_id,
+        learning_unit_year=next_luy_achievement.learning_unit_year,
+        language=achievement.language,
+        order=current_order
+    ).exists()
 
 
 @login_required
@@ -97,7 +139,7 @@ def management(request, learning_unit_year_id):
 
 
 def get_action(request):
-    action = request.POST.get('action', None)
+    action = request.POST.get('action')
     if action not in AVAILABLE_ACTIONS:
         raise AttributeError('Action should be {}, {} or {}'.format(DELETE, UP, DOWN))
     return action
@@ -113,7 +155,8 @@ def update(request, learning_unit_year_id, learning_achievement_id):
     form = LearningAchievementEditForm(
         request.POST or None,
         luy=learning_unit_year,
-        code=learning_achievement.code_name
+        code=learning_achievement.code_name,
+        consistency_id=learning_achievement.consistency_id
     )
 
     if form.is_valid():
@@ -136,7 +179,8 @@ def create(request, learning_unit_year_id, learning_achievement_id):
     learning_achievement_fr = get_object_or_404(LearningAchievement, pk=learning_achievement_id)
     form = LearningAchievementEditForm(
         request.POST or None,
-        luy=learning_unit_yr
+        luy=learning_unit_yr,
+        consistency_id=_get_last_consistency_id(learning_unit_yr.learning_unit)+1
     )
     if form.is_valid():
         return _save_and_redirect(request, form, learning_unit_year_id)
@@ -150,20 +194,34 @@ def create(request, learning_unit_year_id, learning_achievement_id):
     return render(request, "learning_unit/achievement_edit.html", context)
 
 
+def _get_last_consistency_id(learning_unit):
+    try:
+        return LearningAchievement.objects.filter(
+            learning_unit_year__learning_unit=learning_unit
+        ).order_by("consistency_id").last().consistency_id
+    except AttributeError:
+        return 0
+
+
 def _save_and_redirect(request, form, learning_unit_year_id):
     achievement, last_academic_year = form.save()
     display_success_messages(
         request,
         _build_postponement_success_message(
             _("Learning achievement content has been successfully saved"),
-            last_academic_year
+            last_academic_year,
+            learning_unit_year_id
         )
     )
     return HttpResponse()
 
 
-def _build_postponement_success_message(default_msg, last_academic_year=None):
+def _build_postponement_success_message(default_msg, last_academic_year=None, learning_unit_year_id=None):
     msg = "{} {}".format(default_msg, _("and postponed until %(year)s")) if last_academic_year else default_msg
+    luy = LearningUnitYear.objects.get(id=learning_unit_year_id)
+    if luy and ProposalLearningUnit.objects. \
+            filter(learning_unit_year__learning_unit=luy.learning_unit).exists():
+        msg = "{}. {}".format(msg, _("It will be done at the consolidation"))
     return msg % {
         'year': last_academic_year
     }
@@ -177,14 +235,17 @@ def create_first(request, learning_unit_year_id):
     learning_unit_yr = get_object_or_404(LearningUnitYear, pk=learning_unit_year_id)
     form = LearningAchievementEditForm(
         request.POST or None,
-        luy=learning_unit_yr
+        luy=learning_unit_yr,
+        consistency_id=_get_last_consistency_id(learning_unit_yr.learning_unit)+1
     )
     if form.is_valid():
         return _save_and_redirect(request, form, learning_unit_year_id)
 
-    context = {'learning_unit_year': learning_unit_yr,
-               'form': form,
-               'language_code': FR_CODE_LANGUAGE}
+    context = {
+        'learning_unit_year': learning_unit_yr,
+        'form': form,
+        'language_code': FR_CODE_LANGUAGE
+    }
 
     return render(request, "learning_unit/achievement_edit.html", context)
 

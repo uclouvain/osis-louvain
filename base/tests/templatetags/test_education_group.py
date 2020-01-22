@@ -25,6 +25,7 @@
 ##############################################################################
 from datetime import timedelta
 
+import mock
 from django.core.exceptions import FieldDoesNotExist
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
@@ -60,21 +61,24 @@ CUSTOM_LI_TEMPLATE = """
 
 class TestEducationGroupAsCentralManagerTag(TestCase):
     """ This class will test the tag as central manager """
-
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         academic_year = AcademicYearFactory(year=2020)
-        self.education_group_year = TrainingFactory(academic_year=academic_year)
-        self.person = CentralManagerFactory(
+        cls.education_group_year = TrainingFactory(academic_year=academic_year)
+        cls.person = CentralManagerFactory(
             "delete_educationgroup",
             "change_educationgroup",
             "add_educationgroup",
             "can_edit_education_group_administrative_data"
         )
-        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
+        PersonEntityFactory(person=cls.person, entity=cls.education_group_year.management_entity)
 
-        self.url = reverse('delete_education_group', args=[self.education_group_year.id, self.education_group_year.id])
+        cls.url = reverse('delete_education_group', args=[cls.education_group_year.id, cls.education_group_year.id])
+
+        cls.request = RequestFactory().get("")
+
+    def setUp(self):
         self.client.force_login(user=self.person.user)
-        self.request = RequestFactory().get("")
         self.context = {
             "person": self.person,
             "education_group_year": self.education_group_year,
@@ -95,7 +99,11 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
             }
         )
 
-    def test_button_order_with_permission(self):
+    @mock.patch('base.business.education_groups.perms.check_permission')
+    @mock.patch('base.business.education_groups.perms.is_eligible_to_change_education_group')
+    def test_button_order_with_permission(self, mock_permission, mock_eligibility):
+        mock_permission.return_value = True
+        mock_eligibility.return_value = True
         result = button_order_with_permission(self.context, "title", "id", "edit")
         self.assertEqual(result, {"title": "title", "id": "id", "value": "edit", 'disabled': "",
                                   'icon': "glyphicon glyphicon-edit"})
@@ -261,13 +269,6 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
     @override_switch('education_group_year_generate_pdf', active=True)
     def test_tag_link_pdf_content_education_group_not_permitted(self):
         result = link_pdf_content_education_group(self.context)
-        expected_result = CUSTOM_LI_TEMPLATE.format(
-            li_attributes=""" id="btn_operation_pdf_content" """,
-            a_attributes=""" href="#" title="{}" {} """.format(
-                _("Generate pdf"),
-                "", ),
-            text=_('Generate pdf'),
-        )
         self.assertEqual(
             result,
             {
@@ -288,13 +289,6 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
     @override_switch('education_group_year_generate_pdf', active=False)
     def test_tag_link_pdf_content_education_group_not_permitted_with_sample_deactivated(self):
         result = link_pdf_content_education_group(self.context)
-        expected_result = CUSTOM_LI_TEMPLATE.format(
-            li_attributes=""" id="btn_operation_pdf_content" """,
-            a_attributes=""" href="#" title="{}" {} """.format(
-                _("Generate pdf"),
-                "", ),
-            text=_('Generate pdf'),
-        )
         self.assertEqual(
             result,
             {
@@ -327,15 +321,15 @@ class TestEducationGroupAsCentralManagerTag(TestCase):
 
 class TestEducationGroupAsFacultyManagerTag(TestCase):
     """ This class will test the tag as faculty manager """
-
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         academic_year = AcademicYearFactory(year=2020)
-        self.education_group_year = TrainingFactory(academic_year=academic_year)
-        self.person = FacultyManagerFactory("delete_educationgroup", "change_educationgroup", "add_educationgroup")
-        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
+        cls.education_group_year = TrainingFactory(academic_year=academic_year)
+        cls.person = FacultyManagerFactory("delete_educationgroup", "change_educationgroup", "add_educationgroup")
+        PersonEntityFactory(person=cls.person, entity=cls.education_group_year.management_entity)
 
         # Create an academic calendar in order to check permission [Faculty can modify when period is opened]
-        self.academic_calendar = AcademicCalendarFactory(
+        cls.academic_calendar = AcademicCalendarFactory(
             reference=EDUCATION_GROUP_EDITION,
             start_date=timezone.now(),
             end_date=timezone.now() + timedelta(weeks=+1),
@@ -343,8 +337,10 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
             data_year=academic_year,
         )
 
+        cls.url = reverse('delete_education_group', args=[cls.education_group_year.id, cls.education_group_year.id])
+
+    def setUp(self):
         self.client.force_login(user=self.person.user)
-        self.url = reverse('delete_education_group', args=[self.education_group_year.id, self.education_group_year.id])
         self.context = {
             "person": self.person,
             "root": self.education_group_year,
@@ -469,8 +465,11 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
 
 
 class TestEducationGroupDlWithParent(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.parent = EducationGroupYearFactory()
+
     def setUp(self):
-        self.parent = EducationGroupYearFactory()
         self.education_group_year = EducationGroupYearFactory()
         self.context = {
             'parent': self.parent,
@@ -520,7 +519,7 @@ class TestEducationGroupDlWithParent(TestCase):
     def test_dl_invalid_key(self):
         self.education_group_year.partial_deliberation = False
         with self.assertRaises(FieldDoesNotExist):
-            response = dl_with_parent(self.context, "not_a_real_attr")
+            dl_with_parent(self.context, "not_a_real_attr")
 
 
 class TestEducationGroupUpdateTagAsProgramManager(TestCase):

@@ -670,7 +670,7 @@
                 "learningclassyear"
             ],
             [
-                "can_access_learningclassyear",
+                "view_learningclassyear",
                 "base",
                 "learningclassyear"
             ],
@@ -2396,6 +2396,11 @@
                 "delete_messagetemplate",
                 "osis_common",
                 "messagetemplate"
+            ],
+            [
+                "change_educationgroupcontent",
+                "base",
+                "educationgroup"
             ]
         ]
     }
@@ -2722,6 +2727,10 @@
                 "is_institution_administrator",
                 "base",
                 "person"
+            ],            [
+                "change_educationgroupcontent",
+                "base",
+                "educationgroup"
             ]
         ]
     }
@@ -3093,6 +3102,11 @@
                 "can_consolidate_learningunit_proposal",
                 "base",
                 "learningunit"
+            ],
+            [
+                "change_educationgroupcontent",
+                "base",
+                "educationgroup"
             ]
         ]
     }
@@ -3119,11 +3133,6 @@
             ],
             [
                 "change_pedagogyinformation",
-                "base",
-                "educationgroup"
-            ],
-            [
-                "change_educationgroup",
                 "base",
                 "educationgroup"
             ],
@@ -3286,6 +3295,11 @@
                 "change_admissioncondition",
                 "base",
                 "admissioncondition"
+            ],
+            [
+                "change_educationgroupcontent",
+                "base",
+                "educationgroup"
             ]
         ]
     }
@@ -3467,7 +3481,7 @@
         "name": "administrative_managers",
         "permissions": [
             [
-                "can_access_learningclassyear",
+                "view_learningclassyear",
                 "base",
                 "learningclassyear"
             ],

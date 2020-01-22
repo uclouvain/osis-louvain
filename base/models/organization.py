@@ -68,6 +68,7 @@ class Organization(SerializableModel):
     logo_tag.short_description = 'Logo'
 
     class Meta:
+        ordering = ("-is_current_partner", "name")
         permissions = (
             ("can_access_organization", "Can access organization"),
         )
@@ -79,7 +80,3 @@ class Organization(SerializableModel):
         if qs.exists():
             return qs.first().country
         return None
-
-
-def find_by_id(organization_id):
-    return Organization.objects.get(pk=organization_id)

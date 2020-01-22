@@ -34,8 +34,9 @@ from base.tests.factories.person_entity import PersonEntityFactory
 
 
 class PersonEntityTest(TestCase):
-    def setUp(self):
-        self._create_entity_structure()
+    @classmethod
+    def setUpTestData(cls):
+        cls._create_entity_structure()
 
     def test_find_entities_by_person_with_no_link(self):
         person = PersonFactory()
@@ -85,20 +86,21 @@ class PersonEntityTest(TestCase):
         list_filtered = queryset.filter(entity__in=person_2.linked_entities)
         self.assertEqual(len(list_filtered), 1)
 
-    def _create_entity_structure(self):
-        self.organization = OrganizationFactory()
+    @classmethod
+    def _create_entity_structure(cls):
+        cls.organization = OrganizationFactory()
         # Create entities UCL
-        self.root_entity = _create_entity_and_version_related_to(self.organization, "UCL")
+        cls.root_entity = _create_entity_and_version_related_to(cls.organization, "UCL")
         # SST entity
-        self.sst_entity = _create_entity_and_version_related_to(self.organization, "SST", self.root_entity)
-        self.agro_entity = _create_entity_and_version_related_to(self.organization, "AGRO", self.sst_entity)
-        self.chim_entity = _create_entity_and_version_related_to(self.organization, "CHIM", self.sst_entity)
+        cls.sst_entity = _create_entity_and_version_related_to(cls.organization, "SST", cls.root_entity)
+        cls.agro_entity = _create_entity_and_version_related_to(cls.organization, "AGRO", cls.sst_entity)
+        cls.chim_entity = _create_entity_and_version_related_to(cls.organization, "CHIM", cls.sst_entity)
         # SSH entity
-        self.ssh_entity = _create_entity_and_version_related_to(self.organization, "SSH", self.root_entity)
-        self.fial_entity = _create_entity_and_version_related_to(self.organization, "FIAL", self.ssh_entity)
+        cls.ssh_entity = _create_entity_and_version_related_to(cls.organization, "SSH", cls.root_entity)
+        cls.fial_entity = _create_entity_and_version_related_to(cls.organization, "FIAL", cls.ssh_entity)
         # SSS entity
-        self.sss_entity = _create_entity_and_version_related_to(self.organization, "SSS", self.root_entity)
-        self.fasb_entity = _create_entity_and_version_related_to(self.organization, "FASB", self.sss_entity)
+        cls.sss_entity = _create_entity_and_version_related_to(cls.organization, "SSS", cls.root_entity)
+        cls.fasb_entity = _create_entity_and_version_related_to(cls.organization, "FASB", cls.sss_entity)
 
 
 def _create_entity_and_version_related_to(organization, acronym, parent=None):

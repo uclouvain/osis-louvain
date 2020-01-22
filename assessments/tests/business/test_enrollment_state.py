@@ -38,14 +38,15 @@ from base.tests.factories.session_examen import SessionExamFactory
 
 
 class EnrollmentStateTests(TestCase):
-    def setUp(self):
-        self.academic_calendar = AcademicCalendarExamSubmissionFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_calendar = AcademicCalendarExamSubmissionFactory(
             title="Submission of score encoding - 1",
             academic_year__current=True
         )
-        self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=self.academic_calendar,
-                                                                number_session=number_session.ONE)
-        self.session_exam = SessionExamFactory(
+        cls.session_exam_calendar = SessionExamCalendarFactory(academic_calendar=cls.academic_calendar,
+                                                               number_session=number_session.ONE)
+        cls.session_exam = SessionExamFactory(
             number_session=number_session.ONE,
             learning_unit_year__academic_year__current=True
         )

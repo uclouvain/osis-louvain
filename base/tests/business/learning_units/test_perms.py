@@ -45,32 +45,29 @@ from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFact
 
 
 class TestPerms(TestCase):
-
-    def setUp(self):
-        self.learning_unit = LearningUnitFactory()
-        self.current_academic_year = create_current_academic_year()
-        self.next_academic_yr = AcademicYearFactory(year=self.current_academic_year.year+1)
-        self.lcy = LearningContainerYearFactory(
-            academic_year=self.current_academic_year,
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit = LearningUnitFactory()
+        cls.current_academic_year = create_current_academic_year()
+        cls.next_academic_yr = AcademicYearFactory(year=cls.current_academic_year.year+1)
+        cls.lcy = LearningContainerYearFactory(
+            academic_year=cls.current_academic_year,
             container_type=learning_container_year_types.COURSE,
             requirement_entity=EntityVersionFactory().entity
         )
-        self.central_manager = CentralManagerFactory('can_edit_learningunit_pedagogy')
-        self.luy = LearningUnitYearFactory(
-            learning_unit=self.learning_unit,
-            academic_year=self.current_academic_year,
-            learning_container_year=self.lcy,
+        cls.central_manager = CentralManagerFactory('can_edit_learningunit_pedagogy')
+        cls.luy = LearningUnitYearFactory(
+            learning_unit=cls.learning_unit,
+            academic_year=cls.current_academic_year,
+            learning_container_year=cls.lcy,
         )
-        self.central_manager.linked_entities = [self.lcy.requirement_entity.id]
+        cls.central_manager.linked_entities = [cls.lcy.requirement_entity.id]
 
     @mock.patch("base.business.learning_units.perms.is_eligible_to_create_modification_proposal", return_value=True)
     def test_not_is_eligible_to_modify_end_year_by_proposal(self, mock_perm):
-
-        lu = LearningUnitFactory(existing_proposal_in_epc=False)
         learning_unit_yr = LearningUnitYearFactory(
             academic_year=self.current_academic_year,
             subtype=learning_unit_year_subtypes.FULL,
-            learning_unit=lu,
             learning_container_year=self.lcy
         )
         ProposalLearningUnitFactory(learning_unit_year=learning_unit_yr)
@@ -84,11 +81,9 @@ class TestPerms(TestCase):
 
     @mock.patch("base.business.learning_units.perms.is_eligible_to_create_modification_proposal", return_value=True)
     def test_is_eligible_to_modify_end_year_by_proposal(self, mock_perm):
-        lu = LearningUnitFactory(existing_proposal_in_epc=False)
         learning_unit_yr = LearningUnitYearFactory(
             academic_year=self.next_academic_yr,
             subtype=learning_unit_year_subtypes.FULL,
-            learning_unit=lu,
             learning_container_year=self.lcy
         )
         ProposalLearningUnitFactory(learning_unit_year=learning_unit_yr)
@@ -99,11 +94,9 @@ class TestPerms(TestCase):
 
     @mock.patch("base.business.learning_units.perms.is_eligible_to_create_modification_proposal", return_value=True)
     def test_not_is_eligible_to_modify_by_proposal(self, mock_perm):
-        lu = LearningUnitFactory(existing_proposal_in_epc=False)
         learning_unit_yr = LearningUnitYearFactory(
             academic_year=self.current_academic_year,
             subtype=learning_unit_year_subtypes.FULL,
-            learning_unit=lu,
             learning_container_year=self.lcy
         )
         ProposalLearningUnitFactory(learning_unit_year=learning_unit_yr)
@@ -119,11 +112,9 @@ class TestPerms(TestCase):
 
     @mock.patch("base.business.learning_units.perms.is_eligible_to_create_modification_proposal", return_value=True)
     def test_is_eligible_to_modify_by_proposal(self, mock_perm):
-        lu = LearningUnitFactory(existing_proposal_in_epc=False)
         learning_unit_yr = LearningUnitYearFactory(
             academic_year=self.next_academic_yr,
             subtype=learning_unit_year_subtypes.FULL,
-            learning_unit=lu,
             learning_container_year=self.lcy
         )
         ProposalLearningUnitFactory(learning_unit_year=learning_unit_yr)

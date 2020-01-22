@@ -37,8 +37,9 @@ from base.tests.factories.entity_version import EntityVersionFactory
 
 
 class EntityTestCase(TestCase):
-    def setUp(self):
-        self.current_academic_year = create_current_academic_year()
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
 
     def test_get_entity_calendar_no_calendar(self):
         an_entity = EntityFactory()

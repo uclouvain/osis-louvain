@@ -23,7 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.core.validators import RegexValidator
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 from osis_common.models import osis_model_admin
 
@@ -33,24 +35,14 @@ class LearningClassYearAdmin(osis_model_admin.OsisModelAdmin):
     search_fields = ['acronym']
 
 
+only_letters_validator = RegexValidator(r'^[a-zA-Z]*$', _('Only letters are allowed.'))
+
+
 class LearningClassYear(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     learning_component_year = models.ForeignKey('LearningComponentYear', on_delete=models.CASCADE)
-    acronym = models.CharField(max_length=3)
-    description = models.CharField(max_length=100, blank=True, null=True)
-
-    class Meta:
-        permissions = (
-            ("can_access_learningclassyear", "Can access learning class year"),
-        )
+    acronym = models.CharField(max_length=3, validators=[only_letters_validator])
+    description = models.CharField(max_length=100, blank=True)
 
     def __str__(self):
         return u'{}-{}'.format(self.learning_component_year.acronym, self.acronym)
-
-
-def find_by_id(learning_class_year_id):
-    return LearningClassYear.objects.get(pk=learning_class_year_id)
-
-
-def find_by_learning_component_year(a_learning_component_year):
-    return LearningClassYear.objects.filter(learning_component_year=a_learning_component_year).order_by("acronym")

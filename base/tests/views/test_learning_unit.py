@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+import itertools
 import json
 import random
 from decimal import Decimal
@@ -63,6 +64,7 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
+from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.business.test_perms import create_person_with_permission_and_group
@@ -85,7 +87,6 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory, \
     LearningUnitYearFakerFactory
-from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerFactory, \
     UEFacultyManagerFactory
@@ -240,26 +241,27 @@ class LearningUnitViewCreateFullTestCase(TestCase):
 
 @override_flag('learning_unit_create', active=True)
 class LearningUnitViewCreatePartimTestCase(TestCase):
-    def setUp(self):
-        self.current_academic_year = create_current_academic_year()
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
 
         AcademicCalendarFactory(
-            data_year=self.current_academic_year,
-            start_date=datetime.datetime(self.current_academic_year.year - 2, 9, 15),
-            end_date=datetime.datetime(self.current_academic_year.year + 1, 9, 14),
+            data_year=cls.current_academic_year,
+            start_date=datetime.datetime(cls.current_academic_year.year - 2, 9, 15),
+            end_date=datetime.datetime(cls.current_academic_year.year + 1, 9, 14),
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
 
-        self.learning_unit_year_full = LearningUnitYearFactory(
-            academic_year=self.current_academic_year,
-            learning_container_year__academic_year=self.current_academic_year,
+        cls.learning_unit_year_full = LearningUnitYearFactory(
+            academic_year=cls.current_academic_year,
+            learning_container_year__academic_year=cls.current_academic_year,
             subtype=learning_unit_year_subtypes.FULL
         )
-        self.url = reverse(create_partim_form, kwargs={'learning_unit_year_id': self.learning_unit_year_full.id})
-        faculty_manager = FacultyManagerFactory()
-        self.user = faculty_manager.user
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
+        cls.url = reverse(create_partim_form, kwargs={'learning_unit_year_id': cls.learning_unit_year_full.id})
+        faculty_manager = FacultyManagerFactory("can_access_learningunit", "can_create_learningunit")
+        cls.user = faculty_manager.user
+
+    def setUp(self):
         self.client.force_login(self.user)
 
     def test_create_partim_form_when_user_not_logged(self):
@@ -985,13 +987,6 @@ class LearningUnitViewTestCase(TestCase):
         data['internship_subtype'] = internship_subtypes.TEACHING_INTERNSHIP
         return data
 
-    def get_base_partim_form_data(self, original_learning_unit_year):
-        data = self.get_common_data()
-        data.update(self.get_partim_data(original_learning_unit_year))
-        data['specific_title'] = "Partim partial title"
-        data['status'] = original_learning_unit_year.status
-        return data
-
     def get_common_data(self):
         return {
             "container_type": learning_container_year_types.COURSE,
@@ -1025,59 +1020,6 @@ class LearningUnitViewTestCase(TestCase):
 
     def get_valid_data(self):
         return self.get_base_form_data()
-
-    def get_faulty_acronym(self):
-        faulty_dict = dict(self.get_valid_data())
-        faulty_dict["acronym"] = "TA200"
-        return faulty_dict
-
-    def get_existing_acronym(self):
-        faulty_dict = dict(self.get_valid_data())
-        faulty_dict["acronym_1"] = "DRT2018"
-        return faulty_dict
-
-    def get_empty_internship_subtype(self):
-        faulty_dict = dict(self.get_valid_data())
-        faulty_dict["container_type"] = learning_container_year_types.INTERNSHIP
-        faulty_dict["internship_subtype"] = ""
-        return faulty_dict
-
-    def get_empty_acronym(self):
-        faulty_dict = dict(self.get_valid_data())
-        faulty_dict["acronym"] = ""
-        return faulty_dict
-
-    def get_faulty_requirement_entity(self):
-        """We will create an entity + entity version that user cannot create on it"""
-        entity = EntityFactory(country=self.country, organization=self.organization)
-        entity_version = EntityVersionFactory(entity=entity, entity_type=entity_type.SCHOOL, end_date=None,
-                                              start_date=datetime.date.today())
-        faulty_dict = dict(self.get_valid_data())
-        faulty_dict['requirement_entity'] = entity_version.id
-        return faulty_dict
-
-    def _get_volumes_data(self, learning_units_year):
-        if not isinstance(learning_units_year, list):
-            learning_units_year = [learning_units_year]
-        data = {}
-        for learning_unit_year in learning_units_year:
-            data['VOLUME_TOTAL_REQUIREMENT_ENTITIES_{}_{}'.format(learning_unit_year.id,
-                                                                  self.learning_component_yr.id)] = [60]
-            data['VOLUME_Q1_{}_{}'.format(learning_unit_year.id, self.learning_component_yr.id)] = [10]
-            data['VOLUME_Q2_{}_{}'.format(learning_unit_year.id, self.learning_component_yr.id)] = [20]
-            data['VOLUME_TOTAL_{}_{}'.format(learning_unit_year.id, self.learning_component_yr.id)] = [30]
-            data['PLANNED_CLASSES_{}_{}'.format(learning_unit_year.id, self.learning_component_yr.id)] = [2]
-        return data
-
-    @staticmethod
-    def _get_volumes_wrong_data(learning_unit_year, learning_component_year):
-        return {
-            'VOLUME_TOTAL_REQUIREMENT_ENTITIES_{}_{}'.format(learning_unit_year.id, learning_component_year.id): [60],
-            'VOLUME_Q1_{}_{}'.format(learning_unit_year.id, learning_component_year.id): [15],
-            'VOLUME_Q2_{}_{}'.format(learning_unit_year.id, learning_component_year.id): [20],
-            'VOLUME_TOTAL_{}_{}'.format(learning_unit_year.id, learning_component_year.id): [30],
-            'PLANNED_CLASSES_{}_{}'.format(learning_unit_year.id, learning_component_year.id): [2]
-        }
 
     def test_get_username_with_no_person(self):
         a_username = 'dupontm'
@@ -1129,6 +1071,10 @@ class LearningUnitViewTestCase(TestCase):
         self.assertIsInstance(response.context['form_english'], LearningUnitSpecificationsForm)
         self.assertCountEqual(response.context['achievements_FR'], [learning_unit_achievements_fr])
         self.assertCountEqual(response.context['achievements_EN'], [learning_unit_achievements_en])
+        self.assertCountEqual(
+            response.context['achievements'],
+            list(itertools.zip_longest([learning_unit_achievements_fr], [learning_unit_achievements_en]))
+        )
 
     def test_learning_unit_specifications_edit(self):
         a_label = 'label'
@@ -1157,15 +1103,15 @@ class LearningUnitViewTestCase(TestCase):
     def test_learning_unit_specifications_save_with_postponement(self):
         year_range = 5
         academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, year_range)]
-        learning_unit_year = LearningUnitYearFactory(
-            academic_year=create_current_academic_year(),
-            learning_unit=LearningUnitFactory(start_year=academic_years[0], end_year=academic_years[-1])
-        )
-        future_learning_unit_years = [LearningUnitYearFactory(
-            academic_year=AcademicYearFactory(year=create_current_academic_year().year+i),
-            learning_unit=learning_unit_year.learning_unit,
-            acronym=learning_unit_year.acronym
-        ) for i in range(1, year_range)]
+        learning_unit = LearningUnitFactory(start_year=academic_years[0], end_year=academic_years[-1])
+        learning_unit_years = [LearningUnitYearFactory(
+            academic_year=ac,
+            learning_unit=learning_unit,
+            acronym=learning_unit.acronym,
+            subtype=FULL,
+        ) for ac in academic_years]
+        # delete last learning unit year to ensure luy is not created
+        learning_unit_years.pop().delete()
         label = TextLabelFactory(label='label', entity=entity_name.LEARNING_UNIT_YEAR)
         for language in ['fr-be', 'en']:
             TranslatedTextLabelFactory(text_label=label, language=language)
@@ -1174,16 +1120,16 @@ class LearningUnitViewTestCase(TestCase):
             reference=luy.id,
             language='fr-be',
             text_label=label
-        ) for luy in [learning_unit_year, *future_learning_unit_years]]
+        ) for luy in learning_unit_years]
         trans_en = [TranslatedTextFactory(
             entity=entity_name.LEARNING_UNIT_YEAR,
             reference=luy.id,
             language='en',
             text_label=label
-        ) for luy in [learning_unit_year, *future_learning_unit_years]]
+        ) for luy in learning_unit_years]
 
         response = self.client.post(
-            reverse('learning_unit_specifications_edit', kwargs={'learning_unit_year_id': learning_unit_year.id}),
+            reverse('learning_unit_specifications_edit', kwargs={'learning_unit_year_id': learning_unit_years[0].id}),
             data={
                 'trans_text_fr': 'textFR',
                 'trans_text_en': 'textEN',
@@ -1219,14 +1165,15 @@ class LearningUnitViewTestCase(TestCase):
 
 
 class TestCreateXls(TestCase):
-    def setUp(self):
-        self.learning_unit_year = LearningUnitYearFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_year = LearningUnitYearFactory(
             learning_container_year__requirement_entity=EntityFactory(),
             learning_container_year__allocation_entity=EntityFactory(),
             acronym="LOSI1452"
         )
 
-        self.user = UserFactory()
+        cls.user = UserFactory()
 
     @mock.patch("osis_common.document.xls_build.generate_xls")
     def test_generate_xls_data_with_no_data(self, mock_generate_xls):
@@ -1271,15 +1218,18 @@ def _generate_xls_build_parameter(xls_data, user):
 
 
 class TestLearningUnitComponents(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         start_year = AcademicYearFactory(year=2010)
         end_year = AcademicYearFactory(year=2020)
-        self.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
-        self.generated_container = GenerateContainer(start_year=start_year, end_year=end_year)
-        self.a_superuser = SuperUserFactory()
+        cls.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
+        cls.generated_container = GenerateContainer(start_year=start_year, end_year=end_year)
+        cls.a_superuser = SuperUserFactory()
+        cls.person = PersonFactory(user=cls.a_superuser)
+        cls.learning_unit_year = cls.generated_container.generated_container_years[0].learning_unit_year_full
+
+    def setUp(self):
         self.client.force_login(self.a_superuser)
-        self.person = PersonFactory(user=self.a_superuser)
-        self.learning_unit_year = self.generated_container.generated_container_years[0].learning_unit_year_full
 
     @mock.patch('base.models.program_manager.is_program_manager')
     def test_learning_unit_components(self, mock_program_manager):
@@ -1312,17 +1262,18 @@ class TestLearningUnitComponents(TestCase):
 
 
 class TestLearningAchievements(TestCase):
-    def setUp(self):
-        self.academic_year = create_current_academic_year()
-        self.learning_unit_year = LearningUnitYearFactory(
-            academic_year=self.academic_year,
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+        cls.learning_unit_year = LearningUnitYearFactory(
+            academic_year=cls.academic_year,
             subtype=learning_unit_year_subtypes.FULL
         )
 
-        self.code_languages = ["FR", "EN", "IT"]
-        for code_language in self.code_languages:
+        cls.code_languages = ["FR", "EN", "IT"]
+        for code_language in cls.code_languages:
             language = LanguageFactory(code=code_language)
-            LearningAchievementFactory(language=language, learning_unit_year=self.learning_unit_year)
+            LearningAchievementFactory(language=language, learning_unit_year=cls.learning_unit_year)
 
     def test_get_achievements_group_by_language_no_achievement(self):
         a_luy_without_achievements = LearningUnitYearFactory(
@@ -1342,149 +1293,149 @@ class TestLearningAchievements(TestCase):
 
 
 class TestLearningUnitProposalComparison(TestCase):
-    def setUp(self):
-        self.user = SuperUserFactory()
-        PersonFactory(user=self.user)
-        self.client.force_login(self.user)
-        self.current_academic_year = create_current_academic_year()
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = SuperUserFactory()
+        PersonFactory(user=cls.user)
+        cls.current_academic_year = create_current_academic_year()
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         learning_container_year = LearningContainerYearFactory(
-            academic_year=self.current_academic_year,
+            academic_year=cls.current_academic_year,
             container_type=learning_container_year_types.COURSE,
             common_title="common_title",
             type_declaration_vacant=DO_NOT_ASSIGN,
             requirement_entity=EntityVersionFactory().entity
         )
-        self.learning_unit_year = LearningUnitYearFakerFactory(
+        cls.learning_unit_year = LearningUnitYearFakerFactory(
             credits=5,
             subtype=learning_unit_year_subtypes.FULL,
-            academic_year=self.current_academic_year,
+            academic_year=cls.current_academic_year,
             learning_container_year=learning_container_year,
             campus=CampusFactory(organization=an_organization, is_administration=True),
             periodicity=learning_unit_year_periodicity.BIENNIAL_ODD
         )
 
-        self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year - 1)
-        self.previous_learning_container_year = LearningContainerYearFactory(
-            academic_year=self.previous_academic_year,
+        cls.previous_academic_year = AcademicYearFactory(year=cls.current_academic_year.year - 1)
+        cls.previous_learning_container_year = LearningContainerYearFactory(
+            academic_year=cls.previous_academic_year,
             container_type=learning_container_year_types.COURSE,
             common_title="previous_common_title",
             type_declaration_vacant=DO_NOT_ASSIGN,
-            learning_container=self.learning_unit_year.learning_container_year.learning_container
+            learning_container=cls.learning_unit_year.learning_container_year.learning_container
         )
-        self.previous_learning_unit_year = LearningUnitYearFakerFactory(
+        cls.previous_learning_unit_year = LearningUnitYearFakerFactory(
             credits=5,
             subtype=learning_unit_year_subtypes.FULL,
-            academic_year=self.previous_academic_year,
-            learning_container_year=self.previous_learning_container_year,
+            academic_year=cls.previous_academic_year,
+            learning_container_year=cls.previous_learning_container_year,
             periodicity=learning_unit_year_periodicity.BIENNIAL_ODD,
-            learning_unit=self.learning_unit_year.learning_unit
+            learning_unit=cls.learning_unit_year.learning_unit
         )
-        self.next_academic_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
-        self.next_learning_container_year = LearningContainerYearFactory(
-            academic_year=self.next_academic_year,
+        cls.next_academic_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
+        cls.next_learning_container_year = LearningContainerYearFactory(
+            academic_year=cls.next_academic_year,
             container_type=learning_container_year_types.COURSE,
             common_title="next_common_title",
             type_declaration_vacant=DO_NOT_ASSIGN,
-            learning_container=self.learning_unit_year.learning_container_year.learning_container
+            learning_container=cls.learning_unit_year.learning_container_year.learning_container
         )
-        self.next_learning_unit_year = LearningUnitYearFakerFactory(
+        cls.next_learning_unit_year = LearningUnitYearFakerFactory(
             credits=5,
             subtype=learning_unit_year_subtypes.FULL,
-            academic_year=self.next_academic_year,
-            learning_container_year=self.next_learning_container_year,
+            academic_year=cls.next_academic_year,
+            learning_container_year=cls.next_learning_container_year,
             periodicity=learning_unit_year_periodicity.BIENNIAL_ODD,
-            learning_unit=self.learning_unit_year.learning_unit
+            learning_unit=cls.learning_unit_year.learning_unit
         )
         today = datetime.date.today()
 
         an_entity = EntityFactory(organization=an_organization)
-        self.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL, start_date=today,
-                                                   end_date=today.replace(year=today.year + 1))
-        self.learning_component_year_lecturing = LearningComponentYearFactory(
+        cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.SCHOOL, start_date=today,
+                                                  end_date=today.replace(year=today.year + 1))
+        cls.learning_component_year_lecturing = LearningComponentYearFactory(
             type=learning_component_year_type.LECTURING,
             acronym="PM",
-            learning_unit_year=self.learning_unit_year,
+            learning_unit_year=cls.learning_unit_year,
             repartition_volume_requirement_entity=Decimal(10),
             repartition_volume_additional_entity_1=Decimal(10),
             repartition_volume_additional_entity_2=Decimal(10)
         )
-        self.learning_component_year_practical = LearningComponentYearFactory(
+        cls.learning_component_year_practical = LearningComponentYearFactory(
             type=learning_component_year_type.PRACTICAL_EXERCISES,
             acronym="PP",
-            learning_unit_year=self.learning_unit_year,
+            learning_unit_year=cls.learning_unit_year,
             repartition_volume_requirement_entity=Decimal(10),
             repartition_volume_additional_entity_1=Decimal(10),
             repartition_volume_additional_entity_2=Decimal(10)
         )
 
-        requirement_entity = self.learning_unit_year.learning_container_year.requirement_entity
+        requirement_entity = cls.learning_unit_year.learning_container_year.requirement_entity
         initial_data_expected = {
             "learning_container_year": {
-                "id": self.learning_unit_year.learning_container_year.id,
-                "acronym": self.learning_unit_year.acronym,
-                "common_title": self.learning_unit_year.learning_container_year.common_title,
-                "common_title_english": self.learning_unit_year.learning_container_year.common_title_english,
-                "container_type": self.learning_unit_year.learning_container_year.container_type,
-                "in_charge": self.learning_unit_year.learning_container_year.in_charge,
-                "type_declaration_vacant": self.learning_unit_year.learning_container_year.type_declaration_vacant,
+                "id": cls.learning_unit_year.learning_container_year.id,
+                "acronym": cls.learning_unit_year.acronym,
+                "common_title": cls.learning_unit_year.learning_container_year.common_title,
+                "common_title_english": cls.learning_unit_year.learning_container_year.common_title_english,
+                "container_type": cls.learning_unit_year.learning_container_year.container_type,
+                "in_charge": cls.learning_unit_year.learning_container_year.in_charge,
+                "type_declaration_vacant": cls.learning_unit_year.learning_container_year.type_declaration_vacant,
                 "requirement_entity": requirement_entity.id,
                 "allocation_entity": None,
                 "additional_entity_1": requirement_entity.id,
                 "additional_entity_2": requirement_entity.id,
             },
             "learning_unit_year": {
-                "id": self.learning_unit_year.id,
-                "acronym": self.learning_unit_year.acronym,
-                "specific_title": self.learning_unit_year.specific_title,
-                "specific_title_english": self.learning_unit_year.specific_title_english,
-                "internship_subtype": self.learning_unit_year.internship_subtype,
-                "credits": self.learning_unit_year.credits,
-                "quadrimester": self.learning_unit_year.quadrimester,
-                "status": self.learning_unit_year.status,
-                "language": self.learning_unit_year.language.pk,
-                "campus": self.learning_unit_year.campus.id,
-                "periodicity": self.learning_unit_year.periodicity,
-                "attribution_procedure": self.learning_unit_year.attribution_procedure
+                "id": cls.learning_unit_year.id,
+                "acronym": cls.learning_unit_year.acronym,
+                "specific_title": cls.learning_unit_year.specific_title,
+                "specific_title_english": cls.learning_unit_year.specific_title_english,
+                "internship_subtype": cls.learning_unit_year.internship_subtype,
+                "credits": cls.learning_unit_year.credits,
+                "quadrimester": cls.learning_unit_year.quadrimester,
+                "status": cls.learning_unit_year.status,
+                "language": cls.learning_unit_year.language.pk,
+                "campus": cls.learning_unit_year.campus.id,
+                "periodicity": cls.learning_unit_year.periodicity,
+                "attribution_procedure": cls.learning_unit_year.attribution_procedure
             },
             "learning_unit": {
-                "id": self.learning_unit_year.learning_unit.id
+                "id": cls.learning_unit_year.learning_unit.id
             },
             "learning_component_years": [
-                {"id": self.learning_component_year_lecturing.id,
+                {"id": cls.learning_component_year_lecturing.id,
                  "type": "LECTURING",
-                 "planned_classes": self.learning_component_year_lecturing.planned_classes,
-                 "hourly_volume_partial_q1": self.learning_component_year_lecturing.hourly_volume_partial_q1,
-                 "hourly_volume_partial_q2": self.learning_component_year_lecturing.hourly_volume_partial_q2,
-                 "hourly_volume_total_annual": self.learning_component_year_lecturing.hourly_volume_total_annual,
+                 "planned_classes": cls.learning_component_year_lecturing.planned_classes,
+                 "hourly_volume_partial_q1": cls.learning_component_year_lecturing.hourly_volume_partial_q1,
+                 "hourly_volume_partial_q2": cls.learning_component_year_lecturing.hourly_volume_partial_q2,
+                 "hourly_volume_total_annual": cls.learning_component_year_lecturing.hourly_volume_total_annual,
                  "repartition_volume_requirement_entity":
-                     self.learning_component_year_lecturing.repartition_volume_requirement_entity,
+                     cls.learning_component_year_lecturing.repartition_volume_requirement_entity,
                  "repartition_volume_additional_entity_1":
-                     self.learning_component_year_lecturing.repartition_volume_additional_entity_1,
+                     cls.learning_component_year_lecturing.repartition_volume_additional_entity_1,
                  "repartition_volume_additional_entity_2":
-                     self.learning_component_year_lecturing.repartition_volume_additional_entity_2
+                     cls.learning_component_year_lecturing.repartition_volume_additional_entity_2
                  },
-                {"id": self.learning_component_year_practical.id,
+                {"id": cls.learning_component_year_practical.id,
                  "type": "PRACTICAL_EXERCISES",
-                 "planned_classes": self.learning_component_year_practical.planned_classes,
-                 "hourly_volume_partial_q1": self.learning_component_year_practical.hourly_volume_partial_q1,
-                 "hourly_volume_partial_q2": self.learning_component_year_practical.hourly_volume_partial_q2,
-                 "hourly_volume_total_annual": self.learning_component_year_practical.hourly_volume_total_annual,
-                 "repartition_volume_requirement_entity": self.learning_component_year_practical.
+                 "planned_classes": cls.learning_component_year_practical.planned_classes,
+                 "hourly_volume_partial_q1": cls.learning_component_year_practical.hourly_volume_partial_q1,
+                 "hourly_volume_partial_q2": cls.learning_component_year_practical.hourly_volume_partial_q2,
+                 "hourly_volume_total_annual": cls.learning_component_year_practical.hourly_volume_total_annual,
+                 "repartition_volume_requirement_entity": cls.learning_component_year_practical.
                      repartition_volume_requirement_entity,
-                 "repartition_volume_additional_entity_1": self.learning_component_year_practical.
+                 "repartition_volume_additional_entity_1": cls.learning_component_year_practical.
                      repartition_volume_additional_entity_1,
-                 "repartition_volume_additional_entity_2": self.learning_component_year_practical.
+                 "repartition_volume_additional_entity_2": cls.learning_component_year_practical.
                      repartition_volume_additional_entity_2
                  }
             ],
             "volumes": {
                 'PM': {
-                    VOLUME_Q1: self.learning_component_year_lecturing.hourly_volume_partial_q1,
-                    VOLUME_Q2: self.learning_component_year_lecturing.hourly_volume_partial_q2,
+                    VOLUME_Q1: cls.learning_component_year_lecturing.hourly_volume_partial_q1,
+                    VOLUME_Q2: cls.learning_component_year_lecturing.hourly_volume_partial_q2,
                     REAL_CLASSES: 1,
-                    VOLUME_TOTAL: self.learning_component_year_practical.hourly_volume_total_annual,
-                    PLANNED_CLASSES: self.learning_component_year_lecturing.planned_classes,
+                    VOLUME_TOTAL: cls.learning_component_year_practical.hourly_volume_total_annual,
+                    PLANNED_CLASSES: cls.learning_component_year_lecturing.planned_classes,
                     VOLUME_REQUIREMENT_ENTITY: Decimal(120),
                     VOLUME_TOTAL_REQUIREMENT_ENTITIES: Decimal(120),
                     VOLUME_ADDITIONAL_REQUIREMENT_ENTITY_1: Decimal(0),
@@ -1499,10 +1450,13 @@ class TestLearningUnitProposalComparison(TestCase):
                 }
             }
         }
-        self.learning_unit_proposal = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year,
-                                                                  initial_data=initial_data_expected,
-                                                                  type=proposal_type.ProposalType.MODIFICATION.name,
-                                                                  state=proposal_state.ProposalState.FACULTY.name)
+        cls.learning_unit_proposal = ProposalLearningUnitFactory(learning_unit_year=cls.learning_unit_year,
+                                                                 initial_data=initial_data_expected,
+                                                                 type=proposal_type.ProposalType.MODIFICATION.name,
+                                                                 state=proposal_state.ProposalState.FACULTY.name)
+
+    def setUp(self):
+        self.client.force_login(self.user)
 
     def test_learning_unit_proposal_comparison_without_data_modified(self):
         response = self.client.get(reverse(learning_unit_proposal_comparison, args=[self.learning_unit_year.pk]))

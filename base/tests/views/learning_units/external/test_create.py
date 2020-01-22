@@ -31,7 +31,7 @@ from waffle.testutils import override_flag
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from base.tests.forms.test_external_learning_unit import get_valid_external_learning_unit_form_data
 from base.views.learning_units.external.create import get_external_learning_unit_creation_form
@@ -42,20 +42,24 @@ YEAR_LIMIT_LUE_MODIFICATION = 2018
 
 @override_flag('learning_unit_external_create', active=True)
 class TestCreateExternalLearningUnitView(TestCase):
-    def setUp(self):
-        self.user = UserFactory()
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        self.user.user_permissions.add(Permission.objects.get(codename="can_create_learningunit"))
-        self.user.user_permissions.add(Permission.objects.get(codename="add_externallearningunityear"))
-        self.person = PersonFactory(user=self.user)
-        self.client.force_login(self.user)
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.person = PersonWithPermissionsFactory(
+            'can_access_learningunit', 'can_create_learningunit', 'add_externallearningunityear',
+            user=cls.user
+        )
+
         starting_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
         end_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION + 1)
-        self.academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
-        self.academic_year = self.academic_years[1]
-        self.language = LanguageFactory(code='FR')
-        self.data = get_valid_external_learning_unit_form_data(self.academic_year, self.person)
-        self.url = reverse(get_external_learning_unit_creation_form, args=[self.academic_year.pk])
+        cls.academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
+        cls.academic_year = cls.academic_years[1]
+        cls.language = LanguageFactory(code='FR')
+        cls.data = get_valid_external_learning_unit_form_data(cls.academic_year, cls.person)
+        cls.url = reverse(get_external_learning_unit_creation_form, args=[cls.academic_year.pk])
+
+    def setUp(self):
+        self.client.force_login(self.user)
 
     def test_create_get(self):
         response = self.client.get(self.url)

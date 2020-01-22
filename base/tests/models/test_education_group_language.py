@@ -32,14 +32,15 @@ from reference.tests.factories.language import LanguageFactory
 
 
 class EducationGroupLanguageTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         academic_year = AcademicYearFactory()
-        self.education_group_year = EducationGroupYearFactory(academic_year=academic_year)
-        self.language = LanguageFactory()
-        self.education_group_language_1 = EducationGroupLanguageFactory(education_group_year=self.education_group_year,
-                                                                        language=self.language)
-        self.education_group_language_2 = EducationGroupLanguageFactory(education_group_year=self.education_group_year,
-                                                                        language=self.language)
+        cls.education_group_year = EducationGroupYearFactory(academic_year=academic_year)
+        cls.language = LanguageFactory()
+        cls.education_group_language_1 = EducationGroupLanguageFactory(education_group_year=cls.education_group_year,
+                                                                       language=cls.language)
+        cls.education_group_language_2 = EducationGroupLanguageFactory(education_group_year=cls.education_group_year,
+                                                                       language=cls.language)
 
     def test_return_str_format(self):
         self.assertEqual(
@@ -48,4 +49,3 @@ class EducationGroupLanguageTest(TestCase):
                 self.education_group_language_1.education_group_year, self.education_group_language_1.language
             )
         )
-

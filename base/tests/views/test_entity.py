@@ -29,7 +29,6 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 from rest_framework.test import APITestCase
 
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -38,14 +37,14 @@ from base.views.entity import post_entities
 
 
 class EntityViewTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.preexisting_entity_version = EntityVersionFactory(external_id='old_external_id')
+
     def setUp(self):
         user = UserFactory()
         token = Token.objects.create(user=user)
-        self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
-
-        self.preexisting_entity_version = EntityVersionFactory(external_id='old_external_id')
-        self.preexisting_entity_version.save()
 
     def test_create_valid_entity(self):
         response = self.client.post(

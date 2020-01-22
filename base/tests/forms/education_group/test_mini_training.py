@@ -37,15 +37,15 @@ from rules_management.enums import MINI_TRAINING_DAILY_MANAGEMENT, MINI_TRAINING
 
 
 class TestMiniTrainingModelForm(EducationGroupYearModelFormMixin):
-
-    def setUp(self):
-        self.education_group_type = EducationGroupTypeFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_type = EducationGroupTypeFactory(
             category=education_group_categories.MINI_TRAINING
         )
-        self.form_class = MiniTrainingYearModelForm
-        AuthorizedRelationshipFactory(child_type=self.education_group_type)
+        cls.form_class = MiniTrainingYearModelForm
+        AuthorizedRelationshipFactory(child_type=cls.education_group_type)
 
-        super(TestMiniTrainingModelForm, self).setUp(education_group_type=self.education_group_type)
+        super(TestMiniTrainingModelForm, cls).setUpTestData(education_group_type=cls.education_group_type)
 
     def test_fields(self):
         fields = (

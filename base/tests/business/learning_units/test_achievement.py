@@ -36,16 +36,16 @@ from reference.tests.factories.language import LanguageFactory
 
 
 class TestLearningAchievementView(TestCase):
-
-    def setUp(self):
-        self.academic_year = create_current_academic_year()
-        self.learning_unit_year = LearningUnitYearFactory(
-            academic_year=self.academic_year,
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+        cls.learning_unit_year = LearningUnitYearFactory(
+            academic_year=cls.academic_year,
             subtype=learning_unit_year_subtypes.FULL
         )
 
-        self.language_fr = LanguageFactory(code=FR_CODE_LANGUAGE)
-        self.language_en = LanguageFactory(code=EN_CODE_LANGUAGE)
+        cls.language_fr = LanguageFactory(code=FR_CODE_LANGUAGE)
+        cls.language_en = LanguageFactory(code=EN_CODE_LANGUAGE)
 
     def test_get_anchor_reference_for_delete(self):
         achievement_fr_0 = LearningAchievementFactory(language=self.language_fr,

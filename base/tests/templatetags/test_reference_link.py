@@ -33,16 +33,16 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 
 
 class ReferenceLinkTagTests(TestCase):
-
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         academic_yr = AcademicYearFactory()
-        self.grandfather = EducationGroupYearFactory(
+        cls.grandfather = EducationGroupYearFactory(
             academic_year=academic_yr,
         )
-        self.parent = EducationGroupYearFactory(
+        cls.parent = EducationGroupYearFactory(
             academic_year=academic_yr,
         )
-        self.child = EducationGroupYearFactory(
+        cls.child = EducationGroupYearFactory(
             academic_year=academic_yr,
         )
 

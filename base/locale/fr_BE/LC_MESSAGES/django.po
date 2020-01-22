@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-04 15:42+0100\n"
+"POT-Creation-Date: 2020-01-02 09:41+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -70,7 +70,7 @@ msgstr "%(max)s doit être plus grand ou égal à %(min)s"
 msgid ""
 "%(number_extended)s education group(s) extended and %(number_error)s error(s)"
 msgstr ""
-"%(number_extended)s organisation(s) de formation reportée(s) et "
+"%(number_extended)s formation(s) reportée(s) et "
 "%(number_error)s erreur(s)"
 
 #, python-format
@@ -146,15 +146,15 @@ msgstr ""
 "(B OU C) ET (D ET E): non valide</li></ul>"
 
 msgid "<b>create</b> a new learning unit using that acronym"
-msgstr "<b>Créer</b> une nouvelle unité d’enseignement utilisant cet acronyme"
+msgstr "<b>Créer</b> une nouvelle unité d’enseignement utilisant ce sigle"
 
 msgid "<b>prolong</b> the learning unit of the same acronym"
-msgstr "<b>Prolonger</b> l’unité d’enseignement du même acronyme"
+msgstr "<b>Prolonger</b> l’unité d’enseignement du même sigle"
 
 #, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
 msgstr ""
-"Une unité d'enseignement ne peut pas être prérequis à elle-même : %(acronym)s"
+"Une unité d'enseignement ne peut pas être un prérequis d'elle-même : %(acronym)s"
 
 msgid "A null value means many relationships."
 msgstr "Une valeur nulle signifie plusieurs relations."
@@ -258,7 +258,7 @@ msgstr "Code déjà existant en %(academic_year)s"
 
 #, python-format
 msgid "Acronym existed in %(academic_year)s"
-msgstr "Code a déjà existé en %(academic_year)s"
+msgstr "Ce code a déjà existé en %(academic_year)s"
 
 msgid "Acronym is invalid"
 msgstr "Sigle/Intitulé abrégé non valide"
@@ -377,7 +377,7 @@ msgid "Annual"
 msgstr "Annuel"
 
 msgid "Apply postponement on education group year"
-msgstr "Appliquer le report sur les organisations de formations annualisées"
+msgstr "Appliquer le report sur les formations annualisées"
 
 msgid "Apply postponement on learning unit year"
 msgstr "Appliquer le report sur les unités d'enseignement annualisées"
@@ -389,16 +389,16 @@ msgstr ""
 
 #, python-format
 msgid "Are you sure you want to delete %(education_group_year)s?"
-msgstr "Êtes-vous sûr·e que vous voulez supprimer %(education_group_year)s?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer %(education_group_year)s?"
 
 msgid "Are you sure you want to delete the achievement?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer l'acquis d'apprentissage?"
 
 msgid "Are you sure you want to delete the contact ?"
-msgstr "Êtes-vous certain de vouloir supprimer le contact ?"
+msgstr "Êtes-vous sûr·e de vouloir supprimer le contact ?"
 
 msgid "Are you sure you want to delete the event"
-msgstr "Êtes-vous certain de vouloir supprimer l'événement"
+msgstr "Êtes-vous sûr·e de vouloir supprimer l'événement"
 
 msgid "Are you sure you want to delete the teaching material?"
 msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours?"
@@ -413,10 +413,10 @@ msgid "Assistants"
 msgstr "Assistants"
 
 msgid ""
-"At least a partim volume value is greater than corresponding volume of parent"
+"At least a partim volume value is greater than corresponding volume of full UE"
 msgstr ""
 "Au moins une valeur de volume d'un partim est supérieure à celle du volume "
-"correspondant du parent"
+"correspondant de l'UE complète"
 
 msgid "At the end of this learning unit, the student is able to:"
 msgstr "A la fin de cette unité d'enseignement, l'étudiant est capable de:"
@@ -461,10 +461,10 @@ msgid "Beg. of attribution"
 msgstr "Déb. attribution"
 
 msgid "Begining of course registration"
-msgstr "Début inscription aux cours"
+msgstr "Début inscriptions aux cours"
 
 msgid "Begining of exam registration"
-msgstr "Début inscription aux examens"
+msgstr "Début inscriptions aux examens"
 
 msgid "Benefits and organization"
 msgstr "Atouts et organisation"
@@ -511,7 +511,7 @@ msgid "Category"
 msgstr "Catégorie"
 
 msgid "Central"
-msgstr "Centrale"
+msgstr "Central"
 
 msgid "Certificate"
 msgstr "Certificat"
@@ -553,7 +553,7 @@ msgid "Clear notifications"
 msgstr "Supprimer notifications"
 
 msgid "Click to reconnect"
-msgstr "Cliquez pour vous reconnectez"
+msgstr "Cliquez pour vous reconnecter"
 
 msgid "Clinical internship"
 msgstr "Stage clinique"
@@ -613,7 +613,7 @@ msgid "Confirm"
 msgstr "Confirmer"
 
 msgid "Confirm your action."
-msgstr "Confirmer votre action."
+msgstr "Confirmez votre action."
 
 #, python-format
 msgid "Consistency error in %(academic_year)s : %(error)s"
@@ -827,10 +827,10 @@ msgid "Education group"
 msgstr "Organisation de formations"
 
 msgid "Education group achievement"
-msgstr "Acquis d'apprentissage d'organisation de formation"
+msgstr "Acquis d'apprentissage d'une formation"
 
 msgid "Education group detailed achievement"
-msgstr "Acquis d'apprentissage détaillé d'organisation de formation"
+msgstr "Acquis d'apprentissage détaillé d'une formation"
 
 msgid "Education group edition"
 msgstr "Édition des programmes"
@@ -859,7 +859,7 @@ msgid ""
 "a> successfuly updated."
 msgstr ""
 "Organisation de formations <a href='%(link)s'> %(acronym)s "
-"(%(academic_year)s) </a> mis à jour avec succès."
+"(%(academic_year)s) </a> mise à jour avec succès."
 
 msgid "Education_groups"
 msgstr "Formations"
@@ -871,7 +871,7 @@ msgid "Educational information opening"
 msgstr "Ouverture informations pédagoqiques"
 
 msgid "Elaboration and management of the formation catalogue."
-msgstr "Elaboration et gestion du catalogue des formations."
+msgstr "Elaboration et gestion du catalogue de formations."
 
 msgid "End"
 msgstr "Fin"
@@ -960,7 +960,7 @@ msgid "Event"
 msgstr "Événement"
 
 msgid "Exam board secretary"
-msgstr "Secrétaire de jury"
+msgstr "Secrétaire du jury"
 
 msgid "Exam board signatory"
 msgstr "Signataire du jury"
@@ -1118,6 +1118,9 @@ msgstr "Générer le PDF n'est pas disponible. Veuillez utiliser EPC."
 msgid "Generate pdf"
 msgstr "Générer le pdf"
 
+msgid "Generate xls of learning units in training"
+msgstr "Liste des UE de la formation"
+
 msgid "Generate xls of learning units that are prerequisites for"
 msgstr "Liste des UE qui sont des prérequis"
 
@@ -1155,7 +1158,7 @@ msgid "Highlight description"
 msgstr "Description de l'événement"
 
 msgid "Highlight shortcut"
-msgstr "Titre raccourcis de l'événement"
+msgstr "Titre raccourci de l'événement"
 
 msgid "Highlight title"
 msgstr "Titre de l'événement"
@@ -1285,6 +1288,9 @@ msgstr ""
 
 msgid "It remains notes to encode."
 msgstr "Il reste encore des notes à encoder."
+
+msgid "It will be done at the consolidation"
+msgstr "Les modifications seront reportées lors de la consolidation"
 
 msgid ""
 "JavaScript is disabled on your browser, but OSIS does not work without "
@@ -1486,7 +1492,7 @@ msgid "Main"
 msgstr "Principale"
 
 msgid "Maintenance of data with the SQL language"
-msgstr "La maintenance de données avec la langage SQL"
+msgstr "La maintenance de données avec le langage SQL"
 
 msgid "Major list choice"
 msgstr "Liste au choix Majeures"
@@ -1782,6 +1788,9 @@ msgstr "OU"
 msgid "Offers enrollments"
 msgstr "Inscriptions aux formations"
 
+msgid "Ok"
+msgstr ""
+
 msgid "On the file: direct access or access with additional training"
 msgstr ""
 "Sur dossier: accès direct, moyennant compléments de formation, ou refusé"
@@ -1789,11 +1798,14 @@ msgstr ""
 msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
 
+msgid "Only letters are allowed."
+msgstr "Uniquement des lettres sont acceptées"
+
 msgid ""
 "Only program managers of the education group OR central manager linked to "
 "entity can edit."
 msgstr ""
-"Seuls les gestionnaires de programme d'organisation de formation OU les "
+"Seuls les gestionnaires de programme des formations OU les "
 "gestionnaires facultaires lié·es à l'entité peuvent modifier."
 
 msgid "Only the volume Q1 must have a value"
@@ -1842,7 +1854,7 @@ msgid "Other academic responsible"
 msgstr "Autre responsable académique"
 
 msgid "Other academic responsibles"
-msgstr "Autres responsables académique"
+msgstr "Autres responsables académiques"
 
 msgid "Other collective"
 msgstr "Autre collectif"
@@ -1883,7 +1895,7 @@ msgstr "Sigle déjà existant en %(academic_year)s"
 
 #, python-format
 msgid "Partial acronym existed in %(academic_year)s"
-msgstr "Sigle a déjà existé en %(academic_year)s"
+msgstr "Ce sigle a déjà existé en %(academic_year)s"
 
 msgid "Partial acronym is invalid"
 msgstr "Code non valide"
@@ -1922,7 +1934,7 @@ msgid "Person entities"
 msgstr "Entités attachées"
 
 msgid "Person not in accordance with proposal state"
-msgstr "Personne qui ne peut pas travailler avec une proposition dans cet état"
+msgstr "Vous ne pouvez pas modifier une proposition dans cet état"
 
 msgid "Personalized access"
 msgstr "Accès personnalisé"
@@ -2037,7 +2049,7 @@ msgstr ""
 
 msgid "Produce xls of trainings with administrative data"
 msgstr ""
-"Produire un fichier Excel avec la liste des formations avec données "
+"Produire un fichier Excel avec la liste des formations et données "
 "administratives"
 
 msgid "Produce xls with a list of trainings"
@@ -2330,7 +2342,10 @@ msgid "Select a language"
 msgstr "Sélectionnez une langue"
 
 msgid "Select action to execute"
-msgstr "Sélectionner l'action à exécuter"
+msgstr "Sélectionnez l'action à exécuter"
+
+msgid "Select all"
+msgstr "Sélectionner tout"
 
 msgid "Select all the messages"
 msgstr "Sélectionner tous les messages"
@@ -2414,7 +2429,7 @@ msgid "Student search"
 msgstr "Recherche étudiants"
 
 msgid "Students"
-msgstr "Etudiants"
+msgstr "Étudiants"
 
 msgid "Sub group"
 msgstr "Sous-groupe"
@@ -2492,17 +2507,17 @@ msgid "The acronym <b>already exists</b>."
 msgstr "L’acronyme <b>existe déjà</b>."
 
 msgid "The additional informations has been updated"
-msgstr "Les information supplémentaires ont été sauvegardées avec succès"
+msgstr "Les informations supplémentaires ont été sauvegardées avec succès"
 
 msgid "The administrative data has been successfully modified"
-msgstr "Les données administratives ont été sauvées avec succès"
+msgstr "Les données administratives ont été sauvegardées avec succès"
 
 msgid "The annual volume must be equal to the sum of the volumes Q1 and Q2"
 msgstr "Le volume annuel doit être égal à la somme des volumes Q1 et Q2"
 
 #, python-format
 msgid "The class %(acronym)s has been deleted for the year %(year)s"
-msgstr "La classe %(acronym)s a été supprimé(e) pour l'année %(year)s"
+msgstr "La classe %(acronym)s a été supprimée pour l'année %(year)s"
 
 #, python-format
 msgid ""
@@ -2516,7 +2531,7 @@ msgid "The configuration of you user profile"
 msgstr "Informations liées à votre profil"
 
 msgid "The contact has been created"
-msgstr "Le contact a bien été crée"
+msgstr "Le contact a été créé avec succès"
 
 msgid "The contacts modifications has been saved"
 msgstr "Les données de contact ont été sauvegardées"
@@ -2530,13 +2545,13 @@ msgid ""
 "credits value of the parent learning unit."
 msgstr ""
 "Le nombre de crédits du partim %(acronym)s est supérieur ou égal à celui de "
-"l'unité d'enseignement parent."
+"l'unité d'enseignement complète."
 
 msgid "The credits value should be an integer"
 msgstr "La valeur du champ crédits doit être un entier"
 
 msgid "The education group has been deleted."
-msgstr "L'organisation de formation a été supprimée."
+msgstr "La formation a été supprimée."
 
 msgid "The education group is not a training type"
 msgstr "Il ne s'agit pas d'une formation"
@@ -2566,23 +2581,19 @@ msgstr "L'entité '%(acronym)s' n'existe plus en %(year)s"
 msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr "L'événement \"%(event)s\" a été supprimé avec succès"
 
-msgid ""
-"The faculty manager cannot modify general information which are lower than N"
-msgstr ""
-
 msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
 msgid "The field can contain only one value."
-msgstr "Ce champ ne peut contenir d'autre valeur."
+msgstr "Ce champ ne peut contenir qu'une seule valeur."
 
 msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
-"Les champs concernant les données de l'ARES doivent être soit être tous "
-"remplis ou alors tous vides"
+"Les champs concernant les données de l'ARES doivent être soit tous "
+"remplis soit tous vides"
 
 msgid "The following education groups ended with error"
-msgstr "Les groupement suivants se sont terminés par une erreur"
+msgstr "Les groupements suivants se sont terminés par une erreur"
 
 msgid "The following learning units ended with error"
 msgstr "Les unités d'enseignement suivantes se sont terminées par une erreur"
@@ -2652,7 +2663,7 @@ msgid "The learning unit has been updated until %(year)s."
 msgstr "L'unité d'enseignement a été modifiée jusqu'en %(year)s."
 
 msgid "The learning unit have partim"
-msgstr "L'unité d'enseignement dispose de partim"
+msgstr "L'unité d'enseignement dispose d'au moins un partim"
 
 msgid "The learning unit's description fiche is not editable."
 msgstr ""
@@ -2690,11 +2701,11 @@ msgid ""
 "The parent is %(parent_periodicty)s and there is at least one partim which "
 "is not %(parent_periodicty)s"
 msgstr ""
-"L'UE parent est %(parent_periodicty)s et au moins un partim n'est pas "
+"L'UE complète est %(parent_periodicty)s et au moins un partim n'est pas "
 "%(parent_periodicty)s"
 
 msgid "The parent is inactive and there is at least one partim active"
-msgstr "L'UE parent est inactive et au moins un partim est actif"
+msgstr "L'UE complète est inactive et au moins un partim est actif"
 
 msgid "The partim"
 msgstr "Le partim"
@@ -2704,14 +2715,14 @@ msgid "The program %(acronym)s will be published soon"
 msgstr "Le programme %(acronym)s sera publié sous peu"
 
 msgid "The program aim has been updated"
-msgstr "L’objectif du programme a été mis à jour"
+msgstr "L’objectif du programme a été mis à jour avec succès"
 
 #, python-format
 msgid ""
 "The repartition volume of %(col_name)s has been already modified. "
 "(%(new_value)s instead of %(current_value)s)"
 msgstr ""
-"La répartition de volume de %(col_name)s a déjà été modifiée. (%(new_value)s "
+"La répartition des volumes de %(col_name)s a déjà été modifiée. (%(new_value)s "
 "à la place de %(current_value)s)"
 
 #, python-format
@@ -2731,7 +2742,7 @@ msgid ""
 "the parent %(lu_parent)s"
 msgstr ""
 "L'année de fin selectionnée (%(partim_end_year)s) est plus grande que "
-"l'année de fin du parent %(lu_parent)s"
+"l'année de fin de l'UE complète %(lu_parent)s"
 
 msgid "The start date must be equals or lower than the end date"
 msgstr "La date de début doit être égale ou inférieure à la date de fin"
@@ -2755,9 +2766,6 @@ msgstr "Le support de cours a été supprimé avec succès"
 
 msgid "The teaching material has been saved with success"
 msgstr "Le support de cours a été modifié avec succès"
-
-msgid "The user cannot modify data which are greater than N+1"
-msgstr "L’utilisateur ne peut pas modifier les données supérieures à N + 1"
 
 msgid "The user doesn't have right to update admission condition"
 msgstr ""
@@ -2861,7 +2869,7 @@ msgstr "Ce code existe déja pour cette unité d'enseignement"
 
 msgid "This education group is not editable during this period."
 msgstr ""
-"La période de modification d'organisation de formation n'est pas ouverte "
+"La période de modification des formations n'est pas ouverte "
 "durant cette période."
 
 msgid "This feature is in testing phase"
@@ -2890,11 +2898,11 @@ msgstr "Cette unité d'enseignement n'est pas éligible en raison de son type"
 msgid ""
 "This partim is %(partim_periodicity)s and the parent is %(parent_periodicty)s"
 msgstr ""
-"Ce partim est %(partim_periodicity)s alors que l'UE parent est "
+"Ce partim est %(partim_periodicity)s alors que l'UE complète est "
 "%(parent_periodicty)s"
 
 msgid "This partim is active and the parent is inactive"
-msgstr "Ce partim est actif alors que l'UE parent est inactive"
+msgstr "Ce partim est actif alors que l'UE complète est inactive"
 
 msgid "This process controls students internships."
 msgstr "Gestion des stages des étudiants."
@@ -3129,15 +3137,15 @@ msgstr ""
 
 msgid "You are not allowed to change the end year for this academic year"
 msgstr ""
-"Vous n’êtes pas autorisé à changer l’année de fin de cette année académique"
+"Vous n’êtes pas autorisé·e à changer l’année de fin de cette année académique"
 
 msgid "You are not allowed to create a reference with a learning unit"
 msgstr ""
-"Vous n'êtes pas autorisé de créer une référence avec une unité d’enseignement"
+"Vous n'êtes pas autorisé·e à créer une référence avec une unité d’enseignement"
 
 msgid "You are not allowed to put in proposal for this academic year"
 msgstr ""
-"Vous n'êtes pas autorisé à mettre en proposition pour cette année académique"
+"Vous n'êtes pas autorisé·e à mettre en proposition pour cette année académique"
 
 msgid ""
 "You are not attached to initial or current requirement entity, so you can't "
@@ -3208,22 +3216,16 @@ msgstr ""
 msgid "You can't modify proposal which is on an other year"
 msgstr "Vous ne pouvez pas modifier les propositions liées à une autre année"
 
-msgid ""
-"You can't modify proposition which are related to a learning unit year under"
-msgstr ""
-"Vous ne pouvez pas modifier les propositions liées à une année d'unité "
-"d'enseignement sous"
-
 #, python-format
 msgid "You cannot change a education group before %(limit_year)s"
 msgstr ""
-"Vous ne pouvez pas modifier une organisation de formation datant d'avant "
+"Vous ne pouvez pas modifier une formation datant d'avant "
 "%(limit_year)s"
 
 #, python-format
 msgid "You cannot create/update an education group before %(limit_year)s"
 msgstr ""
-"Vous ne pouvez pas créer/modifier une organisation de formation datant "
+"Vous ne pouvez pas créer/modifier une formation datant "
 "d'avant %(limit_year)s"
 
 #, python-format
@@ -3274,7 +3276,7 @@ msgstr ""
 msgid ""
 "Your personal details, configurations and other information related to you."
 msgstr ""
-"Vos données personnelles, des préférences et d'autres informations associés."
+"Vos données personnelles, des préférences et d'autres informations associées."
 
 msgid "Your username and password didn't match. Please try again."
 msgstr ""
@@ -3283,8 +3285,8 @@ msgstr ""
 
 msgid "a partim volume value is greater than corresponding volume of parent"
 msgstr ""
-"au moins une valeur de volume du partim est supérieure à celle du volume "
-"correspondant du parent"
+"au moins une valeur de volume du partim est supérieure à la valeur du volume "
+"correspondant de l'UE complète"
 
 msgid "academic events"
 msgstr "événements académiques"
@@ -3341,7 +3343,7 @@ msgid "biennial odd"
 msgstr "bisannuelle impaire"
 
 msgid "blocked update for tutor"
-msgstr "mise-à-jour bloquée pour l'enseignant"
+msgstr "mise à jour bloquée pour l'enseignant"
 
 msgid "cannot be canceled"
 msgstr "ne peut pas être annulé"
@@ -3350,7 +3352,7 @@ msgid "cannot be changed state"
 msgstr "ne peut pas changer d'état"
 
 msgid "cannot be consolidated"
-msgstr "ne peut pas être consolidé"
+msgstr "ne peut pas être consolidée"
 
 msgid "certificate aims"
 msgstr "attendus du diplôme"
@@ -3391,7 +3393,7 @@ msgid "delete"
 msgstr "supprimer"
 
 msgid "delete education group"
-msgstr "supprimer l'oganisation de formation"
+msgstr "supprimer l'oganisation de formations"
 
 msgid "dissertation"
 msgstr "mémoire"
@@ -3452,7 +3454,7 @@ msgid "items per page"
 msgstr "éléments par page"
 
 msgid "learning unit year"
-msgstr "unité d'enseignement annualisé"
+msgstr "unité d'enseignement annualisée"
 
 msgid "list of required teaching materials"
 msgstr "liste des supports de cours obligatoires"

@@ -15,7 +15,7 @@
 #
 #    This program is distributed in the hope that it will be useful,
 #    but WITHOUT ANY WARRANTY; without even the implied warranty of
-#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 #    GNU General Public License for more details.
 #
 #    A copy of this license - GNU General Public License - is available
@@ -23,13 +23,24 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import string
 
-FRENCH = "FRENCH"
-GERMAN = "GERMAN"
-DUTCH = "DUTCH"
+import factory.fuzzy
+from django.utils import timezone
+from factory.django import DjangoModelFactory
+from faker import Faker
 
-NATIONAL_COMMUNITY_TYPES = (
-    (FRENCH, FRENCH),
-    (GERMAN, GERMAN),
-    (DUTCH, DUTCH),
-)
+from base.tests.factories.academic_year import AcademicYearFactory
+from osis_common.utils.datetime import get_tzinfo
+
+fake = Faker()
+
+
+class GroupFactory(DjangoModelFactory):
+    class Meta:
+        model = "education_group.Group"
+
+    external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
+    changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
+    start_year = factory.SubFactory(AcademicYearFactory, year=factory.fuzzy.FuzzyInteger(2000, timezone.now().year))
+    end_year = None

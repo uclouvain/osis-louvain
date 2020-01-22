@@ -31,10 +31,13 @@ from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
+from base.business.education_groups.perms import is_eligible_to_change_education_group_content
+from base.models.enums.groups import PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP
+from base.templatetags.education_group import _get_permission
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import CentralManagerFactory
+from base.tests.factories.person import CentralManagerFactory, PersonWithPermissionsFactory
 
 
 @override_flag('education_group_update', active=True)
@@ -103,6 +106,34 @@ class TestUp(TestCase):
         response = self.client.post(self.url, data=self.post_valid_data, follow=True, HTTP_REFERER=http_referer)
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTrue(mock_up.called)
+
+
+class TestOrderingButtons(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
+        cls.group_element_year = GroupElementYearFactory(
+            parent=cls.education_group_year,
+            child_branch__academic_year=cls.academic_year
+        )
+
+    def test_button_order_disabled_for_program_manager(self):
+        program_manager = PersonWithPermissionsFactory(groups=(PROGRAM_MANAGER_GROUP, ))
+        context = {'person': program_manager, 'group': self.group_element_year, 'root': None}
+        self.assertEqual(_get_permission(context, is_eligible_to_change_education_group_content)[1], 'disabled')
+
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    @mock.patch("base.business.education_groups.perms._is_year_editable")
+    def test_button_order_enabled_for_person_with_both_roles(self, mock_permission, mock_year_editable):
+        mock_permission.return_value = True
+        mock_year_editable.return_value = True
+        person_with_both_roles = PersonWithPermissionsFactory(
+            'change_educationgroupcontent',
+            groups=(PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP)
+        )
+        context = {'person': person_with_both_roles, 'group': self.group_element_year, 'root': None}
+        self.assertEqual(_get_permission(context, is_eligible_to_change_education_group_content)[1], '')
 
 
 @override_flag('education_group_update', active=True)

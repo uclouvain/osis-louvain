@@ -43,8 +43,9 @@ from program_management.views.generic import NO_PREREQUISITES
 
 
 class TestLearningUnitsAcronymsFromPrerequisite(TestCase):
-    def setUp(self):
-        self.prerequisite = PrerequisiteFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.prerequisite = PrerequisiteFactory()
 
     def test_empty_prerequisite_should_return_empty_list(self):
         self.assertEqual(prerequisite.extract_learning_units_acronym_from_prerequisite(self.prerequisite),
@@ -214,9 +215,10 @@ class TestShowPrerequisites(TestCase):
         self.client.force_login(self.user)
 
     def test_should_return_false_if_in_no_prerequisites(self):
-        for edy_type in NO_PREREQUISITES:
-            edy = EducationGroupYearFactory(education_group_type__name=edy_type)
-            lu = LearningUnitYearFactory()
-            url = reverse("learning_unit_utilization", args=[edy.pk, lu.pk])
-            response = self.client.get(url)
-            self.assertFalse(response.context['show_prerequisites'])
+        for egy_type in NO_PREREQUISITES:
+            with self.subTest(egy_type=egy_type):
+                egy = EducationGroupYearFactory(education_group_type__name=egy_type)
+                lu = LearningUnitYearFactory()
+                url = reverse("learning_unit_utilization", args=[egy.pk, lu.pk])
+                response = self.client.get(url)
+                self.assertFalse(response.context['show_prerequisites'])

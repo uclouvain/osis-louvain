@@ -29,7 +29,11 @@ from django.utils.translation import pgettext_lazy
 from base.models.utils.utils import ChoiceEnum
 
 
-class TrainingType(ChoiceEnum):
+class EducationGroupTypesEnum(ChoiceEnum):
+    pass
+
+
+class TrainingType(EducationGroupTypesEnum):
     AGGREGATION = _("Aggregation")
     CERTIFICATE_OF_PARTICIPATION = _("Certificate of participation")
     CERTIFICATE_OF_SUCCESS = _("Certificate of success")
@@ -134,7 +138,7 @@ class TrainingType(ChoiceEnum):
         ]
 
 
-class MiniTrainingType(ChoiceEnum):
+class MiniTrainingType(EducationGroupTypesEnum):
     DEEPENING = _("Deepening")
     SOCIETY_MINOR = _("Society minor")
     ACCESS_MINOR = _("Access minor")
@@ -166,7 +170,7 @@ class MiniTrainingType(ChoiceEnum):
         ]
 
 
-class GroupType(ChoiceEnum):
+class GroupType(EducationGroupTypesEnum):
     COMMON_CORE = _("Common core")
     MINOR_LIST_CHOICE = _("Minor list choice")
     MAJOR_LIST_CHOICE = _("Major list choice")

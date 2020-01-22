@@ -49,28 +49,26 @@ class TestEditAttribution(TestCase):
         cls.learning_container_year = LearningContainerYearFactory(
             container_type=LearningContainerYearType.COURSE.name
         )
+        cls.learning_unit_year = LearningUnitYearFullFactory(
+            learning_container_year=cls.learning_container_year
+        )
+        cls.lecturing_component = LecturingLearningComponentYearFactory(
+            learning_unit_year=cls.learning_unit_year)
+        cls.practical_component = PracticalLearningComponentYearFactory(
+            learning_unit_year=cls.learning_unit_year)
+        cls.attribution = AttributionNewFactory(
+            learning_container_year=cls.learning_unit_year.learning_container_year
+        )
+        cls.charge_lecturing = AttributionChargeNewFactory(
+            attribution=cls.attribution,
+            learning_component_year=cls.lecturing_component
+        )
+        cls.charge_practical = AttributionChargeNewFactory(
+            attribution=cls.attribution,
+            learning_component_year=cls.practical_component
+        )
 
     def setUp(self):
-
-        self.learning_unit_year = LearningUnitYearFullFactory(
-            learning_container_year=self.learning_container_year
-        )
-        self.lecturing_component = LecturingLearningComponentYearFactory(
-            learning_unit_year=self.learning_unit_year)
-        self.practical_component = PracticalLearningComponentYearFactory(
-            learning_unit_year=self.learning_unit_year)
-        self.attribution = AttributionNewFactory(
-            learning_container_year=self.learning_unit_year.learning_container_year
-        )
-        self.charge_lecturing = AttributionChargeNewFactory(
-            attribution=self.attribution,
-            learning_component_year=self.lecturing_component
-        )
-        self.charge_practical = AttributionChargeNewFactory(
-            attribution=self.attribution,
-            learning_component_year=self.practical_component
-        )
-
         self.client.force_login(self.person.user)
         self.url = reverse("update_attribution", args=[self.learning_unit_year.id, self.attribution.id])
 

@@ -26,6 +26,7 @@
 from django.conf import settings
 
 from base.models import academic_year
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.models.teaching_material import TeachingMaterial, find_by_learning_unit_year
 from cms.enums import entity_name
 from cms.models import text_label, translated_text
@@ -88,4 +89,7 @@ def update_bibliography_changed_field_in_cms(learning_unit_year):
 
 
 def is_pedagogy_data_must_be_postponed(learning_unit_year):
-    return learning_unit_year.academic_year.year >= academic_year.starting_academic_year().year
+    return learning_unit_year.academic_year.year >= academic_year.starting_academic_year().year \
+           and not ProposalLearningUnit.objects.filter(
+        learning_unit_year__learning_unit=learning_unit_year.learning_unit
+    ).exists()

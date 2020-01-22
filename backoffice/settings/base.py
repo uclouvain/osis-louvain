@@ -329,6 +329,7 @@ if CDN_URL:
         CKEDITOR_CONFIGS[config_name]['extraPlugins'] += ',cdn'
         CKEDITOR_CONFIGS[config_name]['toolbar_Custom'].append({'name': 'cdn_integration', 'items': ['CDN']})
         CKEDITOR_CONFIGS[config_name].update({'customValues': {'cdn_url': CDN_URL}})
+        CKEDITOR_CONFIGS[config_name]['allowedContent'] = True
 
 LOGGING = {
     'version': 1,

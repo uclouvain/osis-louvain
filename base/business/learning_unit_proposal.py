@@ -367,7 +367,8 @@ def _consolidate_modification_proposal_accepted(proposal):
         entities_to_update = proposal.learning_unit_year.learning_container_year.get_map_entity_by_type()
 
         update_learning_unit_year_with_report(next_luy, fields_to_update_clean, entities_to_update,
-                                              override_postponement_consistency=True)
+                                              override_postponement_consistency=True,
+                                              lu_to_consolidate=proposal.learning_unit_year)
     return {}
 
 

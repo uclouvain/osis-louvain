@@ -32,10 +32,10 @@ from base.tests.factories.organization import OrganizationFactory
 
 
 class EducationGroupOrganizationTest(TestCase):
-
-    def setUp(self):
-        self.education_group_year = EducationGroupYearFactory()
-        self.organization = OrganizationFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_year = EducationGroupYearFactory()
+        cls.organization = OrganizationFactory()
 
     def test_unique(self):
         EducationGroupOrganizationFactory(education_group_year=self.education_group_year,

@@ -185,8 +185,7 @@ class TestReadEducationGroup(TestCase):
     def setUpTestData(cls):
         cls.user = UserFactory()
         CentralManagerGroupFactory()
-        cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.person = PersonWithPermissionsFactory('can_access_education_group', user=cls.user)
         cls.academic_year = AcademicYearFactory(current=True)
 
     def setUp(self):
@@ -278,7 +277,7 @@ class TestReadEducationGroup(TestCase):
         today = datetime.date.today()
         today.replace(year=current_academic_year.year - 1)
         starting_academic_year, created = AcademicYear.objects.update_or_create(
-            year=current_academic_year.year-1,
+            year=current_academic_year.year - 1,
             defaults={
                 'start_date': current_academic_year.start_date.replace(year=current_academic_year.year - 1),
                 'end_date': current_academic_year.end_date.replace(year=current_academic_year.year)
@@ -329,7 +328,7 @@ class TestReadEducationGroup(TestCase):
 
     def test_not_show_general_info_and_admission_condition_and_achievement_for_n_plus_2(self):
         edy = EducationGroupYearFactory(
-            academic_year=AcademicYearFactory(year=self.academic_year.year+2),
+            academic_year=AcademicYearFactory(year=self.academic_year.year + 2),
         )
 
         url = reverse("education_group_read", args=[edy.pk, edy.pk])
@@ -387,8 +386,7 @@ class EducationGroupDiplomas(TestCase):
                                                               education_group_type=type_training)
         GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
         cls.user = UserFactory()
-        cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.person = PersonWithPermissionsFactory('can_access_education_group', user=cls.user)
         cls.url = reverse("education_group_diplomas",
                           args=[cls.education_group_parent.pk, cls.education_group_child.id])
 
@@ -507,7 +505,6 @@ class TestUtilizationTab(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory()
-        cls.person = PersonFactory()
         cls.education_group_year_1 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
         cls.education_group_year_2 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
         cls.education_group_year_3 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
@@ -530,8 +527,7 @@ class TestUtilizationTab(TestCase):
                                                            child_branch=None,
                                                            child_leaf=cls.learning_unit_year_2)
         cls.user = UserFactory()
-        cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.person = PersonWithPermissionsFactory('can_access_education_group', user=cls.user)
 
         AcademicYearFactory(current=True)
         cls.url = reverse(
@@ -555,57 +551,58 @@ class TestUtilizationTab(TestCase):
 
 
 class TestContent(TestCase):
-    def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        self.person = PersonFactory()
-        self.education_group_year_1 = EducationGroupYearFactory(academic_year=self.current_academic_year)
-        self.education_group_year_2 = EducationGroupYearFactory(academic_year=self.current_academic_year)
-        self.education_group_year_3 = EducationGroupYearFactory(academic_year=self.current_academic_year)
-        self.learning_unit_year_1 = LearningUnitYearFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        cls.education_group_year_1 = EducationGroupYearFactory(academic_year=cls.current_academic_year)
+        cls.education_group_year_2 = EducationGroupYearFactory(academic_year=cls.current_academic_year)
+        cls.education_group_year_3 = EducationGroupYearFactory(academic_year=cls.current_academic_year)
+        cls.learning_unit_year_1 = LearningUnitYearFactory()
 
-        self.learning_component_year_1 = LearningComponentYearFactory(
-            learning_unit_year=self.learning_unit_year_1,
+        cls.learning_component_year_1 = LearningComponentYearFactory(
+            learning_unit_year=cls.learning_unit_year_1,
             hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=10
         )
 
-        self.learning_component_year_2 = LearningComponentYearFactory(
-            learning_unit_year=self.learning_unit_year_1,
+        cls.learning_component_year_2 = LearningComponentYearFactory(
+            learning_unit_year=cls.learning_unit_year_1,
             hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=10
         )
 
-        self.learning_unit_year_without_container = LearningUnitYearFactory(
+        cls.learning_unit_year_without_container = LearningUnitYearFactory(
             learning_container_year=None
         )
 
-        self.group_element_year_1 = GroupElementYearFactory(parent=self.education_group_year_1,
-                                                            child_branch=self.education_group_year_2)
+        cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year_1,
+                                                           child_branch=cls.education_group_year_2)
 
-        self.group_element_year_2 = GroupElementYearFactory(parent=self.education_group_year_1,
-                                                            child_branch=None,
-                                                            child_leaf=self.learning_unit_year_1)
+        cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year_1,
+                                                           child_branch=None,
+                                                           child_leaf=cls.learning_unit_year_1)
 
-        self.group_element_year_3 = GroupElementYearFactory(parent=self.education_group_year_1,
-                                                            child_branch=self.education_group_year_3)
+        cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year_1,
+                                                           child_branch=cls.education_group_year_3)
 
-        self.group_element_year_without_container = GroupElementYearFactory(
-            parent=self.education_group_year_1,
+        cls.group_element_year_without_container = GroupElementYearFactory(
+            parent=cls.education_group_year_1,
             child_branch=None,
-            child_leaf=self.learning_unit_year_without_container
+            child_leaf=cls.learning_unit_year_without_container
         )
 
-        self.user = UserFactory()
-        self.person = PersonFactory(user=self.user)
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user = UserFactory()
+        cls.person = PersonWithPermissionsFactory('can_access_education_group', user=cls.user)
 
-        self.url = reverse(
+        cls.url = reverse(
             "education_group_content",
             args=[
-                self.education_group_year_1.id,
-                self.education_group_year_1.id,
+                cls.education_group_year_1.id,
+                cls.education_group_year_1.id,
             ]
         )
+
+    def setUp(self):
         self.client.force_login(self.user)
 
     def test_context(self):
@@ -643,7 +640,6 @@ class TestContent(TestCase):
 
 
 class TestCatalogGenericDetailView(TestCase):
-
     def test_get_instance_from_cache_when_learning_unit(self):
         luy = LearningUnitYearFactory()
         cached_data = {

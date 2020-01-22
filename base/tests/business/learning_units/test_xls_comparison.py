@@ -49,16 +49,17 @@ from osis_common.document import xls_build
 
 
 class TestComparisonXls(TestCase):
-    def setUp(self):
-        self.user = UserFactory()
-        self.old_academic_year = AcademicYearFactory(year=datetime.date.today().year-2)
-        self.current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
-        generatorContainer = GenerateContainer(self.old_academic_year, self.current_academic_year)
-        self.previous_learning_unit_year = generatorContainer.generated_container_years[0].learning_unit_year_full
-        self.partim = generatorContainer.generated_container_years[0].learning_unit_year_partim
-        self.learning_unit_year_1 = generatorContainer.generated_container_years[1].learning_unit_year_full
-        self.academic_year = self.learning_unit_year_1.academic_year
-        self.previous_academic_year = self.previous_learning_unit_year.academic_year
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
+        cls.current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
+        generatorContainer = GenerateContainer(cls.old_academic_year, cls.current_academic_year)
+        cls.previous_learning_unit_year = generatorContainer.generated_container_years[0].learning_unit_year_full
+        cls.partim = generatorContainer.generated_container_years[0].learning_unit_year_partim
+        cls.learning_unit_year_1 = generatorContainer.generated_container_years[1].learning_unit_year_full
+        cls.academic_year = cls.learning_unit_year_1.academic_year
+        cls.previous_academic_year = cls.previous_learning_unit_year.academic_year
 
     def test_prepare_xls_content_no_data(self):
         self.assertEqual(prepare_xls_content([]), {'data': [], CELLS_MODIFIED_NO_BORDER: None, CELLS_TOP_BORDER: None})
@@ -137,24 +138,25 @@ class TestComparisonXls(TestCase):
 
 
 class TestPropositionComparisonXls(TestCase):
-    def setUp(self):
-        self.user = UserFactory()
-        self.current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
-        generatorContainer = GenerateContainer(self.current_academic_year, self.current_academic_year)
-        self.partim = generatorContainer.generated_container_years[0].learning_unit_year_partim
-        self.learning_unit_year_1 = generatorContainer.generated_container_years[0].learning_unit_year_full
-        self.entity_1 = generatorContainer.entities[0]
-        self.entity_version_1 = EntityVersionFactory(entity=self.entity_1, acronym="AGRO")
-        self.entity_2 = generatorContainer.entities[0]
-        self.entity_version_2 = EntityVersionFactory(entity=self.entity_2, acronym="DRT")
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
+        generatorContainer = GenerateContainer(cls.current_academic_year, cls.current_academic_year)
+        cls.partim = generatorContainer.generated_container_years[0].learning_unit_year_partim
+        cls.learning_unit_year_1 = generatorContainer.generated_container_years[0].learning_unit_year_full
+        cls.entity_1 = generatorContainer.entities[0]
+        cls.entity_version_1 = EntityVersionFactory(entity=cls.entity_1, acronym="AGRO")
+        cls.entity_2 = generatorContainer.entities[0]
+        cls.entity_version_2 = EntityVersionFactory(entity=cls.entity_2, acronym="DRT")
 
-        self.learning_unit_year_1.entities = {REQUIREMENT_ENTITY: self.entity_version_1,
-                                              ALLOCATION_ENTITY: self.entity_version_1,
-                                              ADDITIONAL_REQUIREMENT_ENTITY_1: self.entity_version_2}
+        cls.learning_unit_year_1.entities = {REQUIREMENT_ENTITY: cls.entity_version_1,
+                                             ALLOCATION_ENTITY: cls.entity_version_1,
+                                             ADDITIONAL_REQUIREMENT_ENTITY_1: cls.entity_version_2}
 
-        self.academic_year = self.learning_unit_year_1.academic_year
-        self.proposal = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year_1,
-                                                    initial_data={"learning_unit": {"faculty_remark": "First remark"}})
+        cls.academic_year = cls.learning_unit_year_1.academic_year
+        cls.proposal = ProposalLearningUnitFactory(learning_unit_year=cls.learning_unit_year_1,
+                                                   initial_data={"learning_unit": {"faculty_remark": "First remark"}})
 
     def test_get_proposal_data(self):
         practical_component = LearningComponentYear.objects.filter(
@@ -183,9 +185,12 @@ class TestPropositionComparisonXls(TestCase):
         self.assertEqual(data[7], str(self.learning_unit_year_1.credits))
         self.assertEqual(data[8], self.learning_unit_year_1.language.name if self.learning_unit_year_1.language else '')
         self.assertEqual(data[9],
-                         str(_(self.learning_unit_year_1.get_periodicity_display())) if self.learning_unit_year_1.periodicity else '')
-        self.assertEqual(data[10], str(_(self.learning_unit_year_1.quadrimester)) if self.learning_unit_year_1.quadrimester else '')
-        self.assertEqual(data[11], str(_(self.learning_unit_year_1.session)) if self.learning_unit_year_1.session else '')
+                         str(_(
+                             self.learning_unit_year_1.get_periodicity_display())) if self.learning_unit_year_1.periodicity else '')
+        self.assertEqual(data[10], str(
+            _(self.learning_unit_year_1.quadrimester)) if self.learning_unit_year_1.quadrimester else '')
+        self.assertEqual(data[11],
+                         str(_(self.learning_unit_year_1.session)) if self.learning_unit_year_1.session else '')
         self.assertEqual(data[12], self.learning_unit_year_1.learning_container_year.common_title)
         self.assertEqual(data[13], self.learning_unit_year_1.specific_title)
         self.assertEqual(data[14], self.learning_unit_year_1.learning_container_year.common_title_english)
@@ -206,25 +211,32 @@ class TestPropositionComparisonXls(TestCase):
         self.assertEqual(data[24], self.learning_unit_year_1.learning_unit.other_remark)
         self.assertEqual(data[25], _('Yes') if self.learning_unit_year_1.learning_container_year.team else _('No'))
         self.assertEqual(data[26], _('Yes') if self.learning_unit_year_1.learning_container_year.is_vacant else _('No'))
-        self.assertEqual(data[27], self.learning_unit_year_1.learning_container_year.get_type_declaration_vacant_display())
+        self.assertEqual(data[27],
+                         self.learning_unit_year_1.learning_container_year.get_type_declaration_vacant_display())
         self.assertEqual(data[28], self.learning_unit_year_1.get_attribution_procedure_display())
 
         self.assertEqual(data[29], DEFAULT_ACRONYM_COMPONENT.get(lecturing_component.type))
-        self.assertEqual(data[30], lecturing_component.hourly_volume_total_annual) if lecturing_component.hourly_volume_total_annual else 0
-        self.assertEqual(data[31], lecturing_component.hourly_volume_partial_q1) if lecturing_component.hourly_volume_partial_q1 else 0
-        self.assertEqual(data[32], lecturing_component.hourly_volume_partial_q2) if lecturing_component.hourly_volume_partial_q2 else 0
+        self.assertEqual(data[30],
+                         lecturing_component.hourly_volume_total_annual) if lecturing_component.hourly_volume_total_annual else 0
+        self.assertEqual(data[31],
+                         lecturing_component.hourly_volume_partial_q1) if lecturing_component.hourly_volume_partial_q1 else 0
+        self.assertEqual(data[32],
+                         lecturing_component.hourly_volume_partial_q2) if lecturing_component.hourly_volume_partial_q2 else 0
         self.assertEqual(data[33], lecturing_component.real_classes)
         self.assertEqual(data[34], lecturing_component.planned_classes)
         self.assertEqual(data[39], DEFAULT_ACRONYM_COMPONENT.get(practical_component.type))
-        self.assertEqual(data[40], practical_component.hourly_volume_total_annual) if practical_component.hourly_volume_total_annual else 0
-        self.assertEqual(data[41], practical_component.hourly_volume_partial_q1) if practical_component.hourly_volume_partial_q1 else 0
-        self.assertEqual(data[42], practical_component.hourly_volume_partial_q2) if practical_component.hourly_volume_partial_q2 else 0
+        self.assertEqual(data[40],
+                         practical_component.hourly_volume_total_annual) if practical_component.hourly_volume_total_annual else 0
+        self.assertEqual(data[41],
+                         practical_component.hourly_volume_partial_q1) if practical_component.hourly_volume_partial_q1 else 0
+        self.assertEqual(data[42],
+                         practical_component.hourly_volume_partial_q2) if practical_component.hourly_volume_partial_q2 else 0
         self.assertEqual(data[43], practical_component.real_classes)
         self.assertEqual(data[44], practical_component.planned_classes)
 
     def test_check_changes(self):
         line_number = 0
-        #First 2 columns are unmutable
+        # First 2 columns are unmutable
         self.assertEqual(_check_changes(['elt1', 'elt2', 'elt3', 'elt4'],
                                         ['elt1', 'elt2 bis', 'elt3 bis', 'elt4'],
                                         line_number), ['C{}'.format(line_number)])
@@ -249,4 +261,3 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.ROW_HEIGHT: None,
         }]
     }
-

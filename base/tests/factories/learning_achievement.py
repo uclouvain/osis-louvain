@@ -37,3 +37,4 @@ class LearningAchievementFactory(factory.django.DjangoModelFactory):
     text = factory.fuzzy.FuzzyText('label_', 20)
     learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
     language = factory.SubFactory(LanguageFactory)
+    consistency_id = factory.Sequence(lambda n: n+1)

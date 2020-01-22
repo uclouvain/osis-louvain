@@ -23,27 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import forms
+from django.utils.translation import gettext_lazy as _
 
-from osis_common.decorators.deprecated import deprecated
+from base.models.utils.utils import ChoiceEnum
 
-
-class BootstrapModelForm(forms.ModelForm):
-
-    def __init__(self, *args, **kwargs):
-        super(BootstrapModelForm, self).__init__(*args, **kwargs)
-        set_form_control(self)
+CREDITS = "CREDITS"
+NUMBER_OF_ELEMENTS = "NUMBER_OF_ELEMENTS"
 
 
-# Why ? Still used
-@deprecated
-def set_form_control(self):
-    for field in iter(self.fields):
-        attr_class = self.fields[field].widget.attrs.get('class') or ''
-        # Exception because we don't apply form-control on widget checkbox
-        if self.fields[field].widget.template_name != 'django/forms/widgets/checkbox.html':
-            if isinstance(self.fields[field].widget, forms.MultiWidget):
-                for widget in self.fields[field].widget.widgets:
-                    widget.attrs['class'] = ' '.join((widget.attrs.get('class', ''), 'form-control'))
-            else:
-                self.fields[field].widget.attrs['class'] = ' '.join((attr_class, 'form-control'))
+class ConstraintTypes(ChoiceEnum):
+    CREDITS = _("credits")
+    NUMBER_OF_ELEMENTS = _("Number of elements")

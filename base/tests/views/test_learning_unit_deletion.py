@@ -59,21 +59,25 @@ YEAR_LIMIT_LUE_MODIFICATION = 2018
 
 @override_flag('learning_unit_delete', active=True)
 class LearningUnitDelete(TestCase):
-    def setUp(self):
-        self.user = UserFactory(username="jeandp")
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory(username="jeandp")
         content_type = ContentType.objects.get_for_model(LearningUnit)
         permission = Permission.objects.get(codename="can_delete_learningunit",
                                             content_type=content_type)
-        self.user.user_permissions.add(permission)
-        person = PersonFactory(user=self.user)
-        self.entity_version = EntityVersionFactory(entity_type=entity_type.FACULTY, acronym="SST",
-                                                   start_date=datetime.date(year=1990, month=1, day=1),
-                                                   end_date=None)
-        PersonEntityFactory(person=person, entity=self.entity_version.entity, with_child=True)
-        self.start_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
+        cls.user.user_permissions.add(permission)
+        person = PersonFactory(user=cls.user)
+        cls.entity_version = EntityVersionFactory(entity_type=entity_type.FACULTY, acronym="SST",
+                                                  start_date=datetime.date(year=1990, month=1, day=1),
+                                                  end_date=None)
+        PersonEntityFactory(person=person, entity=cls.entity_version.entity, with_child=True)
+        cls.start_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
+
+    def setUp(self):
         self.learning_unit_year_list = self.create_learning_unit_years_and_dependencies(self.start_year)
 
-    def create_learning_unit_years_and_dependencies(self, start_year):
+    @classmethod
+    def create_learning_unit_years_and_dependencies(cls, start_year):
         academic_year = create_editable_academic_year()
         acronym = "LDROI1004"
         l1 = LearningUnitFactory(start_year=start_year)
@@ -83,7 +87,7 @@ class LearningUnitDelete(TestCase):
             ac_year = AcademicYearFactory(year=academic_year.year + year)
             l_containeryear = LearningContainerYearFactory(
                 academic_year=ac_year,
-                requirement_entity=self.entity_version.entity,
+                requirement_entity=cls.entity_version.entity,
             )
             learning_unit_year = LearningUnitYearFactory(acronym=acronym, learning_unit=l1, academic_year=ac_year,
                                                          learning_container_year=l_containeryear)

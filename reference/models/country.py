@@ -52,11 +52,3 @@ class Country(SerializableModel):
 
     class Meta:
         ordering = ('name',)
-
-
-def find_all():
-    return Country.objects.order_by('name')
-
-
-def find_by_id(country_id):
-    return Country.objects.get(pk=country_id)

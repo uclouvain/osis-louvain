@@ -24,7 +24,7 @@
 from django.utils.translation import gettext_lazy as _
 
 from base.business.education_groups.perms import can_raise_exception, \
-    is_eligible_to_change_education_group
+    is_eligible_to_change_education_group, check_permission
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.models.enums.education_group_types import GroupType
 
@@ -41,6 +41,13 @@ def is_eligible_to_update_group_element_year(person, group_element_year, raise_e
 def is_eligible_to_detach_group_element_year(person, group_element_year, raise_exception):
     return is_eligible_to_change_education_group(person, group_element_year.parent, raise_exception) and \
            _is_eligible_to_change_group_element_year(person, group_element_year, raise_exception)
+
+
+def is_eligible_to_update_group_element_year_content(person, group_element_year, raise_exception):
+    result = check_permission(person, "base.change_educationgroupcontent", raise_exception) and \
+         is_eligible_to_update_group_element_year(person, group_element_year, raise_exception)
+    can_raise_exception(raise_exception, result, _("The user is not allowed to change education group content."))
+    return result
 
 
 def _is_eligible_to_change_group_element_year(person, group_element_year, raise_exception):

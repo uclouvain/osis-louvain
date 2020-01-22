@@ -63,7 +63,7 @@ def get_learning_container_year_warnings(learning_container_year, partim_id=None
         luy_partims = [luy for luy in learning_unit_years_with_context
                        if luy.subtype == learning_unit_year_subtypes.PARTIM and luy.id == partim_id]
     else:
-        msg_part_2 = _('At least a partim volume value is greater than corresponding volume of parent')
+        msg_part_2 = _('At least a partim volume value is greater than corresponding volume of full UE')
         luy_partims = [luy for luy in learning_unit_years_with_context
                        if luy.subtype == learning_unit_year_subtypes.PARTIM]
 

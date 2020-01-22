@@ -199,7 +199,12 @@ paths:
       - in: query
         name: lang
         schema:
-          type: string	
+          type: string
+      - in: query
+        name: ignore_complementary_module
+        schema:
+          description: True if we want to filter roots if the learning unit is inside a complementary module behind the root. By default, all roots of the learning unit are returned.
+          type: boolean
       responses:
         '200':
           description: OK
@@ -470,6 +475,8 @@ components:
                   type: string
             summary_status:
               type: string
+            professional_integration:
+              type: boolean
     ExternalLearningUnit:
       allOf:
         - $ref: '#/components/schemas/LearningUnitDetailed'
@@ -545,6 +552,8 @@ components:
           type: string
           format: uri
         acronym:
+          type: string
+        code:
           type: string
         credits:
           type: number

@@ -43,7 +43,8 @@ class GeneralInformation(generics.RetrieveAPIView):
         egy = get_object_or_404(
             EducationGroupYear.objects.select_related(
                 'academic_year',
-                'admissioncondition'
+                'admissioncondition',
+                'education_group_type'
             ).prefetch_related(
                 'educationgrouppublicationcontact_set',
                 'educationgroupachievement_set'

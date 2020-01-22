@@ -51,34 +51,35 @@ now = datetime.datetime.now()
 
 
 class EntityVersionTest(TestCase):
-    def setUp(self):
-        self.country = CountryFactory()
-        self.organization = OrganizationFactory(type=organization_type.MAIN)
-        self.entities = [EntityFactory(country=self.country, organization=self.organization) for x in range(3)]
-        self.parent = EntityFactory(country=self.country, organization=self.organization)
-        self.start_date = datetime.date(2015, 1, 1)
-        self.end_date = datetime.date(2015, 12, 31)
-        self.date_in_2015 = factory.fuzzy.FuzzyDate(datetime.date(2015, 1, 1),
-                                                    datetime.date(2015, 12, 30)).fuzz()
-        self.date_in_2017 = factory.fuzzy.FuzzyDate(datetime.date(2017, 1, 1),
-                                                    datetime.date(2017, 12, 30)).fuzz()
+    @classmethod
+    def setUpTestData(cls):
+        cls.country = CountryFactory()
+        cls.organization = OrganizationFactory(type=organization_type.MAIN)
+        cls.entities = [EntityFactory(country=cls.country, organization=cls.organization) for x in range(3)]
+        cls.parent = EntityFactory(country=cls.country, organization=cls.organization)
+        cls.start_date = datetime.date(2015, 1, 1)
+        cls.end_date = datetime.date(2015, 12, 31)
+        cls.date_in_2015 = factory.fuzzy.FuzzyDate(datetime.date(2015, 1, 1),
+                                                   datetime.date(2015, 12, 30)).fuzz()
+        cls.date_in_2017 = factory.fuzzy.FuzzyDate(datetime.date(2017, 1, 1),
+                                                   datetime.date(2017, 12, 30)).fuzz()
 
-        self.entity_versions = [EntityVersionFactory(
-            entity=self.entities[x],
+        cls.entity_versions = [EntityVersionFactory(
+            entity=cls.entities[x],
             acronym="ENTITY_V_" + str(x),
             title="This is the entity version " + str(x),
             entity_type="FACULTY",
-            parent=self.parent,
-            start_date=self.start_date,
-            end_date=self.end_date
+            parent=cls.parent,
+            start_date=cls.start_date,
+            end_date=cls.end_date
         )
             for x in range(3)]
-        self.parent_entity_version = EntityVersionFactory(entity=self.parent,
-                                                          acronym="ENTITY_PARENT",
-                                                          title="This is the entity parent version",
-                                                          entity_type="SECTOR",
-                                                          start_date=self.start_date,
-                                                          end_date=self.end_date)
+        cls.parent_entity_version = EntityVersionFactory(entity=cls.parent,
+                                                         acronym="ENTITY_PARENT",
+                                                         title="This is the entity parent version",
+                                                         entity_type="SECTOR",
+                                                         start_date=cls.start_date,
+                                                         end_date=cls.end_date)
 
     def test_create_entity_version_same_entity_same_dates(self):
         with self.assertRaisesMessage(AttributeError, 'EntityVersion invalid parameters'):
@@ -380,16 +381,16 @@ class EntityVersionTest(TestCase):
         person = PersonFactory()
         entity_attached = EntityFactory(organization=self.organization)
         entity_version_attached = EntityVersionFactory(entity=entity_attached, entity_type="FACULTY")
-        
+
         entity_not_attached = EntityFactory(organization=self.organization)
         EntityVersionFactory(entity=entity_not_attached, entity_type="SECTOR")
-        
+
         entity_ilv = EntityFactory(organization=self.organization)
         entity_version_ilv = EntityVersionFactory(entity=entity_ilv, acronym="ILV")
-        
+
         entity_parent = EntityFactory(organization=self.organization)
         entity_version_parent = EntityVersionFactory(entity=entity_parent, entity_type='FACULTY')
-        EntityVersionFactory(parent=entity_parent)
+        EntityVersionFactory(parent=entity_parent, entity_type='OTHER')
 
         PersonEntityFactory(person=person, entity=entity_attached)
         PersonEntityFactory(person=person, entity=entity_ilv)
@@ -425,24 +426,26 @@ class EntityVersionTest(TestCase):
 
 
 class EntityVersionLoadInMemoryTest(TestCase):
-    def setUp(self):
-        self.country = CountryFactory()
-        self.organization = OrganizationFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.country = CountryFactory()
+        cls.organization = OrganizationFactory(
             type=organization_type.MAIN
         )
-        self.now = datetime.datetime.now(get_tzinfo())
-        start_date = self.now - datetime.timedelta(days=10)
+        cls.now = datetime.datetime.now(get_tzinfo())
+        start_date = cls.now - datetime.timedelta(days=10)
         end_date = None
-        self._build_current_entity_version_structure(end_date, start_date)
+        cls._build_current_entity_version_structure(end_date, start_date)
 
-    def _build_current_entity_version_structure(self, end_date, start_date):
+    @classmethod
+    def _build_current_entity_version_structure(cls, end_date, start_date):
         """Build the following entity version structure :
                              SST
                         SC        LOCI
                     MATH PHYS  URBA  BARC
         """
-        self.root = EntityVersionFactory(
-            entity=EntityFactory(country=self.country, organization=self.organization),
+        cls.root = EntityVersionFactory(
+            entity=EntityFactory(country=cls.country, organization=cls.organization),
             acronym="SST",
             title="SST",
             entity_type=entity_version.entity_type.SECTOR,
@@ -450,57 +453,57 @@ class EntityVersionLoadInMemoryTest(TestCase):
             start_date=start_date,
             end_date=end_date
         )
-        self.SC = EntityVersionFactory(
-            entity=EntityFactory(country=self.country, organization=self.organization),
+        cls.SC = EntityVersionFactory(
+            entity=EntityFactory(country=cls.country, organization=cls.organization),
             acronym="SC",
             title="SC",
             entity_type=entity_version.entity_type.FACULTY,
-            parent=self.root.entity,
+            parent=cls.root.entity,
             start_date=start_date,
             end_date=end_date
         )
-        self.MATH = EntityVersionFactory(
-            entity=EntityFactory(country=self.country, organization=self.organization),
+        cls.MATH = EntityVersionFactory(
+            entity=EntityFactory(country=cls.country, organization=cls.organization),
             acronym="MATH",
             title="MATH",
             entity_type=entity_version.entity_type.SCHOOL,
-            parent=self.SC.entity,
+            parent=cls.SC.entity,
             start_date=start_date,
             end_date=end_date
         )
-        self.PHYS = EntityVersionFactory(
-            entity=EntityFactory(country=self.country, organization=self.organization),
+        cls.PHYS = EntityVersionFactory(
+            entity=EntityFactory(country=cls.country, organization=cls.organization),
             acronym="PHYS",
             title="PHYS",
             entity_type=entity_version.entity_type.SCHOOL,
-            parent=self.SC.entity,
+            parent=cls.SC.entity,
             start_date=start_date,
             end_date=end_date
         )
-        self.LOCI = EntityVersionFactory(
-            entity=EntityFactory(country=self.country, organization=self.organization),
+        cls.LOCI = EntityVersionFactory(
+            entity=EntityFactory(country=cls.country, organization=cls.organization),
             acronym="LOCI",
             title="LOCI",
             entity_type=entity_version.entity_type.FACULTY,
-            parent=self.root.entity,
+            parent=cls.root.entity,
             start_date=start_date,
             end_date=end_date
         )
-        self.URBA = EntityVersionFactory(
-            entity=EntityFactory(country=self.country, organization=self.organization),
+        cls.URBA = EntityVersionFactory(
+            entity=EntityFactory(country=cls.country, organization=cls.organization),
             acronym="URBA",
             title="URBA",
             entity_type=entity_version.entity_type.SCHOOL,
-            parent=self.LOCI.entity,
+            parent=cls.LOCI.entity,
             start_date=start_date,
             end_date=end_date
         )
-        self.BARC = EntityVersionFactory(
-            entity=EntityFactory(country=self.country, organization=self.organization),
+        cls.BARC = EntityVersionFactory(
+            entity=EntityFactory(country=cls.country, organization=cls.organization),
             acronym="BARC",
             title="BARC",
             entity_type=entity_version.entity_type.SCHOOL,
-            parent=self.LOCI.entity,
+            parent=cls.LOCI.entity,
             start_date=start_date,
             end_date=end_date
         )
@@ -530,7 +533,7 @@ class EntityVersionLoadInMemoryTest(TestCase):
     def test_build_all_children_by_entity_version_id(self):
         all_current_entites_versions = entity_version.find_all_current_entities_version()
         entity_version_by_entity_id = entity_version._build_entity_version_by_entity_id(all_current_entites_versions)
-        direct_children_by_entity_version_id = entity_version\
+        direct_children_by_entity_version_id = entity_version \
             ._build_direct_children_by_entity_version_id(entity_version_by_entity_id)
         result = entity_version._build_all_children_by_entity_version_id(direct_children_by_entity_version_id)
 
@@ -546,24 +549,6 @@ class EntityVersionLoadInMemoryTest(TestCase):
         self.assertNotIn(self.MATH.id, result.keys())
 
     def test_build_entity_version_structure_in_memory(self):
-        partial_expected_result = {
-            self.root.entity.id: {
-                'entity_version_parent': None,
-                'direct_children': [self.SC, self.LOCI],
-                'all_children': [self.SC, self.LOCI, self.MATH, self.PHYS, self.URBA, self.BARC],
-            },
-            self.SC.entity.id: {
-                'entity_version_parent': self.root,
-                'direct_children': [self.MATH, self.PHYS],
-                'all_children': [self.MATH, self.PHYS],
-            },
-            self.MATH.entity.id: {
-                'entity_version_parent': self.SC,
-                'direct_children': [],
-                'all_children': [],
-            },
-            # ...
-        }
         result = entity_version.build_current_entity_version_structure_in_memory()
         all_current_entities_version = entity_version.find_all_current_entities_version()
 

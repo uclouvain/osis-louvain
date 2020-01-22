@@ -47,26 +47,28 @@ LANGUAGE_CODE_EN = 'en'
 class MyOsisViewTestCase(TestCase):
     fixtures = ['osis_common/fixtures/messages_tests.json']
 
-    def setUp(self):
-        self.a_superuser = SuperUserFactory()
-        self.person = PersonFactory(user=self.a_superuser,
-                                    language=LANGUAGE_CODE_FR)
-        self.client.force_login(self.a_superuser)
-
+    @classmethod
+    def setUpTestData(cls):
+        cls.a_superuser = SuperUserFactory()
+        cls.person = PersonFactory(user=cls.a_superuser,
+                                   language=LANGUAGE_CODE_FR)
         academic_year = create_current_academic_year()
-        self.summary_course_submission_calendar = AcademicCalendarFactory(
+        cls.summary_course_submission_calendar = AcademicCalendarFactory(
             academic_year=academic_year,
             start_date=academic_year.start_date,
             end_date=academic_year.end_date,
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
 
-        self.tutor = TutorFactory(person=self.person)
+        cls.tutor = TutorFactory(person=cls.person)
         # FIXME CHANGE LEARNINGUNITYEARFACTORY FOR AVOID MULTI ACADEMIC YEAR
-        self.learning_container_year = LearningContainerYearFactory(academic_year=academic_year)
-        self.learning_unit_year = LearningUnitYearFakerFactory(academic_year=academic_year,
-                                                               learning_container_year=self.learning_container_year)
-        self.attribution = AttributionFactory(learning_unit_year=self.learning_unit_year, summary_responsible=True,
-                                              tutor=self.tutor)
+        cls.learning_container_year = LearningContainerYearFactory(academic_year=academic_year)
+        cls.learning_unit_year = LearningUnitYearFakerFactory(academic_year=academic_year,
+                                                              learning_container_year=cls.learning_container_year)
+        cls.attribution = AttributionFactory(learning_unit_year=cls.learning_unit_year, summary_responsible=True,
+                                             tutor=cls.tutor)
+
+    def setUp(self):
+        self.client.force_login(self.a_superuser)
 
     @staticmethod
     def get_message_history():

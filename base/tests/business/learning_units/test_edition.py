@@ -50,36 +50,37 @@ from reference.tests.factories.language import LanguageFactory
 
 
 class LearningUnitEditionTestCase(TestCase):
-    def setUp(self):
-        self.academic_year = create_current_academic_year()
-        self.next_academic_year = AcademicYearFactory(year=self.academic_year.year + 1)
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+        cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
 
-        self.learning_container_year = LearningContainerYearFactory(
-            academic_year=self.academic_year,
+        cls.learning_container_year = LearningContainerYearFactory(
+            academic_year=cls.academic_year,
             common_title='common title',
         )
-        self.learning_unit_year = _create_learning_unit_year_with_components(self.learning_container_year,
-                                                                             create_lecturing_component=True,
-                                                                             create_pratical_component=True)
+        cls.learning_unit_year = _create_learning_unit_year_with_components(cls.learning_container_year,
+                                                                            create_lecturing_component=True,
+                                                                            create_pratical_component=True)
 
-        self.entity_version = EntityVersionFactory(parent=None, end_date=None, acronym="DRT")
-        self.entity_version.refresh_from_db()
-        self.allocation_entity = _create_entity_container_with_components(
-            self.learning_unit_year,
+        cls.entity_version = EntityVersionFactory(parent=None, end_date=None, acronym="DRT")
+        cls.entity_version.refresh_from_db()
+        cls.allocation_entity = _create_entity_container_with_components(
+            cls.learning_unit_year,
             entity_container_year_link_type.ALLOCATION_ENTITY,
-            self.entity_version.entity
+            cls.entity_version.entity
         )
-        self.requirement_entity = _create_entity_container_with_components(
-            self.learning_unit_year,
+        cls.requirement_entity = _create_entity_container_with_components(
+            cls.learning_unit_year,
             entity_container_year_link_type.REQUIREMENT_ENTITY,
-            self.entity_version.entity,
+            cls.entity_version.entity,
             repartition_lecturing=Decimal(30),
             repartition_practical_exercises=Decimal(10)
         )
-        self.add_requirement_entity_1 = _create_entity_container_with_components(
-            self.learning_unit_year,
+        cls.add_requirement_entity_1 = _create_entity_container_with_components(
+            cls.learning_unit_year,
             entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-            self.entity_version.entity,
+            cls.entity_version.entity,
             repartition_lecturing=Decimal(10),
             repartition_practical_exercises=Decimal(5)
         )

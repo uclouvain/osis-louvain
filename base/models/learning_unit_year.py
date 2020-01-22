@@ -51,8 +51,8 @@ from base.models.enums.learning_unit_year_periodicity import PERIODICITY_TYPES, 
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LEARNING_UNIT_ACRONYM_REGEX_MODEL
 from base.models.prerequisite_item import PrerequisiteItem
-from cms.models.translated_text import TranslatedText
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
+from cms.models.translated_text import TranslatedText
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
 
@@ -112,7 +112,7 @@ class LearningUnitYearAdmin(VersionAdmin, SerializableModelAdmin):
     list_display = ('external_id', 'acronym', 'specific_title', 'academic_year', 'credits', 'changed', 'structure',
                     'status')
     list_filter = ('academic_year', 'decimal_scores', 'summary_locked')
-    search_fields = ['acronym', 'structure__acronym', 'external_id']
+    search_fields = ['acronym', 'structure__acronym', 'external_id', 'id']
     actions = [
         'resend_messages_to_queue',
     ]
@@ -512,7 +512,7 @@ class LearningUnitYear(SerializableModel):
         ).exists()
 
     def has_or_is_prerequisite(self, education_group_year):
-        formations = group_element_year.find_learning_unit_formations([education_group_year])[education_group_year.id]
+        formations = group_element_year.find_learning_unit_roots([education_group_year])[education_group_year.id]
         return PrerequisiteItem.objects.filter(
             Q(prerequisite__learning_unit_year=self, prerequisite__education_group_year__in=formations) |
             Q(prerequisite__education_group_year__in=formations, learning_unit=self.learning_unit)

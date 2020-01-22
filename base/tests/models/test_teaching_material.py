@@ -36,35 +36,36 @@ from base.tests.factories.teaching_material import TeachingMaterialFactory
 
 
 class TeachingMaterialTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         start_year = AcademicYearFactory(year=2015)
         end_year = AcademicYearFactory(year=2020)
-        self.ac_years_containers = GenerateAcademicYear(start_year=start_year, end_year=end_year)
-        self.learning_container = LearningContainerFactory()
-        self.learning_unit = LearningUnitFactory(learning_container=self.learning_container)
-        self.luys = {}
-        for ac_year in self.ac_years_containers.academic_years:
-            self.luys[ac_year] = LearningUnitYearFactory(
+        cls.ac_years_containers = GenerateAcademicYear(start_year=start_year, end_year=end_year)
+        cls.learning_container = LearningContainerFactory()
+        cls.learning_unit = LearningUnitFactory(learning_container=cls.learning_container)
+        cls.luys = {}
+        for ac_year in cls.ac_years_containers.academic_years:
+            cls.luys[ac_year] = LearningUnitYearFactory(
                 acronym="LBIR1200",
-                learning_unit=self.learning_unit,
+                learning_unit=cls.learning_unit,
                 academic_year=ac_year,
-                learning_container_year__learning_container=self.learning_container,
+                learning_container_year__learning_container=cls.learning_container,
                 learning_container_year__academic_year=ac_year
             )
 
     def test_postpone_teaching_materials(self):
         # Create multiple teaching material in 2015
-        NB_TO_CREATE = 10
+        nb_to_create = 10
         ac_year_2015 = self.ac_years_containers.academic_years[0]
         start_luy = self.luys[ac_year_2015]
-        for i in range(0, NB_TO_CREATE):
+        for _ in range(0, nb_to_create):
             TeachingMaterialFactory(learning_unit_year=start_luy)
         # Make postponement
         postpone_teaching_materials(start_luy)
         # Check if the teaching material has been postponed in future
         for ac_year in self.ac_years_containers.academic_years:
             self.assertEqual(TeachingMaterial.objects.filter(learning_unit_year__academic_year=ac_year).count(),
-                             NB_TO_CREATE)
+                             nb_to_create)
 
     def test_postpone_override_teaching_materials(self):
         """In this test, we ensure that postponement will override encoded in future"""

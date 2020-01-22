@@ -44,7 +44,7 @@ msgid ""
 "another program. It may have been already modified."
 msgstr ""
 "%(education_group_year)s a déjà été recopié en  %(academic_year)s dans un "
-"autre programme. Il pourrait donc avoir déjà été modifié."
+"autre programme. Il a peut-être déjà été modifié."
 
 #, python-format
 msgid ""
@@ -82,10 +82,16 @@ msgstr ""
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s offers"
 msgstr "%(start_index)s à %(end_index)s sur %(total_counts)s formations"
 
+msgid "1st quadri"
+msgstr ""
+
+msgid "2nd quadri"
+msgstr ""
+
 #, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
 msgstr ""
-"Une unité d'enseignement ne peut pas être prérequis à elle-même : %(acronym)s"
+"Une unité d'enseignement ne peut pas être un prérequis à elle-même : %(acronym)s"
 
 msgid "Ac yr."
 msgstr "Anac."
@@ -102,11 +108,20 @@ msgstr "Sigle"
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
 
+msgid "Active"
+msgstr ""
+
 msgid "Activities with prerequisites (in preparation)"
 msgstr "Activité avec prérequis (en préparation)"
 
 msgid "Add potential courses"
 msgstr "Ajouts de cours éventuels"
+
+msgid "Alloc. Ent."
+msgstr ""
+
+msgid "Annual"
+msgstr "Annuel"
 
 #, python-format
 msgid "Are you sure you want to detach %(acronym)s ?"
@@ -115,6 +130,9 @@ msgstr "Êtes-vous sûr·e de vouloir retirer %(acronym)s ?"
 #, python-format
 msgid "Are you sure you want to postpone the content in %(root)s?"
 msgstr "Êtes-vous sûr·e de vouloir reporter le contenu dans %(root)s?"
+
+msgid "At least an education group year, a group year, a learning unit year or a learning class year has to be set"
+msgstr "Il faut au mininum une clé vers education group year, group year, learning unit year ou learning class year"
 
 msgid "Block"
 msgstr "Bloc"
@@ -202,6 +220,9 @@ msgstr "Pour accord,"
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
 
+msgid "Gathering"
+msgstr "Regroupement"
+
 #, python-format
 msgid ""
 "Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
@@ -217,6 +238,12 @@ msgstr "Unités d'enseignement"
 
 msgid "Legend"
 msgstr "Légende"
+
+msgid "LearningUnitList-%(year)s-%(acronym)s"
+msgstr "Liste-UE-%(year)s-%(acronym)s"
+
+msgid "List UE"
+msgstr "Liste UE"
 
 msgid "Link type"
 msgstr "Type de lien"
@@ -253,6 +280,12 @@ msgstr "Aucun résultat!"
 
 msgid "Official"
 msgstr "Officiel"
+
+msgid ""
+"Only one of the following has to be set : an education group year, a group year, a learning unit year or a learning class"
+msgstr ""
+"Seulement une des clés étrangères doit être garnie (education group year, groupe year, learning unit year ou learning "
+"class year)"
 
 #, python-format
 msgid ""
@@ -294,6 +327,9 @@ msgstr "Activité cyclique dispensée en"
 msgid "Please cut or copy an item before attach it"
 msgstr "Veuillez copier ou couper un élément avant de le coller"
 
+msgid "Please select an item before adding it"
+msgstr "Veuillez sélectionner un élément avant de l'ajouter"
+
 msgid "Prerequisite"
 msgid_plural "Prerequisites"
 msgstr[0] "Prérequis"
@@ -301,6 +337,9 @@ msgstr[1] "Prérequis"
 
 msgid "Prerequisites saved."
 msgstr "Prérequis enregistrés."
+
+msgid "Proposal legend"
+msgstr "Légende proposition"
 
 msgid "Registration ID"
 msgstr "NOMA"
@@ -328,7 +367,7 @@ msgid "The content has already been postponed."
 msgstr "Le contenu a déjà été reporté."
 
 msgid "The content of %(acronym)s has been updated."
-msgstr "Le contenu de %(acronym)s a été mis à jour"
+msgstr "Le contenu de %(acronym)s a été mis à jour avec succès."
 
 msgid ""
 "The end date of the education group is smaller than the year of postponement."
@@ -362,7 +401,7 @@ msgid ""
 "finality %(education_group_year_finality)s."
 msgstr ""
 "L'option %(education_group_year_option)s  n'est plus accessible dans "
-"%(education_group_year_root)s en %(academic_year)s => elle est retiré de la "
+"%(education_group_year_root)s en %(academic_year)s => elle est retirée de la "
 "finalité %(education_group_year_finality)s."
 
 #, python-format
@@ -383,14 +422,17 @@ msgid ""
 "group year %(acronym)s will we deleted: %(learning_units)s"
 msgstr ""
 "Les prérequis des unités d'enseignement suivantes contenues dans "
-"l'organisation de formation annualisé %(acronym)s seront supprimés: "
+"l'organisation de formation annualisée %(acronym)s seront supprimés: "
 "%(learning_units)s"
 
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
 
 msgid "The root does not exist in the next academic year."
-msgstr "La racine n'existe pas dans l'anné academique suivante."
+msgstr "La racine n'existe pas dans l'année academique suivante."
+
+msgid "The user is not allowed to change education group content."
+msgstr "L'utilisateur n'a pas la permission de modifier le contenu d'une formation"
 
 msgid ""
 "This form must be signed by the designated authority and delivered to the "
@@ -424,20 +466,23 @@ msgid ""
 "You are not allowed to copy the content of this kind of education group."
 msgstr ""
 "Vous n'êtes pas autorisé à copier le contenu de ce type d'organisation de "
-"formation."
+"formations."
 
 msgid "You are not allowed to postpone this training in the future."
-msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le futur."
+msgstr "Vous n'êtes pas autorisé.e à reporter cette formation dans le futur."
 
 msgid "You are not allowed to postpone this training in the past."
-msgstr "Vous n'êtes pas autorisé à reporter cette formation dans le passé."
+msgstr "Vous n'êtes pas autorisé.e à reporter cette formation dans le passé."
 
 msgid "You are not eligible to detach this item"
-msgstr "Vous n'êtes pas autorisé à détacher cet item"
+msgstr "Vous n'êtes pas autorisé.e à détacher cet élément"
+
+msgid "You are not eligible to update the group element year"
+msgstr "Vous n'êtes pas autorisé à mettre à jour la formation"
 
 msgid "You can not add a learning unit to a %(category)s of type %(type)s."
 msgstr ""
-"Vous ne pouvez pas ajouter une unité d'enseignement à un/une %(category)s "
+"Vous ne pouvez pas ajouter une unité d'enseignement à un(e) %(category)s "
 "de type %(type)s."
 
 msgid "You can not add the same child several times."
@@ -460,7 +505,7 @@ msgid ""
 "learning unit (current context: %(partial_acronym)s - %(acronym)s)"
 msgstr ""
 "Vous devez être dans le contexte d'une formation pour modifier les prérequis "
-"d'une unité d'enseignement(contexte actuel: %(partial_acronym)s - "
+"d'une unité d'enseignement (contexte actuel: %(partial_acronym)s - "
 "%(acronym)s)"
 
 msgid "credits"

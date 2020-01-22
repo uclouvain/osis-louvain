@@ -78,6 +78,7 @@ class TestClearNotifications(TestNotificationsBaseClass):
         self.assert_queryset_equal(get_user_notifications(self.user_with_notifications),
                                    [])
 
+
 class TestMarkNotificationsAsRead(TestNotificationsBaseClass):
     def test_all_notifications_should_be_read_after_method_call(self):
         self.assert_queryset_equal(

@@ -1,4 +1,4 @@
-#############################################################################
+##############################################################################
 #
 #    OSIS stands for Open Student Information System. It's an application
 #    designed to manage the core business of higher education institutions,
@@ -23,13 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django import template
+from django.test import TestCase
 
-register = template.Library()
+from base.models.organization import Organization
+from base.tests.factories.organization import OrganizationFactory
 
 
-@register.filter
-def has_permission_can_read_persons_roles(the_user):
-    if the_user:
-        return the_user.has_perm("base.can_read_persons_roles")
-    return False
+class OrganizationOrderingTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        organization_datas = [
+            (False, 'D'),
+            (True, 'A'),
+            (False, 'C'),
+            (True, 'B')
+        ]
+        for is_partner, name in organization_datas:
+            OrganizationFactory(is_current_partner=is_partner, name=name)
+
+    def test_organization_ordering(self):
+        expected_order = ['A', 'B', 'C', 'D']
+        result = Organization.objects.all().values_list('name', flat=True)
+        self.assertEqual(list(result), expected_order)

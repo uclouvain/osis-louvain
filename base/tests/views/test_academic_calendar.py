@@ -135,11 +135,11 @@ class AcademicCalendarDeleteTestCase(TestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
         cls.person = PersonFactory(user__superuser=True)
+        cls.academic_calendar = AcademicCalendarFactory(academic_year=cls.academic_year)
+        cls.url = reverse('academic_calendar_delete', kwargs={'pk': cls.academic_calendar.pk})
 
     def setUp(self):
-        self.academic_calendar = AcademicCalendarFactory(academic_year=self.academic_year)
         self.client.force_login(self.person.user)
-        self.url = reverse('academic_calendar_delete', kwargs={'pk': self.academic_calendar.pk})
 
     def test_academic_calendar_delete_not_superuser(self):
         person_not_superuser = PersonFactory()

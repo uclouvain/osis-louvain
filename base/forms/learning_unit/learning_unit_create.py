@@ -52,7 +52,7 @@ from base.models.learning_unit import LearningUnit, REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear, MAXIMUM_CREDITS
 from osis_common.forms.widgets import DecimalFormatInput
 from reference.models.country import Country
-from reference.models.language import find_all_languages
+from reference.models.language import Language
 from rules_management.mixins import PermissionFieldMixin
 
 CRUCIAL_YEAR_FOR_CREDITS_VALIDATION = 2018
@@ -119,7 +119,7 @@ class LearningUnitYearModelForm(PermissionFieldMixin, forms.ModelForm):
 
         if not external:
             self.fields['campus'].queryset = find_main_campuses()
-        self.fields['language'].queryset = find_all_languages()
+        self.fields['language'].queryset = Language.objects.all().order_by('name')
 
     class Meta:
         model = LearningUnitYear

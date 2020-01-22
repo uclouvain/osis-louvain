@@ -54,28 +54,29 @@ def create_exam_enrollment_with_student(num_id, registration_id, offer_year, lea
 
 
 class ExamEnrollmentTest(TestCase):
-    def setUp(self):
-        self.academic_year = create_current_academic_year()
-        self.offer_year = test_offer_year.create_offer_year('SINF1BA', 'Bachelor in informatica', self.academic_year)
-        self.learn_unit_year = LearningUnitYearFactory(acronym='LSINF1010',
-                                                       specific_title='Introduction to algorithmic',
-                                                       academic_year=self.academic_year)
-        self.session_exam = test_session_exam.create_session_exam(1, self.learn_unit_year, self.offer_year)
-        self.student = test_student.create_student('Pierre', 'Lacazette', '12345678')
-        self.offer_enrollment = test_offer_enrollment.create_offer_enrollment(self.student, self.offer_year)
-        self.learn_unit_enrol = test_learning_unit_enrollment.create_learning_unit_enrollment(self.learn_unit_year,
-                                                                                              self.offer_enrollment)
-        self.exam_enrollment = ExamEnrollmentFactory(session_exam=self.session_exam,
-                                                     learning_unit_enrollment=self.learn_unit_enrol,
-                                                     score_final=12.6,
-                                                     enrollment_state=enrollment_states.ENROLLED)
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+        cls.offer_year = test_offer_year.create_offer_year('SINF1BA', 'Bachelor in informatica', cls.academic_year)
+        cls.learn_unit_year = LearningUnitYearFactory(acronym='LSINF1010',
+                                                      specific_title='Introduction to algorithmic',
+                                                      academic_year=cls.academic_year)
+        cls.session_exam = test_session_exam.create_session_exam(1, cls.learn_unit_year, cls.offer_year)
+        cls.student = test_student.create_student('Pierre', 'Lacazette', '12345678')
+        cls.offer_enrollment = test_offer_enrollment.create_offer_enrollment(cls.student, cls.offer_year)
+        cls.learn_unit_enrol = test_learning_unit_enrollment.create_learning_unit_enrollment(cls.learn_unit_year,
+                                                                                             cls.offer_enrollment)
+        cls.exam_enrollment = ExamEnrollmentFactory(session_exam=cls.session_exam,
+                                                    learning_unit_enrollment=cls.learn_unit_enrol,
+                                                    score_final=12.6,
+                                                    enrollment_state=enrollment_states.ENROLLED)
         student_unsuscribed = test_student.create_student('Marco', 'Dubois', '12345679')
-        offer_enrollment_2 = test_offer_enrollment.create_offer_enrollment(student_unsuscribed, self.offer_year)
-        learn_unit_enrol_2 = test_learning_unit_enrollment.create_learning_unit_enrollment(self.learn_unit_year,
+        offer_enrollment_2 = test_offer_enrollment.create_offer_enrollment(student_unsuscribed, cls.offer_year)
+        learn_unit_enrol_2 = test_learning_unit_enrollment.create_learning_unit_enrollment(cls.learn_unit_year,
                                                                                            offer_enrollment_2)
-        self.exam_enrollment_2 = ExamEnrollmentFactory(session_exam=self.session_exam,
-                                                       learning_unit_enrollment=learn_unit_enrol_2,
-                                                       enrollment_state=enrollment_states.NOT_ENROLLED)
+        cls.exam_enrollment_2 = ExamEnrollmentFactory(session_exam=cls.session_exam,
+                                                      learning_unit_enrollment=learn_unit_enrol_2,
+                                                      enrollment_state=enrollment_states.NOT_ENROLLED)
 
     def test_save_with_invalid_justification_draft(self):
         ex_enrol = self.exam_enrollment

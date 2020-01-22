@@ -34,24 +34,25 @@ from base.tests.factories.entity_version import EntityVersionFactory
 
 
 class EntityVersionTestCase(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         today = datetime.date.today()
-        self.current_academic_year = AcademicYearFactory(start_date=today,
+        cls.current_academic_year = AcademicYearFactory(start_date=today,
                                                          end_date=today.replace(year=today.year + 1),
                                                          year=today.year)
 
-        self.entity_parent = EntityFactory()
+        cls.entity_parent = EntityFactory()
 
-        self.entity_versions = []
+        cls.entity_versions = []
         for _ in range(20):
             child_entity_version = EntityVersionFactory(
-                parent=self.entity_parent,
-                start_date=self.current_academic_year.start_date,
-                end_date=self.current_academic_year.end_date
+                parent=cls.entity_parent,
+                start_date=cls.current_academic_year.start_date,
+                end_date=cls.current_academic_year.end_date
             )
 
-            self.entity_parent = child_entity_version.entity
-            self.entity_versions.append(child_entity_version)
+            cls.entity_parent = child_entity_version.entity
+            cls.entity_versions.append(child_entity_version)
 
     def test_find_entity_version_according_academic_year(self):
         entity = EntityFactory()

@@ -227,6 +227,6 @@ class TestGetChargeRepartitionWarningMessage(TestCase):
                                     self.attribution_full.tutor.person.last_name)
         tutor_name_with_function = "{} ({})".format(tutor_name, _(self.attribution_full.get_function_display()))
         self.assertListEqual(msgs, [_("The sum of volumes for the partims for professor %(tutor)s is superior to the "
-                                      "volume of parent learning unit for this professor") % {
+                                      "volume of full UE for this professor") % {
                                         "tutor": tutor_name_with_function}])
 

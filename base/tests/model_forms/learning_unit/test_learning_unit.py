@@ -33,8 +33,10 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 
 class TestLearningUnitModelFormInit(TestCase):
     """Tests LearningUnitModelForm.__init__()"""
-    def setUp(self):
-        self.form = LearningUnitModelForm()
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.form = LearningUnitModelForm()
 
     def test_faculty_remark_widget_textarea_rows(self):
         self.assertEqual(self.form.fields['faculty_remark'].widget.attrs['rows'], '5', "should assert rows == 5")
@@ -56,12 +58,13 @@ class TestLearningUnitModelFormSave(TestCase):
 
     post_data = {'faculty_remark': quote_1, 'other_remark': quote_2}
 
-    def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        self.learning_container = LearningContainerFactory()
-        self.form = LearningUnitModelForm(self.post_data)
-        self.save_kwargs = {'learning_container': self.learning_container,
-                            'start_year': self.current_academic_year}
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        cls.learning_container = LearningContainerFactory()
+        cls.form = LearningUnitModelForm(cls.post_data)
+        cls.save_kwargs = {'learning_container': cls.learning_container,
+                           'start_year': cls.current_academic_year}
 
     def test_case_missing_learning_container_kwarg(self):
         with self.assertRaises(KeyError):

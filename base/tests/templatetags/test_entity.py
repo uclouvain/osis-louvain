@@ -41,15 +41,15 @@ today2 = datetime.datetime.today()
 
 
 class EntityTagTest(TestCase):
-
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         yr = timezone.now().year
-        self.start_year = AcademicYearFactory(year=yr - 1)
-        self.end_year = AcademicYearFactory(year=yr)
-        generator_learning_container = GenerateContainer(start_year=self.start_year, end_year=self.end_year)
-        self.a_learning_unit_year = generator_learning_container.generated_container_years[0].learning_unit_year_full
-        self.entity_1 = generator_learning_container.entities[0]
-        self.entity_version_1 = EntityVersionFactory(entity=self.entity_1, acronym=ENTITY_REQUIREMENT_ACRONYM)
+        cls.start_year = AcademicYearFactory(year=yr - 1)
+        cls.end_year = AcademicYearFactory(year=yr)
+        generator_learning_container = GenerateContainer(start_year=cls.start_year, end_year=cls.end_year)
+        cls.a_learning_unit_year = generator_learning_container.generated_container_years[0].learning_unit_year_full
+        cls.entity_1 = generator_learning_container.entities[0]
+        cls.entity_version_1 = EntityVersionFactory(entity=cls.entity_1, acronym=ENTITY_REQUIREMENT_ACRONYM)
 
     def test_requirement_entity(self):
         lu = self.a_learning_unit_year

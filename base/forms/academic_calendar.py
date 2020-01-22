@@ -29,7 +29,6 @@ from django import forms
 from django.db.models.fields import BLANK_CHOICE_DASH
 from django.utils.translation import gettext_lazy as _
 
-from base.forms import bootstrap
 from base.models import offer_year_calendar, academic_year
 from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
@@ -40,7 +39,7 @@ def _get_sorted_choices(li):
     return sorted(((a, _(b)) for (a, b) in li), key=itemgetter(1))
 
 
-class AcademicCalendarForm(bootstrap.BootstrapModelForm):
+class AcademicCalendarForm(forms.ModelForm):
     REFERENCE_CHOICE_FIELD = (
         BLANK_CHOICE_DASH[0],
         (

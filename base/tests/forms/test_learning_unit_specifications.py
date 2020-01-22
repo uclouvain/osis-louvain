@@ -33,15 +33,16 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 
 
 class TestLearningSpecificationsForm(TestCase):
-    def setUp(self):
-        self.learning_unit_year = LearningUnitYearFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=create_current_academic_year()
         )
-        self.laa = TranslatedTextFactory(
-            reference=self.learning_unit_year.id
+        cls.laa = TranslatedTextFactory(
+            reference=cls.learning_unit_year.id
         )
-        self.laa_en = TranslatedTextFactory(
-            reference=self.learning_unit_year.id
+        cls.laa_en = TranslatedTextFactory(
+            reference=cls.learning_unit_year.id
         )
 
     def test_valid_form_and_save_correctly_text(self):

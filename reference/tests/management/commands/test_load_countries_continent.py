@@ -32,7 +32,6 @@ from reference.tests.factories.country import CountryFactory
 
 
 class CommandsTestCase(TestCase):
-
     def test_load_countries_and_continent(self):
         CountryFactory(iso_code='BE', name='Belgium')
         args = []

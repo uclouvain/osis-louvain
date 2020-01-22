@@ -57,6 +57,7 @@ DEFAULT_LEGEND_STYLES = {
     Style(fill=PatternFill(patternType='solid', fgColor=TRANSFORMATION_COLOR)): ['A5'],
     Style(fill=PatternFill(patternType='solid', fgColor=TRANSFORMATION_AND_MODIFICATION_COLOR)): ['A6'],
 }
+BOLD_FONT = Font(bold=True)
 SPACES = '  '
 HEADER_TEACHERS = _('List of teachers')
 HEADER_PROGRAMS = _('Programs')
@@ -156,7 +157,8 @@ def create_xls_with_parameters(user, learning_units, filters, extra_configuratio
                                                     _get_parameters_configurable_list(learning_units,
                                                                                       titles_part1,
                                                                                       user))
-    ws_data.update({xls_build.WORKSHEETS_DATA: [ws_data.get(xls_build.WORKSHEETS_DATA)[0], _prepare_legend_ws_data()]})
+    ws_data.update({xls_build.WORKSHEETS_DATA: [ws_data.get(xls_build.WORKSHEETS_DATA)[0],
+                                                prepare_proposal_legend_ws_data()]})
     return xls_build.generate_xls(ws_data, filters)
 
 
@@ -185,7 +187,7 @@ def _get_significant_volume(volume):
     return ''
 
 
-def _prepare_legend_ws_data():
+def prepare_proposal_legend_ws_data():
     return {
         xls_build.HEADER_TITLES_KEY: [str(_('Legend'))],
         xls_build.CONTENT_KEY: [
@@ -289,18 +291,10 @@ def _get_data_part2(learning_unit_yr, with_attributions):
                 ]
             )
         )
-
+    lu_data_part2.append(learning_unit_yr.get_periodicity_display())
+    lu_data_part2.append(yesno(learning_unit_yr.status))
+    lu_data_part2.extend(volume_information(learning_unit_yr))
     lu_data_part2.extend([
-        learning_unit_yr.get_periodicity_display(),
-        yesno(learning_unit_yr.status),
-        _get_significant_volume(learning_unit_yr.pm_vol_tot or 0),
-        _get_significant_volume(learning_unit_yr.pm_vol_q1 or 0),
-        _get_significant_volume(learning_unit_yr.pm_vol_q2 or 0),
-        learning_unit_yr.pm_classes or 0,
-        _get_significant_volume(learning_unit_yr.pp_vol_tot or 0),
-        _get_significant_volume(learning_unit_yr.pp_vol_q1 or 0),
-        _get_significant_volume(learning_unit_yr.pp_vol_q2 or 0),
-        learning_unit_yr.pp_classes or 0,
         learning_unit_yr.get_quadrimester_display() or '',
         learning_unit_yr.get_session_display() or '',
         learning_unit_yr.language or "",
@@ -393,6 +387,8 @@ def create_xls(user, found_learning_units, filters):
 
 def create_xls_attributions(user, found_learning_units, filters):
     titles = learning_unit_titles_part1() + learning_unit_titles_part2() + [str(_('Tutor')),
+                                                                            "{} ({})".format(str(_('Tutor')),
+                                                                                             str(_('email'))),
                                                                             str(_('Function')),
                                                                             str(_('Substitute')),
                                                                             str(_('Beg. of attribution')),
@@ -411,6 +407,7 @@ def create_xls_attributions(user, found_learning_units, filters):
                   xls_build.WS_TITLE: WORKSHEET_TITLE,
                   xls_build.STYLED_CELLS: {xls_build.STYLE_BORDER_TOP: cells_with_top_border,
                                            Style(font=Font(color=Color('00FFFFFF')),): cells_with_white_font},
+                  xls_build.COLORED_ROWS: {Style(font=BOLD_FONT): [0]}
                   }
 
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)
@@ -457,6 +454,7 @@ def prepare_xls_content_with_attributions(found_learning_units, nb_columns):
 def _get_attribution_detail(an_attribution):
     return [
         an_attribution.get('person').full_name,
+        an_attribution.get('person').email,
         Functions[an_attribution['function']].value if 'function' in an_attribution else '',
         an_attribution.get('substitute') if an_attribution.get('substitute') else '',
         an_attribution.get('start_year'),
@@ -464,3 +462,14 @@ def _get_attribution_detail(an_attribution):
         an_attribution.get('LECTURING'),
         an_attribution.get('PRACTICAL_EXERCISES')
     ]
+
+
+def volume_information(learning_unit_yr):
+    return [_get_significant_volume(learning_unit_yr.pm_vol_tot or 0),
+            _get_significant_volume(learning_unit_yr.pm_vol_q1 or 0),
+            _get_significant_volume(learning_unit_yr.pm_vol_q2 or 0),
+            learning_unit_yr.pm_classes or 0,
+            _get_significant_volume(learning_unit_yr.pp_vol_tot or 0),
+            _get_significant_volume(learning_unit_yr.pp_vol_q1 or 0),
+            _get_significant_volume(learning_unit_yr.pp_vol_q2 or 0),
+            learning_unit_yr.pp_classes or 0]

@@ -36,8 +36,11 @@ from base.tests.factories.user import SuperUserFactory
 
 
 class OfferViewTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.superuser = SuperUserFactory()
+
     def setUp(self):
-        self.superuser = SuperUserFactory()
         self.client.force_login(self.superuser)
 
     def test_offers(self):

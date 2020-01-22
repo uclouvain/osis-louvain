@@ -29,8 +29,9 @@ from base.tests.factories.certificate_aim import CertificateAimFactory
 
 
 class TestCertificateAim(TestCase):
-    def setUp(self):
-        self.certificate_aim = CertificateAimFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.certificate_aim = CertificateAimFactory(
             section=9,
             code=987,
             description="Description of the certificate aim"

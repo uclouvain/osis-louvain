@@ -31,7 +31,8 @@ from django.test import TestCase
 
 from base.business.learning_units import perms
 from base.business.learning_units.perms import is_eligible_to_create_modification_proposal, \
-    FACULTY_UPDATABLE_CONTAINER_TYPES, is_eligible_to_consolidate_proposal, is_academic_year_in_range_to_create_partim, \
+    FACULTY_UPDATABLE_CONTAINER_TYPES, is_eligible_to_consolidate_proposal, \
+    is_academic_year_in_range_to_create_partim, \
     _check_proposal_edition, _can_be_updated_by_faculty_manager
 from base.business.perms import view_academicactors
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS, MAX_ACADEMIC_YEAR_FACULTY, \
@@ -71,41 +72,42 @@ ALL_TYPES = TYPES_PROPOSAL_NEEDED_TO_EDIT + TYPES_DIRECT_EDIT_PERMITTED
 
 
 class PermsTestCase(TestCase):
-    def setUp(self):
-        self.academic_yr = create_current_academic_year()
-        self.academic_yr_1 = AcademicYearFactory.build(year=self.academic_yr.year + 1)
-        super(AcademicYear, self.academic_yr_1).save()
-        self.academic_yr_2 = AcademicYearFactory.build(year=self.academic_yr.year + 2)
-        super(AcademicYear, self.academic_yr_2).save()
-        self.academic_yr_6 = AcademicYearFactory.build(year=self.academic_yr.year + 6)
-        super(AcademicYear, self.academic_yr_6).save()
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_yr = create_current_academic_year()
+        cls.academic_yr_1 = AcademicYearFactory.build(year=cls.academic_yr.year + 1)
+        super(AcademicYear, cls.academic_yr_1).save()
+        cls.academic_yr_2 = AcademicYearFactory.build(year=cls.academic_yr.year + 2)
+        super(AcademicYear, cls.academic_yr_2).save()
+        cls.academic_yr_6 = AcademicYearFactory.build(year=cls.academic_yr.year + 6)
+        super(AcademicYear, cls.academic_yr_6).save()
 
-        self.lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_yr)
-        self.luy = LearningUnitYearFactory(
-            academic_year=self.academic_yr,
-            learning_container_year=self.lunit_container_yr,
+        cls.lunit_container_yr = LearningContainerYearFactory(academic_year=cls.academic_yr)
+        cls.luy = LearningUnitYearFactory(
+            academic_year=cls.academic_yr,
+            learning_container_year=cls.lunit_container_yr,
             subtype=FULL,
             learning_unit=LearningUnitFactory(
-                start_year=self.academic_yr,
-                end_year=self.academic_yr_1
+                start_year=cls.academic_yr,
+                end_year=cls.academic_yr_1
             )
         )
         AcademicCalendarFactory(
-            data_year=self.academic_yr,
-            start_date=datetime.datetime(self.academic_yr.year - 2, 9, 15),
-            end_date=datetime.datetime(self.academic_yr.year + 1, 9, 14),
+            data_year=cls.academic_yr,
+            start_date=datetime.datetime(cls.academic_yr.year - 2, 9, 15),
+            end_date=datetime.datetime(cls.academic_yr.year + 1, 9, 14),
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
         AcademicCalendarFactory(
-            data_year=self.academic_yr_1,
-            start_date=datetime.datetime(self.academic_yr.year - 1, 9, 15),
-            end_date=datetime.datetime(self.academic_yr.year + 2, 9, 14),
+            data_year=cls.academic_yr_1,
+            start_date=datetime.datetime(cls.academic_yr.year - 1, 9, 15),
+            end_date=datetime.datetime(cls.academic_yr.year + 2, 9, 14),
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
         AcademicCalendarFactory(
-            data_year=self.academic_yr_2,
-            start_date=datetime.datetime(self.academic_yr.year, 9, 15),
-            end_date=datetime.datetime(self.academic_yr.year + 3, 9, 14),
+            data_year=cls.academic_yr_2,
+            start_date=datetime.datetime(cls.academic_yr.year, 9, 15),
+            end_date=datetime.datetime(cls.academic_yr.year + 3, 9, 14),
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
 
@@ -160,31 +162,19 @@ class PermsTestCase(TestCase):
                 create_person_with_permission_and_group(UE_FACULTY_MANAGER_GROUP)
             ))
 
-    def test_when_existing_proposal_in_epc(self):
-        a_person = create_person_with_permission_and_group(CENTRAL_MANAGER_GROUP)
-        luy = LearningUnitYearFactory(academic_year=self.academic_yr, learning_unit__existing_proposal_in_epc=True)
-        self.assertFalse(perms.is_eligible_for_modification(luy, a_person))
-        self.assertFalse(perms.is_eligible_for_modification_end_date(luy, a_person))
-        self.assertFalse(perms.is_eligible_to_create_partim(luy, a_person))
-        self.assertFalse(perms.is_eligible_to_create_modification_proposal(luy, a_person))
-        self.assertFalse(perms.is_eligible_to_delete_learning_unit_year(luy, a_person))
-
     @mock.patch('base.business.learning_units.perms.is_year_editable')
-    @mock.patch('base.business.learning_units.perms._any_existing_proposal_in_epc')
     @mock.patch('base.business.learning_units.perms._is_learning_unit_year_in_range_to_be_modified')
     @mock.patch('base.business.learning_units.perms.is_person_linked_to_entity_in_charge_of_lu')
     def test_when_external_learning_unit_is_not_co_graduation(
             self,
             mock_is_person_linked_to_entity_in_charge_of_lu,
             mock_is_learning_unit_year_in_range_to_be_modified,
-            mock_any_existing_proposal_in_epc,
             mock_is_year_editable):
         mock_is_person_linked_to_entity_in_charge_of_lu.return_value = True
         mock_is_learning_unit_year_in_range_to_be_modified.return_value = True
-        mock_any_existing_proposal_in_epc.return_value = True
         mock_is_year_editable.return_value = True
         a_person = CentralManagerFactory()
-        luy = LearningUnitYearFactory(academic_year=self.academic_yr, learning_unit__existing_proposal_in_epc=False)
+        luy = LearningUnitYearFactory(academic_year=self.academic_yr)
         ExternalLearningUnitYearFactory(learning_unit_year=luy, co_graduation=False)
         self.assertFalse(perms.is_external_learning_unit_cograduation(luy, a_person, False))
 
@@ -207,9 +197,10 @@ class PermsTestCase(TestCase):
         luy = generated_container_first_year.learning_unit_year_full
         requirement_entity = generated_container_first_year.requirement_entity_container_year
         PersonEntityFactory(entity=requirement_entity, person=a_person)
+        lunit_container_yr = LearningContainerYearFactory(academic_year=self.academic_yr)
         for proposal_needed_container_type in ALL_TYPES:
-            self.lunit_container_yr.container_type = proposal_needed_container_type
-            self.lunit_container_yr.save()
+            lunit_container_yr.container_type = proposal_needed_container_type
+            lunit_container_yr.save()
             self.assertTrue(perms.is_eligible_for_modification_end_date(luy, a_person))
 
     def test_access_edit_learning_unit_proposal_as_central_manager(self):

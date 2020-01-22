@@ -45,32 +45,33 @@ def create_attribution(tutor, learning_unit_year, score_responsible=False, summa
 
 
 class AttributionTest(TestCase):
-    def setUp(self):
-        self.user = user.UserFactory()
-        self.user.save()
-        self.person = create_person_with_user(self.user)
-        self.structure = structure.StructureFactory()
-        self.structure_children = structure.StructureFactory(part_of=self.structure)
-        self.entity_manager = entity_manager.EntityManagerFactory(person=self.person, structure=self.structure)
-        self.tutor = tutor.TutorFactory(person=self.person)
-        self.academic_year = academic_year.AcademicYearFactory(year=datetime.date.today().year,
-                                                               start_date=datetime.date.today())
-        self.learning_unit_year = learning_unit_year.LearningUnitYearFactory(structure=self.structure,
-                                                                             acronym="LBIR1210",
-                                                                             academic_year=self.academic_year)
-        self.learning_unit_year_children = learning_unit_year.LearningUnitYearFactory(structure=self.structure_children,
-                                                                                      acronym="LBIR1211",
-                                                                                      academic_year=self.academic_year)
-        self.learning_unit_year_without_attribution = learning_unit_year.LearningUnitYearFactory(structure=self.structure,
-                                                                                                 acronym="LBIR1212",
-                                                                                                 academic_year=self.academic_year)
-        self.attribution = create_attribution(tutor=self.tutor,
-                                              learning_unit_year=self.learning_unit_year,
-                                              score_responsible=True,
-                                              summary_responsible=True)
-        self.attribution_children = create_attribution(tutor=self.tutor,
-                                                       learning_unit_year=self.learning_unit_year_children,
-                                                       score_responsible=False)
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = user.UserFactory()
+        cls.user.save()
+        cls.person = create_person_with_user(cls.user)
+        cls.structure = structure.StructureFactory()
+        cls.structure_children = structure.StructureFactory(part_of=cls.structure)
+        cls.entity_manager = entity_manager.EntityManagerFactory(person=cls.person, structure=cls.structure)
+        cls.tutor = tutor.TutorFactory(person=cls.person)
+        cls.academic_year = academic_year.AcademicYearFactory(year=datetime.date.today().year,
+                                                              start_date=datetime.date.today())
+        cls.learning_unit_year = learning_unit_year.LearningUnitYearFactory(structure=cls.structure,
+                                                                            acronym="LBIR1210",
+                                                                            academic_year=cls.academic_year)
+        cls.learning_unit_year_children = learning_unit_year.LearningUnitYearFactory(structure=cls.structure_children,
+                                                                                     acronym="LBIR1211",
+                                                                                     academic_year=cls.academic_year)
+        cls.learning_unit_year_without_attribution = learning_unit_year.LearningUnitYearFactory(structure=cls.structure,
+                                                                                                acronym="LBIR1212",
+                                                                                                academic_year=cls.academic_year)
+        cls.attribution = create_attribution(tutor=cls.tutor,
+                                             learning_unit_year=cls.learning_unit_year,
+                                             score_responsible=True,
+                                             summary_responsible=True)
+        cls.attribution_children = create_attribution(tutor=cls.tutor,
+                                                      learning_unit_year=cls.learning_unit_year_children,
+                                                      score_responsible=False)
 
     def test_search(self):
         attributions = attribution.search(tutor=self.tutor,
@@ -98,39 +99,31 @@ class AttributionTest(TestCase):
 
 class TestFindAllResponsibleByLearningUnitYear(TestCase):
     """Unit tests on find_all_responsible_by_learning_unit_year()"""
-
-    def test_score_responsible_when_multiple_attribution_for_same_tutor(self):
-        luy = LearningUnitYearFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.luy = LearningUnitYearFactory()
         attr1 = AttributionFactory(
             function=COORDINATOR,
-            learning_unit_year=luy,
+            learning_unit_year=cls.luy,
             score_responsible=False,
+            summary_responsible=False
         )
         AttributionFactory(
             function=CO_HOLDER,
             tutor=attr1.tutor,
-            learning_unit_year=luy,
+            learning_unit_year=cls.luy,
             score_responsible=True,
+            summary_responsible=True
         )  # Second attribution with different function
-        result = attribution.find_all_responsible_by_learning_unit_year(luy, '-score_responsible')
+
+    def test_score_responsible_when_multiple_attribution_for_same_tutor(self):
+        result = attribution.find_all_responsible_by_learning_unit_year(self.luy, '-score_responsible')
         self.assertEqual(result.count(), 1)
         self.assertNotEqual(result.count(), 2)  # Prevent from duplication of Tutor name
         self.assertTrue(result.get().score_responsible)
 
     def test_summary_responsible_when_multiple_attribution_for_same_tutor(self):
-        luy = LearningUnitYearFactory()
-        attr1 = AttributionFactory(
-            function=COORDINATOR,
-            learning_unit_year=luy,
-            summary_responsible=False,
-        )
-        AttributionFactory(
-            function=CO_HOLDER,
-            tutor=attr1.tutor,
-            learning_unit_year=luy,
-            summary_responsible=True,
-        )  # Second attribution with different function
-        result = attribution.find_all_responsible_by_learning_unit_year(luy, '-summary_responsible')
+        result = attribution.find_all_responsible_by_learning_unit_year(self.luy, '-summary_responsible')
         self.assertEqual(result.count(), 1)
         self.assertNotEqual(result.count(), 2)  # Prevent from duplication of Tutor name
         self.assertTrue(result.get().summary_responsible)

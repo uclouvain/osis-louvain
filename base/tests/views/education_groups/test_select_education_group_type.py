@@ -32,7 +32,7 @@ from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.models.enums import education_group_categories
-from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
@@ -45,33 +45,33 @@ class TestSelectEducationGroupTypeView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory()
+        create_current_academic_year()
+        cls.parent_education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
 
-    def setUp(self):
-        self.parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
-
-        self.test_categories = [
+        cls.test_categories = [
             education_group_categories.GROUP,
             education_group_categories.TRAINING,
             education_group_categories.MINI_TRAINING,
         ]
 
-        self.education_group_types = [
+        cls.education_group_types = [
             EducationGroupTypeFactory(category=category)
-            for category in self.test_categories
+            for category in cls.test_categories
         ]
 
-        self.auth_rels = [
+        cls.auth_rels = [
             AuthorizedRelationshipFactory(
-                parent_type=self.parent_education_group_year.education_group_type,
+                parent_type=cls.parent_education_group_year.education_group_type,
                 child_type=eg_type,
                 min_count_authorized=0,
                 max_count_authorized=1,
             )
-            for eg_type in self.education_group_types
+            for eg_type in cls.education_group_types
         ]
 
-        self.person = PersonFactory()
+        cls.person = PersonFactory()
 
+    def setUp(self):
         self.client.force_login(self.person.user)
         self.perm_patcher = mock.patch("base.business.education_groups.perms._is_eligible_to_add_education_group",
                                        return_value=True)

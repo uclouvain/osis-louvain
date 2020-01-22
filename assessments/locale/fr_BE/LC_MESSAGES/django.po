@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-07 11:50+0100\n"
+"POT-Creation-Date: 2020-01-15 10:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -147,6 +147,9 @@ msgstr "Tri descendant de la table de données"
 
 msgid "Deadline reached"
 msgstr "Date d'échéance atteinte"
+
+msgid "Decimal score not allowed"
+msgstr "Note contenant une valeur décimale n'est pas autorisée"
 
 msgid "Decimal values in scores are NOT accepted."
 msgstr "Les valeurs décimales dans les notes ne sont PAS acceptées."
@@ -445,6 +448,9 @@ msgstr "Note"
 msgid "Score already submitted"
 msgstr "Note déjà soumise"
 
+msgid "Score have more than 2 decimal places"
+msgstr "Note contenant plus de 2 décimales"
+
 #, python-format
 msgid "Score legend: %(score_legend)s (0=Score of presence)"
 msgstr "Valeur acceptée: %(score_legend)s (0=Note de présence)"
@@ -572,7 +578,7 @@ msgstr ""
 "d'examens."
 
 msgid "Training"
-msgstr ""
+msgstr "Formation"
 
 msgid "Tutor"
 msgstr "Tuteur"

@@ -23,22 +23,39 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
 from unittest import mock
+from unittest.mock import patch
 
 from django.contrib.auth.models import Permission
 from django.http import HttpResponseNotAllowed, HttpResponseForbidden, HttpResponseNotFound
 from django.test import TestCase
+from django.test.utils import override_settings
 from rest_framework.reverse import reverse
 from waffle.testutils import override_flag
 
 import base.models as mdl_base
+from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_PEDAGOGY_FR_ONLY, \
+    CMS_LABEL_SPECIFICATIONS, CMS_LABEL_SUMMARY
+from base.business.learning_units.edition import _descriptive_fiche_and_achievements_update
 from base.models.enums import proposal_state, learning_unit_year_subtypes, \
     proposal_type
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_achievement import LearningAchievementFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from cms.models.translated_text import TranslatedText
+from cms.tests.factories.text_label import TextLabelFactory
+from cms.tests.factories.translated_text import TranslatedTextFactory
+from reference.tests.factories.language import LanguageFactory
+
+NEW_TEXT = "new text begins in  {}"
+EN_CODE_LANGUAGE = 'EN'
+FR_CODE_LANGUAGE = 'FR'
 
 
 @override_flag('learning_unit_proposal_delete', active=True)
@@ -124,5 +141,87 @@ class TestConsolidate(TestCase):
             learning_unit_year__learning_container_year__academic_year=self.current_academic_year
         )
         lu_id = creation_proposal.learning_unit_year.learning_unit.id
-        self.client.post("learning_unit_consolidate_proposal", data={"learning_unit_year_id": creation_proposal.learning_unit_year.id}, follow=False)
+        self.client.post("learning_unit_consolidate_proposal",
+                         data={"learning_unit_year_id": creation_proposal.learning_unit_year.id}, follow=False)
         self.assertTrue(mdl_base.learning_unit.LearningUnit.objects.filter(pk=lu_id).exists())
+
+
+class TestConsolidateReportForCmsLearningUnitAchievement(TestCase):
+
+    def setUp(self):
+        self.language_fr = LanguageFactory(code=FR_CODE_LANGUAGE)
+        self.language_en = LanguageFactory(code=EN_CODE_LANGUAGE)
+
+        current_year = get_current_year()
+        self.lu = LearningUnitFactory()
+
+        self.learning_unit_year_in_future = []
+        self.luy_past = []
+
+        year = current_year - 3
+
+        concerned_cms_labels = \
+            CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_PEDAGOGY_FR_ONLY + CMS_LABEL_SPECIFICATIONS + CMS_LABEL_SUMMARY
+
+        self.text_label = TextLabelFactory(label=random.choice(concerned_cms_labels),
+                                           entity='learning_unit_year')
+
+        while year <= current_year + 6:
+            ay = AcademicYearFactory(year=year)
+            luy = LearningUnitYearFactory(learning_unit=self.lu, academic_year=ay,
+                                          acronym='LECON2365')
+
+            self._create_description_fiche_and_specifications_data(current_year, luy, year)
+            year += 1
+
+    @patch('base.business.learning_units.edition._update_descriptive_fiche')
+    def test_descriptive_fiche_and_achievements_no_update_because_is_past(self, mock__update_descriptive_fiche):
+        proposal_in_past = ProposalLearningUnitFactory(
+            state=proposal_state.ProposalState.ACCEPTED.name,
+            learning_unit_year=self.luy_past[0])
+
+        _descriptive_fiche_and_achievements_update(proposal_in_past.learning_unit_year, self.luy_past[1])
+        mock__update_descriptive_fiche.assert_not_called()
+
+    @override_settings(LANGUAGES=[('fr-be', 'French'), ], LANGUAGE_CODE='fr-be')
+    def test_descriptive_fiche_and_achievements_update_and_report(self):
+        proposal = ProposalLearningUnitFactory(
+            state=proposal_state.ProposalState.ACCEPTED.name,
+            learning_unit_year=self.learning_unit_year)
+
+        _descriptive_fiche_and_achievements_update(proposal.learning_unit_year, self.learning_unit_year_in_future[0])
+
+        self._assert_learning_unit_achievement_update(proposal)
+        self._assert_cms_data_update(proposal)
+
+    def _assert_cms_data_update(self, proposal):
+        for learning_unit_yr in self.learning_unit_year_in_future:
+            for t in TranslatedText.objects.filter(reference=learning_unit_yr.id, entity='learning_unit_year',
+                                                   language=self.language_fr, text_label=self.text_label):
+                self.assertEqual(t.text, NEW_TEXT.format(proposal.learning_unit_year.academic_year.year))
+
+    def _assert_learning_unit_achievement_update(self, proposal):
+        for la in mdl_base.learning_achievement.LearningAchievement.objects. \
+                filter(learning_unit_year__learning_unit=proposal.learning_unit_year.learning_unit):
+            if la.learning_unit_year.academic_year.year < self.learning_unit_year.academic_year.year:
+                self.assertEqual(la.text, "old text {}".format(la.learning_unit_year.academic_year.year))
+            else:
+                self.assertEqual(la.text, NEW_TEXT.format(proposal.learning_unit_year.academic_year.year))
+
+    def _create_description_fiche_and_specifications_data(self, current_year, luy, year):
+        a_text = "old text {}".format(year)
+        if year > current_year:
+            self.learning_unit_year_in_future.append(luy)
+        if year < current_year:
+            self.luy_past.append(luy)
+        if year == current_year:
+            self.learning_unit_year = luy
+            a_text = NEW_TEXT.format(current_year)
+        LearningAchievementFactory(learning_unit_year=luy,
+                                   text=a_text,
+                                   code_name="1",
+                                   language=self.language_fr,
+                                   consistency_id=1)
+        TranslatedTextFactory(reference=luy.id, entity='learning_unit_year',
+                              language="fr-be", text=a_text,
+                              text_label=self.text_label)

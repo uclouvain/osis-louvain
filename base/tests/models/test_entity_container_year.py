@@ -36,17 +36,18 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 
 
 class EntityContainerYearTest(TestCase):
-    def setUp(self):
-        self.entity = EntityFactory()
-        self.entity_versions = {}
-        self.academic_years = {}
+    @classmethod
+    def setUpTestData(cls):
+        cls.entity = EntityFactory()
+        cls.entity_versions = {}
+        cls.academic_years = {}
         for year in [2015, 2016]:
-            self.academic_years[year] = AcademicYearFactory(year=year)
-            self.entity_versions[year] = EntityVersionFactory(entity=self.entity,
-                                                              parent=None,
-                                                              acronym="Entity V_{}".format(year),
-                                                              start_date=datetime.datetime(year, 1, 1),
-                                                              end_date=datetime.datetime(year, 12, 30))
+            cls.academic_years[year] = AcademicYearFactory(year=year)
+            cls.entity_versions[year] = EntityVersionFactory(entity=cls.entity,
+                                                             parent=None,
+                                                             acronym="Entity V_{}".format(year),
+                                                             start_date=datetime.datetime(year, 1, 1),
+                                                             end_date=datetime.datetime(year, 12, 30))
 
     def test_find_entities_no_values(self):
         l_container_year = LearningContainerYearFactory(

@@ -60,67 +60,66 @@ PROPOSAL_STATE = proposal_state.ProposalState.FACULTY.name
 
 
 class TestSave(TestCase):
-    def setUp(self):
-        self.person = PersonFactory()
-        an_organization = OrganizationFactory(type=organization_type.MAIN)
-        self.current_academic_year = create_current_academic_year()
+    @classmethod
+    def setUpTestData(cls):
+        cls.an_organization = OrganizationFactory(type=organization_type.MAIN)
+        cls.current_academic_year = create_current_academic_year()
         GenerateAcademicYear(
-            AcademicYearFactory(year=self.current_academic_year.year - 10),
-            AcademicYearFactory(year=self.current_academic_year.year + 10)
+            AcademicYearFactory(year=cls.current_academic_year.year - 10),
+            AcademicYearFactory(year=cls.current_academic_year.year + 10)
         )
 
         today = datetime.date.today()
-        an_entity = EntityFactory(organization=an_organization)
-        self.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.FACULTY,
-                                                   start_date=today.replace(year=1900),
-                                                   end_date=None)
-        self.an_entity_school = EntityFactory(organization=an_organization)
-        self.entity_version_school = EntityVersionFactory(entity=self.an_entity_school, entity_type=entity_type.SCHOOL,
-                                                          start_date=today.replace(year=1900),
-                                                          end_date=None)
-
-        learning_container_year = LearningContainerYearFactory(
-            academic_year=self.current_academic_year,
+        cls.an_entity = EntityFactory(organization=cls.an_organization)
+        cls.entity_version = EntityVersionFactory(entity=cls.an_entity, entity_type=entity_type.FACULTY,
+                                                  start_date=today.replace(year=1900),
+                                                  end_date=None)
+        cls.an_entity_school = EntityFactory(organization=cls.an_organization)
+        cls.entity_version_school = EntityVersionFactory(entity=cls.an_entity_school, entity_type=entity_type.SCHOOL,
+                                                         start_date=today.replace(year=1900),
+                                                         end_date=None)
+        cls.learning_container_year = LearningContainerYearFactory(
+            academic_year=cls.current_academic_year,
             container_type=learning_container_year_types.COURSE,
-            requirement_entity=self.entity_version.entity,
+            requirement_entity=cls.entity_version.entity,
         )
-        self.learning_unit_year = LearningUnitYearFakerFactory(
+        cls.language = LanguageFactory(code="EN")
+        cls.campus = CampusFactory(name="OSIS Campus", organization=OrganizationFactory(type=organization_type.MAIN),
+                                   is_administration=True)
+        FacultyManagerGroupFactory()
+        CentralManagerGroupFactory()
+        cls.learning_unit_year = LearningUnitYearFakerFactory(
             credits=Decimal(5),
             subtype=learning_unit_year_subtypes.FULL,
-            academic_year=self.current_academic_year,
-            learning_container_year=learning_container_year,
-            campus=CampusFactory(organization=an_organization, is_administration=True),
+            academic_year=cls.current_academic_year,
+            learning_container_year=cls.learning_container_year,
+            campus=CampusFactory(organization=cls.an_organization, is_administration=True),
             periodicity=learning_unit_year_periodicity.ANNUAL,
             internship_subtype=None
         )
-        self.person_entity = PersonEntityFactory(person=self.person, entity=an_entity)
-        self.language = LanguageFactory(code="EN")
-        self.campus = CampusFactory(name="OSIS Campus", organization=OrganizationFactory(type=organization_type.MAIN),
-                                    is_administration=True)
-
-        self.form_data = {
-            "academic_year": self.learning_unit_year.academic_year.id,
+        cls.form_data = {
+            "academic_year": cls.learning_unit_year.academic_year.id,
             "acronym_0": "L",
             "acronym_1": "OSIS1245",
             "common_title": "New common title",
             "common_title_english": "New common title english",
             "specific_title": "New title",
             "specific_title_english": "New title english",
-            "container_type": self.learning_unit_year.learning_container_year.container_type,
+            "container_type": cls.learning_unit_year.learning_container_year.container_type,
             "internship_subtype": "",
-            "credits": self.learning_unit_year.credits,
+            "credits": cls.learning_unit_year.credits,
             "periodicity": learning_unit_year_periodicity.BIENNIAL_ODD,
             "status": False,
-            "language": self.language.pk,
+            "language": cls.language.pk,
             "quadrimester": quadrimesters.Q1,
-            "campus": self.campus.id,
-            "entity": self.entity_version.id,
+            "campus": cls.campus.id,
+            "entity": cls.entity_version.id,
             "folder_id": "1",
             "state": proposal_state.ProposalState.CENTRAL.name,
-            'requirement_entity': self.entity_version.id,
-            'allocation_entity': self.entity_version.id,
-            'additional_entity_1': self.entity_version.id,
-            'additional_entity_2': self.entity_version.id,
+            'requirement_entity': cls.entity_version.id,
+            'allocation_entity': cls.entity_version.id,
+            'additional_entity_1': cls.entity_version.id,
+            'additional_entity_2': cls.entity_version.id,
 
             # Learning component year data model form
             'component-TOTAL_FORMS': '2',
@@ -135,8 +134,10 @@ class TestSave(TestCase):
             'component-0-planned_classes': 1,
             'component-1-planned_classes': 1,
         }
-        FacultyManagerGroupFactory()
-        CentralManagerGroupFactory()
+
+    def setUp(self):
+        self.person = PersonFactory()
+        self.person_entity = PersonEntityFactory(person=self.person, entity=self.an_entity)
 
     def test_learning_unit_proposal_form_get_as_faculty_manager(self):
         self.person.user.groups.add(Group.objects.get(name=FACULTY_MANAGER_GROUP))

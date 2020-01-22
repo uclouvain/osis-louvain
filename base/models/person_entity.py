@@ -34,7 +34,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 class PersonEntityAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('person', 'entity', 'latest_entity_version_name', 'with_child')
-    search_fields = ['person__first_name', 'person__last_name']
+    search_fields = ['person__first_name', 'person__last_name', 'entity__entityversion__acronym']
     raw_id_fields = ('person', 'entity',)
 
     def latest_entity_version_name(self, obj):

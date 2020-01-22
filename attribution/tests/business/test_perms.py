@@ -75,28 +75,28 @@ class TestPerms(TestCase):
     def test_is_calendar_opened_to_edit_educational_information(self):
         patcher = mock.patch(
             'base.business.learning_units.perms.find_educational_information_submission_dates_of_learning_unit_year')
-        MockClass = patcher.start()
+        mock_class = patcher.start()
 
         today = datetime.datetime.now(tz=get_tzinfo())
         yesterday = today - datetime.timedelta(days=1)
         tomorrow = today + datetime.timedelta(days=1)
 
-        MockClass.return_value = {}
+        mock_class.return_value = {}
         with self.assertRaises(PermissionDenied):
             _is_calendar_opened_to_edit_educational_information(learning_unit_year_id=self.learning_unit_year.id)
 
-        MockClass.return_value = {"start_date": yesterday,
-                                  "end_date": yesterday}
+        mock_class.return_value = {"start_date": yesterday,
+                                   "end_date": yesterday}
         with self.assertRaises(PermissionDenied):
             _is_calendar_opened_to_edit_educational_information(learning_unit_year_id=self.learning_unit_year.id)
 
-        MockClass.return_value = {"start_date": tomorrow,
-                                  "end_date": tomorrow}
+        mock_class.return_value = {"start_date": tomorrow,
+                                   "end_date": tomorrow}
         with self.assertRaises(PermissionDenied):
             _is_calendar_opened_to_edit_educational_information(learning_unit_year_id=self.learning_unit_year.id)
 
-        MockClass.return_value = {"start_date": today - datetime.timedelta(days=1),
-                                  "end_date": today + datetime.timedelta(days=1)}
+        mock_class.return_value = {"start_date": today - datetime.timedelta(days=1),
+                                   "end_date": today + datetime.timedelta(days=1)}
         self.assertIsNone(
             _is_calendar_opened_to_edit_educational_information(learning_unit_year_id=self.learning_unit_year.id)
         )

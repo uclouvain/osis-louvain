@@ -26,6 +26,7 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import models
 
+from osis_common.decorators.deprecated import deprecated
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
 
@@ -45,6 +46,7 @@ class Student(SerializableModel):
         return u"%s (%s)" % (self.person, self.registration_id)
 
     class Meta:
+        ordering = ("person__last_name", "person__first_name")
         permissions = (
             ("can_access_student", "Can access student"),
         )
@@ -89,10 +91,6 @@ def find_by_person(a_person):
         return student
     except ObjectDoesNotExist:
         return None
-
-
-def find_by_offer_year(offer_y):
-    return Student.objects.filter(offerenrollment__offer_year=offer_y)
 
 
 def find_by_id(student_id):

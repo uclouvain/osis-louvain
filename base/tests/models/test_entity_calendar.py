@@ -58,7 +58,7 @@ class TestFindByReferenceForCurrentAcademicYear(TestCase):
 
         cls.current_entity_calendar = EntityCalendarFactory(academic_calendar__academic_year=current_academic_year,
                                                             academic_calendar__reference=SUMMARY_COURSE_SUBMISSION)
-        previous_entity_calendar = EntityCalendarFactory(academic_calendar__academic_year=previous_academic_year,
+        EntityCalendarFactory(academic_calendar__academic_year=previous_academic_year,
                                                          academic_calendar__reference=SUMMARY_COURSE_SUBMISSION,
                                                          entity=cls.current_entity_calendar.entity)
 

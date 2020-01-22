@@ -47,8 +47,8 @@ from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.external_learning_unit_year import ExternalLearningUnitYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LearningUnit
-from reference.models import language
 from reference.models.country import Country
+from reference.models.language import Language
 
 
 class LearningContainerYearExternalModelForm(LearningContainerYearModelForm):
@@ -221,7 +221,7 @@ class ExternalLearningUnitBaseForm(LearningUnitBaseForm):
             'proposal': proposal,
             'initial': {
                 # Default language French
-                'language': language.find_by_code('FR'),
+                'language': Language.objects.get(code='FR'),
             },
             'person': self.person
         }

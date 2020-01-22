@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from ckeditor.fields import RichTextField
+from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 from ordered_model.admin import OrderedModelAdmin
@@ -39,13 +40,14 @@ class AbstractAchievementAdmin(OrderedModelAdmin):
 class AbstractAchievement(OrderedModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    code_name = models.CharField(max_length=100, verbose_name=_('code'))
+    code_name = models.CharField(null=True, blank=True, max_length=100, verbose_name=_('code'))
     text = RichTextField(null=True, verbose_name=_('text'))
     language = models.ForeignKey(
         'reference.Language',
         verbose_name=_('Language'),
         on_delete=models.CASCADE,
     )
+    consistency_id = models.IntegerField(default=1, validators=[MinValueValidator(1)])
 
-    class Meta:
+    class Meta(OrderedModel.Meta):
         abstract = True

@@ -46,9 +46,9 @@ OTHER_VOLUME = Decimal(25)
 
 
 class LearningUnitTagTest(TestCase):
-
-    def setUp(self):
-        self.entity_vers = EntityVersionFactory(acronym=ENTITY_ACRONYM)
+    @classmethod
+    def setUpTestData(cls):
+        cls.entity_vers = EntityVersionFactory(acronym=ENTITY_ACRONYM)
 
     def test_get_difference_css(self):
         key_parameter_1 = 'parameter1'

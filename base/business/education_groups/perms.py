@@ -40,6 +40,7 @@ ERRORS_MSG = {
     "base.add_educationgroup": _("The user has not permission to create education groups."),
     "base.change_educationgroup": _("The user has not permission to change education groups."),
     "base.delete_educationgroup": _("The user has not permission to delete education groups."),
+    "base.change_educationgroupcontent": _("The user is not allowed to change education group content.")
 }
 
 
@@ -72,6 +73,11 @@ def is_eligible_to_change_education_group(person, education_group, raise_excepti
     return check_permission(person, "base.change_educationgroup", raise_exception) and \
            _is_eligible_education_group(person, education_group, raise_exception) and \
            _is_year_editable(education_group, raise_exception)
+
+
+def is_eligible_to_change_education_group_content(person, education_group, raise_exception=False):
+    return check_permission(person, "base.change_educationgroupcontent", raise_exception) and \
+        is_eligible_to_change_education_group(person, education_group, raise_exception)
 
 
 def _is_year_editable(education_group, raise_exception):
@@ -173,7 +179,6 @@ def check_link_to_management_entity(education_group, person, raise_exception):
 def check_permission(person, permission, raise_exception=False):
     result = person.user.has_perm(permission)
     can_raise_exception(raise_exception, result, ERRORS_MSG.get(permission, ""))
-
     return result
 
 

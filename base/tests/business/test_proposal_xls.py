@@ -55,16 +55,20 @@ ACRONYM_REQUIREMENT = 'DRT'
 
 
 class TestProposalXls(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+        cls.learning_unit = LearningUnitFactory(start_year__year=1900)
+
+        cls.l_container_year = LearningContainerYearFactory(acronym="LBIR1212", academic_year=cls.academic_year)
+
+        cls.user = UserFactory()
 
     def setUp(self):
-        academic_year = create_current_academic_year()
-        self.learning_unit = LearningUnitFactory(start_year__year=1900)
-
-        l_container_year = LearningContainerYearFactory(acronym="LBIR1212", academic_year=academic_year)
-        self.l_unit_yr_1 = LearningUnitYearFactory(acronym="LBIR1212", learning_container_year=l_container_year,
-                                                   academic_year=academic_year,
-                                                   subtype=learning_unit_year_subtypes.FULL,
-                                                   credits=10)
+        self.l_unit_yr_1 = LearningUnitYearFactory(acronym="LBIR1212", learning_container_year=self.l_container_year,
+                                                  academic_year=self.academic_year,
+                                                  subtype=learning_unit_year_subtypes.FULL,
+                                                  credits=10)
         entity_requirement_ver = EntityVersionFactory(acronym=ACRONYM_REQUIREMENT,
                                                       entity=EntityFactory())
         self.l_unit_yr_1.entity_requirement = entity_requirement_ver.acronym
@@ -73,8 +77,7 @@ class TestProposalXls(TestCase):
         entity_vr = EntityVersionFactory(acronym='ESPO')
 
         self.proposal_1 = ProposalLearningUnitFactory(learning_unit_year=self.l_unit_yr_1,
-                                                      entity=entity_vr.entity)
-        self.user = UserFactory()
+                                                     entity=entity_vr.entity)
         self._set_entities()
 
     def test_prepare_xls_content_no_data(self):
@@ -227,5 +230,3 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.ROW_HEIGHT: None,
         }]
     }
-
-

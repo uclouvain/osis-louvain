@@ -40,18 +40,21 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 
 
 class TestEducationGroupSkillsAchievements(TestCase):
-    def setUp(self):
-        self.perm_patcher = mock.patch(
+    @classmethod
+    def setUpTestData(cls):
+        cls.perm_patcher = mock.patch(
             "base.business.education_groups.perms.AdmissionConditionPerms.is_eligible",
             return_value=True
         )
-        self.mocked_perm = self.perm_patcher.start()
-        self.addCleanup(self.perm_patcher.stop)
 
-        self.education_group_year = EducationGroupYearFactory(
+        cls.education_group_year = EducationGroupYearFactory(
             academic_year=AcademicYearFactory(current=True)
         )
-        self.person = PersonWithPermissionsFactory("can_access_education_group")
+        cls.person = PersonWithPermissionsFactory("can_access_education_group")
+
+    def setUp(self):
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
         self.client.force_login(self.person.user)
 
     def _call_url_as_http_get(self):

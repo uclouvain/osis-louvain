@@ -28,18 +28,17 @@ from django.test import TestCase
 from attribution.models import attribution_new
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.person import PersonFactory
 from base.tests.factories.tutor import TutorFactory
 
 
 class AttributionChargeNewTest(TestCase):
-    def setUp(self):
-        self.person = PersonFactory()
-        self.tutor = TutorFactory(person=self.person)
-        self.learning_container_year = LearningContainerYearFactory()
-        self.attribution_new = AttributionNewFactory(learning_container_year=self.learning_container_year,
-                                                     start_year=2018, end_year=2020, tutor=self.tutor,
-                                                     score_responsible=True)
+    @classmethod
+    def setUpTestData(cls):
+        cls.tutor = TutorFactory()
+        cls.learning_container_year = LearningContainerYearFactory()
+        cls.attribution_new = AttributionNewFactory(learning_container_year=cls.learning_container_year,
+                                                    start_year=2018, end_year=2020, tutor=cls.tutor,
+                                                    score_responsible=True)
 
     def test_duration(self):
         self.assertEqual(self.attribution_new.duration, 3)
@@ -65,9 +64,9 @@ class AttributionChargeNewTest(TestCase):
         self.assertCountEqual(result, [self.attribution_new])
 
     def test_search_with_global_id(self):
-        result = attribution_new.search(global_id=self.person.global_id)
+        result = attribution_new.search(global_id=self.tutor.person.global_id)
         self.assertCountEqual(result, [self.attribution_new])
 
     def test_search_with_global_ids(self):
-        result = attribution_new.search(global_id__in=[self.person.global_id])
+        result = attribution_new.search(global_id__in=[self.tutor.person.global_id])
         self.assertCountEqual(result, [self.attribution_new])

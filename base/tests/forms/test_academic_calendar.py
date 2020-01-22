@@ -37,8 +37,9 @@ from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 
 
 class TestAcademicCalendarForm(TestCase):
-    def setUp(self):
-        self.an_academic_year = AcademicYearFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.an_academic_year = AcademicYearFactory()
 
     def test_with_start_and_end_dates_not_set(self):
         form = AcademicCalendarForm(data={

@@ -66,7 +66,7 @@ class ProposalLearningUnit(models.Model):
         default=ProposalState.FACULTY.name
     )
 
-    initial_data = JSONField(default={}, encoder=DjangoJSONEncoder)
+    initial_data = JSONField(default=dict, encoder=DjangoJSONEncoder)
     entity = models.ForeignKey('Entity', on_delete=models.CASCADE)
     folder_id = models.PositiveIntegerField(validators=[MaxValueValidator(9999999)])
 

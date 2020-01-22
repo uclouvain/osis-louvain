@@ -36,7 +36,7 @@ from attribution.models.enums.function import Functions
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPOSAL_LINE_STYLES, \
-    _get_significant_volume, _prepare_legend_ws_data, _get_wrapped_cells, \
+    _get_significant_volume, prepare_proposal_legend_ws_data, _get_wrapped_cells, \
     _get_colored_rows, _get_attribution_line, _add_training_data, \
     _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
     _get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
@@ -73,45 +73,46 @@ ROOT_ACRONYM = 'DRTI'
 
 
 class TestLearningUnitXls(TestCase):
-    def setUp(self):
-        self.academic_year = AcademicYearFactory(year=2017)
-        self.learning_container_luy1 = LearningContainerYearFactory(academic_year=self.academic_year)
-        self.learning_unit_yr_1 = LearningUnitYearFactory(academic_year=self.academic_year,
-                                                          learning_container_year=self.learning_container_luy1,
-                                                          credits=50)
-        self.learning_unit_yr_2 = LearningUnitYearFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2017)
+        cls.learning_container_luy1 = LearningContainerYearFactory(academic_year=cls.academic_year)
+        cls.learning_unit_yr_1 = LearningUnitYearFactory(academic_year=cls.academic_year,
+                                                         learning_container_year=cls.learning_container_luy1,
+                                                         credits=50)
+        cls.learning_unit_yr_2 = LearningUnitYearFactory()
 
-        self.proposal_creation_1 = ProposalLearningUnitFactory(
+        cls.proposal_creation_1 = ProposalLearningUnitFactory(
             state=proposal_state.ProposalState.ACCEPTED.name,
             type=proposal_type.ProposalType.CREATION.name,
         )
-        self.proposal_creation_2 = ProposalLearningUnitFactory(
+        cls.proposal_creation_2 = ProposalLearningUnitFactory(
             state=proposal_state.ProposalState.ACCEPTED.name,
             type=proposal_type.ProposalType.CREATION.name,
         )
         direct_parent_type = EducationGroupTypeFactory(name='Bachelor', category=education_group_categories.TRAINING)
 
-        self.an_education_group_parent = EducationGroupYearFactory(academic_year=self.academic_year,
-                                                                   education_group_type=direct_parent_type,
-                                                                   acronym=ROOT_ACRONYM)
-        self.group_element_child = GroupElementYearFactory(
-            parent=self.an_education_group_parent,
+        cls.an_education_group_parent = EducationGroupYearFactory(academic_year=cls.academic_year,
+                                                                  education_group_type=direct_parent_type,
+                                                                  acronym=ROOT_ACRONYM)
+        cls.group_element_child = GroupElementYearFactory(
+            parent=cls.an_education_group_parent,
             child_branch=None,
-            child_leaf=self.learning_unit_yr_1
+            child_leaf=cls.learning_unit_yr_1
         )
-        self.an_education_group = EducationGroupYearFactory(academic_year=self.academic_year,
-                                                            acronym=PARENT_ACRONYM,
-                                                            title=PARENT_TITLE,
-                                                            partial_acronym=PARENT_PARTIAL_ACRONYM)
+        cls.an_education_group = EducationGroupYearFactory(academic_year=cls.academic_year,
+                                                           acronym=PARENT_ACRONYM,
+                                                           title=PARENT_TITLE,
+                                                           partial_acronym=PARENT_PARTIAL_ACRONYM)
 
-        self.group_element_child2 = GroupElementYearFactory(
-            parent=self.an_education_group,
-            child_branch=self.group_element_child.parent,
+        cls.group_element_child2 = GroupElementYearFactory(
+            parent=cls.an_education_group,
+            child_branch=cls.group_element_child.parent,
         )
-        self.old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
-        self.current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
-        generatorContainer = GenerateContainer(self.old_academic_year, self.current_academic_year)
-        self.learning_unit_year_with_entities = generatorContainer.generated_container_years[0].learning_unit_year_full
+        cls.old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
+        cls.current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
+        generatorContainer = GenerateContainer(cls.old_academic_year, cls.current_academic_year)
+        cls.learning_unit_year_with_entities = generatorContainer.generated_container_years[0].learning_unit_year_full
         entities = [
             EntityVersionFactory(
                 start_date=datetime.datetime(1900, 1, 1),
@@ -120,77 +121,77 @@ class TestLearningUnitXls(TestCase):
                 entity__organization__type=organization_type.MAIN
             ) for _ in range(4)
         ]
-        self.learning_unit_year_with_entities.entity_requirement = entities[0]
-        self.learning_unit_year_with_entities.entity_allocation = entities[1]
-        self.proposal_creation_3 = ProposalLearningUnitFactory(
-            learning_unit_year=self.learning_unit_year_with_entities,
+        cls.learning_unit_year_with_entities.entity_requirement = entities[0]
+        cls.learning_unit_year_with_entities.entity_allocation = entities[1]
+        cls.proposal_creation_3 = ProposalLearningUnitFactory(
+            learning_unit_year=cls.learning_unit_year_with_entities,
             state=proposal_state.ProposalState.ACCEPTED.name,
             type=proposal_type.ProposalType.CREATION.name,
         )
-        self.learning_container_luy = LearningContainerYearFactory(academic_year=self.academic_year)
-        self.luy_with_attribution = LearningUnitYearFactory(academic_year=self.academic_year,
-                                                            learning_container_year=self.learning_container_luy,
-                                                            periodicity=learning_unit_year_periodicity.ANNUAL,
-                                                            status=True,
-                                                            language=None,
-                                                            )
-        self.luy_with_attribution.entity_requirement = entities[0]
-        self.luy_with_attribution.entity_allocation = entities[1]
+        cls.learning_container_luy = LearningContainerYearFactory(academic_year=cls.academic_year)
+        cls.luy_with_attribution = LearningUnitYearFactory(academic_year=cls.academic_year,
+                                                           learning_container_year=cls.learning_container_luy,
+                                                           periodicity=learning_unit_year_periodicity.ANNUAL,
+                                                           status=True,
+                                                           language=None,
+                                                           )
+        cls.luy_with_attribution.entity_requirement = entities[0]
+        cls.luy_with_attribution.entity_allocation = entities[1]
 
-        self.component_lecturing = LearningComponentYearFactory(
-            learning_unit_year=self.luy_with_attribution,
+        cls.component_lecturing = LearningComponentYearFactory(
+            learning_unit_year=cls.luy_with_attribution,
             type=learning_component_year_type.LECTURING,
             hourly_volume_total_annual=15,
             hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=5,
             planned_classes=1
         )
-        self.component_practical = LearningComponentYearFactory(
-            learning_unit_year=self.luy_with_attribution,
+        cls.component_practical = LearningComponentYearFactory(
+            learning_unit_year=cls.luy_with_attribution,
             type=learning_component_year_type.PRACTICAL_EXERCISES,
             hourly_volume_total_annual=15,
             hourly_volume_partial_q1=10,
             hourly_volume_partial_q2=5,
             planned_classes=1
         )
-        a_person_tutor_1 = PersonFactory(last_name='Dupuis', first_name='Tom')
-        self.a_tutor_1 = TutorFactory(person=a_person_tutor_1)
+        a_person_tutor_1 = PersonFactory(last_name='Dupuis', first_name='Tom', email="dupuis@gmail.com")
+        cls.a_tutor_1 = TutorFactory(person=a_person_tutor_1)
 
-        self.an_attribution_1 = AttributionNewFactory(
-            tutor=self.a_tutor_1,
+        cls.an_attribution_1 = AttributionNewFactory(
+            tutor=cls.a_tutor_1,
             start_year=2017,
             function=COORDINATOR
         )
-        self.attribution_charge_new_lecturing_1 = AttributionChargeNewFactory(
-            learning_component_year=self.component_lecturing,
-            attribution=self.an_attribution_1,
+        cls.attribution_charge_new_lecturing_1 = AttributionChargeNewFactory(
+            learning_component_year=cls.component_lecturing,
+            attribution=cls.an_attribution_1,
             allocation_charge=15.0)
-        self.attribution_charge_new_practical_1 = AttributionChargeNewFactory(
-            learning_component_year=self.component_practical,
-            attribution=self.an_attribution_1,
+        cls.attribution_charge_new_practical_1 = AttributionChargeNewFactory(
+            learning_component_year=cls.component_practical,
+            attribution=cls.an_attribution_1,
             allocation_charge=5.0)
 
-        self.a_tutor_2 = TutorFactory(person=PersonFactory(last_name='Maréchal', first_name='Didier'))
+        cls.a_tutor_2 = TutorFactory(person=PersonFactory(last_name='Maréchal', first_name='Didier'))
 
-        self.an_attribution_2 = AttributionNewFactory(
-            tutor=self.a_tutor_2,
+        cls.an_attribution_2 = AttributionNewFactory(
+            tutor=cls.a_tutor_2,
             start_year=2017
         )
-        self.attribution_charge_new_lecturing_2 = AttributionChargeNewFactory(
-            learning_component_year=self.component_lecturing,
-            attribution=self.an_attribution_2,
+        cls.attribution_charge_new_lecturing_2 = AttributionChargeNewFactory(
+            learning_component_year=cls.component_lecturing,
+            attribution=cls.an_attribution_2,
             allocation_charge=15.0)
-        self.attribution_charge_new_practical_2 = AttributionChargeNewFactory(
-            learning_component_year=self.component_practical,
-            attribution=self.an_attribution_2,
+        cls.attribution_charge_new_practical_2 = AttributionChargeNewFactory(
+            learning_component_year=cls.component_practical,
+            attribution=cls.an_attribution_2,
             allocation_charge=5.0)
-        self.entity_requirement = EntityVersion.objects.filter(
+        cls.entity_requirement = EntityVersion.objects.filter(
             entity=OuterRef('learning_container_year__requirement_entity'),
         ).current(
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
-        self.entity_allocation = EntityVersion.objects.filter(
+        cls.entity_allocation = EntityVersion.objects.filter(
             entity=OuterRef('learning_container_year__allocation_entity'),
         ).current(
             OuterRef('academic_year__start_date')
@@ -271,7 +272,7 @@ class TestLearningUnitXls(TestCase):
             xls_build.STYLED_CELLS:
                 DEFAULT_LEGEND_STYLES
         }
-        self.assertEqual(_prepare_legend_ws_data(), expected)
+        self.assertEqual(prepare_proposal_legend_ws_data(), expected)
 
     def test_add_training_data(self):
         luy_1 = LearningUnitYear.objects.filter(pk=self.learning_unit_yr_1.pk).annotate(
@@ -370,7 +371,7 @@ class TestLearningUnitXls(TestCase):
             luy.get_quadrimester_display() or '',
             luy.get_session_display() or '',
             "",
-            ]
+        ]
         self.assertEqual(_get_data_part2(luy, False), expected_common)
         self.assertEqual(
             _get_data_part2(luy, True),
@@ -447,7 +448,7 @@ class TestLearningUnitXls(TestCase):
         ]
 
     def test_get_attribution_detail(self):
-        a_person = PersonFactory(last_name="Smith", first_name='Aaron')
+        a_person = PersonFactory(last_name="Smith", first_name='Aaron', email='smith@google.com')
         attribution_dict = {
             'LECTURING': 10,
             'substitute': None,
@@ -460,6 +461,7 @@ class TestLearningUnitXls(TestCase):
         self.assertCountEqual(
             _get_attribution_detail(attribution_dict),
             ['Smith Aaron',
+             'smith@google.com',
              _('Co-holder'),
              '',
              self.academic_year,
@@ -487,12 +489,13 @@ class TestLearningUnitXls(TestCase):
         first_attribution = result.get('data')[0]
 
         self.assertEqual(first_attribution[24], 'Dupuis Tom')
-        self.assertEqual(first_attribution[25], _("Coordinator"))
-        self.assertEqual(first_attribution[26], "")
-        self.assertEqual(first_attribution[27], 2017)
-        self.assertEqual(first_attribution[28], '')
-        self.assertEqual(first_attribution[29], 15)
-        self.assertEqual(first_attribution[30], 5)
+        self.assertEqual(first_attribution[25], 'dupuis@gmail.com')
+        self.assertEqual(first_attribution[26], _("Coordinator"))
+        self.assertEqual(first_attribution[27], "")
+        self.assertEqual(first_attribution[28], 2017)
+        self.assertEqual(first_attribution[29], '')
+        self.assertEqual(first_attribution[30], 15)
+        self.assertEqual(first_attribution[31], 5)
 
 
 def expected_attribution_data(attribution_charge_new_lecturing, attribution_charge_new_practical, expected, luy):

@@ -32,11 +32,14 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 
 
 class LearningContainerYearAttributesTestMixin(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.requirement_entity = EntityVersionFactory().entity
+        cls.allocation_entity = EntityVersionFactory().entity
+        cls.additional_entity_1 = EntityVersionFactory().entity
+        cls.additional_entity_2 = EntityVersionFactory().entity
+
     def setUp(self):
-        self.requirement_entity = EntityVersionFactory().entity
-        self.allocation_entity = EntityVersionFactory().entity
-        self.additional_entity_1 = EntityVersionFactory().entity
-        self.additional_entity_2 = EntityVersionFactory().entity
         self.container_year = LearningContainerYearFactory(
             requirement_entity=self.requirement_entity,
             allocation_entity=self.allocation_entity,
@@ -47,12 +50,13 @@ class LearningContainerYearAttributesTestMixin(TestCase):
 
 class GetEntityByTypeTest(LearningContainerYearAttributesTestMixin):
     """Unit tests on LearningContainerYear.get_entity_from_type()"""
-
     def test_common_usage(self):
         self.assertEqual(self.container_year.get_entity_from_type(REQUIREMENT_ENTITY), self.requirement_entity)
         self.assertEqual(self.container_year.get_entity_from_type(ALLOCATION_ENTITY), self.allocation_entity)
-        self.assertEqual(self.container_year.get_entity_from_type(ADDITIONAL_REQUIREMENT_ENTITY_1), self.additional_entity_1)
-        self.assertEqual(self.container_year.get_entity_from_type(ADDITIONAL_REQUIREMENT_ENTITY_2), self.additional_entity_2)
+        self.assertEqual(self.container_year.get_entity_from_type(ADDITIONAL_REQUIREMENT_ENTITY_1),
+                         self.additional_entity_1)
+        self.assertEqual(self.container_year.get_entity_from_type(ADDITIONAL_REQUIREMENT_ENTITY_2),
+                         self.additional_entity_2)
 
     def test_when_entity_is_not_set(self):
         self.container_year.additional_entity_2 = None
@@ -66,7 +70,6 @@ class GetEntityByTypeTest(LearningContainerYearAttributesTestMixin):
 
 class GetMapEntityByTypeTest(LearningContainerYearAttributesTestMixin):
     """Unit tests on LearningContainerYear.get_map_entity_by_type()"""
-
     def test_common_usage(self):
         expected_result = {
             REQUIREMENT_ENTITY: self.requirement_entity,
@@ -79,7 +82,6 @@ class GetMapEntityByTypeTest(LearningContainerYearAttributesTestMixin):
 
 class SetEntityTest(LearningContainerYearAttributesTestMixin):
     """Unit tests on LearningContainerYear.set_entity()"""
-
     def test_common_usage(self):
         new_entity = EntityVersionFactory().entity
         self.container_year.set_entity(ADDITIONAL_REQUIREMENT_ENTITY_2, new_entity)
@@ -96,7 +98,6 @@ class SetEntityTest(LearningContainerYearAttributesTestMixin):
 
 class SetEntitiesTest(LearningContainerYearAttributesTestMixin):
     """Unit tests on LearningContainerYear.set_entities()"""
-
     def test_common_usage(self):
         new_requirement_entity = EntityVersionFactory().entity
         new_allocation_entity = EntityVersionFactory().entity

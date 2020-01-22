@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest.mock import patch
 
 from django.http import HttpResponse
 from django.test import TestCase
@@ -32,13 +31,7 @@ from django.urls import reverse
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from attribution.tests.factories.attribution_new import AttributionNewFactory
 from attribution.tests.views.charge_repartition.common import TestChargeRepartitionMixin
-from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
-    PracticalLearningComponentYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, LearningUnitYearPartimFactory
-from base.tests.factories.person import PersonWithPermissionsFactory
-from base.views.mixins import RulesRequiredMixin
 
 
 class TestSelectAttributionView(TestChargeRepartitionMixin, TestCase):
@@ -75,11 +68,11 @@ class TestSelectAttributionView(TestChargeRepartitionMixin, TestCase):
         attribution.id = None
         attribution.save()
 
-        charge_lecturing = AttributionChargeNewFactory(
+        AttributionChargeNewFactory(
             attribution=attribution,
             learning_component_year=self.lecturing_component
         )
-        charge_practical = AttributionChargeNewFactory(
+        AttributionChargeNewFactory(
             attribution=attribution,
             learning_component_year=self.practical_component
         )

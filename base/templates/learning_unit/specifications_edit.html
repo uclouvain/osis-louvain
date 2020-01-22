@@ -52,7 +52,7 @@
     <input type="submit" value="{% trans "Save" %}" class="btn btn-primary"
            title="{% trans "Save and do not postpone changes" %}"
            onclick="CKupdate(); submitForm(0)"/>
-    {% if not form.learning_unit_year.is_past %}
+    {% if not form.learning_unit_year.is_past and not form.has_proposal %}
     <input type="submit" value="{% trans "Save and postpone" %}"
            title="{% trans "Save and postpone changes on next years" %}" class="btn btn-primary"
            onclick="CKupdate(); submitForm(1)"/>

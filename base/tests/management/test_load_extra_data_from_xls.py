@@ -53,18 +53,18 @@ class TestGetModelClassFromWorksheetTitle(TestCase):
 
 class TestSaveInDatabase(TestCase):
     """Unit tests on _save_in_database()"""
-
-    def setUp(self):
-        self.command_instance = load_extra_data_from_xls.Command()
-        self.headers = [
+    @classmethod
+    def setUpTestData(cls):
+        cls.command_instance = load_extra_data_from_xls.Command()
+        cls.headers = [
             (0, 'entity__entityversion__acronym',),
             (1, 'person__user__username',),
         ]
-        self.entity_version = EntityVersionFactory(acronym='ESPO')
-        self.person = PersonFactory(user__username='toto')
-        self.xls_row = [
-            Mock(value=self.entity_version.acronym),
-            Mock(value=self.person.user.username),
+        cls.entity_version = EntityVersionFactory(acronym='ESPO')
+        cls.person = PersonFactory(user__username='toto')
+        cls.xls_row = [
+            Mock(value=cls.entity_version.acronym),
+            Mock(value=cls.person.user.username),
         ]
 
     def test_when_entity_manager_obj_does_not_exist(self):
@@ -101,11 +101,11 @@ class TestSaveInDatabase(TestCase):
 
 class TestFindObjectTroughForeignKeys(TestSaveInDatabase):
     """Unit tests on _find_object_through_foreign_keys()"""
-
-    def setUp(self):
-        super(TestFindObjectTroughForeignKeys, self).setUp()
-        self.field = self.headers[1][1]  # 'person__user__username'
-        self.value = self.person.user.username
+    @classmethod
+    def setUpTestData(cls):
+        super(TestFindObjectTroughForeignKeys, cls).setUpTestData()
+        cls.field = cls.headers[1][1]  # 'person__user__username'
+        cls.value = cls.person.user.username
 
     def test_classic_usage(self):
         result = self.command_instance._find_object_through_foreign_keys(PersonEntity, self.field, self.value)
@@ -121,7 +121,6 @@ class TestFindObjectTroughForeignKeys(TestSaveInDatabase):
 
 class TestConvertBooleanVellValue(TestCase):
     """Unit tests on _convert_boolean_cell_value()"""
-
     def test_when_value_is_true(self):
         result = load_extra_data_from_xls.Command._convert_boolean_cell_value(True)
         self.assertTrue(result)
@@ -143,7 +142,6 @@ class TestConvertBooleanVellValue(TestCase):
 
 class TestCleanHeaderFromSpecialChars(TestCase):
     """Unit tests on _clean_header_from_special_chars()"""
-
     def test(self):
         col_name = "i_am_field_composing_natural_key**"
         result = load_extra_data_from_xls.Command._clean_header_from_special_chars(col_name)

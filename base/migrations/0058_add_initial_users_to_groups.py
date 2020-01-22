@@ -11,7 +11,7 @@ import base.models as mdl
 
 def add_users_to_group(apps, schema_editor):
     db_alias = schema_editor.connection.alias
-    emit_post_migrate_signal(2, False, db_alias)
+    emit_post_migrate_signal(1, False, db_alias)
     tutors_group = Group.objects.get(name='tutors')
     pgm_managers_group = Group.objects.get(name='program_managers')
     students_group = Group.objects.get(name='students')

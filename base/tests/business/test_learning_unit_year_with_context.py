@@ -39,20 +39,21 @@ from reference.tests.factories.country import CountryFactory
 
 
 class LearningUnitYearWithContextTestCase(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         today = datetime.date.today()
-        self.current_academic_year = AcademicYearFactory(start_date=today,
-                                                         end_date=today.replace(year=today.year + 1),
-                                                         year=today.year)
-        self.organization = OrganizationFactory(type=organization_type.MAIN)
-        self.country = CountryFactory()
-        self.entity = EntityFactory(country=self.country, organization=self.organization)
-        self.learning_container_yr = LearningContainerYearFactory(
-            academic_year=self.current_academic_year,
-            requirement_entity=self.entity
+        cls.current_academic_year = AcademicYearFactory(start_date=today,
+                                                        end_date=today.replace(year=today.year + 1),
+                                                        year=today.year)
+        cls.organization = OrganizationFactory(type=organization_type.MAIN)
+        cls.country = CountryFactory()
+        cls.entity = EntityFactory(country=cls.country, organization=cls.organization)
+        cls.learning_container_yr = LearningContainerYearFactory(
+            academic_year=cls.current_academic_year,
+            requirement_entity=cls.entity
         )
-        self.learning_component_yr = LearningComponentYearFactory(
-            learning_unit_year__learning_container_year=self.learning_container_yr,
+        cls.learning_component_yr = LearningComponentYearFactory(
+            learning_unit_year__learning_container_year=cls.learning_container_yr,
             hourly_volume_partial_q1=-1,
             planned_classes=1
         )

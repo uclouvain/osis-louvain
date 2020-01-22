@@ -36,12 +36,13 @@ from base.tests.factories.session_examen import SessionExamFactory
 
 
 class EnrollmentTests(TestCase):
-    def setUp(self):
-        self.academic_year = AcademicYearFactory(current=True)
-        self.session_exam_calendar = SessionExamCalendarFactory(academic_calendar__academic_year=self.academic_year,
-                                                                number_session=number_session.ONE)
-        self.session_exam = SessionExamFactory(number_session=number_session.ONE,
-                                               learning_unit_year__academic_year=self.academic_year)
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.session_exam_calendar = SessionExamCalendarFactory(academic_calendar__academic_year=cls.academic_year,
+                                                               number_session=number_session.ONE)
+        cls.session_exam = SessionExamFactory(number_session=number_session.ONE,
+                                              learning_unit_year__academic_year=cls.academic_year)
 
     def test_not_enrolled_exam_exists(self):
         exam_enrollment = ExamEnrollmentFactory(session_exam=self.session_exam,

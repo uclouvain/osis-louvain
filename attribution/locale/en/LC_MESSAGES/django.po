@@ -122,7 +122,7 @@ msgstr ""
 msgid "Manage repartition"
 msgstr ""
 
-msgid "No attributions exist for the parent learning unit"
+msgid "No attributions exist for the full UE"
 msgstr ""
 
 msgid "Practical exercises"
@@ -160,7 +160,7 @@ msgstr ""
 #, python-format
 msgid ""
 "The sum of volumes for the partims for professor %(tutor)s is superior to "
-"the volume of parent learning unit for this professor"
+"the volume of full UE for this professor"
 msgstr ""
 
 msgid "There is no course for which you can edit description fiche"
@@ -172,7 +172,7 @@ msgstr ""
 msgid "Tutor"
 msgstr ""
 
-msgid "Tutor for parent LU"
+msgid "Tutor for UE full"
 msgstr ""
 
 msgid "Tutors"

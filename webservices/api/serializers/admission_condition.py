@@ -144,14 +144,11 @@ class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
 
 
 class ContinuingEducationTrainingAdmissionConditionsSerializer(AdmissionConditionsSerializer):
-    admission_enrollment_procedures = serializers.CharField(read_only=True)
-    personalized_access = serializers.CharField(read_only=True)
 
     class Meta:
         model = AdmissionCondition
 
         fields = (
             'alert_message',
-            'admission_enrollment_procedures',
-            'personalized_access',
+            'free_text',
         )

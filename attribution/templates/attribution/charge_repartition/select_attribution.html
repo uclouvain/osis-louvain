@@ -33,7 +33,7 @@
                     {% if not learning_unit_year.is_partim %}
                         <th>{% trans 'Tutor' %}</th>
                     {% else %}
-                        <th>{% trans 'Tutor for parent LU' %}</th>
+                        <th>{% trans 'Tutor for UE full' %}</th>
                     {% endif %}
                     <th>{% trans 'Function' %}</th>
                     {% if not learning_unit_year.is_partim %}
@@ -77,7 +77,7 @@
         {% else %}
             <br>
             <p class="text-center">
-                <strong>{% trans "No attributions exist for the parent learning unit" %}</strong>
+                <strong>{% trans "No attributions exist for the full UE" %}</strong>
             </p>
         {% endif %}
         <a href="{% url 'learning_unit_attributions' learning_unit_year.id %}" class="btn btn-default" role="button">

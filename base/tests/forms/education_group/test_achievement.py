@@ -33,9 +33,10 @@ from cms.tests.factories.text_label import TextLabelFactory
 
 
 class TestInitEducationGroupAchievementCMSForm(TestCase):
-    def setUp(self):
-        self.education_group_year = EducationGroupYearFactory()
-        self.cms_text_label = TextLabelFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_year = EducationGroupYearFactory()
+        cls.cms_text_label = TextLabelFactory()
 
     def test_init_case_parms_not_rigth_instance(self):
         education_group = self.education_group_year.education_group
@@ -63,9 +64,10 @@ class TestInitEducationGroupAchievementCMSForm(TestCase):
 
 
 class TestGetRelatedTextEducationGroupAchievementCMSForm(TestCase):
-    def setUp(self):
-        self.education_group_year = EducationGroupYearFactory()
-        self.cms_text_label = TextLabelFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_year = EducationGroupYearFactory()
+        cls.cms_text_label = TextLabelFactory()
 
     def test_get_related_text_in_french(self):
         expected_result = 'Text in french'

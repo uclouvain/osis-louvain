@@ -47,13 +47,13 @@ from rules_management.enums import GROUP_DAILY_MANAGEMENT, GROUP_PGRM_ENCODING_P
 
 
 class TestGroupModelFormModelForm(EducationGroupYearModelFormMixin):
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_type = EducationGroupTypeFactory(category=education_group_categories.GROUP)
+        cls.form_class = GroupYearModelForm
+        AuthorizedRelationshipFactory(child_type=cls.education_group_type)
 
-    def setUp(self):
-        self.education_group_type = EducationGroupTypeFactory(category=education_group_categories.GROUP)
-        self.form_class = GroupYearModelForm
-        AuthorizedRelationshipFactory(child_type=self.education_group_type)
-
-        super(TestGroupModelFormModelForm, self).setUp(education_group_type=self.education_group_type)
+        super(TestGroupModelFormModelForm, cls).setUpTestData(education_group_type=cls.education_group_type)
 
     def test_fields(self):
         fields = (
@@ -133,15 +133,16 @@ class TestGroupModelFormModelForm(EducationGroupYearModelFormMixin):
 
 
 class TestGroupForm(TestCase):
-    def setUp(self):
-        self.category = education_group_categories.GROUP
-        self.expected_educ_group_year, self.post_data = _get_valid_post_data(self.category)
-        self.egt = self.expected_educ_group_year.education_group_type
+    @classmethod
+    def setUpTestData(cls):
+        cls.category = education_group_categories.GROUP
+        cls.expected_educ_group_year, cls.post_data = _get_valid_post_data(cls.category)
+        cls.egt = cls.expected_educ_group_year.education_group_type
 
         # Create user and attached it to management entity
         person = PersonFactory()
-        PersonEntityFactory(person=person, entity=self.expected_educ_group_year.management_entity)
-        self.user = person.user
+        PersonEntityFactory(person=person, entity=cls.expected_educ_group_year.management_entity)
+        cls.user = person.user
 
     def test_create(self):
         form = GroupForm(
@@ -178,12 +179,12 @@ class TestGroupForm(TestCase):
 
 class TestGroupPostponedList(EducationGroupYearModelFormMixin):
     """Unit tests to ensure that GROUPS DOESN'T HAVE a method _postponed_list"""
-
-    def setUp(self):
-        self.education_group_type = EducationGroupTypeFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_type = EducationGroupTypeFactory(
             category=education_group_categories.GROUP
         )
-        super(TestGroupPostponedList, self).setUp(education_group_type=self.education_group_type)
+        super(TestGroupPostponedList, cls).setUpTestData(education_group_type=cls.education_group_type)
 
     def test_group_doesnt_have_post_save_method(self):
         self.parent_education_group_year.education_group_type = self.education_group_type

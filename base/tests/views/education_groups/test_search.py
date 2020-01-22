@@ -89,7 +89,7 @@ class TestEducationGroupSearchView(TestCase):
         self.assertTrue(all(key in response.context.keys() for key in expected_keys_found))
 
     def test_search_education_group_cache_filter(self):
-        response = self.client.get(self.url, data=FILTER_DATA)
+        self.client.get(self.url, data=FILTER_DATA)
         cached_data = RequestCache(self.user, self.url).cached_data
         self.assertEqual(cached_data, FILTER_DATA)
 

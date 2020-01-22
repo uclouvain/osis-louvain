@@ -35,15 +35,16 @@ from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 
 
 class TestPrerequisiteItem(TestCase):
-    def setUp(self):
-        self.learning_unit_is_prerequisite = LearningUnitFactory()
-        self.learning_unit_not_prerequisite = LearningUnitFactory()
-        self.learning_unit_year_with_prerequisite = LearningUnitYearFactory()
-        self.learning_unit_year_without_prerequisite = LearningUnitYearFactory()
-        self.prerequisite = PrerequisiteFactory(learning_unit_year=self.learning_unit_year_with_prerequisite)
-        self.prerequisite_item = PrerequisiteItemFactory(
-            prerequisite=self.prerequisite,
-            learning_unit=self.learning_unit_is_prerequisite
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_is_prerequisite = LearningUnitFactory()
+        cls.learning_unit_not_prerequisite = LearningUnitFactory()
+        cls.learning_unit_year_with_prerequisite = LearningUnitYearFactory()
+        cls.learning_unit_year_without_prerequisite = LearningUnitYearFactory()
+        cls.prerequisite = PrerequisiteFactory(learning_unit_year=cls.learning_unit_year_with_prerequisite)
+        cls.prerequisite_item = PrerequisiteItemFactory(
+            prerequisite=cls.prerequisite,
+            learning_unit=cls.learning_unit_is_prerequisite
         )
 
     def test_find_by_prerequisite(self):
@@ -61,18 +62,19 @@ class TestPrerequisiteItem(TestCase):
 
 
 class TestPrerequisiteString(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         academic_year = create_current_academic_year()
         luy_prerequisite = LearningUnitYearFactory(acronym='LDROI1223', academic_year=academic_year)
-        self.prerequisite = PrerequisiteFactory(learning_unit_year=luy_prerequisite)
+        cls.prerequisite = PrerequisiteFactory(learning_unit_year=luy_prerequisite)
 
-        self.luy_prerequisite_item_1_1 = LearningUnitYearFactory(acronym='LDROI1001', academic_year=academic_year)
-        self.luy_prerequisite_item_1_2 = LearningUnitYearFactory(acronym='LDROI1002', academic_year=academic_year)
-        self.luy_prerequisite_item_1_3 = LearningUnitYearFactory(acronym='LDROI1003', academic_year=academic_year)
+        cls.luy_prerequisite_item_1_1 = LearningUnitYearFactory(acronym='LDROI1001', academic_year=academic_year)
+        cls.luy_prerequisite_item_1_2 = LearningUnitYearFactory(acronym='LDROI1002', academic_year=academic_year)
+        cls.luy_prerequisite_item_1_3 = LearningUnitYearFactory(acronym='LDROI1003', academic_year=academic_year)
 
-        self.luy_prerequisite_item_2_1 = LearningUnitYearFactory(acronym='LDROI2001', academic_year=academic_year)
-        self.luy_prerequisite_item_2_2 = LearningUnitYearFactory(acronym='LDROI2002', academic_year=academic_year)
-        self.luy_prerequisite_item_2_3 = LearningUnitYearFactory(acronym='LDROI2003', academic_year=academic_year)
+        cls.luy_prerequisite_item_2_1 = LearningUnitYearFactory(acronym='LDROI2001', academic_year=academic_year)
+        cls.luy_prerequisite_item_2_2 = LearningUnitYearFactory(acronym='LDROI2002', academic_year=academic_year)
+        cls.luy_prerequisite_item_2_3 = LearningUnitYearFactory(acronym='LDROI2003', academic_year=academic_year)
 
     def test_get_prerequisite_string_representation_no_item(self):
         self.assertEqual(

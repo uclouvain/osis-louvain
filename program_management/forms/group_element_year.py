@@ -146,7 +146,8 @@ class GroupElementYearForm(forms.ModelForm):
 
 class BaseGroupElementYearFormset(BaseModelFormSet):
     def __init__(self, *args, **kwargs):
-        self.kwargs = kwargs.pop('form_kwargs')[0]
+        if len(kwargs['form_kwargs']) > 0:
+            self.kwargs = kwargs.pop('form_kwargs')[0]
         super().__init__(*args, **kwargs)
 
     def get_form_kwargs(self, index):

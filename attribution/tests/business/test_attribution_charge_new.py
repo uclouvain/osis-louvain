@@ -25,7 +25,6 @@
 ##############################################################################
 
 from django.test import TestCase
-from django.utils import timezone
 
 from attribution.business.attribution_charge_new import find_attribution_charge_new_by_learning_unit_year_as_dict
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
@@ -36,12 +35,16 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class TestAttributionChargeNew(TestCase):
-    def setUp(self):
-        self.academic_year = AcademicYearFactory(year=timezone.now().year)
-        self.l_unit_1 = LearningUnitYearFactory(acronym="LBIR1212", academic_year=self.academic_year,
-                                                subtype=learning_unit_year_subtypes.FULL)
-        component = LearningComponentYearFactory(learning_unit_year=self.l_unit_1)
-        self.attribution_charge_news = [
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.l_unit_1 = LearningUnitYearFactory(
+            acronym="LBIR1212",
+            academic_year=cls.academic_year,
+            subtype=learning_unit_year_subtypes.FULL
+        )
+        component = LearningComponentYearFactory(learning_unit_year=cls.l_unit_1)
+        cls.attribution_charge_news = [
             AttributionChargeNewFactory(learning_component_year=component) for _ in range(5)
         ]
 

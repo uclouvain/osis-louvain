@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
 from unittest import mock
 
 from django.test import TestCase
@@ -33,27 +32,29 @@ from attribution.business import application_json
 from attribution.tests.factories.tutor_application import TutorApplicationFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.person import PersonFactory
-from base.tests.factories.tutor import TutorFactory
 
 
 class AttributionJsonTest(TestCase):
-    def setUp(self):
-        today = date.today()
-        self.academic_year = AcademicYearFactory(year=today.year, start_date=today)
-        self.l_container_1 = LearningContainerYearFactory(in_charge=True)
-        self.tutor_1 = TutorFactory(person=PersonFactory(global_id='00012345'))
-        self.tutor_2 = TutorFactory(person=PersonFactory(global_id=''))
-        self.tutor_3 = TutorFactory(person=PersonFactory(global_id=None))
-        self.tutor_application_1 = TutorApplicationFactory(tutor=self.tutor_1,
-                                                           learning_container_year=self.l_container_1)
-        self.tutor_application_2 = TutorApplicationFactory(tutor=self.tutor_2,
-                                                           learning_container_year=self.l_container_1)
-        self.tutor_application_3 = TutorApplicationFactory(tutor=self.tutor_3,
-                                                           learning_container_year=self.l_container_1)
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.l_container_1 = LearningContainerYearFactory(in_charge=True)
+        cls.global_id = '00012345'
+        cls.tutor_application_1 = TutorApplicationFactory(
+            tutor__person__global_id=cls.global_id,
+            learning_container_year=cls.l_container_1
+        )
+        cls.tutor_application_2 = TutorApplicationFactory(
+            tutor__person__global_id='',
+            learning_container_year=cls.l_container_1
+        )
+        cls.tutor_application_3 = TutorApplicationFactory(
+            tutor__person__global_id=None,
+            learning_container_year=cls.l_container_1
+        )
 
     @mock.patch('osis_common.queue.queue_sender.send_message')
-    @override_settings(QUEUES={'QUEUES_NAME':{'APPLICATION_OSIS_PORTAL': 'dummy'}})
+    @override_settings(QUEUES={'QUEUES_NAME': {'APPLICATION_OSIS_PORTAL': 'dummy'}})
     def test_build_attributions_json(self, mock_send_message):
         application_list = application_json._compute_list()
         self.assertIsInstance(application_list, list)
@@ -64,10 +65,10 @@ class AttributionJsonTest(TestCase):
     def test_build_attributions_json_with_none_value(self):
         self.tutor_application_1.volume_lecturing = None  # Should be computed as '0.0'
         self.tutor_application_1.save()
-        application_list = application_json._compute_list(global_ids=[self.tutor_1.person.global_id])
+        application_list = application_json._compute_list(global_ids=[self.global_id])
         self.assertIsInstance(application_list, list)
         self.assertEqual(len(application_list), 1)
-        self.assertEqual(application_list[0]['global_id'], self.tutor_1.person.global_id)
+        self.assertEqual(application_list[0]['global_id'], self.global_id)
         # We should have two applications
         self.assertIsInstance(application_list[0]['tutor_applications'], list)
         self.assertEqual(len(application_list[0]['tutor_applications']), 1)

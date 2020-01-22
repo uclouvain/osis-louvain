@@ -38,9 +38,7 @@ today2 = datetime.datetime.today()
 
 
 class OfferYearCalendarDisplayTagTest(TestCase):
-
     def setUp(self):
-
         self.build_current_offer_yr_calendar()
         self.build_old_offer_yr_calendar()
 

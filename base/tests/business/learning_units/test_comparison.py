@@ -53,13 +53,14 @@ NEW_ACRONYM = "LDROI1005"
 
 
 class TestComparison(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         learning_unit = LearningUnitFactory()
-        self.academic_year = create_current_academic_year()
-        self.learning_unit_year = create_learning_unit_year(self.academic_year, TITLE, learning_unit)
-        self.previous_academic_yr = AcademicYearFactory(year=self.academic_year.year - 1)
-        self.previous_learning_unit_year = create_learning_unit_year(self.previous_academic_yr, OTHER_TITLE,
-                                                                     learning_unit)
+        cls.academic_year = create_current_academic_year()
+        cls.learning_unit_year = create_learning_unit_year(cls.academic_year, TITLE, learning_unit)
+        cls.previous_academic_yr = AcademicYearFactory(year=cls.academic_year.year - 1)
+        cls.previous_learning_unit_year = create_learning_unit_year(cls.previous_academic_yr, OTHER_TITLE,
+                                                                    learning_unit)
 
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
     def test_get_value_for_boolean(self):
@@ -78,15 +79,24 @@ class TestComparison(TestCase):
 
 
 class LearningUnitYearComparaisonTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+        cls.previous_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
 
     def setUp(self):
-        self.academic_year = create_current_academic_year()
-        self.previous_academic_year = AcademicYearFactory(year=self.academic_year.year + 1)
-
-        self.learning_unit_year = self.create_learning_unit_yr(self.academic_year, "LDR", True,
-                                                               learning_unit_year_subtypes.FULL)
-        self.previous_learning_unit_year = self.create_learning_unit_yr(self.previous_academic_year, NEW_ACRONYM, False,
-                                                                        learning_unit_year_subtypes.PARTIM)
+        self.learning_unit_year = self.create_learning_unit_yr(
+            self.academic_year,
+            "LDR",
+            True,
+            learning_unit_year_subtypes.FULL
+        )
+        self.previous_learning_unit_year = self.create_learning_unit_yr(
+            self.previous_academic_year,
+            NEW_ACRONYM,
+            False,
+            learning_unit_year_subtypes.PARTIM
+        )
 
     def create_learning_unit_yr(self, academic_year, acronym, status, subtype):
         return LearningUnitYearFactory(acronym=acronym,

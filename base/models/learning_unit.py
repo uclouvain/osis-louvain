@@ -86,7 +86,6 @@ class LearningUnitAdmin(VersionAdmin, SerializableModelAdmin):
 
 
 class LearningUnit(SerializableModel):
-    existing_proposal_in_epc = models.BooleanField(default=False)
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     learning_container = models.ForeignKey('LearningContainer', blank=True, null=True, on_delete=models.CASCADE)
     changed = models.DateTimeField(null=True, auto_now=True)

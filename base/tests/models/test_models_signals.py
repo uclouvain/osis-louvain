@@ -77,7 +77,6 @@ def assert_person_match_user_infos(test_case, person, user_infos):
 
 
 class CreateUpdatePerson(TestCase):
-
     def test_create_person_from_user(self):
         user_infos = {
             'USERNAME': 'user1',
@@ -106,7 +105,6 @@ class CreateUpdatePerson(TestCase):
 
 
 class UpdatePersonIfNecessary(TestCase):
-
     user_infos = {
         'USERNAME': 'user_test',
         'PASSWORD': 'pass_test',

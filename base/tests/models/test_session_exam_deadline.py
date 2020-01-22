@@ -33,9 +33,9 @@ from base.tests.factories.session_exam_deadline import SessionExamDeadlineFactor
 
 
 class SessionExamDeadlineTest(TestCase):
-
-    def setUp(self):
-        self.sess_exam_deadline = SessionExamDeadlineFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.sess_exam_deadline = SessionExamDeadlineFactory()
 
     def test_compute_deadline_is_called_case_changing_student_deliberation_date(self):
         with mock.patch.object(compute_student_score_encoding_deadline, 'send') as mock_method:

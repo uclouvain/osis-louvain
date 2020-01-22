@@ -48,11 +48,12 @@ def create_learning_unit(acronym, title):
 
 
 class LearningUnitTest(TestCase):
-    def setUp(self):
-        self.start_year_2014 = AcademicYearFactory(year=2014)
-        self.start_year_2015 = AcademicYearFactory(year=2015)
-        self.start_year_2017 = AcademicYearFactory(year=2017)
-        self.end_year_2018 = AcademicYearFactory(year=2018)
+    @classmethod
+    def setUpTestData(cls):
+        cls.start_year_2014 = AcademicYearFactory(year=2014)
+        cls.start_year_2015 = AcademicYearFactory(year=2015)
+        cls.start_year_2017 = AcademicYearFactory(year=2017)
+        cls.end_year_2018 = AcademicYearFactory(year=2018)
 
     def test_create_learning_unit_with_start_year_higher_than_end_year(self):
         l_unit = LearningUnitFactory.build(start_year=self.start_year_2017, end_year=self.start_year_2015)
@@ -65,7 +66,7 @@ class LearningUnitTest(TestCase):
         l_container_year = LearningContainerYearFactory(academic_year=academic_year)
         l_container_year_2 = LearningContainerYearFactory(academic_year=academic_year)
         # Create learning unit year attached to learning container year
-        learning_unit_year_1 = LearningUnitYearFactory(academic_year=academic_year,
+        LearningUnitYearFactory(academic_year=academic_year,
                                                        learning_container_year=l_container_year,
                                                        subtype=learning_unit_year_subtypes.FULL)
         LearningUnitYearFactory(academic_year=academic_year,
@@ -74,7 +75,7 @@ class LearningUnitTest(TestCase):
         LearningUnitYearFactory(academic_year=academic_year,
                                 learning_container_year=l_container_year,
                                 subtype=learning_unit_year_subtypes.PARTIM)
-        learning_unit_year_2 = LearningUnitYearFactory(academic_year=academic_year,
+        LearningUnitYearFactory(academic_year=academic_year,
                                                        learning_container_year=l_container_year_2,
                                                        subtype=learning_unit_year_subtypes.FULL)
         LearningUnitYearFactory(academic_year=academic_year, learning_container_year=None)
@@ -123,12 +124,13 @@ class LearningUnitTest(TestCase):
 
 
 class LearningUnitGetByAcronymWithLatestAcademicYearTest(TestCase):
-    def setUp(self):
-        self.learning_unit_year_2009 = LearningUnitYearFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_year_2009 = LearningUnitYearFactory(
             academic_year=AcademicYearFactory(year=2009),
             acronym='LDROI1200'
         )
-        self.learning_unit_year_2017 = LearningUnitYearFactory(
+        cls.learning_unit_year_2017 = LearningUnitYearFactory(
             academic_year=AcademicYearFactory(year=2017),
             acronym='LDROI1200'
         )

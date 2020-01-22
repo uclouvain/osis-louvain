@@ -30,8 +30,10 @@ from base.forms.search.search_tutor import TutorSearchForm
 
 class TestSearchTutor(SimpleTestCase):
     def test_form_fields(self):
-        FORM_FIELDS = ("name", )
+        form_fields = ("name", )
         form = TutorSearchForm()
 
-        self.assertCountEqual(FORM_FIELDS,
-                              list(form.fields.keys()))
+        self.assertCountEqual(
+            form_fields,
+            list(form.fields.keys())
+        )

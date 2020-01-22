@@ -31,21 +31,21 @@ from base.tests.factories.education_group_type import EducationGroupTypeFactory
 
 
 class TestEducationGroupTypeOrderingForm(TestCase):
-
-    def setUp(self):
-        self.educ_grp_type_D = EducationGroupTypeFactory(name='D label')
-        self.educ_grp_type_B = EducationGroupTypeFactory(name='B label')
-        self.educ_grp_type_A = EducationGroupTypeFactory(name='A label')
+    @classmethod
+    def setUpTestData(cls):
+        cls.educ_grp_type_D = EducationGroupTypeFactory(name='D label')
+        cls.educ_grp_type_B = EducationGroupTypeFactory(name='B label')
+        cls.educ_grp_type_A = EducationGroupTypeFactory(name='A label')
 
     def test_ordering(self):
         filter = EducationGroupFilter()
         self.assertEqual(list(filter.form.fields["education_group_type"].queryset),
                          [self.educ_grp_type_A, self.educ_grp_type_B, self.educ_grp_type_D])
 
-        educ_grp_type_C = EducationGroupTypeFactory(name='C label')
+        educ_grp_type_c = EducationGroupTypeFactory(name='C label')
 
         filter = EducationGroupFilter()
         self.assertEqual(
             list(filter.form.fields["education_group_type"].queryset),
-            [self.educ_grp_type_A, self.educ_grp_type_B, educ_grp_type_C, self.educ_grp_type_D]
+            [self.educ_grp_type_A, self.educ_grp_type_B, educ_grp_type_c, self.educ_grp_type_D]
         )

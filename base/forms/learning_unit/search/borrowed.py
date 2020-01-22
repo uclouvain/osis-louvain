@@ -57,7 +57,7 @@ class BorrowedLearningUnitSearch(LearningUnitFilter):
         if faculty_borrowing_acronym:
             try:
                 faculty_borrowing_id = EntityVersion.objects.current(academic_year.start_date). \
-                    get(acronym=faculty_borrowing_acronym).entity.id
+                    get(acronym__iexact=faculty_borrowing_acronym).entity.id
             except EntityVersion.DoesNotExist:
                 return LearningUnitYear.objects.none()
 
@@ -113,7 +113,12 @@ def map_learning_unit_year_with_requirement_entity(learning_unit_year_qs):
 
 
 def map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_qs):
-    formations = group_element_year.find_learning_unit_formations(learning_unit_year_qs, parents_as_instances=False)
+    formations = group_element_year.find_learning_unit_roots(
+        learning_unit_year_qs,
+        return_result_params={
+            'parents_as_instances': False
+        }
+    )
     education_group_ids = list(itertools.chain.from_iterable(formations.values()))
     offer_year_entity = OfferYearEntity.objects.filter(education_group_year__in=education_group_ids). \
         values_list("education_group_year", "entity")

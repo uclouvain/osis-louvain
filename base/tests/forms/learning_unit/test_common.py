@@ -39,14 +39,17 @@ from base.tests.factories.user import SuperUserFactory
 
 
 class LearningUnitCheckAcronymViewTestCase(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         today = datetime.date.today()
         start_year = AcademicYearFactory(year=today.year+1)
         end_year = AcademicYearFactory(year=today.year+7)
-        self.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year)
+        cls.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year)
 
-        self.a_superuser = SuperUserFactory()
-        self.person = PersonFactory(user=self.a_superuser)
+        cls.a_superuser = SuperUserFactory()
+        cls.person = PersonFactory(user=cls.a_superuser)
+
+    def setUp(self):
         self.client.force_login(self.a_superuser)
 
     def test_learning_unit_check_acronym(self):

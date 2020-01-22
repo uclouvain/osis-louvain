@@ -40,36 +40,34 @@ def create_academic_year(year=now.year):
 
 
 class MultipleAcademicYearTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         AcademicYearFactory(year=(now.year - 1),
                             start_date=datetime.datetime(now.year - 1, now.month, 15),
                             end_date=datetime.datetime(now.year, now.month, 28))
         AcademicYearFactory(year=now.year,
                             start_date=datetime.datetime(now.year, now.month, 1),
                             end_date=datetime.datetime(now.year + 1, now.month, 28))
+        cls.current_academic_yr = academic_year.current_academic_year()
+        cls.starting_academic_yr = academic_year.starting_academic_year()
 
     def test_find_academic_years(self):
         today = datetime.date.today()
         academic_yrs = academic_year.find_academic_years(start_date=today, end_date=today)
-        current_academic_yr = academic_year.current_academic_year()
-        starting_academic_yr = academic_year.starting_academic_year()
         nb_of_academic_yrs = academic_yrs.count()
-        if starting_academic_yr != current_academic_yr:
+        if self.starting_academic_yr != self.current_academic_yr:
             self.assertEqual(nb_of_academic_yrs, 2)
         else:
             self.assertEqual(nb_of_academic_yrs, 1)
 
     def test_current_academic_year(self):
-        current_academic_yr = academic_year.current_academic_year()
-        starting_academic_yr = academic_year.starting_academic_year()
-        if starting_academic_yr != current_academic_yr:
-            self.assertEqual(current_academic_yr.year, now.year - 1)
+        if self.starting_academic_yr != self.current_academic_yr:
+            self.assertEqual(self.current_academic_yr.year, now.year - 1)
         else:
-            self.assertEqual(current_academic_yr.year, now.year)
+            self.assertEqual(self.current_academic_yr.year, now.year)
 
     def test_starting_academic_year(self):
-        academic_yr = academic_year.starting_academic_year()
-        self.assertEqual(academic_yr.year, now.year)
+        self.assertEqual(self.starting_academic_yr.year, now.year)
 
 
 class SingleAcademicYearTest(TestCase):
@@ -110,9 +108,10 @@ class PeriodAcademicYearTest(TestCase):
 
 
 class AcademicYearNextPropertyTest(TestCase):
-    def setUp(self):
-        self.current_ac = create_current_academic_year()
-        self.next_ac = AcademicYearFactory(year=self.current_ac.year + 1)
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_ac = create_current_academic_year()
+        cls.next_ac = AcademicYearFactory(year=cls.current_ac.year + 1)
 
     def test_next_property_case_have_next(self):
         self.assertEqual(self.current_ac.next(), self.next_ac)
@@ -123,9 +122,10 @@ class AcademicYearNextPropertyTest(TestCase):
 
 
 class AcademicYearPastPropertyTest(TestCase):
-    def setUp(self):
-        self.current_ac = create_current_academic_year()
-        self.prev_ac = AcademicYearFactory(year=self.current_ac.year - 1)
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_ac = create_current_academic_year()
+        cls.prev_ac = AcademicYearFactory(year=cls.current_ac.year - 1)
 
     def test_next_property_case_have_next(self):
         self.assertEqual(self.current_ac.past(), self.prev_ac)

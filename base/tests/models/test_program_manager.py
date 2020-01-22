@@ -36,9 +36,10 @@ from base.tests.factories.user import UserFactory
 
 
 class FindByOfferYearTest(TestCase):
-    def setUp(self):
-        self.academic_year = AcademicYearFactory(current=True)
-        self.offer_year = OfferYearFactory(academic_year=self.academic_year)
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.offer_year = OfferYearFactory(academic_year=cls.academic_year)
 
     def test_case_offer_is_none(self):
         self.assertQuerysetEqual(program_manager.find_by_offer_year(None), [])

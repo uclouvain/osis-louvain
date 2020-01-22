@@ -34,11 +34,12 @@ KWARGS = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
 
 
 class TestFilter(TestCase):
-    def setUp(self):
-        self.country = CountryFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.country = CountryFactory()
 
-        OrganizationAddressFactory(country=self.country, city="NAMUR")
-        OrganizationAddressFactory(country=self.country, city="DINANT")
+        OrganizationAddressFactory(country=cls.country, city="NAMUR")
+        OrganizationAddressFactory(country=cls.country, city="DINANT")
 
     def test_filter_by_country(self):
         response = self.client.get('/learning_units/new/filter_cities_by_country',

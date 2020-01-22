@@ -210,7 +210,7 @@ class ScoreEncodingProgressTest(TestCase):
         session_exam = SessionExamFactory(number_session=number_session.ONE, learning_unit_year=learning_unit_year)
         OfferYearCalendarFactory(academic_calendar=cls.academic_calendar, offer_year=offer_year)
 
-        for index in range(0, nb_enrollment):
+        for _ in range(0, nb_enrollment):
             offer_enrollment = test_offer_enrollment.create_offer_enrollment(StudentFactory(), offer_year)
             learning_unit_enrollment = test_learning_unit_enrollment.create_learning_unit_enrollment(
                 offer_enrollment=offer_enrollment,

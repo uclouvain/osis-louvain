@@ -56,37 +56,38 @@ class EducationGroupYearModelFormMixin(TestCase):
     """Common class used to get common tests on ModelForm instances of Training, MiniTraining and Group"""
     education_group_type = None
 
-    def setUp(self, **kwargs):
-        self.education_group_type = kwargs.pop('education_group_type')
+    @classmethod
+    def setUpTestData(cls, **kwargs):
+        cls.education_group_type = kwargs.pop('education_group_type')
 
-        self.campus = CampusFactory(organization__type=organization_type.MAIN)
-        self.academic_year = AcademicYearFactory()
+        cls.campus = CampusFactory(organization__type=organization_type.MAIN)
+        cls.academic_year = AcademicYearFactory()
         new_entity_version = MainEntityVersionFactory()
 
-        self.form_data = {
+        cls.form_data = {
             "acronym": "ACRO4569",
             "partial_acronym": "PACR8974",
-            "education_group_type": self.education_group_type.id,
+            "education_group_type": cls.education_group_type.id,
             "title": "Test data",
-            "main_teaching_campus": self.campus.id,
-            "academic_year": self.academic_year.id,
+            "main_teaching_campus": cls.campus.id,
+            "academic_year": cls.academic_year.id,
             "management_entity": new_entity_version.pk,
             "remark": "This is a test!!"
         }
 
-        self.parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
+        cls.parent_education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         # Append version to management/administration entity
-        self.entity_version = EntityVersionFactory(entity=self.parent_education_group_year.management_entity)
-        if self.education_group_type.category == TRAINING:
-            EntityVersionFactory(entity=self.parent_education_group_year.administration_entity)
+        cls.entity_version = EntityVersionFactory(entity=cls.parent_education_group_year.management_entity)
+        if cls.education_group_type.category == TRAINING:
+            EntityVersionFactory(entity=cls.parent_education_group_year.administration_entity)
 
         # Create user and attached it to management entity
         person = PersonFactory()
         PersonEntityFactory(
             person=person,
-            entity=self.parent_education_group_year.management_entity
+            entity=cls.parent_education_group_year.management_entity
         )
-        self.user = person.user
+        cls.user = person.user
 
     def _test_fields(self, form_class, fields):
         form = form_class(parent=None, user=self.user, education_group_type=self.education_group_type)
@@ -154,25 +155,25 @@ class EducationGroupYearModelFormMixin(TestCase):
 
 class TestCommonBaseFormIsValid(TestCase):
     """Unit tests on CommonBaseForm.is_valid()"""
-
-    def setUp(self):
-        self.category = education_group_categories.MINI_TRAINING  # Could take GROUP or TRAINING, the result is the same
-        fake_educ_group_year, self.post_data = _get_valid_post_data(self.category)
-        self.egt = fake_educ_group_year.education_group_type
+    @classmethod
+    def setUpTestData(cls):
+        cls.category = education_group_categories.MINI_TRAINING  # Could take GROUP or TRAINING, the result is the same
+        fake_educ_group_year, cls.post_data = _get_valid_post_data(cls.category)
+        cls.egt = fake_educ_group_year.education_group_type
 
         # Create user and attached it to management entity
         person = PersonFactory()
         PersonEntityFactory(person=person, entity=fake_educ_group_year.management_entity)
-        self.user = person.user
+        cls.user = person.user
 
-        self.education_group_year_form = MiniTrainingYearModelForm(
-            self.post_data,
-            user=self.user,
-            education_group_type=self.egt,
+        cls.education_group_year_form = MiniTrainingYearModelForm(
+            cls.post_data,
+            user=cls.user,
+            education_group_type=cls.egt,
         )
-        self.education_group_form = EducationGroupModelForm(
-            self.post_data,
-            user=self.user
+        cls.education_group_form = EducationGroupModelForm(
+            cls.post_data,
+            user=cls.user
         )
 
     @patch('base.forms.education_group.mini_training.MiniTrainingModelForm.is_valid', return_value=False)
@@ -220,20 +221,20 @@ class TestCommonBaseFormIsValid(TestCase):
 
 class TestCommonBaseFormSave(TestCase):
     """Unit tests on CommonBaseForm.save()"""
-
-    def setUp(self):
-        self.academic_years = AcademicYearFactory.produce(number_past=0, number_future=6)
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_years = AcademicYearFactory.produce(number_past=0, number_future=6)
         OpenAcademicCalendarFactory(reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
                                     data_year=current_academic_year())
         category = education_group_categories.MINI_TRAINING  # Could take GROUP or TRAINING, the result is the same
-        self.form_class = MiniTrainingForm  # Could also take GROUP or TRAINING, the result is the same
-        self.expected_educ_group_year, self.post_data = _get_valid_post_data(category)
-        self.education_group_type = self.expected_educ_group_year.education_group_type
+        cls.form_class = MiniTrainingForm  # Could also take GROUP or TRAINING, the result is the same
+        cls.expected_educ_group_year, cls.post_data = _get_valid_post_data(category)
+        cls.education_group_type = cls.expected_educ_group_year.education_group_type
 
         # Create user and attached it to management entity
         person = FacultyManagerFactory()
-        PersonEntityFactory(person=person, entity=self.expected_educ_group_year.management_entity)
-        self.user = person.user
+        PersonEntityFactory(person=person, entity=cls.expected_educ_group_year.management_entity)
+        cls.user = person.user
 
     def _assert_all_fields_correctly_saved(self, education_group_year_saved):
         for field_name in self.post_data.keys():

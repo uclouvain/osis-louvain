@@ -30,9 +30,9 @@ from reference.tests.factories.domain import DomainFactory
 
 
 class TestDomain(TestCase):
-
-    def setUp(self):
-        self.decree = DecreeFactory(name='Paysage')
+    @classmethod
+    def setUpTestData(cls):
+        cls.decree = DecreeFactory(name='Paysage')
 
     def test_str(self):
         dom = DomainFactory(decree=self.decree, code='10H', name='Test Domain')

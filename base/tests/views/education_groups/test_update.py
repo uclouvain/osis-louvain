@@ -77,122 +77,125 @@ from reference.tests.factories.language import LanguageFactory
 
 @override_flag('education_group_update', active=True)
 class TestUpdate(TestCase):
-    def setUp(self):
-        self.start_academic_year = AcademicYearFactory(year=1968)
-        self.academic_year_2010 = AcademicYearFactory(year=2012)
-        self.academic_year_2019 = AcademicYearFactory(year=2018)
-        self.current_academic_year = create_current_academic_year()
+    @classmethod
+    def setUpTestData(cls):
+        cls.start_academic_year = AcademicYearFactory(year=1968)
+        cls.academic_year_2010 = AcademicYearFactory(year=2012)
+        cls.academic_year_2019 = AcademicYearFactory(year=2018)
+        cls.current_academic_year = create_current_academic_year()
         FacultyManagerGroupFactory()
-        self.start_date_ay_1 = self.current_academic_year.start_date.replace(year=self.current_academic_year.year + 1)
-        self.end_date_ay_1 = self.current_academic_year.end_date.replace(year=self.current_academic_year.year + 2)
-        self.previous_academic_year = AcademicYearFactory(year=self.current_academic_year.year - 1)
-        self.academic_year_1 = AcademicYearFactory(start_date=self.start_date_ay_1,
-                                                   end_date=self.end_date_ay_1,
-                                                   year=self.current_academic_year.year + 1)
-        self.start_date_ay_2 = self.current_academic_year.start_date.replace(year=self.current_academic_year.year + 2)
-        self.end_date_ay_2 = self.current_academic_year.end_date.replace(year=self.current_academic_year.year + 3)
-        academic_year_2 = AcademicYearFactory(start_date=self.start_date_ay_2,
-                                              end_date=self.end_date_ay_2,
-                                              year=self.current_academic_year.year + 2)
+        cls.start_date_ay_1 = cls.current_academic_year.start_date.replace(year=cls.current_academic_year.year + 1)
+        cls.end_date_ay_1 = cls.current_academic_year.end_date.replace(year=cls.current_academic_year.year + 2)
+        cls.previous_academic_year = AcademicYearFactory(year=cls.current_academic_year.year - 1)
+        cls.academic_year_1 = AcademicYearFactory(start_date=cls.start_date_ay_1,
+                                                  end_date=cls.end_date_ay_1,
+                                                  year=cls.current_academic_year.year + 1)
+        cls.start_date_ay_2 = cls.current_academic_year.start_date.replace(year=cls.current_academic_year.year + 2)
+        cls.end_date_ay_2 = cls.current_academic_year.end_date.replace(year=cls.current_academic_year.year + 3)
+        academic_year_2 = AcademicYearFactory(start_date=cls.start_date_ay_2,
+                                              end_date=cls.end_date_ay_2,
+                                              year=cls.current_academic_year.year + 2)
 
-        self.education_group_year = GroupFactory()
+        cls.education_group_year = GroupFactory()
 
-        EntityVersionFactory(entity=self.education_group_year.management_entity,
-                             start_date=self.education_group_year.academic_year.start_date)
+        EntityVersionFactory(entity=cls.education_group_year.management_entity,
+                             start_date=cls.education_group_year.academic_year.start_date)
 
-        EntityVersionFactory(entity=self.education_group_year.administration_entity,
-                             start_date=self.education_group_year.academic_year.start_date)
+        EntityVersionFactory(entity=cls.education_group_year.administration_entity,
+                             start_date=cls.education_group_year.academic_year.start_date)
 
         AuthorizedRelationshipFactory(
-            parent_type=self.education_group_year.education_group_type,
-            child_type=self.education_group_year.education_group_type
+            parent_type=cls.education_group_year.education_group_type,
+            child_type=cls.education_group_year.education_group_type
         )
 
-        self.url = reverse(update_education_group, kwargs={"root_id": self.education_group_year.pk,
-                                                           "education_group_year_id": self.education_group_year.pk})
-        self.person = CentralManagerFactory()
-        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
-        self.client.force_login(self.person.user)
-        permission = Permission.objects.get(codename='change_educationgroup')
-        self.person.user.user_permissions.add(permission)
+        cls.url = reverse(update_education_group, kwargs={"root_id": cls.education_group_year.pk,
+                                                          "education_group_year_id": cls.education_group_year.pk})
+        cls.person = CentralManagerFactory()
+        PersonEntityFactory(person=cls.person, entity=cls.education_group_year.management_entity)
 
-        self.an_training_education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
-        self.education_group_type_pgrm_master_120 = EducationGroupTypeFactory(
+        cls.an_training_education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
+        cls.education_group_type_pgrm_master_120 = EducationGroupTypeFactory(
             category=education_group_categories.TRAINING, name=TrainingType.PGRM_MASTER_120.name)
 
-        self.previous_training_education_group_year = TrainingFactory(
-            academic_year=self.previous_academic_year,
-            education_group_type=self.an_training_education_group_type,
-            education_group__start_year=self.start_academic_year
+        cls.previous_training_education_group_year = TrainingFactory(
+            academic_year=cls.previous_academic_year,
+            education_group_type=cls.an_training_education_group_type,
+            education_group__start_year=cls.start_academic_year
         )
 
-        EntityVersionFactory(entity=self.previous_training_education_group_year.management_entity,
-                             start_date=self.previous_training_education_group_year.academic_year.start_date)
+        EntityVersionFactory(entity=cls.previous_training_education_group_year.management_entity,
+                             start_date=cls.previous_training_education_group_year.academic_year.start_date)
 
-        EntityVersionFactory(entity=self.previous_training_education_group_year.administration_entity,
-                             start_date=self.previous_training_education_group_year.academic_year.start_date)
+        EntityVersionFactory(entity=cls.previous_training_education_group_year.administration_entity,
+                             start_date=cls.previous_training_education_group_year.academic_year.start_date)
 
-        self.training_education_group_year = TrainingFactory(
-            academic_year=self.current_academic_year,
-            education_group_type=self.an_training_education_group_type,
-            education_group__start_year=self.start_academic_year
+        cls.training_education_group_year = TrainingFactory(
+            academic_year=cls.current_academic_year,
+            education_group_type=cls.an_training_education_group_type,
+            education_group__start_year=cls.start_academic_year
         )
 
-        self.training_education_group_year_1 = TrainingFactory(
-            academic_year=self.academic_year_1,
-            education_group_type=self.an_training_education_group_type,
-            education_group=self.training_education_group_year.education_group
+        cls.training_education_group_year_1 = TrainingFactory(
+            academic_year=cls.academic_year_1,
+            education_group_type=cls.an_training_education_group_type,
+            education_group=cls.training_education_group_year.education_group
         )
 
-        self.training_education_group_year_2 = TrainingFactory(
+        cls.training_education_group_year_2 = TrainingFactory(
             academic_year=academic_year_2,
-            education_group_type=self.an_training_education_group_type,
-            education_group=self.training_education_group_year.education_group
+            education_group_type=cls.an_training_education_group_type,
+            education_group=cls.training_education_group_year.education_group
         )
 
         AuthorizedRelationshipFactory(
-            parent_type=self.an_training_education_group_type,
-            child_type=self.an_training_education_group_type,
+            parent_type=cls.an_training_education_group_type,
+            child_type=cls.an_training_education_group_type,
         )
 
         EntityVersionFactory(
-            entity=self.training_education_group_year.management_entity,
-            start_date=self.education_group_year.academic_year.start_date
+            entity=cls.training_education_group_year.management_entity,
+            start_date=cls.education_group_year.academic_year.start_date
         )
 
         EntityVersionFactory(
-            entity=self.training_education_group_year.administration_entity,
-            start_date=self.education_group_year.academic_year.start_date
+            entity=cls.training_education_group_year.administration_entity,
+            start_date=cls.education_group_year.academic_year.start_date
         )
 
-        self.training_url = reverse(
+        cls.training_url = reverse(
             update_education_group,
-            args=[self.training_education_group_year.pk, self.training_education_group_year.pk]
+            args=[cls.training_education_group_year.pk, cls.training_education_group_year.pk]
         )
-        PersonEntityFactory(person=self.person, entity=self.training_education_group_year.management_entity)
+        PersonEntityFactory(person=cls.person, entity=cls.training_education_group_year.management_entity)
 
-        self.domains = [DomainFactory() for _ in range(10)]
+        cls.domains = [DomainFactory() for _ in range(10)]
 
-        self.a_mini_training_education_group_type = EducationGroupTypeFactory(
+        cls.a_mini_training_education_group_type = EducationGroupTypeFactory(
             category=education_group_categories.MINI_TRAINING,
             name=MiniTrainingType.DEEPENING.name
         )
 
-        self.mini_training_education_group_year = MiniTrainingFactory(
-            academic_year=self.current_academic_year,
-            education_group_type=self.a_mini_training_education_group_type
+        cls.mini_training_education_group_year = MiniTrainingFactory(
+            academic_year=cls.current_academic_year,
+            education_group_type=cls.a_mini_training_education_group_type
         )
 
-        self.mini_training_url = reverse(
+        cls.mini_training_url = reverse(
             update_education_group,
-            args=[self.mini_training_education_group_year.pk, self.mini_training_education_group_year.pk]
+            args=[cls.mini_training_education_group_year.pk, cls.mini_training_education_group_year.pk]
         )
-        PersonEntityFactory(person=self.person, entity=self.mini_training_education_group_year.management_entity)
+        PersonEntityFactory(person=cls.person, entity=cls.mini_training_education_group_year.management_entity)
 
         EntityVersionFactory(
-            entity=self.mini_training_education_group_year.management_entity,
-            start_date=self.education_group_year.academic_year.start_date
+            entity=cls.mini_training_education_group_year.management_entity,
+            start_date=cls.education_group_year.academic_year.start_date
         )
+
+    def setUp(self):
+        self.client.force_login(self.person.user)
+        permission = Permission.objects.get(codename='change_educationgroup')
+        self.person.user.user_permissions.add(permission)
 
     def test_login_required(self):
         self.client.logout()
@@ -682,19 +685,20 @@ class TestUpdate(TestCase):
 
 
 class TestGetSuccessRedirectUrl(TestCase):
-    def setUp(self):
-        self.current_academic_year = create_current_academic_year()
-        self.education_group_year = EducationGroupYearFactory(
-            academic_year=self.current_academic_year
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        cls.education_group_year = EducationGroupYearFactory(
+            academic_year=cls.current_academic_year
         )
-        start_year = AcademicYearFactory(year=self.current_academic_year.year + 1)
-        end_year = AcademicYearFactory(year=self.current_academic_year.year + 5)
-        self.ac_year_in_future = GenerateAcademicYear(start_year=start_year, end_year=end_year)
+        start_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
+        end_year = AcademicYearFactory(year=cls.current_academic_year.year + 5)
+        cls.ac_year_in_future = GenerateAcademicYear(start_year=start_year, end_year=end_year)
 
-        self.education_group_year_in_future = []
-        for ac_in_future in self.ac_year_in_future.academic_years:
-            self.education_group_year_in_future.append(EducationGroupYearFactory(
-                education_group=self.education_group_year.education_group,
+        cls.education_group_year_in_future = []
+        for ac_in_future in cls.ac_year_in_future.academic_years:
+            cls.education_group_year_in_future.append(EducationGroupYearFactory(
+                education_group=cls.education_group_year.education_group,
                 academic_year=ac_in_future
             ))
 
@@ -719,70 +723,70 @@ class TestGetSuccessRedirectUrl(TestCase):
 @override_flag('education_group_update', active=True)
 class TestSelectAttach(TestCase):
     @classmethod
-    def setUpTestData(self):
-        self.person = PersonFactory()
-        self.academic_year = create_current_academic_year()
-        self.previous_academic_year = AcademicYearFactory(year=self.academic_year.year - 1)
-        self.next_academic_year_1 = AcademicYearFactory(year=self.academic_year.year + 1)
-        self.next_academic_year_2 = AcademicYearFactory(year=self.academic_year.year + 2)
-        self.child_education_group_year = EducationGroupYearFactory(
-            academic_year=self.academic_year,
-            education_group__end_year=self.next_academic_year_1
+    def setUpTestData(cls):
+        cls.person = PersonFactory()
+        cls.academic_year = create_current_academic_year()
+        cls.previous_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
+        cls.next_academic_year_1 = AcademicYearFactory(year=cls.academic_year.year + 1)
+        cls.next_academic_year_2 = AcademicYearFactory(year=cls.academic_year.year + 2)
+        cls.child_education_group_year = EducationGroupYearFactory(
+            academic_year=cls.academic_year,
+            education_group__end_year=cls.next_academic_year_1
         )
-        self.learning_unit_year = LearningUnitYearFactory(academic_year=self.academic_year)
-        self.initial_parent_education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
-        self.new_parent_education_group_year = EducationGroupYearFactory(
-            academic_year=self.academic_year,
+        cls.learning_unit_year = LearningUnitYearFactory(academic_year=cls.academic_year)
+        cls.initial_parent_education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
+        cls.new_parent_education_group_year = EducationGroupYearFactory(
+            academic_year=cls.academic_year,
             education_group_type__learning_unit_child_allowed=True,
-            education_group__end_year=self.next_academic_year_2
+            education_group__end_year=cls.next_academic_year_2
         )
-        self.bad_parent = EducationGroupYearFactory(
-            academic_year=self.academic_year,
+        cls.bad_parent = EducationGroupYearFactory(
+            academic_year=cls.academic_year,
             education_group_type__learning_unit_child_allowed=True,
-            education_group__end_year=self.previous_academic_year
+            education_group__end_year=cls.previous_academic_year
         )
 
-        self.initial_group_element_year = GroupElementYearFactory(
-            parent=self.initial_parent_education_group_year,
-            child_branch=self.child_education_group_year
+        cls.initial_group_element_year = GroupElementYearFactory(
+            parent=cls.initial_parent_education_group_year,
+            child_branch=cls.child_education_group_year
         )
 
-        self.child_group_element_year = GroupElementYearFactory(
-            parent=self.initial_parent_education_group_year,
+        cls.child_group_element_year = GroupElementYearFactory(
+            parent=cls.initial_parent_education_group_year,
             child_branch=None,
-            child_leaf=self.learning_unit_year
+            child_leaf=cls.learning_unit_year
         )
 
-        self.url_copy_education_group = reverse(
+        cls.url_copy_education_group = reverse(
             "copy_education_group_to_cache",
             args=[
-                self.initial_parent_education_group_year.id,
-                self.child_education_group_year.id,
+                cls.initial_parent_education_group_year.id,
+                cls.child_education_group_year.id,
             ]
         )
-        self.url_copy_learning_unit_in_cache = reverse(
+        cls.url_copy_learning_unit_in_cache = reverse(
             "copy_learning_unit_to_cache",
-            args=[self.learning_unit_year.id]
+            args=[cls.learning_unit_year.id]
         )
         group_above_new_parent = GroupElementYearFactory(
-            parent__academic_year=self.academic_year,
-            child_branch=self.new_parent_education_group_year
+            parent__academic_year=cls.academic_year,
+            child_branch=cls.new_parent_education_group_year
         )
 
-        self.url_management = reverse("education_groups_management")
+        cls.url_management = reverse("education_groups_management")
         select_data = {
             "root_id": group_above_new_parent.parent.id,
-            "element_id": self.child_education_group_year.id,
-            "group_element_year_id": self.initial_group_element_year.id,
+            "element_id": cls.child_education_group_year.id,
+            "group_element_year_id": cls.initial_group_element_year.id,
         }
-        self.copy_action_data = {
+        cls.copy_action_data = {
             **select_data,
             **{'action': 'copy'}
         }
-        self.root = group_above_new_parent.parent
-        self.attach_action_data = {
+        cls.root = group_above_new_parent.parent
+        cls.attach_action_data = {
             "root_id": group_above_new_parent.parent.id,
-            "element_id": self.new_parent_education_group_year.id,
+            "element_id": cls.new_parent_education_group_year.id,
             "group_element_year_id": group_above_new_parent.id,
             "action": "attach",
         }
@@ -1099,10 +1103,11 @@ class TestSelectAttach(TestCase):
 
 
 class TestCertificateAimAutocomplete(TestCase):
-    def setUp(self):
-        self.super_user = SuperUserFactory()
-        self.url = reverse("certificate_aim_autocomplete")
-        self.certificate_aim = CertificateAimFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.super_user = SuperUserFactory()
+        cls.url = reverse("certificate_aim_autocomplete")
+        cls.certificate_aim = CertificateAimFactory(
             code=1234,
             section=5,
             description="description",

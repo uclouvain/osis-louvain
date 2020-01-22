@@ -47,6 +47,9 @@
         <input type="hidden" id="hdn_learning_achievement_id" value="{{ learning_achievement.id }}">
 
         {% bootstrap_form_errors form %}
+        <div class="form-group">
+            <span><strong>ID </strong>{{ form.consistency_id }}</span>
+        </div>
         {% bootstrap_field form.code_name %}
 
         <p id="code_exists_error_msg" hidden>
@@ -74,7 +77,7 @@
     <button type="button" class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
     <input type="submit" value="{% trans "Save" %}" title="{% trans "Save and do not postpone changes" %}"
            class="btn btn-primary" onclick="CKupdate(); submitForm(0)"/>
-    {% if not learning_unit_year.is_past %}
+    {% if not learning_unit_year.is_past and not form.has_proposal %}
     <input type="submit" value="{% trans "Save and postpone" %}" id="saveAndPostpone"
            title="{% trans "Save and postpone changes on next years" %}" class="btn btn-primary"
            onclick="CKupdate(); submitForm(1)"/>

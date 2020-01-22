@@ -34,11 +34,12 @@ TITLE = 'title'
 
 
 class LearningUnitTagTest(TestCase):
-    def setUp(self):
-        self.learning_unit_yr = LearningUnitYearFactory(specific_title=TITLE,
-                                                        status=True,
-                                                        professional_integration=True,
-                                                        quadrimester=quadrimesters.Q1)
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_yr = LearningUnitYearFactory(specific_title=TITLE,
+                                                       status=True,
+                                                       professional_integration=True,
+                                                       quadrimester=quadrimesters.Q1)
 
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
     def test_get_attribute(self):

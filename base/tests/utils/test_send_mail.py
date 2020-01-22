@@ -41,56 +41,57 @@ LEARNING_UNIT_YEARS_VARIABLE_PARAGRAPH_ = "<p>{{ learning_unit_years }}/p>"
 
 
 class TestSendMessage(TestCase):
-    def setUp(self):
-        self.person_1 = test_person.create_person("person_1", last_name="test", email="person1@test.com")
-        self.person_2 = test_person.create_person("person_2", last_name="test", email="person2@test.com")
-        self.persons = [self.person_1, self.person_2]
+    @classmethod
+    def setUpTestData(cls):
+        cls.person_1 = test_person.create_person("person_1", last_name="test", email="person1@test.com")
+        cls.person_2 = test_person.create_person("person_2", last_name="test", email="person2@test.com")
+        cls.persons = [cls.person_1, cls.person_2]
 
-        self.person_3 = PersonWithPermissionsFactory("can_receive_emails_about_automatic_postponement")
+        cls.person_3 = PersonWithPermissionsFactory("can_receive_emails_about_automatic_postponement")
 
-        self.academic_year = test_academic_year.create_academic_year()
-        test_academic_year.create_academic_year(year=self.academic_year.year - 1)
+        cls.academic_year = test_academic_year.create_academic_year()
+        test_academic_year.create_academic_year(year=cls.academic_year.year - 1)
 
-        self.learning_unit_year = LearningUnitYearFactory(acronym="TEST",
-                                                          specific_title="Cours de test",
-                                                          academic_year=self.academic_year)
+        cls.learning_unit_year = LearningUnitYearFactory(acronym="TEST",
+                                                         specific_title="Cours de test",
+                                                         academic_year=cls.academic_year)
 
-        self.offer_year = test_offer_year.create_offer_year("SINF2MA", "Master en Sciences Informatique",
-                                                            self.academic_year)
+        cls.offer_year = test_offer_year.create_offer_year("SINF2MA", "Master en Sciences Informatique",
+                                                           cls.academic_year)
 
-        self.exam_enrollment_1 = test_exam_enrollment.create_exam_enrollment_with_student(1, "64641200",
-                                                                                          self.offer_year,
-                                                                                          self.learning_unit_year)
-        self.exam_enrollment_2 = test_exam_enrollment.create_exam_enrollment_with_student(2, "60601200",
-                                                                                          self.offer_year,
-                                                                                          self.learning_unit_year)
+        cls.exam_enrollment_1 = test_exam_enrollment.create_exam_enrollment_with_student(1, "64641200",
+                                                                                         cls.offer_year,
+                                                                                         cls.learning_unit_year)
+        cls.exam_enrollment_2 = test_exam_enrollment.create_exam_enrollment_with_student(2, "60601200",
+                                                                                         cls.offer_year,
+                                                                                         cls.learning_unit_year)
 
-        self.msg_list = [
-            'The partim TEST_A has been deleted for the year ' + str(self.academic_year.year),
-            'The partim TEST_B has been deleted for the year ' + str(self.academic_year.year),
-            'The class TEST_C has been deleted for the year ' + str(self.academic_year.year),
-            'The class TEST_A_C1 has been deleted for the year ' + str(self.academic_year.year),
-            'The class TEST_A_C2 has been deleted for the year ' + str(self.academic_year.year),
-            'The class TEST_B_C1 has been deleted for the year ' + str(self.academic_year.year),
-            'The class TEST_B_C2 has been deleted for the year ' + str(self.academic_year.year),
+        cls.msg_list = [
+            'The partim TEST_A has been deleted for the year ' + str(cls.academic_year.year),
+            'The partim TEST_B has been deleted for the year ' + str(cls.academic_year.year),
+            'The class TEST_C has been deleted for the year ' + str(cls.academic_year.year),
+            'The class TEST_A_C1 has been deleted for the year ' + str(cls.academic_year.year),
+            'The class TEST_A_C2 has been deleted for the year ' + str(cls.academic_year.year),
+            'The class TEST_B_C1 has been deleted for the year ' + str(cls.academic_year.year),
+            'The class TEST_B_C2 has been deleted for the year ' + str(cls.academic_year.year),
             'The learning unit TEST has been successfully deleted for all years'
         ]
 
-        self.egys_to_postpone = EducationGroupYear.objects.all()
-        self.egys_already_existing = EducationGroupYear.objects.all()
-        self.egys_ending_this_year = EducationGroupYear.objects.all()
+        cls.egys_to_postpone = EducationGroupYear.objects.all()
+        cls.egys_already_existing = EducationGroupYear.objects.all()
+        cls.egys_ending_this_year = EducationGroupYear.objects.all()
 
-        self.luys_to_postpone = LearningUnitYear.objects.all()
-        self.luys_already_existing = LearningUnitYear.objects.all()
-        self.luys_ending_this_year = LearningUnitYear.objects.all()
-        self.ending_on_max_adjournment = LearningUnitYear.objects.all()
+        cls.luys_to_postpone = LearningUnitYear.objects.all()
+        cls.luys_already_existing = LearningUnitYear.objects.all()
+        cls.luys_ending_this_year = LearningUnitYear.objects.all()
+        cls.ending_on_max_adjournment = LearningUnitYear.objects.all()
 
-        self.statistics_data = {
-            'max_academic_year_to_postpone': self.academic_year,
-            'to_duplicate': self.luys_to_postpone,
-            'already_duplicated': self.luys_already_existing,
-            'to_ignore': self.luys_ending_this_year,
-            'ending_on_max_academic_year': self.ending_on_max_adjournment
+        cls.statistics_data = {
+            'max_academic_year_to_postpone': cls.academic_year,
+            'to_duplicate': cls.luys_to_postpone,
+            'already_duplicated': cls.luys_already_existing,
+            'to_ignore': cls.luys_ending_this_year,
+            'ending_on_max_academic_year': cls.ending_on_max_adjournment
         }
 
         add_message_template_html()
@@ -152,10 +153,8 @@ class TestSendMessage(TestCase):
         self.assertEqual(len(args.get('receivers')), 1)
         self.assertIsNone(args.get('attachment'))
 
-        # Ensure that the mail contains only postponed of academic year
-        # (Doesn't contains previous which are technical problem)
         self.assertEqual(args['template_base_data']['egys_postponed'], 2)
-        self.assertEqual(args['template_base_data']['egys_postponed_qs'][0], edgy_same_year)
+        self.assertCountEqual(args['template_base_data']['egys_postponed_qs'], [edgy_same_year, edgy_not_same_year])
 
     @patch("osis_common.messaging.send_message.send_messages")
     def test_with_one_enrollment(self, mock_send_messages):

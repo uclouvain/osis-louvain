@@ -59,6 +59,7 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             'title',
             'url',
             'acronym',
+            'code',
             'credits',
             'decree_category',
             'decree_category_text',

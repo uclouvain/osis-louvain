@@ -76,7 +76,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     remark_english = factory.fuzzy.FuzzyText(length=255)
     active = active_status.ACTIVE
     schedule_type = schedule_type.DAILY
-    weighting = False
+    weighting = True
     default_learning_unit_enrollment = False
     duration_unit = factory.Iterator(DURATION_UNIT, getter=operator.itemgetter(0))
     duration = factory.fuzzy.FuzzyInteger(1, 5)

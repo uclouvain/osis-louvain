@@ -33,7 +33,8 @@ from django.utils.translation import gettext as _
 from base.business.education_group import can_user_edit_administrative_data
 from base.business.education_groups.perms import is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_postpone_education_group, \
-    is_eligible_to_delete_education_group_year, is_eligible_to_edit_certificate_aims
+    is_eligible_to_delete_education_group_year, is_eligible_to_edit_certificate_aims, \
+    is_eligible_to_change_education_group_content
 from base.models.academic_year import AcademicYear
 from base.models.utils.utils import get_verbose_field_value
 
@@ -151,7 +152,9 @@ def button_edit_administrative_data(context):
 
 @register.inclusion_tag("blocks/button/button_order.html", takes_context=True)
 def button_order_with_permission(context, title, id_button, value):
-    permission_denied_message, disabled, root = _get_permission(context, is_eligible_to_change_education_group)
+    permission_denied_message, disabled, root = _get_permission(
+        context, is_eligible_to_change_education_group_content
+    )
 
     if disabled:
         title = permission_denied_message

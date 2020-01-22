@@ -38,12 +38,13 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 
 class TestAuthorizedTypes(TestCase):
     """Unit tests on find_authorized_types()"""
-    def setUp(self):
-        self.category = education_group_categories.GROUP
+    @classmethod
+    def setUpTestData(cls):
+        cls.category = education_group_categories.GROUP
 
-        self.subgroup = EducationGroupTypeFactory(name='Subgroup', category=self.category)
-        self.complementary_module = EducationGroupTypeFactory(name='Complementary module', category=self.category)
-        self.options_list = EducationGroupTypeFactory(name='Options list', category=self.category)
+        cls.subgroup = EducationGroupTypeFactory(name='Subgroup', category=cls.category)
+        cls.complementary_module = EducationGroupTypeFactory(name='Complementary module', category=cls.category)
+        cls.options_list = EducationGroupTypeFactory(name='Options list', category=cls.category)
 
     def test_ordered_by_name(self):
         EducationGroupTypeFactory(category=education_group_categories.TRAINING)

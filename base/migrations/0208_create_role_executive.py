@@ -9,7 +9,7 @@ from django.db import migrations
 def add_executive_group(apps, schema_editor):
     # create group
     db_alias = schema_editor.connection.alias
-    emit_post_migrate_signal(2, False, db_alias)
+    emit_post_migrate_signal(1, False, db_alias)
     Group = apps.get_model('auth', 'Group')
     Permission = apps.get_model('auth', 'Permission')
     executive_group, created = Group.objects.get_or_create(name='executive')

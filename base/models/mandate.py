@@ -30,7 +30,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class MandateAdmin(OsisModelAdmin):
-    list_display = ('education_group', 'function')
+    list_display = ('education_group', 'function', 'qualification')
 
     raw_id_fields = ('education_group',)
     search_fields = ['education_group', 'function', 'external_id']

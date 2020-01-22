@@ -33,8 +33,9 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 
 
 class EducationGroupPublicationContactCleanTest(TestCase):
-    def setUp(self):
-        self.education_group_year = EducationGroupYearFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.education_group_year = EducationGroupYearFactory()
 
     def test_role_required_for_types(self):
         self.assertEqual(

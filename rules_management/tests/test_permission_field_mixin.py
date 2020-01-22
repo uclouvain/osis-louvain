@@ -43,28 +43,29 @@ class CountryForm(PermissionFieldMixin, forms.ModelForm):
 
 
 class TestPermissionFieldMixin(TestCase):
-    def setUp(self):
-        self.permissions = [PermissionFactory() for _ in range(10)]
+    @classmethod
+    def setUpTestData(cls):
+        cls.permissions = [PermissionFactory() for _ in range(10)]
 
         FieldReferenceFactory(
             content_type=ContentType.objects.get(app_label="reference", model="country"),
             field_name="name",
             context="LalaLand",
-            permissions=self.permissions,
+            permissions=cls.permissions,
         )
 
         FieldReferenceFactory(
             content_type=ContentType.objects.get(app_label="reference", model="country"),
             field_name="nationality",
             context="",
-            permissions=self.permissions,
+            permissions=cls.permissions,
         )
 
-        self.user_with_perm = UserFactory()
-        self.user_with_perm.user_permissions.add(self.permissions[2])
+        cls.user_with_perm = UserFactory()
+        cls.user_with_perm.user_permissions.add(cls.permissions[2])
 
-        self.user_without_perm = UserFactory()
-        self.user_without_perm.user_permissions.add(PermissionFactory())
+        cls.user_without_perm = UserFactory()
+        cls.user_without_perm.user_permissions.add(PermissionFactory())
 
     def test_init_with_perm(self):
         form = CountryForm(user=self.user_with_perm)

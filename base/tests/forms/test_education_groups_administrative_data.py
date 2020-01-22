@@ -44,23 +44,24 @@ from base.tests.factories.session_exam_calendar import SessionExamCalendarFactor
 
 
 class TestAdministrativeDataForm(TestCase):
-    def setUp(self):
-        self.academic_year = AcademicYearFactory(year=2007)
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2007)
 
-        self.academic_calendars = [
-            AcademicCalendarFactory(reference=i[0], academic_year=self.academic_year)
+        cls.academic_calendars = [
+            AcademicCalendarFactory(reference=i[0], academic_year=cls.academic_year)
             for i in academic_calendar_type.CALENDAR_TYPES
         ]
 
-        self.education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
+        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
 
-        self.offer_year = [
-            OfferYearCalendarFactory(education_group_year=self.education_group_year, academic_calendar=ac)
-            for ac in self.academic_calendars
+        cls.offer_year = [
+            OfferYearCalendarFactory(education_group_year=cls.education_group_year, academic_calendar=ac)
+            for ac in cls.academic_calendars
         ]
 
-        self.session_exam_calendars = [
-            SessionExamCalendarFactory(number_session=1, academic_calendar=ac) for ac in self.academic_calendars
+        cls.session_exam_calendars = [
+            SessionExamCalendarFactory(number_session=1, academic_calendar=ac) for ac in cls.academic_calendars
         ]
 
     def test_initial(self):
@@ -213,24 +214,23 @@ class TestAdministrativeDataForm(TestCase):
 
 
 class TestCourseEnrollmentForm(TestCase):
-
-    def setUp(self):
-        self.academic_year = AcademicYearFactory(year=2007)
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2007)
+        cls.education_group_yr = EducationGroupYearFactory(academic_year=cls.academic_year)
 
     def test_get_new_course_enrollment_calendar(self):
-        education_group_yr = EducationGroupYearFactory(academic_year=self.academic_year)
-        self.assertIsNone(_build_new_course_enrollment_offer_yr_calendar(education_group_yr))
+        self.assertIsNone(_build_new_course_enrollment_offer_yr_calendar(self.education_group_yr))
 
         academic_cal_course_enrollment = AcademicCalendarFactory(reference=academic_calendar_type.COURSE_ENROLLMENT,
                                                                  academic_year=self.academic_year)
-        new_oyc = _build_new_course_enrollment_offer_yr_calendar(education_group_yr)
+        new_oyc = _build_new_course_enrollment_offer_yr_calendar(self.education_group_yr)
 
         self.assertEqual(new_oyc.academic_calendar, academic_cal_course_enrollment)
-        self.assertEqual(new_oyc.education_group_year, education_group_yr)
+        self.assertEqual(new_oyc.education_group_year, self.education_group_yr)
         self.assertIsNone(new_oyc.id)
 
     def test_clean(self):
-        education_group_yr = EducationGroupYearFactory(academic_year=self.academic_year)
         academic_cal_course_enrollment = AcademicCalendarFactory(reference=academic_calendar_type.COURSE_ENROLLMENT,
                                                                  academic_year=self.academic_year)
 
@@ -238,14 +238,13 @@ class TestCourseEnrollmentForm(TestCase):
         exam_enrollment_end = '15/01/{}'.format(self.academic_year.year+1)
 
         form = CourseEnrollmentForm(data={"range_date": exam_enrollment_start + ' - ' + exam_enrollment_end},
-                                    instance=None, education_group_yr=education_group_yr)
+                                    instance=None, education_group_yr=self.education_group_yr)
         form.is_valid()
-        self.assertEqual(form.instance.education_group_year, education_group_yr)
+        self.assertEqual(form.instance.education_group_year, self.education_group_yr)
         self.assertEqual(form.instance.academic_calendar, academic_cal_course_enrollment)
 
     @override_settings(LANGUAGES=[('fr-be', 'Français'), ], LANGUAGE_CODE='fr-be')
     def test_clean_with_validation_error(self):
-        education_group_yr = EducationGroupYearFactory(academic_year=self.academic_year)
         AcademicCalendarFactory(reference=academic_calendar_type.COURSE_ENROLLMENT,
                                 academic_year=self.academic_year)
 
@@ -253,7 +252,7 @@ class TestCourseEnrollmentForm(TestCase):
         exam_enrollment_end = '15/01/{}'.format(self.academic_year.year-1)
 
         form = CourseEnrollmentForm(data={"range_date": exam_enrollment_start + ' - ' + exam_enrollment_end},
-                                    instance=None, education_group_yr=education_group_yr)
+                                    instance=None, education_group_yr=self.education_group_yr)
         form.is_valid()
 
         self.assertEqual(form.errors["range_date"][0],
@@ -264,7 +263,6 @@ class TestCourseEnrollmentForm(TestCase):
 
     @override_settings(LANGUAGES=[('fr-be', 'Français'), ], LANGUAGE_CODE='fr-be')
     def test_clean_with_validation_error_in_date(self):
-        education_group_yr = EducationGroupYearFactory(academic_year=self.academic_year)
         AcademicCalendarFactory(reference=academic_calendar_type.COURSE_ENROLLMENT,
                                 academic_year=self.academic_year)
 
@@ -272,14 +270,13 @@ class TestCourseEnrollmentForm(TestCase):
         exam_enrollment_end = '15/01/{}'.format(self.academic_year.year)
 
         form = CourseEnrollmentForm(data={"range_date": exam_enrollment_start + ' - ' + exam_enrollment_end},
-                                    instance=None, education_group_yr=education_group_yr)
+                                    instance=None, education_group_yr=self.education_group_yr)
         form.is_valid()
         self.assertEqual(form.errors["range_date"][0],
                          _('The start date must be equals or lower than the end date'))
 
 
 class TestAdditionalInfoForm(TestCase):
-
     def test_get_new_course_enrollment_calendar(self):
         academic_year = AcademicYearFactory(year=2017)
         education_group_yr = EducationGroupYearFactory(
@@ -297,4 +294,3 @@ class TestAdditionalInfoForm(TestCase):
         updated_education_group_yr = EducationGroupYear.objects.get(pk=education_group_yr.pk)
         self.assertFalse(updated_education_group_yr.weighting)
         self.assertTrue(updated_education_group_yr.default_learning_unit_enrollment)
-

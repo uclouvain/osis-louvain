@@ -46,15 +46,18 @@ from base.tests.factories.person_entity import PersonEntityFactory
 
 @override_flag('education_group_delete', active=True)
 class TestDeleteGroupEducationView(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_ac = create_current_academic_year()
+        cls.academic_calendar = OpenAcademicCalendarFactory(academic_year=cls.current_ac,
+                                                            data_year=cls.current_ac,
+                                                            reference=academic_calendar_type.EDUCATION_GROUP_EDITION)
+
+        cls.education_group1 = EducationGroupFactory()
+        cls.education_group2 = EducationGroupFactory()
+        cls.person = PersonWithPermissionsFactory("delete_educationgroup")
 
     def setUp(self):
-        self.current_ac = create_current_academic_year()
-        self.academic_calendar = OpenAcademicCalendarFactory(academic_year=self.current_ac,
-                                                             data_year=self.current_ac,
-                                                             reference=academic_calendar_type.EDUCATION_GROUP_EDITION)
-
-        self.education_group1 = EducationGroupFactory()
-        self.education_group2 = EducationGroupFactory()
         self.education_group_year1 = EducationGroupYearFactory(
             education_group=self.education_group1,
             academic_year=self.current_ac,
@@ -63,7 +66,6 @@ class TestDeleteGroupEducationView(TestCase):
             education_group=self.education_group2,
             academic_year=self.current_ac,
         )
-        self.person = PersonWithPermissionsFactory("delete_educationgroup")
         PersonEntityFactory(person=self.person, entity=self.education_group_year1.management_entity)
         PersonEntityFactory(person=self.person, entity=self.education_group_year2.management_entity)
 

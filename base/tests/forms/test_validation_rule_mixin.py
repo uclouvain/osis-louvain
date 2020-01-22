@@ -40,7 +40,8 @@ class TestForm(ValidationRuleMixin, forms.ModelForm):
 
 
 class TestValidationRuleMixin(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         ValidationRuleFactory(
             field_reference="reference_country.name",
             status_field=DISABLED,

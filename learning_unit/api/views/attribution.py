@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import F, Q
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 
@@ -44,20 +44,28 @@ class LearningUnitAttribution(generics.ListAPIView):
 
     def get_queryset(self):
         luy = get_object_or_404(
-            LearningUnitYear.objects.all(),
+            LearningUnitYear.objects.all().only('pk', 'learning_container_year_id'),
             acronym__iexact=self.kwargs['acronym'],
             academic_year__year=self.kwargs['year']
         )
-        return AttributionNew.objects.select_related('substitute').filter(
-            Q(attributionchargenew__learning_component_year__learning_unit_year=luy) |
-            # Coordinator doesn't have any volume
-            Q(learning_container_year_id=luy.learning_container_year_id, function=Functions.COORDINATOR.name)
-        ).distinct(
-            'tutor', 'function'
-        ).annotate(
+
+        attribution_qs = AttributionNew.objects.select_related('substitute').only(
+            'tutor__person', 'substitute', 'function'
+        ).distinct('tutor', 'function').annotate(
             first_name=F('tutor__person__first_name'),
             middle_name=F('tutor__person__middle_name'),
             last_name=F('tutor__person__last_name'),
             email=F('tutor__person__email'),
             global_id=F('tutor__person__global_id'),
         )
+
+        coordinator_qs = attribution_qs.filter(
+            learning_container_year_id=luy.learning_container_year_id,
+            function=Functions.COORDINATOR.name
+        )
+        others_function_qs = attribution_qs.filter(
+            attributionchargenew__learning_component_year__learning_unit_year_id=luy.pk
+        )
+
+        # Working with union improve performance
+        return coordinator_qs.union(others_function_qs)

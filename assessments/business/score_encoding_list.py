@@ -28,6 +28,7 @@ import unicodedata
 from decimal import Decimal, Context, Inexact
 
 from django.db import transaction
+from django.utils.translation import gettext_lazy as _
 
 from base.models import academic_year, session_exam_calendar, exam_enrollment, program_manager, tutor, offer_year, \
     learning_unit_year
@@ -188,13 +189,13 @@ def _convert_to_decimal(score, decimal_scores_authorized):
             # Ensure that we cannot have more than 2 decimal
             return decimal_score.quantize(Decimal(10) ** -2, context=Context(traps=[Inexact]))
         except:
-            raise ValueError("score_have_more_than_2_decimal_places")
+            raise ValueError(_("Score have more than 2 decimal places"))
     else:
         try:
             # Ensure that we cannot have no decimal
             return decimal_score.quantize(Decimal('1.'), context=Context(traps=[Inexact]))
         except:
-            raise ValueError("decimal_score_not_allowed")
+            raise ValueError(_("Decimal score not allowed"))
 
 
 def _format_score_to_decimal(score):
@@ -206,7 +207,7 @@ def _format_score_to_decimal(score):
 
 def _check_str_score_is_digit(score_str):
     if not score_str.replace('.', '').isdigit():  # Case not empty string but have alphabetic values
-        raise ValueError("Scores must be between 0 and 20")
+        raise ValueError(_("Scores must be between 0 and 20"))
 
 
 def is_enrollment_changed(enrollment, is_program_manager):

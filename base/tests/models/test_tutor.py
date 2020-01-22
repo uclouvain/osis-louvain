@@ -38,15 +38,16 @@ from base.tests.factories.user import UserFactory
 
 
 class TestTutor(TestCase):
-    def setUp(self):
-        self.user = UserFactory()
-        self.person = PersonFactory(first_name="James", last_name="Dupont", user=self.user)
-        self.tutor = TutorFactory(person=self.person)
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.person = PersonFactory(first_name="James", last_name="Dupont", user=cls.user)
+        cls.tutor = TutorFactory(person=cls.person)
         TutorFactory()  # Create fake Tutor
         TutorFactory()  # Create fake Tutor
-        self.learning_unit_year = LearningUnitYearFactory()
-        self.attribution = test_attribution.create_attribution(tutor=self.tutor,
-                                                               learning_unit_year=self.learning_unit_year,
+        cls.learning_unit_year = LearningUnitYearFactory()
+        cls.attribution = test_attribution.create_attribution(tutor=cls.tutor,
+                                                               learning_unit_year=cls.learning_unit_year,
                                                                score_responsible=False)
 
     def test_find_by_person(self):
@@ -90,14 +91,15 @@ request.user = MockSuperUser()
 
 
 class TestTutorAdmin(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         for _ in range(10):
             user = UserFactory()
             person = PersonFactory(user=user)
             TutorFactory(person=person)
             user.groups.clear()
 
-        self.site = AdminSite()
+        cls.site = AdminSite()
 
     def test_add_to_group(self):
         setattr(request, 'session', 'session')
@@ -125,14 +127,14 @@ class TestTutorAdmin(TestCase):
 class TestSearch(TestCase):
     @classmethod
     def setUpTestData(cls):
-        TUTOR_NAMES = (
+        tutor_names = (
             {"first_name": "Jean", "last_name": "Pierrer"},
             {"first_name": "John", "last_name": "Doe"},
             {"first_name": "Morgan", "last_name": "Wakaba"},
             {"first_name": "Philip", "last_name": "Doe"}
         )
 
-        cls.tutors = [TutorFactory(person=PersonFactory(**name)) for name in TUTOR_NAMES]
+        cls.tutors = [TutorFactory(person=PersonFactory(**name)) for name in tutor_names]
 
     def test_with_no_criterias(self):
         qs = tutor.search()

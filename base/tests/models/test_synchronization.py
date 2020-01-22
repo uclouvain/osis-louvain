@@ -25,7 +25,6 @@
 ##############################################################################
 import datetime
 
-from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
 from django.utils import timezone
 
@@ -62,4 +61,4 @@ class MultipleSynchronizationTest(TestCase):
 class NonExistingSynchronizationTest(TestCase):
 
     def test_find_last_synchronization_date(self):
-        self.assertRaises(ObjectDoesNotExist, synchronization.find_last_synchronization_date())
+        self.assertIsNone(synchronization.find_last_synchronization_date())

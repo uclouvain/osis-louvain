@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django import template
+from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
@@ -194,8 +195,12 @@ def li_with_permission_for_proposal(data):
     if not disabled:
         if not is_year_editable(proposal.learning_unit_year, raise_exception=False):
             disabled = "disabled"
-            permission_denied_message = "{}" \
-                .format(_("You can't modify proposition which are related to a learning unit year under"))
+            permission_denied_message = "{}.  {}".format(
+                _("You can't modify learning unit under year : %(year)d") %
+                {"year": settings.YEAR_LIMIT_LUE_MODIFICATION + 1},
+                _("Modifications should be made in EPC for year %(year)d") %
+                {"year": proposal.learning_unit_year.academic_year.year},
+                )
         else:
             permission_denied_message, disabled = _get_permission_proposal(context, permission, obj)
 

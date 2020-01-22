@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-04 15:42+0100\n"
+"POT-Creation-Date: 2020-01-02 09:41+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -387,7 +387,7 @@ msgid "Assistants"
 msgstr ""
 
 msgid ""
-"At least a partim volume value is greater than corresponding volume of parent"
+"At least a partim volume value is greater than corresponding volume of full UE"
 msgstr ""
 
 msgid "At the end of this learning unit, the student is able to:"
@@ -1078,6 +1078,9 @@ msgstr ""
 msgid "Generate pdf"
 msgstr ""
 
+msgid "Generate xls of learning units in training"
+msgstr ""
+
 msgid "Generate xls of learning units that are prerequisites for"
 msgstr ""
 
@@ -1237,6 +1240,9 @@ msgid ""
 msgstr ""
 
 msgid "It remains notes to encode."
+msgstr ""
+
+msgid "It will be done at the consolidation"
 msgstr ""
 
 msgid ""
@@ -1717,11 +1723,17 @@ msgstr ""
 msgid "Offers enrollments"
 msgstr ""
 
+msgid "Ok"
+msgstr ""
+
 msgid "On the file: direct access or access with additional training"
 msgstr ""
 "Based on application: accepted, conditional on further training, or refusal"
 
 msgid "One of the partial volumes must have a value to 0."
+msgstr ""
+
+msgid "Only letters are allowed."
 msgstr ""
 
 msgid ""
@@ -2253,6 +2265,9 @@ msgstr ""
 msgid "Select action to execute"
 msgstr ""
 
+msgid "Select all"
+msgstr ""
+
 msgid "Select all the messages"
 msgstr ""
 
@@ -2478,10 +2493,6 @@ msgstr ""
 msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr ""
 
-msgid ""
-"The faculty manager cannot modify general information which are lower than N"
-msgstr ""
-
 msgid "The faculty manager cannot modify outside of program edition period"
 msgstr ""
 
@@ -2637,9 +2648,6 @@ msgid "The teaching material has been deleted with success"
 msgstr ""
 
 msgid "The teaching material has been saved with success"
-msgstr ""
-
-msgid "The user cannot modify data which are greater than N+1"
 msgstr ""
 
 msgid "The user doesn't have right to update admission condition"
@@ -3049,10 +3057,6 @@ msgid "You can't modify learning unit under year : %(year)d"
 msgstr ""
 
 msgid "You can't modify proposal which is on an other year"
-msgstr ""
-
-msgid ""
-"You can't modify proposition which are related to a learning unit year under"
 msgstr ""
 
 #, python-format

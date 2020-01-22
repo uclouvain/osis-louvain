@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-07 11:50+0100\n"
+"POT-Creation-Date: 2020-01-15 10:27+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -131,6 +131,9 @@ msgid "Datatable sort descending"
 msgstr ""
 
 msgid "Deadline reached"
+msgstr ""
+
+msgid "Decimal score not allowed"
 msgstr ""
 
 msgid "Decimal values in scores are NOT accepted."
@@ -412,6 +415,9 @@ msgid "Score"
 msgstr ""
 
 msgid "Score already submitted"
+msgstr ""
+
+msgid "Score have more than 2 decimal places"
 msgstr ""
 
 #, python-format

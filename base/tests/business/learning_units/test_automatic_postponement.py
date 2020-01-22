@@ -37,10 +37,11 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 
 
 class TestFetchLearningUnitToPostpone(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         current_year = get_current_year()
-        self.academic_years = [AcademicYearFactory(year=i) for i in range(current_year, current_year + 7)]
-        self.learning_unit = LearningUnitFactory(end_year=None)
+        cls.academic_years = [AcademicYearFactory(year=i) for i in range(current_year, current_year + 7)]
+        cls.learning_unit = LearningUnitFactory(end_year=None)
 
     def test_fetch_learning_unit_to_postpone_to_N6(self):
         LearningUnitYearFactory(

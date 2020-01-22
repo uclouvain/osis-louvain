@@ -119,13 +119,16 @@ def get_valid_external_learning_unit_form_data(academic_year, person, learning_u
 
 
 class TestExternalLearningUnitForm(TestCase):
-    def setUp(self):
-        self.person = PersonFactory()
+    @classmethod
+    def setUpTestData(cls):
         starting_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
         end_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION + 6)
-        self.academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
-        self.academic_year = self.academic_years[1]
-        self.language = LanguageFactory(code='FR')
+        cls.academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
+        cls.academic_year = cls.academic_years[1]
+        cls.language = LanguageFactory(code='FR')
+
+    def setUp(self):
+        self.person = PersonFactory()
 
     @override_settings(YEAR_LIMIT_LUE_MODIFICATION=YEAR_LIMIT_LUE_MODIFICATION)
     def test_external_learning_unit_form_init(self):
@@ -165,26 +168,29 @@ class TestExternalLearningUnitForm(TestCase):
 
 
 class TestExternalPartimForm(TestCase):
-    def setUp(self):
-        self.person = PersonFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonFactory()
         starting_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
         end_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION + 6)
         academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
-        self.academic_year = academic_years[1]
-        self.language = LanguageFactory(code='FR')
+        cls.academic_year = academic_years[1]
+        cls.language = LanguageFactory(code='FR')
         organization = OrganizationFactory(type=organization_type.MAIN)
-        campus = CampusFactory(organization=organization)
-        language = LanguageFactory(code='FR')
-        container_year = LearningContainerYearFactory(academic_year=self.academic_year, container_type=EXTERNAL)
-        self.learning_unit = LearningUnitFactory(start_year=self.academic_year)
+        cls.campus = CampusFactory(organization=organization)
+        cls.language = LanguageFactory(code='FR')
+        cls.container_year = LearningContainerYearFactory(academic_year=cls.academic_year, container_type=EXTERNAL)
+        cls.learning_unit = LearningUnitFactory(start_year=cls.academic_year)
+
+    def setUp(self):
         self.learning_unit_year = LearningUnitYearFactory(
             acronym='EOSIS1111',
             academic_year=self.academic_year,
             learning_unit=self.learning_unit,
-            learning_container_year=container_year,
+            learning_container_year=self.container_year,
             subtype=learning_unit_year_subtypes.FULL,
-            campus=campus,
-            language=language,
+            campus=self.campus,
+            language=self.language,
             internship_subtype=None
         )
 
@@ -221,10 +227,11 @@ class TestExternalPartimForm(TestCase):
 
 
 class TestLearningUnitYearForExternalModelForm(TestCase):
-    def setUp(self):
-        self.person = PersonFactory()
-        self.academic_year = create_current_academic_year()
-        self.language = LanguageFactory(code='FR')
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonFactory()
+        cls.academic_year = create_current_academic_year()
+        cls.language = LanguageFactory(code='FR')
 
     def test_init(self):
         campus = CampusFactory()
@@ -254,23 +261,24 @@ class TestLearningUnitYearForExternalModelForm(TestCase):
 
 
 class TestExternalLearningUnitSearchForm(TestCase):
-    def setUp(self):
-        self.academic_year = create_current_academic_year()
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
 
-        self.be_organization_adr_city1 = OrganizationAddressFactory(country__iso_code="BE", city=NAMEN)
-        self.external_lu_1 = ExternalLearningUnitYearFactory(
+        cls.be_organization_adr_city1 = OrganizationAddressFactory(country__iso_code="BE", city=NAMEN)
+        cls.external_lu_1 = ExternalLearningUnitYearFactory(
             co_graduation=True,
-            learning_unit_year__academic_year=self.academic_year,
+            learning_unit_year__academic_year=cls.academic_year,
             learning_unit_year__acronym='EDROI1001',
-            learning_unit_year__campus__organization=self.be_organization_adr_city1.organization,
+            learning_unit_year__campus__organization=cls.be_organization_adr_city1.organization,
         )
 
-        self.be_organization_adr_city2 = OrganizationAddressFactory(country__iso_code="BE", city='Bruxelles')
-        self.external_lu_2 = ExternalLearningUnitYearFactory(
+        cls.be_organization_adr_city2 = OrganizationAddressFactory(country__iso_code="BE", city='Bruxelles')
+        cls.external_lu_2 = ExternalLearningUnitYearFactory(
             co_graduation=True,
-            learning_unit_year__academic_year=self.academic_year,
+            learning_unit_year__academic_year=cls.academic_year,
             learning_unit_year__acronym='EDROI1002',
-            learning_unit_year__campus__organization=self.be_organization_adr_city2.organization,
+            learning_unit_year__campus__organization=cls.be_organization_adr_city2.organization,
         )
 
     def test_search_learning_units_on_acronym(self):

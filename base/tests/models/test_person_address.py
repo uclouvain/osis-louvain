@@ -34,10 +34,11 @@ from base.tests.factories.person_address import PersonAddressFactory
 
 
 class PersonAddressTestCase(TestCase):
-    def setUp(self):
-        self.a_user = user.UserFactory(username="user_with_person")
-        self.a_person = PersonFactory(user=self.a_user, language="fr-be", first_name="John", last_name="Doe")
-        self.address = PersonAddressFactory(person=self.a_person)
+    @classmethod
+    def setUpTestData(cls):
+        cls.a_user = user.UserFactory(username="user_with_person")
+        cls.a_person = PersonFactory(user=cls.a_user, language="fr-be", first_name="John", last_name="Doe")
+        cls.address = PersonAddressFactory(person=cls.a_person)
 
     def test_default_label(self):
         self.assertEqual(self.address.label, person_address_type.PersonAddressType.PROFESSIONAL.value)

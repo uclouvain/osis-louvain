@@ -33,7 +33,7 @@ from django.http import HttpResponse
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType, GroupType
-from base.models.group_element_year import find_learning_unit_formations
+from base.models.group_element_year import find_learning_unit_roots
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
@@ -46,9 +46,11 @@ def publish(education_group_year):
                                    'ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT /  '
                                    'ESB_REFRESH_COMMON_ADMISSION_ENDPOINT must be set in configuration')
 
-    trainings = find_learning_unit_formations(
+    trainings = find_learning_unit_roots(
         [education_group_year],
-        parents_as_instances=True
+        return_result_params={
+            'parents_as_instances': True
+        }
     ).get(education_group_year.pk, [])
 
     education_groups_to_publish = [education_group_year] + trainings \

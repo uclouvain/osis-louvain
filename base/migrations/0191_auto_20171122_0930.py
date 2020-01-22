@@ -18,7 +18,7 @@ def remove_duplicate_permission_code_name(apps, schema_editor):
 def add_central_manager_group(apps, schema_editor):
     # create group
     db_alias = schema_editor.connection.alias
-    emit_post_migrate_signal(2, False, db_alias)
+    emit_post_migrate_signal(1, False, db_alias)
     Group = apps.get_model('auth', 'Group')
     Permission = apps.get_model('auth', 'Permission')
     central_managers_group, created = Group.objects.get_or_create(name='central_managers')
@@ -44,7 +44,7 @@ def add_central_manager_group(apps, schema_editor):
 def add_faculty_manager_group(apps, schema_editor):
     # create group
     db_alias = schema_editor.connection.alias
-    emit_post_migrate_signal(2, False, db_alias)
+    emit_post_migrate_signal(1, False, db_alias)
     Group = apps.get_model('auth', 'Group')
     Permission = apps.get_model('auth', 'Permission')
     faculty_managers_group, created = Group.objects.get_or_create(name='faculty_managers')

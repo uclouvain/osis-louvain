@@ -24,7 +24,6 @@
 #
 ##############################################################################
 import collections
-from unittest import mock
 
 import factory.fuzzy
 from django.test import TestCase
@@ -162,26 +161,29 @@ def get_valid_form_data(academic_year, person, learning_unit_year=None):
 
 class LearningUnitFullFormContextMixin(TestCase):
     """This mixin is used in this test file in order to setup an environment for testing FULL FORM"""
+    @classmethod
+    def setUpTestData(cls):
+        cls.initial_language = LanguageFactory(code='FR')
+        cls.initial_campus = CampusFactory(name='Louvain-la-Neuve', organization__type=organization_type.MAIN)
+        cls.current_academic_year = create_current_academic_year()
+        # Creation of a LearningContainerYear and all related models
+        cls.learn_unit_structure = GenerateContainer(cls.current_academic_year, cls.current_academic_year)
+
+        start_year = AcademicYearFactory(year=cls.current_academic_year.year - 3)
+        end_year = AcademicYearFactory(year=cls.current_academic_year.year + 7)
+        cls.acs = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
 
     def setUp(self):
-        self.initial_language = LanguageFactory(code='FR')
-        self.initial_campus = CampusFactory(name='Louvain-la-Neuve', organization__type=organization_type.MAIN)
-        self.current_academic_year = create_current_academic_year()
-        self.person = PersonFactory()
-        self.post_data = get_valid_form_data(self.current_academic_year, person=self.person)
-        # Creation of a LearningContainerYear and all related models
-        self.learn_unit_structure = GenerateContainer(self.current_academic_year, self.current_academic_year)
         self.learning_unit_year = LearningUnitYear.objects.get(
             learning_unit=self.learn_unit_structure.learning_unit_full,
             academic_year=self.current_academic_year
         )
-        start_year = AcademicYearFactory(year=self.current_academic_year.year - 3)
-        end_year = AcademicYearFactory(year=self.current_academic_year.year + 7)
-        self.acs = GenerateAcademicYear(start_year=start_year, end_year=end_year).academic_years
         del self.acs[3]
         for ac in self.acs:
             LearningUnitYearFactory(academic_year=ac, learning_unit=self.learning_unit_year.learning_unit)
         self.acs.insert(3, self.current_academic_year)
+        self.person = PersonFactory()
+        self.post_data = get_valid_form_data(self.current_academic_year, person=self.person)
 
 
 class TestFullFormInit(LearningUnitFullFormContextMixin):

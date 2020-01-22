@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import date
 from decimal import Decimal
 
 from django.test import TestCase
@@ -43,39 +42,39 @@ from base.tests.factories.tutor import TutorFactory
 
 
 class AttributionJsonTest(TestCase):
-    def setUp(self):
-        today = date.today()
-        self.academic_year = AcademicYearFactory(year=today.year, start_date=today)
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
 
         # Creation Container / UE and components related
-        self.l_container = LearningContainerYearFactory(academic_year=self.academic_year, acronym="LBIR1210",
-                                                        in_charge=True)
-        self.learning_unit_yr = _create_learning_unit_year_with_components(
-            academic_year=self.academic_year,
-            l_container=self.l_container,
+        cls.l_container = LearningContainerYearFactory(academic_year=cls.academic_year, acronym="LBIR1210",
+                                                       in_charge=True)
+        cls.learning_unit_yr = _create_learning_unit_year_with_components(
+            academic_year=cls.academic_year,
+            l_container=cls.l_container,
             acronym="LBIR1210",
             subtype=learning_unit_year_subtypes.FULL
         )
 
-        _create_learning_unit_year_with_components(academic_year=self.academic_year, l_container=self.l_container,
+        _create_learning_unit_year_with_components(academic_year=cls.academic_year, l_container=cls.l_container,
                                                    acronym="LBIR1210A", subtype=learning_unit_year_subtypes.PARTIM)
-        _create_learning_unit_year_with_components(academic_year=self.academic_year, l_container=self.l_container,
+        _create_learning_unit_year_with_components(academic_year=cls.academic_year, l_container=cls.l_container,
                                                    acronym="LBIR1210B", subtype=learning_unit_year_subtypes.PARTIM)
 
         # Creation Tutors
-        self.tutor_1 = TutorFactory(person=PersonFactory(first_name="Tom", last_name="Dupont", global_id='00012345'))
-        self.tutor_2 = TutorFactory(person=PersonFactory(first_name="Paul", last_name="Durant", global_id='08923545'))
+        cls.tutor_1 = TutorFactory(person=PersonFactory(first_name="Tom", last_name="Dupont", global_id='00012345'))
+        cls.tutor_2 = TutorFactory(person=PersonFactory(first_name="Paul", last_name="Durant", global_id='08923545'))
 
         # Creation Attribution and Attributions Charges - Tutor 1 - Holder
-        attribution_tutor_1 = AttributionNewFactory(learning_container_year=self.l_container, tutor=self.tutor_1,
+        attribution_tutor_1 = AttributionNewFactory(learning_container_year=cls.l_container, tutor=cls.tutor_1,
                                                     function=function.HOLDER)
-        _create_attribution_charge(self.academic_year, attribution_tutor_1, "LBIR1210", Decimal(15.5), Decimal(10))
-        _create_attribution_charge(self.academic_year, attribution_tutor_1, "LBIR1210A", None, Decimal(5))
+        _create_attribution_charge(cls.academic_year, attribution_tutor_1, "LBIR1210", Decimal(15.5), Decimal(10))
+        _create_attribution_charge(cls.academic_year, attribution_tutor_1, "LBIR1210A", None, Decimal(5))
 
         # Creation Attribution and Attributions Charges - Tutor 2 - Co-holder
-        attribution_tutor_2 = AttributionNewFactory(learning_container_year=self.l_container, tutor=self.tutor_2,
+        attribution_tutor_2 = AttributionNewFactory(learning_container_year=cls.l_container, tutor=cls.tutor_2,
                                                     function=function.CO_HOLDER)
-        _create_attribution_charge(self.academic_year, attribution_tutor_2, "LBIR1210B", Decimal(7.5))
+        _create_attribution_charge(cls.academic_year, attribution_tutor_2, "LBIR1210B", Decimal(7.5))
 
     def test_build_attributions_json(self):
         attrib_list = attribution_json._compute_list()
@@ -88,7 +87,7 @@ class AttributionJsonTest(TestCase):
         self.assertTrue(attrib_tutor_1)
         self.assertEqual(len(attrib_tutor_1['attributions']), 2)
 
-        #Check if attribution is correct
+        # Check if attribution is correct
         attrib_tutor_2 = next(
             (attrib for attrib in attrib_list if attrib['global_id'] == self.tutor_2.person.global_id),
             None)
@@ -97,7 +96,8 @@ class AttributionJsonTest(TestCase):
         self.assertEqual(attrib_tutor_2['attributions'][0]['acronym'], "LBIR1210B")
         self.assertEqual(attrib_tutor_2['attributions'][0]['function'], function.CO_HOLDER)
         self.assertEqual(attrib_tutor_2['attributions'][0][learning_component_year_type.LECTURING], "7.5")
-        self.assertRaises(KeyError, lambda: attrib_tutor_2['attributions'][0][learning_component_year_type.PRACTICAL_EXERCISES + '_CHARGE'])
+        self.assertRaises(KeyError, lambda: attrib_tutor_2['attributions'][0][
+            learning_component_year_type.PRACTICAL_EXERCISES + '_CHARGE'])
 
     def test_learning_unit_in_charge_false(self):
         self.l_container.in_charge = False
@@ -122,8 +122,8 @@ class AttributionJsonTest(TestCase):
         self.assertEqual(len(attrib_list), 2)
 
         attrib_tutor_1 = next(
-                 (attrib for attrib in attrib_list if attrib['global_id'] == self.tutor_1.person.global_id),
-                  None
+            (attrib for attrib in attrib_list if attrib['global_id'] == self.tutor_1.person.global_id),
+            None
         )
         self.assertEqual(len(attrib_tutor_1['attributions']), 3)
 
@@ -155,7 +155,7 @@ class AttributionJsonTest(TestCase):
     def test_get_title_next_luyr(self):
         self.assertIsNone(attribution_json._get_title_next_luyr(self.learning_unit_yr))
 
-        next_academic_year = AcademicYearFactory(year=self.academic_year.year+1)
+        next_academic_year = AcademicYearFactory(year=self.academic_year.year + 1)
         self.assertIsNone(attribution_json._get_title_next_luyr(self.learning_unit_yr))
 
         next_luy = LearningUnitYearFactory(learning_unit=self.learning_unit_yr.learning_unit,

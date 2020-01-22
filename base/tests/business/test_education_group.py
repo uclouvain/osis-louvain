@@ -68,18 +68,21 @@ NO_SESSION_DATA = {'session1': None, 'session2': None, 'session3': None}
 
 
 class EducationGroupTestCase(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Get or Create Permission to edit administrative data
         content_type = ContentType.objects.get_for_model(Person)
         permission, created = Permission.objects.get_or_create(
             codename="can_edit_education_group_administrative_data",
             content_type=content_type)
-        self.user = UserFactory()
-        self.person = PersonFactory(user=self.user)
-        self.user.user_permissions.add(permission)
+        cls.user = UserFactory()
+        cls.person = PersonFactory(user=cls.user)
+        cls.user.user_permissions.add(permission)
+
+    def setUp(self):
         # Create structure
         self._create_basic_entity_structure()
-        # Create education group with 'CHIM' as entity management
+        # Create education group with 'CHIM' as entity cls
         self.education_group_year = EducationGroupYearFactory(management_entity=self.chim_entity)
 
     def test_can_user_edit_administrative_data_no_permission(self):
@@ -205,20 +208,23 @@ class EducationGroupXlsTestCase(TestCase):
 
 
 class EducationGroupXlsAdministrativeDataTestCase(TestCase):
-    def setUp(self):
-        self.academic_year = create_current_academic_year()
-        self.next_academic_year = AcademicYearFactory(year=self.academic_year.year + 1)
-        self.education_group_type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
-        self.education_group = EducationGroupFactory(start_year=self.academic_year,
-                                                     end_year=self.next_academic_year)
-        self.education_group_year_1 = EducationGroupYearFactory(academic_year=self.academic_year, acronym="PREMIER",
-                                                                education_group=self.education_group,
-                                                                weighting=True)
-        self.education_group_year_1.management_entity_version = EntityVersionFactory()
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = create_current_academic_year()
+        cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
+        cls.education_group_type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
+        cls.education_group = EducationGroupFactory(start_year=cls.academic_year,
+                                                    end_year=cls.next_academic_year)
+        cls.education_group_year_1 = EducationGroupYearFactory(academic_year=cls.academic_year, acronym="PREMIER",
+                                                               education_group=cls.education_group,
+                                                               weighting=True)
+        cls.education_group_year_1.management_entity_version = EntityVersionFactory()
 
+        cls.user = UserFactory()
+
+    def setUp(self):
         self._create_administrative_data()
         self._create_mandatary_data()
-        self.user = UserFactory()
 
     def _create_administrative_data(self):
         # Course enrollment event

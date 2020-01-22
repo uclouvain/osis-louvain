@@ -49,32 +49,35 @@ CREATE_URL_NAME = "publication_contact_create"
 
 
 class PublicationContactViewSetupTest(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         # Common offer must exist
-        self.academic_year = create_current_academic_year()
-        EducationGroupYearCommonFactory(academic_year=self.academic_year)
+        cls.academic_year = create_current_academic_year()
+        EducationGroupYearCommonFactory(academic_year=cls.academic_year)
 
-        self.training = TrainingFactory(academic_year=self.academic_year)
-        self.publication_contact = EducationGroupPublicationContactFactory(
-            education_group_year=self.training,
+        cls.training = TrainingFactory(academic_year=cls.academic_year)
+        cls.publication_contact = EducationGroupPublicationContactFactory(
+            education_group_year=cls.training,
             type=PublicationContactType.ACADEMIC_RESPONSIBLE.name
         )
 
         # Create a central manager and linked it to entity of training
-        self.person = CentralManagerFactory("change_educationgroup", "can_access_education_group")
-        PersonEntityFactory(person=self.person, entity=self.training.management_entity)
+        cls.person = CentralManagerFactory("change_educationgroup", "can_access_education_group")
+        PersonEntityFactory(person=cls.person, entity=cls.training.management_entity)
 
+    def setUp(self):
         self.client.force_login(self.person.user)
 
 
 class TestPublicationContactCreateView(PublicationContactViewSetupTest):
-    def setUp(self):
-        super().setUp()
-        self.url_create = reverse(
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.url_create = reverse(
             CREATE_URL_NAME,
             args=[
-                self.training.pk,
-                self.training.pk,
+                cls.training.pk,
+                cls.training.pk,
             ]
         )
 
@@ -123,14 +126,15 @@ class TestPublicationContactCreateView(PublicationContactViewSetupTest):
 
 
 class TestPublicationContactUpdateView(PublicationContactViewSetupTest):
-    def setUp(self):
-        super().setUp()
-        self.url_edit = reverse(
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.url_edit = reverse(
             EDIT_URL_NAME,
             args=[
-                self.training.pk,
-                self.training.pk,
-                self.publication_contact.pk
+                cls.training.pk,
+                cls.training.pk,
+                cls.publication_contact.pk
             ]
         )
 
@@ -155,14 +159,15 @@ class TestPublicationContactUpdateView(PublicationContactViewSetupTest):
 
 
 class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
-    def setUp(self):
-        super().setUp()
-        self.url_delete = reverse(
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.url_delete = reverse(
             DELETE_URL_NAME,
             args=[
-                self.training.id,
-                self.training.id,
-                self.publication_contact.pk
+                cls.training.id,
+                cls.training.id,
+                cls.publication_contact.pk
             ]
         )
 
@@ -200,21 +205,22 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
 
 
 class TestEntityPublicationContactUpdateView(PublicationContactViewSetupTest):
-    def setUp(self):
-        super().setUp()
-        self.entity = EntityFactory(organization__type=organization_type.MAIN)
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.entity = EntityFactory(organization__type=organization_type.MAIN)
         today = datetime.date.today()
-        self.entity_version = EntityVersionFactory(
+        cls.entity_version = EntityVersionFactory(
             start_date=today.replace(year=1900),
             end_date=None,
-            entity=self.entity,
+            entity=cls.entity,
         )
 
-        self.url_update = reverse(
+        cls.url_update = reverse(
             EDIT_ENTITY_URL_NAME,
             args=[
-                self.training.id,
-                self.training.id,
+                cls.training.id,
+                cls.training.id,
             ]
         )
 

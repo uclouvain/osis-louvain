@@ -25,7 +25,6 @@
 ##############################################################################
 import random
 
-from django.contrib.auth.models import Permission
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
@@ -37,41 +36,49 @@ from base.tests.factories.education_group_organization import EducationGroupOrga
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.group import GroupFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.user import UserFactory
 from reference.tests.factories.country import CountryFactory
 
 
 class TestCoorganizationForm(TestCase):
-    def setUp(self):
-        self.group = GroupFactory(name='central_managers')
-        self.user = UserFactory()
-        self.user.groups.add(self.group)
-        self.client.force_login(self.user)
-        self.person = PersonFactory(user=self.user)
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.person = CentralManagerFactory(user=cls.user)
 
-        self.academic_year = create_current_academic_year()
-        self.education_group_yr = EducationGroupYearFactory(
-            acronym='ARKE2A', academic_year=self.academic_year,
+        cls.academic_year = create_current_academic_year()
+        cls.education_group_yr = EducationGroupYearFactory(
+            acronym='ARKE2A', academic_year=cls.academic_year,
             education_group_type=EducationGroupTypeFactory(category=education_group_categories.TRAINING),
             management_entity=EntityFactory()
         )
 
-        self.root_id = self.education_group_yr.id
-        self.country_be = CountryFactory()
+        cls.root_id = cls.education_group_yr.id
+        cls.country_be = CountryFactory()
 
-        self.organization_address = OrganizationAddressFactory(country=self.country_be)
-        self.organization = self.organization_address.organization
-        self.education_group_organization = EducationGroupOrganizationFactory(
-            organization=self.organization,
-            education_group_year=self.education_group_yr,
+        cls.organization_address = OrganizationAddressFactory(country=cls.country_be)
+        cls.organization = cls.organization_address.organization
+        cls.education_group_organization = EducationGroupOrganizationFactory(
+            organization=cls.organization,
+            education_group_year=cls.education_group_yr,
             diploma=diploma_coorganization.UNIQUE,
             all_students=True,
         )
+        cls.organization_bis = OrganizationFactory()
+        cls.address = OrganizationAddressFactory(organization=cls.organization_bis, is_main=True)
+
+    def setUp(self):
+        self.client.force_login(self.user)
+        self.data = {
+            'form-TOTAL_FORMS': 1,
+            'form-INITIAL_FORMS': 0,
+            'form-0-diploma': random.choice(DiplomaCoorganizationTypes.get_names()),
+            'form-0-country': self.address.country.pk,
+            'form-0-organization': self.organization_bis.pk
+        }
 
     def test_fields(self):
         form = CoorganizationEditForm(None, instance=self.education_group_organization, user=self.user)
@@ -96,34 +103,16 @@ class TestCoorganizationForm(TestCase):
         self.assertFalse(form['is_producing_annexe'].value())
 
     def test_formset_valid(self):
-        organization = OrganizationFactory()
-        address = OrganizationAddressFactory(organization=organization, is_main=True)
-        data = {
-            'form-TOTAL_FORMS': 1,
-            'form-INITIAL_FORMS': 0,
-            'form-0-diploma': random.choice(DiplomaCoorganizationTypes.get_names()),
-            'form-0-country': address.country.pk,
-            'form-0-organization': organization.pk
-        }
         form = OrganizationFormset(
-            data=data,
+            data=self.data,
             form_kwargs={'education_group_year': EducationGroupYearFactory(), 'user': self.user},
         )
         self.assertTrue(form.is_valid())
 
     def test_formset_missing_diploma(self):
-        organization = OrganizationFactory()
-        address = OrganizationAddressFactory(organization=organization, is_main=True)
-        data = {
-            'first_name': 'First',
-            'last_name': 'Last',
-            'form-TOTAL_FORMS': 1,
-            'form-INITIAL_FORMS': 0,
-            'form-0-country': address.country.pk,
-            'form-0-organization': organization.pk
-        }
+        self.data['form-0-diploma'] = None
         form = OrganizationFormset(
-            data=data,
+            data=self.data,
             form_kwargs={'education_group_year': EducationGroupYearFactory(), 'user': self.user},
         )
         self.assertFalse(form.is_valid(), form.errors)
@@ -136,23 +125,14 @@ class TestCoorganizationForm(TestCase):
 
     def test_formset_with_organization_already_attached_to_egy(self):
         egy = EducationGroupYearFactory()
-        organization = OrganizationFactory()
         egy_organization = EducationGroupOrganizationFactory(
-            organization=organization,
+            organization=self.organization_bis,
             education_group_year=egy
         )
-        address = OrganizationAddressFactory(organization=organization, is_main=True)
-        data = {
-            'first_name': 'First',
-            'last_name': 'Last',
-            'form-TOTAL_FORMS': 1,
-            'form-INITIAL_FORMS': 0,
-            'form-0-diploma': random.choice(DiplomaCoorganizationTypes.get_names()),
-            'form-0-country': address.country.pk,
-            'form-0-organization': egy_organization.organization.pk
-        }
+        self.data['form-0-organization'] = egy_organization.organization.pk
+
         form = OrganizationFormset(
-            data=data,
+            data=self.data,
             form_kwargs={'education_group_year': egy, 'user': self.user},
         )
         self.assertFalse(form.is_valid(), form.errors)

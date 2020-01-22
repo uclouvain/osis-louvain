@@ -37,8 +37,9 @@ from base.tests.factories.person import PersonFactory
 
 
 class TestSimplifiedVolumeManagementForm(TestCase):
-    def setUp(self):
-        self.data = {
+    @classmethod
+    def setUp(cls):
+        cls.data = {
             'component-TOTAL_FORMS': '2',
             'component-INITIAL_FORMS': '0',
             'component-MAX_NUM_FORMS': '2',
@@ -53,27 +54,11 @@ class TestSimplifiedVolumeManagementForm(TestCase):
         }
         current_academic_year = create_current_academic_year()
         generator = GenerateContainer(current_academic_year, current_academic_year)
-        self.learning_unit_year = generator[0].learning_unit_year_full
-        self.entity_container_years = generator[0].list_repartition_volume_entities
-        self.person = PersonFactory()
+        cls.learning_unit_year = generator[0].learning_unit_year_full
+        cls.entity_container_years = generator[0].list_repartition_volume_entities
+        cls.person = PersonFactory()
 
     def test_save(self):
-        formset = SimplifiedVolumeManagementForm(self.data, self.person, queryset=LearningComponentYear.objects.none())
-        self.assertEqual(len(formset.forms), 2)
-        self.assertTrue(formset.is_valid())
-
-        learning_component_years = formset.save_all_forms(self.learning_unit_year, self.entity_container_years)
-
-        cm_component = learning_component_years[0]
-        tp_component = learning_component_years[1]
-
-        self.assertEqual(cm_component.learning_unit_year, self.learning_unit_year)
-        self.assertEqual(tp_component.learning_unit_year, self.learning_unit_year)
-
-        self.assertEqual(cm_component.type, LECTURING)
-        self.assertEqual(tp_component.type, PRACTICAL_EXERCISES)
-
-    def test_save_with_master_thesis_container_type(self):
         formset = SimplifiedVolumeManagementForm(self.data, self.person, queryset=LearningComponentYear.objects.none())
         self.assertEqual(len(formset.forms), 2)
         self.assertTrue(formset.is_valid())
@@ -111,10 +96,13 @@ class TestSimplifiedVolumeManagementForm(TestCase):
 
 
 class TestSimplifiedVolumeForm(TestCase):
-    def setUp(self):
-        self.instance = LearningComponentYearFactory(hourly_volume_total_annual=10,
-                                                     hourly_volume_partial_q1=5,
-                                                     hourly_volume_partial_q2=5)
+    @classmethod
+    def setUpTestData(cls):
+        cls.instance = LearningComponentYearFactory(
+            hourly_volume_total_annual=10,
+            hourly_volume_partial_q1=5,
+            hourly_volume_partial_q2=5
+        )
 
     def test_clean(self):
         self.instance.hourly_volume_partial_q1 = 0

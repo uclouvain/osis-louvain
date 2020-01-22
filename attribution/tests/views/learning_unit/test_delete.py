@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest.mock import patch
 
 from django.http import HttpResponse
 from django.test import TestCase
@@ -31,14 +30,7 @@ from django.urls import reverse
 
 from attribution.models.attribution_charge_new import AttributionChargeNew
 from attribution.models.attribution_new import AttributionNew
-from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
-from attribution.tests.factories.attribution_new import AttributionNewFactory
 from attribution.tests.views.charge_repartition.common import TestChargeRepartitionMixin
-from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
-    PracticalLearningComponentYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory, LearningUnitYearPartimFactory
-from base.tests.factories.person import PersonWithPermissionsFactory
-from base.views.mixins import RulesRequiredMixin
 
 
 class TestRemoveChargeRepartition(TestChargeRepartitionMixin, TestCase):
@@ -60,7 +52,7 @@ class TestRemoveChargeRepartition(TestChargeRepartitionMixin, TestCase):
         self.assertTemplateUsed(response, "attribution/learning_unit/remove_charge_repartition_confirmation_inner.html")
 
     def test_delete_data(self):
-        response = self.client.delete(self.url)
+        self.client.delete(self.url)
 
         self.assertFalse(AttributionNew.objects.filter(id=self.attribution.id).exists())
         self.assertFalse(

@@ -36,7 +36,7 @@ class CountryList(generics.ListAPIView):
     name = 'country-list'
     queryset = Country.objects.all()
     serializer_class = CountrySerializer
-    filter_fields = (
+    filterset_fields = (
         'iso_code',
         'name',
     )

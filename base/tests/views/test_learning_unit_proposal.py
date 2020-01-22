@@ -30,7 +30,6 @@ from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.contrib.messages.storage.fallback import FallbackStorage
-from django.core.exceptions import ValidationError
 from django.http import HttpResponseNotFound, HttpResponse, HttpResponseForbidden
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
@@ -43,7 +42,6 @@ from base.business import learning_unit_proposal as proposal_business
 from base.business.learning_unit_proposal import INITIAL_DATA_FIELDS, copy_learning_unit_data
 from base.forms.learning_unit.edition import LearningUnitEndDateForm
 from base.forms.learning_unit_proposal import ProposalLearningUnitForm
-from base.models import entity_version
 from base.models import proposal_learning_unit
 from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_periodicity
@@ -351,21 +349,24 @@ class TestLearningUnitSuppressionProposal(TestCase):
 
 
 class TestLearningUnitProposalSearch(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         AcademicYearFactory.produce(number_past=3, number_future=10)
-        self.person = PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
+        cls.person = PersonWithPermissionsFactory("can_propose_learningunit", "can_access_learningunit")
         ac_years = AcademicYearFactory.produce_in_future(quantity=3)
-        self.an_entity = EntityFactory()
-        self.entity_version = EntityVersionFactory(entity=self.an_entity, entity_type=entity_type.SCHOOL,
-                                                   start_date=ac_years[0].start_date,
-                                                   end_date=ac_years[1].end_date)
-        self.person_entity = PersonEntityFactory(person=self.person, entity=self.an_entity, with_child=True)
+        cls.an_entity = EntityFactory()
+        cls.entity_version = EntityVersionFactory(entity=cls.an_entity, entity_type=entity_type.SCHOOL,
+                                                  start_date=ac_years[0].start_date,
+                                                  end_date=ac_years[1].end_date)
+        cls.person_entity = PersonEntityFactory(person=cls.person, entity=cls.an_entity, with_child=True)
+        cls.proposals = [_create_proposal_learning_unit("LOSIS1211"),
+                         _create_proposal_learning_unit("LOSIS1212"),
+                         _create_proposal_learning_unit("LOSIS1213")]
+        for proposal in cls.proposals:
+            PersonEntityFactory(person=cls.person, entity=proposal.entity)
+
+    def setUp(self):
         self.client.force_login(self.person.user)
-        self.proposals = [_create_proposal_learning_unit("LOSIS1211"),
-                          _create_proposal_learning_unit("LOSIS1212"),
-                          _create_proposal_learning_unit("LOSIS1213")]
-        for proposal in self.proposals:
-            PersonEntityFactory(person=self.person, entity=proposal.entity)
 
     def test_learning_units_proposal_search(self):
         url = reverse("learning_units_proposal")
@@ -403,8 +404,7 @@ class TestGroupActionsOnProposals(TestCase):
     @classmethod
     def setUpTestData(cls):
         AcademicYearFactory.produce(number_past=3, number_future=10)
-        cls.person = PersonFactory()
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
+        cls.person = PersonWithPermissionsFactory("can_access_learningunit")
         cls.proposals = [_create_proposal_learning_unit("LOSIS1211"),
                          _create_proposal_learning_unit("LOSIS1212"),
                          _create_proposal_learning_unit("LOSIS1213")]
@@ -477,22 +477,21 @@ class TestGroupActionsOnProposals(TestCase):
 
 @override_flag('learning_unit_proposal_delete', active=True)
 class TestLearningUnitProposalCancellation(TestCase):
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         create_current_academic_year()
-        self.person = FacultyManagerFactory()
-        self.permission = Permission.objects.get(codename="can_propose_learningunit")
-        self.person.user.user_permissions.add(self.permission)
+        cls.person = FacultyManagerFactory("can_propose_learningunit")
+        cls.permission = Permission.objects.get(codename="can_propose_learningunit")
 
+    def setUp(self):
         self.learning_unit_proposal = _create_proposal_learning_unit("LOSIS1211")
         self.learning_unit_year = self.learning_unit_proposal.learning_unit_year
-
         self.person_entity = PersonEntityFactory(
             person=self.person,
             entity=self.learning_unit_year.learning_container_year.requirement_entity
         )
-
-        self.client.force_login(self.person.user)
         self.url = reverse('learning_unit_cancel_proposal', args=[self.learning_unit_year.id])
+        self.client.force_login(self.person.user)
 
     def test_user_not_logged(self):
         self.client.logout()
@@ -987,17 +986,14 @@ class TestLearningUnitProposalDisplay(TestCase):
         self.assertEqual(differences,
                          dict(learning_unit_year_periodicity.PERIODICITY_TYPES)[self.initial_periodicity])
 
-    def get_an_entity_version(self):
-        other_entity = self.generator_learning_container.generated_container_years[0] \
-            .allocation_entity_container_year.entity
-        return entity_version.get_last_version(other_entity)
-
 
 @override_flag('learning_unit_proposal_delete', active=True)
 class TestCreationProposalCancel(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.a_person_central_manager = CentralManagerFactory('can_propose_learningunit', 'can_access_learningunit')
 
     def setUp(self):
-        self.a_person_central_manager = CentralManagerFactory('can_propose_learningunit', 'can_access_learningunit')
         self.client.force_login(self.a_person_central_manager.user)
 
     @mock.patch('base.views.learning_units.perms.business_perms.is_eligible_for_cancel_of_proposal',

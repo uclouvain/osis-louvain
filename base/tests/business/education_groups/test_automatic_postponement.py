@@ -53,7 +53,6 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 
 
 class TestFetchEducationGroupToPostpone(TestCase):
-
     @classmethod
     def setUpTestData(cls):
         cls.current_year = get_current_year()
@@ -189,7 +188,6 @@ class TestFetchEducationGroupToPostpone(TestCase):
 
 
 class TestReddotEducationGroupAutomaticPostponement(TestCase):
-
     @classmethod
     def setUpTestData(cls):
         cls.current_year = AcademicYearFactory(year=get_current_year())

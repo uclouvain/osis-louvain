@@ -25,6 +25,7 @@
 ##############################################################################
 from attribution.models import attribution
 from base.models import offer_year, exam_enrollment, tutor
+from base.models.offer_year import OfferYear
 
 
 def get_scores_encoding_progress(user, offer_year_id, number_session, academic_year, learning_unit_year_ids=None):
@@ -40,7 +41,7 @@ def get_scores_encoding_progress(user, offer_year_id, number_session, academic_y
 
 def find_related_offer_years(score_encoding_progress_list):
     all_offers_ids = [score_encoding_progress.offer_year_id for score_encoding_progress in score_encoding_progress_list]
-    return offer_year.find_by_ids(all_offers_ids).order_by('acronym')
+    return OfferYear.objects.filter(pk__in=all_offers_ids).order_by('acronym')
 
 
 def find_related_tutors(user, academic_year, session_exam_number):

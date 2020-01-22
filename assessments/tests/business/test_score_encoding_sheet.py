@@ -95,7 +95,6 @@ class ScoreSheetAddressTest(TestCase):
 
     def _assert_correct_address(self, correct_address):
         dict = score_encoding_sheet.get_score_sheet_address(self.offer_year)
-        entity_id = dict['entity_id_selected']
         address = dict['address']
 
         for f in self.address_fields:

@@ -34,16 +34,17 @@ from reference.tests.factories.language import LanguageFactory
 
 
 class TestLearningAchievementForm(TestCase):
-    def setUp(self):
-        self.language_fr = LanguageFactory(code="FR")
-        self.language_en = LanguageFactory(code="EN")
-        self.learning_unit_year = LearningUnitYearFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.language_fr = LanguageFactory(code="FR")
+        cls.language_en = LanguageFactory(code="EN")
+        cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=create_current_academic_year()
         )
-        self.learning_achievement = LearningAchievementFactory(
-            learning_unit_year=self.learning_unit_year,
-            language=self.language_fr,
-            code_name='TEST'
+        cls.learning_achievement = LearningAchievementFactory(
+            learning_unit_year=cls.learning_unit_year,
+            language=cls.language_fr,
+            code_name='TEST',
         )
 
     def test_should_not_raise_validation_error_case_update_same_achievement(self):
@@ -56,7 +57,8 @@ class TestLearningAchievementForm(TestCase):
         form = LearningAchievementEditForm(
             luy=self.learning_unit_year,
             data=data,
-            code=self.learning_achievement.code_name
+            code=self.learning_achievement.code_name,
+            consistency_id=self.learning_achievement.consistency_id
         )
         self.assertTrue(form.is_valid(), form.errors)
         self.assertTrue(self.learning_achievement.text, text)
@@ -69,6 +71,7 @@ class TestLearningAchievementForm(TestCase):
         form = LearningAchievementEditForm(
             luy=self.learning_unit_year,
             data=data,
+            consistency_id=2
         )
         self.assertFalse(form.is_valid(), form.errors)
         self.assertDictEqual(

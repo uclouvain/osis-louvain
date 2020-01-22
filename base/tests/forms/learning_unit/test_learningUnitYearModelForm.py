@@ -38,25 +38,25 @@ from base.tests.forms.test_learning_unit_create_2 import get_valid_form_data
 
 
 class TestCreditsValidation(TestCase):
-
-    def setUp(self):
+    @classmethod
+    def setUpTestData(cls):
         start_year = AcademicYearFactory(year=CRUCIAL_YEAR_FOR_CREDITS_VALIDATION - 1)
         end_year = AcademicYearFactory(year=CRUCIAL_YEAR_FOR_CREDITS_VALIDATION + 1)
-        self.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
-        self.learn_unit_structure = GenerateContainer(self.academic_years[0], self.academic_years[2])
-        self.learning_unit_year_2017 = LearningUnitYear.objects.get(
-            learning_unit=self.learn_unit_structure.learning_unit_full,
-            academic_year=self.academic_years[0]
+        cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
+        cls.learn_unit_structure = GenerateContainer(cls.academic_years[0], cls.academic_years[2])
+        cls.learning_unit_year_2017 = LearningUnitYear.objects.get(
+            learning_unit=cls.learn_unit_structure.learning_unit_full,
+            academic_year=cls.academic_years[0]
         )
-        self.learning_unit_year_2018 = LearningUnitYear.objects.get(
-            learning_unit=self.learn_unit_structure.learning_unit_full,
-            academic_year=self.academic_years[1]
+        cls.learning_unit_year_2018 = LearningUnitYear.objects.get(
+            learning_unit=cls.learn_unit_structure.learning_unit_full,
+            academic_year=cls.academic_years[1]
         )
-        self.learning_unit_year_2019 = LearningUnitYear.objects.get(
-            learning_unit=self.learn_unit_structure.learning_unit_full,
-            academic_year=self.academic_years[2]
+        cls.learning_unit_year_2019 = LearningUnitYear.objects.get(
+            learning_unit=cls.learn_unit_structure.learning_unit_full,
+            academic_year=cls.academic_years[2]
         )
-        self.person = PersonFactory()
+        cls.person = PersonFactory()
 
     def test_credits_no_decimal_in_2018(self):
         form = self._build_form_with_decimal(self.learning_unit_year_2018)

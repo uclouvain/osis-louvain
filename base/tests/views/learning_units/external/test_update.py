@@ -44,33 +44,35 @@ from base.views.learning_units.update import update_learning_unit
 
 @override_flag('learning_unit_update', active=True)
 class TestUpdateExternalLearningUnitView(TestCase):
-    def setUp(self):
-        self.user = UserFactory()
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_learningunit"))
-        self.user.user_permissions.add(Permission.objects.get(codename="can_edit_learningunit"))
-        self.person = CentralManagerFactory(user=self.user)
-        self.client.force_login(self.user)
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+        cls.person = CentralManagerFactory(
+            "can_access_learningunit", "can_edit_learningunit",
+            user=cls.user
+        )
 
         person_entity = PersonEntityFactory(
-            person=self.person,
+            person=cls.person,
             entity=EntityVersionFactory().entity,
         )
 
-        self.academic_year = create_current_academic_year()
+        cls.academic_year = create_current_academic_year()
 
-        luy = LearningUnitYearFullFactory(
-            academic_year=self.academic_year,
+        cls.luy = LearningUnitYearFullFactory(
+            academic_year=cls.academic_year,
             internship_subtype=None,
             acronym="EFAC0000",
             learning_container_year__container_type=EXTERNAL,
             learning_container_year__requirement_entity=person_entity.entity,
         )
-        self.external = ExternalLearningUnitYearFactory(learning_unit_year=luy)
+        cls.data = get_valid_external_learning_unit_form_data(cls.academic_year, cls.person, cls.luy)
 
-        self.data = get_valid_external_learning_unit_form_data(self.academic_year, self.person,
-                                                               self.external.learning_unit_year)
+        cls.url = reverse(update_learning_unit, args=[cls.luy.pk])
 
-        self.url = reverse(update_learning_unit, args=[self.external.learning_unit_year.pk])
+    def setUp(self):
+        self.external = ExternalLearningUnitYearFactory(learning_unit_year=self.luy)
+        self.client.force_login(self.user)
 
     def test_update_get(self):
         response = self.client.get(self.url)

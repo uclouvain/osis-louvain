@@ -34,7 +34,6 @@ from django.test import TestCase
 from base.forms.learning_unit_pedagogy import LearningUnitPedagogyEditForm, TeachingMaterialModelForm
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
@@ -46,23 +45,24 @@ from reference.tests.factories.language import LanguageFactory
 
 class LearningUnitPedagogyContextMixin(TestCase):
     """"This mixin is used in this test file in order to setup an environment for testing pedagogy"""
-    def setUp(self):
-        self.language = LanguageFactory(code="EN")
-        self.person = PersonFactory()
-        self.person.user.user_permissions.add(Permission.objects.get(codename="can_edit_learningunit_pedagogy"))
-        self.current_ac = AcademicYearFactory(current=True)
-        self.past_ac_years = AcademicYearFactory.produce_in_past(self.current_ac.year - 1, 5)
-        self.future_ac_years = AcademicYearFactory.produce_in_future(self.current_ac.year + 1, 5)
+    @classmethod
+    def setUpTestData(cls):
+        cls.language = LanguageFactory(code="EN")
+        cls.person = PersonFactory()
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_edit_learningunit_pedagogy"))
+        cls.current_ac = AcademicYearFactory(current=True)
+        cls.past_ac_years = AcademicYearFactory.produce_in_past(cls.current_ac.year - 1, 5)
+        cls.future_ac_years = AcademicYearFactory.produce_in_future(cls.current_ac.year + 1, 5)
 
-        self.current_luy = LearningUnitYearFactory(
-            learning_container_year__academic_year=self.current_ac,
-            academic_year=self.current_ac,
+        cls.current_luy = LearningUnitYearFactory(
+            learning_container_year__academic_year=cls.current_ac,
+            academic_year=cls.current_ac,
             acronym="LAGRO1000",
             subtype=FULL
         )
-        self.luys = {self.current_ac.year: self.current_luy}
-        self.luys.update(
-            _duplicate_learningunityears(self.current_luy, academic_years=self.past_ac_years + self.future_ac_years)
+        cls.luys = {cls.current_ac.year: cls.current_luy}
+        cls.luys.update(
+            _duplicate_learningunityears(cls.current_luy, academic_years=cls.past_ac_years + cls.future_ac_years)
         )
 
 
