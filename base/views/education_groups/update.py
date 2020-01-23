@@ -85,7 +85,12 @@ def update_education_group(request, root_id, education_group_year_id):
         request.POST or None,
         prefix='group_element_year_formset',
         queryset=education_group_year.groupelementyear_set.all(),
-        is_central_manager=is_central_manager
+        form_kwargs=[{
+            'parent': education_group_year,
+            'child_branch': None,
+            'child_leaf': None,
+            'is_central_manager': is_central_manager,
+        }]
 
     )
     return _update_education_group_year(request, root_id, education_group_year, groupelementyear_formset)

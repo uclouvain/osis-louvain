@@ -143,9 +143,21 @@ class TestGroupElementYearForm(TestCase):
                     parent_type=self.parent.education_group_type,
                     child_type=child_branch.education_group_type
                 )
-                form = GroupElementYearForm(parent=self.parent, child_branch=child_branch)
+                form = GroupElementYearForm(parent=self.parent, child_branch=child_branch, is_central_manager=True)
                 enabled_fields = [name for name, field in form.fields.items() if not field.disabled]
                 self.assertCountEqual(expected_fields, enabled_fields)
+
+    def test_disable_all_fields_when_parent_is_formation_and_child_is_minor_major_option_list_choice(self):
+        for name in GroupType.minor_major_option_list_choice():
+            with self.subTest(type=name):
+                child_branch = GroupFactory(education_group_type__name=name)
+                AuthorizedRelationshipFactory(
+                    parent_type=self.parent.education_group_type,
+                    child_type=child_branch.education_group_type
+                )
+                form = GroupElementYearForm(parent=self.parent, child_branch=child_branch, is_central_manager=False)
+                enabled_fields = [name for name, field in form.fields.items() if not field.disabled]
+                self.assertCountEqual([], enabled_fields)
 
     def test_remove_access_condition_when_authorized_relationship(self):
         AuthorizedRelationshipFactory(
