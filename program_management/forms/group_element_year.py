@@ -152,10 +152,11 @@ class BaseGroupElementYearFormset(BaseModelFormSet):
 
     def get_form_kwargs(self, index):
         kwargs = super().get_form_kwargs(index)
-        kwargs['is_central_manager'] = self.kwargs[index]['is_central_manager']
-        kwargs['parent'] = self.kwargs[index]['parent'] or None
-        kwargs['child_branch'] = self.kwargs[index]['child_branch']
-        kwargs['child_leaf'] = self.kwargs[index]['child_leaf']
+        if len(self.kwargs) > index:
+            kwargs['is_central_manager'] = self.kwargs[index]['is_central_manager']
+            kwargs['parent'] = self.kwargs[index]['parent'] or None
+            kwargs['child_branch'] = self.kwargs[index]['child_branch']
+            kwargs['child_leaf'] = self.kwargs[index]['child_leaf']
         return kwargs
 
     def changed_forms(self):
