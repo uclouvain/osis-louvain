@@ -41,7 +41,6 @@ from base.models.enums import entity_type
 from base.models.enums import learning_container_year_types
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
-from base.models.learning_class_year import LearningClassYear
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -49,7 +48,6 @@ from base.tests.business.test_perms import create_person_with_permission_and_gro
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -62,6 +60,8 @@ from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
+from learning_unit.models.learning_class_year import LearningClassYear
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class LearningUnitYearDeletion(TestCase):
@@ -75,6 +75,7 @@ class LearningUnitYearDeletion(TestCase):
             learning_container_year=cls.l_container_year,
             academic_year=cls.academic_year, subtype=learning_unit_year_subtypes.FULL,
             learning_unit=cls.learning_unit)
+        cls.the_partim = _('The partim')
 
     def test_check_related_partims_deletion(self):
         msg = deletion._check_related_partims_deletion(self.l_container_year)
@@ -108,7 +109,7 @@ class LearningUnitYearDeletion(TestCase):
         self.assertEqual(len(msg), 5)
         self.assertIn(
             _("There is %(count)d enrollments in %(subtype)s %(acronym)s for the year %(year)s") % {
-                'subtype': _('The partim'),
+                'subtype': self.the_partim,
                 'acronym': l_unit_2.acronym,
                 'year': l_unit_2.academic_year,
                 'count': 3
@@ -117,12 +118,12 @@ class LearningUnitYearDeletion(TestCase):
         )
 
         msg_delete_tutor = _("%(subtype)s %(acronym)s is assigned to %(tutor)s for the year %(year)s")
-        self.assertIn(msg_delete_tutor % {'subtype': _('The partim'),
+        self.assertIn(msg_delete_tutor % {'subtype': self.the_partim,
                                           'acronym': l_unit_2.acronym,
                                           'year': l_unit_2.academic_year,
                                           'tutor': attribution_1.tutor},
                       msg)
-        self.assertIn(msg_delete_tutor % {'subtype': _('The partim'),
+        self.assertIn(msg_delete_tutor % {'subtype': self.the_partim,
                                           'acronym': l_unit_2.acronym,
                                           'year': l_unit_2.academic_year,
                                           'tutor': attribution_2.tutor},
@@ -131,13 +132,13 @@ class LearningUnitYearDeletion(TestCase):
         msg_delete_offer_type = _('%(subtype)s %(acronym)s is included in the group %(group)s for the year %(year)s')
 
         self.assertIn(msg_delete_offer_type
-                      % {'subtype': _('The partim'),
+                      % {'subtype': self.the_partim,
                          'acronym': l_unit_2.acronym,
                          'group': group_1.parent.partial_acronym,
                          'year': l_unit_2.academic_year},
                       msg)
         self.assertIn(msg_delete_offer_type
-                      % {'subtype': _('The partim'),
+                      % {'subtype': self.the_partim,
                          'acronym': l_unit_2.acronym,
                          'group': group_2.parent.partial_acronym,
                          'year': l_unit_2.academic_year},

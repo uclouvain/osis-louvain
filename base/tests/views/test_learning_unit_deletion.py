@@ -43,7 +43,6 @@ from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory, create_editable_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
@@ -53,6 +52,7 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
 from base.views.learning_units.delete import delete_all_learning_units_year
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 YEAR_LIMIT_LUE_MODIFICATION = 2018
 
@@ -72,6 +72,8 @@ class LearningUnitDelete(TestCase):
                                                   end_date=None)
         PersonEntityFactory(person=person, entity=cls.entity_version.entity, with_child=True)
         cls.start_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION)
+        cls.the_partim_str = _('The partim')
+        cls.the_lu_str = _('The learning unit')
 
     def setUp(self):
         self.learning_unit_year_list = self.create_learning_unit_years_and_dependencies(self.start_year)
@@ -181,7 +183,7 @@ class LearningUnitDelete(TestCase):
         self.assertIn(messages.ERROR, msg_level)
 
         # Check error message
-        subtype = _('The partim') if ly1.is_partim() else _('The learning unit')
+        subtype = self.the_partim_str if ly1.is_partim() else self.the_lu_str
         self.assertIn(_("There is %(count)d enrollments in %(subtype)s %(acronym)s for the year %(year)s")
                       % {'subtype': subtype,
                          'acronym': ly1.acronym,
@@ -218,7 +220,7 @@ class LearningUnitDelete(TestCase):
         self.assertIn(messages.ERROR, msg_level)
 
         # Check error message
-        subtype = _('The partim') if ly1.is_partim() else _('The learning unit')
+        subtype = self.the_partim_str if ly1.is_partim() else self.the_lu_str
         self.assertIn(_("%(subtype)s %(acronym)s is assigned to %(tutor)s for the year %(year)s")
                       % {'subtype': subtype,
                          'acronym': ly1.acronym,
@@ -282,7 +284,7 @@ class LearningUnitDelete(TestCase):
         self.assertIn(messages.ERROR, msg_level)
 
         # Check error message
-        subtype = _('The partim') if ly1.is_partim() else _('The learning unit')
+        subtype = self.the_partim_str if ly1.is_partim() else self.the_lu_str
         self.assertIn(_("%(subtype)s %(acronym)s is assigned to %(tutor)s for the year %(year)s")
                       % {'subtype': subtype,
                          'acronym': ly1.acronym,

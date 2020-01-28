@@ -58,6 +58,11 @@ class LearningContainerYearExternalModelForm(LearningContainerYearModelForm):
         self.fields['container_type'].disabled = True
         self.fields['container_type'].required = False
 
+        self.fields['type_declaration_vacant'].disabled = True
+        self.fields['type_declaration_vacant'].required = False
+        self.fields['is_vacant'].disabled = True
+        self.fields['is_vacant'].required = False
+
     @staticmethod
     def clean_container_type():
         return EXTERNAL
@@ -88,6 +93,8 @@ class LearningUnitYearForExternalModelForm(LearningUnitYearModelForm):
             self.fields['academic_year'].empty_label = None
         else:
             self.data['acronym_0'] = self.instance.acronym[0]
+        self.fields['attribution_procedure'].disabled = True
+        self.fields['attribution_procedure'].required = False
 
     class Meta(LearningUnitYearModelForm.Meta):
         fields = ('academic_year', 'acronym', 'specific_title', 'specific_title_english', 'credits',

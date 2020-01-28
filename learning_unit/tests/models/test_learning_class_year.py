@@ -2,8 +2,8 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
-from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class LearningClassYearTest(TestCase):

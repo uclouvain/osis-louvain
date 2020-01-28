@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-02 09:41+0100\n"
+"POT-Creation-Date: 2020-01-25 00:14+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -387,7 +387,8 @@ msgid "Assistants"
 msgstr ""
 
 msgid ""
-"At least a partim volume value is greater than corresponding volume of full UE"
+"At least a partim volume value is greater than corresponding volume of full "
+"UE"
 msgstr ""
 
 msgid "At the end of this learning unit, the student is able to:"
@@ -943,9 +944,6 @@ msgstr ""
 msgid "Existing acronym"
 msgstr ""
 
-msgid "Existing proposal in epc"
-msgstr ""
-
 msgid "Export"
 msgstr ""
 
@@ -1472,9 +1470,6 @@ msgstr ""
 msgid "Management of organizational structure."
 msgstr ""
 
-msgid "Management of organizations"
-msgstr ""
-
 msgid ""
 "Management of students' path from their registration until their diploma."
 msgstr ""
@@ -1731,9 +1726,6 @@ msgstr ""
 "Based on application: accepted, conditional on further training, or refusal"
 
 msgid "One of the partial volumes must have a value to 0."
-msgstr ""
-
-msgid "Only letters are allowed."
 msgstr ""
 
 msgid ""
@@ -2673,6 +2665,9 @@ msgid "The user has not permission to create education groups."
 msgstr ""
 
 msgid "The user has not permission to delete education groups."
+msgstr ""
+
+msgid "The user is not allowed to change education group content."
 msgstr ""
 
 msgid "The user is not attached to the management entity"

@@ -25,13 +25,15 @@
 ##############################################################################
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
+from openpyxl.styles import Style, Font
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
-
+from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
+    TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
 from base.models.enums.prerequisite_operator import AND, OR
-from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory, GroupElementYearFactory
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
@@ -39,16 +41,13 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.tutor import TutorFactory
+from program_management.business.excel import EducationGroupYearLearningUnitsContainedToExcel
 from program_management.business.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, \
     EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel, _get_blocks_prerequisite_of, FIX_TITLES, _get_headers, \
     optional_header_for_proposition, optional_header_for_credits, optional_header_for_volume, _get_attribution_line, \
-    _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data,\
+    _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data, \
     _build_excel_lines_ues, _get_optional_data, BOLD_FONT
 from program_management.forms.custom_xls import CustomXlsForm
-from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
-    TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
-from openpyxl.styles import Style, Font
-from program_management.business.excel import EducationGroupYearLearningUnitsContainedToExcel
 
 
 class TestGeneratePrerequisitesWorkbook(TestCase):
@@ -338,7 +337,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         optional_data = initialize_optional_data()
         optional_data['has_credits'] = True
         self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
-                              [self.luy.credits.normalize()])
+                              [self.luy.credits.to_integral_value()])
 
     def test_get_optional_has_periodicity(self):
         optional_data = initialize_optional_data()
@@ -405,7 +404,7 @@ def get_expected_data(gey, luy):
                 luy.get_container_type_display(),
                 luy.get_subtype_display(),
                 "{} - {}".format(gey.parent.partial_acronym, gey.parent.title),
-                "{} / {}".format(gey.relative_credits or '-', luy.credits.normalize() or '-'),
+                "{} / {}".format(gey.relative_credits or '-', luy.credits.to_integral_value() or '-'),
                 gey.block or '',
                 _('yes')
                 ]

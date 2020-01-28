@@ -23,14 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory.fuzzy
+from django.core.validators import RegexValidator
+from django.db import models
+from django.utils.translation import gettext_lazy as _
 
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from osis_common.models import osis_model_admin
 
 
-class LearningClassYearFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = "base.LearningClassYear"
+class LearningClassYearAdmin(osis_model_admin.OsisModelAdmin):
+    list_display = ('learning_component_year', 'acronym')
+    search_fields = ['acronym']
 
-    learning_component_year = factory.SubFactory(LearningComponentYearFactory)
-    acronym = factory.fuzzy.FuzzyInteger(99)
+
+only_letters_validator = RegexValidator(r'^[a-zA-Z]*$', _('Only letters are allowed.'))
+
+
+class LearningClassYear(models.Model):
+    external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
+    learning_component_year = models.ForeignKey(
+        'base.LearningComponentYear',
+        on_delete=models.CASCADE
+    )
+    acronym = models.CharField(max_length=3, validators=[only_letters_validator])
+    description = models.CharField(max_length=100, blank=True)
+
+    def __str__(self):
+        return u'{}-{}'.format(self.learning_component_year.acronym, self.acronym)

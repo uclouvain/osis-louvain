@@ -100,9 +100,6 @@ admin.site.register(group_element_year.GroupElementYear,
 admin.site.register(learning_achievement.LearningAchievement,
                     learning_achievement.LearningAchievementAdmin)
 
-admin.site.register(learning_class_year.LearningClassYear,
-                    learning_class_year.LearningClassYearAdmin)
-
 admin.site.register(learning_component_year.LearningComponentYear,
                     learning_component_year.LearningComponentYearAdmin)
 

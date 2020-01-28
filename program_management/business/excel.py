@@ -258,7 +258,7 @@ def _get_item_acronym(prerequisite_item: PrerequisiteItem, group: list):
 def _get_item_credits(prerequisite_item: PrerequisiteItem):
     luy_item = prerequisite_item.learning_unit.luys[0]
     return " ; ".join(
-        set(["{} / {:f}".format(grp.relative_credits, luy_item.credits.normalize()) for grp in luy_item.links])
+        set(["{} / {:f}".format(grp.relative_credits, luy_item.credits.to_integral_value()) for grp in luy_item.links])
     )
 
 
@@ -472,7 +472,7 @@ def _get_credits_prerequisite_of(luy_item, gey):
         relative_credits = gey.relative_credits
     else:
         relative_credits = ''
-    return "{} / {:f}".format(relative_credits, luy_item.credits.normalize())
+    return "{} / {:f}".format(relative_credits, luy_item.credits.to_integral_value())
 
 
 def _get_blocks_prerequisite_of(gey):
@@ -578,7 +578,8 @@ def _fix_data(gey: GroupElementYear, luy: LearningUnitYear):
                                   type=luy.get_container_type_display(),
                                   subtype=luy.get_subtype_display(),
                                   gathering="{} - {}".format(gey.parent.partial_acronym, gey.parent.title),
-                                  credits="{} / {}".format(gey.relative_credits or '-', luy.credits.normalize() or '-'),
+                                  credits="{} / {}".format(gey.relative_credits or '-',
+                                                           luy.credits.to_integral_value() or '-'),
                                   block=gey.block or '',
                                   mandatory=str.strip(yesno(gey.is_mandatory)))
     for name in data_fix._fields:
@@ -640,7 +641,7 @@ def _get_optional_data(data, luy, optional_data_needed):
     if optional_data_needed['has_allocation_entity']:
         data.append(luy.learning_container_year.allocation_entity)
     if optional_data_needed['has_credits']:
-        data.append(luy.credits.normalize() or '-')
+        data.append(luy.credits.to_integral_value() or '-')
     if optional_data_needed['has_periodicity']:
         data.append(luy.get_periodicity_display())
     if optional_data_needed['has_active']:

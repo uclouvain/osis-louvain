@@ -33,9 +33,9 @@ from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDA
 from base.models import learning_unit_enrollment, learning_unit_year as learn_unit_year_model, \
     academic_year
 from base.models import proposal_learning_unit
-from base.models.learning_class_year import LearningClassYear
 from cms.enums import entity_name
 from cms.models import translated_text
+from learning_unit.models.learning_class_year import LearningClassYear
 
 
 def check_learning_unit_deletion(learning_unit, check_proposal=True):

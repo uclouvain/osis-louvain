@@ -1,6 +1,6 @@
 [
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 1,
     "fields": {
       "learning_component_year": 1,
@@ -9,7 +9,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 2,
     "fields": {
       "learning_component_year": 1,
@@ -18,7 +18,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 3,
     "fields": {
       "learning_component_year": 5,
@@ -27,7 +27,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 4,
     "fields": {
       "learning_component_year": 8,
@@ -36,7 +36,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 5,
     "fields": {
       "learning_component_year": 10,
@@ -45,7 +45,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 6,
     "fields": {
       "learning_component_year": 12,
@@ -54,7 +54,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 7,
     "fields": {
       "learning_component_year": 12,
@@ -63,7 +63,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 8,
     "fields": {
       "learning_component_year": 14,
@@ -72,7 +72,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 9,
     "fields": {
       "external_id": "osis.learning_class_year_217826_2016_LECTURING",
@@ -82,7 +82,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 10,
     "fields": {
       "learning_component_year": 17,
@@ -91,7 +91,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 11,
     "fields": {
       "learning_component_year": 19,
@@ -100,7 +100,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 12,
     "fields": {
       "learning_component_year": 19,
@@ -109,7 +109,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 13,
     "fields": {
       "learning_component_year": 21,
@@ -118,7 +118,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 14,
     "fields": {
       "learning_component_year": 21,
@@ -127,7 +127,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 15,
     "fields": {
       "learning_component_year": 26,
@@ -136,7 +136,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 16,
     "fields": {
       "learning_component_year": 26,
@@ -145,7 +145,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 17,
     "fields": {
       "learning_component_year": 31,
@@ -154,7 +154,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 18,
     "fields": {
       "learning_component_year": 31,
@@ -164,7 +164,7 @@
   },
 
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 19,
     "fields": {
       "external_id": "osis.learning_class_year_207028_2017_LECTURING",
@@ -174,7 +174,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 20,
     "fields": {
       "external_id": "osis.learning_class_year_41641_2017_PRACTICAL_EXERCISES",
@@ -184,7 +184,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 21,
     "fields": {
       "external_id": "osis.learning_class_year_41641_2017_LECTURING",
@@ -194,7 +194,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 22,
     "fields": {
       "external_id": "osis.learning_class_year_41637_2017_LECTURING",
@@ -204,7 +204,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 23,
     "fields": {
       "external_id": "osis.learning_class_year_32082_2017_PRACTICAL_EXERCISES",
@@ -214,7 +214,7 @@
     }
   },
   {
-    "model": "base.learningclassyear",
+    "model": "learning_unit.learningclassyear",
     "pk": 24,
     "fields": {
       "external_id": "osis.learning_class_year_32082_2017_LECTURING",

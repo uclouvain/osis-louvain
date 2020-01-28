@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-02 09:41+0100\n"
+"POT-Creation-Date: 2020-01-25 00:14+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -70,8 +70,7 @@ msgstr "%(max)s doit être plus grand ou égal à %(min)s"
 msgid ""
 "%(number_extended)s education group(s) extended and %(number_error)s error(s)"
 msgstr ""
-"%(number_extended)s formation(s) reportée(s) et "
-"%(number_error)s erreur(s)"
+"%(number_extended)s formation(s) reportée(s) et %(number_error)s erreur(s)"
 
 #, python-format
 msgid ""
@@ -154,7 +153,8 @@ msgstr "<b>Prolonger</b> l’unité d’enseignement du même sigle"
 #, python-format
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
 msgstr ""
-"Une unité d'enseignement ne peut pas être un prérequis d'elle-même : %(acronym)s"
+"Une unité d'enseignement ne peut pas être un prérequis d'elle-même : "
+"%(acronym)s"
 
 msgid "A null value means many relationships."
 msgstr "Une valeur nulle signifie plusieurs relations."
@@ -413,7 +413,8 @@ msgid "Assistants"
 msgstr "Assistants"
 
 msgid ""
-"At least a partim volume value is greater than corresponding volume of full UE"
+"At least a partim volume value is greater than corresponding volume of full "
+"UE"
 msgstr ""
 "Au moins une valeur de volume d'un partim est supérieure à celle du volume "
 "correspondant de l'UE complète"
@@ -983,9 +984,6 @@ msgstr "Exécuter l'action sélectionnée"
 msgid "Existing acronym"
 msgstr "Sigle déjà existant"
 
-msgid "Existing proposal in epc"
-msgstr "Il existe des propositions dans EPC"
-
 msgid "Export"
 msgstr "Exporter"
 
@@ -1524,9 +1522,6 @@ msgstr "Gestion des unités d'enseignement"
 msgid "Management of organizational structure."
 msgstr "Gestion des la structure organisationnelle."
 
-msgid "Management of organizations"
-msgstr "Gestion des organisations"
-
 msgid ""
 "Management of students' path from their registration until their diploma."
 msgstr ""
@@ -1798,15 +1793,12 @@ msgstr ""
 msgid "One of the partial volumes must have a value to 0."
 msgstr "Un des volumes partiels doit avoir une valeur à 0."
 
-msgid "Only letters are allowed."
-msgstr "Uniquement des lettres sont acceptées"
-
 msgid ""
 "Only program managers of the education group OR central manager linked to "
 "entity can edit."
 msgstr ""
-"Seuls les gestionnaires de programme des formations OU les "
-"gestionnaires facultaires lié·es à l'entité peuvent modifier."
+"Seuls les gestionnaires de programme des formations OU les gestionnaires "
+"facultaires lié·es à l'entité peuvent modifier."
 
 msgid "Only the volume Q1 must have a value"
 msgstr "Seul le volume Q1 doit avoir une valeur"
@@ -2589,8 +2581,8 @@ msgstr "Ce champ ne peut contenir qu'une seule valeur."
 
 msgid "The fields concerning ARES have to be ALL filled-in or none of them"
 msgstr ""
-"Les champs concernant les données de l'ARES doivent être soit tous "
-"remplis soit tous vides"
+"Les champs concernant les données de l'ARES doivent être soit tous remplis "
+"soit tous vides"
 
 msgid "The following education groups ended with error"
 msgstr "Les groupements suivants se sont terminés par une erreur"
@@ -2722,8 +2714,8 @@ msgid ""
 "The repartition volume of %(col_name)s has been already modified. "
 "(%(new_value)s instead of %(current_value)s)"
 msgstr ""
-"La répartition des volumes de %(col_name)s a déjà été modifiée. (%(new_value)s "
-"à la place de %(current_value)s)"
+"La répartition des volumes de %(col_name)s a déjà été modifiée. "
+"(%(new_value)s à la place de %(current_value)s)"
 
 #, python-format
 msgid ""
@@ -2793,6 +2785,9 @@ msgstr "L'utilisateur n'a pas la permission de créer des formations."
 
 msgid "The user has not permission to delete education groups."
 msgstr "L'utilisateur n'a pas la permission de supprimer les formations."
+
+msgid "The user is not allowed to change education group content."
+msgstr "L'utilisateur n'a pas la permission de modifier le contenu de la formation."
 
 msgid "The user is not attached to the management entity"
 msgstr "L’utilisateur n’est pas attaché à l’entité de gestion"
@@ -2869,8 +2864,8 @@ msgstr "Ce code existe déja pour cette unité d'enseignement"
 
 msgid "This education group is not editable during this period."
 msgstr ""
-"La période de modification des formations n'est pas ouverte "
-"durant cette période."
+"La période de modification des formations n'est pas ouverte durant cette "
+"période."
 
 msgid "This feature is in testing phase"
 msgstr "Cette fonctionnalité est en phase expérimentale"
@@ -3141,11 +3136,13 @@ msgstr ""
 
 msgid "You are not allowed to create a reference with a learning unit"
 msgstr ""
-"Vous n'êtes pas autorisé·e à créer une référence avec une unité d’enseignement"
+"Vous n'êtes pas autorisé·e à créer une référence avec une unité "
+"d’enseignement"
 
 msgid "You are not allowed to put in proposal for this academic year"
 msgstr ""
-"Vous n'êtes pas autorisé·e à mettre en proposition pour cette année académique"
+"Vous n'êtes pas autorisé·e à mettre en proposition pour cette année "
+"académique"
 
 msgid ""
 "You are not attached to initial or current requirement entity, so you can't "
@@ -3219,14 +3216,12 @@ msgstr "Vous ne pouvez pas modifier les propositions liées à une autre année"
 #, python-format
 msgid "You cannot change a education group before %(limit_year)s"
 msgstr ""
-"Vous ne pouvez pas modifier une formation datant d'avant "
-"%(limit_year)s"
+"Vous ne pouvez pas modifier une formation datant d'avant %(limit_year)s"
 
 #, python-format
 msgid "You cannot create/update an education group before %(limit_year)s"
 msgstr ""
-"Vous ne pouvez pas créer/modifier une formation datant "
-"d'avant %(limit_year)s"
+"Vous ne pouvez pas créer/modifier une formation datant d'avant %(limit_year)s"
 
 #, python-format
 msgid ""
