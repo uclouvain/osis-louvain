@@ -666,22 +666,22 @@
             ],
             [
                 "add_learningclassyear",
-                "base",
+                "learning_unit",
                 "learningclassyear"
             ],
             [
                 "view_learningclassyear",
-                "base",
+                "learning_unit",
                 "learningclassyear"
             ],
             [
                 "change_learningclassyear",
-                "base",
+                "learning_unit",
                 "learningclassyear"
             ],
             [
                 "delete_learningclassyear",
-                "base",
+                "learning_unit",
                 "learningclassyear"
             ],
             [
@@ -2980,7 +2980,7 @@
             ],
             [
                 "change_learningclassyear",
-                "base",
+                "learning_unit",
                 "learningclassyear"
             ],
             [
@@ -3158,7 +3158,7 @@
             ],
             [
                 "change_learningclassyear",
-                "base",
+                "learning_unit",
                 "learningclassyear"
             ],
             [
@@ -3316,7 +3316,7 @@
             ],
             [
                 "change_learningclassyear",
-                "base",
+                "learning_unit",
                 "learningclassyear"
             ],
             [
@@ -3482,7 +3482,7 @@
         "permissions": [
             [
                 "view_learningclassyear",
-                "base",
+                "learning_unit",
                 "learningclassyear"
             ],
             [

@@ -48,16 +48,17 @@ from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.learning_achievement import LearningAchievement
-from base.models.learning_class_year import LearningClassYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
+from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.utils.numbers import normalize_fraction
 from reference.models.language import Language
 
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
+NO_DATA = _('No data')
 
 
 # TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
@@ -128,7 +129,8 @@ def _check_extend_partim(last_learning_unit_year, new_academic_year):
 
     lu_parent = last_learning_unit_year.parent
     if last_learning_unit_year.is_partim() and lu_parent:
-        if _get_actual_end_year(lu_parent.learning_unit).year < new_academic_year.year:
+        actual_end_year = _get_actual_end_year(lu_parent.learning_unit).year
+        if actual_end_year < new_academic_year.year:
             raise IntegrityError(
                 _('The selected end year (%(partim_end_year)s) is greater '
                   'than the end year of the parent %(lu_parent)s') % {
@@ -421,7 +423,7 @@ def _get_differences(obj1, obj2, fields_to_compare):
 
 def _get_translated_value(value):
     if value is None:
-        return _('No data')
+        return NO_DATA
     if isinstance(value, bool):
         return _('yes') if value else _('no')
     return value
@@ -445,9 +447,9 @@ def _check_postponement_conflict_on_entity_container_year(lcy, next_lcy):
                             "and year %(next_year)s - %(next_value)s") % {
                               'field': _(entity_type.lower()),
                               'year': lcy.academic_year,
-                              'value': current_entity.most_recent_acronym if current_entity else _('No data'),
+                              'value': current_entity.most_recent_acronym if current_entity else NO_DATA,
                               'next_year': next_lcy.academic_year,
-                              'next_value': next_year_entity.most_recent_acronym if next_year_entity else _('No data')
+                              'next_value': next_year_entity.most_recent_acronym if next_year_entity else NO_DATA
                           })
     return error_list
 
@@ -567,14 +569,14 @@ def _get_error_volume_field_diff(field_diff, current_component, next_year_compon
         "The value of field '%(field)s' for the learning unit %(acronym)s (%(component_type)s) "
         "is different between year %(year)s - %(value)s and year %(next_year)s - %(next_value)s"
     ) % {
-        'field': COMPONENT_DETAILS[field_diff].lower(),
-        'acronym': current_component.learning_unit_year.acronym,
-        'component_type': dict(COMPONENT_TYPES)[current_component.type] if current_component.type else 'NT',
-        'year': current_component.learning_unit_year.academic_year,
-        'value': normalize_fraction(current_value) if current_value is not None else _('No data'),
-        'next_year': next_year_component.learning_unit_year.academic_year,
-        'next_value': normalize_fraction(next_value) if next_value is not None else _('No data')
-    }
+               'field': COMPONENT_DETAILS[field_diff].lower(),
+               'acronym': current_component.learning_unit_year.acronym,
+               'component_type': dict(COMPONENT_TYPES)[current_component.type] if current_component.type else 'NT',
+               'year': current_component.learning_unit_year.academic_year,
+               'value': normalize_fraction(current_value) if current_value is not None else NO_DATA,
+               'next_year': next_year_component.learning_unit_year.academic_year,
+               'next_value': normalize_fraction(next_value) if next_value is not None else NO_DATA
+           }
 
 
 def _get_error_component_not_found(acronym, component_type, existing_academic_year, not_found_academic_year):

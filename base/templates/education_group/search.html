@@ -59,13 +59,19 @@
                         {{ form.media }}
                     </div>
                     <div class="col-md-2">
-                       {% bootstrap_field form.acronym %}
+                        {% bootstrap_label form.acronym.label %}
+                        {% include 'blocks/button/help_search_tooltip.html' %}
+                        {% bootstrap_field form.acronym show_label=False %}
                     </div>
                     <div class="col-md-2">
-                       {% bootstrap_field form.partial_acronym %}
+                        {% bootstrap_label form.partial_acronym.label %}
+                        {% include 'blocks/button/help_search_tooltip.html' %}
+                        {% bootstrap_field form.partial_acronym show_label=False %}
                     </div>
                     <div class="col-md-6">
-                        {% bootstrap_field form.title %}
+                        {% bootstrap_label form.title.label %}
+                        {% include 'blocks/button/help_search_tooltip.html' %}
+                        {% bootstrap_field form.title show_label=False %}
                     </div>
                 </div>
                 <div class="row" style="margin-top:10px;">

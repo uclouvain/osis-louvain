@@ -29,6 +29,7 @@ from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
 from base.business.entity import get_entities_ids
+from base.forms.utils.filter_field import filter_field_by_regex
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.enums import quadrimesters, learning_unit_year_subtypes, active_status, learning_container_year_types
 from base.models.enums.learning_container_year_types import LearningContainerYearType
@@ -106,7 +107,7 @@ class LearningUnitFilter(FilterSet):
     )
     title = filters.CharFilter(
         field_name="full_title",
-        lookup_expr="icontains",
+        method="filter_learning_unit_year_field",
         max_length=40,
         label=_('Title'),
     )
@@ -192,3 +193,6 @@ class LearningUnitFilter(FilterSet):
         queryset = LearningUnitYearQuerySet.annotate_full_title_class_method(queryset)
         queryset = LearningUnitYearQuerySet.annotate_entities_allocation_and_requirement_acronym(queryset)
         return queryset
+
+    def filter_learning_unit_year_field(self, queryset, name, value):
+        return filter_field_by_regex(queryset, name, value)

@@ -74,7 +74,7 @@ class Element(models.Model):
         on_delete=models.PROTECT,
     )
     learning_class_year = models.ForeignKey(
-        'base.LearningClassYear',
+        'learning_unit.LearningClassYear',
         blank=True, null=True,
         verbose_name=_('learning class year'),
         on_delete=models.PROTECT,

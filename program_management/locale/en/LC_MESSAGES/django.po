@@ -166,6 +166,9 @@ msgstr ""
 msgid "English comment"
 msgstr ""
 
+msgid "Evaluation methods"
+msgstr ""
+
 #, python-format
 msgid ""
 "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s "
@@ -239,7 +242,13 @@ msgstr ""
 msgid "No result!"
 msgstr ""
 
+msgid "Non-mandatory"
+msgstr ""
+
 msgid "Official"
+msgstr ""
+
+msgid "Online resources"
 msgstr ""
 
 msgid ""
@@ -270,6 +279,9 @@ msgstr[1] ""
 msgid "Optional"
 msgstr ""
 
+msgid "Other informations"
+msgstr ""
+
 msgid "Paste"
 msgstr ""
 
@@ -283,6 +295,9 @@ msgid "Please cut or copy an item before attach it"
 msgstr ""
 
 msgid "Please select an item before adding it"
+msgstr ""
+
+msgid "Pre-condition"
 msgstr ""
 
 msgid "Prerequisite"
@@ -312,6 +327,9 @@ msgid "Student's contact information"
 msgstr ""
 
 msgid "Student's signature"
+msgstr ""
+
+msgid "Teaching methods"
 msgstr ""
 
 #, python-format
@@ -378,6 +396,9 @@ msgid "The root does not exist in the next academic year."
 msgstr ""
 
 msgid "The user is not allowed to change education group content."
+msgstr ""
+
+msgid "Themes discussed"
 msgstr ""
 
 msgid ""
@@ -458,6 +479,9 @@ msgid "has as prerequisite"
 msgstr ""
 
 msgid "has the following prerequisites"
+msgstr ""
+
+msgid "in English"
 msgstr ""
 
 msgid "is a prerequisite of"

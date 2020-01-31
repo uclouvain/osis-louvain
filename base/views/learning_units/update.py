@@ -37,7 +37,7 @@ from waffle.decorators import waffle_flag
 
 from base.business import learning_unit_year_with_context
 from base.business.learning_units.edition import ConsistencyError
-from base.forms.learning_unit.edition import LearningUnitEndDateForm
+from base.forms.learning_unit.edition import LearningUnitDailyManagementEndDateForm
 from base.forms.learning_unit.edition_volume import VolumeEditionFormsetContainer
 from base.forms.learning_unit.entity_form import find_additional_requirement_entities_choices
 from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
@@ -67,7 +67,9 @@ def learning_unit_edition_end_date(request, learning_unit_year_id):
     context = get_learning_unit_identification_context(learning_unit_year_id, person)
 
     learning_unit_to_edit = learning_unit_year.learning_unit
-    form = LearningUnitEndDateForm(request.POST or None, learning_unit_year=learning_unit_year)
+    form = LearningUnitDailyManagementEndDateForm(
+        request.POST or None, learning_unit_year=learning_unit_year, person=person
+    )
     if form.is_valid():
         try:
             result = form.save()

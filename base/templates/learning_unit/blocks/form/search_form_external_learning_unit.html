@@ -29,8 +29,16 @@
 {% block search_form_row_1 %}
     {% bootstrap_field form.academic_year form_group_class="col-md-2" %}
     {{ form.media }}
-    {% bootstrap_field form.acronym form_group_class="col-md-2" %}
-    {% bootstrap_field form.title form_group_class="col-md-4" %}
+    <div class="col-md-2">
+        {% bootstrap_label form.acronym.label %}
+        {% include 'blocks/button/help_search_tooltip.html' %}
+        {% bootstrap_field form.acronym show_label=False%}
+    </div>
+    <div class="col-md-4">
+        {% bootstrap_label form.title.label %}
+        {% include 'blocks/button/help_search_tooltip.html' %}
+        {% bootstrap_field form.title show_label=False %}
+    </div>
 {% endblock %}
 
 {% block search_form_row_2 %}

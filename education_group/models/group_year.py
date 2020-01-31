@@ -29,6 +29,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.models.entity import Entity
 from education_group.models.enums.constraint_type import ConstraintTypes
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
@@ -56,12 +57,12 @@ class GroupYear(models.Model):
         max_length=15,
         db_index=True,
         null=True,
-        verbose_name=_("Acronym/Short title"),
+        verbose_name=_("code"),
     )
     acronym = models.CharField(
         max_length=40,
         db_index=True,
-        verbose_name=_("code"),
+        verbose_name=_("Acronym/Short title"),
     )
     education_group_type = models.ForeignKey(
         'base.EducationGroupType',
@@ -125,6 +126,14 @@ class GroupYear(models.Model):
         on_delete=models.PROTECT
     )
 
+    management_entity = models.ForeignKey(
+        Entity,
+        verbose_name=_("Management entity"),
+        null=True,
+        related_name="group_management_entity",
+        on_delete=models.PROTECT
+    )
+
     objects = GroupYearManager()
 
     def __str__(self):
@@ -132,7 +141,6 @@ class GroupYear(models.Model):
                                 self.academic_year)
 
     def save(self, *args, **kwargs):
-
         if self.academic_year.year < self.group.start_year.year:
             raise AttributeError(
                 _('Please enter an academic year greater or equal to group start year.')

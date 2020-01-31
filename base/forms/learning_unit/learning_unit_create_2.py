@@ -30,6 +30,7 @@ from django.db import transaction
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
+from base.business import event_perms
 from base.forms.learning_unit.edition_volume import SimplifiedVolumeManagementForm
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
     LearningContainerModelForm, LearningContainerYearModelForm
@@ -377,15 +378,5 @@ class FullForm(LearningUnitBaseForm):
 
     def _restrict_academic_years_choice_for_proposal_creation_suppression(self, proposal_type):
         if proposal_type in (ProposalType.CREATION.name, ProposalType.SUPPRESSION):
-            if self.person.is_faculty_manager and proposal_type == ProposalType.CREATION.name:
-                starting_academic_year = academic_year.starting_academic_year().next()
-            else:
-                starting_academic_year = academic_year.starting_academic_year()
-
-            end_year_range = MAX_ACADEMIC_YEAR_CENTRAL - 1 if self.person.is_faculty_manager \
-                else MAX_ACADEMIC_YEAR_CENTRAL
-
-            self.fields["academic_year"].queryset = academic_year.find_academic_years(
-                start_year=starting_academic_year.year,
-                end_year=starting_academic_year.year + end_year_range
-            )
+            event_perm = event_perms.generate_event_perm_creation_end_date_proposal(self.person)
+            self.fields["academic_year"].queryset = event_perm.get_academic_years()

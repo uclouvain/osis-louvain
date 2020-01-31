@@ -48,12 +48,28 @@
             <br>
             {{ education_group_year.title | default_if_none:'-' }}
         </div>
+        {% if is_finality_types %}
+            <br>
+            <div>
+                <label>{% trans 'Partial title in French' %}</label>
+                <br>
+                {{ education_group_year.partial_title | default_if_none:'-' }}
+            </div>
+        {% endif %}
         <br>
         <div>
             <label>{% trans 'Title in English' %}</label>
             <br>
             {{ education_group_year.title_english | default_if_none:'' }}
         </div>
+        {% if is_finality_types %}
+            <br>
+            <div>
+                <label>{% trans 'Partial title in English' %}</label>
+                <br>
+                {{ education_group_year.partial_title_english | default_if_none:'' }}
+            </div>
+        {% endif %}
         {% if education_group_year.education_group_type.category != 'GROUP' %}
             <br>
             <div>

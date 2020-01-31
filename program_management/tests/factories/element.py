@@ -29,9 +29,9 @@ import string
 import factory.fuzzy
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from education_group.tests.factories.group_year import GroupYearFactory
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 
 class ElementFactory(factory.DjangoModelFactory):

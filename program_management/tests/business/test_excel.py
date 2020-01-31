@@ -23,6 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import html
+from unittest import mock
+
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 from openpyxl.styles import Style, Font
@@ -35,19 +38,39 @@ from base.models.enums.prerequisite_operator import AND, OR
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory, GroupElementYearFactory
+from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
+from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.tutor import TutorFactory
 from program_management.business.excel import EducationGroupYearLearningUnitsContainedToExcel
 from program_management.business.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, \
     EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel, _get_blocks_prerequisite_of, FIX_TITLES, _get_headers, \
     optional_header_for_proposition, optional_header_for_credits, optional_header_for_volume, _get_attribution_line, \
+    optional_header_for_required_entity, optional_header_for_active, optional_header_for_allocation_entity, \
+    optional_header_for_description_fiche, optional_header_for_english_title, optional_header_for_language, \
+    optional_header_for_periodicity, optional_header_for_quadrimester, optional_header_for_session_derogation, \
+    optional_header_for_specifications, optional_header_for_teacher_list, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data, \
-    _build_excel_lines_ues, _get_optional_data, BOLD_FONT
+    _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_specifications_cols, _build_description_fiche_cols, \
+    _build_validate_html_list_to_string
+from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
+from reference.tests.factories.language import LanguageFactory
+
+CMS_TXT_WITH_LIST = '<ol> ' \
+                    '<li>La structure atomique de la mati&egrave;re</li> ' \
+                    '<li>Les diff&eacute;rentes structures mol&eacute;culaires</li> ' \
+                    '</ol>'
+CMS_TXT_WITH_LIST_AFTER_FORMATTING = 'La structure atomique de la matière\n' \
+                                    'Les différentes structures moléculaires'
+
+CMS_TXT_WITH_LINK = '<a href="https://moodleucl.uclouvain.be">moodle</a>'
+CMS_TXT_WITH_LINK_AFTER_FORMATTING = 'moodle - [https://moodleucl.uclouvain.be] \n'
+
 
 
 class TestGeneratePrerequisitesWorkbook(TestCase):
@@ -202,6 +225,9 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
             attribution=cls.attribution_2,
             learning_component_year=cls.practical_component
         )
+        cls.gey = GroupElementYearChildLeafFactory(
+            child_leaf=cls.luy
+        )
 
     def test_header_lines_without_optional_titles(self):
         custom_xls_form = CustomXlsForm({})
@@ -210,12 +236,30 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         self.assertListEqual(_get_headers(custom_xls_form)[0], expected_headers)
 
     def test_header_lines_with_optional_titles(self):
-        custom_xls_form = CustomXlsForm({'proposition': 'on',
-                                         'credits': 'on',
-                                         'volume': 'on'})
+        custom_xls_form = CustomXlsForm({
+            'required_entity': 'on',
+            'allocation_entity': 'on',
+            'credits': 'on',
+            'periodicity': 'on',
+            'active': 'on',
+            'quadrimester': 'on',
+            'session_derogation': 'on',
+            'volume': 'on',
+            'teacher_list': 'on',
+            'proposition': 'on',
+            'english_title': 'on',
+            'language': 'on',
+            'specifications': 'on',
+            'description_fiche': 'on',
+        }
+        )
 
         expected_headers = \
-            FIX_TITLES + optional_header_for_credits + optional_header_for_volume + optional_header_for_proposition
+            FIX_TITLES + optional_header_for_required_entity + optional_header_for_allocation_entity +  \
+            optional_header_for_credits + optional_header_for_periodicity + optional_header_for_active + \
+            optional_header_for_quadrimester + optional_header_for_session_derogation + optional_header_for_volume + \
+            optional_header_for_teacher_list + optional_header_for_proposition + optional_header_for_english_title + \
+            optional_header_for_language + optional_header_for_specifications + optional_header_for_description_fiche
         self.assertListEqual(_get_headers(custom_xls_form)[0], expected_headers)
 
     def test_get_attribution_line(self):
@@ -272,6 +316,8 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                               'has_quadrimester': False,
                               'has_session_derogation': False,
                               'has_language': False,
+                              'has_description_fiche': False,
+                              'has_specifications': False,
                               }
                              )
 
@@ -287,7 +333,10 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                               'volume': 'on',
                               'quadrimester': 'on',
                               'session_derogation': 'on',
-                              'language': 'on'})
+                              'language': 'on',
+                              'description_fiche': 'on',
+                              'specifications': 'on',
+                              })
         self.assertDictEqual(_optional_data(form),
                              {'has_required_entity': True,
                               'has_proposition': True,
@@ -301,6 +350,8 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
                               'has_quadrimester': True,
                               'has_session_derogation': True,
                               'has_language': True,
+                              'has_description_fiche': True,
+                              'has_specifications': True,
                               }
                              )
 
@@ -324,77 +375,202 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
     def test_get_optional_required_entity(self):
         optional_data = initialize_optional_data()
         optional_data['has_required_entity'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.gey),
                               [self.luy.learning_container_year.requirement_entity])
 
     def test_get_optional_allocation_entity(self):
         optional_data = initialize_optional_data()
         optional_data['has_allocation_entity'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.gey),
                               [self.luy.learning_container_year.allocation_entity])
 
     def test_get_optional_credits(self):
         optional_data = initialize_optional_data()
         optional_data['has_credits'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.gey),
                               [self.luy.credits.to_integral_value()])
 
     def test_get_optional_has_periodicity(self):
         optional_data = initialize_optional_data()
         optional_data['has_periodicity'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.gey),
                               [self.luy.get_periodicity_display()])
 
     def test_get_optional_has_active(self):
         optional_data = initialize_optional_data()
         optional_data['has_active'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.gey),
                               [_('yes')])
 
     def test_get_optional_has_quadrimester(self):
         optional_data = initialize_optional_data()
         optional_data['has_quadrimester'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.gey),
                               [self.luy.get_quadrimester_display() or ''])
 
     def test_get_optional_has_session_derogation(self):
         optional_data = initialize_optional_data()
         optional_data['has_session_derogation'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.gey),
                               [self.luy.get_session_display() or ''])
 
     def test_get_optional_has_proposition(self):
         optional_data = initialize_optional_data()
         optional_data['has_proposition'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.gey),
                               ['', ''])
         proposal = ProposalLearningUnitFactory(learning_unit_year=self.luy)
 
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.gey),
                               [proposal.get_type_display(), proposal.get_state_display()])
 
     def test_get_optional_has_english_title(self):
         optional_data = initialize_optional_data()
         optional_data['has_english_title'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.gey),
                               [self.luy.complete_title_english])
 
     def test_get_optional_has_language(self):
         optional_data = initialize_optional_data()
         optional_data['has_language'] = True
-        self.assertCountEqual(_get_optional_data([], self.luy, optional_data),
+        self.assertCountEqual(_get_optional_data([], self.luy, optional_data, self.gey),
                               [self.luy.language])
 
     def test_get_optional_has_teacher_list(self):
         optional_data = initialize_optional_data()
         optional_data['has_teacher_list'] = True
-        teacher_data = _get_optional_data([], self.luy, optional_data)
+        teacher_data = _get_optional_data([], self.luy, optional_data, self.gey)
         self.assertEqual(teacher_data[0], "{} {};{} {}"
                          .format(self.person_1.last_name.upper(), self.person_1.first_name,
                                  self.person_2.last_name.upper(), self.person_2.first_name))
         self.assertEqual(teacher_data[1], "{};{}"
                          .format(self.person_1.email,
                                  self.person_2.email))
+
+    @mock.patch("program_management.business.excel._annotate_with_description_fiche_specifications")
+    def test_get_optional_has_description_fiche_annotate_called(self, mock):
+        optional_data = initialize_optional_data()
+        optional_data['has_description_fiche'] = True
+
+        custom_form = CustomXlsForm({'description_fiche': 'on'})
+        EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, custom_form)
+        self.assertTrue(mock.called)
+
+    @mock.patch("program_management.business.excel._annotate_with_description_fiche_specifications")
+    def test_get_optional_has_specifications_annotate_called(self, mock):
+        optional_data = initialize_optional_data()
+        optional_data['has_specifications'] = True
+
+        custom_form = CustomXlsForm({'specifications': 'on'})
+        EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, custom_form)
+        self.assertTrue(mock.called)
+
+    def test_build_description_fiche_cols(self):
+
+        teaching_material_1 = TeachingMaterialFactory(
+            learning_unit_year=self.luy, title='Title mandatory', mandatory=True
+        )
+        teaching_material_2 = TeachingMaterialFactory(
+            learning_unit_year=self.luy, title='Title non-mandatory', mandatory=False
+        )
+
+        _initialize_cms_data_description_fiche(self.gey)
+
+        description_fiche = _build_description_fiche_cols(self.luy, self.gey)
+
+        self.assertEqual(description_fiche.resume, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
+        self.assertEqual(description_fiche.resume_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
+        self.assertEqual(description_fiche.teaching_methods, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
+        self.assertEqual(description_fiche.teaching_methods_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
+        self.assertEqual(description_fiche.evaluation_methods, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
+        self.assertEqual(description_fiche.evaluation_methods_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
+        self.assertEqual(description_fiche.other_informations, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
+        self.assertEqual(description_fiche.other_informations_en, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
+        self.assertEqual(description_fiche.mobility, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
+        self.assertEqual(description_fiche.bibliography, "{}".format(CMS_TXT_WITH_LIST_AFTER_FORMATTING))
+
+        self.assertEqual(description_fiche.online_resources, "{}".format(CMS_TXT_WITH_LINK_AFTER_FORMATTING))
+        self.assertEqual(description_fiche.online_resources_en, "{}".format(CMS_TXT_WITH_LINK_AFTER_FORMATTING))
+
+        self.assertEqual(description_fiche.teaching_materials,
+                         "{} - {}\n{} - {}".format(_('Mandatory'),
+                                                   teaching_material_1.title,
+                                                   _('Non-mandatory'),
+                                                   teaching_material_2.title))
+
+    def test_build_specifications_cols(self):
+
+        lang_fr = LanguageFactory(code='FR')
+        lang_en = LanguageFactory(code='EN')
+
+        achievement_1_fr = LearningAchievementFactory(learning_unit_year=self.luy, language=lang_fr)
+        achievement_2_fr = LearningAchievementFactory(learning_unit_year=self.luy, language=lang_fr)
+        achievement_1_en = LearningAchievementFactory(learning_unit_year=self.luy, language=lang_en)
+        LearningAchievementFactory(learning_unit_year=self.luy, language=lang_en, text="    ")
+        LearningAchievementFactory(learning_unit_year=self.luy, language=lang_en, text="    ", code_name=None)
+
+        initialize_cms_specifications_data_description_fiche(self.gey)
+        specifications_data = _build_specifications_cols(self.luy, self.gey)
+
+        self.assertEqual(specifications_data.prerequisite, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        self.assertEqual(specifications_data.prerequisite_en, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        self.assertEqual(specifications_data.themes_discussed, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        self.assertEqual(specifications_data.themes_discussed_en, CMS_TXT_WITH_LIST_AFTER_FORMATTING)
+        self.assertEqual(specifications_data.achievements_fr, "{} -{}\n{} -{}".format(
+            achievement_1_fr.code_name, achievement_1_fr.text,
+            achievement_2_fr.code_name, achievement_2_fr.text)
+                         )
+        self.assertEqual(specifications_data.achievements_en, "{} -{}".format(
+            achievement_1_en.code_name, achievement_1_en.text)
+                         )
+
+    def test_build_validate_html_list_to_string(self):
+        self.assertEqual(_build_validate_html_list_to_string(None, html2text), "")
+
+    def test_build_validate_html_list_to_string_illegal_character(self):
+        self.assertEqual(_build_validate_html_list_to_string("", html2text),
+                         "!!! {}".format(_('IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING')))
+
+    def test_build_validate_html_list_to_string_wrong_method(self):
+        self.assertEqual(_build_validate_html_list_to_string('Test', None), 'Test')
+        self.assertEqual(_build_validate_html_list_to_string('Test', _get_blocks_prerequisite_of), 'Test')
+
+    def test_row_height_not_populated(self):
+        custom_form = CustomXlsForm({})
+        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, custom_form)
+        data = _build_excel_lines_ues(custom_form, exl.qs)
+        self.assertDictEqual(data.get('row_height'), {})
+
+    def test_row_height_populated(self):
+        custom_form = CustomXlsForm({'description_fiche': 'on'})
+        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, custom_form)
+        data = _build_excel_lines_ues(custom_form, exl.qs)
+        self.assertDictEqual(data.get('row_height'), {'height': 30, 'start': 2, 'stop': 4})
+
+    def test_html_list_to_string(self):
+        ch = '''<head></head>
+                <body>
+                <style type="text/css"></style>
+                <ul>
+                    <li>Cfr. Student corner</li>
+                </ul>            
+                <p>Cfr. Syllabus</p>
+                <script>alert('coucou');</script>    
+                </body>        
+                '''
+        expected = "Cfr. Student corner\nCfr. Syllabus"
+        self.assertEqual(html2text(html.unescape(ch)), expected)
+
+    def test_convert(self):
+        res = html2text(html.unescape("<p>Introduire aux m&eacute;thodes d&#39;analyse</p>"))
+        self.assertEqual(res, "Introduire aux méthodes d'analyse")
+
+    def test_keep_UES_tree_order_in_qs(self):
+        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, CustomXlsForm({}))
+        expected_ids_following_tree_order = [lu.id for lu in exl.learning_unit_years_parent]
+        ids_ordered_for_xls = [lu.id for lu in list(exl.qs)]
+        self.assertCountEqual(expected_ids_following_tree_order, ids_ordered_for_xls)
 
 
 def get_expected_data(gey, luy):
@@ -407,6 +583,7 @@ def get_expected_data(gey, luy):
                 "{} / {}".format(gey.relative_credits or '-', luy.credits.to_integral_value() or '-'),
                 gey.block or '',
                 _('yes')
+
                 ]
     return expected
 
@@ -424,5 +601,35 @@ def initialize_optional_data():
         'has_teacher_list': False,
         'has_proposition': False,
         'has_english_title': False,
-        'has_language': False
+        'has_language': False,
+        'has_description_fiche': False,
+        'has_specifications': False,
     }
+
+
+def _initialize_cms_data_description_fiche(gey):
+    gey_cms = gey
+    gey_cms.resume = CMS_TXT_WITH_LIST
+    gey_cms.resume_en = CMS_TXT_WITH_LIST
+    gey_cms.teaching_methods = CMS_TXT_WITH_LIST
+    gey_cms.teaching_methods_en = CMS_TXT_WITH_LIST
+    gey_cms.evaluation_methods = CMS_TXT_WITH_LIST
+    gey_cms.evaluation_methods_en = CMS_TXT_WITH_LIST
+    gey_cms.other_informations = CMS_TXT_WITH_LIST
+    gey_cms.other_informations_en = CMS_TXT_WITH_LIST
+    gey_cms.bibliography = CMS_TXT_WITH_LIST
+    gey_cms.mobility = CMS_TXT_WITH_LIST
+
+    gey_cms.online_resources = CMS_TXT_WITH_LINK
+    gey_cms.online_resources_en = CMS_TXT_WITH_LINK
+
+    return gey_cms
+
+
+def initialize_cms_specifications_data_description_fiche(gey):
+    gey_cms = gey
+    gey_cms.prerequisite = CMS_TXT_WITH_LIST
+    gey_cms.prerequisite_en = CMS_TXT_WITH_LIST
+    gey_cms.themes_discussed = CMS_TXT_WITH_LIST
+    gey_cms.themes_discussed_en = CMS_TXT_WITH_LIST
+    return gey_cms

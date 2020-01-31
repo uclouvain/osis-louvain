@@ -42,7 +42,8 @@ from base.models.enums import learning_unit_year_periodicity, learning_container
     learning_unit_year_subtypes, vacant_declaration_type, attribution_procedure, entity_type, organization_type
 from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_calendar import AcademicCalendarFactory, \
+    generate_learning_unit_edition_calendars
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
 from base.tests.factories.business.learning_units import LearningUnitsMixin, GenerateContainer, GenerateAcademicYear
 from base.tests.factories.campus import CampusFactory
@@ -50,7 +51,7 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
@@ -67,7 +68,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.user = UserFactory(username="YodaTheJediMaster")
-        cls.person = PersonFactory(user=cls.user)
+        cls.person = CentralManagerFactory(user=cls.user)
         cls.permission = Permission.objects.get(codename="can_edit_learningunit_date")
         cls.person.user.user_permissions.add(cls.permission)
         cls.setup_academic_years()
@@ -86,6 +87,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
 
         cls.a_superuser = SuperUserFactory()
         cls.a_superperson = PersonFactory(user=cls.a_superuser)
+        generate_learning_unit_edition_calendars(cls.list_of_academic_years)
 
     def setUp(self):
         self.client.force_login(self.user)
@@ -128,13 +130,7 @@ class TestEditLearningUnit(TestCase):
     def setUpTestData(cls):
         today = datetime.date.today()
         cls.an_academic_year = create_current_academic_year()
-
-        AcademicCalendarFactory(
-            data_year=cls.an_academic_year,
-            start_date=datetime.datetime(cls.an_academic_year.year - 2, 9, 15),
-            end_date=datetime.datetime(cls.an_academic_year.year + 1, 9, 14),
-            reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
-        )
+        generate_learning_unit_edition_calendars([cls.an_academic_year])
 
         cls.requirement_entity = EntityVersionFactory(
             entity_type=entity_type.SCHOOL,
@@ -185,8 +181,12 @@ class TestEditLearningUnit(TestCase):
             campus=CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN))
         )
 
-        cls.person = PersonEntityFactory(entity=cls.requirement_entity.entity).person
-        cls.user = cls.person.user
+        person = CentralManagerFactory()
+        PersonEntityFactory(
+            entity=cls.requirement_entity.entity,
+            person=person
+        )
+        cls.user = person.user
         cls.user.user_permissions.add(Permission.objects.get(codename="can_edit_learningunit"),
                                       Permission.objects.get(codename="can_access_learningunit"))
         cls.url = reverse(update_learning_unit, args=[cls.learning_unit_year.id])
@@ -425,6 +425,8 @@ class TestLearningUnitVolumesManagement(TestCase):
         )
 
         cls.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year)
+        generate_learning_unit_edition_calendars(cls.academic_years)
+
         cls.generate_container = GenerateContainer(start_year=start_year, end_year=end_year)
         cls.generated_container_year = cls.generate_container.generated_container_years[0]
 
@@ -432,7 +434,7 @@ class TestLearningUnitVolumesManagement(TestCase):
         cls.learning_unit_year = cls.generated_container_year.learning_unit_year_full
         cls.learning_unit_year_partim = cls.generated_container_year.learning_unit_year_partim
 
-        cls.person = PersonFactory()
+        cls.person = CentralManagerFactory()
 
         cls.url = reverse('learning_unit_volumes_management', kwargs={
             'learning_unit_year_id': cls.learning_unit_year.id,

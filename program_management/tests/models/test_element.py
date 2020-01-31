@@ -28,10 +28,10 @@ from django.test import TestCase
 from django.utils.translation import gettext as _
 
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from education_group.tests.factories.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 from program_management.models.element import Element
 from program_management.tests.factories.element import ElementFactory, ElementEducationGroupYearFactory, \
     ElementLearningUnitYearFactory, ElementLearningClassYearFactory, ElementGroupYearFactory

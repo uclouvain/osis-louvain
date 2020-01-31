@@ -53,6 +53,7 @@ from reference.tests.factories.country import CountryFactory
 
 CINEY = "Ciney"
 NAMUR = "Namur"
+TITLE = "Title luy"
 
 
 class TestSearchForm(TestCase):
@@ -122,6 +123,23 @@ class TestSearchForm(TestCase):
         self.assertTrue(learning_unit_filter.is_valid())
         self.assertEqual(learning_unit_filter.qs.count(), 1)
 
+    def test_search_on_external_title(self):
+        ExternalLearningUnitYearFactory(
+            learning_unit_year__academic_year=self.academic_years[0],
+            learning_unit_year__learning_container_year__container_type=learning_container_year_types.EXTERNAL,
+            learning_unit_year__learning_container_year__common_title=TITLE,
+        )
+
+        self.data.update({
+            "academic_year_id": str(self.academic_years[0].id),
+            "container_type": learning_container_year_types.EXTERNAL,
+            "title": TITLE
+        })
+
+        learning_unit_filter = ExternalLearningUnitFilter(self.data)
+        self.assertTrue(learning_unit_filter.is_valid())
+        self.assertEqual(learning_unit_filter.qs.count(), 1)
+
     def test_dropdown_init(self):
         country = CountryFactory()
 
@@ -151,6 +169,21 @@ class TestSearchForm(TestCase):
     def test_initial_value_learning_unit_filter_with_entity_subordinated(self):
         lu_filter = LearningUnitFilter()
         self.assertTrue(lu_filter.form.fields['with_entity_subordinated'].initial)
+
+    def test_search_on_title(self):
+        LearningUnitYearFactory(
+            academic_year=self.academic_years[0],
+            learning_container_year__common_title=TITLE,
+        )
+
+        self.data.update({
+            "academic_year_id": str(self.academic_years[0].id),
+            "title": TITLE
+        })
+
+        learning_unit_filter = LearningUnitFilter(self.data)
+        self.assertTrue(learning_unit_filter.is_valid())
+        self.assertEqual(learning_unit_filter.qs.count(), 1)
 
 
 class TestFilterIsBorrowedLearningUnitYear(TestCase):

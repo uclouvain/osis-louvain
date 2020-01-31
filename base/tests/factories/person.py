@@ -76,8 +76,7 @@ class PersonWithPermissionsFactory:
         self.person.user.user_permissions.add(*perms_obj)
 
         if groups:
-            groups_obj = [Group.objects.get_or_create(name=name)[0] for name in groups]
-            self.person.user.groups.add(*groups_obj)
+            add_person_to_groups(self.person, groups)
 
     def __new__(cls, *permissions, **kwargs):
         obj = super().__new__(cls)
@@ -108,3 +107,8 @@ class SICFactory(PersonWithPermissionsFactory):
 class AdministrativeManagerFactory(PersonWithPermissionsFactory):
     def __init__(self, *permissions, **kwargs):
         super().__init__(*permissions, groups=(ADMINISTRATIVE_MANAGER_GROUP, ), **kwargs)
+
+
+def add_person_to_groups(person, groups):
+    groups_obj = [Group.objects.get_or_create(name=name)[0] for name in groups]
+    person.user.groups.add(*groups_obj)

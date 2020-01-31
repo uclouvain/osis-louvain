@@ -103,7 +103,13 @@
                         </div>
                         <br>
                         {% bootstrap_field form_education_group_year.title %}
+                        {% if is_finality_types %}
+                            {% bootstrap_field form_education_group_year.partial_title %}
+                        {% endif %}
                         {% bootstrap_field form_education_group_year.title_english %}
+                        {% if is_finality_types %}
+                            {% bootstrap_field form_education_group_year.partial_title_english %}
+                        {% endif %}
                         {% bootstrap_field form_education_group_year.keywords %}
                     </div>
                 </div>

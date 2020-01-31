@@ -29,6 +29,7 @@ from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
 
 from base.business.entity import get_entities_ids
+from base.forms.utils.filter_field import filter_field_by_regex
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
@@ -70,21 +71,21 @@ class EducationGroupFilter(FilterSet):
     )
     acronym = filters.CharFilter(
         field_name="acronym",
-        lookup_expr='icontains',
+        method="filter_education_group_year_field",
         max_length=40,
         required=False,
         label=_('Acronym/Short title'),
     )
     title = filters.CharFilter(
         field_name="title",
-        lookup_expr='icontains',
+        method='filter_education_group_year_field',
         max_length=255,
         required=False,
         label=_('Title')
     )
     partial_acronym = filters.CharFilter(
         field_name="partial_acronym",
-        lookup_expr='icontains',
+        method='filter_education_group_year_field',
         max_length=15,
         required=False,
         label=_('Code'),
@@ -127,3 +128,7 @@ class EducationGroupFilter(FilterSet):
             entity_ids = get_entities_ids(value, with_subordinated)
             queryset = queryset.filter(management_entity__in=entity_ids)
         return queryset
+
+    @staticmethod
+    def filter_education_group_year_field(queryset, name, value):
+        return filter_field_by_regex(queryset, name, value)

@@ -252,6 +252,7 @@ class EducationGroupRead(EducationGroupGenericDetailView):
             'language__name', flat=True)
         context["versions"] = self.get_related_versions()
         context["show_coorganization"] = has_coorganization(self.object)
+        context["is_finality_types"] = context["education_group_year"].is_finality
         return context
 
     def get_template_names(self):

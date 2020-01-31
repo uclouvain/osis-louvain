@@ -30,7 +30,7 @@ from django.utils.translation import gettext_lazy as _
 from waffle.decorators import waffle_flag
 
 from base.business.learning_unit_proposal import compute_proposal_state
-from base.forms.learning_unit.edition import LearningUnitEndDateForm
+from base.forms.learning_unit.edition import LearningUnitProposalEndDateForm
 from base.forms.learning_unit_proposal import ProposalLearningUnitForm, ProposalBaseForm
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear
@@ -73,7 +73,6 @@ def update_learning_unit_proposal(request, learning_unit_year_id):
 
 def _update_or_create_proposal(request, learning_unit_year, proposal=None):
     person = get_object_or_404(Person, user=request.user)
-
     proposal_base_form = ProposalBaseForm(request.POST or None, person, learning_unit_year, proposal)
 
     if request.method == 'POST':
@@ -103,7 +102,9 @@ def _update_or_create_suppression_proposal(request, learning_unit_year, proposal
 
     max_year = _get_max_year(learning_unit_year, proposal)
 
-    form_end_date = LearningUnitEndDateForm(request.POST or None, learning_unit_year, max_year=max_year)
+    form_end_date = LearningUnitProposalEndDateForm(
+        request.POST or None, learning_unit_year, max_year=max_year, person=person
+    )
     form_proposal = ProposalLearningUnitForm(request.POST or None, person=person, instance=proposal,
                                              initial=initial)
 

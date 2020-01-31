@@ -51,6 +51,8 @@ from base.utils.cache import RequestCache
 from education_group.api.serializers.education_group import EducationGroupSerializer
 
 FILTER_DATA = {"acronym": ["LBIR"], "title": ["dummy filter"]}
+TITLE_EDPH2 = "Edph training 2"
+TITLE_EDPH3 = "Edph training 3 [120], sciences"
 
 
 class TestEducationGroupSearchView(TestCase):
@@ -115,7 +117,16 @@ class TestEducationGroupDataSearchFilter(TestCase):
             partial_acronym='EDPH2_SCS',
             education_group__start_year=cls.previous_academic_year,
             education_group_type=cls.type_group,
-            management_entity=envi_entity
+            management_entity=envi_entity,
+            title=TITLE_EDPH2
+        )
+        cls.education_group_edph3 = EducationGroupYearFactory(
+            acronym='EDPH3', academic_year=cls.current_academic_year,
+            partial_acronym='EDPH3_SCS',
+            education_group__start_year=cls.previous_academic_year,
+            education_group_type=cls.type_training,
+            management_entity=envi_entity,
+            title=TITLE_EDPH3
         )
 
         cls.education_group_arke2a = EducationGroupYearFactory(
@@ -196,14 +207,40 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertIn(_('No result!'), messages)
 
     def test_search_with_acronym_only(self):
-        response = self.client.get(self.url, data={"acronym": self.education_group_arke2a.acronym})
+        search_strings = [self.education_group_arke2a.acronym,
+                          '^{}$'.format(self.education_group_arke2a.acronym),
+                          '^{}'.format(self.education_group_arke2a.acronym),
+                          '{}$'.format(self.education_group_arke2a.acronym)
+                          ]
+        for search_string in search_strings:
+            response = self.client.get(self.url, data={"acronym": search_string})
 
-        self.assertTemplateUsed(response, "education_group/search.html")
+            self.assertTemplateUsed(response, "education_group/search.html")
 
-        context = response.context
-        self.assertIsInstance(context["form"], self.form_class)
-        self.assertCountEqual(context["object_list"],
-                              [self.education_group_arke2a, self.education_group_arke2a_previous_year])
+            context = response.context
+            self.assertIsInstance(context["form"], self.form_class)
+            self.assertCountEqual(context["object_list"],
+                                  [self.education_group_arke2a, self.education_group_arke2a_previous_year])
+
+    def test_search_with_acronym_regex(self):
+        search_strings = ['^EDPH',
+                          'H3$',
+                          '^H3$'
+                          ]
+        result_expected = [
+            [self.education_group_edph2, self.education_group_edph3],
+            [self.education_group_edph3],
+            []
+        ]
+        for idx, search_string in enumerate(search_strings):
+            response = self.client.get(self.url, data={"acronym": search_string})
+
+            self.assertTemplateUsed(response, "education_group/search.html")
+
+            context = response.context
+            self.assertIsInstance(context["form"], self.form_class)
+            self.assertCountEqual(context["object_list"],
+                                  result_expected[idx])
 
     def test_search_with_academic_year_only(self):
         response = self.client.get(self.url, data={"academic_year": self.current_academic_year.id})
@@ -213,16 +250,82 @@ class TestEducationGroupDataSearchFilter(TestCase):
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
         self.assertCountEqual(context["object_list"],
-                              [self.education_group_arke2a, self.education_group_edph2, self.education_group_hist2a])
+                              [self.education_group_arke2a, self.education_group_edph2, self.education_group_hist2a,
+                               self.education_group_edph3])
 
     def test_search_with_partial_acronym(self):
-        response = self.client.get(self.url, data={"partial_acronym": self.education_group_edph2.partial_acronym})
+        search_strings = [self.education_group_edph2.acronym,
+                          '^{}$'.format(self.education_group_edph2.partial_acronym),
+                          '^{}'.format(self.education_group_edph2.partial_acronym),
+                          '{}$'.format(self.education_group_edph2.partial_acronym),
+                          ]
+        for search_string in search_strings:
+            response = self.client.get(self.url, data={"partial_acronym": search_string})
 
-        self.assertTemplateUsed(response, "education_group/search.html")
+            self.assertTemplateUsed(response, "education_group/search.html")
 
-        context = response.context
-        self.assertIsInstance(context["form"], self.form_class)
-        self.assertCountEqual(context["object_list"], [self.education_group_edph2])
+            context = response.context
+            self.assertIsInstance(context["form"], self.form_class)
+            self.assertCountEqual(context["object_list"], [self.education_group_edph2])
+
+    def test_search_with_partial_acronym_regex(self):
+        search_strings = ['^EDPH',
+                          '3_SCS',
+                          '^3_SCS']
+        result_expected = [
+            [self.education_group_edph2, self.education_group_edph3],
+            [self.education_group_edph3],
+            []
+        ]
+        for idx, search_string in enumerate(search_strings):
+            response = self.client.get(self.url, data={"partial_acronym": search_string})
+
+            self.assertTemplateUsed(response, "education_group/search.html")
+
+            context = response.context
+            self.assertIsInstance(context["form"], self.form_class)
+            self.assertCountEqual(context["object_list"],
+                                  result_expected[idx])
+
+    def test_search_with_title(self):
+        search_strings = [self.education_group_edph2.title,
+                          '^{}$'.format(self.education_group_edph2.title),
+                          '^{}'.format(self.education_group_edph2.title),
+                          '{}$'.format(self.education_group_edph2.title)
+                          ]
+        for search_string in search_strings:
+            response = self.client.get(self.url, data={"title": search_string})
+
+            self.assertTemplateUsed(response, "education_group/search.html")
+
+            context = response.context
+            self.assertIsInstance(context["form"], self.form_class)
+            self.assertCountEqual(context["object_list"], [self.education_group_edph2])
+
+    def test_search_with_title_regex(self):
+        search_strings = ['^Edph training ',
+                          ', sciences$',
+                          '^ph trai',
+                          '120',
+                          '[120]'
+                          ]
+        result_expected = [
+            [self.education_group_edph2, self.education_group_edph3],
+            [self.education_group_edph3],
+            [],
+            [self.education_group_edph3],
+            [self.education_group_edph3],
+        ]
+
+        for idx, search_string in enumerate(search_strings):
+            response = self.client.get(self.url, data={"title": search_string})
+
+            self.assertTemplateUsed(response, "education_group/search.html")
+
+            context = response.context
+            self.assertIsInstance(context["form"], self.form_class)
+            self.assertCountEqual(context["object_list"],
+                                  result_expected[idx])
 
     def test_search_with_management_entity(self):
         response = self.client.get(self.url, data={"management_entity": self.oph_entity_v.acronym})
@@ -254,7 +357,8 @@ class TestEducationGroupDataSearchFilter(TestCase):
                 self.education_group_arke2a,
                 self.education_group_arke2a_previous_year,
                 self.education_group_hist2a,
-                self.education_group_edph2
+                self.education_group_edph2,
+                self.education_group_edph3
             ]
         )
 
@@ -277,7 +381,8 @@ class TestEducationGroupDataSearchFilter(TestCase):
         context = response.context
         self.assertIsInstance(context["form"], self.form_class)
         self.assertCountEqual(context["object_list"],
-                              [self.education_group_arke2a, self.education_group_arke2a_previous_year])
+                              [self.education_group_arke2a, self.education_group_arke2a_previous_year,
+                               self.education_group_edph3])
 
     def test_with_multiple_criteria(self):
         response = self.client.get(

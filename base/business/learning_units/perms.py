@@ -31,10 +31,9 @@ from django.utils.translation import gettext_lazy as _
 from waffle.models import Flag
 
 from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
-from base.business.event_perms import EventPermLearningUnitFacultyManagerEdition
+from base.business import event_perms
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models import proposal_learning_unit, tutor
-from base.models.academic_year import starting_academic_year
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
 from base.models.enums import learning_container_year_types
@@ -105,7 +104,7 @@ def is_eligible_for_modification(learning_unit_year, person, raise_exception=Fal
     return \
         check_lu_permission(person, 'base.can_edit_learningunit', raise_exception) and \
         is_year_editable(learning_unit_year, raise_exception) and \
-        _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception) and \
+        _is_learning_unit_year_in_state_to_be_modified(learning_unit_year, person, raise_exception) and \
         is_person_linked_to_entity_in_charge_of_lu(learning_unit_year, person, raise_exception) and \
         is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception) and \
         _check_proposal_edition(learning_unit_year, raise_exception)
@@ -124,7 +123,7 @@ def is_eligible_for_modification_end_date(learning_unit_year, person, raise_exce
 def is_eligible_to_create_partim(learning_unit_year, person, raise_exception=False):
     return conjunction(
         is_person_linked_to_entity_in_charge_of_lu,
-        is_academic_year_in_range_to_create_partim,
+        _is_learning_unit_year_in_state_to_create_partim,
         is_learning_unit_year_full,
         is_external_learning_unit_cograduation
     )(learning_unit_year, person, raise_exception)
@@ -237,22 +236,30 @@ def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_e
 def _is_person_eligible_to_edit_proposal_based_on_state(proposal, person, raise_exception=False):
     if person.is_central_manager:
         return True
-    if proposal.state != ProposalState.FACULTY.name:
-        can_raise_exception(
-            raise_exception,
-            False,
-            MSG_NOT_PROPOSAL_STATE_FACULTY
-        )
-        return False
-    if proposal.type == ProposalType.MODIFICATION.name and \
-       proposal.learning_unit_year.academic_year.year != starting_academic_year().year + 1:
-        can_raise_exception(
-            raise_exception,
-            False,
-            MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR
-        )
-        return False
-    return True
+    elif person.is_faculty_manager:
+        if proposal.state != ProposalState.FACULTY.name:
+            can_raise_exception(
+                raise_exception,
+                False,
+                MSG_NOT_PROPOSAL_STATE_FACULTY
+            )
+            return False
+
+        if proposal.type == ProposalType.MODIFICATION.name and \
+                not event_perms.generate_event_perm_modification_transformation_proposal(
+                    person=person,
+                    obj=proposal.learning_unit_year,
+                    raise_exception=False
+                ).is_open():
+            can_raise_exception(
+                raise_exception,
+                False,
+                MSG_PROPOSAL_IS_ON_AN_OTHER_YEAR
+            )
+            return False
+        return True
+
+    return False
 
 
 def _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person, raise_exception=False):
@@ -338,28 +345,35 @@ def is_learning_unit_year_in_proposal(learning_unit_year, _, raise_exception=Fal
     return proposal_learning_unit.is_learning_unit_in_proposal(learning_unit_year.learning_unit)
 
 
-def is_academic_year_in_range_to_create_partim(learning_unit_year, person, raise_exception=False):
-    if person.is_central_manager:
-        return not is_learning_unit_year_in_past(learning_unit_year, person)
-    elif person.is_faculty_manager:
-        return _can_be_updated_by_faculty_manager(learning_unit_year)
-    return False
+def _is_learning_unit_year_in_state_to_create_partim(learning_unit_year, person, raise_exception=False):
+    business_check = (person.is_central_manager and not is_learning_unit_year_in_past(learning_unit_year, person)) or \
+        (person.is_faculty_manager and learning_unit_year.learning_container_year)
+
+    calendar_check = event_perms.generate_event_perm_learning_unit_edition(
+        person=person,
+        obj=learning_unit_year,
+        raise_exception=False
+    ).is_open()
+
+    return business_check and calendar_check
 
 
-def _is_learning_unit_year_in_range_to_be_modified(learning_unit_year, person, raise_exception):
-    result = person.is_central_manager or _can_be_updated_by_faculty_manager(learning_unit_year)
+def _is_learning_unit_year_in_state_to_be_modified(learning_unit_year, person, raise_exception):
+    business_check = person.is_central_manager or learning_unit_year.learning_container_year
+
+    calendar_check = event_perms.generate_event_perm_learning_unit_edition(
+        person=person,
+        obj=learning_unit_year,
+        raise_exception=False
+    ).is_open()
+
+    result = business_check and calendar_check
     can_raise_exception(
         raise_exception,
         result,
         MSG_NOT_GOOD_RANGE_OF_YEARS,
         )
     return result
-
-
-def _can_be_updated_by_faculty_manager(learning_unit_year):
-    if not learning_unit_year.learning_container_year:
-        return False
-    return EventPermLearningUnitFacultyManagerEdition(obj=learning_unit_year, raise_exception=False).is_open()
 
 
 def _is_proposal_in_state_to_be_consolidated(proposal, _):
@@ -599,21 +613,15 @@ def is_eligible_to_modify_end_year_by_proposal(learning_unit_year, person, raise
 
 
 def can_modify_end_year_by_proposal(learning_unit_year, person, raise_exception=False):
-    result = True
-    max_limit = starting_academic_year().year + 6
-    if person.is_faculty_manager and not person.is_central_manager:
-        n_year = starting_academic_year().next().year
-
-    elif person.is_central_manager:
-        n_year = starting_academic_year().year
-    else:
-        return False
-
-    if learning_unit_year.academic_year.year < n_year or learning_unit_year.academic_year.year >= max_limit:
-        result = False
+    result = event_perms.generate_event_perm_creation_end_date_proposal(
+        person=person,
+        obj=learning_unit_year,
+        raise_exception=False
+    ).is_open()
 
     can_raise_exception(
-        raise_exception, result,
+        raise_exception,
+        result,
         MSG_NOT_ELIGIBLE_TO_MODIFY_END_YEAR_PROPOSAL_ON_THIS_YEAR
     )
     return result
@@ -634,24 +642,14 @@ def is_eligible_to_modify_by_proposal(learning_unit_year, person, raise_exceptio
 
 
 def can_modify_by_proposal(learning_unit_year, person, raise_exception=False):
-    result = True
-
-    if person.is_faculty_manager and not person.is_central_manager:
-        n_year = starting_academic_year().next().year
-        max_limit = n_year
-
-    elif person.is_central_manager:
-        n_year = starting_academic_year().year
-        max_limit = n_year+1
-    else:
-        return False
-
-    if learning_unit_year.academic_year.year < n_year or learning_unit_year.academic_year.year > max_limit:
-        result = False
+    result = event_perms.generate_event_perm_modification_transformation_proposal(
+        person=person,
+        obj=learning_unit_year,
+        raise_exception=False
+    ).is_open()
 
     can_raise_exception(
-        raise_exception, result,
-        MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
+        raise_exception, result, MSG_NOT_ELIGIBLE_TO_PUT_IN_PROPOSAL_ON_THIS_YEAR
     )
     return result
 

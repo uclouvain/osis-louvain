@@ -47,6 +47,7 @@ from base.models import program_manager
 from base.models.certificate_aim import CertificateAim
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_types import TrainingType
 from base.models.group_element_year import GroupElementYear
 from base.views.common import display_success_messages, display_warning_messages, show_error_message_for_form_invalid
 from base.views.education_groups.perms import can_change_education_group
@@ -250,7 +251,8 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
             person=request.user.person,
             education_group=education_group_year,
         ),
-        'group_element_years': groupelementyear_formset
+        'group_element_years': groupelementyear_formset,
+        "is_finality_types": education_group_year.is_finality
     })
 
 

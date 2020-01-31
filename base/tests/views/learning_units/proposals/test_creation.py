@@ -25,6 +25,7 @@
 ##############################################################################
 import datetime
 
+from django.contrib.auth.models import Permission
 from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
@@ -37,15 +38,18 @@ from base.forms.learning_unit_proposal import ProposalLearningUnitForm, Creation
 from base.models.academic_year import AcademicYear
 from base.models.enums import learning_unit_year_subtypes, learning_container_year_types, organization_type, \
     entity_type, learning_unit_year_periodicity
+from base.models.enums.proposal_state import ProposalState
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.tests.factories import campus as campus_factory, \
     organization as organization_factory, person as factory_person, user as factory_user
+from base.tests.factories.academic_calendar import generate_creation_or_end_date_proposal_calendars
 from base.tests.factories.academic_year import get_current_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group import FacultyManagerGroupFactory
+from base.tests.factories.person import CentralManagerFactory
 from base.tests.factories.person import FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.views.learning_units.proposal.create import get_proposal_learning_unit_creation_form
@@ -64,12 +68,13 @@ class LearningUnitViewTestCase(TestCase):
             user=cls.faculty_user
         )
         cls.super_user = factory_user.SuperUserFactory()
-        cls.person = factory_person.PersonFactory(user=cls.super_user)
+        cls.person = factory_person.CentralManagerFactory(user=cls.super_user)
         start_year = AcademicYearFactory(year=get_current_year())
         end_year = AcademicYearFactory(year=get_current_year() + 7)
         cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
         cls.current_academic_year = cls.academic_years[0]
         cls.next_academic_year = cls.academic_years[1]
+        generate_creation_or_end_date_proposal_calendars(cls.academic_years)
 
         cls.language = LanguageFactory(code='FR')
         cls.organization = organization_factory.OrganizationFactory(type=organization_type.MAIN)
@@ -100,6 +105,7 @@ class LearningUnitViewTestCase(TestCase):
             "periodicity": learning_unit_year_periodicity.ANNUAL,
             "entity": self.entity_version.id,
             "folder_id": 1,
+            "state": ProposalState.FACULTY.name,
             'requirement_entity': self.entity_version.id,
             'allocation_entity': self.entity_version.id,
             'additional_entity_1': '',
@@ -126,6 +132,22 @@ class LearningUnitViewTestCase(TestCase):
         self.assertIsInstance(response.context['learning_unit_form'], LearningUnitModelForm)
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
+    def test_get_proposal_learning_unit_creation_form_with_central_user(self):
+        central_manager_person = CentralManagerFactory()
+        central_manager_person.user.user_permissions.add(Permission.objects.get(codename='can_propose_learningunit'))
+        central_manager_person.user.user_permissions.add(Permission.objects.get(codename='can_create_learningunit'))
+        self.client.force_login(central_manager_person.user)
+        url = reverse(get_proposal_learning_unit_creation_form, args=[self.next_academic_year.id])
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTemplateUsed(response, 'learning_unit/proposal/creation.html')
+        self.assertIsInstance(response.context['learning_unit_form'], LearningUnitModelForm)
+        self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
+        self.assertCountEqual(
+            list(response.context['learning_unit_year_form'].fields['academic_year'].queryset),
+            self.academic_years[:-1]  # Exclude last one because central manager cannot propose luy in n+7
+        )
+
     def test_get_proposal_learning_unit_creation_form_with_faculty_user(self):
         self.client.force_login(self.faculty_person.user)
         url = reverse(get_proposal_learning_unit_creation_form, args=[self.next_academic_year.id])
@@ -134,6 +156,10 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/proposal/creation.html')
         self.assertIsInstance(response.context['learning_unit_form'], LearningUnitModelForm)
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
+        self.assertCountEqual(
+            list(response.context['learning_unit_year_form'].fields['academic_year'].queryset),
+            self.academic_years[1:-1]  # Exclude first and last one because fac manager cannot propose luy in n and n+7
+        )
 
     def test_post_proposal_learning_unit_creation_form(self):
         url = reverse(get_proposal_learning_unit_creation_form, args=[self.current_academic_year.id])
@@ -204,7 +230,6 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_proposal_learning_unit_add_with_valid_data_for_faculty_manager(self):
         learning_unit_form = CreationProposalBaseForm(self.get_valid_data(), person=self.faculty_person)
-
         self.assertTrue(learning_unit_form.is_valid(), learning_unit_form.errors)
         self.client.force_login(self.faculty_person.user)
         url = reverse(get_proposal_learning_unit_creation_form, args=[self.current_academic_year.id])

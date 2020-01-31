@@ -40,12 +40,12 @@ from base.models.enums import quadrimesters, learning_unit_year_session, attribu
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.learning_unit_year import create_learning_unit_year
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
 TITLE = 'Intitulé'
 OTHER_TITLE = 'title 1'

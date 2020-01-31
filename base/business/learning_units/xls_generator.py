@@ -90,9 +90,9 @@ def _filter_required_teaching_material(learning_units):
 def _build_line(learning_unit):
     # Fetch data in CMS and convert
     bibliography = _html_list_to_string(html.unescape(learning_unit.bibliography)) if learning_unit.bibliography else ""
-    online_resources_fr = _hyperlinks_to_string(html.unescape(learning_unit.online_resources_fr)) \
+    online_resources_fr = hyperlinks_to_string(html.unescape(learning_unit.online_resources_fr)) \
         if learning_unit.online_resources_fr else ""
-    online_resources_en = _hyperlinks_to_string(html.unescape(learning_unit.online_resources_en)) \
+    online_resources_en = hyperlinks_to_string(html.unescape(learning_unit.online_resources_en)) \
         if learning_unit.online_resources_en else ""
     return(
         learning_unit.acronym,
@@ -106,7 +106,7 @@ def _build_line(learning_unit):
     )
 
 
-def _hyperlinks_to_string(text):
+def hyperlinks_to_string(text):
     """ Extract all hyperlinks and append them to a string using a 'title - [url]' format """
     converted_resources = ""
     soup = BeautifulSoup(text, "html5lib")
@@ -117,7 +117,7 @@ def _hyperlinks_to_string(text):
             converted_resources += "{} - [{}] \n".format(element.text, element.get('href'))
     # strip tags when no html hyperlink has been found
     if converted_resources == "":
-        return _strip_tags(text)
+        return strip_tags(text)
     return converted_resources
 
 
@@ -128,15 +128,16 @@ def _html_list_to_string(text):
     for element in soup.find_all(['ul', 'ol', 'li', 'p']):
         if element.name in ['ul', 'ol', 'p']:
             converted_text += "\n" if converted_text != "" else ""
-        else:
+        if element.name in ['li', 'p']:
             converted_text += "{}\n".format(element.get_text())
+
     # strip tags when no list has been found
     if converted_text == "":
-        return _strip_tags(text)
+        return strip_tags(text)
     return converted_text
 
 
-def _strip_tags(text):
+def strip_tags(text):
     soup = BeautifulSoup(text, "html5lib")
     return soup.get_text()
 

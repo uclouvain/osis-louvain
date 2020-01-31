@@ -183,7 +183,7 @@ class EducationGroupYear(SerializableModel):
     )
 
     title = models.CharField(
-        max_length=255,
+        max_length=240,
         verbose_name=_("Title in French")
     )
 
@@ -192,6 +192,20 @@ class EducationGroupYear(SerializableModel):
         blank=True,
         default="",
         verbose_name=_("Title in English")
+    )
+
+    partial_title = models.CharField(
+        max_length=240,
+        blank=True,
+        default="",
+        verbose_name=_("Partial title in French")
+    )
+
+    partial_title_english = models.CharField(
+        max_length=240,
+        blank=True,
+        default="",
+        verbose_name=_("Partial title in English")
     )
 
     academic_year = models.ForeignKey(

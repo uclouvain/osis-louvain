@@ -79,7 +79,6 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
-from base.tests.factories.learning_class_year import LearningClassYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
@@ -106,6 +105,7 @@ from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from learning_unit.api.views.learning_unit import LearningUnitFilter
+from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 from osis_common.document import xls_build
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory
@@ -260,6 +260,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         cls.url = reverse(create_partim_form, kwargs={'learning_unit_year_id': cls.learning_unit_year_full.id})
         faculty_manager = FacultyManagerFactory("can_access_learningunit", "can_create_learningunit")
         cls.user = faculty_manager.user
+        cls.access_denied = "access_denied.html"
 
     def setUp(self):
         self.client.force_login(self.user)
@@ -273,7 +274,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         a_user_without_perms = UserFactory()
         self.client.force_login(a_user_without_perms)
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, self.access_denied)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_create_partim_form_invalid_http_methods(self):
@@ -285,7 +286,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
                 side_effect=lambda *args: False)
     def test_create_partim_when_user_not_linked_to_entity_charge(self, mock_is_pers_linked_to_entity_charge):
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, self.access_denied)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     @mock.patch('base.views.learning_units.perms.business_perms.is_person_linked_to_entity_in_charge_of_learning_unit',
