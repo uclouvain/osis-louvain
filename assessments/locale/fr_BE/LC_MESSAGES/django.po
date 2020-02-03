@@ -373,7 +373,7 @@ msgid "Please choose at least one criteria!"
 msgstr "Veuillez choisir au moins un critère!"
 
 msgid "Please select an XLS file for injection"
-msgstr "Veuillez délectionner un fichier XLS pour injection"
+msgstr "Veuillez sélectionner un fichier XLS pour injection"
 
 msgid "Please select an address"
 msgstr "Veuillez sélectionner une adresse"

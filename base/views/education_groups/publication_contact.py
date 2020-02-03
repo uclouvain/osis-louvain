@@ -62,27 +62,6 @@ class CommonEducationGroupPublicationContactView(RulesRequiredMixin, AjaxTemplat
         return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
 
     def get_success_url(self):
-        return reverse(
-            'education_group_general_informations',
-            args=[
-                self.kwargs["root_id"],
-                self.kwargs["education_group_year_id"]
-            ]
-        )
-
-
-class CreateEducationGroupPublicationContactView(CommonEducationGroupPublicationContactView, CreateView):
-    def get_success_message(self, cleaned_data):
-        return _("The contact has been created")
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        return {
-            'education_group_year': self.education_group_year,
-            **kwargs
-        }
-
-    def get_success_url(self):
         query_dictionary = QueryDict('', mutable=True)
         query_dictionary.update(
             {
@@ -100,6 +79,18 @@ class CreateEducationGroupPublicationContactView(CommonEducationGroupPublication
             ),
             querystring=query_dictionary.urlencode()
         )
+
+
+class CreateEducationGroupPublicationContactView(CommonEducationGroupPublicationContactView, CreateView):
+    def get_success_message(self, cleaned_data):
+        return _("The contact has been created")
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        return {
+            'education_group_year': self.education_group_year,
+            **kwargs
+        }
 
 
 class UpdateEducationGroupPublicationContactView(CommonEducationGroupPublicationContactView, UpdateView):

@@ -51,7 +51,6 @@ from base.models.learning_achievement import LearningAchievement
 from base.models.learning_class_year import LearningClassYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
@@ -371,7 +370,6 @@ def _check_postponement_conflict(luy, next_luy):
     error_list.extend(_check_postponement_conflict_on_learning_unit_year(luy, next_luy))
     error_list.extend(_check_postponement_conflict_on_learning_container_year(lcy, next_lcy))
     error_list.extend(_check_postponement_conflict_on_entity_container_year(lcy, next_lcy))
-    error_list.extend(_check_postponement_learning_unit_year_proposal_state(next_luy))
     error_list.extend(_check_postponement_conflict_on_volumes(lcy, next_lcy))
     return error_list
 
@@ -427,15 +425,6 @@ def _get_translated_value(value):
     if isinstance(value, bool):
         return _('yes') if value else _('no')
     return value
-
-
-def _check_postponement_learning_unit_year_proposal_state(nex_luy):
-    error_msg = _("The learning unit %(luy)s is in proposal,"
-                  " can not save the change from the year %(academic_year)s") % {
-                    'luy': nex_luy.acronym,
-                    'academic_year': nex_luy.academic_year
-                }
-    return [error_msg] if is_learning_unit_year_in_proposal(nex_luy) else []
 
 
 # TODO :: should remove this function and add requirement_entity, allocation_entity, additional_entities

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-02 09:41+0100\n"
+"POT-Creation-Date: 2020-01-24 13:26+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -387,7 +387,8 @@ msgid "Assistants"
 msgstr ""
 
 msgid ""
-"At least a partim volume value is greater than corresponding volume of full UE"
+"At least a partim volume value is greater than corresponding volume of full "
+"UE"
 msgstr ""
 
 msgid "At the end of this learning unit, the student is able to:"
@@ -943,9 +944,6 @@ msgstr ""
 msgid "Existing acronym"
 msgstr ""
 
-msgid "Existing proposal in epc"
-msgstr ""
-
 msgid "Export"
 msgstr ""
 
@@ -1470,9 +1468,6 @@ msgid "Management of learning units."
 msgstr ""
 
 msgid "Management of organizational structure."
-msgstr ""
-
-msgid "Management of organizations"
 msgstr ""
 
 msgid ""
@@ -2553,6 +2548,12 @@ msgid ""
 "year %(academic_year)s"
 msgstr ""
 
+#, python-format
+msgid ""
+"The learning unit has been updated (the report has not been done from "
+"%(year)s because the learning unit is in proposal)."
+msgstr ""
+
 msgid "The learning unit has been updated (with report)."
 msgstr ""
 
@@ -2673,6 +2674,9 @@ msgid "The user has not permission to create education groups."
 msgstr ""
 
 msgid "The user has not permission to delete education groups."
+msgstr ""
+
+msgid "The user is not allowed to change education group content."
 msgstr ""
 
 msgid "The user is not attached to the management entity"

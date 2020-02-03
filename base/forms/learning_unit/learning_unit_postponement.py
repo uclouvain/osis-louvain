@@ -43,7 +43,6 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.models.proposal_learning_unit import is_learning_unit_year_in_proposal
 
 FIELDS_TO_NOT_POSTPONE = {
     'is_vacant': 'learning_container_year.is_vacant',
@@ -299,7 +298,6 @@ class LearningUnitPostponementForm:
         self.consistency_errors = OrderedDict()
         for ac_year in academic_years:
             next_form = self._get_learning_unit_base_form(ac_year, **form_kwargs)
-            self._check_postponement_proposal_state(next_form.learning_unit_year_form.instance, ac_year)
             self._check_postponement_repartition_volume(next_form.learning_unit_year_form.instance)
             self._check_differences(current_form, next_form, ac_year)
 
@@ -322,15 +320,6 @@ class LearningUnitPostponementForm:
                         )
 
         return self._warnings
-
-    def _check_postponement_proposal_state(self, luy, ac_year):
-        if is_learning_unit_year_in_proposal(luy):
-            self.consistency_errors.setdefault(ac_year, []).append(
-                _("The learning unit %(luy)s is in proposal, can not"
-                  " save the change from the year %(academic_year)s") % {
-                    'luy': luy.acronym, 'academic_year': ac_year
-                }
-            )
 
     def _check_postponement_repartition_volume(self, luy):
         """ Check if the repartition volume foreach entities has been changed in the future

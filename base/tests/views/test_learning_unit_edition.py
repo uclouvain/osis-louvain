@@ -33,6 +33,7 @@ from django.contrib.messages import get_messages
 from django.http import HttpResponseForbidden, HttpResponseNotFound, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_flag
 
 from base.forms.learning_unit.learning_unit_create import LearningUnitModelForm, LearningUnitYearModelForm, \
@@ -51,6 +52,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.tests.forms.test_edition_form import get_valid_formset_data
 from base.views.learning_unit import learning_unit_components
@@ -125,12 +127,12 @@ class TestEditLearningUnit(TestCase):
     @classmethod
     def setUpTestData(cls):
         today = datetime.date.today()
-        an_academic_year = create_current_academic_year()
+        cls.an_academic_year = create_current_academic_year()
 
         AcademicCalendarFactory(
-            data_year=an_academic_year,
-            start_date=datetime.datetime(an_academic_year.year - 2, 9, 15),
-            end_date=datetime.datetime(an_academic_year.year + 1, 9, 14),
+            data_year=cls.an_academic_year,
+            start_date=datetime.datetime(cls.an_academic_year.year - 2, 9, 15),
+            end_date=datetime.datetime(cls.an_academic_year.year + 1, 9, 14),
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
 
@@ -153,8 +155,8 @@ class TestEditLearningUnit(TestCase):
             entity__organization__type=organization_type.MAIN,
         )
 
-        learning_container_year = LearningContainerYearFactory(
-            academic_year=an_academic_year,
+        cls.learning_container_year = LearningContainerYearFactory(
+            academic_year=cls.an_academic_year,
             container_type=learning_container_year_types.COURSE,
             type_declaration_vacant=vacant_declaration_type.DO_NOT_ASSIGN,
             requirement_entity=cls.requirement_entity.entity,
@@ -164,9 +166,9 @@ class TestEditLearningUnit(TestCase):
         )
 
         cls.learning_unit_year = LearningUnitYearFactory(
-            learning_container_year=learning_container_year,
+            learning_container_year=cls.learning_container_year,
             acronym="LOSIS4512",
-            academic_year=an_academic_year,
+            academic_year=cls.an_academic_year,
             subtype=learning_unit_year_subtypes.FULL,
             attribution_procedure=attribution_procedure.INTERNAL_TEAM,
             credits=15,
@@ -175,9 +177,9 @@ class TestEditLearningUnit(TestCase):
         )
 
         cls.partim_learning_unit = LearningUnitYearFactory(
-            learning_container_year=learning_container_year,
+            learning_container_year=cls.learning_container_year,
             acronym="LOSIS4512A",
-            academic_year=an_academic_year,
+            academic_year=cls.an_academic_year,
             subtype=learning_unit_year_subtypes.PARTIM,
             credits=10,
             campus=CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN))
@@ -312,6 +314,62 @@ class TestEditLearningUnit(TestCase):
 
         self.learning_unit_year.refresh_from_db()
         self.assertEqual(self.learning_unit_year.credits, credits)
+        msg = [m.message for m in get_messages(response.wsgi_request)]
+        msg_level = [m.level for m in get_messages(response.wsgi_request)]
+        self.assertEqual(msg[0], _('The learning unit has been updated (without report).'))
+        self.assertIn(messages.SUCCESS, msg_level)
+
+    def test_valid_post_request_with_postponement(self):
+        credits = 17
+        form_data = self._get_valid_form_data()
+        form_data['credits'] = credits
+        form_data['container_type'] = learning_container_year_types.COURSE
+        form_data['postponement'] = 1  # This values triggers postponement switch in view
+        response = self.client.post(self.url, data=form_data)
+
+        expected_redirection = reverse("learning_unit", args=[self.learning_unit_year.id])
+        self.assertRedirects(response, expected_redirection)
+
+        self.learning_unit_year.refresh_from_db()
+        self.assertEqual(self.learning_unit_year.credits, credits)
+        msg = [m.message for m in get_messages(response.wsgi_request)]
+        msg_level = [m.level for m in get_messages(response.wsgi_request)]
+        self.assertEqual(msg[0], _('The learning unit has been updated (with report).'))
+        self.assertIn(messages.SUCCESS, msg_level)
+
+    def test_valid_post_request_with_postponement_and_existing_proposal(self):
+        luy_next_year = LearningUnitYearFactory(
+            learning_unit=self.learning_unit_year.learning_unit,
+            academic_year=AcademicYearFactory(year=self.an_academic_year.year + 1),
+            learning_container_year=self.learning_container_year,
+            acronym="LOSIS4512",
+            subtype=learning_unit_year_subtypes.FULL,
+            attribution_procedure=attribution_procedure.INTERNAL_TEAM,
+            credits=15,
+            campus=CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN)),
+            internship_subtype=None,
+        )
+        ProposalLearningUnitFactory(
+            learning_unit_year=luy_next_year
+        )
+        credits = 17
+        form_data = self._get_valid_form_data()
+        form_data['credits'] = credits
+        form_data['container_type'] = learning_container_year_types.COURSE
+        form_data['postponement'] = 1  # This values triggers postponement switch in view
+        response = self.client.post(self.url, data=form_data)
+
+        expected_redirection = reverse("learning_unit", args=[self.learning_unit_year.id])
+        self.assertRedirects(response, expected_redirection)
+
+        self.learning_unit_year.refresh_from_db()
+        self.assertEqual(self.learning_unit_year.credits, credits)
+        msg = [m.message for m in get_messages(response.wsgi_request) if m.level == messages.SUCCESS]
+        self.assertEqual(
+            msg[0],
+            _('The learning unit has been updated (the report has not been done from %(year)s because the learning '
+              'unit is in proposal).') % {'year': luy_next_year.academic_year}
+        )
 
     def test_invalid_post_request(self):
         credits = ''
