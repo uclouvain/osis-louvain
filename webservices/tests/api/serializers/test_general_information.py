@@ -186,7 +186,7 @@ class GeneralInformationSerializerTestCase(TestCase):
             child_branch__education_group_type__name=GroupType.COMMON_CORE.name,
             child_branch__partial_acronym="TESTTC"
         )
-        intro_offer_section = self._adapt_cms_and_rules_for_intro_section_only(gey, self.egy)
+        intro_offer_section = self._get_pertinent_intro_section(gey, self.egy)
         self.assertIsNone(intro_offer_section['content'])
         self.assertEqual(intro_offer_section['id'], 'intro-testtc')
 
@@ -200,7 +200,7 @@ class GeneralInformationSerializerTestCase(TestCase):
             child_branch__education_group_type__name=MiniTrainingType.OPTION.name,
             child_branch__partial_acronym="TESTOPTION"
         )
-        intro_offer_section = self._adapt_cms_and_rules_for_intro_section_only(gey_option, self.egy)
+        intro_offer_section = self._get_pertinent_intro_section(gey_option, self.egy)
         self.assertIsNone(intro_offer_section['content'])
         self.assertEqual(intro_offer_section['id'], 'intro-testoption')
 
@@ -214,11 +214,11 @@ class GeneralInformationSerializerTestCase(TestCase):
             child_branch__education_group_type__name=TrainingType.MASTER_MD_120.name,
             child_branch__partial_acronym="TESTFINA"
         )
-        intro_offer_section = self._adapt_cms_and_rules_for_intro_section_only(gey, egy)
+        intro_offer_section = self._get_pertinent_intro_section(gey, egy)
         self.assertIsNone(intro_offer_section['content'])
         self.assertEqual(intro_offer_section['id'], 'intro-testfina')
 
-    def _adapt_cms_and_rules_for_intro_section_only(self, gey, egy):
+    def _get_pertinent_intro_section(self, gey, egy):
         general_information_sections.SECTIONS_PER_OFFER_TYPE[
             egy.education_group_type.name
         ] = {
