@@ -89,16 +89,16 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             CONTACTS: ContactsSectionSerializer
         }
         extra_intro_offers = self._get_intro_offers(obj)
-
         for common_section in pertinent_sections['common']:
             sections.append(self._get_translated_text(common_egy, common_section, language))
 
         for specific_section in pertinent_sections['specific']:
+            is_iufc_evaluation = obj.is_continuing_education_education_group_year and specific_section == EVALUATION_KEY
             serializer = cms_serializers.get(specific_section)
             if serializer:
                 serializer = serializer({'id': specific_section}, context={'egy': obj, 'lang': language})
                 datas.append(serializer.data)
-            elif specific_section not in [EVALUATION_KEY, CONTACT_INTRO]:
+            elif specific_section not in [EVALUATION_KEY, CONTACT_INTRO] or is_iufc_evaluation:
                 sections.append(self._get_translated_text(obj, specific_section, language))
 
         for offer in extra_intro_offers:
@@ -126,7 +126,7 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         )
 
         if section == EVALUATION_KEY:
-            return self._get_evaluation_text(language, translated_text)
+            return self._get_evaluation_text(language, translated_text, translated_text_label)
 
         try:
             return translated_text.values('label', 'translated_label', 'text').get()
@@ -145,17 +145,22 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             return section + '-commun'
         return section
 
-    def _get_evaluation_text(self, language, translated_text):
+    def _get_evaluation_text(self, language, translated_text, translated_text_label):
         try:
             _, text = get_evaluation_text(self.instance, language)
         except TranslatedText.DoesNotExist:
             text = None
+        fields = ['label', 'translated_label', 'text', 'free_text']
         translated_text = translated_text.annotate(
             free_text=Value(text, output_field=CharField())
-        ).values(
-            'label', 'translated_label', 'text', 'free_text'
-        ).first()
-        return translated_text
+        )
+        if self.instance.is_continuing_education_education_group_year:
+            fields.remove('free_text')
+        return translated_text.values(*fields).first() or {
+                'label': self._get_correct_label_name(self.instance, EVALUATION_KEY),
+                'translated_label': translated_text_label.label,
+                'text': None
+            }
 
     @staticmethod
     def _get_intro_offers(obj):

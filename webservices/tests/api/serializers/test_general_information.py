@@ -31,6 +31,7 @@ from django.test import TestCase
 from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import DETAILED_PROGRAM, \
     COMMON_DIDACTIC_PURPOSES, SKILLS_AND_ACHIEVEMENTS
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
@@ -47,16 +48,16 @@ class GeneralInformationSerializerTestCase(TestCase):
         cls.language = settings.LANGUAGE_CODE_EN
         cls.pertinent_sections = {
             'specific': [EVALUATION_KEY, DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS],
-            'common': [COMMON_DIDACTIC_PURPOSES]
+            'common': [COMMON_DIDACTIC_PURPOSES, EVALUATION_KEY]
         }
         general_information_sections.SECTIONS_PER_OFFER_TYPE[
             cls.egy.education_group_type.name
         ] = cls.pertinent_sections
+        TranslatedTextLabelFactory(
+            language=cls.language,
+            text_label__label=COMMON_DIDACTIC_PURPOSES
+        )
         for section in cls.pertinent_sections['common']:
-            TranslatedTextLabelFactory(
-                language=cls.language,
-                text_label__label=section
-            )
             TranslatedTextFactory(
                 reference=common_egy.id,
                 entity=OFFER_YEAR,
@@ -100,7 +101,7 @@ class GeneralInformationSerializerTestCase(TestCase):
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
-    def test_ensure_content_field_is_list_of_dict(self):
+    def test_ensure_content_field_is_list_of_dict_and_evaluation_has_free_text(self):
         expected_fields = [
             'id',
             'label',
@@ -119,3 +120,24 @@ class GeneralInformationSerializerTestCase(TestCase):
             else:
                 self.assertTrue(isinstance(section, collections.OrderedDict))
                 self.assertListEqual(list(section.keys()), expected_fields)
+
+    def test_get_correct_evaluation_field_for_iufc(self):
+        iufc_egy = EducationGroupYearFactory(
+            education_group_type__name=TrainingType.UNIVERSITY_FIRST_CYCLE_CERTIFICATE.name,
+            academic_year=self.egy.academic_year,
+            acronym="TEST2FC"
+        )
+        language = settings.LANGUAGE_CODE_EN
+        general_information_sections.SECTIONS_PER_OFFER_TYPE[
+            iufc_egy.education_group_type.name
+        ] = {
+            'common': [],
+            'specific': [EVALUATION_KEY]
+        }
+        serializer = GeneralInformationSerializer(
+            iufc_egy, context={
+                'language': language,
+                'acronym': iufc_egy.acronym
+            }
+        )
+        self.assertEqual(list(serializer.data['sections'][0].keys()), ['id', 'label', 'content'])
