@@ -39,28 +39,28 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            <div class="col-md-2">
-                <label>{% trans 'Academic year'%}</label><br>
-                <span id="ac_academic_year">{{ academic_calendar.academic_year }}</span>
+            <div class="col-md-4">
+                <label>{% trans 'Type of event'%}</label><br>
+                {% if academic_calendar.reference %}<span id="ac_reference">{{  academic_calendar.get_reference_display }}</span>{% endif %}
             </div>
-            <div class="col-md-6">
-                <label>{% trans 'Title' %}</label><br>
-                <span id="ac_title">{{ academic_calendar.title }}</span>
+            <div class="col-md-8">
+                <label>{% trans 'Description'%}</label><br>
+                {{ academic_calendar.description| default_if_none:'' }}&nbsp;
             </div>
-            <div class="col-md-2">
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-4">
+                <label>{% trans 'Year of concerned data'%}</label><br>
+                <span id="ac_data_year">{{ academic_calendar.data_year| default_if_none:''}}</span>
+            </div>
+            <div class="col-md-4">
                 <label>{% trans 'Start date'%}</label><br>
                 <span id="ac_start_date">{{ academic_calendar.start_date| default_if_none:''|date_in_form_format }}</span>
             </div>
             <div class="col-md-2">
                 <label>{% trans 'End date' %}</label><br>
                 <span id="ac_end_date">{{ academic_calendar.end_date| default_if_none:''|date_in_form_format }}</span>
-            </div>
-        </div>
-        <br>
-        <div class="row">
-            <div class="col-md-12">
-                <label>{% trans 'Description'%}</label><br>
-                {{ academic_calendar.description| default_if_none:'' }}&nbsp;
             </div>
         </div>
         <br>
