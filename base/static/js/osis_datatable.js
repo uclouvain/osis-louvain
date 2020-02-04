@@ -1,7 +1,8 @@
 function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPage, ajaxUrl, columnDefs){
     setEventKeepIds(tableId, storageKey);
     let domTable = $('#' + tableId);
-    return domTable.DataTable(
+
+    let table = domTable.DataTable(
     {
         'createdRow': function (row, data, dataIndex) {
             let url = "";
@@ -45,4 +46,10 @@ function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPa
             'processing': gettext("Loading...")
         }
     });
+
+    table.columns().iterator( 'column', function (ctx, idx) {
+    $( table.column(idx).header() ).append('<span class="sort-icon"/>');
+    } );
+
+    return table;
 }
