@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
 from base.models.admission_condition import AdmissionCondition
@@ -111,6 +111,7 @@ class ContactsSectionSerializer(serializers.Serializer):
         return ContactsSerializer(egy, context=self.context).data
 
 
+# TODO: Annotate all cms and instantiate serializer with it to reduce queries
 class EvaluationSectionSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     content = serializers.SerializerMethodField()
@@ -137,8 +138,11 @@ class EvaluationSectionSerializer(serializers.Serializer):
         ).text
 
     def get_free_text(self, obj):
-        return TranslatedText.objects.get(
-            reference=self.context.get('egy').id,
-            text_label__label=EVALUATION_KEY,
-            language=self.context.get('lang')
-        ).text
+        try:
+            return TranslatedText.objects.get(
+                reference=self.context.get('egy').id,
+                text_label__label=EVALUATION_KEY,
+                language=self.context.get('lang')
+            ).text
+        except ObjectDoesNotExist:
+            return None
