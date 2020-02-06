@@ -76,7 +76,7 @@
     <script>
         $(document).ready(function() {
             let domTable =  $('#tb_scores_responsible');
-            domTable.DataTable({
+            let table = domTable.DataTable({
                 "columnDefs": [
                     {"name": "requirement_entity", "targets": 0, "data": "requirement_entity"},
                     {"name": "acronym", "targets": 1, "data": "acronym"},
@@ -145,6 +145,10 @@
                     }
                 }
             });
+            table.columns().iterator( 'column', function (ctx, idx) {
+                $( table.column(idx).header() ).append('<span class="sort-icon"/>');
+            } );
+
         });
 
         function getTutorHtmlRendered(attributionRow) {
