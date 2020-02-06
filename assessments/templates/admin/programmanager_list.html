@@ -79,6 +79,7 @@
         display: table-row;
     }
 </style>
+<script src="{% static "js/osis_datatable.js" %}"></script>
 <script>
     $(document).ready(function () {
         bind_trigger_modal();
@@ -123,6 +124,11 @@
         $('.collapse_span_updown').on('click', function () {
             $(this).toggleClass('glyphicon-chevron-up').toggleClass('glyphicon-chevron-down');
         });
+
+        let domTablePgms =  $('#tb_pgms');
+        let tablePgms = domTablePgms.DataTable();
+        add_sort_icons(tablePgms);
+
     });
 
 </script>

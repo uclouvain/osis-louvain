@@ -73,6 +73,7 @@
 {% endblock %}
 
 {% block script %}
+    <script src="{% static "js/osis_datatable.js" %}"></script>
     <script>
         $(document).ready(function() {
             let domTable =  $('#tb_scores_responsible');
@@ -145,9 +146,8 @@
                     }
                 }
             });
-            table.columns().iterator( 'column', function (ctx, idx) {
-                $( table.column(idx).header() ).append('<span class="sort-icon"/>');
-            } );
+
+            add_sort_icons(table);
 
         });
 

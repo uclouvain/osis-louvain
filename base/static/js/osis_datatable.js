@@ -46,10 +46,15 @@ function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPa
             'processing': gettext("Loading...")
         }
     });
+    table = add_sort_icons(table);
+    return table;
+}
 
-    table.columns().iterator( 'column', function (ctx, idx) {
-    $( table.column(idx).header() ).append('<span class="sort-icon"/>');
-    } );
-
+function add_sort_icons(table) {
+    table.columns().iterator('column', function (ctx, idx) {
+        $(table.column(idx).header()).children().remove(".sort-icon");
+        $(table.column(idx).header()).append('<span class="sort' +
+            '-icon"/>');
+    });
     return table;
 }
