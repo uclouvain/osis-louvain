@@ -23,12 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import serializers
 
 from base.models.admission_condition import AdmissionCondition
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
+from base.models.utils.utils import get_object_or_none
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
 from webservices.api.serializers.achievement import AchievementsSerializer
@@ -138,11 +138,10 @@ class EvaluationSectionSerializer(serializers.Serializer):
         ).text
 
     def get_free_text(self, obj):
-        try:
-            return TranslatedText.objects.get(
-                reference=self.context.get('egy').id,
-                text_label__label=EVALUATION_KEY,
-                language=self.context.get('lang')
-            ).text
-        except ObjectDoesNotExist:
-            return None
+        evaluation_text = get_object_or_none(
+            TranslatedText,
+            reference=self.context.get('egy').id,
+            text_label__label=EVALUATION_KEY,
+            language=self.context.get('lang')
+        )
+        return evaluation_text.text if evaluation_text else None
