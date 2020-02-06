@@ -32,7 +32,8 @@ from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonMasterFactory, \
+from base.tests.factories.education_group_year import EducationGroupYearFactory, \
+    EducationGroupYearCommonMasterFactory, \
     TrainingFactory, EducationGroupYearCommonFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
@@ -188,14 +189,14 @@ class EvaluationSectionSerializerTestCase(TestCase):
             text_label__label=EVALUATION_KEY,
             text="EVALUATION_TEXT_COMMON"
         )
+        cls.egy = TrainingFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            academic_year=cls.academic_year
+        )
 
     def test_get_both_evaluation_texts(self):
-        egy = TrainingFactory(
-            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
-            academic_year=self.academic_year
-        )
         TranslatedTextFactory(
-            reference=egy.id,
+            reference=self.egy.id,
             entity=OFFER_YEAR,
             language=self.language,
             text_label__label=EVALUATION_KEY,
@@ -203,7 +204,7 @@ class EvaluationSectionSerializerTestCase(TestCase):
         )
 
         serializer = EvaluationSectionSerializer(
-            {'id': EVALUATION_KEY}, context={'egy': egy, 'lang': self.language}
+            {'id': EVALUATION_KEY}, context={'egy': self.egy, 'lang': self.language}
         ).data
         self.assertEqual(serializer['content'], 'EVALUATION_TEXT_COMMON')
         self.assertEqual(serializer['free_text'], 'EVALUATION_TEXT')
@@ -225,3 +226,9 @@ class EvaluationSectionSerializerTestCase(TestCase):
         ).data
         self.assertIsNone(serializer['content'])
         self.assertEqual(serializer['free_text'], 'EVALUATION_TEXT_FC')
+
+    def test_get_none_if_free_text_does_not_exist(self):
+        serializer = EvaluationSectionSerializer(
+            {'id': EVALUATION_KEY}, context={'egy': self.egy, 'lang': self.language}
+        ).data
+        self.assertIsNone(serializer['free_text'], 'Should get None and not raise and Error')
