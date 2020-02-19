@@ -28,6 +28,8 @@ from enum import Enum
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 
+from osis_common.decorators.deprecated import deprecated
+
 
 class ChoiceEnum(Enum):
     @classmethod
@@ -43,6 +45,7 @@ class ChoiceEnum(Enum):
         return [x.name for x in cls]
 
 
+@deprecated
 def get_object_or_none(klass, *args, **kwargs):
     try:
         return get_object_or_404(klass, *args, **kwargs)
