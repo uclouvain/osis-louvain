@@ -27,6 +27,7 @@ from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
+from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.mini_training import MiniTrainingDetail
@@ -67,7 +68,7 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
 
-class CommonNodeTreeSerializer(serializers.Serializer):
+class BaseCommonNodeTreeSerializer(serializers.Serializer):
     url = CommonNodeHyperlinkedRelatedField(view_name='education_group_api_v1:' + TrainingDetail.name)
     acronym = serializers.SerializerMethodField()
     code = serializers.CharField(source='education_group_year.partial_acronym', read_only=True)
@@ -89,6 +90,28 @@ class CommonNodeTreeSerializer(serializers.Serializer):
         if self.get_node_type(obj) == NodeType.LEARNING_UNIT.name:
             return getattr(obj.learning_unit_year, 'complete_title' + field_suffix)
         return getattr(obj.education_group_year, 'title' + field_suffix)
+
+
+class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
+    partial_title = serializers.SerializerMethodField(read_only=True)
+
+    def get_partial_title(self, obj):
+        language = self.context.get('language')
+        if self.get_node_type(obj) == NodeType.TRAINING.name:
+            return getattr(
+                obj.education_group_year,
+                'partial_title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
+            )
+        return ""
+
+    def to_representation(self, obj):
+        data = super().to_representation(obj)
+        if self.get_node_type(obj) != NodeType.TRAINING.name \
+            or (self.get_node_type(obj) == NodeType.TRAINING.name
+                and obj.education_group_year.education_group_type.name
+                not in education_group_types.TrainingType.finality_types()):
+            data.pop('partial_title')
+        return data
 
 
 class NodeTreeSerializer(CommonNodeTreeSerializer):

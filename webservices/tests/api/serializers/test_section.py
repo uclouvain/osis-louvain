@@ -31,7 +31,8 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonMasterFactory, \
+from base.tests.factories.education_group_year import EducationGroupYearFactory, \
+    EducationGroupYearCommonMasterFactory, \
     TrainingFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
@@ -66,7 +67,6 @@ class SectionSerializerTestCase(TestCase):
             'id',
             'label',
             'content',
-            'free_text'
         ]
         self.assertListEqual(list(serializer.data.keys()), expected_fields)
 

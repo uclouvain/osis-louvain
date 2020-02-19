@@ -60,7 +60,7 @@ class BaseLearningUnitSearch(PermissionRequiredMixin, CacheFilterMixin, SearchMi
 
     filterset_class = None
     permission_required = 'base.can_access_learningunit'
-    cache_exclude_params = 'xls_status'
+    cache_exclude_params = ['xls_status']
 
     serializer_class = None
 

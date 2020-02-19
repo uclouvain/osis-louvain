@@ -25,17 +25,15 @@
 {% endcomment %}
 
 <div class="btn-group  pull-right" role="group" aria-label="actions">
-    {% if not cannot_order %}
-        <form id="form_group_element_year_actions" method="POST" style="display:inline;"
-              action="{% url 'education_groups_management' %}">
-            <input type="hidden" name="root_id" value="{{ root.id }}"/>
-            <input type="hidden" name="element_id" value="{{ group.child.id }}"/>
-            <input type="hidden" name="group_element_year_id" value="{{ group.id }}"/>
-            {% csrf_token %}
-            {% button_order_with_permission _("Go up") "btn_operation_up_"|addstr:group.id "up" %}
-            {% button_order_with_permission _("Go down") "btn_operation_down_"|addstr:group.id "down" %}
-        </form>
-    {% endif %}
+    <form id="form_group_element_year_actions" method="POST" style="display:inline;"
+          action="{% url 'education_groups_management' %}">
+        <input type="hidden" name="root_id" value="{{ root.id }}"/>
+        <input type="hidden" name="element_id" value="{{ group.child.id }}"/>
+        <input type="hidden" name="group_element_year_id" value="{{ group.id }}"/>
+        {% csrf_token %}
+        {% button_order_with_permission _("Go up") "btn_operation_up_"|addstr:group.id "up" %}
+        {% button_order_with_permission _("Go down") "btn_operation_down_"|addstr:group.id "down" %}
+    </form>
     {% url 'group_element_year_delete' root.pk education_group_year.pk group.pk as detach_url %}
     {% action_with_permission _("Detach") "detach" detach_url %}
 </div>

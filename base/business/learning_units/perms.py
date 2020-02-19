@@ -520,7 +520,10 @@ def find_educational_information_submission_dates_of_learning_unit_year(learning
     if requirement_entity_version is None:
         return {}
 
-    return find_summary_course_submission_dates_for_entity_version(requirement_entity_version)
+    return find_summary_course_submission_dates_for_entity_version(
+        entity_version=requirement_entity_version,
+        ac_year=LearningUnitYear.objects.get(pk=learning_unit_year_id).academic_year
+    )
 
 
 def find_last_requirement_entity_version(learning_unit_year_id):

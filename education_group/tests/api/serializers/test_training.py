@@ -27,7 +27,7 @@ from django.conf import settings
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
 
-from base.models.enums import organization_type
+from base.models.enums import organization_type, education_group_types
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -65,6 +65,55 @@ class TrainingListSerializerTestCase(TestCase):
             'academic_year',
             'administration_entity',
             'management_entity',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+    def test_ensure_academic_year_field_is_slugified(self):
+        self.assertEqual(
+            self.serializer.data['academic_year'],
+            self.academic_year.year
+        )
+
+    def test_ensure_education_group_type_field_is_slugified(self):
+        self.assertEqual(
+            self.serializer.data['education_group_type'],
+            self.training.education_group_type.name
+        )
+
+
+class TrainingListSerializerForMasterWithFinalityTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.entity_version = EntityVersionFactory(
+            entity__organization__type=organization_type.MAIN
+        )
+        cls.training = TrainingFactory(
+            acronym='GERM2MA',
+            partial_acronym='LGERM905A',
+            academic_year=cls.academic_year,
+            education_group_type__name=education_group_types.TrainingType.MASTER_MA_120.name,
+            management_entity=cls.entity_version.entity,
+            administration_entity=cls.entity_version.entity,
+        )
+        url = reverse('education_group_api_v1:training-list')
+        cls.serializer = TrainingListSerializer(cls.training, context={
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'title',
+            'url',
+            'acronym',
+            'code',
+            'education_group_type',
+            'education_group_type_text',
+            'academic_year',
+            'administration_entity',
+            'management_entity',
+            'partial_title'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -153,7 +202,114 @@ class TrainingDetailSerializerTestCase(TestCase):
             'enrollment_enabled',
             'credits',
             'remark',
-            'remark_english',
+            'min_constraint',
+            'max_constraint',
+            'constraint_type',
+            'constraint_type_text',
+            'weighting',
+            'default_learning_unit_enrollment',
+            'decree_category',
+            'decree_category_text',
+            'rate_code',
+            'rate_code_text',
+            'internal_comment',
+            'co_graduation',
+            'co_graduation_coefficient',
+            'web_re_registration',
+            'active',
+            'active_text',
+            'enrollment_campus',
+            'main_teaching_campus',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+    def test_ensure_academic_year_field_is_slugified(self):
+        self.assertEqual(
+            self.serializer.data['academic_year'],
+            self.academic_year.year
+        )
+
+    def test_ensure_education_group_type_field_is_slugified(self):
+        self.assertEqual(
+            self.serializer.data['education_group_type'],
+            self.training.education_group_type.name
+        )
+
+
+class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.entity_version = EntityVersionFactory(
+            entity__organization__type=organization_type.MAIN
+        )
+        cls.training = TrainingFactory(
+            acronym='GERM2MA',
+            partial_acronym='LGERM905A',
+            academic_year=cls.academic_year,
+            education_group_type__name=education_group_types.TrainingType.MASTER_MA_120.name,
+            management_entity=cls.entity_version.entity,
+            administration_entity=cls.entity_version.entity,
+        )
+        url = reverse('education_group_api_v1:training_read', kwargs={
+            'acronym': cls.training.acronym,
+            'year': cls.academic_year.year
+        })
+        cls.serializer = TrainingDetailSerializer(cls.training, context={
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'title',
+            'url',
+            'acronym',
+            'code',
+            'education_group_type',
+            'education_group_type_text',
+            'academic_year',
+            'administration_entity',
+            'management_entity',
+            'partial_title',
+            'partial_deliberation',
+            'admission_exam',
+            'funding',
+            'funding_direction',
+            'funding_cud',
+            'funding_direction_cud',
+            'academic_type',
+            'academic_type_text',
+            'university_certificate',
+            'dissertation',
+            'internship',
+            'internship_text',
+            'schedule_type',
+            'schedule_type_text',
+            'english_activities',
+            'english_activities_text',
+            'other_language_activities',
+            'other_language_activities_text',
+            'other_campus_activities',
+            'other_campus_activities_text',
+            'professional_title',
+            'joint_diploma',
+            'diploma_printing_orientation',
+            'diploma_printing_orientation_text',
+            'diploma_printing_title',
+            'inter_organization_information',
+            'inter_university_french_community',
+            'inter_university_belgium',
+            'inter_university_abroad',
+            'primary_language',
+            'keywords',
+            'duration',
+            'duration_unit',
+            'duration_unit_text',
+            'language_association_text',
+            'enrollment_enabled',
+            'credits',
+            'remark',
             'min_constraint',
             'max_constraint',
             'constraint_type',

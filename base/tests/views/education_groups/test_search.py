@@ -28,8 +28,8 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.core.cache import cache
-from django.http import HttpResponseForbidden, HttpResponse
-from django.test import TestCase, RequestFactory
+from django.http import HttpResponseForbidden
+from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -45,10 +45,10 @@ from base.tests.factories.education_group_type import EducationGroupTypeFactory,
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
+from base.tests.views.learning_units.search.search_test_mixin import TestRenderToExcelMixin
 from base.utils.cache import RequestCache
-from education_group.api.serializers.education_group import EducationGroupSerializer
 
 FILTER_DATA = {"acronym": ["LBIR"], "title": ["dummy filter"]}
 TITLE_EDPH2 = "Edph training 2"
@@ -170,8 +170,8 @@ class TestEducationGroupDataSearchFilter(TestCase):
     def tearDown(self):
         self.patch.stop()
 
-    def test_post_request(self):
-        response = self.client.post(self.url, data={})
+    def test_get_request(self):
+        response = self.client.get(self.url, data={})
 
         self.assertTemplateUsed(response, "education_group/search.html")
 
@@ -400,27 +400,6 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.assertIsInstance(context["form"], self.form_class)
         self.assertCountEqual(context["object_list"], [self.education_group_arke2a])
 
-    def test_search_case_get_ajax_request(self):
-        kwargs = {'HTTP_X_REQUESTED_WITH': 'XMLHttpRequest'}
-
-        response = self.client.get(self.url, data={
-                "academic_year": self.current_academic_year.id,
-                "acronym": self.education_group_arke2a.acronym,
-                "management_entity": self.envi_entity_v.acronym,
-                "with_entity_subordinated": True
-            }, **kwargs)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-
-        data_serialized = EducationGroupSerializer(
-            [self.education_group_arke2a],
-            many=True,
-            context={'request': RequestFactory().get(self.url)}
-        )
-        self.assertJSONEqual(
-            str(response.content, encoding='utf8'),
-            {'object_list': data_serialized.data}
-        )
-
 
 class TestEducationGroupTypeAutoComplete(TestCase):
     @classmethod
@@ -462,3 +441,23 @@ class TestEducationGroupTypeAutoComplete(TestCase):
         }
         self.assertEqual(len(json_response["results"]), 1)
         self.assertEqual(json_response["results"][0], expected_response)
+
+
+class TestExcelGeneration(TestRenderToExcelMixin, TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_years = AcademicYearFactory.produce()
+        cls.egys = EducationGroupYearFactory.create_batch(4)
+        cls.url = reverse("education_groups")
+        cls.get_data = {
+            "academic_year": str(cls.egys[0].academic_year.id),
+        }
+        cls.tuples_xls_status_value_with_xls_method_function = (
+            ("xls", "base.views.education_groups.search.create_xls"),
+            ("xls_administrative", "base.views.education_groups.search.create_xls_administrative_data"),
+        )
+
+        cls.person = PersonWithPermissionsFactory("can_access_education_group")
+
+    def setUp(self):
+        self.client.force_login(self.person.user)

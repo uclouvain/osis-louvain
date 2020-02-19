@@ -33,8 +33,10 @@ from django.utils import timezone
 from django.utils.translation import gettext_lazy as _, pgettext
 from waffle.testutils import override_switch
 
+from base.models.enums import education_group_categories
 from base.models.enums.academic_calendar_type import EDUCATION_GROUP_EDITION
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, Categories
+from base.models.enums.education_group_types import GroupType
 from base.templatetags.education_group import li_with_deletion_perm, \
     button_order_with_permission, li_with_create_perm_training, \
     li_with_create_perm_mini_training, li_with_create_perm_group, link_detach_education_group, \
@@ -43,6 +45,7 @@ from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group import EducationGroupFactory
+from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearFactory
 from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
@@ -462,6 +465,34 @@ class TestEducationGroupAsFacultyManagerTag(TestCase):
 
         self.assertEqual(result["class_li"], "disabled")
         self.assertEqual(result["text"], _("Modify"))
+
+    @mock.patch('base.business.education_groups.perms.check_permission')
+    @mock.patch('base.business.education_groups.perms.is_eligible_to_change_education_group')
+    def test_button_order_with_permission_for_major_minor_list_choice_disabled(self, mock_permission, mock_eligibility):
+        mock_permission.return_value = True
+        mock_eligibility.return_value = True
+        group_type_disabled = [GroupType.MAJOR_LIST_CHOICE.name, GroupType.MINOR_LIST_CHOICE.name]
+        self._get_permisson_order_button(group_type_disabled,
+                                         "disabled",
+                                         _('The user is not allowed to change education group content.'))
+
+    @mock.patch('base.business.education_groups.perms.check_permission')
+    @mock.patch('base.business.education_groups.perms.is_eligible_to_change_education_group')
+    def test_button_order_with_permission_for_major_minor_list_choice_enabled(self, mock_permission, mock_eligibility):
+        mock_permission.return_value = True
+        mock_eligibility.return_value = True
+        group_type_disabled = [GroupType.OPTION_LIST_CHOICE.name]
+        self._get_permisson_order_button(group_type_disabled, "", "")
+
+    def _get_permisson_order_button(self, group_type_disabled, disabled_status, message):
+        for group_type in group_type_disabled:
+            egt = EducationGroupTypeFactory(name=group_type, category=education_group_categories.TRAINING)
+            self.context['education_group_year'] = TrainingFactory(education_group_type=egt)
+            result = button_order_with_permission(self.context, message, "id", "edit")
+            self.assertEqual(result, {"title": message,
+                                      "id": "id", "value": "edit", 'disabled': disabled_status,
+                                      'icon': "glyphicon glyphicon-edit"})
+
 
 
 class TestEducationGroupDlWithParent(TestCase):

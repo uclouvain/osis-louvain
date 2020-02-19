@@ -28,69 +28,77 @@ from collections import OrderedDict
 
 from dal import autocomplete
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.shortcuts import get_object_or_404
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
+from django_filters.views import FilterView
 
 from base.business.education_group import create_xls, ORDER_COL, ORDER_DIRECTION, create_xls_administrative_data
 from base.forms.education_groups import EducationGroupFilter
 from base.forms.search.search_form import get_research_criteria
+from base.models.academic_year import starting_academic_year
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.person import Person
-from base.utils.cache import cache_filter
-from base.views.common import paginate_queryset
+from base.utils.cache import CacheFilterMixin
+from base.utils.search import RenderToExcel, SearchMixin
 from education_group.api.serializers.education_group import EducationGroupSerializer
 
 
-@login_required
-@permission_required('base.can_access_education_group', raise_exception=True)
-@cache_filter(exclude_params=['xls_status', 'xls_order_col'])
-def education_groups(request):
-    person = get_object_or_404(Person, user=request.user)
-    filter_form = EducationGroupFilter(request.GET or None)
-
-    objects_qs = EducationGroupYear.objects.none()
-    if filter_form.is_valid():
-        objects_qs = filter_form.qs
-        if not objects_qs.exists():
-            messages.add_message(request, messages.WARNING, _('No result!'))
-
-    # FIXME: use ordering args in filter_form! Remove xls_order_col/xls_order property
-    if request.GET.get('xls_status') == "xls":
-        return create_xls(request.user, objects_qs, _get_filter_keys(filter_form.form),
-                          {ORDER_COL: request.GET.get('xls_order_col'), ORDER_DIRECTION: request.GET.get('xls_order')})
-
-    # FIXME: use ordering args in filter_form! Remove xls_order_col/xls_order property
-    if request.GET.get('xls_status') == "xls_administrative":
-        return create_xls_administrative_data(
-            request.user,
-            objects_qs,
-            _get_filter_keys(filter_form.form),
-            {ORDER_COL: request.GET.get('xls_order_col'), ORDER_DIRECTION: request.GET.get('xls_order')}
-        )
-
-    object_list_paginated = paginate_queryset(objects_qs, request.GET)
-    if request.is_ajax():
-        serializer = EducationGroupSerializer(object_list_paginated, context={'request': request}, many=True)
-        return JsonResponse({'object_list': serializer.data})
-
-    context = {
-        'form': filter_form.form,
-        'object_list': object_list_paginated,
-        'object_list_count': objects_qs.count(),
-        'enums': education_group_categories,
-        'person': person
-    }
-    return render(request, "education_group/search.html", context)
-
-
-def _get_filter_keys(form):
+def _get_filter(form):
     return OrderedDict(itertools.chain(get_research_criteria(form)))
+
+
+def _create_xls(view_obj, context, **response_kwargs):
+    user = view_obj.request.user
+    egys = context["filter"].qs
+    filters = _get_filter(context["form"])
+    # FIXME: use ordering args in filter_form! Remove xls_order_col/xls_order property
+    order = {ORDER_COL: view_obj.request.GET.get('xls_order_col'),
+             ORDER_DIRECTION: view_obj.request.GET.get('xls_order')}
+    return create_xls(user, egys, filters, order)
+
+
+def _create_xls_administrative_data(view_obj, context, **response_kwargs):
+    user = view_obj.request.user
+    egys = context["filter"].qs
+    filters = _get_filter(context["form"])
+    # FIXME: use ordering args in filter_form! Remove xls_order_col/xls_order property
+    order = {ORDER_COL: view_obj.request.GET.get('xls_order_col'),
+             ORDER_DIRECTION: view_obj.request.GET.get('xls_order')}
+    return create_xls_administrative_data(user, egys, filters, order)
+
+
+@RenderToExcel("xls_administrative", _create_xls_administrative_data)
+@RenderToExcel("xls", _create_xls)
+class EducationGroupSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFilterMixin, SearchMixin, FilterView):
+    model = EducationGroupYear
+    template_name = "education_group/search.html"
+    raise_exception = False
+
+    filterset_class = EducationGroupFilter
+    permission_required = 'base.can_access_education_group'
+    cache_exclude_params = 'xls_status'
+
+    serializer_class = EducationGroupSerializer
+
+    def get_context_data(self, **kwargs):
+        person = get_object_or_404(Person, user=self.request.user)
+        context = super().get_context_data(**kwargs)
+        starting_ac = starting_academic_year()
+        if context["paginator"].count == 0:
+            messages.add_message(self.request, messages.WARNING, _('No result!'))
+        context.update({
+            'person': person,
+            'form': context["filter"].form,
+            'object_list_count': context["paginator"].count,
+            'current_academic_year': starting_ac,
+            'items_per_page': context["paginator"].per_page,
+            'enums': education_group_categories,
+        })
+        return context
 
 
 class EducationGroupTypeAutoComplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):

@@ -525,3 +525,13 @@ div.dataTables_wrapper div.dataTables_processing {
     line-height: 15px !important;
     padding-left: 0 !important;
 }
+
+/* Override datatable default style */
+table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, table.dataTable thead .sorting_desc:after, table.dataTable thead .sorting_asc_disabled:after, table.dataTable thead .sorting_desc_disabled:after {
+    position: relative;
+    bottom: 0px;
+    right: 0px;
+    display: inline;
+    vertical-align: middle;
+    margin-left: 5px;
+}

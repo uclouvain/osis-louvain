@@ -24,14 +24,17 @@
 #
 ##############################################################################
 import collections
+from unittest import mock
 
 from django.conf import settings
 from django.test import TestCase
 
-from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import DETAILED_PROGRAM, \
-    COMMON_DIDACTIC_PURPOSES, SKILLS_AND_ACHIEVEMENTS
-from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
+    COMMON_DIDACTIC_PURPOSES, SKILLS_AND_ACHIEVEMENTS, WELCOME_INTRODUCTION, INTRODUCTION
+from base.models.enums.education_group_types import GroupType, MiniTrainingType, TrainingType
+from base.tests.factories.education_group_year import EducationGroupYearCommonFactory, \
+    TrainingFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
@@ -42,26 +45,23 @@ from webservices.business import EVALUATION_KEY, SKILLS_AND_ACHIEVEMENTS_INTRO, 
 class GeneralInformationSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.egy = EducationGroupYearFactory()
-        common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
+        cls.egy = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        cls.common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.language = settings.LANGUAGE_CODE_EN
         cls.pertinent_sections = {
-            'specific': [EVALUATION_KEY, DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS],
+            'specific': [DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS],
             'common': [COMMON_DIDACTIC_PURPOSES]
         }
-        general_information_sections.SECTIONS_PER_OFFER_TYPE[
-            cls.egy.education_group_type.name
-        ] = cls.pertinent_sections
         for section in cls.pertinent_sections['common']:
             TranslatedTextLabelFactory(
                 language=cls.language,
                 text_label__label=section
             )
             TranslatedTextFactory(
-                reference=common_egy.id,
+                reference=cls.common_egy.id,
                 entity=OFFER_YEAR,
                 language=cls.language,
-                text_label__label=section
+                text_label__label=section,
             )
         for section in cls.pertinent_sections['specific']:
             TranslatedTextLabelFactory(
@@ -88,6 +88,14 @@ class GeneralInformationSerializerTestCase(TestCase):
             }
         )
 
+    def setUp(self):
+        patcher_sections = mock.patch(
+            'base.business.education_groups.general_information_sections.SECTIONS_PER_OFFER_TYPE',
+            _get_mocked_sections_per_offer_type(self.egy, **self.pertinent_sections)
+        )
+        patcher_sections.start()
+        self.addCleanup(patcher_sections.stop)
+
     def test_contains_expected_fields(self):
         expected_fields = [
             'language',
@@ -109,8 +117,7 @@ class GeneralInformationSerializerTestCase(TestCase):
         self.assertEqual(type(self.serializer.data['sections']), list)
         self.assertEqual(
             len(self.serializer.data['sections']),
-            len(self.pertinent_sections['common'] + self.pertinent_sections['specific']) - 1
-            # EVALUATION SPECIFIC AND COMMON IN ONLY ONE ENTRY
+            len(self.pertinent_sections['common'] + self.pertinent_sections['specific'])
         )
         for section in self.serializer.data['sections']:
             if section['id'] == EVALUATION_KEY:
@@ -119,3 +126,101 @@ class GeneralInformationSerializerTestCase(TestCase):
             else:
                 self.assertTrue(isinstance(section, collections.OrderedDict))
                 self.assertListEqual(list(section.keys()), expected_fields)
+
+    def test_case_text_not_existing(self):
+        with mock.patch(
+                'base.business.education_groups.general_information_sections.SECTIONS_PER_OFFER_TYPE',
+                _get_mocked_sections_per_offer_type(self.egy, specific=[WELCOME_INTRODUCTION])
+        ):
+            TranslatedTextLabelFactory(
+                language=self.language,
+                text_label__label=WELCOME_INTRODUCTION
+            )
+            welcome_introduction_section = GeneralInformationSerializer(
+                self.egy, context={
+                    'language': self.language,
+                    'acronym': self.egy.acronym
+                }
+            ).data['sections'][0]
+            self.assertIsNone(welcome_introduction_section['content'])
+
+
+def _get_mocked_sections_per_offer_type(egy, specific=None, common=None):
+    return {
+        egy.education_group_type.name: {
+            'specific': specific or [],
+            'common': common or []
+        }
+    }
+
+
+class IntroOffersSectionTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.egy = TrainingFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
+        EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
+        cls.language = settings.LANGUAGE_CODE_EN
+
+    def setUp(self):
+        patcher_sections = mock.patch(
+            'base.business.education_groups.general_information_sections.SECTIONS_PER_OFFER_TYPE',
+            _get_mocked_sections_per_offer_type(self.egy)
+        )
+        patcher_sections.start()
+        self.addCleanup(patcher_sections.stop)
+
+    def test_get_intro_offers(self):
+        gey = GroupElementYearFactory(
+            parent=self.egy,
+            child_branch__education_group_type__name=GroupType.COMMON_CORE.name,
+            child_branch__partial_acronym="TESTTC"
+        )
+        intro_offer_section = self._get_pertinent_intro_section(gey, self.egy)
+        self.assertIsNone(intro_offer_section['content'])
+        self.assertEqual(intro_offer_section['id'], 'intro-testtc')
+
+    def test_get_intro_option_offer(self):
+        gey = GroupElementYearFactory(
+            parent=self.egy,
+            child_branch__education_group_type__name=GroupType.OPTION_LIST_CHOICE.name
+        )
+        gey_option = GroupElementYearFactory(
+            parent=gey.child_branch,
+            child_branch__education_group_type__name=MiniTrainingType.OPTION.name,
+            child_branch__partial_acronym="TESTOPTION"
+        )
+        intro_offer_section = self._get_pertinent_intro_section(gey_option, self.egy)
+        self.assertIsNone(intro_offer_section['content'])
+        self.assertEqual(intro_offer_section['id'], 'intro-testoption')
+
+    def test_get_intro_finality_offer(self):
+        g = GroupElementYearFactory(
+            parent=self.egy,
+            child_branch__education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name
+        )
+        gey = GroupElementYearFactory(
+            parent=g.parent,
+            child_branch__education_group_type__name=TrainingType.MASTER_MD_120.name,
+            child_branch__partial_acronym="TESTFINA",
+        )
+        intro_offer_section = self._get_pertinent_intro_section(gey, self.egy)
+        self.assertIsNone(intro_offer_section['content'])
+        self.assertEqual(intro_offer_section['id'], 'intro-testfina')
+
+    def _get_pertinent_intro_section(self, gey, egy):
+        TranslatedTextLabelFactory(
+            text_label__label=INTRODUCTION,
+            language=self.language,
+        )
+        TranslatedTextFactory(
+            text_label__label=INTRODUCTION,
+            language=self.language,
+            entity=OFFER_YEAR,
+            reference=gey.child_branch.id
+        )
+        return GeneralInformationSerializer(
+            egy, context={
+                'language': self.language,
+                'acronym': egy.acronym
+            }
+        ).data['sections'][0]

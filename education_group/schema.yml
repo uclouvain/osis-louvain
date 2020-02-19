@@ -446,6 +446,18 @@ components:
           type: string
         management_entity:
           type: string
+        partial_title:
+          type: string
+      required:
+        - url
+        - acronym
+        - education_group_type
+        - education_group_type_text
+        - code
+        - title
+        - academic_year
+        - administration_entity
+        - management_entity
     TrainingDetailed:
       allOf:
         - $ref: '#/components/schemas/Training'
@@ -536,8 +548,6 @@ components:
               type: integer
               minimum: 1
             remark:
-              type: string
-            remark_english:
               type: string
             min_constraint:
               type: integer
@@ -665,10 +675,18 @@ components:
           type: string
         type:
           $ref: '#/components/schemas/NodeTypeEnum'
+        partial_title:
+          type: string
         children:
           type: array
           items:
             $ref: '#/components/schemas/Node'
+      required:
+        - url
+        - acronym
+        - title
+        - type
+        - children
     Campus:
       type: object
       properties:
@@ -686,10 +704,14 @@ components:
           format: uri
         acronym:
           type: string
+        code:
+          type: string
         title:
           type: string
         node_type:
           $ref: '#/components/schemas/NodeTypeEnum'
+        partial_title:
+          type: string
         relative_credits:
           type: number
         is_mandatory:
@@ -710,6 +732,19 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Node'
+      required:
+        - url
+        - acronym
+        - title
+        - node_type
+        - relative_credits
+        - is_mandatory
+        - block
+        - access_condition
+        - comment
+        - link_type
+        - link_type_text
+        - children
     ActiveEnum:
       type: string
       enum:

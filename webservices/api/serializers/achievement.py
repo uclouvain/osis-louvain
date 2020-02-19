@@ -36,8 +36,8 @@ from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIE
 
 
 class DetailedAchievementSerializer(serializers.ModelSerializer):
-    code_name = serializers.SerializerMethodField(read_only=True)
-    text = serializers.SerializerMethodField(read_only=True)
+    code_name = serializers.SerializerMethodField()
+    text = serializers.SerializerMethodField()
 
     class Meta:
         model = EducationGroupDetailedAchievement
@@ -55,8 +55,8 @@ class DetailedAchievementSerializer(serializers.ModelSerializer):
 
 
 class AchievementSerializer(serializers.ModelSerializer):
-    code_name = serializers.SerializerMethodField(read_only=True)
-    teaser = serializers.SerializerMethodField(read_only=True, source='text')
+    code_name = serializers.SerializerMethodField()
+    teaser = serializers.SerializerMethodField(source='text')
     detailed_achievements = DetailedAchievementSerializer(
         source='educationgroupdetailedachievement_set',
         read_only=True,
@@ -80,9 +80,9 @@ class AchievementSerializer(serializers.ModelSerializer):
 
 
 class AchievementsSerializer(serializers.ModelSerializer):
-    intro = serializers.SerializerMethodField(read_only=True)
+    intro = serializers.SerializerMethodField()
     blocs = AchievementSerializer(source='educationgroupachievement_set', many=True, read_only=True)
-    extra = serializers.SerializerMethodField(read_only=True)
+    extra = serializers.SerializerMethodField()
 
     class Meta:
         model = EducationGroupYear

@@ -101,7 +101,7 @@ class AggregationAdmissionConditionsSerializer(SpecializedMasterAdmissionConditi
 
 
 class MasterAdmissionConditionsSerializer(AdmissionConditionsSerializer):
-    sections = serializers.SerializerMethodField(read_only=True)
+    sections = serializers.SerializerMethodField()
 
     class Meta:
         model = AdmissionCondition

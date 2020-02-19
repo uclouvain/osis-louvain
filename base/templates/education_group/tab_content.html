@@ -37,28 +37,3 @@
         {% include "education_group/blocks/content_default_table.html" %}
     {% endif %}
 {% endblock %}
-
-{% block script %}
-    <script type="text/javascript">
-        $(document).ready(function () {
-            $('#minor_major_option_table').DataTable({
-                columnDefs: [
-                    { orderable: false, targets: [4] }
-                ],
-                "stateSave": true,
-                "paging" : false,
-                "ordering" : true,
-                "order": [[ 0, "asc" ]],
-                "info"  : false,
-                "searching" : false,
-                "language": {
-                    "sEmptyTable" : "{% trans 'No data'%}",
-                    "oAria": {
-                        "sSortAscending":  "{% trans 'activate to sort column ascending'%}",
-                        "sSortDescending": "{% trans 'activate to sort column descending'%}"
-                    }
-                }
-            });
-        });
-    </script>
-{% endblock %}

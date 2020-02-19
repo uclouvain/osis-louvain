@@ -15,6 +15,13 @@ $(document).ready(function () {
         $documentTree.bind("select_node.jstree", function (event, data) {
             document.location.href = data.node.a_attr.href;
         });
+
+        var selected_node_id = $documentTree.jstree().get_selected(true)[0].id;
+        if (selected_node_id != undefined) {
+            var scrollpos = localStorage.getItem('scrollpos');
+            document.getElementById('scrollableDiv').scrollTo(0,scrollpos);
+        }
+
         // if the tree has never been loaded, execute close_all by default.
         if ($.vakata.storage.get(data.instance.settings.state.key) === null) {
             $(this).jstree('close_all');
@@ -297,4 +304,8 @@ $(document).mouseup(function () {
 $("a[id^='quick-search']").click(function (event) {
     event.preventDefault();
     $(this).attr('data-url', $('#j1_1_anchor').attr('search_url'));
+});
+
+$("#scrollableDiv").on("scroll", function() {
+   localStorage.setItem('scrollpos', $("#scrollableDiv")[0].scrollTop);
 });

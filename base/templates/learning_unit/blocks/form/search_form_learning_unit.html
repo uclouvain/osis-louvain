@@ -29,12 +29,10 @@
     {% bootstrap_field form.academic_year form_group_class="col-md-2" %}
     <div class="col-md-2">
         {% bootstrap_label form.acronym.label %}
-        {% include 'blocks/button/help_search_tooltip.html' %}
         {% bootstrap_field form.acronym show_label=False %}
     </div>
     <div class="col-md-4">
         {% bootstrap_label form.title.label %}
-        {% include 'blocks/button/help_search_tooltip.html' %}
         {% bootstrap_field form.title show_label=False %}
     </div>
     {% bootstrap_field form.container_type form_group_class="col-md-2" %}
@@ -48,7 +46,6 @@
         {% bootstrap_field form.quadrimester form_group_class="col-md-1" %}
         <div class="col-md-2">
         {% bootstrap_label form.tutor.label %}
-        {% include 'blocks/button/help_search_tooltip.html' %}
         {% bootstrap_field form.tutor show_label=False %}
         </div>
         {% bootstrap_field form.requirement_entity form_group_class="col-md-2" %}

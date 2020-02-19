@@ -41,6 +41,7 @@ from base.business.utils.model import update_instance_model_from_data, update_re
 from base.enums.component_detail import COMPONENT_DETAILS
 from base.forms.learning_achievement import update_future_luy as update_future_luy_achievement
 from base.forms.learning_unit_specifications import update_future_luy
+from base.forms.utils.choice_field import NO_PLANNED_END_DISPLAY
 from base.models import academic_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from base.models.entity import Entity
@@ -124,8 +125,10 @@ def extend_learning_unit(learning_unit_to_edit, new_academic_year):
 
 
 def _check_extend_partim(last_learning_unit_year, new_academic_year):
+    no_planned_end = None
     if not new_academic_year:  # If there is no selected academic_year, we take the maximal value
         new_academic_year = AcademicYear.objects.max_adjournment(delta=1)
+        no_planned_end = NO_PLANNED_END_DISPLAY
 
     lu_parent = last_learning_unit_year.parent
     if last_learning_unit_year.is_partim() and lu_parent:
@@ -134,7 +137,7 @@ def _check_extend_partim(last_learning_unit_year, new_academic_year):
             raise IntegrityError(
                 _('The selected end year (%(partim_end_year)s) is greater '
                   'than the end year of the parent %(lu_parent)s') % {
-                    'partim_end_year': new_academic_year,
+                    'partim_end_year': new_academic_year if not no_planned_end else no_planned_end,
                     'lu_parent': lu_parent.acronym
                 }
             )
@@ -282,8 +285,8 @@ def _get_new_end_year(new_academic_year):
 
 
 def get_next_academic_years(learning_unit_to_edit, year):
-    range_years = list(range(learning_unit_to_edit.end_year.year + 1, year + 1))
-    return AcademicYear.objects.filter(year__in=range_years).order_by('year')
+    end_date = learning_unit_to_edit.end_year.year + 1 if learning_unit_to_edit.end_year else None
+    return AcademicYear.objects.filter(year__range=(end_date, year)).order_by('year')
 
 
 # TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code

@@ -36,14 +36,10 @@ from base.business.education_groups.perms import is_eligible_to_change_education
     is_eligible_to_delete_education_group_year, is_eligible_to_edit_certificate_aims, \
     is_eligible_to_change_education_group_content
 from base.models.academic_year import AcademicYear
+from base.models.enums.education_group_types import GroupType
 from base.models.utils.utils import get_verbose_field_value
-
-ICONS = {
-    "up": "fa fa-arrow-up",
-    "down": "fa fa-arrow-down",
-    "detach": "glyphicon glyphicon-remove",
-    "edit": "glyphicon glyphicon-edit",
-}
+from base.templatetags.common import ICONS
+from program_management.templatetags.group_element_year import get_action_with_permission
 
 register = template.Library()
 
@@ -158,6 +154,14 @@ def button_order_with_permission(context, title, id_button, value):
 
     if disabled:
         title = permission_denied_message
+    else:
+        education_group_year = context.get('education_group_year')
+        person = context.get('person')
+
+        if person.is_faculty_manager and education_group_year.type in GroupType.minor_major_list_choice():
+            disabled, permission_denied_message = get_action_with_permission(context)
+            if disabled:
+                title = permission_denied_message
 
     if value == "up" and context["forloop"]["first"]:
         disabled = "disabled"

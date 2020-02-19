@@ -50,70 +50,68 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 
 
 class EducationGroupYearTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-        cls.education_group_type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
+    def setUp(self):  # No setUpTestData here, tests cannot be interrelated
+        self.academic_year = AcademicYearFactory()
+        self.education_group_type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
 
-        cls.education_group_type_minitraining = EducationGroupTypeFactory(
+        self.education_group_type_minitraining = EducationGroupTypeFactory(
             category=education_group_categories.MINI_TRAINING
         )
 
-        cls.education_group_type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
+        self.education_group_type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
 
-        cls.education_group_type_finality = EducationGroupTypeFactory(
+        self.education_group_type_finality = EducationGroupTypeFactory(
             category=education_group_categories.TRAINING,
             name=education_group_types.TrainingType.MASTER_MD_120.name
         )
 
-        cls.education_group_year_1 = EducationGroupYearFactory(academic_year=cls.academic_year,
-                                                               education_group_type=cls.education_group_type_training)
-        cls.education_group_year_2 = EducationGroupYearFactory(
-            academic_year=cls.academic_year,
-            education_group_type=cls.education_group_type_minitraining)
-
-        cls.education_group_year_3 = EducationGroupYearFactory(academic_year=cls.academic_year,
-                                                               education_group_type=cls.education_group_type_training)
-        cls.education_group_year_4 = EducationGroupYearFactory(academic_year=cls.academic_year,
-                                                               education_group_type=cls.education_group_type_group)
-        cls.education_group_year_5 = EducationGroupYearFactory(academic_year=cls.academic_year,
-                                                               education_group_type=cls.education_group_type_group)
-        cls.education_group_year_6 = EducationGroupYearFactory(academic_year=cls.academic_year,
-                                                               education_group_type=cls.education_group_type_training)
-        cls.education_group_year_MD = EducationGroupYearFactory(academic_year=cls.academic_year,
-                                                                education_group_type=cls.education_group_type_finality,
-                                                                title="Complete title",
-                                                                partial_title="Partial title",
-                                                                title_english="Complete title in English",
-                                                                partial_title_english="Partial title  in English",
-                                                                )
-        cls.education_group_year_MD_no_partial_title = EducationGroupYearFactory(
-            academic_year=cls.academic_year,
-            education_group_type=cls.education_group_type_finality,
+        self.education_group_year_1 = EducationGroupYearFactory(
+            academic_year=self.academic_year, education_group_type=self.education_group_type_training)
+        self.education_group_year_2 = EducationGroupYearFactory(
+            academic_year=self.academic_year, education_group_type=self.education_group_type_minitraining)
+        self.education_group_year_3 = EducationGroupYearFactory(
+            academic_year=self.academic_year, education_group_type=self.education_group_type_training)
+        self.education_group_year_4 = EducationGroupYearFactory(
+            academic_year=self.academic_year, education_group_type=self.education_group_type_group)
+        self.education_group_year_5 = EducationGroupYearFactory(
+            academic_year=self.academic_year, education_group_type=self.education_group_type_group)
+        self.education_group_year_6 = EducationGroupYearFactory(
+            academic_year=self.academic_year, education_group_type=self.education_group_type_training)
+        self.education_group_year_MD = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type=self.education_group_type_finality,
+            title="Complete title",
+            partial_title="Partial title",
+            title_english="Complete title in English",
+            partial_title_english="Partial title in English"
+        )
+        self.education_group_year_MD_no_partial_title = EducationGroupYearFactory(
+            academic_year=self.academic_year,
+            education_group_type=self.education_group_type_finality,
             partial_title="",
             partial_title_english="",
-            )
+        )
 
-        cls.educ_group_year_domain = EducationGroupYearDomainFactory(education_group_year=cls.education_group_year_2)
+        self.educ_group_year_domain = EducationGroupYearDomainFactory(education_group_year=self.education_group_year_2)
 
-        cls.entity_version_admin = EntityVersionFactory(
-            entity=cls.education_group_year_2.administration_entity,
-            start_date=cls.education_group_year_2.academic_year.start_date,
+        self.entity_version_admin = EntityVersionFactory(
+            entity=self.education_group_year_2.administration_entity,
+            start_date=self.education_group_year_2.academic_year.start_date,
             parent=None
         )
 
-        cls.offer_year_3 = OfferYearFactory(academic_year=cls.academic_year)
+        self.offer_year_3 = OfferYearFactory(academic_year=self.academic_year)
 
-        cls.entity_version_management = EntityVersionFactory(
-            entity=cls.education_group_year_3.management_entity,
-            start_date=cls.education_group_year_3.academic_year.start_date,
+        self.entity_version_management = EntityVersionFactory(
+            entity=self.education_group_year_3.management_entity,
+            start_date=self.education_group_year_3.academic_year.start_date,
             parent=None
         )
 
-        cls.group_element_year_4 = GroupElementYearFactory(parent=cls.education_group_year_3,
-                                                           child_branch=cls.education_group_year_1)
-        cls.group_element_year_5 = GroupElementYearFactory(parent=cls.education_group_year_6,
-                                                           child_branch=cls.education_group_year_1)
+        self.group_element_year_4 = GroupElementYearFactory(parent=self.education_group_year_3,
+                                                            child_branch=self.education_group_year_1)
+        self.group_element_year_5 = GroupElementYearFactory(parent=self.education_group_year_6,
+                                                            child_branch=self.education_group_year_1)
 
     def test_verbose_type(self):
         type_of_egt = self.education_group_year_1.education_group_type.get_name_display()

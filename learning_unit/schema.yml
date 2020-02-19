@@ -355,9 +355,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/LearningUnitTeachingMaterial'
+                $ref: '#/components/schemas/LearningUnitTeachingMaterial'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':

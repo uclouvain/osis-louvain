@@ -31,12 +31,10 @@
     {{ form.media }}
     <div class="col-md-2">
         {% bootstrap_label form.acronym.label %}
-        {% include 'blocks/button/help_search_tooltip.html' %}
         {% bootstrap_field form.acronym show_label=False%}
     </div>
     <div class="col-md-4">
         {% bootstrap_label form.title.label %}
-        {% include 'blocks/button/help_search_tooltip.html' %}
         {% bootstrap_field form.title show_label=False %}
     </div>
 {% endblock %}

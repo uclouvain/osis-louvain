@@ -88,10 +88,7 @@ class GroupElementYearForm(forms.ModelForm):
             self.fields.pop("access_condition")
 
     def save(self, commit=True):
-        obj = super().save(commit)
-        if self._is_education_group_year_a_minor_major_option_list_choice(obj.parent):
-            self._reorder_children_by_partial_acronym(obj.parent)
-        return obj
+        return super().save(commit)
 
     def clean_link_type(self):
         """
@@ -119,14 +116,6 @@ class GroupElementYearForm(forms.ModelForm):
 
     def _check_authorized_relationship(self, child_type):
         return self.instance.parent.education_group_type.authorized_parent_type.filter(child_type=child_type).exists()
-
-    @staticmethod
-    def _reorder_children_by_partial_acronym(parent):
-        children = parent.children.order_by("child_branch__partial_acronym")
-
-        for counter, child in enumerate(children):
-            child.order = counter
-            child.save()
 
     def _disable_all_fields(self, fields_to_not_disable):
         for name, field in self.fields.items():

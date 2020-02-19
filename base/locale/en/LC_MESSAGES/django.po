@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-03 11:29+0100\n"
+"POT-Creation-Date: 2020-02-18 15:43+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -85,6 +85,10 @@ msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
 msgstr ""
 
 #, python-format
+msgid "%(start_index)s to %(end_index)s of %(total_counts)s trainings"
+msgstr ""
+
+#, python-format
 msgid "%(subtype)s %(acronym)s is assigned to %(tutor)s for the year %(year)s"
 msgstr ""
 
@@ -102,9 +106,6 @@ msgstr ""
 msgid ""
 "%(subtype)s %(acronym)s is included in the group %(group)s for the year "
 "%(year)s"
-msgstr ""
-
-msgid "'^' Means starts with. '$' Means ends by."
 msgstr ""
 
 msgid "1st quadri"
@@ -1262,9 +1263,6 @@ msgstr ""
 msgid "It remains notes to encode."
 msgstr ""
 
-msgid "It will be done at the consolidation"
-msgstr ""
-
 msgid ""
 "JavaScript is disabled on your browser, but OSIS does not work without "
 "JavaScript."
@@ -1316,9 +1314,6 @@ msgstr ""
 msgid ""
 "Learning Unit <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> "
 "successfuly created."
-msgstr ""
-
-msgid "Learning achievement content has been successfully saved"
 msgstr ""
 
 msgid "Learning achievements"
@@ -1790,9 +1785,6 @@ msgid "Opening to Adults"
 msgstr ""
 
 msgid "Operation"
-msgstr ""
-
-msgid "Operation on learning achievement has been successfully completed"
 msgstr ""
 
 msgid "Option"
@@ -2418,6 +2410,9 @@ msgstr ""
 msgid "Summary course submission"
 msgstr ""
 
+msgid "Summary course submission is not allowed for tutors during this period."
+msgstr ""
+
 msgid "Suppression"
 msgstr ""
 
@@ -2439,12 +2434,6 @@ msgstr ""
 msgid "Teaching material"
 msgstr ""
 
-#, python-format
-msgid ""
-"Teaching material has been saved and reported up to %(last_year_reported)s "
-"with success"
-msgstr ""
-
 msgid "Teaching profile"
 msgstr ""
 
@@ -2461,10 +2450,6 @@ msgid "Testing"
 msgstr ""
 
 msgid "The"
-msgstr ""
-
-#, python-format
-msgid "The '%(field)s' field content has been successfully saved"
 msgstr ""
 
 msgid "The acronym <b>already exists</b>."
@@ -2592,6 +2577,9 @@ msgid ""
 "greater than %(year)s"
 msgstr ""
 
+msgid "The learning unit has been updated"
+msgstr ""
+
 #, python-format
 msgid ""
 "The learning unit has been updated (the report has not been done from "
@@ -2609,6 +2597,12 @@ msgid "The learning unit has been updated until %(year)s."
 msgstr ""
 
 msgid "The learning unit have partim"
+msgstr ""
+
+#, python-format
+msgid ""
+"The learning unit is in proposal, the report from %(proposal_year)s will be "
+"done at consolidation"
 msgstr ""
 
 msgid "The learning unit's description fiche is not editable."
@@ -2663,15 +2657,6 @@ msgstr ""
 
 #, python-format
 msgid ""
-"The sections you modified have been saved and reported up to "
-"%(last_year_reported)s with success."
-msgstr ""
-
-msgid "The sections you modified have been saved with success."
-msgstr ""
-
-#, python-format
-msgid ""
 "The selected end year (%(partim_end_year)s) is greater than the end year of "
 "the parent %(lu_parent)s"
 msgstr ""
@@ -2681,18 +2666,6 @@ msgstr ""
 
 msgid ""
 "The sum of the volumes of the entities must be equal to the global volume"
-msgstr ""
-
-#, python-format
-msgid ""
-"The teaching material has been deleted up to %(last_year_reported)s with "
-"success"
-msgstr ""
-
-msgid "The teaching material has been deleted with success"
-msgstr ""
-
-msgid "The teaching material has been saved with success"
 msgstr ""
 
 msgid "The user doesn't have right to update admission condition"

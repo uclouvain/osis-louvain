@@ -340,7 +340,8 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
             self.learning_unit_year_full.academic_year,
             data=post_data,
             learning_unit_instance=None,
-            start_anac=start_year
+            start_anac=self.learning_unit_year_full.learning_unit.start_year,
+            end_year=self.learning_unit_year_full.learning_unit.end_year
         )
 
         self.assertTrue(form.is_valid(), form.errors)
@@ -350,10 +351,9 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
         self.assertEqual(LearningUnitYear.objects.filter(acronym=partim_acronym,
                                                          academic_year=self.current_academic_year).count(), 1)
         self.assertEqual(LearningUnit.objects.filter(learningunityear__acronym=partim_acronym).count(), 1)
-        self.assertEqual(
-            LearningUnit.objects.filter(learningunityear__acronym=partim_acronym).first().start_year,
-            start_year
-        )
+        learning_unit = LearningUnit.objects.filter(learningunityear__acronym=partim_acronym).first()
+        self.assertEqual(learning_unit.start_year, self.learning_unit_year_full.learning_unit.start_year)
+        self.assertEqual(learning_unit.end_year, self.learning_unit_year_full.learning_unit.end_year)
 
     def test_save_method_update_instance(self):
         post_data = get_valid_form_data(self.learning_unit_year_partim)

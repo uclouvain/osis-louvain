@@ -97,25 +97,6 @@ class TestGroupElementYearForm(TestCase):
 
         self.assertTrue(form.is_valid())
 
-    def test_reorder_children_by_partial_acronym(self):
-        group_element_1 = GroupElementYearFactory(
-            order=1,
-            parent=EducationGroupYearFactory(academic_year=self.academic_year),
-            child_branch=EducationGroupYearFactory(academic_year=self.academic_year, partial_acronym="SECOND")
-        )
-        group_element_2 = GroupElementYearFactory(
-            parent=group_element_1.parent,
-            order=2,
-            child_branch=EducationGroupYearFactory(academic_year=self.academic_year, partial_acronym="FIRST")
-        )
-        GroupElementYearForm._reorder_children_by_partial_acronym(group_element_1.parent)
-
-        group_element_1.refresh_from_db()
-        group_element_2.refresh_from_db()
-        self.assertTrue(
-            group_element_1.order == 1 and group_element_2.order == 0
-        )
-
     def test_remove_access_condition_when_not_authorized_relationship(self):
         form = GroupElementYearForm(parent=self.parent, child_branch=self.child_branch)
         self.assertTrue("access_condition" not in list(form.fields.keys()))

@@ -33,6 +33,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 from django.test import TestCase, RequestFactory
 from django.urls import reverse
+from django.utils.translation import gettext as _
 from waffle.models import Flag
 from waffle.testutils import override_flag
 
@@ -41,7 +42,7 @@ from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.enums import learning_unit_year_subtypes
 from base.models.learning_achievement import LearningAchievement
 from base.models.learning_unit_year import LearningUnitYear
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory, get_current_year
+from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
@@ -51,9 +52,11 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory
 from base.tests.factories.user import UserFactory
-from base.views.learning_achievement import operation, management, create, create_first
+from base.tests.factories.utils.get_messages import get_messages_from_response
+from base.views.learning_achievement import management, create, create_first
 from cms.tests.factories.text_label import TextLabelFactory
 from reference.models.language import FR_CODE_LANGUAGE
 from reference.tests.factories.language import LanguageFactory
@@ -240,7 +243,24 @@ class TestLearningAchievementActions(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/achievement_edit.html')
         self.assertIsInstance(response.context['form'], LearningAchievementEditForm)
 
-    def test_learning_achievement_save(self):
+    def test_learning_achievement_simple_save(self):
+        msg = self._test_learning_achievement_save()
+        self.assertEqual(msg[0].get('message'), "{}.".format(_("The learning unit has been updated")))
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    def test_learning_achievement_save_with_proposal(self):
+        ProposalLearningUnitFactory(learning_unit_year=self.luy)
+        msg = self._test_learning_achievement_save()
+        expected_msg = "{}. {}.".format(
+            _("The learning unit has been updated"),
+            _("The learning unit is in proposal, the report from %(proposal_year)s will be done at consolidation") % {
+                'proposal_year': self.luy.proposallearningunit.learning_unit_year.academic_year
+            }
+        )
+        self.assertEqual(msg[0].get('message'), expected_msg)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    def _test_learning_achievement_save(self):
         learning_achievement = LearningAchievementFactory(
             learning_unit_year=self.luy,
             language=self.language_fr
@@ -265,6 +285,8 @@ class TestLearningAchievementActions(TestCase):
             }
         )
         self.assertEqual(response.status_code, 200)
+        msg = get_messages_from_response(response)
+        return msg
 
     @mock.patch("cms.models.translated_text.update_or_create")
     def test_learning_achievement_save_triggers_cms_save(self, mock_translated_text_update_or_create):

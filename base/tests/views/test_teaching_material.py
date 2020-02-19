@@ -25,27 +25,33 @@
 ##############################################################################
 from unittest import mock
 
+from django.contrib import messages
 from django.contrib.auth.models import Permission
 from django.http import HttpResponseNotAllowed, HttpResponse
 from django.http import HttpResponseRedirect
 from django.test import TestCase
 from django.urls import reverse
+from django.utils.translation import gettext as _
 
 from base.forms.learning_unit_pedagogy import TeachingMaterialModelForm
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.teaching_material import TeachingMaterial
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import CentralManagerFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
+from base.tests.factories.utils.get_messages import get_messages_from_response
 
 
 class TeachingMaterialCreateTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year, *cls.future_academic_years = AcademicYearFactory.produce_in_future(quantity=6)
+        learning_unit = LearningUnitFactory()
         cls.learning_unit_year, *cls.future_learning_unit_years = [
-            LearningUnitYearFactory(subtype=FULL, academic_year=acy)
+            LearningUnitYearFactory(subtype=FULL, academic_year=acy, learning_unit=learning_unit)
             for acy in ([cls.current_academic_year] + cls.future_academic_years)
         ]
         cls.url = reverse('teaching_material_create', kwargs={'learning_unit_year_id': cls.learning_unit_year.id})
@@ -74,14 +80,54 @@ class TeachingMaterialCreateTestCase(TestCase):
         self.assertIsInstance(response.context['form'], TeachingMaterialModelForm)
 
     @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
-    def test_should_create_teaching_material_when_successfull_post(self,  mock_is_linked_to_entity_charge):
+    @mock.patch('base.views.learning_units.pedagogy.update.is_pedagogy_data_must_be_postponed')
+    def test_create_teaching_material_successfull_post_without_postponement(
+            self, mock_is_pedagogy_data_must_be_postponed, mock_is_linked_to_entity_charge):
         mock_is_linked_to_entity_charge.return_value = True
-        response = self.client.post(self.url, data={"mandatory": "True", "title": "This is a test"})
+        mock_is_pedagogy_data_must_be_postponed.return_value = False
+        msg = self._test_teaching_material_post()
+        self.assertEqual(msg[0].get('message'), "{}.".format(_("The learning unit has been updated")))
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
 
+    @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
+    def test_create_teaching_material_successfull_post_with_postponement(self, mock_is_linked_to_entity_charge):
+        mock_is_linked_to_entity_charge.return_value = True
+        msg = self._test_teaching_material_post()
+        expected_message = "{} {}.".format(
+            _("The learning unit has been updated"),
+            _("and postponed until %(year)s") % {
+                "year": self.future_learning_unit_years[-1].academic_year
+            }
+        )
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
+    def test_create_teaching_material_successfull_post_with_proposal(self,  mock_is_linked_to_entity_charge):
+        mock_is_linked_to_entity_charge.return_value = True
+        proposal = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year)
+        msg = self._test_teaching_material_post()
+        expected_message = "{}. {}.".format(
+            _("The learning unit has been updated"),
+            _("The learning unit is in proposal, the report from %(proposal_year)s will be done at consolidation") % {
+                'proposal_year': proposal.learning_unit_year.academic_year
+            }
+        )
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    def _test_teaching_material_post(self):
+        response = self.client.post(self.url, data={"mandatory": "True", "title": "This is a test"})
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTrue(
-            TeachingMaterial.objects.get(mandatory=True, title="This is a test")
+            TeachingMaterial.objects.get(
+                mandatory=True,
+                title="This is a test",
+                learning_unit_year=self.learning_unit_year
+            )
         )
+        msg = get_messages_from_response(response)
+        return msg
 
 
 class TeachingMaterialUpdateTestCase(TestCase):

@@ -27,6 +27,7 @@ import datetime
 from io import BytesIO
 from unittest.mock import patch
 
+from django.contrib import messages
 from django.http import HttpResponseNotAllowed
 from django.http.response import HttpResponseForbidden, HttpResponseRedirect, HttpResponse
 from django.test import TestCase
@@ -45,8 +46,11 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.user import UserFactory
+from base.tests.factories.utils.get_messages import get_messages_from_response
+from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit
 from base.views.learning_units.search.common import SUMMARY_LIST
 from cms.enums import entity_name
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
@@ -317,6 +321,7 @@ class LearningUnitPedagogyEditTestCase(TestCase):
 
         cls.academic_year = create_current_academic_year()
         cls.old_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
+        cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
         cls.previous_academic_year = GenerateAcademicYear(
             cls.old_academic_year,
             cls.old_academic_year
@@ -341,12 +346,12 @@ class LearningUnitPedagogyEditTestCase(TestCase):
             learning_container_year__acronym="LBIR1100",
             learning_container_year__requirement_entity=cls.requirement_entity_version.entity
         )
-        cls.url = reverse('learning_unit_pedagogy_edit', kwargs={'learning_unit_year_id': cls.learning_unit_year.pk})
+        cls.url = reverse(learning_unit_pedagogy_edit, kwargs={'learning_unit_year_id': cls.learning_unit_year.pk})
         cls.faculty_person = FacultyManagerFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
         PersonEntityFactory(person=cls.faculty_person, entity=cls.requirement_entity_version.entity)
 
     def setUp(self):
-        TranslatedTextFactory(
+        self.cms = TranslatedTextFactory(
             entity=entity_name.LEARNING_UNIT_YEAR,
             reference=self.learning_unit_year.pk,
             language='fr-be',
@@ -364,6 +369,72 @@ class LearningUnitPedagogyEditTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/blocks/modal/modal_pedagogy_edit.html')
         self.assertEqual(response.context["cms_label_pedagogy_fr_only"], CMS_LABEL_PEDAGOGY_FR_ONLY)
         self.assertEqual(response.context["label_name"], 'bibliography')
+
+    def test_learning_unit_pedagogy_edit_post(self):
+        msg = self._post_learning_unit_pedagogy()
+        self.assertEqual(msg[0].get('message'), "{}.".format(_("The learning unit has been updated")))
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    def test_learning_unit_pedagogy_edit_post_with_postponement(self):
+        LearningUnitYearFactory(
+            acronym="LBIR1100",
+            academic_year=self.next_academic_year,
+            learning_container_year__academic_year=self.next_academic_year,
+            learning_container_year__acronym="LBIR1100",
+            learning_container_year__requirement_entity=self.requirement_entity_version.entity,
+            learning_unit=self.learning_unit_year.learning_unit
+        )
+        msg = self._post_learning_unit_pedagogy()
+        expected_message = "{} {}.".format(
+            _("The learning unit has been updated"),
+            _("and postponed until %(year)s") % {
+                "year": self.next_academic_year
+            }
+        )
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    def test_learning_unit_pedagogy_edit_post_with_postponement_and_proposal(self):
+        LearningUnitYearFactory(
+            acronym="LBIR1100",
+            academic_year=self.next_academic_year,
+            learning_container_year__academic_year=self.next_academic_year,
+            learning_container_year__acronym="LBIR1100",
+            learning_container_year__requirement_entity=self.requirement_entity_version.entity,
+            learning_unit=self.learning_unit_year.learning_unit
+        )
+        proposal = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year)
+        msg = self._post_learning_unit_pedagogy()
+        expected_message = "{}. {}.".format(
+            _("The learning unit has been updated"),
+            _("The learning unit is in proposal, the report from %(proposal_year)s will be done at consolidation") % {
+                'proposal_year': proposal.learning_unit_year.academic_year
+            }
+        )
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    def test_learning_unit_pedagogy_edit_post_with_proposal(self):
+        proposal = ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_year)
+        msg = self._post_learning_unit_pedagogy()
+        expected_message = "{}. {}.".format(
+            _("The learning unit has been updated"),
+            _("The learning unit is in proposal, the report from %(proposal_year)s will be done at consolidation") % {
+                'proposal_year': proposal.learning_unit_year.academic_year
+            }
+        )
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    def _post_learning_unit_pedagogy(self):
+        response = self.client.post(self.url, data={
+            'cms_id': self.cms.pk,
+            'trans_text': 'test',
+            'learning_unit_year': self.learning_unit_year
+        })
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+        msg = get_messages_from_response(response)
+        return msg
 
 
 class LearningUnitPedagogySummaryLockedTestCase(TestCase):

@@ -31,7 +31,8 @@ from django.utils.translation import gettext_lazy as _
 from base.models.education_group_year import EducationGroupYear
 from osis_common.document.xls_build import CONTENT_TYPE_XLS
 from program_management.business.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, \
-    EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel, EducationGroupYearLearningUnitsContainedToExcel
+    EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel
+from program_management.business.excel_ue_in_of import EducationGroupYearLearningUnitsContainedToExcel
 from program_management.forms.custom_xls import CustomXlsForm
 
 

@@ -41,7 +41,7 @@ from base.business.learning_units.edition import edit_learning_unit_end_date, up
     update_partim_acronym
 from base.business.learning_units.simple import deletion as business_deletion
 from base.models import campus
-from base.models.academic_year import find_academic_year_by_year
+from base.models.academic_year import find_academic_year_by_year, AcademicYear
 from base.models.entity import find_by_id, get_by_internal_id
 from base.models.enums import entity_container_year_link_type
 from base.models.enums import organization_type
@@ -126,6 +126,8 @@ def clean_attribute_initial_value(attribute_name, attribute_value):
         clean_attribute_value = language.find_by_id(attribute_value)
     elif attribute_name in ['requirement_entity', 'allocation_entity', 'additional_entity_1', 'additional_entity_2']:
         clean_attribute_value = get_by_internal_id(attribute_value)
+    elif attribute_name == "end_year" and attribute_value:
+        clean_attribute_value = AcademicYear.objects.get(pk=attribute_value)
     return clean_attribute_value
 
 

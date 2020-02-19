@@ -135,6 +135,10 @@ def get_by_reference_and_academic_year(a_reference, an_academic_year):
     return get_object_or_none(AcademicCalendar, reference=a_reference, academic_year=an_academic_year)
 
 
+def get_by_reference_and_data_year(a_reference, data_year):
+    return get_object_or_none(AcademicCalendar, reference=a_reference, data_year=data_year)
+
+
 def is_academic_calendar_opened_for_specific_academic_year(an_academic_year_id, a_reference):
     return AcademicCalendar.objects.open_calendars().filter(
         academic_year=an_academic_year_id, reference=a_reference

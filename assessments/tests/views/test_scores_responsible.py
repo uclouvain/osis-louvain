@@ -68,6 +68,8 @@ class ScoresResponsibleSearchTestCase(TestCase):
         cls.root_entity = entities_hierarchy.get('root_entity')
         cls.child_one_entity = entities_hierarchy.get('child_one_entity')
         cls.child_two_entity = entities_hierarchy.get('child_two_entity')
+        cls.learning_unit_yr_req_entity_acronym = entities_hierarchy.get('child_one_entity_version').acronym
+        cls.root_entity_acronym = entities_hierarchy.get('root_entity_version').acronym
 
         cls.entity_manager = EntityManagerFactory(
             person=cls.tutor.person,
@@ -186,6 +188,44 @@ class ScoresResponsibleSearchTestCase(TestCase):
             str(response.content, encoding='utf8'),
             {'object_list': expected_response}
         )
+
+    def test_case_search_by_requirement_entity(self):
+        data = self._data_search_by_req_entity()
+
+        response = self.client.get(self.url, data=data)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        qs_result = response.context['object_list']
+
+        self.assertEqual(qs_result.count(), 1)
+        self.assertEqual(qs_result.first(), self.learning_unit_year)
+
+    def test_case_search_by_requirement_entity_with_entity_subordinated(self):
+        data = self._data_search_by_req_entity()
+        data.update({'with_entity_subordinated': True})
+
+        self._assert_equal_with_entity_subordinated(data, self.root_entity_acronym, [self.learning_unit_year,
+                                                                                     self.learning_unit_year_children])
+        self._assert_equal_with_entity_subordinated(data, self.learning_unit_yr_req_entity_acronym,
+                                                    [self.learning_unit_year])
+
+    def _assert_equal_with_entity_subordinated(self, data, entity, results):
+        data.update({'requirement_entity': entity})
+
+        response = self.client.get(self.url, data=data)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        qs_result = response.context['object_list']
+        self.assertCountEqual(qs_result, results)
+
+    def _data_search_by_req_entity(self):
+        data = {
+            'acronym': '',
+            'learning_unit_title': '',
+            'tutor': '',
+            'scores_responsible': '',
+            'requirement_entity': self.learning_unit_yr_req_entity_acronym
+        }
+        return data
 
 
 class ScoresResponsibleManagementAsEntityManagerTestCase(TestCase):

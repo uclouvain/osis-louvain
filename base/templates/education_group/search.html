@@ -60,17 +60,14 @@
                     </div>
                     <div class="col-md-2">
                         {% bootstrap_label form.acronym.label %}
-                        {% include 'blocks/button/help_search_tooltip.html' %}
                         {% bootstrap_field form.acronym show_label=False %}
                     </div>
                     <div class="col-md-2">
                         {% bootstrap_label form.partial_acronym.label %}
-                        {% include 'blocks/button/help_search_tooltip.html' %}
                         {% bootstrap_field form.partial_acronym show_label=False %}
                     </div>
                     <div class="col-md-6">
                         {% bootstrap_label form.title.label %}
-                        {% include 'blocks/button/help_search_tooltip.html' %}
                         {% bootstrap_field form.title show_label=False %}
                     </div>
                 </div>
@@ -112,7 +109,9 @@
                 {% if object_list_count %}
                     <div class="row">
                         <div class="col-md-6">
-                            <strong style="margin-left:10px;color:grey;"> {{ object_list_count }} {% trans 'Trainings'|lower %} </strong>
+                            <strong style="margin-left:10px;color:grey;">
+                                {% blocktrans with start_index=page_obj.start_index end_index=page_obj.end_index total_counts=object_list_count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} trainings{% endblocktrans %}
+                            </strong>
                         </div>
                         <div class="col-md-6">
                             <button id="dLabel" class="btn btn-default pull-right" type="button"
@@ -144,7 +143,11 @@
                                 {% csrf_token %}
                                 <input type="hidden" id="xls_status" class="no_spinner" name="xls_status">
                             </form>
+                            <div class="pull-right" style="margin-right: 10px">
+                                {% base_pagination_size_select %}
+                            </div>
                         </div>
+
                     </div>
 
 
@@ -161,7 +164,7 @@
                         </thead>
                     </table>
                     <div class="text-center">
-                        {% bootstrap_pagination object_list extra=request.GET.urlencode %}
+                        {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
                     </div>
                 {% endif %}
             </div>
@@ -190,8 +193,8 @@
                 {"name": "code", "targets": 5, "data": "code"}
             ];
 
-            initializeDataTable("search_form", "table_education_groups", "educationGroupIds", {{ object_list.number }},
-                50, "{% url 'education_groups' %}", columnDefs);
+            initializeDataTable("search_form", "table_education_groups", "educationGroupIds", {{ page_obj.number }},
+            {{items_per_page}}, "{% url 'education_groups' %}", columnDefs);
         });
 
         // FIXME remove xls_order_col / xls_order ==> USE ordering params

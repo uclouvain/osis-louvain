@@ -28,15 +28,15 @@ from django.utils.translation import gettext_lazy as _
 
 from base.business import event_perms
 from base.business.learning_units.edition import edit_learning_unit_end_date
-from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
+from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY, NO_PLANNED_END_DISPLAY
 from base.models.academic_year import AcademicYear
 
 
 # TODO Convert it in ModelForm
 class LearningUnitEndDateForm(forms.Form):
-    academic_year = forms.ModelChoiceField(required=True,
-                                           queryset=AcademicYear.objects.none(),
-                                           empty_label=BLANK_CHOICE_DISPLAY,
+    EMPTY_LABEL = BLANK_CHOICE_DISPLAY
+    REQUIRED = True
+    academic_year = forms.ModelChoiceField(queryset=AcademicYear.objects.none(),
                                            label=_('Last year of organization')
                                            )
 
@@ -45,6 +45,8 @@ class LearningUnitEndDateForm(forms.Form):
         self.learning_unit_year = learning_unit_year
         self.person = person
         super().__init__(data, *args, **kwargs)
+        self.fields['academic_year'].empty_label = self.EMPTY_LABEL
+        self.fields['academic_year'].required = self.REQUIRED
         end_year = self.learning_unit.end_year
 
         self._set_initial_value(end_year)
@@ -89,6 +91,9 @@ class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
 
 
 class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):
+    EMPTY_LABEL = NO_PLANNED_END_DISPLAY
+    REQUIRED = False
+
     @classmethod
     def get_event_perm_generator(cls):
         return event_perms.generate_event_perm_learning_unit_edition

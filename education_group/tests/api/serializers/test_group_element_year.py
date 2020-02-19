@@ -140,3 +140,150 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             self.serializer.data['children'][0]['children'][0]['title'],
             self.learning_unit_year.complete_title_english,
         )
+
+
+class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        """
+        GERM2MA
+        |--Common Core
+           |-- Learning unit year
+        """
+        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.training = TrainingFactory(
+            acronym='GERM2MA',
+            partial_acronym='LGERM905A',
+            academic_year=cls.academic_year,
+            education_group_type__name=TrainingType.MASTER_MA_120.name,
+        )
+        cls.common_core = GroupFactory(
+            education_group_type__name=GroupType.COMMON_CORE.name,
+            academic_year=cls.academic_year
+        )
+        GroupElementYearFactory(parent=cls.training, child_branch=cls.common_core, child_leaf=None)
+
+        cls.learning_unit_year = LearningUnitYearFactory(
+            academic_year=cls.academic_year,
+            learning_container_year__academic_year=cls.academic_year
+        )
+        GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
+
+        url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
+            'acronym': cls.training.acronym,
+            'year': cls.academic_year.year
+        })
+        cls.serializer = EducationGroupTreeSerializer(
+            EducationGroupHierarchy(cls.training),
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN
+            }
+        )
+
+    def test_root_contains_expected_fields(self):
+        expected_fields = [
+            'url',
+            'acronym',
+            'code',
+            'title',
+            'node_type',
+            'partial_title',
+            'children',
+        ]
+        self.assertListEqual(expected_fields, list(self.serializer.data.keys()))
+
+    def test_children_contains_expected_fields(self):
+        expected_fields = [
+            'url',
+            'acronym',
+            'code',
+            'title',
+            'node_type',
+            'relative_credits',
+            'is_mandatory',
+            'access_condition',
+            'comment',
+            'link_type',
+            'link_type_text',
+            'block',
+            'children',
+        ]
+        self.assertListEqual(expected_fields, list(self.serializer.data['children'][0].keys()))
+
+
+class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        """
+        GERM2M
+        |--Common Core
+           |-- GERM2MA
+              |-- Learning unit year
+        """
+        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.training = TrainingFactory(
+            acronym='GERM2M',
+            partial_acronym='LGERM905',
+            academic_year=cls.academic_year,
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+        )
+        cls.training_2 = TrainingFactory(
+            acronym='GERM2MA',
+            partial_acronym='LGERM905A',
+            academic_year=cls.academic_year,
+            education_group_type__name=TrainingType.MASTER_MA_120.name,
+        )
+        cls.common_core = GroupFactory(
+            education_group_type__name=GroupType.COMMON_CORE.name,
+            academic_year=cls.academic_year
+        )
+        GroupElementYearFactory(parent=cls.training, child_branch=cls.common_core, child_leaf=None)
+        GroupElementYearFactory(parent=cls.common_core, child_branch=cls.training_2, child_leaf=None)
+        cls.learning_unit_year = LearningUnitYearFactory(
+            academic_year=cls.academic_year,
+            learning_container_year__academic_year=cls.academic_year
+        )
+        GroupElementYearFactory(parent=cls.training_2, child_branch=None, child_leaf=cls.learning_unit_year)
+
+        url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
+            'acronym': cls.training.acronym,
+            'year': cls.academic_year.year
+        })
+        cls.serializer = EducationGroupTreeSerializer(
+            EducationGroupHierarchy(cls.training),
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN
+            }
+        )
+
+    def test_root_contains_expected_fields(self):
+        expected_fields = [
+            'url',
+            'acronym',
+            'code',
+            'title',
+            'node_type',
+            'children',
+        ]
+        self.assertListEqual(expected_fields, list(self.serializer.data.keys()))
+
+    def test_children_contains_expected_fields(self):
+        expected_fields = [
+            'url',
+            'acronym',
+            'code',
+            'title',
+            'node_type',
+            'partial_title',
+            'relative_credits',
+            'is_mandatory',
+            'access_condition',
+            'comment',
+            'link_type',
+            'link_type_text',
+            'block',
+            'children',
+        ]
+        self.assertListEqual(expected_fields, list(self.serializer.data['children'][0]['children'][0].keys()))

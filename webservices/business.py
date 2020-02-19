@@ -50,7 +50,6 @@ ADMISSION_CONDITION_FIELDS = [
 
 
 def get_evaluation_text(education_group_year, language_code):
-
     translated_text = TranslatedText.objects.all().prefetch_related(
         Prefetch(
             'text_label__translatedtextlabel_set',

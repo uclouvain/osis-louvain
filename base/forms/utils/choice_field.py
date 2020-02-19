@@ -24,11 +24,13 @@
 #
 ##############################################################################
 from django.db.models import QuerySet
+from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 
 BLANK_CHOICE_DISPLAY = "---------"
 BLANK_CHOICE = [(None, BLANK_CHOICE_DISPLAY)]
 ALL_CHOICE = [("all", pgettext_lazy("plural", "All"))]
+NO_PLANNED_END_DISPLAY = _("no planned end").capitalize()
 
 
 def add_blank(choices, blank_choice_display=None):

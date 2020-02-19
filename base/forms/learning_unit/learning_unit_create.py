@@ -71,6 +71,7 @@ class LearningUnitModelForm(forms.ModelForm):
     def save(self, **kwargs):
         self.instance.learning_container = kwargs.pop('learning_container')
         self.instance.start_year = kwargs.pop('start_year')
+        self.instance.end_year = kwargs.pop('end_year', None)
         return super().save(**kwargs)
 
     class Meta:

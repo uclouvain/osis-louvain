@@ -30,7 +30,7 @@ from base.models.education_group_year import EducationGroupYear
 
 
 class EducationGroupTitleSerializer(serializers.ModelSerializer):
-    title = serializers.SerializerMethodField(read_only=True)
+    title = serializers.SerializerMethodField()
 
     class Meta:
         model = EducationGroupYear

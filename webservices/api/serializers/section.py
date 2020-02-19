@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from rest_framework import serializers
 
 from base.models.admission_condition import AdmissionCondition
@@ -40,28 +39,19 @@ class SectionSerializer(serializers.Serializer):
     id = serializers.CharField(source='label', read_only=True)
     label = serializers.CharField(source='translated_label', read_only=True)
     content = serializers.CharField(source='text', read_only=True, allow_null=True)
-    free_text = serializers.CharField(read_only=True, required=False)
 
     class Meta:
         fields = (
             'id',
             'label',
             'content',
-            'free_text'
         )
 
 
 class AchievementSectionSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     label = serializers.CharField(source='id', read_only=True)
-    content = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        fields = (
-            'id',
-            'label',
-            'content',
-        )
+    content = serializers.SerializerMethodField()
 
     def get_content(self, obj):
         egy = self.context.get('egy')
@@ -71,14 +61,7 @@ class AchievementSectionSerializer(serializers.Serializer):
 class AdmissionConditionSectionSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     label = serializers.CharField(source='id', read_only=True)
-    content = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        fields = (
-            'id',
-            'label',
-            'content',
-        )
+    content = serializers.SerializerMethodField()
 
     def get_content(self, obj):
         # FIXME: Bachelor has no admissioncondition
@@ -116,14 +99,7 @@ class AdmissionConditionSectionSerializer(serializers.Serializer):
 class ContactsSectionSerializer(serializers.Serializer):
     id = serializers.CharField(read_only=True)
     label = serializers.CharField(source='id', read_only=True)
-    content = serializers.SerializerMethodField(read_only=True)
-
-    class Meta:
-        fields = (
-            'id',
-            'label',
-            'content',
-        )
+    content = serializers.SerializerMethodField()
 
     def get_content(self, obj):
         egy = self.context.get('egy')

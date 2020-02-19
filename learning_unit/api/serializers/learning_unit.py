@@ -35,7 +35,7 @@ from learning_unit.api.serializers.utils import LearningUnitHyperlinkedIdentityF
 
 
 class LearningUnitTitleSerializer(serializers.ModelSerializer):
-    title = serializers.SerializerMethodField(read_only=True)
+    title = serializers.SerializerMethodField()
 
     class Meta:
         model = LearningUnitYear
@@ -71,7 +71,7 @@ class LearningUnitSerializer(LearningUnitTitleSerializer):
     type = serializers.CharField(source='learning_container_year.container_type')
     type_text = serializers.CharField(source='get_container_type_display', read_only=True)
     subtype_text = serializers.CharField(source='get_subtype_display', read_only=True)
-    has_proposal = serializers.SerializerMethodField(read_only=True)
+    has_proposal = serializers.SerializerMethodField()
 
     class Meta(LearningUnitTitleSerializer.Meta):
         model = LearningUnitYear
@@ -107,8 +107,8 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
     parent = LearningUnitHyperlinkedRelatedField(read_only=True, lookup_field='acronym')
     partims = LearningUnitHyperlinkedRelatedField(read_only=True, many=True, source='get_partims_related')
 
-    proposal = serializers.SerializerMethodField(read_only=True)
-    summary_status = serializers.SerializerMethodField(read_only=True)
+    proposal = serializers.SerializerMethodField()
+    summary_status = serializers.SerializerMethodField()
 
     class Meta(LearningUnitSerializer.Meta):
         model = LearningUnitYear

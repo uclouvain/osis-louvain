@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-15 10:27+0100\n"
+"POT-Creation-Date: 2020-02-03 13:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -240,6 +240,9 @@ msgstr ""
 msgid "Justified absence"
 msgstr ""
 
+msgid "LU code"
+msgstr ""
+
 msgid "Last synchronization"
 msgstr ""
 
@@ -247,9 +250,6 @@ msgid "Lastname"
 msgstr ""
 
 msgid "Learning unit"
-msgstr ""
-
-msgid "Learning unit title"
 msgstr ""
 
 msgid "Line"
@@ -445,7 +445,7 @@ msgstr ""
 msgid "Scores responsible"
 msgstr ""
 
-msgid "Scores responsible title"
+msgid "Scores responsible tutor"
 msgstr ""
 
 msgid "Scores responsibles"
@@ -539,6 +539,9 @@ msgstr ""
 msgid "This process helps tutor while encoding notes for the exams sessions."
 msgstr ""
 
+msgid "Title"
+msgstr ""
+
 msgid "Training"
 msgstr ""
 
@@ -549,6 +552,9 @@ msgid "Tutors of the course"
 msgstr ""
 
 msgid "Type"
+msgstr ""
+
+msgid "UE title"
 msgstr ""
 
 msgid "Unauthorized decimal for this learning unit"

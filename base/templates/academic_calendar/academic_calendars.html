@@ -151,25 +151,8 @@
             return Math.round(task.progress * 100) + '%';
         };
 
-        (function(){
-
-            gantt._show_tooltip = function(text, pos) {
-
-                var tip = this._create_tooltip();
-
-                tip.innerHTML = text;
-                gantt.$container.appendChild(tip);
-
-                pos.x += gantt.config.grid_width;
-                pos.y += document.documentElement.scrollTop;
-
-                tip.style.left = pos.x + "px";
-                tip.style.top  = pos.y + "px";
-            };
-
-        })();
-
-        gantt.config.tooltip_hide_timeout = 500;
+        gantt.config.tooltip_offset_y = -20;
+        gantt.config.tooltip_hide_timeout = 2500;
         gantt.templates.tooltip_text = function(start,end,task){
             days = task.duration + 1; // include end_date in duration
             if(days <= 1){

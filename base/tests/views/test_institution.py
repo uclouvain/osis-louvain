@@ -33,13 +33,12 @@ from rest_framework.reverse import reverse
 from rest_framework.test import APITestCase
 
 from base.models.enums import academic_calendar_type
-from base.tests.factories.academic_calendar import AcademicCalendarFactory
+from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.views import institution
-from base.views.institution import entities_search
 
 
 class EntityViewTestCase(APITestCase):
@@ -47,12 +46,15 @@ class EntityViewTestCase(APITestCase):
     def setUpTestData(cls):
         cls.user = PersonFactory().user
         cls.current_academic_year = AcademicYearFactory(current=True)
-        cls.academic_calendar = AcademicCalendarFactory(academic_year=cls.current_academic_year,
-                                                        reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION)
+        cls.academic_calendar = OpenAcademicCalendarFactory(
+            academic_year=cls.current_academic_year,
+            data_year=cls.current_academic_year,
+            reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+        )
         cls.entity = EntityFactory()
         cls.parent = EntityFactory()
-        cls.start_date = datetime.date(2015, 1, 1)
-        cls.end_date = datetime.date(2015, 12, 31)
+        cls.start_date = datetime.date.today() - datetime.timedelta(weeks=48)
+        cls.end_date = datetime.date.today() + datetime.timedelta(weeks=48)
 
         cls.entity_version = EntityVersionFactory(
             entity=cls.entity,
@@ -81,15 +83,26 @@ class EntityViewTestCase(APITestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_entities_search(self):
-        url = reverse(entities_search)
+        url = reverse(institution.entities_search)
         response = self.client.get(url, data={"acronym": "ENTITY_CHILDREN", "title": "", "entity_type": ""})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.context['entities_version']), 1)
 
     def test_entity_read(self):
-        url = reverse('entity_read', args=[self.entity_version.id])
+        url = reverse(institution.entity_read, args=[self.entity_version.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        context = response.context
+        self.assertEqual(context['entity_version'], self.entity_version)
+        self.assertEqual(context['entity_parent'], self.parent_entity_version)
+        self.assertFalse(context['descendants'])
+        self.assertDictEqual(
+            context['calendar_summary_course_submission'],
+            {
+                'start_date': self.academic_calendar.start_date,
+                'end_date': self.academic_calendar.end_date
+            }
+        )
 
     def test_entity_diagram(self):
         url = reverse('entity_diagram', args=[self.entity_version.id])

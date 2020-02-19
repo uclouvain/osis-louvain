@@ -41,7 +41,8 @@ from cms.models.translated_text_label import TranslatedTextLabel
 from program_management.business.group_element_years import group_element_year_tree
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
     AdmissionConditionSectionSerializer, ContactsSectionSerializer
-from webservices.business import EVALUATION_KEY, get_evaluation_text
+
+WS_SECTIONS_TO_SKIP = [CONTACT_INTRO]
 
 
 class GeneralInformationSerializer(serializers.ModelSerializer):
@@ -49,7 +50,7 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
     year = serializers.IntegerField(source='academic_year.year', read_only=True)
     education_group_type = serializers.CharField(source='education_group_type.name', read_only=True)
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
-    sections = serializers.SerializerMethodField(read_only=True)
+    sections = serializers.SerializerMethodField()
 
     class Meta:
         model = EducationGroupYear
@@ -86,28 +87,28 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         cms_serializers = {
             SKILLS_AND_ACHIEVEMENTS: AchievementSectionSerializer,
             ADMISSION_CONDITION: AdmissionConditionSectionSerializer,
-            CONTACTS: ContactsSectionSerializer
+            CONTACTS: ContactsSectionSerializer,
         }
         extra_intro_offers = self._get_intro_offers(obj)
 
         for common_section in pertinent_sections['common']:
-            sections.append(self._get_translated_text(common_egy, common_section, language))
+            sections.append(self._get_section_cms(common_egy, common_section, language))
 
         for specific_section in pertinent_sections['specific']:
             serializer = cms_serializers.get(specific_section)
             if serializer:
                 serializer = serializer({'id': specific_section}, context={'egy': obj, 'lang': language})
                 datas.append(serializer.data)
-            elif specific_section not in [EVALUATION_KEY, CONTACT_INTRO]:
-                sections.append(self._get_translated_text(obj, specific_section, language))
+            elif specific_section not in WS_SECTIONS_TO_SKIP:
+                sections.append(self._get_section_cms(obj, specific_section, language))
 
         for offer in extra_intro_offers:
-            sections.append(self._get_translated_text(offer, 'intro', language))
+            sections.append(self._get_section_cms(offer, 'intro', language))
 
         datas += SectionSerializer(sections, many=True).data
         return datas
 
-    def _get_translated_text(self, egy, section, language):
+    def _get_section_cms(self, egy, section, language):
         translated_text_label = TranslatedTextLabel.objects.get(
             text_label__label=section,
             language=language,
@@ -124,38 +125,22 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             ),
             translated_label=Value(translated_text_label.label, output_field=CharField())
         )
-
-        if section == EVALUATION_KEY:
-            return self._get_evaluation_text(language, translated_text)
-
         try:
             return translated_text.values('label', 'translated_label', 'text').get()
         except ObjectDoesNotExist:
             return {
                 'label': self._get_correct_label_name(egy, section),
                 'translated_label': translated_text_label.label,
-                'text': None
+                'text': None,
             }
 
     @staticmethod
     def _get_correct_label_name(egy, section):
         if section == INTRODUCTION:
             return 'intro-' + egy.partial_acronym.lower()
-        elif 'common' in egy.acronym and section != EVALUATION_KEY:
+        elif 'common' in egy.acronym:
             return section + '-commun'
         return section
-
-    def _get_evaluation_text(self, language, translated_text):
-        try:
-            _, text = get_evaluation_text(self.instance, language)
-        except TranslatedText.DoesNotExist:
-            text = None
-        translated_text = translated_text.annotate(
-            free_text=Value(text, output_field=CharField())
-        ).values(
-            'label', 'translated_label', 'text', 'free_text'
-        ).first()
-        return translated_text
 
     @staticmethod
     def _get_intro_offers(obj):

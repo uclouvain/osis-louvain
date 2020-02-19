@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-15 10:27+0100\n"
+"POT-Creation-Date: 2020-02-03 13:02+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -261,6 +261,9 @@ msgstr ""
 msgid "Justified absence"
 msgstr "Absence justifiée"
 
+msgid "LU code"
+msgstr "Code de l'UE"
+
 msgid "Last synchronization"
 msgstr "Dernière synchronisation"
 
@@ -269,9 +272,6 @@ msgstr "Nom"
 
 msgid "Learning unit"
 msgstr "Unité d'apprentissage"
-
-msgid "Learning unit title"
-msgstr "Titre de l'unité d'apprentissage"
 
 msgid "Line"
 msgstr "Ligne"
@@ -476,8 +476,8 @@ msgstr "Les notes doivent être comprises entre 0 et 20"
 msgid "Scores responsible"
 msgstr "Responsable de notes"
 
-msgid "Scores responsible title"
-msgstr "Titre du responsable de notes"
+msgid "Scores responsible tutor"
+msgstr "Enseignant·e responsable des notes"
 
 msgid "Scores responsibles"
 msgstr "Responsables de notes"
@@ -577,6 +577,9 @@ msgstr ""
 "Cette procédure aide le tuteur durant l'encodage de notes pour les sessions "
 "d'examens."
 
+msgid "Title"
+msgstr "Intitulé"
+
 msgid "Training"
 msgstr "Formation"
 
@@ -588,6 +591,9 @@ msgstr "Tuteurs du cours"
 
 msgid "Type"
 msgstr "Type"
+
+msgid "UE title"
+msgstr "Intitulé de l'UE"
 
 msgid "Unauthorized decimal for this learning unit"
 msgstr "Attention : décimales non autorisées pour ce cours"
@@ -664,3 +670,4 @@ msgstr "programme(s)"
 
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
+

@@ -48,8 +48,8 @@ class ContactSerializer(serializers.ModelSerializer):
 
 
 class ContactsSerializer(serializers.ModelSerializer):
-    contacts = serializers.SerializerMethodField(read_only=True)
-    text = serializers.SerializerMethodField(read_only=True)
+    contacts = serializers.SerializerMethodField()
+    text = serializers.SerializerMethodField()
     entity = serializers.CharField(source='publication_contact_entity_version.acronym', read_only=True)
     management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
 

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-29 14:57+0100\n"
+"POT-Creation-Date: 2020-02-11 11:00+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -92,6 +92,9 @@ msgstr ""
 msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
 msgstr ""
 "Une unité d'enseignement ne peut pas être un prérequis à elle-même : %(acronym)s"
+
+msgid "Absolute credits"
+msgstr "Crédits absolus"
 
 msgid "Ac yr."
 msgstr "Anac."
@@ -361,6 +364,9 @@ msgstr "NOMA"
 
 msgid "Registration form for the content of"
 msgstr "Formulaire d'inscription au contenu de"
+
+msgid "Relative credits"
+msgstr "Crédits relatifs"
 
 msgid "Save"
 msgstr "Enregistrer"

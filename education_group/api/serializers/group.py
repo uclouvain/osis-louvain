@@ -45,7 +45,7 @@ class GroupDetailSerializer(EducationGroupTitleSerializer, serializers.ModelSeri
         queryset=EducationGroupType.objects.filter(category=education_group_categories.GROUP),
     )
     management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
-    remark = serializers.SerializerMethodField(read_only=True)
+    remark = serializers.SerializerMethodField()
     campus = CampusDetailSerializer(source='main_teaching_campus', read_only=True)
 
     # Display human readable value

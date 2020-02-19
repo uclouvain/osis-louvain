@@ -44,7 +44,7 @@ class AdmissionConditionTextsSerializer(DynamicLanguageFieldsModelSerializer):
 
 
 class AdmissionConditionLineSerializer(DynamicLanguageFieldsModelSerializer):
-    access = serializers.SerializerMethodField(read_only=True)
+    access = serializers.SerializerMethodField()
 
     class Meta:
         model = AdmissionConditionLine

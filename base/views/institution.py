@@ -32,6 +32,7 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 
 from base import models as mdl
+from base.business import event_perms
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.business.perms import view_academicactors
 from base.forms.entity import EntityVersionFilter
@@ -78,14 +79,26 @@ def entities_search(request):
 @login_required
 def entity_read(request, entity_version_id):
     entity_version = get_object_or_404(EntityVersion, id=entity_version_id)
-
     entity_parent = entity_version.get_parent_version()
     descendants = entity_version.descendants
 
-    calendar_summary_course_submission = find_summary_course_submission_dates_for_entity_version(entity_version)
+    event_perm = event_perms.EventPermSummaryCourseSubmission()
+    if event_perm.is_open():
+        data_year = event_perm.get_academic_years().get()
+    else:
+        data_year = event_perm.get_previous_opened_calendar().data_year
+    calendar_summary_course_submission = find_summary_course_submission_dates_for_entity_version(
+        entity_version=entity_version,
+        ac_year=data_year
+    )
 
-    # TODO Remove locals
-    return render(request, "entity/identification.html", locals())
+    context = {
+        'entity_version': entity_version,
+        'entity_parent': entity_parent,
+        'descendants': descendants,
+        'calendar_summary_course_submission': calendar_summary_course_submission
+    }
+    return render(request, "entity/identification.html", context)
 
 
 @login_required

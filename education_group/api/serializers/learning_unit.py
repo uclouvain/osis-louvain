@@ -34,7 +34,7 @@ from education_group.api.serializers.utils import TrainingHyperlinkedRelatedFiel
 
 
 class EducationGroupRootsTitleSerializer(serializers.ModelSerializer):
-    title = serializers.SerializerMethodField(read_only=True)
+    title = serializers.SerializerMethodField()
 
     class Meta:
         model = EducationGroupYear
@@ -98,7 +98,7 @@ class LearningUnitYearPrerequisitesListSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     prerequisites = serializers.CharField(source='prerequisite_string')
-    title = serializers.SerializerMethodField(read_only=True)
+    title = serializers.SerializerMethodField()
 
     class Meta:
         model = Prerequisite

@@ -80,7 +80,7 @@
 
             if (url_lu != undefined) {
                 let elem = document.getElementById(domId);
-                if(current_id){
+                if(current_id && $("#nav-url").attr("data-nav-base-url")!= undefined){
                     var id_to_go_to = getIdFromUrl(url_lu); // id_to_go_to luy id to go to
                     var url_by_name = $("#nav-url").attr("data-nav-base-url");  //data-nav-base-url = Url name to go to with current luy_id
                     url = url_by_name.replace(current_id, id_to_go_to) // replace the current luy id by the next/previous one

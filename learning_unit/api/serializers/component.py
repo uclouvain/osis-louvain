@@ -31,7 +31,7 @@ from base.models.learning_component_year import LearningComponentYear
 
 class LearningUnitComponentSerializer(serializers.ModelSerializer):
     type_text = serializers.CharField(source='get_type_display', read_only=True)
-    hourly_volume_total_annual_computed = serializers.SerializerMethodField('get_computed_volume', read_only=True)
+    hourly_volume_total_annual_computed = serializers.SerializerMethodField('get_computed_volume')
 
     class Meta:
         model = LearningComponentYear

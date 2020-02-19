@@ -56,7 +56,8 @@ class EducationGroupHierarchy:
                  cache_hierarchy: dict = None, tab_to_show: str = None, pdf_content: bool = False,
                  max_block: int = 0,
                  cache_structure=None,
-                 cache_entity_parent_root: str = None):
+                 cache_entity_parent_root: str = None,
+                 exclude_options: bool = False):
 
         self.children = []
         self.included_group_element_years = []
@@ -71,6 +72,7 @@ class EducationGroupHierarchy:
         self.tab_to_show = tab_to_show
         self.pdf_content = pdf_content
         self.max_block = max_block
+        self.exclude_options = exclude_options
 
         if not self.pdf_content or \
                 (not (self.group_element_year and
@@ -100,9 +102,12 @@ class EducationGroupHierarchy:
         return self._cache_entity_parent_root
 
     def _init_cache(self):
-        return fetch_all_group_elements_in_tree(self.education_group_year, self.get_queryset()) or {}
+        return fetch_all_group_elements_in_tree(self.education_group_year,
+                                                self.get_queryset(),
+                                                self.exclude_options) or {}
 
     def generate_children(self):
+
         for group_element_year in self.cache_hierarchy.get(self.education_group_year.id) or []:
             self._check_max_block(group_element_year.block)
             if group_element_year.child_branch and group_element_year.child_branch != self.root:

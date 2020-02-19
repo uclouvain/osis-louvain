@@ -27,6 +27,7 @@ from abc import ABC
 
 from django.core.exceptions import PermissionDenied
 from django.db.models.query import QuerySet
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 
@@ -93,6 +94,28 @@ class EventPerm(ABC):
         if max_academic_y:
             qs = qs.filter(data_year__year__lte=max_academic_y)
         return qs.values_list('data_year', flat=True)
+
+    @classmethod
+    def get_previous_opened_calendar(cls, date=None) -> AcademicCalendar:
+        if not date:
+            date = timezone.now()
+        qs = AcademicCalendar.objects.filter(end_date__lte=date).order_by('end_date')
+
+        if cls.event_reference:
+            qs = qs.filter(reference=cls.event_reference)
+
+        return qs.last()
+
+    @classmethod
+    def get_next_opened_calendar(cls, date=None) -> AcademicCalendar:
+        if not date:
+            date = timezone.now()
+        qs = AcademicCalendar.objects.filter(start_date__gte=date).order_by('start_date')
+
+        if cls.event_reference:
+            qs = qs.filter(reference=cls.event_reference)
+
+        return qs.first()
 
 
 class EventPermClosed(EventPerm):
@@ -176,3 +199,9 @@ def generate_event_perm_modification_transformation_proposal(person, obj=None, r
         return EventPermModificationOrTransformationProposalFacultyManager(obj, raise_exception)
     else:
         return EventPermClosed(obj, raise_exception)
+
+
+class EventPermSummaryCourseSubmission(EventPerm):
+    model = LearningUnitYear
+    event_reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION
+    error_msg = _("Summary course submission is not allowed for tutors during this period.")

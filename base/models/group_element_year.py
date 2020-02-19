@@ -43,7 +43,7 @@ from base.models import education_group_year
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, quadrimesters
-from base.models.enums.education_group_types import GroupType, MiniTrainingType, EducationGroupTypesEnum
+from base.models.enums.education_group_types import GroupType, MiniTrainingType, EducationGroupTypesEnum, TrainingType
 from base.models.enums.link_type import LinkTypes
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.models.learning_unit_year import LearningUnitYear
@@ -489,7 +489,7 @@ def _find_elements(
     return list(set(roots))
 
 
-def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict:
+def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset, exclude_options=False) -> dict:
     if queryset.model != GroupElementYear:
         raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
 
@@ -500,6 +500,11 @@ def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict
 
     group_elems_by_parent_id = {}  # Map {<EducationGroupYear.id>: [GroupElementYear, GroupElementYear...]}
     for group_elem_year in queryset:
+        if exclude_options and group_elem_year.child_branch and \
+                group_elem_year.child_branch.education_group_type.name == GroupType.OPTION_LIST_CHOICE.name:
+            if EducationGroupYear.hierarchy.filter(pk=group_elem_year.child_branch.pk).get_parents(). \
+                        filter(education_group_type__name__in=TrainingType.finality_types()).exists():
+                continue
         parent_id = group_elem_year.parent_id
         group_elems_by_parent_id.setdefault(parent_id, []).append(group_elem_year)
     return group_elems_by_parent_id

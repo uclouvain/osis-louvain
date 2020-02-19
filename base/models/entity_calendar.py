@@ -86,7 +86,7 @@ def build_calendar_by_entities(ac_year, reference):
     """
     entity_structure = entity_version.build_current_entity_version_structure_in_memory(date=ac_year.end_date)
     entities_id = list(entity_structure.keys())
-    ac_calendar = academic_calendar.get_by_reference_and_academic_year(reference, ac_year)
+    ac_calendar = academic_calendar.get_by_reference_and_data_year(reference, ac_year)
     all_entities_calendars = EntityCalendar.objects.filter(entity__in=entities_id, academic_calendar=ac_calendar) \
         .select_related('entity')
 

@@ -86,6 +86,9 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
             prerequisite=self.instance
         )
 
+        if not grouped_items:
+            self.instance.delete()
+
     def _delete_old_items(self):
         items = self.instance.prerequisiteitem_set.all()
         for item in items:

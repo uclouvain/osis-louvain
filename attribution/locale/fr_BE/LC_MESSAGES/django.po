@@ -3,12 +3,11 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-13 10:30+0100\n"
+"POT-Creation-Date: 2020-02-04 10:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -95,11 +94,26 @@ msgstr "Durée"
 msgid "Editable"
 msgstr "Modifiable"
 
+#, python-format
+msgid ""
+"For the academic_year %(data_year)s, the summary edition period is ended "
+"since %(end_date)s."
+msgstr "Pour l’année académique %(data_year)s, la période de modification des fiches descriptives est terminée depuis le %(end_date)s."
+
+#, python-format
+msgid ""
+"For the academic_year %(data_year)s, the summary edition period will open "
+"on %(start_date)s."
+msgstr "Pour l’année académique %(data_year)s, la période de modification des fiches descriptives commencera le %(start_date)s."
+
 msgid "Function"
 msgstr "Fonction"
 
 msgid "Holder"
 msgstr "Titulaire"
+
+msgid "Indicate the name or the FGS"
+msgstr "Indiquez le nom ou le FGS"
 
 msgid "Information approved and updatable by the Commission of Program"
 msgstr "Informations avalisées et modifiables via la Commission de Programme"
@@ -124,6 +138,9 @@ msgstr "Gérer la répartition"
 
 msgid "No attributions exist for the full UE"
 msgstr "Aucune attribution n'existe pour l'UE complète"
+
+msgid "Not in period to edit description fiche."
+msgstr "Pas en période pour modifier les fiches descriptives."
 
 msgid "Practical exercises"
 msgstr "Partie pratique"

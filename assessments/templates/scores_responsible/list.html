@@ -39,10 +39,12 @@
         <div class="panel-heading">
              <form id="search_form" method="GET" action="{% url 'scores_responsible_list' %}">
                  <div class="row">
-                    {% bootstrap_field filter.form.acronym form_group_class="col-md-2" %}
+                    {% bootstrap_field filter.form.acronym form_group_class="col-md-1" %}
                     {% bootstrap_field filter.form.learning_unit_title form_group_class="col-md-3" %}
                     {% bootstrap_field filter.form.tutor form_group_class="col-md-3" %}
-                    {% bootstrap_field filter.form.scores_responsible form_group_class="col-md-3" %}
+                    {% bootstrap_field filter.form.scores_responsible form_group_class="col-md-2" %}
+                    {% bootstrap_field filter.form.requirement_entity form_group_class="col-md-1" %}
+                    {% bootstrap_field filter.form.with_entity_subordinated form_group_class="col-md-1" %}
                     {% bootstrap_field filter.form.ordering %}
                     <div class="col-md-1 form-group" style="margin-top:25px">
                         <button type="submit" id="bt_submit_search" class="btn btn-primary" role="button"
@@ -59,7 +61,7 @@
                     <tr>
                         <th>{% trans 'Entity' %}</th>
                         <th>{% trans 'Code' %}</th>
-                        <th>{% trans 'Learning unit title' %}</th>
+                        <th>{% trans 'Title' %}</th>
                         <th>{% trans 'Tutor' %}</th>
                         <th></th>
                     </tr>

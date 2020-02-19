@@ -330,6 +330,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
         form_end_date = response.context['form_end_date']
 
         self.assertEqual(form_end_date.fields['academic_year'].initial, None)
+        self.assertTrue(form_end_date.fields['academic_year'].required)
         self.assertEqual(form_proposal.fields['folder_id'].initial, None)
         self.assertEqual(form_proposal.fields['entity'].initial, None)
 

@@ -31,7 +31,7 @@ PAGINATOR_SIZE_LIST = [10, 25, 50, 100, 250, 500]
 
 
 @register.inclusion_tag('templatetags/pagination_size_select.html', takes_context=True)
-def pagination_size_select(context):
+def base_pagination_size_select(context):
     request = context['request']
     paginator_size = get_paginator_size(request)
     return {

@@ -36,6 +36,7 @@ class PrerequisiteItemAdmin(VersionAdmin, OsisModelAdmin):
     list_filter = ('prerequisite__learning_unit_year__academic_year',)
     search_fields = [
         'learning_unit__id',
+        'prerequisite__id',
         'learning_unit__learningunityear__acronym',
         'learning_unit__learningunityear__specific_title',
         'prerequisite__learning_unit_year__acronym',

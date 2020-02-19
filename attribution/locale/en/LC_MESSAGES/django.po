@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-11-13 10:30+0100\n"
+"POT-Creation-Date: 2020-02-04 10:24+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -95,10 +95,25 @@ msgstr ""
 msgid "Editable"
 msgstr ""
 
+#, python-format
+msgid ""
+"For the academic_year %(data_year)s, the summary edition period is ended "
+"since %(end_date)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"For the academic_year %(data_year)s, the summary edition period will open "
+"on %(start_date)s."
+msgstr ""
+
 msgid "Function"
 msgstr ""
 
 msgid "Holder"
+msgstr ""
+
+msgid "Indicate the name or the FGS"
 msgstr ""
 
 msgid "Information approved and updatable by the Commission of Program"
@@ -123,6 +138,9 @@ msgid "Manage repartition"
 msgstr ""
 
 msgid "No attributions exist for the full UE"
+msgstr ""
+
+msgid "Not in period to edit description fiche."
 msgstr ""
 
 msgid "Practical exercises"

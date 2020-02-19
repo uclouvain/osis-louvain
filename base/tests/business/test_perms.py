@@ -81,6 +81,8 @@ class PermsTestCase(TestCase):
         super(AcademicYear, cls.academic_yr_2).save()
         cls.academic_yr_6 = AcademicYearFactory.build(year=cls.academic_yr.year + 6)
         super(AcademicYear, cls.academic_yr_6).save()
+        previous_academic_yr = AcademicYearFactory.build(year=cls.academic_yr.year - 1)
+        super(AcademicYear, previous_academic_yr).save()
 
         cls.lunit_container_yr = LearningContainerYearFactory(academic_year=cls.academic_yr)
         cls.luy = LearningUnitYearFactory(

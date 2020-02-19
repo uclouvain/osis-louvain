@@ -79,7 +79,11 @@ class TestBuildCalendarByEntity(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = create_current_academic_year()
-        cls.ac_calendar = AcademicCalendarFactory(academic_year=cls.academic_year, reference=SUMMARY_COURSE_SUBMISSION)
+        cls.ac_calendar = AcademicCalendarFactory(
+            academic_year=cls.academic_year,
+            data_year=cls.academic_year,
+            reference=SUMMARY_COURSE_SUBMISSION
+        )
 
         # Create structure entity
         cls.entity_ssh = EntityVersionFactory(acronym='SSH', parent=None)

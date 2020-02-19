@@ -48,7 +48,7 @@ urlpatterns = [
         name='education_group_type_autocomplete'
     ),
 
-    url(r'^$', search.education_groups, name='education_groups'),
+    url(r'^$', search.EducationGroupSearch.as_view(), name='education_groups'),
     url(
         r'^select_lu/(?P<learning_unit_year_id>[0-9]+)$',
         copy_learning_unit_to_cache,

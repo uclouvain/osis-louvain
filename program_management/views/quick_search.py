@@ -50,7 +50,7 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
     timeout = CACHE_TIMEOUT
 
     filterset_class = QuickEducationGroupYearFilter
-    cache_exclude_params = 'page',
+    cache_exclude_params = ['page']
     paginate_by = "12"
     ordering = ('academic_year', 'acronym', 'partial_acronym')
 
@@ -89,7 +89,7 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
     timeout = CACHE_TIMEOUT
 
     filterset_class = QuickLearningUnitYearFilter
-    cache_exclude_params = 'page',
+    cache_exclude_params = ['page']
     paginate_by = "12"
     ordering = ('academic_year', 'acronym')
 

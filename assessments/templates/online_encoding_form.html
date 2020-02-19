@@ -108,7 +108,7 @@
             {% csrf_token %}
             <button type="submit" class="btn btn-primary" id="bt_save_online_encoding_up"
                 {% if not is_program_manager %}
-                    data-toggle="tooltip" data-placement="left" title="{% trans 'Temporary save (not submitted to the faculty yet)' %}"
+                    data-toggle="tooltip" data-placement="bottom" title="{% trans 'Temporary save (not submitted to the faculty yet)' %}"
                 {% endif %}>
                 <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}</button>
             <a class="btn btn-default" href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" role="button" id="lnk_cancel_online_encoding_up">
@@ -235,7 +235,7 @@
             </table>
             <button type="submit" class="btn btn-primary" id="bt_save_online_encoding_down"
                 {% if not is_program_manager %}
-                    data-toggle="tooltip" data-placement="left" title="{% trans 'Temporary save (not submitted to the faculty yet)' %}"
+                    data-toggle="tooltip" data-placement="bottom" title="{% trans 'Temporary save (not submitted to the faculty yet)' %}"
                 {% endif %}>
                 <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}</button>
             <a class="btn btn-default" href="{% url 'online_encoding' learning_unit_year.id %}?{{ request.GET.urlencode }}" role="button" id="lnk_cancel_online_encoding_down">
