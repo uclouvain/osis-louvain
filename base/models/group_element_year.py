@@ -319,10 +319,10 @@ class GroupElementYear(OrderedModel):
     def _verbose_credits(self):
         if self.relative_credits or self.child_branch.credits:
             return "{} ({} {})".format(
-                self.child.title, self.relative_credits or self.child_branch.credits or 0, _("credits")
+                self.child.verbose_title, self.relative_credits or self.child_branch.credits or 0, _("credits")
             )
         else:
-            return "{}".format(self.child.title)
+            return "{}".format(self.child.verbose_title)
 
 
 def find_learning_unit_roots(

@@ -205,11 +205,13 @@ function getDataAjaxTable(formId, domTable, d, pageNumber) {
     });
 
      // Append ordering to querystring
-    let columnName = domTable.DataTable().settings().init().columnDefs[d.order[0]['column']].name;
-    let direction = (d.order[0]['dir'] == 'asc') ? '' : '-';
-    let ordering = direction + columnName;
-    queryString['ordering'] = ordering;
-    $('#id_ordering').val(ordering);
+    if (d.order.length) {
+        let columnName = domTable.DataTable().settings().init().columnDefs[d.order[0]['column']].name;
+        let direction = (d.order[0]['dir'] == 'asc') ? '' : '-';
+        let ordering = direction + columnName;
+        queryString['ordering'] = ordering;
+        $('#id_ordering').val(ordering);
+    }
 
     queryString['page'] = pageNumber;
     return queryString;

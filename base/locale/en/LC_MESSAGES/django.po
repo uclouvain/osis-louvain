@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-28 15:32+0100\n"
+"POT-Creation-Date: 2020-02-28 11:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3501,6 +3501,9 @@ msgid "volume requirement entity"
 msgstr ""
 
 msgid "volume total requirement entities"
+msgstr ""
+
+msgid "without postponement"
 msgstr ""
 
 msgid "yes"

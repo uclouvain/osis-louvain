@@ -32,9 +32,9 @@ from base.business.learning_unit import get_academic_year_postponement_range
 from base.models.learning_achievement import LearningAchievement
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.models.utils.utils import get_object_or_none
 from cms.enums import entity_name
 from cms.models import text_label, translated_text
+from osis_common.utils.models import get_object_or_none
 from reference.models.language import EN_CODE_LANGUAGE, Language
 
 

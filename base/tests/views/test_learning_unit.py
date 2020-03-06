@@ -1116,17 +1116,43 @@ class LearningUnitViewTestCase(TestCase):
         self.assertEqual(msg[0].get('message'), expected_message)
         self.assertEqual(msg[0].get('level'), messages.SUCCESS)
 
-    def test_learning_unit_specifications_save_with_postponement_and_proposal(self):
+    def test_learning_unit_specifications_save_with_postponement_and_proposal_on_same_year(self):
         year_range = 5
         academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, year_range)]
         learning_unit_years = self._generate_learning_unit_years(academic_years)
-        proposal = ProposalLearningUnitFactory(learning_unit_year=learning_unit_years[2])
+        proposal = ProposalLearningUnitFactory(learning_unit_year=learning_unit_years[0])
         msg = self._test_learning_unit_specifications_save_with_postponement(learning_unit_years)
         expected_message = "{}. {}.".format(
             _("The learning unit has been updated"),
             _("The learning unit is in proposal, the report from %(proposal_year)s will be done at consolidation") % {
                 'proposal_year': proposal.learning_unit_year.academic_year
             }
+        )
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    def test_learning_unit_specifications_save_with_postponement_and_proposal_on_future_year(self):
+        year_range = 5
+        academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, year_range)]
+        learning_unit_years = self._generate_learning_unit_years(academic_years)
+        proposal = ProposalLearningUnitFactory(learning_unit_year=learning_unit_years[1])
+        msg = self._test_learning_unit_specifications_save_with_postponement(learning_unit_years)
+        expected_message = _("The learning unit has been updated (the report has not been done from %(year)s because "
+                             "the learning unit is in proposal).") % {
+            'year': proposal.learning_unit_year.academic_year
+        }
+        self.assertEqual(msg[0].get('message'), expected_message)
+        self.assertEqual(msg[0].get('level'), messages.SUCCESS)
+
+    def test_learning_unit_specifications_save_without_postponement_and_proposal_on_future_year(self):
+        year_range = 5
+        academic_years = [AcademicYearFactory(year=get_current_year() + i) for i in range(0, year_range)]
+        learning_unit_years = self._generate_learning_unit_years(academic_years)
+        ProposalLearningUnitFactory(learning_unit_year=learning_unit_years[1])
+        msg = self._test_learning_unit_specifications_save_with_postponement(learning_unit_years, postpone=False)
+        expected_message = "{} ({}).".format(
+            _("The learning unit has been updated"),
+            _("without postponement")
         )
         self.assertEqual(msg[0].get('message'), expected_message)
         self.assertEqual(msg[0].get('level'), messages.SUCCESS)
@@ -1141,7 +1167,7 @@ class LearningUnitViewTestCase(TestCase):
         ) for ac in academic_years]
         return learning_unit_years
 
-    def _test_learning_unit_specifications_save_with_postponement(self, learning_unit_years):
+    def _test_learning_unit_specifications_save_with_postponement(self, learning_unit_years, postpone=True):
         # delete last learning unit year to ensure luy is not created
         learning_unit_years.pop().delete()
         label = TextLabelFactory(label='label', entity=entity_name.LEARNING_UNIT_YEAR)
@@ -1164,16 +1190,17 @@ class LearningUnitViewTestCase(TestCase):
             data={
                 'trans_text_fr': 'textFR',
                 'trans_text_en': 'textEN',
-                'postpone': 1,
+                'postpone': 1 if postpone else 0,
                 'cms_fr_id': trans_fr_be[0].id,
                 'cms_en_id': trans_en[0].id,
             }
         )
         self.assertEqual(response.status_code, 200)
-        for translated_text in TranslatedText.objects.filter(language='fr-be'):
-            self.assertEqual(translated_text.text, 'textFR')
-        for translated_text in TranslatedText.objects.filter(language='en'):
-            self.assertEqual(translated_text.text, 'textEN')
+        if postpone:
+            for translated_text in TranslatedText.objects.filter(language='fr-be'):
+                self.assertEqual(translated_text.text, 'textFR')
+            for translated_text in TranslatedText.objects.filter(language='en'):
+                self.assertEqual(translated_text.text, 'textEN')
         msg = get_messages_from_response(response)
         return msg
 

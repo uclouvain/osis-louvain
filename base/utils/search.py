@@ -47,7 +47,10 @@ class SearchMixin:
                     'language': self.request.LANGUAGE_CODE
                 },
                 many=True)
-            return JsonResponse({'object_list': serializer.data})
+            return JsonResponse({
+                'object_list': serializer.data,
+                'total': context['paginator'].count,
+            })
         return super().render_to_response(context, **response_kwargs)
 
     def get_paginate_by(self, queryset):

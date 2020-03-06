@@ -42,8 +42,8 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
-from base.models.utils.utils import get_object_or_none
 from base.views.common import display_warning_messages, add_to_session
+from osis_common.utils.models import get_object_or_none
 
 SEARCH_URL_PART = 'learning_units/by_'
 

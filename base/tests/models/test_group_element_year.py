@@ -601,33 +601,3 @@ class TestLinkTypeGroupElementYear(TestCase):
         link = GroupElementYear(parent=major_list_choice, child_branch=major, link_type=None)
         link._clean_link_type()
         self.assertEqual(link.link_type, LinkTypes.REFERENCE.name)
-
-
-class TestGroupElementYearProperty(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-
-    def setUp(self):
-        self.egy = EducationGroupYearFactory(academic_year=self.academic_year,
-                                             title="Title FR",
-                                             credits=15)
-        self.group_element_year = GroupElementYearFactory(parent__academic_year=self.academic_year,
-                                                          child_branch=self.egy,
-                                                          relative_credits=10)
-
-    def test_verbose_credit(self):
-        self.assertEqual(self.group_element_year.verbose, "{} ({} {})".format(
-            self.group_element_year.child.title, self.group_element_year.relative_credits, _("credits")))
-
-        self.group_element_year.relative_credits = None
-        self.group_element_year.save()
-
-        self.assertEqual(self.group_element_year.verbose, "{} ({} {})".format(
-            self.group_element_year.child.title, self.group_element_year.child_branch.credits, _("credits")))
-
-        self.egy.credits = None
-        self.egy.save()
-
-        self.assertEqual(self.group_element_year.verbose, "{}".format(
-            self.group_element_year.child.title))

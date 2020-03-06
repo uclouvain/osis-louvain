@@ -1,8 +1,7 @@
-function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPage, ajaxUrl, columnDefs){
+function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPage, ajaxUrl, columnDefs, extra){
     setEventKeepIds(tableId, storageKey);
     let domTable = $('#' + tableId);
-    return domTable.DataTable(
-    {
+    let options = {
         'createdRow': function (row, data, dataIndex) {
             let url = "";
             if (data['osis_url']) {
@@ -23,7 +22,7 @@ function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPa
         "ajax" : {
             "url": ajaxUrl,
             "accepts": {
-              json: 'application/json'
+                json: 'application/json'
             },
             "type": "GET",
             "dataSrc": "object_list",
@@ -44,5 +43,6 @@ function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPa
             },
             'processing': gettext("Loading...")
         }
-    });
+    };
+    return domTable.DataTable($.extend(true, {}, options, extra));
 }
