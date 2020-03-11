@@ -330,7 +330,6 @@ def find_learning_unit_roots(
         luy=None,
         is_root_when_matches=None
 ):
-    is_root_when_matches = {} if is_root_when_matches is None else is_root_when_matches
     if return_result_params is None:
         return_result_params = {}
     parents_as_instances = return_result_params.get('parents_as_instances', False)
@@ -368,7 +367,6 @@ def _flatten_list_of_lists(list_of_lists):
 
 
 def _find_related_formations(objects, parents_by_id, is_root_when_matches=None):
-    is_root_when_matches = {} if is_root_when_matches is None else is_root_when_matches
     if not objects:
         return {}
     if isinstance(objects[0], LearningUnitYear):
@@ -469,7 +467,6 @@ def _find_elements(
         child_leaf_id=None,
         child_branch_id=None
 ):
-    is_root_when_matches = {} if is_root_when_matches is None else is_root_when_matches
     roots = []
     unique_child_key = _build_child_key(child_leaf=child_leaf_id, child_branch=child_branch_id)
     group_elem_year_parents = group_elements_by_child_id.get(unique_child_key, [])
