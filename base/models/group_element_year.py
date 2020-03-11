@@ -48,6 +48,8 @@ from base.models.learning_component_year import LearningComponentYear, volume_to
 from base.models.learning_unit_year import LearningUnitYear
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
+COMMON_FILTER_TYPES = [MiniTrainingType.OPTION.name]
+
 
 class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('parent', 'child_branch', 'child_leaf',)
@@ -120,9 +122,10 @@ ORDER BY level DESC, id;
 
 def validate_block_value(value):
     max_authorized_value = 6
-    _error_msg = _("Please register a maximum of %(max_authorized_value)s digits in ascending order, "
-                   "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46") % \
-                 {'max_authorized_value': max_authorized_value}
+    _error_msg = _(
+        "Please register a maximum of %(max_authorized_value)s digits in ascending order, "
+        "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46"
+    ) % {'max_authorized_value': max_authorized_value}
 
     MinValueValidator(1, message=_error_msg)(value)
     if not all([
@@ -443,7 +446,7 @@ def _build_child_key(child_branch=None, child_leaf=None):
 def _is_root_group_element_year(group_element_year, recursive_params=None):
     recursive_params = {'stop': [], 'continue': []} if recursive_params is None else recursive_params
     root_categories = (education_group_categories.TRAINING, education_group_categories.MINI_TRAINING)
-    filter_types = [MiniTrainingType.OPTION.name] + recursive_params['continue']
+    filter_types = COMMON_FILTER_TYPES + recursive_params['continue']
     return group_element_year["parent__education_group_type__category"] in root_categories and (
             group_element_year["parent__education_group_type__name"] in recursive_params['stop']
             or group_element_year["parent__education_group_type__name"] not in filter_types
