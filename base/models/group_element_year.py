@@ -26,7 +26,6 @@
 import collections
 import itertools
 from collections import Counter
-from typing import List
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
@@ -43,7 +42,7 @@ from base.models import education_group_year
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, quadrimesters
-from base.models.enums.education_group_types import GroupType, MiniTrainingType, EducationGroupTypesEnum, TrainingType
+from base.models.enums.education_group_types import GroupType, MiniTrainingType, TrainingType
 from base.models.enums.link_type import LinkTypes
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.models.learning_unit_year import LearningUnitYear
@@ -329,9 +328,9 @@ def find_learning_unit_roots(
         objects,
         return_result_params=None,
         luy=None,
-        is_root_when_matches: List[EducationGroupTypesEnum] = None
+        is_root_when_matches=None
 ):
-    is_root_when_matches = [] if is_root_when_matches is None else is_root_when_matches
+    is_root_when_matches = {} if is_root_when_matches is None else is_root_when_matches
     if return_result_params is None:
         return_result_params = {}
     parents_as_instances = return_result_params.get('parents_as_instances', False)
@@ -368,8 +367,8 @@ def _flatten_list_of_lists(list_of_lists):
     return list(set(itertools.chain.from_iterable(list_of_lists)))
 
 
-def _find_related_formations(objects, parents_by_id, is_root_when_matches: List[EducationGroupTypesEnum] = None):
-    is_root_when_matches = [] if is_root_when_matches is None else is_root_when_matches
+def _find_related_formations(objects, parents_by_id, is_root_when_matches=None):
+    is_root_when_matches = {} if is_root_when_matches is None else is_root_when_matches
     if not objects:
         return {}
     if isinstance(objects[0], LearningUnitYear):
@@ -448,29 +447,29 @@ def _build_child_key(child_branch=None, child_leaf=None):
     return '{branch_part}_{id_part}'.format(branch_part=branch_part, id_part=id_part)
 
 
-def _is_root_group_element_year(group_element_year):
+def _is_root_group_element_year(group_element_year, types_to_ignore):
     root_categories = (education_group_categories.TRAINING, education_group_categories.MINI_TRAINING)
-    return group_element_year["parent__education_group_type__category"] in root_categories \
-        and group_element_year["parent__education_group_type__name"] != MiniTrainingType.OPTION.name
+    return group_element_year["parent__education_group_type__category"] in root_categories and \
+        group_element_year["parent__education_group_type__name"] not in [MiniTrainingType.OPTION.name] + types_to_ignore
 
 
 def _is_root_group_element_year_or_is_root_when_matches(
         group_element_year,
-        is_root_when_matches: List[EducationGroupTypesEnum] = None
+        is_root_when_matches=None
 ):
-    is_root_when_matches = [] if is_root_when_matches is None else is_root_when_matches
-    type_names = [egy_type.name for egy_type in is_root_when_matches]
-    is_root = _is_root_group_element_year(group_element_year)
+    is_root_when_matches = {'as_root': [], 'ignore': []} if is_root_when_matches is None else is_root_when_matches
+    type_names = [egy_type.name for egy_type in is_root_when_matches['as_root']]
+    is_root = _is_root_group_element_year(group_element_year, is_root_when_matches['ignore'])
     return group_element_year["parent__education_group_type__name"] in type_names or is_root
 
 
 def _find_elements(
         group_elements_by_child_id,
-        is_root_when_matches: List[EducationGroupTypesEnum] = None,
+        is_root_when_matches=None,
         child_leaf_id=None,
         child_branch_id=None
 ):
-    is_root_when_matches = [] if is_root_when_matches is None else is_root_when_matches
+    is_root_when_matches = {} if is_root_when_matches is None else is_root_when_matches
     roots = []
     unique_child_key = _build_child_key(child_leaf=child_leaf_id, child_branch=child_branch_id)
     group_elem_year_parents = group_elements_by_child_id.get(unique_child_key, [])
