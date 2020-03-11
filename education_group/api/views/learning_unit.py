@@ -66,17 +66,15 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
         education_group_root_ids = group_element_year.find_learning_unit_roots(
             [learning_unit_year],
             luy=learning_unit_year,
-            is_root_when_matches={
-                'as_root': [GroupType.COMPLEMENTARY_MODULE],
-                'ignore': TrainingType.finality_types()
+            recursive_params={
+                'stop': [GroupType.COMPLEMENTARY_MODULE],
+                'continue': TrainingType.finality_types()
             }
         ).get(learning_unit_year.id, [])
 
         return EducationGroupYear.objects.filter(
             pk__in=education_group_root_ids
-        ).select_related(
-            'education_group_type', 'academic_year'
-        )
+        ).select_related('education_group_type', 'academic_year')
 
 
 class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.ListAPIView):
