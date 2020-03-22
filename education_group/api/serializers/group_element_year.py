@@ -148,7 +148,7 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
     with_prerequisite = serializers.BooleanField(source='group_element_year.has_prerequisite', read_only=True)
     periodicity = serializers.CharField(source='learning_unit_year.periodicity', read_only=True)
     quadrimester = serializers.CharField(source='learning_unit_year.quadrimester', read_only=True)
-    status = serializers.CharField(source='learning_unit_year.status', read_only=True)
+    status = serializers.BooleanField(source='learning_unit_year.status', read_only=True)
     proposal_type = serializers.SerializerMethodField()
 
     @staticmethod
