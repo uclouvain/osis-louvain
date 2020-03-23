@@ -45,7 +45,7 @@
             <div class="item {% if forloop.counter0 == 0 %}active{% endif %}">
               <div class="jumbotron"  style="margin-bottom: 0px; text-align: center;">
                 <h3>{{ highlight.highlight_title }}</h3>
-                <small style="margin-bottom: 10px;">{{ highlight.highlight_description }}</small>
+                <small class="margin-bottom-10">{{ highlight.highlight_description }}</small>
                 <p class="margin-top-10"><a class="btn btn-primary btn-sm" href="/{{ highlight.highlight_shortcut }}"
                       role="button">{% trans 'Go' %}</a>
                 </p>

@@ -168,7 +168,7 @@
         {% endblock %}
     {% endif %}
     {% if experimental_phase %}
-        <div class="alert alert-warning" style="margin-bottom: 10px;">
+        <div class="alert alert-warning margin-bottom-10">
             <i class="fa fa-exclamation-triangle" aria-hidden="true"></i> {% trans 'This feature is in testing phase' %}.
         </div>
     {% endif %}
@@ -177,7 +177,7 @@
 
     {# FIXME ! It is forbidden to add something in the main layout for a specific need. Use messages instead !#}
     {% if warnings %}
-        <div class="alert alert-warning" style="margin-bottom: 10px">
+        <div class="alert alert-warning margin-bottom-10">
             <i class="fa fa-exclamation-triangle"
                aria-hidden="true"></i> {% trans 'We detected inconsistencies in the following data :' %}
             <button id="btn_expandButton" type="button" class="btn" data-toggle="collapse"
