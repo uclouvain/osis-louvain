@@ -109,7 +109,7 @@
                 {% if object_list_count %}
                     <div class="row">
                         <div class="col-md-6">
-                            <strong style="margin-left:10px;color:grey;">
+                            <strong class="grey-color" style="margin-left:10px;">
                                 {% blocktrans with start_index=page_obj.start_index end_index=page_obj.end_index total_counts=object_list_count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} trainings{% endblocktrans %}
                             </strong>
                         </div>

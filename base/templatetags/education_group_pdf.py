@@ -95,7 +95,7 @@ CHILD_COMMENT = """\
 # margin-left is there to align the value with the remark.
 # We use 14px which is the size of the image before the value
 BRANCH_CONSTRAINT = """\
-        <div style="font-style: italic;">
+        <div class="font-italic">
             {constraint_value}
         </div>
 """
@@ -130,8 +130,7 @@ def walk_items(item_list):
                 item = next_item
         except StopIteration:
             pass
-    else:
-        return ""
+    return ""
 
 
 def list_formatter(item_list, tabs=1, depth=None):
@@ -214,11 +213,9 @@ def get_prerequis_picture(item):
 
 def get_case_picture(item):
     if item.child_leaf.status:
-        if item.child_leaf.periodicity == ANNUAL:
-            return VALIDATE_CASE_JPG
-        elif item.child_leaf.periodicity == BIENNIAL_EVEN and item.child_leaf.academic_year.is_even:
-            return VALIDATE_CASE_JPG
-        elif item.child_leaf.periodicity == BIENNIAL_ODD and item.child_leaf.academic_year.is_odd:
+        even = item.child_leaf.periodicity == BIENNIAL_EVEN and item.child_leaf.academic_year.is_even
+        odd = item.child_leaf.periodicity == BIENNIAL_ODD and item.child_leaf.academic_year.is_odd
+        if item.child_leaf.periodicity == ANNUAL or even or odd:
             return VALIDATE_CASE_JPG
     return INVALIDATE_CASE_JPG
 
