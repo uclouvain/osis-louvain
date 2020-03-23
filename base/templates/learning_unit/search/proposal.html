@@ -29,7 +29,7 @@
 
 {% block panel %}
     {% include "learning_unit/blocks/form/search_form_proposal.html" %}
-        <div style="margin-top:10px;">
+        <div class="margin-top-10">
             {% if learning_units_count %}
 
             <div class="row">
@@ -71,7 +71,7 @@
             </div>
             <form id="proposals_form" method="post">
                 {% csrf_token %}
-                <div style="margin-top:10px;">
+                <div class="margin-top-10">
 
                         <div class="btn-group">
                             <button type="button" class="btn btn-default" data-toggle="modal"

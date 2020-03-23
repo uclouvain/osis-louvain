@@ -27,7 +27,7 @@
     <br>
     <div class="panel panel-default">
         <div class="panel-body">
-            <div class="row" style="margin-top:10px;">
+            <div class="row margin-top-10">
                 <div class="col-md-2">
                 </div>
                 <div class="col-md-5">
@@ -39,7 +39,7 @@
             </div>
             <hr/>
             {% for label_key, label_translated in cms_specification_labels_translated.items %}
-                <div class="row" style="margin-top:10px;">
+                <div class="row margin-top-10">
                     <div class="col-md-2">
                         {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
                             <a class="trigger_modal pull-right" href="#"
@@ -101,7 +101,7 @@
                   id="form_achievements">
                 {% csrf_token %}
                 <input type="hidden" id="hdn_achievement_id" name="achievement_id"/>
-                <div class="row" style="margin-top:10px;">
+                <div class="row margin-top-10">
                     <div class="col-md-2">
                         <label>{% trans 'Learning achievements' %}</label>
                         <br>
@@ -132,7 +132,7 @@
                 </div>
                 {% for achievement, achievement_en in achievements %}
                     <a id="anchor_{{ achievement.id }}"></a>
-                    <div class="row" style="margin-top:10px;">
+                    <div class="row margin-top-10">
                         {% if perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
                             <div class="col-md-1">
                                 <div class="btn-group">
@@ -218,10 +218,9 @@
 
                     {% if forloop.last and perms.base.can_edit_learningunit_specification and can_update_learning_achievement %}
 
-                        <a class="btn btn-primary btn-sm trigger_modal"
+                        <a class="btn btn-primary btn-sm trigger_modal margin-top-10"
                            data-url="{% url 'achievement_create' learning_unit_year_id=learning_unit_year.id learning_achievement_id=achievement.id %}"
-                           data-modal_class="modal-lg" title="{% trans 'Create' %}"
-                           style="margin-top:10px;">
+                           data-modal_class="modal-lg" title="{% trans 'Create' %}">
                             {% trans 'Add another' %}
                         </a>
                     {% else %}
