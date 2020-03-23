@@ -28,18 +28,18 @@
           style="color:green;"
           {% if title_status_true %} data-toggle="tooltip" data-html="true" title="{{ title_status_true }}"{% endif %} >
         <!-- This span is used for table sort JS -->
-        <span style="display:None;">2</span>
+        <span class="display-none">2</span>
     </span>
 {% elif title_status_false %}
     <span class="glyphicon glyphicon-remove-circle" aria-hidden="true"
           style="color:red;"
           data-toggle="tooltip" data-html="true" title="{{ title_status_false }}">
         <!-- This span is used for table sort JS -->
-         <span style="display:None;">0</span>
+         <span class="display-none">0</span>
     </span>
 {% else %}
     <span class="glyphicon glyphicon-ok-circle grey-color" aria-hidden="true">
          <!-- This span is used for table sort JS -->
-         <span style="display:None;">1</span>
+         <span class="display-none">1</span>
     </span>
 {% endif %}
