@@ -69,6 +69,9 @@ msgstr "Valeur acceptée: %(justification_label_authorized)s "
 msgid "Acronym"
 msgstr "Acronyme"
 
+msgid "Acronym enrollment header"
+msgstr "Sigle"
+
 msgid "Add"
 msgstr "Ajouter"
 
@@ -504,6 +507,9 @@ msgid "Selected"
 msgstr "Sélectionné"
 
 msgid "Session"
+msgstr "Session"
+
+msgid "Session enrollment header"
 msgstr "Session"
 
 msgid "Session number"

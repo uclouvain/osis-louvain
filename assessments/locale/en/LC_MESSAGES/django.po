@@ -60,6 +60,9 @@ msgstr ""
 msgid "Acronym"
 msgstr ""
 
+msgid "Acronym enrollment header"
+msgstr "Program"
+
 msgid "Add"
 msgstr ""
 
@@ -474,6 +477,9 @@ msgstr ""
 
 msgid "Session"
 msgstr ""
+
+msgid "Session enrollment header"
+msgstr "Session number"
 
 msgid "Session number"
 msgstr ""
