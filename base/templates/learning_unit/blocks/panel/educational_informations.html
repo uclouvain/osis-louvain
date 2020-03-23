@@ -29,7 +29,7 @@
 {% get_current_language as LANGUAGE_CODE %}
 
 <div role="tabpanel" class="tab-pane active" id="pedagogy">
-    <div class="row well margin-right-10" style="margin-left: 10px;">
+    <div class="row well margin-right-10 margin-left-10">
         <div class="col-md-6">
             {% if attributions %}
                 <table class="table" style="border-bottom: 1px solid #ddd">
@@ -83,7 +83,7 @@
                         {{ teaching_material.title }}
 
                         {% if can_edit_information %}
-                            <a class="trigger_modal pull-right" style="margin-left:10px;"
+                            <a class="trigger_modal pull-right margin-left-10"
                                data-url="{% url "teaching_material_delete" learning_unit_year_id=learning_unit_year.pk teaching_material_id=teaching_material.pk %}">
                                 <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                             </a>
