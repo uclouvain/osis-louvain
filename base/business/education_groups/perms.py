@@ -80,6 +80,7 @@ def is_eligible_to_change_education_group_content(person, education_group, raise
         is_eligible_to_change_education_group(person, education_group, raise_exception)
 
 
+# FIXME :: DEPRECATED - Use MinimumEditableYearValidator
 def _is_year_editable(education_group, raise_exception):
     error_msg = None
     if education_group.academic_year.year < settings.YEAR_LIMIT_EDG_MODIFICATION:

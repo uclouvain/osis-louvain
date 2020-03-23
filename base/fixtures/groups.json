@@ -3562,7 +3562,7 @@
             "name": "continuing_education_managers",
             "permissions": [
                 [
-                    "can_access_admission",
+                    "view_admission",
                     "continuing_education",
                     "admission"
                 ],
@@ -3572,14 +3572,24 @@
                     "admission"
                 ],
                 [
-                    "can_validate_registration",
+                    "validate_registration",
                     "continuing_education",
                     "admission"
                 ],
                 [
-                    "can_create_json",
+                    "view_persontraining",
                     "continuing_education",
-                    "admission"
+                    "persontraining"
+                ],
+                [
+                    "add_persontraining",
+                    "continuing_education",
+                    "persontraining"
+                ],
+                [
+                    "delete_persontraining",
+                    "continuing_education",
+                    "persontraining"
                 ]
             ]
         }
@@ -3590,7 +3600,7 @@
             "name": "continuing_education_training_managers",
             "permissions": [
                 [
-                    "can_access_admission",
+                    "view_admission",
                     "continuing_education",
                     "admission"
                 ],
@@ -3608,17 +3618,17 @@
             "name": "continuing_education_student_workers",
             "permissions": [
                 [
-                    "can_access_admission",
+                    "view_admission",
                     "continuing_education",
                     "admission"
                 ],
                 [
-                    "can_edit_received_file_field",
+                    "change_received_file_state",
                     "continuing_education",
                     "admission"
                 ],
                 [
-                    "can_validate_registration",
+                    "validate_registration",
                     "continuing_education",
                     "admission"
                 ]
@@ -3673,6 +3683,82 @@
                     "base",
                     "learningunit"
                 ]
+            ]
+        }
+    },
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "partnership_managers",
+            "permissions": [
+                ["add_address","partnership","address"],
+                ["change_address","partnership","address"],
+                ["delete_address","partnership","address"],
+                ["add_contact","partnership","contact"],
+                ["change_contact","partnership","contact"],
+                ["delete_contact","partnership","contact"],
+                ["add_contacttype","partnership","contacttype"],
+                ["change_contacttype","partnership","contacttype"],
+                ["delete_contacttype","partnership","contacttype"],
+                ["add_financing","partnership","financing"],
+                ["change_financing","partnership","financing"],
+                ["delete_financing","partnership","financing"],
+                ["add_media","partnership","media"],
+                ["change_media","partnership","media"],
+                ["delete_media","partnership","media"],
+                ["add_partner","partnership","partner"],
+                ["can_access_partners","partnership","partner"],
+                ["change_partner","partnership","partner"],
+                ["delete_partner","partnership","partner"],
+                ["add_partnerentity","partnership","partnerentity"],
+                ["change_partnerentity","partnership","partnerentity"],
+                ["delete_partnerentity","partnership","partnerentity"],
+                ["add_partnership","partnership","partnership"],
+                ["can_access_partnerships","partnership","partnership"],
+                ["change_partnership","partnership","partnership"],
+                ["delete_partnership","partnership","partnership"],
+                ["can_access_partnerships_agreements", "partnership", "partnershipagreement"],
+                ["add_partnershipagreement","partnership","partnershipagreement"],
+                ["change_partnershipagreement","partnership","partnershipagreement"],
+                ["delete_partnershipagreement","partnership","partnershipagreement"],
+                ["add_partnershipconfiguration","partnership","partnershipconfiguration"],
+                ["change_partnershipconfiguration","partnership","partnershipconfiguration"],
+                ["delete_partnershipconfiguration","partnership","partnershipconfiguration"],
+                ["add_partnershipentitymanager","partnership","partnershipentitymanager"],
+                ["change_partnershipentitymanager","partnership","partnershipentitymanager"],
+                ["delete_partnershipentitymanager","partnership","partnershipentitymanager"],
+                ["add_partnershiptag","partnership","partnershiptag"],
+                ["change_partnershiptag","partnership","partnershiptag"],
+                ["delete_partnershiptag","partnership","partnershiptag"],
+                ["add_partnershipyear","partnership","partnershipyear"],
+                ["change_partnershipyear","partnership","partnershipyear"],
+                ["delete_partnershipyear","partnership","partnershipyear"],
+                ["add_partnershipyeareducationfield","partnership","partnershipyeareducationfield"],
+                ["change_partnershipyeareducationfield","partnership","partnershipyeareducationfield"],
+                ["delete_partnershipyeareducationfield","partnership","partnershipyeareducationfield"],
+                ["add_partnershipyeareducationlevel","partnership","partnershipyeareducationlevel"],
+                ["change_partnershipyeareducationlevel","partnership","partnershipyeareducationlevel"],
+                ["delete_partnershipyeareducationlevel","partnership","partnershipyeareducationlevel"],
+                ["add_partnertag","partnership","partnertag"],
+                ["change_partnertag","partnership","partnertag"],
+                ["delete_partnertag","partnership","partnertag"],
+                ["add_partnertype","partnership","partnertype"],
+                ["change_partnertype","partnership","partnertype"],
+                ["delete_partnertype","partnership","partnertype"],
+                ["add_uclmanagemententity","partnership","uclmanagemententity"],
+                ["change_uclmanagemententity","partnership","uclmanagemententity"],
+                ["delete_uclmanagemententity","partnership","uclmanagemententity"]
+            ]
+        }
+    },
+    {
+        "model": "auth.group",
+        "fields": {
+            "name": "partnership_viewers",
+            "permissions": [
+                ["can_access_partnerships","partnership","partnership"],
+                ["can_access_partners","partnership","partner"],
+                ["can_access_partnerships_agreements", "partnership", "partnershipagreement"]
             ]
         }
     }

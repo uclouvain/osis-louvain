@@ -65,62 +65,6 @@ class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
     list_filter = ('is_mandatory', 'access_condition', 'parent__academic_year')
 
 
-SQL_RECURSIVE_QUERY_EDUCATION_GROUP = """\
-WITH RECURSIVE group_element_year_parent AS (
-
-    SELECT id, child_branch_id, child_leaf_id, parent_id, 0 AS level
-    FROM base_groupelementyear
-    WHERE parent_id IN (%s)
-
-    UNION ALL
-
-    SELECT child.id,
-           child.child_branch_id,
-           child.child_leaf_id,
-           child.parent_id,
-           parent.level + 1
-
-    FROM base_groupelementyear AS child
-    INNER JOIN group_element_year_parent AS parent on parent.child_branch_id = child.parent_id
-
-    )
-
-SELECT * FROM group_element_year_parent ;
-"""
-
-# TODO: Déplacer le code dans un Manager du modèle GroupElementYear
-SQL_RECURSIVE_QUERY_GET_TREE_FROM_CHILD = """
-WITH RECURSIVE group_element_year_parent_from_child_leaf AS (
-    SELECT  gey.id,
-            gey.child_branch_id,
-            gey.child_leaf_id,
-            gey.parent_id,
-            edyc.academic_year_id,
-            0 AS level
-    FROM base_groupelementyear gey
-    INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
-    WHERE child_leaf_id = %(child_leaf_id)s
-
-    UNION ALL
-
-    SELECT 	parent.id,
-            parent.child_branch_id,
-            parent.child_leaf_id,
-            parent.parent_id,
-            edyp.academic_year_id,
-            child.level + 1
-    FROM base_groupelementyear AS parent
-    INNER JOIN group_element_year_parent_from_child_leaf AS child on parent.child_branch_id = child.parent_id
-    INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
-)
-
-SELECT DISTINCT id, child_branch_id, child_leaf_id, parent_id, level
-FROM group_element_year_parent_from_child_leaf
-WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
-ORDER BY level DESC, id;
-"""
-
-
 def validate_block_value(value):
     max_authorized_value = 6
     _error_msg = _(
@@ -157,6 +101,180 @@ class GroupElementYearManager(models.Manager):
         return super().get_queryset().filter(
             Q(child_branch__isnull=False) | Q(child_leaf__learning_container_year__isnull=False)
         )
+
+    def get_adjacency_list(self, root_elements_ids):
+        if not isinstance(root_elements_ids, list):
+            raise Exception('root_elements_ids must be an instance of list')
+        if not root_elements_ids:
+            return []
+
+        adjacency_query = """
+            WITH RECURSIVE
+                adjacency_query AS (
+                    SELECT
+                        parent_id as starting_node_id,
+                        id,
+                        child_branch_id,
+                        child_leaf_id,
+                        parent_id,
+                        "order",
+                        0 AS level,
+                        CAST(parent_id || '|' ||
+                            (
+                                CASE
+                                WHEN child_branch_id is not null
+                                    THEN child_branch_id
+                                    ELSE child_leaf_id
+                                END
+                            ) as varchar(1000)
+                        ) As path
+                    FROM base_groupelementyear
+                    WHERE parent_id IN (%s)
+
+                    UNION ALL
+
+                    SELECT parent.starting_node_id,
+                           child.id,
+                           child.child_branch_id,
+                           child.child_leaf_id,
+                           child.parent_id,
+                           child.order,
+                           parent.level + 1,
+                           CAST(
+                                parent.path || '|' ||
+                                    (
+                                        CASE
+                                        WHEN child.child_branch_id is not null
+                                            THEN child.child_branch_id
+                                            ELSE child.child_leaf_id
+                                        END
+                                    ) as varchar(1000)
+                               ) as path
+                    FROM base_groupelementyear AS child
+                    INNER JOIN adjacency_query AS parent on parent.child_branch_id = child.parent_id
+                )
+            SELECT * FROM adjacency_query
+            ORDER BY starting_node_id, level, "order";
+        """ % ','.join(["%s"] * len(root_elements_ids))
+
+        with connection.cursor() as cursor:
+            cursor.execute(adjacency_query, root_elements_ids)
+            return [
+                {
+                    'starting_node_id': row[0],
+                    'id': row[1],
+                    'child_branch_id': row[2],
+                    'child_leaf_id': row[3],
+                    'parent_id': row[4],
+                    'child_id': row[2] or row[3],
+                    'order': row[5],
+                    'level': row[6],
+                    'path': row[7],
+                } for row in cursor.fetchall()
+            ]
+
+    def get_reverse_adjacency_list(
+            self,
+            child_leaf_ids=None,
+            child_branch_ids=None,
+            academic_year_id=None,
+            link_type: LinkTypes = None
+    ):
+        if child_leaf_ids is None:
+            child_leaf_ids = []
+        if child_branch_ids is None:
+            child_branch_ids = []
+        if child_leaf_ids and not isinstance(child_leaf_ids, list):
+            raise Exception('child_leaf_ids must be an instance of list')
+        if child_branch_ids and not isinstance(child_branch_ids, list):
+            raise Exception('child_branch_ids must be an instance of list')
+        if not child_leaf_ids and not child_branch_ids:
+            return []
+
+        # TODO :: simplify the code (by using a param child_ids_instance=LearningUnitYear by default?)
+        where_statement_leaf = ""
+        if child_leaf_ids:
+            where_statement_leaf = "child_leaf_id in (%(child_ids)s)" % {
+                'child_ids': ','.join(["%s"] * len(child_leaf_ids))
+            }
+
+        where_statement_branch = ""
+        if child_branch_ids:
+            where_statement_branch = "child_branch_id in (%(child_ids)s)" % {
+                'child_ids': ','.join(["%s"] * len(child_branch_ids))
+            }
+
+        if child_leaf_ids and child_branch_ids:
+            where_statement = where_statement_leaf + ' OR ' + where_statement_branch
+        elif child_leaf_ids and not child_branch_ids:
+            where_statement = where_statement_leaf
+        else:
+            where_statement = where_statement_branch
+
+        reverse_adjacency_query = """
+            WITH RECURSIVE
+                reverse_adjacency_query AS (
+                    SELECT
+                        CASE
+                            WHEN gey.child_leaf_id is not null then gey.child_leaf_id
+                            ELSE gey.child_branch_id
+                        END as starting_node_id,
+                           gey.id,
+                           gey.child_branch_id,
+                           gey.child_leaf_id,
+                           gey.parent_id,
+                           gey.order,
+                           edyc.academic_year_id,
+                           0 AS level
+                    FROM base_groupelementyear gey
+                    INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
+                    WHERE %(where_statement)s
+                    AND (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
+
+                    UNION ALL
+
+                    SELECT 	child.starting_node_id,
+                            parent.id,
+                            parent.child_branch_id,
+                            parent.child_leaf_id,
+                            parent.parent_id,
+                            parent.order,
+                            edyp.academic_year_id,
+                            child.level + 1
+                    FROM base_groupelementyear AS parent
+                    INNER JOIN reverse_adjacency_query AS child on parent.child_branch_id = child.parent_id
+                    INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
+                )
+
+            SELECT distinct starting_node_id, id, child_branch_id, child_leaf_id, parent_id, "order", level
+            FROM reverse_adjacency_query
+            WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
+            ORDER BY starting_node_id,  level DESC, "order";
+        """ % {
+            'where_statement': where_statement,
+            'academic_year_id': "%s",
+            'link_type': '%s',
+        }
+        with connection.cursor() as cursor:
+            parameters = child_leaf_ids + child_branch_ids + [
+                link_type.name if link_type else None,
+                link_type.name if link_type else None,
+                academic_year_id,
+                academic_year_id
+            ]
+            cursor.execute(reverse_adjacency_query, parameters)
+            return [
+                {
+                    'starting_node_id': row[0],
+                    'id': row[1],
+                    'child_branch_id': row[2],
+                    'child_leaf_id': row[3],
+                    'parent_id': row[4],
+                    'child_id': row[2] or row[3],
+                    'order': row[5],
+                    'level': row[6],
+                } for row in cursor.fetchall()
+            ]
 
 
 class GroupElementYear(OrderedModel):
@@ -284,6 +402,7 @@ class GroupElementYear(OrderedModel):
         self.clean()
         return super().save(force_insert, force_update, using, update_fields)
 
+    # FIXME :: DEPRECATED ??? Move this to validators? (is a model validation - not a business validation?)
     def clean(self):
         if self.child_branch and self.child_leaf:
             raise ValidationError(_("It is forbidden to save a GroupElementYear with a child branch and a child leaf."))
@@ -300,6 +419,7 @@ class GroupElementYear(OrderedModel):
             )
         self._check_same_academic_year_parent_child_branch()
 
+    # FIXME :: DEPRECATED -  Use AttachOptionsValidator
     def _check_same_academic_year_parent_child_branch(self):
         if (self.parent and self.child_branch) and \
                 (self.parent.academic_year.year != self.child_branch.academic_year.year):
@@ -493,35 +613,14 @@ def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset, exclude
 
 
 def fetch_row_sql(root_ids):
-    with connection.cursor() as cursor:
-        cursor.execute(SQL_RECURSIVE_QUERY_EDUCATION_GROUP, root_ids)
-        return [
-            {
-                'id': row[0],
-                'child_branch_id': row[1],
-                'child_leaf_id': row[2],
-                'parent_id': row[3],
-                'level': row[4],
-            } for row in cursor.fetchall()
-        ]
+    return GroupElementYear.objects.get_adjacency_list(root_ids)
 
 
 def fetch_row_sql_tree_from_child(child_leaf_id: int, academic_year_id: int = None) -> list:
-    parameters = {
-        "child_leaf_id": child_leaf_id,
-        "academic_year_id": academic_year_id
-    }
-    with connection.cursor() as cursor:
-        cursor.execute(SQL_RECURSIVE_QUERY_GET_TREE_FROM_CHILD, parameters)
-        return [
-            {
-                'id': row[0],
-                'child_branch_id': row[1],
-                'child_leaf_id': row[2],
-                'parent_id': row[3],
-                'level': row[4],
-            } for row in cursor.fetchall()
-        ]
+    return GroupElementYear.objects.get_reverse_adjacency_list(
+        child_leaf_ids=[child_leaf_id],
+        academic_year_id=academic_year_id
+    )
 
 
 def get_or_create_group_element_year(parent, child_branch=None, child_leaf=None):

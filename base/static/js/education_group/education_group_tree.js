@@ -3,6 +3,7 @@ $(document).ready(function () {
     let treeVisibility = localStorage.getItem("treeVisibility") || "0";
     if (treeVisibility === "1") {
         openNav();
+        adaptTreeOnFooter();
     } else {
         closeNav();
     }
@@ -309,3 +310,15 @@ $("a[id^='quick-search']").click(function (event) {
 $("#scrollableDiv").on("scroll", function() {
    localStorage.setItem('scrollpos', $("#scrollableDiv")[0].scrollTop);
 });
+
+$(window).scroll(function() {
+    adaptTreeOnFooter();
+});
+
+function adaptTreeOnFooter() {
+    if (checkVisible($('.footer'))) {
+        $('.side-container').css("height", "calc(100% - 100px)");
+    } else {
+        $('.side-container').css("height", "calc(100% - 50px)");
+    }
+}

@@ -35,6 +35,7 @@ OPTIONAL_APPS = (
     'cms',
     'webservices',
     'behave_django',
+    'osis_role',
     'backoffice'
 )
 OPTIONAL_MIDDLEWARES = ()

@@ -133,8 +133,8 @@ class TestProposalXls(TestCase):
         self.assertEqual(
             basic_titles_part_2(),
             [
-                str(_("Faculty remark")),
-                str(_("Other remark")),
+                str(_("Faculty remark (unpublished)")),
+                str(_("Other remark (intended for publication)")),
                 str(_("Team management")),
                 str(_("Vacant")),
                 str(_("Decision")),

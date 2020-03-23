@@ -25,12 +25,16 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
+
+# FIXME :: DEPRECATED - Use DerogationQuadrimesterEnum instead
 Q1 = "Q1"
 Q2 = "Q2"
 Q3 = "Q3"
 Q1and2 = "Q1 and Q2"
 Q1or2 = "Q1 or Q2"
 
+# FIXME :: DEPRECATED - Use DerogationQuadrimesterEnum instead
 LEARNING_UNIT_YEAR_QUADRIMESTERS = (
     (Q1, Q1),
     (Q2, Q2),
@@ -39,6 +43,7 @@ LEARNING_UNIT_YEAR_QUADRIMESTERS = (
     (Q3, Q3)
 )
 
+# FIXME :: DEPRECATED - Use DerogationQuadrimesterEnum instead
 DEROGATION_QUADRIMESTERS = (
     (Q1, Q1),
     (Q2, Q2),
@@ -46,3 +51,12 @@ DEROGATION_QUADRIMESTERS = (
     (Q1or2, _("Q1 or Q2")),
     (Q3, Q3)
 )
+
+
+# TODO :: move this into ddd/domain layer
+class DerogationQuadrimesterEnum(ChoiceEnum):
+    Q1 = "Q1"
+    Q2 = "Q2"
+    Q3 = "Q3"
+    Q1and2 = "Q1 and Q2"
+    Q1or2 = "Q1 or Q2"

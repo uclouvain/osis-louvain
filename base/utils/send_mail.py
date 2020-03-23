@@ -37,6 +37,7 @@ from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 
 from assessments.business import score_encoding_sheet
+from base.models.enums.exam_enrollment_justification_type import JUSTIFICATION_TYPES
 from base.models.person import Person
 from osis_common.document import paper_sheet, xls_build
 from osis_common.document.xls_build import _adjust_column_width
@@ -46,26 +47,38 @@ EDUCATIONAL_INFORMATION_UPDATE_TXT = 'educational_information_update_txt'
 
 EDUCATIONAL_INFORMATION_UPDATE_HTML = 'educational_information_update_html'
 
+ENROLLMENT_HEADERS = [
+    _('Acronym enrollment header'),
+    _('Session enrollment header'),
+    _('Registration number'),
+    _('Lastname'),
+    _('Firstname'),
+    _('Score'),
+    _('Justification')
+]
+ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE = "assessments_scores_submission"
+ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER = "assessments_all_scores_by_pgm_manager"
+
 
 def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enrollments, all_encoded):
     """
     Send an email to all the teachers after the scores submission for a learning unit
     :param persons: The list of the teachers of the leaning unit
     :param learning_unit_name: The name of the learning unit for which scores were submitted
-    :param submitted_enrollments : The list of newly sibmitted enrollments
+    :param submitted_enrollments : The list of newly submitted enrollments
     :param all_encoded : Tell if all the scores are encoded and submitted
     :return An error message if the template is not in the database
     """
 
-    html_template_ref = 'assessments_scores_submission_html'
-    txt_template_ref = 'assessments_scores_submission_txt'
+    html_template_ref = "{}_html".format(ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE)
+    txt_template_ref = "{}_txt".format(ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE)
     receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in persons]
     suject_data = {'learning_unit_name': learning_unit_name}
     template_base_data = {'learning_unit_name': learning_unit_name,
                           'encoding_status': _('All the scores are encoded.') if all_encoded
                           else _('It remains notes to encode.')
                           }
-    header_txt = ['acronym', 'session_title', 'registration_number', 'lastname', 'firstname', 'score', 'documentation']
+    justifications = dict(JUSTIFICATION_TYPES)
     submitted_enrollments_data = [
         (
             enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
@@ -73,10 +86,13 @@ def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enr
             enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-            enrollment.score_final,
-            _(enrollment.justification_final) if enrollment.justification_final else None,
+            enrollment.score_final if enrollment.score_final else '',
+            justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in submitted_enrollments]
-    table = message_config.create_table('submitted_enrollments', header_txt, submitted_enrollments_data)
+
+    table = message_config.create_table('submitted_enrollments',
+                                        ENROLLMENT_HEADERS,
+                                        submitted_enrollments_data)
 
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, [table], receivers,
                                                             template_base_data, suject_data)
@@ -311,10 +327,10 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
     :return: A message if an error occured, None if it's ok
     """
 
-    html_template_ref = 'assessments_all_scores_by_pgm_manager_html'
-    txt_template_ref = 'assessments_all_scores_by_pgm_manager_txt'
+    html_template_ref = '{}_html'.format(ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER)
+    txt_template_ref = '{}_txt'.format(ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER)
     receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in persons]
-    suject_data = {
+    subject_data = {
         'learning_unit_acronym': learning_unit_acronym,
         'offer_acronym': offer_acronym
     }
@@ -322,6 +338,7 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
         'learning_unit_acronym': learning_unit_acronym,
         'offer_acronym': offer_acronym,
     }
+    justifications = dict(JUSTIFICATION_TYPES)
     enrollments_data = [
         (
             enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
@@ -329,23 +346,15 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
             enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-            enrollment.score_final,
-            enrollment.justification_final if enrollment.justification_final else None,
+            enrollment.score_final if enrollment.score_final else '',
+            justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in enrollments]
-    enrollments_headers = (
-        'acronym',
-        'session_title',
-        'registration_number',
-        'lastname',
-        'firstname',
-        'score',
-        'justification'
-    )
-    table = message_config.create_table('enrollments', enrollments_headers, enrollments_data,
-                                        data_translatable=['justification'])
+
+    table = message_config.create_table('enrollments', ENROLLMENT_HEADERS, enrollments_data)
+
     attachment = build_scores_sheet_attachment(enrollments)
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref,
-                                                            [table], receivers, template_base_data, suject_data,
+                                                            [table], receivers, template_base_data, subject_data,
                                                             attachment)
     return message_service.send_messages(message_content)
 

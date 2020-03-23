@@ -51,7 +51,8 @@ from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory, \
     TrainingFactory, EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonBachelorFactory, \
-    EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory
+    EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory, \
+    EducationGroupYearBachelorFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.mandatary import MandataryFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
@@ -550,7 +551,7 @@ class EducationGroupAdministrativedata(TestCase):
     def test_get_good_mandataries(self):
         ed = EducationGroupFactory()
         ac = AcademicYearFactory(current=True)
-        edy = EducationGroupYearFactory(education_group=ed, academic_year=ac)
+        edy = EducationGroupYearBachelorFactory(education_group=ed, academic_year=ac)
 
         url = reverse('education_group_administrative', args=[
             edy.id, edy.id
@@ -683,8 +684,16 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
-        cls.education_group_parent = TrainingFactory(acronym="Parent", academic_year=cls.academic_year)
-        cls.education_group_child = TrainingFactory(acronym="Child_1", academic_year=cls.academic_year)
+        cls.education_group_parent = TrainingFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,  # Type to match 'show_admission_conditions'
+            acronym="Parent",
+            academic_year=cls.academic_year
+        )
+        cls.education_group_child = TrainingFactory(
+            education_group_type__name=TrainingType.MASTER_MC.name,  # Type to match 'show_admission_conditions'
+            acronym="Child_1",
+            academic_year=cls.academic_year
+        )
 
         cls.agregation_adm_cond = AdmissionConditionFactory(
             education_group_year=EducationGroupYearCommonAgregationFactory(academic_year=cls.academic_year)
