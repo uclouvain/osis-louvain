@@ -124,9 +124,8 @@
 
                     <div class="col-md-9">
                         <div class="dropdown {{ dropdirection }} pull-right">
-                            <button id="dLabel" class="btn btn-default" type="button"
+                            <button id="dLabel" class="btn btn-default margin-right-10" type="button"
                                     data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                    style="margin-right:10px;"
                                     title="{% trans 'Export' %}">
                                 <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
                                 <span class="caret"></span>
@@ -134,8 +133,7 @@
                             <ul class="dropdown-menu dropdown-menu-large row pull-right">
                                 <li>
                                     <a id="btn_produce_xls_with_parameters"
-                                       class="no_spinner"
-                                       style="margin-right:10px;"
+                                       class="no_spinner margin-right-10"
                                        title="{% trans 'Produce a customizable xls of learning units' %}"
                                        data-toggle="modal" data-target="#modalXlsLuyWithParameters">
                                         &nbsp;{% trans 'Configurable list of learning units' %}
@@ -143,29 +141,26 @@
                                 </li>
                                 <li>
                                     <a id="btn_produce_xls_comparison"
-                                       class="no_spinner"
-                                       style="margin-right:10px;" title="Produce xls of comparison"
+                                       class="no_spinner margin-right-10" title="Produce xls of comparison"
                                        data-toggle="modal" data-target="#modalComparisonLuy">
                                         &nbsp;{% trans 'List of learning units with comparison' %}
                                     </a>
                                 </li>
                                 <li>
                                     <a id="btn_produce_xls_detailled_attributions"
-                                       class="no_spinner"
-                                       style="margin-right:10px;" title="{% trans 'Produce a xls of learning units with one line per attribution' %}">
+                                       class="no_spinner margin-right-10" title="{% trans 'Produce a xls of learning units with one line per attribution' %}">
                                         &nbsp;{% trans 'List of learning units with with one line per attribution' %}
                                     </a>
                                 </li>
                                 <li>
                                     <a id="btn_produce_xls_educational_specifications"
-                                       class="no_spinner"
-                                       style="margin-right:10px;" title="{% trans 'Produce a xls of learning units with educational information and specifications' %}">
+                                       class="no_spinner margin-right-10" title="{% trans 'Produce a xls of learning units with educational information and specifications' %}">
                                         &nbsp;{% trans 'List of learning units with educational information and specifications' %}
                                     </a>
                                 </li>
                             </ul>
                         </div>
-                        <div class="pull-right" style="margin-right: 10px">
+                        <div class="pull-right margin-right-10">
                             {% base_pagination_size_select %}
                         </div>
                     </div>

@@ -29,7 +29,7 @@
 {% get_current_language as LANGUAGE_CODE %}
 
 <div role="tabpanel" class="tab-pane active" id="pedagogy">
-    <div class="row well" style="margin-left: 10px;margin-right: 10px">
+    <div class="row well margin-right-10" style="margin-left: 10px;">
         <div class="col-md-6">
             {% if attributions %}
                 <table class="table" style="border-bottom: 1px solid #ddd">
@@ -76,8 +76,8 @@
             <ul class="list-group list-group-flush">
                 {% for teaching_material in teaching_materials %}
                     <li class="list-group-item">
-                <span class="glyphicon glyphicon-ok-circle" aria-hidden="true"
-                      style="color:green;margin-right:10px;
+                <span class="glyphicon glyphicon-ok-circle margin-right-10" aria-hidden="true"
+                      style="color:green;
                               {% if not teaching_material.mandatory %}visibility: hidden; {% endif %}"
                       data-toggle="tooltip" title="{% trans 'Required' %}"></span>
                         {{ teaching_material.title }}

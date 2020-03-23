@@ -23,9 +23,13 @@
 */
 
 .font-italic {
-     font-style: italic;
+    font-style: italic;
 }
 
 .grey-color {
     color: grey;
+}
+
+.margin-right-10 {
+    margin-right: 10px;
 }

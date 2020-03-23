@@ -42,9 +42,8 @@
 
                 <div class="col-md-9">
                     <div class="dropdown {{ dropdirection }} pull-right">
-                        <button id="dLabel" class="btn btn-default" type="button"
+                        <button id="dLabel" class="btn btn-default margin-right-10" type="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                style="margin-right:10px;"
                                 title="{% trans 'Export' %}">
                             <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
                             <span class="caret"></span>
@@ -52,22 +51,20 @@
                         <ul class="dropdown-menu dropdown-menu-large row pull-right">
                             <li>
                                 <a id="btn_produce_xls_proposal"
-                                   class="no_spinner"
-                                   style="margin-right:10px;" title="{% trans 'The learning units' %}">
+                                   class="no_spinner margin-right-10" title="{% trans 'The learning units' %}">
                                     &nbsp;{% trans 'List proposals' %}
                                 </a>
                                 <input type="hidden" id="xls_status_proposal" name="xls_status_proposal">
                             </li>
                             <li>
                                 <a id="btn_produce_xls_proposal_comparison"
-                                   class="no_spinner"
-                                   style="margin-right:10px;" title="{% trans 'The learning units' %}">
+                                   class="no_spinner margin-right-10" title="{% trans 'The learning units' %}">
                                     &nbsp;{% trans 'List comparison LU / Proposal' %}
                                 </a>
                             </li>
                         </ul>
                     </div>
-                    <div class="pull-right" style="margin-right: 10px">
+                    <div class="pull-right margin-right-10">
                         {% base_pagination_size_select %}
                     </div>
                 </div>
