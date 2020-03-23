@@ -22,7 +22,7 @@
 {% endblock form_field %}
 
 {% block count_message %}
-    <strong style="margin-left:10px; color:grey;">
+    <strong class="grey-color" style="margin-left:10px;">
         {% blocktrans with start_index=page_obj.start_index end_index=page_obj.end_index total_counts=paginator.count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} offers{% endblocktrans %}
     </strong>
 {% endblock count_message %}
