@@ -47,15 +47,6 @@ EDUCATIONAL_INFORMATION_UPDATE_TXT = 'educational_information_update_txt'
 
 EDUCATIONAL_INFORMATION_UPDATE_HTML = 'educational_information_update_html'
 
-ENROLLMENT_HEADERS = [
-    _('Acronym enrollment header'),
-    _('Session enrollment header'),
-    _('Registration number'),
-    _('Lastname'),
-    _('Firstname'),
-    _('Score'),
-    _('Justification')
-]
 ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE = "assessments_scores_submission"
 ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER = "assessments_all_scores_by_pgm_manager"
 
@@ -91,7 +82,7 @@ def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enr
         ) for enrollment in submitted_enrollments]
 
     table = message_config.create_table('submitted_enrollments',
-                                        ENROLLMENT_HEADERS,
+                                        get_enrollment_headers(),
                                         submitted_enrollments_data)
 
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, [table], receivers,
@@ -350,7 +341,7 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in enrollments]
 
-    table = message_config.create_table('enrollments', ENROLLMENT_HEADERS, enrollments_data)
+    table = message_config.create_table('enrollments', get_enrollment_headers(), enrollments_data)
 
     attachment = build_scores_sheet_attachment(enrollments)
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref,
@@ -376,3 +367,15 @@ def send_mail_for_educational_information_update(teachers, learning_units_years)
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, None, receivers,
                                                             template_base_data, {}, None)
     return message_service.send_messages(message_content)
+
+
+def get_enrollment_headers():
+    return [
+        _('Acronym enrollment header'),
+        _('Session enrollment header'),
+        _('Registration number header'),
+        _('Lastname'),
+        _('Firstname'),
+        _('Score'),
+        _('Justification')
+    ]

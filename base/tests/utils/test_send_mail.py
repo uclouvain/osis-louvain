@@ -168,7 +168,7 @@ class TestSendMessage(TestCase):
         )
         args = mock_create_table.call_args[0]
         self.assertEqual(args[0], 'enrollments')
-        self.assertListEqual(args[1], send_mail.ENROLLMENT_HEADERS)
+        self.assertListEqual(args[1], send_mail.get_enrollment_headers())
         self.assertListEqual(list(args[2][0]),
                              [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
                               self.exam_enrollment_1.session_exam.number_session,
@@ -188,7 +188,6 @@ class TestSendMessage(TestCase):
                          "{}_html".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
         self.assertEqual(args.get('txt_template_ref'),
                          "{}_txt".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
-
 
     @patch("osis_common.messaging.send_message.send_messages")
     def test_send_mail_for_educational_information_update(self, mock_send_messages):
@@ -210,7 +209,7 @@ class TestSendMessage(TestCase):
         )
         args = mock_create_table.call_args[0]
         self.assertEqual(args[0], 'submitted_enrollments')
-        self.assertListEqual(args[1], send_mail.ENROLLMENT_HEADERS)
+        self.assertListEqual(args[1], send_mail.get_enrollment_headers())
         self.assertListEqual(list(args[2][0]),
                              [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
                               self.exam_enrollment_1.session_exam.number_session,

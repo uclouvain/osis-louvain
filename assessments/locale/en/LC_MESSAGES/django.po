@@ -391,6 +391,9 @@ msgstr ""
 msgid "Registration number"
 msgstr ""
 
+msgid "Registration number header"
+msgstr "Registration number"
+
 msgid "Remove"
 msgstr ""
 

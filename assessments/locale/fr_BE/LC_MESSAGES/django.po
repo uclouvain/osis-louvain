@@ -417,6 +417,9 @@ msgstr "Le noma ne corresond pas à l'adresse de messagerie"
 msgid "Registration number"
 msgstr "Noma"
 
+msgid "Registration number header"
+msgstr "Noma"
+
 msgid "Remove"
 msgstr "Retirer"
 
