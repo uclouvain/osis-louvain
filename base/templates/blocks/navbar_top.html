@@ -169,7 +169,7 @@
                                 <li><a href="{% url 'partnerships:list' %}"
                                        id="lnk_dropdown_partnerships">{% trans 'partnerships' %}</a></li>
                                 {% if perms.partnership.can_access_partnerships_agreements %}
-                                    <li><a href="{% url 'partnerships:list' %}?agreements=1"
+                                    <li><a href="{% url 'partnerships:agreements-list' %}"
                                            id="lnk_dropdown_agreements">{% trans 'agreements' %}</a></li>
                                 {% endif %}
                                 {% if perms.partnership.change_partnershipconfiguration %}
