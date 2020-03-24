@@ -37,6 +37,7 @@ from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 
 from assessments.business import score_encoding_sheet
+from base.models.enums import proposal_type
 from base.models.enums.exam_enrollment_justification_type import JUSTIFICATION_TYPES
 from base.models.person import Person
 from osis_common.document import paper_sheet, xls_build
@@ -270,7 +271,9 @@ def _build_table_proposal_data(proposals_with_results):
         (
             proposal.learning_unit_year.academic_year.name,
             proposal.learning_unit_year.acronym,
-            proposal.learning_unit_year.complete_title,
+            proposal.learning_unit_year.get_learning_unit_previous_year().complete_title
+            if proposal.type == proposal_type.ProposalType.SUPPRESSION.name
+            else proposal.learning_unit_year.complete_title,
             proposal.get_type_display(),
             proposal.get_state_display(),
             _("Success") if ERROR not in results else _("Failure"),

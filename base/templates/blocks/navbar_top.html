@@ -33,7 +33,12 @@
                             <ul class="dropdown-menu">
                                 {% if perms.base.can_access_education_group %}
                                     <li>
-                                        <a href="{% url 'education_groups' %}" id="lnk_dropdown_educationgroups">
+                                        {% flag "version_program" %}
+                                            {% url 'version_program' as url_training %}
+                                        {% else %}
+                                            {% url 'education_groups' as url_training %}
+                                        {% endflag %}
+                                        <a href="{{url_training}}" id="lnk_dropdown_educationgroups">
                                             <span class="fa fa-folder-open"></span>
                                             {% trans 'Trainings' %}
                                         </a>

@@ -335,6 +335,12 @@ class LearningUnitYear(SerializableModel):
     def find_list_group_element_year(self):
         return self.child_leaf.filter(child_leaf=self).select_related('parent')
 
+    def get_learning_unit_previous_year(self):
+        try:
+            return self.learning_unit.learningunityear_set.get(academic_year__year=(self.academic_year.year - 1))
+        except LearningUnitYear.DoesNotExist:
+            return None
+
     def get_learning_unit_next_year(self):
         try:
             return self.learning_unit.learningunityear_set.get(academic_year__year=(self.academic_year.year + 1))

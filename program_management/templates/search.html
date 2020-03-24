@@ -1,0 +1,177 @@
+{% extends "education_group/layout.html" %}
+{% load static %}
+{% load i18n bootstrap3 %}
+{% load waffle_tags %}
+
+{% comment "License" %}
+ * OSIS stands for Open Student Information System. It's an application
+ * designed to manage the core business of higher education institutions,
+ * such as universities, faculties, institutes and professional schools.
+ * The core business involves the administration of students, teachers,
+ * courses, programs and so on.
+ *
+ * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of this license - GNU General Public License - is available
+ * at the root of the source code of this program.  If not,
+ * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+    <li>
+        <a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a>
+    </li>
+    <li class="active">{% trans 'Trainings' %}</li>
+{% endblock %}
+
+{% block content %}
+
+    <div class="page-header">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>{% trans 'Trainings' %}</h2>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+
+            <form id="search_form">
+                <div class="row">
+                    <div class="col-md-2">
+                       {% bootstrap_field form.academic_year %}
+                        {{ form.media }}
+                    </div>
+                    <div class="col-md-2">
+                        {% bootstrap_label form.acronym.label %}
+                        {% bootstrap_field form.acronym show_label=False %}
+                    </div>
+                    <div class="col-md-2">
+                        {% bootstrap_label form.partial_acronym.label %}
+                        {% bootstrap_field form.partial_acronym show_label=False %}
+                    </div>
+                    <div class="col-md-6">
+                        {% bootstrap_label form.title_fr.label %}
+                        {% bootstrap_field form.title_fr show_label=False %}
+                    </div>
+                </div>
+                <div class="row" style="margin-top:10px;">
+                    <div class="col-md-2">
+                        {% bootstrap_field form.category %}
+                    </div>
+                    <div class="col-md-3">
+                        {% bootstrap_field form.education_group_type %}
+                    </div>
+                    <div class="col-md-1">
+                        {% bootstrap_field form.management_entity %}
+                    </div>
+                    <div class="col-md-2" style="margin-top: 28px;">
+                         {% bootstrap_field form.with_entity_subordinated %}
+                    </div>
+                    <div class="col-md-1">
+                        {% bootstrap_field form.version %}
+                    </div>
+                    <div class="col-md-2" style="margin-top: 28px;">
+                         {% bootstrap_field form.with_entity_transition %}
+                    </div>
+                    <div class="col-md-1">
+                        <br>
+                        <div class="btn-toolbar pull-right">
+                            <button type="submit" id="bt_submit_education_groups_search"
+                                    class="btn btn-primary" role="button">
+                                <span class="glyphicon glyphicon-search" aria-hidden="true"></span>
+                            </button>
+                            {% include 'blocks/button/button_filter_refresh.html' %}
+                        </div>
+                    </div>
+                </div>
+                {% bootstrap_field form.ordering %}
+                {{ form.media }}
+            </form>
+
+            {% include 'learning_unit/blocks/form/search_form_reset.html' %}
+            <hr style="margin:10px -15px 10px -15px;">
+            <div class="row">
+                {% if object_list_count %}
+                    <div class="row">
+                        <div class="col-md-12">
+                            <strong style="margin-left:10px;color:grey;">
+                                {% blocktrans with start_index=page_obj.start_index end_index=page_obj.end_index total_counts=object_list_count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} trainings{% endblocktrans %}
+                            </strong>
+                        </div>
+                    </div>
+
+                    <table id="table_education_groups" class="table table-striped table-hover">
+                        <thead>
+                            <tr>
+                                <th id="th_0_academic_year.year">{% trans 'Ac yr.' %}</th>
+                                <th id="th_1_acronym">{% trans 'Acronym/Short title' context "abbreviation" %}</th>
+                                <th id="th_2_title_fr">{% trans 'Title' %}</th>
+                                <th id="th_3_education_group_type.name">{% trans 'Type' %}</th>
+                                <th id="th_4_management_entity_version.acronym">{% trans 'Entity' %}</th>
+                                <th id="th_5_partial_acronym">{% trans 'Code' %}</th>
+                            </tr>
+                        </thead>
+                    </table>
+                    <div class="text-center">
+                        {% bootstrap_pagination page_obj extra=request.GET.urlencode %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block script %}
+    <script src="{% static "js/osis_datatable.js" %}"></script>
+    <script>
+        $(document).ready(function () {
+            let columnDefs = [
+                {"name": "academic_year", "targets": 0, "data": "academic_year"},
+                {
+                    "name": "acronym",
+                    "targets": 1,
+                    "data": "complete_title_fr",
+                    "render": function ( data, type, row, meta ) {
+                        return outputAnchorOuterHtml(row["url"], data);
+                    }
+                },
+                {"name": "title", "targets": 2, "data": "title"},
+                {"name": "type", "targets": 3,  "data": "education_group_type_text"},
+                {"name": "management_entity", "targets": 4, "data": "management_entity"},
+                {"name": "code", "targets": 5, "data": "code"}
+            ];
+
+            initializeDataTable("search_form", "table_education_groups", "educationGroupIds", {{ page_obj.number }},
+            {{items_per_page}}, "{% url 'version_program' %}", columnDefs);
+        });
+
+        // FIXME remove xls_order_col / xls_order ==> USE ordering params
+        function get_ordering_column(order) {
+            let id_search = 'th_' + order[0][0] + '_';
+            let id_string = '[id^=' + id_search + ']';
+            let element = document.querySelector(id_string).id;
+            let field_name = element.replace(id_search, "");
+            return field_name;
+        }
+
+        // Disable typing on education group type select input
+        $('#id_education_group_type').on('select2:opening select2:closing', function( event ) {
+            let $searchfield = $(this).parent().find('.select2-search__field');
+            $searchfield.prop('disabled', true);
+        });
+    </script>
+    <script src="{% static "js/sorting_dropdown_type.js" %}"></script>
+{% endblock %}

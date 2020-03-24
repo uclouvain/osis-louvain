@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% load static %}
 {% load i18n %}
+{% load waffle_tags %}
 
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
@@ -40,7 +41,12 @@
             <div class="col-md-1"><i class="fa fa-folder-open" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
                 <h4 class="media-heading">
-                    <a href="{% url 'education_groups' %}" id="lnk_education_groups">{% trans 'Trainings' %}</a>
+                    {% flag "version_program" %}
+                        {% url 'version_program' as url_training %}
+                    {% else %}
+                        {% url 'education_groups' as url_training %}
+                    {% endflag %}
+                    <a href="{{url_training}}" id="lnk_education_groups">{% trans 'Trainings' %}</a>
                 </h4>
                 <p>{% trans 'Management of formations' %}</p>
             </div>
