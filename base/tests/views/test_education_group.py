@@ -447,24 +447,27 @@ class EducationGroupViewTestCase(TestCase):
 
 
 class EducationGroupAdministrativedata(TestCase):
-    def setUp(self):
-        self.person = PersonWithPermissionsFactory(
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonWithPermissionsFactory(
             'can_access_education_group', 'can_edit_education_group_administrative_data'
         )
 
-        self.permission_access = Permission.objects.get(codename='can_access_education_group')
-        self.permission_edit = Permission.objects.get(codename='can_edit_education_group_administrative_data')
+        cls.permission_access = Permission.objects.get(codename='can_access_education_group')
+        cls.permission_edit = Permission.objects.get(codename='can_edit_education_group_administrative_data')
 
-        self.education_group_year = EducationGroupYearFactory()
-        self.program_manager = ProgramManagerFactory(
-            person=self.person,
-            education_group=self.education_group_year.education_group,
+        cls.education_group_year = EducationGroupYearFactory()
+        cls.program_manager = ProgramManagerFactory(
+            person=cls.person,
+            education_group=cls.education_group_year.education_group,
         )
 
-        self.url = reverse('education_group_administrative', args=[
-            self.education_group_year.id, self.education_group_year.id
+        cls.url = reverse('education_group_administrative', args=[
+            cls.education_group_year.id, cls.education_group_year.id
         ])
         create_current_academic_year()
+
+    def setUp(self):
         self.client.force_login(self.person.user)
 
     def test_when_not_logged(self):
