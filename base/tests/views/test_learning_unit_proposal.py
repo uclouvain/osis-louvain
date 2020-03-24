@@ -280,6 +280,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
             allocation_entity=cls.entity_version.entity,
         )
         cls.learning_unit = LearningUnitFactory(
+            start_year=AcademicYear.objects.first(),
             end_year=None
         )
 
