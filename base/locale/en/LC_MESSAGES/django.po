@@ -994,7 +994,7 @@ msgstr ""
 msgid "Faculty borrowing"
 msgstr ""
 
-msgid "Faculty remark"
+msgid "Faculty remark (unpublished)"
 msgstr ""
 
 msgid "Failure"
@@ -1829,7 +1829,7 @@ msgstr ""
 msgid "Other languages activities"
 msgstr ""
 
-msgid "Other remark"
+msgid "Other remark (intended for publication)"
 msgstr ""
 
 msgid "Others Bachelors of the French speaking Community of Belgium"

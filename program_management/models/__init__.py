@@ -1,1 +1,2 @@
+from program_management.models import education_group_version
 from program_management.models import element

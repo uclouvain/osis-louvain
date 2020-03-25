@@ -28,7 +28,7 @@ from django.urls import include
 
 from program_management.views import groupelementyear_create, groupelementyear_delete, groupelementyear_update, \
     groupelementyear_read, prerequisite_update, prerequisite_read, element_utilization, groupelementyear_postpone, \
-    groupelementyear_management, excel
+    groupelementyear_management, excel, search, tree
 from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
 urlpatterns = [
@@ -86,5 +86,15 @@ urlpatterns = [
         r'reporting/(?P<root_id>[0-9]+)/(?P<education_group_year_pk>[0-9]+)/contains/$',
         excel.get_learning_units_of_training_for_excel,
         name="education_group_learning_units_contains"
-    )
+    ),
+    url(r'^$', search.EducationGroupSearch.as_view(), name='version_program'),
+
+    # NEW VERSION URL - Program management
+    url(r'^(?P<root_id>[0-9]+)/', include([
+        url(u'^create', tree.create.CreateLinkView.as_view(), name='tree_create_link'),
+        url(u'^update', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
+        url(u'^attach', tree.attach.AttachMultipleNodesView.as_view(), name='tree_attach_node'),
+        url(u'^detach', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
+        url(u'^move', tree.move.MoveNodeView.as_view(), name='tree_move_node'),
+    ])),
 ]

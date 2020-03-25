@@ -1,0 +1,99 @@
+{% load bootstrap3 i18n static %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="modal-content" id="form-modal-content">
+    {% if not messages %}
+        <div class="modal-header">
+            <h4 class="text-center">{% trans 'Content' %}</h4>
+        </div>
+
+        <div id="form-modal-body" class="modal-body">
+            <form method="post" id="form_attach_node" action="{{ request.path }}?{{ request.GET.urlencode }}" data-formset-prefix="{{ formset.prefix }}">
+                {% csrf_token %}
+                {{ formset.management_form }}
+                {{ formset.media }}
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
+                            <th>{% trans 'Code' %}</th>
+                            <th>{% trans 'Access condition' %}</th>
+                            <th>{% trans 'Mandatory' %}</th>
+                            <th>{% trans 'Block' %}</th>
+                            <th>{% trans 'Link type' %}</th>
+                            <th>{% trans 'Comment' %}</th>
+                            <th>{% trans 'English comment' %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for form in formset.forms %}
+                            {% if forloop.first %}
+                                {{ form.media }}
+                            {% endif %}
+                            <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
+                                {{ form.id }}
+                                <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{{ form.node.acronym }}</td>
+                                <td>{{ form.node.code }}</td>
+
+                                <td>{{ form.access_condition }}</td>
+                                <td>{{ form.is_mandatory }}</td>
+                                <td style="word-wrap: break-word; min-width: 90px;max-width: 90px;">{% bootstrap_field form.block show_label=False %}</td>
+                                <td style="word-wrap: break-word; min-width: 125px;max-width: 125px;">{% bootstrap_field form.link_type show_label=False %}</td>
+                                <td>{% bootstrap_field form.comment show_label=False %}</td>
+                                <td>{% bootstrap_field form.comment_english show_label=False %}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </form>
+
+            <script src="{% static 'js/jquery.formset.js' %}"></script>
+            <script>
+                $(document).ready(function() {
+                    document.getElementById("modal_dialog_id").classList.add("modal-lg");
+                    $('.link-formset').formset({
+                        prefix: '{{ formset.prefix }}',
+                        addText: '',
+                        deleteText: ''
+                    });
+                });
+            </script>
+        </div>
+
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+            <button type="submit" onclick="document.forms['form_attach_node'].submit();" class="btn btn-primary pull-right">
+                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
+            </button>
+        </div>
+    {% else %}
+        <div class="modal-body">
+            {% include 'template_messages.html' %}
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+        </div>
+    {% endif %}
+</div>

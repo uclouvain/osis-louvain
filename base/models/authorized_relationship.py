@@ -23,10 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List, Set
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from base.models.education_group_type import EducationGroupType
+from base.models.enums.education_group_types import EducationGroupTypesEnum
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
@@ -53,3 +56,50 @@ class AuthorizedRelationship(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.parent_type, self.child_type)
+
+
+class AuthorizedRelationshipObject:
+    # Object used for typing 'parent_type' and 'child_type' as Enum
+    def __init__(
+            self,
+            parent_type: EducationGroupTypesEnum,
+            child_type: EducationGroupTypesEnum,
+            min_constraint: int,
+            max_constraint: int
+    ):
+        self.parent_type = parent_type
+        self.child_type = child_type
+        self.min_count_authorized = min_constraint
+        self.max_count_authorized = max_constraint
+
+
+class AuthorizedRelationshipList:
+
+    def __init__(self, authorized_relationships: List[AuthorizedRelationshipObject]):
+        assert authorized_relationships, "You must set at least 1 authorized relation (list can't be empty)"
+        assert isinstance(authorized_relationships, list)
+        assert isinstance(authorized_relationships[0], AuthorizedRelationshipObject)
+        self.authorized_relationships = authorized_relationships
+
+    def get_authorized_relationship(
+            self,
+            parent_type: EducationGroupTypesEnum,
+            child_type: EducationGroupTypesEnum
+    ) -> AuthorizedRelationshipObject:
+        return next(
+            (
+                auth_rel for auth_rel in self.authorized_relationships
+                if auth_rel.child_type == child_type
+                and auth_rel.parent_type == parent_type
+            ),
+            None
+        )
+
+    def is_authorized(self, parent_type: EducationGroupTypesEnum, child_type: EducationGroupTypesEnum) -> bool:
+        return child_type in self.get_authorized_children_types(parent_type)
+
+    def get_authorized_children_types(self, parent_type: EducationGroupTypesEnum) -> Set[EducationGroupTypesEnum]:
+        return set(
+            auth_rel.child_type for auth_rel in self.authorized_relationships
+            if auth_rel.parent_type == parent_type
+        )

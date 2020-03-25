@@ -199,6 +199,21 @@ class LearningUnitYearTest(TestCase):
         luy = LearningUnitYearFactory()
         self.assertFalse(luy.is_external())
 
+    def test_get_learning_unit_previous_year(self):
+        learning_unit = LearningUnitFactory()
+        dict_learning_unit_year = create_learning_units_year(2000, 2017, learning_unit)
+        cases = [
+            {'expected_result': dict_learning_unit_year[2006],
+             'result': dict_learning_unit_year[2007].get_learning_unit_previous_year(),
+             'name': "When there is a previous year of luy"},
+            {'expected_result': None,
+             'result': dict_learning_unit_year[2000].get_learning_unit_previous_year(),
+             'name': "When there is NOT a previous year of luy"}
+        ]
+        for case in cases:
+            with self.subTest(case['name']):
+                self.assertEqual(case['expected_result'], case['result'])
+
 
 class LearningUnitYearGetEntityTest(TestCase):
     @classmethod

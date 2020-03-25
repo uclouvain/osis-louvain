@@ -25,6 +25,7 @@
 ##############################################################################
 import logging
 import subprocess
+from typing import List
 
 from django.conf import settings
 from django.contrib import messages
@@ -39,6 +40,7 @@ from django.utils.translation import gettext_lazy as _
 from base import models as mdl
 from base.models.utils import native
 from osis_common.models import application_notice
+from program_management.ddd.business_types import *
 
 ITEMS_PER_PAGE = 25
 
@@ -209,6 +211,12 @@ def display_info_messages(request, messages_to_display, extra_tags=None):
 
 def display_warning_messages(request, messages_to_display, extra_tags=None):
     display_messages(request, messages_to_display, messages.WARNING, extra_tags=extra_tags)
+
+
+def display_business_messages(request, messages_to_display: List['BusinessValidationMessage'], extra_tags=None):
+    display_success_messages(request, [m.message for m in messages_to_display if m.is_success()], extra_tags=extra_tags)
+    display_error_messages(request, [m.message for m in messages_to_display if m.is_error()], extra_tags=extra_tags)
+    display_warning_messages(request, [m.message for m in messages_to_display if m.is_warning()], extra_tags=extra_tags)
 
 
 def display_messages(request, messages_to_display, level, extra_tags=None):

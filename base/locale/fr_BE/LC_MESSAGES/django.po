@@ -1039,8 +1039,8 @@ msgstr "Faculté"
 msgid "Faculty borrowing"
 msgstr "Faculté emprunteuse"
 
-msgid "Faculty remark"
-msgstr "Remarque de faculté"
+msgid "Faculty remark (unpublished)"
+msgstr "Remarque de faculté (non publiée)"
 
 msgid "Failure"
 msgstr "Echec"
@@ -1907,8 +1907,8 @@ msgstr "Autre individuel"
 msgid "Other languages activities"
 msgstr "Activités dans d'autres langues"
 
-msgid "Other remark"
-msgstr "Autre remarque"
+msgid "Other remark (intended for publication)"
+msgstr "Autre remarque (destinée à la publication)"
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr "Autres bacheliers de la Communauté française de Belgique"

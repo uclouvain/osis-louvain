@@ -193,14 +193,6 @@ function getDataAjaxTable(formId, domTable, d, pageNumber) {
     return queryString;
 }
 
-$(window).scroll(function() {
-    if (checkVisible($('.footer'))) {
-        $('.side-container').css("height", "calc(100% - 100px)");
-    } else {
-        $('.side-container').css("height", "calc(100% - 50px)");
-    }
-});
-
 function checkVisible( elm, eval ) {
     eval = eval || "visible";
     var vpH = $(window).height(), // Viewport Height

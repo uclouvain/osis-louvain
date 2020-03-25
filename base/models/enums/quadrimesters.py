@@ -27,18 +27,8 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.utils.utils import ChoiceEnum
 
-UNIQUE = "UNIQUE"
-SEPARATE = "SEPARATE"
-NOT_CONCERNED = "NOT_CONCERNED"
 
-# TODO: Is it used ?
-COORGANIZATION_DIPLOMA_TYPE = (
-    (UNIQUE, _("Unique")),
-    (SEPARATE, _("Separate")),
-    (NOT_CONCERNED, _("Not concerned")),
-)
-
-
+# TODO :: move this into ddd/domain layer
 class DerogationQuadrimester(ChoiceEnum):
     Q1 = 'Q1'
     Q2 = 'Q2'

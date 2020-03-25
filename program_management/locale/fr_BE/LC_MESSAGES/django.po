@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-11 11:00+0100\n"
+"POT-Creation-Date: 2020-03-12 11:28+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -229,6 +229,9 @@ msgstr "Pour accord,"
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
 
+msgid "Include transition"
+msgstr "Inclure transition"
+
 #, python-format
 msgid ""
 "Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
@@ -290,6 +293,9 @@ msgstr "Aucun résultat!"
 msgid "Non-mandatory"
 msgstr "Facultatif"
 
+msgid "Offer"
+msgstr "Offre"
+
 msgid "Official"
 msgstr "Officiel"
 
@@ -333,6 +339,9 @@ msgstr "Au choix"
 msgid "Other informations"
 msgstr "Autres informations"
 
+msgid "Particular"
+msgstr "Particulière"
+
 msgid "Paste"
 msgstr "Coller"
 
@@ -370,6 +379,15 @@ msgstr "Formulaire d'inscription au contenu de"
 
 msgid "Relative credits"
 msgstr "Crédits relatifs"
+
+msgid "Req. Entity"
+msgstr "Entité Resp."
+
+msgid "Requirement entity"
+msgstr "Entité resp. cahier des charges"
+
+msgid "Root group"
+msgstr "Groupement racine"
 
 msgid "Save"
 msgstr "Enregistrer"
@@ -480,11 +498,23 @@ msgstr "La formation n'a pas de contenu à reporter."
 msgid "Title"
 msgstr "Intitulé"
 
+msgid "Title in English"
+msgstr "Intitulé en anglais"
+
+msgid "Title in French"
+msgstr "Intitulé en français"
+
 msgid "Trainings"
 msgstr "Formations"
 
 msgid "Utilizations"
 msgstr "Utilisations"
+
+msgid "Version name"
+msgstr "Sigle de la version"
+
+msgid "Volume"
+msgstr "Volume"
 
 msgid "Yes"
 msgstr "Oui"
