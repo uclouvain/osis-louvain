@@ -43,8 +43,8 @@
 
 {% block search_form_row_2 %}
     {% with activity_search_type=1 service_search_type=2 borrowed_search_type=5 %}
-        {% bootstrap_field form.status form_group_class="col-md-1" %}
-        {% bootstrap_field form.quadrimester form_group_class="col-md-1" %}
+        {% bootstrap_field form.status form_group_class="col-md-2" %}
+        {% bootstrap_field form.quadrimester form_group_class="col-md-2" %}
         <div class="col-md-2">
         {% bootstrap_label form.tutor.label %}
         {% bootstrap_field form.tutor show_label=False %}

@@ -36,7 +36,6 @@ from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
-from osis_common.decorators import deprecated
 
 LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table

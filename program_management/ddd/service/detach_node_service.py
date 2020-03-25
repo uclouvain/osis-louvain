@@ -25,8 +25,8 @@
 ##############################################################################
 from typing import List
 
-from program_management.ddd.business_types import *
 from base.ddd.utils.validation_message import BusinessValidationMessage
+from program_management.ddd.business_types import *
 
 
 def detach_node(tree: 'ProgramTree', path: 'Path' = None) -> List[BusinessValidationMessage]:

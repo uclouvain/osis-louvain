@@ -25,8 +25,8 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
-from program_management.ddd.business_types import *
 from base.ddd.utils.business_validator import BusinessValidator
+from program_management.ddd.business_types import *
 
 
 #  Implemented from _check_new_attach_is_not_duplication

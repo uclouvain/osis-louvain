@@ -25,8 +25,8 @@
 ##############################################################################
 import factory.fuzzy
 
-from base.models.enums.education_group_types import TrainingType
 from base.models.authorized_relationship import AuthorizedRelationshipObject, AuthorizedRelationshipList
+from base.models.enums.education_group_types import TrainingType
 
 
 class AuthorizedRelationshipFactory(factory.Factory):

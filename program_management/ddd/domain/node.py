@@ -30,7 +30,7 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.link import factory as link_factory
-from program_management.ddd.domain.prerequisite import Prerequisite, PrerequisiteExpression
+from program_management.ddd.domain.prerequisite import Prerequisite
 from program_management.models.enums.node_type import NodeType
 
 

@@ -28,9 +28,9 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
+from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.enums.education_group_types import TrainingType
 from base.models.enums.link_type import LinkTypes
-from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from program_management.ddd.domain import program_tree
 from program_management.ddd.service import attach_node_service
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator

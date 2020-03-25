@@ -25,7 +25,6 @@
 ##############################################################################
 
 from base.models.enums.link_type import LinkTypes
-from base.models.enums.quadrimesters import DerogationQuadrimesterEnum
 from program_management.ddd.business_types import *
 from program_management.models.enums.node_type import NodeType
 

@@ -36,11 +36,11 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.shortcuts import redirect, render
 from django.utils import translation
 from django.utils.translation import gettext_lazy as _
-from program_management.ddd.business_types import *
 
 from base import models as mdl
 from base.models.utils import native
 from osis_common.models import application_notice
+from program_management.ddd.business_types import *
 
 ITEMS_PER_PAGE = 25
 

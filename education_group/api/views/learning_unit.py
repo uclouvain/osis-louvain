@@ -31,7 +31,7 @@ from rest_framework.generics import get_object_or_404
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import GroupType
+from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer, \
@@ -66,14 +66,15 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
         education_group_root_ids = group_element_year.find_learning_unit_roots(
             [learning_unit_year],
             luy=learning_unit_year,
-            is_root_when_matches=[GroupType.COMPLEMENTARY_MODULE]
+            recursive_conditions={
+                'stop': [GroupType.COMPLEMENTARY_MODULE.name],
+                'continue': TrainingType.finality_types()
+            }
         ).get(learning_unit_year.id, [])
 
         return EducationGroupYear.objects.filter(
             pk__in=education_group_root_ids
-        ).select_related(
-            'education_group_type', 'academic_year'
-        )
+        ).select_related('education_group_type', 'academic_year')
 
 
 class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.ListAPIView):

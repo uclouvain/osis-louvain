@@ -23,9 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import TestCase, SimpleTestCase
+from django.test import SimpleTestCase
 
-from program_management.ddd.domain.node import NodeGroupYear, NodeLearningUnitYear
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.serializers.program_tree_view import ProgramTreeViewSerializer
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory

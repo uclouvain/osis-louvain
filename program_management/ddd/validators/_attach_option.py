@@ -26,10 +26,10 @@
 
 from django.utils.translation import ngettext
 
+from base.ddd.utils.business_validator import BusinessValidator
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import program_tree
-from base.ddd.utils.business_validator import BusinessValidator
 
 
 # Implmented from _check_attach_options_rules

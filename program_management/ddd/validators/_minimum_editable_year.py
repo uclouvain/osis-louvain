@@ -26,8 +26,8 @@
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from program_management.ddd.business_types import *
 from base.ddd.utils.business_validator import BusinessValidator
+from program_management.ddd.business_types import *
 
 
 # Implemented from AttachPermission._check_year_is_editable

@@ -25,15 +25,14 @@
 ##############################################################################
 from urllib.parse import urlencode
 
-from django.utils.translation import gettext_lazy as _
 from django.templatetags.static import static
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
 from program_management.ddd.domain import link, node
-from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
 
 

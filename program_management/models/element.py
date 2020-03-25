@@ -31,7 +31,6 @@ from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from osis_common.models.osis_model_admin import OsisModelAdmin
-from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
 
 

@@ -34,8 +34,8 @@ from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree, node
-from program_management.tests.factories.element import ElementEducationGroupYearFactory
 from program_management.ddd.repositories import load_tree
+from program_management.tests.factories.element import ElementEducationGroupYearFactory
 
 
 class TestLoadTree(TestCase):

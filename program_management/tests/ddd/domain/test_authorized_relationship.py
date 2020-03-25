@@ -25,8 +25,8 @@
 ##############################################################################
 from django.test import SimpleTestCase
 
-from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.authorized_relationship import AuthorizedRelationshipList
+from base.models.enums.education_group_types import TrainingType, GroupType
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 

@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import factory.fuzzy
+
 from base.tests.factories.utils.fuzzy import FuzzyBoolean
 from program_management.ddd.domain.link import Link
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory

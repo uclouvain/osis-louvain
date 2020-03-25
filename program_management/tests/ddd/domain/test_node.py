@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import factory.fuzzy
 from django.test import SimpleTestCase
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType

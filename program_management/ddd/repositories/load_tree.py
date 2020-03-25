@@ -31,8 +31,8 @@ from django.db.models import Case, F, When, IntegerField
 
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
-from program_management.ddd.business_types import *
-from program_management.ddd.domain import node, link
+from program_management.ddd.domain import node
+from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
@@ -120,7 +120,7 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
         child_id = gey_dict.pop('child_id')
 
         tree_id = '_'.join([str(parent_id), str(child_id)])
-        tree_links[tree_id] = link.factory.get_link(parent=None, child=None, **gey_dict)
+        tree_links[tree_id] = link_factory.get_link(parent=None, child=None, **gey_dict)
     return tree_links
 
 

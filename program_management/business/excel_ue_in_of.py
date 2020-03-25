@@ -51,10 +51,10 @@ from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
     STYLED_CELLS, COLORED_ROWS, ROW_HEIGHT
+from program_management.business.excel import clean_worksheet_title
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
-from program_management.business.excel import clean_worksheet_title
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 

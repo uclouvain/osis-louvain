@@ -26,6 +26,7 @@
 from unittest.mock import patch
 
 from django.test import TestCase
+from django.utils.translation import gettext as _
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -36,7 +37,6 @@ from base.tests.models import test_person, test_academic_year, test_offer_year, 
     test_exam_enrollment
 from base.utils import send_mail
 from osis_common.models import message_template
-from django.utils.translation import gettext as _
 
 LEARNING_UNIT_YEARS_VARIABLE_PARAGRAPH_ = "<p>{{ learning_unit_years }}/p>"
 

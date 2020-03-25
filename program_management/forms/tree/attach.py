@@ -27,9 +27,6 @@ from django import forms
 from django.forms import BaseFormSet
 
 from base.models.enums.link_type import LinkTypes
-from program_management.ddd.domain import program_tree
-from program_management.ddd.service import attach_node_service
-from program_management.ddd.repositories import load_node
 
 
 class AttachNodeFormSet(BaseFormSet):

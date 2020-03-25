@@ -34,13 +34,12 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic.base import TemplateView
 
+from base.ddd.utils.validation_message import BusinessValidationMessage
 from base.models.education_group_year import EducationGroupYear
 from base.utils.cache import ElementCache
-from base.views.common import display_warning_messages, display_success_messages, display_error_messages, \
-    display_business_messages
+from base.views.common import display_warning_messages, display_business_messages
 from base.views.mixins import AjaxTemplateMixin
 from program_management.business.group_element_years import management
-from base.ddd.utils.validation_message import BusinessValidationMessage
 from program_management.ddd.service import attach_node_service
 from program_management.forms.tree.attach import AttachNodeForm, AttachNodeFormSet
 from program_management.models.enums.node_type import NodeType

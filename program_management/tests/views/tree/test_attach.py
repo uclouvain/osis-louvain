@@ -25,15 +25,15 @@
 ##############################################################################
 import mock
 from django.contrib import messages
-from django.http import HttpResponseBadRequest, HttpResponseNotFound, HttpResponse
+from django.http import HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
+from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.enums.education_group_types import GroupType
 from base.tests.factories.education_group_year import GroupFactory
 from base.tests.factories.person import PersonFactory
-from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.forms.tree.attach import AttachNodeFormSet, AttachNodeForm
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory
