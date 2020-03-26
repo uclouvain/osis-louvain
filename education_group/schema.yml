@@ -115,8 +115,114 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - trainings
-  /trainings/{year}/{acronym}/tree:
+        - trainings
+  /trainings/{year}/{acronym}/versions/:
+    get:
+      description: Return the versions list of the training
+      operationId: versions_list
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfVersion'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - trainings
+  /trainings/{year}/{acronym}/versions/{version_name}:
+    get:
+      description: Return the detail of the training version
+      operationId: training_version
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: version_name
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrainingDetailed'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - trainings
+  /trainings/{year}/{acronym}/versions/{version_name}/tree:
+    get:
+      description: Return the tree of the version
+      operationId: versions_tree
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: version_name
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tree'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      tags:
+        - trainings
+  '/trainings/{year}/{acronym}/tree':
     get:
       description: Return the tree of the training
       operationId: trainings_tree
@@ -492,6 +598,24 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
+    ArrayOfVersion:
+      type: array
+      items:
+        $ref: '#/components/schemas/Version'
+    Version:
+      type: object
+      properties:
+        url:
+          type: string
+          format: uri
+        version_name:
+          type: string
+        code:
+          type: string
+      required:
+        - url
+        - version_name
+        - code
     ArrayOfTraining:
       type: array
       items:
@@ -566,7 +690,7 @@ components:
             main_teaching_campus:
               $ref: '#/components/schemas/Campus'
             dissertation:
-               type: boolean
+              type: boolean
             internship:
               $ref: '#/components/schemas/InternshipPresenceEnum'
             internship_text:
@@ -658,6 +782,8 @@ components:
             domain_name:
               type: string
             domain_code:
+              type: string
+            version_name:
               type: string
     GroupDetailed:
       type: object
