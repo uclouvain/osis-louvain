@@ -376,7 +376,7 @@ def _get_default_common_value_learning_unit_year(learning_container_year, subtyp
         'specific_title_english': 'Title Specific English',
         'credits': Decimal(5),
         'session': learning_unit_year_session.SESSION_1X3,
-        'quadrimester': quadrimesters.Q1,
+        'quadrimester': quadrimesters.LearningUnitYearQuadrimester.Q1.name,
         'internship_subtype': None,
         'language': language,
         'periodicity': learning_unit_year_periodicity.ANNUAL

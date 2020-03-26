@@ -77,7 +77,7 @@ class LearningUnitFilter(FilterSet):
         label=_('Tutor'),
     )
     quadrimester = filters.ChoiceFilter(
-        choices=quadrimesters.LEARNING_UNIT_YEAR_QUADRIMESTERS,
+        choices=quadrimesters.LearningUnitYearQuadrimester.choices(),
         required=False,
         field_name="quadrimester",
         label=_('Quadri'),

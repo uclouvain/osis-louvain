@@ -351,7 +351,7 @@ class GroupElementYear(OrderedModel):
 
     quadrimester_derogation = models.CharField(
         max_length=10,
-        choices=quadrimesters.DEROGATION_QUADRIMESTERS,
+        choices=quadrimesters.DerogationQuadrimester.choices(),
         blank=True, null=True, verbose_name=_('Quadrimester derogation')
     )
 

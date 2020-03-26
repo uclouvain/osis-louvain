@@ -40,12 +40,19 @@ from osis_common.models import message_template
 
 LEARNING_UNIT_YEARS_VARIABLE_PARAGRAPH_ = "<p>{{ learning_unit_years }}/p>"
 
+LANGUAGE_CODE_FR = 'fr-be'
+LANGUAGE_CODE_EN = 'en'
+
 
 class TestSendMessage(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person_1 = test_person.create_person("person_1", last_name="test", email="person1@test.com")
-        cls.person_2 = test_person.create_person("person_2", last_name="test", email="person2@test.com")
+        cls.person_1 = test_person.create_person(
+            "person_1", last_name="test", email="person1@test.com", language=LANGUAGE_CODE_FR
+        )
+        cls.person_2 = test_person.create_person(
+            "person_2", last_name="test", email="person2@test.com", language=LANGUAGE_CODE_EN
+        )
         cls.persons = [cls.person_1, cls.person_2]
 
         cls.person_3 = PersonWithPermissionsFactory("can_receive_emails_about_automatic_postponement")
@@ -168,7 +175,7 @@ class TestSendMessage(TestCase):
         )
         args = mock_create_table.call_args[0]
         self.assertEqual(args[0], 'enrollments')
-        self.assertListEqual(args[1], send_mail.get_enrollment_headers())
+        self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers())
         self.assertListEqual(list(args[2][0]),
                              [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
                               self.exam_enrollment_1.session_exam.number_session,
@@ -178,11 +185,12 @@ class TestSendMessage(TestCase):
                               self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
                               self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
                               ])
-
         args = mock_send_messages.call_args[0][0]
         self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_acronym'))
         self.assertEqual(self.offer_year.acronym, args.get('subject_data').get('offer_acronym'))
         self.assertEqual(len(args.get('receivers')), 2)
+        self.assertEqual(args.get('receivers')[0].get('receiver_lang'), LANGUAGE_CODE_FR)
+        self.assertEqual(args.get('receivers')[1].get('receiver_lang'), LANGUAGE_CODE_EN)
         self.assertIsNotNone(args.get('attachment'))
         self.assertEqual(args.get('html_template_ref'),
                          "{}_html".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
@@ -209,7 +217,7 @@ class TestSendMessage(TestCase):
         )
         args = mock_create_table.call_args[0]
         self.assertEqual(args[0], 'submitted_enrollments')
-        self.assertListEqual(args[1], send_mail.get_enrollment_headers())
+        self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers())
         self.assertListEqual(list(args[2][0]),
                              [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
                               self.exam_enrollment_1.session_exam.number_session,

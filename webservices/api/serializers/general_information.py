@@ -81,18 +81,13 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         language = settings.LANGUAGE_CODE_FR \
             if self.instance.language == settings.LANGUAGE_CODE_FR[:2] else self.instance.language
         pertinent_sections = general_information_sections.SECTIONS_PER_OFFER_TYPE[obj.education_group_type.name]
-        common_egy = EducationGroupYear.objects.get_common(
-            academic_year=obj.academic_year
-        )
+
         cms_serializers = {
             SKILLS_AND_ACHIEVEMENTS: AchievementSectionSerializer,
             ADMISSION_CONDITION: AdmissionConditionSectionSerializer,
             CONTACTS: ContactsSectionSerializer,
         }
         extra_intro_offers = self._get_intro_offers(obj)
-
-        for common_section in pertinent_sections['common']:
-            sections.append(self._get_section_cms(common_egy, common_section, language))
 
         for specific_section in pertinent_sections['specific']:
             serializer = cms_serializers.get(specific_section)
@@ -109,20 +104,14 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         return datas
 
     def _get_section_cms(self, egy, section, language):
-        translated_text_label = TranslatedTextLabel.objects.get(
-            text_label__label=section,
-            language=language,
-        )
+        translated_text_label = TranslatedTextLabel.objects.get(text_label__label=section, language=language)
         translated_text = TranslatedText.objects.filter(
             text_label__label=section,
             language=language,
             entity=OFFER_YEAR,
             reference=egy.id
         ).annotate(
-            label=Value(
-                self._get_correct_label_name(egy, section),
-                output_field=CharField()
-            ),
+            label=Value(self._get_correct_label_name(egy, section), output_field=CharField()),
             translated_label=Value(translated_text_label.label, output_field=CharField())
         )
 
@@ -139,8 +128,6 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
     def _get_correct_label_name(egy, section):
         if section == INTRODUCTION:
             return 'intro-' + egy.partial_acronym.lower()
-        elif 'common' in egy.acronym:
-            return section + '-commun'
         return section
 
     @staticmethod

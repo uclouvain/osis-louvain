@@ -55,7 +55,7 @@ ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER = "assessments_all_scores_by_pgm_manager"
 def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enrollments, all_encoded):
     """
     Send an email to all the teachers after the scores submission for a learning unit
-    :param persons: The list of the teachers of the leaning unit
+    :param persons: The list of the teachers of the learning unit
     :param learning_unit_name: The name of the learning unit for which scores were submitted
     :param submitted_enrollments : The list of newly submitted enrollments
     :param all_encoded : Tell if all the scores are encoded and submitted
@@ -84,7 +84,8 @@ def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enr
 
     table = message_config.create_table('submitted_enrollments',
                                         get_enrollment_headers(),
-                                        submitted_enrollments_data)
+                                        submitted_enrollments_data,
+                                        data_translatable=['Justification'])
 
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref, [table], receivers,
                                                             template_base_data, suject_data)
@@ -318,7 +319,7 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
     :param enrollments: The enrollments that are encoded and submitted
     :param learning_unit_acronym The learning unit encoded
     :param offer_acronym: The offer which is managed
-    :return: A message if an error occured, None if it's ok
+    :return: A message if an error occurred, None if it's ok
     """
 
     html_template_ref = '{}_html'.format(ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER)
@@ -344,7 +345,8 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in enrollments]
 
-    table = message_config.create_table('enrollments', get_enrollment_headers(), enrollments_data)
+    table = message_config.create_table('enrollments', get_enrollment_headers(), enrollments_data,
+                                        data_translatable=['Justification'])
 
     attachment = build_scores_sheet_attachment(enrollments)
     message_content = message_config.create_message_content(html_template_ref, txt_template_ref,
@@ -373,12 +375,12 @@ def send_mail_for_educational_information_update(teachers, learning_units_years)
 
 
 def get_enrollment_headers():
-    return [
-        _('Acronym enrollment header'),
-        _('Session enrollment header'),
-        _('Registration number header'),
-        _('Lastname'),
-        _('Firstname'),
-        _('Score'),
-        _('Justification')
-    ]
+    return (
+        'Acronym enrollment header',
+        'Session enrollment header',
+        'Registration number header',
+        'Last name',
+        'First name',
+        'Score',
+        'Justification'
+    )

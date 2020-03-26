@@ -73,7 +73,7 @@ class LearningUnitYearFactory(DjangoModelFactory):
     decimal_scores = False
     status = True
     session = factory.Iterator(learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION, getter=operator.itemgetter(0))
-    quadrimester = factory.Iterator(quadrimesters.LEARNING_UNIT_YEAR_QUADRIMESTERS,
+    quadrimester = factory.Iterator(quadrimesters.LearningUnitYearQuadrimester.choices(),
                                     getter=operator.itemgetter(0))
     language = factory.SubFactory(LanguageFactory)
     attribution_procedure = None
@@ -100,7 +100,7 @@ class LearningUnitYearFakerFactory(DjangoModelFactory):
     decimal_scores = False
     status = True
     session = factory.Iterator(learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION, getter=operator.itemgetter(0))
-    quadrimester = factory.Iterator(quadrimesters.LEARNING_UNIT_YEAR_QUADRIMESTERS,
+    quadrimester = factory.Iterator(quadrimesters.LearningUnitYearQuadrimester.choices(),
                                     getter=operator.itemgetter(0))
     language = factory.SubFactory(LanguageFactory)
     attribution_procedure = None
@@ -128,7 +128,7 @@ def create_learning_unit_year(academic_yr, title, learning_unit):
                                    professional_integration=True,
                                    specific_title=title,
                                    specific_title_english=None,
-                                   quadrimester=quadrimesters.Q1,
+                                   quadrimester=quadrimesters.LearningUnitYearQuadrimester.Q1.name,
                                    session=learning_unit_year_session.SESSION_123,
                                    attribution_procedure=attribution_procedure.EXTERNAL,
                                    learning_unit=learning_unit

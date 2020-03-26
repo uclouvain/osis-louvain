@@ -31,13 +31,11 @@ from decimal import Decimal
 from unittest import mock
 
 import factory.fuzzy
-import reversion
 from django.contrib import messages
-from django.contrib.auth.models import Permission
 from django.http import HttpResponse, HttpResponseForbidden
 from django.http import HttpResponseNotAllowed
 from django.http import HttpResponseRedirect
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
@@ -64,11 +62,9 @@ from base.models.enums import learning_unit_year_session
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.academic_calendar_type import LEARNING_UNIT_EDITION_FACULTY_MANAGERS
 from base.models.enums.attribution_procedure import EXTERNAL
-from base.models.enums.groups import FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.enums.vacant_declaration_type import DO_NOT_ASSIGN, VACANT_NOT_PUBLISH
 from base.models.learning_unit_year import LearningUnitYear
-from base.tests.business.test_perms import create_person_with_permission_and_group
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year, get_current_year
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
@@ -77,7 +73,6 @@ from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
@@ -85,11 +80,9 @@ from base.tests.factories.learning_container import LearningContainerFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory, \
-    LearningUnitYearFakerFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerFactory, \
-    UEFacultyManagerFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
@@ -587,11 +580,11 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_units_search_quadrimester(self):
         self._prepare_context_learning_units_search()
-        self.luy_LBIR1100C.quadrimester = quadrimesters.Q1and2
+        self.luy_LBIR1100C.quadrimester = quadrimesters.LearningUnitYearQuadrimester.Q1and2.name
         self.luy_LBIR1100C.save()
         filter_data = {
             'academic_year': self.current_academic_year.id,
-            'quadrimester': quadrimesters.Q1and2,
+            'quadrimester': quadrimesters.LearningUnitYearQuadrimester.Q1and2.name,
             'acronym': 'LBIR1100C',
         }
         response = self.client.get(reverse('learning_units'), data=filter_data)

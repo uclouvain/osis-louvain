@@ -517,11 +517,11 @@ components:
         administration_entity:
           type: string
         administration_faculty:
-          type:string
+          type: string
         management_entity:
           type: string
         management_faculty:
-          type:string
+          type: string
         partial_title:
           type: string
       required:
@@ -672,7 +672,7 @@ components:
         management_entity:
           type: string
         management_faculty:
-          type:string
+          type: string
         academic_year:
           type: number
         education_group_type:
@@ -715,7 +715,7 @@ components:
         management_entity:
           type: string
         management_faculty:
-          type:string
+          type: string
         academic_year:
           type: number
         education_group_type:
@@ -769,10 +769,7 @@ components:
         node_type:
           $ref: '#/components/schemas/NodeTypeEnum'
         subtype:
-          allOf:
-            - $ref: '#/components/schemas/MiniTrainingTypeEnum'
-            - $ref: '#/components/schemas/TrainingTypeEnum'
-            - $ref: '#/components/schemas/GroupTypeEnum'
+          $ref: '#/components/schemas/NodeSubTypeEnum'
         partial_title:
           type: string
         children:
