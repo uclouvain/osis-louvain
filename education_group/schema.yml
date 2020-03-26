@@ -83,24 +83,24 @@ paths:
         '401':
           $ref: '#/components/responses/Unauthorized'
       tags:
-      - trainings
+        - trainings
   /trainings/{year}/{acronym}:
     get:
       description: Return the detail of the training
       operationId: trainings_read
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: path
-        name: acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -227,18 +227,18 @@ paths:
       description: Return the tree of the training
       operationId: trainings_tree
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: path
-        name: acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: acronym
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -253,7 +253,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - trainings
+        - trainings
   /trainings/{year}/{acronym}/title:
     get:
       description: Return the title of the training
@@ -298,18 +298,18 @@ paths:
       description: Return the detail of the group
       operationId: groups_read
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: path
-        name: partial_acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: partial_acronym
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -324,24 +324,24 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - groups
+        - groups
   /groups/{year}/{partial_acronym}/tree:
     get:
       description: Return the tree of the group
       operationId: groups_tree
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: path
-        name: partial_acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: partial_acronym
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -356,7 +356,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - groups
+        - groups
   /groups/{year}/{partial_acronym}/title:
     get:
       description: Return the title of the group
@@ -439,10 +439,10 @@ paths:
         - in: query
           name: education_group_type
           schema:
-              description: Filter result by specified mini-training types
-              type: array
-              items:
-                type: string
+            description: Filter result by specified mini-training types
+            type: array
+            items:
+              type: string
           style: form
           explode: true
         - in: query
@@ -473,18 +473,18 @@ paths:
       description: Return the detail of the mini-training
       operationId: minitrainings_read
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: path
-        name: partial_acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: partial_acronym
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -499,24 +499,24 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - mini_trainings
+        - mini_trainings
   /mini_trainings/{year}/{partial_acronym}/tree:
     get:
       description: Return the tree of the mini-training
       operationId: minitraining_tree
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: path
-        name: partial_acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: partial_acronym
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -531,7 +531,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - mini_trainings
+        - mini_trainings
   /mini_trainings/{year}/{partial_acronym}/title:
     get:
       description: Return the title of the mini training
@@ -734,7 +734,7 @@ components:
               description: |
                 The language code according to ISO 639-1 specification (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)
             keywords:
-             type: string
+              type: string
             duration:
               type: integer
               minimum: 1
@@ -996,9 +996,9 @@ components:
     ActiveEnum:
       type: string
       enum:
-       - ACTIVE
-       - INACTIVE
-       - RE_REGISTRATION
+        - ACTIVE
+        - INACTIVE
+        - RE_REGISTRATION
     NodeTypeEnum:
       type: string
       enum:
