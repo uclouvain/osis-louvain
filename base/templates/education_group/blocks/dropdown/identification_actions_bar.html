@@ -104,6 +104,11 @@
                     {% li_with_postpone_perm_training %}
                 {% endflag %}
 
+                <li class="divider"></li>
+                {% url 'create_education_group_version' root.pk education_group_year.education_group.pk as create_version_url %}
+                {% li_with_create_perm_specific_version create_version_url _('Create specific version') %}
+                <li class="divider"></li>
+
                 {% flag "pdf_content" %}
                     <li class="divider"></li>
                     {% url 'group_content' root_id=parent.id education_group_year_id=education_group_year.id as pdf_generate_url %}

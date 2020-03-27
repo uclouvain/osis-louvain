@@ -69,6 +69,16 @@ def _is_eligible_to_add_education_group(person, education_group, category, educa
             else check_authorized_type(education_group, category, raise_exception))
 
 
+def is_eligible_to_add_specific_version(person, education_group, raise_exception=False):
+    return _is_eligible_to_add_specific_version(person, education_group, raise_exception=raise_exception)
+
+
+def _is_eligible_to_add_specific_version(person, education_group, raise_exception=False):
+    return check_permission(person, "base.create_educationgroup_specific_version", raise_exception) and \
+           _is_eligible_education_group(person, education_group, raise_exception) and \
+           _is_year_editable(education_group, raise_exception)
+
+
 def is_eligible_to_change_education_group(person, education_group, raise_exception=False):
     return check_permission(person, "base.change_educationgroup", raise_exception) and \
            _is_eligible_education_group(person, education_group, raise_exception) and \

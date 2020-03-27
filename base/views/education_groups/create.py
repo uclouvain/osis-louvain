@@ -195,3 +195,9 @@ def validate_field(request, category, education_group_year_pk=None):
             response[field] = {'msg': e.message_dict[field][0], 'level': messages.DEFAULT_TAGS[messages.ERROR]}
 
     return JsonResponse(response)
+
+
+@login_required
+def create_education_group_specific_version(request, root_id=None, education_group_year_id=None):
+    context = { }
+    return render(request, "education_group/create_specific_version.html", data)
