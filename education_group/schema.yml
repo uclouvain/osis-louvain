@@ -133,6 +133,12 @@ paths:
           schema:
             description: ''
             type: string
+        - in: query
+          name: is_transition
+          schema:
+            description: Is a transition version
+            type: boolean
+            default: false
       responses:
         '200':
           description: OK
