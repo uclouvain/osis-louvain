@@ -34,9 +34,14 @@ from base.models.group_element_year import GroupElementYear
 from program_management.ddd.domain import node
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.domain.program_tree_version import MonProgramTreeVersion
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
-
+from program_management.models.education_group_version import EducationGroupVersion
+from django.db.models import Case, When, Value, CharField
+from django.db.models.functions import Concat
+from django.db.models import Q
 # Typing
 GroupElementYearColumnName = str
 LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"
@@ -180,3 +185,42 @@ def __build_children(
         link_node.child = child_node
         children.append(link_node)
     return children
+
+
+def find_all_program_tree_versions(tree_root_id: int, load_tree=True) -> List['ProgramTreeVersion']:
+    # id = group_year_id
+    qs = EducationGroupVersion.objects.filter(root_group__pk=tree_root_id).first()
+    id_education_group_yr = qs.offer.id
+    qs = EducationGroupVersion.objects.filter(offer__pk=id_education_group_yr)
+
+    qs = qs.values('is_transition', 'version_name', 'title_fr', 'root_group')
+    results = []
+    for elem in qs:
+        results.append(MonProgramTreeVersion(**elem))
+    return results
+
+
+def load_mon_program_tree_version(tree_root_id: int, load_tree=True) -> 'ProgramTreeVersion':
+    qs = EducationGroupVersion.objects.filter(root_group__pk=tree_root_id).annotate(
+            version_label=Case(
+                        When(Q(is_transition=True) &
+                             Q(version_name=''),
+                             then=Value('[Transition]')),
+                        When(~Q(version_name='') &
+                             Q(is_transition=True),
+                             then=Concat(Value('['), 'version_name', Value('-Transition]'))),
+                        When(~Q(version_name='') &
+                             Q(is_transition=False),
+                             then=Concat(Value('['), 'version_name', Value(']'))),
+                        default=Value(''),
+                        output_field=CharField()
+                    )
+        )
+    qs = qs.values('is_transition', 'version_name', 'title_fr', 'root_group', 'version_label')
+
+    for elem in qs:
+
+        return MonProgramTreeVersion(**elem)
+
+    return None
+

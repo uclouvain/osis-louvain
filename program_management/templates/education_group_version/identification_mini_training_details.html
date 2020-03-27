@@ -1,0 +1,48 @@
+{% extends "education_group_version/tab_identification.html" %}
+{% load i18n %}
+{% load static %}
+{% load format education_group %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+{% block details %}
+    {% with  parent=parent_training %}
+        <div class="row">
+            <div class="col-md-7" style="margin-top: 10px">
+                {% include 'education_group/blocks/informations.html' %}
+            </div>
+            <div class="col-md-5" style="margin-top: 10px">
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        {% dl_with_parent_without_context 'acronym' education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") %}
+                        {% dl_with_parent_without_context "start_year" education_group_year.education_group parent.education_group dl_title=_("Start") default_value=_('unspecified') %}
+                        {% dl_with_parent_without_context "end_year" education_group_year.education_group parent.education_group dl_title=_("Last year of organization") default_value=_('unspecified') %}
+                        {% dl_with_parent "main_teaching_campus" %}
+                    </div>
+                </div>
+                {% include "blocks/panel/reversion.html" %}
+            </div>
+        </div>
+        {% include 'education_group/blocks/remarks.html' %}
+    {% endwith %}
+{% endblock %}

@@ -60,10 +60,33 @@ class ProgramTreeVersion:
             tree: 'ProgramTree',
             version_name: str = STANDARD,
             is_transition: bool = False,
+            title_fr = ''
     ):
         self.tree = tree
         self.is_transition = is_transition
         self.version_name = version_name
+        self.title_fr = title_fr
+
+    @property
+    def is_standard(self):
+        return self.version_name == STANDARD
+
+
+class MonProgramTreeVersion:
+
+    def __init__(
+            self,
+            version_name: str = STANDARD,
+            is_transition: bool = False,
+            title_fr = '',
+            root_group = None,
+            version_label=''
+    ):
+        self.is_transition = is_transition
+        self.version_name = version_name
+        self.title_fr = title_fr
+        self.group_year_id = root_group
+        self.version_label = version_label
 
     @property
     def is_standard(self):

@@ -1,0 +1,84 @@
+{% load static %}
+{% load i18n education_group %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row">
+            {% dl_with_parent_version 'acronym' class_dl="col-md-6" dl_title='Acronym/Short title'%}
+            {% dl_with_parent 'partial_acronym' class_dl="col-md-6" %}
+            {% dl_with_parent_without_context 'category' education_group_year.education_group_type parent.education_group_type class_dl="col-md-6" %}
+            {% dl_with_parent_without_context 'name' education_group_year.education_group_type parent.education_group_type class_dl="col-md-6" %}
+
+            {% if education_group_year.education_group_type.category != 'GROUP' %}
+                {% dl_with_parent 'active' class_dl="col-md-6" %}
+                {% dl_with_parent 'schedule_type' class_dl="col-md-6" %}
+            {% endif %}
+
+            {% dl_with_parent 'credits' class_dl="col-md-6" %}
+            {% dl_with_parent 'constraint_type' dl_title=_('Type of constraint') class_dl="col-md-6" %}
+            {% dl_with_parent 'min_constraint' class_dl="col-md-6" %}
+            {% dl_with_parent 'max_constraint' class_dl="col-md-6" %}
+        </div>
+
+        <div>
+            <label>{% trans 'Title in French' %}</label>
+            <br>
+            {{ education_group_year.title | default_if_none:'-' }}
+        </div>
+        {% if is_finality_types %}
+            <br>
+            <div>
+                <label>{% trans 'Partial title in French' %}</label>
+                <br>
+                {{ education_group_year.partial_title | default_if_none:'-' }}
+            </div>
+        {% endif %}
+        <br>
+        <div>
+            <label>{% trans 'Title in English' %}</label>
+            <br>
+            {{ education_group_year.title_english | default_if_none:'' }}
+        </div>
+        {% if is_finality_types %}
+            <br>
+            <div>
+                <label>{% trans 'Partial title in English' %}</label>
+                <br>
+                {{ education_group_year.partial_title_english | default_if_none:'' }}
+            </div>
+        {% endif %}
+        {% if education_group_year.education_group_type.category != 'GROUP' %}
+            <br>
+            <div>
+                <label>{% trans 'Keywords' %}</label><br>
+                {% if parent.keywords %}
+                    <strong class="text-primary">{{ parent.keywords }}</strong><br>
+                {%  endif %}
+                {{ education_group_year.keywords | default_if_none:'' }}
+            </div>
+        {% endif %}
+    </div>
+</div>

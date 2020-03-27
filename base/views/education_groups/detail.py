@@ -25,6 +25,7 @@
 ##############################################################################
 import itertools
 import json
+import operator
 from collections import namedtuple, defaultdict
 
 from ckeditor.widgets import CKEditorWidget
@@ -75,6 +76,8 @@ from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
 from program_management.forms.custom_xls import CustomXlsForm
 from webservices.business import CONTACT_INTRO_KEY
+from program_management.ddd.repositories.load_tree import find_all_program_tree_versions, load_mon_program_tree_version
+from education_group.models.group_year import GroupYear
 
 SECTIONS_WITH_TEXT = (
     'ucl_bachelors',
@@ -144,6 +147,13 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
     @cached_property
+    def root_group(self):
+        if self.kwargs.get("root_group"):
+            return get_object_or_404(GroupYear, pk=self.kwargs.get("root_group"))
+        else:
+            return None
+
+    @cached_property
     def starting_academic_year(self):
         return starting_academic_year()
 
@@ -172,6 +182,20 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
             education_group_hierarchy_tree = EducationGroupHierarchy(self.root,
                                                                      tab_to_show=self.request.GET.get('tab_to_show'))
             context['tree'] = json.dumps(education_group_hierarchy_tree.to_json())
+            context['version_list_standard'] = None
+            context['version_list_particular'] = None
+            if self.root_group:
+                program_tree = load_mon_program_tree_version(self.root_group.pk, False)
+                context['program_tree'] = program_tree
+                list_of_versions = find_all_program_tree_versions(self.root_group.id, False)
+                context.update(_get_version_lists(list_of_versions))
+
+            else:
+                context['program_tree'] = None
+
+
+            context['root_group'] = self.root_group
+
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
             person=self.person,
@@ -190,7 +214,10 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk])
+        if self.root_group:
+            default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk, self.root_group.pk])
+        else:
+            default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk])
         if self.request.GET.get('group_to_parent'):
             default_url += '?group_to_parent=' + self.request.GET.get('group_to_parent')
         if not self.can_show_view():
@@ -241,10 +268,13 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
 
 
 class EducationGroupRead(EducationGroupGenericDetailView):
+
+    app = 'education_group_version'
+
     templates = {
-        education_group_categories.TRAINING: "education_group/identification_training_details.html",
-        education_group_categories.MINI_TRAINING: "education_group/identification_mini_training_details.html",
-        education_group_categories.GROUP: "education_group/identification_group_details.html"
+        education_group_categories.TRAINING: "{}/identification_training_details.html".format(app),
+        education_group_categories.MINI_TRAINING: "{}/identification_mini_training_details.html".format(app),
+        education_group_categories.GROUP: "{}/identification_group_details.html".format(app)
     }
 
     def can_show_view(self):
@@ -632,3 +662,25 @@ def get_appropriate_common_admission_condition(edy):
         common_admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=common_egy)
         return common_admission_condition
     return None
+
+
+def _get_version_lists(list_of_versions):
+
+
+    data_dict_standard = {}
+    data_dict_particular = {}
+    for a_version in list_of_versions:
+        if a_version.is_standard:
+            if a_version.is_transition:
+                data_dict_standard.update({a_version.group_year_id: 'Transition'.format(a_version.version_name)})
+            else:
+                data_dict_standard.update({a_version.group_year_id: 'Standard'})
+        else:
+            if a_version.is_transition:
+                data_dict_particular.update({a_version.group_year_id: '{}-Transition'.format(a_version.version_name)})
+            else:
+                data_dict_particular.update({a_version.group_year_id: a_version.version_name})
+    return {
+        'version_list_standard': dict(sorted(data_dict_standard.items(), key=operator.itemgetter(1))),
+        'version_list_particular': dict(sorted(data_dict_particular.items(), key=operator.itemgetter(1)))
+    }

@@ -33,9 +33,15 @@ class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityFiel
         super().__init__(view_name='education_group_read', **kwargs)
 
     def get_url(self, obj, view_name, request, format):
+        education_group_year_id = 1
+        if obj.education_group_year_id is None:
+            education_group_year_id = 1
+        else:
+            education_group_year_id = obj.education_group_year_id
         kwargs = {
-            'root_id': obj.pk,
-            'education_group_year_id': obj.pk
+            'root_id': education_group_year_id,
+            'education_group_year_id': education_group_year_id,
+            'root_group': obj.id
         }
         return self.reverse(view_name, kwargs=kwargs, request=request, format=format)
 
@@ -54,6 +60,7 @@ class EducationGroupSerializer(serializers.Serializer):
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
+    education_group_year_id = serializers.IntegerField()
 
     class Meta:
         fields = (

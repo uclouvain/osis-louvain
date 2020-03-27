@@ -1,0 +1,119 @@
+{% extends "education_group_version/layout_detail.html" %}
+{% load i18n %}
+{% load form_field %}
+{% load static %}
+{% load bootstrap3 %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block breadcrumb %}
+    {{ block.super }}
+    <li>{% trans "Modification" %}</li>
+{% endblock %}
+
+
+{% block style %}
+    {% include "education_group/blocks/datetimepicker_imports_css.html" %}
+{% endblock style %}
+
+{% block content %}
+<div class="panel panel-default">
+    <div class="panel-body" id="tabs">
+        <div class="tab-content" id="tab_content">
+            <form method="post">
+                {% csrf_token %}
+                <div role="tabpanel" class="tab-pane active" id="administrative_data">
+                    <div class="panel panel-default">
+                    <div class="panel-body">
+                        {% bootstrap_form course_enrollment layout='horizontal' %}
+                    </div>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th><label>{% trans 'Session' %} 1</label></th>
+                                    <th><label>{% trans 'Session' %} 2</label></th>
+                                    <th><label>{% trans 'Session' %} 3</label></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{ formset_session.management_form }}
+
+                                {% for field in formset_session.forms.0 %}
+                                   <tr>
+                                       <td>{% bootstrap_label field.label %}
+                                           {% if field.name == 'deliberation' or field.name == 'scores_exam_diffusion' %}
+                                               <label>({% trans 'date and time' %})</label>
+                                           {% endif %}
+                                       </td>
+                                       {% for form in formset_session %}
+                                            <td>
+                                            {% with form|select_field:field.name as current_field %}
+                                                {% bootstrap_field current_field show_label=False %}
+                                            {% endwith %}
+                                            </td>
+                                       {%  endfor %}
+                                   </tr>
+                                {%  endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+
+                <div class="panel panel-default">
+                    <div class="panel-heading"><label>{% trans 'Additional info' %}</label></div>
+                    <div class="panel-body">
+                        <div class="row">
+                            {% bootstrap_field additional_info_form.weighting form_group_class="col-md-6" %}
+                            {% bootstrap_field additional_info_form.default_learning_unit_enrollment form_group_class="col-md-6" %}
+                        </div>
+                    </div>
+                </div>
+                <div class="pull-right">
+                    <a id="link_administrative" href="{% url 'education_group_administrative' root_id education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}"
+                       role="tab"
+                            class="btn btn-default">
+                        {% trans 'Cancel' %}
+                    </a>
+                    {% bootstrap_button _("Save") button_type="submit" button_class="btn-primary" icon="glyphicon glyphicon-floppy-save" %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block script %}
+    {% include "education_group/blocks/datetimepicker_imports_js.html" %}
+    <script>
+        $(function() {
+            $('.onlyTimePicker').datetimepicker({
+                pickDate: false
+            });
+        });
+
+    </script>
+{% endblock script %}

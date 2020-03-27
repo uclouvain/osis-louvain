@@ -84,3 +84,22 @@ class EducationGroupVersion(models.Model):
     class Meta:
         unique_together = ('version_name', 'offer', 'is_transition')
         default_manager_name = 'objects'
+
+    @property
+    def is_standard(self):
+        if self.version_name == '':
+            return True
+        return False
+
+    @property
+    def version_label(self):
+        if self.is_standard:
+            if self.is_transition:
+                return "Transition"
+            else:
+                return "Standard"
+        else:
+            if self.is_transition:
+                return '{}-Transition'.format(self.version_name)
+            else:
+                return self.version_name

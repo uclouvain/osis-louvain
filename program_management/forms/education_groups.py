@@ -40,6 +40,7 @@ from base.models.enums import education_group_categories
 from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
 from django.db.models import Q
+from program_management.models.education_group_version import EducationGroupVersion
 
 
 PARTICULAR = "PARTICULAR"
@@ -182,7 +183,11 @@ class GroupFilter(FilterSet):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
-        return GroupYear.objects.all().annotate(
+        version = EducationGroupVersion.objects.filter(
+            root_group__pk=OuterRef('pk'),
+        ).values('offer__pk')[:1]
+
+        qs = GroupYear.objects.all().annotate(
             type_ordering=Case(
                 *[When(education_group_type__name=key, then=Value(str(_(val))))
                   for i, (key, val) in enumerate(education_group_types.ALL_TYPES)],
@@ -224,7 +229,10 @@ class GroupFilter(FilterSet):
                      then=Concat('title_fr', Value(' ['), 'educationgroupversion__title_fr', Value(']'))),
                 default='title_fr',
                 output_field=CharField(),)
+        ).annotate(
+            education_group_year_id=Subquery(version)
         )
+        return qs
 
     def filter_queryset(self, queryset):
         # Order by id to always ensure same order when objects have same values for order field (ex: title)
