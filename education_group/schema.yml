@@ -136,7 +136,7 @@ paths:
         - in: query
           name: is_transition
           schema:
-            description: Is a transition version
+            description: Is a transition version (default is standard version -> false)
             type: boolean
             default: false
       responses:
