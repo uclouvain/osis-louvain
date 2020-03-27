@@ -26,7 +26,6 @@
 from unittest.mock import patch
 
 from django.test import TestCase
-from django.utils.translation import gettext as _
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -176,15 +175,16 @@ class TestSendMessage(TestCase):
         args = mock_create_table.call_args[0]
         self.assertEqual(args[0], 'enrollments')
         self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers())
-        self.assertListEqual(list(args[2][0]),
-                             [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
-                              self.exam_enrollment_1.session_exam.number_session,
-                              self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
-                              self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
-                              self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-                              self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
-                              self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
-                              ])
+        self.assertListEqual(
+            list(args[2][0]),
+            [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+             self.exam_enrollment_1.session_exam.number_session,
+             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
+             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
+             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
+             self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
+             self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
+             ])
         args = mock_send_messages.call_args[0][0]
         self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_acronym'))
         self.assertEqual(self.offer_year.acronym, args.get('subject_data').get('offer_acronym'))
@@ -209,35 +209,45 @@ class TestSendMessage(TestCase):
     @patch("osis_common.messaging.send_message.send_messages")
     @patch("osis_common.messaging.message_config.create_table")
     def test_send_mail_after_scores_submission(self, mock_create_table, mock_send_messages):
-        send_mail.send_mail_after_scores_submission(
-            self.persons,
-            self.learning_unit_year.acronym,
-            [self.exam_enrollment_1],
-            True
-        )
-        args = mock_create_table.call_args[0]
-        self.assertEqual(args[0], 'submitted_enrollments')
-        self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers())
-        self.assertListEqual(list(args[2][0]),
-                             [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
-                              self.exam_enrollment_1.session_exam.number_session,
-                              self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
-                              self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
-                              self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-                              self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
-                              self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
-                              ])
+        for person in self.persons:
+            send_mail.send_mail_after_scores_submission(
+                [person],
+                self.learning_unit_year.acronym,
+                [self.exam_enrollment_1],
+                True
+            )
+            args = mock_create_table.call_args[0]
+            self.assertEqual(args[0], 'submitted_enrollments')
+            self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers())
+            self.assertListEqual(list(args[2][0]),
+                                 [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+                                  self.exam_enrollment_1.session_exam.number_session,
+                                  self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
+                                  self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
+                                  self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
+                                  self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
+                                  self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
+                                  ])
 
-        args = mock_send_messages.call_args[0][0]
-        self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_name'))
+            args = mock_send_messages.call_args[0][0]
+            self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_name'))
 
-        self.assertEqual(len(args.get('receivers')), 2)
-        self.assertEqual(args.get('html_template_ref'),
-                         "{}_html".format(send_mail.ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE))
-        self.assertEqual(args.get('txt_template_ref'),
-                         "{}_txt".format(send_mail.ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE))
-        self.assertEqual(self.learning_unit_year.acronym, args.get('template_base_data').get('learning_unit_name'))
-        self.assertEqual(_('All the scores are encoded.'), args.get('template_base_data').get('encoding_status'))
+            self.assertEqual(len(args.get('receivers')), 1)
+            self.assertEqual(args.get('html_template_ref'),
+                             "{}_html".format(send_mail.ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE))
+            self.assertEqual(args.get('txt_template_ref'),
+                             "{}_txt".format(send_mail.ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE))
+            self.assertEqual(self.learning_unit_year.acronym, args.get('template_base_data').get('learning_unit_name'))
+
+    def test_get_encoding_status_not_all_encoded(self):
+        self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_EN, False), 'It remains notes to encode.')
+        self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_FR, False),
+                         'Il reste encore des notes à encoder.')
+
+    def test_get_encoding_status_all_encoded(self):
+        self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_EN, True), 'All the scores are encoded.')
+        self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_FR, True),
+                         'Toutes les notes ont été soumises.')
 
 
 def add_message_template_txt():
