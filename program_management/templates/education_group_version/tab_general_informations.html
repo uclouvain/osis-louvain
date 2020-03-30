@@ -1,0 +1,93 @@
+{% extends "education_group_version/layout_detail.html" %}
+{% load i18n getattr %}
+{% load static education_group format %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block top_action_bar %}
+    {% if can_edit_information %}
+        {% include  "education_group/blocks/refresh_publication_button.html" %}
+    {% endif %}
+{% endblock %}
+{% block details %}
+    {% url 'education_group_pedagogy_edit' parent.pk education_group_year.id as post_url %}
+    <div class="panel panel-default">
+        {% for section_name, labels in sections_with_translated_labels %}
+            <div class="panel-heading text-center section">
+                <h3>{{ section_name }}</h3>
+            </div>
+            <div class="panel panel-body">
+                <div class="container-fluid">
+                    {% for label in labels %}
+                        {% include  "education_group/blocks/row_label_general_informations.html" %}
+                        {% if not forloop.last %}
+                            <hr/>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                {% if not forloop.last or not show_contacts %}
+                    </div>
+                {% endif %}
+        {% endfor %}
+
+
+        {% if show_contacts %}
+            <hr/>
+            <div class="container-fluid">
+                <div class="row">
+                    {% include  "education_group/blocks/contacts_general_informations.html" %}
+                </div>
+            </div>
+            </div>
+        {% endif %}
+    </div>
+    </div>
+
+    <div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
+{% endblock %}
+
+{% block script %}
+    <script>
+        {% if can_edit_information %}
+            $('div#panel-data').on('click', 'a.pedagogy-edit-btn', function (evt) {
+                evt.preventDefault();
+                var url = $(this).data("form");
+                var pedagogy_edit_modal = $("#pedagogy_edit");
+                pedagogy_edit_modal.load(url, function () {
+                    $(this).modal('show');
+                });
+                return false;
+            });
+        {% endif %}
+
+        {% if  request.GET.anchor  %}
+            $(document).ready(function () {
+                var elt_to_focus = "#lbl_contacts_header";
+                $(elt_to_focus).attr("tabindex",-1).focus();
+                $(window).scrollTop($(elt_to_focus).position().top);
+            });
+        {% endif %}
+
+    </script>
+{% endblock %}

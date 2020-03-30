@@ -1,0 +1,149 @@
+{% extends "education_group_version/layout.html" %}
+{% load education_group format i18n static %}
+
+{% block title %}
+    <title>OSIS - {{ education_group_year.acronym }} {{ learning_unit_year.acronym }}</title>
+{% endblock %}
+{% block breadcrumb %}
+    {{ block.super }}
+    <li class="active">
+        {% if education_group_year.education_group_type.category == "TRAINING" %}
+            {{ education_group_year.acronym }}
+        {% else %}
+            {{ education_group_year.partial_acronym }}
+        {% endif %}
+    </li>
+{% endblock %}
+
+{% block header_content %}
+    <div class="page-header">
+    {% with disabled_nav=False %}
+        {% include "education_group/blocks/header.html" %}
+    {% endwith %}
+    </div>
+{% endblock %}
+
+{% block sidebar %}
+
+    <div class="side-container" id="mySidenav">
+        <div class="sidenav panel" id="scrollableDiv">
+            <div class="panel-heading ">
+                <input class="form-control" id="search_jstree" type="text" placeholder="Search" aria-label="Search">
+            </div>
+            <div class="panel-body">
+                <div class="row" id="panel_file_tree"></div>
+            </div>
+        </div>
+        <div id="split-bar"></div>
+
+    </div>
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="panel panel-default" id="panel-data">
+        <div class="panel-heading">
+            <div class="row">
+                <a class="btn btn-default" style="margin-left: 15px;" onclick="toggleNav()">
+                    <span class="fa fa-bars" aria-hidden="true"></span>
+                </a>
+
+                {% if root == education_group_year %}
+                    <label>
+                        <select class="form-control"
+                                name="academic_year"
+                                id="id_academic_year_search"
+                                onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
+                            {% for edy in education_group_year.education_group.educationgroupyear_set.all %}
+                                <option value="{% url "education_group_read" edy.pk edy.pk %}"
+                                        {% if edy == education_group_year %} selected="selected" {% endif %}>
+                                    {{ edy.academic_year }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </label>
+                    {% if version_list_standard or version_list_particular %}
+                        <label>
+                        <select class="form-control"
+                                onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
+                            {% for group_yr_id, version_label in version_list_standard.items %}
+                                <option value="{% url "education_group_read" education_group_year.pk education_group_year.pk group_yr_id %}"
+                                        {% if group_yr_id == root_group.pk %} selected="selected"{% endif %}>
+                                    {{ version_label }}
+                                </option>
+                            {% endfor %}
+                            {% for group_yr_id, version_label in version_list_particular.items %}
+                                <option value="{% url "education_group_read" education_group_year.pk education_group_year.pk group_yr_id %}"
+                                        {% if group_yr_id == root_group.pk %} selected="selected"{% endif %}>
+                                    {{ version_label }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                        </label>
+                    {% endif %}
+
+                {% endif %}
+                <div class="pull-right" style="margin-right: 15px;">
+                    {% block top_action_bar %}
+                    {% endblock %}
+                </div>
+            </div>
+        </div>
+        <div class="panel-body" id="tabs">
+            <div class="tab-content" id="tab_content">
+                <div role="tabpanel" class="tab-pane active" id="identification">
+                    <div class="row" style="display:flex;">
+                        <div class="col-md-12" style="height: 100%;">
+                            {% block tabs %}
+                                {% include "education_group/tabs.html" %}
+                            {% endblock %}
+                            <br>
+                            {% block details %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer text-right">
+            {% block bottom_action_bar %}
+            {% endblock %}
+        </div>
+    </div>
+    <div id="clipboard" class="alert alert-info" role="alert" {% if not selected_element_clipboard %}hidden="hidden"{% endif %}>
+        <div style="display: inline-block;">
+            <div class="pull-right">
+                <button type="button" class="close" id="clear_clipboard" data-toggle="tooltip" data-placement="right" title="{% trans "Clear clipboard" %}">
+                    <span aria-hidden="true" style="font-size: 0.8em;">&nbsp;<em class="fa fa-trash"></em></span>
+                </button>
+            </div>
+            <div id="clipboard_content" class="pull-left">
+                {{ selected_element_clipboard | safe }}
+            </div>
+        </div>
+    </div>
+    {% if education_group_year %}
+        {% include "education_group/blocks/modal/custom_xls.html" %}
+    {% endif %}
+    <script>
+        const root_id = "{{ root_id }}";
+        const url_resolver_match = "{% url_resolver_match %}";
+        const tree = JSON.parse('{{ tree | escapejs }}');
+        const management_url = "{% url "education_groups_management" %}";
+        const clear_clipboard_url = "{% url "education_group_clear_clipboard" %}";
+        let clear_clipboard = document.getElementById("clear_clipboard");
+        clear_clipboard.addEventListener("click", function(){
+            $.ajax({
+                url: clear_clipboard_url,
+                type: 'POST',
+                success: function () {
+                    $("#clipboard").hide();
+                }
+            });
+        });
+    </script>
+    <script type="text/javascript" src="{% static 'js/education_group/education_group_tree.js' %}">
+    </script>
+
+{% endblock content %}
