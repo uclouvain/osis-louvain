@@ -116,7 +116,7 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - trainings
-  /trainings/{year}/{acronym}/versions/:
+  /trainings/{year}/{acronym}/versions:
     get:
       description: Return the versions list of the training
       operationId: versions_list
