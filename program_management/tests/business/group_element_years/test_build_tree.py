@@ -32,13 +32,16 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_switch
 
+import program_management.business
 from base.models import entity_version
-from base.models.enums import organization_type
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums import organization_type, education_group_types
 from base.models.enums.education_group_types import MiniTrainingType, GroupType, TrainingType
 from base.models.enums.link_type import LinkTypes
+from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, GroupFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
@@ -822,3 +825,64 @@ class TestGetFinalityList(TestCase):
 
         node = EducationGroupHierarchy(self.root)
         self.assertCountEqual(node.get_finality_list(), list_finality)
+
+
+class TestFetchGroupElementsBehindHierarchy(TestCase):
+    """Unit tests on fetch_all_group_elements_behind_hierarchy()"""
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
+        cls.root = TrainingFactory(
+            acronym='DROI2M',
+            education_group_type__name=education_group_types.TrainingType.PGRM_MASTER_120,
+            academic_year=cls.academic_year
+        )
+
+        finality_list = GroupFactory(
+            acronym='LIST FINALITIES',
+            education_group_type__name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE,
+            academic_year=cls.academic_year
+        )
+
+        formation_master_md = TrainingFactory(
+            acronym='DROI2MD',
+            education_group_type__name=education_group_types.TrainingType.MASTER_MD_120,
+            academic_year=cls.academic_year
+        )
+
+        common_core = GroupFactory(
+            acronym='TC DROI2MD',
+            education_group_type__name=education_group_types.GroupType.COMMON_CORE,
+            academic_year=cls.academic_year
+        )
+
+        cls.link_1 = GroupElementYearFactory(parent=cls.root, child_branch=finality_list, child_leaf=None)
+        cls.link_1_bis = GroupElementYearFactory(parent=cls.root,
+                                                 child_branch=EducationGroupYearFactory(
+                                                     academic_year=cls.academic_year),
+                                                 child_leaf=None)
+        cls.link_2 = GroupElementYearFactory(parent=finality_list, child_branch=formation_master_md, child_leaf=None)
+        cls.link_3 = GroupElementYearFactory(parent=formation_master_md, child_branch=common_core, child_leaf=None)
+        cls.link_4 = GroupElementYearFactory(parent=common_core,
+                                             child_leaf=LearningUnitYearFactory(),
+                                             child_branch=None)
+
+    def test_with_one_root_id(self):
+        queryset = GroupElementYear.objects.all().select_related(
+            'child_branch__academic_year',
+            'child_leaf__academic_year',
+            # [...] other fetch
+        )
+        result = program_management.business.group_element_years.group_element_year_tree.fetch_all_group_elements_in_tree(self.root, queryset)
+        expected_result = {
+            self.link_1.parent_id: [self.link_1, self.link_1_bis],
+            self.link_2.parent_id: [self.link_2],
+            self.link_3.parent_id: [self.link_3],
+            self.link_4.parent_id: [self.link_4],
+        }
+        self.assertDictEqual(result, expected_result)
+
+    def test_when_queryset_is_not_from_group_element_year_model(self):
+        wrong_queryset_model = EducationGroupYear.objects.all()
+        with self.assertRaises(AttributeError):
+            program_management.business.group_element_years.group_element_year_tree.fetch_all_group_elements_in_tree(self.root, wrong_queryset_model)

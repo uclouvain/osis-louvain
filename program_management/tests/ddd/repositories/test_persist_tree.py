@@ -43,19 +43,19 @@ class TestSaveTree(TestCase):
 
         self.root_node = NodeEducationGroupYear(
             node_id=training.pk,
-            acronym=training.acronym,
+            code=training.acronym,
             title=training.title,
             year=training.academic_year.year
         )
         self.common_core_node = NodeEducationGroupYear(
             node_id=common_core.pk,
-            acronym=common_core.acronym,
+            code=common_core.acronym,
             title=common_core.title,
             year=common_core.academic_year.year
         )
         self.learning_unit_year_node = NodeLearningUnitYear(
             node_id=learning_unit_year.pk,
-            acronym=learning_unit_year.acronym,
+            code=learning_unit_year.acronym,
             title=learning_unit_year.specific_title,
             year=learning_unit_year.academic_year.year
         )

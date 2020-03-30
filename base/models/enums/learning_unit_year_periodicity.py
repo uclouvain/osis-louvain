@@ -25,12 +25,22 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
+
 ANNUAL = "ANNUAL"
 BIENNIAL_EVEN = "BIENNIAL_EVEN"
 BIENNIAL_ODD = "BIENNIAL_ODD"
 
+
+# FIXME :: DEPRECATED - use PeriodicityEnum instead
 PERIODICITY_TYPES = (
     (ANNUAL, _("Annual")),
     (BIENNIAL_EVEN, _("biennial even")),
-    (BIENNIAL_ODD, _("biennial odd"))
+    (BIENNIAL_ODD, _("biennial odd")),
 )
+
+
+class PeriodicityEnum(ChoiceEnum):
+    ANNUAL = _("Annual")
+    BIENNIAL_EVEN = _("biennial even")
+    BIENNIAL_ODD = _("biennial odd")

@@ -36,21 +36,22 @@ from program_management.ddd.domain.link import Link
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers.node_view import NodeViewAttributeSerializer, LeafViewAttributeSerializer, \
     NodeViewSerializer, LeafViewSerializer
+from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
 class TestNodeViewSerializer(SimpleTestCase):
     def setUp(self):
-        self.root_node = NodeGroupYearFactory(node_id=1, acronym="LBIR100A", title="BIR1BA", year=2018)
-        node_parent = NodeGroupYearFactory(node_id=2, acronym="LTROC250T", title="Tronc commun 2", year=2018)
-        node_child = NodeGroupYearFactory(node_id=6, acronym="LSUBGR150G", title="Sous-groupe 2", year=2018)
-        self.link = Link(parent=node_parent, child=node_child)
+        self.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100A", title="BIR1BA", year=2018)
+        node_parent = NodeGroupYearFactory(node_id=2, code="LTROC250T", title="Tronc commun 2", year=2018)
+        node_child = NodeGroupYearFactory(node_id=6, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
+        self.link = LinkFactory(parent=node_parent, child=node_child)
 
         self.context = {'path': '1|2|6', 'root': self.root_node}
         self.serializer = NodeViewSerializer(self.link, context=self.context)
 
     def test_serialize_node_ensure_text(self):
-        expected_text = self.link.child.acronym
+        expected_text = self.link.child.code + " - " + self.link.child.title
         self.assertEquals(self.serializer.data['text'], expected_text)
 
     def test_serialize_node_ensure_icon_case_concrete_link(self):
@@ -66,30 +67,28 @@ class TestNodeViewSerializer(SimpleTestCase):
 
 class TestNodeViewAttributeSerializer(SimpleTestCase):
     def setUp(self):
-        self.root_node = NodeGroupYearFactory(node_id=1, acronym="LBIR100A", title="BIR1BA", year=2018)
-        node_parent = NodeGroupYearFactory(node_id=2, acronym="LTROC250T", title="Tronc commun 2", year=2018)
-        node_child = NodeGroupYearFactory(node_id=6, acronym="LSUBGR150G", title="Sous-groupe 2", year=2018)
-        self.link = Link(parent=node_parent, child=node_child)
+        self.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100A", title="BIR1BA", year=2018)
+        self.node_parent = NodeGroupYearFactory(node_id=2, code="LTROC250T", title="Tronc commun 2", year=2018)
+        self.node_child = NodeGroupYearFactory(node_id=6, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
+        self.link = LinkFactory(parent=self.node_parent, child=self.node_child)
 
         self.context = {'path': '1|2|6', 'root': self.root_node}
         self.serializer = NodeViewAttributeSerializer(self.link, context=self.context)
 
     def test_serialize_node_attr_ensure_detach_url(self):
-        expected_url = reverse('tree_detach_node', args=[self.root_node.pk]) + "?" + urlencode({
-            'path': self.context['path']
-        })
+        expected_url = reverse('group_element_year_delete', args=[
+            self.root_node.pk, self.node_child.pk, self.link.pk
+        ])
         self.assertEquals(self.serializer.data['detach_url'], expected_url)
 
     def test_serialize_node_attr_ensure_attach_url(self):
-        expected_url = reverse('tree_attach_node', args=[self.root_node.pk]) + "?" + urlencode({
-            'to_path': self.context['path']
-        })
+        expected_url = reverse('education_group_attach', args=[self.root_node.pk, self.node_child.pk])
         self.assertEquals(self.serializer.data['attach_url'], expected_url)
 
     def test_serialize_node_attr_ensure_modify_url(self):
-        expected_url = reverse('tree_update_link', args=[self.root_node.pk]) + "?" + urlencode({
-            'path': self.context['path']
-        })
+        expected_url = reverse('group_element_year_update', args=[
+            self.root_node.pk, self.node_child.pk, self.link.pk
+        ])
         self.assertEquals(self.serializer.data['modify_url'], expected_url)
 
     def test_serializer_node_attr_ensure_search_url(self):
@@ -97,7 +96,7 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
         self.assertEquals(self.serializer.data['search_url'], expected_url)
 
     def test_serializer_node_attr_ensure_get_title(self):
-        expected_title = self.link.child.acronym
+        expected_title = self.link.child.code
         self.assertEquals(self.serializer.data['title'], expected_title)
 
     def test_serializer_node_attr_ensure_get_href(self):
@@ -110,21 +109,21 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
 
 class TestLeafViewSerializer(SimpleTestCase):
     def setUp(self):
-        self.root_node = NodeGroupYearFactory(node_id=1, acronym="LBIR100A", title="BIR1BA", year=2018)
-        node_parent = NodeGroupYearFactory(node_id=2, acronym="LTROC250T", title="Tronc commun 2", year=2018)
-        leaf_child = NodeLearningUnitYearFactory(node_id=9, acronym="LSUBGR150G", title="Sous-groupe 2", year=2018)
-        self.link = Link(parent=node_parent, child=leaf_child)
+        self.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100A", title="BIR1BA", year=2018)
+        node_parent = NodeGroupYearFactory(node_id=2, code="LTROC250T", title="Tronc commun 2", year=2018)
+        leaf_child = NodeLearningUnitYearFactory(node_id=9, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
+        self.link = LinkFactory(parent=node_parent, child=leaf_child)
 
         self.context = {'path': '1|2|9', 'root': self.root_node}
         self.serializer = LeafViewSerializer(self.link, context=self.context)
 
     def test_serializer_leaf_ensure_text_case_leaf_have_same_year_of_root(self):
-        expected_text = self.link.child.title
+        expected_text = self.link.child.code
         self.assertEquals(self.serializer.data['text'], expected_text)
 
     def test_serializer_leaf_ensure_text_case_leaf_doesnt_have_same_year_of_root(self):
         self.link.child.year = self.root_node.year - 1
-        expected_text = self.link.child.title + "|" + str(self.link.child.year)
+        expected_text = self.link.child.code + "|" + str(self.link.child.year)
 
         self.assertEquals(self.serializer.data['text'], expected_text)
 
@@ -187,10 +186,10 @@ class TestLeafViewSerializer(SimpleTestCase):
 
 class TestLeafViewAttributeSerializer(SimpleTestCase):
     def setUp(self):
-        self.root_node = NodeGroupYearFactory(node_id=1, acronym="LBIR100A", title="BIR1BA", year=2018)
-        node_parent = NodeGroupYearFactory(node_id=2, acronym="LTROC250T", title="Tronc commun 2", year=2018)
-        leaf_child = NodeLearningUnitYearFactory(node_id=9, acronym="LSUBGR150G", title="Sous-groupe 2", year=2018)
-        self.link = Link(parent=node_parent, child=leaf_child)
+        self.root_node = NodeGroupYearFactory(node_id=1, code="LBIR100A", title="BIR1BA", year=2018)
+        node_parent = NodeGroupYearFactory(node_id=2, code="LTROC250T", title="Tronc commun 2", year=2018)
+        leaf_child = NodeLearningUnitYearFactory(node_id=9, code="LSUBGR150G", title="Sous-groupe 2", year=2018)
+        self.link = LinkFactory(parent=node_parent, child=leaf_child)
 
         self.context = {'path': '1|2|9', 'root': self.root_node}
         self.serializer = LeafViewAttributeSerializer(self.link, context=self.context)
@@ -203,7 +202,7 @@ class TestLeafViewAttributeSerializer(SimpleTestCase):
         self.assertEquals(self.serializer.data['href'], expected_url)
 
     def test_serializer_node_attr_ensure_get_element_type(self):
-        self.assertEquals(self.serializer.data['element_type'], NodeType.LEARNING_UNIT)
+        self.assertEquals(self.serializer.data['element_type'], NodeType.LEARNING_UNIT.name)
 
     @mock.patch('program_management.ddd.domain.node.NodeLearningUnitYear.has_prerequisite',
                 new_callable=mock.PropertyMock,

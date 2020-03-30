@@ -23,13 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
+from decimal import Decimal
+from typing import List
+
 from django.templatetags.static import static
-from django.utils import six
+from django.utils import translation
 from django.utils.encoding import force_text
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
 
+from backoffice.settings.base import LANGUAGE_CODE_EN
+from base.models.enums.constraint_type import ConstraintTypeEnum
 from base.models.enums.learning_unit_year_periodicity import BIENNIAL_EVEN, BIENNIAL_ODD, ANNUAL
 from base.templatetags.education_group import register
+from program_management.ddd.business_types import *
+
+# TODO :: Remove this file and move the code into a Serializer
 
 OPTIONAL_PNG = static('img/education_group_year/optional.png')
 MANDATORY_PNG = static('img/education_group_year/mandatory.png')
@@ -45,7 +54,7 @@ CHILD_BRANCH = """\
         {constraint}
         <div style="word-break: keep-all;">
             <img src="{icon_list_2}" height="10" width="10">
-            {value}
+            {value} <br>
             {remark}
             {comment}
             {sublist}
@@ -60,7 +69,7 @@ CHILD_LEAF = """\
             <img src="{icon_list_1}" height="14" width="17">
             <img src="{icon_list_2}" height="10" width="10">
             <img src="{icon_list_5}" height="10" width="10">
-            {value}
+            {value} <br>
             <img src="{icon_list_3}" height="10" width="10">
             <img src="{icon_list_4}" height="10" width="10">
             {comment}
@@ -101,124 +110,180 @@ BRANCH_CONSTRAINT = """\
 """
 
 
-@register.filter
-def pdf_tree_list(value):
+@register.filter  # TODO :: Remove this tag and move the code into a Serializer
+def pdf_tree_list(value: List['Link']):
     return mark_safe(list_formatter(value))
 
 
-def walk_items(item_list):
-    if item_list:
-        item_iterator = iter(item_list)
-        try:
-            item = next(item_iterator)
-            while True:
-                try:
-                    next_item = next(item_iterator)
-                except StopIteration:
-                    yield item, None
-                    break
-                if not isinstance(next_item, six.string_types):
-                    try:
-                        iter(next_item)
-                    except TypeError:
-                        pass
-                    else:
-                        yield item, next_item
-                        item = next(item_iterator)
-                        continue
-                yield item, None
-                item = next_item
-        except StopIteration:
-            pass
-    else:
-        return ""
-
-
-def list_formatter(item_list, tabs=1, depth=None):
+def list_formatter(links_under_root: List['Link'], tabs=1, depth=None):
     output = []
     depth = depth if depth else 1
-    for item, children in walk_items(item_list):
+    for link in links_under_root:
         sublist = ''
         padding = 2 * depth
-        if children:
+        if link.child.children:
             sublist = '%s' % (
-                list_formatter(children, tabs + 1, depth + 1))
-        append_output(item, output, padding, sublist)
+                list_formatter(link.child.children, tabs + 1, depth + 1))
+        append_output(link, output, padding, sublist)
     return '\n'.join(output)
 
 
-def append_output(item, output, padding, sublist):
-    comment = CHILD_COMMENT.format(
-        comment_value=item.verbose_comment
-    ) if item and item.verbose_comment else ""
-
-    if item.child_leaf:
-        mandatory_picture = get_mandatory_picture(item)
+def append_output(link: 'Link', output, padding, sublist):
+    comment = _get_verbose_comment(link)
+    if link.is_link_with_learning_unit():
+        mandatory_picture = get_mandatory_picture(link)
         output.append(
             CHILD_LEAF.format(padding=padding,
-                              icon_list_1=get_case_picture(item),
+                              icon_list_1=get_case_picture(link.child),
                               icon_list_2=mandatory_picture,
-                              icon_list_3=get_status_picture(item),
-                              icon_list_4=get_biennial_picture(item),
-                              icon_list_5=get_prerequis_picture(item),
-                              value=force_text(item.verbose),
+                              icon_list_3=get_status_picture(link.child),
+                              icon_list_4=get_biennial_picture(link.child),
+                              icon_list_5=get_prerequis_picture(link.child),
+                              value=force_text(get_verbose_link(link)),
                               comment=comment,
                               sublist=sublist,
-                              an_1=check_block(item, 1),
-                              an_2=check_block(item, 2),
-                              an_3=check_block(item, 3),
-                              an_4=check_block(item, 4),
-                              an_5=check_block(item, 5),
-                              an_6=check_block(item, 6),
+                              an_1=check_block(link, 1),
+                              an_2=check_block(link, 2),
+                              an_3=check_block(link, 3),
+                              an_4=check_block(link, 4),
+                              an_5=check_block(link, 5),
+                              an_6=check_block(link, 6),
                               )
         )
     else:
         constraint = BRANCH_CONSTRAINT.format(
-            constraint_value=item.child_branch.verbose_constraint
-        ) if item.child_branch.constraint_type else ""
-
-        remark = BRANCH_REMARK.format(remark_value=item.child.verbose_remark) if item.child.verbose_remark else ""
+            constraint_value=get_verbose_constraint(link.child)
+        ) if link.child.constraint_type else ""
 
         output.append(
             CHILD_BRANCH.format(padding=padding,
                                 constraint=constraint,
-                                icon_list_2=get_mandatory_picture(item),
-                                value=force_text(item.verbose),
-                                remark=remark,
+                                icon_list_2=get_mandatory_picture(link),
+                                value=force_text(get_verbose_link(link)),
+                                remark=get_verbose_remark(link.child),
                                 comment=comment,
                                 sublist=sublist
                                 )
         )
 
 
-def get_status_picture(item):
-    return DELTA if not item.child_leaf.status else ""
+def _get_verbose_comment(link: 'Link'):
+    comment_from_lang = link.comment
+    if link.comment_english and translation.get_language() == LANGUAGE_CODE_EN:
+        comment_from_lang = link.comment_english
+    return CHILD_COMMENT.format(
+        comment_value=comment_from_lang
+    ) if comment_from_lang else ""
 
 
-def get_biennial_picture(item):
-    if item.child_leaf.periodicity == BIENNIAL_EVEN:
+def get_verbose_remark(node: 'NodeEducationGroupYear'):
+    remark = node.remark_fr or ""
+    if node.remark_en and translation.get_language() == LANGUAGE_CODE_EN:
+        remark = node.remark_en
+    return remark
+
+
+def get_verbose_constraint(node: 'NodeEducationGroupYear'):
+    msg = "from %(min)s to %(max)s credits among" \
+        if node.constraint_type == ConstraintTypeEnum.CREDITS else "from %(min)s to %(max)s among"
+    return _(msg) % {
+        "min": node.min_constraint if node.min_constraint else "",
+        "max": node.max_constraint if node.max_constraint else ""
+    }
+
+
+def get_verbose_title_group(node: 'NodeEducationGroupYear'):
+    if node.is_finality():
+        if node.offer_partial_title_en and translation.get_language() == LANGUAGE_CODE_EN:
+            return node.offer_partial_title_en
+        return node.offer_partial_title_fr
+    else:
+        if node.offer_title_en and translation.get_language() == LANGUAGE_CODE_EN:
+            return node.offer_title_en
+        return node.offer_title_fr
+
+
+def get_verbose_credits(link: 'Link'):
+    if link.relative_credits or link.child.credits:
+        return "{} ({} {})".format(
+            get_verbose_title_group(link.child),
+            link.relative_credits or link.child.credits or 0, _("credits")  # FIXME :: Duplicated line
+        )
+    else:
+        return "{}".format(get_verbose_title_group(link.child))
+
+
+def get_verbose_title_ue(node: 'NodeLearningUnitYear'):
+    verbose_title_fr = get_verbose_title_fr_ue(node)
+    verbose_title_en = get_verbose_title_en_ue(node)
+    if verbose_title_en and translation.get_language() == 'en':
+        return verbose_title_en
+    return verbose_title_fr
+
+
+# Copied from LearningUnitYear.complete_title
+def get_verbose_title_fr_ue(node: 'NodeLearningUnitYear'):
+    complete_title = node.specific_title_fr
+    if node.common_title_fr:
+        complete_title = node.common_title_fr + ' - ' + node.specific_title_fr
+    return complete_title
+
+
+# Copied from LearningUnitYear.complete_title_english
+def get_verbose_title_en_ue(node: 'NodeLearningUnitYear'):
+    complete_title_english = node.specific_title_en
+    if node.common_title_en:
+        complete_title_english = node.common_title_en + ' - ' + node.specific_title_en
+    return complete_title_english
+
+
+def get_verbose_link(link: 'Link'):
+    if link.is_link_with_group():
+        return get_verbose_credits(link)
+    elif link.is_link_with_learning_unit():
+        return "{} {} [{}] ({} {})".format(
+            link.child.code,
+            get_verbose_title_ue(link.child),
+            get_volume_total_verbose(link.child),
+            link.relative_credits or link.child.credits or 0, _("credits")  # FIXME :: Duplicated line
+        )
+
+
+def get_volume_total_verbose(node: 'NodeLearningUnitYear'):
+    return "%(total_lecturing)gh + %(total_practical)gh" % {
+        "total_lecturing": node.volume_total_lecturing or Decimal(0.0),
+        "total_practical": node.volume_total_practical or Decimal(0.0)
+    }
+
+
+def get_status_picture(node: 'NodeLearningUnitYear'):
+    return DELTA if not node.status else ""
+
+
+def get_biennial_picture(node: 'NodeLearningUnitYear'):
+    if node.periodicity == BIENNIAL_EVEN:
         return BISANNUAL_EVEN
-    elif item.child_leaf.periodicity == BIENNIAL_ODD:
+    elif node.periodicity == BIENNIAL_ODD:
         return BISANNUAL_ODD
     else:
         return ""
 
 
-def get_mandatory_picture(item):
-    return MANDATORY_PNG if item.is_mandatory else OPTIONAL_PNG
+def get_mandatory_picture(link: 'Link'):
+    return MANDATORY_PNG if link.is_mandatory else OPTIONAL_PNG
 
 
-def get_prerequis_picture(item):
-    return PREREQUIS if item.has_prerequisite else None
+def get_prerequis_picture(node: 'NodeLearningUnitYear'):
+    return PREREQUIS if node.has_prerequisite else None
 
 
-def get_case_picture(item):
-    if item.child_leaf.status:
-        if item.child_leaf.periodicity == ANNUAL:
+def get_case_picture(node: 'NodeLearningUnitYear'):
+    if node.status:
+        if node.periodicity == ANNUAL:
             return VALIDATE_CASE_JPG
-        elif item.child_leaf.periodicity == BIENNIAL_EVEN and item.child_leaf.academic_year.is_even:
+        elif node.periodicity == BIENNIAL_EVEN and node.academic_year.is_even:
             return VALIDATE_CASE_JPG
-        elif item.child_leaf.periodicity == BIENNIAL_ODD and item.child_leaf.academic_year.is_odd:
+        elif node.periodicity == BIENNIAL_ODD and node.academic_year.is_odd:
             return VALIDATE_CASE_JPG
     return INVALIDATE_CASE_JPG
 

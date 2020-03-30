@@ -43,8 +43,23 @@ class TestIsReference(SimpleTestCase):
 class TestStr(SimpleTestCase):
     def test_str(self):
         link = LinkFactory(
-            parent=NodeGroupYearFactory(acronym='parent', year=2019),
-            child=NodeLearningUnitYearFactory(acronym='child', year=2018)
+            parent=NodeGroupYearFactory(code='parent', year=2019),
+            child=NodeLearningUnitYearFactory(code='child', year=2018)
         )
         expected_result = 'parent (2019) - child (2018)'
         self.assertEqual(expected_result, str(link))
+
+
+class TestBlockRepr(SimpleTestCase):
+
+    def test_when_multiple_block_values(self):
+        link = LinkFactory(block=123)
+        self.assertEqual(link.block_repr, '1 ; 2 ; 3')
+
+    def test_when_one_block_value(self):
+        link = LinkFactory(block=1)
+        self.assertEqual(link.block_repr, '1')
+
+    def test_when_block_value_is_none(self):
+        link = LinkFactory(block=None)
+        self.assertEqual(link.block_repr, '')

@@ -30,6 +30,7 @@ from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _, ngettext
 
+import program_management.ddd.repositories.find_roots
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
@@ -91,11 +92,9 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
 
     @cached_property
     def _parents(self):
-        return group_element_year.find_learning_unit_roots(
+        return program_management.ddd.repositories.find_roots.find_roots(
             [self.parent],
-            return_result_params={
-                'parents_as_instances': True
-            }
+            as_instances=True
         )[self.parent.pk] + [self.parent]
 
     @cached_property

@@ -27,16 +27,17 @@ from django.test import SimpleTestCase
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
+from education_group.enums.node_type import NodeType
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
 
 class TestAddChildNode(SimpleTestCase):
     def test_add_child_to_node(self):
-        group_year_node = NodeGroupYearFactory(node_id=0, acronym="LDROI200G", title="Tronc commun", year=2018)
+        group_year_node = NodeGroupYearFactory(node_id=0, code="LDROI200G", title="Tronc commun", year=2018)
         learning_unit_year_node = NodeLearningUnitYearFactory(
             node_id=2,
-            acronym="LDROI100",
+            code="LDROI100",
             title="Introduction",
             year=2018
         )
@@ -50,9 +51,9 @@ class TestAddChildNode(SimpleTestCase):
 
 class TestDescendentsPropertyNode(SimpleTestCase):
     def setUp(self):
-        self.root_node = NodeGroupYearFactory(node_id=0, acronym="LDROI200T", title="Tronc commun", year=2018)
-        self.subgroup_node = NodeGroupYearFactory(node_id=1, acronym="LDROI200G", title="Sub group", year=2018)
-        self.leaf = NodeLearningUnitYearFactory(node_id=2, acronym="LDROI100", title="Introduction", year=2018)
+        self.root_node = NodeGroupYearFactory(node_id=0, code="LDROI200T", title="Tronc commun", year=2018)
+        self.subgroup_node = NodeGroupYearFactory(node_id=1, code="LDROI200G", title="Sub group", year=2018)
+        self.leaf = NodeLearningUnitYearFactory(node_id=2, code="LDROI100", title="Introduction", year=2018)
 
     def test_case_no_descendents(self):
         self.assertIsInstance(self.root_node.descendents, dict)
@@ -86,7 +87,7 @@ class TestEq(SimpleTestCase):
 
     def test_when_nodes_learning_unit_are_equal(self):
         node_with_same_id = NodeLearningUnitYearFactory(node_id=self.node_id)
-        self.assertTrue(self.node == node_with_same_id)
+        self.assertFalse(self.node == node_with_same_id)
 
     def test_when_nodes_learning_unit_are_not_equal(self):
         node_with_different_id = NodeLearningUnitYearFactory(node_id=self.node_id + 1)
@@ -96,16 +97,16 @@ class TestEq(SimpleTestCase):
 class TestStr(SimpleTestCase):
 
     def setUp(self):
-        acronym = 'Acronym'
+        code = 'Code'
         year = 2019
-        self.node_group_year = NodeGroupYearFactory(acronym=acronym, year=year)
-        self.node_learning_unit = NodeLearningUnitYearFactory(acronym=acronym, year=year)
+        self.node_group_year = NodeGroupYearFactory(code=code, year=year)
+        self.node_learning_unit = NodeLearningUnitYearFactory(code=code, year=year)
 
     def test_node_group_year_str(self):
-        self.assertEqual(str(self.node_group_year), 'Acronym (2019)')
+        self.assertEqual(str(self.node_group_year), 'Code (2019)')
 
     def test_node_learning_unit_str(self):
-        self.assertEqual(str(self.node_learning_unit), 'Acronym (2019)')
+        self.assertEqual(str(self.node_learning_unit), 'Code (2019)')
 
 
 class TestGetChildrenTypes(SimpleTestCase):
@@ -208,3 +209,51 @@ class TestGetAllChildrenAsNode(SimpleTestCase):
             link1_2_1.child,
         }
         self.assertSetEqual(result, expected_result)
+
+
+class TestGetIsPrerequisiteOf(SimpleTestCase):
+
+    def test_when_is_prerequisite_of_nothing(self):
+        node = NodeLearningUnitYearFactory(is_prerequisite_of=None)
+        self.assertEqual(node.get_is_prerequisite_of(), [])
+
+    def test_when_id_prerequisite_of_mutliple_nodes(self):
+        multiple_nodes = [NodeLearningUnitYearFactory(), NodeLearningUnitYearFactory()]
+        node = NodeLearningUnitYearFactory(is_prerequisite_of=multiple_nodes)
+        self.assertListEqual(node.get_is_prerequisite_of(), multiple_nodes)
+
+    def test_ordering(self):
+        ldroi1002 = NodeLearningUnitYearFactory(code='LDROI1002')
+        lecge1010 = NodeLearningUnitYearFactory(code='LECGE1010')
+        ldroi1001 = NodeLearningUnitYearFactory(code='LDROI1001')
+
+        wrong_order = [lecge1010, ldroi1002, ldroi1001]
+        node = NodeLearningUnitYearFactory(is_prerequisite_of=wrong_order)
+
+        error_msg = "This order is used to order prerequisite nodes in excel file."
+        expected_result = [ldroi1001, ldroi1002, lecge1010]
+        self.assertListEqual(node.get_is_prerequisite_of(), expected_result, error_msg)
+
+
+class TestGetAllChildrenAsLearningUnitNodes(SimpleTestCase):
+
+    def setUp(self):
+        self.parent = NodeGroupYearFactory()
+
+    def test_when_contains_children_of_type_group(self):
+        LinkFactory(parent=self.parent, child__node_type=NodeType.GROUP)
+        result = self.parent.get_all_children_as_learning_unit_nodes()
+        self.assertEqual(result, [])
+
+    def test_when_has_no_children(self):
+        result = self.parent.get_all_children_as_learning_unit_nodes()
+        self.assertEqual(result, [])
+
+    def test_ordering(self):
+        link0 = LinkFactory(parent=self.parent, child=NodeLearningUnitYearFactory(), order=0)
+        link2 = LinkFactory(parent=self.parent, child=NodeLearningUnitYearFactory(), order=2)
+        link1 = LinkFactory(parent=self.parent, child=NodeLearningUnitYearFactory(), order=1)
+        result = self.parent.get_all_children_as_learning_unit_nodes()
+        exepcted_order = [link0.child, link1.child, link2.child]
+        error_msg = "This order is used for prerequisites in excel file."
+        self.assertListEqual(result, exepcted_order, error_msg)

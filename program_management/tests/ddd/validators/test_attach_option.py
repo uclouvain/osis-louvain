@@ -82,12 +82,12 @@ class TestAttachOptionsValidator(SimpleTestCase):
         )
         self.assertFalse(validator.is_valid())
         expected_result = ngettext(
-            "Option \"%(acronym)s\" must be present in %(root_acronym)s program.",
-            "Options \"%(acronym)s\" must be present in %(root_acronym)s program.",
+            "Option \"%(code)s\" must be present in %(root_code)s program.",
+            "Options \"%(code)s\" must be present in %(root_code)s program.",
             1
         ) % {
-            'acronym': different_option.acronym,
-            'root_acronym': self.tree_2m_with_option.root_node.acronym,
+            'code': different_option.code,
+            'root_code': self.tree_2m_with_option.root_node.code,
         }
         self.assertEqual(expected_result, validator.error_messages[0].message)
 
@@ -108,12 +108,12 @@ class TestAttachOptionsValidator(SimpleTestCase):
         )
         self.assertFalse(validator.is_valid())
         expected_result = ngettext(
-            "Option \"%(acronym)s\" must be present in %(root_acronym)s program.",
-            "Options \"%(acronym)s\" must be present in %(root_acronym)s program.",
+            "Option \"%(code)s\" must be present in %(root_code)s program.",
+            "Options \"%(code)s\" must be present in %(root_code)s program.",
             1
         ) % {
-            'acronym': different_option.acronym,
-            'root_acronym': self.tree_2m_with_option.root_node.acronym,
+            'code': different_option.code,
+            'root_code': self.tree_2m_with_option.root_node.code,
         }
         self.assertEqual(expected_result, validator.error_messages[0].message)
 

@@ -41,10 +41,10 @@ class TestDetachNodeForm(SimpleTestCase):
             |---Learning unit
         |---SUBGROUP 2
         """
-        root_node = NodeGroupYearFactory(acronym='DROI2M')
-        common_core = NodeGroupYearFactory(acronym='TCDRO200M')
-        learning_unit = NodeLearningUnitYearFactory(acronym='LDROI1200')
-        subgroup = NodeGroupYearFactory(acronym='LPOR100G')
+        root_node = NodeGroupYearFactory(code='DROI2M')
+        common_core = NodeGroupYearFactory(code='TCDRO200M')
+        learning_unit = NodeLearningUnitYearFactory(code='LDROI1200')
+        subgroup = NodeGroupYearFactory(code='LPOR100G')
 
         common_core.add_child(learning_unit)
         root_node.add_child(common_core)
