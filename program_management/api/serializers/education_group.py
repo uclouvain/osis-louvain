@@ -33,16 +33,22 @@ class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityFiel
         super().__init__(view_name='education_group_read', **kwargs)
 
     def get_url(self, obj, view_name, request, format):
+        # obj = education_group.models.group_year.GroupYear
         education_group_year_id = 1
         if obj.education_group_year_id is None:
             education_group_year_id = 1
         else:
             education_group_year_id = obj.education_group_year_id
+        # 'root_id': 40324, 'version_name': 'CEMS', 'transition': ''
+        print("version_name : {}.".format((obj.version_name)))
+        print("transition : {}.".format((obj.transition)))
+
         kwargs = {
-            'root_id': education_group_year_id,
             'education_group_year_id': education_group_year_id,
-            'root_group': obj.id
+            'version_name': obj.version_name if obj.version_name and obj.version_name != '' else '-',
+            'transition': obj.transition if obj.transition and obj.transition != '' else '-',
         }
+        print(kwargs)
         return self.reverse(view_name, kwargs=kwargs, request=request, format=format)
 
 

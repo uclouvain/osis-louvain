@@ -231,7 +231,20 @@ class GroupFilter(FilterSet):
                 output_field=CharField(),)
         ).annotate(
             education_group_year_id=Subquery(version)
+        ).annotate(
+            transition=Case(
+                When(Q(educationgroupversion__isnull=False) & Q(educationgroupversion__is_transition=True),
+                     then=Value('transition')),
+                default=Value(''),
+                output_field=CharField(),)
+        ).annotate(
+            version_name=Case(
+                When(Q(educationgroupversion__isnull=False) & ~Q(educationgroupversion__version_name=''),
+                     then='educationgroupversion__version_name'),
+                default=Value(''),
+                output_field=CharField(),)
         )
+
         return qs
 
     def filter_queryset(self, queryset):

@@ -76,8 +76,9 @@ from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
 from program_management.forms.custom_xls import CustomXlsForm
 from webservices.business import CONTACT_INTRO_KEY
-from program_management.ddd.repositories.load_tree import find_all_program_tree_versions, load_mon_program_tree_version
+from program_management.ddd.repositories.load_tree import find_all_program_tree_versions, load_mon_program_tree_version, load
 from education_group.models.group_year import GroupYear
+from program_management.serializers.program_tree_view import ProgramTreeViewSerializer
 
 SECTIONS_WITH_TEXT = (
     'ucl_bachelors',
@@ -154,10 +155,25 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
             return None
 
     @cached_property
+    def version_name(self):
+        if self.kwargs.get("version_name"):
+            return '-' if self.kwargs.get("version_name") == '' else self.kwargs.get("version_name")
+        else:
+            return '-'
+
+    @cached_property
+    def transition(self):
+        if self.kwargs.get("transition"):
+            return self.kwargs.get("transition") if self.kwargs.get("transition") else '-'
+        else:
+            return '-'
+
+    @cached_property
     def starting_academic_year(self):
         return starting_academic_year()
 
     def get_context_data(self, **kwargs):
+        print('get_context_data')
         context = super().get_context_data(**kwargs)
 
         # This objects are mandatory for all education group views
@@ -177,22 +193,33 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
+            print(self.root)
             # FIXME: resolve dependency in other way
             from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
             education_group_hierarchy_tree = EducationGroupHierarchy(self.root,
                                                                      tab_to_show=self.request.GET.get('tab_to_show'))
-            context['tree'] = json.dumps(education_group_hierarchy_tree.to_json())
+            arbre = json.dumps(education_group_hierarchy_tree.to_json())
+            context['tree'] = arbre
             context['version_list_standard'] = None
             context['version_list_particular'] = None
             if self.root_group:
-                program_tree = load_mon_program_tree_version(self.root_group.pk, False)
-                context['program_tree'] = program_tree
+                # program_tree = load_mon_program_tree_version(self.root.id,self.root_group.pk, False)
+                program_tree = load(self.root.pk)
+                print('************')
+                print(program_tree)
+                p = ProgramTreeViewSerializer(program_tree).data
+                print('************')
+                print(p)
+                context['tree'] = p
+                # print(p)
+                context['program_tree'] = p
                 list_of_versions = find_all_program_tree_versions(self.root_group.id, False)
                 context.update(_get_version_lists(list_of_versions))
 
             else:
                 context['program_tree'] = None
 
+            # context['tree'] = arbre
 
             context['root_group'] = self.root_group
 
@@ -214,10 +241,12 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if self.root_group:
-            default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk, self.root_group.pk])
-        else:
-            default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk])
+        # if self.root_group:
+        #     default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk, self.root_group.pk])
+        # else:
+        #     default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk])
+        default_url = reverse('education_group_read', args=[self.root.pk, self.version_name, self.transition])
+        # default_url = reverse('education_group_read2', args=[self.root.pk, self.version_name, self.transition])
         if self.request.GET.get('group_to_parent'):
             default_url += '?group_to_parent=' + self.request.GET.get('group_to_parent')
         if not self.can_show_view():

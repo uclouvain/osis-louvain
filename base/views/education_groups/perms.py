@@ -93,6 +93,7 @@ class FlagNotAuthorized(AccessMixin):
     flag_not_authorized = None
 
     def get_flag_not_authorized(self):
+        self.flag_not_authorized = "xxx"
         if self.flag_not_authorized:
             if isinstance(self.flag_not_authorized, str):
                 return Flag.objects.filter(name=self.flag_not_authorized).exists()

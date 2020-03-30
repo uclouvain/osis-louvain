@@ -304,7 +304,9 @@ def dl_with_parent_version(context, key, dl_title="", class_dl="", default_value
     """
     obj = context["education_group_year"]
     parent = context["parent"]
-
-    version_label = context["program_tree"].version_label if context["program_tree"] else ''
+    try:
+        version_label = context["program_tree"].version_label if context["program_tree"] else ''
+    except:
+        version_label=''
     return dl_with_parent_without_context(key, obj, parent, dl_title=dl_title, class_dl=class_dl,
                                           default_value=default_value, version_label=version_label)

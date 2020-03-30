@@ -164,26 +164,30 @@ def __build_children(
         structure for structure in tree_structure
         if structure['path'] == "|".join([root_path, str(structure['child_id'])])
     ]
+    print(childs_structure)
     for child_structure in childs_structure:
-        child_node = copy.deepcopy(nodes[child_structure['child_id']])
-        child_node.children = __build_children(
-            "|".join([root_path, str(child_node.pk)]),
-            tree_structure,
-            nodes,
-            links,
-            prerequisites
-        )
+        try:
+            child_node = copy.deepcopy(nodes[child_structure['child_id']])
+            child_node.children = __build_children(
+                "|".join([root_path, str(child_node.pk)]),
+                tree_structure,
+                nodes,
+                links,
+                prerequisites
+            )
 
-        if isinstance(child_node, node.NodeLearningUnitYear):
-            child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, [])
-            child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
+            if isinstance(child_node, node.NodeLearningUnitYear):
+                child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, [])
+                child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
 
-        link_node = copy.deepcopy(
-            links['_'.join([str(child_structure['parent_id']), str(child_structure['child_id'])])]
-        )
-        link_node.parent = copy.deepcopy(nodes[child_structure['parent_id']])
-        link_node.child = child_node
-        children.append(link_node)
+            link_node = copy.deepcopy(
+                links['_'.join([str(child_structure['parent_id']), str(child_structure['child_id'])])]
+            )
+            link_node.parent = copy.deepcopy(nodes[child_structure['parent_id']])
+            link_node.child = child_node
+            children.append(link_node)
+        except KeyError:
+            continue
     return children
 
 
@@ -200,27 +204,55 @@ def find_all_program_tree_versions(tree_root_id: int, load_tree=True) -> List['P
     return results
 
 
-def load_mon_program_tree_version(tree_root_id: int, load_tree=True) -> 'ProgramTreeVersion':
-    qs = EducationGroupVersion.objects.filter(root_group__pk=tree_root_id).annotate(
-            version_label=Case(
-                        When(Q(is_transition=True) &
-                             Q(version_name=''),
-                             then=Value('[Transition]')),
-                        When(~Q(version_name='') &
-                             Q(is_transition=True),
-                             then=Concat(Value('['), 'version_name', Value('-Transition]'))),
-                        When(~Q(version_name='') &
-                             Q(is_transition=False),
-                             then=Concat(Value('['), 'version_name', Value(']'))),
-                        default=Value(''),
-                        output_field=CharField()
-                    )
-        )
-    qs = qs.values('is_transition', 'version_name', 'title_fr', 'root_group', 'version_label')
+def load_mon_program_tree_version(tree_root_id: int, root_group: int, load_tree=True) -> 'ProgramTreeVersion':
+    # qs = EducationGroupVersion.objects.filter(root_group__pk=tree_root_id).annotate(
+    #         version_label=Case(
+    #                     When(Q(is_transition=True) &
+    #                          Q(version_name=''),
+    #                          then=Value('[Transition]')),
+    #                     When(~Q(version_name='') &
+    #                          Q(is_transition=True),
+    #                          then=Concat(Value('['), 'version_name', Value('-Transition]'))),
+    #                     When(~Q(version_name='') &
+    #                          Q(is_transition=False),
+    #                          then=Concat(Value('['), 'version_name', Value(']'))),
+    #                     default=Value(''),
+    #                     output_field=CharField()
+    #                 )
+    #     )
+    # qs = qs.values('is_transition', 'version_name', 'title_fr', 'root_group', 'version_label')
+    #
+    # for elem in qs:
+    #
+    #     return MonProgramTreeVersion(**elem)
 
-    for elem in qs:
+    print('1*')
+    root_node = load_node.load_node_education_group_year(tree_root_id)
+    print('2*')
+    print(root_node)
+    print('3*')
+    structure = GroupElementYear.objects.get_adjacency_list([tree_root_id])
+    print('4*')
+    nodes = __load_tree_nodes(structure)
+    print('5*')
+    nodes.update({root_node.pk: root_node})
+    print('6*')
+    links = __load_tree_links(structure)
+    print('7*')
+    prerequisites = __load_tree_prerequisites(tree_root_id, nodes)
+    print('8*')
+    f = __build_tree(root_node, structure, nodes, links, prerequisites)
+    print('9*')
+    return f
 
-        return MonProgramTreeVersion(**elem)
 
-    return None
-
+def __build_tree_version(
+        root_node: 'Node',
+        tree_structure: TreeStructure,
+        nodes: Dict[NodePk, 'Node'],
+        links: Dict[LinkKey, 'Link'],
+        prerequisites
+) -> 'ProgramTree':
+    root_node.children = __build_children(str(root_node.pk), tree_structure, nodes, links, prerequisites)
+    tree = MonProgramTreeVersion(root_node, authorized_relationships=load_authorized_relationship.load())
+    return tree
