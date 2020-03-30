@@ -105,7 +105,7 @@
                 {% endflag %}
 
                 <li class="divider"></li>
-                {% url 'create_education_group_version' root.pk education_group_year.education_group.pk as create_version_url %}
+                {% url 'create_education_group_version' root.pk education_group_year.pk as create_version_url %}
                 {% li_with_create_perm_specific_version create_version_url _('Create specific version') %}
                 <li class="divider"></li>
 

@@ -45,6 +45,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import TrainingType
 from base.models.exceptions import ValidationWarning
+from base.models.person import Person
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages, show_error_message_for_form_invalid
 from base.views.education_groups.perms import can_create_education_group
@@ -200,8 +201,14 @@ def validate_field(request, category, education_group_year_pk=None):
 
 @login_required
 def create_education_group_specific_version(request, root_id=None, education_group_year_id=None):
+    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+    person = get_object_or_404(Person, user=request.user)
     form_version = SpecificVersionForm(
-        request.POST or None
+        request.POST or None,
+        person=person
     )
-    context = {"form": form_version}
+    context = {
+        "form": form_version,
+        "parent": education_group_year
+    }
     return render(request, "education_group/create_specific_version.html", context)

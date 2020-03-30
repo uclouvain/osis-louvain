@@ -24,27 +24,32 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-    <div class="modal-content">
-        <form class="form pedagogy-form" role="form" method="POST" action="{{ request.path }}">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">×</button>
-                <h4>{% trans 'New spécific version' %}</h4>
-            </div>
-            <div class="modal-body">
-                {% csrf_token %}
-                <div class="panel panel-default">
-                    <div class="panel-body">
-                        {% bootstrap_field form.acronym %}
-                        {% bootstrap_field form.title %}
-                        {% bootstrap_field form.title_english %}
-                        {% bootstrap_field form.end_year %}
+<div class="modal-content">
+    <form class="form pedagogy-form" role="form" method="POST" action="{{ request.path }}">
+        <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">×</button>
+            <h4>{% trans 'New spécific version' %}</h4>
+        </div>
+        <div class="modal-body">
+            {% csrf_token %}
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="input-group">
+                        <span class="input-group-addon">{{parent.acronym}} [</span>
+                        {% bootstrap_field form.acronym show_label=False %}
+                        <span class="input-group-addon">]</span>
                     </div>
+                    <br>
+                    {% bootstrap_field form.title %}
+                    {% bootstrap_field form.title_english %}
+                    {% bootstrap_field form.end_year %}
                 </div>
             </div>
-            <div class="modal-footer">
-               <button type="submit" class="btn" data-dismiss="modal">{% trans 'Cancel' %}</button>
-               <button class="btn btn-primary" type="submit">{% trans 'Save' %}</button>
-          </div>
-        </form>
-    </div>
+        </div>
+        <div class="modal-footer">
+            <button type="submit" class="btn" data-dismiss="modal">{% trans 'Cancel' %}</button>
+            <button class="btn btn-primary" type="submit">{% trans 'Save' %}</button>
+        </div>
+    </form>
+</div>
 

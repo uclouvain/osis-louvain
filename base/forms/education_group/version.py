@@ -38,7 +38,8 @@ class SpecificVersionForm(forms.Form):
     end_year = forms.ModelChoiceField(queryset=AcademicYear.objects.none(), required=False,
                                       label=_('This version exists until'), empty_label=BLANK_CHOICE_DISPLAY)
 
-    def __init__(self, max_year=None, *args, **kwargs):
+    def __init__(self, data, person, *args, **kwargs):
+        self.person = person
         super().__init__(*args, **kwargs)
         try:
             event_perm = event_perms.generate_event_perm_creation_end_date_proposal(self.person)

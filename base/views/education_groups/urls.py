@@ -92,7 +92,7 @@ urlpatterns = [
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
 
         url(r'^identification/$', detail.EducationGroupRead.as_view(), name='education_group_read'),
-        url(r'^create_specific_version/$',  create.create_education_group_specific_version,
+        url(r'^create_education_group_version/$',  create.create_education_group_specific_version,
             name="create_education_group_version"),
         url(r'^update/$', update.update_education_group, name="update_education_group"),
         url(r'^diplomas/$', detail.EducationGroupDiplomas.as_view(),
