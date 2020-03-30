@@ -61,7 +61,8 @@ from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
-from base.models.group_element_year import find_learning_unit_roots, GroupElementYear
+from base.models.group_element_year import GroupElementYear
+from program_management.ddd.repositories.find_roots import find_roots
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
@@ -73,7 +74,9 @@ from base.views.education_groups.select import get_clipboard_content_display
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from program_management.ddd.repositories import load_tree
 from program_management.forms.custom_xls import CustomXlsForm
+from program_management.serializers import program_tree_view
 from webservices.business import CONTACT_INTRO_KEY
 
 SECTIONS_WITH_TEXT = (
@@ -167,11 +170,9 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
-            # FIXME: resolve dependency in other way
-            from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
-            education_group_hierarchy_tree = EducationGroupHierarchy(self.root,
-                                                                     tab_to_show=self.request.GET.get('tab_to_show'))
-            context['tree'] = json.dumps(education_group_hierarchy_tree.to_json())
+            program_tree = load_tree.load(self.root.id)
+            serialized_data = program_tree_view.ProgramTreeViewSerializer(program_tree).data
+            context['tree'] = json.dumps(serialized_data)
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
             person=self.person,
@@ -543,11 +544,9 @@ class EducationGroupUsing(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["group_element_years"] = self.object.child_branch.select_related("parent")
-        context["formations"] = find_learning_unit_roots(
+        context["formations"] = find_roots(
             list(grp.parent for grp in self.object.child_branch.select_related("parent")),
-            return_result_params={
-                'parents_as_instances': True
-            }
+            as_instances=True
         )
         return context
 

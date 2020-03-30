@@ -25,16 +25,16 @@
 ##############################################################################
 from rest_framework import serializers
 
-from program_management.ddd.domain import program_tree
 from program_management.serializers.node_view import ChildrenField
+from program_management.ddd.business_types import *
 
 
 class ProgramTreeViewSerializer(serializers.Serializer):
-    text = serializers.CharField(source='root_node.title')
+    text = serializers.SerializerMethodField()
     icon = serializers.SerializerMethodField()
     children = ChildrenField(source='root_node.children', many=True)
 
-    def __init__(self, instance: program_tree.ProgramTree, **kwargs):
+    def __init__(self, instance: 'ProgramTree', **kwargs):
         kwargs['context'] = {
             **kwargs.get('context', {}),
             'root': instance.root_node,
@@ -42,5 +42,8 @@ class ProgramTreeViewSerializer(serializers.Serializer):
         }
         super().__init__(instance, **kwargs)
 
-    def get_icon(self, tree: program_tree.ProgramTree):
+    def get_icon(self, tree: 'ProgramTree'):
         return None
+
+    def get_text(self, obj: 'ProgramTree'):
+        return '%(code)s - %(title)s' % {'code': obj.root_node.code, 'title': obj.root_node.title}

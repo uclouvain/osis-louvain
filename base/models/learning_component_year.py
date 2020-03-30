@@ -190,14 +190,6 @@ class LearningComponentYear(SerializableModel):
             setattr(self, attr, repartition_volumes[entity_container_type])
 
 
-def volume_total_verbose(learning_component_years):
-    q1 = next((component['total'] for component in learning_component_years
-               if component['type'] == LECTURING), 0)
-    q2 = next((component['total'] for component in learning_component_years
-               if component['type'] == PRACTICAL_EXERCISES), 0)
-    return "%(q1)gh + %(q2)gh" % {"q1": q1, "q2": q2}
-
-
 def find_by_id(learning_component_year_id):
     return LearningComponentYear.objects.get(pk=learning_component_year_id)
 

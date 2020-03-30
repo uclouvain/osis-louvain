@@ -32,14 +32,13 @@ from program_management.ddd.business_types import *
 # Implemented from GroupElementYear._check_same_academic_year_parent_child_branch
 class ParentChildSameAcademicYearValidator(BusinessValidator):
 
-    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path'):
+    def __init__(self, parent_node: 'Node', node_to_add: 'Node'):
         super(ParentChildSameAcademicYearValidator, self).__init__()
-        self.tree = tree
         self.node_to_add = node_to_add
-        self.path = path
+        self.parent_node = parent_node
 
     def validate(self):
-        if self.tree.get_node(self.path).year != self.node_to_add.year:
+        if self.parent_node.year != self.node_to_add.year:
             self.add_error_message(
                 _("It is prohibited to attach a group, mini-training or training to an element of "
                   "another academic year.")

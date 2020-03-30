@@ -34,9 +34,10 @@ from base.tests.factories.education_group_year import TrainingFactory, GroupFact
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
-from education_group.api.serializers.group_element_year import EducationGroupTreeSerializer
+from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
 from education_group.api.views.group_element_year import TrainingTreeView, GroupTreeView, MiniTrainingTreeView
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
+from program_management.ddd.domain.link import Link
+from program_management.ddd.repositories import load_tree
 
 
 class TrainingTreeViewTestCase(APITestCase):
@@ -78,7 +79,7 @@ class TrainingTreeViewTestCase(APITestCase):
             acronym='DROI2MS/IU',
             partial_acronym='LIURE200S',
             academic_year=cls.academic_year,
-            education_group_type__name=TrainingType.MASTER_MS_120
+            education_group_type__name=TrainingType.MASTER_MS_120.name
         )
         GroupElementYearFactory(parent=cls.finality_list_choice, child_branch=cls.training_ms, child_leaf=None)
         cls.common_core_ms = GroupFactory(
@@ -121,8 +122,8 @@ class TrainingTreeViewTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        serializer = EducationGroupTreeSerializer(
-            EducationGroupHierarchy(self.training),
+        serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=load_tree.load(self.training.id).root_node),
             context={
                 'request': RequestFactory().get(self.url),
             }
@@ -199,8 +200,8 @@ class MiniTrainingTreeViewTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        serializer = EducationGroupTreeSerializer(
-            EducationGroupHierarchy(self.mini_training),
+        serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=load_tree.load(self.mini_training.id).root_node),
             context={
                 'request': RequestFactory().get(self.url),
             }
@@ -275,8 +276,8 @@ class GroupTreeViewTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        serializer = EducationGroupTreeSerializer(
-            EducationGroupHierarchy(self.common_core),
+        serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=load_tree.load(self.common_core.id).root_node),
             context={
                 'request': RequestFactory().get(self.url),
             }

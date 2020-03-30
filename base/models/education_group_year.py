@@ -684,7 +684,7 @@ class EducationGroupYear(SerializableModel):
             else self.title
         return "{} ({} {})".format(title, self.credits or 0, _("credits"))
 
-    @property
+    @property  # TODO :: move this into template tags or 'presentation' layer (not responsibility of model)
     def verbose_title(self):
         if self.is_finality:
             if self.partial_title_english and translation.get_language() == LANGUAGE_CODE_EN:
@@ -708,15 +708,6 @@ class EducationGroupYear(SerializableModel):
         if self.remark_english and translation.get_language() == LANGUAGE_CODE_EN:
             return self.remark_english
         return self.remark
-
-    @property
-    def verbose_constraint(self):
-        msg = "from %(min)s to %(max)s credits among" \
-            if self.constraint_type == CREDITS else "from %(min)s to %(max)s among"
-        return _(msg) % {
-            "min": self.min_constraint if self.min_constraint else "",
-            "max": self.max_constraint if self.max_constraint else ""
-        }
 
     @property
     def verbose_duration(self):

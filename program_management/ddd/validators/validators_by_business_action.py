@@ -31,12 +31,10 @@ from program_management.ddd.domain.node import NodeEducationGroupYear, NodeGroup
 from program_management.ddd.validators._authorized_relationship import \
     AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator
 from program_management.ddd.validators._detach_root import DetachRootForbiddenValidator
-from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityValidator
+from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
-from program_management.ddd.validators._node_duplication import NodeDuplicationValidator
-from program_management.ddd.validators._parent_as_leaf import ParentIsNotLeafValidator
-from program_management.ddd.validators._parent_child_academic_year import ParentChildSameAcademicYearValidator
+from program_management.ddd.validators.link import CreateLinkValidatorList
 
 
 class AttachNodeValidatorList(BusinessListValidator):
@@ -46,32 +44,23 @@ class AttachNodeValidatorList(BusinessListValidator):
     ]
 
     def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path'):
-
-        # TODO :: instancier les validators directement, plutôt que d'avoir des classes (les paramètres changent)
         if isinstance(node_to_add, NodeEducationGroupYear) or isinstance(node_to_add, NodeGroupYear):
-
             self.validators = [
-                ParentIsNotLeafValidator,
-                AttachAuthorizedRelationshipValidator,
-                NodeDuplicationValidator,
-                MinimumEditableYearValidator,
-                InfiniteRecursivityValidator,
-                ParentChildSameAcademicYearValidator,
+                CreateLinkValidatorList(tree.get_node(path), node_to_add),
+                AttachAuthorizedRelationshipValidator(tree, node_to_add, tree.get_node(path)),
+                MinimumEditableYearValidator(tree),
+                InfiniteRecursivityTreeValidator(tree, node_to_add, path),
             ]
 
         elif isinstance(node_to_add, NodeLearningUnitYear):
-
             self.validators = [
-                ParentIsNotLeafValidator,
-                AuthorizedRelationshipLearningUnitValidator,
-                NodeDuplicationValidator,
-                MinimumEditableYearValidator,
-                InfiniteRecursivityValidator,
-                DetachRootForbiddenValidator,
-                ParentChildSameAcademicYearValidator,
+                CreateLinkValidatorList(tree.get_node(path), node_to_add),
+                AuthorizedRelationshipLearningUnitValidator(tree, node_to_add, tree.get_node(path)),
+                MinimumEditableYearValidator(tree),
+                InfiniteRecursivityTreeValidator(tree, node_to_add, path),
+                DetachRootForbiddenValidator(tree, node_to_add),
             ]
 
         else:
             raise AttributeError("Unknown instance of node")
-
-        super(AttachNodeValidatorList, self).__init__(validator_args=[tree, node_to_add, tree.get_node(path)])
+        super().__init__()

@@ -31,12 +31,12 @@ PrerequisiteExpression = str  # Example : "(Prerequisite1 OR Prerequisite2) AND 
 
 
 class PrerequisiteItem:
-    def __init__(self, acronym: str, year: int):
-        self.acronym = acronym
+    def __init__(self, code: str, year: int):
+        self.code = code
         self.year = year
 
     def __str__(self):
-        return self.acronym
+        return self.code
 
 
 class PrerequisiteItemGroup:
@@ -45,8 +45,8 @@ class PrerequisiteItemGroup:
         self.operator = operator
         self.prerequisite_items = prerequisite_items or []
 
-    def add_prerequisite_item(self, acronym: str, year: int):
-        self.prerequisite_items.append(PrerequisiteItem(acronym, year))
+    def add_prerequisite_item(self, code: str, year: int):
+        self.prerequisite_items.append(PrerequisiteItem(code, year))
 
     def __str__(self):
         return str(" " + self.operator + " ").join(str(p_item) for p_item in self.prerequisite_items)
@@ -63,7 +63,16 @@ class Prerequisite:
         self.prerequisite_item_groups.append(group)
 
     def __str__(self) -> PrerequisiteExpression:
-        str_format = "({})" if len(self.prerequisite_item_groups) > 1 else "{}"
+        def _format_group(group: PrerequisiteItemGroup):
+            return "({})" if len(group.prerequisite_items) > 1 and len(self.prerequisite_item_groups) > 1 else "{}"
         return str(" " + self.main_operator + " ").join(
-            str_format.format(group) for group in self.prerequisite_item_groups
+            _format_group(group).format(group) for group in self.prerequisite_item_groups
         )
+
+
+class NullPrerequisite(Prerequisite):
+    def __init__(self):
+        super().__init__(prerequisite_operator.AND, None)
+
+    def __bool__(self):
+        return False

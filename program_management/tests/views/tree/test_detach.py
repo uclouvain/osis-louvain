@@ -56,10 +56,10 @@ class TestDetachNodeView(TestCase):
                 |---LBIR1110 (UE)
            |----LBIR101G (subgroup)
         """
-        root_node = NodeEducationGroupYearFactory(acronym="BIR1BA")
-        common_core = NodeEducationGroupYearFactory(acronym="LBIR150T")
-        learning_unit_node = NodeLearningUnitYearFactory(acronym='LBIR1110')
-        subgroup = NodeEducationGroupYearFactory(acronym="LBIR101G")
+        root_node = NodeEducationGroupYearFactory(code="BIR1BA")
+        common_core = NodeEducationGroupYearFactory(code="LBIR150T")
+        learning_unit_node = NodeLearningUnitYearFactory(code='LBIR1110')
+        subgroup = NodeEducationGroupYearFactory(code="LBIR101G")
 
         common_core.add_child(learning_unit_node)
         root_node.add_child(common_core)

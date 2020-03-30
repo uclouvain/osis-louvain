@@ -33,6 +33,8 @@ from django.contrib.auth.models import Permission
 from django.contrib.messages import ERROR
 from django.db.models import Q
 from django.utils.translation import gettext as _
+from django.utils import translation
+
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 
@@ -64,8 +66,8 @@ def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enr
 
     html_template_ref = "{}_html".format(ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE)
     txt_template_ref = "{}_txt".format(ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE)
-    receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in persons]
-    suject_data = {'learning_unit_name': learning_unit_name}
+    subject_data = {'learning_unit_name': learning_unit_name}
+
     template_base_data = {'learning_unit_name': learning_unit_name,
                           'encoding_status': _('All the scores are encoded.') if all_encoded
                           else _('It remains notes to encode.')
@@ -86,10 +88,16 @@ def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enr
                                         get_enrollment_headers(),
                                         submitted_enrollments_data,
                                         data_translatable=['Justification'])
-
-    message_content = message_config.create_message_content(html_template_ref, txt_template_ref, [table], receivers,
-                                                            template_base_data, suject_data)
-    return message_service.send_messages(message_content)
+    receivers = [message_config.create_receiver(person.id, person.email, person.language) for person in persons]
+    for receiver in receivers:
+        template_base_data.update(
+            {'encoding_status': _get_encoding_status(receiver['receiver_lang'], all_encoded)
+             }
+        )
+        message_content = message_config.create_message_content(html_template_ref, txt_template_ref, [table],
+                                                                [receiver], template_base_data, subject_data)
+        message_service.send_messages(message_content)
+    return None
 
 
 def send_mail_after_the_learning_unit_year_deletion(managers, acronym, academic_year, msg_list):
@@ -384,3 +392,9 @@ def get_enrollment_headers():
         'Score',
         'Justification'
     )
+
+
+def _get_encoding_status(language, all_encoded):
+    message = 'All the scores are encoded.' if all_encoded else 'It remains notes to encode.'
+    with translation.override(language):
+        return translation.gettext(message)

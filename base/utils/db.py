@@ -35,3 +35,12 @@ def convert_order_by_strings_to_expressions(order_by):
         return expression
 
     return tuple(_convert_field_to_expression(field) for field in order_by)
+
+
+def dict_fetchall(cursor):  # Inspired from https://docs.djangoproject.com
+    """
+    Return all rows from a cursor as a dict
+    """
+    desc = cursor.description
+    columns = [col[0] for col in desc]
+    return [dict(zip(columns, row)) for row in cursor.fetchall()]

@@ -35,7 +35,6 @@ from base.models.prerequisite import Prerequisite, prerequisite_syntax_validator
     MULTIPLE_PREREQUISITES_REGEX_AND
 
 
-# TODO: Only used in program_management => move to it?
 class LearningUnitPrerequisiteForm(forms.ModelForm):
     main_operator = None
 
@@ -58,11 +57,10 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
         model = Prerequisite
         fields = ()
 
-    def __init__(self, *args, luys_that_can_be_prerequisite=None, **kwargs):
+    def __init__(self, *args, codes_permitted=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['prerequisite_string'].initial = self.instance.prerequisite_string
-        self.luys_that_can_be_prerequisite = luys_that_can_be_prerequisite or []
-        self._acronyms_accepted_as_item = [luy.acronym for luy in self.luys_that_can_be_prerequisite]
+        self.codes_permitted = codes_permitted or []
 
     def clean_prerequisite_string(self):
         prerequisite_string = self.cleaned_data['prerequisite_string']
@@ -122,7 +120,7 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
                     'prerequisite_string',
                     _("A learning unit cannot be prerequisite to itself : %(acronym)s") % {'acronym': item}
                 )
-            elif item not in self._acronyms_accepted_as_item:
+            elif item not in self.codes_permitted:
                 self.add_error(
                     'prerequisite_string',
                     _("The learning unit %(acronym)s is not contained inside the formation") % {'acronym': item}

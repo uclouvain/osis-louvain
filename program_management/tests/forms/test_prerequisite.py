@@ -26,10 +26,10 @@
 
 from django.test import TestCase
 
-from base.forms.prerequisite import LearningUnitPrerequisiteForm
 from base.models.prerequisite import Prerequisite
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
+from program_management.forms.prerequisite import LearningUnitPrerequisiteForm
 
 
 class TestPrerequisiteForm(TestCase):
@@ -37,28 +37,24 @@ class TestPrerequisiteForm(TestCase):
         self.luy_1 = LearningUnitYearFactory()
         self.luy_2 = LearningUnitYearFactory()
         self.prerequisite = PrerequisiteFactory()
-        self.prerequisite_pk = self.prerequisite.pk
+        self.codes_permitted = [self.luy_1.acronym, self.luy_2.acronym]
 
     def test_prerequisite_form_with_prerequisites(self):
         form = LearningUnitPrerequisiteForm(
             instance=self.prerequisite,
-            luys_that_can_be_prerequisite=[self.luy_1, self.luy_2],
-            data={
-                "prerequisite_string": "{} ET {}".format(self.luy_1.acronym, self.luy_2.acronym),
-            }
+            codes_permitted=self.codes_permitted,
+            data={"prerequisite_string": "{} ET {}".format(self.codes_permitted[0], self.codes_permitted[1])}
         )
         self.assertTrue(form.is_valid())
         form.save()
-        self.assertTrue(Prerequisite.objects.filter(pk=self.prerequisite_pk))
+        self.assertTrue(Prerequisite.objects.filter(pk=self.prerequisite.pk))
 
     def test_prerequisite_form_without_prerequisites(self):
         form = LearningUnitPrerequisiteForm(
             instance=self.prerequisite,
-            luys_that_can_be_prerequisite=[self.luy_1, self.luy_2],
-            data={
-                "prerequisite_string": "",
-            }
+            codes_permitted=self.codes_permitted,
+            data={"prerequisite_string": ""}
         )
         self.assertTrue(form.is_valid())
         form.save()
-        self.assertFalse(Prerequisite.objects.filter(pk=self.prerequisite_pk))
+        self.assertFalse(Prerequisite.objects.filter(pk=self.prerequisite.pk))
