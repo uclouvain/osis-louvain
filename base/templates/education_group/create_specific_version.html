@@ -28,11 +28,18 @@
         <form class="form pedagogy-form" role="form" method="POST" action="{{ request.path }}">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">×</button>
-                <h4>{% trans 'New Spécific Version' %}</h4>
+                <h4>{% trans 'New spécific version' %}</h4>
             </div>
             <div class="modal-body">
                 {% csrf_token %}
-
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        {% bootstrap_field form.acronym %}
+                        {% bootstrap_field form.title %}
+                        {% bootstrap_field form.title_english %}
+                        {% bootstrap_field form.end_year %}
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                <button type="submit" class="btn" data-dismiss="modal">{% trans 'Cancel' %}</button>

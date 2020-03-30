@@ -38,6 +38,7 @@ from base.forms.education_group.common import EducationGroupModelForm, Education
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
 from base.forms.education_group.training import TrainingForm
+from base.forms.education_group.version import SpecificVersionForm
 from base.models.academic_year import starting_academic_year, AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
@@ -199,5 +200,8 @@ def validate_field(request, category, education_group_year_pk=None):
 
 @login_required
 def create_education_group_specific_version(request, root_id=None, education_group_year_id=None):
-    context = { }
-    return render(request, "education_group/create_specific_version.html", data)
+    form_version = SpecificVersionForm(
+        request.POST or None
+    )
+    context = {"form": form_version}
+    return render(request, "education_group/create_specific_version.html", context)
