@@ -27,6 +27,7 @@
 from program_management.ddd.business_types import *
 
 STANDARD = ""
+TRANSITION_LABEL = 'Transition'
 
 
 class ProgramTreeVersionBuilder:
@@ -64,6 +65,11 @@ class ProgramTreeVersion:
         self.tree = tree
         self.is_transition = is_transition
         self.version_name = version_name
+
+        if self.is_standard:
+            self.version_label = 'Transition' if is_transition else ''
+        else:
+            self.version_label = '{}-Transition'.format(version_name) if is_transition else version_name
 
     @property
     def is_standard(self):

@@ -56,33 +56,26 @@
                                 id="id_academic_year_search"
                                 onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
                             {% for edy in education_group_year.education_group.educationgroupyear_set.all %}
-                                <option value="{% url "education_group_read" edy.pk edy.pk %}"
+                                <option value="{% url "education_group_read" edy.pk version_name transition %}"
                                         {% if edy == education_group_year %} selected="selected" {% endif %}>
                                     {{ edy.academic_year }}
                                 </option>
                             {% endfor %}
                         </select>
                     </label>
-                    {% if version_list_standard or version_list_particular %}
-                        <label>
+                    {% if version_list %}
+                     <label>
                         <select class="form-control"
                                 onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
-                            {% for group_yr_id, version_label in version_list_standard.items %}
-                                <option value="{% url "education_group_read" education_group_year.pk education_group_year.pk group_yr_id %}"
-                                        {% if group_yr_id == root_group.pk %} selected="selected"{% endif %}>
-                                    {{ version_label }}
-                                </option>
-                            {% endfor %}
-                            {% for group_yr_id, version_label in version_list_particular.items %}
-                                <option value="{% url "education_group_read" education_group_year.pk education_group_year.pk group_yr_id %}"
-                                        {% if group_yr_id == root_group.pk %} selected="selected"{% endif %}>
-                                    {{ version_label }}
+                            {% for version in version_list %}
+                                <option value="{% url 'education_group_read' version.offer version.version_name_url version.transition_url %}"
+                                {% if version.version_name_url == version_name and version.transition_url == transition %}selected="selected"{% endif %}>
+                                    {{ version.version_label }}
                                 </option>
                             {% endfor %}
                         </select>
                         </label>
                     {% endif %}
-
                 {% endif %}
                 <div class="pull-right" style="margin-right: 15px;">
                     {% block top_action_bar %}

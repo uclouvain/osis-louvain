@@ -40,6 +40,7 @@ from base.models.enums import education_group_categories
 from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
 from django.db.models import Q
+from program_management.models.education_group_version import EducationGroupVersion
 
 
 PARTICULAR = "PARTICULAR"
@@ -182,6 +183,10 @@ class GroupFilter(FilterSet):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
+        version = EducationGroupVersion.objects.filter(
+            root_group__pk=OuterRef('pk'),
+        ).values('offer__pk')[:1]
+
         return GroupYear.objects.all().annotate(
             type_ordering=Case(
                 *[When(education_group_type__name=key, then=Value(str(_(val))))
@@ -223,6 +228,26 @@ class GroupFilter(FilterSet):
                 When(Q(educationgroupversion__isnull=False) & ~Q(educationgroupversion__title_fr=''),
                      then=Concat('title_fr', Value(' ['), 'educationgroupversion__title_fr', Value(']'))),
                 default='title_fr',
+                output_field=CharField(),)
+        ).annotate(
+            education_group_year_id=Subquery(version)
+        ).annotate(
+            transition=Case(
+                When(Q(educationgroupversion__isnull=False) & Q(educationgroupversion__is_transition=True),
+                     then=Value('transition')),
+                default=Value(''),
+                output_field=CharField(),)
+        ).annotate(
+            version_name=Case(
+                When(Q(educationgroupversion__isnull=False) & ~Q(educationgroupversion__version_name=''),
+                     then='educationgroupversion__version_name'),
+                default=Value(''),
+                output_field=CharField(),)
+        ).annotate(
+            version_label=Case(
+                When(Q(educationgroupversion__isnull=False) & ~Q(educationgroupversion__version_name=''),
+                     then='educationgroupversion__version_name'),
+                default=Value(''),
                 output_field=CharField(),)
         )
 

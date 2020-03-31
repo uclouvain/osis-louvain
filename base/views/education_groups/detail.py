@@ -32,7 +32,6 @@ from django import forms
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
-from django.db.models import Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
@@ -75,9 +74,12 @@ from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
 from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.load_tree import find_all_program_tree_versions
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.serializers import program_tree_view
 from webservices.business import CONTACT_INTRO_KEY
+from program_management.business.program_version import ordered_list, build_list_from_ddd_version_list
+from django.db.models import Prefetch
 
 SECTIONS_WITH_TEXT = (
     'ucl_bachelors',
@@ -144,7 +146,19 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
 
     @cached_property
     def root(self):
-        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
+        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("education_group_year_id"))
+
+    @cached_property
+    def version_name(self):
+        if self.kwargs.get("version_name"):
+            return '-' if self.kwargs.get("version_name") == '' else self.kwargs.get("version_name")
+        return '-'
+
+    @cached_property
+    def transition(self):
+        if self.kwargs.get("transition"):
+            return self.kwargs.get("transition") if self.kwargs.get("transition") else '-'
+        return '-'
 
     @cached_property
     def starting_academic_year(self):
@@ -152,7 +166,6 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-
         # This objects are mandatory for all education group views
         context['person'] = self.person
 
@@ -170,7 +183,9 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
-            program_tree = load_tree.load(self.root.id)
+            program_tree = load_tree.load(self.root.id,
+                                          '' if self.version_name == '-' else self.version_name,
+                                          True if self.transition == 'transition' else False)
             serialized_data = program_tree_view.ProgramTreeViewSerializer(program_tree).data
             context['tree'] = json.dumps(serialized_data)
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
@@ -187,11 +202,23 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
         context['form_xls_custom'] = CustomXlsForm()
 
+        list_of_versions = find_all_program_tree_versions(self.root.pk)
+        version_view = build_list_from_ddd_version_list(list_of_versions, self.root.pk)
+        context['version_list'] = ordered_list(version_view)
+        context['version_name'] = self.version_name
+        context['transition'] = self.transition
+        context['version_label'] = find_version(self.version_name, self.transition, list_of_versions)
+
         return context
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk])
+        if self.root:
+            default_url = reverse('education_group_read', args=[self.root.pk,
+                                                                self.version_name,
+                                                                self.transition])
+        else:
+            default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk])
         if self.request.GET.get('group_to_parent'):
             default_url += '?group_to_parent=' + self.request.GET.get('group_to_parent')
         if not self.can_show_view():
@@ -243,9 +270,9 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
 
 class EducationGroupRead(EducationGroupGenericDetailView):
     templates = {
-        education_group_categories.TRAINING: "education_group/identification_training_details.html",
-        education_group_categories.MINI_TRAINING: "education_group/identification_mini_training_details.html",
-        education_group_categories.GROUP: "education_group/identification_group_details.html"
+        education_group_categories.TRAINING: "education_group_version/identification_training_details.html",
+        education_group_categories.MINI_TRAINING: "education_group_version/identification_mini_training_details.html",
+        education_group_categories.GROUP: "education_group_version/identification_group_details.html"
     }
 
     def can_show_view(self):
@@ -630,4 +657,16 @@ def get_appropriate_common_admission_condition(edy):
         ).get()
         common_admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=common_egy)
         return common_admission_condition
+    return None
+
+
+def find_version(version_name: str, transition: str, list_of_version):
+    for a_version in list_of_version:
+        if a_version.version_name == version_name or a_version.is_standard:
+            if transition == "transition":
+                if a_version.is_transition:
+                    return a_version.version_label
+            else:
+                if not a_version.is_transition:
+                    return a_version.version_label
     return None

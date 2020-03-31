@@ -93,12 +93,12 @@ def _check_integers_orders(value):
 
 
 class GroupElementYearManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(
-            Q(child_branch__isnull=False) | Q(child_leaf__learning_container_year__isnull=False)
-        )
+    # def get_queryset(self):
+    #     return super().get_queryset().filter(
+    #         Q(child_branch__isnull=False) | Q(child_leaf__learning_container_year__isnull=False)
+    #     )
 
-    def get_adjacency_list(self, root_elements_ids):
+    def get_adjacency_list(self, root_elements_ids, education_group_year_id):
         if not isinstance(root_elements_ids, list):
             raise Exception('root_elements_ids must be an instance of list')
         if not root_elements_ids:
@@ -108,11 +108,20 @@ class GroupElementYearManager(models.Manager):
             WITH RECURSIVE
                 adjacency_query AS (
                     SELECT
-                        parent_id as starting_node_id,
-                        id,
-                        child_branch_id,
-                        child_leaf_id,
-                        parent_id,
+                        %(education_group_year_id)s as starting_node_id,
+                        base_groupelementyear.id,
+                        CASE
+                        WHEN child_element_rec.group_year_id is not null
+                            THEN child_element_rec.group_year_id        
+                            ELSE null
+                        END
+                        as child_branch_id,
+                        CASE
+                        WHEN child_element_rec.learning_unit_year_id is not null
+                            THEN  child_element_rec.learning_unit_year_id
+                            ELSE null
+                        END as child_leaf_id,
+                        %(education_group_year_id)s as parent_id,
                         "order",
                         0 AS level,
                         CAST(parent_id || '|' ||
@@ -124,8 +133,10 @@ class GroupElementYearManager(models.Manager):
                                 END
                             ) as varchar(1000)
                         ) As path
-                    FROM base_groupelementyear
-                    WHERE parent_id IN %(root_element_ids)s
+                    FROM  base_groupelementyear 
+                    INNER JOIN program_management_element AS parent_element_rec ON parent_element_rec.id=base_groupelementyear.parent_element_id
+                    INNER JOIN program_management_element AS child_element_rec ON child_element_rec.id=base_groupelementyear.child_element_id    
+                    where parent_element_rec.group_year_id IN %(root_element_ids)s
 
                     UNION ALL
 
@@ -146,8 +157,9 @@ class GroupElementYearManager(models.Manager):
                                         END
                                     ) as varchar(1000)
                                ) as path
-                    FROM base_groupelementyear AS child
+                    FROM base_groupelementyear AS child                                          
                     INNER JOIN adjacency_query AS parent on parent.child_branch_id = child.parent_id
+                    
                 )
             SELECT distinct starting_node_id, adjacency_query.id, child_branch_id, child_leaf_id, parent_id,
             COALESCE(child_branch_id, child_leaf_id) AS child_id, "order", level, path
@@ -157,7 +169,8 @@ class GroupElementYearManager(models.Manager):
             ORDER BY starting_node_id, level, "order";
         """
         parameters = {
-            "root_element_ids": tuple(root_elements_ids)
+            "root_element_ids": tuple(root_elements_ids),
+            "education_group_year_id": education_group_year_id
         }
         return self.fetch_all(adjacency_query_template, parameters)
 

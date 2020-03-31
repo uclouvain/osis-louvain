@@ -27,15 +27,25 @@ from rest_framework import serializers
 
 from base.models.education_group_type import EducationGroupType
 
+NO_ATTRIBUTE = '-'
+
 
 class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
     def __init__(self, *args, **kwargs):
         super().__init__(view_name='education_group_read', **kwargs)
 
     def get_url(self, obj, view_name, request, format):
+        #TODO POURQUOI CE TRUC EST NONE
+        education_group_year_id = 1
+        if obj.education_group_year_id is None:
+            education_group_year_id = 1
+        else:
+            education_group_year_id = obj.education_group_year_id
+
         kwargs = {
-            'root_id': obj.pk,
-            'education_group_year_id': obj.pk
+            'education_group_year_id': education_group_year_id,
+            'version_name': obj.version_name if obj.version_name and obj.version_name != '' else NO_ATTRIBUTE,
+            'transition': obj.transition if obj.transition and obj.transition != '' else NO_ATTRIBUTE,
         }
         return self.reverse(view_name, kwargs=kwargs, request=request, format=format)
 
@@ -51,6 +61,7 @@ class EducationGroupSerializer(serializers.Serializer):
     management_entity = serializers.StringRelatedField()
     complete_title_fr = serializers.CharField()
     title = serializers.CharField()
+    education_group_year_id = serializers.IntegerField()
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)

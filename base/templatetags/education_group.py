@@ -259,7 +259,7 @@ def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None):
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=False)
-def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", default_value=None):
+def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", default_value=None, version_label=None):
     value = None
     parent_value = None
     if obj:
@@ -272,7 +272,8 @@ def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", d
             parent_value = get_verbose_field_value(parent, key)
         else:
             parent, parent_value = None, None
-
+    if key == "acronym" and version_label:
+        value = "{}[{}]".format(value, version_label)
     return {
         'label': _(dl_title),
         'value': _bool_to_string(value),
@@ -291,3 +292,14 @@ def _bool_to_string(value):
         return "yes" if value else "no"
 
     return str(value)
+
+
+@register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=True)
+def dl_with_parent_version(context, key, dl_title="", class_dl="", default_value=None):
+    obj = context["education_group_year"]
+    parent = context["parent"]
+
+    version_label = context["version_label"] if context["version_label"] else ''
+
+    return dl_with_parent_without_context(key, obj, parent, dl_title=dl_title, class_dl=class_dl,
+                                          default_value=default_value, version_label=version_label)
