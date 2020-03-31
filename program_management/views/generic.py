@@ -107,7 +107,7 @@ class LearningUnitGenericUpdateView(RulesRequiredMixin, SuccessMessageMixin, Upd
         context = super().get_context_data(**kwargs)
 
         root = self.get_root()
-        serialized_data = program_tree_view.ProgramTreeViewSerializer(self.program_tree).data
+        serialized_data = program_tree_view.program_tree_view_serializer(self.program_tree)
 
         context['person'] = self.get_person()
         context['root'] = root
@@ -140,7 +140,7 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView, Catalog
         root = self.get_root()
 
         self.program_tree = load_tree.load(root.id)
-        serialized_data = program_tree_view.ProgramTreeViewSerializer(self.program_tree).data
+        serialized_data = program_tree_view.program_tree_view_serializer(self.program_tree)
 
         node = self.program_tree.get_node_by_id_and_class(self.object.id, NodeLearningUnitYear)
 

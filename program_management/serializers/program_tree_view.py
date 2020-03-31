@@ -23,27 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from rest_framework import serializers
 
-from program_management.serializers.node_view import ChildrenField
+from program_management.serializers.node_view import serialize_children
 from program_management.ddd.business_types import *
 
 
-class ProgramTreeViewSerializer(serializers.Serializer):
-    text = serializers.SerializerMethodField()
-    icon = serializers.SerializerMethodField()
-    children = ChildrenField(source='root_node.children', many=True)
-
-    def __init__(self, instance: 'ProgramTree', **kwargs):
-        kwargs['context'] = {
-            **kwargs.get('context', {}),
-            'root': instance.root_node,
-            'path': str(instance.root_node.pk)
-        }
-        super().__init__(instance, **kwargs)
-
-    def get_icon(self, tree: 'ProgramTree'):
-        return None
-
-    def get_text(self, obj: 'ProgramTree'):
-        return '%(code)s - %(title)s' % {'code': obj.root_node.code, 'title': obj.root_node.title}
+def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
+    return {
+        'text': '%(code)s - %(title)s' % {'code': tree.root_node.code, 'title': tree.root_node.title},
+        'icon': None,
+        'children': serialize_children(
+            children=tree.root_node.children,
+            path=str(tree.root_node.pk),
+            context={'root': tree.root_node}
+        ),
+    }

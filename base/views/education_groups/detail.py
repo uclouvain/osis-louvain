@@ -166,6 +166,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
         # This objects are mandatory for all education group views
         context['person'] = self.person
 
