@@ -618,10 +618,13 @@ components:
           type: string
         code:
           type: string
+        is_transition:
+          type: boolean
       required:
         - url
         - version_name
         - code
+        - is_transition
     ArrayOfTraining:
       type: array
       items:
@@ -791,6 +794,8 @@ components:
               type: string
             version_name:
               type: string
+            is_transition:
+              type: boolean
     GroupDetailed:
       type: object
       properties:
