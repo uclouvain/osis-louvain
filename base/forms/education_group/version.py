@@ -29,6 +29,7 @@ from django.utils.translation import gettext_lazy as _
 from base.business import event_perms
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
 from base.models.academic_year import AcademicYear
+from program_management.models.education_group_version import EducationGroupVersion
 
 
 class SpecificVersionForm(forms.Form):
@@ -38,11 +39,22 @@ class SpecificVersionForm(forms.Form):
     end_year = forms.ModelChoiceField(queryset=AcademicYear.objects.none(), required=False,
                                       label=_('This version exists until'), empty_label=BLANK_CHOICE_DISPLAY)
 
-    def __init__(self, data, person, *args, **kwargs):
-        self.person = person
+    def __init__(self, *args, **kwargs):
+        self.person = kwargs.pop('person')
         super().__init__(*args, **kwargs)
         try:
             event_perm = event_perms.generate_event_perm_creation_end_date_proposal(self.person)
             self.fields["end_year"].queryset = event_perm.get_academic_years()
         except ValueError:
             self.fields['end_year'].disabled = True
+
+    def save(self, education_group_year):
+        new_education_group_version = EducationGroupVersion(
+            version_name=self.cleaned_data["acronym"],
+            title_fr=self.cleaned_data["title"],
+            title_en=self.cleaned_data["title_english"],
+            offer=education_group_year,
+            is_transition=False
+        )
+        new_education_group_version.save()
+        return new_education_group_version

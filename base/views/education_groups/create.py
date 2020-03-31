@@ -207,6 +207,15 @@ def create_education_group_specific_version(request, root_id=None, education_gro
         request.POST or None,
         person=person
     )
+    if request.method == 'POST':
+        if form_version.is_valid():
+            form_version.save(education_group_year=education_group_year)
+            redirect_url = reverse('education_group_read', kwargs={
+                'root_id': root_id,
+                'education_group_year_id': education_group_year_id
+            })
+            return redirect(redirect_url)
+        print(form_version.errors)
     context = {
         "form": form_version,
         "parent": education_group_year
