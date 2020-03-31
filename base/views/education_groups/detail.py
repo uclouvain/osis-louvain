@@ -77,6 +77,7 @@ from cms.models.translated_text_label import TranslatedTextLabel
 from program_management.ddd.repositories import load_tree
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.serializers import program_tree_view
+from program_management.serializers.program_tree_view import program_tree_view_serializer
 from webservices.business import CONTACT_INTRO_KEY
 
 SECTIONS_WITH_TEXT = (
@@ -171,7 +172,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
             program_tree = load_tree.load(self.root.id)
-            serialized_data = program_tree_view.ProgramTreeViewSerializer(program_tree).data
+            serialized_data = program_tree_view_serializer(program_tree)
             context['tree'] = json.dumps(serialized_data)
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = perms.is_eligible_to_change_education_group(

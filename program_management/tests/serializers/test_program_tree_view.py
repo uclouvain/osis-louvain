@@ -24,9 +24,10 @@
 #
 ##############################################################################
 from django.test import SimpleTestCase
+from mock import patch
 
 from program_management.ddd.domain.program_tree import ProgramTree
-from program_management.serializers.program_tree_view import ProgramTreeViewSerializer
+from program_management.serializers.program_tree_view import program_tree_view_serializer
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 
@@ -59,37 +60,39 @@ class TestProgramTreeViewSerializer(SimpleTestCase):
 
         self.tree = ProgramTree(root_node=self.root_node)
 
-    def test_serialize_program_tree_ensure_context_have_root_keys(self):
-        serializer = ProgramTreeViewSerializer(self.tree)
-        self.assertEquals(serializer.context['root'], self.tree.root_node)
+    @patch('program_management.serializers.node_view.serialize_children')
+    def test_serialize_program_tree_ensure_context_have_root_keys(self, mock):
+        program_tree_view_serializer(self.tree)
+        context_kwarg = mock.call_args[1]['context']
+        self.assertEquals(context_kwarg['root'], self.tree.root_node)
 
     def test_serialize_program_tree_assert_keys_of_root_element(self):
-        serializer = ProgramTreeViewSerializer(self.tree)
+        serialized_data = program_tree_view_serializer(self.tree)
         expected_keys = ['text', 'icon', 'children']
 
-        self.assertListEqual(list(serializer.data.keys()), expected_keys)
+        self.assertSetEqual(set(serialized_data.keys()), set(expected_keys))
 
     def test_serialize_program_tree_assert_node_child_element(self):
-        serializer = ProgramTreeViewSerializer(self.tree)
+        serialized_data = program_tree_view_serializer(self.tree)
 
-        self.assertIsInstance(serializer.data['children'], list)
+        self.assertIsInstance(serialized_data['children'], list)
         self.assertEquals(
-            serializer.data['children'][0]['path'],
+            serialized_data['children'][0]['path'],
             "|".join([str(self.root_node.pk), str(self.common_core.pk)]),
         )
         expected_text = self.common_core.code + " - " + self.common_core.title
-        self.assertEquals(serializer.data['children'][0]['text'], expected_text)
-        self.assertEquals(serializer.data['children'][0]['icon'], None)
-        self.assertIsInstance(serializer.data['children'][0]['children'], list)
+        self.assertEquals(serialized_data['children'][0]['text'], expected_text)
+        self.assertEquals(serialized_data['children'][0]['icon'], None)
+        self.assertIsInstance(serialized_data['children'][0]['children'], list)
 
     def test_serialize_program_tree_assert_keys_of_node_a_attr(self):
-        serializer = ProgramTreeViewSerializer(self.tree)
+        serialized_data = program_tree_view_serializer(self.tree)
         expected_keys = [
             "href", "root", "group_element_year", "element_id", "element_type", "title", "attach_url", "detach_url",
             "modify_url", "attach_disabled", "attach_msg", "detach_disabled", "detach_msg", "modification_disabled",
             "modification_msg", "search_url"
         ]
 
-        a_attr = serializer.data['children'][0]['a_attr']
+        a_attr = serialized_data['children'][0]['a_attr']
         self.assertIsInstance(a_attr, dict)
-        self.assertListEqual(list(a_attr.keys()), expected_keys)
+        self.assertSetEqual(set(a_attr.keys()), set(expected_keys))
