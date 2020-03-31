@@ -250,6 +250,34 @@ class EducationGroupTreeSerializerTestCase(TestCase):
         self.assertEqual(serializer.data['children'][0]['credits'], egy.credits,
                          'should get absolute credits if no relative credits')
 
+    def test_get_all_blocks_if_not_in_set_in_luy(self):
+        luy = LearningUnitYearFactory(
+            academic_year=self.academic_year,
+            learning_container_year__academic_year=self.academic_year,
+        )
+        gey = GroupElementYearFactory(
+            parent__education_group_type__name=GroupType.COMMON_CORE.name,
+            parent__duration=4,
+            child_branch=None,
+            child_leaf=luy,
+            relative_credits=None,
+            block=None
+        )
+        url = reverse('education_group_api_v1:' + GroupTreeView.name, kwargs={
+            'partial_acronym': gey.parent.partial_acronym,
+            'year': self.academic_year.year
+        })
+        serializer = EducationGroupTreeSerializer(
+            EducationGroupHierarchy(gey.parent),
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN,
+                'education_group_year': gey.parent
+            }
+        )
+        self.assertEqual(serializer.data['children'][0]['block'], [1, 2],
+                         'should get range(1, duration/2 + 1)')
+
     def test_get_appropriate_relative_credits(self):
         expected_credits = 10
         serializer = self.expected_credits(15, expected_credits)

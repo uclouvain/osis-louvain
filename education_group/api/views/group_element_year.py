@@ -47,11 +47,16 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
             lookup_field: self.kwargs[lookup_url_kwarg]
             for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
         }
-        education_group_year = get_object_or_404(queryset, **filter_kwargs)
+        self.education_group_year = get_object_or_404(queryset, **filter_kwargs)
 
-        self.check_object_permissions(self.request, education_group_year)
+        self.check_object_permissions(self.request, self.education_group_year)
 
-        return EducationGroupHierarchy(education_group_year)
+        return EducationGroupHierarchy(self.education_group_year)
+
+    def get_serializer_context(self):
+        serializer_context = super().get_serializer_context()
+        serializer_context['education_group_year'] = self.education_group_year
+        return serializer_context
 
 
 class TrainingTreeView(EducationGroupTreeView):
