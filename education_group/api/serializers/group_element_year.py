@@ -99,7 +99,7 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
         is_learning_unit_year = not obj.education_group_year
         if root.is_minor:
             return [2, 3]
-        elif is_learning_unit_year and not obj.group_element_year.block:
+        elif is_learning_unit_year and not obj.group_element_year.block and root.duration:
             return list(range(1, int(root.duration / 2) + 1))
         return sorted([int(block) for block in str(obj.group_element_year.block or '')])
 
