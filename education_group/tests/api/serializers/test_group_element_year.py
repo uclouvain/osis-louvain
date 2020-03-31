@@ -260,7 +260,6 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             parent__duration=4,
             child_branch=None,
             child_leaf=luy,
-            relative_credits=None,
             block=None
         )
         url = reverse('education_group_api_v1:' + GroupTreeView.name, kwargs={
@@ -287,7 +286,6 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             parent__education_group_type__name=MiniTrainingType.OPEN_MINOR.name,
             child_branch=None,
             child_leaf=luy,
-            relative_credits=None,
             block=None
         )
 
