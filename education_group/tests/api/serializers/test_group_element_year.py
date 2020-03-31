@@ -304,7 +304,7 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             }
         )
         self.assertEqual(serializer.data['children'][0]['block'], [2, 3],
-                         'should get range(1, duration/2 + 1)')
+                         'should get block 2 and 3')
 
     def test_get_appropriate_relative_credits(self):
         expected_credits = 10
