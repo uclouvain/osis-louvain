@@ -27,7 +27,7 @@ from django.conf import settings
 from django.test import TestCase, RequestFactory
 from rest_framework.reverse import reverse
 
-from base.models.enums.education_group_types import TrainingType, GroupType
+from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
@@ -35,7 +35,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from education_group.api.serializers.group_element_year import EducationGroupTreeSerializer
 from education_group.api.views.group import GroupDetail
-from education_group.api.views.group_element_year import TrainingTreeView, GroupTreeView
+from education_group.api.views.group_element_year import TrainingTreeView, GroupTreeView, MiniTrainingTreeView
 from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
@@ -276,6 +276,34 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             }
         )
         self.assertEqual(serializer.data['children'][0]['block'], [1, 2],
+                         'should get range(1, duration/2 + 1)')
+
+    def test_get_second_and_third_block_if_root_is_minor(self):
+        luy = LearningUnitYearFactory(
+            academic_year=self.academic_year,
+            learning_container_year__academic_year=self.academic_year,
+        )
+        gey = GroupElementYearFactory(
+            parent__education_group_type__name=MiniTrainingType.OPEN_MINOR.name,
+            child_branch=None,
+            child_leaf=luy,
+            relative_credits=None,
+            block=None
+        )
+
+        url = reverse('education_group_api_v1:' + MiniTrainingTreeView.name, kwargs={
+            'partial_acronym': gey.parent.partial_acronym,
+            'year': self.academic_year.year
+        })
+        serializer = EducationGroupTreeSerializer(
+            EducationGroupHierarchy(gey.parent),
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN,
+                'education_group_year': gey.parent
+            }
+        )
+        self.assertEqual(serializer.data['children'][0]['block'], [2, 3],
                          'should get range(1, duration/2 + 1)')
 
     def test_get_appropriate_relative_credits(self):

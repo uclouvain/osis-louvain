@@ -95,9 +95,11 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
         return obj.group_element_year.relative_credits or absolute_credits
 
     def get_block(self, obj):
+        root = self.context.get('education_group_year')
         is_learning_unit_year = not obj.education_group_year
-        if is_learning_unit_year and not obj.group_element_year.block:
-            root = self.context.get('education_group_year')
+        if root.is_minor:
+            return [2, 3]
+        elif is_learning_unit_year and not obj.group_element_year.block:
             return list(range(1, int(root.duration / 2) + 1))
         return sorted([int(block) for block in str(obj.group_element_year.block or '')])
 
