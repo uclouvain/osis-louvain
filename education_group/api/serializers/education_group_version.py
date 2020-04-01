@@ -37,6 +37,6 @@ class EducationGroupVersionSerializer(serializers.ModelSerializer):
         fields = (
             'is_transition',
             'code',
-            'url',
+            # 'url',
             'version_name',
         )
