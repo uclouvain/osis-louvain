@@ -180,18 +180,16 @@
                             {% endblock panel_components %}
                         </div>
                     </div>
-                    {% if not object.is_external_with_co_graduation %}
-                        <div class="panel panel-default">
-                            <div class="panel-body">
-                                <div>
-                                    {% dl_tooltip learning_unit_year.learning_unit 'faculty_remark' not_annualized=True %}
-                                </div>
-                                <div>
-                                    {% dl_tooltip learning_unit_year.learning_unit 'other_remark' not_annualized=True %}
-                                </div>
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div>
+                                {% dl_tooltip learning_unit_year.learning_unit 'faculty_remark' %}
+                            </div>
+                            <div>
+                                {% dl_tooltip learning_unit_year.learning_unit 'other_remark' %}
                             </div>
                         </div>
-                    {% endif %}
+                    </div>
                     {% if learning_unit_year.subtype != "PARTIM" %}
                         <div class="panel panel-default">
                             <div class="panel-body">
@@ -231,8 +229,6 @@
                                     </div>
                                 </div>
                                 {% dl_tooltip learning_unit_year.externallearningunityear 'external_credits' %}
-                                {% dl_tooltip learning_unit_year.learning_unit 'faculty_remark' %}
-                                {% dl_tooltip learning_unit_year.learning_unit 'other_remark' %}
                             </div>
                         </div>
                     {% endif %}
