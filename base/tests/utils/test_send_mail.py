@@ -219,15 +219,16 @@ class TestSendMessage(TestCase):
             args = mock_create_table.call_args[0]
             self.assertEqual(args[0], 'submitted_enrollments')
             self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers())
-            self.assertListEqual(list(args[2][0]),
-                                 [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
-                                  self.exam_enrollment_1.session_exam.number_session,
-                                  self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
-                                  self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
-                                  self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-                                  self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
-                                  self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
-                                  ])
+            self.assertListEqual(
+                list(args[2][0]),
+                [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+                 self.exam_enrollment_1.session_exam.number_session,
+                 self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
+                 self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
+                 self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
+                 self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
+                 self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
+                 ])
 
             args = mock_send_messages.call_args[0][0]
             self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_name'))
