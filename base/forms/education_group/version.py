@@ -29,6 +29,7 @@ from django.utils.translation import gettext_lazy as _
 from base.business import event_perms
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
 from base.models.academic_year import AcademicYear
+from education_group.models.group_year import GroupYear
 from program_management.models.education_group_version import EducationGroupVersion
 
 
@@ -49,12 +50,19 @@ class SpecificVersionForm(forms.Form):
             self.fields['end_year'].disabled = True
 
     def save(self, education_group_year):
+        version_standart = EducationGroupVersion.objects.get(
+            offer=education_group_year, version_name="", is_transition=False
+        )
+        new_groupyear = version_standart.root_group
+        new_groupyear.pk = None
+        new_groupyear.save()
         new_education_group_version = EducationGroupVersion(
             version_name=self.cleaned_data["acronym"],
             title_fr=self.cleaned_data["title"],
             title_en=self.cleaned_data["title_english"],
             offer=education_group_year,
-            is_transition=False
+            is_transition=False,
+            root_group=new_groupyear
         )
         new_education_group_version.save()
         return new_education_group_version
