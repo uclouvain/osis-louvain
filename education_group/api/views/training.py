@@ -31,7 +31,9 @@ from backoffice.settings.rest_framework.common_views import LanguageContextSeria
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
+from education_group.api.serializers.education_group_version import EducationGroupVersionSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
+from program_management.models.education_group_version import EducationGroupVersion
 
 
 class TrainingFilter(filters.FilterSet):
@@ -127,3 +129,23 @@ class TrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
             academic_year__year=year
         )
         return egy
+
+
+class TrainingVersions(LanguageContextSerializerMixin, generics.ListAPIView):
+    """
+        Return the version's list of the training
+    """
+    name = 'versions-list'
+    serializer_class = EducationGroupVersionSerializer
+
+    def get_queryset(self):
+        acronym = self.kwargs['acronym']
+        year = self.kwargs['year']
+        egy = get_object_or_404(
+            EducationGroupYear.objects.all().select_related(
+                'academic_year',
+            ),
+            acronym__iexact=acronym,
+            academic_year__year=year
+        )
+        return EducationGroupVersion.objects.filter(offer=egy)
