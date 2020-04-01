@@ -184,7 +184,7 @@
                     "targets": 1,
                     "data": "acronym",
                     "render": function ( data, type, row, meta ) {
-                        return '<a href="'+ row['url'] +'">'+ data + '</a>';
+                        return outputAnchorOuterHtml(row["url"], data);
                     }
                 },
                 {"name": "title", "targets": 2, "data": "title"},

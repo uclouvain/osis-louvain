@@ -52,7 +52,8 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 class EducationGroupYearTest(TestCase):
     def setUp(self):  # No setUpTestData here, tests cannot be interrelated
         self.academic_year = AcademicYearFactory()
-        self.education_group_type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
+        self.education_group_type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING,
+                                                                       name=education_group_types.TrainingType.BACHELOR.name)
 
         self.education_group_type_minitraining = EducationGroupTypeFactory(
             category=education_group_categories.MINI_TRAINING
@@ -232,7 +233,7 @@ class EducationGroupYearTest(TestCase):
         self.assertFalse(self.education_group_year_5.is_mini_training())
         self.assertFalse(self.education_group_year_6.is_mini_training())
 
-    @override_settings(LANGUAGES=[('fr-be', 'French'),  ], LANGUAGE_CODE='fr-be')
+    @override_settings(LANGUAGES=[('fr-be', 'French'), ], LANGUAGE_CODE='fr-be')
     def test_verbose_title_fr(self):
         self.assertEqual(self.education_group_year_MD.verbose_title, self.education_group_year_MD.partial_title)
         self.assertEqual(self.education_group_year_1.verbose_title, self.education_group_year_1.title)

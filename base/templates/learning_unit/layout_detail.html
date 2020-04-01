@@ -33,9 +33,12 @@
     {% include "learning_unit/breadcrumb.html" %}
 {% endblock %}
 
+{% block header_content %}
+    {% navigation_learning_unit  request.user learning_unit_year request.resolver_match.url_name %}
+{% endblock header_content %}
+
 {% block content %}
 
-    {% include "learning_unit/blocks/header.html" %}
     {% if messages_deletion %}
         {% include "learning_unit/deletion_msg.html" %}
     {% endif %}

@@ -27,9 +27,9 @@
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.utils.search import RenderToExcel
-from base.views.learning_units.search.common import SIMPLE_SEARCH, _create_xls, _create_xls_comparison, \
+from base.views.learning_units.search.common import _create_xls, _create_xls_comparison, \
     _create_xls_attributions, _create_xls_with_parameters, \
-    BaseLearningUnitSearch, _create_xls_educational_specifications
+    BaseLearningUnitSearch, _create_xls_educational_specifications, SearchTypes
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
@@ -40,7 +40,7 @@ from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 @RenderToExcel("xls", _create_xls)
 class LearningUnitSearch(BaseLearningUnitSearch):
     template_name = "learning_unit/search/base.html"
-    search_type = SIMPLE_SEARCH
+    search_type = SearchTypes.SIMPLE_SEARCH
     filterset_class = LearningUnitFilter
     serializer_class = LearningUnitSerializer
 

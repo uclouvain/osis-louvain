@@ -39,11 +39,14 @@ class LearningUnitTagTest(TestCase):
         cls.learning_unit_yr = LearningUnitYearFactory(specific_title=TITLE,
                                                        status=True,
                                                        professional_integration=True,
-                                                       quadrimester=quadrimesters.Q1)
+                                                       quadrimester=quadrimesters.LearningUnitYearQuadrimester.Q1.name)
 
     @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
     def test_get_attribute(self):
         self.assertEqual(get_attribute(self.learning_unit_yr, 'specific_title'), TITLE)
         self.assertEqual(get_attribute(self.learning_unit_yr, 'professional_integration'), 'oui')
         self.assertEqual(get_attribute(self.learning_unit_yr, 'status'), 'Actif')
-        self.assertEqual(get_attribute(self.learning_unit_yr, 'quadrimester'), quadrimesters.Q1)
+        self.assertEqual(
+            get_attribute(self.learning_unit_yr, 'quadrimester'),
+            quadrimesters.LearningUnitYearQuadrimester.Q1.name
+        )

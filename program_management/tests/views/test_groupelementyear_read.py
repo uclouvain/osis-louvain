@@ -25,6 +25,7 @@
 ##############################################################################
 import random
 
+from django.conf import settings
 from django.db.models import F, When, Case
 from django.http import HttpResponse
 from django.test import TestCase
@@ -37,7 +38,8 @@ from base.models.enums import education_group_categories, education_group_types
 from base.models.learning_component_year import volume_total_verbose, LearningComponentYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, MiniTrainingFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, MiniTrainingFactory, \
+    EducationGroupYearBachelorFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -50,9 +52,12 @@ class TestRead(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory()
-        cls.person = PersonFactory()
+        cls.person = PersonFactory(language=settings.LANGUAGE_CODE_FR)
         cls.education_group_year_1 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
-        cls.education_group_year_2 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year)
+        cls.education_group_year_2 = EducationGroupYearBachelorFactory(
+            title_english="",
+            academic_year=cls.academic_year
+        )
         cls.education_group_year_3 = EducationGroupYearFactory(title_english="", academic_year=cls.academic_year,
                                                                acronym='ed3')
         cls.learning_unit_year_1 = LearningUnitYearFactory(specific_title_english="")

@@ -51,6 +51,7 @@ from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.learning_achievement import LearningAchievement
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
+from base.models.proposal_learning_unit import ProposalLearningUnit
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
@@ -276,8 +277,12 @@ def _check_shorten_partim(learning_unit_to_edit, new_academic_year, partim):
 
 
 def _get_actual_end_year(learning_unit_to_edit):
-    return learning_unit_to_edit.end_year or \
-           academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1)
+    proposal = ProposalLearningUnit.objects.filter(
+        learning_unit_year__learning_unit=learning_unit_to_edit
+    ).first()
+    end_year_lu = proposal.initial_data.get('learning_unit').get('end_year') if proposal \
+        else learning_unit_to_edit.end_year
+    return end_year_lu or academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1)
 
 
 def _get_new_end_year(new_academic_year):

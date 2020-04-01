@@ -31,6 +31,7 @@ from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from program_management.models.enums.node_type import NodeType
 
 
 class ElementManager(models.Manager):
@@ -83,14 +84,13 @@ class Element(models.Model):
     objects = ElementManager()
 
     def __str__(self):
-        if self.education_group_year:
-            return str(self.education_group_year)
-        elif self.group_year:
-            return str(self.group_year)
-        elif self.learning_unit_year:
-            return str(self.learning_unit_year)
-        elif self.learning_class_year:
-            return str(self.learning_class_year)
+        field = {
+            NodeType.EDUCATION_GROUP: self.education_group_year,
+            NodeType.GROUP: self.group_year,
+            NodeType.LEARNING_UNIT: self.learning_unit_year,
+            NodeType.LEARNING_CLASS: self.learning_class_year,
+        }[self.node_type]
+        return str(field)
 
     def save(self, *args, **kwargs):
 
@@ -112,3 +112,14 @@ class Element(models.Model):
             )
 
         super().save(*args, **kwargs)
+
+    @property
+    def node_type(self):
+        if self.education_group_year:
+            return NodeType.EDUCATION_GROUP
+        elif self.group_year:
+            return NodeType.GROUP
+        elif self.learning_unit_year:
+            return NodeType.LEARNING_UNIT
+        elif self.learning_class_year:
+            return NodeType.LEARNING_CLASS

@@ -28,7 +28,7 @@ from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
 from base.models.abstracts.abstract_achievement import AbstractAchievement, AbstractAchievementAdmin
-from base.models.utils.utils import get_object_or_none
+from osis_common.utils.models import get_object_or_none
 
 
 class LearningAchievementAdmin(VersionAdmin, AbstractAchievementAdmin):

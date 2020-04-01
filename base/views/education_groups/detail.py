@@ -122,8 +122,6 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
     permission_required = 'base.can_access_education_group'
     raise_exception = True
 
-    limited_by_category = None
-
     # FIXME: resolve dependency in other ways
     with_tree = 'program_management' in settings.INSTALLED_APPS
 
@@ -187,15 +185,20 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context['current_academic_year'] = self.starting_academic_year
         context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
         context['form_xls_custom'] = CustomXlsForm()
+
         return context
 
     def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
         default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk])
         if self.request.GET.get('group_to_parent'):
             default_url += '?group_to_parent=' + self.request.GET.get('group_to_parent')
-        if self.limited_by_category and self.get_object().education_group_type.category not in self.limited_by_category:
+        if not self.can_show_view():
             return HttpResponseRedirect(default_url)
         return super().get(request, *args, **kwargs)
+
+    def can_show_view(self):
+        return True
 
     def show_identification(self):
         return True
@@ -221,7 +224,6 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         return not self.object.is_common
 
     def show_admission_conditions(self):
-        # @TODO: Need to refactor after business clarification
         return not self.object.is_main_common and \
                self.object.education_group_type.name in itertools.chain(TrainingType.with_admission_condition(),
                                                                         MiniTrainingType.with_admission_condition()) \
@@ -244,6 +246,9 @@ class EducationGroupRead(EducationGroupGenericDetailView):
         education_group_categories.MINI_TRAINING: "education_group/identification_mini_training_details.html",
         education_group_categories.GROUP: "education_group/identification_group_details.html"
     }
+
+    def can_show_view(self):
+        return self.show_identification()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -290,7 +295,9 @@ class EducationGroupRead(EducationGroupGenericDetailView):
 
 class EducationGroupDiplomas(EducationGroupGenericDetailView):
     template_name = "education_group/tab_diplomas.html"
-    limited_by_category = (education_group_categories.TRAINING,)
+
+    def can_show_view(self):
+        return self.show_diploma()
 
     def get_queryset(self):
         return super().get_queryset().prefetch_related('certificate_aims')
@@ -298,6 +305,9 @@ class EducationGroupDiplomas(EducationGroupGenericDetailView):
 
 class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
     template_name = "education_group/tab_general_informations.html"
+
+    def can_show_view(self):
+        return self.show_general_information()
 
     def get_queryset(self):
         """ Optimization """
@@ -433,7 +443,9 @@ def publish(request, education_group_year_id, root_id):
 
 class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
     template_name = "education_group/tab_administrative_data.html"
-    limited_by_category = (education_group_categories.TRAINING,)
+
+    def can_show_view(self):
+        return self.show_administrative()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -503,6 +515,9 @@ def get_sessions_dates(education_group_year):
 class EducationGroupContent(EducationGroupGenericDetailView):
     template_name = "education_group/tab_content.html"
 
+    def can_show_view(self):
+        return self.show_content()
+
     def get_queryset(self):
         prefetch = Prefetch(
             'groupelementyear_set',
@@ -522,6 +537,9 @@ class EducationGroupContent(EducationGroupGenericDetailView):
 class EducationGroupUsing(EducationGroupGenericDetailView):
     template_name = "education_group/tab_utilization.html"
 
+    def can_show_view(self):
+        return self.show_utilization()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["group_element_years"] = self.object.child_branch.select_related("parent")
@@ -536,6 +554,9 @@ class EducationGroupUsing(EducationGroupGenericDetailView):
 
 class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
     template_name = "education_group/tab_admission_conditions.html"
+
+    def can_show_view(self):
+        return self.show_admission_conditions()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

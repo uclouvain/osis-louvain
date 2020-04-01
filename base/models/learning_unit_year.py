@@ -225,7 +225,7 @@ class LearningUnitYear(SerializableModel):
                                choices=learning_unit_year_session.LEARNING_UNIT_YEAR_SESSION,
                                verbose_name=_('Session derogation'))
     quadrimester = models.CharField(max_length=9, blank=True, null=True, verbose_name=_('Quadrimester'),
-                                    choices=quadrimesters.LEARNING_UNIT_YEAR_QUADRIMESTERS)
+                                    choices=quadrimesters.LearningUnitYearQuadrimester.choices())
 
     attribution_procedure = models.CharField(
         max_length=20, blank=True, null=True,
@@ -334,6 +334,12 @@ class LearningUnitYear(SerializableModel):
 
     def find_list_group_element_year(self):
         return self.child_leaf.filter(child_leaf=self).select_related('parent')
+
+    def get_learning_unit_previous_year(self):
+        try:
+            return self.learning_unit.learningunityear_set.get(academic_year__year=(self.academic_year.year - 1))
+        except LearningUnitYear.DoesNotExist:
+            return None
 
     def get_learning_unit_next_year(self):
         try:

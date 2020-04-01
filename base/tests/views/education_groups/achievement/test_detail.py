@@ -32,9 +32,10 @@ from django.urls import reverse
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearBachelorFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.views.education_groups.achievement.detail import CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
+from base.views.education_groups.detail import EducationGroupGenericDetailView
 from cms.enums import entity_name
 from cms.tests.factories.translated_text import TranslatedTextFactory
 
@@ -47,7 +48,7 @@ class TestEducationGroupSkillsAchievements(TestCase):
             return_value=True
         )
 
-        cls.education_group_year = EducationGroupYearFactory(
+        cls.education_group_year = EducationGroupYearBachelorFactory(
             academic_year=AcademicYearFactory(current=True)
         )
         cls.person = PersonWithPermissionsFactory("can_access_education_group")
@@ -64,6 +65,11 @@ class TestEducationGroupSkillsAchievements(TestCase):
         )
         self.assertEqual(response.status_code, HttpResponse.status_code)
         return response
+
+    @mock.patch.object(EducationGroupGenericDetailView, "show_skills_and_achievements")
+    def test_can_show_view_call_correct_function(self, mock_method):
+        self._call_url_as_http_get()
+        self.assertEqual(2, mock_method.call_count)
 
     def test_get_achievements(self):
         achievement = EducationGroupAchievementFactory(education_group_year=self.education_group_year)

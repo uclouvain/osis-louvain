@@ -66,6 +66,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
             GroupElementYear(parent=self.parent, child_branch=self.child, child_leaf=None).clean()
         return True
 
+    # FIXME :: DEPRECATED - Use AttachFinalityEndDateValidator instead
     def _check_end_year_constraints_on_2m(self):
         """
         In context of 2M, when we add a finality [or group which contains finality], we must ensure that
@@ -133,6 +134,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
                 options_missing_by_finality[root] = set(options_to_add) - set(options_in_2m)
         return options_missing_by_finality
 
+    # FIXME :: DEPRECATED -  Use AttachOptionsValidator
     def _check_attach_options_rules(self):
         errors = []
         for root, missing_options in self._get_missing_options().items():
@@ -151,6 +153,7 @@ class AttachEducationGroupYearStrategy(AttachStrategy):
         if errors:
             raise ValidationError(errors)
 
+    # FIXME :: DEPRECATED - Use NodeDuplicationValidator
     def _check_new_attach_is_not_duplication(self):
         if GroupElementYear.objects.filter(parent=self.parent, child_branch=self.child).exists():
             raise ValidationError(gettext("You can not add the same child several times."))
@@ -173,6 +176,7 @@ class AttachLearningUnitYearStrategy(AttachStrategy):
             })
         return True
 
+    # FIXME :: DEPRECATED - Use NodeDuplicationValidator
     def _check_new_attach_is_not_duplication(self):
         if GroupElementYear.objects.filter(parent=self.parent, child_leaf=self.child).exists():
             raise ValidationError(gettext("You can not add the same child several times."))

@@ -1,6 +1,41 @@
 {% load bootstrap3 %}
+{% load i18n %}
+{% load learning_unit %}
 
-{% bootstrap_field learning_container_year_form.common_title form_group_class="form-group required_field" %}
-{% bootstrap_field learning_unit_year_form.specific_title %}
-{% bootstrap_field learning_container_year_form.common_title_english  %}
-{% bootstrap_field learning_unit_year_form.specific_title_english %}
+<div class="panel panel-default">
+    <div class="panel-body">
+        <label title="{% trans "The title is made up of the common part and / or any supplement" %}">
+            {% trans "Title" %} *
+        </label>
+        <br>
+        <label style="font-style:italic" title="{% trans "Part of the title which is common to the complete EU, to its partims and to its classes" %}">
+            {% trans "Common part" %}
+        </label>
+        {% bootstrap_field learning_container_year_form.common_title form_group_class="form-group" show_label=False %}
+        {% if learning_unit_year.subtype == "PARTIM" %}
+            <label style="font-style:italic">{% trans "Specific complement (Partim)" %}</label>
+        {% else %}
+            <label style="font-style:italic">{% trans "Specific complement (Full)" %}</label>
+        {% endif %}
+        {% bootstrap_field learning_unit_year_form.specific_title form_group_class="form-group" show_label=False %}
+    </div>
+</div>
+<br/>
+<div class="panel panel-default">
+    <div class="panel-body">
+        <label title="{% trans "The title is made up of the common part and / or any supplement" %}">
+            {% trans "Title in English" %} *
+        </label>
+        <br>
+        <label style="font-style:italic" title="{% trans "Part of the title which is common to the complete EU, to its partims and to its classes" %}">
+            {% trans "Common part" %}
+        </label>
+        {% bootstrap_field learning_container_year_form.common_title_english form_group_class="form-group" show_label=False %}
+        {% if learning_unit_year.subtype == "PARTIM" %}
+            <label style="font-style:italic">{% trans "Specific complement (Partim)" %}</label>
+        {% else %}
+            <label style="font-style:italic">{% trans "Specific complement (Full)" %}</label>
+        {% endif %}
+        {% bootstrap_field learning_unit_year_form.specific_title_english form_group_class="form-group" show_label=False %}
+    </div>
+</div>

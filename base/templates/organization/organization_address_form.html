@@ -53,13 +53,12 @@
             </div>
             <br>
             <div class=pull-right>
-                <button type="submit" class="btn btn-primary" title="{% trans 'Save'%}" id="bt_organization_organization_save">
-                    <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save'%}
-                </button>
                 <a href="{% url 'organization_address_read' organization_address_id=organization_address.id %}"
                    id="lnk_organization_address_read_{{organization_address.id}}"  title="{%trans 'Cancel'%}"
                    class="btn btn-default" role="button">{% trans 'Cancel'%}</a>
-
+                <button type="submit" class="btn btn-primary" title="{% trans 'Save'%}" id="bt_organization_organization_save">
+                    <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save'%}
+                </button>
             </div>
     </form>
   </div>

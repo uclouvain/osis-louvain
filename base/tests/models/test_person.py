@@ -50,8 +50,8 @@ from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory
 
 
-def create_person(first_name, last_name, email=""):
-    a_person = person.Person(first_name=first_name, last_name=last_name, email=email)
+def create_person(first_name, last_name, email="", language=None):
+    a_person = person.Person(first_name=first_name, last_name=last_name, email=email, language=language)
     a_person.save()
     return a_person
 

@@ -108,7 +108,11 @@ class LearningComponentYear(SerializableModel):
 
     @cached_property
     def real_classes(self) -> int:
-        return self.learningclassyear_set.count()
+        # FIXME :: Temporary solution - Waiting for real classes in OSIS
+        real_classes = self.learningclassyear_set.count()
+        if self.planned_classes and self.planned_classes > 0 and real_classes == 0:
+            return 1
+        return real_classes
 
     @property
     def warnings(self):
@@ -143,11 +147,11 @@ class LearningComponentYear(SerializableModel):
 
         strategies = {
             None: LearningComponentYearQuadriNoStrategy,
-            quadrimesters.Q1: LearningComponentYearQ1Strategy,
-            quadrimesters.Q2: LearningComponentYearQ2Strategy,
-            quadrimesters.Q1and2: LearningComponentYearQ1and2Strategy,
-            quadrimesters.Q1or2: LearningComponentYearQ1or2Strategy,
-            quadrimesters.Q3: LearningComponentYearQuadriNoStrategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q1.name: LearningComponentYearQ1Strategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q2.name: LearningComponentYearQ2Strategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q1and2.name: LearningComponentYearQ1and2Strategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q1or2.name: LearningComponentYearQ1or2Strategy,
+            quadrimesters.LearningUnitYearQuadrimester.Q3.name: LearningComponentYearQuadriNoStrategy,
         }
 
         try:

@@ -2,7 +2,7 @@
 {% load l10n %}
 {% load i18n %}
 {% load sum %}
-{% load score_display enrollment_state %}
+{% load score_display enrollment_state score_justification_disabled_status %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -154,26 +154,19 @@
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|default_if_none:"" }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name|default_if_none:"" }}</td>
                         <td>
+                           {% get_score_justification_disabled_status as disabled_score_status %}
 			                <input type="text" min="0" max="20" name="score_{{ enrollment.id }}"
                                 id="num_score_{{ enrollment.id }}" tabindex="{{ forloop.counter }}"
                                 class="form-control"
-                                {% if enrollment.enrollment_state != 'ENROLLED' %}
-                                    disabled
-                                {% else %}
+                                {{ disabled_score_status }}
+                                {% if enrollment.enrollment_state == 'ENROLLED' %}
                                     {% if is_program_manager %}
                                        value="{{ enrollment.score_final | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores}}"
-                                       {% if enrollment.deadline_reached %}
-                                            disabled
-                                       {% endif %}
                                     {% else %}
                                        {% if enrollment.score_final != None %}
                                             value="{{ enrollment.score_final | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores}}"
                                        {% elif not enrollment.justification_final %}
                                             value="{{ enrollment.score_draft | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores }}"
-                                       {% endif %}
-
-                                       {% if enrollment.score_final != None or enrollment.justification_final or enrollment.deadline_reached or enrollment.deadline_tutor_reached%}
-                                           disabled
                                        {% endif %}
                                     {% endif %}
                                 {% endif %}
@@ -182,15 +175,7 @@
                         <td>
 			                <select class="form-control" name="justification_{{ enrollment.id }}" id="slt_justification_score_{{ enrollment.id }}"
                                     tabindex="{{ enrollments|length|sum:forloop.counter }}"
-                                    {% if is_program_manager %}
-                                        {% if enrollment.deadline_reached or enrollment.enrollment_state != 'ENROLLED' %}
-                                            disabled
-                                        {% endif %}
-                                    {% else %}
-                                        {% if enrollment.score_final != None or enrollment.justification_final or enrollment.deadline_reached or enrollment.deadline_tutor_reached or enrollment.enrollment_state != 'ENROLLED'%}
-                                            disabled
-                                        {% endif %}
-                                    {% endif %}>
+                                    {{ disabled_score_status }}>
                                 <option value=""></option>
                                 {% if is_program_manager %}
                                     <option value="ABSENCE_UNJUSTIFIED"

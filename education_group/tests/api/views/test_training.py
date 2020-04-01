@@ -45,10 +45,7 @@ class TrainingTitleTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         anac = AcademicYearFactory()
-
-        cls.egy = TrainingFactory(
-            academic_year=anac,
-        )
+        cls.egy = TrainingFactory(academic_year=anac)
         cls.person = PersonFactory()
         cls.url = reverse('education_group_api_v1:trainingstitle_read', kwargs={
             'acronym': cls.egy.acronym,
@@ -172,7 +169,6 @@ class FilterTrainingTestCase(APITestCase):
     def setUpTestData(cls):
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:training-list')
-
         for year in [2018, 2019, 2020]:
             academic_year = AcademicYearFactory(year=year)
             TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=academic_year)

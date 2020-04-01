@@ -25,9 +25,9 @@
 ##############################################################################
 from django.db.models import Prefetch
 
-from base.models.utils.utils import get_object_or_none
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
+from osis_common.utils.models import get_object_or_none
 
 SKILLS_AND_ACHIEVEMENTS_INTRO = 'skills_and_achievements_introduction'
 SKILLS_AND_ACHIEVEMENTS_EXTRA = 'skills_and_achievements_additional_text'

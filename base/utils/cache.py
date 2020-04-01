@@ -119,6 +119,18 @@ class RequestCache(OsisCache):
         return new_get_request
 
 
+class SearchParametersCache(OsisCache):
+    PREFIX_KEY = "search_"
+
+    def __init__(self, user, objects_class):
+        self.user = user
+        self.objects_class = objects_class
+
+    @property
+    def key(self):
+        return "_".join([self.PREFIX_KEY, str(self.user.id), self.objects_class])
+
+
 class ElementCache(OsisCache):
     PREFIX_KEY = 'select_element_{user}'
 

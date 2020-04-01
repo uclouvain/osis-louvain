@@ -472,7 +472,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
         expected_result = OrderedDict({
             next_academic_year: [
                 _("%(col_name)s has been already modified. (%(new_value)s instead of %(current_value)s)") % {
-                    'col_name': _('French title proper'),
+                    'col_name': _('Specific complement (Full)'),
                     'new_value': '-',
                     'current_value': self.instance_luy_base_form.data['specific_title']
                 }

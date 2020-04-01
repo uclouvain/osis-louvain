@@ -96,13 +96,13 @@ msgstr "Modifiable"
 
 #, python-format
 msgid ""
-"For the academic_year %(data_year)s, the summary edition period is ended "
+"For the academic year %(data_year)s, the summary edition period is ended "
 "since %(end_date)s."
 msgstr "Pour l’année académique %(data_year)s, la période de modification des fiches descriptives est terminée depuis le %(end_date)s."
 
 #, python-format
 msgid ""
-"For the academic_year %(data_year)s, the summary edition period will open "
+"For the academic year %(data_year)s, the summary edition period will open "
 "on %(start_date)s."
 msgstr "Pour l’année académique %(data_year)s, la période de modification des fiches descriptives commencera le %(start_date)s."
 

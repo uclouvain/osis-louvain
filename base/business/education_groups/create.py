@@ -35,9 +35,8 @@ from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType
 from base.models.group_element_year import GroupElementYear
-from base.models.utils import utils
-from base.models.utils.utils import get_object_or_none
 from base.models.validation_rule import ValidationRule
+from osis_common.utils.models import get_object_or_none
 
 REGEX_TRAINING_PARTIAL_ACRONYM = r"^(?P<sigle_ele>[A-Z]{3,5})\d{3}[A-Z]$"
 REGEX_COMMON_PARTIAL_ACRONYM = r"^(?P<sigle_ele>common(-\d[a-z]{1,2})?)$"
@@ -87,7 +86,7 @@ def create_initial_group_element_year_structure(parent_egys: list):
 
 
 def _get_or_create_branch(child_education_group_type, title_initial_value, partial_acronym_initial_value, parent_egy):
-    existing_grp_ele = utils.get_object_or_none(
+    existing_grp_ele = get_object_or_none(
         GroupElementYear,
         parent=parent_egy,
         child_branch__education_group_type=child_education_group_type
@@ -96,7 +95,7 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
         return existing_grp_ele
 
     academic_year = parent_egy.academic_year
-    previous_grp_ele = utils.get_object_or_none(
+    previous_grp_ele = get_object_or_none(
         GroupElementYear,
         parent__education_group=parent_egy.education_group,
         parent__academic_year__year__in=[academic_year.year - 1, academic_year.year],
@@ -142,7 +141,7 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
 
 
 def _duplicate_branch(child_education_group_type, parent_egy, last_child):
-    existing_grp_ele = utils.get_object_or_none(
+    existing_grp_ele = get_object_or_none(
         GroupElementYear,
         parent=parent_egy,
         child_branch__education_group_type=child_education_group_type
@@ -173,7 +172,7 @@ def _get_validation_rule(field_name, education_group_type):
 
 
 def _generate_child_partial_acronym(parent, child_initial_value, child_type):
-    previous_grp_ele = utils.get_object_or_none(
+    previous_grp_ele = get_object_or_none(
         GroupElementYear,
         parent__education_group=parent.education_group,
         parent__academic_year__year__in=[parent.academic_year.year - 1, parent.academic_year.year],

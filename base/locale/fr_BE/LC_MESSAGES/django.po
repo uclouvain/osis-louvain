@@ -117,7 +117,7 @@ msgid ""
 "%(subtype)s %(acronym)s is included in the group %(group)s for the year "
 "%(year)s"
 msgstr ""
-"%(subtype)s %(acronym)s est repris dans le groupement %(group)s l’année "
+"%(subtype)s %(acronym)s est reprise dans le groupement %(group)s l’année "
 "%(year)s"
 
 msgid "1st quadri"
@@ -502,6 +502,9 @@ msgstr ""
 msgid "Cancel"
 msgstr "Annuler"
 
+msgid "Cancel proposal"
+msgstr "Annuler proposition"
+
 msgid "Cancel the proposal"
 msgstr "Annuler la proposition"
 
@@ -592,6 +595,9 @@ msgstr "Intitulé commun en anglais"
 
 msgid "Common core"
 msgstr "Partie de base (Tronc commun)"
+
+msgid "Common part"
+msgstr "Partie commune"
 
 msgid "Common title"
 msgstr "Intitulé commun"
@@ -809,6 +815,9 @@ msgstr "Remise du mémoire"
 msgid "Do not assign"
 msgstr "Ne pas attribuer"
 
+msgid "Do you want to cancel proposal?"
+msgstr "Voulez-vous annuler ces propositions?"
+
 msgid "Do you want to change the status of this proposals?"
 msgstr "Voulez-vous changer le statut de ces propositions?"
 
@@ -820,9 +829,6 @@ msgstr "Voulez-vous continuer ?"
 
 msgid "Do you want to export the following informations"
 msgstr "Désirez-vous exporter les informations suivantes"
-
-msgid "Do you want to get back to initial data?"
-msgstr "Voulez-vous retourner à l'état initial?"
 
 msgid "Do you want to report the modifications done to the next years ?"
 msgstr ""
@@ -932,9 +938,6 @@ msgstr "Commentaire en anglais"
 msgid "English title proper"
 msgstr "Intitulé propre en anglais"
 
-msgid "English title proper to the partim"
-msgstr "Intitulé en anglais propre au partim"
-
 msgid "Enrolled"
 msgstr "Inscrit"
 
@@ -1036,8 +1039,8 @@ msgstr "Faculté"
 msgid "Faculty borrowing"
 msgstr "Faculté emprunteuse"
 
-msgid "Faculty remark"
-msgstr "Remarque de faculté"
+msgid "Faculty remark (unpublished)"
+msgstr "Remarque de faculté (non publiée)"
 
 msgid "Failure"
 msgstr "Echec"
@@ -1152,9 +1155,6 @@ msgstr "Liste des UE qui sont des prérequis"
 
 msgid "Generate xls of learning units that have prerequisites"
 msgstr "Liste des UE qui ont des prérequis"
-
-msgid "Get back to initial data"
-msgstr "Retour à l'état initial"
 
 msgid "Global ID"
 msgstr "Matricule FGS"
@@ -1907,8 +1907,8 @@ msgstr "Autre individuel"
 msgid "Other languages activities"
 msgstr "Activités dans d'autres langues"
 
-msgid "Other remark"
-msgstr "Autre remarque"
+msgid "Other remark (intended for publication)"
+msgstr "Autre remarque (destinée à la publication)"
 
 msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr "Autres bacheliers de la Communauté française de Belgique"
@@ -1924,6 +1924,13 @@ msgstr "P."
 
 msgid "Page not found."
 msgstr "Page inexistante."
+
+msgid ""
+"Part of the title which is common to the complete EU, to its partims and to "
+"its classes"
+msgstr ""
+"Partie de l’intitulé qui est commune à l’UE complète, à ses partims et à "
+"ses classes"
 
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
@@ -2257,6 +2264,9 @@ msgstr "Classes effectives"
 msgid "Real/Planned classrooms"
 msgstr "Classes effectives/prévues"
 
+msgid "Reason for failure"
+msgstr "Motif de l'échec"
+
 msgid "Received on"
 msgstr "Reçu le"
 
@@ -2439,6 +2449,12 @@ msgstr "Conditions Particulières"
 
 msgid "Specific admission requirements"
 msgstr "Conditions spécifiques d'admission"
+
+msgid "Specific complement (Full)"
+msgstr "Complément spécifique à l'UE (complet)"
+
+msgid "Specific complement (Partim)"
+msgstr "Complément spécifique à l'UE (partim)"
 
 msgid "Specifications"
 msgstr "Cahier des charges"
@@ -2794,6 +2810,10 @@ msgstr ""
 "Le volume global doit être égal à la somme des volumes répartis sur les "
 "entités"
 
+msgid "The title is made up of the common part and / or any supplement"
+msgstr ""
+"L’intitulé est composé de la partie commune et/ou de l’éventuel complément"
+
 msgid "The user doesn't have right to update admission condition"
 msgstr ""
 "L’utilisateur n’a pas le droit de mettre à jour la condition d’admission"
@@ -2958,9 +2978,6 @@ msgstr "Intitulé en anglais"
 
 msgid "Title in French"
 msgstr "Intitulé en français"
-
-msgid "Title proper to the partim"
-msgstr "Intitulé propre au partim"
 
 msgid "To complete"
 msgstr "A compléter"
@@ -3691,6 +3708,9 @@ msgstr "vol. ent. charge"
 
 msgid "volume total requirement entities"
 msgstr "vol. tot. ent. charge"
+
+msgid "without postponement"
+msgstr "sans report"
 
 msgid "yes"
 msgstr "oui"

@@ -32,9 +32,9 @@ from base.models import academic_year
 from base.models.enums import academic_calendar_type
 from base.models.exceptions import StartDateHigherThanEndDateException
 from base.models.utils.admin_extentions import remove_delete_action
-from base.models.utils.utils import get_object_or_none
 from base.signals.publisher import compute_all_scores_encodings_deadlines
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.utils.models import get_object_or_none
 
 
 class AcademicCalendarAdmin(VersionAdmin, SerializableModelAdmin):

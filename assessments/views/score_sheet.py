@@ -37,7 +37,7 @@ from assessments.forms.score_sheet_address import ScoreSheetAddressForm
 from assessments.models import score_sheet_address as score_sheet_address_model
 from base import models as mdl
 from base.models.offer_year import OfferYear
-from base.models.utils.utils import get_object_or_none
+from osis_common.utils.models import get_object_or_none
 from reference.models.country import Country
 
 

@@ -49,19 +49,22 @@ from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group import EducationGroupFactory
-from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory, \
     TrainingFactory, EducationGroupYearCommonAgregationFactory, EducationGroupYearCommonBachelorFactory, \
-    EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory
+    EducationGroupYearCommonSpecializedMasterFactory, EducationGroupYearCommonMasterFactory, \
+    EducationGroupYearBachelorFactory, MiniTrainingFactory, GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.mandatary import MandataryFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
+from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.views.education_groups.detail import get_appropriate_common_admission_condition
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
+
+ACCESS_DENIED = "access_denied.html"
+LOGIN_NEXT = '/login/?next={}'
 
 
 class EducationGroupGeneralInformations(TestCase):
@@ -94,6 +97,7 @@ class EducationGroupGeneralInformations(TestCase):
             "education_group_general_informations",
             args=[cls.education_group_parent.pk, cls.education_group_child.pk]
         )
+        cls.template_path = "education_group/tab_general_informations.html"
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -108,14 +112,14 @@ class EducationGroupGeneralInformations(TestCase):
         self.client.logout()
         response = self.client.get(self.url)
 
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
+        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
     def test_user_without_permission(self):
         an_other_user = UserFactory()
         self.client.force_login(an_other_user)
 
         response = self.client.get(self.url)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, ACCESS_DENIED)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_with_non_existent_education_group_year(self):
@@ -128,8 +132,11 @@ class EducationGroupGeneralInformations(TestCase):
 
     def test_with_education_group_year_of_type_group(self):
         group_education_group_year = EducationGroupYearFactory(
-            academic_year=self.current_academic_year
+            academic_year=self.current_academic_year,
+            education_group_type__name=TrainingType.BACHELOR.name,
+            education_group_type__category=education_group_categories.TRAINING
         )
+
         group_education_group_year.education_group_type.category = education_group_categories.GROUP
         group_education_group_year.education_group_type.save()
 
@@ -139,7 +146,7 @@ class EducationGroupGeneralInformations(TestCase):
         )
         response = self.client.get(url)
 
-        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+        self.assertTemplateUsed(response, self.template_path)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
     def test_case_didactic_offer_ensure_show_finalite_common(self):
@@ -151,7 +158,7 @@ class EducationGroupGeneralInformations(TestCase):
                       args=[education_group_year.pk, education_group_year.id])
         response = self.client.get(url)
 
-        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+        self.assertTemplateUsed(response, self.template_path)
 
         context = response.context
         self.assertEqual(context["parent"], education_group_year)
@@ -170,7 +177,7 @@ class EducationGroupGeneralInformations(TestCase):
                       args=[education_group_year.pk, education_group_year.id])
         response = self.client.get(url)
 
-        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+        self.assertTemplateUsed(response, self.template_path)
 
         context = response.context
         self.assertEqual(context["parent"], education_group_year)
@@ -191,7 +198,7 @@ class EducationGroupGeneralInformations(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+        self.assertTemplateUsed(response, self.template_path)
 
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
         self.assertGreater(len(soup.select('a.pedagogy-edit-btn')), 0)
@@ -201,7 +208,7 @@ class EducationGroupGeneralInformations(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_general_informations.html")
+        self.assertTemplateUsed(response, self.template_path)
 
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
         self.assertEqual(len(soup.select('a.pedagogy-edit-btn')), 0)
@@ -245,7 +252,7 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
     def test_when_not_logged(self):
         self.client.logout()
         response = self.client.get(self.url)
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
+        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
     @mock.patch('base.business.education_groups.perms.GeneralInformationPerms.is_eligible', return_value=False)
     @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_get')
@@ -331,7 +338,7 @@ class EducationGroupPublishViewTestCase(TestCase):
     def test_publish_case_user_not_logged(self):
         self.client.logout()
         response = self.client.post(self.url)
-        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
     def test_public_case_methods_not_allowed(self):
         methods_not_allowed = ['get', 'delete', 'put']
@@ -368,28 +375,34 @@ class EducationGroupViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
+        cls.person = PersonWithPermissionsFactory("can_access_education_group")
+        cls.template_name = "education_group/tab_administrative_data.html"
 
-        cls.type_training = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
-        cls.type_minitraining = EducationGroupTypeFactory(category=education_group_categories.MINI_TRAINING)
-        cls.type_group = EducationGroupTypeFactory(category=education_group_categories.GROUP)
+    def setUp(self):
+        self.client.force_login(self.person.user)
 
     def test_education_administrative_data(self):
-        an_education_group = EducationGroupYearFactory(academic_year=self.academic_year)
-        self.initialize_session()
-        url = reverse("education_group_administrative", args=[an_education_group.id, an_education_group.id])
+        an_education_group_year = TrainingFactory(
+            education_group_type__name=TrainingType.BACHELOR.name,
+            academic_year=self.academic_year
+        )
+        url = reverse("education_group_administrative", args=[an_education_group_year.id, an_education_group_year.id])
         response = self.client.get(url)
-        self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
-        self.assertEqual(response.context['education_group_year'], an_education_group)
-        self.assertEqual(response.context['parent'], an_education_group)
+        self.assertTemplateUsed(response, self.template_name)
+        self.assertEqual(response.context['education_group_year'], an_education_group_year)
+        self.assertEqual(response.context['parent'], an_education_group_year)
 
     def test_education_administrative_data_with_root_set(self):
+        edy = TrainingFactory(
+            education_group_type__name=TrainingType.BACHELOR.name,
+            academic_year=self.academic_year
+        )
         a_group_element_year = GroupElementYearFactory(parent__academic_year=self.academic_year,
-                                                       child_branch__academic_year=self.academic_year)
-        self.initialize_session()
+                                                       child_branch=edy)
         url = reverse("education_group_administrative",
                       args=[a_group_element_year.parent.id, a_group_element_year.child_branch.id])
         response = self.client.get(url)
-        self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
+        self.assertTemplateUsed(response, self.template_name)
         self.assertEqual(response.context['education_group_year'], a_group_element_year.child_branch)
         self.assertEqual(response.context['parent'], a_group_element_year.parent)
 
@@ -429,16 +442,10 @@ class EducationGroupViewTestCase(TestCase):
 
     def test_education_content(self):
         an_education_group = EducationGroupYearFactory()
-        self.initialize_session()
         url = reverse("education_group_diplomas", args=[an_education_group.id, an_education_group.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "education_group/tab_diplomas.html")
-
-    def initialize_session(self):
-        person = PersonFactory()
-        person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        self.client.force_login(person.user)
 
 
 class EducationGroupAdministrativedata(TestCase):
@@ -451,7 +458,7 @@ class EducationGroupAdministrativedata(TestCase):
         cls.permission_access = Permission.objects.get(codename='can_access_education_group')
         cls.permission_edit = Permission.objects.get(codename='can_edit_education_group_administrative_data')
 
-        cls.education_group_year = EducationGroupYearFactory()
+        cls.education_group_year = EducationGroupYearBachelorFactory()
         cls.program_manager = ProgramManagerFactory(
             person=cls.person,
             education_group=cls.education_group_year.education_group,
@@ -461,6 +468,7 @@ class EducationGroupAdministrativedata(TestCase):
             cls.education_group_year.id, cls.education_group_year.id
         ])
         create_current_academic_year()
+        cls.template_name = "education_group/tab_administrative_data.html"
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -469,7 +477,7 @@ class EducationGroupAdministrativedata(TestCase):
         self.client.logout()
         response = self.client.get(self.url)
 
-        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
     def test_user_has_not_permission(self):
         Group.objects.get(name="program_managers").permissions.remove(self.permission_access)
@@ -477,14 +485,14 @@ class EducationGroupAdministrativedata(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, ACCESS_DENIED)
 
     def test_user_is_not_program_manager_of_education_group(self):
         self.program_manager.delete()
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
+        self.assertTemplateUsed(response, self.template_name)
 
         self.assertFalse(response.context["can_edit_administrative_data"])
 
@@ -493,7 +501,7 @@ class EducationGroupAdministrativedata(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
+        self.assertTemplateUsed(response, self.template_name)
 
         self.assertFalse(response.context["can_edit_administrative_data"])
 
@@ -505,9 +513,7 @@ class EducationGroupAdministrativedata(TestCase):
         self.assertTemplateUsed(response, "page_not_found.html")
 
     def test_with_education_group_year_of_type_mini_training(self):
-        mini_training_education_group_year = EducationGroupYearFactory()
-        mini_training_education_group_year.education_group_type.category = education_group_categories.MINI_TRAINING
-        mini_training_education_group_year.education_group_type.save()
+        mini_training_education_group_year = MiniTrainingFactory()
 
         url = reverse("education_group_administrative",
                       args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
@@ -519,9 +525,7 @@ class EducationGroupAdministrativedata(TestCase):
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
     def test_with_education_group_year_of_type_group(self):
-        group_education_group_year = EducationGroupYearFactory()
-        group_education_group_year.education_group_type.category = education_group_categories.GROUP
-        group_education_group_year.education_group_type.save()
+        group_education_group_year = GroupFactory()
 
         url = reverse("education_group_administrative",
                       args=[group_education_group_year.id, group_education_group_year.id])
@@ -536,14 +540,14 @@ class EducationGroupAdministrativedata(TestCase):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_administrative_data.html")
+        self.assertTemplateUsed(response, self.template_name)
 
         self.assertTrue(response.context["can_edit_administrative_data"])
 
     def test_get_good_mandataries(self):
         ed = EducationGroupFactory()
         ac = AcademicYearFactory(current=True)
-        edy = EducationGroupYearFactory(education_group=ed, academic_year=ac)
+        edy = EducationGroupYearBachelorFactory(education_group=ed, academic_year=ac)
 
         url = reverse('education_group_administrative', args=[
             edy.id, edy.id
@@ -605,21 +609,21 @@ class EducationGroupEditAdministrativeData(TestCase):
         self.client.logout()
         response = self.client.get(self.url)
 
-        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
     def test_user_has_not_permission(self):
         self.person.user.user_permissions.remove(self.permission)
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, ACCESS_DENIED)
 
     def test_user_is_not_program_manager_of_education_group(self):
         self.program_manager.delete()
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, ACCESS_DENIED)
 
     def test_education_group_non_existent(self):
         self.education_group_year.delete()
@@ -637,7 +641,7 @@ class EducationGroupEditAdministrativeData(TestCase):
                       args=[mini_training_education_group_year.id, mini_training_education_group_year.id])
         response = self.client.get(url)
 
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, ACCESS_DENIED)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_with_education_group_year_of_type_group(self):
@@ -649,7 +653,7 @@ class EducationGroupEditAdministrativeData(TestCase):
                       args=[group_education_group_year.id, group_education_group_year.id])
         response = self.client.get(url)
 
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, ACCESS_DENIED)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     @mock.patch('base.business.education_group.can_user_edit_administrative_data')
@@ -675,10 +679,17 @@ class EducationGroupEditAdministrativeData(TestCase):
 class AdmissionConditionEducationGroupYearTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-        AcademicYearFactory(current=True)
-        cls.education_group_parent = TrainingFactory(acronym="Parent", academic_year=cls.academic_year)
-        cls.education_group_child = TrainingFactory(acronym="Child_1", academic_year=cls.academic_year)
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.education_group_parent = TrainingFactory(
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,  # Type to match 'show_admission_conditions'
+            acronym="Parent",
+            academic_year=cls.academic_year
+        )
+        cls.education_group_child = TrainingFactory(
+            education_group_type__name=TrainingType.MASTER_MC.name,  # Type to match 'show_admission_conditions'
+            acronym="Child_1",
+            academic_year=cls.academic_year
+        )
 
         cls.agregation_adm_cond = AdmissionConditionFactory(
             education_group_year=EducationGroupYearCommonAgregationFactory(academic_year=cls.academic_year)
@@ -708,6 +719,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
             "education_group_year_admission_condition_edit",
             args=[cls.education_group_parent.pk, cls.education_group_child.pk]
         )
+        cls.template_name = "education_group/tab_admission_conditions.html"
 
     def setUp(self):
         self.perm_patcher = mock.patch(
@@ -722,7 +734,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.client.logout()
         response = self.client.get(self.url)
 
-        self.assertRedirects(response, "/login/?next={}".format(self.url))
+        self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
     def test_user_without_permission(self):
         an_other_user = UserFactory()
@@ -730,14 +742,14 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         response = self.client.get(self.url)
 
-        self.assertTemplateUsed(response, "access_denied.html")
+        self.assertTemplateUsed(response, ACCESS_DENIED)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_user_has_link_to_edit_conditions(self):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_admission_conditions.html")
+        self.assertTemplateUsed(response, self.template_name)
 
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
         self.assertGreater(len(soup.select('button.btn-publish')), 0)
@@ -746,14 +758,13 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
     def test_user_has_not_link_to_edit_conditions(self, mock_perms):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_admission_conditions.html")
+        self.assertTemplateUsed(response, self.template_name)
 
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
         self.assertEqual(len(soup.select('button.btn-publish')), 0)
 
     def test_case_free_text_is_not_show_when_common(self):
-        AcademicYearFactory(current=True)
-        common_bachelor = EducationGroupYearCommonBachelorFactory()
+        common_bachelor = EducationGroupYearCommonBachelorFactory(academic_year=self.academic_year)
         url_edit_common = reverse(
             "education_group_year_admission_condition_edit",
             args=[common_bachelor.pk, common_bachelor.pk]
@@ -761,7 +772,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         response = self.client.get(url_edit_common)
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, "education_group/tab_admission_conditions.html")
+        self.assertTemplateUsed(response, self.template_name)
 
         self.assertFalse(response.context['info']['show_free_text'])
 

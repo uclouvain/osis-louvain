@@ -29,7 +29,7 @@
     <form method="POST" action="{% url 'learning_unit_cancel_proposal' learning_unit_year_id=learning_unit_year.id %}">
         {% csrf_token %}
         <div class="modal-header">
-            <h3>{% trans 'Do you want to get back to initial data?' %}</h3>
+            <h3>{% trans 'Do you want to cancel proposal?' %}</h3>
             <div class='alert alert-warning' id="alert_warning" style="display: none;"></div>
         </div>
         {% if list_partims %}

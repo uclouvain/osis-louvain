@@ -31,8 +31,8 @@ from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from base.models.prerequisite import Prerequisite
-from base.models.utils.utils import get_object_or_none
 from base.views.common import display_warning_messages
+from osis_common.utils.models import get_object_or_none
 from program_management.business.learning_units.prerequisite import \
     get_prerequisite_acronyms_which_are_outside_of_education_group
 from program_management.views.generic import LearningUnitGenericDetailView

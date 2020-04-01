@@ -34,8 +34,8 @@ from base.models import entity_version
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit import LearningUnit
-from base.models.utils.utils import get_object_or_none
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from osis_common.utils.models import get_object_or_none
 
 
 class ProposalLearningUnitAdmin(VersionAdmin, OsisModelAdmin):

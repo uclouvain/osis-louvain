@@ -50,7 +50,7 @@ class GroupElementYearForm(forms.ModelForm):
             "comment": forms.Textarea(attrs={'rows': 5}),
             "comment_english": forms.Textarea(attrs={'rows': 5}),
             "block": forms.TextInput(),
-            "relative_credits": forms.TextInput()
+            "relative_credits": forms.TextInput(attrs={'style': 'min-width: 40px;'})
         }
 
     def __init__(self, *args, parent=None, child_branch=None, child_leaf=None, **kwargs):

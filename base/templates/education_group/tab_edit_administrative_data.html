@@ -93,12 +93,12 @@
                     </div>
                 </div>
                 <div class="pull-right">
-                    {% bootstrap_button _("Save") button_type="submit" button_class="btn-primary" icon="glyphicon glyphicon-floppy-save" %}
                     <a id="link_administrative" href="{% url 'education_group_administrative' root_id education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}"
                        role="tab"
                             class="btn btn-default">
                         {% trans 'Cancel' %}
                     </a>
+                    {% bootstrap_button _("Save") button_type="submit" button_class="btn-primary" icon="glyphicon glyphicon-floppy-save" %}
                 </div>
             </form>
         </div>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-03 13:02+0100\n"
+"POT-Creation-Date: 2020-03-16 13:59+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -59,6 +59,9 @@ msgstr ""
 
 msgid "Acronym"
 msgstr ""
+
+msgid "Acronym enrollment header"
+msgstr "Program"
 
 msgid "Add"
 msgstr ""
@@ -212,7 +215,7 @@ msgstr ""
 msgid "If you try to put decimal values, it will be ignored."
 msgstr ""
 
-msgid "Incomplete"
+msgid "Include subordinate entities"
 msgstr ""
 
 msgid "Inject"
@@ -388,6 +391,9 @@ msgstr ""
 msgid "Registration number"
 msgstr ""
 
+msgid "Registration number header"
+msgstr "Registration number"
+
 msgid "Remove"
 msgstr ""
 
@@ -395,6 +401,9 @@ msgid ""
 "Represents the quantity of scores submitted to the administration. The "
 "number surrounded by parenthesis is the number of scores encoded by the "
 "tutor that aren't submitted yet ('draft' state)"
+msgstr ""
+
+msgid "Req. Entity"
 msgstr ""
 
 msgid ""
@@ -471,6 +480,9 @@ msgstr ""
 
 msgid "Session"
 msgstr ""
+
+msgid "Session enrollment header"
+msgstr "Session number"
 
 msgid "Session number"
 msgstr ""
@@ -552,6 +564,9 @@ msgid "Tutors of the course"
 msgstr ""
 
 msgid "Type"
+msgstr ""
+
+msgid "Type of training"
 msgstr ""
 
 msgid "UE title"

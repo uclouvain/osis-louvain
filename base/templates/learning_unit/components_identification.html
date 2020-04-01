@@ -65,13 +65,9 @@
             <td>{% dl_component_tooltip 'VOLUME_Q2' value=component.volumes.VOLUME_Q2 id=component.learning_component_year.id default_if_none='' %}</td>
             <td>{% dl_component_tooltip 'VOLUME_TOTAL' value=component.volumes.VOLUME_TOTAL id=component.learning_component_year.id default_if_none='' %}</td>
             <td>
-                {# FIXME :: Temporary solution - Waiting for real classes in OSIS #}
                 {% with component.learning_component_year.real_classes as real_classes %}
                     <span class="badge fixed_width {{ component.learning_component_year.planned_classes |get_css_class:real_classes }}">
-                    {% if component.learning_component_year.planned_classes > 0 and real_classes == 0 %}
-                        1
-                    {% else %} {{ real_classes| default_if_none:'0' }}{% endif %} /
-                        {{ component.learning_component_year.planned_classes| default_if_none:'0' }}
+                    {{ real_classes| default_if_none:'0' }}/{{ component.learning_component_year.planned_classes| default_if_none:'0' }}
                 </span>
                 {% endwith %}
             </td>

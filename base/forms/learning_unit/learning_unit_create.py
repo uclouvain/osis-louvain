@@ -105,9 +105,14 @@ class LearningUnitYearModelForm(PermissionFieldMixin, forms.ModelForm):
             self.initial['acronym'] = split_acronym(acronym, subtype, instance=self.instance)
 
         if subtype == learning_unit_year_subtypes.PARTIM:
+            type_str = _('Specific complement (Partim)')
             self.fields['acronym'] = PartimAcronymField()
-            self.fields['specific_title'].label = _('Title proper to the partim')
-            self.fields['specific_title_english'].label = _('English title proper to the partim')
+            self.fields['specific_title'].label = type_str
+            self.fields['specific_title_english'].label = type_str
+        else:
+            type_str = _('Specific complement (Full)')
+            self.fields['specific_title'].label = type_str
+            self.fields['specific_title_english'].label = type_str
 
         # Disabled fields when it's an update
         if self.instance.pk:
@@ -313,6 +318,8 @@ class LearningContainerYearModelForm(PermissionFieldMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['requirement_entity'].queryset = self.person.find_main_entities_version
         self.prepare_fields()
+        self.fields['common_title'].label = _('Common part')
+        self.fields['common_title_english'].label = _('Common part')
 
         if self.instance.requirement_entity:
             self.initial['requirement_entity'] = get_last_version(self.instance.requirement_entity).pk

@@ -29,7 +29,7 @@ from base.business.learning_units.xls_generator import generate_xls_teaching_mat
 from base.forms.learning_unit.search.educational_information import LearningUnitDescriptionFicheFilter
 from base.utils.search import RenderToExcel
 from base.views.common import remove_from_session
-from base.views.learning_units.search.common import SUMMARY_LIST, BaseLearningUnitSearch
+from base.views.learning_units.search.common import BaseLearningUnitSearch, SearchTypes
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 
 
@@ -41,7 +41,7 @@ def _create_xls_teaching_material(view_obj, context, **response_kwargs):
 class LearningUnitDescriptionFicheSearch(BaseLearningUnitSearch):
     template_name = "learning_unit/search/description_fiche.html"
     filterset_class = LearningUnitDescriptionFicheFilter
-    search_type = SUMMARY_LIST
+    search_type = SearchTypes.SUMMARY_LIST
     serializer_class = LearningUnitDetailedSerializer
 
     def get_context_data(self, **kwargs):

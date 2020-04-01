@@ -38,10 +38,10 @@ from base.models.academic_calendar import AcademicCalendar
 from base.models.academic_year import AcademicYear
 from base.models.enums import academic_calendar_type
 from base.models.enums.academic_calendar_type import ACADEMIC_CATEGORY, PROJECT_CATEGORY, AD_HOC_CATEGORY
-from base.models.utils.utils import get_object_or_none
 from base.utils.cache import cache_filter
 from base.views import common
 from base.views.mixins import RulesRequiredMixin
+from osis_common.utils.models import get_object_or_none
 
 
 def _build_gantt_json(academic_calendar_list, show_academic_events, show_project_events):

@@ -25,12 +25,13 @@
 ##############################################################################
 from dal import autocomplete
 from django import forms
-from django.db.models import Case, When, Value, CharField
+from django.db.models import Case, When, Value, CharField, OuterRef, Subquery
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
 
 from base.business.entity import get_entities_ids
 from base.forms.utils.filter_field import filter_field_by_regex
+from base.models import entity_version
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
@@ -101,7 +102,7 @@ class EducationGroupFilter(FilterSet):
             ('academic_year__year', 'academic_year'),
             ('title', 'title'),
             ('type_ordering', 'type'),
-            ('management_entity__entityversion__acronym', 'management_entity')
+            ('entity_management_version', 'management_entity')
         ),
         widget=forms.HiddenInput
     )
@@ -140,10 +141,26 @@ class EducationGroupFilter(FilterSet):
         # Need this close so as to return empty query by default when form is unbound
         if not self.data:
             return EducationGroupYear.objects.none()
+
+        management_entity = entity_version.EntityVersion.objects.filter(
+            entity=OuterRef('management_entity'),
+        ).current(
+            OuterRef('academic_year__start_date')
+        ).values('acronym')[:1]
+
         return EducationGroupYear.objects.all().annotate(
             type_ordering=Case(
                 *[When(education_group_type__name=key, then=Value(str(_(val))))
                   for i, (key, val) in enumerate(education_group_types.ALL_TYPES)],
                 default=Value(''),
                 output_field=CharField()
-            ))
+            )
+        ).annotate(
+            entity_management_version=Subquery(management_entity)
+        )
+
+    def filter_queryset(self, queryset):
+        # Order by id to always ensure same order when objects have same values for order field (ex: title)
+        qs = super().filter_queryset(queryset)
+        order_fields = qs.query.order_by + ('id', )
+        return qs.order_by(*order_fields)

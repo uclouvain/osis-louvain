@@ -43,9 +43,7 @@ class GroupTitleTestCase(APITestCase):
     def setUpTestData(cls):
         anac = AcademicYearFactory()
 
-        cls.egy = GroupFactory(
-            academic_year=anac,
-        )
+        cls.egy = GroupFactory(academic_year=anac)
 
         cls.person = PersonFactory()
         cls.url = reverse('education_group_api_v1:groupstitle_read', kwargs={
@@ -89,10 +87,7 @@ class GetGroupTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
-        cls.group = GroupFactory(
-            academic_year=cls.academic_year,
-        )
-
+        cls.group = GroupFactory(academic_year=cls.academic_year)
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:group_read', kwargs={
             'partial_acronym': cls.group.partial_acronym,

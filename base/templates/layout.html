@@ -64,6 +64,7 @@
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
     <link rel="stylesheet" href="{% static 'css/dataTables.bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/osis.css' %}">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
     <link rel="stylesheet" href="{% static 'fontawesome-free-5.7.2-web/css/all.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/tree.css' %}">
     <link rel="stylesheet" href="{% static 'css/jstree.min.css' %}">
@@ -199,7 +200,7 @@
     {% block content %}{% endblock %}
     {% block modal %}{% endblock %}
 
-    <div class="modal fade" id="form-ajax-modal" role="dialog">
+    <div class="modal fade" id="form-ajax-modal" role="dialog" data-backdrop="static">
         <div class="modal-dialog" id="modal_dialog_id">
             <div class="modal-content" id="form-modal-ajax-content">
                 {# loading ajax requests #}

@@ -491,6 +491,12 @@ class GetScoreEncodingViewProgramManagerTest(AcademicYearMockMixin, SessionExamC
         context = response.context[-1]
         self.assertEqual(len(context['notes_list']), 3)
 
+    def test_get_score_encoding_check_offer_year_id_in_context(self):
+        response = self.client.get(reverse('scores_encoding'), data={'offer': str(self.offer_year_bio2ma.id)})
+        self.assertEqual(response.status_code, 200)
+        context = response.context
+        self.assertEqual(context['offer_year_id'], self.offer_year_bio2ma.id)
+
     def _create_context_exam_enrollment(self):
         self.students = []
         for index in range(0, 20):

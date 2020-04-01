@@ -51,7 +51,7 @@ from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.user import UserFactory
 from base.tests.factories.utils.get_messages import get_messages_from_response
 from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit
-from base.views.learning_units.search.common import SUMMARY_LIST
+from base.views.learning_units.search.common import SearchTypes
 from cms.enums import entity_name
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.tests.factories.text_label import TextLabelFactory
@@ -118,7 +118,7 @@ class LearningUnitPedagogyTestCase(TestCase):
 
         self.assertTemplateUsed(response, 'learning_unit/search/description_fiche.html')
         self.assertTrue(response.context['is_faculty_manager'])
-        self.assertEqual(response.context['search_type'], SUMMARY_LIST)
+        self.assertEqual(response.context['search_type'], SearchTypes.SUMMARY_LIST.value)
         self.assertEqual(response.context['learning_units_count'], 1)
 
         self.assertEqual(response.context['object_list'].first(), self.learning_unit_year)

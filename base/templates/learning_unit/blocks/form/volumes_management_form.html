@@ -77,13 +77,13 @@
     </table>
     {% if not learning_unit_year.is_past %}
         <div class="pull-right">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalReport">
-                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
-            </button>
             <a class="btn btn-default"
                href="{% url luy_url learning_unit_year_id=learning_unit_year.id %}">
                 {% trans 'Cancel' %}
             </a>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#modalReport">
+                <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
+            </button>
         </div>
         {% include "learning_unit/blocks/modal/modal_modification_ask_to_report.html" %}
     {% else %}

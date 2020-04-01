@@ -34,7 +34,14 @@
 
 {% block content %}
 
-{% include "learning_unit/blocks/header.html" with local_storage_key="attributionIds" %}
+<div class="row" style="margin:0 -15px 5px; padding:0;">
+
+    <div class="col-md-10 col-md-offset-1">
+        <h2>{{ learning_unit_year.acronym|default_if_none:'' }} &mdash; {{ learning_unit_year.academic_year }}</h2>
+        <h4 style="margin-top: 0;">{{ learning_unit_year.complete_title }}</h4>
+    </div>
+
+</div>
 
 <br/>
 

@@ -117,7 +117,7 @@ class GeneralInformationSerializerTestCase(TestCase):
         self.assertEqual(type(self.serializer.data['sections']), list)
         self.assertEqual(
             len(self.serializer.data['sections']),
-            len(self.pertinent_sections['common'] + self.pertinent_sections['specific'])
+            len(self.pertinent_sections['specific'])
         )
         for section in self.serializer.data['sections']:
             if section['id'] == EVALUATION_KEY:

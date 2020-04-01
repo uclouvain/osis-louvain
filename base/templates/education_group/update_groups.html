@@ -30,6 +30,14 @@
     <li>{% trans "Modification" %}</li>
 {% endblock %}
 
+{% block header_content %}
+    <div class="page-header">
+        {% with disabled_nav=True %}
+            {% include "education_group/blocks/header.html" %}
+        {% endwith %}
+    </div>
+{% endblock %}
+
 {% block content %}
     {% include "education_group/blocks/form/group.html" %}
 {% endblock %}

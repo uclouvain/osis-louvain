@@ -61,4 +61,4 @@ class GroupYearFactory(factory.django.DjangoModelFactory):
     title_en = factory.LazyAttribute(generate_title)
     remark_fr = factory.fuzzy.FuzzyText(length=255)
     remark_en = factory.fuzzy.FuzzyText(length=255)
-    academic_year = factory.SubFactory(AcademicYearFactory, id=factory.SelfAttribute("..group.start_year"))
+    academic_year = factory.SubFactory(AcademicYearFactory, year=factory.SelfAttribute("..group.start_year.year"))

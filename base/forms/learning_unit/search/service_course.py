@@ -23,14 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django import forms
+from django_filters import filters
+
 from base.business.entity import build_entity_container_prefetch
 from base.business.entity_version import SERVICE_COURSE
 from base.business.learning_unit_year_with_context import append_latest_entities
 from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.models.enums import entity_container_year_link_type
+from base.views.learning_units.search.common import SearchTypes
 
 
 class ServiceCourseFilter(LearningUnitFilter):
+    search_type = filters.CharFilter(
+        field_name="acronym",
+        method=lambda request, *args, **kwargs: request,
+        widget=forms.HiddenInput,
+        required=False,
+        initial=SearchTypes.SERVICE_COURSES_SEARCH.value
+    )
 
     def filter_queryset(self, queryset):
         qs = super().filter_queryset(queryset)

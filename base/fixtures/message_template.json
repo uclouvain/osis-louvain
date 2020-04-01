@@ -5,7 +5,7 @@
     "fields": {
         "reference": "assessments_scores_submission_html",
         "subject": "Soumission de notes pour {learning_unit_name}",
-        "template": "<p>{% autoescape off %}</p>\r\n\r\n<h3>Soumission de notes</h3>\r\n\r\n<p><em>Ceci est un message automatique g&eacute;n&eacute;r&eacute; par le serveur OSIS &ndash; Merci de ne pas y r&eacute;pondre.</em></p>\r\n\r\n<p><br />\r\nNous vous informons qu&#39;une soumission de notes &agrave; &eacute;t&eacute; effectu&eacute;e pour <strong>{{ learning_unit_name }}</strong></p>\r\n\r\n<p>{{ submitted_enrollments }}</p>\r\n\r\n<p>Status : {{ encoding_status }}</p>\r\n\r\n<p>{{ signature }}</p>\r\n\r\n<p>{% endautoescape %}</p>",
+        "template": "<p>{% autoescape off %}</p>\r\n\r\n<h3>Soumission de notes</h3>\r\n\r\n<p><em>Ceci est un message automatique g&eacute;n&eacute;r&eacute; par le serveur OSIS &ndash; Merci de ne pas y r&eacute;pondre.</em></p>\r\n\r\n<p><br />\r\nNous vous informons qu&#39;une soumission de notes a &eacute;t&eacute; effectu&eacute;e pour <strong>{{ learning_unit_name }}</strong></p>\r\n\r\n<p>{{ submitted_enrollments }}</p>\r\n\r\n<p>Statut : {{ encoding_status }}</p>\r\n\r\n<p>{{ signature }}</p>\r\n\r\n<p>{% endautoescape %}</p>",
         "format": "HTML",
         "language": "fr-be"
     }
@@ -16,7 +16,7 @@
     "fields": {
         "reference": "assessments_scores_submission_txt",
         "subject": "Soumission de notes pour {learning_unit_name}",
-        "template": "<p><em>Ceci est un message automatique g&eacute;n&eacute;r&eacute; par le serveur OSIS &ndash; Merci de ne pas y r&eacute;pondre.</em><br />\r\n<br />\r\nNous vous informons qu&#39;une soumission de notes &agrave; &eacute;t&eacute; effectu&eacute;e pour {{ learning_unit_name }}</p>\r\n\r\n<p>{{ submitted_enrollments }}</p>\r\n\r\n<p>Status : {{ encoding_status }}</p>",
+        "template": "<p><em>Ceci est un message automatique g&eacute;n&eacute;r&eacute; par le serveur OSIS &ndash; Merci de ne pas y r&eacute;pondre.</em><br />\r\n<br />\r\nNous vous informons qu&#39;une soumission de notes a &eacute;t&eacute; effectu&eacute;e pour {{ learning_unit_name }}</p>\r\n\r\n<p>{{ submitted_enrollments }}</p>\r\n\r\n<p>Statut : {{ encoding_status }}</p>",
         "format": "PLAIN",
         "language": "fr-be"
     }
@@ -49,7 +49,7 @@
     "fields": {
         "reference": "assessments_scores_submission_txt",
         "subject": "Scores submission for  {learning_unit_name}",
-        "template": "<p>This is a generated message - Please don&#39;t reply<br />\r\nWe inform tou that scores have been submitted for&nbsp; {{ learning_unit_name }}</p>\r\n\r\n<p>{{ submitted_enrollments }}</p>\r\n\r\n<p>Status : {{ encoding_status }}</p>",
+        "template": "<p>This is a generated message - Please don&#39;t reply<br />\r\nWe inform you that scores have been submitted for&nbsp; {{ learning_unit_name }}</p>\r\n\r\n<p>{{ submitted_enrollments }}</p>\r\n\r\n<p>Status : {{ encoding_status }}</p>",
         "format": "PLAIN",
         "language": "en"
     }

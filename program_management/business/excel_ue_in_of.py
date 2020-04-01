@@ -51,10 +51,10 @@ from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
     STYLED_CELLS, COLORED_ROWS, ROW_HEIGHT
+from program_management.business.excel import clean_worksheet_title
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
-from program_management.business.excel import clean_worksheet_title
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
@@ -113,10 +113,11 @@ SpecificationsCols = namedtuple(
         'achievements_fr', 'achievements_en'
     ]
 )
-FIX_TITLES = [_('Code'), _('Ac yr.'), _('Title'), _('Type'), _('Subtype'), _('Gathering'), _('Block'), _('Mandatory')]
+FIX_TITLES = [_('Code'), _('Ac yr.'), _('Title'), _('Type'), _('Subtype'), _('Direct gathering'), _('Main gathering'),
+              _('Block'), _('Mandatory')]
 
 FixLineUEContained = namedtuple('FixLineUEContained', ['acronym', 'year', 'title', 'type', 'subtype', 'gathering',
-                                                       'block', 'mandatory'
+                                                       'main_gathering', 'block', 'mandatory'
                                                        ])
 
 LEGEND_WB_STYLE = 'colored_cells'
@@ -125,12 +126,15 @@ LEGEND_WB_CONTENT = 'content'
 
 class EducationGroupYearLearningUnitsContainedToExcel:
 
-    def __init__(self, egy: EducationGroupYear, custom_xls_form: CustomXlsForm):
+    def __init__(self, root: EducationGroupYear, egy: EducationGroupYear, custom_xls_form: CustomXlsForm):
         self.egy = egy
-        self.hierarchy = EducationGroupHierarchy(root=self.egy)
+
+        exclude_options = True if self.egy.is_master120 or self.egy.is_master180 else False
+        self.root_hierarchy = EducationGroupHierarchy(root=root, exclude_options=exclude_options)
+        hierarchy = EducationGroupHierarchy(root=self.egy, exclude_options=exclude_options)
         self.learning_unit_years_parent = []
 
-        for grp in self.hierarchy.included_group_element_years:
+        for grp in hierarchy.included_group_element_years:
             if not grp.child_leaf:
                 continue
             self.learning_unit_years_parent.append(grp)
@@ -154,14 +158,14 @@ class EducationGroupYearLearningUnitsContainedToExcel:
         self.qs = GroupElementYear.objects.filter(id__in=ids).order_by(preserved)
 
     def _to_workbook(self):
-        return generate_ue_contained_for_workbook(self.custom_xls_form, self.qs)
+        return generate_ue_contained_for_workbook(self.custom_xls_form, self.qs, self.root_hierarchy)
 
     def to_excel(self, ):
         return save_virtual_workbook(self._to_workbook())
 
 
-def generate_ue_contained_for_workbook(custom_xls_form: CustomXlsForm, qs: QuerySet):
-    data = _build_excel_lines_ues(custom_xls_form, qs)
+def generate_ue_contained_for_workbook(custom_xls_form: CustomXlsForm, qs: QuerySet, hierarchy):
+    data = _build_excel_lines_ues(custom_xls_form, qs, hierarchy)
     need_proposal_legend = custom_xls_form.is_valid() and custom_xls_form.cleaned_data['proposition']
 
     return _get_workbook_for_custom_xls(data.get('content'),
@@ -170,7 +174,7 @@ def generate_ue_contained_for_workbook(custom_xls_form: CustomXlsForm, qs: Query
                                         data.get('row_height'))
 
 
-def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, qs: QuerySet):
+def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, qs: QuerySet, hierarchy):
     content = _get_headers(custom_xls_form)
 
     optional_data_needed = _optional_data(custom_xls_form)
@@ -179,7 +183,7 @@ def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, qs: QuerySet):
 
     for gey in qs:
         luy = gey.child_leaf
-        content.append(_get_optional_data(_fix_data(gey, luy), luy, optional_data_needed, gey))
+        content.append(_get_optional_data(_fix_data(gey, luy, hierarchy), luy, optional_data_needed, gey))
         if getattr(luy, "proposallearningunit", None):
             colored_cells[PROPOSAL_LINE_STYLES.get(luy.proposallearningunit.type)].append(idx)
         idx += 1
@@ -218,14 +222,18 @@ def _get_headers(custom_xls_form):
     return content
 
 
-def _fix_data(gey: GroupElementYear, luy: LearningUnitYear):
+def _fix_data(gey: GroupElementYear, luy: LearningUnitYear, hierarchy):
     data = []
+
+    main_gathering = hierarchy.get_main_parent(gey.parent.id)
+
     data_fix = FixLineUEContained(acronym=luy.acronym,
                                   year=luy.academic_year,
                                   title=luy.complete_title_i18n,
                                   type=luy.get_container_type_display(),
                                   subtype=luy.get_subtype_display(),
-                                  gathering="{} - {}".format(gey.parent.partial_acronym, gey.parent.title),
+                                  gathering=_build_gathering_content(gey.parent),
+                                  main_gathering=_build_main_gathering_content(main_gathering),
                                   block=gey.block or '',
                                   mandatory=str.strip(yesno(gey.is_mandatory)))
     for name in data_fix._fields:
@@ -448,3 +456,11 @@ def build_annotations(qs: QuerySet, fr_labels: list, en_labels: list):
 def _build_subquery_text_label(qs, cms_text_label, lang):
     return qs.filter(text_label__label="{}".format(cms_text_label), language=lang).values(
         'text')[:1]
+
+
+def _build_gathering_content(edg):
+    return "{} - {}".format(edg.partial_acronym, edg.title) if edg else ''
+
+
+def _build_main_gathering_content(edg):
+    return "{} - {}".format(edg.acronym, edg.partial_title if edg.is_finality else edg.title) if edg else ''

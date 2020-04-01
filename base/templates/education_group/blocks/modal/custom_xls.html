@@ -27,7 +27,7 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <form role="form" method="POST" name="custom_xls_form" id="custom_xls_form"
-                  action="{% url "education_group_learning_units_contains" education_group_year_pk=education_group_year.pk %}">
+                  action="{% url "education_group_learning_units_contains" root_id=root_id education_group_year_pk=education_group_year.pk %}">
                 <div class="modal-body">
                     {% csrf_token %}
                     <label>{% trans 'Do you want to export the following informations' %}?</label>
