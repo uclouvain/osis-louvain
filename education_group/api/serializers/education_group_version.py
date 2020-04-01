@@ -29,6 +29,14 @@ from program_management.models.education_group_version import EducationGroupVers
 
 
 class EducationGroupVersionSerializer(serializers.ModelSerializer):
+    # TODO: add URL to version
+    code = serializers.CharField(source='root_group.acronym')
+
     class Meta:
         model = EducationGroupVersion
-        fields = ()
+        fields = (
+            'is_transition',
+            'code',
+            'url',
+            'version_name',
+        )
