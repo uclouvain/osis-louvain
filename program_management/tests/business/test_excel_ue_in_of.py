@@ -36,8 +36,8 @@ from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
 from base.models.enums import education_group_types
-from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory, \
     EducationGroupYearBachelorFactory
