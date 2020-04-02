@@ -135,11 +135,11 @@
                             <div class="panel panel-default">
                                 <div class="panel-body">
                                     <label title="{% trans "The title is made up of the common part and / or any supplement"%}">{% trans "Title"%}</label>
-                                    {% dl_tooltip learning_unit_year.learning_container_year 'common_title' title=_('Common part') label_text=_('Common part') inherited=learning_unit_year.subtype common_title=True %}
+                                    {% dl_tooltip learning_unit_year.learning_container_year 'common_title' title=_('Common part') label_text=_('Common part') inherited=learning_unit_year.subtype common_title=True default_if_none="-" %}
                                     {% if learning_unit_year.subtype == "PARTIM" %}
-                                        {% dl_tooltip learning_unit_year 'specific_title' label_text=_('Specific complement (Partim)') title=_('Specific complement (Partim)') specific_title=True %}
+                                        {% dl_tooltip learning_unit_year 'specific_title' label_text=_('Specific complement (Partim)') title=_('Specific complement (Partim)') specific_title=True default_if_none="-" %}
                                     {% else %}
-                                        {% dl_tooltip learning_unit_year 'specific_title' title=_('Specific complement (Full)') label_text=_('Specific complement (Full)') specific_title=True %}
+                                        {% dl_tooltip learning_unit_year 'specific_title' title=_('Specific complement (Full)') label_text=_('Specific complement (Full)') specific_title=True default_if_none="-" %}
                                     {% endif %}
                                 </div>
                             </div>
@@ -147,11 +147,11 @@
                             <div class="panel panel-default">
                                 <div class="panel-body">
                                     <label title="{% trans "The title is made up of the common part and / or any supplement"%}">{% trans "Title in English"%}</label>
-                                    {% dl_tooltip learning_unit_year.learning_container_year 'common_title_english' title=_('Common part') label_text=_('Common part') inherited=learning_unit_year.subtype common_title=True %}
+                                    {% dl_tooltip learning_unit_year.learning_container_year 'common_title_english' title=_('Common part') label_text=_('Common part') inherited=learning_unit_year.subtype common_title=True default_if_none="-" %}
                                     {% if learning_unit_year.subtype == "PARTIM" %}
-                                        {% dl_tooltip learning_unit_year 'specific_title_english' title=_('Specific complement (Partim)') label_text=_('Specific complement (Partim)') specific_title=True %}
+                                        {% dl_tooltip learning_unit_year 'specific_title_english' title=_('Specific complement (Partim)') label_text=_('Specific complement (Partim)') specific_title=True default_if_none="-" %}
                                     {% else %}
-                                        {% dl_tooltip learning_unit_year 'specific_title_english' title=_('Specific complement (Full)') label_text=_('Specific complement (Full)') specific_title=True %}
+                                        {% dl_tooltip learning_unit_year 'specific_title_english' title=_('Specific complement (Full)') label_text=_('Specific complement (Full)') specific_title=True default_if_none="-" %}
                                     {% endif %}
                                 </div>
                             </div>
