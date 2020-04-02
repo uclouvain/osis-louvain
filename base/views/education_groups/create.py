@@ -23,11 +23,13 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import re
+
 from django import forms
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import ValidationError
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -52,6 +54,7 @@ from base.views.education_groups.perms import can_create_education_group
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.decorators.ajax import ajax_required
 from osis_common.utils.models import get_object_or_none
+from program_management.models.education_group_version import EducationGroupVersion
 
 FORMS_BY_CATEGORY = {
     education_group_categories.GROUP: GroupForm,
@@ -205,7 +208,8 @@ def create_education_group_specific_version(request, root_id=None, education_gro
     person = get_object_or_404(Person, user=request.user)
     form_version = SpecificVersionForm(
         request.POST or None,
-        person=person
+        person=person,
+        education_group_year=education_group_year
     )
     if request.method == 'POST':
         if form_version.is_valid():
@@ -215,9 +219,23 @@ def create_education_group_specific_version(request, root_id=None, education_gro
                 'education_group_year_id': education_group_year_id
             })
             return redirect(redirect_url)
-        print(form_version.errors)
     context = {
         "form": form_version,
-        "parent": education_group_year
+        "parent": education_group_year,
+        "parent_id": education_group_year.id
     }
     return render(request, "education_group/create_specific_version.html", context)
+
+
+@login_required
+@ajax_required
+def check_version_name(request, parent_id):
+    if not parent_id:
+        raise HttpResponseNotFound
+    education_group_year = get_object_or_404(EducationGroupYear, pk=parent_id)
+    acronym = education_group_year.acronym+request.GET['acronym']
+    existing = EducationGroupVersion.objects.filter(
+        version_name=acronym,
+        offer=education_group_year).exists()
+    valid = bool(re.match("^[A-Z]{0,15}$", request.GET['acronym'].upper()))
+    return JsonResponse({'existing': existing, 'valid': valid}, safe=False)

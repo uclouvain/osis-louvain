@@ -25,7 +25,8 @@
 {% endcomment %}
 
 <div class="modal-content">
-    <form class="form pedagogy-form" role="form" method="POST" action="{{ request.path }}">
+    <form class="form" method="POST" id="SpecificVersionForm" data-validate-url="{% url 'check_version_name' parent_id %}"
+    action="{{ request.path }}">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">×</button>
             <h4>{% trans 'New spécific version' %}</h4>
@@ -34,10 +35,14 @@
             {% csrf_token %}
             <div class="panel panel-default">
                 <div class="panel-body">
-                    <div class="input-group">
-                        <span class="input-group-addon">{{parent.acronym}} [</span>
-                        {% bootstrap_field form.acronym show_label=False %}
-                        <span class="input-group-addon">]</span>
+                    {% bootstrap_label form.acronym.label label_class="control-label" %}
+                    <div class="acronym-group">
+                        <div class="input-group">
+                            <span class="input-group-addon">{{parent.acronym}} [</span>
+                            {% bootstrap_field form.acronym show_label=False %}
+                            <span class="input-group-addon">]</span>
+                        </div>
+                        <span id="acronym_error_id"></span>
                     </div>
                     <br>
                     {% bootstrap_field form.title %}
@@ -53,3 +58,6 @@
     </form>
 </div>
 
+{% block script %}
+    <script type="text/javascript" src="{% static 'js/education_group/education_group_year_creation.js' %}"></script>
+{% endblock %}

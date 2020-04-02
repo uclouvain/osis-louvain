@@ -24,30 +24,43 @@
 #
 ##############################################################################
 from django import forms
+from django.core.exceptions import ValidationError
+from django.forms import TextInput
 from django.utils.translation import gettext_lazy as _
 
 from base.business import event_perms
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
 from base.models.academic_year import AcademicYear
-from education_group.models.group_year import GroupYear
 from program_management.models.education_group_version import EducationGroupVersion
 
 
 class SpecificVersionForm(forms.Form):
-    acronym = forms.CharField(max_length=15, required=True, label=_('Acronym of version'))
-    title = forms.CharField(max_length=100, label=_('Full title of the french version'))
-    title_english = forms.CharField(max_length=255, label=_('Full title of the english version'))
+    acronym = forms.CharField(max_length=15, required=True, label=_('Acronym of version'), widget=TextInput(attrs={
+                'onchange': 'validate_version_name()'
+            }))
+    title = forms.CharField(max_length=100, required=False, label=_('Full title of the french version'))
+    title_english = forms.CharField(max_length=100, required=False, label=_('Full title of the english version'))
     end_year = forms.ModelChoiceField(queryset=AcademicYear.objects.none(), required=False,
                                       label=_('This version exists until'), empty_label=BLANK_CHOICE_DISPLAY)
 
     def __init__(self, *args, **kwargs):
         self.person = kwargs.pop('person')
+        self.education_group_year = kwargs.pop('education_group_year')
         super().__init__(*args, **kwargs)
         try:
             event_perm = event_perms.generate_event_perm_creation_end_date_proposal(self.person)
             self.fields["end_year"].queryset = event_perm.get_academic_years()
+            self.fields["end_year"].initial = self.education_group_year.academic_year
         except ValueError:
             self.fields['end_year'].disabled = True
+
+    def clean_acronym(self):
+        acronym = self.education_group_year.acronym + self.cleaned_data["acronym"]
+        if EducationGroupVersion.objects.filter(version_name=acronym,
+                                                offer=self.education_group_year).exists():
+            raise ValidationError(_("Acronym already exists in %(academic_year)s") % {
+                    "academic_year": self.education_group_year.academic_year})
+        return acronym.upper()
 
     def save(self, education_group_year):
         version_standart = EducationGroupVersion.objects.get(
