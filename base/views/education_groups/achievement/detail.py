@@ -38,6 +38,9 @@ class EducationGroupSkillsAchievements(EducationGroupGenericDetailView):
     template_name = "education_group/tab_skills_achievements.html"
     cms_translated_texts = None
 
+    def can_show_view(self):
+        return self.show_skills_and_achievements()
+
     def get_achievements(self):
         return self.object.educationgroupachievement_set.all().prefetch_related('educationgroupdetailedachievement_set')
 

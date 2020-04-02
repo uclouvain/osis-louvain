@@ -36,8 +36,8 @@
 {% endblock %}
 
 {% block modal_footer %}
-    <button type="hidden" class="btn btn-primary" onclick="submit_form_consolidate()">{% trans 'Yes' %}</button>
     <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
+    <button type="hidden" class="btn btn-primary" onclick="submit_form_consolidate()">{% trans 'Yes' %}</button>
 
     <script>
         function submit_form_consolidate(){

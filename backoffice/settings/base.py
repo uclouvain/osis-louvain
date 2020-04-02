@@ -78,7 +78,6 @@ INSTALLED_APPS = (
     'statici18n',
     'rest_framework',
     'rest_framework.authtoken',
-    'corsheaders',
     'bootstrap3',
     'ordered_model',
     'waffle',
@@ -110,7 +109,6 @@ class CustomLocaleMiddleware(LocaleMiddleware):
 MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'backoffice.settings.base.CustomLocaleMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -184,6 +182,8 @@ DATABASES = {
         'ATOMIC_REQUESTS':  os.environ.get('DATABASE_ATOMIC_REQUEST', 'True').lower() == 'true'
     },
 }
+
+AUTHENTICATION_BACKENDS = os.environ.get('AUTHENTICATION_BACKENDS', 'django.contrib.auth.backends.ModelBackend').split()
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.9/topics/i18n/
@@ -391,8 +391,6 @@ REST_FRAMEWORK = {
         'rest_framework.filters.SearchFilter',   # Search based on admin
     ),
 }
-CORS_ORIGIN_WHITELIST = os.environ.get('CORS_ORIGIN_WHITELIST', '').split()
-CORS_ALLOW_CREDENTIALS = os.environ.get('CORS_ALLOW_CREDENTIALS', 'False').lower() == 'true'
 
 # ESB Configuration
 ESB_API_URL = os.environ.get('ESB_API_URL')

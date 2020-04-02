@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import html
+import random
 from unittest import mock
 
 from django.test import TestCase
@@ -34,12 +35,17 @@ from attribution.tests.factories.attribution_charge_new import AttributionCharge
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
+from base.models.enums import education_group_types
+from base.models.enums.education_group_types import GroupType, TrainingType
+from base.models.enums.education_group_categories import Categories
 from base.tests.factories.business.learning_units import GenerateContainer
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
@@ -53,10 +59,15 @@ from program_management.business.excel_ue_in_of import EducationGroupYearLearnin
     optional_header_for_session_derogation, optional_header_for_specifications, optional_header_for_teacher_list, \
     _fix_data, _get_workbook_for_custom_xls, _build_legend_sheet, LEGEND_WB_CONTENT, LEGEND_WB_STYLE, _optional_data, \
     _build_excel_lines_ues, _get_optional_data, BOLD_FONT, _build_specifications_cols, _build_description_fiche_cols, \
-    _build_validate_html_list_to_string
+    _build_validate_html_list_to_string, _build_gathering_content, _build_main_gathering_content
+from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
 from reference.tests.factories.language import LanguageFactory
+
+PARTIAL_ACRONYM = 'Partial'
+
+TITLE = 'Title'
 
 CMS_TXT_WITH_LIST = '<ol> ' \
                     '<li>La structure atomique de la mati&egrave;re</li> ' \
@@ -72,23 +83,54 @@ CMS_TXT_WITH_LINK_AFTER_FORMATTING = 'moodle - [https://moodleucl.uclouvain.be] 
 class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.education_group_year = EducationGroupYearFactory()
+        cls.education_group_yr_root = TrainingFactory(acronym='root')
+        academic_yr = cls.education_group_yr_root.academic_year
         cls.child_leaves = GroupElementYearChildLeafFactory.create_batch(
             2,
-            parent=cls.education_group_year,
+            parent=cls.education_group_yr_root,
             is_mandatory=True
         )
         for node, acronym in zip(cls.child_leaves, ["LCORS124" + str(i) for i in range(0, len(cls.child_leaves))]):
             node.child_leaf.acronym = acronym
             node.child_leaf.save()
+        cls.edy_node_1_training = TrainingFactory(academic_year=academic_yr,
+                                                  education_group_type__category=Categories.TRAINING.name,
+                                                  partial_acronym="{}_T".format(PARTIAL_ACRONYM),
+                                                  title="{}_T".format(TITLE))
+        cls.node_1 = GroupElementYearFactory(
+            child_branch=cls.edy_node_1_training, child_leaf=None, parent=cls.education_group_yr_root
+        )
+        cls.edy_node_1_1_group = EducationGroupYearFactory(academic_year=academic_yr,
+                                                           education_group_type__category=Categories.GROUP.name)
 
-        cls.luy_children = [child.child_leaf for child in cls.child_leaves]
+        cls.node_1_1 = GroupElementYearFactory(child_branch=cls.edy_node_1_1_group,
+                                               child_leaf=None,
+                                               parent=cls.edy_node_1_training)
+        cls.child_leave_node_11 = GroupElementYearChildLeafFactory(
+            parent=cls.edy_node_1_1_group, is_mandatory=True
+        )
+        cls.edy_node_1_1_1_group_type = EducationGroupYearFactory(academic_year=academic_yr,
+                                                                  education_group_type__category=Categories.GROUP.name)
+
+        cls.node_1_1_1_group = GroupElementYearFactory(child_branch=cls.edy_node_1_1_1_group_type, child_leaf=None,
+                                                       parent=cls.edy_node_1_1_group)
+        cls.child_leave_node_111 = GroupElementYearChildLeafFactory(
+            parent=cls.edy_node_1_1_1_group_type, is_mandatory=True
+        )
+
+        cls.luy_children_in_tree = [child.child_leaf for child in cls.child_leaves]
+        cls.luy_children_in_tree.append(cls.child_leave_node_11.child_leaf)
+        cls.luy_children_with_direct_gathering = cls.luy_children_in_tree.copy()
+        cls.luy_children_in_tree.append(cls.child_leave_node_111.child_leaf)
+
         cls.workbook_contains = \
-            EducationGroupYearLearningUnitsContainedToExcel(cls.education_group_year, CustomXlsForm({}))._to_workbook()
+            EducationGroupYearLearningUnitsContainedToExcel(cls.education_group_yr_root,
+                                                            cls.education_group_yr_root,
+                                                            CustomXlsForm({}))._to_workbook()
         cls.sheet_contains = cls.workbook_contains.worksheets[0]
 
-        generator_container = GenerateContainer(cls.education_group_year.academic_year,
-                                                cls.education_group_year.academic_year)
+        generator_container = GenerateContainer(cls.education_group_yr_root.academic_year,
+                                                cls.education_group_yr_root.academic_year)
         cls.luy = generator_container.generated_container_years[0].learning_unit_year_full
 
         cls.lecturing_component = LecturingLearningComponentYearFactory(
@@ -126,6 +168,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         cls.gey = GroupElementYearChildLeafFactory(
             child_leaf=cls.luy
         )
+        cls.hierarchy = EducationGroupHierarchy(root=cls.education_group_yr_root)
 
     def test_header_lines_without_optional_titles(self):
         custom_xls_form = CustomXlsForm({})
@@ -169,10 +212,20 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
 
     def test_fix_data(self):
         gey = self.child_leaves[0]
-        luy = self.luy_children[0]
-        expected = get_expected_data(gey, luy)
-        res = _fix_data(gey, luy)
+        luy = self.luy_children_in_tree[0]
+        expected = get_expected_data(gey, luy, self.education_group_yr_root)
+        res = _fix_data(gey, luy, self.hierarchy)
         self.assertEqual(res, expected)
+
+    def test_main_parent_result(self):
+        #  To find main gathering loop up through the hierarchy till you find
+        #  complementary module/formation/mini-formation
+        self.assertEqual(self.hierarchy.get_main_parent(self.education_group_yr_root.id), self.education_group_yr_root)
+        self.assertEqual(self.hierarchy.get_main_parent(self.edy_node_1_training.id), self.edy_node_1_training)
+        self.assertEqual(self.hierarchy.get_main_parent(self.edy_node_1_1_group.id), self.edy_node_1_training)
+
+    def test_main_parent_result_not_direct_parent(self):
+        self.assertEqual(self.hierarchy.get_main_parent(self.edy_node_1_1_1_group_type.id), self.edy_node_1_training)
 
     def test_legend_workbook_exists(self):
         wb = _get_workbook_for_custom_xls([['header'], [['row1 col1']]], True, {})
@@ -255,8 +308,10 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
 
     def test_data(self):
         custom_form = CustomXlsForm({})
-        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, custom_form)
-        data = _build_excel_lines_ues(custom_form, exl.learning_unit_years_parent)
+        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root,
+                                                              self.education_group_yr_root,
+                                                              custom_form)
+        data = _build_excel_lines_ues(custom_form, exl.learning_unit_years_parent, self.hierarchy)
         content = data.get('content')
         self._assert_content_equals(content, exl)
         # First line (Header line) is always bold
@@ -266,7 +321,11 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         idx = 1
         for gey in exl.learning_unit_years_parent:
             luy = gey.child_leaf
-            expected = get_expected_data(gey, luy)
+            if luy != self.child_leave_node_111.child_leaf and luy != self.child_leave_node_11.child_leaf:
+                expected = get_expected_data(gey, luy, gey.parent)
+            else:
+                # main_gathering different than direct parent
+                expected = get_expected_data(gey, luy, self.edy_node_1_training)
             self.assertListEqual(content[idx], expected)
             idx += 1
 
@@ -352,7 +411,9 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         optional_data['has_description_fiche'] = True
 
         custom_form = CustomXlsForm({'description_fiche': 'on'})
-        EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, custom_form)
+        EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root,
+                                                        self.education_group_yr_root,
+                                                        custom_form)
         self.assertTrue(mock.called)
 
     @mock.patch("program_management.business.excel_ue_in_of._annotate_with_description_fiche_specifications")
@@ -361,7 +422,9 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         optional_data['has_specifications'] = True
 
         custom_form = CustomXlsForm({'specifications': 'on'})
-        EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, custom_form)
+        EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root,
+                                                        self.education_group_yr_root,
+                                                        custom_form)
         self.assertTrue(mock.called)
 
     def test_build_description_fiche_cols(self):
@@ -436,15 +499,23 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
 
     def test_row_height_not_populated(self):
         custom_form = CustomXlsForm({})
-        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, custom_form)
-        data = _build_excel_lines_ues(custom_form, exl.qs)
+        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root,
+                                                              self.education_group_yr_root,
+                                                              custom_form)
+        data = _build_excel_lines_ues(custom_form, exl.qs, self.hierarchy)
         self.assertDictEqual(data.get('row_height'), {})
 
     def test_row_height_populated(self):
         custom_form = CustomXlsForm({'description_fiche': 'on'})
-        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, custom_form)
-        data = _build_excel_lines_ues(custom_form, exl.qs)
-        self.assertDictEqual(data.get('row_height'), {'height': 30, 'start': 2, 'stop': 4})
+        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root,
+                                                              self.education_group_yr_root,
+                                                              custom_form)
+        data = _build_excel_lines_ues(custom_form, exl.qs, self.hierarchy)
+        self.assertDictEqual(data.get('row_height'), {
+            'height': 30,
+            'start': 2,
+            'stop': len(self.luy_children_in_tree) + 2
+        })
 
     def test_html_list_to_string(self):
         ch = '''<head></head>
@@ -465,19 +536,103 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         self.assertEqual(res, "Introduire aux méthodes d'analyse")
 
     def test_keep_UES_tree_order_in_qs(self):
-        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_year, CustomXlsForm({}))
+        exl = EducationGroupYearLearningUnitsContainedToExcel(self.education_group_yr_root,
+                                                              self.education_group_yr_root,
+                                                              CustomXlsForm({}))
         expected_ids_following_tree_order = [lu.id for lu in exl.learning_unit_years_parent]
         ids_ordered_for_xls = [lu.id for lu in list(exl.qs)]
         self.assertCountEqual(expected_ids_following_tree_order, ids_ordered_for_xls)
 
+    def test_build_gathering_content(self):
+        self.assertEqual(_build_gathering_content(None), '')
+        self.assertEqual(_build_gathering_content(self.education_group_yr_root),
+                         "{} - {}".format(self.education_group_yr_root.partial_acronym,
+                                          self.education_group_yr_root.title))
 
-def get_expected_data(gey, luy):
+    def test_build_main_gathering_content_finality_master(self):
+        edg_finality = EducationGroupYearFactory(
+            education_group_type__name=random.choice(TrainingType.finality_types()),
+            partial_title='partial_title')
+        self.assertEqual(_build_main_gathering_content(edg_finality),
+                         "{} - {}".format(edg_finality.acronym, edg_finality.partial_title))
+
+    def test_build_main_gathering_content_not_master(self):
+        edg_not_a_finality = EducationGroupYearFactory(education_group_type__name=GroupType.COMMON_CORE.name)
+        self.assertEqual(_build_main_gathering_content(edg_not_a_finality),
+                         "{} - {}".format(edg_not_a_finality.acronym, edg_not_a_finality.title))
+
+
+class TestExcludeUEFromdWorkbook(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.root = TrainingFactory(
+            acronym='DROI2M',
+            education_group_type__name=education_group_types.TrainingType.PGRM_MASTER_120.name
+        )
+        academic_year = cls.root.academic_year
+        finality_list = GroupFactory(
+            acronym='LIST FINALITIES',
+            education_group_type__name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE.name,
+            academic_year=academic_year
+        )
+
+        cls.formation_master_md = TrainingFactory(
+            acronym='DROI2MD',
+            education_group_type__name=education_group_types.TrainingType.MASTER_MD_120.name,
+            academic_year=academic_year
+        )
+
+        common_core = GroupFactory(
+            acronym='TC DROI2MD',
+            education_group_type__name=education_group_types.GroupType.COMMON_CORE.name,
+            academic_year=academic_year
+        )
+        options = GroupFactory(
+            acronym='TC DROI2MD',
+            education_group_type__name=education_group_types.GroupType.OPTION_LIST_CHOICE.name,
+            academic_year=academic_year
+        )
+
+        cls.luy_in_common_core = LearningUnitYearFactory()
+        cls.luy_in_finality_options = LearningUnitYearFactory()
+
+        GroupElementYearFactory(parent=cls.root, child_branch=finality_list, child_leaf=None)
+        GroupElementYearFactory(parent=finality_list, child_branch=cls.formation_master_md, child_leaf=None)
+        GroupElementYearFactory(parent=cls.formation_master_md, child_branch=common_core, child_leaf=None)
+        GroupElementYearFactory(parent=cls.formation_master_md, child_branch=options, child_leaf=None)
+        GroupElementYearFactory(parent=common_core,
+                                child_leaf=cls.luy_in_common_core,
+                                child_branch=None)
+        GroupElementYearFactory(parent=options,
+                                child_leaf=cls.luy_in_finality_options,
+                                child_branch=None)
+
+    def test_exclude_options_list_for_2M(self):
+        self._assert_correct_ue_present_in_xls(self.root, [self.luy_in_common_core.id])
+
+    def test_do_not_exclude_options_list_if_not_2M(self):
+        self._assert_correct_ue_present_in_xls(self.formation_master_md,
+                                               [self.luy_in_common_core.id, self.luy_in_finality_options.id])
+
+    def _assert_correct_ue_present_in_xls(self, edy, expected_ue_ids_in_xls):
+        exl = EducationGroupYearLearningUnitsContainedToExcel(edy, edy, CustomXlsForm({}))
+        ue_ids_in_xls = [lu.child_leaf.id for lu in list(exl.qs)]
+        self.assertCountEqual(expected_ue_ids_in_xls, ue_ids_in_xls)
+
+
+def get_expected_data(gey, luy, main_gathering=None):
+    gathering_str = "{} - {}".format(gey.parent.partial_acronym, gey.parent.title)
+    if main_gathering:
+        main_gathering_str = "{} - {}".format(main_gathering.acronym, main_gathering.title)
+    else:
+        main_gathering_str = gathering_str
     expected = [luy.acronym,
                 luy.academic_year,
                 luy.complete_title_i18n,
                 luy.get_container_type_display(),
                 luy.get_subtype_display(),
-                "{} - {}".format(gey.parent.partial_acronym, gey.parent.title),
+                gathering_str,
+                main_gathering_str,
                 gey.block or '',
                 _('yes')
 

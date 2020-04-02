@@ -61,6 +61,7 @@ class GroupDetailSerializerTestCase(TestCase):
             'acronym',
             'code',
             'management_entity',
+            'management_faculty',
             'academic_year',
             'education_group_type',
             'education_group_type_text',

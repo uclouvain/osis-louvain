@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-03 13:02+0100\n"
+"POT-Creation-Date: 2020-03-16 13:52+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,6 +68,9 @@ msgstr "Valeur acceptée: %(justification_label_authorized)s "
 
 msgid "Acronym"
 msgstr "Acronyme"
+
+msgid "Acronym enrollment header"
+msgstr "Sigle"
 
 msgid "Add"
 msgstr "Ajouter"
@@ -232,8 +235,8 @@ msgid "If you try to put decimal values, it will be ignored."
 msgstr ""
 "Si vous tentez d'introduire des valeurs décimales,elles seront ignorées."
 
-msgid "Incomplete"
-msgstr "Incomplet"
+msgid "Include subordinate entities"
+msgstr ""
 
 msgid "Inject"
 msgstr "Injecter"
@@ -414,6 +417,9 @@ msgstr "Le noma ne corresond pas à l'adresse de messagerie"
 msgid "Registration number"
 msgstr "Noma"
 
+msgid "Registration number header"
+msgstr "Noma"
+
 msgid "Remove"
 msgstr "Retirer"
 
@@ -425,6 +431,9 @@ msgstr ""
 "Représente la quantité de notes soumises à l'administration. Le nombre "
 "entouré de parenthèses est le nombre de notes encodées par le tuteur qui "
 "n'ont pas encore été soumises (état 'brouillon')"
+
+msgid "Req. Entity"
+msgstr "Ent. charge"
 
 msgid ""
 "Reuse the address of an entity linked to the program or inform the posting "
@@ -501,6 +510,9 @@ msgid "Selected"
 msgstr "Sélectionné"
 
 msgid "Session"
+msgstr "Session"
+
+msgid "Session enrollment header"
 msgstr "Session"
 
 msgid "Session number"
@@ -592,6 +604,9 @@ msgstr "Tuteurs du cours"
 msgid "Type"
 msgstr "Type"
 
+msgid "Type of training"
+msgstr "Type de formation"
+
 msgid "UE title"
 msgstr "Intitulé de l'UE"
 
@@ -670,4 +685,3 @@ msgstr "programme(s)"
 
 msgid "score(s) saved"
 msgstr "note(s) sauvées"
-

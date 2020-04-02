@@ -60,7 +60,7 @@ def basic_titles_part_1():
         str(_('Quadrimester')),
         str(_('Session derogation')),
         str(_('Common title')),
-        str(_('English title proper')),
+        str(_('French title proper')),
         str(_('Common English title')),
         str(_('English title proper')),
         str(_('Req. Entities')),
@@ -75,8 +75,8 @@ def basic_titles_part_1():
 
 def basic_titles_part_2():
     return [
-        str(_("Faculty remark")),
-        str(_("Other remark")),
+        str(_("Faculty remark (unpublished)")),
+        str(_("Other remark (intended for publication)")),
         str(_("Team management")),
         str(_("Vacant")),
         str(_("Decision")),
@@ -86,7 +86,6 @@ def basic_titles_part_2():
 
 def components_titles():
     return [
-        "PM {}".format(_('code')),
         "PM {}".format(_('Vol. Q1')),
         "PM {}".format(_('Vol. Q2')),
         "PM {}".format(_('Vol. annual')),
@@ -96,16 +95,15 @@ def components_titles():
         "PM {}".format(_('Req. Entities')),
         "PM {}".format(_('Add. requ. ent. 1')),
         "PM {}".format(_('Add. requ. ent. 2')),
-        "PP {}".format(_('code')),
         "PP {}".format(_('Vol. Q1')),
         "PP {}".format(_('Vol. Q2')),
         "PP {}".format(_('Vol. annual')),
-        "PM {}".format(_('Real classes')),
-        "PM {}".format(_('Planned classes')),
+        "PP {}".format(_('Real classes')),
+        "PP {}".format(_('Planned classes')),
         "PP {}".format(_('Vol. global')),
         "PP {}".format(_('Req. Entities')),
-        "PM {}".format(_('Add. requ. ent. 1')),
-        "PM {}".format(_('Add. requ. ent. 2'))
+        "PP {}".format(_('Add. requ. ent. 1')),
+        "PP {}".format(_('Add. requ. ent. 2'))
     ]
 
 

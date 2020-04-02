@@ -1,0 +1,44 @@
+{% load i18n %}
+{% load format %}
+
+<div class="row" style="margin:0 -15px 5px; padding:0;">
+    <div class="col-md-1">
+        <ul class="pager">
+            {% if previous_url %}
+                <li class="previous">
+                    {% block previous_element_anchor %}
+
+                    {% endblock previous_element_anchor %}
+                </li>
+            {% else %}
+            <li class="previous disabled">
+                <a id="previousNavLink" data-toggle="tooltip" data-placement="top" title="">
+                    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+                </a>
+            </li>
+            {% endif %}
+        </ul>
+    </div>
+    <div class="col-md-10">
+        {% block title %}
+
+        {% endblock title %}
+    </div>
+    <div class="col-md-1">
+        <ul class="pager">
+            {% if next_url %}
+                <li class="next">
+                    {% block next_element_anchor %}
+
+                    {% endblock next_element_anchor %}
+                </li>
+            {% else %}
+                <li class="next disabled">
+                    <a id="nextNavLink" data-toggle="tooltip" data-placement="top" title="">
+                        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+                    </a>
+                </li>
+            {% endif %}
+        </ul>
+    </div>
+</div>

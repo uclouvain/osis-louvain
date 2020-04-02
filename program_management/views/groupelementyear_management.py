@@ -24,7 +24,6 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
 from django.shortcuts import redirect, get_object_or_404
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
@@ -33,11 +32,11 @@ from waffle.decorators import waffle_flag
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.utils.utils import get_object_or_none
 from base.utils.cache import ElementCache
 from base.views.common import display_success_messages
 from base.views.education_groups import perms
 from base.views.education_groups.select import get_clipboard_content_display, build_success_json_response
+from osis_common.utils.models import get_object_or_none
 
 
 @login_required

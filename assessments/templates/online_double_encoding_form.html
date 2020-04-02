@@ -2,7 +2,7 @@
 {% load l10n %}
 {% load i18n %}
 {% load sum %}
-{% load score_display enrollment_state %}
+{% load score_display enrollment_state score_justification_disabled_status %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -116,6 +116,7 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
+                        <th>{% trans 'Status' %}</th>
                         <th>{% trans 'Training' %}</th>
                         <th>{% trans 'Registration number' %}</th>
                         <th>{% trans 'Lastname' %}</th>
@@ -127,7 +128,25 @@
                 </thead>
                 <tbody>
                 {% for enrollment in enrollments %}
-                    <tr style="background-color:{% include 'blocks/row_color.html' %}">
+                    <tr style="background-color:
+                           {% if not is_program_manager and enrollment.deadline_tutor_reached %}
+                                #D3D3D3
+                           {% elif enrollment.deadline_reached %}
+                                #D3D3D3
+                           {% else %}
+                                {% include 'blocks/row_color.html' %}
+                           {% endif %}">
+                        <td style="text-align:center;">
+                            {% if enrollment.deadline_reached %}
+                                <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
+                            {% elif enrollment.deadline_tutor_reached and not is_program_manager %}
+                                <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
+                            {% endif %}
+
+                            {% if enrollment.score_final != None or enrollment.justification_final %}
+                                <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'Score submitted' %}"></span>
+                            {% endif %}
+                        </td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
                         <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|default_if_none:"" }}</td>
@@ -140,17 +159,10 @@
                             <input type="hidden" id="hdn_score_draft_{{ enrollment.id }}"
                                    value="{{ enrollment.score_draft | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores }}"/>
                             {% endif %}
+                            {% get_score_justification_disabled_status as disabled_score_status %}
                             <input type="text" min="0" max="20" name="score_{{enrollment.id}}" id="num_double_score_{{ enrollment.id }}"
                                    tabindex="{{ forloop.counter }}" class="form-control" value="{{enrollment.post_score_encoded|default_if_none:''}}"
-                                   {% if enrollment.enrollment_state != 'ENROLLED' %}
-                                        disabled
-                                   {% else %}
-                                       {% if not is_program_manager %}
-                                         {% if enrollment.score_final != None or enrollment.justification_final %}
-                                           disabled
-                                         {% endif %}
-                                       {% endif %}
-                                   {% endif %}>
+                                   {{ disabled_score_status }}>
                         </td>
                         <td>
                             {% if is_program_manager %}
@@ -160,15 +172,7 @@
                             {% endif %}
                             <select class="form-control" name="justification_{{ enrollment.id }}" id="slt_double_justification_score_{{ enrollment.id }}"
                                    tabindex="{{ enrollments|length|sum:forloop.counter }}"
-                                    {% if enrollment.enrollment_state != 'ENROLLED' %}
-                                        disabled
-                                    {% else %}
-                                        {% if not is_program_manager %}
-                                         {% if enrollment.score_final != None or enrollment.justification_final %}
-                                            disabled
-                                        {% endif %}
-                                    {% endif %}
-                                   {% endif %}>
+                                    {{ disabled_score_status }}>
                                 <option value=""></option>
                                 {% if is_program_manager %}
                                     <option value="ABSENCE_UNJUSTIFIED" {% if enrollment.post_justification_encoded == 'ABSENCE_UNJUSTIFIED' %}selected{% endif %} >{% trans 'Unjustified absence' %}</option>

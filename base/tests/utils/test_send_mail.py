@@ -39,12 +39,19 @@ from osis_common.models import message_template
 
 LEARNING_UNIT_YEARS_VARIABLE_PARAGRAPH_ = "<p>{{ learning_unit_years }}/p>"
 
+LANGUAGE_CODE_FR = 'fr-be'
+LANGUAGE_CODE_EN = 'en'
+
 
 class TestSendMessage(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person_1 = test_person.create_person("person_1", last_name="test", email="person1@test.com")
-        cls.person_2 = test_person.create_person("person_2", last_name="test", email="person2@test.com")
+        cls.person_1 = test_person.create_person(
+            "person_1", last_name="test", email="person1@test.com", language=LANGUAGE_CODE_FR
+        )
+        cls.person_2 = test_person.create_person(
+            "person_2", last_name="test", email="person2@test.com", language=LANGUAGE_CODE_EN
+        )
         cls.persons = [cls.person_1, cls.person_2]
 
         cls.person_3 = PersonWithPermissionsFactory("can_receive_emails_about_automatic_postponement")
@@ -157,18 +164,38 @@ class TestSendMessage(TestCase):
         self.assertCountEqual(args['template_base_data']['egys_postponed_qs'], [edgy_same_year, edgy_not_same_year])
 
     @patch("osis_common.messaging.send_message.send_messages")
-    def test_with_one_enrollment(self, mock_send_messages):
+    @patch("osis_common.messaging.message_config.create_table")
+    def test_with_one_enrollment(self, mock_create_table, mock_send_messages):
         send_mail.send_message_after_all_encoded_by_manager(
             self.persons,
             [self.exam_enrollment_1],
             self.learning_unit_year.acronym,
             self.offer_year.acronym
         )
+        args = mock_create_table.call_args[0]
+        self.assertEqual(args[0], 'enrollments')
+        self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers())
+        self.assertListEqual(
+            list(args[2][0]),
+            [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+             self.exam_enrollment_1.session_exam.number_session,
+             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
+             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
+             self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
+             self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
+             self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
+             ])
         args = mock_send_messages.call_args[0][0]
         self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_acronym'))
         self.assertEqual(self.offer_year.acronym, args.get('subject_data').get('offer_acronym'))
         self.assertEqual(len(args.get('receivers')), 2)
+        self.assertEqual(args.get('receivers')[0].get('receiver_lang'), LANGUAGE_CODE_FR)
+        self.assertEqual(args.get('receivers')[1].get('receiver_lang'), LANGUAGE_CODE_EN)
         self.assertIsNotNone(args.get('attachment'))
+        self.assertEqual(args.get('html_template_ref'),
+                         "{}_html".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
+        self.assertEqual(args.get('txt_template_ref'),
+                         "{}_txt".format(send_mail.ASSESSMENTS_ALL_SCORES_BY_PGM_MANAGER))
 
     @patch("osis_common.messaging.send_message.send_messages")
     def test_send_mail_for_educational_information_update(self, mock_send_messages):
@@ -179,6 +206,49 @@ class TestSendMessage(TestCase):
         self.assertEqual(len(args.get('receivers')), 1)
         self.assertEqual([self.learning_unit_year], args.get('template_base_data').get('learning_unit_years'))
 
+    @patch("osis_common.messaging.send_message.send_messages")
+    @patch("osis_common.messaging.message_config.create_table")
+    def test_send_mail_after_scores_submission(self, mock_create_table, mock_send_messages):
+        for person in self.persons:
+            send_mail.send_mail_after_scores_submission(
+                [person],
+                self.learning_unit_year.acronym,
+                [self.exam_enrollment_1],
+                True
+            )
+            args = mock_create_table.call_args[0]
+            self.assertEqual(args[0], 'submitted_enrollments')
+            self.assertCountEqual(list(args[1]), send_mail.get_enrollment_headers())
+            self.assertListEqual(
+                list(args[2][0]),
+                [self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.offer_year.acronym,
+                 self.exam_enrollment_1.session_exam.number_session,
+                 self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.registration_id,
+                 self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.last_name,
+                 self.exam_enrollment_1.learning_unit_enrollment.offer_enrollment.student.person.first_name,
+                 self.exam_enrollment_1.score_final if self.exam_enrollment_1.score_final else '',
+                 self.exam_enrollment_1.justification_final if self.exam_enrollment_1.justification_final else '',
+                 ])
+
+            args = mock_send_messages.call_args[0][0]
+            self.assertEqual(self.learning_unit_year.acronym, args.get('subject_data').get('learning_unit_name'))
+
+            self.assertEqual(len(args.get('receivers')), 1)
+            self.assertEqual(args.get('html_template_ref'),
+                             "{}_html".format(send_mail.ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE))
+            self.assertEqual(args.get('txt_template_ref'),
+                             "{}_txt".format(send_mail.ASSESSMENTS_SCORES_SUBMISSION_MESSAGE_TEMPLATE))
+            self.assertEqual(self.learning_unit_year.acronym, args.get('template_base_data').get('learning_unit_name'))
+
+    def test_get_encoding_status_not_all_encoded(self):
+        self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_EN, False), 'It remains notes to encode.')
+        self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_FR, False),
+                         'Il reste encore des notes à encoder.')
+
+    def test_get_encoding_status_all_encoded(self):
+        self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_EN, True), 'All the scores are encoded.')
+        self.assertEqual(send_mail._get_encoding_status(LANGUAGE_CODE_FR, True),
+                         'Toutes les notes ont été soumises.')
 
 def add_message_template_txt():
     msg_template = message_template.MessageTemplate(

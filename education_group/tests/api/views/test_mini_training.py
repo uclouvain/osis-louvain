@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import urllib.parse
 
 from django.conf import settings
 from django.test import RequestFactory
@@ -30,12 +31,15 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from base.models.enums import organization_type
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import MiniTrainingFactory
+from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer
+from education_group.api.views.mini_training import MiniTrainingList
 
 
 class MiniTrainingTitleTestCase(APITestCase):
@@ -43,9 +47,7 @@ class MiniTrainingTitleTestCase(APITestCase):
     def setUpTestData(cls):
         anac = AcademicYearFactory()
 
-        cls.egy = MiniTrainingFactory(
-            academic_year=anac,
-        )
+        cls.egy = MiniTrainingFactory(academic_year=anac)
 
         cls.person = PersonFactory()
         cls.url = reverse('education_group_api_v1:minitrainingstitle_read', kwargs={
@@ -85,14 +87,100 @@ class MiniTrainingTitleTestCase(APITestCase):
         self.assertEqual(response.data, serializer.data)
 
 
+class MiniTrainingListTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.entity_version = EntityVersionFactory(entity__organization__type=organization_type.MAIN)
+
+        cls.mini_trainings = []
+        for partial_acronym in ['LLOGO210O', 'NLOGO2101', 'WLOGO2102']:
+            cls.mini_trainings.append(
+                MiniTrainingFactory(
+                    partial_acronym=partial_acronym,
+                    academic_year=cls.academic_year,
+                    management_entity=cls.entity_version.entity,
+                )
+            )
+        cls.user = UserFactory()
+        cls.url = reverse('education_group_api_v1:' + MiniTrainingList.name)
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_not_authorized(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_method_not_allowed(self):
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_get_filter_by_multiple_education_group_type(self):
+        """
+        This test ensure that multiple filtering by education_group_type will act as an OR
+        """
+        url = self.url + "?" + urllib.parse.urlencode({
+            'education_group_type': [mini_training.education_group_type.name for mini_training in self.mini_trainings]
+        }, doseq=True)
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 3)
+
+    def test_get_filter_by_code(self):
+        url = self.url + "?" + urllib.parse.urlencode({
+            'code': self.mini_trainings[1].partial_acronym
+        })
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+        self.assertEqual(response.data['results'][0]['code'], self.mini_trainings[1].partial_acronym)
+
+    def test_get_filter_by_acronym(self):
+        url = self.url + "?" + urllib.parse.urlencode({
+            'acronym': self.mini_trainings[0].acronym
+        })
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 1)
+
+    def test_get_filter_from_year_to_year(self):
+        MiniTrainingFactory(academic_year__year=self.academic_year.year - 1)
+        MiniTrainingFactory(academic_year__year=self.academic_year.year + 1)
+
+        url = self.url + "?" + urllib.parse.urlencode({
+            'from_year': self.academic_year.year,
+            'to_year': self.academic_year.year
+        })
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 3)
+
+    def test_order_by_code_in_reverse(self):
+        url = self.url + "?" + urllib.parse.urlencode({
+            'ordering': '-code'
+        })
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 3)
+        self.assertEqual(response.data['results'][0]['code'], self.mini_trainings[2].partial_acronym)
+        self.assertEqual(response.data['results'][1]['code'], self.mini_trainings[1].partial_acronym)
+        self.assertEqual(response.data['results'][2]['code'], self.mini_trainings[0].partial_acronym)
+
+
 class GetMiniTrainingTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
-        cls.mini_training = MiniTrainingFactory(
-            partial_acronym='LGENR100I',
-            academic_year=cls.academic_year,
-        )
+        cls.mini_training = MiniTrainingFactory(partial_acronym='LGENR100I', academic_year=cls.academic_year)
 
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:mini_training_read', kwargs={

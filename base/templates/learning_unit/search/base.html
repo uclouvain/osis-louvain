@@ -222,7 +222,7 @@
                     "targets": 1,
                     "data": "acronym",
                     "render": function ( data, type, row, meta ) {
-                        return '<a href="'+ row['osis_url'] +'">'+ data + '</a>';
+                        return outputAnchorOuterHtml(row["osis_url"], data);
                     }
                 },
                 { "name": "title", "targets": 2, "data": "title"},

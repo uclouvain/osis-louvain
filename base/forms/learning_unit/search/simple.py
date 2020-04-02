@@ -35,6 +35,7 @@ from base.models.enums import quadrimesters, learning_unit_year_subtypes, active
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from base.views.learning_units.search.common import SearchTypes
 
 MOBILITY = 'mobility'
 MOBILITY_CHOICE = ((MOBILITY, _('Mobility')),)
@@ -76,7 +77,7 @@ class LearningUnitFilter(FilterSet):
         label=_('Tutor'),
     )
     quadrimester = filters.ChoiceFilter(
-        choices=quadrimesters.LEARNING_UNIT_YEAR_QUADRIMESTERS,
+        choices=quadrimesters.LearningUnitYearQuadrimester.choices(),
         required=False,
         field_name="quadrimester",
         label=_('Quadri'),
@@ -110,6 +111,13 @@ class LearningUnitFilter(FilterSet):
         method="filter_learning_unit_year_field",
         max_length=40,
         label=_('Title'),
+    )
+    search_type = filters.CharFilter(
+        field_name="acronym",
+        method=lambda request, *args, **kwargs: request,
+        widget=forms.HiddenInput,
+        required=False,
+        initial=SearchTypes.SIMPLE_SEARCH.value
     )
 
     order_by_field = 'ordering'

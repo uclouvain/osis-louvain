@@ -43,7 +43,7 @@ class TestGetLearningUnitExcel(TestCase):
         cls.url_is_prerequisite = reverse("education_group_learning_units_is_prerequisite_for",
                                           args=[cls.education_group_year.pk])
         cls.url_contains = reverse("education_group_learning_units_contains",
-                                   args=[cls.education_group_year.pk])
+                                   args=[cls.education_group_year.pk, cls.education_group_year.pk])
 
     def setUp(self):
         self.client.force_login(self.person.user)

@@ -77,3 +77,9 @@ class GroupGetUrlMixin:
 
 class GroupHyperlinkedIdentityField(GroupGetUrlMixin, serializers.HyperlinkedIdentityField):
     pass
+
+
+def get_entity(obj, entity_field):
+    entity_version = getattr(obj, entity_field + '_entity_version')
+    faculty_entity = entity_version and entity_version.find_faculty_version(obj.academic_year)
+    return faculty_entity.acronym if faculty_entity else None

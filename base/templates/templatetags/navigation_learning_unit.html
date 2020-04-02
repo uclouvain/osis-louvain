@@ -1,0 +1,18 @@
+{% extends "templatetags/navigation.html" %}
+
+{% block previous_element_anchor %}
+    <a id="previousNavLink" href="{{ previous_url }}" data-toggle="tooltip" data-placement="top" title="{{ previous_element_title }}">
+        <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
+    </a>
+{% endblock previous_element_anchor %}
+
+{% block title %}
+    <h2>{{ current_element.acronym|default_if_none:'' }} &mdash; {{ current_element.academic_year }}</h2>
+    <h4 style="margin-top: 0;">{{ current_element.complete_title }}</h4>
+{% endblock title %}
+
+{% block next_element_anchor %}
+    <a id="nextNavLink" href="{{ next_url }}" data-toggle="tooltip" data-placement="top" title="{{ next_element_title }}">
+        <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
+    </a>
+{% endblock next_element_anchor %}

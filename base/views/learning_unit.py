@@ -147,7 +147,7 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
             field_label, last_academic_year = form.save()
             display_success_messages(
                 request,
-                build_postponement_success_message(last_academic_year, learning_unit_year_id)
+                build_success_message(last_academic_year, learning_unit_year_id, form.postponement)
             )
         return HttpResponse()
     else:
@@ -174,7 +174,7 @@ def _get_cms_label_translated(cms_label, user_language):
     ).first().label
 
 
-def build_postponement_success_message(last_academic_year=None, learning_unit_year_id=None):
+def build_success_message(last_academic_year=None, learning_unit_year_id=None, with_postponement=False):
     default_msg = _("The learning unit has been updated")
     luy = LearningUnitYear.objects.get(id=learning_unit_year_id)
     proposal = ProposalLearningUnit.objects.filter(
@@ -187,13 +187,25 @@ def build_postponement_success_message(last_academic_year=None, learning_unit_ye
                 'year': last_academic_year
             }
         )
-    elif proposal:
+    elif proposal and proposal_is_on_same_year(proposal=proposal, base_luy=luy):
         msg = "{}. {}.".format(
             default_msg,
             _("The learning unit is in proposal, the report from %(proposal_year)s will be done at consolidation") % {
                 'proposal_year': proposal.learning_unit_year.academic_year
             }
         )
+    elif proposal and proposal_is_on_future_year(proposal=proposal, base_luy=luy) and with_postponement:
+        msg = _("The learning unit has been updated (the report has not been done from %(year)s because the "
+                "learning unit is in proposal).") % {
+                  'year': proposal.learning_unit_year.academic_year
+              }
+
+    elif proposal and proposal_is_on_future_year(proposal=proposal, base_luy=luy) and not with_postponement:
+        msg = "{} ({}).".format(
+            default_msg,
+            _("without postponement")
+        )
+
     else:
         msg = "{}.".format(default_msg)
 
@@ -504,3 +516,11 @@ def get_languages_settings():
         'LANGUAGE_CODE_FR': settings.LANGUAGE_CODE_FR,
         'LANGUAGE_CODE_EN': settings.LANGUAGE_CODE_EN
     }
+
+
+def proposal_is_on_future_year(proposal, base_luy):
+    return proposal.learning_unit_year.academic_year.year > base_luy.academic_year.year
+
+
+def proposal_is_on_same_year(proposal, base_luy):
+    return proposal.learning_unit_year.academic_year.year == base_luy.academic_year.year

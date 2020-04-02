@@ -23,12 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from django.utils.translation import gettext_lazy as _
 from django.utils.translation import pgettext_lazy
 
 from base.models.utils.utils import ChoiceEnum
 
 
+# TODO :: move the file into the domain ? And rename EducationGroupTypesEnum to NodeTypeEnum
 class EducationGroupTypesEnum(ChoiceEnum):
     pass
 
@@ -63,10 +66,14 @@ class TrainingType(EducationGroupTypesEnum):
     INTERNSHIP = pgettext_lazy("Internship for education group", "Internship")
 
     @classmethod
-    def finality_types(cls):
+    def finality_types(cls) -> List[str]:
+        return [enum.name for enum in cls.finality_types_enum()]
+
+    @classmethod
+    def finality_types_enum(cls) -> List[EducationGroupTypesEnum]:
         return [
-            cls.MASTER_MA_120.name, cls.MASTER_MD_120.name, cls.MASTER_MS_120.name,
-            cls.MASTER_MA_180_240.name, cls.MASTER_MD_180_240.name, cls.MASTER_MS_180_240.name
+            cls.MASTER_MA_120, cls.MASTER_MD_120, cls.MASTER_MS_120,
+            cls.MASTER_MA_180_240, cls.MASTER_MD_180_240, cls.MASTER_MS_180_240
         ]
 
     @classmethod
@@ -89,8 +96,12 @@ class TrainingType(EducationGroupTypesEnum):
         return cls.attestation_types() + cls.university_certificate_types()
 
     @classmethod
-    def root_master_2m_types(cls):
-        return [cls.PGRM_MASTER_120.name, cls.PGRM_MASTER_180_240.name]
+    def root_master_2m_types(cls) -> List[str]:
+        return [enum.name for enum in cls.root_master_2m_types_enum()]
+
+    @classmethod
+    def root_master_2m_types_enum(cls) -> List[EducationGroupTypesEnum]:
+        return [cls.PGRM_MASTER_120, cls.PGRM_MASTER_180_240]
 
     @classmethod
     def with_diploma_values_set_initially_as_true(cls):

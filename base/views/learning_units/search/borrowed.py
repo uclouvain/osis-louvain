@@ -27,9 +27,9 @@
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search.borrowed import BorrowedLearningUnitSearch
 from base.utils.search import RenderToExcel
-from base.views.learning_units.search.common import BORROWED_COURSE, _create_xls_with_parameters, \
+from base.views.learning_units.search.common import _create_xls_with_parameters, \
     _create_xls_attributions, _create_xls_comparison, _create_xls, \
-    BaseLearningUnitSearch, _create_xls_educational_specifications
+    BaseLearningUnitSearch, _create_xls_educational_specifications, SearchTypes
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
@@ -40,7 +40,7 @@ from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 @RenderToExcel("xls", _create_xls)
 class BorrowedLearningUnitSearch(BaseLearningUnitSearch):
     template_name = "learning_unit/search/base.html"
-    search_type = BORROWED_COURSE
+    search_type = SearchTypes.BORROWED_COURSE
     filterset_class = BorrowedLearningUnitSearch
     serializer_class = LearningUnitSerializer
 

@@ -1,6 +1,17 @@
 {% extends "learning_unit/identification.html" %}
 {% load i18n learning_unit bootstrap3 %}
 
+{% block header_content %}
+    <div class="row">
+        <div class="col-md-offset-1 col-md-10">
+            <h2>
+                {% block h2_title %}{{ learning_unit_year.acronym }} &mdash;
+                    {{ learning_unit_year.academic_year }}{% endblock %}
+            </h2>
+            <h4 style="margin-top: 0;">{{ learning_unit_year.complete_title }}</h4>
+        </div>
+    </div>
+{% endblock header_content %}
 
 {% block edit_academic_year %}
     <label style="margin-top:10px;">{% trans 'Start academic year' %}</label><br>

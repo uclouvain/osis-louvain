@@ -32,27 +32,24 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from education_group.api.serializers import utils
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.utils import MiniTrainingHyperlinkedIdentityField
 
 
-class MiniTrainingDetailSerializer(EducationGroupTitleSerializer, serializers.ModelSerializer):
+class MiniTrainingListSerializer(EducationGroupTitleSerializer, serializers.ModelSerializer):
     url = MiniTrainingHyperlinkedIdentityField(read_only=True)
-    code = serializers.CharField(source='partial_acronym', read_only=True)
+    code = serializers.CharField(source='partial_acronym')
     academic_year = serializers.SlugRelatedField(slug_field='year', queryset=AcademicYear.objects.all())
     education_group_type = serializers.SlugRelatedField(
         slug_field='name',
         queryset=EducationGroupType.objects.filter(category=education_group_categories.MINI_TRAINING),
     )
     management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
-    remark = serializers.SerializerMethodField()
-    campus = CampusDetailSerializer(source='main_teaching_campus', read_only=True)
+    management_faculty = serializers.SerializerMethodField()
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
-    constraint_type_text = serializers.CharField(source='get_constraint_type_display', read_only=True)
-    active_text = serializers.CharField(source='get_active_display', read_only=True)
-    schedule_type_text = serializers.CharField(source='get_schedule_type_display', read_only=True)
 
     class Meta(EducationGroupTitleSerializer.Meta):
         model = EducationGroupYear
@@ -60,10 +57,30 @@ class MiniTrainingDetailSerializer(EducationGroupTitleSerializer, serializers.Mo
             'url',
             'acronym',
             'code',
-            'management_entity',
-            'academic_year',
             'education_group_type',
             'education_group_type_text',
+            'academic_year',
+            'management_entity',
+            'management_faculty',
+        )
+
+    @staticmethod
+    def get_management_faculty(obj):
+        return utils.get_entity(obj, 'management')
+
+
+class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
+    remark = serializers.SerializerMethodField()
+    campus = CampusDetailSerializer(source='main_teaching_campus', read_only=True)
+
+    # Display human readable value
+    constraint_type_text = serializers.CharField(source='get_constraint_type_display', read_only=True)
+    active_text = serializers.CharField(source='get_active_display', read_only=True)
+    schedule_type_text = serializers.CharField(source='get_schedule_type_display', read_only=True)
+
+    class Meta(MiniTrainingListSerializer.Meta):
+        model = EducationGroupYear
+        fields = MiniTrainingListSerializer.Meta.fields + (
             'active',
             'active_text',
             'schedule_type',

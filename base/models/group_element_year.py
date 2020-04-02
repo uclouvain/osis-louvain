@@ -26,7 +26,6 @@
 import collections
 import itertools
 from collections import Counter
-from typing import List
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
@@ -42,12 +41,15 @@ from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models import education_group_year
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories, quadrimesters
-from base.models.enums.education_group_types import GroupType, MiniTrainingType, EducationGroupTypesEnum
+from base.models.enums import quadrimesters
+from base.models.enums.education_group_types import GroupType, MiniTrainingType, TrainingType
 from base.models.enums.link_type import LinkTypes
 from base.models.learning_component_year import LearningComponentYear, volume_total_verbose
 from base.models.learning_unit_year import LearningUnitYear
 from osis_common.models.osis_model_admin import OsisModelAdmin
+
+COMMON_FILTER_TYPES = [MiniTrainingType.OPTION.name]
+DEFAULT_ROOT_TYPES = TrainingType.get_names() + MiniTrainingType.get_names()
 
 
 class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
@@ -63,67 +65,12 @@ class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
     list_filter = ('is_mandatory', 'access_condition', 'parent__academic_year')
 
 
-SQL_RECURSIVE_QUERY_EDUCATION_GROUP = """\
-WITH RECURSIVE group_element_year_parent AS (
-
-    SELECT id, child_branch_id, child_leaf_id, parent_id, 0 AS level
-    FROM base_groupelementyear
-    WHERE parent_id IN (%s)
-
-    UNION ALL
-
-    SELECT child.id,
-           child.child_branch_id,
-           child.child_leaf_id,
-           child.parent_id,
-           parent.level + 1
-
-    FROM base_groupelementyear AS child
-    INNER JOIN group_element_year_parent AS parent on parent.child_branch_id = child.parent_id
-
-    )
-
-SELECT * FROM group_element_year_parent ;
-"""
-
-# TODO: Déplacer le code dans un Manager du modèle GroupElementYear
-SQL_RECURSIVE_QUERY_GET_TREE_FROM_CHILD = """
-WITH RECURSIVE group_element_year_parent_from_child_leaf AS (
-    SELECT  gey.id,
-            gey.child_branch_id,
-            gey.child_leaf_id,
-            gey.parent_id,
-            edyc.academic_year_id,
-            0 AS level
-    FROM base_groupelementyear gey
-    INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
-    WHERE child_leaf_id = %(child_leaf_id)s
-
-    UNION ALL
-
-    SELECT 	parent.id,
-            parent.child_branch_id,
-            parent.child_leaf_id,
-            parent.parent_id,
-            edyp.academic_year_id,
-            child.level + 1
-    FROM base_groupelementyear AS parent
-    INNER JOIN group_element_year_parent_from_child_leaf AS child on parent.child_branch_id = child.parent_id
-    INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
-)
-
-SELECT DISTINCT id, child_branch_id, child_leaf_id, parent_id, level
-FROM group_element_year_parent_from_child_leaf
-WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
-ORDER BY level DESC, id;
-"""
-
-
 def validate_block_value(value):
     max_authorized_value = 6
-    _error_msg = _("Please register a maximum of %(max_authorized_value)s digits in ascending order, "
-                   "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46") %\
-        {'max_authorized_value': max_authorized_value}
+    _error_msg = _(
+        "Please register a maximum of %(max_authorized_value)s digits in ascending order, "
+        "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46"
+    ) % {'max_authorized_value': max_authorized_value}
 
     MinValueValidator(1, message=_error_msg)(value)
     if not all([
@@ -154,6 +101,180 @@ class GroupElementYearManager(models.Manager):
         return super().get_queryset().filter(
             Q(child_branch__isnull=False) | Q(child_leaf__learning_container_year__isnull=False)
         )
+
+    def get_adjacency_list(self, root_elements_ids):
+        if not isinstance(root_elements_ids, list):
+            raise Exception('root_elements_ids must be an instance of list')
+        if not root_elements_ids:
+            return []
+
+        adjacency_query = """
+            WITH RECURSIVE
+                adjacency_query AS (
+                    SELECT
+                        parent_id as starting_node_id,
+                        id,
+                        child_branch_id,
+                        child_leaf_id,
+                        parent_id,
+                        "order",
+                        0 AS level,
+                        CAST(parent_id || '|' ||
+                            (
+                                CASE
+                                WHEN child_branch_id is not null
+                                    THEN child_branch_id
+                                    ELSE child_leaf_id
+                                END
+                            ) as varchar(1000)
+                        ) As path
+                    FROM base_groupelementyear
+                    WHERE parent_id IN (%s)
+
+                    UNION ALL
+
+                    SELECT parent.starting_node_id,
+                           child.id,
+                           child.child_branch_id,
+                           child.child_leaf_id,
+                           child.parent_id,
+                           child.order,
+                           parent.level + 1,
+                           CAST(
+                                parent.path || '|' ||
+                                    (
+                                        CASE
+                                        WHEN child.child_branch_id is not null
+                                            THEN child.child_branch_id
+                                            ELSE child.child_leaf_id
+                                        END
+                                    ) as varchar(1000)
+                               ) as path
+                    FROM base_groupelementyear AS child
+                    INNER JOIN adjacency_query AS parent on parent.child_branch_id = child.parent_id
+                )
+            SELECT * FROM adjacency_query
+            ORDER BY starting_node_id, level, "order";
+        """ % ','.join(["%s"] * len(root_elements_ids))
+
+        with connection.cursor() as cursor:
+            cursor.execute(adjacency_query, root_elements_ids)
+            return [
+                {
+                    'starting_node_id': row[0],
+                    'id': row[1],
+                    'child_branch_id': row[2],
+                    'child_leaf_id': row[3],
+                    'parent_id': row[4],
+                    'child_id': row[2] or row[3],
+                    'order': row[5],
+                    'level': row[6],
+                    'path': row[7],
+                } for row in cursor.fetchall()
+            ]
+
+    def get_reverse_adjacency_list(
+            self,
+            child_leaf_ids=None,
+            child_branch_ids=None,
+            academic_year_id=None,
+            link_type: LinkTypes = None
+    ):
+        if child_leaf_ids is None:
+            child_leaf_ids = []
+        if child_branch_ids is None:
+            child_branch_ids = []
+        if child_leaf_ids and not isinstance(child_leaf_ids, list):
+            raise Exception('child_leaf_ids must be an instance of list')
+        if child_branch_ids and not isinstance(child_branch_ids, list):
+            raise Exception('child_branch_ids must be an instance of list')
+        if not child_leaf_ids and not child_branch_ids:
+            return []
+
+        # TODO :: simplify the code (by using a param child_ids_instance=LearningUnitYear by default?)
+        where_statement_leaf = ""
+        if child_leaf_ids:
+            where_statement_leaf = "child_leaf_id in (%(child_ids)s)" % {
+                'child_ids': ','.join(["%s"] * len(child_leaf_ids))
+            }
+
+        where_statement_branch = ""
+        if child_branch_ids:
+            where_statement_branch = "child_branch_id in (%(child_ids)s)" % {
+                'child_ids': ','.join(["%s"] * len(child_branch_ids))
+            }
+
+        if child_leaf_ids and child_branch_ids:
+            where_statement = where_statement_leaf + ' OR ' + where_statement_branch
+        elif child_leaf_ids and not child_branch_ids:
+            where_statement = where_statement_leaf
+        else:
+            where_statement = where_statement_branch
+
+        reverse_adjacency_query = """
+            WITH RECURSIVE
+                reverse_adjacency_query AS (
+                    SELECT
+                        CASE
+                            WHEN gey.child_leaf_id is not null then gey.child_leaf_id
+                            ELSE gey.child_branch_id
+                        END as starting_node_id,
+                           gey.id,
+                           gey.child_branch_id,
+                           gey.child_leaf_id,
+                           gey.parent_id,
+                           gey.order,
+                           edyc.academic_year_id,
+                           0 AS level
+                    FROM base_groupelementyear gey
+                    INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
+                    WHERE %(where_statement)s
+                    AND (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
+
+                    UNION ALL
+
+                    SELECT 	child.starting_node_id,
+                            parent.id,
+                            parent.child_branch_id,
+                            parent.child_leaf_id,
+                            parent.parent_id,
+                            parent.order,
+                            edyp.academic_year_id,
+                            child.level + 1
+                    FROM base_groupelementyear AS parent
+                    INNER JOIN reverse_adjacency_query AS child on parent.child_branch_id = child.parent_id
+                    INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
+                )
+
+            SELECT distinct starting_node_id, id, child_branch_id, child_leaf_id, parent_id, "order", level
+            FROM reverse_adjacency_query
+            WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
+            ORDER BY starting_node_id,  level DESC, "order";
+        """ % {
+            'where_statement': where_statement,
+            'academic_year_id': "%s",
+            'link_type': '%s',
+        }
+        with connection.cursor() as cursor:
+            parameters = child_leaf_ids + child_branch_ids + [
+                link_type.name if link_type else None,
+                link_type.name if link_type else None,
+                academic_year_id,
+                academic_year_id
+            ]
+            cursor.execute(reverse_adjacency_query, parameters)
+            return [
+                {
+                    'starting_node_id': row[0],
+                    'id': row[1],
+                    'child_branch_id': row[2],
+                    'child_leaf_id': row[3],
+                    'parent_id': row[4],
+                    'child_id': row[2] or row[3],
+                    'order': row[5],
+                    'level': row[6],
+                } for row in cursor.fetchall()
+            ]
 
 
 class GroupElementYear(OrderedModel):
@@ -230,7 +351,7 @@ class GroupElementYear(OrderedModel):
 
     quadrimester_derogation = models.CharField(
         max_length=10,
-        choices=quadrimesters.DEROGATION_QUADRIMESTERS,
+        choices=quadrimesters.DerogationQuadrimester.choices(),
         blank=True, null=True, verbose_name=_('Quadrimester derogation')
     )
 
@@ -281,6 +402,7 @@ class GroupElementYear(OrderedModel):
         self.clean()
         return super().save(force_insert, force_update, using, update_fields)
 
+    # FIXME :: DEPRECATED ??? Move this to validators? (is a model validation - not a business validation?)
     def clean(self):
         if self.child_branch and self.child_leaf:
             raise ValidationError(_("It is forbidden to save a GroupElementYear with a child branch and a child leaf."))
@@ -297,6 +419,7 @@ class GroupElementYear(OrderedModel):
             )
         self._check_same_academic_year_parent_child_branch()
 
+    # FIXME :: DEPRECATED -  Use AttachOptionsValidator
     def _check_same_academic_year_parent_child_branch(self):
         if (self.parent and self.child_branch) and \
                 (self.parent.academic_year.year != self.child_branch.academic_year.year):
@@ -308,7 +431,7 @@ class GroupElementYear(OrderedModel):
     def _clean_link_type(self):
         if getattr(self.parent, 'type', None) in [GroupType.MINOR_LIST_CHOICE.name,
                                                   GroupType.MAJOR_LIST_CHOICE.name] and \
-           isinstance(self.child, EducationGroupYear) and self.child.type in MiniTrainingType.minors() + \
+                isinstance(self.child, EducationGroupYear) and self.child.type in MiniTrainingType.minors() + \
                 [MiniTrainingType.FSA_SPECIALITY.name, MiniTrainingType.DEEPENING.name]:
             self.link_type = LinkTypes.REFERENCE.name
 
@@ -319,19 +442,13 @@ class GroupElementYear(OrderedModel):
     def _verbose_credits(self):
         if self.relative_credits or self.child_branch.credits:
             return "{} ({} {})".format(
-                self.child.title, self.relative_credits or self.child_branch.credits or 0, _("credits")
+                self.child.verbose_title, self.relative_credits or self.child_branch.credits or 0, _("credits")
             )
         else:
-            return "{}".format(self.child.title)
+            return "{}".format(self.child.verbose_title)
 
 
-def find_learning_unit_roots(
-        objects,
-        return_result_params=None,
-        luy=None,
-        is_root_when_matches: List[EducationGroupTypesEnum] = None
-):
-    is_root_when_matches = [] if is_root_when_matches is None else is_root_when_matches
+def find_learning_unit_roots(objects, return_result_params=None, luy=None, recursive_conditions=None):
     if return_result_params is None:
         return_result_params = {}
     parents_as_instances = return_result_params.get('parents_as_instances', False)
@@ -351,13 +468,13 @@ def find_learning_unit_roots(
 
         parents_by_id = _build_parent_list_by_education_group_year_id(academic_year, luy)
 
-        roots_by_object_id = _find_related_formations(objects, parents_by_id, is_root_when_matches)
+        roots_by_object_id = _find_related_formations(objects, parents_by_id, recursive_conditions)
 
         if parents_as_instances:
             roots_by_object_id = _convert_parent_ids_to_instances(roots_by_object_id)
             if with_parents_of_parents:
                 flat_list_of_parents = _flatten_list_of_lists(roots_by_object_id.values())
-                roots_by_parent_id = _find_related_formations(flat_list_of_parents, parents_by_id, is_root_when_matches)
+                roots_by_parent_id = _find_related_formations(flat_list_of_parents, parents_by_id, recursive_conditions)
                 roots_by_parent_id = _convert_parent_ids_to_instances(roots_by_parent_id)
                 roots_by_object_id = {**roots_by_object_id, **roots_by_parent_id}
 
@@ -368,14 +485,13 @@ def _flatten_list_of_lists(list_of_lists):
     return list(set(itertools.chain.from_iterable(list_of_lists)))
 
 
-def _find_related_formations(objects, parents_by_id, is_root_when_matches: List[EducationGroupTypesEnum] = None):
-    is_root_when_matches = [] if is_root_when_matches is None else is_root_when_matches
+def _find_related_formations(objects, parents_by_id, recursive_conditions=None):
     if not objects:
         return {}
     if isinstance(objects[0], LearningUnitYear):
-        return {obj.id: _find_elements(parents_by_id, is_root_when_matches, child_leaf_id=obj.id) for obj in objects}
+        return {obj.id: _find_elements(parents_by_id, recursive_conditions, child_leaf_id=obj.id) for obj in objects}
     else:
-        return {obj.id: _find_elements(parents_by_id, is_root_when_matches, child_branch_id=obj.id) for obj in objects}
+        return {obj.id: _find_elements(parents_by_id, recursive_conditions, child_branch_id=obj.id) for obj in objects}
 
 
 def _build_parent_list_by_education_group_year_id(academic_year: AcademicYear = None, learning_unit_year=None):
@@ -448,48 +564,34 @@ def _build_child_key(child_branch=None, child_leaf=None):
     return '{branch_part}_{id_part}'.format(branch_part=branch_part, id_part=id_part)
 
 
-def _is_root_group_element_year(group_element_year):
-    root_categories = (education_group_categories.TRAINING, education_group_categories.MINI_TRAINING)
-    return group_element_year["parent__education_group_type__category"] in root_categories \
-        and group_element_year["parent__education_group_type__name"] != MiniTrainingType.OPTION.name
+def _is_root_group_element_year(group_element_year, recursive_conditions=None):
+    recursive_conditions = {'stop': [], 'continue': []} if recursive_conditions is None \
+        else recursive_conditions
+    filter_types = COMMON_FILTER_TYPES + recursive_conditions['continue']
+    return group_element_year["parent__education_group_type__name"] not in filter_types and \
+        group_element_year["parent__education_group_type__name"] in recursive_conditions['stop'] + DEFAULT_ROOT_TYPES
 
 
-def _is_root_group_element_year_or_is_root_when_matches(
-        group_element_year,
-        is_root_when_matches: List[EducationGroupTypesEnum] = None
-):
-    is_root_when_matches = [] if is_root_when_matches is None else is_root_when_matches
-    type_names = [egy_type.name for egy_type in is_root_when_matches]
-    is_root = _is_root_group_element_year(group_element_year)
-    return group_element_year["parent__education_group_type__name"] in type_names or is_root
-
-
-def _find_elements(
-        group_elements_by_child_id,
-        is_root_when_matches: List[EducationGroupTypesEnum] = None,
-        child_leaf_id=None,
-        child_branch_id=None
-):
-    is_root_when_matches = [] if is_root_when_matches is None else is_root_when_matches
+def _find_elements(group_elements_by_child_id, recursive_conditions=None, child_leaf_id=None, child_branch_id=None):
     roots = []
     unique_child_key = _build_child_key(child_leaf=child_leaf_id, child_branch=child_branch_id)
     group_elem_year_parents = group_elements_by_child_id.get(unique_child_key, [])
 
     for group_elem_year in group_elem_year_parents:
         parent_id = group_elem_year['parent']
-        if _is_root_group_element_year_or_is_root_when_matches(group_elem_year, is_root_when_matches):
+        if _is_root_group_element_year(group_elem_year, recursive_conditions):
             # If record matches any filter, we must stop mounting across the hierarchy.
             roots.append(parent_id)
         else:
             # Recursive call ; the parent_id becomes the child_branch.
             roots.extend(
-                _find_elements(group_elements_by_child_id, is_root_when_matches, child_branch_id=parent_id)
+                _find_elements(group_elements_by_child_id, recursive_conditions, child_branch_id=parent_id)
             )
 
     return list(set(roots))
 
 
-def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict:
+def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset, exclude_options=False) -> dict:
     if queryset.model != GroupElementYear:
         raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
 
@@ -500,41 +602,25 @@ def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset) -> dict
 
     group_elems_by_parent_id = {}  # Map {<EducationGroupYear.id>: [GroupElementYear, GroupElementYear...]}
     for group_elem_year in queryset:
+        if exclude_options and group_elem_year.child_branch and \
+                group_elem_year.child_branch.education_group_type.name == GroupType.OPTION_LIST_CHOICE.name:
+            if EducationGroupYear.hierarchy.filter(pk=group_elem_year.child_branch.pk).get_parents(). \
+                        filter(education_group_type__name__in=TrainingType.finality_types()).exists():
+                continue
         parent_id = group_elem_year.parent_id
         group_elems_by_parent_id.setdefault(parent_id, []).append(group_elem_year)
     return group_elems_by_parent_id
 
 
 def fetch_row_sql(root_ids):
-    with connection.cursor() as cursor:
-        cursor.execute(SQL_RECURSIVE_QUERY_EDUCATION_GROUP, root_ids)
-        return [
-            {
-                'id': row[0],
-                'child_branch_id': row[1],
-                'child_leaf_id': row[2],
-                'parent_id': row[3],
-                'level': row[4],
-            } for row in cursor.fetchall()
-        ]
+    return GroupElementYear.objects.get_adjacency_list(root_ids)
 
 
 def fetch_row_sql_tree_from_child(child_leaf_id: int, academic_year_id: int = None) -> list:
-    parameters = {
-        "child_leaf_id": child_leaf_id,
-        "academic_year_id": academic_year_id
-    }
-    with connection.cursor() as cursor:
-        cursor.execute(SQL_RECURSIVE_QUERY_GET_TREE_FROM_CHILD, parameters)
-        return [
-            {
-                'id': row[0],
-                'child_branch_id': row[1],
-                'child_leaf_id': row[2],
-                'parent_id': row[3],
-                'level': row[4],
-            } for row in cursor.fetchall()
-        ]
+    return GroupElementYear.objects.get_reverse_adjacency_list(
+        child_leaf_ids=[child_leaf_id],
+        academic_year_id=academic_year_id
+    )
 
 
 def get_or_create_group_element_year(parent, child_branch=None, child_leaf=None):

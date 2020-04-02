@@ -25,6 +25,7 @@
 ##############################################################################
 import itertools
 
+from django import forms
 from django.utils.translation import gettext_lazy as _
 from django_filters import filters
 
@@ -34,6 +35,7 @@ from base.models.entity_version import EntityVersion, build_current_entity_versi
 from base.models.enums import entity_type
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
+from base.views.learning_units.search.common import SearchTypes
 
 
 class BorrowedLearningUnitSearch(LearningUnitFilter):
@@ -41,6 +43,13 @@ class BorrowedLearningUnitSearch(LearningUnitFilter):
         method=lambda queryset, *args, **kwargs: queryset,
         max_length=20,
         label=_("Faculty borrowing")
+    )
+    search_type = filters.CharFilter(
+        field_name="acronym",
+        method=lambda request, *args, **kwargs: request,
+        widget=forms.HiddenInput,
+        required=False,
+        initial=SearchTypes.BORROWED_COURSE.value
     )
 
     def __init__(self, *args, **kwargs):

@@ -50,12 +50,12 @@ from base.models.enums.education_group_types import MiniTrainingType, TrainingTy
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.offer_enrollment_state import SUBSCRIBED, PROVISORY
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
-from base.models.utils.utils import get_object_or_none
 from base.models.validation_rule import ValidationRule
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
     SerializableQuerySet
+from osis_common.utils.models import get_object_or_none
 
 
 class EducationGroupYearAdmin(VersionAdmin, SerializableModelAdmin):

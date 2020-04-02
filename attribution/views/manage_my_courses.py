@@ -60,7 +60,7 @@ def list_my_attributions_summary_editable(request):
         messages.add_message(
             request,
             messages.INFO,
-            _('For the academic_year %(data_year)s, the summary edition period is ended since %(end_date)s.') % {
+            _('For the academic year %(data_year)s, the summary edition period is ended since %(end_date)s.') % {
                 "data_year": data_year,
                 "end_date": previous_opened_calendar.end_date.strftime('%d-%m-%Y'),
             }
@@ -70,7 +70,7 @@ def list_my_attributions_summary_editable(request):
             messages.add_message(
                 request,
                 messages.INFO,
-                _('For the academic_year %(data_year)s, the summary edition period will open on %(start_date)s.') % {
+                _('For the academic year %(data_year)s, the summary edition period will open on %(start_date)s.') % {
                     "data_year": next_opened_calendar.data_year,
                     "start_date": next_opened_calendar.start_date.strftime('%d-%m-%Y'),
                 }

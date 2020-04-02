@@ -52,6 +52,7 @@ def fetch_source_link(request_parameters, user):
     return source_link
 
 
+# FIXME :: DEPRECATED - Use AuthorizedRelationshipValidator from ddd instead
 def fetch_elements_selected(request_parameters, user):
     selected_data = _get_elements_selected(request_parameters, user)
 
@@ -78,6 +79,7 @@ def _get_elements_selected(request_parameters, user):
     return selected_data
 
 
+# FIXME :: DEPRECATED - Use AuthorizedRelationshipValidator from ddd instead
 def is_max_child_reached(parent, child_education_group_type):
     try:
         auth_rel = parent.education_group_type.authorized_parent_type.get(child_type__name=child_education_group_type)
@@ -121,6 +123,7 @@ def _compute_number_children_by_education_group_type(root, link=None, to_delete=
     )
 
 
+# FIXME :: DEPRECATED - Use AuthorizedRelationshipValidator from ddd instead
 class CheckAuthorizedRelationship:
     def __init__(self, parent, link_to_attach=None, link_to_detach=None):
         self.parent = parent
@@ -234,12 +237,14 @@ class CheckAuthorizedRelationship:
         return Counter(dict(children_type_count_qs))
 
 
+# FIXME :: DEPRECATED - Use AuthorizedRelationshipValidator from ddd instead
 class CheckAuthorizedRelationshipAttach(CheckAuthorizedRelationship):
     @property
     def errors(self):
         return self.max_reached_errors + self.not_authorized_errors
 
 
+# FIXME :: DEPRECATED - Use AuthorizedRelationshipValidator from ddd instead
 class CheckAuthorizedRelationshipDetach(CheckAuthorizedRelationship):
     @property
     def errors(self):

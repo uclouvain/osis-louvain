@@ -12,8 +12,8 @@ from base.models.person import Person
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from base.utils.search import RenderToExcel
 from base.views.common import display_messages_by_level
-from base.views.learning_units.search.common import PROPOSAL_SEARCH, _create_xls_proposal, \
-    _create_xls_proposal_comparison, BaseLearningUnitSearch
+from base.views.learning_units.search.common import _create_xls_proposal, \
+    _create_xls_proposal_comparison, BaseLearningUnitSearch, SearchTypes
 from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSerializer
 
 ACTION_BACK_TO_INITIAL = "back_to_initial"
@@ -25,7 +25,7 @@ ACTION_FORCE_STATE = "force_state"
 @RenderToExcel("xls_comparison", _create_xls_proposal_comparison)
 class SearchLearningUnitProposal(BaseLearningUnitSearch):
     template_name = "learning_unit/search/proposal.html"
-    search_type = PROPOSAL_SEARCH
+    search_type = SearchTypes.PROPOSAL_SEARCH
     filterset_class = ProposalLearningUnitFilter
     serializer_class = LearningUnitDetailedSerializer
 

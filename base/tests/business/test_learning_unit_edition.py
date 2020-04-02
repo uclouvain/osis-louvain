@@ -31,10 +31,8 @@ from django.forms import model_to_dict
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
-from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report, \
-    ConsistencyError
-from base.forms.utils.choice_field import NO_PLANNED_END_DISPLAY
 from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report
+from base.forms.utils.choice_field import NO_PLANNED_END_DISPLAY
 from base.models import academic_year
 from base.models import learning_unit_year as mdl_luy
 from base.models import teaching_material as mdl_teaching_material
@@ -822,7 +820,7 @@ class TestModifyLearningUnit(TestCase, LearningUnitsMixin):
             "internship_subtype": internship_subtypes.PROFESSIONAL_INTERNSHIP,
             "status": False,
             "session": learning_unit_year_session.SESSION_123,
-            "quadrimester": quadrimesters.Q2,
+            "quadrimester": quadrimesters.LearningUnitYearQuadrimester.Q2.name,
             "attribution_procedure": attribution_procedure.EXTERNAL,
             "language": self.other_language
         }

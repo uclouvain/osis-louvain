@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.http import QueryDict
 from django.test import TestCase
 
 from base.forms.education_groups import EducationGroupFilter
@@ -49,3 +49,13 @@ class TestEducationGroupTypeOrderingForm(TestCase):
             list(filter.form.fields["education_group_type"].queryset),
             [self.educ_grp_type_A, self.educ_grp_type_B, educ_grp_type_c, self.educ_grp_type_D]
         )
+
+
+class TestEducationGroupYearOrdering(TestCase):
+    def test_should_always_order_by_id(self):
+        search_parameters = QueryDict(mutable=True)
+        search_parameters["ordering"] = "title"
+
+        filter_form = EducationGroupFilter(search_parameters)
+        self.assertIn("id", filter_form.qs.query.order_by)
+

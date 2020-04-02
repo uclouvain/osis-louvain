@@ -35,6 +35,7 @@ from base.models.enums import active_status
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.organization_address import OrganizationAddress
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from base.views.learning_units.search.common import SearchTypes
 from reference.models.country import Country
 
 
@@ -83,6 +84,13 @@ class ExternalLearningUnitFilter(FilterSet):
         required=False,
         label=_("Institution"),
         help_text=_("Please select a country and a city first")
+    )
+    search_type = filters.CharFilter(
+        field_name="acronym",
+        method=lambda request, *args, **kwargs: request,
+        widget=forms.HiddenInput,
+        required=False,
+        initial=SearchTypes.EXTERNAL_SEARCH.value
     )
 
     order_by_field = 'ordering'

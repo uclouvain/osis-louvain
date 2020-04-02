@@ -31,7 +31,61 @@ from base.models.enums import organization_type
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import MiniTrainingFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer
+from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
+from education_group.api.views.mini_training import MiniTrainingList
+
+
+class MiniTrainingListSerializerTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.entity_version = EntityVersionFactory(
+            entity__organization__type=organization_type.MAIN
+        )
+
+        cls.mini_training = MiniTrainingFactory(
+            partial_acronym='LLOGO210O',
+            academic_year=cls.academic_year,
+            management_entity=cls.entity_version.entity,
+        )
+
+        url = reverse('education_group_api_v1:' + MiniTrainingList.name)
+        cls.serializer = MiniTrainingListSerializer(cls.mini_training, context={
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
+
+    def test_contains_expected_fields(self):
+        expected_fields = [
+            'title',
+            'url',
+            'acronym',
+            'code',
+            'education_group_type',
+            'education_group_type_text',
+            'academic_year',
+            'management_entity',
+            'management_faculty',
+        ]
+        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+    def test_ensure_academic_year_field_is_slugified(self):
+        self.assertEqual(
+            self.serializer.data['academic_year'],
+            self.academic_year.year
+        )
+
+    def test_ensure_education_group_type_field_is_slugified(self):
+        self.assertEqual(
+            self.serializer.data['education_group_type'],
+            self.mini_training.education_group_type.name
+        )
+
+    def test_ensure_code_is_an_alias_to_partial_acronym(self):
+        self.assertEqual(
+            self.serializer.data['code'],
+            self.mini_training.partial_acronym
+        )
 
 
 class MiniTrainingDetailSerializerTestCase(TestCase):
@@ -61,10 +115,11 @@ class MiniTrainingDetailSerializerTestCase(TestCase):
             'url',
             'acronym',
             'code',
-            'management_entity',
-            'academic_year',
             'education_group_type',
             'education_group_type_text',
+            'academic_year',
+            'management_entity',
+            'management_faculty',
             'active',
             'active_text',
             'schedule_type',

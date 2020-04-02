@@ -88,3 +88,11 @@ if hasattr(settings, 'QUEUES') and settings.QUEUES:
             callback=send_json_scores_sheets_to_response_queue,
             queue_name='SCORE_ENCODING_PDF_REQUEST'
         )
+
+    if 'continuing_education' in settings.INSTALLED_APPS:
+        from continuing_education.business.registration_queue import save_role_registered_in_admission
+
+        _listen_to_queue_with_callback(
+            callback=save_role_registered_in_admission,
+            queue_name='EPC_TO_IUFC'
+        )

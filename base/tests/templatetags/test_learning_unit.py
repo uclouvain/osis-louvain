@@ -227,7 +227,7 @@ class LearningUnitTagTest(TestCase):
             }
         }
 
-        expected_html = "<dl><dd  data-toggle=tooltip title='{} : {}' class='{}'  id='id_volume_q1'><p style='' " \
+        expected_html = "<dl><dd  data-toggle=tooltip title='{} : {}' class='{}'  id='id_volume_q1'><p class='' " \
                         "title=''>{}</p></dd></dl>". \
             format(LABEL_VALUE_BEFORE_PROPOSAL, OTHER_VOLUME, CSS_PROPOSAL_VALUE, VOLUME)
         self.assertEqual(

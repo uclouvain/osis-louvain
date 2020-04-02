@@ -23,20 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.http import JsonResponse
+import urllib
+
+from django.http import JsonResponse, QueryDict
 from django_filters.views import FilterView
 
 from base.templatetags import pagination
+from base.utils.cache import SearchParametersCache
 
 
 class SearchMixin:
     """
         Search Mixin to return FilterView filter result as json when accept header is of type application/json.
-        Also implements method to return number of items per page.
+        Implements method to return number of items per page.
+        Add possibility to cache search parameters
 
         serializer_class: class used to serialize the resulting queryset
     """
     serializer_class = None
+    cache_search = True
 
     def render_to_response(self, context, **response_kwargs):
         if "application/json" in self.request.headers.get("Accept", ""):
@@ -47,8 +52,18 @@ class SearchMixin:
                     'language': self.request.LANGUAGE_CODE
                 },
                 many=True)
-            return JsonResponse({'object_list': serializer.data})
+            return JsonResponse({
+                'object_list': serializer.data,
+                'total': context['paginator'].count,
+            })
         return super().render_to_response(context, **response_kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.cache_search:
+            SearchParametersCache(self.request.user, self.model.__name__).set_cached_data(self.request.GET)
+
+        return context
 
     def get_paginate_by(self, queryset):
         pagination.store_paginator_size(self.request)

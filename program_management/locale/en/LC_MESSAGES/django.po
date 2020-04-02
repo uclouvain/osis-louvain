@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-11 11:00+0100\n"
+"POT-Creation-Date: 2020-03-12 11:28+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -162,6 +162,9 @@ msgstr ""
 msgid "Cred. rel./abs."
 msgstr ""
 
+msgid "Direct gathering"
+msgstr ""
+
 #, python-format
 msgid "Element selected %(element)s"
 msgstr ""
@@ -191,7 +194,7 @@ msgstr ""
 msgid "Formation catalogue"
 msgstr ""
 
-msgid "Gathering"
+msgid "Include transition"
 msgstr ""
 
 #, python-format
@@ -220,6 +223,9 @@ msgstr ""
 msgid "Made in"
 msgstr ""
 
+msgid "Main gathering"
+msgstr ""
+
 msgid "Mandatory"
 msgstr ""
 
@@ -246,6 +252,9 @@ msgid "No result!"
 msgstr ""
 
 msgid "Non-mandatory"
+msgstr ""
+
+msgid "Offer"
 msgstr ""
 
 msgid "Official"
@@ -285,6 +294,9 @@ msgstr ""
 msgid "Other informations"
 msgstr ""
 
+msgid "Particular"
+msgstr ""
+
 msgid "Paste"
 msgstr ""
 
@@ -321,6 +333,15 @@ msgid "Registration form for the content of"
 msgstr ""
 
 msgid "Relative credits"
+msgstr ""
+
+msgid "Req. Entity"
+msgstr ""
+
+msgid "Requirement entity"
+msgstr ""
+
+msgid "Root group"
 msgstr ""
 
 msgid "Save"
@@ -421,10 +442,37 @@ msgstr ""
 msgid "Title"
 msgstr ""
 
+msgid "Title in English"
+msgstr ""
+
+msgid "Title in French"
+msgstr ""
+
 msgid "Trainings"
 msgstr ""
 
+msgid "Transformation"
+msgstr ""
+
+msgid "Transformation and modification"
+msgstr ""
+
+msgid "Transition"
+msgstr ""
+
+msgid "Tutors"
+msgstr ""
+
+msgid "Type"
+msgstr ""
+
 msgid "Utilizations"
+msgstr ""
+
+msgid "Version name"
+msgstr ""
+
+msgid "Volume"
 msgstr ""
 
 msgid "Yes"

@@ -23,8 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import OrderedDict
-
+from django.db.models import F
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
@@ -54,11 +53,6 @@ class LearningAchievementList(generics.GenericAPIView):
             learning_unit_year=learning_unit_year
         ).order_by('order').filter(
             language__code=language[:2].upper()
-        ).values('code_name', 'text')
-        learning_achievements_grouped = OrderedDict()
-        for learning_achievement in qs:
-            code_name = learning_achievement['code_name']
-            learning_achievements_grouped.setdefault(code_name, {'achievement': '', 'code_name': code_name})
-            learning_achievements_grouped[code_name]['achievement'] = learning_achievement['text']
-        serializer = self.get_serializer(learning_achievements_grouped.values(), many=True)
+        ).values('code_name', achievement=F('text'))
+        serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)

@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.contrib.auth.mixins import AccessMixin, ImproperlyConfigured
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 
@@ -31,6 +32,8 @@ from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from base.models.person import Person
+
+from waffle.models import Flag
 
 
 def can_create_education_group(view_func):
@@ -83,3 +86,27 @@ def can_change_admission_condition(view_func):
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
     return f_can_change_admission_condition
+
+
+class FlagNotAuthorized(AccessMixin):
+
+    flag_not_authorized = None
+
+    def get_flag_not_authorized(self):
+        if self.flag_not_authorized:
+            if isinstance(self.flag_not_authorized, str):
+                return Flag.objects.filter(name=self.flag_not_authorized).exists()
+            else:
+                raise ImproperlyConfigured(
+                    '{0} flag_not_authorized is not correctly defined'.format(self.__class__.__name__)
+                )
+
+            return False
+
+    def has_flag(self):
+        return self.get_flag_not_authorized()
+
+    def dispatch(self, request, *args, **kwargs):
+        if self.has_flag():
+            return self.handle_no_permission()
+        return super().dispatch(request, *args, **kwargs)

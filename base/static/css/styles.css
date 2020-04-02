@@ -1,8 +1,4 @@
-{% load static %}
-{% load i18n %}
-{% load format %}
-{% comment "License" %}
-* OSIS stands for Open Student Information System. It's an application
+/* OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
 * such as universities, faculties, institutes and professional schools.
 * The core business involves the administration of students, teachers,
@@ -23,10 +19,13 @@
 * A copy of this license - GNU General Public License - is available
 * at the root of the source code of this program.  If not,
 * see http://www.gnu.org/licenses/.
-{% endcomment %}
+*
+*/
 
-{% with learning_unit_year.academic_year|slugify as current_yr %}
-    {% with current_id=learning_unit_year.id local_storage_key=local_storage_key|default:"learningUnitIds" acronym=learning_unit_year.acronym complete_title=learning_unit_year.complete_title current_yr=current_yr %}
-        {% include "template_nav_header.html" %}
-    {% endwith %}
-{% endwith %}
+.font-italic {
+     font-style:italic;
+}
+
+.grey-color {
+    color: grey;
+}

@@ -97,13 +97,13 @@ msgstr ""
 
 #, python-format
 msgid ""
-"For the academic_year %(data_year)s, the summary edition period is ended "
+"For the academic year %(data_year)s, the summary edition period is ended "
 "since %(end_date)s."
 msgstr ""
 
 #, python-format
 msgid ""
-"For the academic_year %(data_year)s, the summary edition period will open "
+"For the academic year %(data_year)s, the summary edition period will open "
 "on %(start_date)s."
 msgstr ""
 

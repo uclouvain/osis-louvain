@@ -66,9 +66,9 @@ class TestProposalXls(TestCase):
 
     def setUp(self):
         self.l_unit_yr_1 = LearningUnitYearFactory(acronym="LBIR1212", learning_container_year=self.l_container_year,
-                                                  academic_year=self.academic_year,
-                                                  subtype=learning_unit_year_subtypes.FULL,
-                                                  credits=10)
+                                                   academic_year=self.academic_year,
+                                                   subtype=learning_unit_year_subtypes.FULL,
+                                                   credits=10)
         entity_requirement_ver = EntityVersionFactory(acronym=ACRONYM_REQUIREMENT,
                                                       entity=EntityFactory())
         self.l_unit_yr_1.entity_requirement = entity_requirement_ver.acronym
@@ -77,7 +77,7 @@ class TestProposalXls(TestCase):
         entity_vr = EntityVersionFactory(acronym='ESPO')
 
         self.proposal_1 = ProposalLearningUnitFactory(learning_unit_year=self.l_unit_yr_1,
-                                                     entity=entity_vr.entity)
+                                                      entity=entity_vr.entity)
         self._set_entities()
 
     def test_prepare_xls_content_no_data(self):
@@ -116,7 +116,7 @@ class TestProposalXls(TestCase):
                 str(_('Quadrimester')),
                 str(_('Session derogation')),
                 str(_('Common title')),
-                str(_('English title proper')),
+                str(_('French title proper')),
                 str(_('Common English title')),
                 str(_('English title proper')),
                 str(_('Req. Entities')),
@@ -133,8 +133,8 @@ class TestProposalXls(TestCase):
         self.assertEqual(
             basic_titles_part_2(),
             [
-                str(_("Faculty remark")),
-                str(_("Other remark")),
+                str(_("Faculty remark (unpublished)")),
+                str(_("Other remark (intended for publication)")),
                 str(_("Team management")),
                 str(_("Vacant")),
                 str(_("Decision")),
@@ -146,7 +146,6 @@ class TestProposalXls(TestCase):
         self.assertEqual(
             components_titles(),
             [
-                "PM {}".format(_('code')),
                 "PM {}".format(_('Vol. Q1')),
                 "PM {}".format(_('Vol. Q2')),
                 "PM {}".format(_('Vol. annual')),
@@ -156,16 +155,15 @@ class TestProposalXls(TestCase):
                 "PM {}".format(_('Req. Entities')),
                 "PM {}".format(_('Add. requ. ent. 1')),
                 "PM {}".format(_('Add. requ. ent. 2')),
-                "PP {}".format(_('code')),
                 "PP {}".format(_('Vol. Q1')),
                 "PP {}".format(_('Vol. Q2')),
                 "PP {}".format(_('Vol. annual')),
-                "PM {}".format(_('Real classes')),
-                "PM {}".format(_('Planned classes')),
+                "PP {}".format(_('Real classes')),
+                "PP {}".format(_('Planned classes')),
                 "PP {}".format(_('Vol. global')),
                 "PP {}".format(_('Req. Entities')),
-                "PM {}".format(_('Add. requ. ent. 1')),
-                "PM {}".format(_('Add. requ. ent. 2'))
+                "PP {}".format(_('Add. requ. ent. 1')),
+                "PP {}".format(_('Add. requ. ent. 2'))
             ]
         )
 

@@ -105,6 +105,7 @@ def _add_cms_title_fr_en(cms_labels, with_en=True):
 
 
 def get_html_to_text(text_to_convert):
+    text_to_convert = text_to_convert or ''
     return bleach.clean(html.unescape(text_to_convert),
                         strip=True, tags=CMS_ALLOWED_TAGS).lstrip()
 

@@ -74,8 +74,8 @@ class LearningUnitEndDateForm(forms.Form):
             )
 
         event_perm = self.get_event_perm_generator()(self.person)
-        luy_current_year = self.learning_unit_year.academic_year.year
-        academic_years = event_perm.get_academic_years(min_academic_y=luy_current_year, max_academic_y=max_year)
+        self.luy_current_year = self.learning_unit_year.academic_year.year
+        academic_years = event_perm.get_academic_years(min_academic_y=self.luy_current_year, max_academic_y=max_year)
 
         return academic_years
 
@@ -85,9 +85,23 @@ class LearningUnitEndDateForm(forms.Form):
 
 
 class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):
+    EMPTY_LABEL = None
+
+    def __init__(self, data, learning_unit_year, *args, max_year=None, person=None, **kwargs):
+        super().__init__(data, learning_unit_year, *args, max_year=max_year, person=person, **kwargs)
+        self.fields['academic_year'].widget.attrs['readonly'] = 'readonly'
+
     @classmethod
     def get_event_perm_generator(cls):
         return event_perms.generate_event_perm_creation_end_date_proposal
+
+    def _get_academic_years(self, max_year):
+        super()._get_academic_years(max_year)
+        # Allow previous year as last organisation year for suppression proposal
+        return AcademicYear.objects.filter(year=self.luy_current_year-1)
+
+    def clean_academic_year(self):
+        return AcademicYear.objects.get(year=self.luy_current_year-1)
 
 
 class LearningUnitDailyManagementEndDateForm(LearningUnitEndDateForm):

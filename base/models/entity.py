@@ -29,8 +29,8 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 
 from base.models.enums import entity_type
-from base.models.utils.utils import get_object_or_none
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
+from osis_common.utils.models import get_object_or_none
 
 
 class EntityAdmin(SerializableModelAdmin):

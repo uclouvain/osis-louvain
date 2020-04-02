@@ -27,9 +27,9 @@
 from base.forms.learning_unit.comparison import SelectComparisonYears
 from base.forms.learning_unit.search.service_course import ServiceCourseFilter
 from base.utils.search import RenderToExcel
-from base.views.learning_units.search.common import SERVICE_COURSES_SEARCH, _create_xls_with_parameters, \
+from base.views.learning_units.search.common import _create_xls_with_parameters, \
     _create_xls_attributions, \
-    _create_xls_comparison, _create_xls, BaseLearningUnitSearch, _create_xls_educational_specifications
+    _create_xls_comparison, _create_xls, BaseLearningUnitSearch, _create_xls_educational_specifications, SearchTypes
 from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 
 
@@ -40,7 +40,7 @@ from learning_unit.api.serializers.learning_unit import LearningUnitSerializer
 @RenderToExcel("xls", _create_xls)
 class ServiceCourseSearch(BaseLearningUnitSearch):
     template_name = "learning_unit/search/base.html"
-    search_type = SERVICE_COURSES_SEARCH
+    search_type = SearchTypes.SERVICE_COURSES_SEARCH
     filterset_class = ServiceCourseFilter
     serializer_class = LearningUnitSerializer
 

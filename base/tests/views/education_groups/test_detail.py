@@ -24,12 +24,14 @@
 #
 ##############################################################################
 import datetime
+import urllib
 from http import HTTPStatus
+from unittest import mock
 
 import reversion
 from django.contrib.auth.models import Group
 from django.contrib.auth.models import Permission
-from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseRedirect
+from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseRedirect, QueryDict
 from django.test import TestCase
 from django.urls import reverse
 
@@ -55,7 +57,7 @@ from base.tests.factories.person import PersonFactory, PersonWithPermissionsFact
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
 from base.utils.cache import ElementCache
-from base.views.education_groups.detail import CatalogGenericDetailView
+from base.views.education_groups.detail import CatalogGenericDetailView, EducationGroupGenericDetailView
 
 
 class EducationGroupRead(TestCase):
@@ -107,6 +109,11 @@ class EducationGroupRead(TestCase):
         )
         self.assertEqual(context["enums"], education_group_categories)
         self.assertEqual(context["parent"], self.education_group_parent)
+
+    @mock.patch.object(EducationGroupGenericDetailView, "show_identification")
+    def test_can_show_view_call_correct_function(self, mock_method):
+        self.client.get(self.url)
+        self.assertEqual(2, mock_method.call_count)
 
     def test_with_root_set(self):
         response = self.client.get(self.url, data={"root": self.education_group_parent.id})
@@ -464,6 +471,11 @@ class EducationGroupDiplomas(TestCase):
         self.assertEqual(context["education_group_year"], self.education_group_child)
         self.assertEqual(context["parent"], self.education_group_parent)
 
+    @mock.patch.object(EducationGroupGenericDetailView, "show_diploma")
+    def test_can_show_view_call_correct_function(self, mock_method):
+        self.client.get(self.url)
+        self.assertEqual(2, mock_method.call_count)
+
     def test_with_non_existent_root_id(self):
         non_existent_id = self.education_group_child.id + self.education_group_parent.id
         url = reverse("education_group_diplomas", args=[non_existent_id, self.education_group_child.pk])
@@ -538,16 +550,22 @@ class TestUtilizationTab(TestCase):
             ]
         )
 
-    def test_education_group_using_template_use(self):
+    def setUp(self):
         self.client.force_login(self.user)
+
+    def test_education_group_using_template_use(self):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, 'education_group/tab_utilization.html')
 
     def test_education_group_using_check_parent_list_with_group(self):
-        self.client.force_login(self.user)
         response = self.client.get(self.url)
         self.assertEqual(len(response.context_data['group_element_years']), 1)
         self.assertTemplateUsed(response, 'education_group/tab_utilization.html')
+
+    @mock.patch.object(EducationGroupGenericDetailView, "show_utilization")
+    def test_can_show_view_call_correct_function(self, mock_method):
+        self.client.get(self.url)
+        self.assertEqual(2, mock_method.call_count)
 
 
 class TestContent(TestCase):
@@ -615,6 +633,11 @@ class TestContent(TestCase):
         self.assertIn(self.group_element_year_2, geys)
         self.assertIn(self.group_element_year_3, geys)
         self.assertNotIn(self.group_element_year_without_container, geys)
+
+    @mock.patch.object(EducationGroupGenericDetailView, "show_content")
+    def test_can_show_view_call_correct_function(self, mock_method):
+        self.client.get(self.url)
+        self.assertEqual(2, mock_method.call_count)
 
     def test_show_minor_major_option_table_case_right_type(self):
         minor_major_option_types = [

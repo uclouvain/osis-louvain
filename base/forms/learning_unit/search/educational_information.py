@@ -23,17 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django import forms
 from django.db.models import OuterRef, Case, When, Value, Subquery, BooleanField
+from django_filters import filters
 
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY
 from base.forms.learning_unit.search.simple import LearningUnitFilter
 from base.models import entity_calendar
 from base.models.enums.academic_calendar_type import SUMMARY_COURSE_SUBMISSION
+from base.views.learning_units.search.common import SearchTypes
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 
 
 class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
+    search_type = filters.CharFilter(
+        field_name="acronym",
+        method=lambda request, *args, **kwargs: request,
+        widget=forms.HiddenInput,
+        required=False,
+        initial=SearchTypes.SUMMARY_LIST.value
+    )
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.form.fields['with_entity_subordinated'].initial = True

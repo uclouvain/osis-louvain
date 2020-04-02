@@ -33,10 +33,12 @@ from django.urls import reverse
 
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.enums import organization_type
+from base.models.enums.education_group_types import TrainingType
 from base.models.enums.publication_contact_type import PublicationContactType
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
-from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory
+from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory, \
+    EducationGroupYearMasterFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import CentralManagerFactory
@@ -55,7 +57,9 @@ class PublicationContactViewSetupTest(TestCase):
         cls.academic_year = create_current_academic_year()
         EducationGroupYearCommonFactory(academic_year=cls.academic_year)
 
-        cls.training = TrainingFactory(academic_year=cls.academic_year)
+        cls.training = EducationGroupYearMasterFactory(
+            academic_year=cls.academic_year,
+        )
         cls.publication_contact = EducationGroupPublicationContactFactory(
             education_group_year=cls.training,
             type=PublicationContactType.ACADEMIC_RESPONSIBLE.name

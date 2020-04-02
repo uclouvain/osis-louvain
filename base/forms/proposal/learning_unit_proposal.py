@@ -37,6 +37,7 @@ from base.models.enums.proposal_state import ProposalState, LimitedProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.proposal_learning_unit import ProposalLearningUnit
+from base.views.learning_units.search.common import SearchTypes
 
 
 def _get_sorted_choices(tuple_of_choices):
@@ -109,6 +110,13 @@ class ProposalLearningUnitFilter(FilterSet):
         choices=_get_sorted_choices(ProposalState.choices()),
         required=False,
         empty_label=pgettext_lazy("plural", "All"),
+    )
+    search_type = filters.CharFilter(
+        field_name="acronym",
+        method=lambda request, *args, **kwargs: request,
+        widget=forms.HiddenInput,
+        required=False,
+        initial=SearchTypes.PROPOSAL_SEARCH.value
     )
 
     order_by_field = 'ordering'

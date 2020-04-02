@@ -34,10 +34,10 @@ from base.business.learning_units.achievement import get_anchor_reference, DELET
 from base.forms.learning_achievement import LearningAchievementEditForm
 from base.models.learning_achievement import LearningAchievement, find_learning_unit_achievement
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.utils.utils import get_object_or_none
 from base.views.common import display_success_messages
-from base.views.learning_unit import learning_unit_specifications, build_postponement_success_message
+from base.views.learning_unit import learning_unit_specifications, build_success_message
 from base.views.learning_units import perms
+from osis_common.utils.models import get_object_or_none
 from reference.models.language import EN_CODE_LANGUAGE, FR_CODE_LANGUAGE
 
 
@@ -59,11 +59,11 @@ def operation(request, learning_achievement_id, operation_str):
     last_academic_year = execute_operation(filtered_achievements, operation_str)
     if last_academic_year and last_academic_year.year <= achievement_fr.learning_unit_year.academic_year.year:
         display_success_messages(
-            request, build_postponement_success_message(None, lu_yr_id)
+            request, build_success_message(None, lu_yr_id, False)
         )
     else:
         display_success_messages(
-            request, build_postponement_success_message(last_academic_year, lu_yr_id)
+            request, build_success_message(last_academic_year, lu_yr_id, True)
         )
 
     return HttpResponseRedirect(reverse(learning_unit_specifications,
@@ -206,9 +206,10 @@ def _save_and_redirect(request, form, learning_unit_year_id):
     achievement, last_academic_year = form.save()
     display_success_messages(
         request,
-        build_postponement_success_message(
+        build_success_message(
             last_academic_year,
-            learning_unit_year_id
+            learning_unit_year_id,
+            form.postponement
         )
     )
     return HttpResponse()

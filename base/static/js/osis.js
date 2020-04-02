@@ -143,30 +143,6 @@ var browser_supported_versions = {
     edge: 24
 };
 
-function setEventKeepIds(domTableId, localStorageKey) {
-    if (typeof localStorage != undefined) {
-        if (domTableId == undefined || localStorageKey == undefined) {
-            return;
-        }
-
-        var table = $('#' + domTableId)
-        if (table != undefined) {
-            table.on('init.dt order.dt', function () {
-                var orderList = [];
-                table.find('tr').each(function () {
-                    var id = $(this).attr('data-id');
-                    var value = $(this).attr('data-value');
-                    if (id != undefined) {
-                        orderList.push({'id': id, 'value': value});
-                    }
-                });
-                if (orderList.length > 0) {
-                    localStorage.setItem(localStorageKey, JSON.stringify(orderList));
-                }
-            });
-        }
-    }
-}
 
 function displayInfoMessage(jsonResponse, containerId) {
     let message_info_container = document.getElementById(containerId);
@@ -205,23 +181,17 @@ function getDataAjaxTable(formId, domTable, d, pageNumber) {
     });
 
      // Append ordering to querystring
-    let columnName = domTable.DataTable().settings().init().columnDefs[d.order[0]['column']].name;
-    let direction = (d.order[0]['dir'] == 'asc') ? '' : '-';
-    let ordering = direction + columnName;
-    queryString['ordering'] = ordering;
-    $('#id_ordering').val(ordering);
+    if (d.order.length) {
+        let columnName = domTable.DataTable().settings().init().columnDefs[d.order[0]['column']].name;
+        let direction = (d.order[0]['dir'] == 'asc') ? '' : '-';
+        let ordering = direction + columnName;
+        queryString['ordering'] = ordering;
+        $('#id_ordering').val(ordering);
+    }
 
     queryString['page'] = pageNumber;
     return queryString;
 }
-
-$(window).scroll(function() {
-    if (checkVisible($('.footer'))) {
-        $('.side-container').css("height", "calc(100% - 100px)");
-    } else {
-        $('.side-container').css("height", "calc(100% - 50px)");
-    }
-});
 
 function checkVisible( elm, eval ) {
     eval = eval || "visible";

@@ -32,6 +32,7 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, education_group_types
+from education_group.api.serializers import utils
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField
 from reference.models.language import Language
@@ -46,7 +47,9 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
         queryset=EducationGroupType.objects.filter(category=education_group_categories.TRAINING),
     )
     administration_entity = serializers.CharField(source='administration_entity_version.acronym', read_only=True)
+    administration_faculty = serializers.SerializerMethodField()
     management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
+    management_faculty = serializers.SerializerMethodField()
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
@@ -61,12 +64,22 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
             'education_group_type_text',
             'academic_year',
             'administration_entity',
+            'administration_faculty',
             'management_entity',
+            'management_faculty',
         )
+
+    @staticmethod
+    def get_administration_faculty(obj):
+        return utils.get_entity(obj, 'administration')
+
+    @staticmethod
+    def get_management_faculty(obj):
+        return utils.get_entity(obj, 'management')
 
 
 class TrainingListSerializer(TrainingBaseListSerializer):
-    partial_title = serializers.SerializerMethodField(read_only=True)
+    partial_title = serializers.SerializerMethodField()
 
     class Meta(TrainingBaseListSerializer.Meta):
         fields = TrainingBaseListSerializer.Meta.fields + (
@@ -112,7 +125,9 @@ class TrainingDetailSerializer(TrainingListSerializer):
     decree_category_text = serializers.CharField(source='get_decree_category_display', read_only=True)
     rate_code_text = serializers.CharField(source='get_rate_code_display', read_only=True)
     active_text = serializers.CharField(source='get_active_display', read_only=True)
-    remark = serializers.SerializerMethodField(read_only=True)
+    remark = serializers.SerializerMethodField()
+    domain_name = serializers.CharField(source='main_domain.parent.name', read_only=True)
+    domain_code = serializers.CharField(source='main_domain.code', read_only=True)
 
     class Meta(TrainingListSerializer.Meta):
         fields = TrainingListSerializer.Meta.fields + (
@@ -172,6 +187,8 @@ class TrainingDetailSerializer(TrainingListSerializer):
             'active_text',
             'enrollment_campus',
             'main_teaching_campus',
+            'domain_code',
+            'domain_name'
         )
 
     def get_remark(self, training):

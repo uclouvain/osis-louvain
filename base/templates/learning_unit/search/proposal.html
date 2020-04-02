@@ -86,7 +86,7 @@
                                     id="btn_modal_get_back_to_initial"
                                     data-toggle="modal" data-target="#modalBackToInitial"
                                     {% if not can_change_proposal_state %} disabled {% endif %}>
-                                {% trans 'Get back to initial data' %}
+                                {% trans 'Cancel proposal' %}
                             </button>
                             <button type="button" class="btn btn-default"
                                     id="btn_modal_consolidate"
@@ -152,7 +152,7 @@
                     "targets": 2,
                     "data": "acronym",
                     "render": function ( data, type, row, meta ) {
-                        return '<a href="'+ row['osis_url'] +'">'+ data + '</a>';
+                        return outputAnchorOuterHtml(row["osis_url"], data);
                     }
                 },
                 {

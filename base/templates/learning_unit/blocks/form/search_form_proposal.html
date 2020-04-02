@@ -26,6 +26,7 @@
 {% endcomment %}
 
 {% block search_form_row_1 %}
+    {% bootstrap_field form.search_type %}
     {% bootstrap_field form.academic_year form_group_class="col-md-2" %}
     {{ form.media }}
     <div class="col-md-2">

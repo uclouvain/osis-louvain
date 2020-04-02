@@ -38,6 +38,7 @@ INVALIDATE_CASE_JPG = static('img/education_group_year/invalidate_case.png')
 DELTA = static('img/education_group_year/delta.png')
 BISANNUAL_EVEN = static('img/education_group_year/bisannual_even.png')
 BISANNUAL_ODD = static('img/education_group_year/bisannual_odd.png')
+PREREQUIS = static('img/education_group_year/prerequis.gif')
 CHILD_BRANCH = """\
 <tr>
     <td style="padding-left:{padding}em;">
@@ -58,6 +59,7 @@ CHILD_LEAF = """\
         <div style="word-break: keep-all;">
             <img src="{icon_list_1}" height="14" width="17">
             <img src="{icon_list_2}" height="10" width="10">
+            <img src="{icon_list_5}" height="10" width="10">
             {value}
             <img src="{icon_list_3}" height="10" width="10">
             <img src="{icon_list_4}" height="10" width="10">
@@ -158,6 +160,7 @@ def append_output(item, output, padding, sublist):
                               icon_list_2=mandatory_picture,
                               icon_list_3=get_status_picture(item),
                               icon_list_4=get_biennial_picture(item),
+                              icon_list_5=get_prerequis_picture(item),
                               value=force_text(item.verbose),
                               comment=comment,
                               sublist=sublist,
@@ -203,6 +206,10 @@ def get_biennial_picture(item):
 
 def get_mandatory_picture(item):
     return MANDATORY_PNG if item.is_mandatory else OPTIONAL_PNG
+
+
+def get_prerequis_picture(item):
+    return PREREQUIS if item.has_prerequisite else None
 
 
 def get_case_picture(item):

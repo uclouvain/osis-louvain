@@ -23,14 +23,64 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
+from backoffice.settings.rest_framework.filters import OrderingFilterWithDefault
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_types import MiniTrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
-from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer
+from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
+
+
+class MiniTrainingFilter(filters.FilterSet):
+    from_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='gte')
+    to_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='lte')
+    code = filters.CharFilter(field_name="partial_acronym", lookup_expr='icontains')
+    education_group_type = filters.MultipleChoiceFilter(
+        field_name='education_group_type__name',
+        choices=MiniTrainingType.choices()
+    )
+
+    order_by_field = 'ordering'
+    ordering = OrderingFilterWithDefault(
+        fields=(
+            ('acronym', 'acronym'),
+            ('partial_acronym', 'code'),
+            ('academic_year__year', 'academic_year'),
+            ('title', 'title'),
+        ),
+        default_ordering=('-academic_year__year', 'acronym',)
+    )
+
+    class Meta:
+        model = EducationGroupYear
+        fields = ['acronym', 'code', 'education_group_type', 'title', 'title_english', 'from_year', 'to_year']
+
+
+class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
+    """
+       Return a list of all the mini_trainings with optional filtering.
+    """
+    name = 'minitraining_list'
+    queryset = EducationGroupYear.objects.filter(
+        education_group_type__category=education_group_categories.MINI_TRAINING
+    ).select_related('education_group_type', 'academic_year')\
+     .prefetch_related('management_entity__entityversion_set')\
+     .exclude(
+        acronym__icontains='common',
+     )
+    serializer_class = MiniTrainingListSerializer
+    filterset_class = MiniTrainingFilter
+    search_fields = (
+        'acronym',
+        'partial_acronym',
+        'title',
+        'title_english',
+    )
 
 
 class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):

@@ -128,6 +128,11 @@ class EducationGroupYearCommonBachelorFactory(EducationGroupYearFactory):
     )
 
 
+class EducationGroupYearBachelorFactory(EducationGroupYearCommonBachelorFactory):
+    acronym = 'actu1ba'
+    partial_acronym = 'actu1ba'
+
+
 class EducationGroupYearCommonAgregationFactory(EducationGroupYearFactory):
     acronym = 'common-2a'
     partial_acronym = 'common-2a'
