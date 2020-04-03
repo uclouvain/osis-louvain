@@ -31,6 +31,7 @@ from django.utils.translation import gettext_lazy as _
 from waffle.models import Flag
 
 from attribution.business.perms import _is_tutor_attributed_to_the_learning_unit
+from attribution.models.tutor_application import TutorApplication
 from base.business import event_perms
 from base.business.institution import find_summary_course_submission_dates_for_entity_version
 from base.models import proposal_learning_unit, tutor
@@ -60,6 +61,7 @@ MSG_ONLY_IF_YOUR_ARE_LINK_TO_ENTITY = _("You can only modify a learning unit whe
 MSG_LEARNING_UNIT_IS_OR_HAS_PREREQUISITE = _("You cannot delete a learning unit which is prerequisite or has "
                                              "prerequisite(s)")
 MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE = _("Person not in accordance with proposal state")
+MSG_LEARNING_UNIT_HAS_APPLICATION = _("This learning unit has application.")
 MSG_NOT_PROPOSAL_STATE_FACULTY = _("You are faculty manager and the proposal state is not 'Faculty', so you can't edit")
 MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL = _("You are not eligible to cancel proposal")
 MSG_NOT_ELIGIBLE_TO_EDIT_PROPOSAL = _("You are not eligible to edit proposal")
@@ -115,9 +117,21 @@ def is_eligible_for_modification_end_date(learning_unit_year, person, raise_exce
         check_lu_permission(person, 'base.can_edit_learningunit_date', raise_exception) and \
         is_year_editable(learning_unit_year, raise_exception) and \
         not (is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
+        _has_no_applications(learning_unit_year, raise_exception) and \
         is_eligible_for_modification(learning_unit_year, person, raise_exception) and \
-        _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person, raise_exception) and\
+        _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person, raise_exception) and \
         is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
+
+
+def _has_no_applications(learning_unit_year, raise_exception=False):
+    result = not TutorApplication.objects.filter(
+        learning_container_year=learning_unit_year.learning_container_year
+    ).exists()
+    can_raise_exception(
+        raise_exception, result,
+        MSG_LEARNING_UNIT_HAS_APPLICATION
+    )
+    return result
 
 
 def is_eligible_to_create_partim(learning_unit_year, person, raise_exception=False):
@@ -132,10 +146,10 @@ def is_eligible_to_create_partim(learning_unit_year, person, raise_exception=Fal
 def is_eligible_to_create_modification_proposal(learning_unit_year, person, raise_exception=False):
     result = \
         check_lu_permission(person, 'base.can_propose_learningunit', raise_exception) and \
-        not(is_learning_unit_year_in_past(learning_unit_year, person, raise_exception))and \
-        not(is_learning_unit_year_a_partim(learning_unit_year, person, raise_exception))and \
-        _is_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception)and \
-        not(is_learning_unit_year_in_proposal(learning_unit_year, person, raise_exception))and \
+        not(is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
+        not(is_learning_unit_year_a_partim(learning_unit_year, person, raise_exception)) and \
+        _is_container_type_course_dissertation_or_internship(learning_unit_year, person, raise_exception) and \
+        not(is_learning_unit_year_in_proposal(learning_unit_year, person, raise_exception)) and \
         is_person_linked_to_entity_in_charge_of_learning_unit(learning_unit_year, person) and \
         is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
     #  TODO detail why button is disabled
@@ -149,12 +163,33 @@ def is_eligible_to_create_modification_proposal(learning_unit_year, person, rais
 def is_eligible_for_cancel_of_proposal(proposal, person, raise_exception=False):
     result = \
         _is_person_in_accordance_with_proposal_state(proposal, person, raise_exception) and \
+        _is_not_proposal_of_type_with_applications(proposal, ProposalType.CREATION, raise_exception) and \
         _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception) and \
         _has_person_the_right_to_make_proposal(proposal, person, raise_exception) and \
         is_external_learning_unit_cograduation(proposal.learning_unit_year, person, raise_exception)
     can_raise_exception(
         raise_exception, result,
         MSG_NOT_ELIGIBLE_TO_CANCEL_PROPOSAL
+    )
+    return result
+
+
+def _is_person_in_accordance_with_proposal_state(proposal, person, raise_exception=False):
+    result = person.is_central_manager or proposal.state == ProposalState.FACULTY.name
+    can_raise_exception(
+        raise_exception, result,
+        MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE
+    )
+    return result
+
+
+def _is_not_proposal_of_type_with_applications(proposal, proposal_of_type, raise_exception=False):
+    result = proposal.type != proposal_of_type.name or not TutorApplication.objects.filter(
+        learning_container_year=proposal.learning_unit_year.learning_container_year
+    ).exists()
+    can_raise_exception(
+        raise_exception, result,
+        MSG_LEARNING_UNIT_HAS_APPLICATION
     )
     return result
 
@@ -183,6 +218,8 @@ def is_eligible_to_consolidate_proposal(proposal, person, raise_exception=False)
         msg = MSG_PROPOSAL_NOT_IN_CONSOLIDATION_ELIGIBLE_STATES
     elif not _is_attached_to_initial_or_current_requirement_entity(proposal, person, raise_exception):
         msg = MSG_CAN_EDIT_PROPOSAL_NO_LINK_TO_ENTITY
+    elif not _is_not_proposal_of_type_with_applications(proposal, ProposalType.SUPPRESSION, raise_exception):
+        msg = MSG_LEARNING_UNIT_HAS_APPLICATION
 
     result = False if msg else True
     can_raise_exception(
@@ -212,6 +249,7 @@ def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_e
     checked_ok = \
         check_lu_permission(person, 'base.can_delete_learningunit', raise_exception) and \
         _can_delete_learning_unit_year_according_type(learning_unit_year, person, raise_exception)
+
     if not checked_ok:
         msg = MSG_NOT_ELIGIBLE_TO_DELETE_LU
     elif not person.is_linked_to_entity_in_charge_of_learning_unit_year(learning_unit_year):
@@ -222,6 +260,8 @@ def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_e
                                          academic_year__year__lt=settings.YEAR_LIMIT_LUE_MODIFICATION):
         msg = _("You cannot delete a learning unit which is existing before %(limit_year)s") % {
             "limit_year": settings.YEAR_LIMIT_LUE_MODIFICATION}
+    elif not _has_no_applications(learning_unit_year, raise_exception):
+        msg = MSG_LEARNING_UNIT_HAS_APPLICATION
 
     result = False if msg else True
     can_raise_exception(
@@ -296,15 +336,6 @@ def _is_person_central_manager(_, person, raise_exception):
 
 def _is_learning_unit_year_a_partim(learning_unit_year, _, raise_exception=False):
     return learning_unit_year.is_partim()
-
-
-def _is_person_in_accordance_with_proposal_state(proposal, person, raise_exception=False):
-    result = person.is_central_manager or proposal.state == ProposalState.FACULTY.name
-    can_raise_exception(
-        raise_exception, result,
-        MSG_PERSON_NOT_IN_ACCORDANCE_WITH_PROPOSAL_STATE
-    )
-    return result
 
 
 def _has_person_the_right_to_make_proposal(_, person, raise_exception=False):
