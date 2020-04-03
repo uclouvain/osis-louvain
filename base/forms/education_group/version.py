@@ -32,11 +32,12 @@ from base.business import event_perms
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
 from base.models import academic_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
+from program_management.ddd.repositories import load_specific_version
 from program_management.models.education_group_version import EducationGroupVersion
 
 
 class SpecificVersionForm(forms.Form):
-    acronym = forms.CharField(max_length=15, required=True, label=_('Acronym of version'), widget=TextInput(attrs={
+    version_name = forms.CharField(max_length=15, required=True, label=_('Acronym of version'), widget=TextInput(attrs={
         'onchange': 'validate_version_name()'
     }))
     title = forms.CharField(max_length=100, required=False, label=_('Full title of the french version'))
@@ -55,13 +56,12 @@ class SpecificVersionForm(forms.Form):
         except ValueError:
             self.fields['end_year'].disabled = True
 
-    def clean_acronym(self):
-        acronym = self.education_group_year.acronym + self.cleaned_data["acronym"]
-        if EducationGroupVersion.objects.filter(version_name=acronym,
-                                                offer=self.education_group_year).exists():
+    def clean_version_name(self):
+        version_name = self.education_group_year.acronym + self.cleaned_data["version_name"]
+        if load_specific_version.check_existing_version(version_name, self.education_group_year.id):
             raise ValidationError(_("Acronym already exists in %(academic_year)s") % {
                 "academic_year": self.education_group_year.academic_year})
-        return acronym.upper()
+        return version_name.upper()
 
     def save(self, education_group_year):
         max_year = academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1).year
@@ -87,7 +87,7 @@ class SpecificVersionForm(forms.Form):
         new_groupyear.pk = None
         new_groupyear.save()
         new_education_group_version = EducationGroupVersion(
-            version_name=self.cleaned_data["acronym"],
+            version_name=self.cleaned_data["version_name"],
             title_fr=self.cleaned_data["title"],
             title_en=self.cleaned_data["title_english"],
             offer=education_group_year,

@@ -25,7 +25,7 @@
 {% endcomment %}
 
 <div class="modal-content">
-    <form class="form" method="POST" id="SpecificVersionForm" data-validate-url="{% url 'check_version_name' parent_id %}"
+    <form class="form" method="POST" id="SpecificVersionForm" data-validate-url="{% url 'check_version_name' education_group_year.id %}"
     action="{{ request.path }}">
         <div class="modal-header">
             <button type="button" class="close" data-dismiss="modal">×</button>
@@ -38,7 +38,7 @@
                     {% bootstrap_label form.acronym.label label_class="control-label" %}
                     <div class="acronym-group">
                         <div class="input-group">
-                            <span class="input-group-addon">{{parent.acronym}} [</span>
+                            <span class="input-group-addon">{{education_group_year.acronym}} [</span>
                             {% bootstrap_field form.acronym show_label=False %}
                             <span class="input-group-addon">]</span>
                         </div>

@@ -154,5 +154,6 @@ urlpatterns = [
                 name="publication_contact_delete"),
         ])),
     ])),
-    url(r'^check_version_name/(?P<parent_id>[0-9]+)$', create.check_version_name, name="check_version_name"),
+    url(r'^check_version_name/(?P<education_group_year_id>[0-9]+)$', create.check_version_name,
+        name="check_version_name"),
 ]

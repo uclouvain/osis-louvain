@@ -54,6 +54,7 @@ from base.views.education_groups.perms import can_create_education_group
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.decorators.ajax import ajax_required
 from osis_common.utils.models import get_object_or_none
+from program_management.ddd.repositories import load_specific_version
 from program_management.models.education_group_version import EducationGroupVersion
 
 FORMS_BY_CATEGORY = {
@@ -206,11 +207,7 @@ def validate_field(request, category, education_group_year_pk=None):
 def create_education_group_specific_version(request, root_id=None, education_group_year_id=None):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
     person = get_object_or_404(Person, user=request.user)
-    form_version = SpecificVersionForm(
-        request.POST or None,
-        person=person,
-        education_group_year=education_group_year
-    )
+    form_version = SpecificVersionForm(request.POST or None, person=person, education_group_year=education_group_year)
     if request.method == 'POST':
         if form_version.is_valid():
             form_version.save(education_group_year=education_group_year)
@@ -219,23 +216,18 @@ def create_education_group_specific_version(request, root_id=None, education_gro
                 'education_group_year_id': education_group_year_id
             })
             return redirect(redirect_url)
-    context = {
-        "form": form_version,
-        "parent": education_group_year,
-        "parent_id": education_group_year.id
-    }
+    context = {"form": form_version, "education_group_year": education_group_year}
     return render(request, "education_group/create_specific_version.html", context)
 
 
 @login_required
 @ajax_required
-def check_version_name(request, parent_id):
-    if not parent_id:
+def check_version_name(request, education_group_year_id):
+    if not education_group_year_id:
         raise HttpResponseNotFound
-    education_group_year = get_object_or_404(EducationGroupYear, pk=parent_id)
-    acronym = education_group_year.acronym+request.GET['acronym']
-    existing = EducationGroupVersion.objects.filter(
-        version_name=acronym,
-        offer=education_group_year).exists()
+    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+    version_name = education_group_year.acronym+request.GET['version_name']
+    existing = load_specific_version.check_existing_version(version_name, education_group_year_id)
+    # TODO: Validation de l'acronym
     valid = bool(re.match("^[A-Z]{0,15}$", request.GET['acronym'].upper()))
     return JsonResponse({'existing': existing, 'valid': valid}, safe=False)
