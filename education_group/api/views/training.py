@@ -92,7 +92,6 @@ class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
         version_name = self.kwargs.get('version_name', '')
-        print(version_name)
         evy = get_object_or_404(
             EducationGroupVersion.objects.filter(
                 offer__education_group_type__category=education_group_categories.TRAINING

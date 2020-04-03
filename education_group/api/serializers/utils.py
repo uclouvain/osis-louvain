@@ -35,23 +35,15 @@ class FlattenMixin:
                 serializer_class=self.__class__.__name__
             )
         )
-        print(obj)
         # Get the current object representation
         rep = super(FlattenMixin, self).to_representation(obj)
         # Iterate the specified related objects with their serializer
         for field, serializer_class in self.Meta.flatten:
             serializer = serializer_class(context=self.context)
-            print(serializer)
-            print(field)
-            print(getattr(obj, field))
             objrep = serializer.to_representation(getattr(obj, field))
-            # Include their fields, prefixed, in the current representation
+            # Include their fields in the current representation
             for key in objrep:
-                print(key)
-                if callable(objrep[key]):
-                    objrep[key] = objrep[key]()
-                rep[key] = objrep[key]
-                print('after')
+                rep[key] = objrep[key]() if callable(objrep[key]) else objrep[key]
         return rep
 
 
@@ -61,8 +53,9 @@ class TrainingGetUrlMixin:
 
     def get_url(self, obj, view_name, request, format):
         url_kwargs = {
-            'acronym': obj.acronym,
-            'year': obj.academic_year.year,
+            'acronym': obj.offer.acronym,
+            'year': obj.offer.academic_year.year,
+            'version_name': obj.version_name
         }
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 

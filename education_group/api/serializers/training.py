@@ -40,7 +40,7 @@ from reference.models.language import Language
 
 
 class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.HyperlinkedModelSerializer):
-    url = TrainingHyperlinkedIdentityField(read_only=True)
+    # url = TrainingHyperlinkedIdentityField(read_only=True)
     code = serializers.CharField(source='partial_acronym')
     academic_year = serializers.SlugRelatedField(slug_field='year', queryset=AcademicYear.objects.all())
     education_group_type = serializers.SlugRelatedField(
@@ -58,7 +58,7 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
     class Meta(EducationGroupTitleSerializer.Meta):
         model = EducationGroupYear
         fields = EducationGroupTitleSerializer.Meta.fields + (
-            'url',
+            # 'url',
             'acronym',
             'code',
             'education_group_type',
@@ -202,9 +202,12 @@ class EducationGroupYearSerializer(TrainingListSerializer):
 
 
 class TrainingDetailSerializer(FlattenMixin, serializers.HyperlinkedModelSerializer):
+    url = TrainingHyperlinkedIdentityField(read_only=True)
+
     class Meta:
         model = EducationGroupVersion
         flatten = [('offer', EducationGroupYearSerializer)]
         fields = (
+            'url',
             'version_name',
         )
