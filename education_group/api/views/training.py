@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.http import HttpResponseNotFound
+from django.http import Http404
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
@@ -62,7 +62,7 @@ class TrainingFilter(filters.FilterSet):
             offer__acronym__icontains='common'
         )
         if value not in allowed_types:
-            return HttpResponseNotFound()
+            raise Http404
         elif value == 'transition':
             return egvs.filter(is_transition=True)
         elif value == 'special':
