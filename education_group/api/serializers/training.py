@@ -34,7 +34,8 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, education_group_types
 from education_group.api.serializers import utils
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
-from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField
+from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField, FlattenMixin
+from program_management.models.education_group_version import EducationGroupVersion
 from reference.models.language import Language
 
 
@@ -100,7 +101,7 @@ class TrainingListSerializer(TrainingBaseListSerializer):
         return data
 
 
-class TrainingDetailSerializer(TrainingListSerializer):
+class EducationGroupYearSerializer(TrainingListSerializer):
     primary_language = serializers.SlugRelatedField(slug_field='code', queryset=Language.objects.all())
     enrollment_campus = CampusDetailSerializer()
     main_teaching_campus = CampusDetailSerializer()
@@ -130,6 +131,7 @@ class TrainingDetailSerializer(TrainingListSerializer):
     domain_code = serializers.CharField(source='main_domain.code', read_only=True)
 
     class Meta(TrainingListSerializer.Meta):
+        model = EducationGroupYear
         fields = TrainingListSerializer.Meta.fields + (
             'partial_deliberation',
             'admission_exam',
@@ -196,4 +198,13 @@ class TrainingDetailSerializer(TrainingListSerializer):
         return getattr(
             training,
             'remark' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
+        )
+
+
+class TrainingDetailSerializer(FlattenMixin, serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = EducationGroupVersion
+        flatten = [('offer', EducationGroupYearSerializer)]
+        fields = (
+            'version_name',
         )

@@ -39,6 +39,11 @@ urlpatterns = [
         TrainingDetail.as_view(),
         name=TrainingDetail.name
     ),
+    url(
+        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/| ]?[a-zA-Z]{1,2})?)/versions/(?P<version_name>[a-zA-Z]*)$',
+        TrainingDetail.as_view(),
+        name=TrainingDetail.name
+    ),
     url(r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/| ]?[a-zA-Z]{1,2})?)/', include([
         url(r'^tree$', TrainingTreeView.as_view(), name=TrainingTreeView.name),
         url(r'^title$', TrainingTitle.as_view(), name=TrainingTitle.name),

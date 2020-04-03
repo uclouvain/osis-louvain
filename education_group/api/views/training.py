@@ -32,6 +32,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
+from program_management.models.education_group_version import EducationGroupVersion
 
 
 class TrainingFilter(filters.FilterSet):
@@ -90,23 +91,28 @@ class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     def get_object(self):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
-        egy = get_object_or_404(
-            EducationGroupYear.objects.filter(
-                education_group_type__category=education_group_categories.TRAINING
+        version_name = self.kwargs.get('version_name', '')
+        print(version_name)
+        evy = get_object_or_404(
+            EducationGroupVersion.objects.filter(
+                offer__education_group_type__category=education_group_categories.TRAINING
             ).select_related(
-                'education_group_type',
-                'academic_year',
-                'main_teaching_campus',
-                'enrollment_campus',
-                'primary_language',
+                'offer',
+                'offer__education_group_type',
+                'offer__academic_year',
+                'offer__main_teaching_campus',
+                'offer__enrollment_campus',
+                'offer__primary_language',
             ).prefetch_related(
-                'administration_entity__entityversion_set',
-                'management_entity__entityversion_set',
+                'offer__administration_entity__entityversion_set',
+                'offer__management_entity__entityversion_set',
             ),
-            acronym__iexact=acronym,
-            academic_year__year=year
+            offer__acronym__iexact=acronym,
+            offer__academic_year__year=year,
+            version_name=version_name,
+            is_transition=False
         )
-        return egy
+        return evy
 
 
 class TrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):

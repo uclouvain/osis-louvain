@@ -27,6 +27,34 @@ from rest_framework import serializers
 from rest_framework.reverse import reverse
 
 
+class FlattenMixin:
+    """Flatens the specified related objects in this representation"""
+    def to_representation(self, obj):
+        assert hasattr(self.Meta, 'flatten'), (
+            'Class {serializer_class} missing "Meta.flatten" attribute'.format(
+                serializer_class=self.__class__.__name__
+            )
+        )
+        print(obj)
+        # Get the current object representation
+        rep = super(FlattenMixin, self).to_representation(obj)
+        # Iterate the specified related objects with their serializer
+        for field, serializer_class in self.Meta.flatten:
+            serializer = serializer_class(context=self.context)
+            print(serializer)
+            print(field)
+            print(getattr(obj, field))
+            objrep = serializer.to_representation(getattr(obj, field))
+            # Include their fields, prefixed, in the current representation
+            for key in objrep:
+                print(key)
+                if callable(objrep[key]):
+                    objrep[key] = objrep[key]()
+                rep[key] = objrep[key]
+                print('after')
+        return rep
+
+
 class TrainingGetUrlMixin:
     def __init__(self, **kwargs):
         super().__init__(view_name='education_group_api_v1:training_read', **kwargs)
@@ -34,7 +62,7 @@ class TrainingGetUrlMixin:
     def get_url(self, obj, view_name, request, format):
         url_kwargs = {
             'acronym': obj.acronym,
-            'year': obj.academic_year.year
+            'year': obj.academic_year.year,
         }
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
