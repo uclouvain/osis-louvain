@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.http import HttpResponseNotFound
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
@@ -39,12 +40,33 @@ class TrainingFilter(filters.FilterSet):
     from_year = filters.NumberFilter(field_name="offer__academic_year__year", lookup_expr='gte')
     to_year = filters.NumberFilter(field_name="offer__academic_year__year", lookup_expr='lte')
     in_type = filters.CharFilter(field_name="offer__education_group_type__name", lookup_expr='contains')
+    version_type = filters.CharFilter(method='filter_version_type')
 
     class Meta:
         model = EducationGroupVersion
         fields = [
-            'offer__acronym', 'offer__partial_acronym', 'offer__title', 'offer__title_english', 'from_year', 'to_year'
+            'offer__acronym', 'offer__partial_acronym', 'offer__title', 'offer__title_english',
+            'from_year', 'to_year',
+            'is_transition', 'version_name'
         ]
+
+    def filter_version_type(self, queryset, name, value):
+        allowed_types = ['standard', 'transition', 'special']
+        egvs = EducationGroupVersion.objects.filter(
+            offer__education_group_type__category=education_group_categories.TRAINING
+        ).select_related('offer__education_group_type', 'offer__academic_year').prefetch_related(
+            'offer__administration_entity__entityversion_set',
+            'offer__management_entity__entityversion_set'
+        ).exclude(
+            offer__acronym__icontains='common'
+        )
+        if value not in allowed_types:
+            return HttpResponseNotFound()
+        elif value == 'transition':
+            return egvs.filter(is_transition=True)
+        elif value == 'special':
+            return egvs.exclude(version_name='')
+        return queryset
 
 
 class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -56,8 +78,7 @@ class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
         offer__education_group_type__category=education_group_categories.TRAINING,
         version_name='',
         is_transition=False
-    ).select_related('offer__education_group_type', 'offer__academic_year')\
-        .prefetch_related(
+    ).select_related('offer__education_group_type', 'offer__academic_year').prefetch_related(
         'offer__administration_entity__entityversion_set',
         'offer__management_entity__entityversion_set'
     ).exclude(
@@ -70,6 +91,8 @@ class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
         'offer__partial_acronym',
         'offer__title',
         'offer__title_english',
+        'version_name',
+        'is_transition'
     )
     ordering_fields = (
         'offer__acronym',

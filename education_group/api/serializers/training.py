@@ -86,7 +86,8 @@ class TrainingListSerializer(FlattenMixin, serializers.HyperlinkedModelSerialize
         flatten = [('offer', TrainingBaseListSerializer)]
         fields = (
             'url',
-            'partial_title'
+            'partial_title',
+            'version_name'
         )
 
     def get_partial_title(self, version):
@@ -97,6 +98,7 @@ class TrainingListSerializer(FlattenMixin, serializers.HyperlinkedModelSerialize
         )
 
     def to_representation(self, instance):
+        print(instance)
         data = super().to_representation(instance)
         if instance.offer.education_group_type.name not in education_group_types.TrainingType.finality_types():
             data.pop('partial_title')
@@ -206,6 +208,4 @@ class EducationGroupYearSerializer(serializers.ModelSerializer):
 class TrainingDetailSerializer(TrainingListSerializer):
     class Meta(TrainingListSerializer.Meta):
         flatten = TrainingListSerializer.Meta.flatten + [('offer', EducationGroupYearSerializer)]
-        fields = TrainingListSerializer.Meta.fields + (
-            'version_name',
-        )
+        fields = TrainingListSerializer.Meta.fields
