@@ -33,14 +33,12 @@ from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, education_group_types
 from education_group.api.serializers import utils
-from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField, FlattenMixin
 from program_management.models.education_group_version import EducationGroupVersion
 from reference.models.language import Language
 
 
-class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.HyperlinkedModelSerializer):
-    # url = TrainingHyperlinkedIdentityField(read_only=True)
+class TrainingBaseListSerializer(FlattenMixin, serializers.HyperlinkedModelSerializer):
     code = serializers.CharField(source='partial_acronym')
     academic_year = serializers.SlugRelatedField(slug_field='year', queryset=AcademicYear.objects.all())
     education_group_type = serializers.SlugRelatedField(
@@ -55,10 +53,10 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
 
-    class Meta(EducationGroupTitleSerializer.Meta):
+    class Meta:
         model = EducationGroupYear
-        fields = EducationGroupTitleSerializer.Meta.fields + (
-            # 'url',
+        fields = (
+            'url',
             'acronym',
             'code',
             'education_group_type',
@@ -79,29 +77,33 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
         return utils.get_entity(obj, 'management')
 
 
-class TrainingListSerializer(TrainingBaseListSerializer):
+class TrainingListSerializer(FlattenMixin, serializers.HyperlinkedModelSerializer):
+    url = TrainingHyperlinkedIdentityField(read_only=True)
     partial_title = serializers.SerializerMethodField()
 
-    class Meta(TrainingBaseListSerializer.Meta):
-        fields = TrainingBaseListSerializer.Meta.fields + (
-            'partial_title',
+    class Meta:
+        model = EducationGroupVersion
+        flatten = [('offer', TrainingBaseListSerializer)]
+        fields = (
+            'url',
+            'partial_title'
         )
 
-    def get_partial_title(self, training):
+    def get_partial_title(self, version):
         language = self.context.get('language')
         return getattr(
-            training,
+            version.offer,
             'partial_title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
         )
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        if instance.education_group_type.name not in education_group_types.TrainingType.finality_types():
+        if instance.offer.education_group_type.name not in education_group_types.TrainingType.finality_types():
             data.pop('partial_title')
         return data
 
 
-class EducationGroupYearSerializer(TrainingListSerializer):
+class EducationGroupYearSerializer(serializers.ModelSerializer):
     primary_language = serializers.SlugRelatedField(slug_field='code', queryset=Language.objects.all())
     enrollment_campus = CampusDetailSerializer()
     main_teaching_campus = CampusDetailSerializer()
@@ -130,9 +132,9 @@ class EducationGroupYearSerializer(TrainingListSerializer):
     domain_name = serializers.CharField(source='main_domain.parent.name', read_only=True)
     domain_code = serializers.CharField(source='main_domain.code', read_only=True)
 
-    class Meta(TrainingListSerializer.Meta):
+    class Meta:
         model = EducationGroupYear
-        fields = TrainingListSerializer.Meta.fields + (
+        fields = (
             'partial_deliberation',
             'admission_exam',
             'funding',
@@ -201,13 +203,13 @@ class EducationGroupYearSerializer(TrainingListSerializer):
         )
 
 
-class TrainingDetailSerializer(FlattenMixin, serializers.HyperlinkedModelSerializer):
+class TrainingDetailSerializer(TrainingListSerializer, FlattenMixin, serializers.HyperlinkedModelSerializer):
     url = TrainingHyperlinkedIdentityField(read_only=True)
 
-    class Meta:
+    class Meta(TrainingListSerializer):
         model = EducationGroupVersion
         flatten = [('offer', EducationGroupYearSerializer)]
-        fields = (
+        fields = TrainingListSerializer.Meta.fields + (
             'url',
-            'version_name',
+            'version_name'
         )

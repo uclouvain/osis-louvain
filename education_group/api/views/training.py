@@ -50,14 +50,16 @@ class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
        Return a list of all the training with optional filtering.
     """
     name = 'training-list'
-    queryset = EducationGroupYear.objects.filter(
-        education_group_type__category=education_group_categories.TRAINING
-    ).select_related('education_group_type', 'academic_year')\
+    queryset = EducationGroupVersion.objects.filter(
+        offer__education_group_type__category=education_group_categories.TRAINING,
+        version_name='',
+        is_transition=False
+    ).select_related('offer__education_group_type', 'offer__academic_year')\
         .prefetch_related(
-        'administration_entity__entityversion_set',
-        'management_entity__entityversion_set'
+        'offer__administration_entity__entityversion_set',
+        'offer__management_entity__entityversion_set'
     ).exclude(
-        acronym__icontains='common'
+        offer__acronym__icontains='common'
     )
     serializer_class = TrainingListSerializer
     filterset_class = TrainingFilter
