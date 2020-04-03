@@ -36,13 +36,15 @@ from program_management.models.education_group_version import EducationGroupVers
 
 
 class TrainingFilter(filters.FilterSet):
-    from_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='gte')
-    to_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='lte')
-    in_type = filters.CharFilter(field_name="education_group_type__name", lookup_expr='contains')
+    from_year = filters.NumberFilter(field_name="offer__academic_year__year", lookup_expr='gte')
+    to_year = filters.NumberFilter(field_name="offer__academic_year__year", lookup_expr='lte')
+    in_type = filters.CharFilter(field_name="offer__education_group_type__name", lookup_expr='contains')
 
     class Meta:
-        model = EducationGroupYear
-        fields = ['acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year']
+        model = EducationGroupVersion
+        fields = [
+            'offer__acronym', 'offer__partial_acronym', 'offer__title', 'offer__title_english', 'from_year', 'to_year'
+        ]
 
 
 class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -64,20 +66,20 @@ class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     serializer_class = TrainingListSerializer
     filterset_class = TrainingFilter
     search_fields = (
-        'acronym',
-        'partial_acronym',
-        'title',
-        'title_english',
+        'offer__acronym',
+        'offer__partial_acronym',
+        'offer__title',
+        'offer__title_english',
     )
     ordering_fields = (
-        'acronym',
-        'partial_acronym',
-        'title',
-        'title_english',
+        'offer__acronym',
+        'offer__partial_acronym',
+        'offer__title',
+        'offer__title_english',
     )
     ordering = (
-        '-academic_year__year',
-        'acronym',
+        '-offer__academic_year__year',
+        'offer__acronym',
     )  # Default ordering
 
 
