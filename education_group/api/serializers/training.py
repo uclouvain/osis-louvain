@@ -33,6 +33,7 @@ from base.models.education_group_type import EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories, education_group_types
 from education_group.api.serializers import utils
+from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField, FlattenMixin
 from program_management.models.education_group_version import EducationGroupVersion
 from reference.models.language import Language
@@ -82,7 +83,7 @@ class TrainingListSerializer(FlattenMixin, serializers.HyperlinkedModelSerialize
 
     class Meta:
         model = EducationGroupVersion
-        flatten = [('offer', TrainingBaseListSerializer)]
+        flatten = [('offer', TrainingBaseListSerializer), ('offer', EducationGroupTitleSerializer)]
         fields = (
             'url',
             'partial_title'
