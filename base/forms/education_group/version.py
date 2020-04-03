@@ -30,14 +30,15 @@ from django.utils.translation import gettext_lazy as _
 
 from base.business import event_perms
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
-from base.models.academic_year import AcademicYear
+from base.models import academic_year
+from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from program_management.models.education_group_version import EducationGroupVersion
 
 
 class SpecificVersionForm(forms.Form):
     acronym = forms.CharField(max_length=15, required=True, label=_('Acronym of version'), widget=TextInput(attrs={
-                'onchange': 'validate_version_name()'
-            }))
+        'onchange': 'validate_version_name()'
+    }))
     title = forms.CharField(max_length=100, required=False, label=_('Full title of the french version'))
     title_english = forms.CharField(max_length=100, required=False, label=_('Full title of the english version'))
     end_year = forms.ModelChoiceField(queryset=AcademicYear.objects.none(), required=False,
@@ -48,7 +49,7 @@ class SpecificVersionForm(forms.Form):
         self.education_group_year = kwargs.pop('education_group_year')
         super().__init__(*args, **kwargs)
         try:
-            event_perm = event_perms.generate_event_perm_creation_end_date_proposal(self.person)
+            event_perm = event_perms.generate_event_perm_creation_specific_version(self.person)
             self.fields["end_year"].queryset = event_perm.get_academic_years()
             self.fields["end_year"].initial = self.education_group_year.academic_year
         except ValueError:
@@ -59,14 +60,30 @@ class SpecificVersionForm(forms.Form):
         if EducationGroupVersion.objects.filter(version_name=acronym,
                                                 offer=self.education_group_year).exists():
             raise ValidationError(_("Acronym already exists in %(academic_year)s") % {
-                    "academic_year": self.education_group_year.academic_year})
+                "academic_year": self.education_group_year.academic_year})
         return acronym.upper()
 
     def save(self, education_group_year):
-        version_standart = EducationGroupVersion.objects.get(
+        max_year = academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1).year
+        end_postponement = max_year if not self.cleaned_data['end_year'] else self.cleaned_data['end_year'].year
+        new_education_group_version = self._create_specific_version(education_group_year)
+        self._report_specific_version_creation(education_group_year, end_postponement)
+        return new_education_group_version
+
+    def _report_specific_version_creation(self, education_group_year, end_postponement):
+        education_group_year = education_group_year.next_year()
+        if education_group_year:
+            while education_group_year.academic_year.year <= end_postponement or not education_group_year:
+                self._create_specific_version(education_group_year)
+                education_group_year = education_group_year.next_year()
+                if not education_group_year:
+                    break
+
+    def _create_specific_version(self, education_group_year):
+        version_standard = EducationGroupVersion.objects.get(
             offer=education_group_year, version_name="", is_transition=False
         )
-        new_groupyear = version_standart.root_group
+        new_groupyear = version_standard.root_group
         new_groupyear.pk = None
         new_groupyear.save()
         new_education_group_version = EducationGroupVersion(

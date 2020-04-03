@@ -205,3 +205,24 @@ class EventPermSummaryCourseSubmission(EventPerm):
     model = LearningUnitYear
     event_reference = academic_calendar_type.SUMMARY_COURSE_SUBMISSION
     error_msg = _("Summary course submission is not allowed for tutors during this period.")
+
+
+def generate_event_perm_creation_specific_version(person, obj=None, raise_exception=True):
+    if person.is_central_manager:
+        return EventPermCreationSpecificVersionCentralManager(obj, raise_exception)
+    elif person.is_faculty_manager:
+        return EventPermCreationSpecificVersionFacultyManager(obj, raise_exception)
+    else:
+        return EventPermClosed(obj, raise_exception)
+
+
+class EventPermCreationSpecificVersionCentralManager(EventPerm):
+    model = LearningUnitYear
+    event_reference = academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_CENTRAL_MANAGERS
+    error_msg = _("Creation specific version not allowed for central managers during this period.")
+
+
+class EventPermCreationSpecificVersionFacultyManager(EventPerm):
+    model = LearningUnitYear
+    event_reference = academic_calendar_type.CREATION_OR_END_DATE_PROPOSAL_FACULTY_MANAGERS
+    error_msg = _("Creation specific version not allowed for faculty managers during this period.")
