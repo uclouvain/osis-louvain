@@ -46,11 +46,12 @@ class TrainingFilter(filters.FilterSet):
         model = EducationGroupVersion
         fields = [
             'offer__acronym', 'offer__partial_acronym', 'offer__title', 'offer__title_english',
-            'from_year', 'to_year',
+            'from_year', 'to_year', 'version_type',
             'is_transition', 'version_name'
         ]
 
-    def filter_version_type(self, queryset, name, value):
+    @staticmethod
+    def filter_version_type(queryset, name, value):
         allowed_types = ['standard', 'transition', 'special']
         egvs = EducationGroupVersion.objects.filter(
             offer__education_group_type__category=education_group_categories.TRAINING
@@ -66,7 +67,10 @@ class TrainingFilter(filters.FilterSet):
             return egvs.filter(is_transition=True)
         elif value == 'special':
             return egvs.exclude(version_name='')
-        return queryset
+        return queryset.filter(
+            is_transition=False,
+            version_name=''
+        )
 
 
 class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
