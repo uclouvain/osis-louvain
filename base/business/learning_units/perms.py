@@ -113,13 +113,13 @@ def is_eligible_for_modification(learning_unit_year, person, raise_exception=Fal
 
 
 def is_eligible_for_modification_end_date(learning_unit_year, person, raise_exception=False):
-    return \
-        check_lu_permission(person, 'base.can_edit_learningunit_date', raise_exception) and \
+    return check_lu_permission(person, 'base.can_edit_learningunit_date', raise_exception) and \
         is_year_editable(learning_unit_year, raise_exception) and \
         not (is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
         _has_no_applications(learning_unit_year, raise_exception) and \
         is_eligible_for_modification(learning_unit_year, person, raise_exception) and \
-        _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person, raise_exception) and \
+        _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person,
+                                                                       raise_exception) and \
         is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
 
 

@@ -827,6 +827,30 @@ class TestGetFinalityList(TestCase):
         self.assertCountEqual(node.get_finality_list(), list_finality)
 
 
+class TestPath(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.root = EducationGroupYearFactory(academic_year=cls.academic_year)
+        cls.group_element_year = GroupElementYearFactory(parent=cls.root, child_branch__academic_year=cls.academic_year)
+
+    def test_path_of_root_is_equal_to_minus_1(self):
+        node = EducationGroupHierarchy(self.root)
+        self.assertEqual(
+            node.path,
+            "{}".format(self.root.id)
+        )
+
+    def test_path_of_child_is_equal_to_parent_path_plus_parent_id(self):
+        node = EducationGroupHierarchy(self.root)
+        child = node.children[0]
+        self.assertEqual(
+            child.path,
+            "{}_{}".format(self.root.id, self.group_element_year.child_branch.id)
+        )
+
+
+
 class TestFetchGroupElementsBehindHierarchy(TestCase):
     """Unit tests on fetch_all_group_elements_behind_hierarchy()"""
     @classmethod
