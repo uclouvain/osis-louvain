@@ -34,6 +34,7 @@ from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer
 from education_group.api.serializers.learning_unit import LearningUnitYearPrerequisitesListSerializer
 from education_group.api.views.learning_unit import LearningUnitPrerequisitesList
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 class EducationGroupRootsListSerializerTestCase(TestCase):
@@ -45,18 +46,18 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
         )
+        cls.version = EducationGroupVersionFactory(offer=cls.training)
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
-        cls.serializer = EducationGroupRootsListSerializer(cls.training, context={
+        cls.serializer = EducationGroupRootsListSerializer(cls.version, context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
             })
 
     def test_contains_expected_fields(self):
         expected_fields = [
-            'title',
             'url',
             'acronym',
             'code',
@@ -69,6 +70,7 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             'education_group_type',
             'education_group_type_text',
             'academic_year',
+            'title'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 

@@ -47,7 +47,7 @@ class FlattenMixin:
         return rep
 
 
-class TrainingGetUrlMixin:
+class VersionGetUrlMixin:
     def __init__(self, **kwargs):
         super().__init__(view_name='education_group_api_v1:training_read', **kwargs)
 
@@ -60,11 +60,11 @@ class TrainingGetUrlMixin:
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
 
-class TrainingHyperlinkedIdentityField(TrainingGetUrlMixin, serializers.HyperlinkedIdentityField):
+class VersionHyperlinkedIdentityField(VersionGetUrlMixin, serializers.HyperlinkedIdentityField):
     pass
 
 
-class TrainingHyperlinkedRelatedField(TrainingGetUrlMixin, serializers.HyperlinkedRelatedField):
+class VersionHyperlinkedRelatedField(VersionGetUrlMixin, serializers.HyperlinkedRelatedField):
     pass
 
 
