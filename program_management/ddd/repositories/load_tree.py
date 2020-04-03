@@ -42,7 +42,24 @@ from program_management.models.education_group_version import EducationGroupVers
 from program_management.models.enums.node_type import NodeType
 from program_management.business.program_version import ProgramVersion
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
+from dal import autocomplete
+from django import forms
+from django.db.models import Case, When, Value, CharField, OuterRef, Subquery
+from django.db.models.functions import Concat
+from django.utils.translation import gettext_lazy as _, pgettext_lazy
+from django_filters import OrderingFilter, filters, FilterSet
 
+from base.business.entity import get_entities_ids
+from base.forms.utils.filter_field import filter_field_by_regex
+from base.models import entity_version
+from base.models.academic_year import AcademicYear, starting_academic_year
+from base.models.education_group_type import EducationGroupType
+from education_group.models.group_year import GroupYear
+from base.models.enums import education_group_categories
+from base.models.enums import education_group_types
+from base.models.enums.education_group_categories import Categories
+from django.db.models import Q
+from program_management.models.education_group_version import EducationGroupVersion
 
 GroupElementYearColumnName = str
 LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"
@@ -50,11 +67,12 @@ NodeKey = str  # <node_id>_<node_type> Example : "589_LEARNING_UNIT"
 TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 
-def load(tree_root_id: int, version_name, transition) -> 'ProgramTree':
+def load(tree_root_id: int, version_name, transition, year, acronym) -> 'ProgramTree':
     root_node = load_node.load_node_education_group_year(tree_root_id)
-    version = EducationGroupVersion.objects.filter(offer__pk=tree_root_id,
+    version = EducationGroupVersion.objects.filter(offer__acronym=acronym, offer__academic_year__year=year,
                                                    version_name=version_name,
                                                    is_transition=transition).first()
+
     structure = group_element_year.GroupElementYear.objects.get_adjacency_list([version.root_group.pk], tree_root_id)
     nodes = __load_tree_nodes(structure)
     nodes.update({'{}_{}'.format(root_node.pk, NodeType.EDUCATION_GROUP): root_node})
@@ -207,8 +225,11 @@ def __build_children(
     return children
 
 
-def find_all_program_tree_versions(tree_root_id: int) -> List['ProgramVersion']:
-    qs = EducationGroupVersion.objects.filter(offer__pk=tree_root_id)
+def find_all_program_tree_versions(acronym: str, year: int, load_tree: bool = True) -> List['ProgramTreeVersion']:
+    tree = None
+    qs = EducationGroupVersion.objects.filter(offer__acronym=acronym, offer__academic_year__year=year)\
+        .order_by('version_name')
+
     qs = qs.values('is_transition', 'version_name')
     results = []
     for elem in qs:

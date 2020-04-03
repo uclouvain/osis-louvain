@@ -1,0 +1,47 @@
+{% load i18n bootstrap3 %}
+{% load waffle_tags %}
+{% load feature_flag education_group %}
+
+{% comment "License" %}
+ * OSIS stands for Open Student Information System. It's an application
+ * designed to manage the core business of higher education institutions,
+ * such as universities, faculties, institutes and professional schools.
+ * The core business involves the administration of students, teachers,
+ * courses, programs and so on.
+ *
+ * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of this license - GNU General Public License - is available
+ * at the root of the source code of this program.  If not,
+ * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% features_or "education_group_create" as show_button %}
+{% if show_button %}
+    <button type="button" id="btn-action" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">
+        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {% trans 'Actions' %}
+        <span class="caret"></span>
+    </button>
+    <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
+        {% flag "education_group_create" %}
+            {% url 'select_education_group_type' enums.GROUP as create_group_url %}
+            {% url 'select_education_group_type' enums.TRAINING as create_training_url %}
+            {% url 'select_education_group_type' enums.MINI_TRAINING as create_mini_training_url %}
+
+            {% li_with_create_perm_group create_group_url _('New Education Group') %}
+            {% li_with_create_perm_training create_training_url _('New Training') %}
+            {% li_with_create_perm_mini_training create_mini_training_url _('New Mini-Training') %}
+        {% endflag %}
+    </ul>
+{% endif %}

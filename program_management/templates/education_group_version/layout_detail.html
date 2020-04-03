@@ -1,5 +1,5 @@
 {% extends "education_group_version/layout.html" %}
-{% load education_group format i18n static %}
+{% load education_group format i18n static dictionnary %}
 
 {% block title %}
     <title>OSIS - {{ education_group_year.acronym }} {{ learning_unit_year.acronym }}</title>
@@ -49,33 +49,44 @@
                     <span class="fa fa-bars" aria-hidden="true"></span>
                 </a>
 
-                {% if root == education_group_year %}
+                {% if offer == education_group_year %}
+                    {{ program_version_form.version_name }}
+                    {{ program_version_form.transition }}
                     <label>
                         <select class="form-control"
                                 name="academic_year"
                                 id="id_academic_year_search"
                                 onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
                             {% for edy in education_group_year.education_group.educationgroupyear_set.all %}
-                                <option value="{% url "education_group_read" edy.pk version_name transition %}"
-                                        {% if edy == education_group_year %} selected="selected" {% endif %}>
-                                    {{ edy.academic_year }}
-                                </option>
+                                    {% if program_version_form.version_name != '' %}
+                                        <option value="{% url "education_group_read" edy.pk program_version_form.version_name %}"
+                                                {% if edy == education_group_year %} selected="selected" {% endif %}>
+                                            {{ edy.academic_year }}
+                                        </option>
+                                    {% else %}
+                                        <option value="{% url "education_group_read" edy.pk %}"
+                                                {% if edy == education_group_year %} selected="selected" {% endif %}>
+                                            {{ edy.academic_year }}
+                                        </option>
+                                    {% endif %}
+
                             {% endfor %}
                         </select>
                     </label>
-                    {% if version_list %}
+                     {% if program_version_form.version_list_for_url %}
                      <label>
                         <select class="form-control"
                                 onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
-                            {% for version in version_list %}
-                                <option value="{% url 'education_group_read' version.offer version.version_name_url version.transition_url %}"
-                                {% if version.version_name_url == version_name and version.transition_url == transition %}selected="selected"{% endif %}>
-                                    {{ version.version_label }}
-                                </option>
+                            {% for version in program_version_form.version_list_for_url %}
+                                <option value="{{ version|get_item:'url' }}"
+                                {% if version|get_item:'selected' == "selected" %}
+                                            selected="selected"
+                                        {% endif %}>{{ version|get_item:'version_label' }}</option>
                             {% endfor %}
                         </select>
                         </label>
                     {% endif %}
+
                 {% endif %}
                 <div class="pull-right" style="margin-right: 15px;">
                     {% block top_action_bar %}
@@ -89,7 +100,7 @@
                     <div class="row" style="display:flex;">
                         <div class="col-md-12" style="height: 100%;">
                             {% block tabs %}
-                                {% include "education_group/tabs.html" %}
+                                {% include "education_group_version/tabs.html" %}
                             {% endblock %}
                             <br>
                             {% block details %}
@@ -120,7 +131,7 @@
         {% include "education_group/blocks/modal/custom_xls.html" %}
     {% endif %}
     <script>
-        const root_id = "{{ root_id }}";
+        const root_id = "{{ offer_id }}";
         const url_resolver_match = "{% url_resolver_match %}";
         const tree = JSON.parse('{{ tree | escapejs }}');
         const management_url = "{% url "education_groups_management" %}";

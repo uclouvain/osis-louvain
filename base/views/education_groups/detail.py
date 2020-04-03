@@ -80,6 +80,8 @@ from program_management.serializers import program_tree_view
 from webservices.business import CONTACT_INTRO_KEY
 from program_management.business.program_version import ordered_list, build_list_from_ddd_version_list
 from django.db.models import Prefetch
+from program_management.serializers.program_tree_view import program_tree_view_serializer
+from program_management.forms.program_version import ProgramVersionForm
 
 SECTIONS_WITH_TEXT = (
     'ucl_bachelors',
@@ -145,20 +147,16 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         return self.request.user.person
 
     @cached_property
-    def root(self):
+    def offer(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("education_group_year_id"))
 
     @cached_property
     def version_name(self):
-        if self.kwargs.get("version_name"):
-            return '-' if self.kwargs.get("version_name") == '' else self.kwargs.get("version_name")
-        return '-'
+        return self.kwargs.get('version_name', '')
 
     @cached_property
     def transition(self):
-        if self.kwargs.get("transition"):
-            return self.kwargs.get("transition") if self.kwargs.get("transition") else '-'
-        return '-'
+        return self.kwargs.get('transition', False)
 
     @cached_property
     def starting_academic_year(self):
@@ -171,9 +169,9 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context['person'] = self.person
 
         # FIXME same param
-        context['root'] = self.root
-        context['root_id'] = self.root.pk
-        context['parent'] = self.root
+        context['offer'] = self.offer
+        context['offer_id'] = self.offer.pk
+        context['parent'] = self.offer
         context['parent_training'] = self.object.parent_by_training()
         context["show_identification"] = self.show_identification()
         context["show_diploma"] = self.show_diploma()
@@ -184,10 +182,12 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
-            program_tree = load_tree.load(self.root.id,
+            program_tree = load_tree.load(self.offer.id,
                                           '' if self.version_name == '-' else self.version_name,
-                                          True if self.transition == 'transition' else False)
-            serialized_data = program_tree_view.ProgramTreeViewSerializer(program_tree).data
+                                          self.transition == 'transition',
+                                          self.offer.academic_year.year,
+                                          self.offer.acronym)
+            serialized_data = program_tree_view_serializer(program_tree)
             context['tree'] = json.dumps(serialized_data)
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
@@ -203,23 +203,30 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
         context['form_xls_custom'] = CustomXlsForm()
 
-        list_of_versions = find_all_program_tree_versions(self.root.pk)
-        version_view = build_list_from_ddd_version_list(list_of_versions, self.root.pk)
-        context['version_list'] = ordered_list(version_view)
-        context['version_name'] = self.version_name
-        context['transition'] = self.transition
-        context['version_label'] = find_version(self.version_name, self.transition, list_of_versions)
+        list_of_versions = find_all_program_tree_versions(self.offer.acronym, self.offer.academic_year.year)
+        program_version_form = ProgramVersionForm(list_of_versions=list_of_versions,
+                                                  version_name=self.version_name,
+                                                  transition=self.transition,
+                                                  offer_id=self.offer.id)
+
+        context['program_version_form'] = program_version_form
 
         return context
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if self.root:
-            default_url = reverse('education_group_read', args=[self.root.pk,
-                                                                self.version_name,
-                                                                self.transition])
+        if self.offer:
+            url_name = 'education_group_read'
+            if self.transition:
+                url_name = 'education_group_read_transition'
+            if self.version_name == '':
+                default_url = reverse(url_name, kwargs={'education_group_year_id': self.offer.pk})
+
+            else:
+                default_url = reverse(url_name, kwargs={'education_group_year_id': self.offer.pk,
+                                                        'version_name': self.version_name})
         else:
-            default_url = reverse('education_group_read', args=[self.root.pk, self.get_object().pk])
+            default_url = reverse('education_group_read', args=[self.offer.pk, self.get_object().pk])
         if self.request.GET.get('group_to_parent'):
             default_url += '?group_to_parent=' + self.request.GET.get('group_to_parent')
         if not self.can_show_view():
@@ -661,10 +668,10 @@ def get_appropriate_common_admission_condition(edy):
     return None
 
 
-def find_version(version_name: str, transition: str, list_of_version):
+def find_version(version_name: str, transition: bool, list_of_version):
     for a_version in list_of_version:
         if a_version.version_name == version_name or a_version.is_standard:
-            if transition == "transition":
+            if transition:
                 if a_version.is_transition:
                     return a_version.version_label
             else:

@@ -48,13 +48,13 @@ class PostponeGroupElementYearView(RulesRequiredMixin, AjaxTemplateMixin, Educat
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["warning_message"] = _("Are you sure you want to postpone the content in %(root)s?") % {
-            "root": self.root
+            "root": self.offer
         }
         return context
 
     def post(self, request, **kwargs):
         try:
-            postponer = PostponeContent(self.root.previous_year(), request.user.person)
+            postponer = PostponeContent(self.offer.previous_year(), request.user.person)
             postponer.postpone()
             success = _("%(count_elements)s OF(s) and %(count_links)s link(s) have been postponed with success.") % {
                 'count_elements': postponer.number_elements_created,

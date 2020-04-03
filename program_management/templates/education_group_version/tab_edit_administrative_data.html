@@ -93,7 +93,7 @@
                     </div>
                 </div>
                 <div class="pull-right">
-                    <a id="link_administrative" href="{% url 'education_group_administrative' root_id education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}"
+                    <a id="link_administrative" href="{% url 'education_group_administrative' offer_id education_group_year.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}"
                        role="tab"
                             class="btn btn-default">
                         {% trans 'Cancel' %}

@@ -36,17 +36,19 @@ class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityFiel
 
     def get_url(self, obj, view_name, request, format):
         #TODO POURQUOI CE TRUC EST NONE
-        education_group_year_id = 1
         if obj.education_group_year_id is None:
             education_group_year_id = 1
         else:
             education_group_year_id = obj.education_group_year_id
 
         kwargs = {
-            'education_group_year_id': education_group_year_id,
-            'version_name': obj.version_name if obj.version_name and obj.version_name != '' else NO_ATTRIBUTE,
-            'transition': obj.transition if obj.transition and obj.transition != '' else NO_ATTRIBUTE,
+            'education_group_year_id': education_group_year_id
         }
+        if obj.transition:
+            view_name = 'education_group_read_transition'
+        if obj.version_name and obj.version_name != '':
+            kwargs.update({'version_name': obj.version_name})
+
         return self.reverse(view_name, kwargs=kwargs, request=request, format=format)
 
 

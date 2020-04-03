@@ -77,9 +77,9 @@ def li_with_create_perm_group(context, url, message, url_id="link_create_group")
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_postpone_perm_training(context, url_id="link_postpone_training"):
-    root = context['root']
+    offer = context['offer']
     education_group_year = context['education_group_year']
-    url = reverse('postpone_education_group', args=[root.pk, education_group_year.pk])
+    url = reverse('postpone_education_group', args=[offer.pk, education_group_year.pk])
 
     try:
         last_academic_year = education_group_year.academic_year.past()
@@ -299,7 +299,6 @@ def dl_with_parent_version(context, key, dl_title="", class_dl="", default_value
     obj = context["education_group_year"]
     parent = context["parent"]
 
-    version_label = context["version_label"] if context["version_label"] else ''
-
-    return dl_with_parent_without_context(key, obj, parent, dl_title=dl_title, class_dl=class_dl,
-                                          default_value=default_value, version_label=version_label)
+    return dl_with_parent_without_context(
+        key, obj, parent, dl_title=dl_title, class_dl=class_dl, default_value=default_value,
+        version_label=context['program_version_form'].additional_title)

@@ -74,7 +74,7 @@ def update_education_group(request, root_id, education_group_year_id):
 
     # Store root in the instance to avoid to pass the root in methods
     # it will be used in the templates.
-    education_group_year.root = root_id
+    education_group_year.offer = root_id
 
     if program_manager.is_program_manager(request.user, education_group=education_group_year.education_group) \
             and not any((request.user.is_superuser, person.is_faculty_manager, person.is_central_manager)):

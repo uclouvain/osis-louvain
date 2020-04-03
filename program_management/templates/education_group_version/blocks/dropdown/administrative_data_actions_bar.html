@@ -1,6 +1,6 @@
-{% extends "education_group_version/layout_detail.html" %}
+{% load static %}
 {% load i18n %}
-{% load static getattr education_group format %}
+{% load format waffle_tags feature_flag education_group %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -25,15 +25,24 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% block top_action_bar %}
-    {% include "education_group_version/blocks/dropdown/identification_actions_bar.html" with dropdirection="dropdown" tab_to_show='content' %}
-{% endblock %}
+{% if "base" in perms %}
+    {% features_or "education_group_update" as show_button %}
+    {% features_or "education_group_administrative_data_update" as show_button_administrative_data %}
+
+    {% if show_button and show_button_administrative_data%}
+        <div class="dropdown {{ dropdirection }}">
+
+            <button id="dLabel" class="btn btn-default" type="button" data-toggle="dropdown" aria-haspopup="true"
+                    aria-expanded="false">
+                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {% trans 'Actions' %}
+                <span class="caret"></span>
+            </button>
 
 
-{% block details %}
-    {% if show_minor_major_option_table %}
-        {% include "education_group/blocks/content_minor_major_option_table.html" %}
-    {% else %}
-        {% include "education_group/blocks/content_default_table.html" %}
+            <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
+                {% button_edit_administrative_data %}
+            </ul>
+        </div>
     {% endif %}
-{% endblock %}
+{% endif %}
+

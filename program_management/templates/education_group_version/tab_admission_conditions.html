@@ -106,7 +106,7 @@
                             {% for lang in language.list %}
                                 {% if lang != language.tab_lang %}
                                     <li>
-                                        <a href="{% url 'tab_lang_edit' root.pk education_group_year.pk lang %}">{{ lang }}</a>
+                                        <a href="{% url 'tab_lang_edit' offer.pk education_group_year.pk lang %}">{{ lang }}</a>
                                     </li>
                                 {% endif %}
                             {% endfor %}
@@ -154,7 +154,7 @@
                             {% for lang in language.list %}
                                 {% if lang != language.tab_lang %}
                                     <li>
-                                        <a href="{% url 'tab_lang_edit' root.pk education_group_year.pk lang %}">
+                                        <a href="{% url 'tab_lang_edit' offer.pk education_group_year.pk lang %}">
                                             {{ lang }}
                                         </a></li>
                                 {% endif %}
@@ -240,7 +240,7 @@
 
                 $.ajax({
                     type: 'POST',
-                    url: "{% url 'education_group_year_admission_condition_line_order' root.pk education_group_year.pk %}",
+                    url: "{% url 'education_group_year_admission_condition_line_order' offer.pk education_group_year.pk %}",
                     dataType: 'json',
                     data: JSON.stringify({'record': record, 'action': action}),
                     success: function (xhr, ajaxOptions, thrownError) {
