@@ -102,7 +102,17 @@ class LearningAchievementEditForm(forms.ModelForm):
     def save(self, commit=True):
         return self._save_translated_text()
 
+    def _get_ac_year_postponement_range(self, first_proposal_year):
+        ac_year_postponement_range = get_academic_year_postponement_range(self.luy)
+        if first_proposal_year:
+            return ac_year_postponement_range.exclude(year__gte=first_proposal_year)
+        return ac_year_postponement_range
+
     def _save_translated_text(self):
+        first_proposal_year = ProposalLearningUnit.objects.filter(
+            learning_unit_year__learning_unit=self.luy.learning_unit,
+            learning_unit_year__academic_year__year__gt=self.luy.academic_year.year
+        ).values_list('learning_unit_year__academic_year__year', flat=True).first()
         for code, label in settings.LANGUAGES:
             self.achievement, _ = LearningAchievement.objects.select_related(
                 'learning_unit_year__academic_year').prefetch_related(
@@ -118,7 +128,7 @@ class LearningAchievementEditForm(forms.ModelForm):
 
             self.last_postponed_academic_year = None
             if not self.achievement.learning_unit_year.academic_year.is_past and self.postponement:
-                ac_year_postponement_range = get_academic_year_postponement_range(self.achievement.learning_unit_year)
+                ac_year_postponement_range = self._get_ac_year_postponement_range(first_proposal_year)
                 self.last_postponed_academic_year = ac_year_postponement_range.last()
                 update_future_luy(ac_year_postponement_range, self.achievement)
 
