@@ -31,8 +31,8 @@ from program_management.ddd.domain import prerequisite
 
 class TestPrerequisiteItem(SimpleTestCase):
     def test_case_assert_str_method(self):
-        p_item = prerequisite.PrerequisiteItem(acronym='LDROI1200', year=2018)
-        expected_str = p_item.acronym
+        p_item = prerequisite.PrerequisiteItem(code='LDROI1200', year=2018)
+        expected_str = p_item.code
 
         self.assertEquals(str(p_item), expected_str)
 
@@ -91,5 +91,5 @@ class TestPrerequisite(SimpleTestCase):
         p_req.add_prerequisite_item_group(self.p_group)
         p_req.add_prerequisite_item_group(self.p_group_2)
 
-        expected_str = '(LDROI1300 OR LAGRO2400) AND (LDROI1400)'
+        expected_str = '(LDROI1300 OR LAGRO2400) AND LDROI1400'
         self.assertEquals(str(p_req), expected_str)

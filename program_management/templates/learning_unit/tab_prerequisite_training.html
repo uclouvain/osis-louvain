@@ -28,22 +28,17 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <p>
-                <a href="{% url 'learning_unit' learning_unit_year.pk %}">
-                    <ins>{{ learning_unit_year.acronym }}</ins>
-                </a>
+                <a href="{% url 'learning_unit' learning_unit_year.pk %}"><ins>{{ learning_unit_year.acronym }}</ins></a>
                 {% trans "has the following prerequisites" %} :
             </p>
 
             <div class="row">
                 <div class="col-md-7">
-                    <p>{% prerequisite_string prerequisite learning_unit_years_parent %}</p>
+                    <p>{% prerequisite_as_html node.prerequisite program_links %}</p>
                 </div>
                 <div class="col-md-5">
                     {% if can_modify_prerequisite %}
-                        <a class="btn btn-default"
-                           href=
-                                   {% url 'learning_unit_prerequisite_update' root_id=root_id learning_unit_year_id=learning_unit_year.id %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}"
-                           role="button">
+                        <a class="btn btn-default" href={% url 'learning_unit_prerequisite_update' root_id=root_id learning_unit_year_id=learning_unit_year.id %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}" role="button">
                             {% trans 'Modify prerequisites' %}
                         </a>
                     {% else %}
@@ -53,35 +48,14 @@
             </div>
         </div>
     </div>
-    {% if is_prerequisites_list %}
+    {% if is_prerequisite_of_list %}
         <div class="panel panel-default">
             <div class="panel-body">
                 <p>
-                    <a href="{% url 'learning_unit' learning_unit_year.pk %}">
-                        <ins>{{ learning_unit_year.acronym }}</ins>
-                    </a>
+                    <a href="{% url 'learning_unit' learning_unit_year.pk %}"><ins>{{ learning_unit_year.acronym }}</ins></a>
                     {% trans 'is a prerequisite of' %} :
                 </p>
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>{% trans 'Acronym' %}</th>
-                            <th>{% trans 'Title' %}</th>
-                            <th>{% trans 'Cred. rel./abs.' %}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for p in is_prerequisites_list %}
-                            {% with learning_unit_years_parent|get_item:p.learning_unit_year.id as link %}
-                            <tr>
-                                <td><a href="{% url 'learning_unit' p.learning_unit_year.pk %}">{{ p.learning_unit_year.acronym }}</a></td>
-                                <td>{{ p.learning_unit_year.complete_title }}</td>
-                                <td>{{ link.relative_credits }} / {{ p.learning_unit_year.credits.normalize }}</td>
-                            </tr>
-                            {% endwith %}
-                        {% endfor %}
-                    </tbody>
-                </table>
+                {% is_prerequisite_as_html is_prerequisite_of_list program_links %}
             </div>
         </div>
     {% endif %}

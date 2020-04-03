@@ -81,17 +81,11 @@ class BusinessValidator(ABC):
 class BusinessListValidator(BusinessValidator):
     validators = None
 
-    validator_args = None
-    validator_kwargs = None
-
-    def __init__(self, validator_args=None, validator_kwargs=None):
+    def __init__(self):
         super(BusinessListValidator, self).__init__()
         assert self.success_messages, "Please set the 'success_messages' attribute"
-        self.validator_args = validator_args
-        self.validator_kwargs = validator_kwargs or {}
 
     def validate(self):
-        for validator_class in self.validators:
-            validator = validator_class(*self.validator_args, **self.validator_kwargs)
+        for validator in self.validators:
             validator.validate()
             self.add_messages(validator.messages)

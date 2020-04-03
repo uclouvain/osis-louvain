@@ -50,7 +50,7 @@ def load_has_prerequisite(tree_root_id: int, node_ids: List[int]) -> dict:
         prerequisite__education_group_year_id=tree_root_id,
         prerequisite__learning_unit_year_id__in=node_ids
     ).annotate(
-        acronym=Subquery(
+        code=Subquery(
             LearningUnitYear.objects.filter(
                 learning_unit_id=OuterRef('learning_unit_id'),
                 academic_year_id=OuterRef('prerequisite__learning_unit_year__academic_year_id'),
@@ -60,7 +60,7 @@ def load_has_prerequisite(tree_root_id: int, node_ids: List[int]) -> dict:
         main_operator=F('prerequisite__main_operator'),
         learning_unit_year_id=F('prerequisite__learning_unit_year_id')
     ).order_by('learning_unit_year_id', 'group_number', 'position')\
-     .values('learning_unit_year_id', 'main_operator', 'group_number', 'position', 'acronym', 'year')
+     .values('learning_unit_year_id', 'main_operator', 'group_number', 'position', 'code', 'year')
 
     prerequisites_dict = {}
     for node_id, prequisite_items in itertools.groupby(prerequisite_item_qs, key=lambda p: p['learning_unit_year_id']):
@@ -74,7 +74,7 @@ def load_has_prerequisite(tree_root_id: int, node_ids: List[int]) -> dict:
             p_group_items = prerequisite.PrerequisiteItemGroup(
                 operator=operator_item,
                 prerequisite_items=[
-                    prerequisite.PrerequisiteItem(p_item['acronym'], p_item['year']) for p_item in p_items
+                    prerequisite.PrerequisiteItem(p_item['code'], p_item['year']) for p_item in p_items
                 ]
             )
             prerequisites_dict[node_id].add_prerequisite_item_group(p_group_items)

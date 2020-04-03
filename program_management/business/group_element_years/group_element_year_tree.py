@@ -38,7 +38,7 @@ from base.models.enums.education_group_types import MiniTrainingType, GroupType,
 from base.models.enums.entity_type import SECTOR, FACULTY, SCHOOL, DOCTORAL_COMMISSION
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
-from base.models.group_element_year import GroupElementYear, fetch_all_group_elements_in_tree
+from base.models.group_element_year import GroupElementYear, fetch_row_sql
 from base.models.prerequisite_item import PrerequisiteItem
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from program_management.business.group_element_years import attach
@@ -556,3 +556,25 @@ class ModificationPermission(LinkActionPermission):
             self.errors.append(
                 str(_("Cannot perform modification action on root."))
             )
+
+
+#  DEPRECATED remove this function when EducationGroupHierarchy is removed
+def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset, exclude_options=False) -> dict:
+    if queryset.model != GroupElementYear:
+        raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
+
+    elements = fetch_row_sql([root.id])
+
+    distinct_group_elem_ids = {elem['id'] for elem in elements}
+    queryset = queryset.filter(pk__in=distinct_group_elem_ids)
+
+    group_elems_by_parent_id = {}  # Map {<EducationGroupYear.id>: [GroupElementYear, GroupElementYear...]}
+    for group_elem_year in queryset:
+        if exclude_options and group_elem_year.child_branch and \
+                group_elem_year.child_branch.education_group_type.name == GroupType.OPTION_LIST_CHOICE.name:
+            if EducationGroupYear.hierarchy.filter(pk=group_elem_year.child_branch.pk).get_parents(). \
+                        filter(education_group_type__name__in=TrainingType.finality_types()).exists():
+                continue
+        parent_id = group_elem_year.parent_id
+        group_elems_by_parent_id.setdefault(parent_id, []).append(group_elem_year)
+    return group_elems_by_parent_id

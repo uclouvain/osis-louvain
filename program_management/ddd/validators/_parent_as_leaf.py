@@ -33,14 +33,13 @@ from program_management.ddd.domain import node
 # Implemented from AttachPermission._check_if_leaf
 class ParentIsNotLeafValidator(BusinessValidator):
 
-    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path'):
+    def __init__(self, parent_node: 'Node', node_to_add: 'Node'):
         super(ParentIsNotLeafValidator, self).__init__()
-        self.tree = tree
+        self.parent_node = parent_node
         self.node_to_add = node_to_add
-        self.path = path
 
     def validate(self):
-        if isinstance(self.tree.get_node(self.path), node.NodeLearningUnitYear):
+        if isinstance(self.parent_node, node.NodeLearningUnitYear):
             self.add_error_message(
                 _("Cannot add any element to learning unit")
             )

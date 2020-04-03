@@ -35,6 +35,7 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
+from program_management.ddd.repositories import load_tree
 
 
 def _build_correct_tree_list(tree):
@@ -95,14 +96,14 @@ class TestBuildPDFTree(TestCase):
         )
 
     def test_build_pdf_tree_with_mandatory(self):
-        tree = EducationGroupHierarchy(self.education_group_year_1).to_list()
+        tree = load_tree.load(self.education_group_year_1.id)
         out = Template(
             "{% load education_group_pdf %}"
             "{{ tree|pdf_tree_list }}"
         ).render(Context({
-            'tree': tree
+            'tree': tree.root_node.children
         }))
-        self.assertEqual(out, _build_correct_tree_list(tree))
+        self.assertEqual(out, _build_correct_tree_list(tree.root_node.children))
 
     def test_build_pdf_tree_with_optional(self):
         self.group_element_year_1.is_mandatory = False
@@ -110,21 +111,21 @@ class TestBuildPDFTree(TestCase):
         self.group_element_year_2.is_mandatory = False
         self.group_element_year_2.save()
 
-        tree = EducationGroupHierarchy(self.education_group_year_1).to_list()
+        tree = load_tree.load(self.education_group_year_1.id)
         out = Template(
             "{% load education_group_pdf %}"
             "{{ tree|pdf_tree_list }}"
         ).render(Context({
-            'tree': tree
+            'tree': tree.root_node.children
         }))
-        self.assertEqual(out, _build_correct_tree_list(tree))
+        self.assertEqual(out, _build_correct_tree_list(tree.root_node.children))
 
     def test_tree_list_with_none(self):
         out = Template(
             "{% load education_group_pdf %}"
             "{{ tree|pdf_tree_list }}"
         ).render(Context({
-            'tree': None
+            'tree': []
         }))
         self.assertEqual(out, "")
 

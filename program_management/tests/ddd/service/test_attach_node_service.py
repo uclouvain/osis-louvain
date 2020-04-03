@@ -47,7 +47,9 @@ from program_management.tests.ddd.service.mixins import ValidatorPatcherMixin
 class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
 
     def setUp(self):
-        self.root_node = NodeEducationGroupYearFactory()
+        self.root_node = NodeEducationGroupYearFactory(
+            node_type=TrainingType.BACHELOR
+        )
         self.tree = ProgramTreeFactory(root_node=self.root_node)
         self.root_path = str(self.root_node.node_id)
         self.node_to_attach = NodeEducationGroupYearFactory()

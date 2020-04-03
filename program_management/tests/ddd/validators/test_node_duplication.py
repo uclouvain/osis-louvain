@@ -44,9 +44,8 @@ class TestNodeDuplicationValidator(SimpleTestCase):
     def test_when_node_already_exists(self):
         node_to_attach = self.child
         validator = NodeDuplicationValidator(
-            self.tree_with_child,
-            node_to_attach,
-            build_path(self.tree_with_child.root_node)
+            self.tree_with_child.root_node,
+            node_to_attach
         )
         self.assertFalse(validator.is_valid())
         expected_result = _("You can not add the same child several times.")
@@ -57,17 +56,15 @@ class TestNodeDuplicationValidator(SimpleTestCase):
         link = LinkFactory(parent=self.tree_with_child.root_node)
         LinkFactory(parent=link.child, child=node_to_attach)
         validator = NodeDuplicationValidator(
-            self.tree_with_child,
-            node_to_attach,
-            build_path(self.tree_with_child.root_node)
+            self.tree_with_child.root_node,
+            node_to_attach
         )
         self.assertTrue(validator.is_valid())
 
     def test_when_node_does_not_exists(self):
         node_to_attach = NodeGroupYearFactory()
         validator = NodeDuplicationValidator(
-            self.tree_with_child,
-            node_to_attach,
-            build_path(self.tree_with_child.root_node)
+            self.tree_with_child.root_node,
+            node_to_attach
         )
         self.assertTrue(validator.is_valid())

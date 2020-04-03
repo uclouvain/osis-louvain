@@ -29,12 +29,14 @@ from rest_framework.generics import get_object_or_404
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
-from education_group.api.serializers.group_element_year import EducationGroupTreeSerializer
+from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
+from program_management.ddd.domain import link
+from program_management.ddd.repositories import load_tree
 
 
 class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAPIView):
-    serializer_class = EducationGroupTreeSerializer
+    serializer_class = EducationGroupRootNodeTreeSerializer
     filter_backends = []
     paginator = None
     lookup_fields = ('academic_year__year', 'acronym__iexact',)
@@ -51,7 +53,8 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
 
         self.check_object_permissions(self.request, education_group_year)
 
-        return EducationGroupHierarchy(education_group_year)
+        tree = load_tree.load(education_group_year.id)
+        return link.factory.get_link(parent=None, child=tree.root_node)
 
 
 class TrainingTreeView(EducationGroupTreeView):

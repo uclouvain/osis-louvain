@@ -1,0 +1,23 @@
+{% load i18n %}
+{% if is_prerequisite_rows %}
+    <table class="table table-hover">
+        <thead>
+        <tr>
+            <th>{% trans 'Acronym' %}</th>
+            <th>{% trans 'Title' %}</th>
+            <th>{% trans 'Cred. rel./abs.' %}</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for row in is_prerequisite_rows %}
+            <tr>
+                <td><a href="{% url 'learning_unit' acronym=row.code year=row.year %}">{{ row.code }}</a></td>
+                <td>{{ row.title }}</td>
+                <td>{{ row.relative_credits }} / {{ row.credits }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% else %}
+    -
+{% endif %}

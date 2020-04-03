@@ -328,9 +328,8 @@ class CommonBaseForm:
 
     @staticmethod
     def _save_group_element_year(parent, child):
-        # TODO :: what if this relation parent/child already exists? Should we create a new GroupElementYear anymore?
         if parent:
-            group_element_year.get_or_create_group_element_year(parent, child_branch=child)
+            group_element_year.GroupElementYear.objects.get_or_create(parent=parent, child_branch=child)
 
     @property
     def errors(self):
