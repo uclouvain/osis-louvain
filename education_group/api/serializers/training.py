@@ -205,7 +205,6 @@ class EducationGroupYearSerializer(serializers.ModelSerializer):
 
 class TrainingDetailSerializer(TrainingListSerializer):
     class Meta(TrainingListSerializer.Meta):
-        model = EducationGroupVersion
         flatten = TrainingListSerializer.Meta.flatten + [('offer', EducationGroupYearSerializer)]
         fields = TrainingListSerializer.Meta.fields + (
             'version_name',

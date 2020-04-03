@@ -128,11 +128,11 @@ class TrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     def get_object(self):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
-        egy = get_object_or_404(
+        egv = get_object_or_404(
             EducationGroupYear.objects.all().select_related(
                 'academic_year',
             ),
             acronym__iexact=acronym,
             academic_year__year=year
         )
-        return egy
+        return egv
