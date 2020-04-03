@@ -54,7 +54,7 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer):
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
 
-    class Meta(EducationGroupTitleSerializer):
+    class Meta(EducationGroupTitleSerializer.Meta):
         model = EducationGroupYear
         fields = EducationGroupTitleSerializer.Meta.fields + (
             'acronym',
@@ -204,7 +204,7 @@ class EducationGroupYearSerializer(serializers.ModelSerializer):
 
 
 class TrainingDetailSerializer(TrainingListSerializer):
-    class Meta(TrainingListSerializer):
+    class Meta(TrainingListSerializer.Meta):
         model = EducationGroupVersion
         flatten = TrainingListSerializer.Meta.flatten + [('offer', EducationGroupYearSerializer)]
         fields = TrainingListSerializer.Meta.fields + (
