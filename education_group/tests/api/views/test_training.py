@@ -40,7 +40,8 @@ from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 from program_management.models.education_group_version import EducationGroupVersion
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardEducationGroupVersionFactory
 
 
 class TrainingTitleTestCase(APITestCase):
@@ -96,9 +97,9 @@ class GetAllTrainingTestCase(APITestCase):
         offer1 = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
         offer2 = TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=cls.academic_year)
         offer3 = TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=cls.academic_year)
-        EducationGroupVersionFactory(offer=offer1, version_name='')
-        EducationGroupVersionFactory(offer=offer2, version_name='')
-        EducationGroupVersionFactory(offer=offer3, version_name='')
+        StandardEducationGroupVersionFactory(offer=offer1)
+        StandardEducationGroupVersionFactory(offer=offer2)
+        StandardEducationGroupVersionFactory(offer=offer3)
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
@@ -182,9 +183,9 @@ class FilterTrainingTestCase(APITestCase):
             offer1 = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=academic_year)
             offer2 = TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=academic_year)
             offer3 = TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=academic_year)
-            EducationGroupVersionFactory(offer=offer1, version_name='')
-            EducationGroupVersionFactory(offer=offer2, version_name='')
-            EducationGroupVersionFactory(offer=offer3, version_name='')
+            StandardEducationGroupVersionFactory(offer=offer1)
+            StandardEducationGroupVersionFactory(offer=offer2)
+            StandardEducationGroupVersionFactory(offer=offer3)
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
@@ -255,7 +256,7 @@ class GetTrainingTestCase(APITestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.training = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
-        cls.version = EducationGroupVersionFactory(offer=cls.training, version_name='')
+        cls.version = StandardEducationGroupVersionFactory(offer=cls.training)
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,

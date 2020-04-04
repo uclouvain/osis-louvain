@@ -123,7 +123,7 @@ class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
         version_name = self.kwargs.get('version_name', '')
-        evy = get_object_or_404(
+        egv = get_object_or_404(
             EducationGroupVersion.objects.filter(
                 offer__education_group_type__category=education_group_categories.TRAINING
             ).select_related(
@@ -142,7 +142,7 @@ class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
             version_name=version_name,
             is_transition=False
         )
-        return evy
+        return egv
 
 
 class TrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
@@ -155,11 +155,11 @@ class TrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     def get_object(self):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
-        egv = get_object_or_404(
+        egy = get_object_or_404(
             EducationGroupYear.objects.all().select_related(
                 'academic_year',
             ),
             acronym__iexact=acronym,
             academic_year__year=year
         )
-        return egv
+        return egy
