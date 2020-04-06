@@ -77,7 +77,6 @@ from program_management.ddd.repositories.find_roots import find_roots
 from program_management.ddd.repositories.load_tree import find_all_program_tree_versions
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.enums import node_type
-from program_management.serializers.program_tree_view import program_tree_view_serializer
 from webservices.business import CONTACT_INTRO_KEY
 from django.db.models import Prefetch
 from program_management.serializers.program_tree_view import program_tree_view_serializer
