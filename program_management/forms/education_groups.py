@@ -120,6 +120,12 @@ class GroupFilter(FilterSet):
         widget=forms.CheckboxInput,
         initial='True'
     )
+    # has_educationversiongroup = filters.BooleanFilter(
+    #     method="filter_by_educationgroupversion",
+    #     initial='True'
+    # )
+
+    method = 'filter_with_entity_subordinated',
 
     order_by_field = 'ordering'
     ordering = OrderingFilter(
@@ -175,7 +181,7 @@ class GroupFilter(FilterSet):
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound
         if not self.data:
-            return GroupYear.objects.none()
+            return GroupYear.objects_version.none()
 
         management_entity = entity_version.EntityVersion.objects.filter(
             entity=OuterRef('management_entity'),
@@ -183,11 +189,7 @@ class GroupFilter(FilterSet):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
-        version = EducationGroupVersion.objects.filter(
-            root_group__pk=OuterRef('pk'),
-        ).values('offer__pk')[:1]
-
-        return GroupYear.objects.all().annotate(
+        return GroupYear.objects_version.all().annotate(
             type_ordering=Case(
                 *[When(education_group_type__name=key, then=Value(str(_(val))))
                   for i, (key, val) in enumerate(education_group_types.ALL_TYPES)],
@@ -196,12 +198,6 @@ class GroupFilter(FilterSet):
             )
         ).annotate(
             entity_management_version=Subquery(management_entity)
-        ).annotate(
-            version=Case(
-                When(~Q(Q(educationgroupversion__version_name='') | Q(educationgroupversion__isnull=True)),
-                     then=Value(PARTICULAR)),
-                default=Value(STANDARD),
-                output_field=CharField(),)
         ).annotate(
             complete_title_fr=Case(
                 When(
@@ -212,7 +208,10 @@ class GroupFilter(FilterSet):
                              then=Concat('acronym', Value('[Transition]'))),
                         When(~Q(educationgroupversion__version_name='') &
                              Q(educationgroupversion__is_transition=True),
-                             then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value('-Transition]'))),
+                             then=Concat('acronym',
+                                         Value('['),
+                                         'educationgroupversion__version_name',
+                                         Value('-Transition]'))),
                         When(~Q(educationgroupversion__version_name='') &
                              Q(educationgroupversion__is_transition=False),
                              then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value(']'))),
@@ -225,29 +224,9 @@ class GroupFilter(FilterSet):
             )
         ).annotate(
             title=Case(
-                When(Q(educationgroupversion__isnull=False) & ~Q(educationgroupversion__title_fr=''),
+                When(Q(educationgroupversion__title_fr__isnull=False) & ~Q(educationgroupversion__title_fr=''),
                      then=Concat('title_fr', Value(' ['), 'educationgroupversion__title_fr', Value(']'))),
                 default='title_fr',
-                output_field=CharField(),)
-        ).annotate(
-            education_group_year_id=Subquery(version)
-        ).annotate(
-            transition=Case(
-                When(Q(educationgroupversion__isnull=False) & Q(educationgroupversion__is_transition=True),
-                     then=Value('transition')),
-                default=Value(''),
-                output_field=CharField(),)
-        ).annotate(
-            version_name=Case(
-                When(Q(educationgroupversion__isnull=False) & ~Q(educationgroupversion__version_name=''),
-                     then='educationgroupversion__version_name'),
-                default=Value(''),
-                output_field=CharField(),)
-        ).annotate(
-            version_label=Case(
-                When(Q(educationgroupversion__isnull=False) & ~Q(educationgroupversion__version_name=''),
-                     then='educationgroupversion__version_name'),
-                default=Value(''),
                 output_field=CharField(),)
         )
 

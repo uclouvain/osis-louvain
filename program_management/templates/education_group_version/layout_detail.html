@@ -50,8 +50,6 @@
                 </a>
 
                 {% if offer == education_group_year %}
-                    {{ program_version_form.version_name }}
-                    {{ program_version_form.transition }}
                     <label>
                         <select class="form-control"
                                 name="academic_year"
@@ -128,7 +126,7 @@
         </div>
     </div>
     {% if education_group_year %}
-        {% include "education_group/blocks/modal/custom_xls.html" %}
+        {% include "education_group_version/modal/custom_xls.html" %}
     {% endif %}
     <script>
         const root_id = "{{ offer_id }}";

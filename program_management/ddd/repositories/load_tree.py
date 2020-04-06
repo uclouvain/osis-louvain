@@ -26,7 +26,8 @@
 
 from typing import List, Dict, Any
 
-from django.db.models import Case, F, When, IntegerField
+from django.db.models import Case, When
+from django.db.models import F, IntegerField
 
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
@@ -35,31 +36,12 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
+from program_management.models.education_group_version import EducationGroupVersion
 # Typing
-from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.enums.node_type import NodeType
-from program_management.business.program_version import ProgramVersion
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
-from dal import autocomplete
-from django import forms
-from django.db.models import Case, When, Value, CharField, OuterRef, Subquery
-from django.db.models.functions import Concat
-from django.utils.translation import gettext_lazy as _, pgettext_lazy
-from django_filters import OrderingFilter, filters, FilterSet
-
-from base.business.entity import get_entities_ids
-from base.forms.utils.filter_field import filter_field_by_regex
-from base.models import entity_version
-from base.models.academic_year import AcademicYear, starting_academic_year
-from base.models.education_group_type import EducationGroupType
-from education_group.models.group_year import GroupYear
-from base.models.enums import education_group_categories
-from base.models.enums import education_group_types
-from base.models.enums.education_group_categories import Categories
-from django.db.models import Q
-from program_management.models.education_group_version import EducationGroupVersion
 
 GroupElementYearColumnName = str
 LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"

@@ -76,9 +76,7 @@ from cms.models.translated_text_label import TranslatedTextLabel
 from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.load_tree import find_all_program_tree_versions
 from program_management.forms.custom_xls import CustomXlsForm
-from program_management.serializers import program_tree_view
 from webservices.business import CONTACT_INTRO_KEY
-from program_management.business.program_version import ordered_list, build_list_from_ddd_version_list
 from django.db.models import Prefetch
 from program_management.serializers.program_tree_view import program_tree_view_serializer
 from program_management.forms.program_version import ProgramVersionForm
@@ -217,14 +215,12 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         self.object = self.get_object()
         if self.offer:
             url_name = 'education_group_read'
+            kwargs_dict = {'education_group_year_id': self.offer.pk}
             if self.transition:
                 url_name = 'education_group_read_transition'
-            if self.version_name == '':
-                default_url = reverse(url_name, kwargs={'education_group_year_id': self.offer.pk})
-
-            else:
-                default_url = reverse(url_name, kwargs={'education_group_year_id': self.offer.pk,
-                                                        'version_name': self.version_name})
+            if self.version_name != '':
+                kwargs_dict.update({'version_name': self.version_name})
+            default_url = reverse(url_name, kwargs=kwargs_dict)
         else:
             default_url = reverse('education_group_read', args=[self.offer.pk, self.get_object().pk])
         if self.request.GET.get('group_to_parent'):
@@ -665,16 +661,4 @@ def get_appropriate_common_admission_condition(edy):
         ).get()
         common_admission_condition, created = AdmissionCondition.objects.get_or_create(education_group_year=common_egy)
         return common_admission_condition
-    return None
-
-
-def find_version(version_name: str, transition: bool, list_of_version):
-    for a_version in list_of_version:
-        if a_version.version_name == version_name or a_version.is_standard:
-            if transition:
-                if a_version.is_transition:
-                    return a_version.version_label
-            else:
-                if not a_version.is_transition:
-                    return a_version.version_label
     return None

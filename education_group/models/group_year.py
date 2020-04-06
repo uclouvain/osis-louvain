@@ -41,6 +41,13 @@ class GroupYearManager(models.Manager):
         )
 
 
+class GroupYearVersionManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(educationgroupversion__isnull=False).select_related(
+            'group', 'educationgroupversion'
+        )
+
+
 class GroupYearAdmin(VersionAdmin, OsisModelAdmin):
     list_display = ('acronym', 'partial_acronym', 'title_fr', 'group', 'education_group_type', 'academic_year',
                     'changed')
@@ -135,6 +142,7 @@ class GroupYear(models.Model):
     )
 
     objects = GroupYearManager()
+    objects_version = GroupYearVersionManager()
 
     def __str__(self):
         return "{} ({})".format(self.acronym,
