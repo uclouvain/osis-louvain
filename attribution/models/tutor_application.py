@@ -52,7 +52,7 @@ class TutorApplicationAdmin(admin.ModelAdmin):
 class TutorApplication(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
-    learning_container_year = models.ForeignKey('base.LearningContainerYear', on_delete=models.CASCADE)
+    learning_container_year = models.ForeignKey('base.LearningContainerYear', on_delete=models.PROTECT)
     tutor = models.ForeignKey('base.Tutor', on_delete=models.CASCADE)
     function = models.CharField(max_length=35, blank=True, null=True, choices=Functions.choices(), db_index=True)
     volume_lecturing = models.DecimalField(max_digits=6, decimal_places=1, blank=True, null=True)

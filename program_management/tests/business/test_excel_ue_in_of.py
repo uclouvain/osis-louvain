@@ -36,8 +36,8 @@ from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
 from base.models.enums import education_group_types
-from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory, \
     EducationGroupYearBachelorFactory
@@ -93,29 +93,35 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         for node, acronym in zip(cls.child_leaves, ["LCORS124" + str(i) for i in range(0, len(cls.child_leaves))]):
             node.child_leaf.acronym = acronym
             node.child_leaf.save()
-        cls.edy_node_1_training = TrainingFactory(academic_year=academic_yr,
-                                                  education_group_type__category=Categories.TRAINING.name,
-                                                  partial_acronym="{}_T".format(PARTIAL_ACRONYM),
-                                                  title="{}_T".format(TITLE))
+        cls.edy_node_1_training = EducationGroupYearBachelorFactory(
+            academic_year=academic_yr,
+            partial_acronym="{}_T".format(PARTIAL_ACRONYM),
+            title="{}_T".format(TITLE)
+        )
         cls.node_1 = GroupElementYearFactory(
             child_branch=cls.edy_node_1_training, child_leaf=None, parent=cls.education_group_yr_root
         )
-        cls.edy_node_1_1_group = EducationGroupYearFactory(academic_year=academic_yr,
-                                                           education_group_type__category=Categories.GROUP.name)
+        cls.edy_node_1_1_group = GroupFactory(academic_year=academic_yr)
 
-        cls.node_1_1 = GroupElementYearFactory(child_branch=cls.edy_node_1_1_group,
-                                               child_leaf=None,
-                                               parent=cls.edy_node_1_training)
-        cls.child_leave_node_11 = GroupElementYearChildLeafFactory(
-            parent=cls.edy_node_1_1_group, is_mandatory=True
+        cls.node_1_1 = GroupElementYearFactory(
+            child_branch=cls.edy_node_1_1_group,
+            child_leaf=None,
+            parent=cls.edy_node_1_training
         )
-        cls.edy_node_1_1_1_group_type = EducationGroupYearFactory(academic_year=academic_yr,
-                                                                  education_group_type__category=Categories.GROUP.name)
+        cls.child_leave_node_11 = GroupElementYearChildLeafFactory(
+            parent=cls.edy_node_1_1_group,
+            is_mandatory=True
+        )
+        cls.edy_node_1_1_1_group_type = GroupFactory(academic_year=academic_yr)
 
-        cls.node_1_1_1_group = GroupElementYearFactory(child_branch=cls.edy_node_1_1_1_group_type, child_leaf=None,
-                                                       parent=cls.edy_node_1_1_group)
+        cls.node_1_1_1_group = GroupElementYearFactory(
+            child_branch=cls.edy_node_1_1_1_group_type,
+            child_leaf=None,
+            parent=cls.edy_node_1_1_group
+        )
         cls.child_leave_node_111 = GroupElementYearChildLeafFactory(
-            parent=cls.edy_node_1_1_1_group_type, is_mandatory=True
+            parent=cls.edy_node_1_1_1_group_type,
+            is_mandatory=True
         )
 
         cls.luy_children_in_tree = [child.child_leaf for child in cls.child_leaves]

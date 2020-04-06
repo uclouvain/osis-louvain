@@ -108,8 +108,8 @@ class GroupElementYearManager(models.Manager):
             WITH RECURSIVE
                 adjacency_query AS (SELECT
                         parent_element_rec.group_year_id as starting_node_id,
-                        base_groupelementyear.id as group_element_year_id,                        
-                        child_element_rec.id as child_branch_id,
+                        child_element_rec.id as child_id,                        
+                        child_element_rec.group_year_id as child_branch_id,
                         child_element_rec.learning_unit_year_id as child_leaf_id,
                         parent_element_rec.id as parent_id,
                         "order",
@@ -122,20 +122,20 @@ class GroupElementYearManager(models.Manager):
                 UNION ALL
                     SELECT
                         parent.starting_node_id,
-                        child.id as group_element_year_id,                        
-                        child_element_rec.id as child_branch_id,
+                        child_element_rec.id as child_id,                        
+                        child_element_rec.group_year_id as child_branch_id,
                         child_element_rec.learning_unit_year_id as child_leaf_id,
                         parent_element_rec.id as parent_id,
                         child.order,
                         parent.level + 1,
                         parent.path || '|' || child_element_rec.id As Path
                     FROM  base_groupelementyear as child                    
-                    INNER JOIN adjacency_query AS parent on parent.child_branch_id = child.parent_id
+                    INNER JOIN adjacency_query AS parent on parent.parent_id = child.parent_id
                     INNER JOIN program_management_element AS parent_element_rec ON parent_element_rec.id=child.parent_element_id
                     INNER JOIN program_management_element AS child_element_rec ON child_element_rec.id=child.child_element_id
 )
-            SELECT distinct starting_node_id, adjacency_query.group_element_year_id, child_branch_id, child_leaf_id, parent_id,
-            COALESCE(child_branch_id, child_leaf_id) AS child_id, "order", level, path
+            SELECT distinct starting_node_id, adjacency_query.child_id, child_branch_id, child_leaf_id, parent_id,
+             "order", level, path
             FROM adjacency_query
             LEFT JOIN base_learningunityear bl on bl.id = adjacency_query.child_leaf_id
             WHERE adjacency_query.child_leaf_id is null or bl.learning_container_year_id is not null

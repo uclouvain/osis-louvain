@@ -26,6 +26,7 @@
 from dal import autocomplete
 from django import forms
 from django.db.models import Case, When, Value, CharField, OuterRef, Subquery
+from django.db.models import Q
 from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
@@ -35,13 +36,13 @@ from base.forms.utils.filter_field import filter_field_by_regex
 from base.models import entity_version
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.education_group_type import EducationGroupType
-from education_group.models.group_year import GroupYear
 from base.models.enums import education_group_categories
 from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
 from django.db.models import Q
 from program_management.models.education_group_version import EducationGroupVersion
 
+from education_group.models.group_year import GroupYear
 
 PARTICULAR = "PARTICULAR"
 STANDARD = "STANDARD"
@@ -120,8 +121,6 @@ class GroupFilter(FilterSet):
         widget=forms.CheckboxInput,
         initial='True'
     )
-
-    method = 'filter_with_entity_subordinated',
 
     order_by_field = 'ordering'
     ordering = OrderingFilter(
@@ -210,7 +209,7 @@ class GroupFilter(FilterSet):
                                          Value('-Transition]'))),
                         When(~Q(educationgroupversion__version_name='') &
                              Q(educationgroupversion__is_transition=False),
-                             then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value(']'))),
+                             then=Concat('acronym', Value('['), 'educationgroupversion__version_name', Value(']'))),
                         default='acronym',
                         output_field=CharField()
                     )
@@ -223,7 +222,7 @@ class GroupFilter(FilterSet):
                 When(Q(educationgroupversion__title_fr__isnull=False) & ~Q(educationgroupversion__title_fr=''),
                      then=Concat('title_fr', Value(' ['), 'educationgroupversion__title_fr', Value(']'))),
                 default='title_fr',
-                output_field=CharField(),)
+                output_field=CharField(), )
         )
 
     def filter_queryset(self, queryset):

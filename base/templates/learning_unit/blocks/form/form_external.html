@@ -24,11 +24,9 @@
 
                 {% include "learning_unit/blocks/components.html" %}
 
-                {% if not learning_unit_external_form %}
-                    {% block remarks %}
-                        {% include "learning_unit/blocks/remarks.html" %}
-                    {% endblock remarks %}
-                {% endif %}
+                {% block remarks %}
+                    {% include "learning_unit/blocks/remarks.html" %}
+                {% endblock remarks %}
 
                 {% block components %}
                     {% if components %}
@@ -58,8 +56,6 @@
                                     {% bootstrap_field learning_unit_external_form.external_credits show_label=False %}
                                 </div>
                             </div>
-                            {% bootstrap_field learning_unit_form.faculty_remark %}
-                            {% bootstrap_field learning_unit_form.other_remark %}
                         </div>
                     </div>
                 {% endif %}

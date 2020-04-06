@@ -37,12 +37,11 @@ from django_filters.views import FilterView
 from base.forms.search.search_form import get_research_criteria
 from base.models.academic_year import starting_academic_year
 from base.models.education_group_type import EducationGroupType
-from education_group.models.group_year import GroupYear
 from base.models.enums import education_group_categories
 from base.models.person import Person
 from base.utils.cache import CacheFilterMixin
 from base.utils.search import SearchMixin
-
+from education_group.models.group_year import GroupYear
 from program_management.api.serializers.education_group import EducationGroupSerializer
 from program_management.forms.education_groups import GroupFilter
 

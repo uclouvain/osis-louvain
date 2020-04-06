@@ -61,7 +61,6 @@ from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
 from base.models.group_element_year import GroupElementYear
-from program_management.ddd.repositories.find_roots import find_roots
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
@@ -74,8 +73,11 @@ from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
 from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.find_roots import find_roots
 from program_management.ddd.repositories.load_tree import find_all_program_tree_versions
 from program_management.forms.custom_xls import CustomXlsForm
+from program_management.models.enums import node_type
+from program_management.serializers.program_tree_view import program_tree_view_serializer
 from webservices.business import CONTACT_INTRO_KEY
 from django.db.models import Prefetch
 from program_management.serializers.program_tree_view import program_tree_view_serializer
@@ -187,6 +189,10 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
                                           self.offer.acronym)
             serialized_data = program_tree_view_serializer(program_tree)
             context['tree'] = json.dumps(serialized_data)
+            context["current_node"] = program_tree.get_node_by_id_and_type(
+                self.object.id,
+                node_type.NodeType.EDUCATION_GROUP
+            )
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
             person=self.person,

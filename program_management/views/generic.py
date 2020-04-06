@@ -43,6 +43,7 @@ from base.views.education_groups.detail import CatalogGenericDetailView
 from base.views.mixins import RulesRequiredMixin, FlagMixin, AjaxTemplateMixin
 from program_management.ddd.domain.node import NodeLearningUnitYear
 from program_management.ddd.repositories import load_tree
+from program_management.models.enums.node_type import NodeType
 from program_management.serializers import program_tree_view
 
 NO_PREREQUISITES = TrainingType.finality_types() + [
@@ -142,7 +143,7 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView, Catalog
         self.program_tree = load_tree.load(root.id)
         serialized_data = program_tree_view.program_tree_view_serializer(self.program_tree)
 
-        node = self.program_tree.get_node_by_id_and_class(self.object.id, NodeLearningUnitYear)
+        node = self.program_tree.get_node_by_id_and_type(self.object.id, NodeType.LEARNING_UNIT)
 
         context['person'] = self.get_person()
         context['root'] = root
