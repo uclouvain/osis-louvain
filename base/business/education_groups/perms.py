@@ -69,13 +69,13 @@ def _is_eligible_to_add_education_group(person, education_group, category, educa
             else check_authorized_type(education_group, category, raise_exception))
 
 
-def is_eligible_to_add_specific_version(person, education_group, raise_exception=False):
-    return _is_eligible_to_add_specific_version(person, education_group, raise_exception=raise_exception)
+def is_eligible_to_add_education_group_year_version(person, education_group, raise_exception=False):
+    return _is_eligible_to_add_education_group_year_version(person, education_group, raise_exception=raise_exception)
 
 
 def _is_eligible_to_add_specific_version(person, education_group, raise_exception=False):
-    return check_permission(person, "base.create_educationgroup_specific_version", raise_exception) and \
-           _is_eligible_education_group(person, education_group, raise_exception) and \
+    return check_permission(person, "program_management.create_educationgroupversion", raise_exception) and \
+           _is_eligible_to_add_education_group_year_version(person, education_group, raise_exception) and \
            _is_year_editable(education_group, raise_exception)
 
 
@@ -152,6 +152,12 @@ def _is_eligible_education_group(person, education_group, raise_exception):
             person.is_central_manager or
             EventPermEducationGroupEdition(obj=education_group, raise_exception=raise_exception).is_open()
         )
+    )
+
+
+def _is_eligible_to_add_education_group_year_version(person, education_group, raise_exception):
+    return (
+        check_link_to_management_entity(education_group, person, raise_exception) and person.is_central_manager
     )
 
 

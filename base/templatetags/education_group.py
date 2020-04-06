@@ -34,7 +34,7 @@ from base.business.education_group import can_user_edit_administrative_data
 from base.business.education_groups.perms import is_eligible_to_change_education_group, is_eligible_to_add_training, \
     is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_postpone_education_group, \
     is_eligible_to_delete_education_group_year, is_eligible_to_edit_certificate_aims, \
-    is_eligible_to_change_education_group_content, is_eligible_to_add_specific_version
+    is_eligible_to_change_education_group_content, is_eligible_to_add_education_group_year_version
 from base.models.academic_year import AcademicYear
 from base.models.enums.education_group_types import GroupType
 from base.models.utils.utils import get_verbose_field_value
@@ -77,7 +77,7 @@ def li_with_create_perm_group(context, url, message, url_id="link_create_group")
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
 def li_with_create_perm_specific_version(context, url, message, url_id="link_create_specific_version"):
-    return li_with_permission(context, is_eligible_to_add_specific_version, url, message, url_id, True)
+    return li_with_permission(context, is_eligible_to_add_education_group_year_version, url, message, url_id, True)
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
