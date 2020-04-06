@@ -55,7 +55,7 @@ def load(tree_root_id: int, version_name, transition, year, acronym) -> 'Program
                                                    version_name=version_name,
                                                    is_transition=transition).first()
 
-    structure = group_element_year.GroupElementYear.objects.get_adjacency_list([version.root_group.pk], tree_root_id)
+    structure = group_element_year.GroupElementYear.objects.get_adjacency_list([version.root_group.pk])
     nodes = __load_tree_nodes(structure)
     nodes.update({'{}_{}'.format(root_node.pk, NodeType.EDUCATION_GROUP): root_node})
     links = __load_tree_links(structure)

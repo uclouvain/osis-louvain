@@ -98,7 +98,7 @@ class GroupElementYearManager(models.Manager):
     #         Q(child_branch__isnull=False) | Q(child_leaf__learning_container_year__isnull=False)
     #     )
 
-    def get_adjacency_list(self, root_elements_ids, education_group_year_id):
+    def get_adjacency_list(self, root_elements_ids):
         if not isinstance(root_elements_ids, list):
             raise Exception('root_elements_ids must be an instance of list')
         if not root_elements_ids:
@@ -106,62 +106,35 @@ class GroupElementYearManager(models.Manager):
 
         adjacency_query_template = """
             WITH RECURSIVE
-                adjacency_query AS (
-                    SELECT
-                        %(education_group_year_id)s as starting_node_id,
-                        base_groupelementyear.id,
-                        CASE
-                        WHEN child_element_rec.group_year_id is not null
-                            THEN child_element_rec.group_year_id        
-                            ELSE null
-                        END
-                        as child_branch_id,
-                        CASE
-                        WHEN child_element_rec.learning_unit_year_id is not null
-                            THEN  child_element_rec.learning_unit_year_id
-                            ELSE null
-                        END as child_leaf_id,
-                        %(education_group_year_id)s as parent_id,
+                adjacency_query AS (SELECT
+                        parent_element_rec.group_year_id as starting_node_id,
+                        base_groupelementyear.id as group_element_year_id,                        
+                        child_element_rec.id as child_branch_id,
+                        child_element_rec.learning_unit_year_id as child_leaf_id,
+                        parent_element_rec.id as parent_id,
                         "order",
                         0 AS level,
-                        CAST(parent_id || '|' ||
-                            (
-                                CASE
-                                WHEN child_branch_id is not null
-                                    THEN child_branch_id
-                                    ELSE child_leaf_id
-                                END
-                            ) as varchar(1000)
-                        ) As path
-                    FROM  base_groupelementyear 
+                        parent_element_rec.id || '|' || child_element_rec.id as Path
+                    FROM  base_groupelementyear
                     INNER JOIN program_management_element AS parent_element_rec ON parent_element_rec.id=base_groupelementyear.parent_element_id
-                    INNER JOIN program_management_element AS child_element_rec ON child_element_rec.id=base_groupelementyear.child_element_id    
+                    INNER JOIN program_management_element AS child_element_rec ON child_element_rec.id=base_groupelementyear.child_element_id
                     where parent_element_rec.group_year_id IN %(root_element_ids)s
-
-                    UNION ALL
-
-                    SELECT parent.starting_node_id,
-                           child.id,
-                           child.child_branch_id,
-                           child.child_leaf_id,
-                           child.parent_id,
-                           child.order,
-                           parent.level + 1,
-                           CAST(
-                                parent.path || '|' ||
-                                    (
-                                        CASE
-                                        WHEN child.child_branch_id is not null
-                                            THEN child.child_branch_id
-                                            ELSE child.child_leaf_id
-                                        END
-                                    ) as varchar(1000)
-                               ) as path
-                    FROM base_groupelementyear AS child                                          
+                UNION ALL
+                    SELECT
+                        parent.starting_node_id,
+                        child.id as group_element_year_id,                        
+                        child_element_rec.id as child_branch_id,
+                        child_element_rec.learning_unit_year_id as child_leaf_id,
+                        parent_element_rec.id as parent_id,
+                        child.order,
+                        parent.level + 1,
+                        parent.path || '|' || child_element_rec.id As Path
+                    FROM  base_groupelementyear as child                    
                     INNER JOIN adjacency_query AS parent on parent.child_branch_id = child.parent_id
-                    
-                )
-            SELECT distinct starting_node_id, adjacency_query.id, child_branch_id, child_leaf_id, parent_id,
+                    INNER JOIN program_management_element AS parent_element_rec ON parent_element_rec.id=child.parent_element_id
+                    INNER JOIN program_management_element AS child_element_rec ON child_element_rec.id=child.child_element_id
+)
+            SELECT distinct starting_node_id, adjacency_query.group_element_year_id, child_branch_id, child_leaf_id, parent_id,
             COALESCE(child_branch_id, child_leaf_id) AS child_id, "order", level, path
             FROM adjacency_query
             LEFT JOIN base_learningunityear bl on bl.id = adjacency_query.child_leaf_id
@@ -169,8 +142,7 @@ class GroupElementYearManager(models.Manager):
             ORDER BY starting_node_id, level, "order";
         """
         parameters = {
-            "root_element_ids": tuple(root_elements_ids),
-            "education_group_year_id": education_group_year_id
+            "root_element_ids": tuple(root_elements_ids)
         }
         return self.fetch_all(adjacency_query_template, parameters)
 
