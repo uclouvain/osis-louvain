@@ -120,10 +120,6 @@ class GroupFilter(FilterSet):
         widget=forms.CheckboxInput,
         initial='True'
     )
-    # has_educationversiongroup = filters.BooleanFilter(
-    #     method="filter_by_educationgroupversion",
-    #     initial='True'
-    # )
 
     method = 'filter_with_entity_subordinated',
 
