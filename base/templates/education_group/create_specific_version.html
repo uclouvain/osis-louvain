@@ -35,14 +35,14 @@
             {% csrf_token %}
             <div class="panel panel-default">
                 <div class="panel-body">
-                    {% bootstrap_label form.acronym.label label_class="control-label" %}
-                    <div class="acronym-group">
+                    {% bootstrap_label form.version_name.label label_class="control-label" %}
+                    <div class="version_name-group">
                         <div class="input-group">
                             <span class="input-group-addon">{{education_group_year.acronym}} [</span>
-                            {% bootstrap_field form.acronym show_label=False %}
+                            {% bootstrap_field form.version_name show_label=False %}
                             <span class="input-group-addon">]</span>
                         </div>
-                        <span id="acronym_error_id"></span>
+                        <span id="version_name_error_id"></span>
                     </div>
                     <br>
                     {% bootstrap_field form.title %}

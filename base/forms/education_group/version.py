@@ -29,6 +29,7 @@ from django.forms import TextInput
 from django.utils.translation import gettext_lazy as _
 
 from base.business import event_perms
+from base.business.education_groups.create import create_initial_group_element_year_structure
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
 from base.models import academic_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
@@ -67,17 +68,23 @@ class SpecificVersionForm(forms.Form):
         max_year = academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1).year
         end_postponement = max_year if not self.cleaned_data['end_year'] else self.cleaned_data['end_year'].year
         new_education_group_version = self._create_specific_version(education_group_year)
-        self._report_specific_version_creation(education_group_year, end_postponement)
+        education_group_years_list = [education_group_year]
+        education_group_years_list = self._report_specific_version_creation(education_group_year,
+                                                                            end_postponement,
+                                                                            education_group_years_list)
+        create_initial_group_element_year_structure(education_group_years_list)
         return new_education_group_version
 
-    def _report_specific_version_creation(self, education_group_year, end_postponement):
+    def _report_specific_version_creation(self, education_group_year, end_postponement, education_group_years_list):
         education_group_year = education_group_year.next_year()
         if education_group_year:
             while education_group_year.academic_year.year <= end_postponement or not education_group_year:
+                education_group_years_list.append(education_group_year)
                 self._create_specific_version(education_group_year)
                 education_group_year = education_group_year.next_year()
                 if not education_group_year:
                     break
+        return education_group_years_list
 
     def _create_specific_version(self, education_group_year):
         version_standard = EducationGroupVersion.objects.get(

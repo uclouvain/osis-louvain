@@ -227,7 +227,8 @@ def check_version_name(request, education_group_year_id):
         raise HttpResponseNotFound
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
     version_name = education_group_year.acronym+request.GET['version_name']
+    # TODO: Check si version existe (in repositories)
     existing = load_specific_version.check_existing_version(version_name, education_group_year_id)
-    # TODO: Validation de l'acronym
-    valid = bool(re.match("^[A-Z]{0,15}$", request.GET['acronym'].upper()))
+    # TODO: Validation de l'acronym (in validators)
+    valid = bool(re.match("^[A-Z]{0,15}$", request.GET['version_name'].upper()))
     return JsonResponse({'existing': existing, 'valid': valid}, safe=False)
