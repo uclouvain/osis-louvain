@@ -49,13 +49,12 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.exceptions import ValidationWarning
 from base.models.person import Person
 from base.utils.cache import RequestCache
-from base.views.common import display_success_messages, show_error_message_for_form_invalid
+from base.views.common import display_success_messages, show_error_message_for_form_invalid, display_error_messages
 from base.views.education_groups.perms import can_create_education_group
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.decorators.ajax import ajax_required
 from osis_common.utils.models import get_object_or_none
 from program_management.ddd.repositories import load_specific_version
-from program_management.models.education_group_version import EducationGroupVersion
 
 FORMS_BY_CATEGORY = {
     education_group_categories.GROUP: GroupForm,
@@ -208,15 +207,13 @@ def create_education_group_specific_version(request, root_id=None, education_gro
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
     person = get_object_or_404(Person, user=request.user)
     form_version = SpecificVersionForm(request.POST or None, person=person, education_group_year=education_group_year)
-    if request.method == 'POST':
-        if form_version.is_valid():
-            form_version.save(education_group_year=education_group_year)
-            redirect_url = reverse('education_group_read', kwargs={
-                'root_id': root_id,
-                'education_group_year_id': education_group_year_id
-            })
-            return redirect(redirect_url)
-    context = {"form": form_version, "education_group_year": education_group_year}
+    if request.method == 'POST' and form_version.is_valid():
+        form_version.save(education_group_year=education_group_year)
+        success_msg = [_get_success_message_for_creation_education_group_year(root_id, education_group_year)]
+        display_success_messages(request, success_msg, extra_tags='safe')
+        url = reverse("education_group_read", args=[root_id, education_group_year_id])
+        return redirect(url)
+    context = {"form": form_version, "education_group_year": education_group_year, "root_id": root_id}
     return render(request, "education_group/create_specific_version.html", context)
 
 
