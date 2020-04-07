@@ -32,10 +32,12 @@ from django.core.exceptions import ValidationError
 from django.http import JsonResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import FormView
+from django.views.generic import FormView, CreateView
 from waffle.decorators import waffle_flag
 
+from base.business.education_groups import perms
 from base.forms.education_group.common import EducationGroupModelForm, EducationGroupTypeForm
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
@@ -47,9 +49,8 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import TrainingType
 from base.models.exceptions import ValidationWarning
-from base.models.person import Person
 from base.utils.cache import RequestCache
-from base.views.common import display_success_messages, show_error_message_for_form_invalid, display_error_messages
+from base.views.common import display_success_messages, show_error_message_for_form_invalid
 from base.views.education_groups.perms import can_create_education_group
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.decorators.ajax import ajax_required
@@ -202,19 +203,44 @@ def validate_field(request, category, education_group_year_pk=None):
     return JsonResponse(response)
 
 
-@login_required
-def create_education_group_specific_version(request, root_id=None, education_group_year_id=None):
-    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    person = get_object_or_404(Person, user=request.user)
-    form_version = SpecificVersionForm(request.POST or None, person=person, education_group_year=education_group_year)
-    if request.method == 'POST' and form_version.is_valid():
-        form_version.save(education_group_year=education_group_year)
-        success_msg = [_get_success_message_for_creation_education_group_year(root_id, education_group_year)]
-        display_success_messages(request, success_msg, extra_tags='safe')
-        url = reverse("education_group_read", args=[root_id, education_group_year_id])
-        return redirect(url)
-    context = {"form": form_version, "education_group_year": education_group_year, "root_id": root_id}
-    return render(request, "education_group/create_specific_version.html", context)
+class CreateEducationGroupSpecificVersion(AjaxTemplateMixin, CreateView):
+    template_name = "education_group/create_specific_version_inner.html"
+    form_class = SpecificVersionForm
+    rules = [perms.is_eligible_to_add_education_group_year_version]
+
+    @cached_property
+    def person(self):
+        return self.request.user.person
+
+    @cached_property
+    def education_group_year(self):
+        return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
+
+    def _call_rule(self, rule):
+        return rule(self.person, self.education_group_year)
+
+    def get_form_kwargs(self):
+        form_kwargs = super().get_form_kwargs()
+        form_kwargs['education_group_year'] = self.education_group_year
+        form_kwargs['person'] = self.person
+        form_kwargs.pop('instance')
+        return form_kwargs
+
+    def get_context_data(self, **kwargs):
+        context = super(CreateEducationGroupSpecificVersion, self).get_context_data(**kwargs)
+        context['education_group_year'] = self.education_group_year
+        context['root_id'] = self.kwargs['root_id']
+        context['form'] = self.get_form()
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        for education_group_year in form.education_group_years_list:
+            display_success_messages(self.request, education_group_year.acronym)
+        return response
+
+    def get_success_url(self):
+        return reverse("education_group_read", args=[self.kwargs['root_id'], self.kwargs['education_group_year_id']])
 
 
 @login_required
@@ -223,7 +249,7 @@ def check_version_name(request, education_group_year_id):
     if not education_group_year_id:
         raise HttpResponseNotFound
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    version_name = education_group_year.acronym+request.GET['version_name']
+    version_name = education_group_year.acronym + request.GET['version_name']
     # TODO: Check si version existe (in repositories)
     existing = load_specific_version.check_existing_version(version_name, education_group_year_id)
     # TODO: Validation de l'acronym (in validators)
