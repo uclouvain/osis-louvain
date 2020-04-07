@@ -236,7 +236,13 @@ class CreateEducationGroupSpecificVersion(AjaxTemplateMixin, CreateView):
     def form_valid(self, form):
         response = super().form_valid(form)
         for education_group_year in form.education_group_years_list:
-            display_success_messages(self.request, education_group_year.acronym)
+            message = \
+                _("Specific version for education group year %(acronym)s (%(academic_year)s) successfully created.") % \
+                {
+                    "acronym": form.clean_version_name(),
+                    "academic_year": education_group_year.academic_year,
+                }
+            display_success_messages(self.request, message)
         return response
 
     def get_success_url(self):
