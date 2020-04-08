@@ -1,18 +1,26 @@
 let linkButtonNoSpinnerClicked = false;
 
+//sync spinner is always active on page load
+const spinnerActive = {sync: true, async: false};
+
 function bindNoSpinner(elem){
     linkButtonNoSpinnerClicked = elem ? elem.hasClass("no_spinner") : false;
 }
 
-function showOverlaySpinner() {
+function showOverlaySpinner(async=false) {
     $("#loader").show();
     document.getElementById("overlay_fadein").style.display = "block";
+    spinnerActive[async ? 'async' : 'sync'] = true;
 }
 
-function closeOverlaySpinner(){
-    $("#loader").hide();
-    document.getElementById("overlay").style.display = "none";
-    document.getElementById("overlay_fadein").style.display = "none";
+function closeOverlaySpinner(async=false){
+    // hide according to initial trigger
+    if(spinnerActive[async ? 'async' : 'sync'] && !spinnerActive[!async ? 'async' : 'sync']) {
+        $("#loader").hide();
+        document.getElementById("overlay").style.display = "none";
+        document.getElementById("overlay_fadein").style.display = "none";
+        spinnerActive[async ? 'async' : 'sync'] = false;
+    }
 }
 
 $( document ).ready(function() {
@@ -41,7 +49,7 @@ window.addEventListener('beforeunload', function (e) {
 });
 
 $(document).ajaxStart(function(){
-    showOverlaySpinner();
+    showOverlaySpinner(true);
 }).ajaxStop(function(){
-    closeOverlaySpinner();
+    closeOverlaySpinner(true);
 });
