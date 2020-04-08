@@ -68,21 +68,21 @@ class SpecificVersionForm(forms.Form):
     def save(self):
         max_year = academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1).year
         end_postponement = max_year if not self.cleaned_data['end_year'] else self.cleaned_data['end_year'].year
-        self._create_specific_version(self.education_group_year)
-        self.education_group_years_list = self._report_specific_version_creation(end_postponement)
+        self.create_specific_version(self.education_group_year)
+        self.education_group_years_list = self.report_specific_version_creation(end_postponement)
         create_initial_group_element_year_structure(self.education_group_years_list)
 
-    def _report_specific_version_creation(self, end_postponement):
+    def report_specific_version_creation(self, end_postponement):
         education_group_years_list = [self.education_group_year]
         next_education_group_year = self.education_group_year.next_year()
         if next_education_group_year:
             while next_education_group_year and next_education_group_year.academic_year.year <= end_postponement:
                 education_group_years_list.append(next_education_group_year)
-                self._create_specific_version(next_education_group_year)
+                self.create_specific_version(next_education_group_year)
                 next_education_group_year = next_education_group_year.next_year()
         return education_group_years_list
 
-    def _create_specific_version(self, education_group_year):
+    def create_specific_version(self, education_group_year):
         version_standard = EducationGroupVersion.objects.get(
             offer=education_group_year, version_name="", is_transition=False
         )
