@@ -51,7 +51,31 @@
                 </div>
             </div>
         </div>
-        {% include "blocks/forms/create_cancel_buttons_modal.html" %}
+        <div id="existing_footer" style="display: none">
+            <div class="modal-footer">
+                <button id="cancel_button" type="button" class="btn btn-default" data-dismiss="modal">
+                    {% trans "Cancel" %}
+                </button>
+                <button type="submit" class="btn btn-primary no_spinner" title="{% trans 'Add' %}">
+                    <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>
+                    {% trans 'Rattacher' %}
+                </button>
+                <button type="submit" class="btn btn-primary no_spinner" title="{% trans 'Add' %}">
+                    <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>
+                    {% trans 'Nouvelle Version' %}
+                </button>
+            </div>
+        </div>
+        <div id="default_footer" style="display: block">
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
+                    {% trans "Cancel" %}
+                </button>
+            </div>
+        </div>
+        <div id="valid_footer" style="display: none">
+            {% include "blocks/forms/create_cancel_buttons_modal.html" %}
+        </div>
     </form>
 </div>
 

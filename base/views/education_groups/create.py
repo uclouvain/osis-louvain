@@ -269,4 +269,5 @@ def check_version_name(request, education_group_year_id):
         "existed_version_name": existed_version_name,
         "existing_version_name": existing_version_name,
         "last_using": last_using,
-        "valid": valid}, safe=False)
+        "valid": valid,
+        "version_name": request.GET['version_name']}, safe=False)

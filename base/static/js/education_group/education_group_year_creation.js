@@ -18,6 +18,10 @@ function callbackVersionNameValidation(data) {
         setWarningMessage(trans_existed_version_name, '#version_name_error_id');
     }else if (!data['valid']) {
         setErrorMessage(trans_invalid_version_name, '#version_name_error_id');
+    }else if (!data['version_name']) {
+        cleanErrorMessage();
+    }else if (data['valid']) {
+        setValideMessage();
     }
 }
 
@@ -43,12 +47,24 @@ function setErrorMessage(text, element) {
         parent.addClass('has-error');
         parent.append("<div class='help-block'>" + text + "</div>");
     }
+    document.getElementById('valid_footer').style.display = 'none';
+    document.getElementById('existing_footer').style.display = 'none';
+    document.getElementById('default_footer').style.display = 'block';
 }
 
 function setWarningMessage(text, element){
     parent = $(element).closest(".version_name-group");
     parent.addClass('has-warning');
     parent.append("<div class='help-block'>" + text + "</div>");
+    document.getElementById('existing_footer').style.display = 'block';
+    document.getElementById('valid_footer').style.display = 'none';
+    document.getElementById('default_footer').style.display = 'none';
+}
+
+function setValideMessage(){
+    document.getElementById('valid_footer').style.display = 'block';
+    document.getElementById('existing_footer').style.display = 'none';
+    document.getElementById('default_footer').style.display = 'none';
 }
 
 function cleanErrorMessage() {
@@ -57,6 +73,9 @@ function cleanErrorMessage() {
     parent.removeClass('has-warning');
     parent.find(".help-block").remove();
     parent.find(".has-error").removeClass('has-error');
+    document.getElementById('valid_footer').style.display = 'none';
+    document.getElementById('existing_footer').style.display = 'none';
+    document.getElementById('default_footer').style.display = 'block';
 }
 
 $(document).ready(function () {
