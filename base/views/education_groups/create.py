@@ -56,6 +56,7 @@ from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.decorators.ajax import ajax_required
 from osis_common.utils.models import get_object_or_none
 from program_management.ddd.repositories import load_specific_version
+from program_management.models.education_group_version import EducationGroupVersion
 
 FORMS_BY_CATEGORY = {
     education_group_categories.GROUP: GroupForm,
@@ -256,8 +257,16 @@ def check_version_name(request, education_group_year_id):
         raise HttpResponseNotFound
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
     version_name = education_group_year.acronym + request.GET['version_name']
-    # TODO: Check si version existe (in repositories)
-    existing = load_specific_version.check_existing_version(version_name, education_group_year_id)
-    # TODO: Validation de l'acronym (in validators)
+    existed_version_name = False
+    existing_version_name = load_specific_version.check_existing_version(version_name, education_group_year_id)
+    last_using = None
+    old_specific_versions = load_specific_version.find_last_existed_version(education_group_year, version_name)
+    if old_specific_versions:
+        last_using = str(old_specific_versions.offer.academic_year)
+        existed_version_name = True
     valid = bool(re.match("^[A-Z]{0,15}$", request.GET['version_name'].upper()))
-    return JsonResponse({'existing': existing, 'valid': valid}, safe=False)
+    return JsonResponse({
+        "existed_version_name": existed_version_name,
+        "existing_version_name": existing_version_name,
+        "last_using": last_using,
+        "valid": valid}, safe=False)

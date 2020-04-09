@@ -29,3 +29,9 @@ from program_management.models.education_group_version import EducationGroupVers
 
 def check_existing_version(version_name: str, education_group_year_id: int) -> bool:
     return EducationGroupVersion.objects.filter(version_name=version_name, offer__id=education_group_year_id).exists()
+
+
+def find_last_existed_version(education_group_year, version_name):
+    return EducationGroupVersion.objects.filter(
+        version_name=version_name, offer__education_group=education_group_year.education_group,
+        offer__academic_year__year__lt=education_group_year.academic_year.year).order_by('offer__academic_year').last()

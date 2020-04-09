@@ -53,7 +53,8 @@ class SpecificVersionForm(forms.Form):
         super().__init__(*args, **kwargs)
         try:
             event_perm = event_perms.generate_event_perm_creation_specific_version(self.person)
-            self.fields["end_year"].queryset = event_perm.get_academic_years()
+            self.fields["end_year"].queryset = event_perm.get_academic_years().exclude(
+                year__lt=self.education_group_year.academic_year.year)
             self.fields["end_year"].initial = self.education_group_year.academic_year
         except ValueError:
             self.fields['end_year'].disabled = True
