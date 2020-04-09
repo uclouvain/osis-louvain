@@ -32,7 +32,7 @@ from ordered_model.models import OrderedModel
 
 
 class AbstractAchievementAdmin(OrderedModelAdmin):
-    list_display = ('code_name', 'order', 'move_up_down_links', 'language')
+    list_display = ('code_name', 'order', 'consistency_id', 'move_up_down_links', 'language')
     readonly_fields = ['order']
     search_fields = ['code_name', 'order']
 

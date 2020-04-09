@@ -35,11 +35,13 @@ from base.forms.learning_unit.learning_unit_create import LearningUnitYearModelF
 from base.forms.learning_unit.learning_unit_create_2 import LearningUnitBaseForm
 from base.forms.utils.acronym_field import split_acronym
 from base.forms.utils.choice_field import add_blank
-from base.models.academic_year import LEARNING_UNIT_CREATION_SPAN_YEARS, starting_academic_year
+from base.models.academic_year import LEARNING_UNIT_CREATION_SPAN_YEARS, starting_academic_year, \
+    find_academic_year_by_year
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LearningUnit
+from base.models.proposal_learning_unit import is_learning_unit_in_proposal, find_by_learning_unit
 
 PARTIM_FORM_READ_ONLY_FIELD = {
     'acronym_0', 'acronym_1', 'common_title', 'common_title_english',
@@ -196,13 +198,19 @@ class PartimForm(LearningUnitBaseForm):
         return initial_learning_unit_year
 
     def save(self, commit=True):
-        start_year = self.instance.learning_unit.start_year if self.instance else \
-            self.learning_unit_full_instance.start_year
 
-        end_anac = self.instance.learning_unit.end_year if self.instance else \
-            self.learning_unit_full_instance.end_year
+        learning_unit_instance = self.instance.learning_unit if self.instance else self.learning_unit_full_instance
+
+        start_year = learning_unit_instance.start_year
+        end_anac = learning_unit_instance.end_year
+
+        # retrieve original learning unit end year if proposal
+        if is_learning_unit_in_proposal(learning_unit_instance):
+            proposal = find_by_learning_unit(learning_unit_instance)
+            end_anac = find_academic_year_by_year(proposal.initial_data['learning_unit']['end_year'])
 
         lcy = self.learning_unit_year_full.learning_container_year
+
         # Save learning unit
         learning_unit = self.learning_unit_form.save(
             start_year=self.start_anac if self.start_anac else start_year,

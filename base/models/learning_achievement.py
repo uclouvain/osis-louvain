@@ -33,6 +33,7 @@ from osis_common.utils.models import get_object_or_none
 
 class LearningAchievementAdmin(VersionAdmin, AbstractAchievementAdmin):
     raw_id_fields = ('learning_unit_year',)
+    list_filter = ('language', 'learning_unit_year__academic_year')
 
     def get_list_display(self, request):
         return ('learning_unit_year',) + super().get_list_display(request)

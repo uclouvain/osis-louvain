@@ -73,6 +73,7 @@ class LearningAchievementEditForm(forms.ModelForm):
         self.luy = kwargs.pop('luy', None)
         self.code = kwargs.pop('code', '')
         self.consistency_id = kwargs.pop('consistency_id')
+        self.order = kwargs.pop('order', None)
         self.has_proposal = ProposalLearningUnit.objects.filter(learning_unit_year=self.luy).exists()
         super().__init__(data, initial=initial, **kwargs)
 
@@ -120,7 +121,8 @@ class LearningAchievementEditForm(forms.ModelForm):
             ).get_or_create(
                 learning_unit_year_id=self.luy.id,
                 language=Language.objects.get(code=code[:2].upper()),
-                consistency_id=self.consistency_id
+                consistency_id=self.consistency_id,
+                order=self.order
             )
             self.achievement.code_name = self.cleaned_data.get('code_name')
             self.achievement.text = self.cleaned_data.get('text_{}'.format(code[:2]))

@@ -30,6 +30,7 @@ from django.views.decorators.http import require_POST
 from base.utils.cache import ElementCache
 
 
+#  FIXME move to program management
 @login_required
 @require_POST
 @permission_required('base.can_access_education_group', raise_exception=True)

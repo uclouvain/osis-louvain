@@ -33,6 +33,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, UpdateView
 
+import program_management.views.tree.move
 from base.business.education_groups.perms import is_eligible_to_change_achievement
 from base.forms.education_group.achievement import ActionForm, EducationGroupAchievementForm, \
     EducationGroupDetailedAchievementForm, EducationGroupAchievementCMSForm

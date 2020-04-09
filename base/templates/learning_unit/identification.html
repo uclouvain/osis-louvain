@@ -1,5 +1,5 @@
 {% extends "learning_unit/layout_detail.html" %}
-{% load i18n %}
+{% load i18n static %}
 {% load learning_unit %}
 {% load feature_flag %}
 {% load waffle_tags %}
@@ -304,3 +304,8 @@
     </div>
 
 {% endblock %}
+
+{% block script %}
+    {{ block.super }}
+    <script type="text/javascript" src="{% static 'js/program_management/education_group_tree.js' %}"></script>
+{% endblock script %}
