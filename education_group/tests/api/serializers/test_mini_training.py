@@ -45,11 +45,13 @@ class MiniTrainingListSerializerTestCase(TestCase):
         )
 
         cls.mini_training = MiniTrainingFactory(
-            partial_acronym='LLOGO210O',
             academic_year=cls.academic_year,
             management_entity=cls.entity_version.entity,
         )
-        cls.version = StandardEducationGroupVersionFactory(offer=cls.mini_training)
+        cls.version = StandardEducationGroupVersionFactory(
+            offer=cls.mini_training,
+            root_group__partial_acronym='LLOGO210O',
+        )
 
         url = reverse('education_group_api_v1:' + MiniTrainingList.name)
         cls.serializer = MiniTrainingListSerializer(cls.version, context={
@@ -98,11 +100,13 @@ class MiniTrainingDetailSerializerTestCase(TestCase):
             entity__organization__type=organization_type.MAIN
         )
         cls.mini_training = MiniTrainingFactory(
-            partial_acronym='LGENR100I',
             academic_year=cls.academic_year,
             management_entity=cls.entity_version.entity,
         )
-        cls.version = StandardEducationGroupVersionFactory(offer=cls.mini_training)
+        cls.version = StandardEducationGroupVersionFactory(
+            offer=cls.mini_training,
+            root_group__partial_acronym='LGENR100I',
+        )
         url = reverse('education_group_api_v1:mini_training_read', kwargs={
             'partial_acronym': cls.version.root_group.partial_acronym,
             'year': cls.academic_year.year
