@@ -38,7 +38,7 @@
                     {% bootstrap_label form.version_name.label label_class="control-label" %} *
                     <div class="version_name-group">
                         <div class="input-group">
-                            <span class="input-group-addon">{{education_group_year.acronym}} [</span>
+                            <span class="input-group-addon">{{ education_group_year.acronym }} [</span>
                             {% bootstrap_field form.version_name show_label=False %}
                             <span class="input-group-addon">]</span>
                         </div>
@@ -51,17 +51,16 @@
                 </div>
             </div>
         </div>
+        <input type="hidden" id="save_type" name="save_type">
         <div id="existing_footer" style="display: none">
             <div class="modal-footer">
-                <button id="cancel_button" type="button" class="btn btn-default" data-dismiss="modal">
+                <button type="button" class="btn btn-default" data-dismiss="modal">
                     {% trans "Cancel" %}
                 </button>
-                <button type="submit" class="btn btn-primary no_spinner" title="{% trans 'Add' %}">
-                    <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>
+                <button type="submit" class="btn btn-primary no_spinner" title="{% trans 'Add' %}" value="attach"  onclick="changeValue(this.value)">
                     {% trans 'Rattacher' %}
                 </button>
-                <button type="submit" class="btn btn-primary no_spinner" title="{% trans 'Add' %}">
-                    <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span>
+                <button type="submit" class="btn btn-primary no_spinner" title="{% trans 'Add' %}" value="new_version" onclick="changeValue(this.value)">
                     {% trans 'Nouvelle Version' %}
                 </button>
             </div>
@@ -74,11 +73,23 @@
             </div>
         </div>
         <div id="valid_footer" style="display: none">
-            {% include "blocks/forms/create_cancel_buttons_modal.html" %}
+            <div class="modal-footer">
+                <button id="cancel_button" type="button" class="btn btn-default" data-dismiss="modal">
+                    {% trans "Cancel" %}
+                </button>
+                <button type="submit" class="btn btn-primary no_spinner" title="{% trans 'Add' %}" value="new_version" onclick="changeValue(this.value)">
+                    {% trans 'Nouvelle Version' %}
+                </button>
+            </div>
         </div>
     </form>
 </div>
 
 {% block script %}
     <script type="text/javascript" src="{% static 'js/education_group/education_group_year_creation.js' %}"></script>
+    <script>
+        function changeValue(new_value){
+            document.getElementById('save_type').value=new_value;
+        }
+    </script>
 {% endblock %}

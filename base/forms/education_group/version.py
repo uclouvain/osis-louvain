@@ -47,6 +47,7 @@ class SpecificVersionForm(forms.Form):
                                       label=_('This version exists until'), empty_label=BLANK_CHOICE_DISPLAY)
 
     def __init__(self, *args, **kwargs):
+        self.save_type = kwargs.pop('save_type')
         self.education_group_years_list = []
         self.person = kwargs.pop('person')
         self.education_group_year = kwargs.pop('education_group_year')
@@ -69,13 +70,24 @@ class SpecificVersionForm(forms.Form):
     def save(self):
         max_year = academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1).year
         end_postponement = max_year if not self.cleaned_data['end_year'] else self.cleaned_data['end_year'].year
-        self.create_specific_version(self.education_group_year)
-        self.education_group_years_list = self.report_specific_version_creation(end_postponement)
+        if self.save_type == "new_version":
+            self.create_specific_version(self.education_group_year)
+            education_group_years_list = [self.education_group_year]
+            self.education_group_years_list = self.report_specific_version_creation(
+                self.education_group_year, end_postponement, education_group_years_list
+            )
+        if self.save_type == "attach":
+            education_group_years_list = []
+            last_old_version = load_specific_version.find_last_existed_version(
+                self.education_group_year, self.cleaned_data["version_name"]
+            )
+            self.education_group_years_list = self.report_specific_version_creation(
+                last_old_version.offer, end_postponement, education_group_years_list
+            )
         create_initial_group_element_year_structure(self.education_group_years_list)
 
-    def report_specific_version_creation(self, end_postponement):
-        education_group_years_list = [self.education_group_year]
-        next_education_group_year = self.education_group_year.next_year()
+    def report_specific_version_creation(self, education_group_year, end_postponement, education_group_years_list):
+        next_education_group_year = education_group_year.next_year()
         if next_education_group_year:
             while next_education_group_year and next_education_group_year.academic_year.year <= end_postponement:
                 education_group_years_list.append(next_education_group_year)

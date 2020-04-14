@@ -56,7 +56,6 @@ from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.decorators.ajax import ajax_required
 from osis_common.utils.models import get_object_or_none
 from program_management.ddd.repositories import load_specific_version
-from program_management.models.education_group_version import EducationGroupVersion
 
 FORMS_BY_CATEGORY = {
     education_group_categories.GROUP: GroupForm,
@@ -222,6 +221,7 @@ class CreateEducationGroupSpecificVersion(AjaxTemplateMixin, CreateView):
 
     def get_form_kwargs(self):
         form_kwargs = super().get_form_kwargs()
+        form_kwargs["save_type"] = self.request.POST["save_type"] if "save_type" in self.request.POST else None
         form_kwargs['education_group_year'] = self.education_group_year
         form_kwargs['person'] = self.person
         form_kwargs.pop('instance')
