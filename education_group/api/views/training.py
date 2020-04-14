@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import F
 from django.http import Http404
 from django_filters import rest_framework as filters
 from rest_framework import generics
@@ -134,7 +133,7 @@ class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
             ).prefetch_related(
                 'offer__administration_entity__entityversion_set',
                 'offer__management_entity__entityversion_set',
-            ).annotate(credits=F('root_group__credits')),
+            ),
             offer__acronym__iexact=acronym,
             offer__academic_year__year=year,
             version_name=version_name,

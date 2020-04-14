@@ -30,16 +30,18 @@ from rest_framework import serializers
 from base.api.serializers.campus import CampusDetailSerializer
 from education_group.api.serializers import utils
 from education_group.api.serializers.education_group_year import BaseEducationGroupYearSerializer
-from education_group.api.serializers.utils import MiniTrainingHyperlinkedIdentityField
+from education_group.api.serializers.utils import MiniTrainingHyperlinkedIdentityField, FlattenMixin
 
 
-class MiniTrainingListSerializer(BaseEducationGroupYearSerializer, serializers.ModelSerializer):
+class MiniTrainingListSerializer(FlattenMixin, serializers.ModelSerializer):
     url = MiniTrainingHyperlinkedIdentityField(read_only=True)
     management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
     management_faculty = serializers.SerializerMethodField()
 
-    class Meta(BaseEducationGroupYearSerializer.Meta):
-        fields = ('url',) + BaseEducationGroupYearSerializer.Meta.fields + (
+    class Meta:
+        flatten = [('offer', BaseEducationGroupYearSerializer)]
+        fields = (
+            'url',
             'management_entity',
             'management_faculty',
         )
@@ -57,6 +59,7 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
     constraint_type_text = serializers.CharField(source='get_constraint_type_display', read_only=True)
     active_text = serializers.CharField(source='get_active_display', read_only=True)
     schedule_type_text = serializers.CharField(source='get_schedule_type_display', read_only=True)
+    credits = serializers.IntegerField(source='root_group.credits', read_only=True)
 
     class Meta(MiniTrainingListSerializer.Meta):
         fields = MiniTrainingListSerializer.Meta.fields + (
