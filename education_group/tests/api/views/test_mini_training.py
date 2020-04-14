@@ -98,12 +98,16 @@ class MiniTrainingListTestCase(APITestCase):
         cls.versions = []
         for partial_acronym in ['LLOGO210O', 'NLOGO2101', 'WLOGO2102']:
             mini_training = MiniTrainingFactory(
-                partial_acronym=partial_acronym,
                 academic_year=cls.academic_year,
                 management_entity=cls.entity_version.entity,
             )
             cls.mini_trainings.append(mini_training)
-            cls.versions.append(StandardEducationGroupVersionFactory(offer=mini_training))
+            cls.versions.append(
+                StandardEducationGroupVersionFactory(
+                    offer=mini_training,
+                    root_group__partial_acronym=partial_acronym
+                )
+            )
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:' + MiniTrainingList.name)
 
@@ -137,13 +141,13 @@ class MiniTrainingListTestCase(APITestCase):
 
     def test_get_filter_by_code(self):
         url = self.url + "?" + urllib.parse.urlencode({
-            'code': self.versions[1].partial_acronym
+            'code': self.versions[1].root_group.partial_acronym
         })
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 1)
-        self.assertEqual(response.data['results'][0]['code'], self.versions[1].partial_acronym)
+        self.assertEqual(response.data['results'][0]['code'], self.versions[1].root_group.partial_acronym)
 
     def test_get_filter_by_acronym(self):
         url = self.url + "?" + urllib.parse.urlencode({
@@ -175,9 +179,9 @@ class MiniTrainingListTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 3)
-        self.assertEqual(response.data['results'][0]['code'], self.versions[2].partial_acronym)
-        self.assertEqual(response.data['results'][1]['code'], self.versions[1].partial_acronym)
-        self.assertEqual(response.data['results'][2]['code'], self.versions[0].partial_acronym)
+        self.assertEqual(response.data['results'][0]['code'], self.versions[2].root_group.partial_acronym)
+        self.assertEqual(response.data['results'][1]['code'], self.versions[1].root_group.partial_acronym)
+        self.assertEqual(response.data['results'][2]['code'], self.versions[0].root_group.partial_acronym)
 
 
 class GetMiniTrainingTestCase(APITestCase):
