@@ -124,7 +124,6 @@ class EducationGroupYearSerializer(serializers.ModelSerializer):
             'duration_unit_text',
             'language_association_text',
             'enrollment_enabled',
-            'credits',
             'remark',
             'min_constraint',
             'max_constraint',

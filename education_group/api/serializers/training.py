@@ -81,8 +81,6 @@ class TrainingListSerializer(FlattenMixin, serializers.HyperlinkedModelSerialize
 
 
 class TrainingDetailSerializer(TrainingListSerializer):
-    credits = serializers.IntegerField(source='root_group.credits')
-
     class Meta(TrainingListSerializer.Meta):
         flatten = TrainingListSerializer.Meta.flatten + [('offer', EducationGroupYearSerializer)]
         fields = TrainingListSerializer.Meta.fields + ('credits',)
