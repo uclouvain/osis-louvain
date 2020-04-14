@@ -29,6 +29,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, EducationGroupYearMasterFactory
@@ -54,7 +55,7 @@ class FilterEducationGroupRootsTestCase(APITestCase):
         cls.training = EducationGroupYearMasterFactory(
             academic_year=cls.academic_year, acronym='test2m', partial_acronym='test2m'
         )
-
+        StandardEducationGroupVersionFactory(offer=cls.training)
         cls.common_core = GroupFactory(
             education_group_type__name=GroupType.COMMON_CORE.name,
             academic_year=cls.academic_year
@@ -86,14 +87,14 @@ class FilterEducationGroupRootsTestCase(APITestCase):
         self.client.force_authenticate(user=self.user)
 
     def test_get_educationgrouproots_case_filter_ignore_complementary_module_params(self):
-        education_group_roots = StandardEducationGroupVersionFactory(offer=self.training)
+        education_group_roots = EducationGroupYear.objects.filter(id=self.training.id)
 
         query_string = {'ignore_complementary_module': 'true'}
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = EducationGroupRootsListSerializer(
-            [education_group_roots],
+            education_group_roots,
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
@@ -104,10 +105,10 @@ class FilterEducationGroupRootsTestCase(APITestCase):
         self.assertEqual(response.data, serializer.data)
 
     def test_get_finality_root_and_not_itself(self):
-        education_group_roots = StandardEducationGroupVersionFactory(offer=self.training)
+        education_group_roots = EducationGroupYear.objects.filter(id=self.training.id)
 
         finality_root = EducationGroupYearMasterFactory(academic_year=self.academic_year)
-        finality_root_version = StandardEducationGroupVersionFactory(offer=finality_root)
+        StandardEducationGroupVersionFactory(offer=finality_root)
         finality = TrainingFactory(
             academic_year=self.academic_year,
             education_group_type__name=TrainingType.MASTER_MD_120.name
@@ -120,7 +121,7 @@ class FilterEducationGroupRootsTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = EducationGroupRootsListSerializer(
-            [education_group_roots, finality_root_version],
+            list(education_group_roots) + [finality_root],
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
@@ -191,7 +192,7 @@ class EducationGroupRootsListTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = EducationGroupRootsListSerializer(
-            [self.training_version],
+            [self.training],
             many=True,
             context={
                 'request': RequestFactory().get(self.url),

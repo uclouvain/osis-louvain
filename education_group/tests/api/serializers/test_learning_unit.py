@@ -28,30 +28,27 @@ from django.test import TestCase, RequestFactory
 from rest_framework.reverse import reverse
 
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.education_group_year import EducationGroupYearBachelorFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer
 from education_group.api.serializers.learning_unit import LearningUnitYearPrerequisitesListSerializer
 from education_group.api.views.learning_unit import LearningUnitPrerequisitesList
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardEducationGroupVersionFactory
 
 
 class EducationGroupRootsListSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
-        cls.training = TrainingFactory(
-            acronym='BIR1BA',
-            partial_acronym='LBIR1000I',
-            academic_year=cls.academic_year,
-        )
-        cls.version = EducationGroupVersionFactory(offer=cls.training)
+        cls.training = EducationGroupYearBachelorFactory(academic_year=cls.academic_year)
+        cls.version = StandardEducationGroupVersionFactory(offer=cls.training)
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
-        cls.serializer = EducationGroupRootsListSerializer(cls.version, context={
+        cls.serializer = EducationGroupRootsListSerializer(cls.training, context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
             })
@@ -59,18 +56,18 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'url',
-            'acronym',
-            'code',
             'credits',
             'decree_category',
             'decree_category_text',
             'duration',
             'duration_unit',
             'duration_unit_text',
+            'title',
+            'acronym',
+            'code',
             'education_group_type',
             'education_group_type_text',
             'academic_year',
-            'title'
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -114,13 +111,13 @@ class LearningUnitYearPrerequisitesListSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'url',
+            'prerequisites',
             'title',
             'acronym',
             'code',
-            'academic_year',
             'education_group_type',
             'education_group_type_text',
-            'prerequisites'
+            'academic_year',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 

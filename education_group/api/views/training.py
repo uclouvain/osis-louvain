@@ -67,10 +67,7 @@ class TrainingFilter(filters.FilterSet):
             return egvs.filter(is_transition=True)
         elif value == 'special':
             return egvs.exclude(version_name='')
-        return queryset.filter(
-            is_transition=False,
-            version_name=''
-        )
+        return queryset
 
 
 class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):

@@ -53,10 +53,12 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer):
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
+    partial_title = serializers.SerializerMethodField()
 
     class Meta(EducationGroupTitleSerializer.Meta):
         model = EducationGroupYear
         fields = EducationGroupTitleSerializer.Meta.fields + (
+            'partial_title',
             'acronym',
             'code',
             'education_group_type',
@@ -76,33 +78,30 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer):
     def get_management_faculty(obj):
         return utils.get_entity(obj, 'management')
 
+    def get_partial_title(self, obj):
+        language = self.context.get('language')
+        return getattr(
+            obj,
+            'partial_title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
+        )
+
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if instance.education_group_type.name not in education_group_types.TrainingType.finality_types():
+            data.pop('partial_title')
+        return data
+
 
 class TrainingListSerializer(FlattenMixin, serializers.HyperlinkedModelSerializer):
     url = VersionHyperlinkedIdentityField(read_only=True)
-    partial_title = serializers.SerializerMethodField()
 
     class Meta:
         model = EducationGroupVersion
         flatten = [('offer', TrainingBaseListSerializer)]
         fields = (
             'url',
-            'partial_title',
             'version_name'
         )
-
-    def get_partial_title(self, version):
-        language = self.context.get('language')
-        return getattr(
-            version.offer,
-            'partial_title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
-        )
-
-    def to_representation(self, instance):
-        print(instance)
-        data = super().to_representation(instance)
-        if instance.offer.education_group_type.name not in education_group_types.TrainingType.finality_types():
-            data.pop('partial_title')
-        return data
 
 
 class EducationGroupYearSerializer(serializers.ModelSerializer):
@@ -208,4 +207,3 @@ class EducationGroupYearSerializer(serializers.ModelSerializer):
 class TrainingDetailSerializer(TrainingListSerializer):
     class Meta(TrainingListSerializer.Meta):
         flatten = TrainingListSerializer.Meta.flatten + [('offer', EducationGroupYearSerializer)]
-        fields = TrainingListSerializer.Meta.fields

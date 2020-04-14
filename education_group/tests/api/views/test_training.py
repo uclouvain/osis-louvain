@@ -34,14 +34,13 @@ from rest_framework.test import APITestCase
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearBachelorFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 from program_management.models.education_group_version import EducationGroupVersion
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
-    StandardEducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 
 
 class TrainingTitleTestCase(APITestCase):
@@ -255,7 +254,9 @@ class GetTrainingTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
-        cls.training = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
+        cls.training = EducationGroupYearBachelorFactory(
+            acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year
+        )
         cls.version = StandardEducationGroupVersionFactory(offer=cls.training)
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:training_read', kwargs={

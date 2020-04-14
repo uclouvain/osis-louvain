@@ -112,9 +112,9 @@ class TrainingListSerializerForMasterWithFinalityTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'url',
-            'partial_title',
             'version_name',
             'title',
+            'partial_title',
             'acronym',
             'code',
             'education_group_type',
@@ -282,9 +282,9 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'url',
-            'partial_title',
             'version_name',
             'title',
+            'partial_title',
             'acronym',
             'code',
             'education_group_type',
