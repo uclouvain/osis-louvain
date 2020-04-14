@@ -36,6 +36,7 @@ from education_group.models.group_year import GroupYear
 
 class GroupDetailSerializer(BaseEducationGroupYearSerializer, serializers.ModelSerializer):
     url = GroupHyperlinkedIdentityField(read_only=True)
+    code = serializers.CharField(source='partial_acronym')
     remark = serializers.SerializerMethodField()
     campus = CampusDetailSerializer(source='main_teaching_campus', read_only=True)
 
@@ -47,6 +48,7 @@ class GroupDetailSerializer(BaseEducationGroupYearSerializer, serializers.ModelS
     class Meta(BaseEducationGroupYearSerializer.Meta):
         model = GroupYear
         fields = ('url',) + BaseEducationGroupYearSerializer.Meta.fields + (
+            'code',
             'management_entity',
             'management_faculty',
             'credits',

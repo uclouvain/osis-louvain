@@ -36,6 +36,7 @@ from program_management.models.education_group_version import EducationGroupVers
 
 class MiniTrainingListSerializer(FlattenMixin, serializers.ModelSerializer):
     url = MiniTrainingHyperlinkedIdentityField(read_only=True)
+    code = serializers.CharField(source='root_group.partial_acronym')
     management_entity = serializers.CharField(source='offer.management_entity_version.acronym', read_only=True)
     management_faculty = serializers.SerializerMethodField()
 
@@ -44,6 +45,7 @@ class MiniTrainingListSerializer(FlattenMixin, serializers.ModelSerializer):
         flatten = [('offer', BaseEducationGroupYearSerializer)]
         fields = (
             'url',
+            'code',
             'management_entity',
             'management_faculty',
         )

@@ -36,7 +36,6 @@ from reference.models.language import Language
 
 
 class BaseEducationGroupYearSerializer(EducationGroupTitleSerializer):
-    code = serializers.CharField(source='partial_acronym')
     academic_year = serializers.SlugRelatedField(slug_field='year', queryset=AcademicYear.objects.all())
     education_group_type = serializers.SlugRelatedField(
         slug_field='name',
@@ -49,7 +48,6 @@ class BaseEducationGroupYearSerializer(EducationGroupTitleSerializer):
     class Meta(EducationGroupTitleSerializer.Meta):
         fields = EducationGroupTitleSerializer.Meta.fields + (
             'acronym',
-            'code',
             'education_group_type',
             'education_group_type_text',
             'academic_year'
