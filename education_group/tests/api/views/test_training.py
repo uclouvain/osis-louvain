@@ -242,7 +242,8 @@ class FilterTrainingTestCase(APITestCase):
         serializer = TrainingListSerializer(
             EducationGroupVersion.objects.filter(
                 offer_id__in=trainings.values_list('id', flat=True),
-                is_transition=False
+                is_transition=False,
+                version_name=''
             ),
             many=True,
             context={
@@ -266,7 +267,8 @@ class FilterTrainingTestCase(APITestCase):
         serializer = TrainingListSerializer(
             EducationGroupVersion.objects.filter(
                 offer_id__in=trainings.values_list('id', flat=True),
-                is_transition=False
+                is_transition=False,
+                version_name=''
             ),
             many=True,
             context={
