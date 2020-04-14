@@ -56,7 +56,7 @@ class TrainingListSerializer(FlattenMixin, serializers.HyperlinkedModelSerialize
 
     @staticmethod
     def get_administration_faculty(obj):
-        return utils.get_entity(obj, 'administration')
+        return utils.get_entity(obj.offer, 'administration')
 
     def get_partial_title(self, obj):
         language = self.context.get('language')
