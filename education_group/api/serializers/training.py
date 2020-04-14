@@ -56,7 +56,6 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer):
     partial_title = serializers.SerializerMethodField()
 
     class Meta(EducationGroupTitleSerializer.Meta):
-        model = EducationGroupYear
         fields = EducationGroupTitleSerializer.Meta.fields + (
             'partial_title',
             'acronym',
