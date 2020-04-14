@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.db.models import F
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
@@ -113,7 +112,7 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
                 'offer__main_teaching_campus',
             ).prefetch_related(
                 'offer__management_entity__entityversion_set',
-            ).annotate(credits=F('root_group__credits')),
+            ),
             root_group__partial_acronym__iexact=partial_acronym,  # Field moved into GroupYear
             offer__academic_year__year=year
         )
