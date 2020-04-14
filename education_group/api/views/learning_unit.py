@@ -91,6 +91,8 @@ class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.Lis
         )
 
         return Prerequisite.objects.filter(learning_unit_year=learning_unit_year).select_related(
+            'education_group_year',
+            'learning_unit_year',
             'education_group_year__academic_year',
             'education_group_year__education_group_type',
             'learning_unit_year__academic_year',

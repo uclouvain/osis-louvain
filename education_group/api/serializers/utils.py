@@ -29,6 +29,7 @@ from rest_framework.reverse import reverse
 
 class FlattenMixin:
     """Flatens the specified related objects in this representation"""
+
     def to_representation(self, obj):
         assert hasattr(self.Meta, 'flatten'), (
             'Class {serializer_class} missing "Meta.flatten" attribute'.format(

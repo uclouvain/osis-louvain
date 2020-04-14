@@ -68,11 +68,11 @@ class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     name = 'minitraining_list'
     queryset = EducationGroupYear.objects.filter(
         education_group_type__category=education_group_categories.MINI_TRAINING
-    ).select_related('education_group_type', 'academic_year')\
-     .prefetch_related('management_entity__entityversion_set')\
-     .exclude(
+    ).select_related('education_group_type', 'academic_year') \
+        .prefetch_related('management_entity__entityversion_set') \
+        .exclude(
         acronym__icontains='common',
-     )
+    )
     serializer_class = MiniTrainingListSerializer
     filterset_class = MiniTrainingFilter
     search_fields = (

@@ -28,12 +28,7 @@ from django.conf import settings
 from rest_framework import serializers
 
 from base.api.serializers.campus import CampusDetailSerializer
-from base.models.academic_year import AcademicYear
-from base.models.education_group_type import EducationGroupType
-from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories
 from education_group.api.serializers import utils
-from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.education_group_year import BaseEducationGroupYearSerializer
 from education_group.api.serializers.utils import GroupHyperlinkedIdentityField
 
@@ -49,7 +44,7 @@ class GroupDetailSerializer(BaseEducationGroupYearSerializer, serializers.ModelS
     management_faculty = serializers.SerializerMethodField()
 
     class Meta(BaseEducationGroupYearSerializer.Meta):
-        fields = ('url', ) + BaseEducationGroupYearSerializer.Meta.fields + (
+        fields = ('url',) + BaseEducationGroupYearSerializer.Meta.fields + (
             'management_entity',
             'management_faculty',
             'credits',
