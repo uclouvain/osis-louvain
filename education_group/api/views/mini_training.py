@@ -116,7 +116,7 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
             root_group__partial_acronym__iexact=partial_acronym,  # Field moved into GroupYear
             offer__academic_year__year=year
         )
-        return egv.offer
+        return egv
 
 
 class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):

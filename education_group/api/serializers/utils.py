@@ -95,9 +95,13 @@ class MiniTrainingGetUrlMixin:
         super().__init__(view_name='education_group_api_v1:mini_training_read', **kwargs)
 
     def get_url(self, obj, view_name, request, format):
+        standard_version = obj.educationgroupversion_set.filter(
+            version_name='', is_transition=False
+        ).first()
         url_kwargs = {
-            'partial_acronym': obj.partial_acronym,
-            'year': obj.academic_year.year
+            'partial_acronym': standard_version.root_group.partial_acronym,
+            'year': standard_version.offer.academic_year.year,
+            'version_name': standard_version.version_name
         }
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
