@@ -69,7 +69,7 @@ class TrainingListSerializer(FlattenMixin, serializers.HyperlinkedModelSerialize
     def get_partial_title(self, obj):
         language = self.context.get('language')
         return getattr(
-            obj,
+            obj.offer,
             'partial_title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
         )
 
