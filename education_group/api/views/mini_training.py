@@ -29,7 +29,6 @@ from rest_framework.generics import get_object_or_404
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from backoffice.settings.rest_framework.filters import OrderingFilterWithDefault
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import MiniTrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
@@ -129,9 +128,11 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
     def get_object(self):
         acronym = self.kwargs['partial_acronym']
         year = self.kwargs['year']
-        egy = get_object_or_404(
-            EducationGroupYear.objects.all().select_related('academic_year'),
-            partial_acronym__iexact=acronym,
-            academic_year__year=year
+        egv = get_object_or_404(
+            EducationGroupVersion.objects.all().select_related('root_group__academic_year'),
+            root_group__partial_acronym__iexact=acronym,
+            root_group__academic_year__year=year,
+            version_name='',
+            is_transition=False
         )
-        return egy
+        return egv.offer
