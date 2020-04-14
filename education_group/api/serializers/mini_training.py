@@ -35,7 +35,7 @@ from education_group.api.serializers.utils import MiniTrainingHyperlinkedIdentit
 
 class MiniTrainingListSerializer(FlattenMixin, serializers.ModelSerializer):
     url = MiniTrainingHyperlinkedIdentityField(read_only=True)
-    management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
+    management_entity = serializers.CharField(source='offer.management_entity_version.acronym', read_only=True)
     management_faculty = serializers.SerializerMethodField()
 
     class Meta:
@@ -48,17 +48,22 @@ class MiniTrainingListSerializer(FlattenMixin, serializers.ModelSerializer):
 
     @staticmethod
     def get_management_faculty(obj):
-        return utils.get_entity(obj, 'management')
+        return utils.get_entity(obj.offer, 'management')
 
 
 class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
     remark = serializers.SerializerMethodField()
-    campus = CampusDetailSerializer(source='main_teaching_campus', read_only=True)
+    campus = CampusDetailSerializer(source='offer.main_teaching_campus', read_only=True)
+    schedule_type = serializers.CharField(source='offer.schedule_type', read_only=True)
+    min_constraint = serializers.CharField(source='offer.min_constraint', read_only=True)
+    max_constraint = serializers.CharField(source='offer.max_constraint', read_only=True)
+    constraint_type = serializers.CharField(source='offer.constraint_type', read_only=True)
+    active = serializers.CharField(source='offer.active', read_only=True)
 
     # Display human readable value
-    constraint_type_text = serializers.CharField(source='get_constraint_type_display', read_only=True)
-    active_text = serializers.CharField(source='get_active_display', read_only=True)
-    schedule_type_text = serializers.CharField(source='get_schedule_type_display', read_only=True)
+    constraint_type_text = serializers.CharField(source='offer.get_constraint_type_display', read_only=True)
+    active_text = serializers.CharField(source='offer.get_active_display', read_only=True)
+    schedule_type_text = serializers.CharField(source='offer.get_schedule_type_display', read_only=True)
     credits = serializers.IntegerField(source='root_group.credits', read_only=True)
 
     class Meta(MiniTrainingListSerializer.Meta):
@@ -77,9 +82,9 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
             'campus',
         )
 
-    def get_remark(self, education_group_year):
+    def get_remark(self, version):
         language = self.context.get('language')
         return getattr(
-            education_group_year,
+            version.offer,
             'remark' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
         )
