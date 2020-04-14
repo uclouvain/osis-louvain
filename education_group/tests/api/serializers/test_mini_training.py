@@ -60,14 +60,14 @@ class MiniTrainingListSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'url',
+            'management_entity',
+            'management_faculty',
             'title',
             'acronym',
             'code',
             'education_group_type',
             'education_group_type_text',
             'academic_year',
-            'management_entity',
-            'management_faculty',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -115,14 +115,14 @@ class MiniTrainingDetailSerializerTestCase(TestCase):
     def test_contains_expected_fields(self):
         expected_fields = [
             'url',
+            'management_entity',
+            'management_faculty',
             'title',
             'acronym',
             'code',
             'education_group_type',
             'education_group_type_text',
             'academic_year',
-            'management_entity',
-            'management_faculty',
             'active',
             'active_text',
             'schedule_type',
