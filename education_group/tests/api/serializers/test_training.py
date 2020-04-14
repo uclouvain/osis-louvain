@@ -148,14 +148,15 @@ class TrainingDetailSerializerTestCase(TestCase):
             entity__organization__type=organization_type.MAIN
         )
         cls.training = EducationGroupYearBachelorFactory(
-            acronym='BIR1BA',
-            partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
             management_entity=cls.entity_version.entity,
             administration_entity=cls.entity_version.entity,
             main_domain=DomainFactory(parent=DomainFactory())
         )
-        cls.version = EducationGroupVersionFactory(offer=cls.training)
+        cls.version = EducationGroupVersionFactory(
+            offer=cls.training,
+            root_group__education_group_type=cls.training.education_group_type
+        )
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
