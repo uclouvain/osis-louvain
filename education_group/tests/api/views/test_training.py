@@ -41,7 +41,7 @@ from education_group.api.serializers.education_group_title import EducationGroup
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory, \
-    StandardTransitionEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory
+    StandardTransitionEducationGroupVersionFactory, EducationGroupVersionFactory
 
 
 class TrainingTitleTestCase(APITestCase):
@@ -187,7 +187,7 @@ class FilterTrainingTestCase(APITestCase):
             StandardEducationGroupVersionFactory(offer=offer2)
             StandardEducationGroupVersionFactory(offer=offer3)
         StandardTransitionEducationGroupVersionFactory()
-        ParticularTransitionEducationGroupVersionFactory()
+        EducationGroupVersionFactory()
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
