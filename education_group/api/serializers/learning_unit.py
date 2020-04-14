@@ -34,12 +34,15 @@ from education_group.api.serializers.utils import StandardVersionHyperlinkedRela
 class EducationGroupRootsListSerializer(BaseEducationGroupYearSerializer, serializers.HyperlinkedModelSerializer):
     url = StandardVersionHyperlinkedIdentityField(read_only=True)
 
+    code = serializers.CharField(source='partial_acronym')
+
     # Display human readable value
     decree_category_text = serializers.CharField(source='get_decree_category_display', read_only=True)
     duration_unit_text = serializers.CharField(source='get_duration_unit_display', read_only=True)
 
     class Meta(BaseEducationGroupYearSerializer.Meta):
         fields = ('url',) + BaseEducationGroupYearSerializer.Meta.fields + (
+            'code',
             'credits',
             'decree_category',
             'decree_category_text',
@@ -52,11 +55,13 @@ class EducationGroupRootsListSerializer(BaseEducationGroupYearSerializer, serial
 class LearningUnitYearPrerequisitesListSerializer(FlattenMixin, serializers.ModelSerializer):
     url = StandardVersionHyperlinkedRelatedField(source='education_group_year', lookup_field='acronym', read_only=True)
     prerequisites = serializers.CharField(source='prerequisite_string')
+    code = serializers.CharField(source='education_group_year.partial_acronym')
 
     class Meta:
         flatten = [('education_group_year', BaseEducationGroupYearSerializer)]
         model = Prerequisite
         fields = (
             'url',
+            'code',
             'prerequisites'
         )
