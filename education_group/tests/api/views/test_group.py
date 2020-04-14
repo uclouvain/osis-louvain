@@ -43,7 +43,7 @@ class GroupTitleTestCase(APITestCase):
     def setUpTestData(cls):
         anac = AcademicYearFactory()
 
-        cls.gy = GroupYearFactory(academic_year=anac)
+        cls.gy = GroupYearFactory(academic_year=anac, group__start_year=anac)
 
         cls.person = PersonFactory()
         cls.url = reverse('education_group_api_v1:groupstitle_read', kwargs={

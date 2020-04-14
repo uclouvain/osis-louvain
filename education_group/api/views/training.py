@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models import F
 from django.http import Http404
 from django_filters import rest_framework as filters
 from rest_framework import generics
