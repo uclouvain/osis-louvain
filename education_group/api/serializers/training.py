@@ -38,7 +38,9 @@ from program_management.models.education_group_version import EducationGroupVers
 class TrainingListSerializer(FlattenMixin, serializers.HyperlinkedModelSerializer):
     url = VersionHyperlinkedIdentityField(read_only=True)
 
-    administration_entity = serializers.CharField(source='administration_entity_version.acronym', read_only=True)
+    management_entity = serializers.CharField(source='offer.management_entity_version.acronym', read_only=True)
+    management_faculty = serializers.SerializerMethodField()
+    administration_entity = serializers.CharField(source='offer.administration_entity_version.acronym', read_only=True)
     administration_faculty = serializers.SerializerMethodField()
 
     partial_title = serializers.SerializerMethodField()
@@ -49,10 +51,16 @@ class TrainingListSerializer(FlattenMixin, serializers.HyperlinkedModelSerialize
         fields = (
             'url',
             'version_name',
+            'management_entity',
+            'management_faculty',
             'administration_entity',
             'administration_faculty',
             'partial_title'
         )
+
+    @staticmethod
+    def get_management_faculty(obj):
+        return utils.get_entity(obj.offer, 'management')
 
     @staticmethod
     def get_administration_faculty(obj):

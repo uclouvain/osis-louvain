@@ -25,49 +25,28 @@
 ##############################################################################
 from rest_framework import serializers
 
-from base.models.education_group_type import EducationGroupType
-from base.models.education_group_year import EducationGroupYear
 from base.models.prerequisite import Prerequisite
-from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
+from education_group.api.serializers.education_group_year import BaseEducationGroupYearSerializer
 from education_group.api.serializers.utils import StandardVersionHyperlinkedRelatedField, \
     FlattenMixin, StandardVersionHyperlinkedIdentityField
 
 
-class BaseLearningUnitOfferSerializer(EducationGroupTitleSerializer, serializers.HyperlinkedModelSerializer):
-    academic_year = serializers.IntegerField(source='academic_year.year')
-    education_group_type = serializers.SlugRelatedField(slug_field='name', queryset=EducationGroupType.objects.all())
-    code = serializers.CharField(source='partial_acronym', read_only=True)
-    education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
-
-    class Meta:
-        model = EducationGroupYear
-        fields = EducationGroupTitleSerializer.Meta.fields + (
-            'acronym',
-            'code',
-            'education_group_type',
-            'education_group_type_text',
-            'academic_year',
-        )
-
-
-class EducationGroupRootsListSerializer(BaseLearningUnitOfferSerializer, serializers.HyperlinkedModelSerializer):
+class EducationGroupRootsListSerializer(BaseEducationGroupYearSerializer, serializers.HyperlinkedModelSerializer):
     url = StandardVersionHyperlinkedIdentityField(read_only=True)
 
     # Display human readable value
     decree_category_text = serializers.CharField(source='get_decree_category_display', read_only=True)
     duration_unit_text = serializers.CharField(source='get_duration_unit_display', read_only=True)
 
-    class Meta:
-        model = EducationGroupYear
-        fields = (
-            'url',
+    class Meta(BaseEducationGroupYearSerializer.Meta):
+        fields = ('url',) + BaseEducationGroupYearSerializer.Meta.fields + (
             'credits',
             'decree_category',
             'decree_category_text',
             'duration',
             'duration_unit',
             'duration_unit_text',
-        ) + BaseLearningUnitOfferSerializer.Meta.fields
+        )
 
 
 class LearningUnitYearPrerequisitesListSerializer(FlattenMixin, serializers.ModelSerializer):
@@ -75,7 +54,7 @@ class LearningUnitYearPrerequisitesListSerializer(FlattenMixin, serializers.Mode
     prerequisites = serializers.CharField(source='prerequisite_string')
 
     class Meta:
-        flatten = [('education_group_year', BaseLearningUnitOfferSerializer)]
+        flatten = [('education_group_year', BaseEducationGroupYearSerializer)]
         model = Prerequisite
         fields = (
             'url',

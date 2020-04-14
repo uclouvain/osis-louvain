@@ -45,9 +45,13 @@ class GroupDetailSerializer(BaseEducationGroupYearSerializer, serializers.ModelS
 
     # Display human readable value
     constraint_type_text = serializers.CharField(source='get_constraint_type_display', read_only=True)
+    management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
+    management_faculty = serializers.SerializerMethodField()
 
     class Meta(BaseEducationGroupYearSerializer.Meta):
         fields = ('url', ) + BaseEducationGroupYearSerializer.Meta.fields + (
+            'management_entity',
+            'management_faculty',
             'credits',
             'min_constraint',
             'max_constraint',
@@ -63,3 +67,7 @@ class GroupDetailSerializer(BaseEducationGroupYearSerializer, serializers.ModelS
             education_group_year,
             'remark' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
         )
+
+    @staticmethod
+    def get_management_faculty(obj):
+        return utils.get_entity(obj, 'management')

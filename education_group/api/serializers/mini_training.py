@@ -40,9 +40,18 @@ from education_group.api.serializers.utils import MiniTrainingHyperlinkedIdentit
 
 class MiniTrainingListSerializer(BaseEducationGroupYearSerializer, serializers.ModelSerializer):
     url = MiniTrainingHyperlinkedIdentityField(read_only=True)
+    management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
+    management_faculty = serializers.SerializerMethodField()
 
     class Meta(BaseEducationGroupYearSerializer.Meta):
-        fields = ('url',) + BaseEducationGroupYearSerializer.Meta.fields
+        fields = ('url',) + BaseEducationGroupYearSerializer.Meta.fields + (
+            'management_entity',
+            'management_faculty',
+        )
+
+    @staticmethod
+    def get_management_faculty(obj):
+        return utils.get_entity(obj, 'management')
 
 
 class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
