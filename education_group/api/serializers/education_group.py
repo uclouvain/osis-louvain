@@ -25,8 +25,7 @@
 ##############################################################################
 from rest_framework import serializers
 
-from base.models.education_group_type import EducationGroupType
-from base.models.education_group_year import EducationGroupYear
+from education_group.api.serializers.education_group_year import BaseEducationGroupYearSerializer
 
 
 class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
@@ -41,28 +40,11 @@ class EducationGroupHyperlinkedIdentityField(serializers.HyperlinkedIdentityFiel
         return self.reverse(view_name, kwargs=kwargs, request=request, format=format)
 
 
-class EducationGroupSerializer(serializers.HyperlinkedModelSerializer):
+class EducationGroupSerializer(BaseEducationGroupYearSerializer, serializers.HyperlinkedModelSerializer):
     url = EducationGroupHyperlinkedIdentityField()
-    code = serializers.CharField(source='partial_acronym')
-    academic_year = serializers.StringRelatedField()
-    education_group_type = serializers.SlugRelatedField(
-        slug_field='name',
-        queryset=EducationGroupType.objects.all(),
-    )
     management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True, default='')
 
-    # Display human readable value
-    education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
-
     class Meta:
-        model = EducationGroupYear
-        fields = (
-            'url',
-            'acronym',
-            'code',
-            'education_group_type',
-            'education_group_type_text',
-            'title',
-            'academic_year',
+        fields = ('url',) + BaseEducationGroupYearSerializer.Meta.fields + (
             'management_entity',
         )

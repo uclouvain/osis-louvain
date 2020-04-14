@@ -75,7 +75,7 @@ class TrainingListSerializer(FlattenMixin, serializers.HyperlinkedModelSerialize
 
     def to_representation(self, instance):
         data = super().to_representation(instance)
-        if instance.education_group_type.name not in education_group_types.TrainingType.finality_types():
+        if instance.offer.education_group_type.name not in education_group_types.TrainingType.finality_types():
             data.pop('partial_title')
         return data
 
