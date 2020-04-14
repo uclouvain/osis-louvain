@@ -103,9 +103,24 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
             ).prefetch_related(
                 'management_entity__entityversion_set',
             ),
-            partial_acronym__iexact=partial_acronym,
+            partial_acronym__iexact=partial_acronym,  # Field moved into GroupYear
             academic_year__year=year
         )
+        # version = get_object_or_404(
+        #     EducationGroupVersion.objects.filter(
+        #         root_group__education_group_type__category=education_group_categories.MINI_TRAINING
+        #     ).select_related(
+        #         'root_group__education_group_type',
+        #         'root_group__academic_year',
+        #         'offer',
+        #         'offer__main_teaching_campus',
+        #     ).prefetch_related(
+        #         'offer__management_entity__entityversion_set',
+        #     ),
+        #     partial_acronym__iexact=partial_acronym,  # Field moved into GroupYear
+        #     academic_year__year=year
+        # )
+        # return version.offer
         return egy
 
 
@@ -126,4 +141,13 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
             partial_acronym__iexact=acronym,
             academic_year__year=year
         )
+        # version = get_object_or_404(
+        #     EducationGroupVersion.objects.all().select_related(
+        #         'root_group__academic_year',
+        #         'offer'
+        #     ),
+        #     partial_acronym__iexact=acronym,
+        #     academic_year__year=year
+        # )
+        # return version.offer
         return egy

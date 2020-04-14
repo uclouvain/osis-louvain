@@ -67,10 +67,10 @@ class TrainingListSerializerTestCase(TestCase):
             'education_group_type',
             'education_group_type_text',
             'academic_year',
-            'administration_entity',
-            'administration_faculty',
             'management_entity',
             'management_faculty',
+            'administration_entity',
+            'administration_faculty',
         ]
         self.assertListEqual(list(self.serializer.data), expected_fields)
 
@@ -120,10 +120,10 @@ class TrainingListSerializerForMasterWithFinalityTestCase(TestCase):
             'education_group_type',
             'education_group_type_text',
             'academic_year',
-            'administration_entity',
-            'administration_faculty',
             'management_entity',
             'management_faculty',
+            'administration_entity',
+            'administration_faculty',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
@@ -175,10 +175,10 @@ class TrainingDetailSerializerTestCase(TestCase):
             'education_group_type',
             'education_group_type_text',
             'academic_year',
-            'administration_entity',
-            'administration_faculty',
             'management_entity',
             'management_faculty',
+            'administration_entity',
+            'administration_faculty',
             'partial_deliberation',
             'admission_exam',
             'funding',
@@ -290,10 +290,10 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             'education_group_type',
             'education_group_type_text',
             'academic_year',
-            'administration_entity',
-            'administration_faculty',
             'management_entity',
             'management_faculty',
+            'administration_entity',
+            'administration_faculty',
             'partial_deliberation',
             'admission_exam',
             'funding',
