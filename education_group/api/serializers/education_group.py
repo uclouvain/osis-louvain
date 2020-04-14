@@ -44,7 +44,7 @@ class EducationGroupSerializer(BaseEducationGroupYearSerializer, serializers.Hyp
     url = EducationGroupHyperlinkedIdentityField()
     management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True, default='')
 
-    class Meta:
+    class Meta(BaseEducationGroupYearSerializer.Meta):
         fields = ('url',) + BaseEducationGroupYearSerializer.Meta.fields + (
             'management_entity',
         )
