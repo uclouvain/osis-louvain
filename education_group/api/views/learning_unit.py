@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
@@ -68,7 +67,6 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
             additional_root_categories=[GroupType.COMPLEMENTARY_MODULE],
             exclude_root_categories=TrainingType.finality_types_enum()
         ).get(learning_unit_year.id, [])
-
         return EducationGroupVersion.objects.filter(
             offer_id__in=education_group_root_ids
         ).select_related('offer__education_group_type', 'offer__academic_year')
@@ -89,9 +87,12 @@ class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.Lis
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
-        return Prerequisite.objects.filter(learning_unit_year=learning_unit_year)\
-                                   .select_related(
-                                        'education_group_year__academic_year',
-                                        'education_group_year__education_group_type',
-                                        'learning_unit_year__academic_year',
-                                   ).prefetch_related('prerequisiteitem_set')
+
+        return Prerequisite.objects.filter(learning_unit_year=learning_unit_year).select_related(
+            'education_group_year__academic_year',
+            'education_group_year__education_group_type',
+            'learning_unit_year__academic_year',
+        ).prefetch_related(
+            'prerequisiteitem_set',
+            'education_group_year__educationgroupversion_set'
+        )

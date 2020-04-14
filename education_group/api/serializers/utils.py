@@ -51,6 +51,8 @@ class VersionGetUrlMixin:
     def __init__(self, **kwargs):
         super().__init__(view_name='education_group_api_v1:training_read', **kwargs)
 
+
+class VersionHyperlinkedIdentityField(VersionGetUrlMixin, serializers.HyperlinkedIdentityField):
     def get_url(self, obj, view_name, request, format):
         url_kwargs = {
             'acronym': obj.offer.acronym,
@@ -60,12 +62,17 @@ class VersionGetUrlMixin:
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
 
-class VersionHyperlinkedIdentityField(VersionGetUrlMixin, serializers.HyperlinkedIdentityField):
-    pass
-
-
 class VersionHyperlinkedRelatedField(VersionGetUrlMixin, serializers.HyperlinkedRelatedField):
-    pass
+    def get_url(self, obj, view_name, request, format):
+        standard_version = obj.educationgroupversion_set.filter(
+            version_name='', is_transition=False
+        ).first()
+        url_kwargs = {
+            'acronym': standard_version.offer.acronym,
+            'year': standard_version.offer.academic_year.year,
+            'version_name': standard_version.version_name
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
 
 class MiniTrainingGetUrlMixin:

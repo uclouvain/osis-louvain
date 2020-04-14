@@ -91,6 +91,11 @@ class LearningUnitYearPrerequisitesListSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.prerequisite = PrerequisiteFactory(learning_unit_year__acronym="LDROI1000")
+        EducationGroupVersionFactory(
+            version_name='',
+            is_transition=False,
+            offer=cls.prerequisite.education_group_year
+        )
         cls.prerequisite_item = PrerequisiteItemFactory(prerequisite=cls.prerequisite)
         url_kwargs = {
             'acronym': cls.prerequisite.learning_unit_year.acronym,
