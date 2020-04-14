@@ -24,15 +24,17 @@
 #
 ##############################################################################
 from django.conf.urls import url
-from django.urls import include
+from django.urls import include, path
 
+import program_management.views.tree.move
 from program_management.views import groupelementyear_create, groupelementyear_delete, groupelementyear_update, \
     groupelementyear_read, prerequisite_update, prerequisite_read, element_utilization, groupelementyear_postpone, \
-    groupelementyear_management, excel, search, tree
+    excel, search, tree
 from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
 urlpatterns = [
-    url(r'^management/$', groupelementyear_management.management, name='education_groups_management'),
+    url(r'^cut_element/$', program_management.views.tree.move.cut_to_cache, name='cut_element'),
+    url(r'^copy_element/$', program_management.views.tree.move.copy_to_cache, name='copy_element'),
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^content/', include([
             url(u'^attach/', groupelementyear_create.PasteElementFromCacheToSelectedTreeNode.as_view(),
@@ -47,7 +49,7 @@ urlpatterns = [
                 url(r'^move/$', groupelementyear_create.MoveGroupElementYearView.as_view(),
                     name='group_element_year_move'),
                 url(r'^update/$', groupelementyear_update.UpdateGroupElementYearView.as_view(),
-                    name="group_element_year_update")
+                    name="group_element_year_update"),
             ]))
         ])),
         url(r'^group_content/', groupelementyear_read.ReadEducationGroupTypeView.as_view(), name="group_content"),
@@ -90,11 +92,15 @@ urlpatterns = [
     url(r'^$', search.EducationGroupSearch.as_view(), name='version_program'),
 
     # NEW VERSION URL - Program management
-    url(r'^(?P<root_id>[0-9]+)/', include([
-        url(u'^create', tree.create.CreateLinkView.as_view(), name='tree_create_link'),
-        url(u'^update', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
-        url(u'^attach', tree.attach.AttachMultipleNodesView.as_view(), name='tree_attach_node'),
-        url(u'^detach', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
-        url(u'^move', tree.move.MoveNodeView.as_view(), name='tree_move_node'),
+    path('<int:root_id>/', include([
+        path('create/', tree.create.CreateLinkView.as_view(), name='tree_create_link'),
+        path('update/', tree.update.UpdateLinkView.as_view(), name='tree_update_link'),
+        path('attach/', tree.attach.AttachMultipleNodesView.as_view(), name='tree_attach_node'),
+        path('detach/', tree.detach.DetachNodeView.as_view(), name='tree_detach_node'),
+        path('<int:link_id>/', include([
+            path('up/', program_management.views.tree.move.up, name="group_element_year_up"),
+            path('down/', program_management.views.tree.move.down, name="group_element_year_down")
+        ]))
+
     ])),
 ]

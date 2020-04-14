@@ -47,7 +47,7 @@ class TestOsisRoleManager(SimpleTestCase):
 
         self.manager.register(subclass.__class__)
         self.assertIsInstance(self.manager.roles, set)
-        self.assertEquals(len(self.manager.roles), 1)
+        self.assertTrue(subclass.__class__ in self.manager.roles)
 
     @mock.patch('osis_role.role.OsisRoleManager.roles', new_callable=mock.PropertyMock)
     def test_get_group_names_managed(self, mock_roles_set):

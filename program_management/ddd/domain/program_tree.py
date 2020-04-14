@@ -69,9 +69,6 @@ class ProgramTree:
             result += self.get_parents(PATH_SEPARATOR.join(str_nodes))
         return result
 
-    def get_links(self):
-        return _links_from_root(self.root_node)
-
     def get_links_using_node(self, child_node: 'Node') -> List['Link']:
         return [link_obj for link_obj in _links_from_root(self.root_node) if link_obj.child == child_node]
 
@@ -95,17 +92,17 @@ class ProgramTree:
             from program_management.ddd.domain import node
             raise node.NodeNotFoundException
 
-    def get_node_by_id_and_class(self, node_id: int, node_class: 'Node') -> 'Node':
+    def get_node_by_id_and_type(self, node_id: int, node_type: 'NodeType') -> 'Node':
         """
         Return the corresponding node based on the node_id value with respect to the class.
         :param node_id: int
-        :param node_class: a Node subclass
+        :param node_type: NodeType
         :return: Node
         """
         return next(
             (
                 node for node in self.get_all_nodes()
-                if node.node_id == node_id and isinstance(node, node_class)
+                if node.node_id == node_id and node.type == node_type
             ),
             None
         )
@@ -140,6 +137,9 @@ class ProgramTree:
 
     def get_all_links(self) -> List['Link']:
         return _links_from_root(self.root_node)
+
+    def get_link(self, parent: 'Node', child: 'Node') -> 'Link':
+        return next((link for link in self.get_all_links() if link.parent == parent and link.child == child), None)
 
     def prune(self, ignore_children_from: Set[EducationGroupTypesEnum] = None) -> 'ProgramTree':
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)

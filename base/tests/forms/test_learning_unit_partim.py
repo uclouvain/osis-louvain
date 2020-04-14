@@ -38,6 +38,7 @@ from base.forms.learning_unit.learning_unit_partim import PARTIM_FORM_READ_ONLY_
 from base.models.enums import learning_unit_year_subtypes, organization_type
 from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_EXERCISES
 from base.models.enums.learning_unit_year_periodicity import ANNUAL, BIENNIAL_EVEN
+from base.models.enums.proposal_state import ProposalState
 from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit import LearningUnit
 from base.models.learning_unit_year import LearningUnitYear
@@ -46,6 +47,7 @@ from base.tests.factories.business.learning_units import GenerateContainer, Gene
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
+from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 
 FULL_ACRONYM = 'LBIR1200'
 SUBDIVISION_ACRONYM = 'A'
@@ -418,6 +420,22 @@ class TestPartimFormSave(LearningUnitPartimFormContextMixin):
         # acronym_0 and acronym_1 are disabled in the widget, not in the field
         disabled_fields.update({'acronym_0', 'acronym_1'})
         self.assertEqual(disabled_fields, PARTIM_FORM_READ_ONLY_FIELD)
+
+    def test_save_partim_from_proposal_with_no_end_year_in_original_learning_unit(self):
+        proposal = ProposalLearningUnitFactory(
+            learning_unit_year=self.learning_unit_year_full,
+            state=ProposalState.FACULTY.name,
+            initial_data={'learning_unit': {'end_year': None}}
+        )
+        post_data = get_valid_form_data(proposal.learning_unit_year)
+        form = _instanciate_form(
+            learning_unit_full=proposal.learning_unit_year.learning_unit,
+            academic_year=self.learning_unit_year_full.academic_year,
+            post_data=post_data, instance=None
+        )
+        self.assertTrue(form.is_valid(), msg=form.errors)
+        partim = form.save()
+        self.assertIsNone(partim.learning_unit.end_year)
 
 
 def get_valid_form_data(learning_unit_year_partim):
