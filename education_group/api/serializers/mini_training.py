@@ -63,6 +63,7 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
     max_constraint = serializers.CharField(source='offer.max_constraint', read_only=True)
     constraint_type = serializers.CharField(source='offer.constraint_type', read_only=True)
     active = serializers.CharField(source='offer.active', read_only=True)
+    keywords = serializers.CharField(source='offer.keywords', read_only=True)
 
     # Display human readable value
     constraint_type_text = serializers.CharField(source='offer.get_constraint_type_display', read_only=True)
