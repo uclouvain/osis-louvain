@@ -40,7 +40,8 @@ from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 from program_management.models.education_group_version import EducationGroupVersion
-from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory, \
+    StandardTransitionEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory
 
 
 class TrainingTitleTestCase(APITestCase):
@@ -185,9 +186,47 @@ class FilterTrainingTestCase(APITestCase):
             StandardEducationGroupVersionFactory(offer=offer1)
             StandardEducationGroupVersionFactory(offer=offer2)
             StandardEducationGroupVersionFactory(offer=offer3)
+        StandardTransitionEducationGroupVersionFactory()
+        ParticularTransitionEducationGroupVersionFactory()
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
+
+    def test_get_training_case_version_type_param_is_not_allowed(self):
+        query_string = {'version_type': 'test'}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+    def test_get_training_case_version_type_param_is_transition(self):
+        query_string = {'version_type': 'transition'}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        trainings = EducationGroupVersion.objects.filter(is_transition=True)
+
+        serializer = TrainingListSerializer(
+            trainings,
+            many=True,
+            context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_training_case_version_type_param_is_special(self):
+        query_string = {'version_type': 'special'}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        trainings = EducationGroupVersion.objects.exclude(version_name__iexact='')
+
+        serializer = TrainingListSerializer(
+            trainings,
+            many=True,
+            context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_training_case_filter_from_year_params(self):
         query_string = {'from_year': 2020}
@@ -201,7 +240,10 @@ class FilterTrainingTestCase(APITestCase):
         ).order_by('-academic_year__year', 'acronym')
 
         serializer = TrainingListSerializer(
-            EducationGroupVersion.objects.filter(offer_id__in=trainings.values_list('id', flat=True)),
+            EducationGroupVersion.objects.filter(
+                offer_id__in=trainings.values_list('id', flat=True),
+                is_transition=False
+            ),
             many=True,
             context={
                 'request': RequestFactory().get(self.url, query_string),
@@ -222,7 +264,10 @@ class FilterTrainingTestCase(APITestCase):
         ).order_by('-academic_year__year', 'acronym')
 
         serializer = TrainingListSerializer(
-            EducationGroupVersion.objects.filter(offer_id__in=trainings.values_list('id', flat=True)),
+            EducationGroupVersion.objects.filter(
+                offer_id__in=trainings.values_list('id', flat=True),
+                is_transition=False
+            ),
             many=True,
             context={
                 'request': RequestFactory().get(self.url, query_string),
