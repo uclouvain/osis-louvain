@@ -15,7 +15,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='prerequisite',
             name='education_group_version',
-            field=models.ForeignKey(default=None, on_delete=django.db.models.deletion.CASCADE, to='program_management.EducationGroupVersion'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, to='program_management.EducationGroupVersion'),
             preserve_default=False,
         ),
         migrations.AlterField(
