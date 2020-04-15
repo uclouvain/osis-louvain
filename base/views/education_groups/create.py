@@ -253,8 +253,6 @@ class CreateEducationGroupSpecificVersion(AjaxTemplateMixin, CreateView):
 @login_required
 @ajax_required
 def check_version_name(request, education_group_year_id):
-    if not education_group_year_id:
-        raise HttpResponseNotFound
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
     version_name = education_group_year.acronym + request.GET['version_name']
     existed_version_name = False

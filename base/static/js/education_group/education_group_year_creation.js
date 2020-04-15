@@ -1,5 +1,5 @@
 const trans_existing_version_name = gettext('Existing name version');
-const trans_existed_version_name = gettext('Existed name version');
+const trans_existed_version_name = gettext('Existed name version in ');
 const trans_invalid_version_name = gettext('Invalid name version');
 
 function validate_version_name() {
@@ -15,7 +15,7 @@ function callbackVersionNameValidation(data) {
     if (data['existing_version_name']) {
         setErrorMessage(trans_existing_version_name, '#version_name_error_id');
     }else if (data['existed_version_name']) {
-        setWarningMessage(trans_existed_version_name, '#version_name_error_id');
+        setWarningMessage(trans_existed_version_name + data['last_using'], '#version_name_error_id');
     }else if (!data['valid']) {
         setErrorMessage(trans_invalid_version_name, '#version_name_error_id');
     }else if (!data['version_name']) {

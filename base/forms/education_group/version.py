@@ -34,7 +34,8 @@ from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
 from base.models import academic_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from program_management.ddd.repositories import load_specific_version
-from program_management.models.education_group_version import EducationGroupVersion
+from program_management.ddd.service.create_specific_version import report_specific_version_creation, \
+    create_specific_version
 
 
 class SpecificVersionForm(forms.Form):
@@ -70,45 +71,23 @@ class SpecificVersionForm(forms.Form):
     def save(self):
         max_year = academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1).year
         end_postponement = max_year if not self.cleaned_data['end_year'] else self.cleaned_data['end_year'].year
+        data = {
+            "version_name": self.cleaned_data["version_name"],
+            "title_fr": self.cleaned_data["title"],
+            "title_en": self.cleaned_data["title_english"]
+        }
         if self.save_type == "new_version":
-            self.create_specific_version(self.education_group_year)
+            create_specific_version(data, self.education_group_year)
             education_group_years_list = [self.education_group_year]
-            self.education_group_years_list = self.report_specific_version_creation(
-                self.education_group_year, end_postponement, education_group_years_list
+            self.education_group_years_list = report_specific_version_creation(
+                data, self.education_group_year, end_postponement, education_group_years_list
             )
         if self.save_type == "attach":
             education_group_years_list = []
             last_old_version = load_specific_version.find_last_existed_version(
                 self.education_group_year, self.cleaned_data["version_name"]
             )
-            self.education_group_years_list = self.report_specific_version_creation(
-                last_old_version.offer, end_postponement, education_group_years_list
+            self.education_group_years_list = report_specific_version_creation(
+                data, last_old_version.offer, end_postponement, education_group_years_list
             )
         create_initial_group_element_year_structure(self.education_group_years_list)
-
-    def report_specific_version_creation(self, education_group_year, end_postponement, education_group_years_list):
-        next_education_group_year = education_group_year.next_year()
-        if next_education_group_year:
-            while next_education_group_year and next_education_group_year.academic_year.year <= end_postponement:
-                education_group_years_list.append(next_education_group_year)
-                self.create_specific_version(next_education_group_year)
-                next_education_group_year = next_education_group_year.next_year()
-        return education_group_years_list
-
-    def create_specific_version(self, education_group_year):
-        version_standard = EducationGroupVersion.objects.get(
-            offer=education_group_year, version_name="", is_transition=False
-        )
-        new_groupyear = version_standard.root_group
-        new_groupyear.pk = None
-        new_groupyear.save()
-        new_education_group_version = EducationGroupVersion(
-            version_name=self.cleaned_data["version_name"],
-            title_fr=self.cleaned_data["title"],
-            title_en=self.cleaned_data["title_english"],
-            offer=education_group_year,
-            is_transition=False,
-            root_group=new_groupyear
-        )
-        new_education_group_version.save()
-        return new_education_group_version
