@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('program_management', '0004_auto_20200323_1055'),
-        ('base', '0508_auto_20200325_1013'),
+        ('base', '0510_auto_20200408_1924'),
     ]
 
     operations = [

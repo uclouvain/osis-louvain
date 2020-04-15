@@ -36,6 +36,7 @@ from base.models import learning_unit
 from base.models.enums import prerequisite_operator
 from base.models.enums.prerequisite_operator import OR, AND
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from program_management.models.education_group_version import EducationGroupVersion
 
 AND_OPERATOR = "ET"
 OR_OPERATOR = 'OU'
@@ -93,6 +94,9 @@ class Prerequisite(models.Model):
     )
     education_group_year = models.ForeignKey(
         "EducationGroupYear", on_delete=models.CASCADE
+    )
+    education_group_version = models.ForeignKey(
+        EducationGroupVersion, on_delete=models.CASCADE
     )
     main_operator = models.CharField(
         choices=prerequisite_operator.PREREQUISITES_OPERATORS,
