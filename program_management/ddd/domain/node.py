@@ -77,9 +77,8 @@ class Node:
             credits: Decimal = None
     ):
         self.node_id = node_id
-        if children is None:
-            children = []
         self.children = children
+        self._children = children or []
         self.node_type = node_type
         self.end_date = end_date
         self.code = code
@@ -108,6 +107,15 @@ class Node:
         if self._academic_year is None:
             self._academic_year = AcademicYear(self.year)
         return self._academic_year
+
+    @property
+    def children(self):
+        self._children.sort(key=lambda link_obj: link_obj.order or 0)
+        return self._children
+
+    @children.setter
+    def children(self, new_children: List['Link']):
+        self._children = new_children
 
     def is_learning_unit(self):
         return self.type == NodeType.LEARNING_UNIT
@@ -181,10 +189,14 @@ class Node:
 
     def add_child(self, node: 'Node', **kwargs):
         child = link_factory.get_link(parent=self, child=node, **kwargs)
-        self.children.append(child)
+        self._children.append(child)
+        child._has_changed = True
 
     def detach_child(self, node_id: int):
         self.children = [link for link in self.children if link.child.pk == node_id]
+
+    def get_link(self, link_id: int) -> 'Link':
+        return next((link for link in self.children if link.pk == link_id), None)
 
 
 def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path', 'Node']:

@@ -107,6 +107,18 @@ class TestAddRoleQuerysetToRuleSet(TestCase):
         _add_role_queryset_to_perms_context(rule_set, 'perm_allowed', qs)
         self.assertTrue(rule_set.test_rule('perm_allowed', UserFactory()))
 
+    def test_ensure_perm_name_is_added_to_perms_context(self):
+        @rules.predicate(bind=True, name='ensure_role_qs_exist')
+        def ensure_perm_name_exist_fn(self, *args, **kwargs):
+            if not self.context['perm_name'] == 'perm_allowed':
+                raise Exception
+            return True
+
+        rule_set = RuleSet()
+        rule_set.add_rule('perm_allowed', ensure_perm_name_exist_fn)
+        _add_role_queryset_to_perms_context(rule_set, 'perm_allowed', QuerySet())
+        self.assertTrue(rule_set.test_rule('perm_allowed', UserFactory()))
+
 
 class TestHasModulePerms(TestCase):
     @classmethod

@@ -37,7 +37,8 @@ from base.templatetags.education_group import _get_permission
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import CentralManagerFactory, PersonWithPermissionsFactory
+from base.tests.factories.person import CentralManagerForUEFactory, PersonWithPermissionsFactory
+from program_management.ddd.domain import link
 
 
 @override_flag('education_group_update', active=True)
@@ -54,15 +55,13 @@ class TestUp(TestCase):
         cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year,
                                                            child_branch__academic_year=cls.academic_year)
 
-        cls.person = CentralManagerFactory()
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        cls.url = reverse("education_groups_management")
-        cls.post_valid_data = {
-            "root_id": cls.education_group_year.id,
-            "element_id": cls.education_group_year.id,
-            "group_element_year_id": cls.group_element_year_3.id,
-            'action': 'up',
-        }
+        cls.person = CentralManagerForUEFactory()
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
+        cls.url = reverse(
+            "group_element_year_up",
+            args=[cls.education_group_year.id, cls.group_element_year_3.id]
+        )
+        cls.post_valid_data = {}
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -92,7 +91,7 @@ class TestUp(TestCase):
         response = self.client.get(self.url, data=self.post_valid_data)
         self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
 
-    @mock.patch("base.models.group_element_year.GroupElementYear.up")
+    @mock.patch("program_management.ddd.service.order_link_service.up_link")
     @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
     def test_up_case_success(self, mock_permission, mock_up):
         mock_permission.return_value = True
@@ -150,15 +149,13 @@ class TestDown(TestCase):
         cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year,
                                                            child_branch__academic_year=cls.current_academic_year)
 
-        cls.person = CentralManagerFactory()
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        cls.url = reverse("education_groups_management")
-        cls.post_valid_data = {
-            "root_id": cls.education_group_year.id,
-            "element_id": cls.education_group_year.id,
-            "group_element_year_id": cls.group_element_year_1.id,
-            'action': 'down',
-        }
+        cls.person = CentralManagerForUEFactory()
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
+        cls.url = reverse(
+            "group_element_year_down",
+            args=[cls.education_group_year.id, cls.group_element_year_3.id]
+        )
+        cls.post_valid_data = {}
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -188,7 +185,7 @@ class TestDown(TestCase):
         response = self.client.get(self.url, data=self.post_valid_data)
         self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
 
-    @mock.patch("base.models.group_element_year.GroupElementYear.down")
+    @mock.patch("program_management.ddd.service.order_link_service.down_link")
     @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
     def test_down_case_success(self, mock_permission, mock_down):
         mock_permission.return_value = True

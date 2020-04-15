@@ -72,9 +72,9 @@ class SpecificVersionForm(forms.Form):
         max_year = academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1).year
         end_postponement = max_year if not self.cleaned_data['end_year'] else self.cleaned_data['end_year'].year
         data = {
-            "version_name": self.cleaned_data["version_name"],
-            "title_fr": self.cleaned_data["title"],
-            "title_en": self.cleaned_data["title_english"]
+            "version_name": self.cleaned_data.get("version_name"),
+            "title_fr": self.cleaned_data.get("title"),
+            "title_en": self.cleaned_data.get("title_english")
         }
         if self.save_type == "new_version":
             create_specific_version(data, self.education_group_year)

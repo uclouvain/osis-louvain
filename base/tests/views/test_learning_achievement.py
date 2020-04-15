@@ -405,6 +405,19 @@ class TestLearningAchievementPostponement(TestCase):
         for achievement in LearningAchievement.objects.filter(language__code=FR_CODE_LANGUAGE):
             self.assertEqual(achievement.text, 'text')
 
+    def test_learning_achievement_create_with_postponement_stop_at_proposal_year(self):
+        ProposalLearningUnitFactory(learning_unit_year=self.learning_unit_years[2])
+        proposal_year = self.learning_unit_years[2].academic_year.year
+        create_response = self._create_achievements(code_name=1)
+        self.assertEqual(create_response.status_code, 200)
+        achievements = LearningAchievement.objects.filter(language__code=FR_CODE_LANGUAGE)
+        postponed_achievements = achievements.exclude(learning_unit_year__academic_year__year__gte=proposal_year)
+        not_postponed_achievements = achievements.filter(learning_unit_year__academic_year__year__gte=proposal_year)
+        for achievement in postponed_achievements:
+            self.assertEqual(achievement.text, 'text')
+        for achievement in not_postponed_achievements:
+            self.assertIsNone(achievement.text)
+
     def test_learning_achievement_deletion_with_postponement(self):
         self._create_achievements(code_name=1)
         achievement = LearningAchievement.objects.filter(

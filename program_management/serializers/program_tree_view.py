@@ -37,4 +37,8 @@ def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
             path=str(tree.root_node.pk),
             context={'root': tree.root_node}
         ),
+        'a_attr': {
+            'element_id': tree.root_node.pk,
+            'element_type': tree.root_node.type.name,
+        }
     }

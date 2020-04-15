@@ -26,6 +26,7 @@
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured, ValidationError
+from django.db.models import Q
 from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
@@ -40,9 +41,10 @@ from base.models.education_group import EducationGroup
 from base.models.education_group_type import find_authorized_types, EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import find_pedagogical_entities_version, get_last_version
-from base.models.enums import education_group_categories
+from base.models.enums import education_group_categories, groups, organization_type
 from base.models.enums.education_group_categories import Categories, TRAINING
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
+from osis_role.contrib.forms.fields import EntityRoleChoiceField
 from program_management.business.group_element_years import management
 from reference.models.language import Language
 from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT, \
@@ -68,6 +70,20 @@ class MainEntitiesVersionChoiceField(EntitiesVersionChoiceField):
     def __init__(self, queryset, *args, **kwargs):
         queryset = find_pedagogical_entities_version()
         super(MainEntitiesVersionChoiceField, self).__init__(queryset, *args, **kwargs)
+
+
+class ManagementEntitiesVersionChoiceField(EntityRoleChoiceField):
+    def __init__(self, person, **kwargs):
+        group_names = (groups.FACULTY_MANAGER_GROUP, groups.CENTRAL_MANAGER_GROUP, )
+        super().__init__(
+            person=person,
+            group_names=group_names,
+            label=_('Management entity'),
+            **kwargs,
+        )
+
+    def get_queryset(self):
+        return super().get_queryset().pedagogical_entities().order_by('acronym')
 
 
 class EducationGroupTypeModelChoiceField(forms.ModelChoiceField):
@@ -135,7 +151,6 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
     class Meta:
         model = EducationGroupYear
         field_classes = {
-            "management_entity": MainEntitiesVersionChoiceField,
             "main_teaching_campus": MainCampusChoiceField,
             "enrollment_campus": MainCampusChoiceField,
             "education_group_type": EducationGroupTypeModelChoiceField,
@@ -155,9 +170,9 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
                 raise PermissionDenied("Unauthorized type {} for {}".format(education_group_type, self.category))
 
         super().__init__(*args, **kwargs)
+        self._filter_management_entity_according_to_person()
         self._set_initial_values()
         self._filter_education_group_type()
-        self._filter_management_entity_according_to_person()
         self._init_and_disable_academic_year()
         self._preselect_entity_version_from_entity_value()
 
@@ -200,8 +215,7 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
 
     def _filter_management_entity_according_to_person(self):
         if 'management_entity' in self.fields:
-            self.fields['management_entity'].queryset = \
-                self.fields['management_entity'].queryset.filter(entity__in=self.user.person.linked_entities)
+            self.fields['management_entity'] = ManagementEntitiesVersionChoiceField(person=self.user.person)
 
     def _disable_field(self, key, initial_value=None):
         field = self.fields[key]

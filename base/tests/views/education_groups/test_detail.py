@@ -24,14 +24,11 @@
 #
 ##############################################################################
 import datetime
-import urllib
 from http import HTTPStatus
 from unittest import mock
 
 import reversion
-from django.contrib.auth.models import Group
-from django.contrib.auth.models import Permission
-from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseRedirect, QueryDict
+from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseRedirect, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 
@@ -39,7 +36,6 @@ from base.models.academic_year import AcademicYear
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, GroupType
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.certificate_aim import CertificateAimFactory
 from base.tests.factories.education_group_certificate_aim import EducationGroupCertificateAimFactory
@@ -49,15 +45,15 @@ from base.tests.factories.education_group_type import GroupEducationGroupTypeFac
     MiniTrainingEducationGroupTypeFactory, EducationGroupTypeFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, GroupFactory, \
     MiniTrainingFactory, EducationGroupYearCommonFactory, EducationGroupYearCommonAgregationFactory
-from base.tests.factories.group import CentralManagerGroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
+from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
 from base.utils.cache import ElementCache
 from base.views.education_groups.detail import CatalogGenericDetailView, EducationGroupGenericDetailView
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
 class EducationGroupRead(TestCase):
@@ -76,7 +72,7 @@ class EducationGroupRead(TestCase):
         cls.education_group_language_child_1 = \
             EducationGroupLanguageFactory(education_group_year=cls.education_group_child_1)
 
-        cls.user = PersonWithPermissionsFactory("can_access_education_group").user
+        cls.user = PersonWithPermissionsFactory("view_educationgroup").user
         cls.url = reverse("education_group_read", args=[cls.education_group_parent.id, cls.education_group_child_1.id])
 
     def setUp(self):
@@ -190,13 +186,11 @@ class EducationGroupRead(TestCase):
 class TestReadEducationGroup(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.user = UserFactory()
-        CentralManagerGroupFactory()
-        cls.person = PersonWithPermissionsFactory('can_access_education_group', user=cls.user)
+        cls.central_manager = CentralManagerFactory()
         cls.academic_year = AcademicYearFactory(current=True)
 
     def setUp(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.central_manager.person.user)
 
     def test_training_template_used(self):
         training = TrainingFactory()
@@ -243,24 +237,21 @@ class TestReadEducationGroup(TestCase):
         self.assertFalse(response.context['show_coorganization'])
 
     def test_show_and_edit_coorganization(self):
-        user = UserFactory()
-        person = PersonFactory(user=user)
-        user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        person.user.user_permissions.add(Permission.objects.get(codename='change_educationgroup'))
+        person = PersonWithPermissionsFactory("view_educationgroup", "change_educationgroup")
         training_not_2m = EducationGroupYearFactory(
             education_group_type__category=TRAINING,
-            education_group_type__name=TrainingType.CAPAES.name
+            education_group_type__name=TrainingType.CAPAES.name,
+            academic_year=self.academic_year
         )
-        PersonEntityFactory(person=person, entity=training_not_2m.management_entity)
         url = reverse("education_group_read", args=[training_not_2m.pk, training_not_2m.pk])
-        self.client.force_login(user)
+        self.client.force_login(person.user)
 
         response = self.client.get(url)
+        self.assertEquals(response.status_code, HttpResponse.status_code)
         self.assertTrue(response.context['show_coorganization'])
         self.assertFalse(response.context['can_change_coorganization'])
 
-        user.groups.add(Group.objects.get(name=CENTRAL_MANAGER_GROUP))
-
+        CentralManagerFactory(person=person, entity=training_not_2m.management_entity)
         response = self.client.get(url)
         self.assertTrue(response.context['show_coorganization'])
         self.assertTrue(response.context['can_change_coorganization'])
@@ -393,7 +384,7 @@ class EducationGroupDiplomas(TestCase):
                                                               education_group_type=type_training)
         GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
         cls.user = UserFactory()
-        cls.person = PersonWithPermissionsFactory('can_access_education_group', user=cls.user)
+        cls.person = PersonWithPermissionsFactory('view_educationgroup', user=cls.user)
         cls.url = reverse("education_group_diplomas",
                           args=[cls.education_group_parent.pk, cls.education_group_child.id])
 
@@ -539,7 +530,7 @@ class TestUtilizationTab(TestCase):
                                                            child_branch=None,
                                                            child_leaf=cls.learning_unit_year_2)
         cls.user = UserFactory()
-        cls.person = PersonWithPermissionsFactory('can_access_education_group', user=cls.user)
+        cls.person = PersonWithPermissionsFactory('view_educationgroup', user=cls.user)
 
         AcademicYearFactory(current=True)
         cls.url = reverse(
@@ -610,7 +601,7 @@ class TestContent(TestCase):
         )
 
         cls.user = UserFactory()
-        cls.person = PersonWithPermissionsFactory('can_access_education_group', user=cls.user)
+        cls.person = PersonWithPermissionsFactory('view_educationgroup', user=cls.user)
 
         cls.url = reverse(
             "education_group_content",

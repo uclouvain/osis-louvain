@@ -45,7 +45,7 @@ EXTERNAL_CREDIT_TOOLTIP = _(
     'If the partner university does not use ECTS credit units, '
     'enter below the number of credit units according to the local system.'
 )
-GREY_COLOR = "color-grey"
+GREY_COLOR = "grey-color"
 ITALIC_FONT = "font-italic"
 
 

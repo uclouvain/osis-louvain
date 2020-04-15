@@ -62,14 +62,15 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
-from base.tests.factories.person import PersonFactory, CentralManagerFactory
-from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import SuperUserFactory
 from base.utils.cache import ElementCache
 from base.views.education_groups.update import _get_success_redirect_url, update_education_group
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.business.group_element_years import management
 from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy
+from program_management.models.enums import node_type
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory
 from reference.tests.factories.language import LanguageFactory
@@ -111,8 +112,8 @@ class TestUpdate(TestCase):
 
         cls.url = reverse(update_education_group, kwargs={"root_id": cls.education_group_year.pk,
                                                           "education_group_year_id": cls.education_group_year.pk})
-        cls.person = CentralManagerFactory()
-        PersonEntityFactory(person=cls.person, entity=cls.education_group_year.management_entity)
+        cls.person = PersonFactory()
+        CentralManagerFactory(person=cls.person, entity=cls.education_group_year.management_entity)
 
         cls.an_training_education_group_type = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
         cls.education_group_type_pgrm_master_120 = EducationGroupTypeFactory(
@@ -167,7 +168,7 @@ class TestUpdate(TestCase):
             update_education_group,
             args=[cls.training_education_group_year.pk, cls.training_education_group_year.pk]
         )
-        PersonEntityFactory(person=cls.person, entity=cls.training_education_group_year.management_entity)
+        CentralManagerFactory(person=cls.person, entity=cls.training_education_group_year.management_entity)
 
         cls.domains = [DomainFactory() for _ in range(10)]
 
@@ -185,7 +186,7 @@ class TestUpdate(TestCase):
             update_education_group,
             args=[cls.mini_training_education_group_year.pk, cls.mini_training_education_group_year.pk]
         )
-        PersonEntityFactory(person=cls.person, entity=cls.mini_training_education_group_year.management_entity)
+        CentralManagerFactory(person=cls.person, entity=cls.mini_training_education_group_year.management_entity)
 
         EntityVersionFactory(
             entity=cls.mini_training_education_group_year.management_entity,
@@ -218,7 +219,7 @@ class TestUpdate(TestCase):
 
     def test_post(self):
         new_entity_version = MainEntityVersionFactory()
-        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        CentralManagerFactory(person=self.person, entity=new_entity_version.entity)
         self.education_group_year.management_entity = new_entity_version.entity
         self.education_group_year.save()
 
@@ -249,7 +250,7 @@ class TestUpdate(TestCase):
 
     def test_post_with_group_not_content(self):
         new_entity_version = MainEntityVersionFactory()
-        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        CentralManagerFactory(person=self.person, entity=new_entity_version.entity)
         self.education_group_year.management_entity = new_entity_version.entity
         self.education_group_year.save()
 
@@ -277,7 +278,7 @@ class TestUpdate(TestCase):
 
     def test_invalid_post_group(self):
         new_entity_version = MainEntityVersionFactory()
-        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        CentralManagerFactory(person=self.person, entity=new_entity_version.entity)
         self.education_group_year.management_entity = new_entity_version.entity
         self.education_group_year.save()
 
@@ -317,7 +318,7 @@ class TestUpdate(TestCase):
         training_url = reverse(update_education_group, args=[egy.pk, egy.pk])
 
         new_entity_version = MainEntityVersionFactory()
-        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        CentralManagerFactory(person=self.person, entity=new_entity_version.entity)
         list_domains = [domain.pk for domain in self.domains]
         isced_domain = DomainIscedFactory()
         data = {
@@ -381,7 +382,7 @@ class TestUpdate(TestCase):
         training_url = reverse(update_education_group, args=[egy.pk, egy.pk])
 
         new_entity_version = MainEntityVersionFactory()
-        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        CentralManagerFactory(person=self.person, entity=new_entity_version.entity)
         isced_domain = DomainIscedFactory()
         data = {
             'title': 'Cours au choix',
@@ -453,7 +454,7 @@ class TestUpdate(TestCase):
             management_entity=new_entity_version.entity,
             administration_entity=new_entity_version.entity
         )
-        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        CentralManagerFactory(person=self.person, entity=new_entity_version.entity)
         organization = OrganizationFactory()
         address = OrganizationAddressFactory(organization=organization, is_main=True)
         diploma_choice = random.choice(DiplomaCoorganizationTypes.get_names())
@@ -533,7 +534,7 @@ class TestUpdate(TestCase):
             management_entity=new_entity_version.entity,
             administration_entity=new_entity_version.entity
         )
-        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        CentralManagerFactory(person=self.person, entity=new_entity_version.entity)
         organization = OrganizationFactory()
         return egy, new_entity_version, organization
 
@@ -545,7 +546,7 @@ class TestUpdate(TestCase):
         )
 
         new_entity_version = MainEntityVersionFactory()
-        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        CentralManagerFactory(person=self.person, entity=new_entity_version.entity)
         data = {
             'title': 'Cours au choix',
             'title_english': 'deaze',
@@ -584,7 +585,7 @@ class TestUpdate(TestCase):
         )
 
         new_entity_version = MainEntityVersionFactory()
-        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        CentralManagerFactory(person=self.person, entity=new_entity_version.entity)
         data = {
             'title': 'Cours au choix',
             'title_english': 'deaze',
@@ -605,7 +606,7 @@ class TestUpdate(TestCase):
 
     def test_post_training_with_end_year(self):
         new_entity_version = MainEntityVersionFactory()
-        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        CentralManagerFactory(person=self.person, entity=new_entity_version.entity)
         data = {
             'title': 'Cours au choix',
             'title_english': 'deaze',
@@ -655,7 +656,7 @@ class TestUpdate(TestCase):
             management_entity=new_entity_version.entity,
             administration_entity=new_entity_version.entity
         )
-        PersonEntityFactory(person=self.person, entity=new_entity_version.entity)
+        CentralManagerFactory(person=self.person, entity=new_entity_version.entity)
         sub_egy = TrainingFactory(
             academic_year=self.current_academic_year,
             education_group_type__name=TrainingType.AGGREGATION.name,
@@ -801,15 +802,16 @@ class TestSelectAttach(TestCase):
             child_branch=cls.new_parent_education_group_year
         )
 
-        cls.url_management = reverse("education_groups_management")
+        cls.copy_element_url = reverse("copy_element")
+        cls.cut_element_url = reverse("cut_element")
         select_data = {
             "root_id": group_above_new_parent.parent.id,
             "element_id": cls.child_education_group_year.id,
+            "element_type": node_type.NodeType.EDUCATION_GROUP.name,
             "group_element_year_id": cls.initial_group_element_year.id,
         }
         cls.copy_action_data = {
             **select_data,
-            **{'action': 'copy'}
         }
         cls.root = group_above_new_parent.parent
         cls.attach_action_data = {
@@ -833,7 +835,7 @@ class TestSelectAttach(TestCase):
 
     def test_copy_case_education_group(self):
         response = self.client.post(
-            self.url_management,
+            self.copy_element_url,
             data=self.copy_action_data,
             HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
@@ -845,16 +847,14 @@ class TestSelectAttach(TestCase):
             {
                 'modelname': management.EDUCATION_GROUP_YEAR,
                 'id': self.child_education_group_year.id,
-                'source_link_id': self.initial_group_element_year.pk,
                 'action': ElementCache.ElementCacheAction.COPY.value,
             }
         )
 
     def test_cut_case_education_group(self):
         cut_action_data = self.copy_action_data
-        cut_action_data['action'] = "cut"
         response = self.client.post(
-            self.url_management,
+            self.cut_element_url,
             data=cut_action_data,
             HTTP_X_REQUESTED_WITH='XMLHttpRequest'
         )
@@ -870,21 +870,6 @@ class TestSelectAttach(TestCase):
                 'action': ElementCache.ElementCacheAction.CUT.value,
             }
         )
-
-    def test_cut_when_group_element_year_not_given(self):
-        """When user click on 'cut' action into the root element in the tree"""
-        cut_action_data = dict(self.copy_action_data)
-        cut_action_data['action'] = "cut"
-        del cut_action_data['group_element_year_id']
-        self.client.post(
-            self.url_management,
-            data=cut_action_data,
-            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
-        )
-        action_cached = ElementCache(self.person.user).cached_data['action']
-
-        self.assertEqual(action_cached, ElementCache.ElementCacheAction.COPY.value)
-        self.assertNotEqual(action_cached, ElementCache.ElementCacheAction.CUT.value)
 
     def test_copy_ajax_case_learning_unit_year(self):
         response = self.client.post(
@@ -925,7 +910,7 @@ class TestSelectAttach(TestCase):
         self._assert_link_with_inital_parent_present()
 
         # Select :
-        self.client.post(self.url_management, data=self.copy_action_data)
+        self.client.post(self.copy_element_url, data=self.copy_action_data)
 
         # Create a link :
         self.client.post(
@@ -963,7 +948,7 @@ class TestSelectAttach(TestCase):
         self._assert_link_with_inital_parent_present()
 
         # Select :
-        self.client.post(self.url_management, data=self.copy_action_data)
+        self.client.post(self.copy_element_url, data=self.copy_action_data)
 
         # Create a link :
         self.client.post(
@@ -1043,7 +1028,7 @@ class TestSelectAttach(TestCase):
 
         # Select :
         self.client.post(
-            self.url_management,
+            self.copy_element_url,
             data=self.copy_action_data
         )
 
@@ -1182,8 +1167,9 @@ class TestCertificateAimView(TestCase):
         cls.training = TrainingFactory(academic_year=cls.academic_year)
 
         cls.program_manager = ProgramManagerFactory(education_group=cls.training.education_group)
-        read_permission = Permission.objects.get(codename='can_access_education_group')
-        cls.program_manager.person.user.user_permissions.add(read_permission)
+        read_permission = Permission.objects.get(codename='view_educationgroup')
+        write_permission = Permission.objects.get(codename='change_educationgroupcertificateaim')
+        cls.program_manager.person.user.user_permissions.add(read_permission, write_permission)
 
     def setUp(self):
         super().setUp()

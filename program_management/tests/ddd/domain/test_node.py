@@ -257,3 +257,24 @@ class TestGetAllChildrenAsLearningUnitNodes(SimpleTestCase):
         exepcted_order = [link0.child, link1.child, link2.child]
         error_msg = "This order is used for prerequisites in excel file."
         self.assertListEqual(result, exepcted_order, error_msg)
+
+
+class TestChildren(SimpleTestCase):
+
+    def setUp(self):
+        self.parent = NodeGroupYearFactory()
+
+    def test_return_empty_list_when_no_children(self):
+        self.assertEqual(
+            self.parent.children,
+            []
+        )
+
+    def test_returns_children_ordered_by_order(self):
+        link0 = LinkFactory(parent=self.parent, child=NodeLearningUnitYearFactory(), order=0)
+        link2 = LinkFactory(parent=self.parent, child=NodeLearningUnitYearFactory(), order=2)
+        link1 = LinkFactory(parent=self.parent, child=NodeLearningUnitYearFactory(), order=1)
+        self.assertEqual(
+            self.parent.children,
+            [link0, link1, link2]
+        )

@@ -58,7 +58,8 @@ class EducationGroupHierarchy:
                  max_block: int = 0,
                  cache_structure=None,
                  cache_entity_parent_root: str = None,
-                 exclude_options: bool = False):
+                 exclude_options: bool = False,
+                 parent_path: str = None):
 
         self.children = []
         self.included_group_element_years = []
@@ -74,6 +75,7 @@ class EducationGroupHierarchy:
         self.pdf_content = pdf_content
         self.max_block = max_block
         self.exclude_options = exclude_options
+        self.path = self._construct_path(parent_path)
 
         if not self.pdf_content or \
                 (not (self.group_element_year and
@@ -83,6 +85,13 @@ class EducationGroupHierarchy:
         self.modification_perm = ModificationPermission(self.root, self.group_element_year)
         self.attach_perm = AttachPermission(self.root, self.group_element_year)
         self.detach_perm = DetachPermission(self.root, self.group_element_year)
+
+    def _construct_path(self, parent_path: str):
+        if not parent_path:
+            return "{}".format(self.root.id)
+
+        path = "{parent_path}_{node_id}".format(parent_path=parent_path, node_id=self.group_element_year.child.id)
+        return path
 
     @property
     def cache_hierarchy(self):
@@ -118,13 +127,15 @@ class EducationGroupHierarchy:
                                                pdf_content=self.pdf_content,
                                                max_block=self.max_block,
                                                cache_structure=self.cache_structure,
-                                               cache_entity_parent_root=self.cache_entity_parent_root)
+                                               cache_entity_parent_root=self.cache_entity_parent_root,
+                                               parent_path=self.path)
                 self._check_max_block(node.max_block)
                 self.included_group_element_years.extend(node.included_group_element_years)
             elif group_element_year.child_leaf:
                 node = NodeLeafJsTree(self.root, group_element_year, cache_hierarchy=self.cache_hierarchy,
                                       tab_to_show=self.tab_to_show, cache_structure=self.cache_structure,
-                                      cache_entity_parent_root=self.cache_entity_parent_root)
+                                      cache_entity_parent_root=self.cache_entity_parent_root,
+                                      parent_path=self.path)
 
             else:
                 continue
@@ -167,6 +178,7 @@ class EducationGroupHierarchy:
 
     def to_json(self):
         return {
+            'id': self.path,
             'text': self._get_acronym(),
             'icon': self.icon,
             'children': [child.to_json() for child in self.children],
@@ -366,6 +378,7 @@ class NodeLeafJsTree(EducationGroupHierarchy):
 
     def to_json(self):
         return {
+            'id': self.path,
             'text': self._get_acronym(),
             'icon': self.icon,
             'a_attr': {

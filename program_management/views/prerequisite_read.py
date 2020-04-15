@@ -65,7 +65,7 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
             context['person'],
             context["root"]
         )
-        context["program_links"] = self.program_tree.get_links()
+        context["program_links"] = self.program_tree.get_all_links()
         context["is_prerequisite_of_list"] = context["node"].get_is_prerequisite_of()
         return context
 

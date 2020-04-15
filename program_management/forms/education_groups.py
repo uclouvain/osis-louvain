@@ -26,6 +26,7 @@
 from dal import autocomplete
 from django import forms
 from django.db.models import Case, When, Value, CharField, OuterRef, Subquery
+from django.db.models import Q
 from django.db.models.functions import Concat
 from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import OrderingFilter, filters, FilterSet
@@ -35,12 +36,10 @@ from base.forms.utils.filter_field import filter_field_by_regex
 from base.models import entity_version
 from base.models.academic_year import AcademicYear, starting_academic_year
 from base.models.education_group_type import EducationGroupType
-from education_group.models.group_year import GroupYear
 from base.models.enums import education_group_categories
 from base.models.enums import education_group_types
 from base.models.enums.education_group_categories import Categories
-from django.db.models import Q
-
+from education_group.models.group_year import GroupYear
 
 PARTICULAR = "PARTICULAR"
 STANDARD = "STANDARD"

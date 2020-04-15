@@ -65,6 +65,11 @@ class Link:
         self.quadrimester_derogation = quadrimester_derogation
         self.link_type = link_type
         self.order = order
+        self._has_changed = False
+
+    @property
+    def has_changed(self):
+        return self._has_changed
 
     def __str__(self):
         return "%(parent)s - %(child)s" % {'parent': self.parent, 'child': self.child}
@@ -94,6 +99,14 @@ class Link:
 
     def is_link_with_group(self):
         return self.child.is_group()
+
+    def order_up(self):
+        self.order -= 1
+        self._has_changed = True
+
+    def order_down(self):
+        self.order += 1
+        self._has_changed = True
 
 
 class LinkWithChildLeaf(Link):

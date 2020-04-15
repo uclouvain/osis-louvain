@@ -30,28 +30,21 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView, CreateView, DeleteView
+from osis_role.contrib.views import PermissionRequiredMixin
 
-from base.business.education_groups import perms as business_perms
 from base.forms.education_group.publication_contact import EducationGroupPublicationContactForm, \
     EducationGroupEntityPublicationContactForm
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.education_group_year import EducationGroupYear
-from base.views.mixins import RulesRequiredMixin, AjaxTemplateMixin
+from base.views.mixins import AjaxTemplateMixin
 
 
-class CommonEducationGroupPublicationContactView(RulesRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin):
+class CommonEducationGroupPublicationContactView(PermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin):
     model = EducationGroupPublicationContact
     context_object_name = "publication_contact"
 
     form_class = EducationGroupPublicationContactForm
     template_name = "education_group/blocks/modal/modal_publication_contact_edit_inner.html"
-
-    # RulesRequiredMixin
-    raise_exception = True
-    rules = [business_perms.is_eligible_to_edit_general_information]
-
-    def _call_rule(self, rule):
-        return rule(self.person, self.education_group_year)
 
     @cached_property
     def person(self):
@@ -79,6 +72,14 @@ class CommonEducationGroupPublicationContactView(RulesRequiredMixin, AjaxTemplat
             ),
             querystring=query_dictionary.urlencode()
         )
+
+    def get_permission_object(self):
+        return self.education_group_year
+
+    def get_permission_required(self):
+        perm_name = 'base.change_commonpedagogyinformation' if self.education_group_year.is_common else \
+            'base.change_pedagogyinformation'
+        return (perm_name, )
 
 
 class CreateEducationGroupPublicationContactView(CommonEducationGroupPublicationContactView, CreateView):

@@ -66,7 +66,7 @@ class TestEducationGroupSearchView(TestCase):
     def setUpTestData(cls):
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse(URL_EDUCATION_GROUPS)
 
     def setUp(self):
@@ -195,7 +195,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         cls.envi_entity_v = EntityVersionFactory(entity=envi_entity, end_date=None)
 
         cls.user = PersonFactory().user
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.form_class = GroupFilter()._meta.form
         cls.url = reverse(URL_EDUCATION_GROUPS)
 
@@ -529,7 +529,7 @@ class TestEducationGroupDataSearchFilterWithVersion(TestCase):
             offer=cls.egy)
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse(URL_EDUCATION_GROUPS)
         cls.form_class = GroupFilter()._meta.form
 

@@ -1,5 +1,26 @@
+const PANEL_TREE_MIN_WIDTH = 300;
+const PANEL_TREE_MAX_WIDTH = 1000;
+const PANEL_TREE_MAIN_MIN_WIDTH = 600;
+
+
 $(document).ready(function () {
-    // open or hide the sidebar.
+    setListenerForCopyElements();
+    setListenerForCutElements();
+    setListnerForClearClipboard();
+
+    let $documentTree = $('#panel_file_tree');
+    if ($documentTree.length) {
+        const copy_element_url = $documentTree.attr("data-copyUrl");
+        const cut_element_url = $documentTree.attr("data-cutUrl");
+
+        setNavVisibility();
+        initializeJsTree($documentTree, cut_element_url, copy_element_url);
+        setResearchTimeOut($documentTree);
+    }
+});
+
+
+function setNavVisibility() {
     let treeVisibility = localStorage.getItem("treeVisibility") || "0";
     if (treeVisibility === "1") {
         openNav();
@@ -7,9 +28,151 @@ $(document).ready(function () {
     } else {
         closeNav();
     }
+}
 
-    let $documentTree = $('#panel_file_tree');
+function toggleNav() {
+    let treeVisibility = localStorage.getItem("treeVisibility") || "0";
+    if (treeVisibility === "0") {
+        openNav();
+    } else {
+        closeNav();
+    }
+}
 
+function openNav() {
+    let size = localStorage.getItem("sidenav_size") || "300px";
+    document.getElementById("mySidenav").style.width = size;
+    document.getElementById("main").style.marginLeft = size;
+    localStorage.setItem("treeVisibility", "1");
+
+}
+
+function closeNav() {
+    document.getElementById("mySidenav").style.width = "0";
+    document.getElementById("main").style.marginLeft = "0";
+    localStorage.setItem("treeVisibility", "0");
+}
+
+
+$('#split-bar').mousedown(function (e) {
+    e.preventDefault();
+    $(document).mousemove(function (e) {
+        e.preventDefault();
+
+        let sidebar = $("#mySidenav");
+        let x = e.pageX - sidebar.offset().left;
+        if (x > PANEL_TREE_MIN_WIDTH && x < PANEL_TREE_MAX_WIDTH && e.pageX < ($(window).width() - PANEL_TREE_MAIN_MIN_WIDTH)) {
+            sidebar.css("width", x);
+            $('#main').css("margin-left", x);
+        }
+        localStorage.setItem("sidenav_size", sidebar.width().toString() + "px")
+    })
+});
+$(document).mouseup(function () {
+    $(document).unbind('mousemove');
+});
+
+$("a[id^='quick-search']").click(function (event) {
+    event.preventDefault();
+    $(this).attr('data-url', $('#j1_1_anchor').attr('search_url'));
+});
+
+$("#scrollableDiv").on("scroll", function() {
+   localStorage.setItem('scrollpos', $("#scrollableDiv")[0].scrollTop);
+});
+
+$(window).scroll(function() {
+    adaptTreeOnFooter();
+});
+
+function adaptTreeOnFooter() {
+    if (checkVisible($('.footer'))) {
+        $('.side-container').css("height", "calc(100% - 100px)");
+    } else {
+        $('.side-container').css("height", "calc(100% - 50px)");
+    }
+}
+
+
+function handleCutAction(cut_url, element_id, element_type, link_id) {
+    $.ajax({
+        url: cut_url,
+        dataType: 'json',
+        data: {
+            'element_id': element_id,
+            'element_type': element_type,
+            'group_element_year_id': link_id
+        },
+        type: 'POST',
+        success: function (jsonResponse) {
+            displayInfoMessage(jsonResponse, 'clipboard');
+        }
+    });
+}
+
+function handleCopyAction(copy_url, element_id, element_type) {
+    $.ajax({
+        url: copy_url,
+        dataType: 'json',
+        data: {
+            'element_id': element_id,
+            'element_type': element_type
+        },
+        type: 'POST',
+        success: function (jsonResponse) {
+            if (document.getElementById("clipboard")) {
+                displayInfoMessage(jsonResponse, 'clipboard');
+            } else {
+                displayInfoMessage(jsonResponse, "message_info_container");
+            }
+        }
+    });
+}
+
+
+function setListnerForClearClipboard() {
+    const clearClipboardsElements = document.getElementsByClassName("clear-clipboard");
+    for (let i = 0; i < clearClipboardsElements.length; i++) {
+        clearClipboardsElements[i].addEventListener("click", clearClipboardListener);
+    }
+}
+
+
+function clearClipboardListener(event) {
+    const clear_clipboard_url = event.currentTarget.dataset.url;
+    $.ajax({
+        url: clear_clipboard_url,
+        type: 'POST',
+        success: function () {
+            $("#clipboard").hide();
+        }
+    });
+}
+
+
+function get_data_from_tree(data) {
+    let inst = $.jstree.reference(data.reference),
+        obj = inst.get_node(data.reference);
+
+    return {
+        group_element_year_id: obj.a_attr.group_element_year,
+        element_id: obj.a_attr.element_id,
+        element_type: obj.a_attr.element_type,
+        has_prerequisite: obj.a_attr.has_prerequisite,
+        is_prerequisite: obj.a_attr.is_prerequisite,
+        view_url: obj.a_attr.href,
+        attach_url: obj.a_attr.attach_url,
+        detach_url: obj.a_attr.detach_url,
+        modify_url: obj.a_attr.modify_url,
+        attach_disabled: obj.a_attr.attach_disabled,
+        detach_disabled: obj.a_attr.detach_disabled,
+        modification_disabled: obj.a_attr.modification_disabled,
+        search_url: obj.a_attr.search_url
+    };
+}
+
+
+function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
     $documentTree.bind("state_ready.jstree", function (event, data) {
         // Bind the redirection only when the tree is ready,
         // however, it reload the page during the loading
@@ -20,7 +183,7 @@ $(document).ready(function () {
         var selected_node_id = $documentTree.jstree().get_selected(true)[0].id;
         if (selected_node_id != undefined) {
             var scrollpos = localStorage.getItem('scrollpos');
-            document.getElementById('scrollableDiv').scrollTo(0,scrollpos);
+            document.getElementById('scrollableDiv').scrollTo(0, scrollpos);
         }
 
         // if the tree has never been loaded, execute close_all by default.
@@ -28,60 +191,6 @@ $(document).ready(function () {
             $(this).jstree('close_all');
         }
     });
-
-    function get_data_from_tree(data) {
-        let inst = $.jstree.reference(data.reference),
-            obj = inst.get_node(data.reference);
-
-        return {
-            group_element_year_id: obj.a_attr.group_element_year,
-            element_id: obj.a_attr.element_id,
-            element_type: obj.a_attr.element_type,
-            has_prerequisite: obj.a_attr.has_prerequisite,
-            is_prerequisite: obj.a_attr.is_prerequisite,
-            view_url: obj.a_attr.href,
-            attach_url: obj.a_attr.attach_url,
-            detach_url: obj.a_attr.detach_url,
-            modify_url: obj.a_attr.modify_url,
-            attach_disabled: obj.a_attr.attach_disabled,
-            detach_disabled: obj.a_attr.detach_disabled,
-            modification_disabled: obj.a_attr.modification_disabled,
-            search_url: obj.a_attr.search_url
-        };
-    }
-
-    function build_url_data(element_id, group_element_year_id, action) {
-        var data = {
-            'root_id': root_id,
-            'element_id': element_id,
-            'group_element_year_id': group_element_year_id,
-            'action': action,
-            'source': url_resolver_match
-        };
-        return jQuery.param(data);
-    }
-
-    function handleCopyOrCutAction(data, action) {
-        let __ret = get_data_from_tree(data);
-        let element_id = __ret.element_id;
-        let group_element_year_id = __ret.group_element_year_id;
-        $.ajax({
-            url: management_url,
-            dataType: 'json',
-            data: {
-                'element_id': element_id,
-                'group_element_year_id': group_element_year_id,
-                'action': action
-            },
-            type: 'POST',
-            success: function (jsonResponse) {
-                let clipboard = document.getElementById("clipboard");
-                clipboard.style.display = "block";
-                let clipboard_content = document.getElementById("clipboard_content");
-                clipboard_content.innerHTML = jsonResponse['success_message'];
-            }
-        });
-    }
 
     $documentTree.jstree({
             "core": {
@@ -111,14 +220,17 @@ $(document).ready(function () {
                                 return !get_data_from_tree(data).group_element_year_id;
                             },
                             "action": function (data) {
-                                handleCopyOrCutAction(data, "cut")
+                                const node_data = get_data_from_tree(data);
+                                handleCutAction(cut_element_url, node_data.element_id, node_data.element_type,
+                                    node_data.group_element_year_id)
                             }
                         },
 
                         "copy": {
                             "label": gettext("Copy"),
                             "action": function (data) {
-                                handleCopyOrCutAction(data, "copy")
+                                const node_data = get_data_from_tree(data);
+                                handleCopyAction(copy_element_url, node_data.element_id, node_data.element_type)
                             }
                         },
 
@@ -244,7 +356,33 @@ $(document).ready(function () {
             }
         }
     );
+}
 
+
+function setListenerForCutElements() {
+    $(".cut-element").click(function (event) {
+        const url = event.target.dataset.url;
+        const element_id = event.target.dataset.element_id;
+        const element_type = event.target.dataset.element_type;
+        const link_id = event.target.dataset.link_id;
+        handleCutAction(url, element_id, element_type, link_id);
+        event.preventDefault();
+    });
+}
+
+
+function setListenerForCopyElements() {
+    $(".copy-element").click(function (event) {
+        const url = event.target.dataset.url;
+        const element_id = event.target.dataset.element_id;
+        const element_type = event.target.dataset.element_type;
+        handleCopyAction(url, element_id, element_type);
+        event.preventDefault();
+    });
+}
+
+
+function setResearchTimeOut($documentTree) {
     var to = false;
     $('#search_jstree').keyup(function () {
         if (to) {
@@ -255,70 +393,4 @@ $(document).ready(function () {
             $documentTree.jstree(true).search(v);
         }, 250);
     });
-});
-
-function toggleNav() {
-    let treeVisibility = localStorage.getItem("treeVisibility") || "0";
-    if (treeVisibility === "0") {
-        openNav();
-    } else {
-        closeNav();
-    }
-}
-
-function openNav() {
-    let size = localStorage.getItem("sidenav_size") || "300px";
-    document.getElementById("mySidenav").style.width = size;
-    document.getElementById("main").style.marginLeft = size;
-    localStorage.setItem("treeVisibility", "1");
-
-}
-
-function closeNav() {
-    document.getElementById("mySidenav").style.width = "0";
-    document.getElementById("main").style.marginLeft = "0";
-    localStorage.setItem("treeVisibility", "0");
-}
-
-const min = 300;
-const max = 1000;
-const mainmin = 600;
-
-$('#split-bar').mousedown(function (e) {
-    e.preventDefault();
-    $(document).mousemove(function (e) {
-        e.preventDefault();
-
-        let sidebar = $("#mySidenav");
-        let x = e.pageX - sidebar.offset().left;
-        if (x > min && x < max && e.pageX < ($(window).width() - mainmin)) {
-            sidebar.css("width", x);
-            $('#main').css("margin-left", x);
-        }
-        localStorage.setItem("sidenav_size", sidebar.width().toString() + "px")
-    })
-});
-$(document).mouseup(function () {
-    $(document).unbind('mousemove');
-});
-
-$("a[id^='quick-search']").click(function (event) {
-    event.preventDefault();
-    $(this).attr('data-url', $('#j1_1_anchor').attr('search_url'));
-});
-
-$("#scrollableDiv").on("scroll", function() {
-   localStorage.setItem('scrollpos', $("#scrollableDiv")[0].scrollTop);
-});
-
-$(window).scroll(function() {
-    adaptTreeOnFooter();
-});
-
-function adaptTreeOnFooter() {
-    if (checkVisible($('.footer'))) {
-        $('.side-container').css("height", "calc(100% - 100px)");
-    } else {
-        $('.side-container').css("height", "calc(100% - 50px)");
-    }
 }

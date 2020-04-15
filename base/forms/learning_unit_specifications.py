@@ -26,6 +26,7 @@
 from ckeditor.widgets import CKEditorWidget
 from django import forms
 from django.conf import settings
+from django.db.models import OuterRef, Min, Subquery
 
 from base.business.learning_unit import get_academic_year_postponement_range
 from base.forms.common import set_trans_txt
@@ -87,21 +88,32 @@ class LearningUnitSpecificationsEditForm(forms.Form):
         self._save_translated_text()
         return self.text_label, self.last_postponed_academic_year
 
+    def _get_ac_year_postponement_range(self):
+        ac_year_postponement_range = get_academic_year_postponement_range(self.learning_unit_year)
+        if self.learning_unit_year.min_proposal_year:
+            return ac_year_postponement_range.exclude(year__gte=self.learning_unit_year.min_proposal_year)
+        return ac_year_postponement_range
+
     def _save_translated_text(self):
+        proposal_years = ProposalLearningUnit.objects.filter(
+            learning_unit_year__learning_unit=OuterRef('learning_unit'),
+            learning_unit_year__academic_year__year__gt=OuterRef('academic_year__year')
+        ).values('learning_unit_year__academic_year__year')
         for code, label in settings.LANGUAGES:
             self.trans_text = TranslatedText.objects.get(pk=self.cleaned_data['cms_{}_id'.format(code[:2])])
             self.trans_text.text = self.cleaned_data.get('trans_text_{}'.format(code[:2]))
             self.text_label = self.trans_text.text_label
             self.trans_text.save()
 
-            self.learning_unit_year = LearningUnitYear.objects.select_related(
-                'academic_year').prefetch_related(
+            self.learning_unit_year = LearningUnitYear.objects.select_related('academic_year').prefetch_related(
                 'learning_unit__learningunityear_set'
+            ).annotate(
+                min_proposal_year=Min(Subquery(proposal_years))
             ).get(id=self.trans_text.reference)
 
             self.last_postponed_academic_year = None
             if not self.learning_unit_year.academic_year.is_past and self.postponement:
-                ac_year_postponement_range = get_academic_year_postponement_range(self.learning_unit_year)
+                ac_year_postponement_range = self._get_ac_year_postponement_range()
                 self.last_postponed_academic_year = ac_year_postponement_range.last()
                 cms = {"language": self.trans_text.language,
                        "text_label": self.text_label,

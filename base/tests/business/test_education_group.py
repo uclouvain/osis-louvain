@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -45,8 +45,6 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
 from base.models.enums import mandate_type as mandate_types
-from base.models.enums.groups import CENTRAL_MANAGER_GROUP
-from base.models.person import Person
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
@@ -58,10 +56,10 @@ from base.tests.factories.mandatary import MandataryFactory
 from base.tests.factories.offer_year_calendar import OfferYearCalendarFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.user import UserFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from osis_common.document import xls_build
 
 NO_SESSION_DATA = {'session1': None, 'session2': None, 'session3': None}
@@ -70,26 +68,26 @@ NO_SESSION_DATA = {'session1': None, 'session2': None, 'session3': None}
 class EducationGroupTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # Get or Create Permission to edit administrative data
-        content_type = ContentType.objects.get_for_model(Person)
-        permission, created = Permission.objects.get_or_create(
-            codename="can_edit_education_group_administrative_data",
-            content_type=content_type)
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(permission)
-
-    def setUp(self):
         # Create structure
-        self._create_basic_entity_structure()
-        # Create education group with 'CHIM' as entity cls
-        self.education_group_year = EducationGroupYearFactory(management_entity=self.chim_entity)
+        cls._create_basic_entity_structure()
 
-    def test_can_user_edit_administrative_data_no_permission(self):
-        """Without permission/group, we cannot access to administrative data ==> Refused"""
-        user_without_perm = UserFactory()
-        PersonFactory(user=user_without_perm)
-        self.assertFalse(can_user_edit_administrative_data(user_without_perm, self.education_group_year))
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.education_group_year = EducationGroupYearFactory(
+            management_entity=cls.chim_entity,
+            academic_year=cls.academic_year
+        )
+
+    @classmethod
+    def _create_basic_entity_structure(cls):
+        cls.organization = OrganizationFactory()
+        # Create entities UCL
+        cls.root_entity = _create_entity_and_version_related_to(cls.organization, "UCL")
+        # SST entity
+        cls.sst_entity = _create_entity_and_version_related_to(cls.organization, "SST", cls.root_entity)
+        cls.agro_entity = _create_entity_and_version_related_to(cls.organization, "AGRO", cls.sst_entity)
+        cls.chim_entity = _create_entity_and_version_related_to(cls.organization, "CHIM", cls.sst_entity)
 
     def test_can_user_edit_administrative_data_with_permission_no_pgrm_manager(self):
         """With permission but no program manager of education group ==> Refused"""
@@ -102,25 +100,22 @@ class EducationGroupTestCase(TestCase):
 
     def test_can_user_edit_administartive_data_group_central_manager_no_entity_linked(self):
         """With permission + Group central manager + No linked to the right entity + Not program manager ==> Refused """
-        _add_to_group(self.user, CENTRAL_MANAGER_GROUP)
+        CentralManagerFactory(person=self.person)
         self.assertFalse(can_user_edit_administrative_data(self.user, self.education_group_year))
 
     def test_can_user_edit_administartive_data_group_central_manager_entity_linked(self):
         """With permission + Group central manager + Linked to the right entity ==> Allowed """
-        _add_to_group(self.user, CENTRAL_MANAGER_GROUP)
-        PersonEntityFactory(person=self.person, entity=self.chim_entity, with_child=False)
+        CentralManagerFactory(person=self.person, entity=self.education_group_year.management_entity)
         self.assertTrue(can_user_edit_administrative_data(self.user, self.education_group_year))
 
     def test_can_user_edit_administartive_data_group_central_manager_parent_entity_linked_with_child(self):
         """With permission + Group central manager + Linked to the parent entity (with child TRUE) ==> Allowed """
-        _add_to_group(self.user, CENTRAL_MANAGER_GROUP)
-        PersonEntityFactory(person=self.person, entity=self.root_entity, with_child=True)
+        CentralManagerFactory(person=self.person, entity=self.root_entity, with_child=True)
         self.assertTrue(can_user_edit_administrative_data(self.user, self.education_group_year))
 
     def test_can_user_edit_administartive_data_group_central_manager_parent_entity_linked_no_child(self):
         """With permission + Group central manager + Linked to the parent entity (with child FALSE) ==> Refused """
-        _add_to_group(self.user, CENTRAL_MANAGER_GROUP)
-        PersonEntityFactory(person=self.person, entity=self.root_entity, with_child=False)
+        CentralManagerFactory(person=self.person, entity=self.root_entity, with_child=False)
         self.assertFalse(can_user_edit_administrative_data(self.user, self.education_group_year))
 
     def test_can_user_edit_administartive_data_group_central_manager_no_entity_linked_but_program_manager(self):
@@ -128,19 +123,9 @@ class EducationGroupTestCase(TestCase):
         With permission + Group central manager + Linked to the parent entity (with_child FALSE) + IS
         program manager ==> Allowed
         """
-        _add_to_group(self.user, CENTRAL_MANAGER_GROUP)
-        PersonEntityFactory(person=self.person, entity=self.root_entity, with_child=False)
+        CentralManagerFactory(person=self.person, entity=self.root_entity, with_child=False)
         ProgramManagerFactory(person=self.person, education_group=self.education_group_year.education_group)
         self.assertTrue(can_user_edit_administrative_data(self.user, self.education_group_year))
-
-    def _create_basic_entity_structure(self):
-        self.organization = OrganizationFactory()
-        # Create entities UCL
-        self.root_entity = _create_entity_and_version_related_to(self.organization, "UCL")
-        # SST entity
-        self.sst_entity = _create_entity_and_version_related_to(self.organization, "SST", self.root_entity)
-        self.agro_entity = _create_entity_and_version_related_to(self.organization, "AGRO", self.sst_entity)
-        self.chim_entity = _create_entity_and_version_related_to(self.organization, "CHIM", self.sst_entity)
 
 
 def _create_entity_and_version_related_to(organization, acronym, parent=None):

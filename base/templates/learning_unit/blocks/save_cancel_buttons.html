@@ -2,14 +2,14 @@
 {% load i18n %}
 <div class="row">
     <div class="col-md-4 col-md-offset-8">
-         <a href="{% url 'learning_unit' learning_unit_year.id %}" class="btn btn-default pull-right"
-            style="margin-left: 10px;" role="button">
-            {% trans 'Cancel' %}
-        </a>
-
-        <button onclick="submit()" id="btn-confirm" class="btn btn-primary pull-right">
+         <button onclick="submit()" id="btn-confirm" class="btn btn-primary pull-right" style="margin-left: 10px;">
             <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
         </button>
+
+        <a href="{% url 'learning_unit' learning_unit_year.id %}" class="btn btn-default pull-right"
+            role="button">
+            {% trans 'Cancel' %}
+        </a>
     </div>
 </div>
 

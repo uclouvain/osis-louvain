@@ -35,6 +35,7 @@ from assistant.models.tutoring_learning_unit_year import TutoringLearningUnitYea
 from assistant.tests.factories.assistant_mandate import AssistantMandateFactory
 from attribution.tests.factories.attribution import AttributionNewFactory
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
+from attribution.tests.factories.tutor_application import TutorApplicationFactory
 from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, CMS_LABEL_PEDAGOGY, CMS_LABEL_SUMMARY
 from base.business.learning_units.simple import deletion
 from base.models.enums import entity_type
@@ -53,7 +54,7 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import AdministrativeManagerFactory
+from base.tests.factories.person import AdministrativeManagerFactory, PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.enums import entity_name
@@ -413,6 +414,15 @@ class LearningUnitYearDeletion(TestCase):
         )
         self.luy1.subtype = learning_unit_year_subtypes.FULL
         self.luy1.save()
+
+    def test_cannot_delete_if_has_application(self):
+        luy = LearningUnitYearFactory()
+        TutorApplicationFactory(learning_container_year=luy.learning_container_year)
+        self.assertFalse(
+            base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(
+                luy, PersonWithPermissionsFactory('can_delete_learningunit')
+            )
+        )
 
 
 def add_to_group(user, group_name):

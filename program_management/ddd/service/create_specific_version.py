@@ -45,8 +45,8 @@ def create_specific_version(data, education_group_year):
     new_groupyear.save()
     new_education_group_version = EducationGroupVersion(
         version_name=data["version_name"],
-        title_fr=data["title"],
-        title_en=data["title_english"],
+        title_fr=data["title_fr"],
+        title_en=data["title_en"],
         offer=education_group_year,
         is_transition=False,
         root_group=new_groupyear

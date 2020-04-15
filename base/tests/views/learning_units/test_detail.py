@@ -43,7 +43,7 @@ from base.tests.factories.external_learning_unit_year import ExternalLearningUni
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
-from base.tests.factories.person import PersonFactory, FacultyManagerFactory, UEFacultyManagerFactory
+from base.tests.factories.person import PersonFactory, FacultyManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import SuperUserFactory
 from base.views.learning_units.detail import SEARCH_URL_PART
@@ -146,26 +146,21 @@ class TestLearningUnitDetailView(TestCase):
 
         learning_unit_year.learning_unit.end_year = None
         learning_unit_year.learning_unit.save()
-        ue_manager = UEFacultyManagerFactory(
+        ue_manager = FacultyManagerForUEFactory(
             'can_edit_learningunit',
             'can_access_learningunit',
             'can_edit_learningunit_date'
         )
-        managers = [
-            FacultyManagerFactory('can_edit_learningunit', 'can_access_learningunit', 'can_edit_learningunit_date'),
-            ue_manager
-        ]
 
-        for manager in managers:
-            PersonEntityFactory(
-                entity=learning_container_year.requirement_entity,
-                person=manager
-            )
-            url = reverse("learning_unit", args=[learning_unit_year.id])
-            self.client.force_login(manager.user)
+        PersonEntityFactory(
+            entity=learning_container_year.requirement_entity,
+            person=ue_manager
+        )
+        url = reverse("learning_unit", args=[learning_unit_year.id])
+        self.client.force_login(ue_manager.user)
 
-            response = self.client.get(url)
-            self.assertEqual(response.context["can_edit_date"], True)
+        response = self.client.get(url)
+        self.assertEqual(response.context["can_edit_date"], True)
 
     def test_learning_unit_of_type_partim_with_faculty_manager(self):
         learning_container_year = LearningContainerYearFactory(
@@ -211,7 +206,7 @@ class TestLearningUnitDetailView(TestCase):
         learning_unit_year.learning_unit.end_year = None
         learning_unit_year.learning_unit.save()
         managers = [
-            FacultyManagerFactory('can_access_learningunit'),
+            FacultyManagerForUEFactory('can_access_learningunit'),
         ]
         for manager in managers:
             PersonEntityFactory(entity=learning_container_year.requirement_entity, person=manager)

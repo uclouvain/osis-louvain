@@ -29,6 +29,7 @@ from unittest import mock
 from django.contrib.auth.models import Permission
 from django.test import TestCase
 
+from attribution.tests.factories.tutor_application import TutorApplicationFactory
 from base.business.learning_units import perms
 from base.business.learning_units.perms import is_eligible_to_create_modification_proposal, \
     FACULTY_UPDATABLE_CONTAINER_TYPES, is_eligible_to_consolidate_proposal, _check_proposal_edition
@@ -40,6 +41,7 @@ from base.models.enums.attribution_procedure import EXTERNAL
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, UE_FACULTY_MANAGER_GROUP
 from base.models.enums.learning_container_year_types import OTHER_COLLECTIVE, OTHER_INDIVIDUAL, MASTER_THESIS, COURSE
 from base.models.enums.learning_unit_year_subtypes import FULL, PARTIM
+from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.models.person import Person
 from base.tests.factories.academic_calendar import generate_modification_transformation_proposal_calendars, \
@@ -52,8 +54,8 @@ from base.tests.factories.external_learning_unit_year import ExternalLearningUni
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
-from base.tests.factories.person import PersonFactory, FacultyManagerFactory, CentralManagerFactory, \
-    PersonWithPermissionsFactory, UEFacultyManagerFactory
+from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory, \
+    PersonWithPermissionsFactory, FacultyManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory
@@ -73,7 +75,7 @@ ALL_TYPES = TYPES_PROPOSAL_NEEDED_TO_EDIT + TYPES_DIRECT_EDIT_PERMITTED
 class PermsTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person_fac = FacultyManagerFactory()
+        cls.person_fac = FacultyManagerForUEFactory()
         cls.academic_yr = create_current_academic_year()
         cls.academic_yr_1 = AcademicYearFactory.build(year=cls.academic_yr.year + 1)
         super(AcademicYear, cls.academic_yr_1).save()
@@ -103,6 +105,15 @@ class PermsTestCase(TestCase):
                                           subtype=PARTIM)
 
             self.assertTrue(perms._is_learning_unit_year_in_state_to_be_modified(luy, self.person_fac, False))
+
+    def test_not_eligible_if_has_application(self):
+        luy = LearningUnitYearFactory(academic_year__year=2020)
+        TutorApplicationFactory(learning_container_year=luy.learning_container_year)
+        self.assertFalse(
+            perms.is_eligible_for_modification_end_date(
+                luy, PersonWithPermissionsFactory('can_edit_learningunit_date')
+            )
+        )
 
     def test_can_faculty_manager_modify_end_date_full(self):
         for direct_edit_permitted_container_type in TYPES_DIRECT_EDIT_PERMITTED:
@@ -156,7 +167,7 @@ class PermsTestCase(TestCase):
         mock_is_person_linked_to_entity_in_charge_of_lu.return_value = True
         mock_is_learning_unit_year_in_state_to_be_modified.return_value = True
         mock_is_year_editable.return_value = True
-        a_person = CentralManagerFactory()
+        a_person = CentralManagerForUEFactory()
         luy = LearningUnitYearFactory(academic_year=self.academic_yr)
         ExternalLearningUnitYearFactory(learning_unit_year=luy, co_graduation=False)
         self.assertFalse(perms.is_external_learning_unit_cograduation(luy, a_person, False))
@@ -405,6 +416,20 @@ class PermsTestCase(TestCase):
             with self.subTest(luy=luy):
                 self.assertFalse(perms._is_learning_unit_year_in_state_to_be_modified(luy, self.person_fac, False))
 
+    def test_is_not_eligible_if_creation_proposal_has_application(self):
+        luy = LearningUnitYearFactory()
+        proposal = ProposalLearningUnitFactory(
+            learning_unit_year=luy,
+            type=ProposalType.CREATION.name
+        )
+        TutorApplicationFactory(learning_container_year=luy.learning_container_year)
+
+        self.assertFalse(
+            perms.is_eligible_for_cancel_of_proposal(
+                proposal, CentralManagerForUEFactory()
+            )
+        )
+
 
 def create_person_with_permission_and_group(group_name=None, permission_name='can_edit_learning_unit_proposal'):
     return PersonWithPermissionsFactory(permission_name, groups=None if not group_name else [group_name])
@@ -552,6 +577,23 @@ class TestIsEligibleToConsolidateLearningUnitProposal(TestCase):
 
                 self.assertTrue(is_eligible_to_consolidate_proposal(proposal, self.person_with_right_to_consolidate))
 
+    def test_is_not_eligible_consolidate_delete_proposal_if_has_applications(self):
+        requirement_entity = EntityFactory()
+        luy = LearningUnitYearFactory(learning_container_year__requirement_entity=requirement_entity)
+        proposal = ProposalLearningUnitFactory(
+            learning_unit_year=luy,
+            type=ProposalType.SUPPRESSION.name,
+            state=ProposalState.ACCEPTED.name
+        )
+        TutorApplicationFactory(learning_container_year=luy.learning_container_year)
+        person = PersonWithPermissionsFactory('can_consolidate_learningunit_proposal')
+        PersonEntityFactory(person=person, entity=requirement_entity)
+        self.assertFalse(
+            perms.is_eligible_to_consolidate_proposal(
+                proposal, person
+            )
+        )
+
 
 class TestIsAcademicYearInRangeToCreatePartim(TestCase):
     @classmethod
@@ -565,15 +607,11 @@ class TestIsAcademicYearInRangeToCreatePartim(TestCase):
         cls.learning_unit_years = [LearningUnitYearFactory(academic_year=acy) for acy in cls.academic_years]
         generate_learning_unit_edition_calendars(cls.academic_years)
 
-        cls.faculty_manager = FacultyManagerFactory()
-        cls.central_manager = CentralManagerFactory()
-        cls.faculty_manager_for_ue = UEFacultyManagerFactory()
+        cls.central_manager = CentralManagerForUEFactory()
+        cls.faculty_manager_for_ue = FacultyManagerForUEFactory()
 
     def test_for_faculty_manager_for_ue(self):
         self._test_can_create_partim_based_on_person(self.faculty_manager_for_ue, MAX_ACADEMIC_YEAR_FACULTY)
-
-    def test_for_faculty_manager(self):
-        self._test_can_create_partim_based_on_person(self.faculty_manager, MAX_ACADEMIC_YEAR_FACULTY)
 
     def test_for_central_manager(self):
         self._test_can_create_partim_based_on_person(self.central_manager, MAX_ACADEMIC_YEAR_CENTRAL)

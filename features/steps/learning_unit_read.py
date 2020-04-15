@@ -26,6 +26,8 @@ import time
 from behave import *
 from selenium.webdriver.common.by import By
 
+import program_management.views.tree.move
+
 use_step_matcher("parse")
 
 
@@ -152,7 +154,7 @@ def step_impl(context):
     """
     :type context: behave.runner.Context
     """
-    context.current_page.up.click()
+    program_management.views.tree.move.up.click()
     time.sleep(1)
 
 

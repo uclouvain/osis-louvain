@@ -46,9 +46,10 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import FacultyManagerFactory, CentralManagerFactory
+from base.tests.factories.person import CentralManagerForUEFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
+from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 from program_management.business.group_element_years.postponement import PostponeContent, NotPostponeError, \
     ReuseOldLearningUnitYearWarning
 
@@ -700,10 +701,11 @@ class TestPostponeContent(TestCase):
         )
 
         with self.assertRaises(NotPostponeError, msg=_('You are not allowed to postpone this training in the future.')):
-            self.postponer = PostponeContent(egy, FacultyManagerFactory())
+            faculty_manager = FacultyManagerFactory()
+            self.postponer = PostponeContent(egy, faculty_manager.person)
 
     def test_central_can_copy_into_future(self):
-        central_manager = CentralManagerFactory()
+        central_manager = CentralManagerForUEFactory()
         eg = EducationGroupFactory(end_year=AcademicYearFactory(year=self.current_academic_year.year + 4))
         egy = EducationGroupYearFactory(
             education_group=eg,

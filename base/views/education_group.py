@@ -33,6 +33,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
+from rules.contrib.views import permission_required
 from waffle.decorators import waffle_flag
 
 from base import models as mdl

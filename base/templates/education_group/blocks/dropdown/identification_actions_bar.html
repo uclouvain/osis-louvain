@@ -1,6 +1,4 @@
-{% load static %}
-{% load i18n %}
-{% load format waffle_tags feature_flag education_group %}
+{% load static i18n format education_group osis_role %}
 {% comment "License" %}
 * OSIS stands for Open Student Information System. It's an application
 * designed to manage the core business of higher education institutions,
@@ -25,142 +23,126 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% if "base" in perms %}
-    {% features_or "education_group_create" "education_group_update" "education_group_delete" as show_button %}
 
-    {% if show_button %}
-        <div class="dropdown {{ dropdirection }}">
+<div class="dropdown {{ dropdirection }}">
+    <button id="dLabel" class="btn btn-default" type="button" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">
+        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {% trans 'Actions' %}
+        <span class="caret"></span>
+    </button>
 
-            <button id="dLabel" class="btn btn-default" type="button" data-toggle="dropdown" aria-haspopup="true"
-                    aria-expanded="false">
-                <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {% trans 'Actions' %}
-                <span class="caret"></span>
-            </button>
+    <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
+        {# Create link #}
+        <li>
+            {% url 'select_education_group_type' enums.GROUP root.pk education_group_year.pk as create_group_url %}
+            {% a_tag_has_perm create_group_url _('New Education Group') 'base.add_group' user education_group_year %}
+        </li>
+        <li>
+            {% url 'select_education_group_type' enums.TRAINING root.pk education_group_year.pk as create_training_url %}
+            {% a_tag_has_perm create_training_url _('New Training') 'base.add_training' user education_group_year %}
+        </li>
+        <li>
+            {% url 'select_education_group_type' enums.MINI_TRAINING root.pk education_group_year.pk as create_mini_training_url %}
+            {% a_tag_has_perm create_mini_training_url _('New Mini-Training') 'base.add_minitraining' user education_group_year %}
+        </li>
 
-            <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
-                {% flag "education_group_create" %}
-                    {% url 'select_education_group_type' enums.GROUP root.pk education_group_year.pk as create_group_url %}
-                    {% url 'select_education_group_type' enums.TRAINING root.pk education_group_year.pk as create_training_url %}
-                    {% url 'select_education_group_type' enums.MINI_TRAINING root.pk education_group_year.pk as create_mini_training_url %}
+        <li class="divider"></li>
 
-                    {% li_with_create_perm_group create_group_url _('New Education Group') %}
-                    {% li_with_create_perm_training create_training_url _('New Training') %}
-                    {% li_with_create_perm_mini_training create_mini_training_url _('New Mini-Training') %}
-                    <li class="divider"></li>
-                {% endflag %}
+        {# Cut link #} {# We cannot cut root element #}
+        {% if group_to_parent and group_to_parent != "0" %}
+            <li id='select_li'>
+                <a href="#" class="cut-element" data-url="{% url "cut_element" %}" data-element_id="{{ education_group_year.id }}" data-element_type="EDUCATION_GROUP" data-link_id="{{ group_to_parent }}">
+                    {% trans 'Cut' %}
+                </a>
+            </li>
+        {% endif %}
 
-                {% flag "copy_education_group_to_cache" %}
-                    <li id='select_li' {% if not group_to_parent or group_to_parent == "0" %}class="disabled"{% endif %}>
-                        <a href="#" {% if group_to_parent and group_to_parent != "0" %}onclick="select_education_group('cut')"{% endif %}>
-                            {% trans 'Cut' %}
-                        </a>
-                    </li>
-                    <li id='select_li'>
-                        <a href="#" onclick="select_education_group('copy')" >
-                            {% trans 'Copy' %}
-                        </a>
-                    </li>
-                {% endflag %}
+        {# Copy link #}
+        <li id='select_li'>
+            <a href="#" class="copy-element" data-url="{% url "copy_element" %}" data-element_id="{{ education_group_year.id }}" data-element_type="EDUCATION_GROUP" >
+                {% trans 'Copy' %}
+            </a>
+        </li>
 
-                {% flag "education_group_attach" %}
-                    <li {% if not can_change_education_group %}
-                        class="disabled"
-                    {% else %}
-                        class="trigger_modal"
-                        data-url="{% url 'education_group_attach' parent.id education_group_year.id %}"
-                    {% endif %}>
-                        <a href="#">{% trans 'Paste' %}</a>
-                    </li>
-                    <li class="divider"></li>
-                {% endflag %}
+        {# Paste link #}
+        <li>
+            {% url 'education_group_attach' parent.id education_group_year.id as attach_url %}
+            {% a_tag_modal_has_perm attach_url _('Paste') 'base.attach_educationgroup' user education_group_year %}
+        </li>
+        <li class="divider"></li>
 
-                {% flag "education_group_detach" %}
-                    {% if group_to_parent %}
-                        {% url 'group_element_year_delete' parent.id education_group_year.id group_to_parent as detach_url %}
-                    {% endif %}
-                    {% link_detach_education_group detach_url %}
-                {% endflag %}
 
-                <li class="divider"></li>
+        {# Detach link #}
+        {% if group_to_parent and group_to_parent != "0" %}    {# We cannot detach root element #}
+            <li>
+                {% url 'group_element_year_delete' parent.id education_group_year.id group_to_parent as detach_url %}
+                {% a_tag_modal_has_perm detach_url _('Detach') 'base.detach_educationgroup' user education_group_year %}
+            </li>
+             <li class="divider"></li>
+        {% endif %}
 
-                {% flag "education_group_update" %}
-                    {% url 'update_education_group' root.pk education_group_year.pk as update_url %}
-                    {% if tab_to_show and education_group_year.groupelementyear_set.count > 0 %}
-                        {% with update_url|add:"?tab_to_show="|add:tab_to_show as update_url %}
-                            {% li_with_update_perm update_url _('Modify') %}
-                        {% endwith %}
-                    {% else %}
-                        {% li_with_update_perm update_url _('Modify') %}
-                    {% endif %}
-                {% endflag %}
+        {# Update link #}
+        <li>
+            {% url 'update_education_group' root.pk education_group_year.pk as update_url %}
+            {% have_only_access_to_certificate_aims user education_group_year as only_certificate_aims %}
+            {% if only_certificate_aims %}
+                {% a_tag_modal_has_perm update_url _('Modify') 'base.change_educationgroupcertificateaim' user education_group_year %}
+            {% else %}
+                {% if tab_to_show and education_group_year.groupelementyear_set.count > 0 %}
+                    {% a_tag_has_perm update_url|add:"?tab_to_show="|add:tab_to_show _('Modify') 'base.change_educationgroup' user education_group_year %}
+                {% else %}
+                    {% a_tag_has_perm update_url _('Modify') 'base.change_educationgroup' user education_group_year %}
+                {% endif %}
+            {% endif %}
+        </li>
 
-                {% flag "education_group_delete" %}
-                    {% url 'delete_education_group' root.pk education_group_year.education_group.pk as delete_url %}
-                    {% li_with_deletion_perm delete_url _('Delete permanently') %}
-                {% endflag %}
+        {# Delete link #}
+        <li>
+            {% url 'delete_education_group' root.pk education_group_year.education_group.pk as delete_url %}
+            {% a_tag_has_perm delete_url _('Delete permanently') 'base.delete_all_educationgroup' user education_group_year.education_group %}
+        </li>
 
-                {% flag "education_group_update" %}
-                    <li class="divider"></li>
-                    {% li_with_postpone_perm_training %}
-                {% endflag %}
+        {# Postponement link #}
+        <li class="divider"></li>
+        {% li_with_postpone_perm_training %}
 
-                <li class="divider"></li>
-                {% url 'create_education_group_version' root.pk education_group_year.pk as create_version_url %}
-                {% li_with_create_perm_specific_version create_version_url _('Create specific version') %}
-                <li class="divider"></li>
+        <li class="divider"></li>
+        {% url 'create_education_group_version' root.pk education_group_year.pk as create_version_url %}
+        {% li_with_create_perm_specific_version create_version_url _('Create specific version') %}
+        <li class="divider"></li>
 
-                {% flag "pdf_content" %}
-                    <li class="divider"></li>
-                    {% url 'group_content' root_id=parent.id education_group_year_id=education_group_year.id as pdf_generate_url %}
-                    {% link_pdf_content_education_group pdf_generate_url %}
-                {% endflag %}
-                <li class="divider"></li>
+        {# Generate PDF link #}
+        <li class="divider"></li>
+        {% url 'group_content' root_id=parent.id education_group_year_id=education_group_year.id as pdf_generate_url %}
+        {% link_pdf_content_education_group pdf_generate_url %}
 
-                <li>
-                    <a class="trigger_modal" data-url="{% url 'quick_search_education_group' root_id=parent.id education_group_year_id=education_group_year.id %}"
-                       data-modal_class="modal-lg" title="{% trans 'Search' %}" href="#">
-                        <span>{% trans 'Search' %}</span>
-                    </a>
-                </li>
-                <li class="divider"></li>
-                <li>
-                    <a href="{% url "education_group_learning_units_prerequisites" education_group_year_pk=education_group_year.pk %}"
-                        class="no_spinner">
-                        <span>{% trans 'Generate xls of learning units that have prerequisites' %}</span>
-                    </a>
-                </li>
-                <li>
-                    <a href="{% url "education_group_learning_units_is_prerequisite_for" education_group_year_pk=education_group_year.pk %}"
-                        class="no_spinner">
-                        <span>{% trans 'Generate xls of learning units that are prerequisites for' %}</span>
-                    </a>
-                </li>
-                <li class="divider"></li>
-                <li>
-                    <a href="#" data-toggle="modal" data-target="#modalCustomXls"
-                       role="button" id="bt_modal_custom_xls" class="no_spinner">
-                        <span>{% trans 'Generate xls of learning units in training' %}</span>
-                    </a>
-                </li>
+        <li class="divider"></li>
 
-            </ul>
-        </div>
-    {% endif %}
-{% endif %}
-
-{% block script %}
-    <script>
-        // FIXME move this method to common file
-        function select_education_group(action) {
-            $.ajax({
-                type: "POST",
-                url: "{% url 'education_groups_management' %}",
-                data: {'element_id': {{ education_group_year.id }}, 'group_element_year_id': "{{ group_to_parent }}", 'action': action},
-                dataType: 'json',
-                success: function (jsonResponse) {
-                    displayInfoMessage(jsonResponse, 'clipboard');
-                }
-            });
-        }
-    </script>
-{% endblock %}
+        <li>
+            <a class="trigger_modal" data-url="{% url 'quick_search_education_group' root_id=parent.id education_group_year_id=education_group_year.id %}"
+               data-modal_class="modal-lg" title="{% trans 'Search' %}" href="#">
+                <span>{% trans 'Search' %}</span>
+            </a>
+        </li>
+        <li class="divider"></li>
+        <li>
+            <a href="{% url "education_group_learning_units_prerequisites" education_group_year_pk=education_group_year.pk %}"
+                class="no_spinner">
+                <span>{% trans 'Generate xls of learning units that have prerequisites' %}</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url "education_group_learning_units_is_prerequisite_for" education_group_year_pk=education_group_year.pk %}"
+                class="no_spinner">
+                <span>{% trans 'Generate xls of learning units that are prerequisites for' %}</span>
+            </a>
+        </li>
+        <li class="divider"></li>
+        <li>
+            <a href="#" data-toggle="modal" data-target="#modalCustomXls"
+               role="button" id="bt_modal_custom_xls" class="no_spinner">
+                <span>{% trans 'Generate xls of learning units in training' %}</span>
+            </a>
+        </li>
+    </ul>
+</div>

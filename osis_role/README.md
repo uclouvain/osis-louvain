@@ -17,6 +17,7 @@ Table of Contents
   - [Permissions in views](#permissions-in-views)
   - [Permissions in code](#permissions-in-code)
   - [Error management](#error-management)
+  - [Template Tags](#template-tags)
   - [Synchronize RBAC <> ABAC](#synchronize-rbac--abac)
 - [Managing OSIS-Role](#osis-role-management)
   - [Via administration](#via-administration)
@@ -120,7 +121,9 @@ Documentation: [How to write predicate ?](https://github.com/dfunckt/django-rule
 
 `osis_role` provide a [context](https://github.com/dfunckt/django-rules/blob/master/README.rst#invocation-context) with queryset of the role accessible on every predicate
 
--       @predicate(bind=True)
+-       from rules import predicate
+
+        @predicate(bind=True)
         def is_linked_to_management_entity(self, user, obj):
             role_qs = self.context['role_qs']       # role_qs is already filtered by connected user
             return role_qs.filter(entity=obj.management_entity_id).exists()
@@ -128,20 +131,126 @@ Documentation: [How to write predicate ?](https://github.com/dfunckt/django-rule
 Permissions in views
 --------------------
 `osis_role` is based on `rules` package and `rules` comes with a set of view decorators to help you enforce authorization in your views.
+`osis_role` wraps some functionalities of rules.
+
 
 Documentation: [How to protect views ?](https://github.com/dfunckt/django-rules/blob/master/README.rst#permissions-in-views)
 
+<ins>Class Based View style: </ins>
+-       from osis_role.contrib.views import PermissionRequiredMixin
+        ...
+        
+        class CreateObject(PermissionRequiredMixin, CreateView):
+            ....
+            permission_required = 'base.add_object'
+            ....
+            
+            def get_permission_object(self):
+                # Default behaviour and can be overrided
+                return self.get_object()
+
+<ins>Function Based View style: </ins>
+-       from osis_role.contrib.views import permission_required
+        ...
+
+        def get_object_by_pk(request, object_id):
+            return get_object_or_404(
+                ObjectModel.objects.select_related(...),
+                pk=object_id,
+            )
+
+        @permission_required('base.change_educationgroup', fn=get_object_by_pk)
+        def create_object(request, object_id):
+            ....
+            
+            
 
 Permissions in code
 --------------------
 
-TODO....
+`osis_role` is based on the default auth module provided by Django. 
+
+If you want to test if a user has permission, you can use has_perm method provided in User Model:
+
+-       def can_access_obj(user, obj):
+            return user.has_perm("base.view_object", obj)
 
 Error management
 ----------------
 
-TODO....
+`osis_role` uses an `error` module which manage error related to a specific permission.
 
+`osis_role` provides a decorator which allow you to set permission message on rules precidate.
+
+-       from rules import predicate
+        from osis_role.errors import predicate_failed_msg
+
+        @predicate(bind=True)
+        @predicate_failed_msg(message="You don't have access because not linked to management entity")
+        def is_linked_to_management_entity(self, user, obj):
+            role_qs = self.context['role_qs']       # role_qs is already filtered by connected user
+            return role_qs.filter(entity=obj.management_entity_id).exists()
+
+
+
+If you want to dynamically set the error message, you can use :
+
+-       errors.set_permission_error(user, perm_name, custom_msg)
+
+This method should be called when a user does not fulfill a required permission, as in this example:
+
+-       from osis_role import errors
+
+        def update_object(user, object):
+            perm_name = "base.view_object"
+            has_perm = user.has_perm(perm_name, object)
+            if not has_perm:
+                errors.set_permission_error(user, perm_name, ""You don't have access")
+            return has_perm
+
+
+Template tags
+-------------
+
+`osis_role` provide multiples templatetags 
+
+- <b>a_tag_has_perm</b>: Display <a/> tag with error message as a tooltip when permission denied
+        
+        {% load osis_role %}
+        .......
+        <div>
+             {% a_tag_has_perm create_obj_url _('New Object') 'base.add_obj' user %}                    
+        </div>
+
+- <b>a_tag_modal_has_perm</b>: same as a_tag_has_perm but load url into a modal
+        
+       {% load osis_role %}
+        .......
+        <div>
+             {% a_tag_modal_has_perm create_obj_url _('New Object') 'base.add_obj' user %}                    
+        </div>
+
+- <b>has_perm</b>: Evaluate permission according to user and ressource
+        
+        {% load osis_role %}
+        .......
+        {% has_perm 'base.change_obj' user obj as can_change_obj %}
+        {% if can_change_obj %}
+            <button>Edit Object</button>
+        {% endif %}
+
+- <b>has_module_perms</b>: Evaluate if there is at least one permission valid within an application
+
+        {% load osis_role %}
+        .......
+        {% has_module_perms user 'base' as can_access_base_app %}
+        {% if can_access_base_app %}
+            <ul> 
+                <li>Create Object</li>
+                <li> ... </li>
+                ...
+            </ul>
+        {% endif %}
 
 
 Synchronize RBAC <> ABAC
