@@ -23,25 +23,42 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.http import Http404
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
+from program_management.models.education_group_version import EducationGroupVersion
 
 
 class TrainingFilter(filters.FilterSet):
-    from_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='gte')
-    to_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='lte')
-    in_type = filters.CharFilter(field_name="education_group_type__name", lookup_expr='contains')
+    from_year = filters.NumberFilter(field_name="offer__academic_year__year", lookup_expr='gte')
+    to_year = filters.NumberFilter(field_name="offer__academic_year__year", lookup_expr='lte')
+    in_type = filters.CharFilter(field_name="offer__education_group_type__name", lookup_expr='contains')
+    version_type = filters.CharFilter(method='filter_version_type')
+    acronym = filters.CharFilter(field_name="offer__acronym")
+    partial_acronym = filters.CharFilter(field_name="root_group__partial_acronym")
+    title = filters.CharFilter(field_name="offer__title")
+    title_english = filters.CharFilter(field_name="offer__title_english")
 
     class Meta:
-        model = EducationGroupYear
+        model = EducationGroupVersion
         fields = ['acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year']
+
+    @staticmethod
+    def filter_version_type(queryset, name, value):
+        allowed_types = ['standard', 'transition', 'special']
+        if value not in allowed_types:
+            raise Http404
+        elif value == 'transition':
+            return queryset.filter(is_transition=True)
+        elif value == 'special':
+            return queryset.exclude(version_name='')
+        return queryset
 
 
 class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -49,32 +66,34 @@ class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
        Return a list of all the training with optional filtering.
     """
     name = 'training-list'
-    queryset = EducationGroupYear.objects.filter(
-        education_group_type__category=education_group_categories.TRAINING
-    ).select_related('education_group_type', 'academic_year')\
-        .prefetch_related(
-        'administration_entity__entityversion_set',
-        'management_entity__entityversion_set'
+    queryset = EducationGroupVersion.objects.filter(
+        offer__education_group_type__category=education_group_categories.TRAINING
+    ).select_related(
+        'offer__education_group_type',
+        'offer__academic_year'
+    ).prefetch_related(
+        'offer__administration_entity__entityversion_set',
+        'offer__management_entity__entityversion_set'
     ).exclude(
-        acronym__icontains='common'
+        offer__acronym__icontains='common'
     )
     serializer_class = TrainingListSerializer
     filterset_class = TrainingFilter
     search_fields = (
-        'acronym',
-        'partial_acronym',
-        'title',
-        'title_english',
+        'offer__acronym',
+        'root_group__partial_acronym',
+        'offer__title',
+        'offer__title_english',
     )
     ordering_fields = (
-        'acronym',
-        'partial_acronym',
-        'title',
-        'title_english',
+        'offer__acronym',
+        'root_group__partial_acronym',
+        'offer__title',
+        'offer__title_english',
     )
     ordering = (
-        '-academic_year__year',
-        'acronym',
+        '-offer__academic_year__year',
+        'offer__acronym',
     )  # Default ordering
 
 
@@ -90,23 +109,23 @@ class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     def get_object(self):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
-        egy = get_object_or_404(
-            EducationGroupYear.objects.filter(
-                education_group_type__category=education_group_categories.TRAINING
+        egv = get_object_or_404(
+            EducationGroupVersion.objects.filter(
+                offer__education_group_type__category=education_group_categories.TRAINING
             ).select_related(
-                'education_group_type',
-                'academic_year',
-                'main_teaching_campus',
-                'enrollment_campus',
-                'primary_language',
+                'offer__education_group_type',
+                'offer__academic_year',
+                'offer__main_teaching_campus',
+                'offer__enrollment_campus',
+                'offer__primary_language',
             ).prefetch_related(
-                'administration_entity__entityversion_set',
-                'management_entity__entityversion_set',
+                'offer__administration_entity__entityversion_set',
+                'offer__management_entity__entityversion_set',
             ),
-            acronym__iexact=acronym,
-            academic_year__year=year
+            offer__acronym__iexact=acronym,
+            offer__academic_year__year=year
         )
-        return egy
+        return egv
 
 
 class TrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
@@ -119,11 +138,11 @@ class TrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     def get_object(self):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
-        egy = get_object_or_404(
-            EducationGroupYear.objects.all().select_related(
-                'academic_year',
+        egv = get_object_or_404(
+            EducationGroupVersion.objects.all().select_related(
+                'offer__academic_year',
             ),
-            acronym__iexact=acronym,
-            academic_year__year=year
+            offer__acronym__iexact=acronym,
+            offer__academic_year__year=year
         )
-        return egy
+        return egv

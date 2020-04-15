@@ -30,7 +30,6 @@ from rest_framework.generics import get_object_or_404
 
 import program_management.ddd.repositories.find_roots
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
-from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.learning_unit_year import LearningUnitYear
@@ -70,9 +69,9 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
             exclude_root_categories=TrainingType.finality_types_enum()
         ).get(learning_unit_year.id, [])
 
-        return EducationGroupYear.objects.filter(
-            pk__in=education_group_root_ids
-        ).select_related('education_group_type', 'academic_year')
+        return EducationGroupYear.objects.filter(pk__in=education_group_root_ids).select_related(
+            'education_group_type', 'academic_year'
+        ).prefetch_related('educationgroupversion_set')
 
 
 class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -90,9 +89,9 @@ class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.Lis
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
-        return Prerequisite.objects.filter(learning_unit_year=learning_unit_year)\
-                                   .select_related(
-                                        'education_group_year__academic_year',
-                                        'education_group_year__education_group_type',
-                                        'learning_unit_year__academic_year',
-                                   ).prefetch_related('prerequisiteitem_set')
+        return Prerequisite.objects.filter(learning_unit_year=learning_unit_year).select_related(
+            'education_group_year__academic_year',
+            'education_group_year__education_group_type',
+            'learning_unit_year__academic_year',
+            'education_group_version__offer'
+        ).prefetch_related('prerequisiteitem_set')

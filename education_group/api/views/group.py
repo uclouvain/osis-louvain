@@ -27,10 +27,9 @@ from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
-from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
-from education_group.api.serializers.group import GroupDetailSerializer
+from education_group.api.serializers.group import GroupDetailSerializer, GroupTitleSerializer
+from education_group.models.group_year import GroupYear
 
 
 class GroupDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
@@ -43,8 +42,8 @@ class GroupDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     def get_object(self):
         partial_acronym = self.kwargs['partial_acronym']
         year = self.kwargs['year']
-        egy = get_object_or_404(
-            EducationGroupYear.objects.filter(
+        gy = get_object_or_404(
+            GroupYear.objects.filter(
                 education_group_type__category=education_group_categories.GROUP
             ).select_related(
                 'education_group_type',
@@ -56,7 +55,7 @@ class GroupDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
             partial_acronym__iexact=partial_acronym,
             academic_year__year=year
         )
-        return egy
+        return gy
 
 
 class GroupTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
@@ -64,13 +63,13 @@ class GroupTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
         Return the title of the group
     """
     name = 'groupstitle_read'
-    serializer_class = EducationGroupTitleSerializer
+    serializer_class = GroupTitleSerializer
 
     def get_object(self):
         acronym = self.kwargs['partial_acronym']
         year = self.kwargs['year']
         egy = get_object_or_404(
-            EducationGroupYear.objects.all().select_related(
+            GroupYear.objects.all().select_related(
                 'academic_year',
             ),
             partial_acronym__iexact=acronym,
