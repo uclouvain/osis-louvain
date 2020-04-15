@@ -38,6 +38,7 @@ class GroupDetailSerializer(BaseEducationGroupYearSerializer, serializers.ModelS
     url = GroupHyperlinkedIdentityField(read_only=True)
     code = serializers.CharField(source='partial_acronym')
     remark = serializers.SerializerMethodField()
+    # Does not exist on GroupYear
     campus = CampusDetailSerializer(source='main_teaching_campus', read_only=True)
 
     # Display human readable value
@@ -64,9 +65,16 @@ class GroupDetailSerializer(BaseEducationGroupYearSerializer, serializers.ModelS
         language = self.context.get('language')
         return getattr(
             education_group_year,
-            'remark' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
+            'remark' + ('_en' if language and language not in settings.LANGUAGE_CODE_FR else '_fr')
         )
 
     @staticmethod
     def get_management_faculty(obj):
         return utils.get_entity(obj, 'management')
+
+    def get_title(self, education_group_year):
+        language = self.context.get('language')
+        return getattr(
+            education_group_year,
+            'title' + ('_en' if language and language not in settings.LANGUAGE_CODE_FR else '_fr')
+        )

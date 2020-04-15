@@ -58,6 +58,7 @@ class GroupDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
         return gy
 
 
+# Does not exist on GroupYear
 class GroupTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     """
         Return the title of the group

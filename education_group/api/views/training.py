@@ -41,11 +41,15 @@ class TrainingFilter(filters.FilterSet):
     to_year = filters.NumberFilter(field_name="offer__academic_year__year", lookup_expr='lte')
     in_type = filters.CharFilter(field_name="offer__education_group_type__name", lookup_expr='contains')
     version_type = filters.CharFilter(method='filter_version_type')
+    acronym = filters.CharFilter(field_name="offer__acronym")
+    partial_acronym = filters.CharFilter(field_name="root_group__partial_acronym")
+    title = filters.CharFilter(field_name="offer__title")
+    title_english = filters.CharFilter(field_name="offer__title_english")
 
     class Meta:
         model = EducationGroupVersion
         fields = [
-            'offer__acronym', 'offer__partial_acronym', 'offer__title', 'offer__title_english',
+            'acronym', 'partial_acronym', 'title', 'title_english',
             'from_year', 'to_year', 'version_type',
             'is_transition', 'version_name'
         ]

@@ -45,6 +45,9 @@ class MiniTrainingFilter(filters.FilterSet):
         choices=MiniTrainingType.choices()
     )
     version_type = filters.CharFilter(method='filter_version_type')
+    acronym = filters.CharFilter(field_name="offer__acronym")
+    title = filters.CharFilter(field_name="offer__title")
+    title_english = filters.CharFilter(field_name="offer__title_english")
 
     order_by_field = 'ordering'
     ordering = OrderingFilterWithDefault(
@@ -60,7 +63,7 @@ class MiniTrainingFilter(filters.FilterSet):
     class Meta:
         model = EducationGroupVersion
         fields = [
-            'offer__acronym', 'code', 'offer__education_group_type', 'offer__title', 'offer__title_english',
+            'acronym', 'code', 'education_group_type', 'title', 'title_english',
             'from_year', 'to_year', 'version_type',
             'is_transition', 'version_name'
         ]
