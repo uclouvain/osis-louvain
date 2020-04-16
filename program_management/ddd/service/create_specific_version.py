@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from program_management.models.education_group_version import EducationGroupVersion
+from program_management.models.element import Element
 
 
 def report_specific_version_creation(data, education_group_year, end_postponement, education_group_years_list):
@@ -43,6 +44,8 @@ def create_specific_version(data, education_group_year):
     new_groupyear = version_standard.root_group
     new_groupyear.pk = None
     new_groupyear.save()
+    new_element = Element(group_year=new_groupyear)
+    new_element.save()
     new_education_group_version = EducationGroupVersion(
         version_name=data["version_name"],
         title_fr=data["title_fr"],
