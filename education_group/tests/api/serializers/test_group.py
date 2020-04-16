@@ -29,9 +29,9 @@ from django.urls import reverse
 
 from base.models.enums import organization_type
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import GroupFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from education_group.api.serializers.group import GroupDetailSerializer
+from education_group.tests.factories.group_year import GroupYearFactory
 
 
 class GroupDetailSerializerTestCase(TestCase):
@@ -41,9 +41,10 @@ class GroupDetailSerializerTestCase(TestCase):
         cls.entity_version = EntityVersionFactory(
             entity__organization__type=organization_type.MAIN
         )
-        cls.group = GroupFactory(
+        cls.group = GroupYearFactory(
             academic_year=cls.academic_year,
             management_entity=cls.entity_version.entity,
+            group__start_year=cls.academic_year
         )
         url = reverse('education_group_api_v1:group_read', kwargs={
             'partial_acronym': cls.group.partial_acronym,
@@ -71,7 +72,7 @@ class GroupDetailSerializerTestCase(TestCase):
             'constraint_type',
             'constraint_type_text',
             'remark',
-            'campus',
+            # 'campus',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 

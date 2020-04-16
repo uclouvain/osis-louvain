@@ -43,7 +43,7 @@ class EducationGroupRootsFilter(filters.FilterSet):
     @staticmethod
     def filter_complementary_module(queryset, _, value):
         if value:
-            queryset = queryset.exclude(education_group_type__name=GroupType.COMPLEMENTARY_MODULE.name)
+            queryset = queryset.exclude(offer__education_group_type__name=GroupType.COMPLEMENTARY_MODULE.name)
         return queryset
 
 

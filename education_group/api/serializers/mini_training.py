@@ -41,8 +41,13 @@ class MiniTrainingListSerializer(EducationGroupTitleSerializer, serializers.Mode
     url = MiniTrainingHyperlinkedIdentityField(read_only=True)
     acronym = serializers.CharField(source='offer.acronym')
     code = serializers.CharField(source='root_group.partial_acronym')
-    academic_year = serializers.SlugRelatedField(slug_field='year', queryset=AcademicYear.objects.all())
+    academic_year = serializers.SlugRelatedField(
+        source='offer.academic_year',
+        slug_field='year',
+        queryset=AcademicYear.objects.all()
+    )
     education_group_type = serializers.SlugRelatedField(
+        source='offer.education_group_type',
         slug_field='name',
         queryset=EducationGroupType.objects.filter(category=education_group_categories.MINI_TRAINING),
     )
@@ -82,10 +87,10 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
     credits = serializers.IntegerField(source='root_group.credits', read_only=True)
     min_constraint = serializers.IntegerField(source='root_group.min_constraint', read_only=True)
     max_constraint = serializers.IntegerField(source='root_group.max_constraint', read_only=True)
-    constraint_type = serializers.IntegerField(source='root_group.constraint_type', read_only=True)
+    constraint_type = serializers.CharField(source='root_group.constraint_type', read_only=True)
 
     # Display human readable value
-    constraint_type_text = serializers.CharField(source='offer.get_constraint_type_display', read_only=True)
+    constraint_type_text = serializers.CharField(source='root_group.get_constraint_type_display', read_only=True)
     active_text = serializers.CharField(source='offer.get_active_display', read_only=True)
     schedule_type_text = serializers.CharField(source='offer.get_schedule_type_display', read_only=True)
 
@@ -109,6 +114,6 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
     def get_remark(self, education_group_version):
         language = self.context.get('language')
         return getattr(
-            education_group_version,
+            education_group_version.root_group,
             'remark_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
         )

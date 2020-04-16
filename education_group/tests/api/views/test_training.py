@@ -39,6 +39,8 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
+from program_management.models.education_group_version import EducationGroupVersion
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 class TrainingTitleTestCase(APITestCase):
@@ -46,6 +48,7 @@ class TrainingTitleTestCase(APITestCase):
     def setUpTestData(cls):
         anac = AcademicYearFactory()
         cls.egy = TrainingFactory(academic_year=anac)
+        cls.version = EducationGroupVersionFactory(offer=cls.egy)
         cls.person = PersonFactory()
         cls.url = reverse('education_group_api_v1:trainingstitle_read', kwargs={
             'acronym': cls.egy.acronym,
@@ -80,7 +83,7 @@ class TrainingTitleTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        serializer = EducationGroupTitleSerializer(self.egy, context={'language': settings.LANGUAGE_CODE})
+        serializer = EducationGroupTitleSerializer(self.version, context={'language': settings.LANGUAGE_CODE})
         self.assertEqual(response.data, serializer.data)
 
 
@@ -91,9 +94,12 @@ class GetAllTrainingTestCase(APITestCase):
         cls.url = reverse('education_group_api_v1:training-list')
 
         cls.academic_year = AcademicYearFactory(year=2018)
-        TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
-        TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=cls.academic_year)
-        TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=cls.academic_year)
+        offer1 = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
+        offer2 = TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=cls.academic_year)
+        offer3 = TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=cls.academic_year)
+        EducationGroupVersionFactory(offer=offer1)
+        EducationGroupVersionFactory(offer=offer2)
+        EducationGroupVersionFactory(offer=offer3)
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
@@ -132,17 +138,17 @@ class GetAllTrainingTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        trainings = EducationGroupYear.objects.filter(
-            education_group_type__category=education_group_categories.TRAINING,
-        ).order_by('-academic_year__year', 'acronym')
-        serializer = TrainingListSerializer(trainings, many=True, context={
+        versions = EducationGroupVersion.objects.filter(
+            offer__education_group_type__category=education_group_categories.TRAINING,
+        ).order_by('-offer__academic_year__year', 'offer__acronym')
+        serializer = TrainingListSerializer(versions, many=True, context={
             'request': RequestFactory().get(self.url),
             'language': settings.LANGUAGE_CODE_FR
         })
         self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_all_training_specify_ordering_field(self):
-        ordering_managed = ['acronym', 'partial_acronym', 'title', 'title_english']
+        ordering_managed = ['offer__acronym', 'root_group__partial_acronym', 'offer__title', 'offer__title_english']
 
         for order in ordering_managed:
             with self.subTest(ordering=order):
@@ -150,11 +156,11 @@ class GetAllTrainingTestCase(APITestCase):
                 response = self.client.get(self.url, data=query_string)
                 self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-                trainings = EducationGroupYear.objects.filter(
-                    education_group_type__category=education_group_categories.TRAINING,
+                versions = EducationGroupVersion.objects.filter(
+                    offer__education_group_type__category=education_group_categories.TRAINING,
                 ).order_by(order)
                 serializer = TrainingListSerializer(
-                    trainings,
+                    versions,
                     many=True,
                     context={
                         'request': RequestFactory().get(self.url, query_string),
@@ -171,9 +177,12 @@ class FilterTrainingTestCase(APITestCase):
         cls.url = reverse('education_group_api_v1:training-list')
         for year in [2018, 2019, 2020]:
             academic_year = AcademicYearFactory(year=year)
-            TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=academic_year)
-            TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=academic_year)
-            TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=academic_year)
+            offer1 = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=academic_year)
+            offer2 = TrainingFactory(acronym='AGRO1BA', partial_acronym='LAGRO2111C', academic_year=academic_year)
+            offer3 = TrainingFactory(acronym='MED12M', partial_acronym='LMED12MA', academic_year=academic_year)
+            EducationGroupVersionFactory(offer=offer1)
+            EducationGroupVersionFactory(offer=offer2)
+            EducationGroupVersionFactory(offer=offer3)
 
     def setUp(self):
         self.client.force_authenticate(user=self.user)
@@ -184,13 +193,13 @@ class FilterTrainingTestCase(APITestCase):
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        trainings = EducationGroupYear.objects.filter(
-            education_group_type__category=education_group_categories.TRAINING,
-            academic_year__year__gte=query_string['from_year']
-        ).order_by('-academic_year__year', 'acronym')
+        versions = EducationGroupVersion.objects.filter(
+            offer__education_group_type__category=education_group_categories.TRAINING,
+            offer__academic_year__year__gte=query_string['from_year']
+        ).order_by('-offer__academic_year__year', 'offer__acronym')
 
         serializer = TrainingListSerializer(
-            trainings,
+            versions,
             many=True,
             context={
                 'request': RequestFactory().get(self.url, query_string),
@@ -205,13 +214,13 @@ class FilterTrainingTestCase(APITestCase):
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        trainings = EducationGroupYear.objects.filter(
-            education_group_type__category=education_group_categories.TRAINING,
-            academic_year__year__lte=query_string['to_year']
-        ).order_by('-academic_year__year', 'acronym')
+        versions = EducationGroupVersion.objects.filter(
+            offer__education_group_type__category=education_group_categories.TRAINING,
+            offer__academic_year__year__lte=query_string['to_year']
+        ).order_by('-offer__academic_year__year', 'offer__acronym')
 
         serializer = TrainingListSerializer(
-            trainings,
+            versions,
             many=True,
             context={
                 'request': RequestFactory().get(self.url, query_string),
@@ -244,7 +253,7 @@ class GetTrainingTestCase(APITestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.training = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year)
-
+        cls.version = EducationGroupVersionFactory(offer=cls.training)
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
@@ -272,7 +281,7 @@ class GetTrainingTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = TrainingDetailSerializer(
-            self.training,
+            self.version,
             context={
                 'request': RequestFactory().get(self.url),
                 'language': settings.LANGUAGE_CODE_FR
