@@ -58,7 +58,8 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
     management_faculty = serializers.SerializerMethodField()
 
     # Display human readable value
-    education_group_type_text = serializers.CharField(source='offer.education_group_type.get_name_display', read_only=True)
+    education_group_type_text = serializers.CharField(source='offer.education_group_type.get_name_display',
+                                                      read_only=True)
 
     class Meta(EducationGroupTitleSerializer.Meta):
         model = EducationGroupVersion
@@ -168,7 +169,8 @@ class TrainingDetailSerializer(TrainingListSerializer):
         source='offer.get_other_language_activities_display',
         read_only=True
     )
-    other_campus_activities_text = serializers.CharField(source='offer.get_other_campus_activities_display', read_only=True)
+    other_campus_activities_text = serializers.CharField(source='offer.get_other_campus_activities_display',
+                                                         read_only=True)
     diploma_printing_orientation_text = serializers.CharField(
         source='offer.get_diploma_printing_orientation_display',
         read_only=True,

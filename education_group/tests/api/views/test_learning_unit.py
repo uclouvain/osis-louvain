@@ -267,4 +267,3 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
             }
         )
         self.assertEqual(response.data, serializer.data)
-

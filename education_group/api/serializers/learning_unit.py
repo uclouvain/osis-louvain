@@ -66,7 +66,8 @@ class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, seri
     duration = serializers.IntegerField(source='offer.duration', read_only=True)
 
     # Display human readable value
-    education_group_type_text = serializers.CharField(source='offer.education_group_type.get_name_display', read_only=True)
+    education_group_type_text = serializers.CharField(source='offer.education_group_type.get_name_display',
+                                                      read_only=True)
     decree_category_text = serializers.CharField(source='offer.get_decree_category_display', read_only=True)
     duration_unit_text = serializers.CharField(source='offer.get_duration_unit_display', read_only=True)
 

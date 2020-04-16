@@ -64,7 +64,6 @@ class GroupDetailSerializer(GroupTitleSerializer, serializers.ModelSerializer):
     management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
     management_faculty = serializers.SerializerMethodField()
     remark = serializers.SerializerMethodField()
-    # TODO: Field to add into model
     campus = CampusDetailSerializer(source='main_teaching_campus', read_only=True)
 
     # Display human readable value

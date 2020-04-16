@@ -52,9 +52,9 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             'year': cls.academic_year.year
         })
         cls.serializer = EducationGroupRootsListSerializer(cls.version, context={
-                'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
-            })
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
 
     def test_contains_expected_fields(self):
         expected_fields = [

@@ -61,11 +61,13 @@ class LearningUnitPrerequisiteGetUrlMixin:
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
 
-class LearningUnitPrerequisiteHyperlinkedIdentityField(LearningUnitPrerequisiteGetUrlMixin, serializers.HyperlinkedIdentityField):
+class LearningUnitPrerequisiteHyperlinkedIdentityField(LearningUnitPrerequisiteGetUrlMixin,
+                                                       serializers.HyperlinkedIdentityField):
     pass
 
 
-class LearningUnitPrerequisiteHyperlinkedRelatedField(LearningUnitPrerequisiteGetUrlMixin, serializers.HyperlinkedRelatedField):
+class LearningUnitPrerequisiteHyperlinkedRelatedField(LearningUnitPrerequisiteGetUrlMixin,
+                                                      serializers.HyperlinkedRelatedField):
     pass
 
 
