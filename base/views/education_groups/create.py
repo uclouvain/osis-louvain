@@ -25,14 +25,13 @@
 ##############################################################################
 from django import forms
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
-from django.core.exceptions import ValidationError
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
-from waffle.decorators import waffle_flag
 
 from base.forms.education_group.common import EducationGroupModelForm, EducationGroupTypeForm
 from base.forms.education_group.group import GroupForm
@@ -46,10 +45,10 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.exceptions import ValidationWarning
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages, show_error_message_for_form_invalid
-from base.views.education_groups.perms import can_create_education_group
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.decorators.ajax import ajax_required
 from osis_common.utils.models import get_object_or_none
+from osis_role import errors
 
 FORMS_BY_CATEGORY = {
     education_group_categories.GROUP: GroupForm,
@@ -63,11 +62,14 @@ TEMPLATES_BY_CATEGORY = {
     education_group_categories.MINI_TRAINING: "education_group/create_mini_trainings.html",
 }
 
+PERMS_BY_CATEGORY = {
+    education_group_categories.GROUP: 'base.add_group',
+    education_group_categories.TRAINING: 'base.add_training',
+    education_group_categories.MINI_TRAINING: 'base.add_minitraining',
+}
+
 
 class SelectEducationGroupTypeView(FlagMixin, AjaxTemplateMixin, FormView):
-    flag = "education_group_create"
-    # rules = [can_create_education_group]
-    # raise_exception = True
     template_name = "education_group/blocks/form/education_group_type.html"
     form_class = EducationGroupTypeForm
 
@@ -89,16 +91,19 @@ class SelectEducationGroupTypeView(FlagMixin, AjaxTemplateMixin, FormView):
         return reverse(create_education_group, kwargs=self.kwargs)
 
 
+# TODO: Split create into create_groups/create_training/create_minitraining
+#  in order to user decorator permission_required
 @login_required
-@waffle_flag("education_group_create")
-@can_create_education_group
 def create_education_group(request, category, education_group_type_pk, root_id=None, parent_id=None):
     parent = get_object_or_none(EducationGroupYear, pk=parent_id)
     education_group_type = get_object_or_404(EducationGroupType, pk=education_group_type_pk)
 
+    perm = PERMS_BY_CATEGORY[category]
+    if not request.user.has_perm(perm, parent):
+        raise PermissionDenied(errors.get_permission_error(request.user, perm))
+
     request_cache = RequestCache(request.user, reverse('education_groups'))
     cached_data = request_cache.cached_data or {}
-
     academic_year = cached_data.get('academic_year')
     if not academic_year:
         cached_data['academic_year'] = starting_academic_year()
@@ -164,7 +169,6 @@ def _get_success_message_for_creation_education_group_year(root_id, education_gr
 
 @ajax_required
 @login_required
-@permission_required("base.add_educationgroup", raise_exception=True)
 def validate_field(request, category, education_group_year_pk=None):
     accepted_fields = ["partial_acronym", "acronym"]
 

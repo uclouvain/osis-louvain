@@ -126,7 +126,7 @@ class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView, Catalog
     context_object_name = "learning_unit_year"
     pk_url_kwarg = 'learning_unit_year_id'
 
-    permission_required = 'base.can_access_education_group'
+    permission_required = 'base.view_educationgroup'
     raise_exception = True
 
     def get_person(self):

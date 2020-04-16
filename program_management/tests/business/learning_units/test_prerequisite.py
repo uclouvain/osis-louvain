@@ -209,7 +209,7 @@ class TestShowPrerequisites(TestCase):
     def setUpTestData(cls):
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
 
     def setUp(self):
         self.client.force_login(self.user)

@@ -46,7 +46,7 @@ class QuickSearchEducationGroupYearView(PermissionRequiredMixin, CacheFilterMixi
                                         FilterView):
     model = EducationGroupYear
     template_name = 'quick_search_egy_inner.html'
-    permission_required = ['base.can_access_education_group', 'base.can_access_learningunit']
+    permission_required = ['base.view_educationgroup', 'base.can_access_learningunit']
     timeout = CACHE_TIMEOUT
 
     filterset_class = QuickEducationGroupYearFilter
@@ -85,7 +85,7 @@ class QuickSearchLearningUnitYearView(PermissionRequiredMixin, CacheFilterMixin,
                                       FilterView):
     model = LearningUnitYear
     template_name = 'quick_search_luy_inner.html'
-    permission_required = ['base.can_access_education_group', 'base.can_access_learningunit']
+    permission_required = ['base.view_educationgroup', 'base.can_access_learningunit']
     timeout = CACHE_TIMEOUT
 
     filterset_class = QuickLearningUnitYearFilter

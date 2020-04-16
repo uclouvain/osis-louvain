@@ -129,7 +129,7 @@ class TestEducationGroupYear(SeleniumTestCase):
         self.person = PersonFactory(user=self.user)
 
         # the user can access to the education group
-        self.user.user_permissions.add(Permission.objects.get(codename='can_access_education_group'))
+        self.user.user_permissions.add(Permission.objects.get(codename='view_educationgroup'))
 
         academic_year = AcademicYearFactory()
 

@@ -35,7 +35,7 @@ from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearBachelorFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import CentralManagerFactory, PersonFactory
+from base.tests.factories.person import CentralManagerForUEFactory, PersonFactory
 from base.tests.factories.user import SuperUserFactory
 
 
@@ -68,7 +68,7 @@ class TestReadPdfContent(TestCase):
         education_group_year = EducationGroupYearFactory(academic_year=academic_year)
         GroupElementYearFactory(parent=education_group_year,
                                 child_branch__academic_year=academic_year)
-        cls.person = CentralManagerFactory("can_access_education_group")
+        cls.person = CentralManagerForUEFactory("view_educationgroup")
         cls.url = reverse(
             "group_content",
             kwargs={

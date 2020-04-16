@@ -55,7 +55,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory,
     EducationGroupYearBachelorFactory, MiniTrainingFactory, GroupFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.mandatary import MandataryFactory
-from base.tests.factories.person import PersonWithPermissionsFactory
+from base.tests.factories.person import PersonWithPermissionsFactory, PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
 from base.views.education_groups.detail import get_appropriate_common_admission_condition
@@ -91,7 +91,7 @@ class EducationGroupGeneralInformations(TestCase):
             reference=cls.education_group_child.id,
         )
 
-        cls.person = PersonWithPermissionsFactory("can_access_education_group")
+        cls.person = PersonWithPermissionsFactory("view_educationgroup")
 
         cls.url = reverse(
             "education_group_general_informations",
@@ -101,10 +101,7 @@ class EducationGroupGeneralInformations(TestCase):
 
     def setUp(self):
         self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch(
-            "base.business.education_groups.perms.GeneralInformationPerms.is_eligible",
-            return_value=True
-        )
+        self.perm_patcher = mock.patch("django.contrib.auth.models.User.has_perm", return_value=True)
         self.mocked_perm = self.perm_patcher.start()
         self.addCleanup(self.perm_patcher.stop)
 
@@ -114,10 +111,8 @@ class EducationGroupGeneralInformations(TestCase):
 
         self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
-    def test_user_without_permission(self):
-        an_other_user = UserFactory()
-        self.client.force_login(an_other_user)
-
+    @mock.patch("django.contrib.auth.models.User.has_perm", return_value=False)
+    def test_user_without_permission(self, mock_perms):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, ACCESS_DENIED)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
@@ -203,16 +198,6 @@ class EducationGroupGeneralInformations(TestCase):
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
         self.assertGreater(len(soup.select('a.pedagogy-edit-btn')), 0)
 
-    @mock.patch('base.business.education_groups.perms.GeneralInformationPerms.is_eligible', return_value=False)
-    def test_user_has_not_link_to_edit_pedagogy(self, mock_is_eligible_to_edit_general_info):
-        response = self.client.get(self.url)
-
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, self.template_path)
-
-        soup = bs4.BeautifulSoup(response.content, 'html.parser')
-        self.assertEqual(len(soup.select('a.pedagogy-edit-btn')), 0)
-
 
 class EducationGroupPedagogyUpdateViewTestCase(TestCase):
     @classmethod
@@ -233,18 +218,11 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
             text_label=cls.text_label,
             language=settings.LANGUAGE_CODE_EN,
         )
-        cls.person = PersonWithPermissionsFactory(
-            "can_access_education_group",
-            "change_pedagogyinformation",
-            "change_commonpedagogyinformation"
-        )
+        cls.person = PersonFactory()
         cls.url = reverse("education_group_pedagogy_edit", args=[cls.training.pk, cls.training.pk])
 
     def setUp(self):
-        self.perm_patcher = mock.patch(
-            "base.business.education_groups.perms.GeneralInformationPerms.is_eligible",
-            return_value=True
-        )
+        self.perm_patcher = mock.patch("django.contrib.auth.models.User.has_perm", return_value=True)
         self.mocked_perm = self.perm_patcher.start()
         self.addCleanup(self.perm_patcher.stop)
         self.client.force_login(self.person.user)
@@ -254,7 +232,7 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         response = self.client.get(self.url)
         self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
-    @mock.patch('base.business.education_groups.perms.GeneralInformationPerms.is_eligible', return_value=False)
+    @mock.patch("django.contrib.auth.models.User.has_perm", return_value=False)
     @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_get')
     @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_post')
     def test_get_pedagogy_info_case_user_without_permission(self, mock_edit_post, mock_edit_get, mock_perms):
@@ -292,7 +270,7 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         self.assertEqual(form.initial['text_french'], self.translated_text_in_french.text)
         self.assertEqual(form.initial['text_english'], self.translated_text_in_english.text)
 
-    @mock.patch('base.business.education_groups.perms.GeneralInformationPerms.is_eligible', return_value=False)
+    @mock.patch("django.contrib.auth.models.User.has_perm", return_value=False)
     @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_get')
     @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_post')
     def test_post_pedagogy_info_case_user_without_permission(self, mock_edit_post, mock_edit_get, mock_perms):
@@ -330,7 +308,7 @@ class EducationGroupPublishViewTestCase(TestCase):
         cls.academic_year = create_current_academic_year()
         cls.training = TrainingFactory(academic_year=cls.academic_year)
         cls.url = reverse('education_group_publish', args=(cls.training.pk, cls.training.pk))
-        cls.person = PersonWithPermissionsFactory('can_access_education_group')
+        cls.person = PersonWithPermissionsFactory('view_educationgroup')
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -375,7 +353,7 @@ class EducationGroupViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
-        cls.person = PersonWithPermissionsFactory("can_access_education_group")
+        cls.person = PersonWithPermissionsFactory("view_educationgroup")
         cls.template_name = "education_group/tab_administrative_data.html"
 
     def setUp(self):
@@ -452,10 +430,10 @@ class EducationGroupAdministrativedata(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonWithPermissionsFactory(
-            'can_access_education_group', 'can_edit_education_group_administrative_data'
+            'view_educationgroup', 'can_edit_education_group_administrative_data'
         )
 
-        cls.permission_access = Permission.objects.get(codename='can_access_education_group')
+        cls.permission_access = Permission.objects.get(codename='view_educationgroup')
         cls.permission_edit = Permission.objects.get(codename='can_edit_education_group_administrative_data')
 
         cls.education_group_year = EducationGroupYearBachelorFactory()
@@ -487,16 +465,8 @@ class EducationGroupAdministrativedata(TestCase):
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
         self.assertTemplateUsed(response, ACCESS_DENIED)
 
-    def test_user_is_not_program_manager_of_education_group(self):
-        self.program_manager.delete()
-        response = self.client.get(self.url)
-
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, self.template_name)
-
-        self.assertFalse(response.context["can_edit_administrative_data"])
-
-    def test_user_has_no_permission_to_edit_administrative_data(self):
+    @mock.patch("base.business.education_group.can_user_edit_administrative_data", return_value=False)
+    def test_user_has_no_permission_to_edit_administrative_data(self, mock_edit_administrative):
         self.person.user.user_permissions.remove(self.permission_edit)
         response = self.client.get(self.url)
 
@@ -536,12 +506,12 @@ class EducationGroupAdministrativedata(TestCase):
         self.assertEqual(expected_url, response.url)
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
-    def test_user_can_edit_administrative_data(self):
+    @mock.patch("base.business.education_group.can_user_edit_administrative_data", return_value=True)
+    def test_user_can_edit_administrative_data(self, mock_edit_administrative):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, self.template_name)
-
         self.assertTrue(response.context["can_edit_administrative_data"])
 
     def test_get_good_mandataries(self):
@@ -591,18 +561,25 @@ class EducationGroupAdministrativedata(TestCase):
 class EducationGroupEditAdministrativeData(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person = PersonWithPermissionsFactory('can_edit_education_group_administrative_data')
-        cls.permission = Permission.objects.get(codename='can_edit_education_group_administrative_data')
-
+        cls.person = PersonFactory()
         cls.academic_year = AcademicYearFactory(current=True)
 
         cls.education_group_year = EducationGroupYearFactory()
-        cls.program_manager = ProgramManagerFactory(person=cls.person,
-                                                    education_group=cls.education_group_year.education_group)
+        cls.program_manager = ProgramManagerFactory(
+            person=cls.person,
+            education_group=cls.education_group_year.education_group
+        )
         cls.url = reverse('education_group_edit_administrative',
                           args=[cls.education_group_year.id, cls.education_group_year.id])
 
     def setUp(self):
+        self.perm_patcher = mock.patch(
+            "base.business.education_group.can_user_edit_administrative_data",
+            return_value=True
+        )
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
+
         self.client.force_login(self.person.user)
 
     def test_when_not_logged(self):
@@ -611,15 +588,8 @@ class EducationGroupEditAdministrativeData(TestCase):
 
         self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
-    def test_user_has_not_permission(self):
-        self.person.user.user_permissions.remove(self.permission)
-        response = self.client.get(self.url)
-
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, ACCESS_DENIED)
-
-    def test_user_is_not_program_manager_of_education_group(self):
-        self.program_manager.delete()
+    @mock.patch("base.business.education_group.can_user_edit_administrative_data", return_value=False)
+    def test_user_has_not_permission(self, mock_perms):
         response = self.client.get(self.url)
 
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
@@ -710,11 +680,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
             reference=cls.education_group_child.id
         )
 
-        cls.person = PersonWithPermissionsFactory(
-            "can_access_education_group",
-            "change_admissioncondition",
-            "change_commonadmissioncondition",
-        )
+        cls.person = PersonFactory()
         cls.url = reverse(
             "education_group_year_admission_condition_edit",
             args=[cls.education_group_parent.pk, cls.education_group_child.pk]
@@ -722,12 +688,10 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         cls.template_name = "education_group/tab_admission_conditions.html"
 
     def setUp(self):
-        self.perm_patcher = mock.patch(
-            "base.business.education_groups.perms.AdmissionConditionPerms.is_eligible",
-            return_value=True
-        )
+        self.perm_patcher = mock.patch("django.contrib.auth.models.User.has_perm", return_value=True)
         self.mocked_perm = self.perm_patcher.start()
         self.addCleanup(self.perm_patcher.stop)
+
         self.client.force_login(self.person.user)
 
     def test_when_not_logged(self):
@@ -736,10 +700,8 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         self.assertRedirects(response, LOGIN_NEXT.format(self.url))
 
-    def test_user_without_permission(self):
-        an_other_user = UserFactory()
-        self.client.force_login(an_other_user)
-
+    @mock.patch("django.contrib.auth.models.User.has_perm", return_value=False)
+    def test_user_without_permission(self, mock_has_perm):
         response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, ACCESS_DENIED)
@@ -753,15 +715,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
         self.assertGreater(len(soup.select('button.btn-publish')), 0)
-
-    @mock.patch('base.business.education_groups.perms.AdmissionConditionPerms.is_eligible', return_value=False)
-    def test_user_has_not_link_to_edit_conditions(self, mock_perms):
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, self.template_name)
-
-        soup = bs4.BeautifulSoup(response.content, 'html.parser')
-        self.assertEqual(len(soup.select('button.btn-publish')), 0)
 
     def test_case_free_text_is_not_show_when_common(self):
         common_bachelor = EducationGroupYearCommonBachelorFactory(academic_year=self.academic_year)
@@ -979,7 +932,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         self.assertEqual(response['diploma'], 'diploma')
         self.assertEqual(response['access'], CONDITION_ADMISSION_ACCESSES[2][0])
 
-    @mock.patch('base.business.education_groups.perms.AdmissionConditionPerms.is_eligible', return_value=False)
+    @mock.patch("django.contrib.auth.models.User.has_perm", return_value=False)
     @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_post')
     @mock.patch('base.views.education_group.education_group_year_admission_condition_update_text_get')
     def test_case_update_text_admission_condition_without_perms(self, mock_update_get, mock_update_post, mock_perms):

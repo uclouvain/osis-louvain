@@ -94,6 +94,9 @@ class Prerequisite(models.Model):
     education_group_year = models.ForeignKey(
         "EducationGroupYear", on_delete=models.CASCADE
     )
+    education_group_version = models.ForeignKey(
+        "program_management.EducationGroupVersion", on_delete=models.CASCADE, null=True
+    )
     main_operator = models.CharField(
         choices=prerequisite_operator.PREREQUISITES_OPERATORS,
         max_length=5,

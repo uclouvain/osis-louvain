@@ -31,10 +31,9 @@ from django.views.generic.detail import SingleObjectMixin
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_year import EducationGroupYear
-from base.views.mixins import RulesRequiredMixin
 
 
-class EducationGroupAchievementMixin(RulesRequiredMixin, SingleObjectMixin):
+class EducationGroupAchievementMixin(SingleObjectMixin):
     # SingleObjectMixin
     model = EducationGroupAchievement
     context_object_name = "education_group_achievement"
@@ -64,13 +63,6 @@ class EducationGroupAchievementMixin(RulesRequiredMixin, SingleObjectMixin):
     @cached_property
     def education_group_year(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
-
-    # RulesRequiredMixin
-    raise_exception = True
-
-    def _call_rule(self, rule):
-        """ Rules will be call with the person and the education_group_year"""
-        return rule(self.person, self.education_group_year)
 
 
 class EducationGroupDetailedAchievementMixin(EducationGroupAchievementMixin):

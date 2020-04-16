@@ -83,7 +83,7 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
@@ -254,7 +254,7 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
             subtype=learning_unit_year_subtypes.FULL
         )
         cls.url = reverse(create_partim_form, kwargs={'learning_unit_year_id': cls.learning_unit_year_full.id})
-        faculty_manager = FacultyManagerFactory("can_access_learningunit", "can_create_learningunit")
+        faculty_manager = FacultyManagerForUEFactory("can_access_learningunit", "can_create_learningunit")
         cls.user = faculty_manager.user
         cls.access_denied = "access_denied.html"
 

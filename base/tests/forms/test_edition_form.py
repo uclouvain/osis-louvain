@@ -33,7 +33,7 @@ from base.forms.learning_unit.edition_volume import VolumeEditionForm, VolumeEdi
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateContainer, GenerateAcademicYear
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.person import CentralManagerFactory, FacultyManagerFactory
+from base.tests.factories.person import CentralManagerForUEFactory, FacultyManagerForUEFactory
 
 
 class TestVolumeEditionForm(TestCase):
@@ -216,8 +216,8 @@ class TestVolumeEditionFormsetContainer(TestCase):
 
         cls.learning_unit_year_full = cls.generated_container_year.learning_unit_year_full
         cls.learning_unit_year_partim = cls.generated_container_year.learning_unit_year_partim
-        cls.central_manager = CentralManagerFactory()
-        cls.faculty_manager = FacultyManagerFactory()
+        cls.central_manager = CentralManagerForUEFactory()
+        cls.faculty_manager = FacultyManagerForUEFactory()
         cls.request_factory = RequestFactory()
         cls.data_forms = get_valid_formset_data(cls.learning_unit_year_full.acronym)
 

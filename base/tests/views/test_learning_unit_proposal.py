@@ -262,7 +262,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
     @classmethod
     def setUpTestData(cls):
         AcademicYearFactory.produce(number_past=3, number_future=10)
-        cls.person = person_factory.CentralManagerFactory("can_propose_learningunit", "can_access_learningunit")
+        cls.person = person_factory.CentralManagerForUEFactory("can_propose_learningunit", "can_access_learningunit")
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         cls.academic_years = AcademicYearFactory.produce_in_future(quantity=7)
         cls.current_academic_year = cls.academic_years[0]
@@ -501,7 +501,7 @@ class TestLearningUnitProposalCancellation(TestCase):
     @classmethod
     def setUpTestData(cls):
         create_current_academic_year()
-        cls.person = person_factory.FacultyManagerFactory("can_propose_learningunit")
+        cls.person = person_factory.FacultyManagerForUEFactory("can_propose_learningunit")
         cls.permission = Permission.objects.get(codename="can_propose_learningunit")
 
     def setUp(self):
@@ -713,7 +713,7 @@ class TestEditProposal(TestCase):
         cls.generated_container_first_year = cls.generated_container.generated_container_years[1]
         cls.learning_unit_year = cls.generated_container_first_year.learning_unit_year_full
 
-        cls.person = person_factory.FacultyManagerFactory("can_edit_learning_unit_proposal")
+        cls.person = person_factory.FacultyManagerForUEFactory("can_edit_learning_unit_proposal")
         cls.requirement_entity_of_luy = cls.generated_container_first_year.requirement_entity_container_year
         PersonEntityFactory(entity=cls.requirement_entity_of_luy, person=cls.person)
         cls.person_entity = PersonEntityFactory(person=cls.person, entity=cls.entity)
@@ -753,7 +753,7 @@ class TestEditProposal(TestCase):
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
     def test_edit_proposal_get_as_central_manager_with_instance(self):
-        central_manager = person_factory.CentralManagerFactory("can_edit_learning_unit_proposal")
+        central_manager = person_factory.CentralManagerForUEFactory("can_edit_learning_unit_proposal")
         PersonEntityFactory(person=central_manager, entity=self.requirement_entity_of_luy)
         self.client.logout()
         self.client.force_login(central_manager.user)
@@ -1033,7 +1033,7 @@ class TestLearningUnitProposalDisplay(TestCase):
 class TestCreationProposalCancel(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.a_person_central_manager = person_factory.CentralManagerFactory(
+        cls.a_person_central_manager = person_factory.CentralManagerForUEFactory(
             'can_propose_learningunit', 'can_access_learningunit'
         )
 
