@@ -26,7 +26,6 @@
 from django import forms
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ImproperlyConfigured, ValidationError
-from django.db.models import Q
 from django.utils import translation
 from django.utils.translation import gettext_lazy as _
 
@@ -41,7 +40,7 @@ from base.models.education_group import EducationGroup
 from base.models.education_group_type import find_authorized_types, EducationGroupType
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import find_pedagogical_entities_version, get_last_version
-from base.models.enums import education_group_categories, groups, organization_type
+from base.models.enums import education_group_categories, groups
 from base.models.enums.education_group_categories import Categories, TRAINING
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from osis_role.contrib.forms.fields import EntityRoleChoiceField
@@ -215,7 +214,9 @@ class EducationGroupYearModelForm(ValidationRuleEducationGroupTypeMixin, Permiss
 
     def _filter_management_entity_according_to_person(self):
         if 'management_entity' in self.fields:
-            self.fields['management_entity'] = ManagementEntitiesVersionChoiceField(person=self.user.person)
+            self.fields['management_entity'] = ManagementEntitiesVersionChoiceField(
+                person=self.user.person, disabled=self.fields['management_entity'].disabled
+            )
 
     def _disable_field(self, key, initial_value=None):
         field = self.fields[key]

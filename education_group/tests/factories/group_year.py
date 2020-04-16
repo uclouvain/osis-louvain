@@ -28,8 +28,10 @@ import string
 
 import factory.fuzzy
 
+from base.models.enums import active_status
 from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.campus import CampusFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from education_group.models.enums.constraint_type import CREDITS
 from education_group.tests.factories.group import GroupFactory
@@ -62,3 +64,5 @@ class GroupYearFactory(factory.django.DjangoModelFactory):
     remark_fr = factory.fuzzy.FuzzyText(length=255)
     remark_en = factory.fuzzy.FuzzyText(length=255)
     academic_year = factory.SubFactory(AcademicYearFactory, year=factory.SelfAttribute("..group.start_year.year"))
+    active = active_status.ACTIVE
+    main_teaching_campus = factory.SubFactory(CampusFactory)
