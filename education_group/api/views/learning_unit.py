@@ -93,8 +93,8 @@ class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.Lis
             'education_group_year__academic_year',
             'education_group_year__education_group_type',
             'learning_unit_year__academic_year',
-            # 'education_group_version__offer__academic_year',
-            # 'education_group_version__offer__education_group_type'
+            'education_group_version__offer__academic_year',
+            'education_group_version__offer__education_group_type'
         ).prefetch_related(
             'prerequisiteitem_set',
             'education_group_year__educationgroupversion_set'

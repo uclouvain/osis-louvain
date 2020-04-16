@@ -64,6 +64,7 @@ class MiniTrainingListSerializer(EducationGroupTitleSerializer, serializers.Mode
         model = EducationGroupVersion
         fields = EducationGroupTitleSerializer.Meta.fields + (
             'url',
+            'version_name',
             'acronym',
             'code',
             'education_group_type',

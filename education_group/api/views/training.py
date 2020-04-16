@@ -32,6 +32,7 @@ from backoffice.settings.rest_framework.common_views import LanguageContextSeria
 from base.models.enums import education_group_categories
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
+from education_group.api.views import utils
 from program_management.models.education_group_version import EducationGroupVersion
 
 
@@ -51,14 +52,7 @@ class TrainingFilter(filters.FilterSet):
 
     @staticmethod
     def filter_version_type(queryset, name, value):
-        allowed_types = ['standard', 'transition', 'special']
-        if value not in allowed_types:
-            raise Http404
-        elif value == 'transition':
-            return queryset.filter(is_transition=True)
-        elif value == 'special':
-            return queryset.exclude(version_name='')
-        return queryset
+        return utils.filter_version_type(queryset, value)
 
 
 class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -109,6 +103,7 @@ class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     def get_object(self):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
+        version_name = self.kwargs.get('version_name', '')
         egv = get_object_or_404(
             EducationGroupVersion.objects.filter(
                 offer__education_group_type__category=education_group_categories.TRAINING
@@ -123,7 +118,9 @@ class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
                 'offer__management_entity__entityversion_set',
             ),
             offer__acronym__iexact=acronym,
-            offer__academic_year__year=year
+            offer__academic_year__year=year,
+            version_name=version_name,
+            is_transition=False
         )
         return egv
 

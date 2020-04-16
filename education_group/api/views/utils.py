@@ -25,35 +25,22 @@
 ##############################################################################
 from enum import Enum
 
+from django.http import Http404
 
-class ChoiceEnum(Enum):
-    @classmethod
-    def choices(cls):
-        return tuple((x.name, x.value) for x in cls)
-
-    @classmethod
-    def get_value(cls, key):
-        return getattr(cls, key, key).value if hasattr(cls, key) else key
-
-    @classmethod
-    def get_names(cls):
-        return [x.name for x in cls]
-
-    @classmethod
-    def get_values(cls):
-        return [x.value for x in cls]
+from base.models.utils.utils import ChoiceEnum
 
 
-def get_verbose_field_value(instance, key):
-    if hasattr(instance, "get_" + key + "_display"):
-        value = getattr(instance, "get_" + key + "_display")()
-    else:
-        value = getattr(instance, key, "")
-    return value
+class VersionTypeEnum(ChoiceEnum):
+    STANDARD = "standard"
+    TRANSITION = "transition"
+    SPECIAL = "special"
 
 
-def filter_with_list_or_object(fk_name, model, **kwargs):
-    return model.objects.all().filter(**{
-        fk_name + ('__in' if isinstance(kwargs[fk_name], list) else ''):
-            kwargs[fk_name]
-    })
+def filter_version_type(queryset, value):
+    if value not in VersionTypeEnum.get_values():
+        raise Http404
+    elif value == 'transition':
+        return queryset.filter(is_transition=True)
+    elif value == 'special':
+        return queryset.exclude(version_name='')
+    return queryset

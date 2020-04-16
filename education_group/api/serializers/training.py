@@ -64,6 +64,7 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
         model = EducationGroupVersion
         fields = EducationGroupTitleSerializer.Meta.fields + (
             'url',
+            'version_name',
             'acronym',
             'code',
             'education_group_type',

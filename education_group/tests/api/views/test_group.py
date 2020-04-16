@@ -92,7 +92,8 @@ class GetGroupTestCase(APITestCase):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.group = GroupYearFactory(
             academic_year=cls.academic_year,
-            education_group_type__category=education_group_categories.GROUP
+            education_group_type__category=education_group_categories.GROUP,
+            group__start_year=cls.academic_year
         )
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:group_read', kwargs={

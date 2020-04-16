@@ -34,6 +34,7 @@ from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import MiniTrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
+from education_group.api.views import utils
 from program_management.models.education_group_version import EducationGroupVersion
 
 
@@ -71,14 +72,7 @@ class MiniTrainingFilter(filters.FilterSet):
 
     @staticmethod
     def filter_version_type(queryset, name, value):
-        allowed_types = ['standard', 'transition', 'special']
-        if value not in allowed_types:
-            raise Http404
-        elif value == 'transition':
-            return queryset.filter(is_transition=True)
-        elif value == 'special':
-            return queryset.exclude(version_name='')
-        return queryset
+        return utils.filter_version_type(queryset, value)
 
 
 class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):

@@ -27,6 +27,7 @@
 from django.conf import settings
 from rest_framework import serializers
 
+from base.api.serializers.campus import CampusDetailSerializer
 from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
@@ -64,7 +65,7 @@ class GroupDetailSerializer(GroupTitleSerializer, serializers.ModelSerializer):
     management_faculty = serializers.SerializerMethodField()
     remark = serializers.SerializerMethodField()
     # TODO: Field to add into model
-    # campus = CampusDetailSerializer(source='main_teaching_campus', read_only=True)
+    campus = CampusDetailSerializer(source='main_teaching_campus', read_only=True)
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
@@ -86,7 +87,7 @@ class GroupDetailSerializer(GroupTitleSerializer, serializers.ModelSerializer):
             'constraint_type',
             'constraint_type_text',
             'remark',
-            # 'campus',
+            'campus',
         )
 
     def get_remark(self, education_group_year):

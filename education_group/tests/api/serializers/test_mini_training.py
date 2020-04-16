@@ -59,6 +59,7 @@ class MiniTrainingListSerializerTestCase(TestCase):
         expected_fields = [
             'title',
             'url',
+            'version_name',
             'acronym',
             'code',
             'education_group_type',
@@ -114,6 +115,7 @@ class MiniTrainingDetailSerializerTestCase(TestCase):
         expected_fields = [
             'title',
             'url',
+            'version_name',
             'acronym',
             'code',
             'education_group_type',

@@ -61,6 +61,7 @@ class TrainingListSerializerTestCase(TestCase):
         expected_fields = [
             'title',
             'url',
+            'version_name',
             'acronym',
             'code',
             'education_group_type',
@@ -112,6 +113,7 @@ class TrainingListSerializerForMasterWithFinalityTestCase(TestCase):
         expected_fields = [
             'title',
             'url',
+            'version_name',
             'acronym',
             'code',
             'education_group_type',
@@ -167,6 +169,7 @@ class TrainingDetailSerializerTestCase(TestCase):
         expected_fields = [
             'title',
             'url',
+            'version_name',
             'acronym',
             'code',
             'education_group_type',
@@ -280,6 +283,7 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
         expected_fields = [
             'title',
             'url',
+            'version_name',
             'acronym',
             'code',
             'education_group_type',

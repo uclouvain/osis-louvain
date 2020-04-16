@@ -72,7 +72,7 @@ class GroupDetailSerializerTestCase(TestCase):
             'constraint_type',
             'constraint_type_text',
             'remark',
-            # 'campus',
+            'campus',
         ]
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
