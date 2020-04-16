@@ -99,6 +99,9 @@ class Prerequisite(models.Model):
         max_length=5,
         default=prerequisite_operator.AND
     )
+    education_group_version = models.ForeignKey(
+        "program_management.EducationGroupVersion", on_delete=models.CASCADE, blank=True, null=True
+    )
 
     class Meta:
         unique_together = ('learning_unit_year', 'education_group_year')

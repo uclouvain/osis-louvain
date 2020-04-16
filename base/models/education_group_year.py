@@ -45,7 +45,7 @@ from base.models.enums import academic_type, internship_presence, schedule_type,
     diploma_printing_orientation, active_status, duration_unit, decree_category, rate_code
 from base.models.enums import education_group_association
 from base.models.enums import education_group_categories
-from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
+from base.models.enums.constraint_type import CONSTRAINT_TYPE
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.offer_enrollment_state import SUBSCRIBED, PROVISORY
