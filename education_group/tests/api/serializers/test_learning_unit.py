@@ -122,11 +122,11 @@ class LearningUnitYearPrerequisitesListSerializerTestCase(TestCase):
     def test_ensure_academic_year_field_is_slugified(self):
         self.assertEqual(
             self.serializer.data['academic_year'],
-            self.prerequisite.education_group_year.academic_year.year
+            self.prerequisite.education_group_version.offer.academic_year.year
         )
 
     def test_ensure_education_group_type_field_is_slugified(self):
         self.assertEqual(
             self.serializer.data['education_group_type'],
-            self.prerequisite.education_group_year.education_group_type.name
+            self.prerequisite.education_group_version.offer.education_group_type.name
         )

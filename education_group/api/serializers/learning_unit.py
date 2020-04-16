@@ -29,7 +29,7 @@ from rest_framework import serializers
 from base.models.education_group_type import EducationGroupType
 from base.models.prerequisite import Prerequisite
 from education_group.api.serializers.training import TrainingHyperlinkedIdentityField
-from education_group.api.serializers.utils import LearningUnitPrerequisiteHyperlinkedRelatedField
+from education_group.api.serializers.utils import TrainingHyperlinkedRelatedField
 from program_management.models.education_group_version import EducationGroupVersion
 
 
@@ -90,22 +90,22 @@ class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, seri
 
 
 class LearningUnitYearPrerequisitesListSerializer(serializers.ModelSerializer):
-    # TODO: Use URL for Version
-    url = LearningUnitPrerequisiteHyperlinkedRelatedField(
-        source='education_group_year',
+    url = TrainingHyperlinkedRelatedField(
+        source='education_group_version',
         lookup_field='acronym', read_only=True
     )
 
-    acronym = serializers.CharField(source='education_group_year.acronym')
-    code = serializers.CharField(source='education_group_year.partial_acronym')  # TODO: Get from GroupYear
-    academic_year = serializers.IntegerField(source='education_group_year.academic_year.year')
+    acronym = serializers.CharField(source='education_group_version.offer.acronym')
+    code = serializers.CharField(
+        source='education_group_version.root_group.partial_acronym')  # TODO: Get from GroupYear
+    academic_year = serializers.IntegerField(source='education_group_version.offer.academic_year.year')
     education_group_type = serializers.SlugRelatedField(
-        source='education_group_year.education_group_type',
+        source='education_group_version.offer.education_group_type',
         slug_field='name',
         queryset=EducationGroupType.objects.all(),
     )
     education_group_type_text = serializers.CharField(
-        source='education_group_year.education_group_type.get_name_display',
+        source='education_group_version.offer.education_group_type.get_name_display',
         read_only=True,
     )
     prerequisites = serializers.CharField(source='prerequisite_string')
@@ -127,6 +127,6 @@ class LearningUnitYearPrerequisitesListSerializer(serializers.ModelSerializer):
     def get_title(self, prerequisite):
         language = self.context['language']
         return getattr(
-            prerequisite.education_group_year,
+            prerequisite.education_group_version.offer,
             'title' + ('_english' if language not in settings.LANGUAGE_CODE_FR else '')
         )

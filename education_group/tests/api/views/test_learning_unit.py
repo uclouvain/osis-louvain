@@ -214,6 +214,7 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
             partial_acronym='LDROI1000',
             academic_year=cls.academic_year
         )
+        cls.version = EducationGroupVersionFactory(offer=cls.education_group_year)
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year
@@ -263,7 +264,7 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_FR
             }
         )
         self.assertEqual(response.data, serializer.data)
