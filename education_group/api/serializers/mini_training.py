@@ -34,7 +34,6 @@ from base.models.enums import education_group_categories
 from education_group.api.serializers import utils
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.utils import MiniTrainingHyperlinkedIdentityField
-from program_management.models.education_group_version import EducationGroupVersion
 
 
 class MiniTrainingListSerializer(EducationGroupTitleSerializer, serializers.ModelSerializer):
@@ -61,7 +60,6 @@ class MiniTrainingListSerializer(EducationGroupTitleSerializer, serializers.Mode
     )
 
     class Meta(EducationGroupTitleSerializer.Meta):
-        model = EducationGroupVersion
         fields = EducationGroupTitleSerializer.Meta.fields + (
             'url',
             'version_name',
@@ -96,7 +94,6 @@ class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
     schedule_type_text = serializers.CharField(source='offer.get_schedule_type_display', read_only=True)
 
     class Meta(MiniTrainingListSerializer.Meta):
-        model = EducationGroupVersion
         fields = MiniTrainingListSerializer.Meta.fields + (
             'active',
             'active_text',

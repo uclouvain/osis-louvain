@@ -28,29 +28,12 @@ from rest_framework import serializers
 
 from base.models.education_group_type import EducationGroupType
 from base.models.prerequisite import Prerequisite
+from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingHyperlinkedIdentityField
 from education_group.api.serializers.utils import TrainingHyperlinkedRelatedField
-from program_management.models.education_group_version import EducationGroupVersion
 
 
-class EducationGroupRootsTitleSerializer(serializers.ModelSerializer):
-    title = serializers.SerializerMethodField()
-
-    class Meta:
-        model = EducationGroupVersion
-        fields = (
-            'title',
-        )
-
-    def get_title(self, version):
-        language = self.context['language']
-        return getattr(
-            version.root_group,
-            'title_' + ('en' if language not in settings.LANGUAGE_CODE_FR else 'fr')
-        )
-
-
-class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, serializers.HyperlinkedModelSerializer):
+class EducationGroupRootsListSerializer(EducationGroupTitleSerializer, serializers.HyperlinkedModelSerializer):
     url = TrainingHyperlinkedIdentityField(read_only=True)
     acronym = serializers.CharField(source='offer.acronym', read_only=True)
     academic_year = serializers.IntegerField(source='offer.academic_year.year')
@@ -71,9 +54,8 @@ class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, seri
     decree_category_text = serializers.CharField(source='offer.get_decree_category_display', read_only=True)
     duration_unit_text = serializers.CharField(source='offer.get_duration_unit_display', read_only=True)
 
-    class Meta:
-        model = EducationGroupVersion
-        fields = EducationGroupRootsTitleSerializer.Meta.fields + (
+    class Meta(EducationGroupTitleSerializer.Meta):
+        fields = EducationGroupTitleSerializer.Meta.fields + (
             'url',
             'acronym',
             'code',

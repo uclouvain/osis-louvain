@@ -34,7 +34,6 @@ from base.models.enums import education_group_categories, education_group_types
 from education_group.api.serializers import utils
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.utils import TrainingHyperlinkedIdentityField
-from program_management.models.education_group_version import EducationGroupVersion
 from reference.models.language import Language
 
 
@@ -62,7 +61,6 @@ class TrainingBaseListSerializer(EducationGroupTitleSerializer, serializers.Hype
                                                       read_only=True)
 
     class Meta(EducationGroupTitleSerializer.Meta):
-        model = EducationGroupVersion
         fields = EducationGroupTitleSerializer.Meta.fields + (
             'url',
             'version_name',
