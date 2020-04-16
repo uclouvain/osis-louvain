@@ -72,11 +72,13 @@ class EducationGroupSkillsAchievements(EducationGroupGenericDetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        perm_name = 'base.change_commonadmissioncondition' if self.object.is_common else \
+            'base.change_admissioncondition'
 
         context.update({
             'LANGUAGE_CODE_FR': settings.LANGUAGE_CODE_FR,
             'LANGUAGE_CODE_EN': settings.LANGUAGE_CODE_EN,
-            'can_edit_information': perms.is_eligible_to_edit_admission_condition(context['person'], context['object'])
+            'can_edit_information': self.request.user.has_perm(perm_name, self.object)
         })
 
         context["education_group_achievements"] = self.get_achievements()

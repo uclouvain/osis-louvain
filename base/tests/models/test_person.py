@@ -44,7 +44,7 @@ from base.tests.factories.group import CentralManagerGroupFactory, FacultyManage
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_year import OfferYearFactory
 from base.tests.factories.person import PersonFactory, generate_person_email, PersonWithoutUserFactory, SICFactory, \
-    UEFacultyManagerFactory, AdministrativeManagerFactory
+    FacultyManagerForUEFactory, AdministrativeManagerFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import UserFactory
@@ -189,7 +189,7 @@ class PersonTest(PersonTestCase):
         a_person = PersonFactory()
         self.assertFalse(a_person.is_faculty_manager_for_ue)
 
-        a_person = UEFacultyManagerFactory()
+        a_person = FacultyManagerForUEFactory()
         self.assertTrue(a_person.is_faculty_manager_for_ue)
 
     def test_is_program_manager(self):

@@ -41,7 +41,7 @@ from base.tests.factories.education_group_year import TrainingFactory, Education
     EducationGroupYearMasterFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.person import CentralManagerFactory
+from base.tests.factories.person import CentralManagerForUEFactory, PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 
 DELETE_URL_NAME = "publication_contact_delete"
@@ -64,12 +64,13 @@ class PublicationContactViewSetupTest(TestCase):
             education_group_year=cls.training,
             type=PublicationContactType.ACADEMIC_RESPONSIBLE.name
         )
-
-        # Create a central manager and linked it to entity of training
-        cls.person = CentralManagerFactory("change_educationgroup", "can_access_education_group")
-        PersonEntityFactory(person=cls.person, entity=cls.training.management_entity)
+        cls.person = PersonFactory()
 
     def setUp(self):
+        self.perm_patcher = mock.patch("django.contrib.auth.models.User.has_perm", return_value=True)
+        self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
+
         self.client.force_login(self.person.user)
 
 
@@ -90,7 +91,8 @@ class TestPublicationContactCreateView(PublicationContactViewSetupTest):
         response = self.client.get(self.url_create)
         self.assertRedirects(response, "/login/?next={}".format(self.url_create))
 
-    def test_user_without_permission(self):
+    @mock.patch("django.contrib.auth.models.User.has_perm", return_value=False)
+    def test_user_without_permission(self, mock_has_perm):
         # Remove permission
         self.person.user.user_permissions.clear()
 
@@ -98,14 +100,12 @@ class TestPublicationContactCreateView(PublicationContactViewSetupTest):
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms.is_eligible", return_value=True)
-    def test_assert_template_used(self, mock_permissions):
+    def test_assert_template_used(self):
         response = self.client.get(self.url_create)
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "education_group/blocks/modal/modal_publication_contact_edit_inner.html")
 
-    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms.is_eligible", return_value=True)
-    def test_create_post(self, mock_permissions):
+    def test_create_post(self):
         # Remove current
         self.publication_contact.delete()
 
@@ -147,7 +147,8 @@ class TestPublicationContactUpdateView(PublicationContactViewSetupTest):
         response = self.client.get(self.url_edit)
         self.assertRedirects(response, "/login/?next={}".format(self.url_edit))
 
-    def test_user_without_permission(self):
+    @mock.patch("django.contrib.auth.models.User.has_perm", return_value=False)
+    def test_user_without_permission(self, mock_has_perm):
         # Remove permission
         self.person.user.user_permissions.clear()
 
@@ -155,8 +156,7 @@ class TestPublicationContactUpdateView(PublicationContactViewSetupTest):
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms.is_eligible", return_value=True)
-    def test_assert_template_used(self, mock_permissions):
+    def test_assert_template_used(self):
         response = self.client.get(self.url_edit)
         self.assertEqual(response.status_code, HTTPStatus.OK)
         self.assertTemplateUsed(response, "education_group/blocks/modal/modal_publication_contact_edit_inner.html")
@@ -180,7 +180,8 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
         response = self.client.get(self.url_delete)
         self.assertRedirects(response, "/login/?next={}".format(self.url_delete))
 
-    def test_user_without_permission(self):
+    @mock.patch("django.contrib.auth.models.User.has_perm", return_value=False)
+    def test_user_without_permission(self, mock_has_perm):
         # Remove permission
         self.person.user.user_permissions.clear()
 
@@ -188,16 +189,14 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms.is_eligible", return_value=True)
-    def test_template_used(self, mock_permission):
+    def test_template_used(self):
         response = self.client.get(self.url_delete)
         self.assertTemplateUsed(
             response,
             "education_group/blocks/modal/modal_publication_contact_confirm_delete_inner.html",
         )
 
-    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms.is_eligible", return_value=True)
-    def test_delete_assert_redirection(self, mock_permissions):
+    def test_delete_assert_redirection(self):
         query_dictionary = QueryDict('', mutable=True)
         query_dictionary.update(
             {
@@ -243,7 +242,8 @@ class TestEntityPublicationContactUpdateView(PublicationContactViewSetupTest):
         response = self.client.get(self.url_update)
         self.assertRedirects(response, "/login/?next={}".format(self.url_update))
 
-    def test_user_without_permission(self):
+    @mock.patch("django.contrib.auth.models.User.has_perm", return_value=False)
+    def test_user_without_permission(self, mock_has_perm):
         # Remove permission
         self.person.user.user_permissions.clear()
 
@@ -251,16 +251,14 @@ class TestEntityPublicationContactUpdateView(PublicationContactViewSetupTest):
         self.assertTemplateUsed(response, "access_denied.html")
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms.is_eligible", return_value=True)
-    def test_template_used(self, mock_permission):
+    def test_template_used(self):
         response = self.client.get(self.url_update)
         self.assertTemplateUsed(
             response,
             "education_group/blocks/modal/modal_publication_contact_entity_edit_inner.html",
         )
 
-    @mock.patch("base.business.education_groups.perms.GeneralInformationPerms.is_eligible", return_value=True)
-    def test_update_assert_db(self, mock_permission):
+    def test_update_assert_db(self):
         response = self.client.post(self.url_update, {
             'publication_contact_entity': self.entity_version.pk
         }, follow=True)

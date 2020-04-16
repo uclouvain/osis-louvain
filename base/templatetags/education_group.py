@@ -27,52 +27,29 @@ import waffle
 from django import template
 from django.core.exceptions import PermissionDenied
 from django.urls import reverse
-from django.utils.safestring import mark_safe
 from django.utils.translation import gettext as _
 
 from base.business.education_group import can_user_edit_administrative_data
-from base.business.education_groups.perms import is_eligible_to_change_education_group, is_eligible_to_add_training, \
-    is_eligible_to_add_mini_training, is_eligible_to_add_group, is_eligible_to_postpone_education_group, \
-    is_eligible_to_delete_education_group_year, is_eligible_to_edit_certificate_aims, \
+from base.business.education_groups.perms import is_eligible_to_postpone_education_group, \
     is_eligible_to_change_education_group_content
+from base.models import program_manager
 from base.models.academic_year import AcademicYear
 from base.models.enums.education_group_types import GroupType
 from base.models.utils.utils import get_verbose_field_value
 from base.templatetags.common import ICONS
-from program_management.templatetags.group_element_year import get_action_with_permission
 
 register = template.Library()
 
 
-@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
-def li_with_deletion_perm(context, url, message, url_id="link_delete"):
-    return li_with_permission(context, is_eligible_to_delete_education_group_year, url, message, url_id, True)
-
-
-@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
-def li_with_update_perm(context, url, message, url_id="link_update"):
-    person = context['person']
-
-    if person.is_program_manager and \
-            not any((person.user.is_superuser, person.is_faculty_manager, person.is_central_manager)):
-        return li_with_permission(context, is_eligible_to_edit_certificate_aims, url, message, url_id, load_modal=True)
-
-    return li_with_permission(context, is_eligible_to_change_education_group, url, message, url_id)
-
-
-@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
-def li_with_create_perm_training(context, url, message, url_id="link_create_training"):
-    return li_with_permission(context, is_eligible_to_add_training, url, message, url_id, True)
-
-
-@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
-def li_with_create_perm_mini_training(context, url, message, url_id="link_create_mini_training"):
-    return li_with_permission(context, is_eligible_to_add_mini_training, url, message, url_id, True)
-
-
-@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
-def li_with_create_perm_group(context, url, message, url_id="link_create_group"):
-    return li_with_permission(context, is_eligible_to_add_group, url, message, url_id, True)
+# TODO: Remove when migration of Program Manager is done with OSIS-Role Module
+@register.simple_tag
+def have_only_access_to_certificate_aims(user, education_group_year):
+    """
+    [Backward-compatibility] This templatetag as been created in order to allow
+    program_manager to be redirected to update_certificate_aims
+    """
+    return program_manager.is_program_manager(user, education_group=education_group_year.education_group) \
+        and not any((user.is_superuser, user.person.is_faculty_manager, user.person.is_central_manager))
 
 
 @register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
@@ -159,9 +136,8 @@ def button_order_with_permission(context, title, id_button, value):
         person = context.get('person')
 
         if person.is_faculty_manager and education_group_year.type in GroupType.minor_major_list_choice():
-            disabled, permission_denied_message = get_action_with_permission(context)
-            if disabled:
-                title = permission_denied_message
+            title = _('The user is not allowed to change education group content.')
+            disabled = "disabled"
 
     if value == "up" and context["forloop"]["first"]:
         disabled = "disabled"
@@ -181,43 +157,6 @@ def button_order_with_permission(context, title, id_button, value):
 @register.simple_tag(takes_context=True)
 def url_resolver_match(context):
     return context.request.resolver_match.url_name
-
-
-@register.simple_tag(takes_context=True)
-def link_detach_education_group(context, url):
-    onclick = """onclick="select()" """
-    action = "Detach"
-    if context['can_change_education_group'] and context['group_to_parent'] != '0':
-        li_attributes = """ id="btn_operation_detach_{group_to_parent}" class="trigger_modal" data-url={url} """.format(
-            group_to_parent=context['group_to_parent'],
-            url=url,
-        )
-        a_attributes = """ href="#" title="{title}" {onclick} """.format(title=_(action), onclick=onclick)
-    else:
-        li_attributes = """ class="disabled" """
-        title = ""
-        if not context['can_change_education_group']:
-            title += _("The user has not permission to change education groups.")
-        if context['group_to_parent'] == '0':
-            title += " " + _("It is not possible to %(action)s the root element.") % {
-                "action": str.lower(_(action))
-            }
-
-        a_attributes = """ title="{title}" """.format(title=title)
-    text = _(action)
-    html_template = """
-        <li {li_attributes}>
-            <a {a_attributes} data-toggle="tooltip">{text}</a>
-        </li>
-    """
-
-    return mark_safe(
-        html_template.format(
-            li_attributes=li_attributes,
-            a_attributes=a_attributes,
-            text=text,
-        )
-    )
 
 
 @register.inclusion_tag('blocks/button/li_template.html')

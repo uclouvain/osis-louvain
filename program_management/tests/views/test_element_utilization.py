@@ -64,7 +64,7 @@ class TestLearningUnitUtilization(TestCase):
                                                            child_leaf=cls.learning_unit_year_2)
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
 
         cls.url = reverse(
             "learning_unit_utilization",

@@ -37,7 +37,7 @@ from base.templatetags.education_group import _get_permission
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import CentralManagerFactory, PersonWithPermissionsFactory
+from base.tests.factories.person import CentralManagerForUEFactory, PersonWithPermissionsFactory
 from program_management.ddd.domain import link
 
 
@@ -55,8 +55,8 @@ class TestUp(TestCase):
         cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year,
                                                            child_branch__academic_year=cls.academic_year)
 
-        cls.person = CentralManagerFactory()
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.person = CentralManagerForUEFactory()
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse(
             "group_element_year_up",
             args=[cls.education_group_year.id, cls.group_element_year_3.id]
@@ -149,8 +149,8 @@ class TestDown(TestCase):
         cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year,
                                                            child_branch__academic_year=cls.current_academic_year)
 
-        cls.person = CentralManagerFactory()
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.person = CentralManagerForUEFactory()
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse(
             "group_element_year_down",
             args=[cls.education_group_year.id, cls.group_element_year_3.id]

@@ -42,6 +42,7 @@ from base.models.enums.education_group_types import GroupType, MiniTrainingType,
 from base.models.enums.link_type import LinkTypes
 from base.utils.db import dict_fetchall
 from osis_common.models.osis_model_admin import OsisModelAdmin
+from program_management.models.element import Element
 
 COMMON_FILTER_TYPES = [MiniTrainingType.OPTION.name]
 DEFAULT_ROOT_TYPES = TrainingType.get_names() + MiniTrainingType.get_names()
@@ -326,6 +327,20 @@ class GroupElementYearManager(models.Manager):
 class GroupElementYear(OrderedModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
+
+    parent_element = models.ForeignKey(
+        Element,
+        related_name='parent_elements',
+        null=True,  # TODO: To remove after data migration
+        on_delete=models.PROTECT,
+    )
+
+    child_element = models.ForeignKey(
+        Element,
+        related_name='children_elements',
+        null=True,  # TODO: To remove after data migration
+        on_delete=models.PROTECT,
+    )
 
     parent = models.ForeignKey(
         EducationGroupYear,

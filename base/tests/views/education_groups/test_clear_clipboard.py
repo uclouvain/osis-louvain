@@ -29,7 +29,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import CentralManagerFactory
+from base.tests.factories.person import CentralManagerForUEFactory
 from base.tests.factories.user import UserFactory
 from base.utils.cache import ElementCache
 
@@ -38,7 +38,7 @@ class TestClearClipboard(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.url = reverse("education_group_clear_clipboard")
-        cls.central_manager = CentralManagerFactory("can_access_education_group", user__superuser=False)
+        cls.central_manager = CentralManagerForUEFactory("view_educationgroup", user__superuser=False)
 
     def test_when_not_logged(self):
         response = self.client.post(self.url)

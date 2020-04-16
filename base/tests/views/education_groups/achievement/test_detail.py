@@ -43,20 +43,17 @@ from cms.tests.factories.translated_text import TranslatedTextFactory
 class TestEducationGroupSkillsAchievements(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.perm_patcher = mock.patch(
-            "base.business.education_groups.perms.AdmissionConditionPerms.is_eligible",
-            return_value=True
-        )
-
         cls.education_group_year = EducationGroupYearBachelorFactory(
             academic_year=AcademicYearFactory(current=True)
         )
-        cls.person = PersonWithPermissionsFactory("can_access_education_group")
+        cls.person = PersonWithPermissionsFactory("view_educationgroup")
 
     def setUp(self):
+        self.client.force_login(self.person.user)
+
+        self.perm_patcher = mock.patch("django.contrib.auth.models.User.has_perm", return_value=True)
         self.mocked_perm = self.perm_patcher.start()
         self.addCleanup(self.perm_patcher.stop)
-        self.client.force_login(self.person.user)
 
     def _call_url_as_http_get(self):
         response = self.client.get(

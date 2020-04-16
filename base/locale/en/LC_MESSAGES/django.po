@@ -2696,12 +2696,12 @@ msgstr ""
 
 #, python-format
 msgctxt "female"
-msgid "The user has not permission to create a %(category)s."
+msgid "The user does not have permission to create a %(category)s."
 msgstr ""
 
 #, python-format
 msgctxt "male"
-msgid "The user has not permission to create a %(category)s."
+msgid "The user does not have permission to create a %(category)s."
 msgstr ""
 
 msgid "The user has not permission to create education groups."

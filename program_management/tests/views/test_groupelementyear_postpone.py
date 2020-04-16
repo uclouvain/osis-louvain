@@ -34,7 +34,7 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import CentralManagerFactory
+from base.tests.factories.person import CentralManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 
 
@@ -45,9 +45,9 @@ class TestPostpone(TestCase):
         cls.current_academic_year = create_current_academic_year()
         cls.next_academic_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
 
-        cls.person = CentralManagerFactory()
+        cls.person = CentralManagerForUEFactory()
         cls.person.user.user_permissions.add(Permission.objects.get(codename="change_educationgroup"))
-        cls.person.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
 
         cls.education_group = EducationGroupFactory(end_year=cls.next_academic_year)
         cls.education_group_year = TrainingFactory(academic_year=cls.current_academic_year,

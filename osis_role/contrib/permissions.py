@@ -24,9 +24,8 @@
 #
 ##############################################################################
 import rules
-from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
-from django.contrib.auth.models import Permission
+from django.contrib.auth.models import Permission, Group
 
 from osis_role import role, errors
 
@@ -39,11 +38,10 @@ class ObjectPermissionBackend(ModelBackend):
         errors.clear_permission_error(user_obj, perm)
         results = set()
         for role_mdl in _get_relevant_roles(user_obj, perm):
-            qs = role_mdl.objects.filter(person=getattr(user_obj, 'person', None))
-            if qs.exists():
-                rule_set = role_mdl.rule_set()
-                _add_role_queryset_to_perms_context(rule_set, perm, qs)
-                results.add(rule_set.test_rule(perm, user_obj, *args, **kwargs))
+            rule_set = role_mdl.rule_set()
+            role_qs = role_mdl.objects.filter(person=getattr(user_obj, 'person', None))
+            _add_role_queryset_to_perms_context(rule_set, perm, role_qs)
+            results.add(rule_set.test_rule(perm, user_obj, *args, **kwargs))
         return any(results) or super().has_perm(user_obj, perm, obj=kwargs.get('obj'))
 
     def has_module_perms(self, user_obj, app_label, *args, **kwargs):
@@ -59,11 +57,10 @@ class ObjectPermissionBackend(ModelBackend):
         """
         Override method in order to fallback to default RBAC Django when role is not registered
         """
-        user_groups_field = get_user_model()._meta.get_field('groups')
-        user_groups_query = 'group__%s' % user_groups_field.related_query_name()
-        return Permission.objects.filter(**{user_groups_query: user_obj}).exclude(
-            group__name__in=role.role_manager.group_names_managed()
-        )
+        sub_qs = Group.objects.filter(
+            user=user_obj
+        ).exclude(name__in=role.role_manager.group_names_managed()).values_list('permissions', flat=True)
+        return Permission.objects.filter(pk__in=sub_qs)
 
 
 def _get_relevant_roles(user_obj, perm):

@@ -51,7 +51,7 @@ from base.tests.factories.group import FacultyManagerGroupFactory, CentralManage
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, FacultyManagerFactory, CentralManagerFactory
+from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory, FacultyManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from reference.tests.factories.language import LanguageFactory
@@ -302,7 +302,7 @@ class TestSave(TestCase):
 
     def test_academic_year_range_creation_proposal_central_manager(self):
         LanguageFactory(code="FR")
-        central_manager = CentralManagerFactory()
+        central_manager = CentralManagerForUEFactory()
         form = learning_unit_create_2.FullForm(
             central_manager,
             self.learning_unit_year.academic_year,
@@ -319,7 +319,7 @@ class TestSave(TestCase):
 
     def test_academic_year_range_creation_proposal_faculty_manager(self):
         LanguageFactory(code="FR")
-        faculty_manager = FacultyManagerFactory()
+        faculty_manager = FacultyManagerForUEFactory()
         form = learning_unit_create_2.FullForm(
             faculty_manager,
             self.learning_unit_year.academic_year,

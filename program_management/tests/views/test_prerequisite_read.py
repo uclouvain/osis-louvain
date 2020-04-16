@@ -54,7 +54,7 @@ class TestLearningUnitPrerequisite(TestCase):
             learning_unit_year=cls.learning_unit_year_child,
             education_group_year=cls.education_group_year_parents[0]
         )
-        cls.person = PersonWithPermissionsFactory("can_access_education_group")
+        cls.person = PersonWithPermissionsFactory("view_educationgroup")
         cls.url = reverse("learning_unit_prerequisite",
                           args=[cls.education_group_year_parents[0].id, cls.learning_unit_year_child.id])
 

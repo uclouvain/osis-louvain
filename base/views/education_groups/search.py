@@ -81,7 +81,7 @@ class EducationGroupSearch(LoginRequiredMixin, FlagNotAuthorized, PermissionRequ
     raise_exception = False
 
     filterset_class = EducationGroupFilter
-    permission_required = 'base.can_access_education_group'
+    permission_required = 'base.view_educationgroup'
     flag_not_authorized = 'version_program'
 
     cache_exclude_params = 'xls_status'

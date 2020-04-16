@@ -21,40 +21,34 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext_lazy as _
 
-from base.business.education_groups.perms import can_raise_exception, \
-    is_eligible_to_change_education_group, check_permission
-from base.business.event_perms import EventPermEducationGroupEdition
+from base.business.education_groups.perms import can_raise_exception
 from base.models.enums.education_group_types import GroupType
+from osis_role import errors
 
 
 # TODO: Extract permission logic from logic of education group because it's manipulating tree structure
 def is_eligible_to_update_group_element_year(person, group_element_year, raise_exception):
-    return is_eligible_to_change_education_group(person, group_element_year.parent, raise_exception) and \
-           _is_eligible_to_change_group_element_year(person, group_element_year, raise_exception) and \
+    return person.user.has_perm('base.change_educationgroup', group_element_year.parent) and \
            (not group_element_year.child_branch
             or _can_user_update_education_group_year_child(person, group_element_year.child_branch, raise_exception))
 
 
 # TODO: Extract permission logic from logic of education group because it's manipulating tree structure
 def is_eligible_to_detach_group_element_year(person, group_element_year, raise_exception):
-    return is_eligible_to_change_education_group(person, group_element_year.parent, raise_exception) and \
-           _is_eligible_to_change_group_element_year(person, group_element_year, raise_exception)
-
-
-def is_eligible_to_update_group_element_year_content(person, group_element_year, raise_exception):
-    result = check_permission(person, "base.change_educationgroupcontent", raise_exception) and \
-         is_eligible_to_update_group_element_year(person, group_element_year, raise_exception)
-    can_raise_exception(raise_exception, result, _("The user is not allowed to change education group content."))
+    result = person.user.has_perm('base.change_educationgroup', group_element_year.parent)
+    if raise_exception and not result:
+        raise PermissionDenied(errors.get_permission_error(person.user, 'base.change_educationgroup'))
     return result
 
 
-def _is_eligible_to_change_group_element_year(person, group_element_year, raise_exception):
-    return person.is_central_manager or EventPermEducationGroupEdition(
-        obj=group_element_year.parent,
-        raise_exception=raise_exception
-    ).is_open()
+def is_eligible_to_update_group_element_year_content(person, group_element_year, raise_exception):
+    result = person.user.has_perm('base.change_educationgroupcontent') and \
+                person.user.has_perm('base.change_educationgroup', group_element_year.parent)
+    can_raise_exception(raise_exception, result, _("The user is not allowed to change education group content."))
+    return result
 
 
 def _can_user_update_education_group_year_child(person, egy_child, raise_exception):

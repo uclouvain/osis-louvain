@@ -114,16 +114,9 @@ def can_user_edit_administrative_data(a_user, an_education_group_year, raise_exc
     if isinstance(a_user, Person):
         person = a_user
         a_user = person.user
-    else:
-        person = Person.objects.get(user=a_user)
 
-    if not perms.check_permission(person, "base.can_edit_education_group_administrative_data", raise_exception):
-        return False
-
-    if person.is_central_manager and _is_management_entity_linked_to_user(person, an_education_group_year):
-        return True
-
-    return is_program_manager(a_user, education_group=an_education_group_year.education_group)
+    return a_user.has_perm("base.can_edit_education_group_administrative_data", an_education_group_year) or \
+        is_program_manager(a_user, education_group=an_education_group_year.education_group)
 
 
 def _is_management_entity_linked_to_user(person, an_education_group_year):

@@ -49,8 +49,8 @@ from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group import FacultyManagerGroupFactory
-from base.tests.factories.person import CentralManagerFactory
-from base.tests.factories.person import FacultyManagerFactory
+from base.tests.factories.person import CentralManagerForUEFactory
+from base.tests.factories.person import FacultyManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.views.learning_units.proposal.create import get_proposal_learning_unit_creation_form
 from reference.tests.factories.language import LanguageFactory
@@ -63,12 +63,12 @@ class LearningUnitViewTestCase(TestCase):
         today = datetime.date.today()
         FacultyManagerGroupFactory()
         cls.faculty_user = factory_user.UserFactory()
-        cls.faculty_person = FacultyManagerFactory(
+        cls.faculty_person = FacultyManagerForUEFactory(
             'can_propose_learningunit', 'can_create_learningunit',
             user=cls.faculty_user
         )
         cls.super_user = factory_user.SuperUserFactory()
-        cls.person = factory_person.CentralManagerFactory(user=cls.super_user)
+        cls.person = factory_person.CentralManagerForUEFactory(user=cls.super_user)
         start_year = AcademicYearFactory(year=get_current_year())
         end_year = AcademicYearFactory(year=get_current_year() + 7)
         cls.academic_years = GenerateAcademicYear(start_year, end_year).academic_years
@@ -133,7 +133,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertIsInstance(response.context['form_proposal'], ProposalLearningUnitForm)
 
     def test_get_proposal_learning_unit_creation_form_with_central_user(self):
-        central_manager_person = CentralManagerFactory()
+        central_manager_person = CentralManagerForUEFactory()
         central_manager_person.user.user_permissions.add(Permission.objects.get(codename='can_propose_learningunit'))
         central_manager_person.user.user_permissions.add(Permission.objects.get(codename='can_create_learningunit'))
         self.client.force_login(central_manager_person.user)
