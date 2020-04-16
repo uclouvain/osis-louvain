@@ -27,45 +27,51 @@ from django.conf import settings
 from rest_framework import serializers
 
 from base.models.education_group_type import EducationGroupType
-from base.models.education_group_year import EducationGroupYear
 from base.models.prerequisite import Prerequisite
 from education_group.api.serializers.training import TrainingHyperlinkedIdentityField
-from education_group.api.serializers.utils import TrainingHyperlinkedRelatedField
+from education_group.api.serializers.utils import LearningUnitPrerequisiteHyperlinkedRelatedField
+from program_management.models.education_group_version import EducationGroupVersion
 
 
 class EducationGroupRootsTitleSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
 
     class Meta:
-        model = EducationGroupYear
+        model = EducationGroupVersion
         fields = (
             'title',
         )
 
-    def get_title(self, education_group_year):
+    def get_title(self, version):
         language = self.context['language']
         return getattr(
-            education_group_year,
+            version.offer,
             'title' + ('_english' if language not in settings.LANGUAGE_CODE_FR else '')
         )
 
 
 class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, serializers.HyperlinkedModelSerializer):
     url = TrainingHyperlinkedIdentityField(read_only=True)
-    academic_year = serializers.IntegerField(source='academic_year.year')
+    acronym = serializers.CharField(source='offer.acronym', read_only=True)
+    academic_year = serializers.IntegerField(source='offer.academic_year.year')
     education_group_type = serializers.SlugRelatedField(
+        source='offer.education_group_type',
         slug_field='name',
         queryset=EducationGroupType.objects.all(),
     )
-    code = serializers.CharField(source='partial_acronym', read_only=True)
+    code = serializers.CharField(source='root_group.partial_acronym', read_only=True)
+    decree_category = serializers.CharField(source='offer.decree_category', read_only=True)
+    duration_unit = serializers.CharField(source='offer.duration_unit', read_only=True)
+    credits = serializers.IntegerField(source='root_group.credits', read_only=True)
+    duration = serializers.IntegerField(source='offer.duration', read_only=True)
 
     # Display human readable value
-    education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
-    decree_category_text = serializers.CharField(source='get_decree_category_display', read_only=True)
-    duration_unit_text = serializers.CharField(source='get_duration_unit_display', read_only=True)
+    education_group_type_text = serializers.CharField(source='offer.education_group_type.get_name_display', read_only=True)
+    decree_category_text = serializers.CharField(source='offer.get_decree_category_display', read_only=True)
+    duration_unit_text = serializers.CharField(source='offer.get_duration_unit_display', read_only=True)
 
     class Meta:
-        model = EducationGroupYear
+        model = EducationGroupVersion
         fields = EducationGroupRootsTitleSerializer.Meta.fields + (
             'url',
             'acronym',
@@ -83,10 +89,14 @@ class EducationGroupRootsListSerializer(EducationGroupRootsTitleSerializer, seri
 
 
 class LearningUnitYearPrerequisitesListSerializer(serializers.ModelSerializer):
-    url = TrainingHyperlinkedRelatedField(source='education_group_year', lookup_field='acronym', read_only=True)
+    # TODO: Use URL for Version
+    url = LearningUnitPrerequisiteHyperlinkedRelatedField(
+        source='education_group_year',
+        lookup_field='acronym', read_only=True
+    )
 
     acronym = serializers.CharField(source='education_group_year.acronym')
-    code = serializers.CharField(source='education_group_year.partial_acronym')
+    code = serializers.CharField(source='education_group_year.partial_acronym')  # TODO: Get from GroupYear
     academic_year = serializers.IntegerField(source='education_group_year.academic_year.year')
     education_group_type = serializers.SlugRelatedField(
         source='education_group_year.education_group_type',

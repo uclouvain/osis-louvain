@@ -33,8 +33,9 @@ class TrainingGetUrlMixin:
 
     def get_url(self, obj, view_name, request, format):
         url_kwargs = {
-            'acronym': obj.acronym,
-            'year': obj.academic_year.year
+            'acronym': obj.offer.acronym,
+            'year': obj.offer.academic_year.year,
+            'version_name': obj.version_name
         }
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
@@ -47,14 +48,36 @@ class TrainingHyperlinkedRelatedField(TrainingGetUrlMixin, serializers.Hyperlink
     pass
 
 
+class LearningUnitPrerequisiteGetUrlMixin:
+    def __init__(self, **kwargs):
+        super().__init__(view_name='education_group_api_v1:training_read', **kwargs)
+
+    def get_url(self, obj, view_name, request, format):
+        url_kwargs = {
+            'acronym': obj.acronym,
+            'year': obj.academic_year.year,
+            'version_name': ''
+        }
+        return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
+
+
+class LearningUnitPrerequisiteHyperlinkedIdentityField(LearningUnitPrerequisiteGetUrlMixin, serializers.HyperlinkedIdentityField):
+    pass
+
+
+class LearningUnitPrerequisiteHyperlinkedRelatedField(LearningUnitPrerequisiteGetUrlMixin, serializers.HyperlinkedRelatedField):
+    pass
+
+
 class MiniTrainingGetUrlMixin:
     def __init__(self, **kwargs):
         super().__init__(view_name='education_group_api_v1:mini_training_read', **kwargs)
 
     def get_url(self, obj, view_name, request, format):
         url_kwargs = {
-            'partial_acronym': obj.partial_acronym,
-            'year': obj.academic_year.year
+            'partial_acronym': obj.root_group.partial_acronym,
+            'year': obj.offer.academic_year.year,
+            'version_name': obj.version_name
         }
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 

@@ -48,7 +48,7 @@ class GroupDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
             ).select_related(
                 'education_group_type',
                 'academic_year',
-                'main_teaching_campus',
+                # 'main_teaching_campus',
             ).prefetch_related(
                 'management_entity__entityversion_set',
             ),
@@ -69,9 +69,7 @@ class GroupTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
         acronym = self.kwargs['partial_acronym']
         year = self.kwargs['year']
         egy = get_object_or_404(
-            GroupYear.objects.all().select_related(
-                'academic_year',
-            ),
+            GroupYear.objects.all().select_related('academic_year'),
             partial_acronym__iexact=acronym,
             academic_year__year=year
         )

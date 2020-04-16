@@ -27,7 +27,6 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from base.api.serializers.campus import CampusDetailSerializer
 from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
@@ -64,7 +63,8 @@ class GroupDetailSerializer(GroupTitleSerializer, serializers.ModelSerializer):
     management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
     management_faculty = serializers.SerializerMethodField()
     remark = serializers.SerializerMethodField()
-    campus = CampusDetailSerializer(source='main_teaching_campus', read_only=True)
+    # TODO: Field to add into model
+    # campus = CampusDetailSerializer(source='main_teaching_campus', read_only=True)
 
     # Display human readable value
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
@@ -86,14 +86,14 @@ class GroupDetailSerializer(GroupTitleSerializer, serializers.ModelSerializer):
             'constraint_type',
             'constraint_type_text',
             'remark',
-            'campus',
+            # 'campus',
         )
 
     def get_remark(self, education_group_year):
         language = self.context.get('language')
         return getattr(
             education_group_year,
-            'remark' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
+            'remark_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
         )
 
     @staticmethod
