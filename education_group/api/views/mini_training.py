@@ -47,8 +47,8 @@ class MiniTrainingFilter(filters.FilterSet):
     )
     version_type = filters.CharFilter(method='filter_version_type')
     acronym = filters.CharFilter(field_name="offer__acronym")
-    title = filters.CharFilter(field_name="offer__title")
-    title_english = filters.CharFilter(field_name="offer__title_english")
+    title = filters.CharFilter(field_name="root_group__title_fr")
+    title_english = filters.CharFilter(field_name="root_group__title_en")
 
     order_by_field = 'ordering'
     ordering = OrderingFilterWithDefault(
@@ -56,7 +56,7 @@ class MiniTrainingFilter(filters.FilterSet):
             ('offer__acronym', 'acronym'),
             ('root_group__partial_acronym', 'code'),
             ('offer__academic_year__year', 'academic_year'),
-            ('offer__title', 'title'),
+            ('root_group__title_fr', 'title'),
         ),
         default_ordering=('-offer__academic_year__year', 'offer__acronym',)
     )
@@ -95,8 +95,8 @@ class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     search_fields = (
         'offer__acronym',
         'root_group__partial_acronym',
-        'offer__title',
-        'offer__title_english',
+        'root_group__title_fr',
+        'root_group__title_en',
     )
 
 
@@ -116,7 +116,7 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
             ).select_related(
                 'offer__education_group_type',
                 'offer__academic_year',
-                'offer__main_teaching_campus',
+                'root_group__main_teaching_campus',
                 'root_group'
             ).prefetch_related(
                 'offer__management_entity__entityversion_set',

@@ -42,8 +42,8 @@ class TrainingFilter(filters.FilterSet):
     version_type = filters.CharFilter(method='filter_version_type')
     acronym = filters.CharFilter(field_name="offer__acronym")
     partial_acronym = filters.CharFilter(field_name="root_group__partial_acronym")
-    title = filters.CharFilter(field_name="offer__title")
-    title_english = filters.CharFilter(field_name="offer__title_english")
+    title = filters.CharFilter(field_name="root_group__title")
+    title_english = filters.CharFilter(field_name="root_group__title_en")
 
     class Meta:
         model = EducationGroupVersion
@@ -75,14 +75,14 @@ class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
     search_fields = (
         'offer__acronym',
         'root_group__partial_acronym',
-        'offer__title',
-        'offer__title_english',
+        'root_group__title_fr',
+        'root_group__title_en',
     )
     ordering_fields = (
         'offer__acronym',
         'root_group__partial_acronym',
-        'offer__title',
-        'offer__title_english',
+        'root_group__title_fr',
+        'root_group__title_en',
     )
     ordering = (
         '-offer__academic_year__year',
@@ -109,7 +109,7 @@ class TrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
             ).select_related(
                 'offer__education_group_type',
                 'offer__academic_year',
-                'offer__main_teaching_campus',
+                'root_group__main_teaching_campus',
                 'offer__enrollment_campus',
                 'offer__primary_language',
             ).prefetch_related(

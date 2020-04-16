@@ -81,8 +81,8 @@ class MiniTrainingListSerializer(EducationGroupTitleSerializer, serializers.Mode
 
 class MiniTrainingDetailSerializer(MiniTrainingListSerializer):
     remark = serializers.SerializerMethodField()
-    campus = CampusDetailSerializer(source='offer.main_teaching_campus', read_only=True)
-    active = serializers.CharField(source='offer.active', read_only=True)
+    campus = CampusDetailSerializer(source='root_group.main_teaching_campus', read_only=True)
+    active = serializers.CharField(source='root_group.active', read_only=True)
     schedule_type = serializers.CharField(source='offer.schedule_type', read_only=True)
     keywords = serializers.CharField(source='offer.keywords', read_only=True)
     credits = serializers.IntegerField(source='root_group.credits', read_only=True)
