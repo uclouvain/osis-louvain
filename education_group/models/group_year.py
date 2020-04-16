@@ -26,7 +26,6 @@
 
 from django.core.validators import MinValueValidator
 from django.db import models
-from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
@@ -52,7 +51,6 @@ class GroupYearAdmin(VersionAdmin, OsisModelAdmin):
 
 
 class GroupYear(models.Model):
-
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
@@ -170,9 +168,3 @@ class GroupYear(models.Model):
             )
 
         super().save(*args, **kwargs)
-
-    @cached_property
-    def management_entity_version(self):
-        return entity_version.find_entity_version_according_academic_year(
-            self.management_entity, self.academic_year
-        )
