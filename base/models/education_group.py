@@ -105,7 +105,9 @@ class EducationGroup(SerializableModel):
 
     class Meta:
         permissions = (
-            ("can_access_education_group", "Can access education_group"),
+            ("add_training", "Can add training"),
+            ("add_minitraining", "Can add mini-training"),
+            ("add_group", "Can add group"),
             ("change_commonpedagogyinformation", "Can change common pedagogy information"),
             ("change_pedagogyinformation", "Can change pedagogy information"),
             ("change_educationgroupcontent", "Can change education group content"),

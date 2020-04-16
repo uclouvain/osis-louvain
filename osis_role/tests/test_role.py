@@ -41,7 +41,7 @@ class TestOsisRoleManager(SimpleTestCase):
         with self.assertRaises(ImproperlyConfigured):
             self.manager.register(SimpleNamespace)
 
-    def test_register_case_subclass_of_role_model(self):
+    def test_register_case_subclass_of_role_model(self, ):
         subclass = mock.Mock(spec=models.RoleModel)
         type(subclass.__class__).group_name = mock.PropertyMock(return_value='role_model_subclass')
 

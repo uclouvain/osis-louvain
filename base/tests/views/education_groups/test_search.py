@@ -64,7 +64,7 @@ class TestEducationGroupSearchView(TestCase):
     def setUpTestData(cls):
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse(EDUCATION_GROUPS_URL)
 
     def setUp(self):
@@ -170,7 +170,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         cls.envi_entity_v = EntityVersionFactory(entity=envi_entity, end_date=None)
 
         cls.user = PersonFactory().user
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.form_class = EducationGroupFilter()._meta.form
         cls.url = reverse(EDUCATION_GROUPS_URL)
 
@@ -181,9 +181,7 @@ class TestEducationGroupDataSearchFilter(TestCase):
         self.locmem_cache.clear()
         self.patch = mock.patch.object(utils.cache, 'cache', self.locmem_cache)
         self.patch.start()
-
-    def tearDown(self):
-        self.patch.stop()
+        self.addCleanup(self.patch.stop)
 
     def test_get_request(self):
         response = self.client.get(self.url, data={})
@@ -472,7 +470,7 @@ class TestExcelGeneration(TestRenderToExcelMixin, TestCase):
             ("xls_administrative", "base.views.education_groups.search.create_xls_administrative_data"),
         )
 
-        cls.person = PersonWithPermissionsFactory("can_access_education_group")
+        cls.person = PersonWithPermissionsFactory("view_educationgroup")
 
     def setUp(self):
         self.client.force_login(self.person.user)

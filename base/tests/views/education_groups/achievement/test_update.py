@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase
@@ -31,16 +30,17 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
-from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from base.views.education_groups.achievement.detail import CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
 class TestEducationGroupAchievementActionUpdateDelete(TestCase):
@@ -52,17 +52,11 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
         cls.achievement_1 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
         cls.achievement_2 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
 
-        cls.user = UserFactory()
-        cls.person = PersonWithPermissionsFactory(
-            'can_access_education_group',
-            'change_educationgroupachievement',
-            'delete_educationgroupachievement',
-            user=cls.user
-        )
-        PersonEntityFactory(person=cls.person, entity=cls.education_group_year.management_entity)
+        cls.person = PersonFactory()
+        CentralManagerFactory(person=cls.person, entity=cls.education_group_year.management_entity)
 
     def setUp(self):
-        self.client.force_login(self.user)
+        self.client.force_login(self.person.user)
 
     def test_form_valid_up(self):
         response = self.client.post(
@@ -126,8 +120,8 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
         self.achievement_2.refresh_from_db()
         self.assertEqual(self.achievement_2.code_name, code)
 
-    def test_permission_denied(self):
-        self.user.user_permissions.remove(Permission.objects.get(codename="change_educationgroupachievement"))
+    def test_update_case_user_without_permissions(self):
+        self.client.force_login(user=UserFactory())
         code = "The life is like a box of chocolates"
         response = self.client.post(
             reverse(
@@ -156,8 +150,8 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
         with self.assertRaises(ObjectDoesNotExist):
             self.achievement_0.refresh_from_db()
 
-    def test_permission_denied(self):
-        self.user.user_permissions.remove(Permission.objects.get(codename="delete_educationgroupachievement"))
+    def test_delete_case_user_without_permissions(self):
+        self.client.force_login(user=UserFactory())
         response = self.client.post(
             reverse(
                 "delete_education_group_achievement",
@@ -167,19 +161,16 @@ class TestEducationGroupAchievementActionUpdateDelete(TestCase):
                     self.achievement_2.pk,
                 ]), data={}
         )
-
         self.assertEqual(response.status_code, 403)
 
 
 class TestEducationGroupAchievementCMSSetup(TestCase):
     def setUp(self):
-        self.user = UserFactory()
-        self.person = PersonFactory(user=self.user)
-        self.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
-        self.user.user_permissions.add(Permission.objects.get(codename="change_educationgroupachievement"))
-        self.education_group_year = EducationGroupYearFactory()
-        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
-        self.client.force_login(self.user)
+        self.person = PersonFactory()
+        self.academic_year = AcademicYearFactory(current=True)
+        self.education_group_year = EducationGroupYearFactory(academic_year=self.academic_year)
+        CentralManagerFactory(person=self.person, entity=self.education_group_year.management_entity)
+        self.client.force_login(self.person.user)
 
 
 class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementCMSSetup):
@@ -225,7 +216,7 @@ class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementC
         ).exists())
 
     def test_update_without_permission(self):
-        self.user.user_permissions.remove(Permission.objects.get(codename="change_educationgroupachievement"))
+        self.client.force_login(user=UserFactory())
         response = self.client.post(self.url, data={'french_text': 'Evil hacker'})
         self.assertEqual(response.status_code, 403)
 
@@ -280,7 +271,7 @@ class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupA
         ).exists())
 
     def test_update_without_permission(self):
-        self.user.user_permissions.remove(Permission.objects.get(codename="change_educationgroupachievement"))
+        self.client.force_login(user=UserFactory())
         response = self.client.post(self.url, data={'french_text': 'Evil hacker'})
         self.assertEqual(response.status_code, 403)
 

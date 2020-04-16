@@ -41,7 +41,7 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.person_entity import PersonEntity
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFullFactory
-from base.tests.factories.person import FacultyManagerFactory, PersonFactory
+from base.tests.factories.person import FacultyManagerForUEFactory, PersonFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.functionals.test_education_group import LoginPage
 from base.tests.factories.person import PersonWithPermissionsFactory
@@ -57,7 +57,7 @@ def step_impl(context: Context):
 
 @step("L'utilisateur est loggé en tant que gestionnaire facultaire ou central")
 def step_impl(context: Context):
-    context.user = FacultyManagerFactory(
+    context.user = FacultyManagerForUEFactory(
         user__username="usual_suspect",
         user__first_name="Keyser",
         user__last_name="Söze",

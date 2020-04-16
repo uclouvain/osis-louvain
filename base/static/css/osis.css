@@ -535,3 +535,8 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
     vertical-align: middle;
     margin-left: 5px;
 }
+
+.dropdown-menu > li > a.disabled {
+    color: #777;
+    cursor: not-allowed;
+}

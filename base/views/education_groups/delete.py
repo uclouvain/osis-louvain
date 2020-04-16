@@ -26,25 +26,22 @@
 from django.http import JsonResponse
 from django.urls import reverse_lazy
 from django.utils.translation import gettext_lazy as _
+from osis_role.contrib.views import PermissionRequiredMixin
 
 from base.business.education_groups import delete
-from base.business.education_groups.perms import can_delete_all_education_group
 from base.models.education_group import EducationGroup
 from base.views import common
 from base.views.mixins import DeleteViewWithDependencies
 
 
-class DeleteGroupEducationView(DeleteViewWithDependencies):
+class DeleteGroupEducationView(PermissionRequiredMixin, DeleteViewWithDependencies):
     # DeleteView
     model = EducationGroup
     success_url = reverse_lazy('education_groups')
     pk_url_kwarg = "education_group_year_id"
     template_name = "education_group/delete.html"
     context_object_name = "education_group"
-
-    # RulesRequiredMixin
-    raise_exception = True
-    rules = [can_delete_all_education_group]
+    permission_required = 'base.delete_all_educationgroup'
 
     # DeleteViewWithDependencies
     success_message = _("The education group has been deleted.")

@@ -35,6 +35,8 @@ from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 
 
 class TestEventPermEducationGroupEditionPerms(TestCase):
@@ -106,13 +108,13 @@ class TestEventPermPropositionsCreationEndDate(TestCase):
         self.assertFalse(event_perm.is_open())
 
     def test_event_perm_creation_end_date_proposal_central_manager(self):
-        person = person_factory.CentralManagerFactory()
-        event_perm = event_perms.generate_event_perm_creation_end_date_proposal(person)
+        central_manager = CentralManagerFactory()
+        event_perm = event_perms.generate_event_perm_creation_end_date_proposal(central_manager.person)
         self.assertTrue(event_perm.is_open())
 
     def test_event_perm_creation_end_date_proposal_faculty_manager(self):
-        person = person_factory.FacultyManagerFactory()
-        event_perm = event_perms.generate_event_perm_creation_end_date_proposal(person)
+        faculty_manager = FacultyManagerFactory()
+        event_perm = event_perms.generate_event_perm_creation_end_date_proposal(faculty_manager.person)
         self.assertTrue(event_perm.is_open())
 
 
@@ -135,13 +137,13 @@ class TestEventPermPropositionsModificationTransformation(TestCase):
         self.assertFalse(event_perm.is_open())
 
     def test_event_perm_modification_transformation_proposal_central_manager(self):
-        person = person_factory.CentralManagerFactory()
-        event_perm = event_perms.generate_event_perm_modification_transformation_proposal(person)
+        central_manager = CentralManagerFactory()
+        event_perm = event_perms.generate_event_perm_modification_transformation_proposal(central_manager.person)
         self.assertTrue(event_perm.is_open())
 
     def test_event_perm_modification_transformation_proposal_faculty_manager(self):
-        person = person_factory.FacultyManagerFactory()
-        event_perm = event_perms.generate_event_perm_modification_transformation_proposal(person)
+        faculty_manager = FacultyManagerFactory()
+        event_perm = event_perms.generate_event_perm_modification_transformation_proposal(faculty_manager.person)
         self.assertTrue(event_perm.is_open())
 
 
@@ -164,11 +166,11 @@ class TestEventPermLearningUnitEdition(TestCase):
         self.assertFalse(event_perm.is_open())
 
     def test_event_perm_modification_transformation_proposal_central_manager(self):
-        person = person_factory.CentralManagerFactory()
-        event_perm = event_perms.generate_event_perm_learning_unit_edition(person)
+        central_manager = CentralManagerFactory()
+        event_perm = event_perms.generate_event_perm_learning_unit_edition(central_manager.person)
         self.assertTrue(event_perm.is_open())
 
     def test_event_perm_modification_transformation_proposal_faculty_manager(self):
-        person = person_factory.FacultyManagerFactory()
-        event_perm = event_perms.generate_event_perm_learning_unit_edition(person)
+        faculty_manager = FacultyManagerFactory()
+        event_perm = event_perms.generate_event_perm_learning_unit_edition(faculty_manager.person)
         self.assertTrue(event_perm.is_open())
