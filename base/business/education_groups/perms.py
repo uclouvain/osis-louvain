@@ -40,7 +40,7 @@ ERRORS_MSG = {
 
 
 def is_eligible_to_add_education_group_year_version(person, education_group, raise_exception=False):
-    return _is_eligible_to_add_education_group_year_version(person, education_group, raise_exception=raise_exception)
+    return _is_eligible_to_add_specific_version(person, education_group, raise_exception=raise_exception)
 
 
 def _is_eligible_to_add_specific_version(person, education_group, raise_exception=False):

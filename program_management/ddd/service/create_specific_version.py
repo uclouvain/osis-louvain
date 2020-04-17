@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from education_group.models.group_year import GroupYear
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 
@@ -43,6 +44,15 @@ def create_specific_version(data, education_group_year):
     )
     new_groupyear = version_standard.root_group
     new_groupyear.pk = None
+    new_partial_acronym = new_groupyear.partial_acronym
+    counter = 1
+    while GroupYear.objects.get(
+            partial_acronym=new_partial_acronym,
+            academic_year=education_group_year.academic_year).exist():
+        incrementation = str(int(new_groupyear.partial_acronym[-4:][:-1])+counter)
+        new_partial_acronym = new_partial_acronym[:-4]+incrementation+new_partial_acronym[-1:]
+        counter += 1
+    new_groupyear.partial_acronym = new_partial_acronym
     new_groupyear.save()
     new_element = Element(group_year=new_groupyear)
     new_element.save()
