@@ -48,7 +48,7 @@ class GroupDetail(LanguageContextSerializerMixin, generics.RetrieveAPIView):
             ).select_related(
                 'education_group_type',
                 'academic_year',
-                # 'main_teaching_campus',
+                'main_teaching_campus',
             ).prefetch_related(
                 'management_entity__entityversion_set',
             ),
