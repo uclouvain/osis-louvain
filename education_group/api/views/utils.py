@@ -38,8 +38,8 @@ class VersionTypeEnum(ChoiceEnum):
 def filter_version_type(queryset, value):
     if value not in VersionTypeEnum.get_values():
         raise Http404
-    elif value == 'transition':
+    elif value == VersionTypeEnum.TRANSITION.value:
         return queryset.filter(is_transition=True)
-    elif value == 'special':
+    elif value == VersionTypeEnum.SPECIAL.value:
         return queryset.exclude(version_name='')
     return queryset
