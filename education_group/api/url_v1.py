@@ -25,6 +25,7 @@
 ##############################################################################
 from django.conf.urls import url, include
 
+from education_group.api.views.education_group_version import TrainingVersionList
 from education_group.api.views.group import GroupDetail, GroupTitle
 from education_group.api.views.group_element_year import TrainingTreeView, MiniTrainingTreeView, GroupTreeView
 from education_group.api.views.mini_training import MiniTrainingDetail, MiniTrainingTitle, MiniTrainingList
@@ -47,6 +48,7 @@ urlpatterns = [
     url(r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/| ]?[a-zA-Z]{1,2})?)/', include([
         url(r'^tree$', TrainingTreeView.as_view(), name=TrainingTreeView.name),
         url(r'^title$', TrainingTitle.as_view(), name=TrainingTitle.name),
+        url(r'^versions$', TrainingVersionList.as_view(), name=TrainingVersionList.name)
     ])),
 
     url(r'^mini_trainings$', MiniTrainingList.as_view(), name=MiniTrainingList.name),
