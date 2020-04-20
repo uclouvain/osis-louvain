@@ -96,7 +96,11 @@ class MiniTrainingVersionListTestCase(APITestCase):
             group__start_year=cls.academic_year
         )
         cls.versions.append(StandardEducationGroupVersionFactory(offer=cls.offer, root_group=group))
-        group_transition = GroupYearFactory(academic_year=cls.academic_year, partial_acronym=cls.partial_acronym)
+        group_transition = GroupYearFactory(
+            academic_year=cls.academic_year,
+            partial_acronym=cls.partial_acronym,
+            group__start_year=cls.academic_year
+        )
         cls.versions.append(
             StandardTransitionEducationGroupVersionFactory(offer=cls.offer, root_group=group_transition)
         )
