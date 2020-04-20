@@ -75,6 +75,8 @@ class MiniTrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIVi
         group_year = get_object_or_404(
             GroupYear.objects.all().select_related('educationgroupversion__offer'),
             partial_acronym=self.kwargs['partial_acronym'].upper(),
-            academic_year__year=self.kwargs['year']
+            academic_year__year=self.kwargs['year'],
+            educationgroupversion__version_name='',
+            educationgroupversion__is_transition=False
         )
         return EducationGroupVersion.objects.filter(offer=group_year.educationgroupversion.offer)
