@@ -35,6 +35,7 @@ from base.business import entity_version as entity_version_business
 from base.models import entity as entity_model, entity_version as entity_version, person_address, \
     session_exam_calendar, \
     offer_year_entity
+from base.models.entity_version import EntityVersion
 from base.models.enums import exam_enrollment_state as enrollment_states
 from base.models.enums.person_address_type import PersonAddressType
 from base.models.exam_enrollment import justification_label_authorized, get_deadline
@@ -87,7 +88,7 @@ def get_map_entity_with_offer_year_entity_type(off_year):
 
 
 def save_address_from_entity(off_year, entity_version_id_selected, email):
-    entity_id = entity_version.find_by_id(entity_version_id_selected).entity_id
+    entity_id = EntityVersion.objects.get(pk=entity_version_id_selected).entity_id
     entity_id_mapped_with_type = get_map_entity_with_offer_year_entity_type(off_year)
     entity_address_choice = entity_id_mapped_with_type.get(entity_id)
     new_address = score_sheet_address.ScoreSheetAddress(offer_year=off_year,

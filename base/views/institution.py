@@ -103,7 +103,7 @@ def entity_read(request, entity_version_id):
 
 @login_required
 def entities_version(request, entity_version_id):
-    entity_version = mdl.entity_version.find_by_id(entity_version_id)
+    entity_version = EntityVersion.objects.get(pk=entity_version_id)
     entity_parent = entity_version.get_parent_version()
     entities_version = mdl.entity_version.search(entity=entity_version.entity) \
                                          .order_by('-start_date')
@@ -112,7 +112,7 @@ def entities_version(request, entity_version_id):
 
 @login_required
 def entity_diagram(request, entity_version_id):
-    entity_version = mdl.entity_version.find_by_id(entity_version_id)
+    entity_version = EntityVersion.objects.get(pk=entity_version_id)
     entities_version_as_json = json.dumps(entity_version.get_organigram_data())
 
     return render(
@@ -126,7 +126,7 @@ def entity_diagram(request, entity_version_id):
 
 @login_required
 def get_entity_address(request, entity_version_id):
-    version = entity_version_mdl.find_by_id(entity_version_id)
+    version = EntityVersion.objects.get(pk=entity_version_id)
     entity = version.entity
     response = {
         'entity_version_exists_now': version.exists_now(),

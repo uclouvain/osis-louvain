@@ -169,17 +169,6 @@ class EntityVersionTest(TestCase):
                                                  datetime.date(2015, 12, 30)).fuzz()
             )
 
-    def test_find_entity_version(self):
-        search_date = factory.fuzzy.FuzzyDate(datetime.date(2015, 1, 1),
-                                              datetime.date(2015, 12, 30)).fuzz()
-        self.assertEqual(entity_version.find("ENTITY_V_0", search_date), self.entity_versions[0])
-        self.assertEqual(entity_version.find("ENTITY_V_1", search_date), self.entity_versions[1])
-        self.assertEqual(entity_version.find("NOT_EXISTING_ENTITY", search_date), None)
-        ev = entity_version.find_by_id(self.entity_versions[0].id)
-        self.assertEqual(ev, self.entity_versions[0])
-        self.assertEqual(str(ev), str(self.entity_versions[0]))
-        self.assertIsNone(entity_version.find_by_id(None))
-
     def test_search_matching_entity_version(self):
         self.assertCountEqual(
             entity_version.search(

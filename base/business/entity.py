@@ -24,12 +24,9 @@
 #
 ##############################################################################
 from django.db.models import Prefetch
-from django.utils import timezone
 
-from base.models import entity_calendar, entity_version
 from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
-from base.models.enums import academic_calendar_type
 from base.models.enums.entity_container_year_link_type import REQUIREMENT_ENTITY, ALLOCATION_ENTITY, \
     ADDITIONAL_REQUIREMENT_ENTITY_1, ADDITIONAL_REQUIREMENT_ENTITY_2
 
@@ -49,24 +46,6 @@ def get_entities_ids(entity_acronym, with_entity_subordinated):
 
         return list(entities_ids)
     return []
-
-
-def get_entity_calendar(an_entity_version, academic_yr):
-    entity_cal = entity_calendar.find_by_entity_and_reference(
-        an_entity_version.entity.id,
-        academic_calendar_type.SUMMARY_COURSE_SUBMISSION,
-        academic_yr
-    )
-
-    if entity_cal:
-        return entity_cal
-    else:
-        if an_entity_version.parent:
-            parent_entity_version = entity_version.find_latest_version_by_entity(an_entity_version.parent,
-                                                                                 timezone.now())
-            if parent_entity_version:
-                return get_entity_calendar(parent_entity_version, academic_yr)
-        return None
 
 
 def build_entity_container_prefetch(entity_container_year_link_type):
