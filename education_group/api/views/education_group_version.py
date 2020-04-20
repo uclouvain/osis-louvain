@@ -37,7 +37,7 @@ class TrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
        Return a list of all version of the training.
     """
-    name = 'versions_list'
+    name = 'training_versions_list'
     serializer_class = VersionListSerializer
     search_fields = (
         'is_transition',
@@ -57,7 +57,7 @@ class MiniTrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIVi
     """
        Return a list of all version of the mini training.
     """
-    name = 'versions_list'
+    name = 'minitraining_versions_list'
     serializer_class = VersionListSerializer
     search_fields = (
         'is_transition',
@@ -66,8 +66,10 @@ class MiniTrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIVi
 
     def get_queryset(self):
         group_year = get_object_or_404(
-            GroupYear.objects.all(),
+            GroupYear.objects.all().select_related('educationgroupversion__offer'),
             partial_acronym=self.kwargs['partial_acronym'].upper(),
-            academic_year__year=self.kwargs['year']
+            academic_year__year=self.kwargs['year'],
+            educationgroupversion__version_name='',
+            educationgroupversion__is_transition=False
         )
-        return EducationGroupVersion.objects.filter(root_group=group_year)
+        return EducationGroupVersion.objects.filter(offer=group_year.educationgroupversion.offer)
