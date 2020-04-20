@@ -39,7 +39,6 @@ from education_group.api.views.group_element_year import TrainingTreeView, Group
 from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.ddd.domain.link import Link
 from program_management.ddd.repositories import load_tree
 

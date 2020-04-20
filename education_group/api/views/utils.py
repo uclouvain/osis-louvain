@@ -23,30 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.conf import settings
-from django.test import TestCase
 
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from django.http import Http404
+
+from base.models.utils.utils import ChoiceEnum
 
 
-class EducationGroupTitleSerializerTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        academic_year = AcademicYearFactory()
-        cls.education_group_year = EducationGroupYearFactory(
-            academic_year=academic_year,
-        )
-        cls.version = EducationGroupVersionFactory(offer=cls.education_group_year)
-        cls.serializer = EducationGroupTitleSerializer(
-            cls.version,
-            context={'language': settings.LANGUAGE_CODE_EN}
-        )
+class VersionTypeEnum(ChoiceEnum):
+    STANDARD = "standard"
+    TRANSITION = "transition"
+    SPECIAL = "special"
 
-    def test_contains_expected_fields(self):
-        expected_fields = [
-            'title',
-        ]
-        self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
+
+def filter_version_type(queryset, value):
+    if value not in VersionTypeEnum.get_values():
+        raise Http404
+    elif value == VersionTypeEnum.TRANSITION.value:
+        return queryset.filter(is_transition=True)
+    elif value == VersionTypeEnum.SPECIAL.value:
+        return queryset.exclude(version_name='')
+    return queryset

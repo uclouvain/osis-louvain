@@ -30,7 +30,6 @@ from backoffice.settings.rest_framework.common_views import LanguageContextSeria
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.ddd.domain import link
 from program_management.ddd.repositories import load_tree
 
