@@ -30,7 +30,7 @@ from education_group.api.serializers.utils import TrainingHyperlinkedIdentityFie
 from program_management.models.education_group_version import EducationGroupVersion
 
 
-class TrainingVersionListSerializer(serializers.ModelSerializer):
+class VersionListSerializer(serializers.ModelSerializer):
     url = TrainingHyperlinkedIdentityField(read_only=True)
     code = serializers.CharField(source='root_group.partial_acronym', read_only=True)
 
