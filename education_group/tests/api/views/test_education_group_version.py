@@ -90,7 +90,11 @@ class MiniTrainingVersionListTestCase(APITestCase):
         cls.offer = TrainingFactory(academic_year=cls.academic_year)
         cls.versions = []
         cls.partial_acronym = 'LHIST100I'
-        group = GroupYearFactory(academic_year=cls.academic_year, partial_acronym=cls.partial_acronym)
+        group = GroupYearFactory(
+            academic_year=cls.academic_year,
+            partial_acronym=cls.partial_acronym,
+            group__start_year=cls.academic_year
+        )
         cls.versions.append(StandardEducationGroupVersionFactory(offer=cls.offer, root_group=group))
         group_transition = GroupYearFactory(academic_year=cls.academic_year, partial_acronym=cls.partial_acronym)
         cls.versions.append(

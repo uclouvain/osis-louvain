@@ -48,7 +48,6 @@ class TrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIView):
     serializer_class = VersionListSerializer
     filterset_class = VersionFilter
     search_fields = (
-        'is_transition',
         'version_name',
     )
 
@@ -69,7 +68,6 @@ class MiniTrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIVi
     serializer_class = VersionListSerializer
     filterset_class = VersionFilter
     search_fields = (
-        'is_transition',
         'version_name',
     )
 
@@ -77,8 +75,6 @@ class MiniTrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIVi
         group_year = get_object_or_404(
             GroupYear.objects.all().select_related('educationgroupversion__offer'),
             partial_acronym=self.kwargs['partial_acronym'].upper(),
-            academic_year__year=self.kwargs['year'],
-            educationgroupversion__version_name='',
-            educationgroupversion__is_transition=False
+            academic_year__year=self.kwargs['year']
         )
         return EducationGroupVersion.objects.filter(offer=group_year.educationgroupversion.offer)
