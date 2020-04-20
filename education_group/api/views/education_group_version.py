@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
@@ -33,12 +34,19 @@ from education_group.models.group_year import GroupYear
 from program_management.models.education_group_version import EducationGroupVersion
 
 
+class VersionFilter(filters.FilterSet):
+    class Meta:
+        model = EducationGroupVersion
+        fields = ['is_transition']
+
+
 class TrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIView):
     """
        Return a list of all version of the training.
     """
     name = 'training_versions_list'
     serializer_class = VersionListSerializer
+    filterset_class = VersionFilter
     search_fields = (
         'is_transition',
         'version_name',
@@ -59,6 +67,7 @@ class MiniTrainingVersionList(LanguageContextSerializerMixin, generics.ListAPIVi
     """
     name = 'minitraining_versions_list'
     serializer_class = VersionListSerializer
+    filterset_class = VersionFilter
     search_fields = (
         'is_transition',
         'version_name',

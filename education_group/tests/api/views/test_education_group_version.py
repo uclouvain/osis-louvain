@@ -36,6 +36,7 @@ from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_version import VersionListSerializer
 from education_group.api.views.education_group_version import TrainingVersionList, MiniTrainingVersionList
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
     StandardEducationGroupVersionFactory, StandardTransitionEducationGroupVersionFactory
 
@@ -125,3 +126,38 @@ class MiniTrainingVersionListTestCase(APITestCase):
             'language': settings.LANGUAGE_CODE_FR
         })
         self.assertCountEqual(response.data['results'], serializer.data)
+
+
+class FilterVersionTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = UserFactory()
+
+        cls.offer = TrainingFactory()
+        cls.versions = [
+            StandardTransitionEducationGroupVersionFactory(offer=cls.offer),
+            StandardEducationGroupVersionFactory(offer=cls.offer)
+        ]
+        cls.url = reverse('education_group_api_v1:' + TrainingVersionList.name, kwargs={
+            'year': cls.offer.academic_year.year,
+            'acronym': cls.offer.acronym
+        })
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_version_case_params_is_transition_false(self):
+        query_string = {'is_transition': 'false'}
+
+        response = self.client.get(self.url, data=query_string)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        trainings = EducationGroupVersion.objects.filter(is_transition=False)
+
+        serializer = VersionListSerializer(
+            trainings,
+            many=True,
+            context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertEqual(response.data['results'], serializer.data)
