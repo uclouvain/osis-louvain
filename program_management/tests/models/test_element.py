@@ -49,7 +49,7 @@ class TestElementSave(TestCase):
     def test_save_no_foreign_key_set(self):
         with self.assertRaisesMessage(
                 AttributeError,
-                _('At least an education group year, a group year, a learning unit year or a learning class year '
+                _('At least a group year, a learning unit year or a learning class year '
                   'has to be set')):
             element = ElementFactory()
             element.save()
@@ -88,8 +88,8 @@ class TestElementSave(TestCase):
 
         with self.assertRaisesMessage(
                 AttributeError,
-                _('Only one of the following has to be set : an education group year, a group year, '
-                  'a learning unit year or a learning class')):
+                _('Only one of the following has to be set : a group year, '
+                    'a learning unit year or a learning class')):
             element = ElementFactory(learning_class_year=self.lcy, group_year=self.gy)
             element.save()
 

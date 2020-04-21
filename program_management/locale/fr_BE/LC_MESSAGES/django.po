@@ -405,11 +405,11 @@ msgid "Online resources"
 msgstr "Ressources en ligne"
 
 msgid ""
-"Only one of the following has to be set : an education group year, a group "
+"Only one of the following has to be set : a group "
 "year, a learning unit year or a learning class"
 msgstr ""
-"Seulement une des clés étrangères doit être garnie (education group year, "
-"groupe year, learning unit year ou learning class year)"
+"Seulement une des clés étrangères doit être garnie ("
+"groupement, unité d'enseignement ou classe)"
 
 #, python-format
 msgid ""

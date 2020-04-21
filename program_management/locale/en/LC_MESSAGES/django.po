@@ -370,7 +370,7 @@ msgid "Online resources"
 msgstr ""
 
 msgid ""
-"Only one of the following has to be set : an education group year, a group "
+"Only one of the following has to be set : a group "
 "year, a learning unit year or a learning class"
 msgstr ""
 

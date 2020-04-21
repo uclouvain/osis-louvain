@@ -102,10 +102,10 @@ class Element(models.Model):
                                     self.learning_class_year,
                                     self.learning_unit_year])
 
-        if resulted_counter[None] < 3:
+        if resulted_counter[None] < 2:
             raise AttributeError(
                 _(
-                    'Only one of the following has to be set : an education group year, a group year, '
+                    'Only one of the following has to be set : a group year, '
                     'a learning unit year or a learning class')
             )
 
