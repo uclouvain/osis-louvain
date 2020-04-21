@@ -41,7 +41,7 @@ class TestElementSave(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-        academic_year = AcademicYearFactory.current(True)
+        academic_year = AcademicYearFactory(current=True)
         cls.luy = LearningUnitYearFactory(academic_year=academic_year)
         cls.lcy = LearningClassYearFactory()
         cls.gy = GroupYearFactory(academic_year=academic_year, group=GroupFactory(start_year=academic_year))
