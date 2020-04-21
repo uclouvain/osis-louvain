@@ -37,7 +37,6 @@ from program_management.models.enums.node_type import NodeType
 class ElementManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().select_related(
-            'education_group_year',
             'group_year',
             'learning_unit_year',
             'learning_class_year'
@@ -45,36 +44,38 @@ class ElementManager(models.Manager):
 
 
 class ElementAdmin(VersionAdmin, OsisModelAdmin):
-    list_display = ('education_group_year', 'group_year', 'learning_unit_year', 'learning_class_year')
-    search_fields = ('education_group_year__acronym',
-                     'group_year__acronym',
-                     'learning_unit_year__acronym',
-                     'learning_class_year__acronym')
+    list_display = ('group_year', 'learning_unit_year', 'learning_class_year')
+    search_fields = (
+        'group_year__acronym',
+        'learning_unit_year__acronym',
+        'learning_class_year__acronym',
+    )
 
 
 class Element(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
+    # TODO: Unused, remove after migration
     education_group_year = models.ForeignKey(
         'base.EducationGroupYear',
         blank=True, null=True,
         verbose_name=_('education group year'),
         on_delete=models.PROTECT
     )
-    group_year = models.ForeignKey(
+    group_year = models.OneToOneField(
         'education_group.GroupYear',
         blank=True, null=True,
         verbose_name=_('group year'),
         on_delete=models.PROTECT
     )
-    learning_unit_year = models.ForeignKey(
+    learning_unit_year = models.OneToOneField(
         'base.LearningUnitYear',
         blank=True, null=True,
         verbose_name=_('learning unit year'),
         on_delete=models.PROTECT,
     )
-    learning_class_year = models.ForeignKey(
+    learning_class_year = models.OneToOneField(
         'learning_unit.LearningClassYear',
         blank=True, null=True,
         verbose_name=_('learning class year'),
@@ -85,7 +86,6 @@ class Element(models.Model):
 
     def __str__(self):
         field = {
-            NodeType.EDUCATION_GROUP: self.education_group_year,
             NodeType.GROUP: self.group_year,
             NodeType.LEARNING_UNIT: self.learning_unit_year,
             NodeType.LEARNING_CLASS: self.learning_class_year,
@@ -93,14 +93,12 @@ class Element(models.Model):
         return str(field)
 
     def save(self, *args, **kwargs):
-
-        if not any([self.education_group_year, self.group_year, self.learning_class_year, self.learning_unit_year]):
+        if not any([self.group_year, self.learning_class_year, self.learning_unit_year]):
             raise AttributeError(
-                _('At least an education group year, a group year, a learning unit year or a learning class year has '
+                _('At least a group year, a learning unit year or a learning class year has '
                   'to be set')
             )
-        resulted_counter = Counter([self.education_group_year,
-                                    self.group_year,
+        resulted_counter = Counter([self.group_year,
                                     self.learning_class_year,
                                     self.learning_unit_year])
 
@@ -115,9 +113,7 @@ class Element(models.Model):
 
     @property
     def node_type(self):
-        if self.education_group_year:
-            return NodeType.EDUCATION_GROUP
-        elif self.group_year:
+        if self.group_year:
             return NodeType.GROUP
         elif self.learning_unit_year:
             return NodeType.LEARNING_UNIT

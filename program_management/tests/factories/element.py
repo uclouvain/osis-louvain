@@ -41,12 +41,12 @@ class ElementFactory(factory.DjangoModelFactory):
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
 
-    education_group_year = None
     group_year = None
     learning_unit_year = None
     learning_class_year = None
 
 
+# TODO: Remove after migration !!! Don't use anymore
 class ElementEducationGroupYearFactory(ElementFactory):
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
 
