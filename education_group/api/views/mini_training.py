@@ -110,6 +110,7 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
     def get_object(self):
         partial_acronym = self.kwargs['partial_acronym']
         year = self.kwargs['year']
+        version = self.kwargs.get('version_name', '')
         egv = get_object_or_404(
             EducationGroupVersion.objects.filter(
                 offer__education_group_type__category=education_group_categories.MINI_TRAINING
@@ -122,7 +123,8 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
                 'offer__management_entity__entityversion_set',
             ),
             root_group__partial_acronym__iexact=partial_acronym,
-            offer__academic_year__year=year
+            offer__academic_year__year=year,
+            version_name__iexact=version
         )
         return egv
 
