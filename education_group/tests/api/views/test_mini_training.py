@@ -40,7 +40,8 @@ from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer
 from education_group.api.views.mini_training import MiniTrainingList
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardEducationGroupVersionFactory
 
 
 class MiniTrainingTitleTestCase(APITestCase):
@@ -183,7 +184,7 @@ class GetMiniTrainingTestCase(APITestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.mini_training = MiniTrainingFactory(partial_acronym='LGENR100I', academic_year=cls.academic_year)
-        cls.version = EducationGroupVersionFactory(offer=cls.mini_training)
+        cls.version = StandardEducationGroupVersionFactory(offer=cls.mini_training)
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:mini_training_read', kwargs={
             'partial_acronym': cls.version.root_group.partial_acronym,
