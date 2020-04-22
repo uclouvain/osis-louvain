@@ -38,7 +38,7 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
-from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer
+from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
 from education_group.api.views.mini_training import MiniTrainingList
 
 
@@ -174,6 +174,21 @@ class MiniTrainingListTestCase(APITestCase):
         self.assertEqual(response.data['results'][0]['code'], self.mini_trainings[2].partial_acronym)
         self.assertEqual(response.data['results'][1]['code'], self.mini_trainings[1].partial_acronym)
         self.assertEqual(response.data['results'][2]['code'], self.mini_trainings[0].partial_acronym)
+
+    def test_get_training_case_filter_lowercase_acronym(self):
+        query_string = {'partial_acronym': self.mini_trainings[1].partial_acronym.lower()}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        serializer = MiniTrainingListSerializer(
+            self.mini_trainings[1],
+            context={
+                'request': RequestFactory().get(self.url, query_string),
+                'language': settings.LANGUAGE_CODE_FR
+            },
+        )
+        self.assertEqual(dict(response.data['results'][0]), serializer.data)
 
 
 class GetMiniTrainingTestCase(APITestCase):

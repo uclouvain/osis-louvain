@@ -238,6 +238,27 @@ class FilterTrainingTestCase(APITestCase):
         )
         self.assertEqual(response.data['results'], serializer.data)
 
+    def test_get_training_case_filter_lowercase_acronym(self):
+        query_string = {'acronym': 'agro1ba'}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        trainings = EducationGroupYear.objects.filter(
+            education_group_type__category=education_group_categories.TRAINING,
+            acronym__icontains='agro1ba'
+        ).order_by('-academic_year__year', 'acronym')
+
+        serializer = TrainingListSerializer(
+            trainings,
+            many=True,
+            context={
+                'request': RequestFactory().get(self.url, query_string),
+                'language': settings.LANGUAGE_CODE_EN
+            },
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
 
 class GetTrainingTestCase(APITestCase):
     @classmethod

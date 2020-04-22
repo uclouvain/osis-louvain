@@ -264,7 +264,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
         AcademicYearFactory.produce(number_past=3, number_future=10)
         cls.person = person_factory.CentralManagerForUEFactory("can_propose_learningunit", "can_access_learningunit")
         an_organization = OrganizationFactory(type=organization_type.MAIN)
-        cls.academic_years = AcademicYearFactory.produce_in_future(quantity=7)
+        cls.academic_years = AcademicYearFactory.produce_in_future(quantity=8)
         cls.current_academic_year = cls.academic_years[0]
         cls.next_academic_year = cls.academic_years[1]
         generate_creation_or_end_date_proposal_calendars(cls.academic_years)
@@ -272,7 +272,7 @@ class TestLearningUnitSuppressionProposal(TestCase):
         an_entity = EntityFactory(organization=an_organization)
         cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.FACULTY,
                                                   start_date=cls.current_academic_year.start_date,
-                                                  end_date=cls.current_academic_year.end_date)
+                                                  end_date=cls.academic_years[7].end_date)
         learning_container_year = LearningContainerYearFactory(
             academic_year=cls.current_academic_year,
             container_type=learning_container_year_types.COURSE,

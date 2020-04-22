@@ -31,7 +31,7 @@ from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
-from django.views.generic import UpdateView, DetailView
+from django.views.generic import UpdateView, DetailView, FormView
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
@@ -41,7 +41,6 @@ from base.models.person import Person
 from base.views.education_groups import perms
 from base.views.education_groups.detail import CatalogGenericDetailView
 from base.views.mixins import RulesRequiredMixin, FlagMixin, AjaxTemplateMixin
-from program_management.ddd.domain.node import NodeLearningUnitYear
 from program_management.ddd.repositories import load_tree
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers import program_tree_view
@@ -83,7 +82,7 @@ class GenericGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessMessage
 
 
 @method_decorator(login_required, name='dispatch')
-class LearningUnitGenericUpdateView(RulesRequiredMixin, SuccessMessageMixin, UpdateView):
+class LearningUnitGenericUpdateView(RulesRequiredMixin, SuccessMessageMixin, FormView):
     model = LearningUnitYear
     context_object_name = "learning_unit_year"
     pk_url_kwarg = 'learning_unit_year_id'
@@ -111,6 +110,7 @@ class LearningUnitGenericUpdateView(RulesRequiredMixin, SuccessMessageMixin, Upd
         serialized_data = program_tree_view.program_tree_view_serializer(self.program_tree)
 
         context['person'] = self.get_person()
+        context['learning_unit_year'] = LearningUnitYear.objects.get(id=self.kwargs["learning_unit_year_id"])
         context['root'] = root
         context['root_id'] = self.kwargs.get("root_id")
         context['parent'] = root

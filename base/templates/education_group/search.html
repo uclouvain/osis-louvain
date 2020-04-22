@@ -124,7 +124,7 @@
                             <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
                                 <li>
                                     <a id="btn_produce_xls"
-                                       class="no_spinner"
+                                       class="download"
                                        style="margin-right:10px;"
                                        title="{% trans 'Produce xls with a list of trainings' %}">
                                         &nbsp;{% trans 'List of trainings' %}
@@ -132,7 +132,7 @@
                                 </li>
                                 <li>
                                     <a id="btn_produce_xls_administrative_data"
-                                       class="no_spinner"
+                                       class="download"
                                        style="margin-right:10px;"
                                        title="{% trans 'Produce xls of trainings with administrative data' %}">
                                         &nbsp;{% trans 'List of trainings with administrative data' %}
@@ -141,7 +141,7 @@
                             </ul>
                             <form id="download_xls" action="{{ request.path }}" method="post">
                                 {% csrf_token %}
-                                <input type="hidden" id="xls_status" class="no_spinner" name="xls_status">
+                                <input type="hidden" id="xls_status" class="download" name="xls_status">
                             </form>
                             <div class="pull-right" style="margin-right: 10px">
                                 {% base_pagination_size_select %}

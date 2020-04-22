@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import inspect
+from unittest import mock
 
 from django.test import SimpleTestCase
 
@@ -32,7 +33,8 @@ from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.domain import node
 from program_management.ddd.domain.program_tree import ProgramTree
-from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList
+from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
+    UpdatePrerequisiteValidatorList
 from program_management.models.enums import node_type
 from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipFactory
 from program_management.tests.ddd.factories.link import LinkFactory
@@ -450,3 +452,19 @@ class TestGetLink(SimpleTestCase):
             result,
             self.link2
         )
+
+
+class TestSetPrerequisite(SimpleTestCase, ValidatorPatcherMixin):
+    def setUp(self):
+        self.tree = ProgramTreeFactory()
+        self.link1 = LinkFactory(parent=self.tree.root_node, child=NodeLearningUnitYearFactory())
+
+    def test_should_not_set_prerequisites_when_clean_is_not_valid(self):
+        self.mock_validator(UpdatePrerequisiteValidatorList, ["error_message_text"], level=MessageLevel.ERROR)
+        self.tree.set_prerequisite("LOSIS1452 OU MARC2589", self.link1.child)
+        self.assertFalse(self.link1.child.prerequisite)
+
+    def test_should_set_prerequisites_when_clean_is_valid(self):
+        self.mock_validator(UpdatePrerequisiteValidatorList, ["success_message_text"], level=MessageLevel.SUCCESS)
+        self.tree.set_prerequisite("LOSIS1452 OU MARC2589", self.link1.child)
+        self.assertTrue(self.link1.child.prerequisite)

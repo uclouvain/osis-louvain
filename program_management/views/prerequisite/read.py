@@ -25,18 +25,16 @@
 ##############################################################################
 
 from django.db.models import Prefetch
-from django.utils.translation import gettext_lazy as _
 
 import program_management.ddd.repositories.find_roots
 from base.business.education_groups import perms
-from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from base.models.prerequisite import Prerequisite
-from base.views.common import display_warning_messages
+from base.views.common import display_business_warning_messages
 from osis_common.utils.models import get_object_or_none
-from program_management.business.learning_units.prerequisite import \
-    get_prerequisite_acronyms_which_are_outside_of_education_group
+from program_management.ddd.validators._prerequisites_items import PrerequisiteItemsValidator
+from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import LearningUnitGenericDetailView
 
 
@@ -74,20 +72,13 @@ class LearningUnitPrerequisiteTraining(LearningUnitGenericDetailView):
         return super().render_to_response(context, **response_kwargs)
 
     def add_warning_messages(self, context):
-        root = context["root"]
-        prerequisite = context["prerequisite"]
         learning_unit_year = context["learning_unit_year"]
-        learning_unit_inconsistent = get_prerequisite_acronyms_which_are_outside_of_education_group(root, prerequisite)\
-            if prerequisite else []
-        if learning_unit_inconsistent:
-            display_warning_messages(
+        node_luy = self.program_tree.get_node_by_id_and_type(learning_unit_year.id, NodeType.LEARNING_UNIT)
+        validator = PrerequisiteItemsValidator(str(node_luy.prerequisite), node_luy, self.program_tree)
+        if not validator.is_valid():
+            display_business_warning_messages(
                 self.request,
-                _("The prerequisites %(prerequisites)s for the learning unit %(learning_unit)s "
-                  "are not inside the selected training %(root)s") % {
-                    "prerequisites": ", ".join(learning_unit_inconsistent),
-                    "learning_unit": learning_unit_year,
-                    "root": root,
-                }
+                validator.messages
             )
 
 

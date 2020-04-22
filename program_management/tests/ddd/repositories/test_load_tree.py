@@ -25,6 +25,7 @@
 ##############################################################################
 from django.test import TestCase
 
+from base.models.enums import prerequisite_operator
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -39,6 +40,7 @@ from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeEducationGroupYearFactory
 from program_management.tests.factories.element import ElementEducationGroupYearFactory
 from program_management.ddd.repositories import load_tree
+from django.utils.translation import gettext_lazy as _
 
 
 class TestLoadTree(TestCase):
@@ -109,7 +111,10 @@ class TestLoadTree(TestCase):
 
         self.assertIsInstance(leaf, node.NodeLearningUnitYear)
         self.assertIsInstance(leaf.prerequisite, prerequisite.Prerequisite)
-        expected_str = 'LDROI1200 AND (LAGRO1600 OR LBIR2300)'
+        expected_str = 'LDROI1200 {AND} (LAGRO1600 {OR} LBIR2300)'.format(
+            OR=_(prerequisite_operator.OR),
+            AND=_(prerequisite_operator.AND)
+        )
         self.assertEquals(str(leaf.prerequisite), expected_str)
         self.assertTrue(leaf.has_prerequisite)
 

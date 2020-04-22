@@ -34,6 +34,7 @@ from base.models.enums.quadrimesters import DerogationQuadrimester
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
 from program_management.ddd.domain.link import factory as link_factory
+from program_management.ddd.domain.prerequisite import NullPrerequisite
 from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
@@ -190,7 +191,7 @@ def __build_children(
         )
 
         if isinstance(child_node, node.NodeLearningUnitYear):
-            child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, [])
+            child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, NullPrerequisite())
             child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
 
         parent_id = child_structure['parent_id']

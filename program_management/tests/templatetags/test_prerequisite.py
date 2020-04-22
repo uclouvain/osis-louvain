@@ -108,6 +108,23 @@ class TestPrerequisiteHtmlDisplay(SimpleTestCase):
             )
         )
 
+    def test_should_not_have_title_value_when_no_links_have_prerequisite_value_as_children(self):
+        prerequisite_items_group_obj = prerequisite_domain.PrerequisiteItemGroup(
+            prerequisite_operator.OR,
+            [prerequisite_domain.PrerequisiteItem("OSIS5452", 2019)]
+        )
+        prerequisite_obj = prerequisite_domain.Prerequisite(
+            prerequisite_operator.AND,
+            [prerequisite_items_group_obj]
+
+        )
+
+        result = prerequisite_tags.prerequisite_as_html(prerequisite_obj, self.links)
+        self.assertEqual(
+            result,
+            "<a href='/learning_units/OSIS5452/2019' title=''>OSIS5452</a>"
+        )
+
 
 class TestIsPrerequisiteAsHtml(SimpleTestCase):
     def setUp(self) -> None:

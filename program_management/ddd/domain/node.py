@@ -328,6 +328,7 @@ class NodeLearningUnitYear(Node):
 
     def set_prerequisite(self, prerequisite: Prerequisite):
         self.prerequisite = prerequisite
+        self.prerequisite.has_changed = True
 
 
 class NodeLearningClassYear(Node):

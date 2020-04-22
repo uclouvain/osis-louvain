@@ -772,6 +772,16 @@ components:
           $ref: '#/components/schemas/NodeSubTypeEnum'
         partial_title:
           type: string
+        min_constraint:
+          type: integer
+          minimum: 1
+        max_constraint:
+          type: integer
+          minimum: 1
+        constraint_type:
+          $ref: '#/components/schemas/ConstraintTypeEnum'
+        remark:
+          type: string
         children:
           type: array
           items:

@@ -40,6 +40,8 @@ class MiniTrainingFilter(filters.FilterSet):
     from_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='gte')
     to_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='lte')
     code = filters.CharFilter(field_name="partial_acronym", lookup_expr='icontains')
+    partial_acronym = filters.CharFilter(field_name="partial_acronym", lookup_expr='icontains')
+    acronym = filters.CharFilter(field_name="acronym", lookup_expr='icontains')
     education_group_type = filters.MultipleChoiceFilter(
         field_name='education_group_type__name',
         choices=MiniTrainingType.choices()

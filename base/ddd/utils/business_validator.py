@@ -40,6 +40,7 @@ class BusinessValidator(ABC):
     def __init__(self, *args, **kwargs):
         self._messages = []
 
+    #  FIXME can not return success messages when error messages present
     @property
     def messages(self) -> List[BusinessValidationMessage]:
         return self._messages + (self.success_messages or [])
@@ -66,6 +67,9 @@ class BusinessValidator(ABC):
     def add_error_message(self, msg: str):
         self._messages.append(BusinessValidationMessage(msg, level=MessageLevel.ERROR))
 
+    def add_warning_message(self, msg: str):
+        self._messages.append(BusinessValidationMessage(msg, level=MessageLevel.WARNING))
+
     def add_messages(self, messages: List[BusinessValidationMessage]):
         for msg in messages:
             self.add_message(msg)
@@ -83,7 +87,6 @@ class BusinessListValidator(BusinessValidator):
 
     def __init__(self):
         super(BusinessListValidator, self).__init__()
-        assert self.success_messages, "Please set the 'success_messages' attribute"
 
     def validate(self):
         for validator in self.validators:

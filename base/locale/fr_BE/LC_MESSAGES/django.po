@@ -2063,7 +2063,7 @@ msgid "Prerequisite"
 msgstr "Prérequis"
 
 msgid "Prerequisites are invalid"
-msgstr "<p>Prérequis invalides</p>"
+msgstr "Prérequis invalides"
 
 msgid "President"
 msgstr "Président·e"

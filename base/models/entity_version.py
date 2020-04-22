@@ -27,18 +27,22 @@ import collections
 import datetime
 from collections import OrderedDict
 
-from django.db import models, connection
+from django.contrib.postgres.fields import ArrayField
+from django.db import models
 from django.db.models import Q
+from django.db.models.expressions import F, Func, RawSQL, Value
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.timezone import now
 from django.utils.translation import gettext_lazy as _
+from django_cte import CTEManager, CTEQuerySet, With
 from reversion.admin import VersionAdmin
 
 from base.models.entity import Entity
 from base.models.enums import entity_type
 from base.models.enums.entity_type import PEDAGOGICAL_ENTITY_TYPES
 from base.models.enums.organization_type import MAIN
+from base.models.utils.func import ArrayConcat
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 from osis_common.utils.datetime import get_tzinfo
 
@@ -47,31 +51,6 @@ PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS = [
     "IUFC",
     "CCR"
 ]
-
-SQL_RECURSIVE_QUERY = """\
-WITH RECURSIVE under_entity AS (
-
-    SELECT id, acronym, parent_id, entity_id, '{{}}'::INT[] AS parents, '{date}'::DATE AS date, 0 AS level
-    FROM base_entityversion WHERE entity_id IN ({list_entities})
-
-    UNION ALL
-
-    SELECT b.id,
-           b.acronym,
-           b.parent_id,
-           b.entity_id,
-           parents || b.parent_id,
-           u.date,
-           u.level + 1
-
-    FROM under_entity AS u, base_entityversion AS b
-    WHERE (u.entity_id=b.parent_id) AND (
-        (b.end_date >= date::date OR b.end_date IS NULL) AND
-        b.start_date <= date::date)
-    )
-
-SELECT * FROM under_entity ;
-"""
 
 
 class Node:
@@ -103,7 +82,7 @@ class EntityVersionAdmin(VersionAdmin, SerializableModelAdmin):
     list_filter = ['entity_type']
 
 
-class EntityVersionQuerySet(models.QuerySet):
+class EntityVersionQuerySet(CTEQuerySet):
     def current(self, date):
         if date:
             return self.filter(Q(end_date__gte=date) | Q(end_date__isnull=True), start_date__lte=date, )
@@ -113,57 +92,167 @@ class EntityVersionQuerySet(models.QuerySet):
     def entity(self, entity):
         return self.filter(entity=entity)
 
-    def get_tree(self, entities, date=None):
+    def with_children(self, date=None):
         """
-        Create a list of all descendants of given entities
+        Use a Common Table Expression to construct the hierarchy of children entities
 
-        :param entities: int, Entity, QuerysetEntity, [int], [Entity]
-        :param date: Date
-        :return: list(dict))
+        :param date: Date to filter the entity versions on (default: now)
+        :return: a CTE queryset that can be used as is, or joined again on
+        EntityVersion to get more info, e.g.:
+
+        qs = cte.join(EntityVersion, id=cte.col.id).with_cte(cte).filter(
+            entity_type='FACULTY',
+        )
+
+        It can also be used as is, to get only the fields used in CTE:
+        qs = cte.queryset().with_cte(cte)
+        :rtype: With
         """
-        list_entities_id = []
-
-        if not date:
+        if date is None:
             date = now()
 
-        # Convert the entity in list
-        if not isinstance(entities, collections.Iterable):
-            entities = [entities]
+        def children_entities(cte):
+            """ This function is used for the recursive SQL query """
+            # self here is an EntityVersion queryset
+            return self.values(
+                "id",
+                "entity_id",
+                "parent_id",
+                children=RawSQL(
+                    # start the array with the current entity
+                    "ARRAY[entity_id]", [],
+                    output_field=ArrayField(models.IntegerField()),
+                ),
+            ).union(
+                # recursive union: get descendants with entity_id = parent_id
+                cte.join(EntityVersion, entity_id=cte.col.parent_id).filter(
+                    Q(end_date__gte=date) | Q(end_date__isnull=True),
+                    start_date__lte=date,
+                ).values(
+                    "id",
+                    "entity_id",
+                    "parent_id",
+                    children=ArrayConcat(
+                        # Prepend the child to the array
+                        F("entity_id"), cte.col.children,
+                        output_field=ArrayField(models.IntegerField()),
+                    ),
+                ),
+                all=True,
+            )
 
-        # Extract from the list the ids
-        for entity in entities:
-            if isinstance(entity, Entity):
-                entity = entity.pk
+        return With.recursive(children_entities)
 
-            list_entities_id.append(str(entity))
+    def with_parents(self, entity_ids, date=None):
+        """
+        Use a Common Table Expression to construct the hierarchy of parent entities
 
-        if not list_entities_id:
-            return []
+        :param entity_ids: List of ids or queryset to filter entities id on
+        :param date: Date to filter the entity versions on (default: now)
+        :return:
+        """
+        if date is None:
+            date = now()
 
-        with connection.cursor() as cursor:
-            cursor.execute(SQL_RECURSIVE_QUERY.format(list_entities=','.join(list_entities_id), date=date))
+        def parent_entities(cte):
+            """ This function is used for the recursive SQL query """
+            # self here is an EntityVersion queryset
+            return self.filter(
+                entity_id__in=entity_ids,
+            ).values(
+                'id',
+                'acronym',
+                'parent_id',
+                'entity_id',
+                parents=Value(
+                    # empty array filled by union
+                    "{}",
+                    output_field=ArrayField(models.IntegerField())
+                ),
+            ).union(
+                # recursive union: get parents with entity_id = parent_id
+                cte.join(EntityVersion, parent_id=cte.col.entity_id).filter(
+                    Q(end_date__gte=date) | Q(end_date__isnull=True),
+                    start_date__lte=date,
+                ).values(
+                    'id',
+                    'acronym',
+                    'parent_id',
+                    'entity_id',
+                    parents=ArrayConcat(
+                        # Append the parent to the array
+                        cte.col.parents, F("parent_id"),
+                        output_field=ArrayField(models.IntegerField()),
+                    ),
+                ),
+                all=True,
+            )
 
-            return [
-                {
-                    'id': row[0],
-                    'acronym': row[1],
-                    'parent_id': row[2],
-                    'entity_id': row[3],
-                    'parents': row[4],
-                    'date': row[5],
-                    'level': row[6],
-                } for row in cursor.fetchall()
-            ]
+        cte = With.recursive(parent_entities)
+        qs = cte.queryset().with_cte(cte).annotate(
+            level=Func('parents', function='cardinality'),
+            date=Value(date, models.DateField()),
+        )
+        return qs
+
+    def get_tree(self, entity_ids, date=None):
+        """
+        :return: a list of dictionnaries returning
+            - entityversion id,
+            - acronym,
+            - parent_id,
+            - entity_id,
+            - parents,
+            - date,
+            - level
+        """
+        # Convert the entity_ids in list if only one given
+        if not isinstance(entity_ids, collections.Iterable):
+            entity_ids = [entity_ids]
+
+        # Get only entity_id field in queryset
+        if isinstance(entity_ids, models.QuerySet):
+            entity_ids = entity_ids.values('pk')
+
+        # Extract from the list the ids of each entity
+        else:
+            if not entity_ids:
+                return []
+
+            for i, entity in enumerate(entity_ids):
+                if isinstance(entity, Entity):
+                    entity_ids[i] = entity.pk
+
+        qs = self.with_parents(entity_ids, date)
+        return qs.values(
+            'id',
+            'acronym',
+            'parent_id',
+            'entity_id',
+            'parents',
+            'date',
+            'level',
+        )
 
     def descendants(self, entity, date=None):
-        tree = self.get_tree(entity, date)
-        return self.filter(pk__in=[node['id'] for node in tree[1:]]).order_by('acronym')
+        """ Return the children entities """
+        tree_qs = self.with_parents(entity, date)
+
+        # Children contain the asked entity as first element, ignore it
+        return self.filter(pk__in=tree_qs.values('id')[1:]).order_by('acronym')
 
     def pedagogical_entities(self):
         return self.filter(
             Q(entity__organization__type=MAIN),
             Q(entity_type__in=PEDAGOGICAL_ENTITY_TYPES) | Q(acronym__in=PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS),
         )
+
+
+class EntityVersionManager(CTEManager.from_queryset(EntityVersionQuerySet)):
+    use_in_migrations = True
+
+    def get_queryset(self):
+        return EntityVersionQuerySet(self.model, using=self._db)
 
 
 class EntityVersion(SerializableModel):
@@ -192,7 +281,7 @@ class EntityVersion(SerializableModel):
         blank=True,
         verbose_name=_("logo")
     )
-    objects = EntityVersionQuerySet.as_manager()
+    objects = EntityVersionManager()
 
     def __str__(self):
         return "{} ({} - {} - {} to {})".format(

@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from program_management.ddd.domain.program_tree import Path
     from program_management.ddd.domain.link import Link
     from base.ddd.utils.validation_message import BusinessValidationMessage
+    from program_management.ddd.domain.prerequisite import PrerequisiteExpression
 
 
 FieldValueRepresentation = str  # Type used to verbose a field value for its view representation
