@@ -44,7 +44,9 @@ class TrainingFilter(filters.FilterSet):
 
     class Meta:
         model = EducationGroupYear
-        fields = ['acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year']
+        fields = [
+            'acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year', 'year', 'ares_ability'
+        ]
 
 
 class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
