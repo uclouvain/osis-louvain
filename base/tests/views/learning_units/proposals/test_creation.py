@@ -53,7 +53,7 @@ from base.tests.factories.person import CentralManagerForUEFactory
 from base.tests.factories.person import FacultyManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.views.learning_units.proposal.create import get_proposal_learning_unit_creation_form
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
 
 
 @override_flag('learning_unit_proposal_create', active=True)
@@ -76,7 +76,7 @@ class LearningUnitViewTestCase(TestCase):
         cls.next_academic_year = cls.academic_years[1]
         generate_creation_or_end_date_proposal_calendars(cls.academic_years)
 
-        cls.language = LanguageFactory(code='FR')
+        cls.language = FrenchLanguageFactory()
         cls.organization = organization_factory.OrganizationFactory(type=organization_type.MAIN)
         cls.campus = campus_factory.CampusFactory(organization=cls.organization, is_administration=True)
         cls.entity = EntityFactory(organization=cls.organization)

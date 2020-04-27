@@ -34,7 +34,6 @@ from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
 from program_management.ddd.business_types import *
-from program_management.ddd.domain import link
 
 
 class RecursiveField(serializers.Serializer):
@@ -73,7 +72,10 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
 class BaseCommonNodeTreeSerializer(serializers.Serializer):
     url = CommonNodeHyperlinkedRelatedField(view_name='education_group_api_v1:' + TrainingDetail.name)
     title = serializers.SerializerMethodField()
-    children = RecursiveField(source='child.children', many=True)
+    children = RecursiveField(
+        source='child.get_children_and_only_reference_children_except_within_minor_list',
+        many=True
+    )
 
 
 class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
@@ -167,7 +169,7 @@ class LearningUnitNodeTreeSerializer(CommonNodeTreeSerializer):
 
         complete_title = specific_title
         if common_title:
-            complete_title = common_title + ' - ' + specific_title
+            complete_title = common_title + (' - ' + specific_title if specific_title else "")
         return complete_title
 
     def to_representation(self, obj: 'Link'):

@@ -39,6 +39,10 @@ class ChoiceEnum(Enum):
     def get_names(cls):
         return [x.name for x in cls]
 
+    @classmethod
+    def get_values(cls):
+        return [x.value for x in cls]
+
 
 def get_verbose_field_value(instance, key):
     if hasattr(instance, "get_" + key + "_display"):

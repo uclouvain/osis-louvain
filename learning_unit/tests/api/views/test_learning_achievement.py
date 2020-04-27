@@ -35,6 +35,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from learning_unit.api.views.learning_achievement import LearningAchievementList
 from reference.models.language import FR_CODE_LANGUAGE
+from reference.tests.factories.language import FrenchLanguageFactory
 
 
 class LearningAchievementListTestCase(APITestCase):
@@ -51,7 +52,7 @@ class LearningAchievementListTestCase(APITestCase):
             cls.achievements.append(
                 LearningAchievementFactory(
                     learning_unit_year=cls.learning_unit_year,
-                    language__code=FR_CODE_LANGUAGE,
+                    language=FrenchLanguageFactory(),
                     order=index
                 )
             )
@@ -99,3 +100,16 @@ class LearningAchievementListTestCase(APITestCase):
             ('achievement', self.achievements[0].text),
         ])
         self.assertDictEqual(response.data[0], expected_response)
+
+    def test_get_only_achievements_with_text(self):
+        LearningAchievementFactory(
+            learning_unit_year=self.learning_unit_year,
+            language__code=FR_CODE_LANGUAGE,
+            order=5,
+            text=''
+        )
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        self.assertIsInstance(response.data, list)
+        self.assertEqual(len(response.data), 5)

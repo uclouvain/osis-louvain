@@ -23,17 +23,16 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
-
 from django.utils.translation import gettext as _
 
 from base.ddd.utils.business_validator import BusinessListValidator
 from program_management.ddd.business_types import *
-from program_management.ddd.domain.node import NodeEducationGroupYear, NodeGroupYear, NodeLearningUnitYear
 from program_management.ddd.validators._authorized_relationship import \
-    AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator
+    AuthorizedRelationshipLearningUnitValidator, AttachAuthorizedRelationshipValidator, \
+    DetachAuthorizedRelationshipValidator
+from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
+from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator, HasPrerequisiteValidator
 from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
-from program_management.ddd.validators._detach_root import DetachRootForbiddenValidator
 from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator
 from program_management.ddd.validators._minimum_editable_year import \
     MinimumEditableYearValidator
@@ -49,7 +48,7 @@ class AttachNodeValidatorList(BusinessListValidator):
     ]
 
     def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path'):
-        if isinstance(node_to_add, NodeEducationGroupYear) or isinstance(node_to_add, NodeGroupYear):
+        if node_to_add.is_group():
             self.validators = [
                 CreateLinkValidatorList(tree.get_node(path), node_to_add),
                 AttachAuthorizedRelationshipValidator(tree, node_to_add, tree.get_node(path)),
@@ -57,13 +56,12 @@ class AttachNodeValidatorList(BusinessListValidator):
                 InfiniteRecursivityTreeValidator(tree, node_to_add, path),
             ]
 
-        elif isinstance(node_to_add, NodeLearningUnitYear):
+        elif node_to_add.is_learning_unit():
             self.validators = [
                 CreateLinkValidatorList(tree.get_node(path), node_to_add),
                 AuthorizedRelationshipLearningUnitValidator(tree, node_to_add, tree.get_node(path)),
                 MinimumEditableYearValidator(tree),
                 InfiniteRecursivityTreeValidator(tree, node_to_add, path),
-                DetachRootForbiddenValidator(tree, node_to_add),
             ]
 
         else:
@@ -71,7 +69,41 @@ class AttachNodeValidatorList(BusinessListValidator):
         super().__init__()
 
 
+class DetachNodeValidatorList(BusinessListValidator):
+
+    def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node', path_to_parent: 'Path'):
+        detach_from = tree.get_node(path_to_parent)
+
+        if node_to_detach.is_group():
+            path_to_node_to_detach = path_to_parent + '|' + str(node_to_detach.node_id)
+            self.validators = [
+                MinimumEditableYearValidator(tree),
+                DetachAuthorizedRelationshipValidator(tree, node_to_detach, detach_from),
+                IsPrerequisiteValidator(tree, node_to_detach),
+                HasPrerequisiteValidator(tree, node_to_detach),
+                DetachOptionValidator(tree, path_to_node_to_detach, [tree]),
+            ]
+
+        elif node_to_detach.is_learning_unit():
+            self.validators = [
+                AuthorizedRelationshipLearningUnitValidator(tree, node_to_detach, detach_from),
+                MinimumEditableYearValidator(tree),
+                IsPrerequisiteValidator(tree, node_to_detach),
+                HasPrerequisiteValidator(tree, node_to_detach),
+            ]
+
+        else:
+            raise AttributeError("Unknown instance of node")
+        super().__init__()
+
+        self.add_success_message(_("\"%(child)s\" has been detached from \"%(parent)s\"") % {
+            'child': node_to_detach,
+            'parent': detach_from,
+        })  # TODO :: unit test
+
+
 class UpdatePrerequisiteValidatorList(BusinessListValidator):
+
     def __init__(
             self,
             prerequisite_string: 'PrerequisiteExpression',

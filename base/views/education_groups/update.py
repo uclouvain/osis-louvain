@@ -231,7 +231,8 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
     # TODO :: IMPORTANT :: Need to update form to filter on list of parents, not only on the first direct parent
     form_education_group_year = TrainingForm(request.POST or None, user=request.user, instance=education_group_year)
     coorganization_formset = None
-    forms_valid = all([form_education_group_year.is_valid(), groupelementyear_formset.is_valid()])
+    has_content = len(groupelementyear_formset.queryset) > 0
+    forms_valid = all([form_education_group_year.is_valid(), not has_content or groupelementyear_formset.is_valid()])
     if has_coorganization(education_group_year):
         coorganization_formset = OrganizationFormset(
             data=request.POST or None,
@@ -243,7 +244,8 @@ def _update_training(request, education_group_year, root, groupelementyear_forms
         if forms_valid:
             if has_coorganization(education_group_year):
                 coorganization_formset.save()
-            return _common_success_redirect(request, form_education_group_year, root, groupelementyear_formset)
+            return _common_success_redirect(request, form_education_group_year, root,
+                                            groupelementyear_formset if has_content else None)
         else:
             show_error_message_for_form_invalid(request)
 
@@ -289,10 +291,11 @@ def _update_mini_training(request, education_group_year, root, groupelementyear_
     # TODO :: IMPORTANT :: Fix urls patterns to get the GroupElementYear_id and the root_id in the url path !
     # TODO :: IMPORTANT :: Need to upodate form to filter on list of parents, not only on the first direct parent
     form = MiniTrainingForm(request.POST or None, instance=education_group_year, user=request.user)
-
     if request.method == 'POST':
-        if form.is_valid() and groupelementyear_formset.is_valid():
-            return _common_success_redirect(request, form, root, groupelementyear_formset)
+        has_content = len(groupelementyear_formset.queryset) > 0
+        forms_valid = all([form.is_valid(), not has_content or groupelementyear_formset.is_valid()])
+        if forms_valid:
+            return _common_success_redirect(request, form, root, groupelementyear_formset if has_content else None)
         else:
             show_error_message_for_form_invalid(request)
 

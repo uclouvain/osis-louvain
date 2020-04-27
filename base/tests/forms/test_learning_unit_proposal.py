@@ -49,12 +49,12 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.group import FacultyManagerGroupFactory, CentralManagerGroupFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory, LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory, FacultyManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, EnglishLanguageFactory, FrenchLanguageFactory
 
 PROPOSAL_TYPE = proposal_type.ProposalType.TRANSFORMATION_AND_MODIFICATION.name
 PROPOSAL_STATE = proposal_state.ProposalState.FACULTY.name
@@ -84,12 +84,12 @@ class TestSave(TestCase):
             container_type=learning_container_year_types.COURSE,
             requirement_entity=cls.entity_version.entity,
         )
-        cls.language = LanguageFactory(code="EN")
+        cls.language = EnglishLanguageFactory()
         cls.campus = CampusFactory(name="OSIS Campus", organization=OrganizationFactory(type=organization_type.MAIN),
                                    is_administration=True)
         FacultyManagerGroupFactory()
         CentralManagerGroupFactory()
-        cls.learning_unit_year = LearningUnitYearFakerFactory(
+        cls.learning_unit_year = LearningUnitYearFactory(
             credits=Decimal(5),
             subtype=learning_unit_year_subtypes.FULL,
             academic_year=cls.current_academic_year,
@@ -208,12 +208,16 @@ class TestSave(TestCase):
 
     def test_with_all_entities_set(self):
         today = datetime.date.today()
-        entity_1 = EntityFactory(organization=OrganizationFactory(type=organization_type.MAIN))
+        entity_1 = EntityFactory(
+            organization=OrganizationFactory(type=organization_type.MAIN),
+        )
         additional_entity_version_1 = EntityVersionFactory(entity_type=entity_type.SCHOOL,
                                                            start_date=today.replace(year=1900),
                                                            end_date=today.replace(year=today.year + 1),
                                                            entity=entity_1)
-        entity_2 = EntityFactory(organization=OrganizationFactory(type=organization_type.MAIN))
+        entity_2 = EntityFactory(
+            organization=OrganizationFactory(type=organization_type.MAIN),
+        )
         additional_entity_version_2 = EntityVersionFactory(entity_type=entity_type.SCHOOL,
                                                            start_date=today.replace(year=1900),
                                                            end_date=today.replace(year=today.year + 1),
@@ -273,7 +277,7 @@ class TestSave(TestCase):
         initial_data_expected["learning_unit_year"]["credits"] = '5.00'
         initial_data_expected['entities'] = {
             entity_container_year_link_type.REQUIREMENT_ENTITY: self.entity_version.entity.id,
-            entity_container_year_link_type.ALLOCATION_ENTITY: None,
+            entity_container_year_link_type.ALLOCATION_ENTITY: self.entity_version.entity.id,
             entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1: None,
             entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_2: None
         }
@@ -301,7 +305,7 @@ class TestSave(TestCase):
         self.assertTrue('entity' in form.errors[1])
 
     def test_academic_year_range_creation_proposal_central_manager(self):
-        LanguageFactory(code="FR")
+        FrenchLanguageFactory()
         central_manager = CentralManagerForUEFactory()
         form = learning_unit_create_2.FullForm(
             central_manager,
@@ -318,7 +322,7 @@ class TestSave(TestCase):
         )
 
     def test_academic_year_range_creation_proposal_faculty_manager(self):
-        LanguageFactory(code="FR")
+        FrenchLanguageFactory()
         faculty_manager = FacultyManagerForUEFactory()
         form = learning_unit_create_2.FullForm(
             faculty_manager,
@@ -339,7 +343,7 @@ def build_initial_data(learning_unit_year, entity):
     initial_data_expected = {
         "learning_container_year": {
             "id": learning_unit_year.learning_container_year.id,
-            "acronym": learning_unit_year.acronym,
+            "acronym": learning_unit_year.learning_container_year.acronym,
             "common_title": learning_unit_year.learning_container_year.common_title,
             "container_type": learning_unit_year.learning_container_year.container_type,
             "in_charge": learning_unit_year.learning_container_year.in_charge,
@@ -348,7 +352,7 @@ def build_initial_data(learning_unit_year, entity):
             "is_vacant": learning_unit_year.learning_container_year.is_vacant,
             "type_declaration_vacant": learning_unit_year.learning_container_year.type_declaration_vacant,
             "requirement_entity": entity.id,
-            "allocation_entity": None,
+            "allocation_entity": entity.id,
             "additional_entity_1": None,
             "additional_entity_2": None,
         },

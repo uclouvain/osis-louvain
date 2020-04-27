@@ -220,7 +220,7 @@ class TestPostponementEducationGroupYear(TestCase):
         cls.management_entity_version = MainEntityVersionFactory()
         cls.education_group_type = EducationGroupTypeFactory(
             category=education_group_categories.TRAINING,
-            name=education_group_types.TrainingType.BACHELOR
+            name=education_group_types.TrainingType.BACHELOR.name
         )
 
     def setUp(self):
@@ -246,7 +246,7 @@ class TestPostponementEducationGroupYear(TestCase):
         self.administration_entity_version = MainEntityVersionFactory()
         self.education_group_year = TrainingFactory(
             academic_year=create_current_academic_year(),
-            education_group_type__name=education_group_types.TrainingType.BACHELOR,
+            education_group_type__name=education_group_types.TrainingType.BACHELOR.name,
             management_entity=self.management_entity_version.entity,
             administration_entity=self.administration_entity_version.entity,
         )

@@ -31,6 +31,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
+from program_management.ddd.domain.program_tree import build_path
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers.node_view import _get_node_view_attribute_serializer, \
     _get_leaf_view_attribute_serializer, \
@@ -74,12 +75,10 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
         self.link = LinkFactory(parent=self.node_parent, child=self.node_child)
 
         self.context = {'path': '1|2|6', 'root': self.root_node}
-        self.serialized_data = _get_node_view_attribute_serializer(self.link, context=self.context)
+        self.serialized_data = _get_node_view_attribute_serializer(self.link, '1|2|6', context=self.context)
 
     def test_serialize_node_attr_ensure_detach_url(self):
-        expected_url = reverse('group_element_year_delete', args=[
-            self.root_node.pk, self.node_child.pk, self.link.pk
-        ])
+        expected_url = reverse('tree_detach_node', args=[self.root_node.pk]) + "?path=1|2|6"
         self.assertEquals(self.serialized_data['detach_url'], expected_url)
 
     def test_serialize_node_attr_ensure_attach_url(self):

@@ -294,6 +294,19 @@ class LearningUnitYearWarningsTest(TestCase):
             type=LECTURING,
             learning_unit_year=self.luy_full
         ).first()
+        luy_partim = self.generated_container.generated_container_years[0].learning_unit_year_partim
+
+        learning_component_year_partim_lecturing = LearningComponentYear.objects.filter(
+            type=LECTURING,
+            learning_unit_year=luy_partim
+        ).first()
+        learning_component_year_partim_lecturing.planned_classes = 0
+        learning_component_year_partim_lecturing.hourly_volume_partial_q1 = 0
+        learning_component_year_partim_lecturing.hourly_volume_partial_q2 = 0
+        learning_component_year_partim_lecturing.hourly_volume_total_annual = 0
+        learning_component_year_partim_lecturing.repartition_volume_requirement_entity = 0
+        learning_component_year_partim_lecturing.save()
+
 
         self.luy_full.quadrimester = None
         self.luy_full.save()
@@ -561,18 +574,26 @@ class LearningUnitYearWarningsTest(TestCase):
         self.luy_full.credits = self.luy_full.credits + 1
         self.luy_full.save()
 
-        test_cases = [
-            {'vol_q1': 10, 'vol_q2': 20, 'vol_tot_annual': 30, 'planned_classes': 0, 'vol_tot_global': 60}
-        ]
+        luy_partim = self.generated_container.generated_container_years[0].learning_unit_year_partim
 
-        for case in test_cases:
-            with self.subTest(case=case):
-                self.component_full_lecturing.hourly_volume_partial_q1 = case.get('vol_q1')
-                self.component_full_lecturing.hourly_volume_partial_q2 = case.get('vol_q2')
-                self.component_full_lecturing.hourly_volume_total_annual = case.get('vol_tot_annual')
-                self.component_full_lecturing.planned_classes = case.get('planned_classes')
-                self.component_full_lecturing.repartition_volume_requirement_entity = 0
-                self.component_full_lecturing.save()
+        learning_component_year_partim_lecturing = LearningComponentYear.objects.filter(
+            type=LECTURING,
+            learning_unit_year=luy_partim
+        ).first()
+
+        learning_component_year_partim_lecturing.planned_classes = 0
+        learning_component_year_partim_lecturing.hourly_volume_partial_q1 = 0
+        learning_component_year_partim_lecturing.hourly_volume_partial_q2 = 0
+        learning_component_year_partim_lecturing.hourly_volume_total_annual = 0
+        learning_component_year_partim_lecturing.repartition_volume_requirement_entity = 0
+        learning_component_year_partim_lecturing.save()
+
+        self.component_full_lecturing.hourly_volume_partial_q1 = 30
+        self.component_full_lecturing.hourly_volume_partial_q2 = 20
+        self.component_full_lecturing.hourly_volume_total_annual = 50
+        self.component_full_lecturing.planned_classes = 0
+        self.component_full_lecturing.repartition_volume_requirement_entity = 0
+        self.component_full_lecturing.save()
 
         excepted_error = "{} ({})".format(
             _('Volumes of {} are inconsistent').format(self.component_full_lecturing.complete_acronym),
@@ -589,6 +610,7 @@ class LearningUnitYearWarningsTest(TestCase):
         self.component_full_lecturing.hourly_volume_partial_q1 = 0
         self.component_full_lecturing.hourly_volume_partial_q2 = 0
         self.component_full_lecturing.hourly_volume_total_annual = 0
+        self.component_full_lecturing.repartition_volume_requirement_entity = 0
         self.component_full_lecturing.planned_classes = 1
         self.component_full_lecturing.save()
 

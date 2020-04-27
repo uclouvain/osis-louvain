@@ -21,84 +21,106 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import time
+import os
 
 from behave import *
 from behave.runner import Context
+from django.utils.translation import gettext_lazy as _
 
-from features.steps.utils.pages import SearchLearningUnitPage
+from features.forms.learning_units import search_form
+from features.pages.learning_unit.pages import SearchLearningUnitPage
 
 use_step_matcher("re")
 
 
 @step("Aller sur la page de recherche d'UE")
 def step_impl(context: Context):
-    url = '/learning_units/by_activity/'
-    context.current_page = SearchLearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
-    context.test.assertEqual(context.browser.current_url, context.get_url(url))
+    url = 'learning_units'
+    SearchLearningUnitPage(driver=context.browser, base_url=context.get_url(url)).open()
 
 
 @step("Réinitialiser les critères de recherche")
 def step_impl(context: Context):
-    context.current_page.clear_button.click()
-
-
-@when("Sélectionner (?P<anac>.+) dans la zone de saisie « Anac\. »")
-def step_impl(context: Context, anac: str):
-    context.current_page.anac = anac
+    page = SearchLearningUnitPage(driver=context.browser)
+    page.clear_button.click()
 
 
 @step("Cliquer sur le bouton Rechercher \(Loupe\)")
 def step_impl(context: Context):
-    context.current_page.search.click()
-    context.current_page.wait_for_page_to_load()
+    page = SearchLearningUnitPage(driver=context.browser)
+    page.search.click()
 
 
 @then("Le nombre total de résultat est (?P<result_count>.+)")
 def step_impl(context: Context, result_count: str):
-    context.test.assertEqual(context.current_page.count_result(), result_count)
-
-
-@step("Dans la liste de résultat, le\(s\) premier\(s\) « Code » est\(sont\) bien (?P<acronym>.+)\.")
-def step_impl(context: Context, acronym: str):
-    acronyms = acronym.split(',')
-    for row, acronym in enumerate(acronyms):
-        context.test.assertEqual(context.current_page.find_acronym_in_table(row + 1), acronym)
+    page = SearchLearningUnitPage(driver=context.browser)
+    context.test.assertEqual(page.count_result(), result_count)
 
 
 @when("Ouvrir le menu « Exporter »")
 def step_impl(context: Context):
-    context.current_page.export.click()
+    page = SearchLearningUnitPage(driver=context.browser)
+    page.export.click()
 
 
 @step("Sélection « Liste personnalisée des unités d’enseignement »")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    context.current_page.list_learning_units.click()
+def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
+    page.list_learning_units.click()
 
 
 @step("Cocher les cases « Programmes/regroupements » et « Enseignant\(e\)s »")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    context.current_page.with_program.click()
-    context.current_page.with_tutor.click()
+def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
+    page.with_program.click()
+    page.with_tutor.click()
 
 
 @step("Cliquer sur « Produire Excel »")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    context.current_page.generate_xls.click()
+def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
+    page.generate_xls.click()
 
 
 @step("Sélectionner l’onglet « Propositions »")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    context.current_page = context.current_page.proposal_search.click()
+def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
+    page.proposal_search.click()
+
+
+@step("Encoder le code d'une UE")
+def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
+    context.search_form_values = search_form.fill_code(page)
+
+
+@step("Encoder le type d'UE")
+def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
+    context.search_form_values = search_form.fill_container_type(page)
+
+
+@step("Encoder l'entité d'UE")
+def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
+    context.search_form_values = search_form.fill_entity(page)
+
+
+@step("Encoder l'enseignant d'UE")
+def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
+    context.search_form_values = search_form.fill_tutor(page)
+
+
+@step("La liste de résultat doit correspondre aux crières de recherche")
+def step_impl(context: Context):
+    page = SearchLearningUnitPage(driver=context.browser)
+    search_criterias = context.search_form_values
+    context.test.assertLearningUnitResultsMatchCriteria(page.results, search_criterias)
+
+
+@then("Le fichier excel devrait être présent")
+def step_impl(context: Context):
+    filename = "{}.xlsx".format(_('LearningUnitsList'))
+    full_path = os.path.join(context.download_directory, filename)
+    context.test.assertTrue(os.path.exists(full_path), full_path)

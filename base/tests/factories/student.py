@@ -37,7 +37,9 @@ class StudentFactory(factory.DjangoModelFactory):
         django_get_or_create = ('registration_id', )
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1),
-                                          datetime.datetime(2017, 3, 1))
+    changed = factory.fuzzy.FuzzyNaiveDateTime(
+        datetime.datetime(2016, 1, 1),
+        datetime.datetime(2017, 3, 1)
+    )
     registration_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     person = factory.SubFactory(PersonFactory)

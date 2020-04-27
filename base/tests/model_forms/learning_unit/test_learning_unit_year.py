@@ -48,7 +48,7 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import CentralManagerForUEFactory, FacultyManagerForUEFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
 
 
 class TestLearningUnitYearModelFormInit(TestCase):
@@ -111,14 +111,13 @@ class TestLearningUnitYearModelFormSave(TestCase):
             learning_container=self.learning_container,
             academic_year=self.current_academic_year,
             container_type=learning_container_year_types.COURSE,
-            requirement_entity=EntityFactory(),
             allocation_entity=EntityFactory(),
             additional_entity_1=EntityFactory(),
             additional_entity_2=EntityFactory(),
         )
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=FULL)
         campus = CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN))
-        self.language = LanguageFactory(code='FR')
+        self.language = FrenchLanguageFactory()
 
         self.post_data = {
             'acronym_0': 'L',
@@ -246,7 +245,9 @@ class TestLearningUnitYearModelFormSave(TestCase):
 
     def test_single_warnings_entity_container_year(self):
         learning_unit_year_to_update = LearningUnitYearFactory(
-            learning_unit=self.learning_unit, learning_container_year=self.learning_container_year, subtype=FULL,
+            learning_unit=self.learning_unit,
+            learning_container_year=self.learning_container_year,
+            subtype=FULL,
             academic_year=self.current_academic_year
         )
         self.requirement_entity_version.start_date = datetime.date(1990, 9, 15)
@@ -264,7 +265,9 @@ class TestLearningUnitYearModelFormSave(TestCase):
 
     def test_multiple_warnings_entity_container_year(self):
         learning_unit_year_to_update = LearningUnitYearFactory(
-            learning_unit=self.learning_unit, learning_container_year=self.learning_container_year, subtype=FULL,
+            learning_unit=self.learning_unit,
+            learning_container_year=self.learning_container_year,
+            subtype=FULL,
             academic_year=self.current_academic_year
         )
         self.requirement_entity_version.start_date = datetime.date(1990, 9, 15)

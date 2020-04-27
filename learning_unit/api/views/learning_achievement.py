@@ -51,7 +51,7 @@ class LearningAchievementList(generics.GenericAPIView):
         )
         qs = LearningAchievement.objects.filter(
             learning_unit_year=learning_unit_year
-        ).order_by('order').filter(
+        ).exclude(text__iexact='').order_by('order').filter(
             language__code=language[:2].upper()
         ).values('code_name', achievement=F('text'))
         serializer = self.get_serializer(qs, many=True)

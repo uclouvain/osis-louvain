@@ -59,14 +59,14 @@ from base.tests.factories.utils.get_messages import get_messages_from_response
 from base.views.learning_achievement import management, create, create_first
 from cms.tests.factories.text_label import TextLabelFactory
 from reference.models.language import FR_CODE_LANGUAGE
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
 
 
 @override_flag('learning_achievement_update', active=True)
 class TestLearningAchievementView(TestCase):
     def setUp(self):
-        self.language_fr = LanguageFactory(code="FR")
-        self.language_en = LanguageFactory(code="EN")
+        self.language_fr = FrenchLanguageFactory()
+        self.language_en = EnglishLanguageFactory()
         self.user = UserFactory()
         self.person = PersonFactory(user=self.user)
         self.person_entity = PersonEntityFactory(person=self.person)
@@ -171,8 +171,8 @@ class TestLearningAchievementView(TestCase):
 class TestLearningAchievementActions(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.language_fr = LanguageFactory(code="FR")
-        cls.language_en = LanguageFactory(code="EN")
+        cls.language_fr = FrenchLanguageFactory()
+        cls.language_en = EnglishLanguageFactory()
         cls.user = UserFactory()
         cls.person = PersonWithPermissionsFactory("can_access_learningunit", "can_create_learningunit", user=cls.user)
         cls.a_superuser = SuperUserFactory()
@@ -369,8 +369,8 @@ class TestLearningAchievementActions(TestCase):
 class TestLearningAchievementPostponement(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.language_fr = LanguageFactory(code="FR")
-        cls.language_en = LanguageFactory(code="EN")
+        cls.language_fr = FrenchLanguageFactory()
+        cls.language_en = EnglishLanguageFactory()
         cls.user = UserFactory()
         flag, created = Flag.objects.get_or_create(name='learning_achievement_update')
         flag.users.add(cls.user)

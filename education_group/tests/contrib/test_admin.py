@@ -31,7 +31,7 @@ from education_group.contrib.admin import EducationGroupRoleModelAdmin, Educatio
 class TestEducationGroupRoleModelAdmin(SimpleTestCase):
     def test_ensure_list_display(self):
         expected_list_display = ('person', 'education_group',)
-        self.assertEquals(EducationGroupRoleModelAdmin.list_display, expected_list_display)
+        self.assertEqual(EducationGroupRoleModelAdmin.list_display, expected_list_display)
 
     def test_ensure_search_fields(self):
         expected_search_fields = [
@@ -46,7 +46,7 @@ class TestEducationGroupRoleModelAdmin(SimpleTestCase):
 class TestEducationGroupYearRoleModelAdmin(SimpleTestCase):
     def test_ensure_list_display(self):
         expected_list_display = ('person', 'education_group_year',)
-        self.assertEquals(EducationGroupYearRoleModelAdmin.list_display, expected_list_display)
+        self.assertEqual(EducationGroupYearRoleModelAdmin.list_display, expected_list_display)
 
     def test_ensure_search_fields(self):
         expected_search_fields = [

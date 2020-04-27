@@ -11,7 +11,7 @@ class TestCentralAdmissionManager(SimpleTestCase):
 
     def test_assert_group_name_meta_property(self):
         instance = CentralAdmissionManager()
-        self.assertEquals(instance._meta.group_name, "central_admission_managers")
+        self.assertEqual(instance._meta.group_name, "central_admission_managers")
 
     def test_assert_rule_sets_class_method(self):
         self.assertIsInstance(

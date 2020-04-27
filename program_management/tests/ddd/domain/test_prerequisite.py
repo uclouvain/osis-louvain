@@ -29,6 +29,9 @@ from django.utils.translation import gettext_lazy as _
 from base.models.enums import prerequisite_operator
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain.prerequisite import NullPrerequisite
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.prerequisite import PrerequisiteItemFactory, PrerequisiteFactory, \
+    PrerequisiteItemGroupFactory
 
 
 class TestPrerequisiteItem(SimpleTestCase):
@@ -37,6 +40,21 @@ class TestPrerequisiteItem(SimpleTestCase):
         expected_str = p_item.code
 
         self.assertEquals(str(p_item), expected_str)
+
+    def test_eq_when_code_and_year_are_the_same(self):
+        item1 = PrerequisiteItemFactory(code='code', year=2018)
+        item2 = PrerequisiteItemFactory(code='code', year=2018)
+        self.assertEqual(item1, item2)
+
+    def test_eq_when_code_is_different(self):
+        item1 = PrerequisiteItemFactory(code='code', year=2018)
+        item2 = PrerequisiteItemFactory(code='code2', year=2018)
+        self.assertNotEqual(item1, item2)
+
+    def test_eq_when_year_is_different(self):
+        item1 = PrerequisiteItemFactory(code='code', year=2018)
+        item2 = PrerequisiteItemFactory(code='code', year=2019)
+        self.assertNotEqual(item1, item2)
 
 
 class TestPrerequisiteGroupItem(SimpleTestCase):
@@ -98,6 +116,82 @@ class TestPrerequisite(SimpleTestCase):
             AND=_(prerequisite_operator.AND)
         )
         self.assertEquals(str(p_req), expected_str)
+
+
+class TestRemovePrerequisiteItem(SimpleTestCase):
+
+    def test_when_prerequisite_item_groups_is_empty(self):
+        prerequisite = PrerequisiteFactory(prerequisite_item_groups=[])
+        self.assertIsNone(prerequisite.remove_prerequisite_item('code', 2018))
+        self.assertListEqual(prerequisite.get_all_prerequisite_items(), [])
+        self.assertFalse(prerequisite.has_changed)
+
+    def test_when_item_to_remove_does_not_exist(self):
+        existing_item = PrerequisiteItemFactory()
+        prerequisite = PrerequisiteFactory(
+            prerequisite_item_groups=[
+                PrerequisiteItemGroupFactory(
+                    prerequisite_items=[existing_item]
+                ),
+            ]
+        )
+        inexisting_year = 99999
+        self.assertIsNone(prerequisite.remove_prerequisite_item("Inexisting code", inexisting_year))
+        self.assertListEqual(prerequisite.get_all_prerequisite_items(), [existing_item])
+        self.assertFalse(prerequisite.has_changed)
+
+    def test_when_item_to_remove_exist(self):
+        existing_item = PrerequisiteItemFactory()
+        prerequisite = PrerequisiteFactory(
+            prerequisite_item_groups=[
+                PrerequisiteItemGroupFactory(
+                    prerequisite_items=[existing_item]
+                ),
+            ]
+        )
+        self.assertIsNone(prerequisite.remove_prerequisite_item(existing_item.code, existing_item.year))
+        self.assertListEqual(prerequisite.get_all_prerequisite_items(), list())
+        self.assertTrue(prerequisite.has_changed)
+
+
+class TestgetAllPrerequisiteItems(SimpleTestCase):
+
+    def test_when_prerequisite_item_groups_is_empty(self):
+        prerequisite = PrerequisiteFactory(prerequisite_item_groups=[])
+        self.assertListEqual(prerequisite.get_all_prerequisite_items(), [])
+
+    def test_when_contains_1_item(self):
+        item = PrerequisiteItemFactory()
+        prerequisite = PrerequisiteFactory(
+            prerequisite_item_groups=[
+                PrerequisiteItemGroupFactory(
+                    prerequisite_items=[item]
+                ),
+            ]
+        )
+        expected_result = [item]
+        self.assertListEqual(prerequisite.get_all_prerequisite_items(), expected_result)
+
+    def test_when_contains_multiple_items_in_multiple_item_groups(self):
+        item = PrerequisiteItemFactory()
+        item2 = PrerequisiteItemFactory()
+        item3 = PrerequisiteItemFactory()
+        item4 = PrerequisiteItemFactory()
+        prerequisite = PrerequisiteFactory(
+            prerequisite_item_groups=[
+                PrerequisiteItemGroupFactory(
+                    prerequisite_items=[item, item2]
+                ),
+                PrerequisiteItemGroupFactory(
+                    prerequisite_items=[item3]
+                ),
+                PrerequisiteItemGroupFactory(
+                    prerequisite_items=[item4]
+                ),
+            ]
+        )
+        expected_result = [item, item2, item3, item4]
+        self.assertListEqual(prerequisite.get_all_prerequisite_items(), expected_result)
 
 
 class TestConstructPrerequisiteFromExpression(SimpleTestCase):

@@ -362,23 +362,53 @@ paths:
           $ref: '#/components/responses/Unauthorized'
       tags:
         - mini_trainings
+  /mini_trainings/{year}/{partial_acronym}/offer_roots:
+    get:
+      description: Return the list of offer roots for a mini training.
+      operationId: minitrainings_offer_roots
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: partial_acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfTraining'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - mini_trainings
   /mini_trainings/{year}/{partial_acronym}:
     get:
       description: Return the detail of the mini-training
       operationId: minitrainings_read
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: path
-        name: partial_acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: partial_acronym
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK

@@ -128,6 +128,9 @@ class TrainingDetailSerializer(TrainingListSerializer):
     remark = serializers.SerializerMethodField()
     domain_name = serializers.CharField(source='main_domain.parent.name', read_only=True)
     domain_code = serializers.CharField(source='main_domain.code', read_only=True)
+    ares_study = serializers.IntegerField(source='hops.ares_study', read_only=True)
+    ares_graca = serializers.IntegerField(source='hops.ares_graca', read_only=True)
+    ares_ability = serializers.IntegerField(source='hops.ares_ability', read_only=True)
 
     class Meta(TrainingListSerializer.Meta):
         fields = TrainingListSerializer.Meta.fields + (
@@ -188,7 +191,10 @@ class TrainingDetailSerializer(TrainingListSerializer):
             'enrollment_campus',
             'main_teaching_campus',
             'domain_code',
-            'domain_name'
+            'domain_name',
+            'ares_study',
+            'ares_graca',
+            'ares_ability'
         )
 
     def get_remark(self, training):

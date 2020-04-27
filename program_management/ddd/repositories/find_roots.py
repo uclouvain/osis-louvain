@@ -7,7 +7,6 @@ from base.models import learning_unit_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType
 
-
 DEFAULT_ROOT_CATEGORIES = set(TrainingType) | set(MiniTrainingType) - {MiniTrainingType.OPTION}
 
 

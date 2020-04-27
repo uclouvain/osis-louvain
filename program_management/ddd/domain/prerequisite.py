@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List, Set
 import re
 from typing import List
 
@@ -68,6 +69,12 @@ class PrerequisiteItem:
     def __str__(self):
         return self.code
 
+    def __eq__(self, other):
+        return self.code == other.code and self.year == other.year
+
+    def __hash__(self):
+        return hash(self.code + str(self.year))
+
 
 class PrerequisiteItemGroup:
     def __init__(self, operator: str, prerequisite_items: List[PrerequisiteItem] = None):
@@ -77,6 +84,12 @@ class PrerequisiteItemGroup:
 
     def add_prerequisite_item(self, code: str, year: int):
         self.prerequisite_items.append(PrerequisiteItem(code, year))
+
+    def remove_prerequisite_item(self, prerequisite_item: 'PrerequisiteItem') -> bool:
+        if prerequisite_item in self.prerequisite_items:
+            self.prerequisite_items.remove(prerequisite_item)
+            return True
+        return False
 
     def __str__(self):
         return str(" " + _(self.operator) + " ").join(str(p_item) for p_item in self.prerequisite_items)
@@ -92,6 +105,23 @@ class Prerequisite:
 
     def add_prerequisite_item_group(self, group: PrerequisiteItemGroup):
         self.prerequisite_item_groups.append(group)
+
+    def get_all_prerequisite_items(self) -> List['PrerequisiteItem']:
+        all_prerequisites = list()
+        for prereq_item_group in self.prerequisite_item_groups:
+            for item in prereq_item_group.prerequisite_items:
+                all_prerequisites.append(item)
+        return all_prerequisites
+
+    def remove_all_prerequisite_items(self):
+        for prerequisite_item in set(self.get_all_prerequisite_items()):
+            self.remove_prerequisite_item(prerequisite_item.code, prerequisite_item.year)
+
+    def remove_prerequisite_item(self, code: str, year: int) -> None:
+        self.has_changed = any(
+            prereq_item_group.remove_prerequisite_item(PrerequisiteItem(code=code, year=year))
+            for prereq_item_group in self.prerequisite_item_groups
+        )
 
     def __str__(self) -> PrerequisiteExpression:
         def _format_group(group: PrerequisiteItemGroup):

@@ -65,7 +65,7 @@ class AuthorizedRelationshipObject:
             parent_type: EducationGroupTypesEnum,
             child_type: EducationGroupTypesEnum,
             min_constraint: int,
-            max_constraint: int
+            max_constraint: int,
     ):
         self.parent_type = parent_type
         self.child_type = child_type

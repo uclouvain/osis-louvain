@@ -75,7 +75,7 @@ from base.tests.factories.user import UserFactory
 from base.views.learning_units.proposal.update import update_learning_unit_proposal, \
     learning_unit_modification_proposal, learning_unit_suppression_proposal
 from base.views.learning_units.search.proposal import ACTION_CONSOLIDATE, ACTION_BACK_TO_INITIAL, ACTION_FORCE_STATE
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
 
 LABEL_VALUE_BEFORE_PROPOSAL = _('Value before proposal')
 
@@ -89,10 +89,12 @@ class TestLearningUnitModificationProposal(TestCase):
 
         an_organization = OrganizationFactory(type=organization_type.MAIN)
         current_academic_year = create_current_academic_year()
-        an_entity = EntityFactory(organization=an_organization)
-        cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.FACULTY,
-                                                  start_date=current_academic_year.start_date,
-                                                  end_date=current_academic_year.end_date)
+        cls.entity_version = EntityVersionFactory(
+            entity__organization=an_organization,
+            entity_type=entity_type.FACULTY,
+            start_date=current_academic_year.start_date,
+            end_date=current_academic_year.end_date
+        )
         learning_container_year = LearningContainerYearFactory(
             acronym="LOSIS1212",
             academic_year=current_academic_year,
@@ -113,7 +115,11 @@ class TestLearningUnitModificationProposal(TestCase):
             internship_subtype=None
         )
 
-        cls.person_entity = PersonEntityFactory(person=cls.person, entity=an_entity, with_child=True)
+        cls.person_entity = PersonEntityFactory(
+            person=cls.person,
+            entity=cls.entity_version.entity,
+            with_child=True
+        )
 
         cls.url = reverse(learning_unit_modification_proposal, args=[cls.learning_unit_year.id])
 
@@ -269,10 +275,12 @@ class TestLearningUnitSuppressionProposal(TestCase):
         cls.next_academic_year = cls.academic_years[1]
         generate_creation_or_end_date_proposal_calendars(cls.academic_years)
 
-        an_entity = EntityFactory(organization=an_organization)
-        cls.entity_version = EntityVersionFactory(entity=an_entity, entity_type=entity_type.FACULTY,
-                                                  start_date=cls.current_academic_year.start_date,
-                                                  end_date=cls.academic_years[7].end_date)
+        cls.entity_version = EntityVersionFactory(
+            entity__organization=an_organization,
+            entity_type=entity_type.FACULTY,
+            start_date=cls.current_academic_year.start_date,
+            end_date=cls.academic_years[7].end_date
+        )
         learning_container_year = LearningContainerYearFactory(
             academic_year=cls.current_academic_year,
             container_type=learning_container_year_types.COURSE,
@@ -298,7 +306,11 @@ class TestLearningUnitSuppressionProposal(TestCase):
             periodicity=learning_unit_year_periodicity.ANNUAL
         )
 
-        cls.person_entity = PersonEntityFactory(person=cls.person, entity=an_entity, with_child=True)
+        cls.person_entity = PersonEntityFactory(
+            person=cls.person,
+            entity=cls.entity_version.entity,
+            with_child=True
+        )
 
         cls.url = reverse(learning_unit_suppression_proposal, args=[cls.learning_unit_year.id])
 
@@ -701,7 +713,7 @@ class TestEditProposal(TestCase):
         end_year = AcademicYearFactory(year=cls.current_academic_year.year + 10)
         generate_modification_transformation_proposal_calendars(cls.academic_years)
         generate_creation_or_end_date_proposal_calendars(cls.academic_years)
-        cls.language = LanguageFactory(code='FR')
+        cls.language = FrenchLanguageFactory()
         cls.organization = organization_factory.OrganizationFactory(type=organization_type.MAIN)
         cls.campus = campus_factory.CampusFactory(organization=cls.organization, is_administration=True)
         cls.entity = EntityFactory(organization=cls.organization)

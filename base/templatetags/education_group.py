@@ -188,7 +188,7 @@ def link_pdf_content_education_group(url):
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=True)
-def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None):
+def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None, html_id=None):
     """
     Tag to render <dl> for details of education_group.
     If the fetched value does not exist for the current education_group_year,
@@ -199,11 +199,11 @@ def dl_with_parent(context, key, dl_title="", class_dl="", default_value=None):
     parent = context["parent"]
 
     return dl_with_parent_without_context(key, obj, parent, dl_title=dl_title, class_dl=class_dl,
-                                          default_value=default_value)
+                                          default_value=default_value, html_id=html_id)
 
 
 @register.inclusion_tag("blocks/dl/dl_with_parent.html", takes_context=False)
-def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", default_value=None):
+def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", default_value=None, html_id=None):
     value = None
     parent_value = None
     if obj:
@@ -223,6 +223,7 @@ def dl_with_parent_without_context(key, obj, parent, dl_title="", class_dl="", d
         'parent_value': _bool_to_string(parent_value),
         'class_dl': class_dl,
         'default_value': default_value,
+        'html_id': html_id,
     }
 
 

@@ -96,7 +96,7 @@
                         {% dl_with_parent_without_context "acronym" education_group_year.management_entity_version parent.management_entity_version dl_title=_("Management entity") %}
                         {% dl_with_parent_without_context "acronym" education_group_year.administration_entity_version parent.administration_entity_version dl_title=_("Administration entity") %}
                         {% dl_with_parent_without_context "start_year" education_group_year.education_group parent.education_group dl_title=_("Start") default_value=_('unspecified') %}
-                        {% dl_with_parent_without_context "end_year" education_group_year.education_group parent.education_group dl_title=_("Last year of organization") default_value=_('unspecified') %}
+                        {% dl_with_parent_without_context "end_year" education_group_year.education_group parent.education_group dl_title=_("Last year of organization") default_value=_('unspecified') html_id="end_year" %}
                         {% dl_with_parent "main_teaching_campus" %}
                         {% dl_with_parent "enrollment_campus" %}
                         {% dl_with_parent "other_campus_activities" %}

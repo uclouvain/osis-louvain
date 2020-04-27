@@ -167,7 +167,8 @@ function get_data_from_tree(data) {
         attach_disabled: obj.a_attr.attach_disabled,
         detach_disabled: obj.a_attr.detach_disabled,
         modification_disabled: obj.a_attr.modification_disabled,
-        search_url: obj.a_attr.search_url
+        search_url: obj.a_attr.search_url,
+        path: obj.a_attr.path
     };
 }
 

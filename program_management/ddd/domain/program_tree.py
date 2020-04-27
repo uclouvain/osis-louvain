@@ -24,15 +24,26 @@
 #
 ##############################################################################
 import copy
-from typing import List, Set
+from collections import Counter
+from typing import List, Set, Tuple
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
-from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType, MiniTrainingType
+from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
+from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
+from program_management.ddd.validators._detach_root import DetachRootValidator
+from program_management.ddd.validators._path_validator import PathValidator
+from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
+    DetachNodeValidatorList
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
     UpdatePrerequisiteValidatorList
 from program_management.models.enums import node_type
+
+from django.utils.translation import gettext_lazy as _
+
+from program_management.models.enums.node_type import NodeType
 
 PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
@@ -53,6 +64,9 @@ class ProgramTree:
     def is_master_2m(self):
         return self.root_node.is_master_2m()
 
+    def is_root(self, node: 'Node'):
+        return self.root_node == node
+
     def get_parents_using_node_as_reference(self, child_node: 'Node') -> List['Node']:
         result = []
         for tree_node in self.get_all_nodes():
@@ -61,7 +75,13 @@ class ProgramTree:
                     result.append(link.parent)
         return result
 
-    def get_parents(self, path: Path) -> List['Node']:
+    def get_2m_option_list(self):  # TODO :: unit tests
+        tree_without_finalities = self.prune(
+            ignore_children_from={GroupType.FINALITY_120_LIST_CHOICE, GroupType.FINALITY_180_LIST_CHOICE}
+        )
+        return tree_without_finalities.root_node.get_option_list()
+
+    def get_parents(self, path: Path) -> List['Node']:  # TODO :: unit tests
         result = []
         str_nodes = path.split(PATH_SEPARATOR)
         if len(str_nodes) > 1:
@@ -94,8 +114,10 @@ class ProgramTree:
             from program_management.ddd.domain import node
             raise node.NodeNotFoundException
 
-    def get_node_by_id_and_type(self, node_id: int, node_type: 'NodeType') -> 'Node':
+    @deprecated  # Please use :py:meth:`~program_management.ddd.domain.program_tree.ProgramTree.get_node` instead !
+    def get_node_by_id_and_type(self, node_id: int, node_type: NodeType) -> 'Node':
         """
+        DEPRECATED :: Please use the :py:meth:`get_node <ProgramTree.get_node>` instead !
         Return the corresponding node based on the node_id value with respect to the class.
         :param node_id: int
         :param node_type: NodeType
@@ -119,19 +141,43 @@ class ProgramTree:
             return set(n for n in all_nodes if n.node_type in types)
         return all_nodes
 
-    def get_nodes_by_type(self, node_type_value) -> List['Node']:
-        return [node for node in self.get_all_nodes() if node.type == node_type_value]
+    def get_nodes_by_type(self, node_type_value) -> Set['Node']:
+        return {node for node in self.get_all_nodes() if node.type == node_type_value}
 
-    def get_codes_permitted_as_prerequisite(self):
+    def get_codes_permitted_as_prerequisite(self) -> List[str]:
         learning_unit_nodes_contained_in_program = self.get_nodes_by_type(node_type.NodeType.LEARNING_UNIT)
-        return [node_obj.code for node_obj in learning_unit_nodes_contained_in_program]
+        return list(sorted(node_obj.code for node_obj in learning_unit_nodes_contained_in_program))
 
-    # TODO :: unit test
-    def get_all_finalities(self):
+    def get_nodes_that_are_prerequisites(self) -> List['NodeLearningUnitYear']:  # TODO :: unit test
+        return list(
+            sorted(
+                (
+                    node_obj for node_obj in self.get_all_nodes()
+                    if node_obj.is_learning_unit() and node_obj.is_prerequisite
+                ),
+                key=lambda node_obj: node_obj.code
+            )
+        )
+
+    def get_nodes_that_have_prerequisites(self) -> List['NodeLearningUnitYear']:  # TODO :: unit test
+        return list(
+            sorted(
+                (
+                    node_obj for node_obj in self.get_all_nodes()
+                    if node_obj.is_learning_unit() and node_obj.has_prerequisite
+                ),
+                key=lambda node_obj: node_obj.code
+            )
+        )
+
+    def count_usage(self, node: 'Node') -> int:
+        return Counter(_nodes_from_root(self.root_node))[node]
+
+    def get_all_finalities(self) -> Set['Node']:
         finality_types = set(TrainingType.finality_types_enum())
         return self.get_all_nodes(types=finality_types)
 
-    def get_greater_block_value(self):
+    def get_greater_block_value(self) -> int:
         all_links = self.get_all_links()
         if not all_links:
             return 0
@@ -147,7 +193,12 @@ class ProgramTree:
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
         return ProgramTree(root_node=copied_root_node, authorized_relationships=self.authorized_relationships)
 
-    def attach_node(self, node_to_attach: 'Node', path: Path = None, **link_attributes):
+    def attach_node(
+            self,
+            node_to_attach: 'Node',
+            path: Path = None,
+            **link_attributes
+    ) -> List['BusinessValidationMessage']:
         """
         Add a node to the tree
         :param node_to_attach: Node to add on the tree
@@ -160,7 +211,7 @@ class ProgramTree:
             parent.add_child(node_to_attach, **link_attributes)
         return messages
 
-    def clean_attach_node(self, node_to_attach: 'Node', path: Path):
+    def clean_attach_node(self, node_to_attach: 'Node', path: Path) -> Tuple[bool, List['BusinessValidationMessage']]:
         validator = AttachNodeValidatorList(self, node_to_attach, path)
         return validator.is_valid(), validator.messages
 
@@ -187,17 +238,44 @@ class ProgramTree:
         validator = UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
         return validator.is_valid(), validator.messages
 
-    def detach_node(self, path: str):
+    def detach_node(self, path_to_node_to_detach: Path) -> Tuple[bool, List['BusinessValidationMessage']]:
         """
         Detach a node from tree
-        :param path: The path node to detach
+        :param path_to_node_to_detach: The path node to detach
         :return:
         """
-        parent_path, *node_id = path.rsplit(PATH_SEPARATOR, 1)
+        validator = PathValidator(path_to_node_to_detach)
+        if not validator.is_valid():
+            return False, validator.messages
+
+        validator = DetachRootValidator(self, path_to_node_to_detach)
+        if not validator.is_valid():
+            return False, validator.messages
+
+        parent_path, *__ = path_to_node_to_detach.rsplit(PATH_SEPARATOR, 1)
         parent = self.get_node(parent_path)
-        if not node_id:
-            raise Exception("You cannot detach root node")
-        parent.detach_child(node_id)
+        node_to_detach = self.get_node(path_to_node_to_detach)
+        is_valid, messages = self.clean_detach_node(node_to_detach, parent_path)
+        if is_valid:
+            self.remove_prerequisites(node_to_detach)
+            parent.detach_child(node_to_detach)
+        return is_valid, messages
+
+    def remove_prerequisites(self, detached_node: 'Node'):
+        if detached_node.is_learning_unit():
+            to_remove = [detached_node] if detached_node.has_prerequisite else []
+        else:
+            to_remove = ProgramTree(root_node=detached_node).get_nodes_that_have_prerequisites()
+        for n in to_remove:
+            n.remove_all_prerequisite_items()
+
+    def clean_detach_node(
+            self,
+            node_to_detach: 'Node',
+            path_to_parent: Path
+    ) -> Tuple[bool, List['BusinessValidationMessage']]:
+        validator = DetachNodeValidatorList(self, node_to_detach, path_to_parent)
+        return validator.is_valid(), validator.messages
 
 
 def _nodes_from_root(root: 'Node') -> List['Node']:

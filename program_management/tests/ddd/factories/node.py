@@ -23,8 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import random
-
 import factory.fuzzy
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
@@ -39,7 +37,7 @@ class NodeFactory(factory.Factory):
 
     node_id = factory.Sequence(lambda n: n+1)
     code = factory.Sequence(lambda n: 'Code-%02d' % n)
-    title = factory.fuzzy.FuzzyText(length=240)
+    title = factory.Sequence(lambda n: 'Acronym-%02d' % n)
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     end_date = factory.LazyAttribute(generate_end_date)
 

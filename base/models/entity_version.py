@@ -92,11 +92,14 @@ class EntityVersionQuerySet(CTEQuerySet):
     def entity(self, entity):
         return self.filter(entity=entity)
 
-    def with_children(self, date=None):
+    def with_children(self, date=None, *extra_fields, **filter_kwargs):
         """
         Use a Common Table Expression to construct the hierarchy of children entities
+        The Union is made recursively on LEFT.entity_id = CTE.parent_id
 
         :param date: Date to filter the entity versions on (default: now)
+        :param extra_fields: Any field to add on the cte query
+        :param filter_kwargs: Any filter to add on the original query
         :return: a CTE queryset that can be used as is, or joined again on
         EntityVersion to get more info, e.g.:
 
@@ -118,11 +121,14 @@ class EntityVersionQuerySet(CTEQuerySet):
                 "id",
                 "entity_id",
                 "parent_id",
+                *extra_fields,
                 children=RawSQL(
                     # start the array with the current entity
                     "ARRAY[entity_id]", [],
                     output_field=ArrayField(models.IntegerField()),
                 ),
+            ).filter(
+                **filter_kwargs
             ).union(
                 # recursive union: get descendants with entity_id = parent_id
                 cte.join(EntityVersion, entity_id=cte.col.parent_id).filter(
@@ -132,6 +138,7 @@ class EntityVersionQuerySet(CTEQuerySet):
                     "id",
                     "entity_id",
                     "parent_id",
+                    *extra_fields,
                     children=ArrayConcat(
                         # Prepend the child to the array
                         F("entity_id"), cte.col.children,
@@ -143,13 +150,16 @@ class EntityVersionQuerySet(CTEQuerySet):
 
         return With.recursive(children_entities)
 
-    def with_parents(self, entity_ids, date=None):
+    def with_parents(self, date=None, *extra_fields, **filter_kwargs):
         """
         Use a Common Table Expression to construct the hierarchy of parent entities
+        The Union is made recursively on LEFT.parent_id = CTE.children_id
 
-        :param entity_ids: List of ids or queryset to filter entities id on
         :param date: Date to filter the entity versions on (default: now)
-        :return:
+        :param extra_fields: Any field to add on the cte query
+        :param filter_kwargs: Any filter to add on the original query
+        :return: a CTE queryset
+        :rtype: With
         """
         if date is None:
             date = now()
@@ -158,12 +168,12 @@ class EntityVersionQuerySet(CTEQuerySet):
             """ This function is used for the recursive SQL query """
             # self here is an EntityVersion queryset
             return self.filter(
-                entity_id__in=entity_ids,
+                **filter_kwargs,
             ).values(
                 'id',
-                'acronym',
                 'parent_id',
                 'entity_id',
+                *extra_fields,
                 parents=Value(
                     # empty array filled by union
                     "{}",
@@ -176,9 +186,9 @@ class EntityVersionQuerySet(CTEQuerySet):
                     start_date__lte=date,
                 ).values(
                     'id',
-                    'acronym',
                     'parent_id',
                     'entity_id',
+                    *extra_fields,
                     parents=ArrayConcat(
                         # Append the parent to the array
                         cte.col.parents, F("parent_id"),
@@ -188,12 +198,7 @@ class EntityVersionQuerySet(CTEQuerySet):
                 all=True,
             )
 
-        cte = With.recursive(parent_entities)
-        qs = cte.queryset().with_cte(cte).annotate(
-            level=Func('parents', function='cardinality'),
-            date=Value(date, models.DateField()),
-        )
-        return qs
+        return With.recursive(parent_entities)
 
     def get_tree(self, entity_ids, date=None):
         """
@@ -223,7 +228,11 @@ class EntityVersionQuerySet(CTEQuerySet):
                 if isinstance(entity, Entity):
                     entity_ids[i] = entity.pk
 
-        qs = self.with_parents(entity_ids, date)
+        cte = self.with_parents(date, 'acronym', entity_id__in=entity_ids)
+        qs = cte.queryset().with_cte(cte).annotate(
+            level=Func('parents', function='cardinality'),
+            date=Value(date, models.DateField()),
+        )
         return qs.values(
             'id',
             'acronym',
@@ -236,7 +245,7 @@ class EntityVersionQuerySet(CTEQuerySet):
 
     def descendants(self, entity, date=None):
         """ Return the children entities """
-        tree_qs = self.with_parents(entity, date)
+        tree_qs = self.get_tree(entity, date)
 
         # Children contain the asked entity as first element, ignore it
         return self.filter(pk__in=tree_qs.values('id')[1:]).order_by('acronym')

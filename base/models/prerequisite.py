@@ -60,10 +60,13 @@ class Prerequisite(models.Model):
 
     )
     education_group_year = models.ForeignKey(
-        "EducationGroupYear", on_delete=models.CASCADE
+        "EducationGroupYear", on_delete=models.CASCADE,
+        null=True,  # TODO :: remove this field after migration on education_group_version
     )
     education_group_version = models.ForeignKey(
-        "program_management.EducationGroupVersion", on_delete=models.CASCADE, null=True
+        "program_management.EducationGroupVersion",
+        on_delete=models.CASCADE,
+        null=True  # TODO :: make this null=False after migration on education_group_version
     )
     main_operator = models.CharField(
         choices=prerequisite_operator.PREREQUISITES_OPERATORS,

@@ -63,7 +63,7 @@ from program_management.business.excel_ue_in_of import EducationGroupYearLearnin
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
 
 PARTIAL_ACRONYM = 'Partial'
 
@@ -468,8 +468,8 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
 
     def test_build_specifications_cols(self):
 
-        lang_fr = LanguageFactory(code='FR')
-        lang_en = LanguageFactory(code='EN')
+        lang_fr = FrenchLanguageFactory()
+        lang_en = EnglishLanguageFactory()
 
         achievement_1_fr = LearningAchievementFactory(learning_unit_year=self.luy, language=lang_fr)
         achievement_2_fr = LearningAchievementFactory(learning_unit_year=self.luy, language=lang_fr)

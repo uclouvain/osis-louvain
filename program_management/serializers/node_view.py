@@ -49,7 +49,7 @@ def serialize_children(children: List['Link'], path: str, context=None) -> List[
     return serialized_children
 
 
-def _get_node_view_attribute_serializer(link: 'Link', context=None) -> dict:
+def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', context=None) -> dict:
     return {
         'href': reverse('education_group_read', args=[context['root'].pk, link.child.pk]),
         'root': context['root'].pk,
@@ -58,7 +58,7 @@ def _get_node_view_attribute_serializer(link: 'Link', context=None) -> dict:
         'element_type': link.child.type.name,
         'title': link.child.code,
         'attach_url': reverse('education_group_attach', args=[context['root'].pk, link.child.pk]),
-        'detach_url': reverse('group_element_year_delete', args=[context['root'].pk, link.child.pk, link.pk]),
+        'detach_url': reverse('tree_detach_node', args=[context['root'].pk]) + "?path=%s" % path,
         'modify_url': reverse('group_element_year_update', args=[context['root'].pk, link.child.pk, link.pk]),
         'attach_disabled': False,
         'attach_msg': None,
@@ -71,7 +71,7 @@ def _get_node_view_attribute_serializer(link: 'Link', context=None) -> dict:
 
 
 def _get_leaf_view_attribute_serializer(link: 'Link', path: str, context=None) -> dict:
-    attrs = _get_node_view_attribute_serializer(link, context=context)
+    attrs = _get_node_view_attribute_serializer(link, path, context=context)
     attrs.update({
         'path': path,
         'icon': None,
@@ -113,10 +113,10 @@ def _get_node_view_serializer(link: 'Link', path: str, context=None) -> dict:
         'text': '%(code)s - %(title)s' % {'code': link.child.code, 'title': link.child.title},
         'children': serialize_children(
             children=link.child.children,
-            path=path + PATH_SEPARATOR + str(link.child.pk),
+            path=path,
             context=context
         ),
-        'a_attr': _get_node_view_attribute_serializer(link, context=context),
+        'a_attr': _get_node_view_attribute_serializer(link, path, context=context),
     }
 
 

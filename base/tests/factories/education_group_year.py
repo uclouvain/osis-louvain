@@ -38,7 +38,6 @@ from base.models.enums.education_group_types import TrainingType, MiniTrainingTy
 from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
-from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_type import EducationGroupTypeFactory
 from base.tests.factories.entity import EntityFactory
 from reference.tests.factories.language import LanguageFactory
@@ -54,12 +53,23 @@ def generate_title(education_group_year):
     return '{obj.academic_year} {gen_str}'.format(obj=education_group_year, gen_str=string_generator()).lower()
 
 
+def generate_partial_acronym():
+    sigle_ele = "".join(random.sample(string.ascii_uppercase, k=5))
+    cnum = "".join(random.sample(string.digits, k=3))
+    subdivision = random.choice(string.ascii_uppercase)
+    return "{sigle_ele}{cnum}{subdivision}".format(
+        sigle_ele=sigle_ele,
+        cnum=cnum,
+        subdivision=subdivision
+    )
+
+
 class EducationGroupYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = EducationGroupYear
         django_get_or_create = ('partial_acronym', 'academic_year',)
 
-    education_group = factory.SubFactory(EducationGroupFactory)
+    education_group = factory.SubFactory("base.tests.factories.education_group.EducationGroupFactory")
     academic_year = factory.SubFactory(AcademicYearFactory)
     acronym = ""
     partial_acronym = ""
@@ -102,7 +112,7 @@ class EducationGroupYearFactory(factory.django.DjangoModelFactory):
             if self.partial_acronym == "":
                 self.partial_acronym = exrex.getone(self.rules['partial_acronym'].regex_rule).upper()
         except KeyError:
-            self.partial_acronym = string_generator(7)
+            self.partial_acronym = generate_partial_acronym()
 
 
 class MiniTrainingFactory(EducationGroupYearFactory):

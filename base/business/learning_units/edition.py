@@ -48,6 +48,7 @@ from base.models.entity import Entity
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
+from base.models.enums.proposal_type import ProposalType
 from base.models.learning_achievement import LearningAchievement
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -279,6 +280,8 @@ def _check_shorten_partim(learning_unit_to_edit, new_academic_year, partim):
 def _get_actual_end_year(learning_unit_to_edit):
     proposal = ProposalLearningUnit.objects.filter(
         learning_unit_year__learning_unit=learning_unit_to_edit
+    ).exclude(
+        type=ProposalType.CREATION.name
     ).first()
     end_year_lu = proposal.initial_data.get('learning_unit').get('end_year') if proposal \
         else learning_unit_to_edit.end_year

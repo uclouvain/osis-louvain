@@ -31,7 +31,7 @@ from factory import post_generation
 
 from base.models.enums import prerequisite_operator
 from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory, LearningUnitYearFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
@@ -43,7 +43,7 @@ class PrerequisiteFactory(factory.django.DjangoModelFactory):
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-    learning_unit_year = factory.SubFactory(LearningUnitYearFakerFactory)
+    learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
     main_operator = prerequisite_operator.AND
     education_group_version = factory.SubFactory(EducationGroupVersionFactory)

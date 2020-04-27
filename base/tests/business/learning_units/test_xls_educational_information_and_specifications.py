@@ -57,7 +57,7 @@ from base.tests.factories.user import UserFactory
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
 
 INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_AND_EN_COLUMN = 3
 INDEX_FIRST_CMS_LABEL_PEDAGOGY_FR_ONLY_COLUMN = 14
@@ -81,9 +81,9 @@ class TestXlsEducationalInformationSpecificationXls(TestCase):
         cls.teaching_material = TeachingMaterialFactory(learning_unit_year=cls.l_unit_yr_1, 
                                                         title='Teaching material title')
         cls.learning_unit_achievement_fr = LearningAchievementFactory(learning_unit_year=cls.l_unit_yr_1, 
-                                                                      language=LanguageFactory(code='FR'))
+                                                                      language=FrenchLanguageFactory())
         cls.learning_unit_achievement_en = LearningAchievementFactory(learning_unit_year=cls.l_unit_yr_1, 
-                                                                      language=LanguageFactory(code='EN'))
+                                                                      language=EnglishLanguageFactory())
         cls.entity_requirement = EntityVersion.objects.filter(
             entity=OuterRef('learning_container_year__requirement_entity'),
         ).current(
