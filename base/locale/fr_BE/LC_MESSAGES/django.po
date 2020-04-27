@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-19 11:42+0100\n"
+"POT-Creation-Date: 2020-04-27 08:54+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -126,39 +126,11 @@ msgstr "1er quadri"
 msgid "2nd quadri"
 msgstr "2e quadri"
 
-msgid ""
-"<b>Syntax rules</b>:<ul><li>No double parentheses.</li><li>Valid operators "
-"are OU or ET.</li><li>The operator must be the same inside all parentheses "
-"(groups).</li><li>The operator that linked groups must be different than the "
-"one that linked LU inside groups (parentheses).</li><li>The LU code cannot "
-"include spaces (ex: LDROI1001 and not LDROI&nbsp;1001).</li></ul></"
-"p><p><b>Examples</b>:<ul><li>A OU B OU C: valid</li><li>A ET B ET C : valid</"
-"li><li>A ET (B OU C) ET (D OU E): valid</li><li>A ET (B OU C) OU (D OU E): "
-"not valid</li><li>A ET (B ET C) ET (D ET E): not valid</li><li>A ET (B OU C) "
-"ET (D ET E): not valid</li></ul>"
-msgstr ""
-"<b>Règles de syntaxe:</b><ul><li>Pas de doubles parenthèses.</li><li>Les "
-"opérateurs valides sont OU et ET.</li><li>L'opérateur doit être le même à "
-"l'intérieur de toutes les parenthèses (groupes).</li><li>L'opérateur qui "
-"unit les groupes doit être différent de celui qui unit les UEs dans un "
-"groupe (parenthèses).</li><li>Le code de l'UE ne peut pas comporter "
-"d'espaces (ex: LDROI1001 et non LDROI&nbsp;1001).</li></ul></"
-"p><p><b>Exemples</b>:<ul><li>A OU B OU C: valide</li><li>A ET B ET C : "
-"valide</li><li>A ET (B OU C) ET (D OU E): valide</li><li>A ET (B OU C) OU (D "
-"OU E): non valide</li><li>A ET (B ET C) ET (D ET E): non valide</li><li>A ET "
-"(B OU C) ET (D ET E): non valide</li></ul>"
-
 msgid "<b>create</b> a new learning unit using that acronym"
 msgstr "<b>Créer</b> une nouvelle unité d’enseignement utilisant ce sigle"
 
 msgid "<b>prolong</b> the learning unit of the same acronym"
 msgstr "<b>Prolonger</b> l’unité d’enseignement du même sigle"
-
-#, python-format
-msgid "A learning unit cannot be prerequisite to itself : %(acronym)s"
-msgstr ""
-"Une unité d'enseignement ne peut pas être un prérequis d'elle-même : "
-"%(acronym)s"
 
 msgid "A null value means many relationships."
 msgstr "Une valeur nulle signifie plusieurs relations."
@@ -266,6 +238,9 @@ msgstr "Ce code a déjà existé en %(academic_year)s"
 
 msgid "Acronym is invalid"
 msgstr "Sigle/Intitulé abrégé non valide"
+
+msgid "Acronym of version"
+msgstr "Sigle de version"
 
 msgid "Acronym/Short title"
 msgstr "Sigle/Intitulé abrégé"
@@ -677,6 +652,9 @@ msgstr "Créer"
 msgid "Create contact"
 msgstr "Créer contact"
 
+msgid "Create specific version"
+msgstr ""
+
 msgid "Creation"
 msgstr "Création"
 
@@ -700,6 +678,9 @@ msgstr "Proposition de création ou de date de fin par gestionnaires centraux"
 msgid "Creation or end date proposal by faculty managers"
 msgstr ""
 "Proposition de création ou de date de fin par gestionnaires facultaires"
+
+msgid "Creation specific version by central managers"
+msgstr "Création de version specific par gestionnaires centraux"
 
 msgid "Cred. rel./abs."
 msgstr "Créd. rel./abs."
@@ -1111,6 +1092,12 @@ msgstr "Complet"
 msgid "Full name"
 msgstr "Nom complet"
 
+msgid "Full title of the english version"
+msgstr ""
+
+msgid "Full title of the french version"
+msgstr ""
+
 msgid "Function"
 msgstr "Fonction"
 
@@ -1297,13 +1284,6 @@ msgstr ""
 
 msgid "It is necessary to indicate the internship subtype."
 msgstr "Il est nécessaire d'indiquer le sous-type de stage."
-
-#, python-format
-msgid "It is not possible to %(action)s the root element."
-msgstr "Il n'est pas possible de %(action)s l'élément racine."
-
-msgid "It is not possible to detach the root element."
-msgstr "Il n'est pas possible de retirer l'élément racine."
 
 msgid ""
 "It is prohibited to attach a group, mini-training or training to an element "
@@ -1728,6 +1708,9 @@ msgstr "Nouvelle UE"
 msgid "New partim"
 msgstr "Nouveau partim"
 
+msgid "New spécific version"
+msgstr ""
+
 msgid "New value"
 msgstr "Nouvelle valeur"
 
@@ -1755,12 +1738,6 @@ msgstr "Aucune différence"
 msgid "No enrollment for this learning unit"
 msgstr "Il n'y a aucune inscription pour cette unité d'enseignement"
 
-#, python-format
-msgid "No match has been found for this learning unit :  %(acronym)s"
-msgstr ""
-"Aucune correspondance n'a été trouvée pour cette unité d'enseignement : "
-"%(acronym)s"
-
 msgid "No print"
 msgstr "Pas d’impression"
 
@@ -1769,15 +1746,6 @@ msgstr "Aucune proposition n'a été sélectionnée."
 
 msgid "No result!"
 msgstr "Aucun résultat!"
-
-#, python-format
-msgctxt "female"
-msgid ""
-"No type of %(child_category)s can be created as child of %(category)s of "
-"type %(type)s"
-msgstr ""
-"Aucun type de %(child_category)s ne peut être créé comme enfant d'une "
-"%(category)s de type %(type)s"
 
 msgid "No. Session"
 msgstr "No. session"
@@ -1820,6 +1788,9 @@ msgstr "Encodage des notes"
 #, python-format
 msgid "Notification%(number_unread_notifications|pluralize)s"
 msgstr "Notification%(number_unread_notifications|pluralize)s"
+
+msgid "Nouvelle Version"
+msgstr ""
 
 msgid "Number of elements"
 msgstr "Nombre d'éléments"
@@ -1929,8 +1900,8 @@ msgid ""
 "Part of the title which is common to the complete EU, to its partims and to "
 "its classes"
 msgstr ""
-"Partie de l’intitulé qui est commune à l’UE complète, à ses partims et à "
-"ses classes"
+"Partie de l’intitulé qui est commune à l’UE complète, à ses partims et à ses "
+"classes"
 
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
@@ -2058,12 +2029,6 @@ msgstr "Vol. PP"
 
 msgid "Preferences"
 msgstr "Préférences"
-
-msgid "Prerequisite"
-msgstr "Prérequis"
-
-msgid "Prerequisites are invalid"
-msgstr "Prérequis invalides"
 
 msgid "President"
 msgstr "Président·e"
@@ -2257,6 +2222,9 @@ msgstr "Quadrimestre dérogation"
 
 msgid "Rate code"
 msgstr "Code tarif"
+
+msgid "Rattached to"
+msgstr "Rattachée à"
 
 msgid "Real classes"
 msgstr "Classes effectives"
@@ -2456,6 +2424,11 @@ msgstr "Complément spécifique à l'UE (complet)"
 msgid "Specific complement (Partim)"
 msgstr "Complément spécifique à l'UE (partim)"
 
+msgid ""
+"Specific version for education group year %(acronym)s (%(academic_year)s) successfully created."
+msgstr ""
+"La version spécifique %(acronym)s (%(academic_year)s) créée avec succès."
+
 msgid "Specifications"
 msgstr "Cahier des charges"
 
@@ -2610,9 +2583,6 @@ msgstr "La valeur du champ crédits doit être un entier"
 msgid "The education group has been deleted."
 msgstr "La formation a été supprimée."
 
-msgid "The education group is not a training type"
-msgstr "Il ne s'agit pas d'une formation"
-
 #, python-format
 msgid "The end date must be greater or equals to the finality %(acronym)s"
 msgstr ""
@@ -2637,9 +2607,6 @@ msgstr "L'entité '%(acronym)s' n'existe plus en %(year)s"
 #, python-format
 msgid "The event \"%(event)s\" has been deleted successfully"
 msgstr "L'événement \"%(event)s\" a été supprimé avec succès"
-
-msgid "The faculty manager cannot modify outside of program edition period"
-msgstr ""
 
 msgid "The field can contain only one value."
 msgstr "Ce champ ne peut contenir qu'une seule valeur."
@@ -2684,10 +2651,6 @@ msgid ""
 "The learning unit %(acronym)s is included in the following education groups"
 msgstr ""
 "L'unité d'enseignement %(acronym)s est incluse dans les groupements suivants"
-
-#, python-format
-msgid "The learning unit %(acronym)s is not contained inside the formation"
-msgstr "L'unité d'enseignement %(acronym)s n'est pas incluse dans la formation"
 
 #, python-format
 msgid "The learning unit %(acronym)s is not included in any education group"
@@ -2814,31 +2777,13 @@ msgid "The title is made up of the common part and / or any supplement"
 msgstr ""
 "L’intitulé est composé de la partie commune et/ou de l’éventuel complément"
 
-msgid "The user doesn't have right to update admission condition"
-msgstr ""
-"L’utilisateur n’a pas le droit de mettre à jour la condition d’admission"
-
-msgid "The user doesn't have right to update general information"
-msgstr ""
-"L’utilisateur n’a pas le droit de mettre à jour les informations générales"
-
-msgid "The user has not permission to change education groups."
+msgid "The user does not have permission to change education groups."
 msgstr "L'utilisateur n'a pas la permission de modifier les formations."
 
-#, python-format
-msgctxt "female"
-msgid "The user does not have permission to create a %(category)s."
-msgstr "L'utilisateur n'a pas la permission de créer une %(category)s."
-
-#, python-format
-msgctxt "male"
-msgid "The user does not have permission to create a %(category)s."
-msgstr "L'utilisateur n'a pas la permission de créer un %(category)s."
-
-msgid "The user has not permission to create education groups."
+msgid "The user does not have permission to create education groups."
 msgstr "L'utilisateur n'a pas la permission de créer des formations."
 
-msgid "The user has not permission to delete education groups."
+msgid "The user does not have permission to delete education groups."
 msgstr "L'utilisateur n'a pas la permission de supprimer les formations."
 
 msgid "The user is not allowed to change education group content."
@@ -2847,9 +2792,6 @@ msgstr ""
 
 msgid "The user is not attached to the management entity"
 msgstr "L’utilisateur n’est pas attaché à l’entité de gestion"
-
-msgid "The user is not the program manager of the education group"
-msgstr "L'utilisateur n'est pas gestionnaire de programme de cette formation"
 
 #, python-format
 msgid ""
@@ -2969,6 +2911,9 @@ msgstr "Gestion des stages des étudiants."
 
 msgid "This process helps tutors while scores encoding."
 msgstr "Processus visant à aider les enseignants pour l'encodage des notes."
+
+msgid "This version exists until"
+msgstr ""
 
 msgid "Title"
 msgstr "Intitulé"
@@ -3425,9 +3370,6 @@ msgstr "commentaire"
 
 msgid "comment (internal)"
 msgstr "commentaire (interne)"
-
-msgid "confirm"
-msgstr "confirmer"
 
 msgid "credits"
 msgstr "crédits"
