@@ -24,8 +24,24 @@
 #
 ##############################################################################
 from education_group.models.group_year import GroupYear
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionBuilder
+from program_management.ddd.repositories.persist_tree import persist_specific_version_program
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
+
+
+def create_program_version(offer_acronym: str, offer_year: int, title_fr: str, title_en: str, version_name: str, end_year: int) -> ProgramTreeVersion:
+    """Devrait créer une version de programme, sur base des paramètres entrés"""
+    tree_version = init_program_tree_version(offer_acronym, offer_year, title_fr, title_en, version_name, end_year)
+    persist_specific_version_program(tree_version)
+
+
+def init_program_tree_version(offer_acronym: str, offer_year: int, title_fr: str, title_en: str, version_name: str, end_year: int) -> ProgramTreeVersion:
+    """Instancie un ProgramTreeVersion"""
+    # builder = ProgramTreeVersionBuilder()
+    # program_tree_version = builder.build_from(param1, param2)
+    # return program_tree_version
+    return ProgramTreeVersionBuilder()
 
 
 def report_specific_version_creation(data, education_group_year, end_postponement, education_group_years_list):

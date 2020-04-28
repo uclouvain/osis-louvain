@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
 from base.models import academic_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from program_management.ddd.repositories import load_specific_version
-from program_management.ddd.service.create_specific_version import report_specific_version_creation, \
+from program_management.ddd.service.create_program_tree_version import report_specific_version_creation, \
     create_specific_version
 
 
@@ -53,14 +53,11 @@ class SpecificVersionForm(forms.Form):
         self.person = kwargs.pop('person')
         self.education_group_year = kwargs.pop('education_group_year')
         super().__init__(*args, **kwargs)
-        try:
-            event_perm = event_perms.generate_event_perm_creation_specific_version(self.person)
-            self.fields["end_year"].queryset = event_perm.get_academic_years(
-                min_academic_y=self.education_group_year.academic_year.year
-            )
-            self.fields["end_year"].initial = self.education_group_year.academic_year
-        except ValueError:
-            self.fields['end_year'].disabled = True
+        event_perm = event_perms.generate_event_perm_creation_specific_version(self.person)
+        self.fields["end_year"].queryset = event_perm.get_academic_years(
+            min_academic_y=self.education_group_year.academic_year.year
+        )
+        self.fields["end_year"].initial = self.education_group_year.academic_year
 
     def clean_version_name(self):
         version_name = self.education_group_year.acronym + self.cleaned_data["version_name"]

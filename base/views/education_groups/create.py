@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -226,7 +226,7 @@ class CreateEducationGroupSpecificVersion(AjaxTemplateMixin, CreateView):
 
     def get_form_kwargs(self):
         form_kwargs = super().get_form_kwargs()
-        form_kwargs["save_type"] = self.request.POST["save_type"] if "save_type" in self.request.POST else None
+        form_kwargs["save_type"] = self.request.POST.get("save_type")
         form_kwargs['education_group_year'] = self.education_group_year
         form_kwargs['person'] = self.person
         form_kwargs.pop('instance')
