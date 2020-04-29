@@ -186,19 +186,19 @@ class PostponeContent:
     def check_instance(self, person=None):
         is_central = person and person.is_central_manager
         # [OK] Moved into MinimumMaximumPostponementYearValidator
-        # if self.instance.academic_year.year < self.current_year.year:
-        #     raise NotPostponeError(_("You are not allowed to postpone this training in the past."))
-        # if self.instance.academic_year.year - 1 > self.current_year.year and not is_central:
-        #     raise NotPostponeError(_("You are not allowed to postpone this training in the future."))
+        if self.instance.academic_year.year < self.current_year.year:
+            raise NotPostponeError(_("You are not allowed to postpone this training in the past."))
+        if self.instance.academic_year.year - 1 > self.current_year.year and not is_central:
+            raise NotPostponeError(_("You are not allowed to postpone this training in the future."))
 
         # [OK] Moved into EndYearPostponementValidator
-        # end_year = self.instance.education_group.end_year
-        # if end_year and end_year.year < self.next_academic_year.year:
-        #     raise NotPostponeError(_("The end date of the education group is smaller than the year of postponement."))
+        end_year = self.instance.education_group.end_year
+        if end_year and end_year.year < self.next_academic_year.year:
+            raise NotPostponeError(_("The end date of the education group is smaller than the year of postponement."))
 
         # [OK] Moved into EndYearPostponementValidator
-        # if not self.instance.groupelementyear_set.exists():
-        #     raise NotPostponeError(_("This training has no content to postpone."))
+        if not self.instance.groupelementyear_set.exists():
+            raise NotPostponeError(_("This training has no content to postpone."))
 
     def get_instance_n1(self, instance):
         try:
@@ -287,6 +287,8 @@ class PostponeContent:
         """
         old_luy = old_gr.child_leaf
         new_luy = old_luy.learning_unit.learningunityear_set.filter(academic_year=new_gr.parent.academic_year).first()
+
+        # FIXME :: deprecated - Reuse ReuseOldLearningUnitNodeValidator instead
         if not new_luy:
             new_luy = old_luy
             self.warnings.append(ReuseOldLearningUnitYearWarning(old_luy, self.next_academic_year))
@@ -307,7 +309,8 @@ class PostponeContent:
             if new_gr.link_type == LinkTypes.REFERENCE.name and is_empty:
                 self.warnings.append(ReferenceLinkEmptyWarning(new_egy))
             elif not is_empty:
-                if not (new_egy.is_training() or new_egy.education_group_type.name in MiniTrainingType.to_postpone()):
+                if not new_egy.is_training() and new_egy.education_group_type.name not in MiniTrainingType.to_postpone():
+                    # FIXME :: is this really a business validation? With this condition, any GROUP aren't postponed...?
                     self.warnings.append(EducationGroupYearNotEmptyWarning(new_egy, self.next_academic_year))
             else:
                 self._postpone(old_egy, new_egy)
