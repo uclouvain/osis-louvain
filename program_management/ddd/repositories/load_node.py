@@ -45,6 +45,34 @@ def load_by_type(type: NodeType, element_id: int) -> node.Node:
         return load_node_learning_unit_year(element_id)
 
 
+def load_same_node_by_year(n: node.Node, year: int) -> node.Node:  # TODO :: unit tests
+    qs = element.Element.objects.filter(
+        pk=n.pk
+    ).filter(
+        Q(group_year__group__groupyear__academic_year__year=year)
+        | Q(learning_unit_year__learning_unit__learningunityear__academic_year__year=year)
+    ).distinct().annotate(
+        equivalent_element_id_from_year=Case(
+            When(
+                group_year__group__groupyear__element__pk__isnull=False,
+                then=F('group_year__group__groupyear__element__pk')
+            ),
+            When(
+                learning_unit_year__learning_unit__learningunityear__element__pk__isnull=False,
+                then=F('learning_unit_year__learning_unit__learningunityear__element__pk')
+            ),
+            default=Value(-1),
+            output_field=IntegerField(),
+        )
+    ).values_list(
+        'equivalent_element_id_from_year',
+        flat=True
+    )
+    if not qs:
+        return
+    return load_multiple(qs)[0]
+
+
 # TODO: Depracated, must be deleted (use load method type are determined in element)
 def load_node_group_year(node_id: int) -> node.Node:
     try:

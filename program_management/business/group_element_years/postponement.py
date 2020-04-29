@@ -311,6 +311,7 @@ class PostponeContent:
             elif not is_empty:
                 if not new_egy.is_training() and new_egy.education_group_type.name not in MiniTrainingType.to_postpone():
                     # FIXME :: is this really a business validation? With this condition, any GROUP aren't postponed...?
+                    # FIXME :: CF. NodeGroupAlreadyPostponedValidator for implementation
                     self.warnings.append(EducationGroupYearNotEmptyWarning(new_egy, self.next_academic_year))
             else:
                 self._postpone(old_egy, new_egy)

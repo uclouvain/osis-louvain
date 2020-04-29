@@ -303,6 +303,9 @@ class NodeGroupYear(Node):
         self.offer_partial_title_en = offer_partial_title_en
         self.category = category
 
+    def is_training(self):
+        return self.category == Categories.TRAINING
+
 
 class NodeLearningUnitYear(Node):
 
