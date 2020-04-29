@@ -26,8 +26,11 @@
 from program_management.ddd.repositories.check_node_code_exists import check_node_code_exists
 
 
-def generate_node_code(code_from_standard_root_node: str) -> str:
-    """Incrémenter la parie numérique du code de la version standard jusqu'à ce que le nouveau code n'existe pas."""
-    code = ""
-    check_node_code_exists(code)
-    return ""
+def generate_node_code(code_from_standard_root_node: str, year: int) -> str:
+    counter = 1
+    new_partial_acronym = code_from_standard_root_node
+    while check_node_code_exists(code_from_standard_root_node, year):
+        incrementation = str(int(code_from_standard_root_node[-4:][:-1]) + counter)
+        new_partial_acronym = code_from_standard_root_node[:-4] + incrementation + code_from_standard_root_node[-1:]
+        counter += 1
+    return new_partial_acronym

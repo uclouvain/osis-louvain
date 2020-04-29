@@ -23,8 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from program_management.models.education_group_version import EducationGroupVersion
 
 
 def check_version_name_exists(working_year: int, version_name: str, is_transition: bool) -> bool:
-    """Vérifier en DB si le nom de version entré en paramètre existe déjà sur l'année en cours ou futures."""
-    pass
+    return EducationGroupVersion.objects.filter(
+        version_name=version_name,
+        offer__academic_year__year__gte=working_year
+    ).exists()
+

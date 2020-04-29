@@ -24,15 +24,13 @@
 #
 ##############################################################################
 from django import forms
-from django.core.exceptions import ValidationError
 from django.forms import TextInput
 from django.utils.translation import gettext_lazy as _
 
-from base.business import event_perms
 from base.business.education_groups.create import create_initial_group_element_year_structure
-from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY
+from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models import academic_year
-from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
+from base.models.academic_year import compute_max_academic_year_adjournment
 from program_management.ddd.repositories import load_specific_version
 from program_management.ddd.service.create_program_tree_version import report_specific_version_creation, \
     create_specific_version
@@ -44,31 +42,20 @@ class SpecificVersionForm(forms.Form):
     }))
     title = forms.CharField(max_length=100, required=False, label=_('Full title of the french version'))
     title_english = forms.CharField(max_length=100, required=False, label=_('Full title of the english version'))
-    end_year = forms.ModelChoiceField(queryset=AcademicYear.objects.none(), required=False,
-                                      label=_('This version exists until'), empty_label=BLANK_CHOICE_DISPLAY)
+    end_year = forms.ChoiceField(required=False, label=_('This version exists until'))
 
     def __init__(self, *args, **kwargs):
         self.save_type = kwargs.pop('save_type')
         self.education_group_years_list = []
         self.person = kwargs.pop('person')
         self.education_group_year = kwargs.pop('education_group_year')
+        self.max_year = academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1).year
+        choices_years = [(x, x) for x in range(self.education_group_year.academic_year.year, self.max_year)]
         super().__init__(*args, **kwargs)
-        event_perm = event_perms.generate_event_perm_creation_specific_version(self.person)
-        self.fields["end_year"].queryset = event_perm.get_academic_years(
-            min_academic_y=self.education_group_year.academic_year.year
-        )
-        self.fields["end_year"].initial = self.education_group_year.academic_year
-
-    def clean_version_name(self):
-        version_name = self.education_group_year.acronym + self.cleaned_data["version_name"]
-        if load_specific_version.check_existing_version(version_name, self.education_group_year.id):
-            raise ValidationError(_("Acronym already exists in %(academic_year)s") % {
-                "academic_year": self.education_group_year.academic_year})
-        return version_name.upper()
+        self.fields["end_year"].choices = BLANK_CHOICE + choices_years
 
     def save(self):
-        max_year = academic_year.find_academic_year_by_year(compute_max_academic_year_adjournment() + 1).year
-        end_postponement = max_year if not self.cleaned_data['end_year'] else self.cleaned_data['end_year'].year
+        end_postponement = self.max_year if not self.cleaned_data['end_year'] else self.cleaned_data['end_year']
         data = {
             "version_name": self.cleaned_data.get("version_name"),
             "title_fr": self.cleaned_data.get("title"),

@@ -23,20 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from education_group.models.group_year import GroupYear
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionBuilder
 from program_management.ddd.repositories.persist_tree import persist_specific_version_program
+from program_management.ddd.service.generate_node_code import generate_node_code
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 
 
-def create_program_version(offer_acronym: str, offer_year: int, title_fr: str, title_en: str, version_name: str, end_year: int) -> ProgramTreeVersion:
+def create_program_version(title_fr: str, title_en: str, version_name: str, end_year: int) -> None:
     """Devrait créer une version de programme, sur base des paramètres entrés"""
-    tree_version = init_program_tree_version(offer_acronym, offer_year, title_fr, title_en, version_name, end_year)
+    tree_version = init_program_tree_version(title_fr, title_en, version_name, end_year)
     persist_specific_version_program(tree_version)
 
 
-def init_program_tree_version(offer_acronym: str, offer_year: int, title_fr: str, title_en: str, version_name: str, end_year: int) -> ProgramTreeVersion:
+def init_program_tree_version(title_fr: str, title_en: str, version_name: str, end_year: int) -> ProgramTreeVersion:
     """Instancie un ProgramTreeVersion"""
     # builder = ProgramTreeVersionBuilder()
     # program_tree_version = builder.build_from(param1, param2)
@@ -60,14 +60,7 @@ def create_specific_version(data, education_group_year):
     )
     new_groupyear = version_standard.root_group
     new_groupyear.pk = None
-    new_partial_acronym = new_groupyear.partial_acronym
-    counter = 1
-    while GroupYear.objects.get(
-            partial_acronym=new_partial_acronym,
-            academic_year=education_group_year.academic_year).exist():
-        incrementation = str(int(new_groupyear.partial_acronym[-4:][:-1])+counter)
-        new_partial_acronym = new_partial_acronym[:-4]+incrementation+new_partial_acronym[-1:]
-        counter += 1
+    new_partial_acronym = generate_node_code(new_groupyear.partial_acronym, education_group_year.academic_year.year)
     new_groupyear.partial_acronym = new_partial_acronym
     new_groupyear.save()
     new_element = Element(group_year=new_groupyear)

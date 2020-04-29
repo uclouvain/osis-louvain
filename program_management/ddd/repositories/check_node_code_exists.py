@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from education_group.models.group_year import GroupYear
 
 
-def check_node_code_exists(code: str) -> bool:
-    """Accès DB pour vérifier l'existance du code"""
-    pass
+def check_node_code_exists(code: str, year: int) -> bool:
+    return GroupYear.objects.get(partial_acronym=code, academic_year__year=year).exist()

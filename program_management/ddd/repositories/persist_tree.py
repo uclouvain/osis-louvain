@@ -28,6 +28,7 @@ from django.db import transaction
 from base.models.group_element_year import GroupElementYear
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.node import Node, NodeEducationGroupYear, NodeLearningUnitYear
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
 from program_management.ddd.repositories import _persist_prerequisite
 
 
