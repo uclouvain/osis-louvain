@@ -191,6 +191,7 @@ class PostponeContent:
         if self.instance.academic_year.year - 1 > self.current_year.year and not is_central:
             raise NotPostponeError(_("You are not allowed to postpone this training in the future."))
 
+        # [OK] Moved into EndYearPostponementValidator
         end_year = self.instance.education_group.end_year
         if end_year and end_year.year < self.next_academic_year.year:
             raise NotPostponeError(_("The end date of the education group is smaller than the year of postponement."))
