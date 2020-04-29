@@ -185,6 +185,7 @@ class PostponeContent:
 
     def check_instance(self, person=None):
         is_central = person and person.is_central_manager
+        # [OK] Moved into MinimumMaximumPostponementYearValidator
         if self.instance.academic_year.year < self.current_year.year:
             raise NotPostponeError(_("You are not allowed to postpone this training in the past."))
         if self.instance.academic_year.year - 1 > self.current_year.year and not is_central:
