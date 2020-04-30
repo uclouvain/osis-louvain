@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
@@ -34,14 +35,22 @@ from program_management.ddd.repositories import load_node
 
 # TODO :: unit tests
 class NodeGroupAlreadyPostponedValidator(BusinessValidator):
-    def __init__(self, tree_to_fill_in: 'ProgramTree', copy_from_node: 'NodeGroupYear'):
+    def __init__(
+            self,
+            tree_to_fill_in: 'ProgramTree',
+            copy_from_node: 'NodeGroupYear',
+            existing_nodes_into_year_to_fill: List['Node']  # TODO :: typing ExistingNodesWithTheirChildren
+    ):
         super(NodeGroupAlreadyPostponedValidator, self).__init__()
         self.copy_from_node = copy_from_node
         self.tree_to_fill_in = tree_to_fill_in
+        self.existing_nodes_into_year_to_fill = existing_nodes_into_year_to_fill
 
     def validate(self):
         year_of_tree_to_fill = self.tree_to_fill_in.root_node.year
         existing_node = load_node.load_same_node_by_year(self.copy_from_node, year_of_tree_to_fill)
+        # TODO :: supprimer l'utilisation de load_node et réutiliser get_existing_node_next_year
+        # TODO :: implémenter le is_empty() qui se base sur les mandatory groups (squelette)
         if existing_node \
                 and not self.copy_from_node.is_training() \
                 and self.copy_from_node.node_type.name not in MiniTrainingType.to_postpone():
@@ -52,3 +61,12 @@ class NodeGroupAlreadyPostponedValidator(BusinessValidator):
                     "academic_year": self.tree_to_fill_in.root_node.academic_year
                 }
             )
+
+    def get_existing_node_next_year(self):
+        return next(
+            (
+                n for n in self.existing_nodes_into_year_to_fill
+                if n.unique_id_trough_years == self.copy_from_node.unique_id_trough_years  # TODO :: add and load this field into domain and repository
+            ),
+            None
+        )

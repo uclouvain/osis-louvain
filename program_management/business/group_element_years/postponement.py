@@ -196,7 +196,7 @@ class PostponeContent:
         if end_year and end_year.year < self.next_academic_year.year:
             raise NotPostponeError(_("The end date of the education group is smaller than the year of postponement."))
 
-        # [OK] Moved into EndYearPostponementValidator
+        # [OK] Moved into HasContentToPostponeValidator
         if not self.instance.groupelementyear_set.exists():
             raise NotPostponeError(_("This training has no content to postpone."))
 
@@ -206,9 +206,11 @@ class PostponeContent:
                 academic_year=self.next_academic_year
             ).get()
         except EducationGroupYear.DoesNotExist:
+            # TODO :: to implement into OfferNotExistForPostponementValidator
             raise NotPostponeError(_("The root does not exist in the next academic year."))
 
         if self._check_if_already_postponed(next_instance):
+            # TODO :: to implement into ProgramTreeAlreadyPostponedValidator
             raise NotPostponeError(_("The content has already been postponed."))
 
         return next_instance
@@ -275,6 +277,7 @@ class PostponeContent:
         )
         for luy in luys_not_postponed:
             if luy.has_prerequisite:
+                # TODO :: implements validator
                 self.warnings.append(PrerequisiteWarning(luy, self.instance_n1))
 
         for old_luy, new_luy in self.postponed_luy:
@@ -307,6 +310,7 @@ class PostponeContent:
         if new_egy:
             is_empty = self._is_empty(new_egy)
             if new_gr.link_type == LinkTypes.REFERENCE.name and is_empty:
+                # TODO :: implements validator
                 self.warnings.append(ReferenceLinkEmptyWarning(new_egy))
             elif not is_empty:
                 if not new_egy.is_training() and new_egy.education_group_type.name not in MiniTrainingType.to_postpone():
@@ -347,6 +351,7 @@ class PostponeContent:
         if old_egy.education_group_type.category != Categories.GROUP.name:
             if old_egy.education_group.end_year and \
                     old_egy.education_group.end_year.year < self.next_academic_year.year:
+                # TODO :: implements validator
                 self.warnings.append(EducationGroupEndYearWarning(old_egy, self.next_academic_year))
                 return None
 
@@ -393,6 +398,7 @@ class PostponeContent:
         for finality, options in missing_options.items():
             for option in options:
                 if option.id in self.postponed_options and self.postponed_options[option.id].id:
+                    # TODO :: implements validator
                     self.warnings.append(
                         FinalityOptionNotValidWarning(
                             option,
@@ -433,6 +439,7 @@ class PostponeContent:
         result = True
         for item in old_prerequisite.prerequisiteitem_set.all():
             if not item.learning_unit.learningunityear_set.filter(id__in=self._learning_units_id_in_n1_instance):
+                # TODO :: implements validator
                 self.warnings.append(PrerequisiteItemWarning(old_prerequisite, item, self.instance_n1))
                 result = False
         return result

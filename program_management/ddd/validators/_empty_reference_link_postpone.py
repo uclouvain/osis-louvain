@@ -23,25 +23,33 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.business_validator import BusinessValidator
+from base.models.enums.education_group_types import MiniTrainingType
 from program_management.ddd.business_types import *
-from program_management.ddd.repositories import load_working_academic_year
 
 
-class MinimumMaximumPostponementYearValidator(BusinessValidator):
-    def __init__(self, tree_to_fill_in: 'ProgramTree'):
-        super(MinimumMaximumPostponementYearValidator, self).__init__()
-        self.tree_to_fill_in = tree_to_fill_in
+# TODO :: unit tests
+class EmptyReferenceLinkToPostponeValidator(BusinessValidator):
+    def __init__(
+            self,
+            tree_to_copy: 'ProgramTree',
+            link_to_copy: 'Link',
+            existing_nodes_into_year_to_fill: List['NodeGroupYear']
+    ):
+        """
+        :param tree_to_copy: Tree to copy into next year.
+        :param link_to_copy: Link to copy into next year.
+        :param existing_nodes_into_year_to_fill: List of nodes WITH THEIR CHILDREN.
+        """
+        super(EmptyReferenceLinkToPostponeValidator, self).__init__()
+        self.link_to_copy = link_to_copy
+        self.tree_to_fill_in = tree_to_copy
+        self.existing_nodes_into_year_to_fill = existing_nodes_into_year_to_fill
 
     def validate(self):
-        year_of_tree_to_fill_in = self.tree_to_fill_in.root_node.year
-        if year_of_tree_to_fill_in < self.current_working_year:
-            self.add_error_message(_("You are not allowed to postpone this training in the past."))
-        elif year_of_tree_to_fill_in - 1 > self.current_working_year:
-            self.add_error_message(_("You are not allowed to postpone this training in the future."))
-
-    @property
-    def current_working_year(self) -> int:
-        return load_working_academic_year.load()  # TODO :: use dependency injection instead !!
+        # To implement from ReferenceLinkEmptyWarning (program_management/business/group_element_years/postponement)
+        raise NotImplementedError()

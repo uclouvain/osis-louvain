@@ -23,12 +23,83 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Callable, List, Set
 
 from program_management.ddd.business_types import *
 from base.models.education_group_year import EducationGroupYear
 from education_group.models.group_year import GroupYear
 
 STANDARD = ""
+
+
+class ProgramTreeVersionAttributes:
+    def __init__(
+            self,
+            version_name: str = STANDARD,
+            is_transition: bool = False,
+            title_fr: str = None,
+            title_en: str = None,
+    ):
+        self.version_name = version_name or STANDARD
+        self.is_transition = is_transition
+        self.title_fr = title_fr
+        self.title_en = title_en
+
+
+NodesToCopy = List['Node']
+SearchYear = int
+ExistingNodesWithTheirChildren = List['Node']
+
+
+class ProgramTreeVersionFromAnotherTreeBuilder:
+
+    def __init__(
+            self,
+            from_tree: 'ProgramTreeVersion',
+            # Dependency injection below
+            f_load_existing_nodes: Callable[[NodesToCopy, SearchYear], ExistingNodesWithTheirChildren],
+            attrs: ProgramTreeVersionAttributes,
+    ):
+        # TODO :: validators to use :
+        # TODO :: MinimumMaximumPostponementYearValidator
+        # TODO :: EndYearPostponementValidator
+        # TODO :: HasContentToPostponeValidator
+        # TODO :: ProgramTreeAlreadyPostponedValidator
+        # validator = validate()
+        # if not validator.is_Valid():
+        #     return validator.messages
+        self.from_tree = from_tree
+        self.load_next_year_nodes_function = f_load_existing_nodes
+        self.attrs = attrs
+
+    @property
+    def copy_from_year(self) -> int:
+        return self.from_tree.tree.root_node.year
+
+    @property
+    def copy_to_year(self) -> int:
+        return self.copy_from_year + 1
+
+    @property
+    def nodes_to_copy(self) -> Set['Node']:
+        return self.from_tree.tree.get_all_nodes()
+
+    @property
+    def existing_nodes_in_destination_year(self) -> ExistingNodesWithTheirChildren:
+        return self.load_next_year_nodes_function(list(self.nodes_to_copy), self.copy_to_year)
+
+    def build_from(self):
+        if self.from_tree.is_transition:
+            tree_version = self._build_from_transition()
+        else:
+            tree_version = self._build_from_standard()
+        return tree_version
+
+    def _build_from_transition(self) -> 'ProgramTreeVersion':
+        raise NotImplementedError()
+
+    def _build_from_standard(self) -> 'ProgramTreeVersion':
+        raise NotImplementedError()
 
 
 class ProgramTreeVersionBuilder:
@@ -38,6 +109,9 @@ class ProgramTreeVersionBuilder:
     def build_from(self, from_tree: 'ProgramTreeVersion', **tree_version_attrs) -> 'ProgramTreeVersion':
         assert isinstance(from_tree, ProgramTreeVersion)
         assert from_tree.is_standard, "Forbidden to copy from a non Standard version"
+        # validator = validate()
+        # if not validator.is_Valid():
+        #     return validator.messages
         if from_tree.is_transition:
             self._tree_version = self._build_from_transition(from_tree.tree, **tree_version_attrs)
         else:

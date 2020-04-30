@@ -23,25 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from django.utils.translation import gettext_lazy as _
 
 from base.ddd.utils.business_validator import BusinessValidator
+from base.models.enums.education_group_types import MiniTrainingType
 from program_management.ddd.business_types import *
-from program_management.ddd.repositories import load_working_academic_year
 
 
-class MinimumMaximumPostponementYearValidator(BusinessValidator):
-    def __init__(self, tree_to_fill_in: 'ProgramTree'):
-        super(MinimumMaximumPostponementYearValidator, self).__init__()
+# TODO :: unit tests
+class ProgramTreeAlreadyPostponedValidator(BusinessValidator):
+    def __init__(
+            self,
+            tree_to_fill_in: 'ProgramTree',
+            copy_from_node: 'NodeGroupYear',
+            existing_nodes_into_year_to_fill: List['Node']  # TODO :: typing ExistingNodesWithTheirChildren
+    ):
+        super(ProgramTreeAlreadyPostponedValidator, self).__init__()
+        self.copy_from_node = copy_from_node
         self.tree_to_fill_in = tree_to_fill_in
+        self.existing_nodes_into_year_to_fill = existing_nodes_into_year_to_fill
 
     def validate(self):
-        year_of_tree_to_fill_in = self.tree_to_fill_in.root_node.year
-        if year_of_tree_to_fill_in < self.current_working_year:
-            self.add_error_message(_("You are not allowed to postpone this training in the past."))
-        elif year_of_tree_to_fill_in - 1 > self.current_working_year:
-            self.add_error_message(_("You are not allowed to postpone this training in the future."))
-
-    @property
-    def current_working_year(self) -> int:
-        return load_working_academic_year.load()  # TODO :: use dependency injection instead !!
+        # TODO :: supprimer l'utilisation de load_node et réutiliser get_existing_node_next_year
+        # TODO :: implémenter le is_empty() qui se base sur les mandatory groups (squelette)
+        # TODO :: à merger / réutiliser avec NodeGroupAlreadyPostponedValidator ??
+        # To implement from _check_if_already_postponed (program_management/business/group_element_years/postponement
+        pass
