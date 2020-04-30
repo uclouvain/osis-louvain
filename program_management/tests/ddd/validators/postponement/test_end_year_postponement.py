@@ -27,25 +27,33 @@
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
-from program_management.ddd.validators._has_content_to_postpone import HasContentToPostponeValidator
-from program_management.tests.ddd.factories.link import LinkFactory
+from program_management.ddd.validators.postponement._end_year_postponement import EndYearPostponementValidator
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestHasContentToPostponeValidator(SimpleTestCase):
+class TestEndYearPostponementValidator(SimpleTestCase):
 
     def setUp(self):
         self.end_postponement_year = 2020
 
-    def test_when_has_content_to_postpone(self):
-        postpone_from = ProgramTreeFactory(root_node__year=self.end_postponement_year + 1)
-        LinkFactory(parent=postpone_from.root_node)
-        validator = HasContentToPostponeValidator(postpone_from)
+    def test_when_year_of_the_tree_to_fill_in_is_lower_than_end_postponement_year(self):
+        tree_to_fill_in = ProgramTreeFactory(root_node__year=self.end_postponement_year - 1)
+        validator = EndYearPostponementValidator(tree_to_fill_in, self.end_postponement_year)
         self.assertTrue(validator.is_valid())
 
-    def test_when_no_content_to_postpone(self):
-        postpone_from = ProgramTreeFactory(root_node__year=self.end_postponement_year + 1)
-        validator = HasContentToPostponeValidator(postpone_from)
+    def test_when_year_of_the_tree_to_fill_in_is_equal_to_end_postponement_year(self):
+        tree_to_fill_in = ProgramTreeFactory(root_node__year=self.end_postponement_year)
+        validator = EndYearPostponementValidator(tree_to_fill_in, self.end_postponement_year)
+        self.assertTrue(validator.is_valid())
+
+    def test_when_year_of_the_tree_to_fill_in_is_greater_than_end_postponement_year(self):
+        tree_to_fill_in = ProgramTreeFactory(root_node__year=self.end_postponement_year + 1)
+        validator = EndYearPostponementValidator(tree_to_fill_in, self.end_postponement_year)
         self.assertFalse(validator.is_valid())
-        expected_result = _("This training has no content to postpone.")
+        expected_result = _("The end date of the education group is smaller than the year of postponement.")
         self.assertListEqual([expected_result], validator.error_messages)
+
+    def test_when_end_postponement_is_none(self):
+        tree_to_fill_in = ProgramTreeFactory(root_node__year=self.end_postponement_year)
+        validator = EndYearPostponementValidator(tree_to_fill_in, None)
+        self.assertTrue(validator.is_valid())

@@ -29,7 +29,7 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
-from program_management.ddd.validators._min_max_postponement_year import MinimumMaximumPostponementYearValidator
+from program_management.ddd.validators.postponement._min_max_postponement_year import MinimumMaximumPostponementYearValidator
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 

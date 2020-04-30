@@ -28,7 +28,7 @@ import copy
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
-from program_management.ddd.validators._reuse_old_learning_unit_node import ReuseOldLearningUnitNodeValidator
+from program_management.ddd.validators.postponement._reuse_old_learning_unit_node import ReuseOldLearningUnitNodeValidator
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
