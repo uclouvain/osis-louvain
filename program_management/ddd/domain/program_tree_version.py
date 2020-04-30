@@ -60,10 +60,16 @@ class ProgramTreeVersion:
             tree: 'ProgramTree',
             version_name: str = STANDARD,
             is_transition: bool = False,
+            offer: int = None,
+            title_fr: str = None,
+            title_en: str = None,
     ):
         self.tree = tree
         self.is_transition = is_transition
         self.version_name = version_name
+        self.offer = offer
+        self.title_fr = title_fr
+        self.title_en = title_en
 
     @property
     def is_standard(self):

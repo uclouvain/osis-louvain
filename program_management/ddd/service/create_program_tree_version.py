@@ -31,17 +31,14 @@ from program_management.models.element import Element
 
 
 def create_program_version(title_fr: str, title_en: str, version_name: str, end_year: int) -> None:
-    """Devrait créer une version de programme, sur base des paramètres entrés"""
     tree_version = init_program_tree_version(title_fr, title_en, version_name, end_year)
     persist_specific_version_program(tree_version)
 
 
 def init_program_tree_version(title_fr: str, title_en: str, version_name: str, end_year: int) -> ProgramTreeVersion:
-    """Instancie un ProgramTreeVersion"""
-    # builder = ProgramTreeVersionBuilder()
-    # program_tree_version = builder.build_from(param1, param2)
-    # return program_tree_version
-    return ProgramTreeVersionBuilder()
+    builder = ProgramTreeVersionBuilder()
+    program_tree_version = builder.build_from()
+    return program_tree_version
 
 
 def report_specific_version_creation(data, education_group_year, end_postponement, education_group_years_list):
