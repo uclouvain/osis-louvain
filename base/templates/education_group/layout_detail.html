@@ -31,7 +31,7 @@
                 <input class="form-control" id="search_jstree" type="text" placeholder="Search" aria-label="Search">
             </div>
             <div class="panel-body">
-                <div class="row" id="panel_file_tree" data-copyUrl="{% url "copy_element" %}" data-cutUrl="{% url "cut_element" %}"></div>
+                <div class="row" id="panel_file_tree" data-rootId= "{{ root.id }}" data-copyUrl="{% url "copy_element" %}" data-cutUrl="{% url "cut_element" %}"></div>
             </div>
         </div>
         <div id="split-bar"></div>

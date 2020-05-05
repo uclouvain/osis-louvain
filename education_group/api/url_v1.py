@@ -27,6 +27,7 @@ from django.conf.urls import url, include
 
 from education_group.api.views.group import GroupDetail, GroupTitle
 from education_group.api.views.group_element_year import TrainingTreeView, MiniTrainingTreeView, GroupTreeView
+from education_group.api.views.hops import HopsList
 from education_group.api.views.mini_training import MiniTrainingDetail, MiniTrainingTitle, MiniTrainingList, \
     OfferRoots
 from education_group.api.views.training import TrainingList, TrainingDetail, TrainingTitle
@@ -34,6 +35,7 @@ from education_group.api.views.training import TrainingList, TrainingDetail, Tra
 app_name = "education_group"
 
 urlpatterns = [
+    url(r'^hops/(?P<year>[\d]{4})$', HopsList.as_view(), name=HopsList.name),
     url(r'^trainings$', TrainingList.as_view(), name=TrainingList.name),
     url(
         r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/| ]?[a-zA-Z]{1,2})?)$',

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,26 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.urls import reverse
+from rest_framework import generics
 
-from program_management.serializers.node_view import serialize_children
-from program_management.ddd.business_types import *
+from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
+from base.models.hops import Hops
+from education_group.api.serializers.hops import HopsListSerializer
 
 
-def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
-    path = str(tree.root_node.pk)
-    return {
-        'text': '%(code)s - %(title)s' % {'code': tree.root_node.code, 'title': tree.root_node.title},
-        'id': path,
-        'icon': None,
-        'children': serialize_children(
-            children=tree.root_node.children,
-            path=path,
-            context={'root': tree.root_node}
-        ),
-        'a_attr': {
-            'href': reverse('education_group_read', args=[tree.root_node.pk, tree.root_node.pk]),
-            'element_id': tree.root_node.pk,
-            'element_type': tree.root_node.type.name,
-        }
-    }
+class HopsList(LanguageContextSerializerMixin, generics.RetrieveAPIView):
+    """
+        Return the list of used habilitation
+    """
+    name = 'habilitations_list'
+    serializer_class = HopsListSerializer
+
+    def get_object(self):
+        year = self.kwargs['year']
+        hops = Hops.objects.filter(
+            education_group_year__academic_year__year=year
+        ).values_list('ares_ability', flat=True).distinct()
+        return hops

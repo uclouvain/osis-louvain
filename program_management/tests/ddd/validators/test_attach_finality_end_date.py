@@ -106,7 +106,7 @@ class TestAttachFinalityEndDateValidator(SimpleTestCase):
         self.assertEqual(expected_msg, validator.error_messages[0])
 
     def test_when_node_to_attach_contains_finality_and_end_date_equals(self):
-        node_to_attach = NodeGroupYearFactory()
+        node_to_attach = NodeGroupYearFactory(end_date=self.tree_2m.root_node.end_date)
         finality_node = NodeGroupYearFactory(
             node_type=TrainingType.MASTER_MA_120,
             end_date=self.tree_2m.root_node.end_date

@@ -116,14 +116,14 @@ def is_eligible_for_modification_end_date(learning_unit_year, person, raise_exce
     return check_lu_permission(person, 'base.can_edit_learningunit_date', raise_exception) and \
         is_year_editable(learning_unit_year, raise_exception) and \
         not (is_learning_unit_year_in_past(learning_unit_year, person, raise_exception)) and \
-        _has_no_applications(learning_unit_year, raise_exception) and \
+        _has_no_applications_this_year(learning_unit_year, raise_exception) and \
         is_eligible_for_modification(learning_unit_year, person, raise_exception) and \
         _is_person_eligible_to_modify_end_date_based_on_container_type(learning_unit_year, person,
                                                                        raise_exception) and \
         is_external_learning_unit_cograduation(learning_unit_year, person, raise_exception)
 
 
-def _has_no_applications(learning_unit_year, raise_exception=False):
+def _has_no_applications_this_year(learning_unit_year, raise_exception=False):
     result = not TutorApplication.objects.filter(
         learning_container_year=learning_unit_year.learning_container_year
     ).exists()
@@ -260,7 +260,7 @@ def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_e
                                          academic_year__year__lt=settings.YEAR_LIMIT_LUE_MODIFICATION):
         msg = _("You cannot delete a learning unit which is existing before %(limit_year)s") % {
             "limit_year": settings.YEAR_LIMIT_LUE_MODIFICATION}
-    elif not _has_no_applications(learning_unit_year, raise_exception):
+    elif not _has_no_applications_all_years(learning_unit_year, raise_exception):
         msg = MSG_LEARNING_UNIT_HAS_APPLICATION
 
     result = False if msg else True
@@ -270,6 +270,17 @@ def is_eligible_to_delete_learning_unit_year(learning_unit_year, person, raise_e
         msg
     )
 
+    return result
+
+
+def _has_no_applications_all_years(learning_unit_year, raise_exception=False):
+    result = not TutorApplication.objects.filter(
+        learning_container_year__learning_container=learning_unit_year.learning_container_year.learning_container
+    ).exists()
+    can_raise_exception(
+        raise_exception, result,
+        MSG_LEARNING_UNIT_HAS_APPLICATION
+    )
     return result
 
 

@@ -62,6 +62,16 @@ paths:
           description: ''
           type: string
       - in: query
+        name: ares_ability
+        schema:
+          description: ''
+          type: integer
+      - in: query
+        name: year
+        schema:
+          description: ''
+          type: integer
+      - in: query
         name: ordering
         schema:
           description: Which field to use when ordering the results.
@@ -115,7 +125,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - trainings
+        - trainings
   /trainings/{year}/{acronym}/tree:
     get:
       description: Return the tree of the training
@@ -290,6 +300,30 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - groups
+  /hops/{year}:
+    get:
+      description: Return the list of used habilitations for a given year.
+      operationId: habilitations_list
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hops'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - habilitation_list
   /mini_trainings/:
     get:
       description: Return a list of all the mini_trainings with optional filtering.
@@ -522,6 +556,15 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
+    Hops:
+      type: object
+      properties:
+        count:
+          type: integer
+        ares_abilities:
+          type: array
+          items:
+            type: integer
     ArrayOfTraining:
       type: array
       items:
@@ -689,6 +732,12 @@ components:
               type: string
             domain_code:
               type: string
+            ares_ability:
+              type: integer
+            ares_graca:
+              type: integer
+            ares_study:
+              type: integer
     GroupDetailed:
       type: object
       properties:

@@ -24,6 +24,7 @@
 #
 ##############################################################################
 import datetime
+from unittest import mock
 
 from django.contrib.auth.models import Group
 from django.core.exceptions import ObjectDoesNotExist
@@ -53,7 +54,7 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
 from base.tests.factories.person import AdministrativeManagerFactory, PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
@@ -74,7 +75,8 @@ class LearningUnitYearDeletion(TestCase):
         cls.luy1 = LearningUnitYearFactory(
             acronym="LBIR1212",
             learning_container_year=cls.l_container_year,
-            academic_year=cls.academic_year, subtype=learning_unit_year_subtypes.FULL,
+            academic_year=cls.academic_year,
+            subtype=learning_unit_year_subtypes.FULL,
             learning_unit=cls.learning_unit)
         cls.the_partim = _('The partim')
 
@@ -415,12 +417,30 @@ class LearningUnitYearDeletion(TestCase):
         self.luy1.subtype = learning_unit_year_subtypes.FULL
         self.luy1.save()
 
-    def test_cannot_delete_if_has_application(self):
+    @mock.patch("base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year", return_value=True)
+    def test_cannot_delete_if_has_application_same_year(self, mock_is_linked):
         luy = LearningUnitYearFactory()
         TutorApplicationFactory(learning_container_year=luy.learning_container_year)
         self.assertFalse(
             base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(
                 luy, PersonWithPermissionsFactory('can_delete_learningunit')
+            )
+        )
+
+    @mock.patch("base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year", return_value=True)
+    def test_cannot_delete_if_has_application_another_year(self, mock_is_linked):
+        luy_next_year = LearningUnitYearFactory(
+            learning_unit=self.learning_unit,
+            academic_year=AcademicYearFactory(year=self.academic_year.year + 1),
+            learning_container_year=LearningContainerYearFactory(
+                learning_container=self.l_container_year.learning_container
+            ),
+            subtype=learning_unit_year_subtypes.FULL,
+        )
+        TutorApplicationFactory(learning_container_year=self.luy1.learning_container_year)
+        self.assertFalse(
+            base.business.learning_units.perms.is_eligible_to_delete_learning_unit_year(
+                luy_next_year, PersonWithPermissionsFactory('can_delete_learningunit')
             )
         )
 

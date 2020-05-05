@@ -39,6 +39,8 @@ class TrainingFilter(filters.FilterSet):
     to_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='lte')
     in_type = filters.CharFilter(field_name="education_group_type__name", lookup_expr='contains')
     acronym = filters.CharFilter(field_name="acronym", lookup_expr='icontains')
+    ares_ability = filters.NumberFilter(field_name="hops__ares_ability")
+    year = filters.NumberFilter(field_name="academic_year__year")
 
     class Meta:
         model = EducationGroupYear
