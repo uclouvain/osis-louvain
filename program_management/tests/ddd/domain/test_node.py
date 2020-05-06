@@ -381,3 +381,41 @@ class TestIsDeepening(SimpleTestCase):
     def test_when_node_is_not_deepening(self):
         node = NodeGroupYearFactory(node_type=MiniTrainingType.ACCESS_MINOR)
         self.assertFalse(node.is_deepening())
+
+
+class TestGetRootNode(SimpleTestCase):
+    def test_get_root_when_itself(self):
+        node = NodeGroupYearFactory()
+        self.assertEqual(node.root_node(), node)
+
+    def test_get_root(self):
+        link1 = LinkFactory()
+        link2 = LinkFactory(parent=link1.child)
+        # TODO: How to avoid that?
+        link1.child.parent_link = link1
+        link2.child.parent_link = link2
+        self.assertEqual(link2.child.root_node(), link1.parent)
+
+
+class TestIsInMinorOrDeepening(SimpleTestCase):
+    def test_case_in_minor(self):
+        link1 = LinkFactory(child__node_type=MiniTrainingType.ACCESS_MINOR)
+        link2 = LinkFactory(parent=link1.child)
+        # TODO: How to avoid that?
+        link2.child.parent_link = link2
+        self.assertTrue(link2.child.is_in_minor_or_deepening())
+
+    def test_case_in_deepening(self):
+        link1 = LinkFactory(child__node_type=MiniTrainingType.DEEPENING)
+        link2 = LinkFactory(parent=link1.child)
+        # TODO: How to avoid that?
+        link2.child.parent_link = link2
+        self.assertTrue(link2.child.is_in_minor_or_deepening())
+
+    def test_case_not_minor_or_deepening(self):
+        link1 = LinkFactory(child__node_type=MiniTrainingType.OPTION)
+        link2 = LinkFactory(parent=link1.child)
+        # TODO: How to avoid that?
+        link1.child.parent_link = link1
+        link2.child.parent_link = link2
+        self.assertFalse(link2.child.is_in_minor_or_deepening())

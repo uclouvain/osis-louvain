@@ -218,8 +218,24 @@ class Node:
                 list_child_nodes_types.append(link.child.node_type)
         return list_child_nodes_types
 
+    def is_in_minor_or_deepening(self) -> bool:
+        parent_link = self.parent_link
+        while parent_link:
+            parent_node = parent_link.parent
+            if parent_node.is_minor() or parent_node.is_deepening():
+                return True
+            parent_link = parent_node.parent_link
+        return False
+
+    def root_node(self) -> 'NodeEducationGroupYear':
+        current_node = self
+        while current_node.parent_link:
+            parent_link = current_node.parent_link
+            current_node = parent_link.parent
+        return current_node
+
     @property
-    def descendents(self) -> Dict['Path', 'Node']:   # TODO :: add unit tests
+    def descendents(self) -> Dict['Path', 'Node']:  # TODO :: add unit tests
         return _get_descendents(self)
 
     def add_child(self, node: 'Node', **link_attrs):

@@ -96,14 +96,12 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     def get_block(obj: 'Link'):
         if obj.block:
             return sorted([int(block) for block in str(obj.block)])
-        parent_link = obj
-        parent_node = None
-        while parent_link:
-            parent_node = parent_link.parent
-            if parent_node.is_minor() or parent_node.is_deepening():
-                return [2, 3]
-            parent_link = parent_node.parent_link
-        return list(range(1, int(parent_node.duration / 2) + 1))
+        elif obj.child.is_in_minor_or_deepening():
+            return [2, 3]
+        root_node = obj.parent.root_node()
+        if root_node.duration:
+            return list(range(1, int(root_node.duration / 2) + 1))
+        return []
 
     def get_comment(self, obj: 'Link'):
         field_suffix = '_english' if self.context.get('language') == settings.LANGUAGE_CODE_EN else ''
