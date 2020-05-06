@@ -142,9 +142,6 @@ class Node:
     def is_option(self) -> bool:
         return self.node_type == MiniTrainingType.OPTION
 
-    def is_master_2m1(self) -> bool:
-        return self.node_type == TrainingType.MASTER_M1
-
     def get_all_children(
             self,
             ignore_children_from: Set[EducationGroupTypesEnum] = None,

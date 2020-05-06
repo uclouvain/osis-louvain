@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
+
 from django.test import SimpleTestCase
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
@@ -358,3 +360,24 @@ class TestGetOptionsList(SimpleTestCase):
         link2 = LinkFactory(parent=link1.child, child__node_type=MiniTrainingType.OPTION)
         expected_result = {link2.child}
         self.assertEqual(link2.parent.get_option_list(), expected_result, "Should contain children of children")
+
+
+class TestIsMinor(SimpleTestCase):
+    def test_when_node_is_minor(self):
+        minor_type = random.choice(MiniTrainingType.minors_enum())
+        node = NodeGroupYearFactory(node_type=minor_type)
+        self.assertTrue(node.is_minor())
+
+    def test_when_node_is_not_minor(self):
+        node = NodeGroupYearFactory(node_type=MiniTrainingType.OPTION)
+        self.assertFalse(node.is_minor())
+
+
+class TestIsDeepening(SimpleTestCase):
+    def test_when_node_is_deepening(self):
+        node = NodeGroupYearFactory(node_type=MiniTrainingType.DEEPENING)
+        self.assertTrue(node.is_deepening())
+
+    def test_when_node_is_not_deepening(self):
+        node = NodeGroupYearFactory(node_type=MiniTrainingType.ACCESS_MINOR)
+        self.assertFalse(node.is_deepening())
