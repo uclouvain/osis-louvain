@@ -543,3 +543,95 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(TestCase):
             'constraint_type'
         ]
         self.assertListEqual(expected_fields, list(self.serializer.data['children'][0]['children'][0].keys()))
+
+
+class BlockLogicTestCase(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        """
+        GERM2M
+        |--Common Core
+           |-- learning_unit_year
+        |--Deepening
+           |-- luy_deep
+        |--Minor
+           |-- luy_minor
+        """
+        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.training = TrainingFactory(
+            acronym='GERM2M',
+            partial_acronym='LGERM905',
+            academic_year=cls.academic_year,
+            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            duration=6
+        )
+        cls.deepening = MiniTrainingFactory(
+            acronym='GERM2DEEP',
+            partial_acronym='LGERM905A',
+            academic_year=cls.academic_year,
+            education_group_type__name=MiniTrainingType.DEEPENING.name,
+        )
+        cls.minor = MiniTrainingFactory(
+            acronym='GERM2MIN',
+            partial_acronym='LGERM906B',
+            academic_year=cls.academic_year,
+            education_group_type__name=MiniTrainingType.DEEPENING.name,
+        )
+        cls.common_core = GroupFactory(
+            education_group_type__name=GroupType.COMMON_CORE.name,
+            academic_year=cls.academic_year
+        )
+        GroupElementYearFactory(parent=cls.training, child_branch=cls.common_core, child_leaf=None)
+        GroupElementYearFactory(parent=cls.training, child_branch=cls.deepening, child_leaf=None)
+        GroupElementYearFactory(parent=cls.training, child_branch=cls.minor, child_leaf=None)
+
+        cls.learning_unit_year = LearningUnitYearFactory(
+            academic_year=cls.academic_year,
+            learning_container_year__academic_year=cls.academic_year
+        )
+        cls.luy_minor = LearningUnitYearFactory(
+            academic_year=cls.academic_year,
+            learning_container_year__academic_year=cls.academic_year
+        )
+        cls.luy_deep = LearningUnitYearFactory(
+            academic_year=cls.academic_year,
+            learning_container_year__academic_year=cls.academic_year
+        )
+        GroupElementYearFactory(
+            parent=cls.common_core,
+            child_branch=None,
+            child_leaf=cls.learning_unit_year,
+            block=None
+        )
+        GroupElementYearFactory(parent=cls.deepening, child_branch=None, child_leaf=cls.luy_deep, block=None)
+        GroupElementYearFactory(parent=cls.minor, child_branch=None, child_leaf=cls.luy_minor, block=None)
+
+        url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
+            'acronym': cls.training.acronym,
+            'year': cls.academic_year.year
+        })
+        cls.serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=load_tree.load(cls.training.id).root_node),
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN
+            }
+        )
+
+    def test_block_calculated_with_root_duration(self):
+        expected_blocks = [1, 2, 3]
+        common_core = self.serializer.data['children'][0]
+        luy = common_core['children'][0]
+        self.assertListEqual(expected_blocks, luy['block'])
+
+    def test_block_equals_to_second_and_third_year_for_deepening(self):
+        expected_blocks = [2, 3]
+        deepening = self.serializer.data['children'][1]
+        luy = deepening['children'][0]
+        self.assertListEqual(expected_blocks, luy['block'])
+
+    def test_block_equals_to_second_and_third_year_for_minor(self):
+        expected_blocks = [2, 3]
+        minor = self.serializer.data['children'][2]
+        luy = minor['children'][0]
+        self.assertListEqual(expected_blocks, luy['block'])
