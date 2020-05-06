@@ -160,6 +160,7 @@ def __load_multiple_node_education_group_year(node_group_year_ids: List[int]) ->
         'offer_title_fr',
         'offer_title_en',
         'category',
+        'duration'
 
     ).annotate(title=F('title_t')).values(
         'node_id',
@@ -180,6 +181,7 @@ def __load_multiple_node_education_group_year(node_group_year_ids: List[int]) ->
         'offer_title_fr',
         'offer_title_en',
         'category',
+        'duration'
     )
 
 

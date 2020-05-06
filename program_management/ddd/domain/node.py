@@ -72,6 +72,7 @@ class Node:
             node_type: EducationGroupTypesEnum = None,
             end_date: int = None,
             children: List['Link'] = None,
+            parent_link: 'Link' = None,
             code: str = None,
             title: str = None,
             year: int = None,
@@ -80,6 +81,7 @@ class Node:
         self.node_id = node_id
         self.children = children
         self._children = children or []
+        self.parent_link = parent_link
         self.node_type = node_type
         self.end_date = end_date
         self.code = code
@@ -128,11 +130,20 @@ class Node:
     def is_finality(self) -> bool:
         return self.node_type in set(TrainingType.finality_types_enum())
 
+    def is_minor(self) -> bool:
+        return self.node_type in set(MiniTrainingType.minors_enum())
+
+    def is_deepening(self) -> bool:
+        return self.node_type == MiniTrainingType.DEEPENING
+
     def is_master_2m(self) -> bool:
         return self.node_type in set(TrainingType.root_master_2m_types_enum())
 
     def is_option(self) -> bool:
         return self.node_type == MiniTrainingType.OPTION
+
+    def is_master_2m1(self) -> bool:
+        return self.node_type == TrainingType.MASTER_M1
 
     def get_all_children(
             self,
@@ -258,6 +269,7 @@ class NodeEducationGroupYear(Node):
             offer_partial_title_fr: str = None,
             offer_partial_title_en: str = None,
             category: Categories = None,
+            duration: int = None,
             **kwargs
     ):
         super().__init__(**kwargs)
@@ -271,6 +283,7 @@ class NodeEducationGroupYear(Node):
         self.offer_partial_title_fr = offer_partial_title_fr
         self.offer_partial_title_en = offer_partial_title_en
         self.category = category
+        self.duration = duration
 
 
 class NodeGroupYear(Node):

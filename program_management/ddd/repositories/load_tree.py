@@ -215,5 +215,6 @@ def __build_children(
         link_node = links['_'.join([str(parent_id), str(child_id)])]
         link_node.parent = nodes['{}_{}'.format(parent_id, NodeType.EDUCATION_GROUP)]
         link_node.child = child_node
+        child_node.parent_link = link_node
         children.append(link_node)
     return children
