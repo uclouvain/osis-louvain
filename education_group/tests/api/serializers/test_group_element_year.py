@@ -545,7 +545,7 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(TestCase):
         self.assertListEqual(expected_fields, list(self.serializer.data['children'][0]['children'][0].keys()))
 
 
-class BlockLogicTestCase(TestCase):
+class BlockLogicCaseNotSetTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         """
