@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
 from typing import Callable, List, Set
 
 from program_management.ddd.business_types import *
@@ -57,7 +58,7 @@ class ProgramTreeVersionFromAnotherTreeBuilder:
             self,
             from_tree: 'ProgramTreeVersion',
             # Dependency injection below
-            f_load_existing_nodes: Callable[[NodesToCopy, SearchYear], ExistingNodesWithTheirChildren],
+            load_existing_nodes: 'NodesRepositoryInterface',
             attrs: ProgramTreeVersionAttributes,
     ):
         # TODO :: validators to use :
@@ -69,7 +70,7 @@ class ProgramTreeVersionFromAnotherTreeBuilder:
         # if not validator.is_Valid():
         #     return validator.messages
         self.from_tree = from_tree
-        self.load_next_year_nodes_function = f_load_existing_nodes
+        self.nodes_repository = load_existing_nodes
         self.attrs = attrs
 
     @property
@@ -85,8 +86,11 @@ class ProgramTreeVersionFromAnotherTreeBuilder:
         return self.from_tree.tree.get_all_nodes()
 
     @property
+    @functools.lru_cache()
     def existing_nodes_in_destination_year(self) -> ExistingNodesWithTheirChildren:
-        return self.load_next_year_nodes_function(list(self.nodes_to_copy), self.copy_to_year)
+        if self._existing_nodes is None:
+            self._existing_nodes = self.nodes_repository.load_existing_nodes(list(self.nodes_to_copy), self.copy_to_year)
+        return self._existing_nodes
 
     def build_from(self):
         if self.from_tree.is_transition:
