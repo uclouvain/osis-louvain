@@ -121,11 +121,12 @@ class TrainingTreeViewTestCase(APITestCase):
     def test_get_training_tree(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
+        tree = load_tree.load(self.training.id)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(self.training.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(self.url),
+                'tree': tree
             }
         )
         self.assertEqual(response.data, serializer.data)
@@ -199,11 +200,12 @@ class MiniTrainingTreeViewTestCase(APITestCase):
     def test_get_mini_training_tree(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
+        tree = load_tree.load(self.mini_training.id)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(self.mini_training.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(self.url),
+                'tree': tree
             }
         )
         self.assertEqual(response.data, serializer.data)
@@ -275,11 +277,12 @@ class GroupTreeViewTestCase(APITestCase):
     def test_get_group_tree(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
+        tree = load_tree.load(self.common_core.id)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(self.common_core.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(self.url),
+                'tree': tree
             }
         )
         self.assertEqual(response.data, serializer.data)

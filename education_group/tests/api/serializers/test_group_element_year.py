@@ -84,11 +84,13 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
+        tree = load_tree.load(cls.training.id)
         cls.serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(cls.training.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'tree': tree
             }
         )
 
@@ -182,11 +184,13 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             'acronym': training.acronym,
             'year': self.academic_year.year
         })
+        tree = load_tree.load(training.id)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(training.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'tree': tree
             }
         )
         self.assertEqual(len(serializer.data['children']), 1)
@@ -210,11 +214,13 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             'acronym': training.acronym,
             'year': self.academic_year.year
         })
+        tree = load_tree.load(training.id)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(training.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'tree': tree
             }
         )
         self.assertEqual(len(serializer.data['children']), 1)
@@ -252,11 +258,13 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             'partial_acronym': gey.parent.partial_acronym,
             'year': self.academic_year.year
         })
+        tree = load_tree.load(gey.parent.id)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(gey.parent.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'tree': tree
             }
         )
         self.assertTrue(serializer.data['children'][0]['with_prerequisite'])
@@ -279,11 +287,13 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             'partial_acronym': gey.parent.partial_acronym,
             'year': self.academic_year.year
         })
+        tree = load_tree.load(gey.parent.id)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(gey.parent.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'tree': tree
             }
         )
         self.assertEqual(serializer.data['children'][0]['credits'], luy.credits,
@@ -305,11 +315,13 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             'partial_acronym': gey.parent.partial_acronym,
             'year': self.academic_year.year
         })
+        tree = load_tree.load(gey.parent.id)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(gey.parent.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'tree': tree
             }
         )
         self.assertEqual(serializer.data['children'][0]['credits'], egy.credits,
@@ -368,11 +380,13 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             'partial_acronym': gey.parent.partial_acronym,
             'year': self.academic_year.year
         })
+        tree = load_tree.load(gey.parent.id)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(gey.parent.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'tree': tree
             }
         )
         return serializer
@@ -409,11 +423,13 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(TestCase):
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
+        tree = load_tree.load(cls.training.id)
         cls.serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(cls.training.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'tree': tree
             }
         )
 
@@ -496,11 +512,13 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(TestCase):
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
+        tree = load_tree.load(cls.training.id)
         cls.serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(cls.training.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'tree': tree
             }
         )
 
@@ -610,11 +628,13 @@ class BlockLogicCaseNotSetTestCase(TestCase):
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
+        tree = load_tree.load(cls.training.id)
         cls.serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(cls.training.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
+                'language': settings.LANGUAGE_CODE_EN,
+                'tree': tree
             }
         )
 
