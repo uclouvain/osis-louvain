@@ -30,27 +30,31 @@ STANDARD = ""
 
 
 class ProgramTreeVersionBuilder:
-
     _tree_version = None
 
-    def build_from(self, from_tree: 'ProgramTreeVersion', **tree_version_attrs) -> 'ProgramTreeVersion':
+    def build_from(self, from_tree: 'ProgramTreeVersion', title_fr: str, title_en: str, version_name: str,
+                   year: int) -> 'ProgramTreeVersion':
         assert isinstance(from_tree, ProgramTreeVersion)
         assert from_tree.is_standard, "Forbidden to copy from a non Standard version"
         if from_tree.is_transition:
-            self._tree_version = self._build_from_transition(from_tree.tree, **tree_version_attrs)
+            self.program_tree_version = self._build_from_transition(from_tree.tree, title_fr, title_en, version_name,
+                                                                    year)
         else:
-            self._tree_version = self._build_from_standard(from_tree.tree, **tree_version_attrs)
+            self.program_tree_version = self._build_from_standard(from_tree.tree, title_fr, title_en, version_name,
+                                                                  year)
         return self.program_tree_version
 
-    @property
-    def program_tree_version(self):
-        return self._tree_version
+    def _build_from_transition(self, program_tree: 'ProgramTree', title_fr: str, title_en: str, version_name: str,
+                               year: int) -> 'ProgramTreeVersion':
+        program_tree_version = ProgramTreeVersion(tree=program_tree, title_fr=title_fr, title_en=title_en,
+                                                  version_name=version_name, year=year, is_transition=True)
+        return program_tree_version
 
-    def _build_from_transition(self, from_tree: 'ProgramTree', **tree_version_attrs) -> 'ProgramTreeVersion':
-        raise NotImplementedError()
-
-    def _build_from_standard(self, from_tree: 'ProgramTree', **tree_version_attrs) -> 'ProgramTreeVersion':
-        raise NotImplementedError()
+    def _build_from_standard(self, program_tree: 'ProgramTree', title_fr: str, title_en: str, version_name: str,
+                             year: int) -> 'ProgramTreeVersion':
+        program_tree_version = ProgramTreeVersion(tree=program_tree, title_fr=title_fr, title_en=title_en,
+                                                  version_name=version_name, year=year, is_transition=False)
+        return program_tree_version
 
 
 class ProgramTreeVersion:
@@ -63,6 +67,7 @@ class ProgramTreeVersion:
             offer: int = None,
             title_fr: str = None,
             title_en: str = None,
+            year: int = None,
     ):
         self.tree = tree
         self.is_transition = is_transition
@@ -70,6 +75,7 @@ class ProgramTreeVersion:
         self.offer = offer
         self.title_fr = title_fr
         self.title_en = title_en
+        self.year = year
 
     @property
     def is_standard(self):

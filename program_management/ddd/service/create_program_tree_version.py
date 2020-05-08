@@ -26,18 +26,24 @@
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionBuilder
 from program_management.ddd.repositories.persist_tree import persist_specific_version_program
 from program_management.ddd.service.generate_node_code import generate_node_code
+from program_management.ddd.validators.program_tree_version import CreateProgramTreeVersionValidatorList
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 
 
-def create_program_version(title_fr: str, title_en: str, version_name: str, end_year: int) -> None:
-    tree_version = init_program_tree_version(title_fr, title_en, version_name, end_year)
-    persist_specific_version_program(tree_version)
+def create_program_version(from_tree: ProgramTreeVersion, title_fr: str, title_en: str, version_name: str,
+                           year: int) -> None:
+    validator = CreateProgramTreeVersionValidatorList(year, version_name)
+    if not validator.is_valid():
+        tree_version = init_program_tree_version(from_tree, title_fr, title_en, version_name, year)
+        persist_specific_version_program(tree_version)
 
 
-def init_program_tree_version(title_fr: str, title_en: str, version_name: str, end_year: int) -> ProgramTreeVersion:
+def init_program_tree_version(from_tree: ProgramTreeVersion, title_fr: str, title_en: str,
+                              version_name: str, year: int) -> ProgramTreeVersion:
     builder = ProgramTreeVersionBuilder()
-    program_tree_version = builder.build_from()
+    program_tree_version = builder.build_from(from_tree=from_tree, title_fr=title_fr, title_en=title_en,
+                                              version_name=version_name, year=year)
     return program_tree_version
 
 
