@@ -55,7 +55,7 @@ from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.decorators.ajax import ajax_required
 from osis_common.utils.models import get_object_or_none
 from osis_role import errors
-from program_management.ddd.repositories import load_specific_version
+from program_management.models.education_group_version import EducationGroupVersion
 
 FORMS_BY_CATEGORY = {
     education_group_categories.GROUP: GroupForm,
@@ -261,9 +261,9 @@ def check_version_name(request, education_group_year_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
     version_name = education_group_year.acronym + request.GET['version_name']
     existed_version_name = False
-    existing_version_name = load_specific_version.check_existing_version(version_name, education_group_year_id)
+    existing_version_name = check_existing_version(version_name, education_group_year_id)
     last_using = None
-    old_specific_versions = load_specific_version.find_last_existed_version(education_group_year, version_name)
+    old_specific_versions = find_last_existed_version(education_group_year, version_name)
     if old_specific_versions:
         last_using = str(old_specific_versions.offer.academic_year)
         existed_version_name = True
@@ -274,3 +274,13 @@ def check_version_name(request, education_group_year_id):
         "last_using": last_using,
         "valid": valid,
         "version_name": request.GET['version_name']}, safe=False)
+
+
+def check_existing_version(version_name: str, education_group_year_id: int) -> bool:
+    return EducationGroupVersion.objects.filter(version_name=version_name, offer__id=education_group_year_id).exists()
+
+
+def find_last_existed_version(education_group_year, version_name):
+    return EducationGroupVersion.objects.filter(
+        version_name=version_name, offer__education_group=education_group_year.education_group,
+        offer__academic_year__year__lt=education_group_year.academic_year.year).order_by('offer__academic_year').last()

@@ -27,11 +27,11 @@ from django import forms
 from django.forms import TextInput
 from django.utils.translation import gettext_lazy as _
 
+import base.views.education_groups.create
 from base.business.education_groups.create import create_initial_group_element_year_structure
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models import academic_year
 from base.models.academic_year import compute_max_academic_year_adjournment
-from program_management.ddd.repositories import load_specific_version
 from program_management.ddd.service.create_program_tree_version import report_specific_version_creation, \
     create_specific_version
 
@@ -69,7 +69,7 @@ class SpecificVersionForm(forms.Form):
             )
         if self.save_type == "attach":
             education_group_years_list = []
-            last_old_version = load_specific_version.find_last_existed_version(
+            last_old_version = base.views.education_groups.create.find_last_existed_version(
                 self.education_group_year, self.cleaned_data["version_name"]
             )
             self.education_group_years_list = report_specific_version_creation(
