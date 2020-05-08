@@ -489,6 +489,7 @@ class EducationGroupYear(SerializableModel):
         on_delete=models.PROTECT,
         null=True, blank=True,
         verbose_name=_("ISCED domain"),
+        limit_choices_to={'is_ares': True},
     )
 
     management_entity = models.ForeignKey(
