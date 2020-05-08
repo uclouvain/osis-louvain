@@ -235,9 +235,11 @@ class Node:
     def current_path(self, root_node: 'Node', parent: 'Node'):
         descendents = root_node.descendents
         path_end = str(parent.node_id) + '|' + str(self.node_id)
-        for (path, node) in descendents.items():
-            if node == self and path.endswith(path_end):
-                return path
+        return next(
+            path
+            for (path, node) in descendents.items()
+            if node == self and path.endswith(path_end)
+        )
 
     def add_child(self, node: 'Node', **link_attrs):
         child = link_factory.get_link(parent=self, child=node, **link_attrs)

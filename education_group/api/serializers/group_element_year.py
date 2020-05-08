@@ -95,11 +95,11 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     def get_block(self, obj: 'Link'):
         tree = self.context.get('tree')
         root_node = tree.root_node
-        obj.child.ascendents(tree, obj.parent)
         if obj.block:
             return sorted([int(block) for block in str(obj.block)])
 
-        for _, node in obj.child.ascendents(tree, obj.parent):
+        ascendents = obj.child.ascendents(tree, obj.parent)
+        for _, node in ascendents.items():
             if node.is_minor() or node.is_deepening():
                 return [2, 3]
 
