@@ -30,7 +30,6 @@ from backoffice.settings.rest_framework.common_views import LanguageContextSeria
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.ddd.domain import link
 from program_management.ddd.repositories import load_tree
 
@@ -53,8 +52,13 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
 
         self.check_object_permissions(self.request, education_group_year)
 
-        tree = load_tree.load(education_group_year.id)
-        return link.factory.get_link(parent=None, child=tree.root_node)
+        self.tree = load_tree.load(education_group_year.id)
+        return link.factory.get_link(parent=None, child=self.tree.root_node)
+
+    def get_serializer_context(self):
+        serializer_context = super().get_serializer_context()
+        serializer_context['tree'] = self.tree
+        return serializer_context
 
 
 class TrainingTreeView(EducationGroupTreeView):

@@ -28,21 +28,16 @@ from collections import Counter
 from typing import List, Set, Tuple
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
-from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType, MiniTrainingType
+from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
-from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
+from program_management.ddd.domain import prerequisite
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._path_validator import PathValidator
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
-    DetachNodeValidatorList
-from program_management.ddd.domain import prerequisite
-from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
     UpdatePrerequisiteValidatorList
+from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.models.enums import node_type
-
-from django.utils.translation import gettext_lazy as _
-
 from program_management.models.enums.node_type import NodeType
 
 PATH_SEPARATOR = '|'
@@ -50,7 +45,6 @@ Path = str  # Example : "root|node1|node2|child_leaf"
 
 
 class ProgramTree:
-
     root_node = None
     authorized_relationships = None
 

@@ -44,7 +44,7 @@ from program_management.models.enums.node_type import NodeType
 class NodeFactory:
     def get_node(self, type: NodeType, **node_attrs):
         node_cls = {
-            NodeType.EDUCATION_GROUP: NodeEducationGroupYear,   # TODO: Remove when migration is done
+            NodeType.EDUCATION_GROUP: NodeEducationGroupYear,  # TODO: Remove when migration is done
 
             NodeType.GROUP: NodeGroupYear,
             NodeType.LEARNING_UNIT: NodeLearningUnitYear,
@@ -57,7 +57,6 @@ factory = NodeFactory()
 
 
 class Node:
-
     _academic_year = None
 
     _deleted_children = None
@@ -72,7 +71,6 @@ class Node:
             node_type: EducationGroupTypesEnum = None,
             end_date: int = None,
             children: List['Link'] = None,
-            parent_link: 'Link' = None,
             code: str = None,
             title: str = None,
             year: int = None,
@@ -81,7 +79,6 @@ class Node:
         self.node_id = node_id
         self.children = children
         self._children = children or []
-        self.parent_link = parent_link
         self.node_type = node_type
         self.end_date = end_date
         self.code = code
@@ -91,7 +88,7 @@ class Node:
         self._deleted_children = set()
 
     def __eq__(self, other):
-        return (self.node_id, self.__class__) == (other.node_id,  other.__class__)
+        return (self.node_id, self.__class__) == (other.node_id, other.__class__)
 
     def __hash__(self):
         return hash(self.node_id)
@@ -218,25 +215,29 @@ class Node:
                 list_child_nodes_types.append(link.child.node_type)
         return list_child_nodes_types
 
-    def is_in_minor_or_deepening(self) -> bool:
-        parent_link = self.parent_link
-        while parent_link:
-            parent_node = parent_link.parent
-            if parent_node.is_minor() or parent_node.is_deepening():
-                return True
-            parent_link = parent_node.parent_link
-        return False
-
-    def root_node(self) -> 'NodeEducationGroupYear':
-        current_node = self
-        while current_node.parent_link:
-            parent_link = current_node.parent_link
-            current_node = parent_link.parent
-        return current_node
-
     @property
     def descendents(self) -> Dict['Path', 'Node']:  # TODO :: add unit tests
         return _get_descendents(self)
+
+    def ascendents(self, tree: 'ProgramTree', parent: 'Node') -> Dict['Path', 'Node']:
+        path = self.current_path(tree.root_node, parent)
+        current_path = path.replace('|' + str(self.node_id), '')
+        ascendents = {}
+        node_ids = current_path.split('|')
+        node_ids.reverse()
+        for node_id in node_ids:
+            ascendents.update({
+                current_path: tree.get_node(current_path)
+            })
+            current_path = current_path.replace('|' + str(node_id), '')
+        return ascendents
+
+    def current_path(self, root_node: 'Node', parent: 'Node'):
+        descendents = root_node.descendents
+        path_end = str(parent.node_id) + '|' + str(self.node_id)
+        for (path, node) in descendents.items():
+            if node == self and path.endswith(path_end):
+                return path
 
     def add_child(self, node: 'Node', **link_attrs):
         child = link_factory.get_link(parent=self, child=node, **link_attrs)
@@ -267,7 +268,6 @@ def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path
 
 
 class NodeEducationGroupYear(Node):
-
     type = NodeType.EDUCATION_GROUP
 
     def __init__(
@@ -300,22 +300,21 @@ class NodeEducationGroupYear(Node):
 
 
 class NodeGroupYear(Node):
-
     type = NodeType.GROUP
 
     def __init__(
-        self,
-        constraint_type: ConstraintTypes = None,
-        min_constraint: int = None,
-        max_constraint: int = None,
-        remark_fr: str = None,
-        remark_en: str = None,
-        offer_title_fr: str = None,
-        offer_title_en: str = None,
-        offer_partial_title_fr: str = None,
-        offer_partial_title_en: str = None,
-        category: Categories = None,
-        **kwargs
+            self,
+            constraint_type: ConstraintTypes = None,
+            min_constraint: int = None,
+            max_constraint: int = None,
+            remark_fr: str = None,
+            remark_en: str = None,
+            offer_title_fr: str = None,
+            offer_title_en: str = None,
+            offer_partial_title_fr: str = None,
+            offer_partial_title_en: str = None,
+            category: Categories = None,
+            **kwargs
     ):
         super().__init__(**kwargs)
         self.constraint_type = constraint_type
@@ -331,7 +330,6 @@ class NodeGroupYear(Node):
 
 
 class NodeLearningUnitYear(Node):
-
     type = NodeType.LEARNING_UNIT
     node_type = NodeType.LEARNING_UNIT
 
@@ -392,7 +390,6 @@ class NodeLearningUnitYear(Node):
 
 
 class NodeLearningClassYear(Node):
-
     type = NodeType.LEARNING_CLASS
 
     def __init__(self, node_id: int, year: int, children: List['Link'] = None):
