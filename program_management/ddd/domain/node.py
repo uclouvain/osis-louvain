@@ -220,16 +220,20 @@ class Node:
         return _get_descendents(self)
 
     def ascendents(self, tree: 'ProgramTree', parent: 'Node') -> Dict['Path', 'Node']:
+        import time
+        start = time.process_time()
         path = self.current_path(tree.root_node, parent)
         current_path = path.replace('|' + str(self.node_id), '')
-        ascendents = {}
-        node_ids = current_path.split('|')
-        node_ids.reverse()
-        for node_id in node_ids:
+        ascendents = {
+            current_path: parent
+        }
+        current_path = current_path.replace('|' + str(parent.node_id), '')
+        parents = tree.get_parents(current_path)
+        for node in parents:
             ascendents.update({
-                current_path: tree.get_node(current_path)
+                current_path: node
             })
-            current_path = current_path.replace('|' + str(node_id), '')
+            current_path = current_path.replace('|' + str(node.node_id), '')
         return ascendents
 
     def current_path(self, root_node: 'Node', parent: 'Node'):
