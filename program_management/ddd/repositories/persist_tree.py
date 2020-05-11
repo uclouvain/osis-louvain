@@ -79,8 +79,3 @@ def __delete_links(tree: program_tree.ProgramTree, node: Node):
 
 def __delete_group_element_year(link):
     GroupElementYear.objects.filter(pk=link.pk).delete()
-
-
-def persist_specific_version_program(program_tree: ProgramTreeVersion) -> None:
-    """Persister en DB le programme passé en paramètre."""
-    pass
