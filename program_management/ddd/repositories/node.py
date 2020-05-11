@@ -65,13 +65,3 @@ class NodeRepository(interface.AbstractRepository):
         if not qs:
             return []
         return load_node.load_multiple(qs)
-
-    # @classmethod
-    # def search(
-    #         cls,
-    #         entity_ids: Optional[List['NodeIdentity']] = None,
-    #         year: int = None,
-    #
-    # ) -> List['Node']:
-    #     pass
-
