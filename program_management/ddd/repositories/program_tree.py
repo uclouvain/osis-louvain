@@ -23,22 +23,31 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import SimpleTestCase
+from typing import Optional, List
 
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from osis_common.ddd import interface
+from osis_common.ddd.interface import EntityIdentity, Entity
+from program_management.ddd.business_types import *
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.repositories import persist_tree, load_tree
+from program_management.models.element import Element
 
 
-class TestInit(SimpleTestCase):
-    def setUp(self):
-        self.tree = ProgramTreeFactory()
+class ProgramTreeRepository(interface.AbstractRepository):
+    @classmethod
+    def create(cls, program_tree: 'ProgramTree') -> 'ProgramTreeIdentity':
+        persist_tree.persist(program_tree)
+        return program_tree.entity_id
 
-    def test_default_version_name_value(self):
-        obj = ProgramTreeVersion(self.tree)
-        error_msg = "By default, a tree version instance is a 'Standard' version, identified by an empty name."
-        self.assertEqual(obj.version_name, '', error_msg)
+    @classmethod
+    def update(cls, program_tree: 'ProgramTree') -> 'ProgramTreeIdentity':
+        persist_tree.persist(program_tree)
+        return program_tree.entity_id
 
-    def test_default_transition_value(self):
-        obj = ProgramTreeVersion(self.tree)
-        error_msg = "By default, a tree version instance is not a transition program."
-        self.assertFalse(obj.is_transition, error_msg)
+    @classmethod
+    def get(cls, entity_id: 'ProgramTreeIdentity') -> 'ProgramTree':
+        tree_root_id = Element.objects.get(
+            group_year__code=entity_id.code,
+            group_year__academic_year__year=entity_id.year
+        ).pk
+        return load_tree.load(tree_root_id)

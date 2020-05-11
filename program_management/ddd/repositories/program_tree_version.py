@@ -23,22 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import SimpleTestCase
+from typing import Optional, List
 
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from education_group.models.group_year import GroupYear
+from osis_common.ddd import interface
+from osis_common.ddd.interface import EntityIdentity, Entity
+from program_management.ddd.business_types import *
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.repositories import persist_tree, load_tree
+from program_management.models.element import Element
 
 
-class TestInit(SimpleTestCase):
-    def setUp(self):
-        self.tree = ProgramTreeFactory()
+class ProgramTreeVersionRepository(interface.AbstractRepository):
 
-    def test_default_version_name_value(self):
-        obj = ProgramTreeVersion(self.tree)
-        error_msg = "By default, a tree version instance is a 'Standard' version, identified by an empty name."
-        self.assertEqual(obj.version_name, '', error_msg)
-
-    def test_default_transition_value(self):
-        obj = ProgramTreeVersion(self.tree)
-        error_msg = "By default, a tree version instance is not a transition program."
-        self.assertFalse(obj.is_transition, error_msg)
+    @classmethod
+    def get(cls, entity_id: 'ProgramTreeVersionIdentity') -> 'ProgramTreeVersion':
+        group_year = GroupYear.objects.filter(
+            partial_acronym=entity_id.code, academic_year__year=entity_id.year
+        ).select_related('education_group_version__education_group_year', 'academic_year')
+        # FIXME :: implement load_version into this function ProgramTreeVersionRepository.get()
+        return load_tree.load_version(
+            group_year.education_group_version.education_group_year.acronym,
+            group_year.academic_year.year,
+            group_year.education_group_version.version_name,
+            group_year.education_group_version.is_transition,
+        )

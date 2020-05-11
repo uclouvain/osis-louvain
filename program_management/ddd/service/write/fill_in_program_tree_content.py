@@ -23,22 +23,38 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import SimpleTestCase
+from osis_common.ddd.interface import EntityIdentity
+from program_management.ddd.command import FillInProgramTreeContentCommand
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionFromAnotherTreeBuilder, \
+    ProgramTreeVersionIdentity
+from program_management.ddd.repositories.node import NodeRepository
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
+def fill_in_program_tree_content(command: FillInProgramTreeContentCommand) -> EntityIdentity:
+    # Given
+    fill_in_from_tree = ProgramTreeVersionRepository.get(
+        ProgramTreeVersionIdentity(
+            command.from_root_node_code,
+            command.from_root_node_year,
+        )
+    )
 
-class TestInit(SimpleTestCase):
-    def setUp(self):
-        self.tree = ProgramTreeFactory()
+    tree_to_fill = ProgramTreeVersionRepository.get(
+        ProgramTreeVersionIdentity(
+            command.to_root_node_code,
+            command.to_root_node_year,
+        )
+    )
 
-    def test_default_version_name_value(self):
-        obj = ProgramTreeVersion(self.tree)
-        error_msg = "By default, a tree version instance is a 'Standard' version, identified by an empty name."
-        self.assertEqual(obj.version_name, '', error_msg)
+    # When
+    new_version = ProgramTreeVersionFromAnotherTreeBuilder(
+        fill_in_from_tree,
+        tree_to_fill,
+        NodeRepository(),
+    ).build()
 
-    def test_default_transition_value(self):
-        obj = ProgramTreeVersion(self.tree)
-        error_msg = "By default, a tree version instance is not a transition program."
-        self.assertFalse(obj.is_transition, error_msg)
+    # Then
+    identity = ProgramTreeVersionRepository.create(new_version)
+
+    return identity

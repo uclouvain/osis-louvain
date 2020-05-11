@@ -34,6 +34,7 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from education_group.models.enums.constraint_type import ConstraintTypes
+from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.academic_year import AcademicYear
 from program_management.ddd.domain.link import factory as link_factory
@@ -54,6 +55,18 @@ class NodeFactory:
 
 
 factory = NodeFactory()
+
+
+class NodeIdentity(interface.EntityIdentity):
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
+
+    def __hash__(self):
+        return hash(self.code + str(self.year))
+
+    def __eq__(self, other):
+        return self.code == other.code and self.year == other.year
 
 
 class Node:
@@ -99,6 +112,10 @@ class Node:
 
     def __repr__(self):
         return str(self)
+
+    @property
+    def entity_id(self) -> NodeIdentity:  # FIXME :: pass entity_id into the constructor
+        return NodeIdentity(self.code, self.year)
 
     @property
     def pk(self):

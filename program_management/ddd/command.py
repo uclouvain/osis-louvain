@@ -23,22 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import SimpleTestCase
-
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
-from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from osis_common.ddd import interface
 
 
-class TestInit(SimpleTestCase):
-    def setUp(self):
-        self.tree = ProgramTreeFactory()
-
-    def test_default_version_name_value(self):
-        obj = ProgramTreeVersion(self.tree)
-        error_msg = "By default, a tree version instance is a 'Standard' version, identified by an empty name."
-        self.assertEqual(obj.version_name, '', error_msg)
-
-    def test_default_transition_value(self):
-        obj = ProgramTreeVersion(self.tree)
-        error_msg = "By default, a tree version instance is not a transition program."
-        self.assertFalse(obj.is_transition, error_msg)
+class FillInProgramTreeContentCommand(interface.CommandRequest):
+    def __init__(
+            self,
+            from_root_node_code: str,
+            from_root_node_year: int,
+            to_root_node_code: str,
+            to_root_node_year: int
+    ):
+        self.from_root_node_code = from_root_node_code
+        self.from_root_node_year = from_root_node_year
+        self.to_root_node_code = to_root_node_code
+        self.to_root_node_year = to_root_node_year

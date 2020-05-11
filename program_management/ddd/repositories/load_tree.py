@@ -48,6 +48,7 @@ NodeKey = str  # <node_id>_<node_type> Example : "589_LEARNING_UNIT"
 TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 
 
+# FIXME :: DEPRECATED - use ProgramTreeVersionRepository.get() instead
 def load_version(acronym: str, year: int, version_name: str, transition: bool) -> 'ProgramTreeVersion':
     try:
         education_group_version = EducationGroupVersion.objects\

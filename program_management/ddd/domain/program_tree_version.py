@@ -26,6 +26,7 @@
 import functools
 from typing import Callable, List, Set
 
+from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from base.models.education_group_year import EducationGroupYear
 from education_group.models.group_year import GroupYear
@@ -52,14 +53,26 @@ SearchYear = int
 ExistingNodesWithTheirChildren = List['Node']
 
 
+# FIXME :: same identity than NodeIdentity and ProgramTreeIdentity
+class ProgramTreeVersionIdentity(interface.EntityIdentity):
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
+
+    def __hash__(self):
+        return hash(self.code + str(self.year))
+
+    def __eq__(self, other):
+        return self.code == other.code and self.year == other.year
+
+
 class ProgramTreeVersionFromAnotherTreeBuilder:
 
     def __init__(
             self,
             from_tree: 'ProgramTreeVersion',
-            # Dependency injection below
-            load_existing_nodes: 'NodesRepositoryInterface',
-            attrs: ProgramTreeVersionAttributes,
+            tree_to_fill: 'ProgramTreeVersion',
+            node_repository: 'NodeRepository',  # Dependency injection
     ):
         # TODO :: validators to use :
         # TODO :: MinimumMaximumPostponementYearValidator
@@ -70,8 +83,8 @@ class ProgramTreeVersionFromAnotherTreeBuilder:
         # if not validator.is_Valid():
         #     return validator.messages
         self.from_tree = from_tree
-        self.nodes_repository = load_existing_nodes
-        self.attrs = attrs
+        self.tree_to_fill = tree_to_fill
+        self.node_repository = node_repository
 
     @property
     def copy_from_year(self) -> int:
@@ -88,11 +101,12 @@ class ProgramTreeVersionFromAnotherTreeBuilder:
     @property
     @functools.lru_cache()
     def existing_nodes_in_destination_year(self) -> ExistingNodesWithTheirChildren:
-        if self._existing_nodes is None:
-            self._existing_nodes = self.nodes_repository.load_existing_nodes(list(self.nodes_to_copy), self.copy_to_year)
-        return self._existing_nodes
+        return self.node_repository.search_nodes_next_year(
+                list(n.pk for n in self.nodes_to_copy),
+                self.copy_to_year
+            )
 
-    def build_from(self):
+    def build(self) -> 'ProgramTreeVersion':
         if self.from_tree.is_transition:
             tree_version = self._build_from_transition()
         else:
@@ -106,34 +120,7 @@ class ProgramTreeVersionFromAnotherTreeBuilder:
         raise NotImplementedError()
 
 
-class ProgramTreeVersionBuilder:
-
-    _tree_version = None
-
-    def build_from(self, from_tree: 'ProgramTreeVersion', **tree_version_attrs) -> 'ProgramTreeVersion':
-        assert isinstance(from_tree, ProgramTreeVersion)
-        assert from_tree.is_standard, "Forbidden to copy from a non Standard version"
-        # validator = validate()
-        # if not validator.is_Valid():
-        #     return validator.messages
-        if from_tree.is_transition:
-            self._tree_version = self._build_from_transition(from_tree.tree, **tree_version_attrs)
-        else:
-            self._tree_version = self._build_from_standard(from_tree.tree, **tree_version_attrs)
-        return self.program_tree_version
-
-    @property
-    def program_tree_version(self):
-        return self._tree_version
-
-    def _build_from_transition(self, from_tree: 'ProgramTree', **tree_version_attrs) -> 'ProgramTreeVersion':
-        raise NotImplementedError()
-
-    def _build_from_standard(self, from_tree: 'ProgramTree', **tree_version_attrs) -> 'ProgramTreeVersion':
-        raise NotImplementedError()
-
-
-class ProgramTreeVersion:
+class ProgramTreeVersion(interface.RootEntity):
 
     def __init__(
             self,
@@ -145,13 +132,18 @@ class ProgramTreeVersion:
             title_en: str = None,
             root_group = None
     ):
-        self.tree = tree
+        super(ProgramTreeVersion, self).__init__()
+        self.tree = tree  # FIXME :: replace this param with "root_code" and "year"
         self.is_transition = is_transition
         self.version_name = version_name
         self.offer = offer
         self.title_fr = title_fr
         self.title_en = title_en
         self.root_group = root_group
+
+    @property
+    def entity_id(self) -> ProgramTreeVersionIdentity:  # FIXME :: pass entity_id into the constructor
+        return ProgramTreeVersionIdentity(self.tree.root_node.code, self.tree.root_node.year)
 
     @property
     def is_standard(self):
