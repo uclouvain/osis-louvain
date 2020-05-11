@@ -32,7 +32,7 @@ from base.business.education_groups.create import create_initial_group_element_y
 from base.forms.utils.choice_field import BLANK_CHOICE
 from base.models import academic_year
 from base.models.academic_year import compute_max_academic_year_adjournment
-from program_management.ddd.service.create_program_tree_version import report_specific_version_creation, \
+from program_management.ddd.service.create_program_tree_version_service import report_specific_version_creation, \
     create_specific_version
 
 

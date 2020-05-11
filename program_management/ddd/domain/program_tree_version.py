@@ -44,15 +44,15 @@ class ProgramTreeVersionBuilder:
                                                                   year)
         return self.program_tree_version
 
-    def _build_from_transition(self, program_tree: 'ProgramTree', title_fr: str, title_en: str, version_name: str,
+    def _build_from_transition(self, title_fr: str, title_en: str, version_name: str,
                                year: int) -> 'ProgramTreeVersion':
-        program_tree_version = ProgramTreeVersion(tree=program_tree, title_fr=title_fr, title_en=title_en,
-                                                  version_name=version_name, year=year, is_transition=True)
-        return program_tree_version
+        raise NotImplementedError()
 
-    def _build_from_standard(self, program_tree: 'ProgramTree', title_fr: str, title_en: str, version_name: str,
+    def _build_from_standard(self, title_fr: str, title_en: str, version_name: str,
                              year: int) -> 'ProgramTreeVersion':
-        program_tree_version = ProgramTreeVersion(tree=program_tree, title_fr=title_fr, title_en=title_en,
+        root_node = NodeGroupYear()
+        tree = ProgramTree(root_node)
+        program_tree_version = ProgramTreeVersion(tree=tree, title_fr=title_fr, title_en=title_en,
                                                   version_name=version_name, year=year, is_transition=False)
         return program_tree_version
 
