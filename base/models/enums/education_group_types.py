@@ -166,6 +166,15 @@ class MiniTrainingType(EducationGroupTypesEnum):
         ]
 
     @classmethod
+    def minors_enum(cls):
+        return [
+            MiniTrainingType.ACCESS_MINOR,
+            MiniTrainingType.DISCIPLINARY_COMPLEMENT_MINOR,
+            MiniTrainingType.OPEN_MINOR,
+            MiniTrainingType.SOCIETY_MINOR
+        ]
+
+    @classmethod
     def to_postpone(cls):
         return cls.minors() + [cls.DEEPENING.name, cls.FSA_SPECIALITY.name]
 

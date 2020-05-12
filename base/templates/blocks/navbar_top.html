@@ -31,7 +31,7 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                {% if perms.base.can_access_education_group %}
+                                {% if perms.base.view_educationgroup %}
                                     <li>
                                         {% flag "version_program" %}
                                             {% url 'version_program' as url_training %}

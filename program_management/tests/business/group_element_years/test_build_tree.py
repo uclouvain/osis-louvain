@@ -32,13 +32,16 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from waffle.testutils import override_switch
 
+import program_management.business
 from base.models import entity_version
-from base.models.enums import organization_type
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums import organization_type, education_group_types
 from base.models.enums.education_group_types import MiniTrainingType, GroupType, TrainingType
 from base.models.enums.link_type import LinkTypes
+from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory, TrainingFactory, GroupFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
@@ -112,7 +115,8 @@ class TestBuildTree(TestCase):
             type=organization_type.MAIN
         )
         cls.ADEF = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="ADEF",
             title="ADEF",
             entity_type=entity_version.entity_type.LOGISTICS_ENTITY,
@@ -122,7 +126,8 @@ class TestBuildTree(TestCase):
         )
 
         cls.ILV = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="ILV",
             title="ILV",
             entity_type=entity_version.entity_type.LOGISTICS_ENTITY,
@@ -132,7 +137,8 @@ class TestBuildTree(TestCase):
         )
 
         cls.root = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="SST",
             title="SST",
             entity_type=entity_version.entity_type.SECTOR,
@@ -141,7 +147,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.SC = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="SC",
             title="SC",
             entity_type=entity_version.entity_type.FACULTY,
@@ -150,7 +157,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.MATH = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="MATH",
             title="MATH",
             entity_type=entity_version.entity_type.SCHOOL,
@@ -159,7 +167,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.PHYS = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="PHYS",
             title="PHYS",
             entity_type=entity_version.entity_type.SCHOOL,
@@ -168,7 +177,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.LOCI = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="LOCI",
             title="LOCI",
             entity_type=entity_version.entity_type.FACULTY,
@@ -177,7 +187,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.URBA = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="URBA",
             title="URBA",
             entity_type=entity_version.entity_type.SCHOOL,
@@ -186,7 +197,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.BARC = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="BARC",
             title="BARC",
             entity_type=entity_version.entity_type.SCHOOL,
@@ -195,7 +207,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.EDDY = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="EDDY",
             title="EDDY",
             entity_type=entity_version.entity_type.SCHOOL,
@@ -204,7 +217,8 @@ class TestBuildTree(TestCase):
             end_date=end_date
         )
         cls.E2DY = EntityVersionFactory(
-            entity=EntityFactory(country=cls.country, organization=cls.organization),
+            entity__country=cls.country,
+            entity__organization=cls.organization,
             acronym="E2DY",
             title="E2DY",
             entity_type=entity_version.entity_type.SCHOOL,
@@ -470,7 +484,10 @@ class TestBuildTree(TestCase):
         GroupElementYearFactory(
             parent=self.group_element_year_2.child_branch,
             child_branch=None,
-            child_leaf=LearningUnitYearFactory(acronym=acronym)
+            child_leaf=LearningUnitYearFactory(
+                acronym=acronym,
+                learning_container_year__requirement_entity=None
+            )
         )
 
         node = json.dumps(EducationGroupHierarchy(self.parent).to_json())
@@ -768,7 +785,7 @@ class TestGetFinalityList(TestCase):
     def test_get_finality_list_case_result_found(self):
         finality_list = EducationGroupYearFactory(
             academic_year=self.academic_year,
-            education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE
+            education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name
         )
         finality_1 = EducationGroupYearFactory(
             academic_year=self.academic_year,
@@ -846,3 +863,63 @@ class TestPath(TestCase):
             "{}_{}".format(self.root.id, self.group_element_year.child_branch.id)
         )
 
+
+class TestFetchGroupElementsBehindHierarchy(TestCase):
+    """Unit tests on fetch_all_group_elements_behind_hierarchy()"""
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory()
+        cls.root = TrainingFactory(
+            acronym='DROI2M',
+            education_group_type__name=education_group_types.TrainingType.PGRM_MASTER_120.name,
+            academic_year=cls.academic_year
+        )
+
+        finality_list = GroupFactory(
+            acronym='LIST FINALITIES',
+            education_group_type__name=education_group_types.GroupType.FINALITY_120_LIST_CHOICE.name,
+            academic_year=cls.academic_year
+        )
+
+        formation_master_md = TrainingFactory(
+            acronym='DROI2MD',
+            education_group_type__name=education_group_types.TrainingType.MASTER_MD_120.name,
+            academic_year=cls.academic_year
+        )
+
+        common_core = GroupFactory(
+            acronym='TC DROI2MD',
+            education_group_type__name=education_group_types.GroupType.COMMON_CORE.name,
+            academic_year=cls.academic_year
+        )
+
+        cls.link_1 = GroupElementYearFactory(parent=cls.root, child_branch=finality_list, child_leaf=None)
+        cls.link_1_bis = GroupElementYearFactory(parent=cls.root,
+                                                 child_branch=EducationGroupYearFactory(
+                                                     academic_year=cls.academic_year),
+                                                 child_leaf=None)
+        cls.link_2 = GroupElementYearFactory(parent=finality_list, child_branch=formation_master_md, child_leaf=None)
+        cls.link_3 = GroupElementYearFactory(parent=formation_master_md, child_branch=common_core, child_leaf=None)
+        cls.link_4 = GroupElementYearFactory(parent=common_core,
+                                             child_leaf=LearningUnitYearFactory(),
+                                             child_branch=None)
+
+    def test_with_one_root_id(self):
+        queryset = GroupElementYear.objects.all().select_related(
+            'child_branch__academic_year',
+            'child_leaf__academic_year',
+            # [...] other fetch
+        )
+        result = program_management.business.group_element_years.group_element_year_tree.fetch_all_group_elements_in_tree(self.root, queryset)
+        expected_result = {
+            self.link_1.parent_id: [self.link_1, self.link_1_bis],
+            self.link_2.parent_id: [self.link_2],
+            self.link_3.parent_id: [self.link_3],
+            self.link_4.parent_id: [self.link_4],
+        }
+        self.assertDictEqual(result, expected_result)
+
+    def test_when_queryset_is_not_from_group_element_year_model(self):
+        wrong_queryset_model = EducationGroupYear.objects.all()
+        with self.assertRaises(AttributeError):
+            program_management.business.group_element_years.group_element_year_tree.fetch_all_group_elements_in_tree(self.root, wrong_queryset_model)

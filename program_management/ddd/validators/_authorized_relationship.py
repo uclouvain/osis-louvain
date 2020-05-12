@@ -51,8 +51,10 @@ class AttachAuthorizedRelationshipValidator(BusinessValidator):
             )
         if self.is_maximum_children_types_reached(self.parent, self.node_to_add):
             self.add_error_message(
-                _("The parent must have at least one child of type(s) \"%(types)s\".") % {
-                    "types": str(self.auth_relations.get_authorized_children_types(self.parent.node_type))
+                _("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
+                  "has already reached the limit.") % {
+                    'child_types': self.node_to_add.node_type.value,
+                    'parent': self.parent
                 }
             )
 
@@ -67,32 +69,41 @@ class AttachAuthorizedRelationshipValidator(BusinessValidator):
 
 # Implemented from CheckAuthorizedRelationship (management.py)
 class DetachAuthorizedRelationshipValidator(BusinessValidator):
-    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', position_to_add: 'Node'):
+    def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node', detach_from: 'Node'):
         super(DetachAuthorizedRelationshipValidator, self).__init__()
+        self.node_to_detach = node_to_detach
+        self.detach_from = detach_from
         self.tree = tree
-        self.node_to_add = node_to_add
-        self.parent = position_to_add
-        self.auth_relations = tree.authorized_relationships
 
     def validate(self):
-        if self.is_minimum_children_types_reached(self.parent, self.node_to_add):
+        minimum_children_types_reached = self._get_minimum_children_types_reached(self.detach_from, self.node_to_detach)
+        if minimum_children_types_reached:
             self.add_error_message(
-                _("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
-                  "has already reached the limit.") % {
-                    'child_types': self.node_to_add.node_type.value,
-                    'parent': self.parent
+                _("The parent must have at least one child of type(s) \"%(types)s\".") % {
+                    "types": ','.join(str(node_type.value) for node_type in minimum_children_types_reached)
                 }
             )
 
-    def is_minimum_children_types_reached(self, parent_node: 'Node', child_node: 'Node'):
-        if not self.auth_relations.is_authorized(parent_node.node_type, child_node.node_type):
-            return False
+    def _get_minimum_children_types_reached(self, parent_node: 'Node', child_node: 'Node'):
+        children_types_to_check = [child_node.node_type]
+        if self.tree.get_link(parent_node, child_node).is_reference():
+            children_types_to_check = [l.child.node_type for l in child_node.children]
+
         counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
-        current_count = counter[child_node.node_type]
-        relation = self.auth_relations.get_authorized_relationship(parent_node.node_type, child_node.node_type)
-        return current_count == relation.min_count_authorized
+
+        types_minimum_reached = []
+        for child_type in children_types_to_check:
+            current_count = counter[child_type]
+            relation = self.tree.authorized_relationships.get_authorized_relationship(parent_node.node_type, child_type)
+            if not relation:
+                # FIXME :: business cass to fix (cf unit test)
+                continue
+            if current_count == relation.min_count_authorized:
+                types_minimum_reached.append(child_type)
+
+        return types_minimum_reached
 
 
 class AuthorizedRelationshipLearningUnitValidator(BusinessValidator):
     def validate(self):
-        pass  # cf. AttachLearningUnitYearStrategy.id_valid
+        pass  # cf. AttachLearningUnitYearStrategy.id_valid  # TODO :: to implement !

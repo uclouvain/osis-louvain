@@ -45,7 +45,7 @@ from base.models.enums import academic_type, internship_presence, schedule_type,
     diploma_printing_orientation, active_status, duration_unit, decree_category, rate_code
 from base.models.enums import education_group_association
 from base.models.enums import education_group_categories
-from base.models.enums.constraint_type import CONSTRAINT_TYPE, CREDITS
+from base.models.enums.constraint_type import CONSTRAINT_TYPE
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType, GroupType
 from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.offer_enrollment_state import SUBSCRIBED, PROVISORY
@@ -197,6 +197,7 @@ class EducationGroupYear(SerializableModel):
     partial_title = models.CharField(
         max_length=240,
         blank=True,
+        null=True,
         default="",
         verbose_name=_("Partial title in French")
     )
@@ -204,6 +205,7 @@ class EducationGroupYear(SerializableModel):
     partial_title_english = models.CharField(
         max_length=240,
         blank=True,
+        null=True,
         default="",
         verbose_name=_("Partial title in English")
     )
@@ -487,6 +489,7 @@ class EducationGroupYear(SerializableModel):
         on_delete=models.PROTECT,
         null=True, blank=True,
         verbose_name=_("ISCED domain"),
+        limit_choices_to={'is_ares': True},
     )
 
     management_entity = models.ForeignKey(
@@ -684,7 +687,7 @@ class EducationGroupYear(SerializableModel):
             else self.title
         return "{} ({} {})".format(title, self.credits or 0, _("credits"))
 
-    @property
+    @property  # TODO :: move this into template tags or 'presentation' layer (not responsibility of model)
     def verbose_title(self):
         if self.is_finality:
             if self.partial_title_english and translation.get_language() == LANGUAGE_CODE_EN:
@@ -708,15 +711,6 @@ class EducationGroupYear(SerializableModel):
         if self.remark_english and translation.get_language() == LANGUAGE_CODE_EN:
             return self.remark_english
         return self.remark
-
-    @property
-    def verbose_constraint(self):
-        msg = "from %(min)s to %(max)s credits among" \
-            if self.constraint_type == CREDITS else "from %(min)s to %(max)s among"
-        return _(msg) % {
-            "min": self.min_constraint if self.min_constraint else "",
-            "max": self.max_constraint if self.max_constraint else ""
-        }
 
     @property
     def verbose_duration(self):

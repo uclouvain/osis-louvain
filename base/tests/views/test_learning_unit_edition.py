@@ -51,7 +51,7 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, CentralManagerFactory
+from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
@@ -68,7 +68,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.user = UserFactory(username="YodaTheJediMaster")
-        cls.person = CentralManagerFactory(user=cls.user)
+        cls.person = CentralManagerForUEFactory(user=cls.user)
         cls.permission = Permission.objects.get(codename="can_edit_learningunit_date")
         cls.person.user.user_permissions.add(cls.permission)
         cls.setup_academic_years()
@@ -181,7 +181,7 @@ class TestEditLearningUnit(TestCase):
             campus=CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN))
         )
 
-        person = CentralManagerFactory()
+        person = CentralManagerForUEFactory()
         PersonEntityFactory(
             entity=cls.requirement_entity.entity,
             person=person
@@ -434,7 +434,7 @@ class TestLearningUnitVolumesManagement(TestCase):
         cls.learning_unit_year = cls.generated_container_year.learning_unit_year_full
         cls.learning_unit_year_partim = cls.generated_container_year.learning_unit_year_partim
 
-        cls.person = CentralManagerFactory()
+        cls.person = CentralManagerForUEFactory()
 
         cls.url = reverse('learning_unit_volumes_management', kwargs={
             'learning_unit_year_id': cls.learning_unit_year.id,

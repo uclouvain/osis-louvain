@@ -25,45 +25,13 @@
 #############################################################################
 import itertools
 
-from django.core import validators
 from django.db import models
-from django.utils.functional import lazy
-from django.utils.safestring import mark_safe
-from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from base.models import learning_unit
 from base.models.enums import prerequisite_operator
 from base.models.enums.prerequisite_operator import OR, AND
 from osis_common.models.osis_model_admin import OsisModelAdmin
-
-AND_OPERATOR = "ET"
-OR_OPERATOR = 'OU'
-ACRONYM_REGEX = learning_unit.LEARNING_UNIT_ACRONYM_REGEX_ALL.lstrip('^').rstrip('$')
-NO_PREREQUISITE_REGEX = r''
-UNIQUE_PREREQUISITE_REGEX = r'{acronym_regex}'.format(acronym_regex=ACRONYM_REGEX)
-ELEMENT_REGEX = r'({acronym_regex}|\({acronym_regex}( {secondary_operator} {acronym_regex})+\))'
-MULTIPLE_PREREQUISITES_REGEX = '{element_regex}( {main_operator} {element_regex})+'
-MULTIPLE_PREREQUISITES_REGEX_OR = MULTIPLE_PREREQUISITES_REGEX.format(
-    main_operator=OR_OPERATOR,
-    element_regex=ELEMENT_REGEX.format(acronym_regex=ACRONYM_REGEX, secondary_operator=AND_OPERATOR)
-)
-MULTIPLE_PREREQUISITES_REGEX_AND = MULTIPLE_PREREQUISITES_REGEX.format(
-    main_operator=AND_OPERATOR,
-    element_regex=ELEMENT_REGEX.format(acronym_regex=ACRONYM_REGEX, secondary_operator=OR_OPERATOR)
-)
-PREREQUISITE_SYNTAX_REGEX = r'^(?i)({no_element_regex}|' \
-                            r'{unique_element_regex}|' \
-                            r'{multiple_elements_regex_and}|' \
-                            r'{multiple_elements_regex_or})$'.format(
-                                no_element_regex=NO_PREREQUISITE_REGEX,
-                                unique_element_regex=UNIQUE_PREREQUISITE_REGEX,
-                                multiple_elements_regex_and=MULTIPLE_PREREQUISITES_REGEX_AND,
-                                multiple_elements_regex_or=MULTIPLE_PREREQUISITES_REGEX_OR
-                            )
-mark_safe_lazy = lazy(mark_safe, str)
-prerequisite_syntax_validator = validators.RegexValidator(regex=PREREQUISITE_SYNTAX_REGEX,
-                                                          message=mark_safe_lazy(_("Prerequisites are invalid")))
+from django.utils.translation import gettext_lazy as _
 
 
 class PrerequisiteAdmin(VersionAdmin, OsisModelAdmin):
@@ -92,7 +60,13 @@ class Prerequisite(models.Model):
 
     )
     education_group_year = models.ForeignKey(
-        "EducationGroupYear", on_delete=models.CASCADE
+        "EducationGroupYear", on_delete=models.CASCADE,
+        null=True,  # TODO :: remove this field after migration on education_group_version
+    )
+    education_group_version = models.ForeignKey(
+        "program_management.EducationGroupVersion",
+        on_delete=models.CASCADE,
+        null=True  # TODO :: make this null=False after migration on education_group_version
     )
     main_operator = models.CharField(
         choices=prerequisite_operator.PREREQUISITES_OPERATORS,

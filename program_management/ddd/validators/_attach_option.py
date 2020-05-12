@@ -71,11 +71,11 @@ class AttachOptionsValidator(BusinessValidator):
             if missing_options:
                 self.add_error_message(
                     ngettext(
-                        "Option \"%(acronym)s\" must be present in %(root_acronym)s program.",
-                        "Options \"%(acronym)s\" must be present in %(root_acronym)s program.",
+                        "Option \"%(code)s\" must be present in %(root_code)s program.",
+                        "Options \"%(code)s\" must be present in %(root_code)s program.",
                         len(missing_options)
                     ) % {
-                        "acronym": ', '.join(option.acronym for option in missing_options),
-                        "root_acronym": self.tree_2m.root_node.acronym
+                        "code": ', '.join(option.code for option in missing_options),
+                        "root_code": self.tree_2m.root_node.code
                     }
                 )

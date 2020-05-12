@@ -33,13 +33,14 @@ from rest_framework.test import APITestCase
 
 from base.models.enums import organization_type
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import MiniTrainingFactory
+from base.tests.factories.education_group_year import MiniTrainingFactory, TrainingFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
-from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer
-from education_group.api.views.mini_training import MiniTrainingList
+from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
+from education_group.api.views.mini_training import MiniTrainingList, OfferRoots
 
 
 class MiniTrainingTitleTestCase(APITestCase):
@@ -175,6 +176,21 @@ class MiniTrainingListTestCase(APITestCase):
         self.assertEqual(response.data['results'][1]['code'], self.mini_trainings[1].partial_acronym)
         self.assertEqual(response.data['results'][2]['code'], self.mini_trainings[0].partial_acronym)
 
+    def test_get_training_case_filter_lowercase_acronym(self):
+        query_string = {'partial_acronym': self.mini_trainings[1].partial_acronym.lower()}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        serializer = MiniTrainingListSerializer(
+            self.mini_trainings[1],
+            context={
+                'request': RequestFactory().get(self.url, query_string),
+                'language': settings.LANGUAGE_CODE_FR
+            },
+        )
+        self.assertEqual(dict(response.data['results'][0]), serializer.data)
+
 
 class GetMiniTrainingTestCase(APITestCase):
     @classmethod
@@ -224,3 +240,41 @@ class GetMiniTrainingTestCase(APITestCase):
         })
         response = self.client.get(invalid_url)
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class OfferRootsTestCase(APITestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(year=2018)
+        cls.entity_version = EntityVersionFactory(entity__organization__type=organization_type.MAIN)
+
+        cls.minor = MiniTrainingFactory(academic_year=cls.academic_year)
+        for _ in range(0, 3):
+            offer = TrainingFactory(academic_year=cls.academic_year)
+            GroupElementYearFactory(parent=offer, child_branch=cls.minor, child_leaf=None)
+        cls.user = UserFactory()
+        cls.url = reverse('education_group_api_v1:' + OfferRoots.name, kwargs={
+            'partial_acronym': cls.minor.partial_acronym,
+            'year': cls.academic_year.year
+        })
+
+    def setUp(self):
+        self.client.force_authenticate(user=self.user)
+
+    def test_get_not_authorized(self):
+        self.client.force_authenticate(user=None)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+
+    def test_get_method_not_allowed(self):
+        methods_not_allowed = ['post', 'delete', 'put', 'patch']
+
+        for method in methods_not_allowed:
+            response = getattr(self.client, method)(self.url)
+            self.assertEqual(response.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
+
+    def test_get_results(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 3)

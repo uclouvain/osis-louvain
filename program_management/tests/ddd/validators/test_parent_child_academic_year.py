@@ -38,21 +38,18 @@ class TestParentChildSameAcademicYearValidator(SimpleTestCase):
     def setUp(self):
         self.year = 2019
         self.tree = ProgramTreeFactory(root_node__year=self.year)
-        self.path_to_attach = build_path(self.tree.root_node)
 
     def test_when_year_equals(self):
         validator = ParentChildSameAcademicYearValidator(
-            self.tree,
-            NodeGroupYearFactory(year=self.year),
-            self.path_to_attach
+            self.tree.root_node,
+            NodeGroupYearFactory(year=self.year)
         )
         self.assertTrue(validator.is_valid())
 
     def test_when_year_of_node_to_attach_is_lower(self):
         validator = ParentChildSameAcademicYearValidator(
-            self.tree,
-            NodeGroupYearFactory(year=self.year - 1),
-            self.path_to_attach
+            self.tree.root_node,
+            NodeGroupYearFactory(year=self.year - 1)
         )
         self.assertFalse(validator.is_valid())
         expected_result = _(
@@ -62,9 +59,8 @@ class TestParentChildSameAcademicYearValidator(SimpleTestCase):
 
     def test_when_year_of_node_to_attach_is_greater(self):
         validator = ParentChildSameAcademicYearValidator(
-            self.tree,
-            NodeGroupYearFactory(year=self.year + 1),
-            self.path_to_attach
+            self.tree.root_node,
+            NodeGroupYearFactory(year=self.year + 1)
         )
         self.assertFalse(validator.is_valid())
         expected_result = _(

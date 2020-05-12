@@ -23,26 +23,29 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+
 from django.conf import settings
 from django.test import TestCase, RequestFactory
 from rest_framework.reverse import reverse
 
-from base.models.enums.education_group_types import TrainingType, GroupType
+from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
+from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
+from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
-from education_group.api.serializers.group_element_year import EducationGroupTreeSerializer
+from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.group_element_year import TrainingTreeView, GroupTreeView
 from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
+from program_management.ddd.domain.link import Link
+from program_management.ddd.repositories import load_tree
 
 
-class EducationGroupTreeSerializerTestCase(TestCase):
+class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         """
@@ -69,7 +72,9 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year,
             credits=10,
-            status=False
+            status=False,
+            specific_title_english=None,
+            learning_container_year__common_title_english='COMMON'
         )
         cls.luy_gey = GroupElementYearFactory(
             parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year, relative_credits=15
@@ -79,8 +84,8 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
-        cls.serializer = EducationGroupTreeSerializer(
-            EducationGroupHierarchy(cls.training),
+        cls.serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=load_tree.load(cls.training.id).root_node),
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
@@ -151,9 +156,69 @@ class EducationGroupTreeSerializerTestCase(TestCase):
         ]
         self.assertListEqual(list(self.serializer.data['children'][0]['children'][0].keys()), expected_fields)
 
+    def test_learning_unit_children_have_only_common_title_if_no_specific_one(self):
+        luy = self.serializer.data['children'][0]['children'][0]
+        self.assertEqual(luy['title'], 'COMMON')
+
     def test_learning_unit_children_status_field_is_false_boolean(self):
         luy = self.serializer.data['children'][0]['children'][0]
         self.assertFalse(luy['status'])
+
+    def test_ensure_not_getting_direct_child_of_reference_link(self):
+        training = TrainingFactory(
+            academic_year=self.academic_year,
+            education_group_type__name=TrainingType.BACHELOR.name
+        )
+        common_core = GroupFactory(
+            education_group_type__name=GroupType.COMMON_CORE.name,
+            academic_year=self.academic_year
+        )
+        GroupElementYearFactory(
+            parent=training, child_branch=common_core, child_leaf=None, link_type=LinkTypes.REFERENCE.name
+        )
+        luy = LearningUnitYearFactory(academic_year=self.academic_year)
+        GroupElementYearFactory(parent=common_core, child_branch=None, child_leaf=luy)
+        url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
+            'acronym': training.acronym,
+            'year': self.academic_year.year
+        })
+        serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=load_tree.load(training.id).root_node),
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN
+            }
+        )
+        self.assertEqual(len(serializer.data['children']), 1)
+        self.assertEqual(serializer.data['children'][0]['code'], luy.acronym)
+
+    def test_ensure_not_getting_direct_child_of_reference_link_except_within_minor_list(self):
+        training = TrainingFactory(
+            academic_year=self.academic_year,
+            education_group_type__name=GroupType.MINOR_LIST_CHOICE.name
+        )
+        minor = MiniTrainingFactory(
+            education_group_type__name=MiniTrainingType.ACCESS_MINOR.name,
+            academic_year=self.academic_year
+        )
+        GroupElementYearFactory(
+            parent=training, child_branch=minor, child_leaf=None, link_type=LinkTypes.REFERENCE.name
+        )
+        luy = LearningUnitYearFactory(academic_year=self.academic_year)
+        GroupElementYearFactory(parent=minor, child_branch=None, child_leaf=luy)
+        url = reverse('education_group_api_v1:' + TrainingTreeView.name, kwargs={
+            'acronym': training.acronym,
+            'year': self.academic_year.year
+        })
+        serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=load_tree.load(training.id).root_node),
+            context={
+                'request': RequestFactory().get(url),
+                'language': settings.LANGUAGE_CODE_EN
+            }
+        )
+        self.assertEqual(len(serializer.data['children']), 1)
+        self.assertEqual(serializer.data['children'][0]['code'], minor.partial_acronym)
 
     def test_ensure_node_type_and_subtype_expected(self):
         self.assertEqual(self.serializer.data['node_type'], NodeType.TRAINING.name)
@@ -187,8 +252,8 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'partial_acronym': gey.parent.partial_acronym,
             'year': self.academic_year.year
         })
-        serializer = EducationGroupTreeSerializer(
-            EducationGroupHierarchy(gey.parent),
+        serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=load_tree.load(gey.parent.id).root_node),
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
@@ -214,8 +279,8 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'partial_acronym': gey.parent.partial_acronym,
             'year': self.academic_year.year
         })
-        serializer = EducationGroupTreeSerializer(
-            EducationGroupHierarchy(gey.parent),
+        serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=load_tree.load(gey.parent.id).root_node),
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
@@ -240,8 +305,8 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'partial_acronym': gey.parent.partial_acronym,
             'year': self.academic_year.year
         })
-        serializer = EducationGroupTreeSerializer(
-            EducationGroupHierarchy(gey.parent),
+        serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=load_tree.load(gey.parent.id).root_node),
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
@@ -303,8 +368,8 @@ class EducationGroupTreeSerializerTestCase(TestCase):
             'partial_acronym': gey.parent.partial_acronym,
             'year': self.academic_year.year
         })
-        serializer = EducationGroupTreeSerializer(
-            EducationGroupHierarchy(gey.parent),
+        serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=load_tree.load(gey.parent.id).root_node),
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
@@ -344,8 +409,8 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(TestCase):
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
-        cls.serializer = EducationGroupTreeSerializer(
-            EducationGroupHierarchy(cls.training),
+        cls.serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=load_tree.load(cls.training.id).root_node),
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN
@@ -431,8 +496,8 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(TestCase):
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
-        cls.serializer = EducationGroupTreeSerializer(
-            EducationGroupHierarchy(cls.training),
+        cls.serializer = EducationGroupRootNodeTreeSerializer(
+            Link(parent=None, child=load_tree.load(cls.training.id).root_node),
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN

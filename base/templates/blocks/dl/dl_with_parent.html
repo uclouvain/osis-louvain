@@ -1,7 +1,7 @@
 {% load i18n %}
 <dl class="{{ class_dl }}">
     <dt style="margin-bottom: 5px;">{{ label|capfirst }}</dt>
-    <dd>
+    <dd {% if html_id %}id="{{ html_id }}"{% endif %}>
         {% if value %}
             {% trans value %}
         {% elif parent_value %}

@@ -27,6 +27,7 @@ from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
+import program_management.ddd.repositories.find_roots
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from backoffice.settings.rest_framework.filters import OrderingFilterWithDefault
 from base.models.education_group_year import EducationGroupYear
@@ -34,12 +35,15 @@ from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import MiniTrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
+from education_group.api.serializers.training import TrainingListSerializer
 
 
 class MiniTrainingFilter(filters.FilterSet):
     from_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='gte')
     to_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='lte')
     code = filters.CharFilter(field_name="partial_acronym", lookup_expr='icontains')
+    partial_acronym = filters.CharFilter(field_name="partial_acronym", lookup_expr='icontains')
+    acronym = filters.CharFilter(field_name="acronym", lookup_expr='icontains')
     education_group_type = filters.MultipleChoiceFilter(
         field_name='education_group_type__name',
         choices=MiniTrainingType.choices()
@@ -127,3 +131,24 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
             academic_year__year=year
         )
         return egy
+
+
+class OfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
+    """
+        Return the list of offer roots for a mini training.
+    """
+    name = 'offer_roots'
+    serializer_class = TrainingListSerializer
+
+    def get_queryset(self):
+        acronym = self.kwargs['partial_acronym']
+        year = self.kwargs['year']
+        egy = get_object_or_404(
+            EducationGroupYear.objects.all().select_related(
+                'academic_year',
+            ),
+            partial_acronym__iexact=acronym,
+            academic_year__year=year
+        )
+        education_group_root_ids = program_management.ddd.repositories.find_roots.find_roots([egy]).get(egy.id, [])
+        return EducationGroupYear.objects.filter(id__in=education_group_root_ids)

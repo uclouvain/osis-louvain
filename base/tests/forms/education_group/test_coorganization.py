@@ -38,7 +38,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
-from base.tests.factories.person import CentralManagerFactory
+from base.tests.factories.person import CentralManagerForUEFactory
 from base.tests.factories.user import UserFactory
 from reference.tests.factories.country import CountryFactory
 
@@ -47,7 +47,7 @@ class TestCoorganizationForm(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory()
-        cls.person = CentralManagerFactory(user=cls.user)
+        cls.person = CentralManagerForUEFactory(user=cls.user)
 
         cls.academic_year = create_current_academic_year()
         cls.education_group_yr = EducationGroupYearFactory(

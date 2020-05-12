@@ -31,7 +31,7 @@
                 <input class="form-control" id="search_jstree" type="text" placeholder="Search" aria-label="Search">
             </div>
             <div class="panel-body">
-                <div class="row" id="panel_file_tree"></div>
+                <div class="row" id="panel_file_tree" data-rootId= "{{ root.id }}" data-copyUrl="{% url "copy_element" %}" data-cutUrl="{% url "cut_element" %}"></div>
             </div>
         </div>
         <div id="split-bar"></div>
@@ -45,7 +45,7 @@
     <div class="panel panel-default" id="panel-data">
         <div class="panel-heading">
             <div class="row">
-                <a class="btn btn-default" style="margin-left: 15px;" onclick="toggleNav()">
+                <a id="btn-toggle-tree" class="btn btn-default" style="margin-left: 15px;" onclick="toggleNav()">
                     <span class="fa fa-bars" aria-hidden="true"></span>
                 </a>
 
@@ -91,10 +91,10 @@
             {% endblock %}
         </div>
     </div>
-    <div id="clipboard" class="alert alert-info" role="alert" {% if not selected_element_clipboard %}hidden="hidden"{% endif %}>
+    <div id="clipboard" class="alert alert-info " role="alert" {% if not selected_element_clipboard %}hidden="hidden"{% endif %}>
         <div style="display: inline-block;">
             <div class="pull-right">
-                <button type="button" class="close" id="clear_clipboard" data-toggle="tooltip" data-placement="right" title="{% trans "Clear clipboard" %}">
+                <button type="button" class="close clear-clipboard" data-url="{% url "education_group_clear_clipboard" %}"  id="clear_clipboard" data-toggle="tooltip" data-placement="right" title="{% trans "Clear clipboard" %}">
                     <span aria-hidden="true" style="font-size: 0.8em;">&nbsp;<em class="fa fa-trash"></em></span>
                 </button>
             </div>
@@ -107,23 +107,9 @@
         {% include "education_group/blocks/modal/custom_xls.html" %}
     {% endif %}
     <script>
-        const root_id = "{{ root_id }}";
-        const url_resolver_match = "{% url_resolver_match %}";
         const tree = JSON.parse('{{ tree | escapejs }}');
-        const management_url = "{% url "education_groups_management" %}";
-        const clear_clipboard_url = "{% url "education_group_clear_clipboard" %}";
-        let clear_clipboard = document.getElementById("clear_clipboard");
-        clear_clipboard.addEventListener("click", function(){
-            $.ajax({
-                url: clear_clipboard_url,
-                type: 'POST',
-                success: function () {
-                    $("#clipboard").hide();
-                }
-            });
-        });
     </script>
-    <script type="text/javascript" src="{% static 'js/education_group/education_group_tree.js' %}">
+    <script type="text/javascript" src="{% static 'js/program_management/education_group_tree.js' %}">
     </script>
 
 {% endblock content %}

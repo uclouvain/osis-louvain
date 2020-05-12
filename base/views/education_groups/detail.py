@@ -44,7 +44,7 @@ from django.views.generic import DetailView
 from reversion.models import Version
 
 from base import models as mdl
-from base.business.education_group import can_user_edit_administrative_data, has_coorganization
+from base.business import education_group as education_group_business
 from base.business.education_groups import perms, general_information
 from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
@@ -61,7 +61,7 @@ from base.models.education_group_year_domain import EducationGroupYearDomain
 from base.models.enums import education_group_categories, academic_calendar_type
 from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType
-from base.models.group_element_year import find_learning_unit_roots, GroupElementYear
+from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.mandatary import Mandatary
 from base.models.offer_year_calendar import OfferYearCalendar
@@ -73,7 +73,11 @@ from base.views.education_groups.select import get_clipboard_content_display
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.find_roots import find_roots
 from program_management.forms.custom_xls import CustomXlsForm
+from program_management.models.enums import node_type
+from program_management.serializers.program_tree_view import program_tree_view_serializer
 from webservices.business import CONTACT_INTRO_KEY
 
 SECTIONS_WITH_TEXT = (
@@ -119,7 +123,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
     pk_url_kwarg = 'education_group_year_id'
 
     # PermissionRequiredMixin
-    permission_required = 'base.can_access_education_group'
+    permission_required = 'base.view_educationgroup'
     raise_exception = True
 
     # FIXME: resolve dependency in other ways
@@ -167,25 +171,26 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
         context["show_utilization"] = self.show_utilization()
         context["show_admission_conditions"] = self.show_admission_conditions()
         if self.with_tree:
-            # FIXME: resolve dependency in other way
-            from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
-            education_group_hierarchy_tree = EducationGroupHierarchy(self.root,
-                                                                     tab_to_show=self.request.GET.get('tab_to_show'))
-            context['tree'] = json.dumps(education_group_hierarchy_tree.to_json())
+            program_tree = load_tree.load(self.root.id)
+            serialized_data = program_tree_view_serializer(program_tree)
+            context['tree'] = json.dumps(serialized_data)
+            context["current_node"] = program_tree.get_node_by_id_and_type(
+                self.object.id,
+                node_type.NodeType.EDUCATION_GROUP
+            )
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
-        context['can_change_education_group'] = perms.is_eligible_to_change_education_group(
-            person=self.person,
-            education_group=context['object'],
+        context['can_change_education_group'] = self.request.user.has_perm(
+            'base.change_educationgroup',
+            context['object']
         )
-        context['can_change_coorganization'] = perms.is_eligible_to_change_coorganization(
-            person=self.person,
-            education_group=context['object'],
+        context['can_change_coorganization'] = self.request.user.has_perm(
+            'base.change_educationgrouporganization',
+            context['object']
         )
         context['enums'] = mdl.enums.education_group_categories
         context['current_academic_year'] = self.starting_academic_year
         context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
         context['form_xls_custom'] = CustomXlsForm()
-
         return context
 
     def get(self, request, *args, **kwargs):
@@ -256,7 +261,7 @@ class EducationGroupRead(EducationGroupGenericDetailView):
         context["education_group_languages"] = self.object.educationgrouplanguage_set.order_by('order').values_list(
             'language__name', flat=True)
         context["versions"] = self.get_related_versions()
-        context["show_coorganization"] = has_coorganization(self.object)
+        context["show_coorganization"] = education_group_business.has_coorganization(self.object)
         context["is_finality_types"] = context["education_group_year"].is_finality
         return context
 
@@ -328,6 +333,8 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
         )
         texts = self.get_translated_texts(sections_to_display, common_education_group_year, self.user_language_code)
         show_contacts = CONTACTS in sections_to_display['specific']
+        perm_name = 'base.change_commonpedagogyinformation' if self.object.is_common else \
+            'base.change_pedagogyinformation'
         context.update({
             'is_common_education_group_year': is_common_education_group_year,
             'sections_with_translated_labels': self.get_sections_with_translated_labels(
@@ -336,7 +343,7 @@ class EducationGroupGeneralInformation(EducationGroupGenericDetailView):
             ),
             'contacts': self._get_publication_contacts_group_by_type(),
             'show_contacts': show_contacts,
-            'can_edit_information': perms.is_eligible_to_edit_general_information(context['person'], context['object'])
+            'can_edit_information': self.request.user.has_perm(perm_name, self.object)
         })
         return context
 
@@ -474,7 +481,8 @@ class EducationGroupAdministrativeData(EducationGroupGenericDetailView):
             'course_enrollment_dates': course_enrollment_dates,
             'mandataries': mandataries,
             'pgm_mgrs': pgm_mgrs,
-            "can_edit_administrative_data": can_user_edit_administrative_data(self.request.user, self.object)
+            "can_edit_administrative_data":
+                education_group_business.can_user_edit_administrative_data(self.request.user, self.object)
         })
         context.update(get_sessions_dates(self.object))
 
@@ -543,11 +551,9 @@ class EducationGroupUsing(EducationGroupGenericDetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["group_element_years"] = self.object.child_branch.select_related("parent")
-        context["formations"] = find_learning_unit_roots(
+        context["formations"] = find_roots(
             list(grp.parent for grp in self.object.child_branch.select_related("parent")),
-            return_result_params={
-                'parents_as_instances': True
-            }
+            as_instances=True
         )
         return context
 
@@ -584,9 +590,10 @@ class EducationGroupYearAdmissionCondition(EducationGroupGenericDetailView):
                 admission_condition=admission_condition,
                 section=section
             ).annotate_text(tab_lang)
+        perm_name = 'base.change_commonadmissioncondition' if is_common else 'base.change_admissioncondition'
         context.update({
             'admission_condition_form': admission_condition_form,
-            'can_edit_information': perms.is_eligible_to_edit_admission_condition(context['person'], context['object']),
+            'can_edit_information': self.request.user.has_perm(perm_name, self.object),
             'info': {
                 'is_specific': is_specific,
                 'is_common': is_common,

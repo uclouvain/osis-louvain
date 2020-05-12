@@ -24,6 +24,8 @@
 #
 ##############################################################################
 import datetime
+import itertools
+import string
 
 import factory
 
@@ -31,27 +33,25 @@ from base.models.enums import entity_type, organization_type
 from base.tests.factories.entity import EntityFactory
 
 
+def generate_acronyms():
+    acronyms_letters_generator = itertools.permutations(string.ascii_uppercase, r=4)
+    for acronym_letters in acronyms_letters_generator:
+        yield "".join(acronym_letters)
+
+
 class EntityVersionFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'base.EntityVersion'
 
     entity = factory.SubFactory(EntityFactory)
-    title = factory.Faker('text', max_nb_chars=255)
-    acronym = factory.Faker('text', max_nb_chars=20)
+    title = factory.Faker('company')
+    acronym = factory.Iterator(generate_acronyms())
     entity_type = factory.Iterator(entity_type.ENTITY_TYPES, getter=lambda c: c[0])
     parent = factory.SubFactory(EntityFactory)
     start_date = datetime.date(2015, 1, 1).isoformat()
     end_date = None
 
 
-class MainEntityVersionFactory(factory.DjangoModelFactory):
-    class Meta:
-        model = 'base.EntityVersion'
-
+class MainEntityVersionFactory(EntityVersionFactory):
     entity = factory.SubFactory(EntityFactory, organization__type=organization_type.MAIN)
-    title = factory.Faker('text', max_nb_chars=255)
-    acronym = factory.Faker('text', max_nb_chars=20)
     entity_type = factory.Iterator(entity_type.PEDAGOGICAL_ENTITY_TYPES)
-    parent = factory.SubFactory(EntityFactory)
-    start_date = datetime.date(2015, 1, 1).isoformat()
-    end_date = None

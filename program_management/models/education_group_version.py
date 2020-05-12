@@ -66,12 +66,12 @@ class EducationGroupVersion(models.Model):
     )
     title_fr = models.CharField(
         blank=True, null=True,
-        max_length=100,
+        max_length=240,
         verbose_name=_("Title in French")
     )
     title_en = models.CharField(
         blank=True, null=True,
-        max_length=100,
+        max_length=240,
         verbose_name=_("Title in English")
     )
 

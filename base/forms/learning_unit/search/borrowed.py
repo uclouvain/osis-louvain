@@ -29,8 +29,10 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 from django_filters import filters
 
+import program_management.ddd.repositories.find_roots
 from base.forms.learning_unit.search.simple import LearningUnitFilter
-from base.models import group_element_year, entity_version
+from base.models import entity_version
+from base.models.academic_year import AcademicYear
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
 from base.models.enums import entity_type
 from base.models.learning_unit_year import LearningUnitYear
@@ -39,6 +41,11 @@ from base.views.learning_units.search.common import SearchTypes
 
 
 class BorrowedLearningUnitSearch(LearningUnitFilter):
+    academic_year = filters.ModelChoiceFilter(
+        queryset=AcademicYear.objects.all(),
+        required=True,
+        label=_('Ac yr.'),
+    )
     faculty_borrowing_acronym = filters.CharFilter(
         method=lambda queryset, *args, **kwargs: queryset,
         max_length=20,
@@ -72,14 +79,14 @@ class BorrowedLearningUnitSearch(LearningUnitFilter):
 
         ids = filter_is_borrowed_learning_unit_year(
             qs,
-            academic_year.start_date,
+            academic_year,
             faculty_borrowing=faculty_borrowing_id
         )
         return qs.filter(id__in=ids)
 
 
-def filter_is_borrowed_learning_unit_year(learning_unit_year_qs, date, faculty_borrowing=None):
-    entities = build_current_entity_version_structure_in_memory(date)
+def filter_is_borrowed_learning_unit_year(learning_unit_year_qs, academic_year, faculty_borrowing=None):
+    entities = build_current_entity_version_structure_in_memory(academic_year.start_date)
     entities_borrowing_allowed = []
     if faculty_borrowing in entities:
         entities_borrowing_allowed.extend(entities[faculty_borrowing]["all_children"])
@@ -88,7 +95,7 @@ def filter_is_borrowed_learning_unit_year(learning_unit_year_qs, date, faculty_b
 
     entities_faculty = compute_faculty_for_entities(entities)
     map_luy_entity = map_learning_unit_year_with_requirement_entity(learning_unit_year_qs)
-    map_luy_education_group_entities = map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_qs)
+    map_luy_education_group_entities = map_learning_unit_year_with_entities_of_education_groups(academic_year)
 
     ids = []
     for luy in learning_unit_year_qs:
@@ -121,13 +128,8 @@ def map_learning_unit_year_with_requirement_entity(learning_unit_year_qs):
     return {luy_id: entity_id for luy_id, entity_id in learning_unit_years_with_entity}
 
 
-def map_learning_unit_year_with_entities_of_education_groups(learning_unit_year_qs):
-    formations = group_element_year.find_learning_unit_roots(
-        learning_unit_year_qs,
-        return_result_params={
-            'parents_as_instances': False
-        }
-    )
+def map_learning_unit_year_with_entities_of_education_groups(academic_year):
+    formations = program_management.ddd.repositories.find_roots.find_all_roots_for_academic_year(academic_year.id)
     education_group_ids = list(itertools.chain.from_iterable(formations.values()))
     offer_year_entity = OfferYearEntity.objects.filter(education_group_year__in=education_group_ids). \
         values_list("education_group_year", "entity")

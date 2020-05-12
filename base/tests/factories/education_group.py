@@ -30,7 +30,9 @@ from django.utils import timezone
 from factory.django import DjangoModelFactory
 from faker import Faker
 
+from base.business.education_groups import postponement
 from base.tests.factories.academic_year import AcademicYearFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from osis_common.utils.datetime import get_tzinfo
 
 fake = Faker()
@@ -44,3 +46,18 @@ class EducationGroupFactory(DjangoModelFactory):
     changed = fake.date_time_this_decade(before_now=True, after_now=True, tzinfo=get_tzinfo())
     start_year = factory.SubFactory(AcademicYearFactory, year=factory.fuzzy.FuzzyInteger(2000, timezone.now().year))
     end_year = None
+
+
+class EducationGroupWithAnnualizedDataDactory(EducationGroupFactory):
+
+    @factory.post_generation
+    def educationgroupyears(obj, create, extracted, **kwargs):
+        academic_years = kwargs.pop("academic_years")
+        start_year, *following_years = academic_years
+        initial_education_group_year = EducationGroupYearFactory(
+            education_group=obj,
+            academic_year=start_year,
+            **kwargs
+        )
+        for acy in following_years:
+            postponement.duplicate_education_group_year(initial_education_group_year, acy)

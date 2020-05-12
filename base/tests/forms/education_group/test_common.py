@@ -48,8 +48,9 @@ from base.tests.factories.education_group_type import EducationGroupTypeFactory,
 from base.tests.factories.education_group_year import EducationGroupYearFactory, MiniTrainingFactory
 from base.tests.factories.entity_version import MainEntityVersionFactory, EntityVersionFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import PersonFactory, FacultyManagerFactory
-from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.person import PersonFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 
 
 class EducationGroupYearModelFormMixin(TestCase):
@@ -83,7 +84,7 @@ class EducationGroupYearModelFormMixin(TestCase):
 
         # Create user and attached it to management entity
         person = PersonFactory()
-        PersonEntityFactory(
+        CentralManagerFactory(
             person=person,
             entity=cls.parent_education_group_year.management_entity
         )
@@ -163,7 +164,7 @@ class TestCommonBaseFormIsValid(TestCase):
 
         # Create user and attached it to management entity
         person = PersonFactory()
-        PersonEntityFactory(person=person, entity=fake_educ_group_year.management_entity)
+        CentralManagerFactory(person=person, entity=fake_educ_group_year.management_entity)
         cls.user = person.user
 
         cls.education_group_year_form = MiniTrainingYearModelForm(
@@ -232,8 +233,8 @@ class TestCommonBaseFormSave(TestCase):
         cls.education_group_type = cls.expected_educ_group_year.education_group_type
 
         # Create user and attached it to management entity
-        person = FacultyManagerFactory()
-        PersonEntityFactory(person=person, entity=cls.expected_educ_group_year.management_entity)
+        person = PersonFactory()
+        FacultyManagerFactory(person=person, entity=cls.expected_educ_group_year.management_entity)
         cls.user = person.user
 
     def _assert_all_fields_correctly_saved(self, education_group_year_saved):

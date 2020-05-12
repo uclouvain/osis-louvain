@@ -23,72 +23,132 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest.mock import patch
+from unittest import mock
+
 from django.test import TestCase
 
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear
-from program_management.ddd.repositories import persist_tree
+from program_management.ddd.repositories import persist_tree, load_tree
+from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
+from program_management.tests.ddd.factories.link import LinkFactory
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestSaveTree(TestCase):
+class TestPersistTree(TestCase):
     def setUp(self):
         academic_year = AcademicYearFactory(current=True)
-        training = TrainingFactory(academic_year=academic_year)
-        common_core = GroupFactory(academic_year=academic_year)
-        learning_unit_year = LearningUnitYearFactory(academic_year=academic_year)
+        self.training = TrainingFactory(academic_year=academic_year)
+        self.common_core = GroupFactory(academic_year=academic_year)
+        self.learning_unit_year = LearningUnitYearFactory(academic_year=academic_year)
 
         self.root_node = NodeEducationGroupYear(
-            node_id=training.pk,
-            acronym=training.acronym,
-            title=training.title,
-            year=training.academic_year.year
+            node_id=self.training.pk,
+            code=self.training.acronym,
+            title=self.training.title,
+            year=self.training.academic_year.year
         )
         self.common_core_node = NodeEducationGroupYear(
-            node_id=common_core.pk,
-            acronym=common_core.acronym,
-            title=common_core.title,
-            year=common_core.academic_year.year
+            node_id=self.common_core.pk,
+            code=self.common_core.acronym,
+            title=self.common_core.title,
+            year=self.common_core.academic_year.year
         )
         self.learning_unit_year_node = NodeLearningUnitYear(
-            node_id=learning_unit_year.pk,
-            acronym=learning_unit_year.acronym,
-            title=learning_unit_year.specific_title,
-            year=learning_unit_year.academic_year.year
+            node_id=self.learning_unit_year.pk,
+            code=self.learning_unit_year.acronym,
+            title=self.learning_unit_year.specific_title,
+            year=self.learning_unit_year.academic_year.year
         )
 
-    def test_case_tree_persist_from_scratch(self):
+    def test_persist_tree_from_scratch(self):
         self.common_core_node.add_child(self.learning_unit_year_node)
         self.root_node.add_child(self.common_core_node)
         tree = ProgramTreeFactory(root_node=self.root_node)
 
         persist_tree.persist(tree)
 
-        self.assertEquals(GroupElementYear.objects.all().count(), 2)
+        link_root_with_common_core = GroupElementYear.objects.filter(
+            parent_id=self.root_node.node_id,
+            child_branch_id=self.common_core_node.node_id,
+        )
+        self.assertTrue(link_root_with_common_core.exists())
 
-    def test_case_tree_persist_with_some_existing_part(self):
-        self.root_node.add_child(self.common_core_node)
-        tree = ProgramTreeFactory(root_node=self.root_node)
+        link_common_core_with_learn_unit = GroupElementYear.objects.filter(
+            parent_id=self.common_core_node.node_id,
+            child_leaf_id=self.learning_unit_year_node.node_id,
+        )
+        self.assertTrue(link_common_core_with_learn_unit.exists())
 
-        persist_tree.persist(tree)
-        self.assertEquals(GroupElementYear.objects.all().count(), 1)
+    def test_save_when_first_link_exists_and_second_one_does_not(self):
+        GroupElementYearFactory(parent=self.training, child_branch=self.common_core, child_leaf=None)
+        tree = load_tree.load(self.root_node.node_id)
 
         # Append UE to common core
-        self.common_core_node.add_child(self.learning_unit_year_node)
-        persist_tree.persist(tree)
-        self.assertEquals(GroupElementYear.objects.all().count(), 2)
-
-    def test_case_tree_persist_after_detach_element(self):
-        self.root_node.add_child(self.common_core_node)
-        tree = ProgramTreeFactory(root_node=self.root_node)
+        tree.root_node.children[0].child.add_child(self.learning_unit_year_node)
 
         persist_tree.persist(tree)
-        self.assertEquals(GroupElementYear.objects.all().count(), 1)
 
-        path_to_detach = "|".join([str(self.root_node.pk), str(self.common_core_node.pk)])
+        new_link = GroupElementYear.objects.filter(
+            parent_id=self.common_core_node.node_id,
+            child_leaf_id=self.learning_unit_year_node.node_id
+        )
+        self.assertTrue(new_link.exists())
+
+    @patch("program_management.ddd.repositories.persist_tree.__persist_group_element_year")
+    def test_save_when_link_has_not_changed(self, mock):
+        GroupElementYearFactory(parent=self.training, child_branch=self.common_core, child_leaf=None)
+        tree = load_tree.load(self.root_node.node_id)
+        persist_tree.persist(tree)
+        assertion_msg = "No changes made, so function GroupelementYear.save() should not have been called"
+        self.assertFalse(mock.called, assertion_msg)
+
+    @patch("program_management.ddd.repositories.persist_tree.__persist_group_element_year")
+    def test_save_when_link_has_changed(self, mock):
+        GroupElementYearFactory(parent=self.training, child_branch=self.common_core, child_leaf=None)
+        tree = load_tree.load(self.root_node.node_id)
+        tree.root_node.children[0]._has_changed = True  # Made some changes
+        persist_tree.persist(tree)
+        assertion_msg = """
+            Changes were triggered in the Link object, so function GroupelementYear.save() should have been called
+        """
+        self.assertTrue(mock.called, assertion_msg)
+
+    @patch.object(DetachAuthorizedRelationshipValidator, 'validate')
+    def test_delete_when_1_link_has_been_deleted(self, mock):
+        GroupElementYearFactory(parent=self.training, child_branch=self.common_core, child_leaf=None)
+        node_to_detach = self.common_core_node
+        qs_link_will_be_detached = GroupElementYear.objects.filter(child_branch_id=node_to_detach.pk)
+        self.assertEquals(qs_link_will_be_detached.count(), 1)
+
+        tree = load_tree.load(self.root_node.node_id)
+
+        path_to_detach = "|".join([str(self.root_node.pk), str(node_to_detach.pk)])
         tree.detach_node(path_to_detach)
         persist_tree.persist(tree)
-        self.assertEquals(GroupElementYear.objects.all().count(), 0)
+        self.assertEquals(qs_link_will_be_detached.count(), 0)
+
+    @patch("program_management.ddd.repositories.persist_tree.__delete_group_element_year")
+    def test_delete_when_nothing_has_been_deleted(self, mock):
+        GroupElementYearFactory(parent=self.training, child_branch=self.common_core, child_leaf=None)
+        tree = load_tree.load(self.root_node.node_id)
+        persist_tree.persist(tree)
+        assertion_msg = "No changes made, so function GroupelementYear.delete() should not have been called"
+        self.assertFalse(mock.called, assertion_msg)
+
+
+class TestPersistPrerequisites(TestCase):
+    @mock.patch("program_management.ddd.repositories._persist_prerequisite.persist")
+    def test_call_persist_(self, mock_persist_prerequisite):
+        tree = ProgramTreeFactory()
+        LinkFactory(parent=tree.root_node, child=NodeLearningUnitYearFactory())
+
+        persist_tree.persist(tree)
+
+        mock_persist_prerequisite.assert_called_once_with(tree)

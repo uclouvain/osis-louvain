@@ -117,16 +117,16 @@
             <table class="table table-hover">
                 <thead>
                     <tr>
-                        <th>{% trans 'Status' %}</th>
-                        <th>{% trans 'Training' %}</th>
-                        <th>{% trans 'Registration number' %}</th>
-                        <th>{% trans 'Lastname' %}</th>
-                        <th>{% trans 'Firstname' %}</th>
-                        <th>{% trans 'Score' %}</th>
-                        <th>{% trans 'Justification' %}</th>
-                        <th>{% trans 'Teacher deadline' %}</th>
+                        <th id="status">{% trans 'Status' %}</th>
+                        <th id="program">{% trans 'Training' %}</th>
+                        <th id="registration_number">{% trans 'Registration number' %}</th>
+                        <th id="lastname">{% trans 'Lastname' %}</th>
+                        <th id="firstname">{% trans 'Firstname' %}</th>
+                        <th id="score">{% trans 'Score' %}</th>
+                        <th id="justification">{% trans 'Justification' %}</th>
+                        <th id="deadline">{% trans 'Teacher deadline' %}</th>
                     </tr>
-                </thead>
+                </thead>³1
                 <tbody>
                 {% for enrollment in enrollments %}
 
@@ -137,8 +137,8 @@
                                     #D3D3D3
                                {% else %}
                                    {% include 'blocks/row_color.html' %}
-                               {% endif %}">
-                        <td style="text-align:center;">
+                               {% endif %}" class="result">
+                        <td headers="status" style="text-align:center;">
                             {% if enrollment.deadline_reached %}
                                 <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
                             {% elif enrollment.deadline_tutor_reached and not is_program_manager %}
@@ -149,11 +149,11 @@
                                 <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'Score submitted' %}"></span>
                             {% endif %}
                         </td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|default_if_none:"" }}</td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name|default_if_none:"" }}</td>
-                        <td>
+                        <td headers="program">{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
+                        <td headers="registration_number">{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
+                        <td headers="lastname">{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|default_if_none:"" }}</td>
+                        <td headers="firstname">{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name|default_if_none:"" }}</td>
+                        <td headers="score">
                            {% get_score_justification_disabled_status as disabled_score_status %}
 			                <input type="text" min="0" max="20" name="score_{{ enrollment.id }}"
                                 id="num_score_{{ enrollment.id }}" tabindex="{{ forloop.counter }}"
@@ -172,7 +172,7 @@
                                 {% endif %}
                              >
 			            </td>
-                        <td>
+                        <td headers="justification">
 			                <select class="form-control" name="justification_{{ enrollment.id }}" id="slt_justification_score_{{ enrollment.id }}"
                                     tabindex="{{ enrollments|length|sum:forloop.counter }}"
                                     {{ disabled_score_status }}>
@@ -211,7 +211,7 @@
 			                {% if not enrollment.deadline_reached %}
                             	<input type="hidden" id="hdn_score_changed_{{ enrollment.id }}" name="score_changed_{{ enrollment.id }}" value="false"></td>
 			                {% endif %}
-                        <td>
+                        <td headers="deadline">
                             {% if enrollment.enrollment_state == 'ENROLLED' %}{{ enrollment.deadline | default_if_none:''|date:"j/m/Y" }}{% endif %}
                         </td>
                     </tr>

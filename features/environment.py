@@ -21,39 +21,49 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-import os
+import tempfile
 
 from django.conf import settings
 from django.utils.text import slugify
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 
+from features.data import setup_data
+
 
 def before_all(context):
-    options = Options()
-    options.set_preference('browser.download.folderList', 2)  # customlocation
-    options.set_preference("browser.download.dir", os.path.abspath("features/logs"))
-    options.set_preference("browser.download.manager.showWhenStarting", False)
-    options.set_preference(
-        "browser.helperApps.neverAsk.saveToDisk",
-        "application/xls;text/csv;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+    context.download_directory = tempfile.mkdtemp('osis-selenium')
 
+    fp = webdriver.FirefoxProfile()
+    fp.set_preference('browser.download.dir', context.download_directory)
+    fp.set_preference('browser.download.folderList', 2)
+    fp.set_preference('browser.download.manager.showWhenStarting', False)
+    fp.set_preference("intl.accept_languages", 'fr-be')
+    fp.set_preference('pdfjs.disabled', True)
+    known_mimes = [
+        'application/vnd.ms-excel',
+        'application/pdf',
+        'text/csv',
+        'application/xls',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    ]
+    fp.set_preference('browser.helperApps.neverAsk.saveToDisk', ','.join(known_mimes))
+
+    options = Options()
     if settings.SELENIUM_SETTINGS["VIRTUAL_DISPLAY"]:
         options.add_argument('-headless')
-    executable_path = settings.SELENIUM_SETTINGS["GECKO_DRIVER"]
-    context.browser = webdriver.Firefox(options=options, executable_path=executable_path)
 
-    screen_size = (settings.SELENIUM_SETTINGS['SCREEN_WIDTH'], settings.SELENIUM_SETTINGS['SCREEN_HIGH'])
-    context.browser.set_window_size(*screen_size)
+    context.browser = webdriver.Firefox(
+        firefox_profile=fp,
+        options=options,
+        executable_path=settings.SELENIUM_SETTINGS["GECKO_DRIVER"]
+    )
+    context.browser.set_window_size(
+        settings.SELENIUM_SETTINGS['SCREEN_WIDTH'],
+        settings.SELENIUM_SETTINGS['SCREEN_HIGH']
+    )
 
-
-def before_scenario(context, scenario):
-    pass
-
-
-def after_scenario(context, scenario):
-    pass
+    setup_data(context)
 
 
 def after_all(context):

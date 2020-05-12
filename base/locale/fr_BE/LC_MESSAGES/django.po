@@ -2063,7 +2063,7 @@ msgid "Prerequisite"
 msgstr "Prérequis"
 
 msgid "Prerequisites are invalid"
-msgstr "<p>Prérequis invalides</p>"
+msgstr "Prérequis invalides"
 
 msgid "President"
 msgstr "Président·e"
@@ -2827,12 +2827,12 @@ msgstr "L'utilisateur n'a pas la permission de modifier les formations."
 
 #, python-format
 msgctxt "female"
-msgid "The user has not permission to create a %(category)s."
+msgid "The user does not have permission to create a %(category)s."
 msgstr "L'utilisateur n'a pas la permission de créer une %(category)s."
 
 #, python-format
 msgctxt "male"
-msgid "The user has not permission to create a %(category)s."
+msgid "The user does not have permission to create a %(category)s."
 msgstr "L'utilisateur n'a pas la permission de créer un %(category)s."
 
 msgid "The user has not permission to create education groups."

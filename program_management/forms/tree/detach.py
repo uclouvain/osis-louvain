@@ -24,26 +24,12 @@
 #
 ##############################################################################
 from django import forms
-from django.utils.translation import gettext_lazy as _
 
-from program_management.ddd.domain import program_tree, node
 from program_management.ddd.service import detach_node_service
 
 
 class DetachNodeForm(forms.Form):
     path = forms.CharField(widget=forms.HiddenInput)
 
-    def __init__(self, tree: program_tree.ProgramTree, **kwargs):
-        self.tree = tree
-        super().__init__(**kwargs)
-
-    def clean_path(self):
-        path = self.cleaned_data['path']
-        try:
-            self.tree.get_node(path)
-        except node.NodeNotFoundException:
-            raise forms.ValidationError(_("Invalid tree path"))
-        return path
-
     def save(self):
-        return detach_node_service.detach_node(self.tree)
+        return detach_node_service.detach_node(self.cleaned_data['path'])

@@ -55,10 +55,10 @@ class TestComparisonXls(TestCase):
         cls.user = UserFactory()
         cls.old_academic_year = AcademicYearFactory(year=datetime.date.today().year - 2)
         cls.current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
-        generatorContainer = GenerateContainer(cls.old_academic_year, cls.current_academic_year)
-        cls.previous_learning_unit_year = generatorContainer.generated_container_years[0].learning_unit_year_full
-        cls.partim = generatorContainer.generated_container_years[0].learning_unit_year_partim
-        cls.learning_unit_year_1 = generatorContainer.generated_container_years[1].learning_unit_year_full
+        generator_container = GenerateContainer(cls.old_academic_year, cls.current_academic_year)
+        cls.previous_learning_unit_year = generator_container.generated_container_years[0].learning_unit_year_full
+        cls.partim = generator_container.generated_container_years[0].learning_unit_year_partim
+        cls.learning_unit_year_1 = generator_container.generated_container_years[1].learning_unit_year_full
         cls.academic_year = cls.learning_unit_year_1.academic_year
         cls.previous_academic_year = cls.previous_learning_unit_year.academic_year
 
@@ -146,13 +146,13 @@ class TestPropositionComparisonXls(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory()
-        cls.current_academic_year = AcademicYearFactory(year=datetime.date.today().year)
-        generatorContainer = GenerateContainer(cls.current_academic_year, cls.current_academic_year)
-        cls.partim = generatorContainer.generated_container_years[0].learning_unit_year_partim
-        cls.learning_unit_year_1 = generatorContainer.generated_container_years[0].learning_unit_year_full
-        cls.entity_1 = generatorContainer.entities[0]
+        cls.current_academic_year = AcademicYearFactory(current=True)
+        generator_container = GenerateContainer(cls.current_academic_year, cls.current_academic_year)
+        cls.partim = generator_container.generated_container_years[0].learning_unit_year_partim
+        cls.learning_unit_year_1 = generator_container.generated_container_years[0].learning_unit_year_full
+        cls.entity_1 = generator_container.entities[0]
         cls.entity_version_1 = EntityVersionFactory(entity=cls.entity_1, acronym="AGRO")
-        cls.entity_2 = generatorContainer.entities[1]
+        cls.entity_2 = generator_container.entities[1]
         cls.entity_version_2 = EntityVersionFactory(entity=cls.entity_2, acronym="DRT")
 
         cls.learning_unit_year_1.entities = {REQUIREMENT_ENTITY: cls.entity_version_1,
@@ -225,14 +225,14 @@ class TestPropositionComparisonXls(TestCase):
                          or BLANK_VALUE)
         self.assertEqual(data[28], self.learning_unit_year_1.get_attribution_procedure_display() or BLANK_VALUE)
 
-        self.assertEqual(data[29], lecturing_component.hourly_volume_total_annual or BLANK_VALUE)
-        self.assertEqual(data[30], lecturing_component.hourly_volume_partial_q1 or BLANK_VALUE)
-        self.assertEqual(data[31], lecturing_component.hourly_volume_partial_q2 or BLANK_VALUE)
+        self.assertEqual(data[29], lecturing_component.hourly_volume_partial_q1 or BLANK_VALUE)
+        self.assertEqual(data[30], lecturing_component.hourly_volume_partial_q2 or BLANK_VALUE)
+        self.assertEqual(data[31], lecturing_component.hourly_volume_total_annual or BLANK_VALUE)
         self.assertEqual(data[32], lecturing_component.real_classes or BLANK_VALUE)
         self.assertEqual(data[33], lecturing_component.planned_classes or BLANK_VALUE)
-        self.assertEqual(data[38], practical_component.hourly_volume_total_annual or BLANK_VALUE)
-        self.assertEqual(data[39], practical_component.hourly_volume_partial_q1 or BLANK_VALUE)
-        self.assertEqual(data[40], practical_component.hourly_volume_partial_q2 or BLANK_VALUE)
+        self.assertEqual(data[38], practical_component.hourly_volume_partial_q1 or BLANK_VALUE)
+        self.assertEqual(data[39], practical_component.hourly_volume_partial_q2 or BLANK_VALUE)
+        self.assertEqual(data[40], practical_component.hourly_volume_total_annual or BLANK_VALUE)
         self.assertEqual(data[41], practical_component.real_classes or BLANK_VALUE)
         self.assertEqual(data[42], practical_component.planned_classes or BLANK_VALUE)
 
@@ -264,12 +264,12 @@ class TestPropositionComparisonXls(TestCase):
 
         data = _get_data_from_initial_data(self.learning_unit_year_1.proposallearningunit.initial_data, True)
 
-        to_test = []
+        to_test = list()
         to_test.append((data[0], _('Initial data')))
         to_test.append((data[1], self.original_learning_unit_year_1.acronym))
         to_test.append((data[2], "{}   ({} {})".format(self.original_learning_unit_year_1.academic_year.name,
                                                        _('End').lower(),
-                                                       self.original_learning_unit_year_1.learning_unit.end_year)))  # Attention, c'est l'id
+                                                       self.original_learning_unit_year_1.learning_unit.end_year)))
         to_test.append((data[3],
                         self.original_learning_unit_year_1.learning_container_year.get_container_type_display()))
         to_test.append((data[4], translate_status(self.original_learning_unit_year_1.status)))
@@ -320,14 +320,14 @@ class TestPropositionComparisonXls(TestCase):
         to_test.append((data[28],
                         self.original_learning_unit_year_1.get_attribution_procedure_display() or BLANK_VALUE))
 
-        to_test.append((data[29], lecturing_component.hourly_volume_total_annual or BLANK_VALUE))
-        to_test.append((data[30], lecturing_component.hourly_volume_partial_q1 or BLANK_VALUE))
-        to_test.append((data[31], lecturing_component.hourly_volume_partial_q2 or BLANK_VALUE))
+        to_test.append((data[29], lecturing_component.hourly_volume_partial_q1 or BLANK_VALUE))
+        to_test.append((data[30], lecturing_component.hourly_volume_partial_q2 or BLANK_VALUE))
+        to_test.append((data[31], lecturing_component.hourly_volume_total_annual or BLANK_VALUE))
         to_test.append((data[32], lecturing_component.real_classes or BLANK_VALUE))
         to_test.append((data[33], lecturing_component.planned_classes or BLANK_VALUE))
-        to_test.append((data[38], practical_component.hourly_volume_total_annual or BLANK_VALUE))
-        to_test.append((data[39], practical_component.hourly_volume_partial_q1 or BLANK_VALUE))
-        to_test.append((data[40], practical_component.hourly_volume_partial_q2 or BLANK_VALUE))
+        to_test.append((data[38], practical_component.hourly_volume_partial_q1 or BLANK_VALUE))
+        to_test.append((data[39], practical_component.hourly_volume_partial_q2 or BLANK_VALUE))
+        to_test.append((data[40], practical_component.hourly_volume_total_annual or BLANK_VALUE))
         to_test.append((data[41], practical_component.real_classes or BLANK_VALUE))
         to_test.append((data[42], practical_component.planned_classes or BLANK_VALUE))
 

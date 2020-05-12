@@ -56,9 +56,9 @@ from base.tests.factories.entity_version import MainEntityVersionFactory
 from base.tests.factories.group import GroupFactory
 from base.tests.factories.hops import HopsFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, CentralManagerFactory
-from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.forms.education_group.test_common import EducationGroupYearModelFormMixin
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.language import LanguageFactory
 from rules_management.enums import TRAINING_DAILY_MANAGEMENT, TRAINING_PGRM_ENCODING_PERIOD
@@ -87,12 +87,10 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
         administration_entity_version = MainEntityVersionFactory(end_date=None)
         management_entity_version = MainEntityVersionFactory(end_date=None)
         person = PersonFactory()
-        PersonEntityFactory(
+        CentralManagerFactory(
             person=person,
             entity=management_entity_version.entity
         )
-        user = person.user
-        user.groups.add(self.central_manager)
 
         parent_education_group_year = TrainingFactory(academic_year=self.academic_year,
                                                       education_group_type=self.education_group_type,
@@ -125,7 +123,7 @@ class TestTrainingEducationGroupYearForm(EducationGroupYearModelFormMixin):
                     },
                     parent=parent_education_group_year,
                     education_group_type=parent_education_group_year.education_group_type,
-                    user=user,
+                    user=person.user,
                 )
                 if i == 0:
                     self.assertTrue(form.is_valid())
@@ -222,7 +220,7 @@ class TestPostponementEducationGroupYear(TestCase):
         cls.management_entity_version = MainEntityVersionFactory()
         cls.education_group_type = EducationGroupTypeFactory(
             category=education_group_categories.TRAINING,
-            name=education_group_types.TrainingType.BACHELOR
+            name=education_group_types.TrainingType.BACHELOR.name
         )
 
     def setUp(self):
@@ -248,11 +246,11 @@ class TestPostponementEducationGroupYear(TestCase):
         self.administration_entity_version = MainEntityVersionFactory()
         self.education_group_year = TrainingFactory(
             academic_year=create_current_academic_year(),
-            education_group_type__name=education_group_types.TrainingType.BACHELOR,
+            education_group_type__name=education_group_types.TrainingType.BACHELOR.name,
             management_entity=self.management_entity_version.entity,
             administration_entity=self.administration_entity_version.entity,
         )
-        PersonEntityFactory(person=self.person, entity=self.education_group_year.management_entity)
+        CentralManagerFactory(person=self.person, entity=self.education_group_year.management_entity)
 
     def test_init(self):
         # In case of creation
@@ -481,8 +479,8 @@ class TestPostponeTrainingProperty(TestCase):
             number_future=7
         )
         cls.entity_version = MainEntityVersionFactory(entity_type=entity_type.SECTOR)
-        cls.central_manager = CentralManagerFactory()
-        PersonEntityFactory(person=cls.central_manager, entity=cls.entity_version.entity)
+        cls.person = PersonFactory()
+        CentralManagerFactory(person=cls.person, entity=cls.entity_version.entity)
         cls.training = TrainingFactory(
             management_entity=cls.entity_version.entity,
             administration_entity=cls.entity_version.entity,
@@ -501,7 +499,7 @@ class TestPostponeTrainingProperty(TestCase):
         certificate aims is managed by program_manager (This form is only accessible on Central/Faculty manager)
         """
         # Save the training instance will create N+6 data...
-        form = TrainingForm(self.form_data, instance=self.training, user=self.central_manager.user)
+        form = TrainingForm(self.form_data, instance=self.training, user=self.person.user)
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
 
@@ -516,7 +514,7 @@ class TestPostponeTrainingProperty(TestCase):
         form = TrainingForm(
             {**self.form_data, "title": "Modification du titre"},
             instance=self.training,
-            user=self.central_manager.user,
+            user=self.person.user,
         )
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
@@ -541,8 +539,8 @@ class TestPostponeCertificateAims(TestCase):
             number_future=7
         )
         cls.entity_version = MainEntityVersionFactory(entity_type=entity_type.SECTOR)
-        cls.central_manager = CentralManagerFactory()
-        PersonEntityFactory(person=cls.central_manager, entity=cls.entity_version.entity)
+        cls.person = PersonFactory()
+        CentralManagerFactory(person=cls.person, entity=cls.entity_version.entity)
         cls.training = TrainingFactory(
             management_entity=cls.entity_version.entity,
             administration_entity=cls.entity_version.entity,
@@ -555,7 +553,7 @@ class TestPostponeCertificateAims(TestCase):
             'administration_entity': cls.entity_version.pk,
             'management_entity': cls.entity_version.pk
         })
-        training_form = TrainingForm(form_data, instance=cls.training, user=cls.central_manager.user)
+        training_form = TrainingForm(form_data, instance=cls.training, user=cls.person.user)
         training_form.is_valid()
         training_form.save()
 

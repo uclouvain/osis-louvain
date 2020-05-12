@@ -21,12 +21,18 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
+import random
+
 from behave import *
 from behave.runner import Context
 from django.urls import reverse
 
+from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
-from features.steps.utils.pages import EducationGroupPage
+from base.models.enums import education_group_categories
+from features.forms.education_groups import update_form
+from features.pages.education_group.pages import EducationGroupPage, UpdateTrainingPage, QuickSearchPage, \
+    AttachModalPage
 
 use_step_matcher("parse")
 
@@ -40,9 +46,53 @@ def step_impl(context: Context, acronym: str, year: str):
     context.test.assertEqual(context.browser.current_url, context.get_url(url))
 
 
+@given("Aller sur la page de detail d'une formation en année académique courante")
+def step_impl(context: Context):
+    egy = EducationGroupYear.objects.filter(
+        academic_year=context.data.current_academic_year,
+        education_group_type__category=education_group_categories.TRAINING
+    ).order_by('?').first()
+    url = reverse('education_group_read', args=[egy.pk, egy.pk])
+
+    context.egy_modified = egy
+
+    EducationGroupPage(driver=context.browser, base_url=context.get_url(url)).open()
+
+
+@when("Offre cliquer sur le menu « Actions »")
+def step_impl(context: Context):
+    page = EducationGroupPage(driver=context.browser)
+    page.actions.click()
+
+
+@when("Offre Cliquer sur l'action recherche rapide")
+def step_impl(context: Context):
+    page = EducationGroupPage(driver=context.browser)
+    page.quick_search.click()
+
+
+@then("Vérifier que la dernière année d'organisation de la formation a été mis à jour")
+def step_impl(context: Context):
+    end_year_displayed = context.current_page.end_year.text
+    context.test.assertEqual(context.form_data["end_year"], end_year_displayed)
+
+
+@step("Encoder année de fin")
+def step_impl(context: Context):
+    page = UpdateTrainingPage(driver=context.browser)
+    context.form_data = update_form.fill_end_year(page, context.data.current_academic_year)
+
+
 @when("Cliquer sur « Modifier »")
 def step_impl(context):
-    context.current_page = context.current_page.modify.click()
+    page = EducationGroupPage(driver=context.browser)
+    page.modify.click()
+
+
+@step("Offre cliquer sur le bouton « Enregistrer »")
+def step_impl(context: Context):
+    page = UpdateTrainingPage(driver=context.browser)
+    page.save_button.click()
 
 
 @then("Vérifier que la formation {acronym} a bien été mise à jour de {start_year} à {end_year}")
@@ -75,12 +125,21 @@ def step_impl(context, acronym):
 
 @step("Cliquer sur la recherche rapide")
 def step_impl(context):
-    context.current_page = context.current_page.quick_search.click()
+    page = EducationGroupPage(driver=context.browser)
+    page.quick_search.click()
 
 
-@step("Cliquer sur « Sélectionner »")
+@step("Selectionner le premier resultat (recherche rapide)")
 def step_impl(context):
-    context.current_page.select_first.click()
+    page = QuickSearchPage(driver=context.browser)
+    print(page.code.text)
+    page.select_first = True
+
+
+@step("Cliquer sur Ajouter (recherche rapide)")
+def step_impl(context):
+    page = QuickSearchPage(driver=context.browser)
+    page.attach.click()
 
 
 @step("Fermer la modal")
@@ -90,7 +149,8 @@ def step_impl(context):
 
 @step("Selectionner l'onglet d'unité d'enseignement")
 def step_impl(context):
-    context.current_page.lu_tab.click()
+    page = QuickSearchPage(driver=context.browser)
+    page.lu_tab.click()
 
 
 @step("Dans l'arbre, cliquer sur {action} sur {acronym}.")
@@ -117,9 +177,18 @@ def step_impl(context, parent, action, acronym):
 
 @step("Cliquer sur « Enregistrer » dans la modal")
 def step_impl(context):
-    result = context.current_page.save_modal.click()
-    if result:
-        context.current_page = result
+    page = AttachModalPage(driver=context.browser)
+    page.save_modal.click()
+
+
+@step("Vérifier que l'UE se trouve bien dans l'arbre")
+def step_impl(context):
+    page = EducationGroupPage(driver=context.browser)
+    nodes = page.panel_tree().nodes()
+    context.test.assertIn(
+        context.luy_to_attach,
+        [node.text for node in nodes]
+    )
 
 
 @then("Vérifier que {acronym} a été mis à jour")

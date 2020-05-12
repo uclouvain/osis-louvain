@@ -32,8 +32,8 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, UpdateView
+from osis_role.contrib.views import PermissionRequiredMixin
 
-from base.business.education_groups.perms import is_eligible_to_change_achievement
 from base.forms.education_group.achievement import ActionForm, EducationGroupAchievementForm, \
     EducationGroupDetailedAchievementForm, EducationGroupAchievementCMSForm
 from base.models.education_group_year import EducationGroupYear
@@ -41,7 +41,7 @@ from base.views.common import display_error_messages
 from base.views.education_groups.achievement.common import EducationGroupAchievementMixin, \
     EducationGroupDetailedAchievementMixin
 from base.views.education_groups.achievement.detail import CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
-from base.views.mixins import AjaxTemplateMixin, RulesRequiredMixin
+from base.views.mixins import AjaxTemplateMixin
 from cms.enums import entity_name
 from cms.models import translated_text
 from cms.models.text_label import TextLabel
@@ -50,7 +50,8 @@ from cms.models.text_label import TextLabel
 class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
     form_class = ActionForm
     http_method_names = ('post',)
-    rules = [is_eligible_to_change_achievement]
+    permission_required = 'base.change_educationgroupachievement'
+    raise_exception = True
 
     def form_valid(self, form):
         if form.cleaned_data['action'] == 'up':
@@ -63,11 +64,19 @@ class EducationGroupAchievementAction(EducationGroupAchievementMixin, FormView):
         display_error_messages(self.request, _("Invalid action"))
         return HttpResponseRedirect(self.get_success_url())
 
+    def get_permission_object(self):
+        return self.get_object().education_group_year
 
-class UpdateEducationGroupAchievement(AjaxTemplateMixin, EducationGroupAchievementMixin, UpdateView):
+
+class UpdateEducationGroupAchievement(PermissionRequiredMixin, AjaxTemplateMixin, EducationGroupAchievementMixin,
+                                      UpdateView):
     template_name = "education_group/blocks/form/update_achievement.html"
     form_class = EducationGroupAchievementForm
-    rules = [is_eligible_to_change_achievement]
+    permission_required = 'base.change_educationgroupachievement'
+    raise_exception = True
+
+    def get_permission_object(self):
+        return self.get_object().education_group_year
 
 
 class UpdateEducationGroupDetailedAchievement(EducationGroupDetailedAchievementMixin, UpdateEducationGroupAchievement):
@@ -75,20 +84,17 @@ class UpdateEducationGroupDetailedAchievement(EducationGroupDetailedAchievementM
 
 
 class EducationGroupDetailedAchievementAction(EducationGroupDetailedAchievementMixin, EducationGroupAchievementAction):
-    pass
+    def get_permission_object(self):
+        return self.education_group_achievement.education_group_year
 
 
-class EducationGroupAchievementCMS(RulesRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, FormView):
+class EducationGroupAchievementCMS(PermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin, FormView):
     cms_text_label = None
     template_name = "education_group/blocks/modal/modal_pedagogy_edit.html"
 
-    # RulesRequiredMixin
+    # PermissionRequiredMixin
+    permission_required = 'base.change_educationgroupachievement'
     raise_exception = True
-    rules = [is_eligible_to_change_achievement]
-
-    def _call_rule(self, rule):
-        """ Rules will be call with the person and the education_group_year"""
-        return rule(self.request.user.person, self.education_group_year)
 
     @cached_property
     def education_group_year(self):
@@ -129,6 +135,9 @@ class EducationGroupAchievementCMS(RulesRequiredMixin, SuccessMessageMixin, Ajax
             elif trans_text['language'] == settings.LANGUAGE_CODE_EN:
                 initial['text_english'] = trans_text['text']
         return initial
+
+    def get_permission_object(self):
+        return self.education_group_year
 
 
 class EducationGroupAchievementProgramAim(EducationGroupAchievementCMS):

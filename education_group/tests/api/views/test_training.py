@@ -35,6 +35,7 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.hops import HopsFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
@@ -235,6 +236,49 @@ class FilterTrainingTestCase(APITestCase):
             trainings,
             many=True,
             context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_training_case_filter_lowercase_acronym(self):
+        query_string = {'acronym': 'agro1ba'}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        trainings = EducationGroupYear.objects.filter(
+            education_group_type__category=education_group_categories.TRAINING,
+            acronym__icontains='agro1ba'
+        ).order_by('-academic_year__year', 'acronym')
+
+        serializer = TrainingListSerializer(
+            trainings,
+            many=True,
+            context={
+                'request': RequestFactory().get(self.url, query_string),
+                'language': settings.LANGUAGE_CODE_EN
+            },
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_training_case_filter_ares_ability(self):
+        hops = HopsFactory()
+        TrainingFactory(hops=hops)
+        query_string = {'ares_ability': hops.ares_ability}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        trainings = EducationGroupYear.objects.filter(
+            hops__ares_ability=hops.ares_ability
+        ).order_by('-academic_year__year', 'acronym')
+
+        serializer = TrainingListSerializer(
+            trainings,
+            many=True,
+            context={
+                'request': RequestFactory().get(self.url, query_string),
+                'language': settings.LANGUAGE_CODE_FR
+            },
         )
         self.assertEqual(response.data['results'], serializer.data)
 

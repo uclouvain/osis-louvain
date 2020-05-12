@@ -113,6 +113,25 @@ class LearningUnitListTestCase(APITestCase):
         )
         self.assertEqual(response.data['results'], serializer.data)
 
+    def test_get_only_learning_unit_with_container(self):
+        LearningUnitYearFactory(learning_container_year=None)
+        response = self.client.get(self.url, {'lang': 'fr'})
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        qs = LearningUnitYear.objects.filter(
+            learning_container_year__isnull=False
+        ).annotate_full_title().order_by('-academic_year__year', 'acronym')
+        serializer = LearningUnitSerializer(
+            qs,
+            many=True,
+            context={
+                'request': RequestFactory().get(self.url),
+                'language': settings.LANGUAGE_CODE
+            }
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
     def test_get_results_filter_by_academic_year(self):
         response = self.client.get(self.url, data={'year': self.academic_years[3].year})
 
