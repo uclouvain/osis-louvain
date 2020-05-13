@@ -294,6 +294,7 @@ class NodeGroupYear(Node):
             offer_partial_title_fr: str = None,
             offer_partial_title_en: str = None,
             category: Categories = None,
+            duration: int = None,
             **kwargs
     ):
         super().__init__(**kwargs)
@@ -307,6 +308,7 @@ class NodeGroupYear(Node):
         self.offer_partial_title_fr = offer_partial_title_fr
         self.offer_partial_title_en = offer_partial_title_en
         self.category = category
+        self.duration = duration
 
 
 class NodeLearningUnitYear(Node):
