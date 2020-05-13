@@ -58,6 +58,7 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
     def get_serializer_context(self):
         serializer_context = super().get_serializer_context()
         serializer_context['tree'] = self.tree
+        serializer_context['path'] = str(self.tree.root_node.pk)
         return serializer_context
 
 

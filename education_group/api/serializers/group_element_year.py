@@ -38,9 +38,13 @@ from program_management.ddd.business_types import *
 
 class RecursiveField(serializers.Serializer):
     def to_representation(self, value: 'Link'):
+        new_context = self.context.copy()
+        new_context.update({
+            'path': self.context['path'] + '|' + str(value.child.pk)
+        })
         if value.is_link_with_learning_unit():
-            return LearningUnitNodeTreeSerializer(value, context=self.context).data
-        return EducationGroupNodeTreeSerializer(value, context=self.context).data
+            return LearningUnitNodeTreeSerializer(value, context=new_context).data
+        return EducationGroupNodeTreeSerializer(value, context=new_context).data
 
 
 class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
@@ -95,11 +99,10 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     def get_block(self, obj: 'Link'):
         if obj.block:
             return sorted([int(block) for block in str(obj.block)])
-
         tree = self.context.get('tree')
         root_node = tree.root_node
-        ascendents = obj.child.ascendents(tree, obj.parent)
-        for _, node in ascendents.items():
+        parents = tree.get_parents(self.context.get('path'))
+        for node in parents:
             if node.is_minor() or node.is_deepening():
                 return [2, 3]
 

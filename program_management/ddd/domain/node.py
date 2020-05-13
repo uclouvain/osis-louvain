@@ -219,30 +219,6 @@ class Node:
     def descendents(self) -> Dict['Path', 'Node']:  # TODO :: add unit tests
         return _get_descendents(self)
 
-    def ascendents(self, tree: 'ProgramTree', parent: 'Node') -> Dict['Path', 'Node']:
-        path = self.current_path(tree.root_node, parent)
-        current_path = path.replace('|' + str(self.node_id), '')
-        ascendents = {
-            current_path: parent
-        }
-        current_path = current_path.replace('|' + str(parent.node_id), '')
-        parents = tree.get_parents(current_path)
-        for node in parents:
-            ascendents.update({
-                current_path: node
-            })
-            current_path = current_path.replace('|' + str(node.node_id), '')
-        return ascendents
-
-    def current_path(self, root_node: 'Node', parent: 'Node'):
-        descendents = root_node.descendents
-        path_end = str(parent.node_id) + '|' + str(self.node_id)
-        return next(
-            path
-            for (path, node) in descendents.items()
-            if node == self and path.endswith(path_end)
-        )
-
     def add_child(self, node: 'Node', **link_attrs):
         child = link_factory.get_link(parent=self, child=node, **link_attrs)
         self._children.append(child)
