@@ -43,5 +43,6 @@ class LearningUnitComponentSerializer(serializers.ModelSerializer):
             'hourly_volume_total_annual_computed'
         )
 
-    def get_computed_volume(self, obj):
+    @staticmethod
+    def get_computed_volume(obj):
         return str(obj.vol_global)

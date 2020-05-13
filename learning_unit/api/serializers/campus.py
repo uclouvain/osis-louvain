@@ -40,5 +40,6 @@ class LearningUnitCampusSerializer(serializers.ModelSerializer):
             'organization_url'
         )
 
-    def get_organization_url(self, obj):
+    @staticmethod
+    def get_organization_url(obj):
         return obj.organization.website if obj.organization.website != '' else None

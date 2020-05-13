@@ -91,7 +91,8 @@ class LearningUnitSerializer(LearningUnitTitleSerializer):
             'has_proposal',
         )
 
-    def get_has_proposal(self, learning_unit_year):
+    @staticmethod
+    def get_has_proposal(learning_unit_year):
         return getattr(learning_unit_year, "has_proposal", None)
 
 
@@ -128,7 +129,8 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
             'professional_integration'
         )
 
-    def get_proposal(self, learning_unit_year):
+    @staticmethod
+    def get_proposal(learning_unit_year):
         if not hasattr(learning_unit_year, "proposallearningunit"):
             return {}
 
@@ -138,7 +140,8 @@ class LearningUnitDetailedSerializer(LearningUnitSerializer):
             "status": learning_unit_year.proposallearningunit.get_state_display(),
         }
 
-    def get_summary_status(self, learning_unit_year):
+    @staticmethod
+    def get_summary_status(learning_unit_year):
         if getattr(learning_unit_year, "summary_status", False):
             return SummaryStatus.MODIFIED.value
         elif learning_unit_year.summary_locked:
