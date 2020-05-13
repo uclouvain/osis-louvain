@@ -126,7 +126,8 @@ class TrainingTreeViewTestCase(APITestCase):
             Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(self.url),
-                'tree': tree
+                'tree': tree,
+                'path': str(tree.root_node.pk)
             }
         )
         self.assertEqual(response.data, serializer.data)
@@ -205,7 +206,8 @@ class MiniTrainingTreeViewTestCase(APITestCase):
             Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(self.url),
-                'tree': tree
+                'tree': tree,
+                'path': str(tree.root_node.pk)
             }
         )
         self.assertEqual(response.data, serializer.data)
@@ -282,7 +284,8 @@ class GroupTreeViewTestCase(APITestCase):
             Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(self.url),
-                'tree': tree
+                'tree': tree,
+                'path': str(tree.root_node.pk)
             }
         )
         self.assertEqual(response.data, serializer.data)

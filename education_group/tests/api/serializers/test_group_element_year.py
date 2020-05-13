@@ -90,7 +90,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN,
-                'tree': tree
+                'tree': tree,
+                'path': str(tree.root_node.pk)
             }
         )
 
@@ -190,7 +191,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN,
-                'tree': tree
+                'tree': tree,
+                'path': str(tree.root_node.pk)
             }
         )
         self.assertEqual(len(serializer.data['children']), 1)
@@ -220,7 +222,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN,
-                'tree': tree
+                'tree': tree,
+                'path': str(tree.root_node.pk)
             }
         )
         self.assertEqual(len(serializer.data['children']), 1)
@@ -264,7 +267,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN,
-                'tree': tree
+                'tree': tree,
+                'path': str(tree.root_node.pk)
             }
         )
         self.assertTrue(serializer.data['children'][0]['with_prerequisite'])
@@ -293,7 +297,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN,
-                'tree': tree
+                'tree': tree,
+                'path': str(tree.root_node.pk)
             }
         )
         self.assertEqual(serializer.data['children'][0]['credits'], luy.credits,
@@ -321,7 +326,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN,
-                'tree': tree
+                'tree': tree,
+                'path': str(tree.root_node.pk)
             }
         )
         self.assertEqual(serializer.data['children'][0]['credits'], egy.credits,
@@ -386,7 +392,8 @@ class EducationGroupRootNodeTreeSerializerTestCase(TestCase):
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN,
-                'tree': tree
+                'tree': tree,
+                'path': str(tree.root_node.pk)
             }
         )
         return serializer
@@ -429,7 +436,8 @@ class EducationGroupWithMasterFinalityInRootTreeSerializerTestCase(TestCase):
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN,
-                'tree': tree
+                'tree': tree,
+                'path': str(tree.root_node.pk)
             }
         )
 
@@ -518,7 +526,8 @@ class EducationGroupWithMasterFinalityInChildTreeSerializerTestCase(TestCase):
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN,
-                'tree': tree
+                'tree': tree,
+                'path': str(tree.root_node.pk)
             }
         )
 
@@ -634,7 +643,8 @@ class BlockLogicCaseNotSetTestCase(TestCase):
             context={
                 'request': RequestFactory().get(url),
                 'language': settings.LANGUAGE_CODE_EN,
-                'tree': tree
+                'tree': tree,
+                'path': str(tree.root_node.pk)
             }
         )
 
