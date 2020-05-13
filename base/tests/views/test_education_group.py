@@ -196,7 +196,7 @@ class EducationGroupGeneralInformations(TestCase):
         self.assertTemplateUsed(response, self.template_path)
 
         soup = bs4.BeautifulSoup(response.content, 'html.parser')
-        self.assertGreater(len(soup.select('a.pedagogy-edit-btn')), 0)
+        self.assertGreater(len(soup.select('a.trigger_modal')), 0)
 
 
 class EducationGroupPedagogyUpdateViewTestCase(TestCase):

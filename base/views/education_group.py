@@ -159,7 +159,7 @@ def education_group_year_pedagogy_edit_get(request, education_group_year_id):
         label=label_name,
         language=get_user_interface_language(request.user)
     )
-    return render(request, 'education_group/pedagogy_edit.html', context)
+    return render(request, 'education_group/blocks/modal/modal_pedagogy_edit_inner.html', context)
 
 
 @login_required

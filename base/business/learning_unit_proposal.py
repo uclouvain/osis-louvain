@@ -28,6 +28,7 @@ from decimal import Decimal
 
 from django.contrib.messages import ERROR, SUCCESS
 from django.contrib.messages import INFO
+from django.core.exceptions import PermissionDenied
 from django.db import IntegrityError
 from django.forms import model_to_dict
 from django.utils.translation import gettext_lazy as _
@@ -280,11 +281,11 @@ def _apply_action_on_proposals_and_send_report(proposals, author, action_method,
 def _apply_action_on_proposals(proposals, action_method, author, permission_check):
     proposals_with_results = []
     for proposal in proposals:
-        proposal_with_result = (proposal, {ERROR: [_("User %(person)s do not have rights on this proposal.") % {
-            "person": str(author)
-        }]})
-        if permission_check(proposal, author):
+        try:
+            permission_check(proposal, author, True)
             proposal_with_result = (proposal, action_method(proposal))
+        except PermissionDenied as perm_denied:
+            proposal_with_result = (proposal, {ERROR: _(str(perm_denied))})
 
         proposals_with_results.append(proposal_with_result)
 
