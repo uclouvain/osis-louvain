@@ -46,47 +46,30 @@
                         {% endif %}
                     {% endfor %}
                 </div>
-                {% if not forloop.last or not show_contacts %}
-                    </div>
-                {% endif %}
+            </div>
         {% endfor %}
 
 
         {% if show_contacts %}
-            <hr/>
             <div class="container-fluid">
-                <div class="row">
-                    {% include  "education_group/blocks/contacts_general_informations.html" %}
-                </div>
-            </div>
+                {% include "education_group/blocks/contacts_general_informations.html" %}
             </div>
         {% endif %}
     </div>
-    </div>
 
-    <div class="modal fade" id="pedagogy_edit" role="dialog" data-backdrop="static"></div>
 {% endblock %}
 
 {% block script %}
     <script>
-        {% if can_edit_information %}
-            $('div#panel-data').on('click', 'a.pedagogy-edit-btn', function (evt) {
-                evt.preventDefault();
-                var url = $(this).data("form");
-                var pedagogy_edit_modal = $("#pedagogy_edit");
-                pedagogy_edit_modal.load(url, function () {
-                    $(this).modal('show');
-                });
-                return false;
-            });
-        {% endif %}
-
         {% if  request.GET.anchor  %}
             $(document).ready(function () {
+                keepFocusOnContactAfterAdd()
+            });
+            function keepFocusOnContactAfterAdd(){
                 var elt_to_focus = "#lbl_contacts_header";
                 $(elt_to_focus).attr("tabindex",-1).focus();
                 $(window).scrollTop($(elt_to_focus).position().top);
-            });
+            }
         {% endif %}
 
     </script>

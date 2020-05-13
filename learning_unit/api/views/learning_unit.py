@@ -47,7 +47,7 @@ class LearningUnitList(LanguageContextSerializerMixin, generics.ListAPIView):
        Return a list of all the learning unit with optional filtering.
     """
     name = 'learningunits_list'
-    queryset = LearningUnitYear.objects.all().select_related(
+    queryset = LearningUnitYear.objects.filter(learning_container_year__isnull=False).select_related(
         'academic_year',
         'learning_container_year'
     ).prefetch_related(
