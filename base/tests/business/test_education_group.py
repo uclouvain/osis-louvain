@@ -26,8 +26,7 @@
 import datetime
 from unittest import mock
 
-from django.contrib.auth.models import Permission, Group
-from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth.models import Group
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
@@ -373,7 +372,7 @@ def _generate_xls_build_parameter(xls_data, user):
             xls_build.HEADER_TITLES_KEY: EDUCATION_GROUP_TITLES,
             xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE),
             xls_build.STYLED_CELLS: None,
-            xls_build.COLORED_ROWS: None,
+            xls_build.FONT_ROWS: None,
             xls_build.ROW_HEIGHT: None,
         }]
     }
@@ -389,7 +388,7 @@ def _generate_xls_administrative_data_build_parameter(xls_data, user):
             xls_build.HEADER_TITLES_KEY: _get_translated_header_titles(),
             xls_build.WORKSHEET_TITLE_KEY: _(WORKSHEET_TITLE_ADMINISTRATIVE),
             xls_build.STYLED_CELLS: None,
-            xls_build.COLORED_ROWS: None,
+            xls_build.FONT_ROWS: None,
             xls_build.ROW_HEIGHT: None,
         }]
     }

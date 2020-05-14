@@ -35,10 +35,10 @@ from attribution.models.enums.function import COORDINATOR
 from attribution.models.enums.function import Functions
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
-from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPOSAL_LINE_STYLES, \
+from base.business.learning_unit_xls import DEFAULT_LEGEND_FILLS, SPACES, PROPOSAL_LINE_STYLES, \
     _get_significant_volume, prepare_proposal_legend_ws_data, _get_wrapped_cells, \
-    _get_colored_rows, _get_attribution_line, _add_training_data, \
-    _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
+    _get_font_rows, _get_attribution_line, _add_training_data, \
+    _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_ALIGNMENT, HEADER_PROGRAMS, XLS_DESCRIPTION, \
     _get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
     prepare_xls_content_with_attributions
 from base.business.learning_unit_xls import _get_col_letter
@@ -223,10 +223,10 @@ class TestLearningUnitXls(TestCase):
         self.assertIsNone(_get_col_letter(titles, 'whatever'))
 
     def test_get_colored_rows(self):
-        self.assertEqual(_get_colored_rows([self.learning_unit_yr_1,
-                                            self.learning_unit_yr_2,
-                                            self.proposal_creation_1.learning_unit_year,
-                                            self.proposal_creation_2.learning_unit_year]),
+        self.assertEqual(_get_font_rows([self.learning_unit_yr_1,
+                                         self.learning_unit_yr_2,
+                                         self.proposal_creation_1.learning_unit_year,
+                                         self.proposal_creation_2.learning_unit_year]),
                          {PROPOSAL_LINE_STYLES.get(self.proposal_creation_1.type): [3, 4]})
 
     def test_get_attributions_line(self):
@@ -270,7 +270,7 @@ class TestLearningUnitXls(TestCase):
             ],
             xls_build.WORKSHEET_TITLE_KEY: _('Legend'),
             xls_build.STYLED_CELLS:
-                DEFAULT_LEGEND_STYLES
+                DEFAULT_LEGEND_FILLS
         }
         self.assertEqual(prepare_proposal_legend_ws_data(), expected)
 
@@ -303,13 +303,13 @@ class TestLearningUnitXls(TestCase):
         self.assertEqual(param.get(xls_build.DESCRIPTION), XLS_DESCRIPTION)
         self.assertEqual(param.get(xls_build.USER), user_name)
         self.assertEqual(param.get(xls_build.HEADER_TITLES), titles)
-        self.assertEqual(param.get(xls_build.STYLED_CELLS), {WRAP_TEXT_STYLE: []})
-        self.assertEqual(param.get(xls_build.COLORED_ROWS), {})
+        self.assertEqual(param.get(xls_build.STYLED_CELLS), {WRAP_TEXT_ALIGNMENT: []})
+        self.assertEqual(param.get(xls_build.FONT_ROWS), {})
 
         titles.append(HEADER_PROGRAMS)
 
         param = _get_parameters_configurable_list(learning_units, titles, an_user)
-        self.assertEqual(param.get(xls_build.STYLED_CELLS), {WRAP_TEXT_STYLE: ['C2', 'C3']})
+        self.assertEqual(param.get(xls_build.STYLED_CELLS), {WRAP_TEXT_ALIGNMENT: ['C2', 'C3']})
 
     def test_get_data_part2(self):
         learning_container_luy = LearningContainerYearFactory(academic_year=self.academic_year)

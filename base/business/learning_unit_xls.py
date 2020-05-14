@@ -29,7 +29,7 @@ from django.db.models import Subquery, OuterRef
 from django.db.models.expressions import RawSQL
 from django.template.defaultfilters import yesno
 from django.utils.translation import gettext_lazy as _
-from openpyxl.styles import Alignment, Style, PatternFill, Color, Font
+from openpyxl.styles import Alignment, PatternFill, Color, Font
 from openpyxl.utils import get_column_letter
 
 from attribution.business import attribution_charge_new
@@ -50,25 +50,25 @@ TRANSFORMATION_COLOR = Color('ff6600')
 SUPPRESSION_COLOR = Color('ff0000')
 MODIFICATION_COLOR = Color('0000ff')
 CREATION_COLOR = Color('008000')
-DEFAULT_LEGEND_STYLES = {
-    Style(fill=PatternFill(patternType='solid', fgColor=CREATION_COLOR)): ['A2'],
-    Style(fill=PatternFill(patternType='solid', fgColor=MODIFICATION_COLOR)): ['A3'],
-    Style(fill=PatternFill(patternType='solid', fgColor=SUPPRESSION_COLOR)): ['A4'],
-    Style(fill=PatternFill(patternType='solid', fgColor=TRANSFORMATION_COLOR)): ['A5'],
-    Style(fill=PatternFill(patternType='solid', fgColor=TRANSFORMATION_AND_MODIFICATION_COLOR)): ['A6'],
+DEFAULT_LEGEND_FILLS = {
+    PatternFill(patternType='solid', fgColor=CREATION_COLOR): ['A2'],
+    PatternFill(patternType='solid', fgColor=MODIFICATION_COLOR): ['A3'],
+    PatternFill(patternType='solid', fgColor=SUPPRESSION_COLOR): ['A4'],
+    PatternFill(patternType='solid', fgColor=TRANSFORMATION_COLOR): ['A5'],
+    PatternFill(patternType='solid', fgColor=TRANSFORMATION_AND_MODIFICATION_COLOR): ['A6'],
 }
 BOLD_FONT = Font(bold=True)
 SPACES = '  '
 HEADER_TEACHERS = _('List of teachers')
 HEADER_PROGRAMS = _('Programs')
 PROPOSAL_LINE_STYLES = {
-    ProposalType.CREATION.name: Style(font=Font(color=CREATION_COLOR), ),
-    ProposalType.MODIFICATION.name: Style(font=Font(color=MODIFICATION_COLOR), ),
-    ProposalType.SUPPRESSION.name: Style(font=Font(color=SUPPRESSION_COLOR), ),
-    ProposalType.TRANSFORMATION.name: Style(font=Font(color=TRANSFORMATION_COLOR), ),
-    ProposalType.TRANSFORMATION_AND_MODIFICATION.name: Style(font=Font(color=TRANSFORMATION_AND_MODIFICATION_COLOR), ),
+    ProposalType.CREATION.name: Font(color=CREATION_COLOR),
+    ProposalType.MODIFICATION.name: Font(color=MODIFICATION_COLOR),
+    ProposalType.SUPPRESSION.name: Font(color=SUPPRESSION_COLOR),
+    ProposalType.TRANSFORMATION.name: Font(color=TRANSFORMATION_COLOR),
+    ProposalType.TRANSFORMATION_AND_MODIFICATION.name: Font(color=TRANSFORMATION_AND_MODIFICATION_COLOR),
 }
-WRAP_TEXT_STYLE = Style(alignment=Alignment(wrapText=True, vertical="top"), )
+WRAP_TEXT_ALIGNMENT = Alignment(wrapText=True, vertical="top")
 WITH_ATTRIBUTIONS = 'with_attributions'
 WITH_GRP = 'with_grp'
 
@@ -169,14 +169,14 @@ def _get_parameters_configurable_list(learning_units, titles, user):
         xls_build.FILENAME: XLS_FILENAME,
         xls_build.HEADER_TITLES: titles,
         xls_build.WS_TITLE: WORKSHEET_TITLE,
-        xls_build.STYLED_CELLS: {
-            WRAP_TEXT_STYLE: _get_wrapped_cells(
+        xls_build.ALIGN_CELLS: {
+            WRAP_TEXT_ALIGNMENT: _get_wrapped_cells(
                 learning_units,
                 _get_col_letter(titles, HEADER_PROGRAMS),
                 _get_col_letter(titles, HEADER_TEACHERS)
             )
         },
-        xls_build.COLORED_ROWS: _get_colored_rows(learning_units),
+        xls_build.FONT_ROWS: _get_font_rows(learning_units),
     }
     return parameters
 
@@ -199,7 +199,7 @@ def prepare_proposal_legend_ws_data():
         ],
         xls_build.WORKSHEET_TITLE_KEY: _('Legend'),
         xls_build.STYLED_CELLS:
-            DEFAULT_LEGEND_STYLES
+            DEFAULT_LEGEND_FILLS
     }
 
 
@@ -215,7 +215,7 @@ def _get_wrapped_cells(learning_units, teachers_col_letter, programs_col_letter)
     return dict_wrapped_styled_cells
 
 
-def _get_colored_rows(learning_units):
+def _get_font_rows(learning_units):
     colored_cells = defaultdict(list)
     for idx, luy in enumerate(learning_units, start=1):
         if getattr(luy, "proposallearningunit", None):
@@ -405,9 +405,9 @@ def create_xls_attributions(user, found_learning_units, filters):
                   xls_build.FILENAME: XLS_FILENAME,
                   xls_build.HEADER_TITLES: titles,
                   xls_build.WS_TITLE: WORKSHEET_TITLE,
-                  xls_build.STYLED_CELLS: {xls_build.STYLE_BORDER_TOP: cells_with_top_border,
-                                           Style(font=Font(color=Color('00FFFFFF')),): cells_with_white_font},
-                  xls_build.COLORED_ROWS: {Style(font=BOLD_FONT): [0]}
+                  xls_build.BORDER_CELLS: {xls_build.BORDER_TOP: cells_with_top_border},
+                  xls_build.FONT_CELLS: {Font(color=Color('00FFFFFF')): cells_with_white_font},
+                  xls_build.FONT_ROWS: {BOLD_FONT: [0]}
                   }
 
     return xls_build.generate_xls(xls_build.prepare_xls_parameters_list(working_sheets_data, parameters), filters)

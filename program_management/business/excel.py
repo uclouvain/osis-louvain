@@ -29,7 +29,7 @@ from collections import namedtuple, defaultdict
 from django.db.models import QuerySet, Prefetch
 from django.utils.translation import gettext as _
 from openpyxl import Workbook
-from openpyxl.styles import Style, Border, Side, Color, PatternFill, Font
+from openpyxl.styles import Border, Side, Color, PatternFill, Font
 from openpyxl.styles.borders import BORDER_THICK
 from openpyxl.styles.colors import RED, GREEN
 from openpyxl.writer.excel import save_virtual_workbook
@@ -42,23 +42,22 @@ from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
-    STYLED_CELLS, STYLE_NO_GRAY
+    FILL_NO_GRAY, FONT_CELLS, FILL_CELLS
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_tree
 
-STYLE_BORDER_BOTTOM = Style(
-    border=Border(
-        bottom=Side(
-            border_style=BORDER_THICK, color=Color('FF000000')
-        )
+BORDER_BOTTOM = Border(
+    bottom=Side(
+        border_style=BORDER_THICK, color=Color('FF000000')
     )
 )
-STYLE_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('D1D1D1')))
-STYLE_LIGHT_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('E1E1E1')))
-STYLE_LIGHTER_GRAY = Style(fill=PatternFill(patternType='solid', fgColor=Color('F1F1F1')))
 
-STYLE_FONT_RED = Style(font=Font(color=RED))
-STYLE_FONT_GREEN = Style(font=Font(color=GREEN))
+FILL_GRAY = PatternFill(patternType='solid', fgColor=Color('D1D1D1'))
+FILL_LIGHT_GRAY = PatternFill(patternType='solid', fgColor=Color('E1E1E1'))
+FILL_LIGHTER_GRAY = PatternFill(patternType='solid', fgColor=Color('F1F1F1'))
+
+FONT_RED = Font(color=RED)
+FONT_GREEN = Font(color=GREEN)
 FONT_HYPERLINK = Font(underline='single', color='0563C1')
 
 HeaderLine = namedtuple('HeaderLine', ['egy_acronym', 'egy_title', 'code_header', 'title_header', 'credits_header',
@@ -228,53 +227,64 @@ def _get_item_blocks(prerequisite_item: PrerequisiteItem):
     )
 
 
-def _get_style_to_apply(excel_lines: list):
+def _get_fill_to_apply(excel_lines: list):
     style_to_apply_dict = defaultdict(list)
     last_luy_line_index = None
     for index, row in enumerate(excel_lines, 1):
         if isinstance(row, HeaderLine):
-            style_to_apply_dict[STYLE_NO_GRAY].append("A{index}".format(index=index))
-            style_to_apply_dict[STYLE_NO_GRAY].append("B{index}".format(index=index))
-            style_to_apply_dict[STYLE_NO_GRAY].append("C{index}".format(index=index))
-            style_to_apply_dict[STYLE_NO_GRAY].append("D{index}".format(index=index))
-            style_to_apply_dict[STYLE_NO_GRAY].append("E{index}".format(index=index))
-            style_to_apply_dict[STYLE_NO_GRAY].append("F{index}".format(index=index))
-            style_to_apply_dict[STYLE_NO_GRAY].append("G{index}".format(index=index))
-
-        elif isinstance(row, OfficialTextLine):
-            style_to_apply_dict[STYLE_BORDER_BOTTOM].append("A{index}".format(index=index))
+            style_to_apply_dict[FILL_NO_GRAY].append("A{index}".format(index=index))
+            style_to_apply_dict[FILL_NO_GRAY].append("B{index}".format(index=index))
+            style_to_apply_dict[FILL_NO_GRAY].append("C{index}".format(index=index))
+            style_to_apply_dict[FILL_NO_GRAY].append("D{index}".format(index=index))
+            style_to_apply_dict[FILL_NO_GRAY].append("E{index}".format(index=index))
+            style_to_apply_dict[FILL_NO_GRAY].append("F{index}".format(index=index))
+            style_to_apply_dict[FILL_NO_GRAY].append("G{index}".format(index=index))
 
         elif isinstance(row, LearningUnitYearLine):
-            style_to_apply_dict[STYLE_GRAY].append("A{index}".format(index=index))
-            style_to_apply_dict[STYLE_LIGHT_GRAY].append("B{index}".format(index=index))
+            style_to_apply_dict[FILL_GRAY].append("A{index}".format(index=index))
+            style_to_apply_dict[FILL_LIGHT_GRAY].append("B{index}".format(index=index))
             last_luy_line_index = index
 
         elif isinstance(row, PrerequisiteItemLine):
-            if row.operator == _(OR):
-                style_to_apply_dict[STYLE_FONT_RED].append("B{index}".format(index=index))
-            elif row.operator == _(AND):
-                style_to_apply_dict[STYLE_FONT_GREEN].append("B{index}".format(index=index))
-
             if (last_luy_line_index - index) % 2 == 1:
-                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("C{index}".format(index=index))
-                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("D{index}".format(index=index))
-                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("E{index}".format(index=index))
-                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("F{index}".format(index=index))
-                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("G{index}".format(index=index))
+                style_to_apply_dict[FILL_LIGHTER_GRAY].append("C{index}".format(index=index))
+                style_to_apply_dict[FILL_LIGHTER_GRAY].append("D{index}".format(index=index))
+                style_to_apply_dict[FILL_LIGHTER_GRAY].append("E{index}".format(index=index))
+                style_to_apply_dict[FILL_LIGHTER_GRAY].append("F{index}".format(index=index))
+                style_to_apply_dict[FILL_LIGHTER_GRAY].append("G{index}".format(index=index))
         elif isinstance(row, PrerequisiteOfItemLine):
             if (last_luy_line_index - index) % 2 == 1:
-                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("C{index}".format(index=index))
-                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("D{index}".format(index=index))
-                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("E{index}".format(index=index))
-                style_to_apply_dict[STYLE_LIGHTER_GRAY].append("F{index}".format(index=index))
+                style_to_apply_dict[FILL_LIGHTER_GRAY].append("C{index}".format(index=index))
+                style_to_apply_dict[FILL_LIGHTER_GRAY].append("D{index}".format(index=index))
+                style_to_apply_dict[FILL_LIGHTER_GRAY].append("E{index}".format(index=index))
+                style_to_apply_dict[FILL_LIGHTER_GRAY].append("F{index}".format(index=index))
         if isinstance(row, HeaderLinePrerequisiteOf):
-            style_to_apply_dict[STYLE_NO_GRAY].append("A{index}".format(index=index))
-            style_to_apply_dict[STYLE_NO_GRAY].append("B{index}".format(index=index))
-            style_to_apply_dict[STYLE_NO_GRAY].append("C{index}".format(index=index))
-            style_to_apply_dict[STYLE_NO_GRAY].append("D{index}".format(index=index))
-            style_to_apply_dict[STYLE_NO_GRAY].append("E{index}".format(index=index))
-            style_to_apply_dict[STYLE_NO_GRAY].append("F{index}".format(index=index))
+            style_to_apply_dict[FILL_NO_GRAY].append("A{index}".format(index=index))
+            style_to_apply_dict[FILL_NO_GRAY].append("B{index}".format(index=index))
+            style_to_apply_dict[FILL_NO_GRAY].append("C{index}".format(index=index))
+            style_to_apply_dict[FILL_NO_GRAY].append("D{index}".format(index=index))
+            style_to_apply_dict[FILL_NO_GRAY].append("E{index}".format(index=index))
+            style_to_apply_dict[FILL_NO_GRAY].append("F{index}".format(index=index))
     return style_to_apply_dict
+
+
+def _get_font_to_apply(excel_lines: list):
+    font_to_apply_dict = defaultdict(list)
+    for index, row in enumerate(excel_lines, 1):
+        if isinstance(row, PrerequisiteItemLine):
+            if row.operator == _(OR):
+                font_to_apply_dict[FONT_RED].append("B{index}".format(index=index))
+            elif row.operator == _(AND):
+                font_to_apply_dict[FONT_GREEN].append("B{index}".format(index=index))
+    return font_to_apply_dict
+
+
+def _get_border_to_apply(excel_lines: list):
+    border_to_apply_dict = defaultdict(list)
+    for index, row in enumerate(excel_lines, 1):
+        if isinstance(row, OfficialTextLine):
+            border_to_apply_dict[BORDER_BOTTOM].append("A{index}".format(index=index))
+    return border_to_apply_dict
 
 
 def _merge_cells(excel_lines, workbook: Workbook, end_column):
@@ -323,12 +333,14 @@ def generate_ue_is_prerequisite_for_workbook(root: EducationGroupYear):
 
 def _get_workbook(egy, excel_lines, workbook, worksheet_title, end_column):
     header, *content = [tuple(line) for line in excel_lines]
-    style = _get_style_to_apply(excel_lines)
+    fill = _get_fill_to_apply(excel_lines)
+    fonts = _get_font_to_apply(excel_lines)
     worksheet_data = {
         WORKSHEET_TITLE_KEY: worksheet_title,
         HEADER_TITLES_KEY: header,
         CONTENT_KEY: content,
-        STYLED_CELLS: style
+        FILL_CELLS: fill,
+        FONT_CELLS: fonts
     }
     _build_worksheet(worksheet_data, workbook, 0)
     _merge_cells(excel_lines, workbook, end_column)
@@ -379,5 +391,3 @@ def _build_is_prerequisite_for_line(prerequisite_node: 'NodeLearningUnitYear', f
 def clean_worksheet_title(title):
     # Worksheet title is max 25 chars (31 chars with sheet number) + does not accept slash present in acronyms
     return title[:25].replace("/", "_")
-
-

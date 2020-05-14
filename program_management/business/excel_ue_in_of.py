@@ -32,7 +32,7 @@ from django.db.models import QuerySet, Subquery, OuterRef, Case, When
 from django.template.defaultfilters import yesno
 from django.utils.translation import gettext as _
 from openpyxl import Workbook
-from openpyxl.styles import Style, Font
+from openpyxl.styles import Font
 from openpyxl.writer.excel import save_virtual_workbook
 
 from attribution.business import attribution_charge_new
@@ -50,7 +50,7 @@ from base.models.teaching_material import TeachingMaterial
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
-    STYLED_CELLS, COLORED_ROWS, ROW_HEIGHT
+    STYLED_CELLS, ROW_HEIGHT, FONT_ROWS
 from program_management.business.excel import clean_worksheet_title
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.business.utils import html2text
@@ -167,31 +167,29 @@ class EducationGroupYearLearningUnitsContainedToExcel:
 def generate_ue_contained_for_workbook(custom_xls_form: CustomXlsForm, qs: QuerySet, hierarchy):
     data = _build_excel_lines_ues(custom_xls_form, qs, hierarchy)
     need_proposal_legend = custom_xls_form.is_valid() and custom_xls_form.cleaned_data['proposition']
-
     return _get_workbook_for_custom_xls(data.get('content'),
                                         need_proposal_legend,
-                                        data.get('colored_cells'),
+                                        data.get('font_rows'),
                                         data.get('row_height'))
 
 
 def _build_excel_lines_ues(custom_xls_form: CustomXlsForm, qs: QuerySet, hierarchy):
     content = _get_headers(custom_xls_form)
-
     optional_data_needed = _optional_data(custom_xls_form)
-    colored_cells = defaultdict(list)
+    font_rows = defaultdict(list)
     idx = 1
 
     for gey in qs:
         luy = gey.child_leaf
         content.append(_get_optional_data(_fix_data(gey, luy, hierarchy), luy, optional_data_needed, gey))
         if getattr(luy, "proposallearningunit", None):
-            colored_cells[PROPOSAL_LINE_STYLES.get(luy.proposallearningunit.type)].append(idx)
+            font_rows[PROPOSAL_LINE_STYLES.get(luy.proposallearningunit.type)].append(idx)
         idx += 1
+    font_rows[BOLD_FONT].append(0)
 
-    colored_cells[Style(font=BOLD_FONT)].append(0)
     return {
         'content': content,
-        'colored_cells': colored_cells,
+        'font_rows': font_rows,
         'row_height':
             {'height': 30,
              'start': 2,
@@ -241,7 +239,7 @@ def _fix_data(gey: GroupElementYear, luy: LearningUnitYear, hierarchy):
     return data
 
 
-def _get_workbook_for_custom_xls(excel_lines, need_proposal_legend, colored_cells, row_height=dict()):
+def _get_workbook_for_custom_xls(excel_lines, need_proposal_legend, font_rows, row_height=dict()):
     workbook = Workbook()
     worksheet_title = clean_worksheet_title(_("List UE"))
     header, *content = [tuple(line) for line in excel_lines]
@@ -251,7 +249,7 @@ def _get_workbook_for_custom_xls(excel_lines, need_proposal_legend, colored_cell
         HEADER_TITLES_KEY: header,
         CONTENT_KEY: content,
         STYLED_CELLS: {},
-        COLORED_ROWS: colored_cells,
+        FONT_ROWS: font_rows,
         ROW_HEIGHT: row_height,
 
     }
@@ -312,8 +310,8 @@ def _get_optional_data(data, luy, optional_data_needed, gey):
         data.extend(volume_information(luys[0]))
     if optional_data_needed['has_teacher_list']:
         attribution_values = attribution_charge_new.find_attribution_charge_new_by_learning_unit_year_as_dict(
-                    luy
-                ).values()
+            luy
+        ).values()
         data.append(
             ";".join(
                 [_get_attribution_line(value.get('person'))
@@ -368,7 +366,6 @@ def _annotate_with_description_fiche_specifications(group_elt_yrs_param, descrip
 
 
 def _build_validate_html_list_to_string(value_param, method):
-
     if method is None or method not in (hyperlinks_to_string, html2text):
         return value_param.strip()
 

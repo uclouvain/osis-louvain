@@ -29,14 +29,13 @@ from unittest import mock
 
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
-from openpyxl.styles import Style, Font
+from openpyxl.styles import Font
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
 from base.models.enums import education_group_types
-from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory, \
@@ -63,7 +62,7 @@ from program_management.business.excel_ue_in_of import EducationGroupYearLearnin
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
-from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 PARTIAL_ACRONYM = 'Partial'
 
@@ -74,7 +73,7 @@ CMS_TXT_WITH_LIST = '<ol> ' \
                     '<li>Les diff&eacute;rentes structures mol&eacute;culaires</li> ' \
                     '</ol>'
 CMS_TXT_WITH_LIST_AFTER_FORMATTING = 'La structure atomique de la matière\n' \
-                                    'Les différentes structures moléculaires'
+                                     'Les différentes structures moléculaires'
 
 CMS_TXT_WITH_LINK = '<a href="https://moodleucl.uclouvain.be">moodle</a>'
 CMS_TXT_WITH_LINK_AFTER_FORMATTING = 'moodle - [https://moodleucl.uclouvain.be] \n'
@@ -128,7 +127,6 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         cls.luy_children_in_tree.append(cls.child_leave_node_11.child_leaf)
         cls.luy_children_with_direct_gathering = cls.luy_children_in_tree.copy()
         cls.luy_children_in_tree.append(cls.child_leave_node_111.child_leaf)
-
         cls.workbook_contains = \
             EducationGroupYearLearningUnitsContainedToExcel(cls.education_group_yr_root,
                                                             cls.education_group_yr_root,
@@ -202,7 +200,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         )
 
         expected_headers = \
-            FIX_TITLES + optional_header_for_required_entity + optional_header_for_allocation_entity +  \
+            FIX_TITLES + optional_header_for_required_entity + optional_header_for_allocation_entity + \
             optional_header_for_credits + optional_header_for_periodicity + optional_header_for_active + \
             optional_header_for_quadrimester + optional_header_for_session_derogation + optional_header_for_volume + \
             optional_header_for_teacher_list + optional_header_for_proposition + optional_header_for_english_title + \
@@ -250,13 +248,13 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
 
     def test_legend_workbook_style(self):
         data = _build_legend_sheet()
-        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Style(font=Font(color=CREATION_COLOR))), [1])
-        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Style(font=Font(color=MODIFICATION_COLOR))), [2])
-        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Style(font=Font(color=TRANSFORMATION_COLOR))), [3])
+        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Font(color=CREATION_COLOR)), [1])
+        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Font(color=MODIFICATION_COLOR)), [2])
+        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Font(color=TRANSFORMATION_COLOR)), [3])
         self.assertListEqual(
-            data.get(LEGEND_WB_STYLE).get(Style(font=Font(color=TRANSFORMATION_AND_MODIFICATION_COLOR))),
+            data.get(LEGEND_WB_STYLE).get(Font(color=TRANSFORMATION_AND_MODIFICATION_COLOR)),
             [4])
-        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Style(font=Font(color=SUPPRESSION_COLOR))), [5])
+        self.assertListEqual(data.get(LEGEND_WB_STYLE).get(Font(color=SUPPRESSION_COLOR)), [5])
 
     def test_no_optional_data_to_add(self):
         form = CustomXlsForm({})
@@ -321,7 +319,7 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
         content = data.get('content')
         self._assert_content_equals(content, exl)
         # First line (Header line) is always bold
-        self.assertListEqual(data.get('colored_cells')[Style(font=BOLD_FONT)], [0])
+        self.assertListEqual(data.get('font_rows')[BOLD_FONT], [0])
 
     def _assert_content_equals(self, content, exl):
         idx = 1
