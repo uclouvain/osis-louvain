@@ -102,10 +102,6 @@
             {% a_tag_has_perm delete_url _('Delete permanently') 'base.delete_all_educationgroup' user education_group_year.education_group %}
         </li>
 
-        {# Postponement link #}
-        <li class="divider"></li>
-        {% li_with_postpone_perm_training %}
-
         {# Generate PDF link #}
         <li class="divider"></li>
         {% url 'group_content' root_id=parent.id education_group_year_id=education_group_year.id as pdf_generate_url %}

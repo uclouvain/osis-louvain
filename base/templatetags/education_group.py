@@ -30,8 +30,7 @@ from django.urls import reverse
 from django.utils.translation import gettext as _
 
 from base.business.education_group import can_user_edit_administrative_data
-from base.business.education_groups.perms import is_eligible_to_postpone_education_group, \
-    is_eligible_to_change_education_group_content
+from base.business.education_groups.perms import is_eligible_to_change_education_group_content
 from base.models import program_manager
 from base.models.academic_year import AcademicYear
 from base.models.enums.education_group_types import GroupType
@@ -50,25 +49,6 @@ def have_only_access_to_certificate_aims(user, education_group_year):
     """
     return program_manager.is_program_manager(user, education_group=education_group_year.education_group) \
         and not any((user.is_superuser, user.person.is_faculty_manager, user.person.is_central_manager))
-
-
-@register.inclusion_tag('blocks/button/li_template.html', takes_context=True)
-def li_with_postpone_perm_training(context, url_id="link_postpone_training"):
-    root = context['root']
-    education_group_year = context['education_group_year']
-    url = reverse('postpone_education_group', args=[root.pk, education_group_year.pk])
-
-    try:
-        last_academic_year = education_group_year.academic_year.past()
-    except AcademicYear.DoesNotExist:
-        last_academic_year = "last year"
-
-    message = _('Copy the content from %(previous_anac)s to %(current_anac)s') % {
-        'previous_anac': str(last_academic_year),
-        'current_anac': str(education_group_year.academic_year)
-
-    }
-    return li_with_permission(context, is_eligible_to_postpone_education_group, url, message, url_id, True)
 
 
 def li_with_permission(context, permission, url, message, url_id, load_modal=False):

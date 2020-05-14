@@ -29,7 +29,6 @@ from django.utils.translation import gettext_lazy as _
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.models.education_group_year import EducationGroupYear
-from program_management.business.group_element_years import postponement
 
 ERRORS_MSG = {
     "base.add_educationgroup": _("The user does not have permission to create education groups."),
@@ -59,21 +58,6 @@ def _is_year_editable(education_group, raise_exception):
 
     result = error_msg is None
     can_raise_exception(raise_exception, result, error_msg)
-    return result
-
-
-def is_eligible_to_postpone_education_group(person, education_group, raise_exception=False):
-    result = person.user.has_perm('base.change_educationgroup', education_group)
-    if not result:
-        raise PermissionDenied()
-
-    try:
-        # Check if the education group is valid
-        postponement.PostponeContent(education_group.previous_year(), person)
-    except postponement.NotPostponeError as e:
-        result = False
-        if raise_exception:
-            raise PermissionDenied(str(e))
     return result
 
 
