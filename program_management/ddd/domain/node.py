@@ -133,6 +133,9 @@ class Node:
     def is_deepening(self) -> bool:
         return self.node_type == MiniTrainingType.DEEPENING
 
+    def is_minor_list_choice(self) -> bool:
+        return self.node_type == GroupType.MINOR_LIST_CHOICE
+
     def is_master_2m(self) -> bool:
         return self.node_type in set(TrainingType.root_master_2m_types_enum())
 

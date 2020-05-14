@@ -193,11 +193,11 @@ class ProgramTree:
         if link.block:
             return sorted([int(block) for block in str(link.block)])
         parents = self.get_parents(path)
-        for node in parents:
-            if node.is_minor() or node.is_deepening():
-                return [2, 3]
-
-        return list(range(1, int(self.root_node.duration / 2) + 1)) if self.root_node.duration else []
+        duration = list(range(1, int(self.root_node.duration / 2) + 1)) if self.root_node.duration else []
+        return next(
+            ([2, 3] for node in parents if node.is_minor() or node.is_deepening()),
+            duration
+        )
 
     def get_greater_block_value(self) -> int:
         all_links = self.get_all_links()

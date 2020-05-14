@@ -99,7 +99,8 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     def get_block(self, obj: 'Link'):
         tree = self.context.get('tree')
         path = self.context.get('path')
-        return tree.get_block(path) if obj.child.is_learning_unit() else []
+        child = obj.child
+        return tree.get_block(path) if child.is_learning_unit() or child.is_minor_list_choice() else []
 
     def get_comment(self, obj: 'Link'):
         field_suffix = '_english' if self.context.get('language') == settings.LANGUAGE_CODE_EN else ''
