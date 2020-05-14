@@ -186,6 +186,16 @@ class ProgramTree:
         finality_types = set(TrainingType.finality_types_enum())
         return self.get_all_nodes(types=finality_types)
 
+    def get_block(self, link: 'Link', path: Path) -> List[int]:
+        if link.block:
+            return sorted([int(block) for block in str(link.block)])
+        parents = self.get_parents(path)
+        for node in parents:
+            if node.is_minor() or node.is_deepening():
+                return [2, 3]
+
+        return list(range(1, int(self.root_node.duration / 2) + 1)) if self.root_node.duration else []
+
     def get_greater_block_value(self) -> int:
         all_links = self.get_all_links()
         if not all_links:

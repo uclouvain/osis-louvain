@@ -38,10 +38,10 @@ from program_management.ddd.business_types import *
 
 class RecursiveField(serializers.Serializer):
     def to_representation(self, value: 'Link'):
-        new_context = self.context.copy()
-        new_context.update({
-            'path': self.context['path'] + '|' + str(value.child.pk)
-        })
+        new_context = {
+            **self.context,
+            'path': "|".join([self.context['path'], str(value.child.pk)])
+        }
         if value.is_link_with_learning_unit():
             return LearningUnitNodeTreeSerializer(value, context=new_context).data
         return EducationGroupNodeTreeSerializer(value, context=new_context).data
@@ -97,16 +97,9 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
         return obj.relative_credits or absolute_credits or None
 
     def get_block(self, obj: 'Link'):
-        if obj.block:
-            return sorted([int(block) for block in str(obj.block)])
         tree = self.context.get('tree')
-        root_node = tree.root_node
-        parents = tree.get_parents(self.context.get('path'))
-        for node in parents:
-            if node.is_minor() or node.is_deepening():
-                return [2, 3]
-
-        return list(range(1, int(root_node.duration / 2) + 1)) if root_node.duration else []
+        path = self.context.get('path')
+        return tree.get_block(obj, path)
 
     def get_comment(self, obj: 'Link'):
         field_suffix = '_english' if self.context.get('language') == settings.LANGUAGE_CODE_EN else ''
