@@ -381,3 +381,13 @@ class TestIsDeepening(SimpleTestCase):
     def test_when_node_is_not_deepening(self):
         node = NodeGroupYearFactory(node_type=MiniTrainingType.ACCESS_MINOR)
         self.assertFalse(node.is_deepening())
+
+
+class TestIsMinorListChoice(SimpleTestCase):
+    def test_when_node_is_minor_list_choice(self):
+        node = NodeGroupYearFactory(node_type=GroupType.MINOR_LIST_CHOICE)
+        self.assertTrue(node.is_minor_list_choice())
+
+    def test_when_node_is_not_minor_list_choice(self):
+        node = NodeGroupYearFactory(node_type=MiniTrainingType.ACCESS_MINOR)
+        self.assertFalse(node.is_minor_list_choice())
