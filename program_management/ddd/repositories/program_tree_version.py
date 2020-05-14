@@ -23,14 +23,23 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.ddd.utils.business_validator import BusinessListValidator
-from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
+from education_group.models.group_year import GroupYear
+from osis_common.ddd import interface
+from program_management.ddd.business_types import *
+from program_management.ddd.repositories import load_tree
 
 
-class CreateProgramTreeVersionValidatorList(BusinessListValidator):
+class ProgramTreeVersionRepository(interface.AbstractRepository):
 
-    def __init__(self, year: int, version_name: str):
-        self.validators = [
-            VersionNameExistsValidator(year, version_name),
-        ]
-        super().__init__()
+    @classmethod
+    def get(cls, entity_id: 'ProgramTreeVersionIdentity') -> 'ProgramTreeVersion':
+        group_year = GroupYear.objects.filter(
+            partial_acronym=entity_id.code, academic_year__year=entity_id.year
+        ).select_related('education_group_version__education_group_year', 'academic_year')
+        # FIXME :: implement load_version into this function ProgramTreeVersionRepository.get()
+        return load_tree.load_version(
+            group_year.education_group_version.education_group_year.acronym,
+            group_year.academic_year.year,
+            group_year.education_group_version.version_name,
+            group_year.education_group_version.is_transition,
+        )

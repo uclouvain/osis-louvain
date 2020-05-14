@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from base.ddd.utils.business_validator import BusinessValidator
+from program_management.ddd.business_types import *
 from program_management.ddd.repositories.check_version_name_exists import check_version_name_exists
 
 
@@ -37,3 +38,9 @@ class VersionNameExistsValidator(BusinessValidator):
     def validate(self, *args, **kwargs):
         if check_version_name_exists(self.working_year, self.version_name):
             self.add_error_message("Acronym {} already exists".format(self.version_name))
+
+
+class IsProgramTreeVersionStandard(BusinessValidator):
+
+    def __init__(self, repository: 'ProgramTreeVersionRepository', from_tree_identity: 'ProgramTreeVersionIdentity'):
+        super(IsProgramTreeVersionStandard, self).__init__()

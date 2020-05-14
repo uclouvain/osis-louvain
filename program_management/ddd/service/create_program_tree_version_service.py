@@ -23,7 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionBuilder
+from program_management.ddd.business_types import *
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionBuilder
 from program_management.ddd.repositories import persist_program_tree_version
 from program_management.ddd.service.generate_node_code import generate_node_code
 from program_management.ddd.validators.program_tree_version import CreateProgramTreeVersionValidatorList
@@ -31,19 +32,17 @@ from program_management.models.education_group_version import EducationGroupVers
 from program_management.models.element import Element
 
 
-def create_program_version(from_tree: ProgramTreeVersion, title_fr: str, title_en: str, version_name: str,
-                           year: int) -> None:
-    validator = CreateProgramTreeVersionValidatorList(year, version_name)
+def create_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> 'ProgramTreeVersionIdentity':
+    validator = CreateProgramTreeVersionValidatorList(command.year, command.version_name, )
     if not validator.is_valid():
-        tree_version = init_program_tree_version(from_tree, title_fr, title_en, version_name, year)
-        persist_program_tree_version.persist(tree_version)
+        tree_version = init_program_tree_version(command)
+        program_tree_version_identity = persist_program_tree_version.persist(tree_version)
+        return program_tree_version_identity
 
 
-def init_program_tree_version(from_tree: ProgramTreeVersion, title_fr: str, title_en: str,
-                              version_name: str, year: int) -> ProgramTreeVersion:
+def init_program_tree_version(command: 'CreateProgramTreeVersionCommand') -> ProgramTreeVersion:
     builder = ProgramTreeVersionBuilder()
-    program_tree_version = builder.build_from(from_tree=from_tree, title_fr=title_fr, title_en=title_en,
-                                              version_name=version_name, year=year)
+    program_tree_version = builder.build_from(command)
     return program_tree_version
 
 

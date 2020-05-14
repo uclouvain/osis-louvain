@@ -25,20 +25,12 @@
 ##############################################################################
 from django.db import transaction
 
+from program_management.ddd.business_types import *
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersion
-from program_management.ddd.repositories import persist_tree
-from program_management.models.education_group_version import EducationGroupVersion
 
 
 @transaction.atomic
-def persist(program_tree_version: ProgramTreeVersion) -> None:
-    persist_tree.persist(program_tree_version.tree)
-    new_education_group_version = EducationGroupVersion(
-        version_name=program_tree_version.version_name,
-        title_fr=program_tree_version.title_fr,
-        title_en=program_tree_version.title_en,
-        offer=education_group_year,
-        is_transition=program_tree_version.is_transition,
-        root_group=new_groupyear
-    )
-    new_education_group_version.save()
+def persist(program_tree_version: ProgramTreeVersion) -> 'ProgramTreeVersionIdentity':
+    program_tree_version_identity = ProgramTreeVersionIdentity(code=program_tree_version.version_name,
+                                                               year=program_tree_version.year)
+    return program_tree_version_identity

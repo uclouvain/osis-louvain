@@ -23,14 +23,34 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.ddd.utils.business_validator import BusinessListValidator
-from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
+from osis_common.ddd import interface
 
 
-class CreateProgramTreeVersionValidatorList(BusinessListValidator):
+class FillInProgramTreeContentCommand(interface.CommandRequest):
+    def __init__(
+            self,
+            from_root_node_code: str,
+            from_root_node_year: int,
+            to_root_node_code: str,
+            to_root_node_year: int
+    ):
+        self.from_root_node_code = from_root_node_code
+        self.from_root_node_year = from_root_node_year
+        self.to_root_node_code = to_root_node_code
+        self.to_root_node_year = to_root_node_year
 
-    def __init__(self, year: int, version_name: str):
-        self.validators = [
-            VersionNameExistsValidator(year, version_name),
-        ]
-        super().__init__()
+
+class CreateProgramTreeVersionCommand(interface.CommandRequest):
+    def __init__(
+            self,
+            title_fr: str,
+            title_en: int,
+            version_name: str,
+            offer_id: int,
+            year: int
+    ):
+        self.title_fr = title_fr
+        self.title_en = title_en
+        self.version_name = version_name
+        self.offer_id = offer_id
+        self.year = year

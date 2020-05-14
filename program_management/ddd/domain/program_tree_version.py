@@ -23,8 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from osis_common.ddd import interface
 from program_management.ddd.business_types import *
+from program_management.ddd.validators.program_tree_version import CreateProgramTreeVersionValidatorList
 
 STANDARD = ""
 
@@ -32,29 +33,34 @@ STANDARD = ""
 class ProgramTreeVersionBuilder:
     _tree_version = None
 
-    def build_from(self, from_tree: 'ProgramTreeVersion', title_fr: str, title_en: str, version_name: str,
-                   year: int) -> 'ProgramTreeVersion':
-        assert isinstance(from_tree, ProgramTreeVersion)
-        assert from_tree.is_standard, "Forbidden to copy from a non Standard version"
-        if from_tree.is_transition:
-            self.program_tree_version = self._build_from_transition(from_tree.tree, title_fr, title_en, version_name,
-                                                                    year)
-        else:
-            self.program_tree_version = self._build_from_standard(from_tree.tree, title_fr, title_en, version_name,
-                                                                  year)
+    def build_from(self, command: 'CreateProgramTreeVersionCommand',
+                   repository: 'ProgramTreeVersionRepository') -> 'ProgramTreeVersion':
+        identity = ProgramTreeVersionIdentity()
+        validator = CreateProgramTreeVersionValidatorList(command.year, command.version_name)
+        if not validator.is_valid():
+            self.program_tree_version = self._build_from_standard(command)
         return self.program_tree_version
 
-    def _build_from_transition(self, title_fr: str, title_en: str, version_name: str,
-                               year: int) -> 'ProgramTreeVersion':
-        raise NotImplementedError()
-
-    def _build_from_standard(self, title_fr: str, title_en: str, version_name: str,
-                             year: int) -> 'ProgramTreeVersion':
+    def _build_from_standard(self, command: 'CreateProgramTreeVersionCommand'):
         root_node = NodeGroupYear()
         tree = ProgramTree(root_node)
-        program_tree_version = ProgramTreeVersion(tree=tree, title_fr=title_fr, title_en=title_en,
-                                                  version_name=version_name, year=year, is_transition=False)
+        program_tree_version = ProgramTreeVersion(tree=tree, title_fr=command.title_fr, title_en=command.title_en,
+                                                  offer=command.offer_id, version_name=command.version_name,
+                                                  year=command.year, is_transition=False)
         return program_tree_version
+
+
+# FIXME :: same identity than NodeIdentity and ProgramTreeIdentity
+class ProgramTreeVersionIdentity(interface.EntityIdentity):
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
+
+    def __hash__(self):
+        return hash(self.code + str(self.year))
+
+    def __eq__(self, other):
+        return self.code == other.code and self.year == other.year
 
 
 class ProgramTreeVersion:

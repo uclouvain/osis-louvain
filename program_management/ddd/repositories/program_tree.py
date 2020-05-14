@@ -23,14 +23,28 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from base.ddd.utils.business_validator import BusinessListValidator
-from program_management.ddd.validators._version_name_exists import VersionNameExistsValidator
+from osis_common.ddd import interface
+from program_management.ddd.business_types import *
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.repositories import persist_tree, load_tree
+from program_management.models.element import Element
 
 
-class CreateProgramTreeVersionValidatorList(BusinessListValidator):
+class ProgramTreeRepository(interface.AbstractRepository):
+    @classmethod
+    def create(cls, program_tree: 'ProgramTree') -> 'ProgramTreeIdentity':
+        persist_tree.persist(program_tree)
+        return program_tree.entity_id
 
-    def __init__(self, year: int, version_name: str):
-        self.validators = [
-            VersionNameExistsValidator(year, version_name),
-        ]
-        super().__init__()
+    @classmethod
+    def update(cls, program_tree: 'ProgramTree') -> 'ProgramTreeIdentity':
+        persist_tree.persist(program_tree)
+        return program_tree.entity_id
+
+    @classmethod
+    def get(cls, entity_id: 'ProgramTreeIdentity') -> 'ProgramTree':
+        tree_root_id = Element.objects.get(
+            group_year__code=entity_id.code,
+            group_year__academic_year__year=entity_id.year
+        ).pk
+        return load_tree.load(tree_root_id)
