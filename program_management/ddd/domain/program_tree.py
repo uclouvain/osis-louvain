@@ -186,7 +186,10 @@ class ProgramTree:
         finality_types = set(TrainingType.finality_types_enum())
         return self.get_all_nodes(types=finality_types)
 
-    def get_block(self, link: 'Link', path: Path) -> List[int]:
+    def get_block(self, path: Path) -> List[int]:
+        child = self.get_node(path)
+        parent = self.get_node(path.replace('|' + str(child.node_id), ''))
+        link = self.get_link(parent, child)
         if link.block:
             return sorted([int(block) for block in str(link.block)])
         parents = self.get_parents(path)
