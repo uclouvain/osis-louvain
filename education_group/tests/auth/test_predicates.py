@@ -13,7 +13,6 @@ from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
-from base.views.education_groups.create import create_education_group
 from education_group.auth import predicates
 from education_group.auth.roles.faculty_manager import FacultyManager
 from education_group.auth.scope import Scope
@@ -93,7 +92,7 @@ class TestUserAttachedToManagementEntity(TestCase):
             with_child=True
         )
         self.client.force_login(faculty_manager.person.user)
-        url = reverse(create_education_group, args=[
+        url = reverse('create_education_group', args=[
             egy.category, egy.education_group_type.pk, egy.pk, egy.pk
         ])
         response = self.client.get(url)
