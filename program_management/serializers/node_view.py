@@ -33,6 +33,7 @@ from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.models.enums.node_type import NodeType
+from program_management.ddd.business_types import *
 
 
 def serialize_children(children: List['Link'], path: str, context=None) -> List[dict]:
