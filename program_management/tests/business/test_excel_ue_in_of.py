@@ -36,7 +36,6 @@ from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import CREATION_COLOR, MODIFICATION_COLOR, TRANSFORMATION_COLOR, \
     TRANSFORMATION_AND_MODIFICATION_COLOR, SUPPRESSION_COLOR
 from base.models.enums import education_group_types
-from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, TrainingFactory, \
@@ -63,7 +62,7 @@ from program_management.business.excel_ue_in_of import EducationGroupYearLearnin
 from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.business.utils import html2text
 from program_management.forms.custom_xls import CustomXlsForm
-from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 PARTIAL_ACRONYM = 'Partial'
 
@@ -175,6 +174,9 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
             child_leaf=cls.luy
         )
         cls.hierarchy = EducationGroupHierarchy(root=cls.education_group_yr_root)
+        del cls.hierarchy._cache_entity_parent_root
+        del cls.hierarchy._cache_hierarchy
+        del cls.hierarchy._cache_structure
 
     def test_header_lines_without_optional_titles(self):
         custom_xls_form = CustomXlsForm({})
