@@ -30,7 +30,7 @@ from bs4 import BeautifulSoup
 from django.conf import settings
 from django.db.models import Subquery, OuterRef
 from django.utils.translation import gettext_lazy as _
-from openpyxl.styles import Style, Alignment
+from openpyxl.styles import Alignment
 
 from base.business.learning_unit_xls import XLS_DESCRIPTION, XLS_FILENAME
 from base.business.xls import get_name_or_username
@@ -63,8 +63,8 @@ def generate_xls_teaching_material(user, learning_units):
         xls_build.USER: get_name_or_username(user),
         xls_build.HEADER_TITLES: titles,
         xls_build.WS_TITLE: _("Teaching material"),
-        xls_build.STYLED_CELLS: {
-            Style(alignment=Alignment(wrap_text=True)): _get_text_wrapped_cells(len(rows)),
+        xls_build.ALIGN_CELLS: {
+            Alignment(wrap_text=True): _get_text_wrapped_cells(len(rows)),
         }
     }
 

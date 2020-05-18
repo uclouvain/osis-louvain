@@ -29,7 +29,7 @@ import bleach
 from django.conf import settings
 from django.db.models import Prefetch, Case, When, Value, IntegerField
 from django.utils.translation import gettext_lazy as _
-from openpyxl.styles import Alignment, Style
+from openpyxl.styles import Alignment
 from openpyxl.utils import get_column_letter
 
 from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
@@ -50,7 +50,7 @@ from osis_common.document import xls_build
 XLS_DESCRIPTION = _('Learning units list')
 XLS_FILENAME = _('LearningUnitsList')
 WORKSHEET_TITLE = _('Learning units list')
-WRAP_TEXT_STYLE = Style(alignment=Alignment(wrapText=True, vertical="top"), )
+WRAP_TEXT_ALIGN = Alignment(wrapText=True, vertical="top")
 CMS_ALLOWED_TAGS = []
 
 
@@ -69,8 +69,8 @@ def create_xls_educational_information_and_specifications(user, learning_units, 
                                          'start': 2,
                                          'stop': (len(learning_units)) + 1
                                          },
-                  xls_build.STYLED_CELLS: {
-                      WRAP_TEXT_STYLE: _get_wrapped_cells_educational_information_and_specifications(
+                  xls_build.ALIGN_CELLS: {
+                      WRAP_TEXT_ALIGN: _get_wrapped_cells_educational_information_and_specifications(
                           learning_units, len(titles)
                       )
                   }
