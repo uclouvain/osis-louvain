@@ -31,7 +31,7 @@ from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView
 
 from base.models.group_element_year import GroupElementYear
-from program_management.forms.group_element_year import GroupElementYearFormset
+from program_management.forms.tree.attach import GroupElementYearFormset
 from program_management.views import perms as group_element_year_perms
 from program_management.views.generic import GenericGroupElementYearMixin
 

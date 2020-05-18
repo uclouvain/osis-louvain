@@ -26,10 +26,10 @@
 from django.conf.urls import url
 from django.urls import include, path
 
+import program_management.views.tree.attach
 import program_management.views.tree.move
-from program_management.views import groupelementyear_create, groupelementyear_delete, groupelementyear_update, \
-    groupelementyear_read, element_utilization, groupelementyear_postpone, \
-    excel, search, tree
+from program_management.views import groupelementyear_delete, groupelementyear_update, \
+    groupelementyear_read, element_utilization, excel, search, tree
 from program_management.views.prerequisite import read, update
 from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
@@ -38,16 +38,14 @@ urlpatterns = [
     url(r'^copy_element/$', program_management.views.tree.move.copy_to_cache, name='copy_element'),
     url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
         url(r'^content/', include([
-            url(u'^attach/', groupelementyear_create.PasteElementFromCacheToSelectedTreeNode.as_view(),
+            url(u'^attach/', program_management.views.tree.attach.PasteElementFromCacheToSelectedTreeNode.as_view(),
                 name='education_group_attach'),
-            url(r'^check_attach/', groupelementyear_create.AttachCheckView.as_view(),
-                name="check_education_group_attach"),
-            url(u'^create/$', groupelementyear_create.CreateGroupElementYearView.as_view(),
+            url(u'^create/$', program_management.views.tree.attach.CreateGroupElementYearView.as_view(),
                 name='group_element_year_create'),
             url(r'^(?P<group_element_year_id>[0-9]+)/', include([
                 url(r'^delete/$', groupelementyear_delete.DetachGroupElementYearView.as_view(),
                     name='group_element_year_delete'),
-                url(r'^move/$', groupelementyear_create.MoveGroupElementYearView.as_view(),
+                url(r'^move/$', program_management.views.tree.attach.MoveGroupElementYearView.as_view(),
                     name='group_element_year_move'),
                 url(r'^update/$', groupelementyear_update.UpdateGroupElementYearView.as_view(),
                     name="group_element_year_update"),
@@ -55,14 +53,6 @@ urlpatterns = [
         ])),
         url(r'^group_content/', groupelementyear_read.ReadEducationGroupTypeView.as_view(), name="group_content"),
         url(r'^pdf_content/(?P<language>[a-z\-]+)', groupelementyear_read.pdf_content, name="pdf_content"),
-        url(r'^postpone/', groupelementyear_postpone.PostponeGroupElementYearView.as_view(),
-            name="postpone_education_group"),
-        url(r'^quick_search/', include([
-            url(r'^learning_unit/$', QuickSearchLearningUnitYearView.as_view(),
-                name="quick_search_learning_unit"),
-            url(r'^education_group/$', QuickSearchEducationGroupYearView.as_view(),
-                name="quick_search_education_group"),
-        ])),
     ])),
     url(r'^(?P<root_id>[0-9]+)/(?P<learning_unit_year_id>[0-9]+)/learning_unit/', include([
         url(r'^utilization/$',
@@ -101,7 +91,13 @@ urlpatterns = [
         path('<int:link_id>/', include([
             path('up/', program_management.views.tree.move.up, name="group_element_year_up"),
             path('down/', program_management.views.tree.move.down, name="group_element_year_down")
-        ]))
+        ])),
+        path('check_attach/', program_management.views.tree.attach.AttachCheckView.as_view(),
+             name="check_education_group_attach"),
+        path('<str:node_path>/quick_search/', include([
+            path('learning_unit/', QuickSearchLearningUnitYearView.as_view(), name="quick_search_learning_unit"),
+            path('education_group/', QuickSearchEducationGroupYearView.as_view(), name="quick_search_education_group"),
+        ])),
 
     ])),
 ]

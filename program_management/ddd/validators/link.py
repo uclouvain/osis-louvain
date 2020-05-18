@@ -18,6 +18,6 @@ class CreateLinkValidatorList(BusinessListValidator):
             ParentIsNotLeafValidator(parent_node, node_to_add),
             NodeDuplicationValidator(parent_node, node_to_add),
             ParentChildSameAcademicYearValidator(parent_node, node_to_add),
-            InfiniteRecursivityLinkValidator(parent_node, node_to_add)
+            InfiniteRecursivityLinkValidator(parent_node, node_to_add),
         ]
         super().__init__()

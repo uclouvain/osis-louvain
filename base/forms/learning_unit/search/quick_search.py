@@ -32,6 +32,7 @@ from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQue
 class QuickLearningUnitYearFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
         queryset=AcademicYear.objects.all(),
+        to_field_name="year",
         required=False,
         label=_('Ac yr.'),
         empty_label=pgettext_lazy("plural", "All"),

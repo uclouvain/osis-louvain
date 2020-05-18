@@ -214,6 +214,10 @@ class GroupType(EducationGroupTypesEnum):
         ]
 
     @classmethod
+    def minor_major_list_choice_enums(cls) -> List['GroupType']:
+        return [cls.MINOR_LIST_CHOICE, cls.MAJOR_LIST_CHOICE]
+
+    @classmethod
     def ordered(cls):
         return [
             cls.COMMON_CORE.name, cls.FINALITY_120_LIST_CHOICE.name, cls.FINALITY_180_LIST_CHOICE.name,

@@ -31,7 +31,6 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
-from program_management.ddd.domain.program_tree import build_path
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers.node_view import _get_node_view_attribute_serializer, \
     _get_leaf_view_attribute_serializer, \
@@ -82,7 +81,7 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
         self.assertEquals(self.serialized_data['detach_url'], expected_url)
 
     def test_serialize_node_attr_ensure_attach_url(self):
-        expected_url = reverse('education_group_attach', args=[self.root_node.pk, self.node_child.pk])
+        expected_url = reverse('education_group_attach', args=[self.root_node.pk, self.node_child.pk]) + "?path=1|2|6"
         self.assertEquals(self.serialized_data['attach_url'], expected_url)
 
     def test_serialize_node_attr_ensure_modify_url(self):
@@ -92,7 +91,7 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
         self.assertEquals(self.serialized_data['modify_url'], expected_url)
 
     def test_serializer_node_attr_ensure_search_url(self):
-        expected_url = reverse('quick_search_education_group', args=[self.root_node.pk, self.link.child.pk])
+        expected_url = reverse('quick_search_education_group', args=[self.root_node.pk, '1|2|6'])
         self.assertEquals(self.serialized_data['search_url'], expected_url)
 
     def test_serializer_node_attr_ensure_get_title(self):

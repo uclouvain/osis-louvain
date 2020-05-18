@@ -27,12 +27,12 @@ from django_filters import FilterSet, filters, OrderingFilter
 
 from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories
 
 
 class QuickEducationGroupYearFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
         queryset=AcademicYear.objects.all(),
+        to_field_name="year",
         required=False,
         label=_('Ac yr.'),
         empty_label=pgettext_lazy("plural", "All"),

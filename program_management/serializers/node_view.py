@@ -28,11 +28,9 @@ from typing import List
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
 
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
-from program_management.ddd.business_types import *
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.models.enums.node_type import NodeType
 
@@ -57,7 +55,7 @@ def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', context=None
         'element_id': link.child.pk,
         'element_type': link.child.type.name,
         'title': link.child.code,
-        'attach_url': reverse('education_group_attach', args=[context['root'].pk, link.child.pk]),
+        'attach_url': reverse('education_group_attach', args=[context['root'].pk, link.child.pk]) + "?path=%s" % path,
         'detach_url': reverse('tree_detach_node', args=[context['root'].pk]) + "?path=%s" % path,
         'modify_url': reverse('group_element_year_update', args=[context['root'].pk, link.child.pk, link.pk]),
         'attach_disabled': False,
@@ -66,7 +64,7 @@ def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', context=None
         'detach_msg': None,
         'modification_disabled': False,
         'modification_msg': None,
-        'search_url': reverse('quick_search_education_group', args=[context['root'].pk, link.child.pk]),
+        'search_url': reverse('quick_search_education_group', args=[context['root'].pk, path]),
     }
 
 
@@ -76,6 +74,7 @@ def _get_leaf_view_attribute_serializer(link: 'Link', path: str, context=None) -
         'path': path,
         'icon': None,
         'href': reverse('learning_unit_utilization', args=[context['root'].pk, link.child.pk]),
+        'attach_url': None,
         'has_prerequisite': link.child.has_prerequisite,
         'is_prerequisite': link.child.is_prerequisite,
         'css_class': __get_css_class(link),

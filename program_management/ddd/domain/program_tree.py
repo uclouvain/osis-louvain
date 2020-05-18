@@ -25,13 +25,16 @@
 ##############################################################################
 import copy
 from collections import Counter
-from typing import List, Set, Tuple
+from typing import List, Set, Tuple, Optional
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
+from base.models.enums.link_type import LinkTypes
+from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import prerequisite
+from program_management.ddd.service import command
 from program_management.ddd.validators._detach_root import DetachRootValidator
 from program_management.ddd.validators._path_validator import PathValidator
 from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
@@ -44,15 +47,29 @@ PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
 
 
-class ProgramTree:
+class ProgramTreeIdentity(interface.EntityIdentity):
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
+
+    def __hash__(self):
+        return hash(self.code + str(self.year))
+
+    def __eq__(self, other):
+        return self.code == other.code and self.year == other.year
+
+
+class ProgramTree(interface.RootEntity):
     root_node = None
     authorized_relationships = None
 
     def __init__(self, root_node: 'Node', authorized_relationships: AuthorizedRelationshipList = None):
         self.root_node = root_node
         self.authorized_relationships = authorized_relationships
+        # FIXME :: pass entity_id into the __init__ param !
+        super(ProgramTree, self).__init__(entity_id=ProgramTreeIdentity(self.root_node.code, self.root_node.year))
 
-    def __eq__(self, other):
+    def __eq__(self, other: 'ProgramTree'):
         return self.root_node == other.root_node
 
     def is_master_2m(self):
@@ -122,6 +139,25 @@ class ProgramTree:
                 node for node in self.get_all_nodes()
                 if node.node_id == node_id and node.type == node_type
             ),
+            None
+        )
+
+    def get_node_smallest_ordered_path(self, node: 'Node') -> Optional[Path]:
+        """
+        Return the smallest ordered path of node inside the tree.
+        The smallest ordered path would be the result of a depth-first
+        search of the path of the node with respect to the order of the links.
+        Meaning we will recursively search for the path node by searching
+        first in the descendants of the first child and so on.
+        :param node: Node
+        :return: A Path if node is present in tree. None if not.
+        """
+        if node == self.root_node:
+            return build_path(self.root_node)
+
+        nodes_by_path = self.root_node.descendents
+        return next(
+            (path for path, node_obj in nodes_by_path.items() if node_obj == node),
             None
         )
 
@@ -203,7 +239,7 @@ class ProgramTree:
         all_links = self.get_all_links()
         if not all_links:
             return 0
-        return max(l.block_max_value for l in all_links)
+        return max(link_obj.block_max_value for link_obj in all_links)
 
     def get_all_links(self) -> List['Link']:
         return _links_from_root(self.root_node)
@@ -218,23 +254,41 @@ class ProgramTree:
     def attach_node(
             self,
             node_to_attach: 'Node',
-            path: Path = None,
-            **link_attributes
+            path: Optional[Path],
+            attach_command: command.AttachNodeCommand
     ) -> List['BusinessValidationMessage']:
         """
         Add a node to the tree
         :param node_to_attach: Node to add on the tree
-        :param path: [Optional] The position where the node must be added
+        :param path: [Optional]The position where the node must be added
+        :param attach_command: an attach node command
         """
         parent = self.get_node(path) if path else self.root_node
         path = path or str(self.root_node.node_id)
-        is_valid, messages = self.clean_attach_node(node_to_attach, path)
+        link_type = attach_command.link_type
+        block = attach_command.block
+        is_valid, messages = self.clean_attach_node(node_to_attach, path, link_type, block)
         if is_valid:
-            parent.add_child(node_to_attach, **link_attributes)
+            parent.add_child(
+                node_to_attach,
+                access_condition=attach_command.access_condition,
+                is_mandatory=attach_command.is_mandatory,
+                block=attach_command.block,
+                link_type=attach_command.link_type,
+                comment=attach_command.comment,
+                comment_english=attach_command.comment_english,
+                relative_credits=attach_command.relative_credits
+            )
         return messages
 
-    def clean_attach_node(self, node_to_attach: 'Node', path: Path) -> Tuple[bool, List['BusinessValidationMessage']]:
-        validator = AttachNodeValidatorList(self, node_to_attach, path)
+    def clean_attach_node(
+            self,
+            node_to_attach: 'Node',
+            path: Path,
+            link_type: Optional[LinkTypes],
+            block: Optional[int]
+    ) -> Tuple[bool, List['BusinessValidationMessage']]:
+        validator = AttachNodeValidatorList(self, node_to_attach, path, link_type, block)
         return validator.is_valid(), validator.messages
 
     def set_prerequisite(

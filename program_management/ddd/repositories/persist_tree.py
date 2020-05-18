@@ -26,11 +26,13 @@
 from django.db import transaction
 
 from base.models.group_element_year import GroupElementYear
+from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.node import Node, NodeEducationGroupYear, NodeLearningUnitYear
 from program_management.ddd.repositories import _persist_prerequisite
 
 
+@deprecated  # use ProgramTreeRepository.create() or .update() instead
 @transaction.atomic
 def persist(tree: program_tree.ProgramTree) -> None:
     __update_or_create_links(tree.root_node)

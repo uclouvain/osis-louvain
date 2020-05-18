@@ -73,8 +73,8 @@ class BusinessValidator(ABC):
         return not self.error_messages
 
     def add_message(self, msg: BusinessValidationMessage):
-        assert msg.level != MessageLevel.SUCCESS, "please redefine the 'success_messages' property instead"
-        self._messages.append(msg)
+        if msg.level != MessageLevel.SUCCESS:
+            self._messages.append(msg)
 
     def add_error_message(self, msg: str):
         self._messages.append(BusinessValidationMessage(msg, level=MessageLevel.ERROR))

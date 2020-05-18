@@ -27,7 +27,6 @@
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
-from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.validators._node_duplication import NodeDuplicationValidator
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
@@ -48,7 +47,9 @@ class TestNodeDuplicationValidator(SimpleTestCase):
             node_to_attach
         )
         self.assertFalse(validator.is_valid())
-        expected_result = _("You can not add the same child several times.")
+        expected_result = _("You can not add the same child %(child_node)s several times.") % {
+            "child_node": node_to_attach
+        }
         self.assertEqual(expected_result, validator.error_messages[0])
 
     def test_when_node_already_exists_in_other_group_of_the_same_tree(self):

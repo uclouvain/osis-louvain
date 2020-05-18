@@ -28,12 +28,12 @@ from unittest.mock import patch
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
-from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage, BusinessValidationMessageList
+from base.ddd.utils.validation_message import MessageLevel, BusinessValidationMessage
 from base.models.enums.education_group_types import TrainingType
 from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.program_tree import build_path, ProgramTree
 from program_management.ddd.service import detach_node_service
-from program_management.ddd.validators._has_or_is_prerequisite import IsPrerequisiteValidator
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipListFactory
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
@@ -48,7 +48,10 @@ class TestDetachNode(SimpleTestCase, ValidatorPatcherMixin):
             node_id=1
         )
         self.link = LinkFactory(parent=self.root_node, child=NodeLearningUnitYearFactory(node_id=2))
-        self.tree = ProgramTreeFactory(root_node=self.root_node)
+        self.tree = ProgramTreeFactory(
+            root_node=self.root_node,
+            authorized_relationships=AuthorizedRelationshipListFactory()
+        )
         self.root_path = str(self.root_node.node_id)
         self.node_to_detach = self.link.child
         self.path_to_detach = build_path(self.link.parent, self.link.child)

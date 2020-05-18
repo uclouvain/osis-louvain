@@ -211,14 +211,6 @@ class TestAttachFinalityEducationGroupYearStrategy(TestCase):
         with self.assertRaises(ValidationError):
             self.assertTrue(strategy.is_valid())
 
-    def test_is_invalid_case_attach_element_to_itself(self):
-        duplicate = AttachEducationGroupYearStrategy(
-            parent=self.finality_group,
-            child=self.finality_group
-        )
-        with self.assertRaises(ValidationError):
-            self.assertTrue(duplicate.is_valid())
-
     def test_is_not_valid_case_attach_groups_which_contains_finalities_which_have_end_year_greater_than_root(self):
         subgroup = GroupFactory(education_group_type__name=GroupType.SUB_GROUP.name, academic_year=self.academic_year_2018)
         master_120_didactic = TrainingFactory(

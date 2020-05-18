@@ -45,7 +45,7 @@ from reversion.models import Version
 
 from base import models as mdl
 from base.business import education_group as education_group_business
-from base.business.education_groups import perms, general_information
+from base.business.education_groups import general_information
 from base.business.education_groups.general_information import PublishException
 from base.business.education_groups.general_information_sections import SECTION_LIST, \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION, SECTIONS_PER_OFFER_TYPE, CONTACTS
@@ -178,6 +178,7 @@ class EducationGroupGenericDetailView(PermissionRequiredMixin, DetailView, Catal
                 self.object.id,
                 node_type.NodeType.EDUCATION_GROUP
             )
+            context["node_path"] = program_tree.get_node_smallest_ordered_path(context["current_node"])
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['can_change_education_group'] = self.request.user.has_perm(
             'base.change_educationgroup',

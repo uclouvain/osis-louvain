@@ -113,10 +113,10 @@ class TestBusinessValidator(SimpleTestCase):
             "Success message is an attribute of the class ; it is a static value, it can't be removed."
         )
 
-    def test_add_message_when_arg_is_success_message(self):
+    def test_success_message_to_add_should_be_ignored(self):
         validator = ValidatorTest()
-        with self.assertRaises(AssertionError):
-            validator.add_message(BusinessValidationMessage("Success", MessageLevel.SUCCESS))
+        validator.add_message(BusinessValidationMessage("Success", MessageLevel.SUCCESS))
+        self.assertNotIn("Success", validator.messages)
 
     def test_add_message_when_arg_is_not_success_message(self):
         validator = ValidatorTest()

@@ -24,10 +24,9 @@
 #
 ##############################################################################
 from django.test import SimpleTestCase
-from mock import patch
 
-from program_management.ddd.domain import program_tree_version
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionBuilder
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionBuilder, \
+    ProgramTreeVersionIdentity, STANDARD
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -35,13 +34,20 @@ class TestInit(SimpleTestCase):
     def setUp(self):
         self.tree = ProgramTreeFactory()
 
+        self.standard_version_identity = ProgramTreeVersionIdentity(
+            offer_acronym='DROI2M',
+            year=2020,
+            version_name=STANDARD,
+            is_transition=False
+        )
+
     def test_default_version_name_value(self):
-        obj = ProgramTreeVersion(self.tree)
+        obj = ProgramTreeVersion(self.standard_version_identity)
         error_msg = "By default, a tree version instance is a 'Standard' version, identified by an empty name."
         self.assertEqual(obj.version_name, '', error_msg)
 
     def test_default_transition_value(self):
-        obj = ProgramTreeVersion(self.tree)
+        obj = ProgramTreeVersion(self.standard_version_identity)
         error_msg = "By default, a tree version instance is not a transition program."
         self.assertFalse(obj.is_transition, error_msg)
 
@@ -51,28 +57,18 @@ class TestBuilderBuildFrom(SimpleTestCase):
     def setUp(self):
         self.tree = ProgramTreeFactory()
         self.builder = ProgramTreeVersionBuilder()
+        self.version_identity = ProgramTreeVersionIdentity(
+            offer_acronym='DROI2M',
+            year=2020,
+            version_name="NOT_STANDARD",
+            is_transition=False
+        )
 
     def test_when_tree_is_incorrect_type(self):
         with self.assertRaises(AssertionError):
             self.builder.build_from("bad arg")
 
     def test_when_tree_is_not_standard(self):
-        tree = ProgramTreeVersion(self.tree, version_name="CEMS")
+        tree = ProgramTreeVersion(self.version_identity)
         with self.assertRaises(AssertionError):
             self.builder.build_from(tree)
-
-    @patch.object(program_tree_version.ProgramTreeVersionBuilder, '_build_from_transition')
-    @patch.object(program_tree_version.ProgramTreeVersionBuilder, '_build_from_standard')
-    def test_when_tree_is_transition(self, mock_standard, mock_transition):
-        tree = ProgramTreeVersion(self.tree, is_transition=True)
-        self.builder.build_from(tree)
-        self.assertTrue(mock_transition.called)
-        self.assertFalse(mock_standard.called)
-
-    @patch.object(program_tree_version.ProgramTreeVersionBuilder, '_build_from_transition')
-    @patch.object(program_tree_version.ProgramTreeVersionBuilder, '_build_from_standard')
-    def test_when_tree_is_not_transition(self, mock_standard, mock_transition):
-        tree = ProgramTreeVersion(self.tree, is_transition=False)
-        self.builder.build_from(tree)
-        self.assertFalse(mock_transition.called)
-        self.assertTrue(mock_standard.called)

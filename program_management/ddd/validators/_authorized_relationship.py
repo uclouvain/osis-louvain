@@ -31,7 +31,6 @@ from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.business_types import *
 
 
-# Implemented from CheckAuthorizedRelationship (management.py)
 class AttachAuthorizedRelationshipValidator(BusinessValidator):
     def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', position_to_add: 'Node'):
         super(AttachAuthorizedRelationshipValidator, self).__init__()
@@ -43,7 +42,9 @@ class AttachAuthorizedRelationshipValidator(BusinessValidator):
     def validate(self):
         if not self.auth_relations.is_authorized(self.parent.node_type, self.node_to_add.node_type):
             self.add_error_message(
-                _("You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
+                _("You cannot add \"%(child)s\" of type \"%(child_types)s\" "
+                  "to \"%(parent)s\" of type \"%(parent_type)s\"") % {
+                    'child': self.node_to_add,
                     'child_types': self.node_to_add.node_type.value,
                     'parent': self.parent,
                     'parent_type': self.parent.node_type.value,
@@ -51,8 +52,9 @@ class AttachAuthorizedRelationshipValidator(BusinessValidator):
             )
         if self.is_maximum_children_types_reached(self.parent, self.node_to_add):
             self.add_error_message(
-                _("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
-                  "has already reached the limit.") % {
+                _("Cannot add \"%(child)s\" because the number of children of type(s) \"%(child_types)s\" "
+                  "for \"%(parent)s\" has already reached the limit.") % {
+                    'child': self.node_to_add,
                     'child_types': self.node_to_add.node_type.value,
                     'parent': self.parent
                 }
@@ -67,7 +69,27 @@ class AttachAuthorizedRelationshipValidator(BusinessValidator):
         return current_count == relation.max_count_authorized
 
 
-# Implemented from CheckAuthorizedRelationship (management.py)
+class AuthorizedRelationshipLearningUnitValidator(BusinessValidator):
+    def __init__(self, tree: 'ProgramTree', node_to_attach: 'Node', position_to_attach_from: 'Node'):
+        super().__init__()
+        self.tree = tree
+        self.node_to_attach = node_to_attach
+        self.position_to_attach_from = position_to_attach_from
+
+    def validate(self):
+        if not self.tree.authorized_relationships.is_authorized(
+                self.position_to_attach_from.node_type,
+                self.node_to_attach.node_type
+        ):
+            self.add_error_message(
+                _("You can not attach a learning unit like %(node)s to element %(parent)s of type %(type)s.") % {
+                    "node": self.node_to_attach,
+                    "parent": self.position_to_attach_from,
+                    "type": self.position_to_attach_from.node_type.value
+                }
+            )
+
+
 class DetachAuthorizedRelationshipValidator(BusinessValidator):
     def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node', detach_from: 'Node'):
         super(DetachAuthorizedRelationshipValidator, self).__init__()
@@ -102,8 +124,3 @@ class DetachAuthorizedRelationshipValidator(BusinessValidator):
                 types_minimum_reached.append(child_type)
 
         return types_minimum_reached
-
-
-class AuthorizedRelationshipLearningUnitValidator(BusinessValidator):
-    def validate(self):
-        pass  # cf. AttachLearningUnitYearStrategy.id_valid  # TODO :: to implement !

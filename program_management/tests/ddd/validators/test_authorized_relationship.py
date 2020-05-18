@@ -32,11 +32,11 @@ from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.enums.link_type import LinkTypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from program_management.ddd.validators._authorized_relationship import AttachAuthorizedRelationshipValidator, \
-    DetachAuthorizedRelationshipValidator
+    DetachAuthorizedRelationshipValidator, AuthorizedRelationshipLearningUnitValidator
 from program_management.models.enums.node_type import NodeType
-from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipFactory
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
@@ -54,7 +54,7 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
             year=self.academic_year.year,
         )
         self.authorized_relationships = AuthorizedRelationshipList([
-            AuthorizedRelationshipFactory(
+            AuthorizedRelationshipObjectFactory(
                 parent_type=self.authorized_parent.node_type,
                 child_type=self.authorized_child.node_type,
                 max_constraint=1,
@@ -78,11 +78,13 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
         unauthorized_child = NodeGroupYearFactory(node_type=GroupType.COMPLEMENTARY_MODULE)
         validator = AttachAuthorizedRelationshipValidator(self.tree, unauthorized_child, self.authorized_parent)
         self.assertFalse(validator.is_valid())
-        error_msg = _("You cannot add \"%(child_types)s\" to \"%(parent)s\" (type \"%(parent_type)s\")") % {
-            'child_types': unauthorized_child.node_type.value,
-            'parent': self.authorized_parent,
-            'parent_type': self.authorized_parent.node_type.value,
-        }
+        error_msg = _("You cannot add \"%(child)s\" of type \"%(child_types)s\" "
+                      "to \"%(parent)s\" of type \"%(parent_type)s\"") % {
+                        'child': unauthorized_child,
+                        'child_types': unauthorized_child.node_type.value,
+                        'parent': self.authorized_parent,
+                        'parent_type': self.authorized_parent.node_type.value
+                    }
 
         self.assertIn(error_msg, validator.error_messages)
 
@@ -114,13 +116,54 @@ class TestAttachAuthorizedRelationshipValidator(SimpleTestCase):
 
         self.assertFalse(validator.is_valid())
 
-        max_error_msg = _("The number of children of type(s) \"%(child_types)s\" for \"%(parent)s\" "
-                          "has already reached the limit.") % {
+        max_error_msg = _(
+            "Cannot add \"%(child)s\" because the number of children of type(s) \"%(child_types)s\" "
+            "for \"%(parent)s\" has already reached the limit.") % {
+                            'child': another_authorized_child,
                             'child_types': another_authorized_child.node_type.value,
                             'parent': self.authorized_parent
                         }
+
         self.assertIn(max_error_msg, validator.error_messages)
         self.assertEqual(len(validator.error_messages), 1)
+
+
+class TestAuthorizedRelationshipLearningUnitValidator(SimpleTestCase):
+    def test_when_parent_node_do_not_allow_learning_unit_as_children_should_be_not_valid(self):
+        root_node = NodeGroupYearFactory()
+        authorized_relationships = AuthorizedRelationshipList([
+            AuthorizedRelationshipObjectFactory(
+                parent_type=root_node.node_type,
+                child_type=root_node.node_type,
+            )
+        ])
+        tree = ProgramTreeFactory(root_node=root_node, authorized_relationships=authorized_relationships)
+        node_to_add = NodeLearningUnitYearFactory()
+        validator = AuthorizedRelationshipLearningUnitValidator(tree, node_to_add, tree.root_node)
+
+        self.assertFalse(validator.is_valid())
+
+        error_msg_expected = _("You can not attach a learning unit like %(node)s "
+                               "to element %(parent)s of type %(type)s.") % {
+                                 "node": node_to_add,
+                                 "parent": tree.root_node,
+                                 "type": tree.root_node.node_type.value
+                             }
+        self.assertIn(error_msg_expected, validator.error_messages)
+
+    def test_when_parent_node_allows_learning_unit_as_children_then_should_be_valid(self):
+        root_node = NodeGroupYearFactory()
+        authorized_relationships = AuthorizedRelationshipList([
+            AuthorizedRelationshipObjectFactory(
+                parent_type=root_node.node_type,
+                child_type=NodeType.LEARNING_UNIT,
+            )
+        ])
+        tree = ProgramTreeFactory(root_node=root_node, authorized_relationships=authorized_relationships)
+        node_to_add = NodeLearningUnitYearFactory()
+        validator = AuthorizedRelationshipLearningUnitValidator(tree, node_to_add, tree.root_node)
+
+        self.assertTrue(validator.is_valid())
 
 
 class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
@@ -137,17 +180,17 @@ class TestDetachAuthorizedRelationshipValidator(SimpleTestCase):
             year=self.academic_year.year,
         )
         self.authorized_relationships = AuthorizedRelationshipList([
-            AuthorizedRelationshipFactory(
+            AuthorizedRelationshipObjectFactory(
                 parent_type=self.authorized_parent.node_type,
                 child_type=self.authorized_child.node_type,
                 min_constraint=1,
             ),
-            AuthorizedRelationshipFactory(
+            AuthorizedRelationshipObjectFactory(
                 parent_type=self.authorized_child.node_type,
                 child_type=GroupType.SUB_GROUP,
                 min_constraint=1,
             ),
-            AuthorizedRelationshipFactory(
+            AuthorizedRelationshipObjectFactory(
                 parent_type=self.authorized_child.node_type,
                 child_type=NodeType.LEARNING_UNIT,
                 min_constraint=1,

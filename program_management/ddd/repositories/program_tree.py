@@ -23,21 +23,39 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
+from typing import Optional, List
 
-from base.ddd.utils.business_validator import BusinessValidator
+from osis_common.ddd import interface
+from osis_common.ddd.interface import Entity
 from program_management.ddd.business_types import *
+from program_management.ddd.repositories import persist_tree, load_tree
+from program_management.models.element import Element
 
 
-class NodeDuplicationValidator(BusinessValidator):
+class ProgramTreeRepository(interface.AbstractRepository):
 
-    def __init__(self, parent_node: 'Node', node_to_add: 'Node'):
-        super(NodeDuplicationValidator, self).__init__()
-        self.node_to_add = node_to_add
-        self.parent_node = parent_node
+    @classmethod
+    def search(cls, entity_ids: Optional[List['ProgramTreeIdentity']] = None, **kwargs) -> List[Entity]:
+        raise NotImplementedError
 
-    def validate(self):
-        if self.node_to_add in self.parent_node.children_as_nodes:
-            self.add_error_message(
-                _("You can not add the same child %(child_node)s several times.") % {"child_node": self.node_to_add}
-            )
+    @classmethod
+    def delete(cls, entity_id: 'ProgramTreeIdentity') -> None:
+        raise NotImplementedError
+
+    @classmethod
+    def create(cls, program_tree: 'ProgramTree') -> 'ProgramTreeIdentity':
+        persist_tree.persist(program_tree)
+        return program_tree.entity_id
+
+    @classmethod
+    def update(cls, program_tree: 'ProgramTree') -> 'ProgramTreeIdentity':
+        persist_tree.persist(program_tree)
+        return program_tree.entity_id
+
+    @classmethod
+    def get(cls, entity_id: 'ProgramTreeIdentity') -> 'ProgramTree':
+        tree_root_id = Element.objects.get(
+            group_year__partial_acronym=entity_id.code,
+            group_year__academic_year__year=entity_id.year
+        ).pk
+        return load_tree.load(tree_root_id)

@@ -38,7 +38,9 @@ def load() -> AuthorizedRelationshipList:  # TODO :: add unit tests
         'min_count_authorized',
         'max_count_authorized',
     )
-    parent_types_with_authorized_learn_unit = set(EducationGroupType.objects.all().values_list('name', flat=True))
+    parent_types_with_authorized_learn_unit = set(
+        EducationGroupType.objects.filter(learning_unit_child_allowed=True).values_list('name', flat=True)
+    )
     for obj in qs:
         parent_type_name = obj['parent_type__name']
         authorized_relationships.append(

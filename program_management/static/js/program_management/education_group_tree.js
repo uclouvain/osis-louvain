@@ -277,7 +277,7 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
                             "title": $node.a_attr.attach_msg,
                             "_disabled": function (data) {
                                 let __ret = get_data_from_tree(data);
-                                return __ret.attach_disabled === true;
+                                return __ret.attach_url == null;
                             }
                         },
 

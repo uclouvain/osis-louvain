@@ -28,6 +28,10 @@ from enum import Enum
 
 class ChoiceEnum(Enum):
     @classmethod
+    def all(cls):
+        return list(cls)
+
+    @classmethod
     def choices(cls):
         return tuple((x.name, x.value) for x in cls)
 

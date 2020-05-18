@@ -23,22 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from collections import Counter
+import re
 
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
 from django.db import models, connection
 from django.db.models import Q
-from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
-from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import quadrimesters
-from base.models.enums.education_group_types import GroupType, MiniTrainingType, TrainingType
+from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.enums.link_type import LinkTypes
 from base.utils.db import dict_fetchall
 from osis_common.models.osis_model_admin import OsisModelAdmin
@@ -61,35 +58,20 @@ class GroupElementYearAdmin(VersionAdmin, OsisModelAdmin):
     list_filter = ('is_mandatory', 'access_condition', 'parent__academic_year')
 
 
-def validate_block_value(value):
+#  FIXME Kept around as a migration reference this function.
+#        To be removed when migrations are squashed.
+def validate_block_value(value: int):
     max_authorized_value = 6
+    block_regex = r"1?2?3?4?5?6?"
+    str_value = str(value)
+    match_result = re.fullmatch(block_regex, str_value)
     _error_msg = _(
         "Please register a maximum of %(max_authorized_value)s digits in ascending order, "
         "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46"
     ) % {'max_authorized_value': max_authorized_value}
 
-    MinValueValidator(1, message=_error_msg)(value)
-    if not all([
-        _check_integers_max_authorized_value(value, max_authorized_value),
-        _check_integers_duplications(value),
-        _check_integers_orders(value),
-    ]):
+    if not match_result:
         raise ValidationError(_error_msg)
-
-
-def _check_integers_max_authorized_value(value, max_authorized_value):
-    return all(int(char) <= max_authorized_value for char in str(value))
-
-
-def _check_integers_duplications(value):
-    if any(integer for integer, occurence in Counter(str(value)).items() if occurence > 1):
-        return False
-    return True
-
-
-def _check_integers_orders(value):
-    digit_values = [int(char) for char in str(value)]
-    return list(sorted(digit_values)) == digit_values
 
 
 class GroupElementYearManager(models.Manager):
@@ -389,7 +371,6 @@ class GroupElementYear(OrderedModel):
         blank=True,
         null=True,
         verbose_name=_("Block"),
-        validators=[validate_block_value]
     )
 
     access_condition = models.BooleanField(
@@ -426,54 +407,18 @@ class GroupElementYear(OrderedModel):
 
     objects = GroupElementYearManager()
 
-    def __str__(self):
-        return "{} - {}".format(self.parent, self.child)
-
-    @property
-    def verbose_comment(self):
-        if self.comment_english and translation.get_language() == LANGUAGE_CODE_EN:
-            return self.comment_english
-        return self.comment
-
     class Meta:
         unique_together = (('parent', 'child_branch'), ('parent', 'child_leaf'))
         ordering = ('order',)
-
-    def save(self, force_insert=False, force_update=False, using=None, update_fields=None):
-        self.clean()
-        return super().save(force_insert, force_update, using, update_fields)
-
-    # DEPRECATED Move all those validations into forms with ddd validators
-    def clean(self):
-        if self.child_branch and self.child_leaf:
-            raise ValidationError(_("It is forbidden to save a GroupElementYear with a child branch and a child leaf."))
-
-        if self.child_branch == self.parent:
-            raise ValidationError(_("It is forbidden to add an element to itself."))
-
-        if self.parent and self.child_branch in self.parent.ascendants_of_branch:
-            raise ValidationError(_("It is forbidden to add an element to one of its included elements."))
-
-        if self.child_leaf and self.link_type == LinkTypes.REFERENCE.name:
-            raise ValidationError(
-                {'link_type': _("You are not allowed to create a reference with a learning unit")}
+        constraints = [
+            models.CheckConstraint(
+                check=~models.Q(child_branch__isnull=False, child_leaf__isnull=False),
+                name="child_branch_xor_child_leaf"
             )
-        self._check_same_academic_year_parent_child_branch()
+        ]
 
-    def _check_same_academic_year_parent_child_branch(self):
-        if (self.parent and self.child_branch) and \
-                (self.parent.academic_year.year != self.child_branch.academic_year.year):
-            raise ValidationError(_("It is prohibited to attach a group, mini-training or training to an element of "
-                                    "another academic year."))
-
-        self._clean_link_type()
-
-    def _clean_link_type(self):
-        if getattr(self.parent, 'type', None) in [GroupType.MINOR_LIST_CHOICE.name,
-                                                  GroupType.MAJOR_LIST_CHOICE.name] and \
-                isinstance(self.child, EducationGroupYear) and self.child.type in MiniTrainingType.minors() + \
-                [MiniTrainingType.FSA_SPECIALITY.name, MiniTrainingType.DEEPENING.name]:
-            self.link_type = LinkTypes.REFERENCE.name
+    def __str__(self):
+        return "{} - {}".format(self.parent, self.child)
 
     @cached_property
     def child(self):

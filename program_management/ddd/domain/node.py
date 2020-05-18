@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from _decimal import Decimal
+from collections import OrderedDict
 from typing import List, Set, Dict
 
 from base.models.enums.education_group_categories import Categories
@@ -86,6 +87,8 @@ class Node:
         self.year = year
         self.credits = credits
         self._deleted_children = set()
+        # FIXME :: pass entity_id into the __init__ param !
+        super(Node, self).__init__(entity_id=NodeIdentity(self.code, self.year))
 
     def __eq__(self, other):
         return (self.node_id, self.__class__) == (other.node_id, other.__class__)
@@ -141,6 +144,12 @@ class Node:
 
     def is_option(self) -> bool:
         return self.node_type == MiniTrainingType.OPTION
+
+    def is_training(self) -> bool:
+        return self.node_type in TrainingType.all()
+
+    def is_minor_major_list_choice(self) -> bool:
+        return self.node_type in GroupType.minor_major_list_choice_enums()
 
     def get_all_children(
             self,
@@ -237,7 +246,7 @@ class Node:
 
 
 def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path', 'Node']:
-    _descendents = {}
+    _descendents = OrderedDict()
     if current_path is None:
         current_path = str(root_node.pk)
 

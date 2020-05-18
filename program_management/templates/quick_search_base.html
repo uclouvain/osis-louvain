@@ -77,53 +77,56 @@
 
 {% block script %}
     {# Must define column_def variable in js and also quick_search_url #}
-<script src="{% static "js/osis_datatable.js" %}"></script>
-<script>
-    $(document).ready(function()
-    {
-        document.getElementById("modal_dialog_id").classList.add("modal-lg");
+    <script src="{% static "js/osis_datatable.js" %}"></script>
+    <script>
+        $(document).ready(function () {
+            document.getElementById("modal_dialog_id").classList.add("modal-lg");
 
-       initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
-            {{ paginator.per_page }}, "{{ request.path }}", columnDefs);
+            initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
+                {{ paginator.per_page }}, "{{ request.path }}", columnDefs);
 
-        let checkUrl = "{% url 'check_education_group_attach' root_id education_group_year_id %}";
-        let attachUrl = "{% url 'group_element_year_create' root_id education_group_year_id %}";
+            let checkUrl = "{% url 'check_education_group_attach' root_id %}";
+            let attachUrl = "{% url 'tree_attach_node' root_id %}";
 
-        $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
+            $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
 
-        $("#search-pagination li a[href]").each(function(index, paginationAnchor){
-            paginationAnchor.addEventListener('click', function submitWithPage(e){
-                e.preventDefault();
-                const paginationHref = paginationAnchor.getAttribute("href");
-                const searchParams = new URLSearchParams(paginationHref);
-                const page = searchParams.get("page");
-                $("input[name='page']").val(page);
-                $('#form-modal').submit();
+            $("#search-pagination li a[href]").each(function (index, paginationAnchor) {
+                paginationAnchor.addEventListener('click', function submitWithPage(e) {
+                    e.preventDefault();
+                    const paginationHref = paginationAnchor.getAttribute("href");
+                    const searchParams = new URLSearchParams(paginationHref);
+                    const page = searchParams.get("page");
+                    $("input[name='page']").val(page);
+                    $('#form-modal').submit();
+                });
             });
-        });
 
-        function attachElementSelected(checkUrl, attachUrl){
-            return function(){
-                const elementsUrl = $("input[name=selected-item]:checked").map(function(){return $(this).attr("data-url");}).get();
-                const parameters = extract_ids_and_content_type_parameters(elementsUrl);
-                const paramString = new URLSearchParams();
-                paramString.append("content_type", parameters["content_type"]);
-                for (let index in parameters["id"]){
-                    paramString.append("id", parameters["id"][index]);
-                }
+            function attachElementSelected(checkUrl, attachUrl) {
+                return function () {
+                    const elementsUrl = $("input[name=selected-item]:checked").map(function () {
+                        return $(this).attr("data-url");
+                    }).get();
+                    const parameters = extract_ids_and_content_type_parameters(elementsUrl);
+                    const paramString = new URLSearchParams();
+                    paramString.append("content_type", parameters["content_type"]);
+                    paramString.append("path", "{{ node_path }}");
+                    for (let index in parameters["id"]) {
+                        paramString.append("id", parameters["id"][index]);
+                    }
 
-                $.ajax({
-                    url: `${checkUrl}?${paramString.toString()}`
-                }).done(function(jsonResponse){
-                    const error_messages = jsonResponse["error_messages"];
-                    if (error_messages.length > 0) {
-                        const $span_messages = $("#message_info_modal");
-                        $span_messages.removeAttr("style");
-                        $span_messages.text("");
-                        error_messages.forEach(function (message) {
-                            $span_messages.append(`<p>${message}</p>`);
-                        });
-                    } else {
+                    $.ajax({
+                        url: `${checkUrl}?${paramString.toString()}`,
+                        dataType: 'json'
+                    }).done(function (jsonResponse) {
+                        const error_messages = jsonResponse["error_messages"];
+                        if (error_messages.length > 0) {
+                            const $span_messages = $("#message_info_modal");
+                            $span_messages.removeAttr("style");
+                            $span_messages.text("");
+                            error_messages.forEach(function (message) {
+                                $span_messages.append(`<p>${message}</p>`);
+                            });
+                        } else {
                         document.getElementById("modal_dialog_id").classList.add("modal-lg");
                         $('#form-modal-ajax-content').load(`${attachUrl}?${paramString.toString()}`, function (response, status, xhr) {
                             if (status === "success") {

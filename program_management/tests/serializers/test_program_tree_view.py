@@ -74,7 +74,7 @@ class TestProgramTreeViewSerializer(SimpleTestCase):
 
     def test_serialize_program_tree_assert_keys_of_root_element_a_attr(self):
         serialized_data = program_tree_view_serializer(self.tree)
-        expected_keys = ['element_id', 'element_type', 'href']
+        expected_keys = ['element_id', 'element_type', 'href', 'attach_url']
 
         self.assertSetEqual(set(serialized_data["a_attr"].keys()), set(expected_keys))
 

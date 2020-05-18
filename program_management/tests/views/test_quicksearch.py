@@ -37,7 +37,8 @@ class TestQuickSearchLearningUnitView(TestCase):
         cls.root_egy = EducationGroupYearFactory()
         cls.luy_to_find = LearningUnitYearFactory(acronym='CYN', specific_title='Drop dead cynical')
         cls.user = SuperUserFactory()
-        cls.url = reverse('quick_search_learning_unit', args=[cls.root_egy.id, cls.root_egy.id])
+        path = str(cls.root_egy.id)
+        cls.url = reverse('quick_search_learning_unit', args=[cls.root_egy.id, path])
 
     def setUp(self) -> None:
         self.client.force_login(self.user)
@@ -69,7 +70,8 @@ class TestQuickSearchEducationGroupView(TestCase):
         cls.root_egy = EducationGroupYearFactory()
         cls.egy_to_find = GroupFactory(acronym='RAV', title='The Ravenlord', partial_acronym="RV")
         cls.user = SuperUserFactory()
-        cls.url = reverse('quick_search_education_group', args=[cls.root_egy.id, cls.root_egy.id])
+        path = str(cls.root_egy.id)
+        cls.url = reverse('quick_search_education_group', args=[cls.root_egy.id, path])
 
     def setUp(self) -> None:
         self.client.force_login(self.user)

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-04-15 12:50+0200\n"
+"POT-Creation-Date: 2020-05-11 08:09+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -158,11 +158,25 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
+#, python-format
+msgid ""
+"Cannot add \"%(child)s\" because the number of children of type(s) "
+"\"%(child_types)s\" for \"%(parent)s\" has already reached the limit."
+msgstr ""
+
 msgid "Cannot add any element to learning unit"
 msgstr ""
 
+#, python-format
+msgid "Cannot add any element to learning unit %(parent_node)s"
+msgstr ""
+
+#, python-format
+msgid "Cannot attach a node %(node)s to himself."
+msgstr ""
+
 msgid "Cannot attach a node to himself."
-msgstr "Cannot remove link due to prerequisites."
+msgstr ""
 
 msgid "Cannot detach due to prerequisites."
 msgstr "Cannot remove link due to prerequisites."
@@ -223,10 +237,6 @@ msgstr ""
 msgid "Direct gathering"
 msgstr ""
 
-#, python-format
-msgid "Element selected %(element)s"
-msgstr ""
-
 msgid "English comment"
 msgstr ""
 
@@ -281,6 +291,12 @@ msgstr ""
 msgid "Invalid tree path"
 msgstr ""
 
+#, python-format
+msgid ""
+"It is prohibited to attach a %(child_node)s to an element of another "
+"academic year %(parent_node)s."
+msgstr ""
+
 msgid ""
 "It is prohibited to attach a group, mini-training or training to an element "
 "of another academic year."
@@ -316,6 +332,10 @@ msgid "Legend"
 msgstr ""
 
 msgid "Link type"
+msgstr ""
+
+#, python-format
+msgid "Link type should be reference between %(parent)s and %(child)s"
 msgstr ""
 
 msgid "List UE"
@@ -531,6 +551,9 @@ msgstr ""
 msgid "The content has already been postponed."
 msgstr ""
 
+msgid "The content has been updated."
+msgstr ""
+
 #, python-format
 msgid "The content of %(acronym)s has been updated."
 msgstr ""
@@ -657,6 +680,11 @@ msgid ""
 "You are not allowed to copy the content of this kind of education group."
 msgstr ""
 
+#, python-format
+msgid ""
+"You are not allowed to create a reference with a learning unit %(child_node)s"
+msgstr ""
+
 msgid "You are not allowed to postpone this training in the future."
 msgstr ""
 
@@ -673,7 +701,23 @@ msgstr ""
 msgid "You can not add a learning unit to a %(category)s of type %(type)s."
 msgstr ""
 
+#, python-format
+msgid "You can not add the same child %(child_node)s several times."
+msgstr ""
+
 msgid "You can not add the same child several times."
+msgstr ""
+
+#, python-format
+msgid ""
+"You can not attach a learning unit like %(node)s to element %(parent)s of "
+"type %(type)s."
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot add \"%(child)s\" of type \"%(child_types)s\" to \"%(parent)s\" "
+"of type \"%(parent_type)s\""
 msgstr ""
 
 #, python-format
