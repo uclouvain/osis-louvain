@@ -92,7 +92,7 @@ class TestUserAttachedToManagementEntity(TestCase):
             with_child=True
         )
         self.client.force_login(faculty_manager.person.user)
-        url = reverse('create_education_group', args=[
+        url = reverse('new_education_group', args=[
             egy.category, egy.education_group_type.pk, egy.pk, egy.pk
         ])
         response = self.client.get(url)
