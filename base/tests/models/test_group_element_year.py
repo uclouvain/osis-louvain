@@ -23,17 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import random
 
-from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.test import TestCase
 
-from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory, MiniTrainingFactory
+from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from program_management.ddd.repositories import find_roots
@@ -91,46 +88,6 @@ class TestSaveGroupElementYear(TestCase):
                 child_branch=egy,
                 child_leaf=luy,
             )
-
-
-class TestValidationOnEducationGroupYearBlockField(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-
-    def setUp(self):
-        self.group_element_year = GroupElementYearFactory(parent__academic_year=self.academic_year,
-                                                          child_branch__academic_year=self.academic_year)
-
-    def test_when_value_is_higher_than_max_authorized(self):
-        self.group_element_year.block = 7
-        with self.assertRaises(ValidationError):
-            self.group_element_year.full_clean()
-
-    def test_when_more_than_6_digits_are_submitted(self):
-        self.group_element_year.block = 1234567
-        with self.assertRaises(ValidationError):
-            self.group_element_year.full_clean()
-
-    def test_when_values_are_duplicated(self):
-        self.group_element_year.block = 1446
-        with self.assertRaises(ValidationError):
-            self.group_element_year.full_clean()
-
-    def test_when_values_are_not_ordered(self):
-        self.group_element_year.block = 54
-        with self.assertRaises(ValidationError):
-            self.group_element_year.full_clean()
-
-    def test_when_0(self):
-        self.group_element_year.block = 0
-        with self.assertRaises(ValidationError):
-            self.group_element_year.full_clean()
-
-    def test_when_value_is_negative(self):
-        self.group_element_year.block = -124
-        with self.assertRaises(ValidationError):
-            self.group_element_year.full_clean()
 
 
 class TestManagerGetAdjacencyList(TestCase):
