@@ -27,7 +27,7 @@ from django.http import HttpResponse
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from openpyxl import Workbook
-from openpyxl.styles import Color, Style, PatternFill, Font, colors
+from openpyxl.styles import Color, PatternFill, Font, colors
 from openpyxl.writer.excel import save_virtual_workbook
 
 from assessments.business.enrollment_state import get_line_color, ENROLLED_LATE_COLOR, NOT_ENROLLED_COLOR
@@ -92,7 +92,8 @@ def export_xls(exam_enrollments):
     academic_year = lst_exam_enrollments[0].learning_unit_enrollment.learning_unit_year.academic_year
 
     filename = "session_%s_%s_%s.xlsx" % (str(academic_year.year), str(number_session), learn_unit_acronym)
-    response = HttpResponse(save_virtual_workbook(workbook), content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response = HttpResponse(save_virtual_workbook(workbook),
+                            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
     response['Content-Disposition'] = 'attachment; filename=%s' % filename
     return response
 
@@ -148,7 +149,7 @@ def __coloring_non_editable(ws, row_number, score, justification):
         if column_number < 9 or column_number > 10:
             ws.cell(row=row_number, column=column_number).fill = pattern_fill_grey
         else:
-            if not(score is None and justification is None):
+            if not (score is None and justification is None):
                 ws.cell(row=row_number, column=9).fill = pattern_fill_grey
                 ws.cell(row=row_number, column=10).fill = pattern_fill_grey
 
@@ -197,10 +198,10 @@ def __display_legends(ws, decimal):
         str(_('Score legend: %(score_legend)s (0=Score of presence)') % {"score_legend": "0 - 20"}),
     ])
     ws.append([
-            str(''),
-            str(_('Decimals authorized for this learning unit'))
-            if decimal else
-            str(_('Unauthorized decimal for this learning unit'))
+        str(''),
+        str(_('Decimals authorized for this learning unit'))
+        if decimal else
+        str(_('Unauthorized decimal for this learning unit'))
     ])
 
 
@@ -215,8 +216,8 @@ def __get_session_exam_deadline(exam_enroll):
 
     session_exam_deadline = mdl.exam_enrollment.get_session_exam_deadline(exam_enroll)
     if session_exam_deadline:
-        deadline = session_exam_deadline.deadline_tutor_computed if session_exam_deadline.deadline_tutor_computed else\
-                   session_exam_deadline.deadline
+        deadline = session_exam_deadline.deadline_tutor_computed if session_exam_deadline.deadline_tutor_computed else \
+            session_exam_deadline.deadline
 
     return deadline.strftime(date_format) if deadline else "-"
 
@@ -229,7 +230,6 @@ def _coloring_enrollment_state(ws, row_number, exam_enroll):
     if enrollment_state_color:
         pattern_fill_enrollment_state = PatternFill(patternType='solid',
                                                     fgColor=enrollment_state_color.lstrip("#"))
-        style_enrollment_state = Style(fill=pattern_fill_enrollment_state)
         column_number = 1
         while column_number < 12:
             ws.cell(row=row_number, column=column_number).fill = pattern_fill_enrollment_state
@@ -243,8 +243,6 @@ def _color_legend(ws):
 
 
 def __apply_style_to_cells(ws, color_style, row):
-    style_enrollment_state = Style(fill=PatternFill(patternType='solid',
-                                                    fgColor=Color(color_style.lstrip("#"))))
     fill_pattern = PatternFill(
         patternType='solid',
         fgColor=Color(color_style.lstrip("#"))
