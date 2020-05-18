@@ -98,29 +98,35 @@ class TestGenerateEducationGroupYearLearningUnitsContainedWorkbook(TestCase):
             title="{}_T".format(TITLE)
         )
         cls.node_1 = GroupElementYearFactory(
-            child_branch=cls.edy_node_1_training, child_leaf=None, parent=cls.education_group_yr_root
+            child_branch=cls.edy_node_1_training, child_leaf=None, parent=cls.education_group_yr_root,
         )
-        cls.edy_node_1_1_group = GroupFactory(academic_year=academic_yr)
+        cls.edy_node_1_1_group = GroupFactory(
+            academic_year=academic_yr,
+            management_entity=cls.education_group_yr_root.management_entity
+        )
 
         cls.node_1_1 = GroupElementYearFactory(
             child_branch=cls.edy_node_1_1_group,
             child_leaf=None,
-            parent=cls.edy_node_1_training
+            parent=cls.edy_node_1_training,
         )
         cls.child_leave_node_11 = GroupElementYearChildLeafFactory(
             parent=cls.edy_node_1_1_group,
             is_mandatory=True
         )
-        cls.edy_node_1_1_1_group_type = GroupFactory(academic_year=academic_yr)
+        cls.edy_node_1_1_1_group_type = GroupFactory(
+            academic_year=academic_yr,
+            management_entity=cls.education_group_yr_root.management_entity
+        )
 
         cls.node_1_1_1_group = GroupElementYearFactory(
             child_branch=cls.edy_node_1_1_1_group_type,
             child_leaf=None,
-            parent=cls.edy_node_1_1_group
+            parent=cls.edy_node_1_1_group,
         )
         cls.child_leave_node_111 = GroupElementYearChildLeafFactory(
             parent=cls.edy_node_1_1_1_group_type,
-            is_mandatory=True
+            is_mandatory=True,
         )
 
         cls.luy_children_in_tree = [child.child_leaf for child in cls.child_leaves]
