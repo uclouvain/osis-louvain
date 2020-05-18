@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from django.test import TestCase
+from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import prerequisite_operator
 from base.models.enums.link_type import LinkTypes
@@ -35,12 +36,9 @@ from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree, node
-from program_management.models.enums.node_type import NodeType
-from program_management.tests.ddd.factories.link import LinkFactory
-from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeEducationGroupYearFactory
-from program_management.tests.factories.element import ElementEducationGroupYearFactory
 from program_management.ddd.repositories import load_tree
-from django.utils.translation import gettext_lazy as _
+from program_management.models.enums.node_type import NodeType
+from program_management.tests.factories.element import ElementEducationGroupYearFactory
 
 
 class TestLoadTree(TestCase):
@@ -115,7 +113,7 @@ class TestLoadTree(TestCase):
             OR=_(prerequisite_operator.OR),
             AND=_(prerequisite_operator.AND)
         )
-        self.assertEquals(str(leaf.prerequisite), expected_str)
+        self.assertEqual(str(leaf.prerequisite), expected_str)
         self.assertTrue(leaf.has_prerequisite)
 
     def test_case_load_tree_leaf_is_prerequisites_of(self):
@@ -136,8 +134,8 @@ class TestLoadTree(TestCase):
 
         self.assertIsInstance(leaf, node.NodeLearningUnitYear)
         self.assertIsInstance(leaf.is_prerequisite_of, list)
-        self.assertEquals(len(leaf.is_prerequisite_of), 1)
-        self.assertEquals(leaf.is_prerequisite_of[0].pk, self.link_level_2.child_leaf.pk)
+        self.assertEqual(len(leaf.is_prerequisite_of), 1)
+        self.assertEqual(leaf.is_prerequisite_of[0].pk, self.link_level_2.child_leaf.pk)
         self.assertTrue(leaf.is_prerequisite)
 
     def test_case_load_tree_leaf_node_have_a_proposal(self):
@@ -151,7 +149,7 @@ class TestLoadTree(TestCase):
                 education_group_program_tree = load_tree.load(self.root_node.education_group_year.pk)
                 leaf = education_group_program_tree.root_node.children[0].child.children[0].child
                 self.assertTrue(leaf.has_proposal)
-                self.assertEquals(leaf.proposal_type, p_type)
+                self.assertEqual(leaf.proposal_type, p_type)
 
     def test_case_load_tree_leaf_node_have_no_proposal(self):
         education_group_program_tree = load_tree.load(self.root_node.education_group_year.pk)

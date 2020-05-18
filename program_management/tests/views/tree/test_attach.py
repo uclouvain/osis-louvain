@@ -95,7 +95,7 @@ class TestAttachNodeView(TestCase):
     def test_get_method_when_no_data_selected_on_cache(self):
         to_path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
         response = self.client.get(self.url + "?to_path=" + to_path)
-        self.assertEquals(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
 
         msgs = [m.message for m in messages.get_messages(response.wsgi_request)]
@@ -112,12 +112,12 @@ class TestAttachNodeView(TestCase):
         # To path :  BIR1BA ---> COMMON_CORE
         to_path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[0].child.pk)])
         response = self.client.get(self.url + "?to_path=" + to_path)
-        self.assertEquals(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
 
         self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
         self.assertIsInstance(response.context['formset'], AttachNodeFormSet)
-        self.assertEquals(len(response.context['formset'].forms), 1)
+        self.assertEqual(len(response.context['formset'].forms), 1)
         self.assertIsInstance(response.context['formset'].forms[0], AttachNodeForm)
 
     @mock.patch('program_management.business.group_element_years.management.fetch_elements_selected')
@@ -135,12 +135,12 @@ class TestAttachNodeView(TestCase):
         # To path :  BIR1BA ---> LBIR101G
         to_path = "|".join([str(self.tree.root_node.pk), str(self.tree.root_node.children[1].child.pk)])
         response = self.client.get(self.url + "?to_path=" + to_path)
-        self.assertEquals(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTemplateUsed(response, 'tree/attach_inner.html')
 
         self.assertIn('formset', response.context, msg="Probably there are no item selected on cache")
         self.assertIsInstance(response.context['formset'], AttachNodeFormSet)
-        self.assertEquals(len(response.context['formset'].forms), 2)
+        self.assertEqual(len(response.context['formset'].forms), 2)
 
     @mock.patch('program_management.business.group_element_years.management.fetch_elements_selected')
     @mock.patch('program_management.forms.tree.attach.AttachNodeFormSet.is_valid')

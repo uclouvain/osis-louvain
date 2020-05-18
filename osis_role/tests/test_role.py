@@ -55,7 +55,7 @@ class TestOsisRoleManager(SimpleTestCase):
         type(subclass.__class__).group_name = mock.PropertyMock(return_value='role_model_subclass')
         mock_roles_set.return_value = {subclass.__class__}
 
-        self.assertEquals(
+        self.assertEqual(
             self.manager.group_names_managed(),
             {'role_model_subclass'}
         )

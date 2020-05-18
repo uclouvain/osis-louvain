@@ -247,7 +247,7 @@ class TestReadEducationGroup(TestCase):
         self.client.force_login(person.user)
 
         response = self.client.get(url)
-        self.assertEquals(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertTrue(response.context['show_coorganization'])
         self.assertFalse(response.context['can_change_coorganization'])
 
