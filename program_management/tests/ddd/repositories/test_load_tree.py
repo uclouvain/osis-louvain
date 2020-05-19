@@ -115,7 +115,7 @@ class TestLoadTree(TestCase):
             OR=_(prerequisite_operator.OR),
             AND=_(prerequisite_operator.AND)
         )
-        self.assertEquals(str(leaf.prerequisite), expected_str)
+        self.assertEqual(str(leaf.prerequisite), expected_str)
         self.assertTrue(leaf.has_prerequisite)
 
     def test_case_load_tree_leaf_is_prerequisites_of(self):
@@ -136,8 +136,8 @@ class TestLoadTree(TestCase):
 
         self.assertIsInstance(leaf, node.NodeLearningUnitYear)
         self.assertIsInstance(leaf.is_prerequisite_of, list)
-        self.assertEquals(len(leaf.is_prerequisite_of), 1)
-        self.assertEquals(leaf.is_prerequisite_of[0].pk, self.link_level_2.child_leaf.pk)
+        self.assertEqual(len(leaf.is_prerequisite_of), 1)
+        self.assertEqual(leaf.is_prerequisite_of[0].pk, self.link_level_2.child_leaf.pk)
         self.assertTrue(leaf.is_prerequisite)
 
     def test_case_load_tree_leaf_node_have_a_proposal(self):
@@ -151,7 +151,7 @@ class TestLoadTree(TestCase):
                 education_group_program_tree = load_tree.load(self.root_node.education_group_year.pk)
                 leaf = education_group_program_tree.root_node.children[0].child.children[0].child
                 self.assertTrue(leaf.has_proposal)
-                self.assertEquals(leaf.proposal_type, p_type)
+                self.assertEqual(leaf.proposal_type, p_type)
 
     def test_case_load_tree_leaf_node_have_no_proposal(self):
         education_group_program_tree = load_tree.load(self.root_node.education_group_year.pk)

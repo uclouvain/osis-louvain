@@ -99,7 +99,7 @@
         {# Delete link #}
         <li>
             {% url 'delete_education_group' root.pk education_group_year.education_group.pk as delete_url %}
-            {% a_tag_has_perm delete_url _('Delete permanently') 'base.delete_all_educationgroup' user education_group_year.education_group %}
+            {% a_tag_modal_has_perm delete_url _('Delete permanently') 'base.delete_all_educationgroup' user education_group_year.education_group %}
         </li>
 
         {# Generate PDF link #}

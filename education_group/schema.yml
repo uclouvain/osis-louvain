@@ -87,7 +87,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfTraining'
+                $ref: '#/components/schemas/PaginatedTraining'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -389,7 +389,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfMiniTraining'
+                $ref: '#/components/schemas/PaginatedMiniTraining'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -419,7 +419,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfTraining'
+                $ref: '#/components/schemas/PaginatedTraining'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -556,6 +556,17 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
+    Pagination:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          format: uri
+        previous:
+          type: string
+          format: uri
     Hops:
       type: object
       properties:
@@ -565,10 +576,15 @@ components:
           type: array
           items:
             type: integer
-    ArrayOfTraining:
-      type: array
-      items:
-        $ref: '#/components/schemas/Training'
+    PaginatedTraining:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/Training'
     Training:
       type: object
       properties:
@@ -777,10 +793,15 @@ components:
           type: string
         campus:
           $ref: '#/components/schemas/Campus'
-    ArrayOfMiniTraining:
-      type: array
-      items:
-        $ref: '#/components/schemas/MiniTraining'
+    PaginatedMiniTraining:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/MiniTraining'
     MiniTraining:
       type: object
       properties:

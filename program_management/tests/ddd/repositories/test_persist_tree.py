@@ -125,14 +125,14 @@ class TestPersistTree(TestCase):
         GroupElementYearFactory(parent=self.training, child_branch=self.common_core, child_leaf=None)
         node_to_detach = self.common_core_node
         qs_link_will_be_detached = GroupElementYear.objects.filter(child_branch_id=node_to_detach.pk)
-        self.assertEquals(qs_link_will_be_detached.count(), 1)
+        self.assertEqual(qs_link_will_be_detached.count(), 1)
 
         tree = load_tree.load(self.root_node.node_id)
 
         path_to_detach = "|".join([str(self.root_node.pk), str(node_to_detach.pk)])
         tree.detach_node(path_to_detach)
         persist_tree.persist(tree)
-        self.assertEquals(qs_link_will_be_detached.count(), 0)
+        self.assertEqual(qs_link_will_be_detached.count(), 0)
 
     @patch("program_management.ddd.repositories.persist_tree.__delete_group_element_year")
     def test_delete_when_nothing_has_been_deleted(self, mock):

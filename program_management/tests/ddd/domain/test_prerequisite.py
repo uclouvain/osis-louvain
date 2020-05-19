@@ -39,7 +39,7 @@ class TestPrerequisiteItem(SimpleTestCase):
         p_item = prerequisite.PrerequisiteItem(code='LDROI1200', year=2018)
         expected_str = p_item.code
 
-        self.assertEquals(str(p_item), expected_str)
+        self.assertEqual(str(p_item), expected_str)
 
     def test_eq_when_code_and_year_are_the_same(self):
         item1 = PrerequisiteItemFactory(code='code', year=2018)
@@ -64,14 +64,14 @@ class TestPrerequisiteGroupItem(SimpleTestCase):
 
     def test_case_assert_str_method_no_element_on_group(self):
         p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.OR)
-        self.assertEquals(str(p_group), '')
+        self.assertEqual(str(p_group), '')
 
     def test_case_assert_str_method_one_element_on_group(self):
         p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.OR)
         p_group.add_prerequisite_item('LDROI1200', 2018)
 
         expected_str = 'LDROI1200'
-        self.assertEquals(str(p_group), expected_str)
+        self.assertEqual(str(p_group), expected_str)
 
     def test_case_assert_str_method_multiple_elements_on_group(self):
         p_group = prerequisite.PrerequisiteItemGroup(operator=prerequisite_operator.OR)
@@ -79,7 +79,7 @@ class TestPrerequisiteGroupItem(SimpleTestCase):
         p_group.add_prerequisite_item('LAGRO2200', 2018)
 
         expected_str = 'LDROI1200 {OR} LAGRO2200'.format(OR=_(prerequisite_operator.OR))
-        self.assertEquals(str(p_group), expected_str)
+        self.assertEqual(str(p_group), expected_str)
 
 
 class TestPrerequisite(SimpleTestCase):
@@ -97,14 +97,14 @@ class TestPrerequisite(SimpleTestCase):
 
     def test_case_assert_str_method_no_group(self):
         p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
-        self.assertEquals(str(p_req), '')
+        self.assertEqual(str(p_req), '')
 
     def test_case_assert_str_method_with_one_group(self):
         p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
         p_req.add_prerequisite_item_group(self.p_group)
 
         expected_str = 'LDROI1300 {OR} LAGRO2400'.format(OR=_(prerequisite_operator.OR))
-        self.assertEquals(str(p_req), expected_str)
+        self.assertEqual(str(p_req), expected_str)
 
     def test_case_assert_str_method_with_multiple_groups(self):
         p_req = prerequisite.Prerequisite(main_operator=prerequisite_operator.AND)
@@ -115,7 +115,7 @@ class TestPrerequisite(SimpleTestCase):
             OR=_(prerequisite_operator.OR),
             AND=_(prerequisite_operator.AND)
         )
-        self.assertEquals(str(p_req), expected_str)
+        self.assertEqual(str(p_req), expected_str)
 
 
 class TestRemovePrerequisiteItem(SimpleTestCase):
