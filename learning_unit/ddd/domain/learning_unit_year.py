@@ -26,6 +26,7 @@
 from _decimal import Decimal
 from typing import List
 
+from attribution.ddd.domain.attribution import Attribution
 from base.models.enums.learning_container_year_types import LearningContainerYearType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.quadrimesters import DerogationQuadrimester
@@ -106,8 +107,8 @@ class LearningUnitYear:
             teaching_materials: TeachingMaterial = None,
             subtype: str = None,
             session: str = None,
-            main_language: str = None
-
+            main_language: str = None,
+            attributions: List['Attribution'] = None,
 
     ):
         self.id = id
@@ -136,6 +137,7 @@ class LearningUnitYear:
         self.subtype = subtype
         self.session = session
         self.main_language = main_language
+        self.attributions = attributions or []
 
     @property
     def full_title_fr(self):

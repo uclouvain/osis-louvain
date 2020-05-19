@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from django.test import TestCase
 
 from attribution.ddd.domain.attribution import Attribution
@@ -32,6 +34,7 @@ from base.models.enums import learning_unit_year_subtypes
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from learning_unit.tests.ddd.factories.learning_unit_year_identity import LearningUnitYearIdentityFactory
 
 
 class TestLoadAttribution(TestCase):
@@ -53,26 +56,42 @@ class TestLoadAttribution(TestCase):
             academic_year=academic_year,
             subtype=learning_unit_year_subtypes.FULL
         )
+        cls.l_unit_1_identity = LearningUnitYearIdentityFactory(code=cls.l_unit_1.acronym,
+                                                                year=cls.l_unit_1.academic_year.year)
+        cls.l_unit_no_attribution_identity = LearningUnitYearIdentityFactory(
+            code=cls.l_unit_no_attribution.acronym,
+            year=cls.l_unit_no_attribution.academic_year.year
+        )
+        cls.l_units_identities = [cls.l_unit_1_identity, cls.l_unit_no_attribution_identity]
 
     def test_load_learning_unit_year_attributions_number_of_attributions(self):
-        results = load_attributions(self.l_unit_1.acronym, self.l_unit_1.academic_year.year)
+        results = load_attributions([self.l_unit_1_identity])
+        self.assertEqual(len(results), 2)
+        results = load_attributions([self.l_unit_1_identity, self.l_unit_no_attribution_identity])
         self.assertEqual(len(results), 2)
 
     def test_load_learning_unit_year_attributions_no_results(self):
-        results = load_attributions(self.l_unit_no_attribution.acronym, self.l_unit_no_attribution.academic_year.year)
+        results = load_attributions([self.l_unit_no_attribution_identity])
         self.assertEqual(len(results), 0)
 
     def test_load_learning_unit_year_attributions_content_and_order(self):
-        results = load_attributions(self.l_unit_1.acronym, self.l_unit_1.academic_year.year)
-        for obj in results:
-            self.assertTrue(isinstance(obj, Attribution))
-        teacher_attribution = results[0].teacher
+        attributions = load_attributions([self.l_unit_1_identity])
+        self.assertTrue(isinstance(attributions, List))
+
+        for attribution in attributions:
+            self.assertTrue(isinstance(attribution, Attribution))
+
+        teacher_attribution = attributions[0].teacher
+        self.assertEqual(attributions[0].learning_unit_year.code, self.l_unit_1_identity.code)
+        self.assertEqual(attributions[0].learning_unit_year.year, self.l_unit_1_identity.year)
         self.assertEqual(teacher_attribution.last_name, "Marchal")
         self.assertEqual(teacher_attribution.first_name, "Cali")
         self.assertIsNone(teacher_attribution.middle_name)
         self.assertEqual(teacher_attribution.email, "cali@gmail.com")
 
-        teacher_attribution = results[1].teacher
+        teacher_attribution = attributions[1].teacher
+        self.assertEqual(attributions[1].learning_unit_year.code, self.l_unit_1_identity.code)
+        self.assertEqual(attributions[1].learning_unit_year.year, self.l_unit_1_identity.year)
         self.assertEqual(teacher_attribution.last_name, "Marchal")
         self.assertEqual(teacher_attribution.first_name, "Tilia")
         self.assertIsNone(teacher_attribution.middle_name)

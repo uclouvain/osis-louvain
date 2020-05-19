@@ -25,12 +25,27 @@
 ##############################################################################
 
 from attribution.ddd.domain.teacher import Teacher
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
+from osis_common.ddd import interface
 
 
-class Attribution:
+class AttributionIdentity(interface.EntityIdentity):
+    def __init__(self, id: int):
+        self.id = id
+
+    def __hash__(self):
+        return hash(self.id)
+
+    def __eq__(self, other):
+        return other.id == self.id
+
+
+class Attribution(interface.RootEntity):
 
     def __init__(
             self,
+            learning_unit_year: LearningUnitYearIdentity = None,
             teacher: Teacher = None,
     ):
+        self.learning_unit_year = learning_unit_year
         self.teacher = teacher

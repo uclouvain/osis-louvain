@@ -23,19 +23,33 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Optional, List
 
-import factory.fuzzy
+from attribution.ddd.domain.attribution import AttributionIdentity, Attribution
+from attribution.ddd.repositories.load_attribution import load_attributions
+from osis_common.ddd import interface
 
-from attribution.ddd.domain.attribution import Attribution
-from attribution.ddd.domain.attribution import Teacher
+
+class AttributionRepository(interface.AbstractRepository):
+
+    @classmethod
+    def search(cls, entity_ids: Optional[List['AttributionIdentity']] = None, **kwargs) -> List[Attribution]:
+        return load_attributions(learning_unit_year_ids=kwargs.pop('learning_unit_year_ids'))
+
+    @classmethod
+    def delete(cls, entity_id: 'AttributionIdentity') -> None:
+        raise NotImplementedError
+
+    @classmethod
+    def create(cls, program_tree: 'AttributionIdentity') -> 'AttributionIdentity':
+        raise NotImplementedError
+
+    @classmethod
+    def update(cls, program_tree: 'AttributionIdentity') -> 'AttributionIdentity':
+        raise NotImplementedError
+
+    @classmethod
+    def get(cls, entity_id: 'AttributionIdentity') -> 'Attribution':
+        raise NotImplementedError
 
 
-class AttributionFactory(factory.Factory):
-
-    class Meta:
-        model = Attribution
-        abstract = False
-
-    acronym = factory.Sequence(lambda n: 'Code-%02d' % n)
-    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
-    teacher = factory.SubFactory(Teacher)

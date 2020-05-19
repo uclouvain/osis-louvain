@@ -24,12 +24,18 @@
 #
 ##############################################################################
 
+from typing import List
+
 from django.test import TestCase
 from django.test.utils import override_settings
 
+from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
+from base.models.enums import learning_unit_year_subtypes
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory
 from base.tests.factories.learning_component_year import LecturingLearningComponentYearFactory, \
     PracticalLearningComponentYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
@@ -37,7 +43,8 @@ from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFact
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
-from learning_unit.ddd.repository.load_learning_unit_year import load_multiple
+from learning_unit.ddd.repository.load_learning_unit_year import load_multiple, load_multiple_by_identity
+from learning_unit.tests.ddd.factories.learning_unit_year_identity import LearningUnitYearIdentityFactory
 
 LANGUAGE_EN = "en"
 LANGUAGE_FR = "fr-be"
@@ -172,3 +179,73 @@ class TestLoadLearningUnitProposal(TestCase):
         results = load_multiple([self.l_unit_1.id])
         self.assertEqual(results[0].proposal.type, self.proposal.type)
         self.assertEqual(results[0].proposal.state, self.proposal.state)
+
+
+class TestLoadLearningUnitYearWithAttribution(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        academic_year = AcademicYearFactory(current=True)
+        cls.l_unit_1 = LearningUnitYearFactory(
+            acronym="LBIR1212",
+            academic_year=academic_year,
+            subtype=learning_unit_year_subtypes.FULL
+        )
+        component = LearningComponentYearFactory(learning_unit_year=cls.l_unit_1)
+
+        cls.attribution_charge_news = _build_attributions(component)
+
+        cls.l_unit_no_attribution = LearningUnitYearFactory(
+            acronym="LBIR1213",
+            academic_year=academic_year,
+            subtype=learning_unit_year_subtypes.FULL
+        )
+        cls.l_unit_1_identity = LearningUnitYearIdentityFactory(code=cls.l_unit_1.acronym,
+                                                                year=cls.l_unit_1.academic_year.year)
+        cls.l_unit_no_attribution_identity = LearningUnitYearIdentityFactory(
+            code=cls.l_unit_no_attribution.acronym,
+            year=cls.l_unit_no_attribution.academic_year.year
+        )
+        cls.l_units_identities = [cls.l_unit_1_identity, cls.l_unit_no_attribution_identity]
+
+    def test_load_learning_unit_year_result_count_correct(self):
+        # def test_load_learning_unit_year_init_attributions(self):
+        results = load_multiple_by_identity([self.l_unit_1_identity])
+        self.assertEqual(len(results), 1)
+        results = load_multiple_by_identity(self.l_units_identities)
+        self.assertEqual(len(results), 2)
+
+    def test_load_learning_unit_year_attributions_no_results(self):
+        results = load_multiple_by_identity([self.l_unit_no_attribution_identity])
+        self.assertEqual(len(results[0].attributions), 0)
+
+    def test_load_learning_unit_year_attributions_content_and_order(self):
+        results = load_multiple_by_identity([self.l_unit_1_identity])
+        self.assertTrue(isinstance(results, List))
+
+        attributions = results[0].attributions
+
+        teacher_attribution = attributions[0].teacher
+        self.assertEqual(teacher_attribution.last_name, "Marchal")
+        self.assertEqual(teacher_attribution.first_name, "Cali")
+        self.assertIsNone(teacher_attribution.middle_name)
+        self.assertEqual(teacher_attribution.email, "cali@gmail.com")
+
+        teacher_attribution = attributions[1].teacher
+        self.assertEqual(teacher_attribution.last_name, "Marchal")
+        self.assertEqual(teacher_attribution.first_name, "Tilia")
+        self.assertIsNone(teacher_attribution.middle_name)
+        self.assertEqual(teacher_attribution.email, "tilia@gmail.com")
+
+
+def _build_attributions(component):
+    attribution_1 = AttributionChargeNewFactory(learning_component_year=component,
+                                                attribution__tutor__person__last_name='Marchal',
+                                                attribution__tutor__person__first_name='Tilia',
+                                                attribution__tutor__person__email='tilia@gmail.com')
+
+    attribution_2 = AttributionChargeNewFactory(learning_component_year=component,
+                                                attribution__tutor__person__last_name='Marchal',
+                                                attribution__tutor__person__first_name='Cali',
+                                                attribution__tutor__person__email='cali@gmail.com')
+    return [attribution_1, attribution_2]

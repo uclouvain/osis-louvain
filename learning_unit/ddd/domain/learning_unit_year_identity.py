@@ -24,18 +24,22 @@
 #
 ##############################################################################
 
-import factory.fuzzy
 
-from attribution.ddd.domain.attribution import Attribution
-from attribution.ddd.domain.attribution import Teacher
+class LearningUnitYearIdentity:
 
+    def __init__(
+            self,
+            code: str = None,
+            year: int = None
+    ):
+        self.code = code
+        self.year = year
 
-class AttributionFactory(factory.Factory):
+    def __str__(self) -> str:
+        return "{} - {}".format(self.code, self.year)
 
-    class Meta:
-        model = Attribution
-        abstract = False
+    def __eq__(self, other):
+        return (self.code, self.year) == (other.code, other.year)
 
-    acronym = factory.Sequence(lambda n: 'Code-%02d' % n)
-    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
-    teacher = factory.SubFactory(Teacher)
+    def __hash__(self):
+        return hash((self.code, self.year))

@@ -26,16 +26,22 @@
 
 import factory.fuzzy
 
-from attribution.ddd.domain.attribution import Attribution
-from attribution.ddd.domain.attribution import Teacher
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 
 
-class AttributionFactory(factory.Factory):
+def generate_end_year(node):
+    return node.year + 10
+
+
+def generate_start_year(node):
+    return node.year + 10
+
+
+class LearningUnitYearIdentityFactory(factory.Factory):
 
     class Meta:
-        model = Attribution
+        model = LearningUnitYearIdentity
         abstract = False
 
-    acronym = factory.Sequence(lambda n: 'Code-%02d' % n)
+    code = factory.Sequence(lambda n: 'Code-%02d' % n)
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
-    teacher = factory.SubFactory(Teacher)
