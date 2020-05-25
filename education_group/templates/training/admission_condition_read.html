@@ -42,15 +42,15 @@
         <div class="col-md-12">
             <div class="panel">
                 <div class="panel-body">
-                    {% for section, data in conditions.items %}
-                        {% if data.display %}
+                    {% for section, label in conditions.items %}
+                        {% if label.display %}
                             <h3>
-                                {{ data.label_translated }}
+                                {{ label.label_translated }}
                                 {% if can_edit_information %}
                                     {% url 'education_group_year_admission_condition_update_text' training.pk training.pk as update_text_url %}
                                     <a href="#" role="button"
                                        class="button modify-text-btn"
-                                       data-form="{{ update_text_url }}?section={{ section }}&title={{ data.label_translated.split|join:"%20" }}">
+                                       data-form="{{ update_text_url }}?section={{ section }}&title={{ label.label_translated.split|join:"%20" }}">
                                         <span class="glyphicon glyphicon-edit"
                                               style="font-size: 16px;" aria-hidden="true"></span>
                                     </a>
@@ -58,9 +58,7 @@
                             </h3>
                             <div class="row">
                                 <div class="col-md-12">
-                                    {% with data as label %}
-                                        {% include "blocks/row_translation_side_by_side.html" %}
-                                    {% endwith %}
+                                    {% include "blocks/row_translation_side_by_side.html" %}
                                 </div>
                             </div>
                         {% endif %}
