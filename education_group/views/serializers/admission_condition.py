@@ -5,28 +5,10 @@ from base.models.admission_condition import AdmissionCondition
 from base.models.education_group_year import EducationGroupYear
 
 
-def get_training_admission_condition(acronym: str, year: int):
+def get_admission_condition(offer: EducationGroupYear):
     try:
         admission_condition = AdmissionCondition.objects.filter(
-            education_group_year__acronym=acronym,
-            education_group_year__academic_year__year=year
-        ).annotate(
-            admission_requirements_fr=F('text_free'),
-            admission_requirements_en=F('text_free_en')
-        ).get()
-        print(vars(admission_condition))
-    except AdmissionCondition.DoesNotExist:
-        offer = EducationGroupYear.objects.get(acronym=acronym, academic_year__year=year)
-        return __default_admission_condition(offer)
-    return __format_admission_condition(admission_condition)
-    # lines = AdmissionConditionLine.objects.filter(admission_condition=admission_conditions.first())
-
-
-def get_admission_condition(acronym: str, year: int):
-    try:
-        admission_condition = AdmissionCondition.objects.filter(
-            education_group_year__acronym=acronym,
-            education_group_year__academic_year__year=year
+            education_group_year=offer
         ).select_related(
             'education_group_year'
         ).annotate(
@@ -34,7 +16,6 @@ def get_admission_condition(acronym: str, year: int):
             admission_requirements_en=F('text_free_en')
         ).get()
     except AdmissionCondition.DoesNotExist:
-        offer = EducationGroupYear.objects.get(acronym=acronym, academic_year__year=year)
         return __default_admission_condition(offer)
     return __format_admission_condition(admission_condition)
 

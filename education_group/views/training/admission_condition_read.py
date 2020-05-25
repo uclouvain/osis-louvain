@@ -27,4 +27,4 @@ class TrainingReadAdmissionCondition(TrainingRead):
     @functools.lru_cache()
     def __get_admission_condition(self):
         offer = self.get_offer()
-        return admission_condition.get_training_admission_condition(offer.acronym, offer.academic_year.year)
+        return admission_condition.get_admission_condition(offer)
