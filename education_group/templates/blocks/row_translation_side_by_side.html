@@ -25,14 +25,14 @@
 
 <div class="row">
     <div class="col-md-6" id="content_fr_{{ label.label_id }}">
-        {% if label.text_fr is not None %}
+        {% if label.text_fr %}
             <span>{{ label.text_fr|truncatewords_html:40|safe }}</span>
         {% else %}
             <span class="italic">{% trans 'Add the French content of this paragraph' %}</span>
         {% endif %}
     </div>
     <div class="col-md-6" id="content_en_{{ label.label_id }}">
-        {% if label.text_en is not None %}
+        {% if label.text_en %}
             <span>{{ label.text_en|truncatewords_html:40|safe }}</span>
         {% else %}
             <span class="italic">{% trans 'Add the English content of this paragraph' %}</span>

@@ -41,11 +41,13 @@
 {% block tabs %}
     <ul class="nav nav-tabs" role="tablist">
         {% for _, tab_url in tab_urls.items %}
-            <li role="presentation" {% if tab_url.active %} class="active" {% endif %}>
-                <a id="link_identification" href="{{ tab_url.url }}" role="tab">
-                    {{ tab_url.text }}
-                </a>
-            </li>
+            {% if tab_url.display %}
+                <li role="presentation" {% if tab_url.active %} class="active" {% endif %}>
+                    <a id="link_identification" href="{{ tab_url.url }}" role="tab">
+                        {{ tab_url.text }}
+                    </a>
+                </li>
+            {% endif %}
         {% endfor %}
     </ul>
 {% endblock %}

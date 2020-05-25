@@ -24,10 +24,49 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
+{% block top_action_bar %}
+    {% if can_edit_information %}
+        {% include  "blocks/refresh_publication_button.html" %}
+    {% endif %}
+{% endblock %}
+
+{% block bottom_action_bar %}
+    {% if can_edit_information %}
+        {% include  "blocks/refresh_publication_button.html" %}
+    {% endif %}
+{% endblock %}
+
+
 {% block details %}
     <div class="row">
         <div class="col-md-12">
-            TEST ADMISSION CONDITION READ
+            <div class="panel">
+                <div class="panel-body">
+                    {% for section, data in conditions.items %}
+                        {% if data.display %}
+                            <h3>
+                                {{ data.label_translated }}
+                                {% if can_edit_information %}
+                                    {% url 'education_group_year_admission_condition_update_text' training.pk training.pk as update_text_url %}
+                                    <a href="#" role="button"
+                                       class="button modify-text-btn"
+                                       data-form="{{ update_text_url }}?section=free&title={{ data.label_translated.split|join:"%20" }}">
+                                        <span class="glyphicon glypeducation_group_year_admission_condition_update_texthicon-edit"
+                                              style="font-size: 16px;" aria-hidden="true"></span>
+                                    </a>
+                                {% endif %}
+                            </h3>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    {% with data as label %}
+                                        {% include "blocks/row_translation_side_by_side.html" %}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
         </div>
     </div>
 {% endblock details %}
