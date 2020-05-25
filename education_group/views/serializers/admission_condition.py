@@ -24,7 +24,7 @@ def __format_admission_condition(admission_condition):
     bachelor_sections = [
         'ca_bacs_cond_generales', 'ca_bacs_cond_particulieres', 'ca_bacs_examen_langue', 'ca_bacs_cond_speciales',
     ]
-    master_sections = ['ca_cond_generales', 'ca_maitrise_fr', 'ca_allegement', 'ca_ouv_adultes']
+    mc_and_aggregation_sections = ['ca_cond_generales', 'ca_maitrise_fr', 'ca_allegement', 'ca_ouv_adultes']
     sections = [
         'university_bachelors', 'non_university_bachelors', 'holders_second_university_degree', 'personalized_access',
         'holders_non_university_second_degree', 'adults_taking_up_university_training', 'alert_message',
@@ -35,7 +35,7 @@ def __format_admission_condition(admission_condition):
         'text_fr': admission_condition.admission_requirements_fr,
         'text_en': admission_condition.admission_requirements_en
     })
-    for section in sections + bachelor_sections + master_sections:
+    for section in sections + bachelor_sections + mc_and_aggregation_sections:
         admission_condition_formated[section].update({
             'text_fr': getattr(admission_condition, 'text_' + section),
             'text_en': getattr(admission_condition, 'text_' + section + '_en')
