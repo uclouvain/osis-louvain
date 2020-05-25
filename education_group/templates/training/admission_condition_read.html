@@ -50,7 +50,7 @@
                                     {% url 'education_group_year_admission_condition_update_text' training.pk training.pk as update_text_url %}
                                     <a href="#" role="button"
                                        class="button modify-text-btn"
-                                       data-form="{{ update_text_url }}?section=TODO&title={{ data.label_translated.split|join:"%20" }}">
+                                       data-form="{{ update_text_url }}?section={{ section }}&title={{ data.label_translated.split|join:"%20" }}">
                                         <span class="glyphicon glyphicon-edit"
                                               style="font-size: 16px;" aria-hidden="true"></span>
                                     </a>
