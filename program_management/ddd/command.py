@@ -44,3 +44,19 @@ class OrderLinkCommand(interface.CommandRequest):
 class CreateProgramTreeVersionCommand(interface.CommandRequest):
     # To implement
     pass
+
+
+class DeleteProgramTreeVersionCommand(interface.CommandRequest):
+
+    def __init__(
+            self,
+            offer_acronym: str,
+            year: int,
+            version_name: str,
+            is_transition: bool,
+
+    ):
+        self.offer_acronym = offer_acronym
+        self.year = year
+        self.version_name = version_name
+        self.is_transition = is_transition
