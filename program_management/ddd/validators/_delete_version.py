@@ -32,9 +32,9 @@ from base.ddd.utils import business_validator
 from base.models.authorized_relationship import AuthorizedRelationship
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
-from base.models.offer_enrollment import OfferEnrollment
 from education_group.models.group_year import GroupYear
 from program_management.models.education_group_version import EducationGroupVersion
+from program_management.ddd.domain.service.offer_enrollments_count import enrollments_count_by_offer
 
 
 class DeleteVersionValidator(business_validator.BusinessValidator):
@@ -69,8 +69,7 @@ def get_protected_messages_by_education_group_year(education_group_year: Educati
     protected_message = []
 
     # Count the number of enrollment
-    count_enrollment = OfferEnrollment.objects.filter(education_group_year=education_group_version.offer).count()
-
+    count_enrollment = enrollments_count_by_offer(education_group_version.offer)
     if count_enrollment:
         protected_message.append(
             ngettext_lazy(
