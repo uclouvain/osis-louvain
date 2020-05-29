@@ -29,9 +29,10 @@ from django.db.models import Q
 from base.models.group_element_year import GroupElementYear
 from education_group.models.group_year import GroupYear
 from program_management.ddd.command import DeleteProgramTreeVersionCommand
-from program_management.ddd.repositories.load_tree import load_version
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 
 
 def delete_program_tree_version(command: DeleteProgramTreeVersionCommand) -> None:
@@ -47,11 +48,14 @@ def delete_program_tree_version(command: DeleteProgramTreeVersionCommand) -> Non
 
 def _delete_version_trees(education_group_versions: List[EducationGroupVersion]) -> None:
     for education_group_version in education_group_versions:
-        tree = load_version(education_group_version.offer.acronym,
-                            education_group_version.offer.academic_year.year,
-                            education_group_version.version_name,
-                            education_group_version.is_transition)
+        identity_standard = ProgramTreeVersionIdentity(
+            education_group_version.offer.acronym,
+            education_group_version.offer.academic_year.year,
+            education_group_version.version_name,
+            education_group_version.is_transition
+        )
 
+        tree = ProgramTreeVersionRepository().get(entity_id=identity_standard)
         _delete_version_tree_content(tree.get_tree())
 
     for education_group_version in education_group_versions:
@@ -59,10 +63,10 @@ def _delete_version_trees(education_group_versions: List[EducationGroupVersion])
 
 
 def _delete_version_root_group(education_group_version: EducationGroupVersion) -> None:
-    group_year_to_delete = education_group_version.root_group
+    root_group_to_delete = education_group_version.root_group
     education_group_version.delete()
-    if not Element.objects.filter(group_year=group_year_to_delete).exists():
-        group_year_to_delete.delete()
+    if not Element.objects.filter(group_year=root_group_to_delete).exists():
+        root_group_to_delete.delete()
 
 
 def _delete_version_tree_content(tree: 'ProgramTree') -> None:
@@ -71,8 +75,10 @@ def _delete_version_tree_content(tree: 'ProgramTree') -> None:
     """
     group_year_ids = []
     for node in tree.get_all_nodes():
-        #TODO léger doute ici...
-        child_links_to_delete = GroupElementYear.objects.filter(Q(parent_element__pk=node.pk) | Q(child_element__pk=node.pk))
+        #  TODO léger doute ici...
+        child_links_to_delete = GroupElementYear.objects.filter(
+            Q(parent_element__pk=node.pk) | Q(child_element__pk=node.pk)
+        )
 
         elt_to_delete = Element.objects.filter(pk=node.pk).first()
         if elt_to_delete:

@@ -38,7 +38,7 @@ from program_management.models.education_group_version import EducationGroupVers
 from program_management.models.element import Element
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
-
+from education_group.tests.factories.group_year import GroupYearFactory
 GROUP_ELEMENT_YEARS = 'group_element_years'
 ELEMENTS = 'elements'
 GROUP_YEARS = 'group_years'
@@ -64,7 +64,6 @@ class TestDeleteVersion(TestCase):
         self.data.update(build_version_content(self.next_academic_year))
         self.data.update(build_version_content(self.previous_academic_year))
 
-
     def test_delete_version_last_year_only(self):
         education_group_version_to_delete = self.data.get(self.next_academic_year).get(EDUCATION_GROUP_VERSION)
 
@@ -86,10 +85,12 @@ class TestDeleteVersion(TestCase):
 
     def test_delete_version_keep_previous_year(self):
         education_group_version_to_delete = self.data.get(self.academic_year).get('education_group_version')
-        identity = ProgramTreeVersionIdentity(offer_acronym=education_group_version_to_delete.offer.acronym,
-                                              year=education_group_version_to_delete.offer.academic_year.year,
-                                              version_name=education_group_version_to_delete.version_name,
-                                              is_transition=education_group_version_to_delete.is_transition)
+        identity = DeleteProgramTreeVersionCommand(
+            offer_acronym=education_group_version_to_delete.offer.acronym,
+            year=education_group_version_to_delete.offer.academic_year.year,
+            version_name=education_group_version_to_delete.version_name,
+            is_transition=education_group_version_to_delete.is_transition
+        )
         delete_program_tree_version_service.delete_program_tree_version(identity)
         results_expected_for_previous_academic_year = self.data.get(self.previous_academic_year)
 
@@ -100,10 +101,12 @@ class TestDeleteVersion(TestCase):
 
     def test_delete_version_all_years(self):
         education_group_version_to_delete = self.data.get(self.previous_academic_year).get(EDUCATION_GROUP_VERSION)
-        identity = ProgramTreeVersionIdentity(offer_acronym=education_group_version_to_delete.offer.acronym,
-                                              year=education_group_version_to_delete.offer.academic_year.year,
-                                              version_name=education_group_version_to_delete.version_name,
-                                              is_transition=education_group_version_to_delete.is_transition)
+        identity = DeleteProgramTreeVersionCommand(
+            offer_acronym=education_group_version_to_delete.offer.acronym,
+            year=education_group_version_to_delete.offer.academic_year.year,
+            version_name=education_group_version_to_delete.version_name,
+            is_transition=education_group_version_to_delete.is_transition
+        )
         delete_program_tree_version_service.delete_program_tree_version(identity)
         self.assertEqual_remaining_records([],
                                            [],
@@ -124,9 +127,8 @@ class TestDeleteVersion(TestCase):
 def build_version_content(academic_year):
     offer = EducationGroupYearFactory(acronym='LCHIM',
                                       academic_year=academic_year)
-
-    root_node = ElementGroupYearFactory(group_year__group__start_year=academic_year,
-                                        group_year__academic_year=academic_year)
+    group_yr = GroupYearFactory(group__start_year=academic_year, academic_year=academic_year)
+    root_node = ElementGroupYearFactory(group_year=group_yr)
     link_level_1 = GroupElementYearFactory(parent_element=root_node,
                                            child_element__group_year__group__start_year=academic_year,
                                            child_element__group_year__academic_year=academic_year)

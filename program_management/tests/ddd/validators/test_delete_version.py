@@ -35,12 +35,14 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group_year import GroupYearFactory, TrainingGroupYearFactory
-from program_management.ddd.service.write.delete_program_tree_version_service import start
+from program_management.ddd.service.write.delete_program_tree_version_service import _delete_version_root_group
 from program_management.ddd.validators._delete_version import DeleteVersionValidator, \
     _have_contents_which_are_not_mandatory
 from program_management.tests.ddd.service.write.test_delete_program_tree_version_service import build_version_content, \
     EDUCATION_GROUP_VERSION
 from program_management.tests.factories.element import ElementGroupYearFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.ddd.service.write.delete_program_tree_version_service import _delete_version_trees
 
 
 class TestDeleteVersionValidator(TestCase):
@@ -62,9 +64,13 @@ class TestDeleteVersionValidator(TestCase):
         self.data.update(build_version_content(self.next_academic_year))
         self.data.update(build_version_content(self.previous_academic_year))
 
-    def test_validator_has_not_offer_enrollments(self):
-        education_group_version = self.data.get(self.academic_year).get(EDUCATION_GROUP_VERSION)
-        validator = DeleteVersionValidator(education_group_versions=[education_group_version])
+    def test_validator_has_no_offer_enrollments(self):
+        empty_tree_version = EducationGroupVersionFactory(
+            root_group__academic_year=self.academic_year,
+            root_group__group__start_year=self.academic_year,
+            offer__academic_year=self.academic_year,
+        )
+        validator = DeleteVersionValidator(education_group_versions=[empty_tree_version])
         self.assertTrue(validator.is_valid())
         self.assertEqual(len(validator.messages), 0)
 
@@ -96,12 +102,14 @@ class TestHaveContents(TestCase):
         It must be consider as empty
         """
 
-        group_year = TrainingGroupYearFactory(academic_year=self.academic_year)
+        group_year = TrainingGroupYearFactory(academic_year=self.academic_year, group__start_year=self.academic_year)
 
         element_group_year = ElementGroupYearFactory(group_year=group_year)
         for education_group_type in [GroupType.COMMON_CORE.name, GroupType.FINALITY_120_LIST_CHOICE.name]:
 
-            child = GroupYearFactory(academic_year=self.academic_year, education_group_type__name=education_group_type)
+            child = GroupYearFactory(academic_year=self.academic_year,
+                                     education_group_type__name=education_group_type,
+                                     group__start_year=self.academic_year)
             child_element = ElementGroupYearFactory(group_year=child)
 
             AuthorizedRelationshipFactory(
@@ -120,11 +128,12 @@ class TestHaveContents(TestCase):
         ==> We must consider as it have contents
         """
 
-        education_group_year = TrainingGroupYearFactory(academic_year=self.academic_year)
-        parent_education_group_year = ElementGroupYearFactory(group_year=education_group_year)
+        group_yr = TrainingGroupYearFactory(academic_year=self.academic_year, group__start_year=self.academic_year)
+        parent_education_group_year = ElementGroupYearFactory(group_year=group_yr)
         subgroup_1 = GroupYearFactory(
             academic_year=self.academic_year,
-            education_group_type__name=GroupType.SUB_GROUP.name
+            education_group_type__name=GroupType.SUB_GROUP.name,
+            group__start_year=self.academic_year,
         )
         child_subgroup1 = ElementGroupYearFactory(group_year=subgroup_1)
         GroupElementYearFactory(parent_element=parent_education_group_year,
@@ -135,6 +144,7 @@ class TestHaveContents(TestCase):
         subgroup_2 = GroupYearFactory(
             academic_year=self.academic_year,
             education_group_type=subgroup_1.education_group_type,
+            group__start_year=self.academic_year,
         )
         elt_subgroup_2 = ElementGroupYearFactory(group_year=subgroup_2)
         GroupElementYearFactory(
@@ -145,23 +155,23 @@ class TestHaveContents(TestCase):
         )
 
         AuthorizedRelationshipFactory(
-            parent_type=education_group_year.education_group_type,
+            parent_type=group_yr.education_group_type,
             child_type=subgroup_1.education_group_type,
             min_count_authorized=1,
         )
-        self.assertTrue(_have_contents_which_are_not_mandatory(education_group_year))
+        self.assertTrue(_have_contents_which_are_not_mandatory(group_yr))
 
     def test_have_contents_case_contents_because_structure_have_child_which_are_not_mandatory(self):
         """
         In this test, we ensure that at least one children are not mandatory groups so they must not be considered
         as empty
         """
-        education_group_year = TrainingGroupYearFactory(academic_year=self.academic_year)
-        parent_education_group_year = ElementGroupYearFactory(group_year=education_group_year)
-        child_mandatory = GroupYearFactory(academic_year=self.academic_year)
+        group_year = TrainingGroupYearFactory(academic_year=self.academic_year, group__start_year=self.academic_year)
+        parent_education_group_year = ElementGroupYearFactory(group_year=group_year)
+        child_mandatory = GroupYearFactory(academic_year=self.academic_year, group__start_year=self.academic_year)
         child_mandataory_eleem = ElementGroupYearFactory(group_year=child_mandatory)
         AuthorizedRelationshipFactory(
-            parent_type=education_group_year.education_group_type,
+            parent_type=group_year.education_group_type,
             child_type=child_mandatory.education_group_type,
             min_count_authorized=1
         )
@@ -172,10 +182,10 @@ class TestHaveContents(TestCase):
             child_branch=None,
         )
 
-        child_no_mandatory = GroupYearFactory(academic_year=self.academic_year)
+        child_no_mandatory = GroupYearFactory(academic_year=self.academic_year, group__start_year=self.academic_year)
         child_no_mandataory_eleem = ElementGroupYearFactory(group_year=child_no_mandatory)
         AuthorizedRelationshipFactory(
-            parent_type=education_group_year.education_group_type,
+            parent_type=group_year.education_group_type,
             child_type=child_mandatory.education_group_type,
             min_count_authorized=0
         )
@@ -185,7 +195,7 @@ class TestHaveContents(TestCase):
             parent=None,
             child_branch=None,
         )
-        self.assertTrue(_have_contents_which_are_not_mandatory(education_group_year))
+        self.assertTrue(_have_contents_which_are_not_mandatory(group_year))
 
 
 class TestRunDelete(TestCase):
@@ -195,22 +205,26 @@ class TestRunDelete(TestCase):
 
     def test_delete_case_no_mandatory_structure(self):
 
-        education_group_year = TrainingGroupYearFactory(academic_year=self.academic_year)
-        start(education_group_year)
-
+        group_yr = TrainingGroupYearFactory(academic_year=self.academic_year)
+        education_group_version = EducationGroupVersionFactory(root_group=group_yr)
+        _delete_version_root_group(education_group_version)
         with self.assertRaises(GroupYear.DoesNotExist):
-            GroupYear.objects.get(pk=education_group_year.pk)
+            GroupYear.objects.get(pk=group_yr.pk)
 
     def test_delete_case_remove_mandatory_structure(self):
-        education_group_year = TrainingGroupYearFactory(academic_year=self.academic_year)
-        parent_element_education_group_year = ElementGroupYearFactory(group_year=education_group_year)
+        group_yr = TrainingGroupYearFactory(academic_year=self.academic_year,
+                                            group__start_year=self.academic_year)
+        education_group_version = EducationGroupVersionFactory(root_group=group_yr,
+                                                               offer__academic_year=self.academic_year)
+        parent_element_education_group_year = ElementGroupYearFactory(group_year=group_yr)
         child_mandatory = GroupYearFactory(
             academic_year=self.academic_year,
-            education_group_type__name=GroupType.COMMON_CORE.name
+            education_group_type__name=GroupType.COMMON_CORE.name,
+            group__start_year=self.academic_year
         )
         child_element_education_group_year = ElementGroupYearFactory(group_year=child_mandatory)
         AuthorizedRelationshipFactory(
-            parent_type=education_group_year.education_group_type,
+            parent_type=group_yr.education_group_type,
             child_type=child_mandatory.education_group_type,
             min_count_authorized=1,
         )
@@ -219,9 +233,10 @@ class TestRunDelete(TestCase):
                                                     parent=None,
                                                     child_branch=None)
 
-        start(education_group_year)
+        _delete_version_trees([education_group_version])
+
         with self.assertRaises(GroupYear.DoesNotExist):
-            GroupYear.objects.get(pk=education_group_year.pk)
+            GroupYear.objects.get(pk=group_yr.pk)
         with self.assertRaises(GroupYear.DoesNotExist):
             GroupYear.objects.get(pk=child_mandatory.pk)
         with self.assertRaises(GroupElementYear.DoesNotExist):
@@ -234,7 +249,8 @@ class TestRunDelete(TestCase):
 
         root_group = TrainingGroupYearFactory(academic_year=self.academic_year, group__start_year=self.academic_year)
         root_group_element = ElementGroupYearFactory(group_year=root_group)
-
+        education_group_version = EducationGroupVersionFactory(root_group=root_group,
+                                                               offer__academic_year=self.academic_year)
         child_mandatory = GroupYearFactory(
             academic_year=self.academic_year,
             education_group_type__name=GroupType.COMMON_CORE.name,
@@ -260,7 +276,7 @@ class TestRunDelete(TestCase):
                                 parent=None,
                                 child_branch=None)
 
-        start(root_group)
+        _delete_version_trees([education_group_version])
         with self.assertRaises(GroupYear.DoesNotExist):
             GroupYear.objects.get(pk=root_group.pk)
         with self.assertRaises(GroupElementYear.DoesNotExist):

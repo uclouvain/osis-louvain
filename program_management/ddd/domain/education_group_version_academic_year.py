@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,28 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.translation import gettext_lazy as _
-
-from base.models.utils.utils import ChoiceEnum
-
-ACTIVE = "ACTIVE"
-INACTIVE = "INACTIVE"
-RE_REGISTRATION = "RE_REGISTRATION"
-
-ACTIVE_STATUS_LIST = (
-    (ACTIVE, _("Active")),
-    (INACTIVE, _("Inactive")),
-    (RE_REGISTRATION, _("Reregistration"))
-)
 
 
-ACTIVE_STATUS_LIST_FOR_FILTER = (
-    (True, _("Active")),
-    (False, _("Inactive")),
-)
+class EducationGroupVersionAcademicYear:
 
-
-class ActiveStatusEnum(ChoiceEnum):
-    ACTIVE = _("Active")
-    INACTIVE = _("Inactive")
-    RE_REGISTRATION = _("Reregistration")
+    def __init__(self, educationgroupversion):
+        self.academic_year = educationgroupversion.root_group.academic_year
+        self.root_group = educationgroupversion.root_group

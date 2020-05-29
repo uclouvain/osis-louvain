@@ -25,12 +25,21 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
+
 DAILY = 'DAILY'
 SHIFTED = 'SHIFTED'
 ADAPTED = 'ADAPTED'
 
+# FIXME :: DEPRECATED - use ScheduleTypeEnum instead
 SCHEDULE_TYPES = (
     (DAILY, _("Daily")),
     (SHIFTED, _("Shifted")),
     (ADAPTED, _("Adapted"))
 )
+
+
+class ScheduleTypeEnum(ChoiceEnum):
+    DAILY = _("Daily")
+    SHIFTED = _("Shifted")
+    ADAPTED = _("Adapted")

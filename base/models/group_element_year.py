@@ -27,14 +27,11 @@ import re
 
 from django.core.exceptions import ValidationError
 from django.db import models, connection
-from django.db.models import Q
-from django.utils import translation
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from ordered_model.models import OrderedModel
 from reversion.admin import VersionAdmin
 
-from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import quadrimesters
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
@@ -77,11 +74,6 @@ def validate_block_value(value: int):
 
 
 class GroupElementYearManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().filter(
-            Q(child_branch__isnull=False) | Q(child_leaf__learning_container_year__isnull=False)
-        )
-
     def get_adjacency_list(self, root_elements_ids):
         if not isinstance(root_elements_ids, list):
             raise Exception('root_elements_ids must be an instance of list')
@@ -92,52 +84,41 @@ class GroupElementYearManager(models.Manager):
             WITH RECURSIVE
                 adjacency_query AS (
                     SELECT
-                        parent_id as starting_node_id,
+                        parent_element_id as starting_node_id,
                         id,
-                        child_branch_id,
-                        child_leaf_id,
-                        parent_id,
+                        child_element_id,
+                        parent_element_id,
                         "order",
                         0 AS level,
-                        CAST(parent_id || '|' ||
+                        CAST(parent_element_id || '|' ||
                             (
-                                CASE
-                                WHEN child_branch_id is not null
-                                    THEN child_branch_id
-                                    ELSE child_leaf_id
-                                END
+                                child_element_id
                             ) as varchar(1000)
                         ) As path
                     FROM base_groupelementyear
-                    WHERE parent_id IN %(root_element_ids)s
-
+                    WHERE parent_element_id IN %(root_element_ids)s
                     UNION ALL
-
                     SELECT parent.starting_node_id,
                            child.id,
-                           child.child_branch_id,
-                           child.child_leaf_id,
-                           child.parent_id,
+                           child.child_element_id,
+                           child.parent_element_id,
                            child.order,
                            parent.level + 1,
                            CAST(
                                 parent.path || '|' ||
                                     (
-                                        CASE
-                                        WHEN child.child_branch_id is not null
-                                            THEN child.child_branch_id
-                                            ELSE child.child_leaf_id
-                                        END
+                                        child.child_element_id
                                     ) as varchar(1000)
                                ) as path
                     FROM base_groupelementyear AS child
-                    INNER JOIN adjacency_query AS parent on parent.child_branch_id = child.parent_id
+                    INNER JOIN adjacency_query AS parent on parent.child_element_id = child.parent_element_id
                 )
-            SELECT distinct starting_node_id, adjacency_query.id, child_branch_id, child_leaf_id, parent_id,
-            COALESCE(child_branch_id, child_leaf_id) AS child_id, "order", level, path
+            SELECT distinct starting_node_id, adjacency_query.id, parent_element_id as parent_id,
+                   child_element_id AS child_id, "order", level, path
             FROM adjacency_query
-            LEFT JOIN base_learningunityear bl on bl.id = adjacency_query.child_leaf_id
-            WHERE adjacency_query.child_leaf_id is null or bl.learning_container_year_id is not null
+            JOIN program_management_element elem on elem.id = adjacency_query.child_element_id
+            LEFT JOIN base_learningunityear bl on bl.id = elem.learning_unit_year_id
+            WHERE bl.id is null or bl.learning_container_year_id is not null
             ORDER BY starting_node_id, level, "order";
         """
         parameters = {
@@ -147,64 +128,55 @@ class GroupElementYearManager(models.Manager):
 
     def get_reverse_adjacency_list(
             self,
-            child_leaf_ids=None,
-            child_branch_ids=None,
+            child_element_ids=None,
             academic_year_id=None,
             link_type: LinkTypes = None
     ):
-        child_leaf_ids = child_leaf_ids or []
-        child_branch_ids = child_branch_ids or []
-        if child_leaf_ids and not isinstance(child_leaf_ids, list):
-            raise Exception('child_leaf_ids must be an instance of list')
-        if child_branch_ids and not isinstance(child_branch_ids, list):
-            raise Exception('child_branch_ids must be an instance of list')
-        if not child_leaf_ids and not child_branch_ids:
+        if not isinstance(child_element_ids, list):
+            raise Exception('child_element_ids must be an instance of list')
+        if not child_element_ids:
             return []
 
-        where_statement = self.__build_where_statement(None, child_branch_ids, child_leaf_ids)
+        where_statement = self.__build_where_statement(None, child_element_ids)
 
         reverse_adjacency_query_template = """
             WITH RECURSIVE
                 reverse_adjacency_query AS (
                     SELECT
-                        COALESCE(gey.child_leaf_id, gey.child_branch_id) as starting_node_id,
+                           gey.child_element_id as starting_node_id,
                            gey.id,
-                           gey.child_branch_id,
-                           gey.child_leaf_id,
-                           gey.parent_id,
+                           gey.child_element_id,
+                           gey.parent_element_id,
                            gey.order,
-                           edyc.academic_year_id,
+                           gpyc.academic_year_id,
                            0 AS level
                     FROM base_groupelementyear gey
-                    INNER JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
+                    INNER JOIN program_management_element elem on elem.id = gey.parent_element_id
+                    INNER JOIN education_group_groupyear AS gpyc on elem.group_year_id = gpyc.id
                     WHERE {where_statement}
                     AND (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
-
                     UNION ALL
-
                     SELECT 	child.starting_node_id,
                             parent.id,
-                            parent.child_branch_id,
-                            parent.child_leaf_id,
-                            parent.parent_id,
+                            parent.child_element_id,
+                            parent.parent_element_id,
                             parent.order,
-                            edyp.academic_year_id,
+                            gpyp.academic_year_id,
                             child.level + 1
                     FROM base_groupelementyear AS parent
-                    INNER JOIN reverse_adjacency_query AS child on parent.child_branch_id = child.parent_id
-                    INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
+                    INNER JOIN reverse_adjacency_query AS child on parent.child_element_id = child.parent_element_id
+                    INNER JOIN program_management_element elem on elem.id = parent.parent_element_id
+                    INNER JOIN education_group_groupyear AS gpyp on elem.group_year_id = gpyp.id
                 )
-
-            SELECT distinct starting_node_id, id, parent_id, COALESCE(child_branch_id, child_leaf_id) AS child_id,
-            "order", level
+            SELECT distinct starting_node_id, id, parent_element_id AS parent_id, child_element_id AS child_id, 
+                            "order", level
             FROM reverse_adjacency_query
             WHERE %(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s
             ORDER BY starting_node_id,  level DESC, "order";
         """.format(where_statement=where_statement)
 
         parameters = {
-            "child_branch_ids": tuple(child_branch_ids),
-            "child_leaf_ids": tuple(child_leaf_ids),
+            "child_element_ids": tuple(child_element_ids),
             "link_type": link_type.name if link_type else None,
             "academic_year_id": academic_year_id,
         }
@@ -212,74 +184,71 @@ class GroupElementYearManager(models.Manager):
 
     def get_root_list(
             self,
-            child_leaf_ids=None,
-            child_branch_ids=None,
+            child_element_ids=None,
             academic_year_id=None,
             link_type: LinkTypes = None,
             root_category_name=None
     ):
         root_category_name = root_category_name or []
-        child_leaf_ids = child_leaf_ids or []
-        child_branch_ids = child_branch_ids or []
-        if child_leaf_ids and not isinstance(child_leaf_ids, list):
-            raise Exception('child_leaf_ids must be an instance of list')
-        if child_branch_ids and not isinstance(child_branch_ids, list):
-            raise Exception('child_branch_ids must be an instance of list')
-        if not child_leaf_ids and not child_branch_ids and not academic_year_id:
+        child_element_ids = child_element_ids or []
+        if not isinstance(child_element_ids, list):
+            raise Exception('child_element_ids must be an instance of list')
+
+        if not len(child_element_ids) and not academic_year_id:
             return []
 
-        where_statement = self.__build_where_statement(academic_year_id, child_branch_ids, child_leaf_ids)
+        where_statement = self.__build_where_statement(academic_year_id, child_element_ids)
         root_query_template = """
             WITH RECURSIVE
                 root_query AS (
                     SELECT
-                        COALESCE(gey.child_leaf_id, gey.child_branch_id) as starting_node_id,
+                        gey.child_element_id as starting_node_id,
                         gey.id,
-                        gey.child_branch_id,
-                        gey.child_leaf_id,
-                        gey.parent_id,
-                        edyp.academic_year_id,
+                        gey.child_element_id,
+                        gey.parent_element_id,
+                        gpyp.academic_year_id,
                         CASE
                             WHEN egt.name in %(root_categories_names)s THEN true
                             ELSE false
                           END as is_root_row
                     FROM base_groupelementyear gey
-                    INNER JOIN base_educationgroupyear AS edyp on gey.parent_id = edyp.id
-                    INNER JOIN base_educationgrouptype AS egt on edyp.education_group_type_id = egt.id
-                    LEFT JOIN base_learningunityear bl on gey.child_leaf_id = bl.id
-                    LEFT JOIN base_educationgroupyear AS edyc on gey.parent_id = edyc.id
-                    WHERE {where_statement}
-                    AND (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
+                    INNER JOIN program_management_element parent_elem on parent_elem.id = gey.parent_element_id
 
+                    INNER JOIN education_group_groupyear AS gpyp on parent_elem.group_year_id = gpyp.id
+                    INNER JOIN base_educationgrouptype AS egt on gpyp.education_group_type_id = egt.id
+
+                    INNER JOIN program_management_element child_element on child_element.id = gey.child_element_id
+                    LEFT JOIN base_learningunityear bl on child_element.learning_unit_year_id = bl.id
+                    LEFT JOIN education_group_groupyear AS gpyc on parent_elem.group_year_id = gpyc.id
+                    WHERE {where_statement}  AND
+                          (%(link_type)s IS NULL or gey.link_type = %(link_type)s)
                     UNION ALL
-
                     SELECT 	child.starting_node_id,
                       parent.id,
-                      parent.child_branch_id,
-                      parent.child_leaf_id,
-                      parent.parent_id,
-                      edyp.academic_year_id,
+                      parent.child_element_id,
+                      parent.parent_element_id,
+                      gpyp.academic_year_id,
                       CASE
                         WHEN egt.name in %(root_categories_names)s THEN true
                         ELSE false
                       END as is_root_row
                     FROM base_groupelementyear AS parent
-                    INNER JOIN root_query AS child on parent.child_branch_id = child.parent_id
+                    INNER JOIN root_query AS child on parent.child_element_id = child.parent_element_id
                     and child.is_root_row = false
-                    INNER JOIN base_educationgroupyear AS edyp on parent.parent_id = edyp.id
-                    INNER JOIN base_educationgrouptype AS egt on edyp.education_group_type_id = egt.id
-                )
 
-            SELECT distinct starting_node_id AS child_id, parent_id AS root_id
+                    INNER JOIN program_management_element parent_elem on parent_elem.id = parent.parent_element_id
+                    INNER JOIN education_group_groupyear gpyp on parent_elem.group_year_id = gpyp.id
+                    INNER JOIN base_educationgrouptype AS egt on gpyp.education_group_type_id = egt.id
+                )
+            SELECT distinct starting_node_id AS child_id, parent_element_id AS root_id
             FROM root_query
-            WHERE (%(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s)
-            and (is_root_row is not Null and is_root_row = true)
+            WHERE (%(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s) AND
+                  (is_root_row is not Null and is_root_row = true)
             ORDER BY starting_node_id;
         """.format(where_statement=where_statement)
 
         parameters = {
-            "child_branch_ids": tuple(child_branch_ids),
-            "child_leaf_ids": tuple(child_leaf_ids),
+            "child_element_ids": tuple(child_element_ids),
             "link_type": link_type.name if link_type else None,
             "academic_year_id": academic_year_id,
             "root_categories_names": tuple(root_category_name)
@@ -292,20 +261,14 @@ class GroupElementYearManager(models.Manager):
             cursor.execute(query_template, parameters)
             return dict_fetchall(cursor)
 
-    def __build_where_statement(self, academic_year_id, child_branch_ids, child_leaf_ids):
-        where_statement_leaf = "child_leaf_id in %(child_leaf_ids)s" if child_leaf_ids else ""
-        where_statement_branch = "child_branch_id in %(child_branch_ids)s" if child_branch_ids else ""
-        where_statement_academic_year = "(edyc.academic_year_id = %(academic_year_id)s " \
+    def __build_where_statement(self, academic_year_id, child_element_ids):
+        where_statement_element = "child_element_id in %(child_element_ids)s" if child_element_ids else ""
+        where_statement_academic_year = "(gpyc.academic_year_id = %(academic_year_id)s " \
                                         "OR bl.academic_year_id = %(academic_year_id)s)"
         if academic_year_id:
-            where_statement = where_statement_academic_year
-        elif child_leaf_ids and child_branch_ids:
-            where_statement = where_statement_leaf + ' OR ' + where_statement_branch
-        elif child_leaf_ids and not child_branch_ids:
-            where_statement = where_statement_leaf
-        else:
-            where_statement = where_statement_branch
-        return where_statement
+            return where_statement_academic_year
+        elif child_element_ids:
+            return where_statement_element
 
 
 class GroupElementYear(OrderedModel):
