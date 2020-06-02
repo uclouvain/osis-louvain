@@ -21,26 +21,34 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from collections import Counter
 from typing import List
 
-from django.db.models import Count
-from django.utils.translation import gettext as _
-from django.utils.translation import ngettext_lazy, gettext_lazy as _
-
+from django.utils.translation import ngettext_lazy
+from django.utils.translation import gettext_lazy as _
 from base.ddd.utils import business_validator
-from base.models.authorized_relationship import AuthorizedRelationship
-from base.models.education_group_year import EducationGroupYear
-from base.models.group_element_year import GroupElementYear
-from education_group.models.group_year import GroupYear
-from program_management.models.education_group_version import EducationGroupVersion
+from program_management.ddd.business_types import *
 from program_management.ddd.domain.service.offer_enrollments_count import enrollments_count_by_offer
+from program_management.models.education_group_version import EducationGroupVersion
 
 
-class DeleteVersionValidator(business_validator.BusinessValidator):
+class EmptyTreeValidator(business_validator.BusinessValidator):
+
+    def __init__(self, tree: 'ProgramTreeVersion'):
+        super(EmptyTreeValidator, self).__init__()
+        self.tree_to_delete = tree
+
+    def validate(self):
+        validate = self.tree_to_delete.get_tree().is_empty()
+        if not validate:
+            self.add_error_message(_('The content of the education group is not empty.'))
+            return False
+        return True
+
+
+class NoEnrollmentValidator(business_validator.BusinessValidator):
 
     def __init__(self, education_group_versions: List[EducationGroupVersion]):
-        super(DeleteVersionValidator, self).__init__()
+        super(NoEnrollmentValidator, self).__init__()
 
         self.education_group_versions = education_group_versions
 
@@ -49,8 +57,7 @@ class DeleteVersionValidator(business_validator.BusinessValidator):
         protected_messages = []
         for education_group_version in self.education_group_versions:
             education_group_year = education_group_version.offer
-            protected_message = get_protected_messages_by_education_group_year(education_group_year,
-                                                                               education_group_version)
+            protected_message = get_protected_messages_by_education_group_year(education_group_version)
             if protected_message:
                 protected_messages.append({
                     'education_group_year': education_group_year,
@@ -64,8 +71,7 @@ class DeleteVersionValidator(business_validator.BusinessValidator):
         return True
 
 
-def get_protected_messages_by_education_group_year(education_group_year: EducationGroupYear,
-                                                   education_group_version: EducationGroupVersion) -> List:
+def get_protected_messages_by_education_group_year(education_group_version: EducationGroupVersion) -> List:
     protected_message = []
 
     # Count the number of enrollment
@@ -79,36 +85,4 @@ def get_protected_messages_by_education_group_year(education_group_year: Educati
             ) % {"count_enrollment": count_enrollment}
         )
 
-    # Check if content is not empty
-    if _have_contents_which_are_not_mandatory(education_group_version.root_group):
-        protected_message.append(_("The content of the education group is not empty."))
-
-    if education_group_year.linked_with_epc:
-        protected_message.append(_("Linked with EPC"))
-
     return protected_message
-
-
-def _have_contents_which_are_not_mandatory(group_year: GroupYear):
-    """
-    An education group year is empty if:
-        - it has no children
-        - all of his children are mandatory groups and they are empty [=> Min 1]
-    """
-    mandatory_groups = AuthorizedRelationship.objects.filter(
-        parent_type=group_year.education_group_type,
-        min_count_authorized=1
-    ).values_list('child_type', 'min_count_authorized')
-
-    children_count = GroupElementYear.objects \
-        .filter(parent_element__group_year=group_year) \
-        .values('child_element__group_year__education_group_type') \
-        .annotate(count=Count('child_element__group_year__education_group_type')) \
-        .values_list('child_element__group_year__education_group_type', 'count')
-
-    _have_content = bool(Counter(children_count) - Counter(mandatory_groups))
-    if not _have_content:
-        children_qs = GroupElementYear.objects.filter(parent_element__group_year=group_year)
-        _have_content = \
-            any(_have_contents_which_are_not_mandatory(child.child_element.group_year) for child in children_qs)
-    return _have_content

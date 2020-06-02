@@ -35,14 +35,16 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group_year import GroupYearFactory, TrainingGroupYearFactory
-from program_management.ddd.service.write.delete_program_tree_version_service import _delete_version_root_group
-from program_management.ddd.validators._delete_version import DeleteVersionValidator, \
-    _have_contents_which_are_not_mandatory
+from program_management.ddd.repositories.program_tree_version import _delete_version_root_group
+from program_management.ddd.validators._delete_version import NoEnrollmentValidator
+from program_management.ddd.domain.service.tree_has_contents import have_contents_which_are_not_mandatory
 from program_management.tests.ddd.service.write.test_delete_program_tree_version_service import build_version_content, \
     EDUCATION_GROUP_VERSION
 from program_management.tests.factories.element import ElementGroupYearFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
-from program_management.ddd.service.write.delete_program_tree_version_service import _delete_version_trees
+
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository, ProgramTreeVersionIdentity
+from program_management.ddd.validators._delete_version import EmptyTreeValidator
 
 
 class TestDeleteVersionValidator(TestCase):
@@ -70,7 +72,7 @@ class TestDeleteVersionValidator(TestCase):
             root_group__group__start_year=self.academic_year,
             offer__academic_year=self.academic_year,
         )
-        validator = DeleteVersionValidator(education_group_versions=[empty_tree_version])
+        validator = NoEnrollmentValidator(education_group_versions=[empty_tree_version])
         self.assertTrue(validator.is_valid())
         self.assertEqual(len(validator.messages), 0)
 
@@ -82,7 +84,7 @@ class TestDeleteVersionValidator(TestCase):
         )
 
         education_group_version = self.data.get(self.academic_year).get(EDUCATION_GROUP_VERSION)
-        validator = DeleteVersionValidator(education_group_versions=[education_group_version])
+        validator = NoEnrollmentValidator(education_group_versions=[education_group_version])
         self.assertFalse(validator.is_valid())
         self.assertEqual(len(validator.messages), 1)
 
@@ -94,7 +96,7 @@ class TestHaveContents(TestCase):
 
     def test_have_contents_case_no_contents(self):
         group_year = TrainingGroupYearFactory(academic_year=self.academic_year)
-        self.assertFalse(_have_contents_which_are_not_mandatory(group_year))
+        self.assertFalse(have_contents_which_are_not_mandatory(group_year))
 
     def test_have_contents_case_no_contents_which_because_mandatory_structure(self):
         """
@@ -120,7 +122,7 @@ class TestHaveContents(TestCase):
 
             GroupElementYearFactory(parent=None, child_branch=None,
                                     parent_element=element_group_year, child_element=child_element)
-        self.assertFalse(_have_contents_which_are_not_mandatory(group_year))
+        self.assertFalse(have_contents_which_are_not_mandatory(group_year))
 
     def test_have_contents_case_have_contents_because_mandatory_structure_is_present_multiple_times(self):
         """
@@ -159,7 +161,7 @@ class TestHaveContents(TestCase):
             child_type=subgroup_1.education_group_type,
             min_count_authorized=1,
         )
-        self.assertTrue(_have_contents_which_are_not_mandatory(group_yr))
+        self.assertTrue(have_contents_which_are_not_mandatory(group_yr))
 
     def test_have_contents_case_contents_because_structure_have_child_which_are_not_mandatory(self):
         """
@@ -195,7 +197,7 @@ class TestHaveContents(TestCase):
             parent=None,
             child_branch=None,
         )
-        self.assertTrue(_have_contents_which_are_not_mandatory(group_year))
+        self.assertTrue(have_contents_which_are_not_mandatory(group_year))
 
 
 class TestRunDelete(TestCase):
@@ -233,7 +235,18 @@ class TestRunDelete(TestCase):
                                                     parent=None,
                                                     child_branch=None)
 
-        _delete_version_trees([education_group_version])
+        identity = ProgramTreeVersionIdentity(
+                education_group_version.offer.acronym,
+                education_group_version.offer.academic_year.year,
+                education_group_version.version_name,
+                education_group_version.is_transition
+            )
+
+        ProgramTreeVersionRepository().delete(entity_id=identity)
+
+
+
+        # _delete_version_trees([education_group_version])
 
         with self.assertRaises(GroupYear.DoesNotExist):
             GroupYear.objects.get(pk=group_yr.pk)
@@ -276,7 +289,14 @@ class TestRunDelete(TestCase):
                                 parent=None,
                                 child_branch=None)
 
-        _delete_version_trees([education_group_version])
+        identity = ProgramTreeVersionIdentity(
+                education_group_version.offer.acronym,
+                education_group_version.offer.academic_year.year,
+                education_group_version.version_name,
+                education_group_version.is_transition
+            )
+
+        ProgramTreeVersionRepository().delete(entity_id=identity)
         with self.assertRaises(GroupYear.DoesNotExist):
             GroupYear.objects.get(pk=root_group.pk)
         with self.assertRaises(GroupElementYear.DoesNotExist):

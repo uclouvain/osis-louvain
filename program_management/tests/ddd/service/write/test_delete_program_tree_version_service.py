@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
 from django.test import TestCase
 
 from base.models.group_element_year import GroupElementYear
@@ -31,14 +30,14 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from education_group.models.group_year import GroupYear
+from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.command import DeleteProgramTreeVersionCommand
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.service.write import delete_program_tree_version_service
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
-from education_group.tests.factories.group_year import GroupYearFactory
+
 GROUP_ELEMENT_YEARS = 'group_element_years'
 ELEMENTS = 'elements'
 GROUP_YEARS = 'group_years'
@@ -72,7 +71,7 @@ class TestDeleteVersion(TestCase):
                                                    version_name=education_group_version_to_delete.version_name,
                                                    is_transition=education_group_version_to_delete.is_transition)
 
-        delete_program_tree_version_service.delete_program_tree_version(identity)
+        delete_program_tree_version_service.delete(identity)
         expected_for_ac_yr = self.data.get(self.academic_year)
         expected_for_previous_ac_yr = self.data.get(self.previous_academic_year)
 
@@ -91,7 +90,7 @@ class TestDeleteVersion(TestCase):
             version_name=education_group_version_to_delete.version_name,
             is_transition=education_group_version_to_delete.is_transition
         )
-        delete_program_tree_version_service.delete_program_tree_version(identity)
+        delete_program_tree_version_service.delete(identity)
         results_expected_for_previous_academic_year = self.data.get(self.previous_academic_year)
 
         self.assertEqual_remaining_records(results_expected_for_previous_academic_year.get(GROUP_ELEMENT_YEARS),
@@ -107,7 +106,7 @@ class TestDeleteVersion(TestCase):
             version_name=education_group_version_to_delete.version_name,
             is_transition=education_group_version_to_delete.is_transition
         )
-        delete_program_tree_version_service.delete_program_tree_version(identity)
+        delete_program_tree_version_service.delete(identity)
         self.assertEqual_remaining_records([],
                                            [],
                                            [],

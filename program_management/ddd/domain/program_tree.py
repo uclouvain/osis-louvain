@@ -73,6 +73,13 @@ class ProgramTree(interface.RootEntity):
     def __eq__(self, other: 'ProgramTree'):
         return self.root_node == other.root_node
 
+    def is_empty(self):
+        for a in self.authorized_relationships.authorized_relationships:
+            # TODO je ne vois pas comment me servir de ceci pour définir si mon arbre est vide
+            # et donc supprimable
+            pass
+        return True
+
     def is_master_2m(self):
         return self.root_node.is_master_2m()
 

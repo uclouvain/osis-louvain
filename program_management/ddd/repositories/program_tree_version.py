@@ -26,7 +26,9 @@
 from typing import Optional, List
 
 from django.db.models import F
+from django.db.models import Q
 
+from base.models.group_element_year import GroupElementYear
 from education_group.models.group_year import GroupYear
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
@@ -35,6 +37,7 @@ from program_management.ddd.domain.program_tree_version import ProgramTreeVersio
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.models.education_group_version import EducationGroupVersion
+from program_management.models.element import Element
 
 
 class ProgramTreeVersionRepository(interface.AbstractRepository):
@@ -82,7 +85,13 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
 
     @classmethod
     def delete(cls, entity_id: 'ProgramTreeVersionIdentity') -> None:
-        raise NotImplementedError
+        education_group_versions = EducationGroupVersion.objects \
+            .select_related('root_group__element').filter(offer__acronym=entity_id.offer_acronym,
+                                                          offer__academic_year__year__gte=entity_id.year,
+                                                          version_name=entity_id.version_name,
+                                                          is_transition=entity_id.is_transition)
+
+        cls.delete_version_trees(education_group_versions)
 
     @classmethod
     def search_all_versions_from_root_node(cls, root_node_identity: 'NodeIdentity') -> List['ProgramTreeVersion']:
@@ -113,6 +122,20 @@ class ProgramTreeVersionRepository(interface.AbstractRepository):
             results.append(_instanciate_tree_version(record_dict))
         return results
 
+    @classmethod
+    def delete_version_trees(cls, education_group_versions: List[EducationGroupVersion]) -> None:
+        for education_group_version in education_group_versions:
+            identity = ProgramTreeVersionIdentity(
+                education_group_version.offer.acronym,
+                education_group_version.offer.academic_year.year,
+                education_group_version.version_name,
+                education_group_version.is_transition
+            )
+            _delete_version_tree_content(cls.get(entity_id=identity).get_tree())
+
+        for education_group_version in education_group_versions:
+            _delete_version_root_group(education_group_version)
+
 
 def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
 
@@ -128,3 +151,44 @@ def _instanciate_tree_version(record_dict: dict) -> 'ProgramTreeVersion':
         title_fr=record_dict['version_title_fr'],
         title_en=record_dict['version_title_en'],
     )
+
+
+def _delete_version_root_group(education_group_version: EducationGroupVersion) -> None:
+    root_group_to_delete = education_group_version.root_group
+    education_group_version.delete()
+    if not Element.objects.filter(group_year=root_group_to_delete).exists():
+        root_group_to_delete.delete()
+
+
+def _delete_version_tree_content(tree: 'ProgramTree') -> None:
+    """
+    This function will delete group year and the default structure
+    """
+    group_year_ids = []
+    for node in tree.get_all_nodes():
+        child_links_to_delete = GroupElementYear.objects.filter(
+            Q(parent_element__pk=node.pk) | Q(child_element__pk=node.pk)
+        )
+
+        elt_to_delete = Element.objects.filter(pk=node.pk).first()
+        if elt_to_delete:
+            group_year_ids.append(elt_to_delete.group_year.id)
+
+        for group_element_yr_to_delete in child_links_to_delete:
+            group_element_yr_to_delete.delete()
+        if elt_to_delete:
+            elt_to_delete.delete()
+
+    _delete_unused_group_year(group_year_ids)
+
+
+def _delete_unused_group_year(group_year_ids: List[int]) -> None:
+    for group_yr_id in group_year_ids:
+        if not GroupElementYear.objects.filter(child_element__group_year__pk=group_yr_id).exists() and \
+                not GroupElementYear.objects.filter(parent_element__group_year__pk=group_yr_id).exists() and \
+                not EducationGroupVersion.objects.filter(root_group__pk=group_yr_id).exists() and \
+                not Element.objects.filter(group_year__pk=group_yr_id).exists():
+            # No reuse
+            group_yr = GroupYear.objects.filter(pk=group_yr_id).first()
+            if group_yr:
+                group_yr.delete()
