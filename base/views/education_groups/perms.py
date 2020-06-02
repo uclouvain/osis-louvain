@@ -28,15 +28,14 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from waffle.models import Flag
 
-from base.business.education_groups import perms as business_perms
 from base.models.education_group_year import EducationGroupYear
-from base.models.person import Person
+from osis_role.errors import get_permission_error
 
 
 def can_change_education_group(user, education_group):
-    pers = get_object_or_404(Person, user=user)
-    if not business_perms.is_eligible_to_change_education_group(pers, education_group, raise_exception=True):
-        raise PermissionDenied
+    perm = 'base.change_link_data'
+    if not user.has_perm(perm, education_group):
+        raise PermissionDenied(get_permission_error(user, perm))
     return True
 
 

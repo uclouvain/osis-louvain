@@ -30,10 +30,8 @@ from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages
-from django.core.cache import cache
-from django.core.exceptions import ValidationError
 from django.http import HttpResponseForbidden, HttpResponseRedirect, HttpResponse
-from django.test import TestCase, Client
+from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext as _
 from waffle.testutils import override_flag
@@ -62,15 +60,15 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.organization_address import OrganizationAddressFactory
-from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import SuperUserFactory
 from base.utils.cache import ElementCache
 from base.views.education_groups.update import _get_success_redirect_url, update_education_group
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.business.group_element_years import management
-from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy
 from program_management.models.enums import node_type
+from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory
 from reference.tests.factories.language import LanguageFactory
@@ -192,6 +190,8 @@ class TestUpdate(TestCase):
             entity=cls.mini_training_education_group_year.management_entity,
             start_date=cls.education_group_year.academic_year.start_date
         )
+        cls.country_be = CountryFactory(iso_code='BE', name='Belgium')
+        cls.organization_address = OrganizationAddressFactory(country=cls.country_be)
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -473,7 +473,7 @@ class TestUpdate(TestCase):
             "diploma_printing_title": "Diploma Title",
             'form-TOTAL_FORMS': 1,
             'form-INITIAL_FORMS': 0,
-            'form-0-country': address.country.pk,
+            'form-0-country': address.country,
             'form-0-organization': organization.pk,
             'form-0-diploma': diploma_choice,
             'group_element_year_formset-TOTAL_FORMS': 0,
@@ -753,7 +753,6 @@ class TestGetSuccessRedirectUrl(TestCase):
 class TestSelectAttach(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.person = PersonFactory()
         cls.academic_year = create_current_academic_year()
         cls.previous_academic_year = AcademicYearFactory(year=cls.academic_year.year - 1)
         cls.next_academic_year_1 = AcademicYearFactory(year=cls.academic_year.year + 1)
@@ -820,18 +819,11 @@ class TestSelectAttach(TestCase):
             "group_element_year_id": group_above_new_parent.id,
             "action": "attach",
         }
+        cls.person = CentralManagerFactory(entity=cls.new_parent_education_group_year.management_entity).person
+
 
     def setUp(self):
-        self.client = Client()
         self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch(
-            "base.business.education_groups.perms.is_eligible_to_change_education_group",
-            return_value=True
-        )
-        self.mocked_perm = self.perm_patcher.start()
-        self.addCleanup(self.perm_patcher.stop)
-        # Clean cache state
-        self.addCleanup(cache.clear)
 
     def test_copy_case_education_group(self):
         response = self.client.post(
@@ -972,7 +964,8 @@ class TestSelectAttach(TestCase):
         self._assert_link_with_inital_parent_present()
 
     def test_attach_case_child_education_group_year_without_person_entity_link_fails(self):
-        self.mocked_perm.return_value = False
+        person = PersonFactory()
+        self.client.force_login(person.user)
         AuthorizedRelationshipFactory(
             parent_type=self.new_parent_education_group_year.education_group_type,
             child_type=self.child_education_group_year.education_group_type,

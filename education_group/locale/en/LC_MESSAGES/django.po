@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-20 10:11+0100\n"
+"POT-Creation-Date: 2020-05-29 10:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,33 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+msgid "Academic year"
+msgstr ""
+
+msgid "Education group must be mini-training or group"
+msgstr ""
+
 msgid "End academic year"
 msgstr ""
 
-msgid "End year must be greater than the start year"
+msgid "End year must be greater than the start year, or equal"
+msgstr ""
+
+msgid "Start academic year"
+msgstr ""
+
+#, python-format
+msgctxt "female"
+msgid "The user does not have permission to delete a %(category)s."
+msgstr ""
+
+msgid "The user is not allowed to create/modify this type of education group"
+msgstr ""
+
+msgid "The scope of the user is limited and prevents this action to be performed"
+msgstr ""
+
+#, python-format
+msgid ""
+"You cannot change/delete a education group existing before %(limit_year)s"
 msgstr ""

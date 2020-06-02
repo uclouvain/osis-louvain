@@ -36,5 +36,5 @@
         {% button_order_with_permission _("Go down") "btn_operation_down_"|addstr:group.id "down" %}
     </form>
     {% url 'group_element_year_delete' root.pk education_group_year.pk group.pk as detach_url %}
-    {% action_with_permission _("Detach") "detach" detach_url %}
+    {% action_with_permission person group _("Detach") "detach" "base.can_detach_node" detach_url %}
 </div>

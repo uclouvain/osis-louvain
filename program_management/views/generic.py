@@ -26,12 +26,11 @@
 import json
 
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
-from django.views.generic import UpdateView, DetailView, FormView
+from django.views.generic import DetailView, FormView
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
@@ -41,6 +40,7 @@ from base.models.person import Person
 from base.views.education_groups import perms
 from base.views.education_groups.detail import CatalogGenericDetailView
 from base.views.mixins import RulesRequiredMixin, FlagMixin, AjaxTemplateMixin
+from osis_role.contrib.views import PermissionRequiredMixin, AjaxPermissionRequiredMixin
 from program_management.ddd.repositories import load_tree
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers import program_tree_view
@@ -52,7 +52,7 @@ NO_PREREQUISITES = TrainingType.finality_types() + [
 
 
 @method_decorator(login_required, name='dispatch')
-class GenericGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin):
+class GenericGroupElementYearMixin(AjaxPermissionRequiredMixin, FlagMixin, SuccessMessageMixin, AjaxTemplateMixin):
     model = GroupElementYear
     context_object_name = "group_element_year"
     pk_url_kwarg = "group_element_year_id"
@@ -60,18 +60,7 @@ class GenericGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessMessage
     # FlagMixin
     flag = "education_group_update"
 
-    # RulesRequiredMixin
-    raise_exception = True
-    rules = [perms.can_change_education_group]
-
-    def _call_rule(self, rule):
-        """ The permission is computed from the education_group_year """
-        return rule(self.request.user, self.education_group_year)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context['root'] = self.kwargs["root_id"]
-        return context
+    permission_required = 'base.change_link_data'
 
     @property
     def education_group_year(self):
@@ -79,6 +68,9 @@ class GenericGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessMessage
 
     def get_root(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
+
+    def get_permission_object(self):
+        return self.get_object().parent
 
 
 @method_decorator(login_required, name='dispatch')

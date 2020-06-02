@@ -25,15 +25,14 @@
 ##############################################################################
 from typing import List, Tuple
 
-from django.contrib.auth.decorators import login_required
+from django import shortcuts
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
 from django.forms import formset_factory, modelformset_factory
 from django.http import JsonResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import RedirectView, CreateView, FormView, TemplateView
@@ -46,6 +45,8 @@ from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages, display_error_messages
 from base.views.education_groups import perms
 from base.views.mixins import AjaxTemplateMixin
+from osis_role.contrib.views import AjaxPermissionRequiredMixin
+from osis_role.errors import get_permission_error
 from program_management.business.group_element_years import management
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
@@ -58,8 +59,13 @@ from program_management.models.enums.node_type import NodeType
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
-class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
+class AttachMultipleNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
     template_name = "tree/attach_inner.html"
+    permission_required = "base.can_attach_node"
+
+    def get_permission_object(self) -> EducationGroupYear:
+        node_to_attach_from_id = int(self.request.GET['path'].split("|")[-1])
+        return shortcuts.get_object_or_404(EducationGroupYear, pk=node_to_attach_from_id)
 
     @cached_property
     def nodes_to_attach(self) -> List[Tuple[int, NodeType]]:
@@ -151,10 +157,8 @@ class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, Redi
         redirect_url = reverse("check_education_group_attach", args=[self.kwargs["root_id"]])
         redirect_url = "{}?{}".format(redirect_url, self.request.GET.urlencode())
 
-        try:
-            perms.can_change_education_group(self.request.user, self.education_group_year)
-        except PermissionDenied as e:
-            display_warning_messages(self.request, str(e))
+        if not self.request.user.has_perm(self.permission_required, obj=self.education_group_year):
+            display_warning_messages(self.request, get_permission_error(self.request.user, self.permission_required))
 
         cached_data = ElementCache(self.request.user).cached_data
 
@@ -169,16 +173,8 @@ class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, Redi
                 return redirect_url
         return super().get_redirect_url(*args, **kwargs)
 
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        if self.rules:
-            try:
-                self.rules[0](self.request.user, self.education_group_year)
-
-            except PermissionDenied as e:
-                return render(request, 'education_group/blocks/modal/modal_access_denied.html', {'access_message': e})
-
-        return super(PasteElementFromCacheToSelectedTreeNode, self).dispatch(request, *args, **kwargs)
+    def get_permission_object(self):
+        return self.education_group_year
 
 
 class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
@@ -241,6 +237,9 @@ class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
     def get_success_url(self):
         """ We'll reload the page """
         return
+
+    def get_permission_object(self):
+        return self.education_group_year
 
 
 class MoveGroupElementYearView(CreateGroupElementYearView):

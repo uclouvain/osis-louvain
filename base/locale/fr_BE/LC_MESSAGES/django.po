@@ -2841,9 +2841,9 @@ msgstr "L'utilisateur n'a pas la permission de créer des formations."
 msgid "The user has not permission to delete education groups."
 msgstr "L'utilisateur n'a pas la permission de supprimer les formations."
 
-msgid "The user is not allowed to change education group content."
+msgid "The user is not allowed to change link data."
 msgstr ""
-"L'utilisateur n'a pas la permission de modifier le contenu de la formation."
+"L'utilisateur n'a pas la permission de modifier le contenu d'un lien."
 
 msgid "The user is not attached to the management entity"
 msgstr "L’utilisateur n’est pas attaché à l’entité de gestion"

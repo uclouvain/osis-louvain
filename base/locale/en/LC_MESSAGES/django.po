@@ -2710,7 +2710,7 @@ msgstr ""
 msgid "The user has not permission to delete education groups."
 msgstr ""
 
-msgid "The user is not allowed to change education group content."
+msgid "The user is not allowed to change link data."
 msgstr ""
 
 msgid "The user is not attached to the management entity"

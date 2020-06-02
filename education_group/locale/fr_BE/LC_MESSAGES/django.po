@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-12-20 10:11+0100\n"
+"POT-Creation-Date: 2020-05-29 10:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,8 +16,31 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+msgid "Academic year"
+msgstr "Année académique"
+
+msgid "Education group must be mini-training or group"
+msgstr "L'offre doit être une mini-formation ou un groupement"
+
 msgid "End academic year"
 msgstr "Année académique de fin"
 
 msgid "End year must be greater than the start year, or equal"
 msgstr "L'année de fin doit être supérieure ou égale à l'année de début "
+
+msgid "Start academic year"
+msgstr "Année académique de début"
+
+#, python-format
+msgctxt "female"
+msgid "The user does not have permission to delete a %(category)s."
+msgstr "L'utilisateur n'a pas la permission de supprimer une %(category)s."
+
+msgid "The user is not allowed to create/modify this type of education group"
+msgstr "L'utilisateur n'est pas autorisé à créer/modifer ce type de formation"
+
+msgid "The scope of the user is limited and prevents this action to be performed"
+msgstr "La portée de l'utilisateur est limitée et empêche la réalisation de cette action"
+
+msgid "You cannot change/delete a education group existing before %(limit_year)s"
+msgstr "Vous ne pouvez pas supprimer/modifier une formation existant avant %(limit_year)s"

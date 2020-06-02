@@ -33,8 +33,7 @@ from base.models.education_group_year import EducationGroupYear
 ERRORS_MSG = {
     "base.add_educationgroup": _("The user does not have permission to create education groups."),
     "base.change_educationgroup": _("The user does not have permission to change education groups."),
-    "base.delete_educationgroup": _("The user does not have permission to delete education groups."),
-    "base.change_educationgroupcontent": _("The user is not allowed to change education group content.")
+    "base.change_link_data": _("The user is not allowed to change link data.")
 }
 
 
@@ -45,7 +44,7 @@ def is_eligible_to_change_education_group(person, education_group, raise_excepti
 
 
 def is_eligible_to_change_education_group_content(person, education_group, raise_exception=False):
-    return check_permission(person, "base.change_educationgroupcontent", raise_exception) and \
+    return check_permission(person, "base.change_link_data", raise_exception) and \
         is_eligible_to_change_education_group(person, education_group, raise_exception)
 
 

@@ -25,9 +25,8 @@
 ##############################################################################
 from unittest import mock
 
-from django.contrib.auth.models import Permission
 from django.contrib.messages import get_messages, constants as MSG
-from django.http import HttpResponseNotFound, HttpResponse, QueryDict
+from django.http import HttpResponseNotFound, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
@@ -36,8 +35,10 @@ from base.ddd.utils.validation_message import BusinessValidationMessageList, Bus
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import CentralManagerForUEFactory
+from base.tests.factories.person import PersonFactory
 from base.utils.cache import ElementCache
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.forms.tree.detach import DetachNodeForm
 
@@ -50,7 +51,7 @@ class TestDetachNodeView(TestCase):
         cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
         cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
                                                          child_branch__academic_year=cls.academic_year)
-        cls.person = CentralManagerForUEFactory()
+        cls.person = CentralManagerFactory(entity=cls.education_group_year.management_entity).person
         cls.path_to_detach = '|'.join([str(cls.group_element_year.parent_id), str(cls.group_element_year.child_branch_id)])
         cls.url = reverse("tree_detach_node", args=[
             cls.education_group_year.id,
@@ -58,16 +59,7 @@ class TestDetachNodeView(TestCase):
 
     def setUp(self):
         self.client.force_login(self.person.user)
-        self._mock_perms()
         self._mock_authorized_relationship_validator()
-
-    def _mock_perms(self):
-        self.perm_patcher = mock.patch(
-            "program_management.business.group_element_years.perms.is_eligible_to_detach_group_element_year",
-            return_value=True
-        )
-        self.mocked_perm = self.perm_patcher.start()
-        self.addCleanup(self.perm_patcher.stop)
 
     def _mock_authorized_relationship_validator(self):
         self.validator_patcher = mock.patch.object(
@@ -110,7 +102,8 @@ class TestDetachNodeView(TestCase):
         self.assertTemplateUsed(response, "page_not_found.html")
 
     def test_detach_case_user_not_have_access(self):
-        self.mocked_perm.return_value = False
+        person = PersonFactory()
+        self.client.force_login(person.user)
         response = self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
@@ -164,3 +157,11 @@ class TestDetachNodeView(TestCase):
         self.client.post(self.url, follow=True, HTTP_X_REQUESTED_WITH='XMLHttpRequest', data={'path': self.path_to_detach})
         error_msg = "The clipboard should not be cleared if element in clipboard is not the detached element"
         self.assertEqual(ElementCache(self.person.user).cached_data['id'], element_cached.id, error_msg)
+
+    @mock.patch('base.business.event_perms.EventPerm.is_open', return_value=False)
+    def test_detach_not_permitted_for_faculty_manager_if_period_closed(self, mock_period_open):
+        faculty_manager = FacultyManagerFactory(entity=self.education_group_year.management_entity)
+        group_element_year = GroupElementYearFactory(parent=self.group_element_year.parent)
+        self.assertFalse(
+            faculty_manager.person.user.has_perm('base.can_detach_node', group_element_year.parent)
+        )

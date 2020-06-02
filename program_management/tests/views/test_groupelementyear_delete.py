@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest import mock
 
 from django.contrib.auth.models import Permission
 from django.test import TestCase
@@ -34,8 +33,8 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import CentralManagerForUEFactory
 from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
 @override_flag('education_group_update', active=True)
@@ -54,7 +53,7 @@ class TestDetachLearningUnitPrerequisite(TestCase):
             child_branch=None,
             child_leaf=cls.luy
         )
-        cls.person = CentralManagerForUEFactory()
+        cls.person = CentralManagerFactory(entity=cls.education_group_year.management_entity).person
         cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse("group_element_year_delete", args=[
             cls.education_group_year.id,
@@ -64,12 +63,6 @@ class TestDetachLearningUnitPrerequisite(TestCase):
 
     def setUp(self):
         self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch(
-            "program_management.business.group_element_years.perms.is_eligible_to_detach_group_element_year",
-            return_value=True
-        )
-        self.mocked_perm = self.perm_patcher.start()
-        self.addCleanup(self.perm_patcher.stop)
 
     def test_detach_case_learning_unit_being_prerequisite(self):
         PrerequisiteItemFactory(

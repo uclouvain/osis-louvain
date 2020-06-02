@@ -614,7 +614,7 @@ msgstr ""
 msgid "The root does not exist in the next academic year."
 msgstr ""
 
-msgid "The user is not allowed to change education group content."
+msgid "The user is not allowed to change link data."
 msgstr ""
 
 msgid "Themes discussed"

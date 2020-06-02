@@ -2393,7 +2393,7 @@
                     "messagetemplate"
                 ],
                 [
-                    "change_educationgroupcontent",
+                    "change_link_data",
                     "base",
                     "educationgroup"
                 ]
@@ -2684,11 +2684,6 @@
                     "educationgroup"
                 ],
                 [
-                    "delete_educationgroup",
-                    "base",
-                    "educationgroup"
-                ],
-                [
                     "is_entity_manager",
                     "base",
                     "entitymanager"
@@ -2724,7 +2719,7 @@
                     "person"
                 ],
                 [
-                    "change_educationgroupcontent",
+                    "change_link_data",
                     "base",
                     "educationgroup"
                 ]

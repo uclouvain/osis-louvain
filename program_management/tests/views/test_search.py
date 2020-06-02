@@ -462,8 +462,8 @@ class TestEducationGroupTypeAutoComplete(TestCase):
         self.assertEqual(6, len(json_response["results"]))
 
     def test_with_category_set(self):
-        tuples_category_woth_expected_result = [(TRAINING, 2), (MINI_TRAINING, 3), (GROUP, 1)]
-        for category, expected_result in tuples_category_woth_expected_result:
+        tuples_category_with_expected_result = [(TRAINING, 2), (MINI_TRAINING, 3), (GROUP, 1)]
+        for category, expected_result in tuples_category_with_expected_result:
             with self.subTest(category=category):
                 response = self.client.get(self.url, data={"forward": json.dumps({"category": category})})
                 json_response = response.json()

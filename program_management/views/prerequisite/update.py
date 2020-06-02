@@ -25,6 +25,7 @@
 ##############################################################################
 
 from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -46,10 +47,7 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
 
     def get_form_kwargs(self):
         form_kwargs = super().get_form_kwargs()
-        node = self.program_tree.get_node_by_id_and_type(
-            int(self.kwargs["learning_unit_year_id"]),
-            NodeType.LEARNING_UNIT
-        )
+        node = self._get_learning_unit_year_node()
         form_kwargs["program_tree"] = self.program_tree
         form_kwargs["node"] = node
         form_kwargs["initial"] = {
@@ -63,16 +61,22 @@ class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
         return context
 
     def form_valid(self, form):
-        node = self.program_tree.get_node_by_id_and_type(
-            int(self.kwargs["learning_unit_year_id"]),
-            NodeType.LEARNING_UNIT
-        )
+        node = self._get_learning_unit_year_node()
         messages = self.program_tree.set_prerequisite(form.cleaned_data["prerequisite_string"], node)
         error_messages = [msg for msg in messages if msg.level == MessageLevel.ERROR]
         if error_messages:
             raise PermissionDenied([msg.message for msg in error_messages])
         persist_tree.persist(self.program_tree)
         return super().form_valid(form)
+
+    def _get_learning_unit_year_node(self):
+        node = self.program_tree.get_node_by_id_and_type(
+            int(self.kwargs["learning_unit_year_id"]),
+            NodeType.LEARNING_UNIT
+        )
+        if node is None:
+            raise Http404('No learning unit match the given query')
+        return node
 
     #  FIXME refactor permission with new permission module
     def check_can_update_prerequisite(self):
