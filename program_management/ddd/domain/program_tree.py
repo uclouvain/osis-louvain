@@ -73,11 +73,26 @@ class ProgramTree(interface.RootEntity):
     def __eq__(self, other: 'ProgramTree'):
         return self.root_node == other.root_node
 
-    def is_empty(self):
-        for a in self.authorized_relationships.authorized_relationships:
-            # TODO je ne vois pas comment me servir de ceci pour définir si mon arbre est vide
-            # et donc supprimable
-            pass
+    def is_empty(self, children=None):
+        children = children or self.root_node.children
+        for links in children:
+        # TODO Quand je fais des tests je rencontre un problème ici :
+        # if not self.is_empty([l.child for l in links]):
+        # TypeError: 'LinkWithChildBranch' object is not iterable
+
+        if not self.is_empty([l.child for l in links]):
+                return False
+
+            authorized_rel = self.authorized_relationships.get_authorized_relationship(
+                self.root_node.node_type,
+                links.child.node_type
+            )
+            if not authorized_rel:
+                # If the root has an unauthorized child => we consider the structure isn't empty
+                return False
+            elif authorized_rel.min_count_authorized == 0:  #It's a non-mandatory groupement
+                return False
+
         return True
 
     def is_master_2m(self):

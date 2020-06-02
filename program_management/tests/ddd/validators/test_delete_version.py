@@ -36,18 +36,18 @@ from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group_year import GroupYearFactory, TrainingGroupYearFactory
 from program_management.ddd.repositories.program_tree_version import _delete_version_root_group
-from program_management.ddd.validators._delete_version import NoEnrollmentValidator
+from program_management.ddd.validators._delete_version import NoEnrollmentValidator, EmptyTreeValidator
 from program_management.ddd.domain.service.tree_has_contents import have_contents_which_are_not_mandatory
 from program_management.tests.ddd.service.write.test_delete_program_tree_version_service import build_version_content, \
     EDUCATION_GROUP_VERSION
 from program_management.tests.factories.element import ElementGroupYearFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository, ProgramTreeVersionIdentity
-from program_management.ddd.validators._delete_version import EmptyTreeValidator
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository, \
+    ProgramTreeVersionIdentity
 
 
-class TestDeleteVersionValidator(TestCase):
+class TestDeleteVersionOfferEnrollmentValidator(TestCase):
 
     def setUp(self):
         """
@@ -72,7 +72,13 @@ class TestDeleteVersionValidator(TestCase):
             root_group__group__start_year=self.academic_year,
             offer__academic_year=self.academic_year,
         )
-        validator = NoEnrollmentValidator(education_group_versions=[empty_tree_version])
+        identity = ProgramTreeVersionIdentity(
+            offer_acronym=empty_tree_version.offer.acronym,
+            year=empty_tree_version.offer.academic_year.year,
+            version_name=empty_tree_version.version_name,
+            is_transition=empty_tree_version.is_transition
+        )
+        validator = NoEnrollmentValidator(identity=identity)
         self.assertTrue(validator.is_valid())
         self.assertEqual(len(validator.messages), 0)
 
@@ -84,7 +90,35 @@ class TestDeleteVersionValidator(TestCase):
         )
 
         education_group_version = self.data.get(self.academic_year).get(EDUCATION_GROUP_VERSION)
-        validator = NoEnrollmentValidator(education_group_versions=[education_group_version])
+        identity = ProgramTreeVersionIdentity(
+            offer_acronym=education_group_version.offer.acronym,
+            year=education_group_version.offer.academic_year.year,
+            version_name=education_group_version.version_name,
+            is_transition=education_group_version.is_transition
+        )
+
+        validator = NoEnrollmentValidator(identity=identity)
+        self.assertFalse(validator.is_valid())
+        print(validator.messages)
+        self.assertEqual(len(validator.messages), 1)
+
+    def test_validator_has_offer_enrollments_on_next_year_only(self):
+        self.data.get(self.academic_year).get(EDUCATION_GROUP_VERSION)
+        education_group_version_next_year = self.data.get(self.next_academic_year).get(EDUCATION_GROUP_VERSION)
+        OfferEnrollmentFactory.create_batch(
+            3,
+            education_group_year=education_group_version_next_year.offer,
+        )
+
+        education_group_version = self.data.get(self.academic_year).get(EDUCATION_GROUP_VERSION)
+        identity = ProgramTreeVersionIdentity(
+            offer_acronym=education_group_version.offer.acronym,
+            year=education_group_version.offer.academic_year.year,
+            version_name=education_group_version.version_name,
+            is_transition=education_group_version.is_transition
+        )
+
+        validator = NoEnrollmentValidator(identity=identity)
         self.assertFalse(validator.is_valid())
         self.assertEqual(len(validator.messages), 1)
 
@@ -95,8 +129,21 @@ class TestHaveContents(TestCase):
         cls.academic_year = AcademicYearFactory(year=2019)
 
     def test_have_contents_case_no_contents(self):
-        group_year = TrainingGroupYearFactory(academic_year=self.academic_year)
-        self.assertFalse(have_contents_which_are_not_mandatory(group_year))
+        education_group_version = EducationGroupVersionFactory(offer__academic_year=self.academic_year,
+                                                               root_group__academic_year=self.academic_year
+                                                               )
+        data = build_version_content(self.academic_year)
+        education_group_version = data.get(self.academic_year).get(EDUCATION_GROUP_VERSION)
+        # group_year = TrainingGroupYearFactory(academic_year=self.academic_year)
+        identity = ProgramTreeVersionIdentity(
+            offer_acronym=education_group_version.offer.acronym,
+            year=education_group_version.offer.academic_year.year,
+            version_name=education_group_version.version_name,
+            is_transition=education_group_version.is_transition
+        )
+
+        validator_empty_tree = EmptyTreeValidator(tree=ProgramTreeVersionRepository.get(entity_id=identity))
+        self.assertTrue(validator_empty_tree.is_valid())
 
     def test_have_contents_case_no_contents_which_because_mandatory_structure(self):
         """

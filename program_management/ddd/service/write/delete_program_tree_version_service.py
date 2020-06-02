@@ -24,9 +24,11 @@
 #
 ##############################################################################
 
+from typing import List
+
+from program_management.ddd.business_types import *
 from program_management.ddd.command import DeleteProgramTreeVersionCommand
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
-from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.validators._delete_version import EmptyTreeValidator, NoEnrollmentValidator
 
 
 def delete(command: DeleteProgramTreeVersionCommand) -> None:
@@ -37,4 +39,24 @@ def delete(command: DeleteProgramTreeVersionCommand) -> None:
         command.is_transition
     )
 
-    ProgramTreeVersionRepository().delete(entity_id=identity)
+    program_tree_version = ProgramTreeVersionRepository().get(entity_id=identity)
+
+    error_messages = __validate_delete(program_tree_version, identity)
+    if error_messages and len(error_messages) > 0:
+        #  TODO : Il me semblait que les service ne pouvait pas retourner de messages????
+        return error_messages
+    else:
+        ProgramTreeVersionRepository().delete(entity_id=identity)
+
+
+def __validate_delete(
+        program_tree_version: 'ProgramTreeVersion',
+        identity: 'ProgramTreeVersionIdentity') -> List['BusinessValidationMessage']:
+    error_messages = []
+    empty_tree_validator = EmptyTreeValidator(tree=program_tree_version)
+    no_enrollment_validator = NoEnrollmentValidator(identity=identity)
+    if not empty_tree_validator.is_valid():
+        error_messages += empty_tree_validator.error_messages
+    if not no_enrollment_validator.is_valid():
+        error_messages += no_enrollment_validator.error_messages
+    return error_messages

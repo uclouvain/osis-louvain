@@ -24,9 +24,10 @@
 #
 ##############################################################################
 
-from base.models.education_group_year import EducationGroupYear
 from base.models.offer_enrollment import OfferEnrollment
+from program_management.ddd.business_types import *
 
 
-def enrollments_count_by_offer(offer: EducationGroupYear) -> int:
-    return OfferEnrollment.objects.filter(education_group_year=offer).count()
+def enrollments_count_by_offer(offer: 'ProgramTreeVersion') -> int:
+    return OfferEnrollment.objects.filter(education_group_year__acronym=offer.entity_id.offer_acronym,
+                                          education_group_year__academic_year__year=offer.entity_id.year).count()
