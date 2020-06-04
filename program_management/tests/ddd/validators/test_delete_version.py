@@ -37,7 +37,6 @@ from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group_year import GroupYearFactory, TrainingGroupYearFactory
 from program_management.ddd.repositories.program_tree_version import _delete_version_root_group
 from program_management.ddd.validators._delete_version import NoEnrollmentValidator, EmptyTreeValidator
-from program_management.ddd.domain.service.tree_has_contents import have_contents_which_are_not_mandatory
 from program_management.tests.ddd.service.write.test_delete_program_tree_version_service import build_version_content, \
     EDUCATION_GROUP_VERSION
 from program_management.tests.factories.element import ElementGroupYearFactory
@@ -144,107 +143,6 @@ class TestHaveContents(TestCase):
 
         validator_empty_tree = EmptyTreeValidator(tree=ProgramTreeVersionRepository.get(entity_id=identity))
         self.assertTrue(validator_empty_tree.is_valid())
-
-    def test_have_contents_case_no_contents_which_because_mandatory_structure(self):
-        """
-        In this test, we ensure that all of his children are mandatory groups and they are empty.
-        It must be consider as empty
-        """
-
-        group_year = TrainingGroupYearFactory(academic_year=self.academic_year, group__start_year=self.academic_year)
-
-        element_group_year = ElementGroupYearFactory(group_year=group_year)
-        for education_group_type in [GroupType.COMMON_CORE.name, GroupType.FINALITY_120_LIST_CHOICE.name]:
-
-            child = GroupYearFactory(academic_year=self.academic_year,
-                                     education_group_type__name=education_group_type,
-                                     group__start_year=self.academic_year)
-            child_element = ElementGroupYearFactory(group_year=child)
-
-            AuthorizedRelationshipFactory(
-                parent_type=group_year.education_group_type,
-                child_type=child.education_group_type,
-                min_count_authorized=1,
-            )
-
-            GroupElementYearFactory(parent=None, child_branch=None,
-                                    parent_element=element_group_year, child_element=child_element)
-        self.assertFalse(have_contents_which_are_not_mandatory(group_year))
-
-    def test_have_contents_case_have_contents_because_mandatory_structure_is_present_multiple_times(self):
-        """
-        In this test, we ensure that we have two elements of one type which are mandatory in the basic structure.
-        ==> We must consider as it have contents
-        """
-
-        group_yr = TrainingGroupYearFactory(academic_year=self.academic_year, group__start_year=self.academic_year)
-        parent_education_group_year = ElementGroupYearFactory(group_year=group_yr)
-        subgroup_1 = GroupYearFactory(
-            academic_year=self.academic_year,
-            education_group_type__name=GroupType.SUB_GROUP.name,
-            group__start_year=self.academic_year,
-        )
-        child_subgroup1 = ElementGroupYearFactory(group_year=subgroup_1)
-        GroupElementYearFactory(parent_element=parent_education_group_year,
-                                child_element=child_subgroup1,
-                                parent=None,
-                                child_branch=None)
-
-        subgroup_2 = GroupYearFactory(
-            academic_year=self.academic_year,
-            education_group_type=subgroup_1.education_group_type,
-            group__start_year=self.academic_year,
-        )
-        elt_subgroup_2 = ElementGroupYearFactory(group_year=subgroup_2)
-        GroupElementYearFactory(
-            parent_element=parent_education_group_year,
-            child_element=elt_subgroup_2,
-            parent=None,
-            child_branch=None
-        )
-
-        AuthorizedRelationshipFactory(
-            parent_type=group_yr.education_group_type,
-            child_type=subgroup_1.education_group_type,
-            min_count_authorized=1,
-        )
-        self.assertTrue(have_contents_which_are_not_mandatory(group_yr))
-
-    def test_have_contents_case_contents_because_structure_have_child_which_are_not_mandatory(self):
-        """
-        In this test, we ensure that at least one children are not mandatory groups so they must not be considered
-        as empty
-        """
-        group_year = TrainingGroupYearFactory(academic_year=self.academic_year, group__start_year=self.academic_year)
-        parent_education_group_year = ElementGroupYearFactory(group_year=group_year)
-        child_mandatory = GroupYearFactory(academic_year=self.academic_year, group__start_year=self.academic_year)
-        child_mandataory_eleem = ElementGroupYearFactory(group_year=child_mandatory)
-        AuthorizedRelationshipFactory(
-            parent_type=group_year.education_group_type,
-            child_type=child_mandatory.education_group_type,
-            min_count_authorized=1
-        )
-        GroupElementYearFactory(
-            parent_element=parent_education_group_year,
-            child_element=child_mandataory_eleem,
-            parent=None,
-            child_branch=None,
-        )
-
-        child_no_mandatory = GroupYearFactory(academic_year=self.academic_year, group__start_year=self.academic_year)
-        child_no_mandataory_eleem = ElementGroupYearFactory(group_year=child_no_mandatory)
-        AuthorizedRelationshipFactory(
-            parent_type=group_year.education_group_type,
-            child_type=child_mandatory.education_group_type,
-            min_count_authorized=0
-        )
-        GroupElementYearFactory(
-            parent_element=parent_education_group_year,
-            child_element=child_no_mandataory_eleem,
-            parent=None,
-            child_branch=None,
-        )
-        self.assertTrue(have_contents_which_are_not_mandatory(group_year))
 
 
 class TestRunDelete(TestCase):
