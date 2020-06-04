@@ -118,3 +118,8 @@ class ProgramTreeVersionIdentity(interface.EntityIdentity):
 class ProgramTreeVersionNotFoundException(Exception):
     def __init__(self, *args, **kwargs):
         super().__init__("The program version cannot be found")
+
+
+class ProgramTreeVersionUndeletableException(Exception):
+    def __init__(self, *args, **kwargs):
+        super().__init__("The program version cannot be deleted")

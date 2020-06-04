@@ -122,29 +122,6 @@ class TestDeleteVersionOfferEnrollmentValidator(TestCase):
         self.assertEqual(len(validator.messages), 1)
 
 
-class TestHaveContents(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory(year=2019)
-
-    def test_have_contents_case_no_contents(self):
-        education_group_version = EducationGroupVersionFactory(offer__academic_year=self.academic_year,
-                                                               root_group__academic_year=self.academic_year
-                                                               )
-        data = build_version_content(self.academic_year)
-        education_group_version = data.get(self.academic_year).get(EDUCATION_GROUP_VERSION)
-        # group_year = TrainingGroupYearFactory(academic_year=self.academic_year)
-        identity = ProgramTreeVersionIdentity(
-            offer_acronym=education_group_version.offer.acronym,
-            year=education_group_version.offer.academic_year.year,
-            version_name=education_group_version.version_name,
-            is_transition=education_group_version.is_transition
-        )
-
-        validator_empty_tree = EmptyTreeValidator(tree=ProgramTreeVersionRepository.get(entity_id=identity))
-        self.assertTrue(validator_empty_tree.is_valid())
-
-
 class TestRunDelete(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -189,65 +166,9 @@ class TestRunDelete(TestCase):
 
         ProgramTreeVersionRepository().delete(entity_id=identity)
 
-
-
-        # _delete_version_trees([education_group_version])
-
         with self.assertRaises(GroupYear.DoesNotExist):
             GroupYear.objects.get(pk=group_yr.pk)
         with self.assertRaises(GroupYear.DoesNotExist):
             GroupYear.objects.get(pk=child_mandatory.pk)
         with self.assertRaises(GroupElementYear.DoesNotExist):
             GroupElementYear.objects.get(pk=link_parent_child.pk)
-
-    def test_delete_case_remove_mandatory_structure_case_reused_item_which_are_mandatory(self):
-        """
-        In this test, we ensure that the mandatory elem is not removed if it is reused in another structure
-        """
-
-        root_group = TrainingGroupYearFactory(academic_year=self.academic_year, group__start_year=self.academic_year)
-        root_group_element = ElementGroupYearFactory(group_year=root_group)
-        education_group_version = EducationGroupVersionFactory(root_group=root_group,
-                                                               offer__academic_year=self.academic_year)
-        child_mandatory = GroupYearFactory(
-            academic_year=self.academic_year,
-            education_group_type__name=GroupType.COMMON_CORE.name,
-            group__start_year=self.academic_year
-        )
-        child_mandatory_element = ElementGroupYearFactory(group_year=child_mandatory)
-
-        AuthorizedRelationshipFactory(
-            parent_type=root_group.education_group_type,
-            child_type=child_mandatory.education_group_type,
-            min_count_authorized=1,
-        )
-        link_parent_child = GroupElementYearFactory(parent_element=root_group_element,
-                                                    child_element=child_mandatory_element,
-                                                    parent=None,
-                                                    child_branch=None)
-
-        # Create another training
-        another_training = TrainingGroupYearFactory(academic_year=self.academic_year)
-        another_parent_element_training = ElementGroupYearFactory(group_year=another_training)
-        GroupElementYearFactory(parent_element=another_parent_element_training,
-                                child_element=child_mandatory_element,
-                                parent=None,
-                                child_branch=None)
-
-        identity = ProgramTreeVersionIdentity(
-                education_group_version.offer.acronym,
-                education_group_version.offer.academic_year.year,
-                education_group_version.version_name,
-                education_group_version.is_transition
-            )
-
-        ProgramTreeVersionRepository().delete(entity_id=identity)
-        with self.assertRaises(GroupYear.DoesNotExist):
-            GroupYear.objects.get(pk=root_group.pk)
-        with self.assertRaises(GroupElementYear.DoesNotExist):
-            GroupElementYear.objects.get(pk=link_parent_child.pk)
-
-        self.assertEqual(
-            child_mandatory,
-            GroupYear.objects.get(pk=child_mandatory.pk)
-        )

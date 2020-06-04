@@ -29,6 +29,7 @@ from typing import List
 from program_management.ddd.business_types import *
 from program_management.ddd.command import DeleteProgramTreeVersionCommand
 from program_management.ddd.validators._delete_version import EmptyTreeValidator, NoEnrollmentValidator
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionUndeletableException
 
 
 def delete(command: DeleteProgramTreeVersionCommand) -> None:
@@ -43,8 +44,7 @@ def delete(command: DeleteProgramTreeVersionCommand) -> None:
 
     error_messages = __validate_delete(program_tree_version, identity)
     if error_messages and len(error_messages) > 0:
-        #  TODO : Il me semblait que les service ne pouvait pas retourner de messages????
-        return error_messages
+        raise ProgramTreeVersionUndeletableException(error_messages)
     else:
         ProgramTreeVersionRepository().delete(entity_id=identity)
 

@@ -76,11 +76,7 @@ class ProgramTree(interface.RootEntity):
     def is_empty(self, children=None):
         children = children or self.root_node.children
         for links in children:
-        # TODO Quand je fais des tests je rencontre un problème ici :
-        # if not self.is_empty([l.child for l in links]):
-        # TypeError: 'LinkWithChildBranch' object is not iterable
-
-        if not self.is_empty([l.child for l in links]):
+            if not self.is_empty([l.child for l in links]):
                 return False
 
             authorized_rel = self.authorized_relationships.get_authorized_relationship(
