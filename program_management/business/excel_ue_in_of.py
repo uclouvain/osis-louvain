@@ -28,8 +28,6 @@ import re
 from collections import namedtuple, defaultdict
 from typing import Dict, List
 
-from django.conf import settings
-from django.db.models import QuerySet, Subquery
 from django.template.defaultfilters import yesno
 from django.utils import translation
 from django.utils.translation import gettext as _
@@ -41,7 +39,7 @@ from attribution.ddd.domain.teacher import Teacher
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_unit_xls import PROPOSAL_LINE_STYLES, \
     prepare_proposal_legend_ws_data
-from base.business.learning_unit_xls import _get_significant_volume
+from base.business.learning_unit_xls import get_significant_volume
 from base.business.learning_units.xls_generator import hyperlinks_to_string
 from base.models.enums.education_group_types import GroupType
 from base.models.enums.proposal_state import ProposalState
@@ -49,6 +47,7 @@ from base.models.enums.proposal_type import ProposalType
 from learning_unit.ddd.domain.achievement import Achievement
 from learning_unit.ddd.domain.description_fiche import DescriptionFiche
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear as DddLearningUnitYear
+from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from learning_unit.ddd.domain.specifications import Specifications
 from learning_unit.ddd.domain.teaching_material import TeachingMaterial
 from learning_unit.ddd.repository.load_learning_unit_year import load_multiple_by_identity
@@ -56,13 +55,10 @@ from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER
     STYLED_CELLS, COLORED_ROWS, ROW_HEIGHT
 from program_management.business.excel import clean_worksheet_title
 from program_management.business.utils import html2text
-from program_management.ddd.domain.link import Link
-from program_management.ddd.domain.node import Node
+from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeLearningUnitYear
-from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.repositories import load_tree
 from program_management.forms.custom_xls import CustomXlsForm
-from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
@@ -298,7 +294,7 @@ def _get_attribution_line(a_person_teacher: 'Teacher'):
     return ""
 
 
-def _get_optional_data(data: Link, luy: DddLearningUnitYear, optional_data_needed: Dict[str, bool], link: 'Link'):
+def _get_optional_data(data: List, luy: DddLearningUnitYear, optional_data_needed: Dict[str, bool], link: 'Link'):
     if optional_data_needed['has_required_entity']:
         data.append(luy.entities.requirement_entity_acronym)
     if optional_data_needed['has_allocation_entity']:
@@ -333,7 +329,6 @@ def _get_optional_data(data: Link, luy: DddLearningUnitYear, optional_data_neede
         )
     if optional_data_needed['has_proposition']:
         if luy.proposal:
-            luy.proposal.state
             data.append(ProposalType.get_value(luy.proposal.type) if luy.proposal.type else '')
             data.append(ProposalState.get_value(luy.proposal.state) if luy.proposal.state else '')
         else:
@@ -430,21 +425,6 @@ def _build_description_fiche_cols(description_fiche: 'DescriptionFiche',
     )
 
 
-def build_annotations(qs: QuerySet, fr_labels: list, en_labels: list):
-    annotations = {
-        lbl: Subquery(
-            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_FR))
-        for lbl in fr_labels
-    }
-
-    annotations.update({
-        "{}_en".format(lbl): Subquery(
-            _build_subquery_text_label(qs, lbl, settings.LANGUAGE_CODE_EN))
-        for lbl in en_labels}
-    )
-    return annotations
-
-
 def _build_subquery_text_label(qs, cms_text_label, lang):
     return qs.filter(text_label__label="{}".format(cms_text_label), language=lang).values(
         'text')[:1]
@@ -463,13 +443,13 @@ def _build_main_gathering_label(gathering_node: 'Node') -> str:
 
 
 def volumes_information(lecturing_volume, practical_volume):
-    return [_get_significant_volume(lecturing_volume.total_annual or 0),
-            _get_significant_volume(lecturing_volume.first_quadrimester or 0),
-            _get_significant_volume(lecturing_volume.second_quadrimester or 0),
+    return [get_significant_volume(lecturing_volume.total_annual or 0),
+            get_significant_volume(lecturing_volume.first_quadrimester or 0),
+            get_significant_volume(lecturing_volume.second_quadrimester or 0),
             lecturing_volume.classes_count or 0,
-            _get_significant_volume(practical_volume.total_annual or 0),
-            _get_significant_volume(practical_volume.first_quadrimester or 0),
-            _get_significant_volume(practical_volume.second_quadrimester or 0),
+            get_significant_volume(practical_volume.total_annual or 0),
+            get_significant_volume(practical_volume.first_quadrimester or 0),
+            get_significant_volume(practical_volume.second_quadrimester or 0),
             practical_volume.classes_count or 0]
 
 
