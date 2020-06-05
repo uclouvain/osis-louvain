@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from django.conf import settings
-from django.test import RequestFactory
+from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -41,9 +41,6 @@ from base.tests.factories.user import UserFactory
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer, \
     LearningUnitYearPrerequisitesListSerializer
 from education_group.api.views.learning_unit import EducationGroupRootsList, LearningUnitPrerequisitesList
-from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
-from program_management.tests.factories.element import ElementFactory
 
 LEARNING_UNIT_API_HEAD = 'learning_unit_api_v1:'
 
@@ -146,27 +143,17 @@ class EducationGroupRootsListTestCase(APITestCase):
             education_group_type__name=TrainingType.BACHELOR.name,
             acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year
         )
-        cls.group = GroupYearFactory(
-            education_group_type__name=TrainingType.BACHELOR.name,
-            acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year
-        )
-        StandardEducationGroupVersionFactory(root_group=cls.group, offer=cls.training)
-        cls.common_core = GroupYearFactory(
+        cls.common_core = GroupFactory(
             education_group_type__name=GroupType.COMMON_CORE.name,
             academic_year=cls.academic_year
         )
-        common_core_element = ElementFactory(group_year=cls.common_core)
-        GroupElementYearFactory(parent_element__group_year=cls.group, child_element=common_core_element)
+        GroupElementYearFactory(parent=cls.training, child_branch=cls.common_core, child_leaf=None)
 
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year
         )
-        luy_element = ElementFactory(learning_unit_year=cls.learning_unit_year)
-        GroupElementYearFactory(
-            parent_element=common_core_element,
-            child_element=luy_element
-        )
+        GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
         cls.user = UserFactory()
         url_kwargs = {
             'acronym': cls.learning_unit_year.acronym,
