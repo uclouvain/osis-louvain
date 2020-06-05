@@ -65,7 +65,7 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
             learning_unit_year__acronym=self.kwargs['acronym'].upper(),
             learning_unit_year__academic_year__year=self.kwargs['year']
         )
-        education_group_root_ids = program_management.ddd.repositories.find_roots.find_roots(
+        root_elements = program_management.ddd.repositories.find_roots.find_roots(
             [element],
             additional_root_categories=[GroupType.COMPLEMENTARY_MODULE],
             exclude_root_categories=TrainingType.finality_types_enum(),
@@ -73,7 +73,7 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
         ).get(element.id, [])
         return EducationGroupYear.objects.filter(
             pk__in=EducationGroupVersion.objects.filter(
-                root_group__element__in=education_group_root_ids
+                root_group__element__in=root_elements
             ).values('offer_id')
         ).select_related('academic_year', 'education_group_type')
 
