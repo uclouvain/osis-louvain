@@ -26,7 +26,6 @@
 import collections
 import datetime
 from collections import OrderedDict
-from typing import Dict, Iterable, List
 
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
@@ -459,7 +458,7 @@ def find(acronym, date=None):
     return entity_version
 
 
-def find_latest_version(date) -> EntityVersionQuerySet:
+def find_latest_version(date):
     return EntityVersion.objects.current(date).select_related('entity', 'entity__organization').order_by('-start_date')
 
 
@@ -560,13 +559,13 @@ def _match_dates(osis_date, esb_date):
         return osis_date.strftime('%Y-%m-%d') == esb_date
 
 
-def find_all_current_entities_version() -> EntityVersionQuerySet:
+def find_all_current_entities_version():
     now = datetime.datetime.now(get_tzinfo())
     return find_latest_version(date=now)
 
 
 # TODO Use recursive query instead
-def build_current_entity_version_structure_in_memory(date: datetime.date = None) -> Dict[int, Dict]:
+def build_current_entity_version_structure_in_memory(date=None):
     if date:
         all_current_entities_version = find_latest_version(date=date)
     else:
@@ -609,13 +608,11 @@ def get_entity_version_parent_or_itself_from_type(entity_versions: dict, entity:
                                                          entity_type=entity_type)
 
 
-def _build_entity_version_by_entity_id(entity_version_qs: Iterable[EntityVersion]) -> Dict[int, EntityVersion]:
-    return {version.entity_id: version for version in entity_version_qs}
+def _build_entity_version_by_entity_id(versions):
+    return {version.entity_id: version for version in versions}
 
 
-def _build_direct_children_by_entity_version_id(
-        entity_version_by_entity_id: Dict[int, EntityVersion]
-) -> Dict[int, List[EntityVersion]]:
+def _build_direct_children_by_entity_version_id(entity_version_by_entity_id):
     direct_children_by_entity_version_id = {}
     for entity_version in entity_version_by_entity_id.values():
         entity_version_parent = entity_version_by_entity_id.get(entity_version.parent_id)
@@ -624,17 +621,12 @@ def _build_direct_children_by_entity_version_id(
     return direct_children_by_entity_version_id
 
 
-def _build_all_children_by_entity_version_id(
-        direct_children_by_entity_version_id: Dict[int, List[EntityVersion]]
-) -> Dict[int, List[EntityVersion]]:
+def _build_all_children_by_entity_version_id(direct_children_by_entity_version_id):
     return {entity_version_id: _get_all_children(entity_version_id, direct_children_by_entity_version_id)
             for entity_version_id in direct_children_by_entity_version_id.keys()}
 
 
-def _get_all_children(
-        entity_version_id: int,
-        direct_children_by_entity_version_id: Dict[int, List[EntityVersion]]
-) -> List[EntityVersion]:
+def _get_all_children(entity_version_id, direct_children_by_entity_version_id):
     all_children = []
     for entity_version in direct_children_by_entity_version_id.get(entity_version_id, []):
         all_children.extend(_get_all_children(entity_version.id, direct_children_by_entity_version_id))

@@ -43,7 +43,6 @@ class ElementFactory(factory.DjangoModelFactory):
     group_year = None
     learning_unit_year = None
     learning_class_year = None
-    education_group_year = None
 
 
 class ElementGroupYearFactory(ElementFactory):

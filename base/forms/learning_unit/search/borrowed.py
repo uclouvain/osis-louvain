@@ -26,7 +26,6 @@
 import itertools
 
 from django import forms
-from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from django_filters import filters
 
@@ -36,7 +35,7 @@ from base.models import entity_version
 from base.models.academic_year import AcademicYear
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
 from base.models.enums import entity_type
-from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
+from base.models.learning_unit_year import LearningUnitYear
 from base.models.offer_year_entity import OfferYearEntity
 from base.views.learning_units.search.common import SearchTypes
 
@@ -81,21 +80,17 @@ class BorrowedLearningUnitSearch(LearningUnitFilter):
         ids = filter_is_borrowed_learning_unit_year(
             qs,
             academic_year,
-            faculty_borrowing_id=faculty_borrowing_id
+            faculty_borrowing=faculty_borrowing_id
         )
         return qs.filter(id__in=ids)
 
 
-def filter_is_borrowed_learning_unit_year(
-        learning_unit_year_qs: LearningUnitYearQuerySet,
-        academic_year: AcademicYear,
-        faculty_borrowing_id: int = None
-):
+def filter_is_borrowed_learning_unit_year(learning_unit_year_qs, academic_year, faculty_borrowing=None):
     entities = build_current_entity_version_structure_in_memory(academic_year.start_date)
     entities_borrowing_allowed = []
-    if faculty_borrowing_id in entities:
-        entities_borrowing_allowed.extend(entities[faculty_borrowing_id]["all_children"])
-        entities_borrowing_allowed.append(entities[faculty_borrowing_id]["entity_version"])
+    if faculty_borrowing in entities:
+        entities_borrowing_allowed.extend(entities[faculty_borrowing]["all_children"])
+        entities_borrowing_allowed.append(entities[faculty_borrowing]["entity_version"])
         entities_borrowing_allowed = [entity_version.entity.id for entity_version in entities_borrowing_allowed]
 
     entities_faculty = compute_faculty_for_entities(entities)

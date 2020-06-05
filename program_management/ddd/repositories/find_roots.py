@@ -1,6 +1,6 @@
 import collections
 import itertools
-from typing import List, Dict
+from typing import List
 
 from base.models import education_group_year, group_element_year
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType
@@ -10,7 +10,7 @@ DEFAULT_ROOT_CATEGORIES = set(TrainingType) | set(MiniTrainingType) - {MiniTrain
 
 
 #  DEPRECATED Suppress this method when borrowed course filter is refactored OSIS-3376
-def find_all_roots_for_academic_year(academic_year_id: int):
+def find_all_roots_for_academic_year(academic_year_id):
     root_categories = DEFAULT_ROOT_CATEGORIES
     root_categories_names = [root_type.name for root_type in root_categories]
 
@@ -60,10 +60,10 @@ def find_roots(
     return roots_by_children_id
 
 
-def _group_roots_id_by_children_id(child_root_list: List[Dict]) -> Dict[int, List[int]]:
+def _group_roots_id_by_children_id(child_root_list):
     roots_by_children_id = collections.defaultdict(list)
     for child_root in child_root_list:
-        roots_by_children_id[child_root["old_child_id"]].append(child_root["old_root_id"])
+        roots_by_children_id[child_root["child_id"]].append(child_root["root_id"])
     return roots_by_children_id
 
 
