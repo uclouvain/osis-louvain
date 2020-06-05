@@ -32,7 +32,7 @@ from rest_framework.test import APITestCase
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
-from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearMasterFactory
+from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, EducationGroupYearMasterFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
@@ -54,51 +54,29 @@ class FilterEducationGroupRootsTestCase(APITestCase):
         cls.user = UserFactory()
 
         cls.academic_year = create_current_academic_year()
-
         cls.training = EducationGroupYearMasterFactory(
             academic_year=cls.academic_year, acronym='test2m', partial_acronym='test2m'
         )
-        cls.group = GroupYearFactory(
-            education_group_type__name=TrainingType.PGRM_MASTER_120.name,
-            acronym='test2m', partial_acronym='test2m', academic_year=cls.academic_year
-        )
-        StandardEducationGroupVersionFactory(root_group=cls.group, offer=cls.training)
-
-        cls.common_core = GroupYearFactory(
+        cls.common_core = GroupFactory(
             education_group_type__name=GroupType.COMMON_CORE.name,
             academic_year=cls.academic_year
         )
-        common_core_element = ElementFactory(group_year=cls.common_core)
-        GroupElementYearFactory(parent_element__group_year=cls.group, child_element=common_core_element)
+        GroupElementYearFactory(parent=cls.training, child_branch=cls.common_core, child_leaf=None)
 
         cls.training_2 = TrainingFactory(academic_year=cls.academic_year)
-        group_2 = GroupYearFactory(
-            education_group_type=cls.training_2.education_group_type,
-            acronym=cls.training_2.acronym, partial_acronym=cls.training_2.partial_acronym,
-            academic_year=cls.academic_year
-        )
-        StandardEducationGroupVersionFactory(root_group=group_2, offer=cls.training_2)
 
-        cls.complementary_module = GroupYearFactory(
+        cls.complementary_module = GroupFactory(
             education_group_type__name=GroupType.COMPLEMENTARY_MODULE.name,
             academic_year=cls.academic_year
         )
-        complementary_module_element = ElementFactory(group_year=cls.complementary_module)
-        GroupElementYearFactory(parent_element__group_year=group_2, child_element=complementary_module_element)
+        GroupElementYearFactory(parent=cls.training_2, child_branch=cls.complementary_module, child_leaf=None)
 
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year
         )
-        cls.luy_element = ElementFactory(learning_unit_year=cls.learning_unit_year)
-        GroupElementYearFactory(
-            parent_element=common_core_element,
-            child_element=cls.luy_element
-        )
-        GroupElementYearFactory(
-            parent_element=complementary_module_element,
-            child_element=cls.luy_element
-        )
+        GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
+        GroupElementYearFactory(parent=cls.complementary_module, child_branch=None, child_leaf=cls.learning_unit_year)
 
         url_kwargs = {
             'acronym': cls.learning_unit_year.acronym,
@@ -130,20 +108,12 @@ class FilterEducationGroupRootsTestCase(APITestCase):
 
     def test_get_finality_root_and_not_itself(self):
         finality_root = EducationGroupYearMasterFactory(academic_year=self.academic_year)
-        finality_root_group = GroupYearFactory(
-            acronym=finality_root.acronym, partial_acronym=finality_root.partial_acronym,
-            academic_year=self.academic_year
-        )
-        StandardEducationGroupVersionFactory(root_group=finality_root_group, offer=finality_root)
-
-        finality = GroupYearFactory(
+        finality = TrainingFactory(
             academic_year=self.academic_year,
             education_group_type__name=TrainingType.MASTER_MD_120.name
         )
-        finality_element = ElementFactory(group_year=finality)
-
-        GroupElementYearFactory(parent_element__group_year=finality_root_group, child_element=finality_element)
-        GroupElementYearFactory(parent_element=finality_element, child_element=self.luy_element)
+        GroupElementYearFactory(parent=finality_root, child_branch=finality, child_leaf=None)
+        GroupElementYearFactory(parent=finality, child_branch=None, child_leaf=self.learning_unit_year)
 
         query_string = {'ignore_complementary_module': 'true'}
         response = self.client.get(self.url, data=query_string)
@@ -159,6 +129,7 @@ class FilterEducationGroupRootsTestCase(APITestCase):
                 'language': settings.LANGUAGE_CODE_FR
             }
         )
+
         self.assertCountEqual(response.data, serializer.data)
 
 
