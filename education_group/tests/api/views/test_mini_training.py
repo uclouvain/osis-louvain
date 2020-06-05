@@ -32,7 +32,6 @@ from rest_framework import status
 from rest_framework.test import APITestCase
 
 from base.models.enums import organization_type
-from base.models.enums.education_group_types import MiniTrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import MiniTrainingFactory, TrainingFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -42,9 +41,6 @@ from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
 from education_group.api.views.mini_training import MiniTrainingList, OfferRoots
-from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
-from program_management.tests.factories.element import ElementFactory
 
 
 class MiniTrainingTitleTestCase(APITestCase):
@@ -252,22 +248,10 @@ class OfferRootsTestCase(APITestCase):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.entity_version = EntityVersionFactory(entity__organization__type=organization_type.MAIN)
 
-        cls.minor = GroupYearFactory(
-            academic_year=cls.academic_year,
-            education_group_type__name=MiniTrainingType.OPEN_MINOR.name
-        )
-        minor_element = ElementFactory(group_year=cls.minor)
+        cls.minor = MiniTrainingFactory(academic_year=cls.academic_year)
         for _ in range(0, 3):
             offer = TrainingFactory(academic_year=cls.academic_year)
-            group = GroupYearFactory(
-                academic_year=cls.academic_year,
-                acronym=offer.acronym,
-                partial_acronym=offer.partial_acronym,
-                education_group_type=offer.education_group_type
-            )
-            StandardEducationGroupVersionFactory(offer=offer, root_group=group)
-            GroupElementYearFactory(parent_element__group_year=group, child_element=minor_element)
-
+            GroupElementYearFactory(parent=offer, child_branch=cls.minor, child_leaf=None)
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:' + OfferRoots.name, kwargs={
             'partial_acronym': cls.minor.partial_acronym,
