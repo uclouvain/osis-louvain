@@ -75,7 +75,10 @@ class GroupElementYearFactory(factory.django.DjangoModelFactory):
 
 
 class GroupElementYearChildLeafFactory(GroupElementYearFactory):
-    child_element = factory.SubFactory(ElementLearningUnitYearFactory)
+    child_element = factory.SubFactory(
+        ElementLearningUnitYearFactory,
+        learning_unit_year=factory.SelfAttribute("..child_leaf")
+    )
     # TODO: Remove after refactoring
     child_leaf = factory.SubFactory(
         LearningUnitYearFactory,

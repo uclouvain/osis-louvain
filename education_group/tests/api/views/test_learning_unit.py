@@ -242,7 +242,6 @@ class EducationGroupRootsListTestCase(APITestCase):
         self.assertEqual(response.data, serializer.data)
 
 
-# @override_settings(LANGUAGES=[('fr-be', 'French'), ('en', 'English'), ], LANGUAGE_CODE='fr-be')
 class LearningUnitPrerequisitesViewTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
@@ -306,4 +305,4 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
                 'language': settings.LANGUAGE_CODE_FR
             }
         )
-        self.assertEqual(response.data, serializer.data)
+        self.assertListEqual(response.data, serializer.data)

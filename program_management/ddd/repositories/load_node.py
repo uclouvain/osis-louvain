@@ -53,6 +53,7 @@ def load_by_type(type: NodeType, element_id: int) -> node.Node:
 def load_node_group_year(node_id: int) -> node.Node:
     try:
         node_data = __load_multiple_node_group_year([node_id])[0]
+        node_data["node_id"] = node_data.pop("id")
         return node.factory.get_node(**__convert_string_to_enum(node_data))
     except IndexError:
         raise node.NodeNotFoundException
@@ -175,7 +176,7 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         schedule_type=F('educationgroupversion__offer__schedule_type'),
         keywords=F('educationgroupversion__offer__keywords'),
         group_title_fr=F('title_fr'),
-        group_title_en=F('title_en')
+        group_title_en=F('title_en'),
     ).values(
         'id',
         'type',

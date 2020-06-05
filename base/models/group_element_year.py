@@ -215,6 +215,9 @@ class GroupElementYearManager(models.Manager):
                         gey.child_element_id,
                         gey.parent_element_id,
                         gpyp.academic_year_id,
+                        gey.parent_id,
+                        gey.child_branch_id,
+                        gey.child_leaf_id,
                         CASE
                             WHEN egt.name in %(root_categories_names)s THEN true
                             ELSE false
@@ -238,6 +241,9 @@ class GroupElementYearManager(models.Manager):
                       parent.child_element_id,
                       parent.parent_element_id,
                       gpyp.academic_year_id,
+                      parent.parent_id,
+                      parent.child_branch_id,
+                      parent.child_leaf_id,
                       CASE
                         WHEN egt.name in %(root_categories_names)s THEN true
                         ELSE false
@@ -251,7 +257,8 @@ class GroupElementYearManager(models.Manager):
                     INNER JOIN base_educationgrouptype AS egt on gpyp.education_group_type_id = egt.id
                 )
 
-            SELECT distinct starting_node_id AS child_id, parent_element_id AS root_id
+            SELECT distinct starting_node_id AS child_id, parent_element_id AS root_id, parent_id as old_root_id, 
+                COALESCE(child_branch_id, child_leaf_id) AS old_child_id
             FROM root_query
             WHERE (%(academic_year_id)s IS NULL OR academic_year_id = %(academic_year_id)s) AND
                   (is_root_row is not Null and is_root_row = true)
