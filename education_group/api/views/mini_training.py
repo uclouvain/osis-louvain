@@ -36,6 +36,8 @@ from base.models.enums.education_group_types import MiniTrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
 from education_group.api.serializers.training import TrainingListSerializer
+from program_management.models.education_group_version import EducationGroupVersion
+from program_management.models.element import Element
 
 
 class MiniTrainingFilter(filters.FilterSet):
@@ -143,12 +145,19 @@ class OfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
     def get_queryset(self):
         acronym = self.kwargs['partial_acronym']
         year = self.kwargs['year']
-        egy = get_object_or_404(
-            EducationGroupYear.objects.all().select_related(
-                'academic_year',
+        element = get_object_or_404(
+            Element.objects.all().select_related(
+                'group_year__academic_year',
             ),
-            partial_acronym__iexact=acronym,
-            academic_year__year=year
+            group_year__partial_acronym__iexact=acronym,
+            group_year__academic_year__year=year
         )
-        education_group_root_ids = program_management.ddd.repositories.find_roots.find_roots([egy]).get(egy.id, [])
-        return EducationGroupYear.objects.filter(id__in=education_group_root_ids)
+        root_elements = program_management.ddd.repositories.find_roots.find_roots(
+            [element],
+            as_instances=True
+        ).get(element.id, [])
+        return EducationGroupYear.objects.filter(
+            pk__in=EducationGroupVersion.objects.filter(
+                root_group__element__in=root_elements
+            ).values('offer_id')
+        ).select_related('academic_year', 'education_group_type')
