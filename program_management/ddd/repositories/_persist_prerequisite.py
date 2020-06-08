@@ -21,12 +21,11 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from django.db import transaction
-
-from base.models import education_group_year, learning_unit_year, prerequisite_item, learning_unit
+from base.models import learning_unit_year, prerequisite_item, learning_unit
 from base.models import prerequisite as prerequisite_model
 from program_management.ddd.domain import prerequisite as prerequisite_domain, program_tree
-from program_management.ddd.domain.node import NodeLearningUnitYear, NodeEducationGroupYear
+from program_management.ddd.domain.node import NodeLearningUnitYear, NodeGroupYear
+from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.enums.node_type import NodeType
 
 
@@ -38,19 +37,17 @@ def persist(tree: program_tree.ProgramTree):
 
 
 def _persist(
-        node_education_group_year: NodeEducationGroupYear,
+        node_group_year: NodeGroupYear,
         node_learning_unit_year_obj: NodeLearningUnitYear,
 ) -> None:
-    education_group_year_obj = education_group_year.EducationGroupYear.objects.get(
-        id=node_education_group_year.node_id
-    )
+    education_group_version_obj = EducationGroupVersion.objects.get(root_group__element__pk=node_group_year.node_id)
     learning_unit_year_obj = learning_unit_year.LearningUnitYear.objects.get(
         id=node_learning_unit_year_obj.node_id
     )
     prerequisite = node_learning_unit_year_obj.prerequisite
 
     prerequisite_model_obj, created = prerequisite_model.Prerequisite.objects.update_or_create(
-        education_group_year=education_group_year_obj,
+        education_group_version=education_group_version_obj,
         learning_unit_year=learning_unit_year_obj,
         defaults={"main_operator": prerequisite.main_operator}
     )

@@ -41,7 +41,7 @@ def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
             context={'root': tree.root_node}
         ),
         'a_attr': {
-            'href': reverse('education_group_read', args=[tree.root_node.pk, tree.root_node.pk]),
+            'href': reverse('element_identification', args=[tree.root_node.year, tree.root_node.code]),
             'element_id': tree.root_node.pk,
             'element_type': tree.root_node.type.name,
             'attach_url': reverse(

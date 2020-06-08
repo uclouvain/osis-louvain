@@ -59,6 +59,7 @@ class Prerequisite(models.Model):
         "LearningUnitYear", on_delete=models.CASCADE
 
     )
+    # TODO : Remove this field after migration
     education_group_year = models.ForeignKey(
         "EducationGroupYear", on_delete=models.CASCADE,
         null=True,  # TODO :: remove this field after migration on education_group_version
@@ -79,6 +80,12 @@ class Prerequisite(models.Model):
 
     def __str__(self):
         return "{} / {}".format(self.education_group_year, self.learning_unit_year)
+
+    def save(self, *args, **kwargs):
+        # TODO: Remove when migration is done (Field: education_group_year will be deleted)
+        if self.education_group_version:
+            self.education_group_year = self.education_group_version.offer
+        return super().save(*args, **kwargs)
 
     @property
     def secondary_operator(self):

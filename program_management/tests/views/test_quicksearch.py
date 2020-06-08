@@ -26,19 +26,20 @@ from django.http import JsonResponse
 from django.test import TestCase
 from django.urls import reverse
 
-from base.tests.factories.education_group_year import EducationGroupYearFactory, GroupFactory
+from base.tests.factories.education_group_year import GroupFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.user import SuperUserFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 
 
 class TestQuickSearchLearningUnitView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.root_egy = EducationGroupYearFactory()
+        cls.root_gy = GroupYearFactory()
         cls.luy_to_find = LearningUnitYearFactory(acronym='CYN', specific_title='Drop dead cynical')
         cls.user = SuperUserFactory()
-        path = str(cls.root_egy.id)
-        cls.url = reverse('quick_search_learning_unit', args=[cls.root_egy.id, path])
+        path = str(cls.root_gy.id)
+        cls.url = reverse('quick_search_learning_unit', args=[cls.root_gy.id, path])
 
     def setUp(self) -> None:
         self.client.force_login(self.user)
@@ -67,11 +68,11 @@ class TestQuickSearchLearningUnitView(TestCase):
 class TestQuickSearchEducationGroupView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.root_egy = EducationGroupYearFactory()
+        cls.root_gy = GroupYearFactory()
         cls.egy_to_find = GroupFactory(acronym='RAV', title='The Ravenlord', partial_acronym="RV")
         cls.user = SuperUserFactory()
-        path = str(cls.root_egy.id)
-        cls.url = reverse('quick_search_education_group', args=[cls.root_egy.id, path])
+        path = str(cls.root_gy.id)
+        cls.url = reverse('quick_search_education_group', args=[cls.root_gy.id, path])
 
     def setUp(self) -> None:
         self.client.force_login(self.user)

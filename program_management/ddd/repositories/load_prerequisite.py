@@ -31,9 +31,8 @@ from django.db.models import Subquery, OuterRef, F
 
 from base.models.enums import prerequisite_operator
 from base.models.learning_unit_year import LearningUnitYear
-from base.models.prerequisite_item import PrerequisiteItem as PrerequisiteItemModel
+from base.models.prerequisite_item import PrerequisiteItem as PrerequisiteItemModel, PrerequisiteItem
 from program_management.ddd.domain import prerequisite as prerequisite_domain
-from program_management.models.enums.node_type import NodeType
 
 from program_management.ddd.business_types import *
 
@@ -57,9 +56,9 @@ def load_has_prerequisite_multiple(
     :param nodes: Dict where keys = '<node_id>_<TYPE>' and values = Node
     :return:
     """
-    prerequisite_item_qs = PrerequisiteItemModel.objects.filter(
-        prerequisite__education_group_year_id__in=tree_root_ids,
-        prerequisite__learning_unit_year_id__in=set(n.pk for n in nodes.values() if n.is_learning_unit())
+    prerequisite_item_qs = PrerequisiteItem.objects.filter(
+        prerequisite__education_group_version__root_group__element__id__in=tree_root_ids,
+        prerequisite__learning_unit_year_id__element__pk__in=set(n.pk for n in nodes.values() if n.is_learning_unit())
     ).annotate(
         code=Subquery(
             LearningUnitYear.objects.filter(
@@ -69,15 +68,15 @@ def load_has_prerequisite_multiple(
         ),
         year=F('prerequisite__learning_unit_year__academic_year__year'),
         main_operator=F('prerequisite__main_operator'),
-        learning_unit_year_id=F('prerequisite__learning_unit_year_id'),
-        education_group_year_id=F('prerequisite__education_group_year_id'),
+        element_id=F('prerequisite__learning_unit_year__element__pk'),
+        root_element_id=F('prerequisite__education_group_version__root_group__element__pk'),
     ).order_by(
-        'learning_unit_year_id',
+        'element_id',
         'group_number',
         'position'
     ).values(
-        'education_group_year_id',
-        'learning_unit_year_id',
+        'root_element_id',
+        'element_id',
         'main_operator',
         'group_number',
         'position',
@@ -86,12 +85,12 @@ def load_has_prerequisite_multiple(
     )
 
     prerequisites_dict_by_program_root_id = {}
-    result_grouped_by_ed_group_id = itertools.groupby(prerequisite_item_qs, key=lambda p: p['education_group_year_id'])
+    result_grouped_by_ed_group_id = itertools.groupby(prerequisite_item_qs, key=lambda p: p['root_element_id'])
     for program_id, prerequisite_item_list in result_grouped_by_ed_group_id:
         prerequisites_dict = {}
         result_grouped_by_learn_unit_id = itertools.groupby(
             prerequisite_item_list,
-            key=lambda p: p['learning_unit_year_id']
+            key=lambda p: p['element_id']
         )
         for node_id, prequisite_items in result_grouped_by_learn_unit_id:
             prequisite_items = list(prequisite_items)
@@ -123,26 +122,26 @@ def load_is_prerequisite_multiple(
            node_id:  [node_id],
         }
     :param tree_root_ids: List of root nodes of the trees
-    :param nodes: Dict where keys = '<node_id>_<TYPE>' and values = Node
+    :param nodes: Dict where keys = '<node_id>' and values = Node
     :return:
     """
     qs = PrerequisiteItemModel.objects.filter(
-        prerequisite__education_group_year_id__in=tree_root_ids,
-        learning_unit__learningunityear__pk__in=set(n.pk for n in nodes.values() if n.is_learning_unit())
+        prerequisite__education_group_version__root_group__element__pk__in=tree_root_ids,
+        learning_unit__learningunityear__element__pk__in=set(n.pk for n in nodes.values() if n.is_learning_unit())
     ).values(
-        'learning_unit__learningunityear__pk'
+        'learning_unit__learningunityear__element__pk'
     ).annotate(
-        node_id=F('learning_unit__learningunityear__pk'),
-        is_a_prerequisite_of=ArrayAgg('prerequisite__learning_unit_year_id'),
-        education_group_year_id=F('prerequisite__education_group_year_id'),
+        node_id=F('learning_unit__learningunityear__element__pk'),
+        is_a_prerequisite_of=ArrayAgg('prerequisite__learning_unit_year__element__pk'),
+        root_element_id=F('prerequisite__education_group_version__root_group__element__pk'),
     ).values(
         'node_id',
         'is_a_prerequisite_of',
-        'education_group_year_id',
+        'root_element_id',
     )
 
     result = {}
-    for tree_root_id, prerequisite_query_result in itertools.groupby(qs, key=lambda p: p['education_group_year_id']):
+    for tree_root_id, prerequisite_query_result in itertools.groupby(qs, key=lambda p: p['root_element_id']):
         map_node_id_with_ids_prerequisite_of = __get_is_prerequisite_of_by_node_id(prerequisite_query_result)
         result[tree_root_id] = __convert_ids_to_nodes(map_node_id_with_ids_prerequisite_of, nodes)
     return result
@@ -160,6 +159,6 @@ def __convert_ids_to_nodes(
         nodes: Dict['NodeKey', 'Node']
 ) -> Dict[NodeId, List['NodeLearningUnitYear']]:
     return {
-        main_node_id: [nodes['{}_{}'.format(id, NodeType.LEARNING_UNIT)] for id in node_ids]
+        main_node_id: [nodes[id] for id in node_ids]
         for main_node_id, node_ids in map_node_id_with_is_prerequisite.items()
     }

@@ -670,9 +670,9 @@ msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
 msgid "The root does not exist in the next academic year."
 msgstr "La racine n'existe pas dans l'année academique suivante."
 
-msgid "The user is not allowed to change education group content."
+msgid "The user is not allowed to change link data."
 msgstr ""
-"L'utilisateur n'a pas la permission de modifier le contenu d'une formation"
+"L'utilisateur n'a pas la permission de modifier le contenu d'un lien"
 
 msgid "Themes discussed"
 msgstr "Thèmes abordés"

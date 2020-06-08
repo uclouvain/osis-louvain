@@ -139,8 +139,8 @@ class EducationGroupYearCommonBachelorFactory(EducationGroupYearFactory):
 
 
 class EducationGroupYearBachelorFactory(EducationGroupYearCommonBachelorFactory):
-    acronym = 'actu1ba'
-    partial_acronym = 'actu1ba'
+    acronym = 'ACTU1BA'
+    partial_acronym = 'ACTU1BA'
 
 
 class EducationGroupYearCommonAgregationFactory(EducationGroupYearFactory):
@@ -174,8 +174,8 @@ class EducationGroupYearCommonMasterFactory(EducationGroupYearFactory):
 
 
 class EducationGroupYearMasterFactory(EducationGroupYearCommonMasterFactory):
-    acronym = 'actu2m'
-    partial_acronym = 'actu2m'
+    acronym = 'ACTU2M'
+    partial_acronym = 'ACTU2M'
 
 
 class EducationGroupYearCommonFactory(EducationGroupYearFactory):
@@ -185,4 +185,14 @@ class EducationGroupYearCommonFactory(EducationGroupYearFactory):
         'base.tests.factories.education_group_type.EducationGroupTypeFactory',
         name=MiniTrainingType.DEEPENING.name,
         category=education_group_categories.MINI_TRAINING
+    )
+
+
+class ContinuingEducationTrainingFactory(EducationGroupYearFactory):
+    acronym = 'acronym-FC'
+    partial_acronym = 'acronym-FC'
+    education_group_type = factory.SubFactory(
+        'base.tests.factories.education_group_type.EducationGroupTypeFactory',
+        category=education_group_categories.TRAINING,
+        name=factory.fuzzy.FuzzyChoice(TrainingType.continuing_education_types())
     )

@@ -23,25 +23,18 @@
 #    see http://www.gnu.org/licenses/.
 #
 ############################################################################
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
-from django.db.models import Q
 from django.http import JsonResponse
-from django.shortcuts import render
-from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import DeleteView, FormView
+from django.views.generic import DeleteView
 
 from base.utils.cache import ElementCache
-from base.views.common import display_error_messages, display_success_messages, display_warning_messages, \
-    display_business_messages
+from base.views.common import display_error_messages, display_warning_messages, display_business_messages
 from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
     DetachLearningUnitYearStrategy
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.service import detach_node_service
 from program_management.forms.tree.detach import DetachNodeForm
-from program_management.views import perms as group_element_year_perms
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
@@ -49,15 +42,8 @@ from program_management.views.generic import GenericGroupElementYearMixin
 class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     template_name = "group_element_year/confirm_detach_inner.html"
 
+    permission_required = 'base.can_detach_node'
     form_class = DetachNodeForm
-
-    # TODO :: [MOVED OK]
-    raise_exception = True
-    rules = [group_element_year_perms.can_detach_group_element_year]
-
-    # TODO :: [MOVED OK]
-    def _call_rule(self, rule):
-        return rule(self.request.user, self.get_object())
 
     @cached_property
     def strategy(self):
@@ -119,21 +105,3 @@ class DetachGroupElementYearView(GenericGroupElementYearMixin, DeleteView):
     def get_success_url(self):
         # We can just reload the page
         return
-
-    # TODO :: [MOVED OK]
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            try:
-                for rule in self.rules:
-                    perm = rule(self.request.user, self.get_object())
-                    if not perm:
-                        break
-
-            except PermissionDenied as e:
-
-                return render(request,
-                              'education_group/blocks/modal/modal_access_denied.html',
-                              {'access_message': _('You are not eligible to detach this item')})
-
-        return super(DetachGroupElementYearView, self).dispatch(request, *args, **kwargs)

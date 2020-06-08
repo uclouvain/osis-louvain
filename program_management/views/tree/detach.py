@@ -23,11 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.db.models import Q
-from django.shortcuts import render
-from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
@@ -38,7 +34,6 @@ from base.views.mixins import AjaxTemplateMixin
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.service import detach_node_service
 from program_management.forms.tree.detach import DetachNodeForm
-from program_management.views import perms as group_element_year_perms
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
@@ -46,13 +41,9 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
     template_name = "tree/detach_confirmation_inner.html"
     form_class = DetachNodeForm
 
-    raise_exception = True
-    rules = [group_element_year_perms.can_detach_group_element_year]
+    permission_required = 'base.can_detach_node'
 
     _object = None
-
-    def _call_rule(self, rule):
-        return rule(self.request.user, self.get_object())
 
     @property
     def parent_id(self):
@@ -98,11 +89,10 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         }
 
     def get_object(self):
-        obj = self.model.objects.filter(
-            parent_id=self.parent_id
-        ).filter(
-            Q(child_branch_id=self.child_id_to_detach) | Q(child_leaf_id=self.child_id_to_detach)
-        ).get()
+        obj = self.model.objects.get(
+            parent_element_id=self.parent_id,
+            child_element_id=self.child_id_to_detach
+        )
         return obj
 
     @property
@@ -131,20 +121,3 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
     def get_success_url(self):
         # We can just reload the page
         return
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            try:
-                for rule in self.rules:
-                    perm = rule(self.request.user, self.get_object())
-                    if not perm:
-                        break
-
-            except PermissionDenied as e:
-
-                return render(request,
-                              'education_group/blocks/modal/modal_access_denied.html',
-                              {'access_message': _('You are not eligible to detach this item')})
-
-        return super(DetachNodeView, self).dispatch(request, *args, **kwargs)

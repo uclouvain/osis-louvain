@@ -546,3 +546,43 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
     color: #777;
     cursor: not-allowed;
 }
+
+.of_unversioned_field #academic_type,
+.of_unversioned_field #duration,
+.of_unversioned_field #internship,
+.of_unversioned_field #is_enrollment_enabled,
+.of_unversioned_field #has_online_re_registration,
+.of_unversioned_field #has_partial_deliberation,
+.of_unversioned_field #has_admission_exam,
+.of_unversioned_field #has_dissertation,
+.of_unversioned_field #produce_university_certificate,
+.of_unversioned_field #decree_category,
+.of_unversioned_field #rate_code,
+.of_unversioned_field #main_language,
+.of_unversioned_field #english_activities,
+.of_unversioned_field #other_language_activities,
+.of_unversioned_field #main_domain,
+.of_unversioned_field #secondary_domains,
+.of_unversioned_field #isced_domain,
+.of_unversioned_field #internal_comment,
+.of_unversioned_field #panel_coorganization,
+.of_unversioned_field #management_entity,
+.of_unversioned_field #management_entity,
+.of_unversioned_field #start_year,
+.of_unversioned_field #end_year,
+.of_unversioned_field #teaching_campus,
+.of_unversioned_field #enrollment_campus,
+.of_unversioned_field #other_campus_activities,
+.of_unversioned_field #funding_can_be_funded,
+.of_unversioned_field #funding_orientation,
+.of_unversioned_field #funding_can_be_international_funded,
+.of_unversioned_field #international_funding_orientation,
+.of_unversioned_field #hops_ares_code,
+.of_unversioned_field #hops_ares_graca,
+.of_unversioned_field #hops_ares_authorization,
+.of_unversioned_field #co_graduation_inter_cfb,
+.of_unversioned_field #co_graduation_coefficient,
+.of_unversioned_field #keywords
+{
+    color: grey;
+}

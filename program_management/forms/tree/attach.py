@@ -31,18 +31,14 @@ from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.forms import BaseFormSet, BaseModelFormSet, modelformset_factory
 
-import program_management.ddd.service.command
 from base.ddd.utils import validation_message
 from base.forms.utils import choice_field
-from base.models import group_element_year
-from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums import education_group_categories
 from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from program_management.business.group_element_years.attach import AttachEducationGroupYearStrategy, \
     AttachLearningUnitYearStrategy
 from program_management.business.group_element_years.management import CheckAuthorizedRelationshipAttach
-from program_management.ddd.domain.node import Node
 from program_management.ddd.repositories import load_node, load_authorized_relationship
 from program_management.ddd.service import attach_node_service, command
 from program_management.ddd.validators import _block_validator

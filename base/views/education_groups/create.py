@@ -155,13 +155,24 @@ def _common_success_redirect(request, form, root_id=None):
     display_success_messages(request, success_msg, extra_tags='safe')
 
     # Redirect
-    url = reverse("education_group_read", args=[root_id, education_group_year.pk])
+    url = reverse(
+        "element_identification",
+        kwargs={
+            "year": education_group_year.academic_year.year,
+            "code": education_group_year.partial_acronym
+        }
+    )
     return redirect(url)
 
 
 def _get_success_message_for_creation_education_group_year(root_id, education_group_year):
+    link = reverse("element_identification", kwargs={
+            "year": education_group_year.academic_year.year,
+            "code": education_group_year.partial_acronym
+        }
+    )
     return _("Education group year <a href='%(link)s'> %(acronym)s (%(academic_year)s) </a> successfully created.") % {
-        "link": reverse("education_group_read", args=[root_id, education_group_year.pk]),
+        "link": link,
         "acronym": education_group_year.acronym,
         "academic_year": education_group_year.academic_year,
     }

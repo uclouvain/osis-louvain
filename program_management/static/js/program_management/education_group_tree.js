@@ -135,7 +135,10 @@ function saveScrollPosition() {
 function scrollToPositionSaved() {
     const rootId = $('#panel_file_tree').attr("data-rootId");
     const storageValue = JSON.parse(localStorage.getItem('scrollpos'));
-    const scrollPosition = rootId in storageValue ? storageValue[rootId] : 0;
+    let scrollPosition = 0;
+    if (storageValue !== null && rootId in storageValue) {
+        scrollPosition = storageValue[rootId];
+    }
     document.getElementById('scrollableDiv').scrollTo(0, scrollPosition);
 }
 
@@ -146,7 +149,7 @@ $(window).scroll(function() {
 
 
 function adaptTreeOnFooter() {
-    if (checkVisible($('.footer'))) {
+    if (checkVisible !== undefined && checkVisible($('.footer'))) {
         $('.side-container').css("height", "calc(100% - 100px)");
     } else {
         $('.side-container').css("height", "calc(100% - 50px)");

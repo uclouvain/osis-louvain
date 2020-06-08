@@ -26,27 +26,46 @@
 
 from typing import List, Dict, Any
 
-from django.db.models import Case, F, When, IntegerField
-
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from osis_common.decorators.deprecated import deprecated
+from education_group.models.group_year import GroupYear
+from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
+from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
 from program_management.ddd.domain.link import factory as link_factory
-from program_management.ddd.domain.prerequisite import NullPrerequisite
-from program_management.ddd.domain.prerequisite import Prerequisite
+from program_management.ddd.domain.prerequisite import NullPrerequisite, Prerequisite
 from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionNotFoundException
 from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
 # Typing
 from program_management.ddd.repositories.load_prerequisite import TreeRootId, NodeId
-from program_management.models.enums.node_type import NodeType
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.models.education_group_version import EducationGroupVersion
 
 GroupElementYearColumnName = str
 LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"
 NodeKey = str  # <node_id>_<node_type> Example : "589_LEARNING_UNIT"
 TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
+
+
+@deprecated  # use ProgramTreeVersionRepository.get() instead
+def load_version(acronym: str, year: int, version_name: str, transition: bool) -> 'ProgramTreeVersion':
+    try:
+        education_group_version = EducationGroupVersion.objects\
+            .filter(root_group__element__isnull=False)\
+            .select_related('root_group__element').get(
+                offer__acronym=acronym,
+                offer__academic_year__year=year,
+                version_name=version_name,
+                is_transition=transition
+            )
+    except EducationGroupVersion.DoesNotExist:
+        raise ProgramTreeVersionNotFoundException
+
+    return __instanciate_from_education_group_version(education_group_version)
 
 
 @deprecated  # use ProgramTreeRepository.get() instead
@@ -63,9 +82,8 @@ def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
     has_prerequisites = load_prerequisite.load_has_prerequisite_multiple(tree_root_ids, nodes)
     is_prerequisites = load_prerequisite.load_is_prerequisite_multiple(tree_root_ids, nodes)
     for tree_root_id in tree_root_ids:
-        root_node = load_node.load_node_education_group_year(tree_root_id)  # TODO : use load_multiple
-        unique_key = '{}_{}'.format(root_node.pk, NodeType.EDUCATION_GROUP)
-        nodes[unique_key] = root_node
+        root_node = load_node.load(tree_root_id)  # TODO : use load_multiple
+        nodes[root_node.pk] = root_node
         tree_prerequisites = {
             'has_prerequisite_dict': has_prerequisites.get(tree_root_id) or {},
             'is_prerequisite_dict': is_prerequisites.get(tree_root_id) or {},
@@ -73,26 +91,22 @@ def load_trees(tree_root_ids: List[int]) -> List['ProgramTree']:
         structure_for_current_root_node = [s for s in structure if s['starting_node_id'] == tree_root_id]
         tree = __build_tree(root_node, structure_for_current_root_node, nodes, links, tree_prerequisites)
         trees.append(tree)
-        del nodes[unique_key]
+        del nodes[root_node.pk]
     return trees
 
 
 # FIXME :: to move into ProgramTreeRepository.search()
 def load_trees_from_children(
-        child_branch_ids: list,
-        child_leaf_ids: list = None,
+        child_element_ids: list,
         link_type: LinkTypes = None
 ) -> List['ProgramTree']:
-    if not child_branch_ids and not child_leaf_ids:
+    if child_element_ids:
+        assert isinstance(child_element_ids, list)
+    if not child_element_ids:
         return []
-    if child_branch_ids:
-        assert isinstance(child_branch_ids, list)
-    if child_leaf_ids:
-        assert isinstance(child_leaf_ids, list)
 
     qs = group_element_year.GroupElementYear.objects.get_reverse_adjacency_list(
-        child_branch_ids=child_branch_ids,
-        child_leaf_ids=child_leaf_ids,
+        child_element_ids=child_element_ids,
         link_type=link_type,
     )
     if not qs:
@@ -109,9 +123,9 @@ def load_trees_from_children(
 
 
 def __load_tree_nodes(tree_structure: TreeStructure) -> Dict[NodeKey, 'Node']:
-    ids = [link['id'] for link in tree_structure]
-    nodes_list = load_node.load_multiple(ids)
-    return {'{}_{}'.format(n.pk, n.type): n for n in nodes_list}
+    element_ids = [link['child_id'] for link in tree_structure]
+    nodes_list = load_node.load_multiple(element_ids)
+    return {n.pk: n for n in nodes_list}
 
 
 def __convert_link_type_to_enum(link_data: dict) -> None:
@@ -127,13 +141,7 @@ def __convert_quadrimester_to_enum(gey_dict: dict) -> None:
 
 def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
     group_element_year_ids = [link['id'] for link in tree_structure]
-    group_element_year_qs = group_element_year.GroupElementYear.objects.filter(pk__in=group_element_year_ids).annotate(
-        child_id=Case(
-            When(child_branch_id__isnull=True, then=F('child_leaf_id')),
-            default=F('child_branch_id'),
-            output_field=IntegerField()
-        )
-    ).values(
+    group_element_year_qs = group_element_year.GroupElementYear.objects.filter(pk__in=group_element_year_ids).values(
         'pk',
         'relative_credits',
         'min_credits',
@@ -145,15 +153,15 @@ def __load_tree_links(tree_structure: TreeStructure) -> Dict[LinkKey, 'Link']:
         'own_comment',
         'quadrimester_derogation',
         'link_type',
-        'parent_id',
-        'child_id',
+        'parent_element_id',
+        'child_element_id',
         'order'
     )
 
     tree_links = {}
     for gey_dict in group_element_year_qs:
-        parent_id = gey_dict.pop('parent_id')
-        child_id = gey_dict.pop('child_id')
+        parent_id = gey_dict.pop('parent_element_id')
+        child_id = gey_dict.pop('child_element_id')
         __convert_link_type_to_enum(gey_dict)
         __convert_quadrimester_to_enum(gey_dict)
 
@@ -200,10 +208,8 @@ def __build_children(
     for child_structure in map_parent_path_with_tree_structure.get(root_path) or []:
         child_id = child_structure['child_id']
         parent_id = child_structure['parent_id']
-        if not child_id or not parent_id:
-            continue  # TODO :: To remove when child_leaf and child_branch will disappear !
-        ntype = NodeType.LEARNING_UNIT if child_structure['child_leaf_id'] else NodeType.EDUCATION_GROUP
-        child_node = nodes['{}_{}'.format(child_id, ntype)]
+        child_node = nodes[child_id]
+
         child_node.children = __build_children(
             child_structure['path'],
             map_parent_path_with_tree_structure,
@@ -216,8 +222,63 @@ def __build_children(
             child_node.prerequisite = prerequisites['has_prerequisite_dict'].get(child_node.pk, NullPrerequisite())
             child_node.is_prerequisite_of = prerequisites['is_prerequisite_dict'].get(child_node.pk, [])
 
-        link_node = links['_'.join([str(parent_id), str(child_id)])]
-        link_node.parent = nodes['{}_{}'.format(parent_id, NodeType.EDUCATION_GROUP)]
+        link_node = links['_'.join([str(parent_id), str(child_node.pk)])]
+        link_node.parent = nodes[parent_id]
         link_node.child = child_node
         children.append(link_node)
     return children
+
+
+@deprecated  # use ProgramTreeVersionRepository.search_all_versions_from_root_node instead
+def find_all_program_tree_versions(acronym: str, year: int, load_tree: bool = True) -> List['ProgramTreeVersion']:
+    qs = EducationGroupVersion.objects.filter(offer__acronym=acronym, offer__academic_year__year=year)\
+        .select_related('offer__academic_year', 'root_group').order_by('version_name')
+
+    results = []
+
+    for elt in qs:
+        results.append(
+            __instanciate_from_education_group_version(elt)
+        )
+    return results
+
+
+def __instanciate_from_education_group_version(educ_group_version: EducationGroupVersion) -> 'ProgramTreeVersion':
+    identity = ProgramTreeVersionIdentity(
+        educ_group_version.offer.acronym,
+        educ_group_version.offer.academic_year.year,
+        educ_group_version.version_name,
+        educ_group_version.is_transition
+    )
+    tree_identity = ProgramTreeIdentity(
+        educ_group_version.root_group.partial_acronym,
+        educ_group_version.offer.academic_year.year
+    )
+    return ProgramTreeVersion(
+        identity,
+        tree_identity,
+        ProgramTreeRepository(),
+        title_en=elt.title_en,
+        title_fr=elt.title_fr,
+    )
+
+
+#  TODO :: to remove
+def find_all_versions_academic_year(acronym: str,
+                                    version_name: str,
+                                    is_transition: bool) -> List['EducationGroupVersionAcademicYear']:
+    qs = GroupYear.objects.filter(educationgroupversion__offer__acronym=acronym,
+                                  educationgroupversion__version_name=version_name,
+                                  educationgroupversion__is_transition=is_transition) \
+        .distinct('educationgroupversion__root_group__academic_year')
+    results = []
+    for elem in qs:
+        results.append(EducationGroupVersionAcademicYear(elem.educationgroupversion))
+    return results
+
+
+def load_from_year_and_code(year: int, code: str) -> 'ProgramTree':
+    obj = GroupYear.objects.get(academic_year__year=year,
+                                partial_acronym=code)
+
+    return load(obj.element.pk) if obj else None

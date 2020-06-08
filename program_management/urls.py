@@ -28,9 +28,9 @@ from django.urls import include, path
 
 import program_management.views.tree.attach
 import program_management.views.tree.move
+from program_management.views.proxy.identification import IdentificationRedirectView
 from program_management.views import groupelementyear_delete, groupelementyear_update, \
-    groupelementyear_read, element_utilization, excel, search, tree
-from program_management.views.prerequisite import read, update
+    groupelementyear_read, element_utilization, excel, search, tree, prerequisite_read, prerequisite_update
 from program_management.views.quick_search import QuickSearchLearningUnitYearView, QuickSearchEducationGroupYearView
 
 urlpatterns = [
@@ -54,17 +54,6 @@ urlpatterns = [
         url(r'^group_content/', groupelementyear_read.ReadEducationGroupTypeView.as_view(), name="group_content"),
         url(r'^pdf_content/(?P<language>[a-z\-]+)', groupelementyear_read.pdf_content, name="pdf_content"),
     ])),
-    url(r'^(?P<root_id>[0-9]+)/(?P<learning_unit_year_id>[0-9]+)/learning_unit/', include([
-        url(r'^utilization/$',
-            element_utilization.LearningUnitUtilization.as_view(),
-            name='learning_unit_utilization'),
-        url(r'^prerequisite/$',
-            read.LearningUnitPrerequisite.as_view(),
-            name='learning_unit_prerequisite'),
-        url(r'^prerequisite/update/$',
-            update.LearningUnitPrerequisite.as_view(),
-            name='learning_unit_prerequisite_update'),
-    ])),
     url(
         r'reporting/(?P<education_group_year_pk>[0-9]+)/prerequisites/$',
         excel.get_learning_unit_prerequisites_excel,
@@ -76,7 +65,7 @@ urlpatterns = [
         name="education_group_learning_units_is_prerequisite_for"
     ),
     url(
-        r'reporting/(?P<root_id>[0-9]+)/(?P<education_group_year_pk>[0-9]+)/contains/$',
+        r'reporting/(?P<year>[0-9]+)/(?P<code>[A-Za-z0-9]+)/contains/$',
         excel.get_learning_units_of_training_for_excel,
         name="education_group_learning_units_contains"
     ),
@@ -98,6 +87,28 @@ urlpatterns = [
             path('learning_unit/', QuickSearchLearningUnitYearView.as_view(), name="quick_search_learning_unit"),
             path('education_group/', QuickSearchEducationGroupYearView.as_view(), name="quick_search_education_group"),
         ])),
-
     ])),
+    path('<int:root_element_id>/', include([
+        path('<int:child_element_id>/', include([
+            path('quick_search/', include([
+                path('learning_unit/', QuickSearchLearningUnitYearView.as_view(),
+                     name="quick_search_learning_unit"),
+                path('education_group/', QuickSearchEducationGroupYearView.as_view(),
+                     name="quick_search_education_group"),
+            ])),
+            path('learning_unit/', include([
+                path('utilization/',
+                     element_utilization.LearningUnitUtilization.as_view(),
+                     name='learning_unit_utilization'),
+                path('prerequisite/',
+                     prerequisite_read.LearningUnitPrerequisite.as_view(),
+                     name='learning_unit_prerequisite'),
+                path('prerequisite/update/',
+                     prerequisite_update.LearningUnitPrerequisite.as_view(),
+                     name='learning_unit_prerequisite_update'),
+            ]))
+        ]))
+    ])),
+
+    path('<int:year>/<str:code>/', IdentificationRedirectView.as_view(), name='element_identification'),
 ]

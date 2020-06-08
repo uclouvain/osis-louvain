@@ -23,18 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from program_management.ddd.repositories.find_roots import find_roots
-from program_management.views.generic import LearningUnitGenericDetailView
+from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.ddd.service import tree_service
+from program_management.views.generic import LearningUnitGeneric
 
 
-class LearningUnitUtilization(LearningUnitGenericDetailView):
+class LearningUnitUtilization(PermissionRequiredMixin, LearningUnitGeneric):
     template_name = "learning_unit/tab_utilization.html"
+
+    permission_required = 'base.view_educationgroup'
+    raise_exception = True
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["group_element_years"] = self.object.child_leaf.select_related("parent")
-        context["formations"] = find_roots(
-            list(grp.parent for grp in self.object.child_leaf.select_related("parent")),
-            as_instances=True
-        )
+        trees = tree_service.search_trees_using_node(self.node)
+
+        context['utilization_rows'] = []
+        for tree in trees:
+            context['utilization_rows'] += [
+                {'link': link, 'root_nodes': [tree.root_node]}
+                for link in tree.get_links_using_node(self.node)
+            ]
+        context['utilization_rows'] = sorted(context['utilization_rows'], key=lambda row: row['link'].parent.code)
         return context

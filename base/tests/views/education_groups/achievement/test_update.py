@@ -30,24 +30,26 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from backoffice.settings.base import LANGUAGE_CODE_FR, LANGUAGE_CODE_EN
+from base.business.education_groups.general_information_sections import CMS_LABEL_PROGRAM_AIM, \
+    CMS_LABEL_ADDITIONAL_INFORMATION
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_achievement import EducationGroupAchievementFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
-from base.views.education_groups.achievement.detail import CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 
 
 class TestEducationGroupAchievementActionUpdateDelete(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.education_group_year = EducationGroupYearFactory()
-
+        StandardEducationGroupVersionFactory(offer=cls.education_group_year)
         cls.achievement_0 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
         cls.achievement_1 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)
         cls.achievement_2 = EducationGroupAchievementFactory(education_group_year=cls.education_group_year)

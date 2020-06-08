@@ -517,6 +517,7 @@ class LearningUnitYear(SerializableModel):
             Q(learning_unit=self.learning_unit) | Q(prerequisite__learning_unit_year=self)
         ).exists()
 
+    # FIXME :: To remove with EducationGroupHierarchy
     def has_or_is_prerequisite(self, education_group_year):
         formations = repositories.find_roots.find_roots([education_group_year])[education_group_year.id]
         return PrerequisiteItem.objects.filter(

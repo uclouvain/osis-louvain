@@ -1,0 +1,79 @@
+{% load static %}
+{% load i18n education_group_extra bootstrap3 %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row">
+            <div id="management_entity" class="col-md-12">
+                {% bootstrap_label _("Management entity") label_class='d-block'%}
+                <p>{{ education_group_year.management_entity.acronym }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="management_entity" class="col-md-12">
+                {% bootstrap_label _("Administration entity") label_class='d-block'%}
+                <p>{{ education_group_year.management_entity.acronym }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="start_year" class="col-md-12">
+                {% bootstrap_label _("Start") label_class='d-block'%}
+                <p>{{ education_group_year.start_year|format_to_academic_year }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="end_year" class="col-md-12">
+                {% bootstrap_label _("Last year of organization") label_class='d-block'%}
+                <p>{{ education_group_year.end_year|default:_("unspecified") }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="teaching_campus" class="col-md-12">
+                {% bootstrap_label _("Learning location") label_class='d-block'%}
+                <p>{{ education_group_year.teaching_campus.name }} - {{ education_group_year.teaching_campus.university_name }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="enrollment_campus" class="col-md-12">
+                {% bootstrap_label _("Enrollment campus") label_class='d-block'%}
+                <p>{{ education_group_year.enrollment_campus.name }} - {{ education_group_year.enrollment_campus.university_name }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="other_campus_activities" class="col-md-12">
+                {% bootstrap_label _("Activities on other campus") label_class='d-block'%}
+                <p>{{ education_group_year.other_campus_activities.value | title }}</p>
+            </div>
+        </div>
+        <br>
+    </div>
+</div>

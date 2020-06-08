@@ -901,8 +901,8 @@ class TestEditProposal(TestCase):
 class TestLearningUnitProposalDisplay(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.language_pt = LanguageFactory(code='PT')
-        cls.language_it = LanguageFactory(code='IT')
+        cls.language_pt = LanguageFactory(code='PT', name="Portugais")
+        cls.language_it = LanguageFactory(code='IT', name="Italien")
         cls.campus = CampusFactory()
         cls.academic_year = create_current_academic_year()
         cls.l_container_year = LearningContainerYearFactory(

@@ -13,6 +13,9 @@ if TYPE_CHECKING:
     from base.ddd.utils.validation_message import BusinessValidationMessage
     from program_management.ddd.domain.prerequisite import PrerequisiteExpression
 
+    from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+    from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+
     from program_management.ddd.repositories.load_tree import NodeKey
 
 

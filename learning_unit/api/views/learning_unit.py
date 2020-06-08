@@ -72,7 +72,7 @@ class LearningUnitDetailed(LanguageContextSerializerMixin, generics.RetrieveAPIV
     def get_object(self):
         acronym = self.kwargs['acronym']
         year = self.kwargs['year']
-        queryset = LearningUnitYear.objects.all().select_related(
+        queryset = LearningUnitYear.objects.filter(learning_container_year__isnull=False).select_related(
             'language',
             'campus',
             'academic_year',

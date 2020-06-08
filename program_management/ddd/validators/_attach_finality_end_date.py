@@ -66,7 +66,8 @@ class AttachFinalityEndDateValidator(BusinessValidator):
                 )
 
     def _get_codes_where_end_date_gte_root_end_date(self):
+        root_end_date = self.tree_2m.root_node.end_date
         return [
             finality.code for finality in self.tree_from_node_to_add.get_all_finalities()
-            if finality.end_date > self.tree_2m.root_node.end_date
+            if all([finality.end_date, root_end_date]) and finality.end_date > root_end_date
         ]

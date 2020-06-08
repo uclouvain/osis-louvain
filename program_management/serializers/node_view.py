@@ -28,7 +28,6 @@ from typing import List
 from django.templatetags.static import static
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
 
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
@@ -51,7 +50,7 @@ def serialize_children(children: List['Link'], path: str, context=None) -> List[
 
 def _get_node_view_attribute_serializer(link: 'Link', path: 'Path', context=None) -> dict:
     return {
-        'href': reverse('education_group_read', args=[context['root'].pk, link.child.pk]),
+        'href': reverse('element_identification', args=[link.child.year, link.child.code]) + "?path=%s" % path,
         'root': context['root'].pk,
         'group_element_year': link.pk,
         'element_id': link.child.pk,

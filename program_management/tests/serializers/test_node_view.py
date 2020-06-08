@@ -100,7 +100,7 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
         self.assertEqual(self.serialized_data['title'], expected_title)
 
     def test_serializer_node_attr_ensure_get_href(self):
-        expected_url = reverse('education_group_read', args=[self.root_node.pk, self.link.child.pk])
+        expected_url = reverse('element_identification', args=[self.link.child.year, self.link.child.code]) + "?path=1|2|6"
         self.assertEqual(self.serialized_data['href'], expected_url)
 
     def test_serializer_node_attr_ensure_element_id(self):

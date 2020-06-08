@@ -245,7 +245,7 @@ class TestLearningAchievementActions(TestCase):
 
     def test_learning_achievement_simple_save(self):
         msg = self._test_learning_achievement_save()
-        self.assertEqual(msg[0].get('message'), "{}.".format(_("The learning unit has been updated")))
+        self.assertEqual(msg[0].get('message'), "{}".format(_("The learning unit has been updated (without report).")))
         self.assertEqual(msg[0].get('level'), messages.SUCCESS)
 
     def test_learning_achievement_save_with_proposal(self):

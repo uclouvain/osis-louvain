@@ -55,7 +55,7 @@ class AttachNodeValidatorList(BusinessListValidator):
             link_type: Optional[LinkTypes],
             block: Optional[int]
     ):
-        if node_to_add.is_group():
+        if node_to_add.is_group_or_mini_or_training():
             self.validators = [
                 CreateLinkValidatorList(tree.get_node(path), node_to_add),
                 AttachAuthorizedRelationshipValidator(tree, node_to_add, tree.get_node(path)),
@@ -85,7 +85,7 @@ class DetachNodeValidatorList(BusinessListValidator):
     def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node', path_to_parent: 'Path'):
         detach_from = tree.get_node(path_to_parent)
 
-        if node_to_detach.is_group():
+        if node_to_detach.is_group_or_mini_or_training():
             path_to_node_to_detach = path_to_parent + '|' + str(node_to_detach.node_id)
             self.validators = [
                 MinimumEditableYearValidator(tree),

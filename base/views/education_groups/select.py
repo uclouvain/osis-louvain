@@ -41,12 +41,10 @@ from base.utils.cache import ElementCache
 @waffle_flag("copy_education_group_to_cache")
 def copy_education_group_to_cache(request, root_id=None, education_group_year_id=None):
     education_group_year = get_object_or_404(EducationGroupYear, pk=request.POST['element_id'])
-    redirect_to = reverse(
-        'education_group_read',
-        args=[
-            root_id,
-            education_group_year_id,
-        ]
+    redirect_to = reverse("element_identification", kwargs={
+            "year": education_group_year.academic_year.year,
+            "code": education_group_year.partial_acronym
+        }
     )
     return _cache_object_and_redirect(request, education_group_year, redirect_to=redirect_to)
 

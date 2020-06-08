@@ -23,21 +23,26 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import RequestFactory
+from django.test import RequestFactory, SimpleTestCase
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from base.models.enums.education_group_categories import GROUP, MINI_TRAINING, TRAINING
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
+from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
 from education_group.api.views.group_element_year import TrainingTreeView, GroupTreeView, MiniTrainingTreeView
+from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.domain.link import Link
 from program_management.ddd.repositories import load_tree
+from program_management.models.element import Element
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 
 
 class TrainingTreeViewTestCase(APITestCase):
@@ -54,39 +59,73 @@ class TrainingTreeViewTestCase(APITestCase):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.training = TrainingFactory(
             acronym='DROI2M',
-            partial_acronym='LBROI200M',
             academic_year=cls.academic_year,
             education_group_type__name=TrainingType.PGRM_MASTER_120.name
         )
-        cls.common_core = GroupFactory(
+        training_version = EducationGroupVersionFactory(
+            offer=cls.training,
+            root_group__academic_year=cls.academic_year,
+            root_group__education_group_type__category=TRAINING,
+            root_group__partial_acronym='LBROI200M',
+        )
+        element_training = ElementFactory(group_year=training_version.root_group)
+        cls.common_core = GroupYearFactory(
+            education_group_type__category=GROUP,
             education_group_type__name=GroupType.COMMON_CORE.name,
             academic_year=cls.academic_year
         )
-        GroupElementYearFactory(parent=cls.training, child_branch=cls.common_core, child_leaf=None)
+        element_common_core = ElementFactory(group_year=cls.common_core)
+        GroupElementYearFactory(
+            parent_element=element_training,
+            child_element=element_common_core,
+        )
 
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year
         )
-        GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
+        element_learning_unit_year = ElementFactory(learning_unit_year=cls.learning_unit_year)
+        GroupElementYearFactory(
+            parent_element=element_common_core,
+            child_element=element_learning_unit_year,
+        )
 
-        cls.finality_list_choice = GroupFactory(
+        cls.finality_list_choice = GroupYearFactory(
+            education_group_type__category=GROUP,
             education_group_type__name=GroupType.FINALITY_120_LIST_CHOICE.name,
             academic_year=cls.academic_year
         )
-        GroupElementYearFactory(parent=cls.training, child_branch=cls.finality_list_choice, child_leaf=None)
+        element_finality_choice = ElementFactory(group_year=cls.finality_list_choice)
+        GroupElementYearFactory(
+            parent_element=element_training,
+            child_element=element_finality_choice,
+        )
         cls.training_ms = TrainingFactory(
             acronym='DROI2MS/IU',
-            partial_acronym='LIURE200S',
             academic_year=cls.academic_year,
             education_group_type__name=TrainingType.MASTER_MS_120.name
         )
-        GroupElementYearFactory(parent=cls.finality_list_choice, child_branch=cls.training_ms, child_leaf=None)
-        cls.common_core_ms = GroupFactory(
+        training_ms_version = EducationGroupVersionFactory(
+            offer=cls.training_ms,
+            root_group__academic_year=cls.academic_year,
+            root_group__education_group_type__category=TRAINING,
+            root_group__partial_acronym='LIURE200S',
+        )
+        element_training_ms = ElementFactory(group_year=training_ms_version.root_group)
+        GroupElementYearFactory(
+            parent_element=element_finality_choice,
+            child_element=element_training_ms,
+        )
+        cls.common_core_ms = GroupYearFactory(
+            education_group_type__category=GROUP,
             education_group_type__name=GroupType.COMMON_CORE.name,
             academic_year=cls.academic_year
         )
-        GroupElementYearFactory(parent=cls.training_ms, child_branch=cls.common_core_ms, child_leaf=None)
+        element_common_core_ms = ElementFactory(group_year=cls.common_core_ms)
+        GroupElementYearFactory(
+            parent_element=element_training_ms,
+            child_element=element_common_core_ms,
+        )
         cls.person = PersonFactory()
         url_kwargs = {
             'acronym': cls.training.acronym,
@@ -122,8 +161,9 @@ class TrainingTreeViewTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        training_element = Element.objects.get(group_year__educationgroupversion__offer=self.training)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(self.training.id).root_node),
+            Link(parent=None, child=load_tree.load(training_element.id).root_node),
             context={
                 'request': RequestFactory().get(self.url),
             }
@@ -151,23 +191,32 @@ class MiniTrainingTreeViewTestCase(APITestCase):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.mini_training = MiniTrainingFactory(
             acronym="CCHOIXM60",
-            partial_acronym='LBIOL212O',
             academic_year=cls.academic_year
         )
-        cls.common_core = GroupFactory(
+        cls.mini_training_version = EducationGroupVersionFactory(
+            offer=cls.mini_training,
+            root_group__education_group_type__category=MINI_TRAINING,
+            root_group__partial_acronym='LBIOL212O',
+            root_group__academic_year=cls.academic_year,
+        )
+        cls.mini_training_element = ElementFactory(group_year=cls.mini_training_version.root_group)
+        cls.common_core = GroupYearFactory(
+            education_group_type__category=GROUP,
             education_group_type__name=GroupType.COMMON_CORE.name,
             academic_year=cls.academic_year
         )
-        GroupElementYearFactory(parent=cls.mini_training, child_branch=cls.common_core, child_leaf=None)
+        element_common_core = ElementFactory(group_year=cls.common_core)
+        GroupElementYearFactory(parent_element=cls.mini_training_element, child_element=element_common_core)
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year
         )
-        GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
+        element_learning_unit_year = ElementFactory(learning_unit_year=cls.learning_unit_year)
+        GroupElementYearFactory(parent_element=element_common_core, child_element=element_learning_unit_year)
 
         cls.person = PersonFactory()
         url_kwargs = {
-            'partial_acronym': cls.mini_training.partial_acronym,
+            'partial_acronym': cls.mini_training_version.root_group.partial_acronym,
             'year': cls.mini_training.academic_year.year
         }
         cls.url = reverse('education_group_api_v1:' + MiniTrainingTreeView.name, kwargs=url_kwargs)
@@ -201,7 +250,7 @@ class MiniTrainingTreeViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(self.mini_training.id).root_node),
+            Link(parent=None, child=load_tree.load(self.mini_training_element.id).root_node),
             context={
                 'request': RequestFactory().get(self.url),
             }
@@ -210,7 +259,7 @@ class MiniTrainingTreeViewTestCase(APITestCase):
 
     def test_get_result_with_lowercase_acronym(self):
         url_kwargs = {
-            'partial_acronym': self.mini_training.partial_acronym.lower(),
+            'partial_acronym': self.mini_training_version.root_group.partial_acronym.lower(),
             'year': self.mini_training.academic_year.year
         }
         url = reverse('education_group_api_v1:' + MiniTrainingTreeView.name, kwargs=url_kwargs)
@@ -227,20 +276,25 @@ class GroupTreeViewTestCase(APITestCase):
                |-- Sub group
         """
         cls.academic_year = AcademicYearFactory(year=2018)
-        cls.common_core = GroupFactory(
+        cls.common_core = GroupYearFactory(
+            education_group_type__category=GROUP,
             education_group_type__name=GroupType.COMMON_CORE.name,
             academic_year=cls.academic_year
         )
+        cls.element_common_core = ElementFactory(group_year=cls.common_core)
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year
         )
-        GroupElementYearFactory(parent=cls.common_core, child_branch=None, child_leaf=cls.learning_unit_year)
-        cls.sub_group = GroupFactory(
+        element_learning_unit_year = ElementFactory(learning_unit_year=cls.learning_unit_year)
+        GroupElementYearFactory(parent_element=cls.element_common_core, child_element=element_learning_unit_year)
+        cls.sub_group = GroupYearFactory(
+            education_group_type__category=GROUP,
             education_group_type__name=GroupType.SUB_GROUP.name,
             academic_year=cls.academic_year
         )
-        GroupElementYearFactory(parent=cls.common_core, child_branch=cls.sub_group, child_leaf=None)
+        element_sub_group = ElementFactory(group_year=cls.sub_group)
+        GroupElementYearFactory(parent_element=cls.element_common_core, child_element=element_sub_group)
         cls.person = PersonFactory()
         url_kwargs = {
             'partial_acronym': cls.common_core.partial_acronym,
@@ -277,7 +331,7 @@ class GroupTreeViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(self.common_core.id).root_node),
+            Link(parent=None, child=load_tree.load(self.element_common_core.id).root_node),
             context={
                 'request': RequestFactory().get(self.url),
             }

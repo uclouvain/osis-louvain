@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-19 11:42+0100\n"
+"POT-Creation-Date: 2020-06-03 08:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -615,6 +615,9 @@ msgid "Contacts"
 msgstr ""
 
 msgid "Content"
+msgstr ""
+
+msgid "Continuing education academic year linkable to admission"
 msgstr ""
 
 msgid "Coordinator"
@@ -2710,7 +2713,7 @@ msgstr ""
 msgid "The user has not permission to delete education groups."
 msgstr ""
 
-msgid "The user is not allowed to change education group content."
+msgid "The user is not allowed to change link data."
 msgstr ""
 
 msgid "The user is not attached to the management entity"
@@ -2730,6 +2733,9 @@ msgstr ""
 msgid ""
 "The value of field '%(field)s' is different between year %(year)s - "
 "%(value)s and year %(next_year)s - %(next_value)s"
+msgstr ""
+
+msgid "The value of this attribute is inherited from the standard OF"
 msgstr ""
 
 msgid "The volume Q1 or Q2 must have a value but not both"

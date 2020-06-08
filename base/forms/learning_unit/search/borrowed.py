@@ -24,8 +24,10 @@
 #
 ##############################################################################
 import itertools
+from typing import Dict, List
 
 from django import forms
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from django_filters import filters
 
@@ -35,9 +37,11 @@ from base.models import entity_version
 from base.models.academic_year import AcademicYear
 from base.models.entity_version import EntityVersion, build_current_entity_version_structure_in_memory
 from base.models.enums import entity_type
-from base.models.learning_unit_year import LearningUnitYear
+from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet
 from base.models.offer_year_entity import OfferYearEntity
 from base.views.learning_units.search.common import SearchTypes
+from education_group.models.group_year import GroupYear
+from program_management.models.element import Element
 
 
 class BorrowedLearningUnitSearch(LearningUnitFilter):
@@ -80,29 +84,33 @@ class BorrowedLearningUnitSearch(LearningUnitFilter):
         ids = filter_is_borrowed_learning_unit_year(
             qs,
             academic_year,
-            faculty_borrowing=faculty_borrowing_id
+            faculty_borrowing_id=faculty_borrowing_id
         )
         return qs.filter(id__in=ids)
 
 
-def filter_is_borrowed_learning_unit_year(learning_unit_year_qs, academic_year, faculty_borrowing=None):
+def filter_is_borrowed_learning_unit_year(
+        learning_unit_year_qs: LearningUnitYearQuerySet,
+        academic_year: AcademicYear,
+        faculty_borrowing_id: int = None
+):
     entities = build_current_entity_version_structure_in_memory(academic_year.start_date)
     entities_borrowing_allowed = []
-    if faculty_borrowing in entities:
-        entities_borrowing_allowed.extend(entities[faculty_borrowing]["all_children"])
-        entities_borrowing_allowed.append(entities[faculty_borrowing]["entity_version"])
+    if faculty_borrowing_id in entities:
+        entities_borrowing_allowed.extend(entities[faculty_borrowing_id]["all_children"])
+        entities_borrowing_allowed.append(entities[faculty_borrowing_id]["entity_version"])
         entities_borrowing_allowed = [entity_version.entity.id for entity_version in entities_borrowing_allowed]
 
     entities_faculty = compute_faculty_for_entities(entities)
     map_luy_entity = map_learning_unit_year_with_requirement_entity(learning_unit_year_qs)
-    map_luy_education_group_entities = map_learning_unit_year_with_entities_of_education_groups(academic_year)
+    map_luy_group_entities = map_learning_unit_year_with_entities_of_group_year(academic_year)
 
     ids = []
     for luy in learning_unit_year_qs:
         if _is_borrowed_learning_unit(luy,
                                       entities_faculty,
                                       map_luy_entity,
-                                      map_luy_education_group_entities,
+                                      map_luy_group_entities,
                                       entities_borrowing_allowed):
             ids.append(luy.id)
 
@@ -128,22 +136,30 @@ def map_learning_unit_year_with_requirement_entity(learning_unit_year_qs):
     return {luy_id: entity_id for luy_id, entity_id in learning_unit_years_with_entity}
 
 
-def map_learning_unit_year_with_entities_of_education_groups(academic_year):
-    formations = program_management.ddd.repositories.find_roots.find_all_roots_for_academic_year(academic_year.id)
-    education_group_ids = list(itertools.chain.from_iterable(formations.values()))
-    offer_year_entity = OfferYearEntity.objects.filter(education_group_year__in=education_group_ids). \
-        values_list("education_group_year", "entity")
-    dict_entity_of_education_group = {education_group_year_id: entity_id for education_group_year_id, entity_id
-                                      in offer_year_entity}
+def map_learning_unit_year_with_entities_of_group_year(academic_year: AcademicYear) -> Dict[int, List[int]]:
+    roots_by_children_id = program_management.ddd.repositories.find_roots.find_all_roots_for_academic_year(
+        academic_year.id
+    )
+    root_element_ids = list(itertools.chain.from_iterable(roots_by_children_id.values()))
+    children_element_ids = list(roots_by_children_id.keys())
+    dict_entity_of_element_id = dict(
+        Element.objects.filter(id__in=root_element_ids).values_list("id", "group_year__management_entity")
+    )
+    dict_element_id_luy_id = dict(
+        Element.objects.filter(id__in=children_element_ids).values_list("id", "learning_unit_year")
+    )
 
-    dict_education_group_year_entities_for_learning_unit_year = {}
-    for luy_id, formations_ids in formations.items():
-        dict_education_group_year_entities_for_learning_unit_year[luy_id] = \
-            [dict_entity_of_education_group.get(formation_id) for formation_id in formations_ids]
-    return dict_education_group_year_entities_for_learning_unit_year
+    dict_group_year_entities_for_learning_unit_year = {}
+    for luy_element_id, root_element_ids in roots_by_children_id.items():
+        luy_id = dict_element_id_luy_id.get(luy_element_id)
+        if not luy_id:
+            continue
+        dict_group_year_entities_for_learning_unit_year[luy_id] = \
+            [dict_entity_of_element_id.get(element_id) for element_id in root_element_ids]
+    return dict_group_year_entities_for_learning_unit_year
 
 
-def _is_borrowed_learning_unit(luy, map_entity_faculty, map_luy_entity, map_luy_education_group_entities,
+def _is_borrowed_learning_unit(luy, map_entity_faculty, map_luy_entity, map_luy_group_entities,
                                entities_borrowing_allowed):
     luy_entity = map_luy_entity.get(luy.id)
     luy_faculty = map_entity_faculty.get(luy_entity)
@@ -154,7 +170,7 @@ def _is_borrowed_learning_unit(luy, map_entity_faculty, map_luy_entity, map_luy_
     def is_entity_allowed(entity):
         return not entities_borrowing_allowed or entity in entities_borrowing_allowed
 
-    entities_allowed = filter(is_entity_allowed, map_luy_education_group_entities.get(luy.id, []))
+    entities_allowed = filter(is_entity_allowed, map_luy_group_entities.get(luy.id, []))
     for education_group_entity in entities_allowed:
         if luy_faculty != map_entity_faculty.get(education_group_entity) \
                 and map_entity_faculty.get(education_group_entity) is not None:

@@ -1,0 +1,129 @@
+{% load static %}
+{% load i18n bootstrap3 %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-6">
+                {% bootstrap_label _("Acronym/Short title") label_class='d-block'%}
+                <p>{{ node.title }}</p>
+            </div>
+            <div class="col-md-6">
+                {% bootstrap_label _("Code") label_class='d-block'%}
+                <p>{{ node.code }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-6">
+                {% bootstrap_label _("Category") label_class='d-block'%}
+                <p>{% trans 'Training' %}</p>
+            </div>
+            <div class="col-md-6">
+                {% bootstrap_label _("Type of training") label_class='d-block'%}
+                <p>{{ node.category.value }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-6">
+                {% bootstrap_label _("Status") label_class='d-block'%}
+                <p>{{ node.offer_status.value }}</p>
+            </div>
+            <div class="col-md-6">
+                {% bootstrap_label _("Schedule type") label_class='d-block'%}
+                <p>{{ node.schedule_type.value }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-6">
+                {% with label=_("credits") %}
+                    {% bootstrap_label label|capfirst label_class='d-block'%}
+                {% endwith %}
+                <p>{{ node.credits }}</p>
+            </div>
+            <div class="col-md-6">
+                {% bootstrap_label _("Type of constraint") label_class='d-block'%}
+                <p>{{ node.constraint_type|default_if_none:""  }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-6">
+                {% with label=_("minimum constraint") %}
+                    {% bootstrap_label label|capfirst label_class='d-block'%}
+                {% endwith %}
+                <p>{{ node.min_constraint|default_if_none:""  }}</p>
+            </div>
+            <div class="col-md-6">
+                {% with label=_("maximum constraint") %}
+                    {% bootstrap_label label|capfirst label_class='d-block'%}
+                {% endwith %}
+                <p>{{ node.max_constraint|default_if_none:"" }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col-md-12">
+                {% bootstrap_label _("Title in French") label_class='d-block'%}
+                <p>{{ node.group_title_fr }}</p>
+            </div>
+        </div>
+        <br>
+        {% if education_group_year.is_finality %}
+            <div class="row">
+                <div class="col-md-12">
+                    {% bootstrap_label _("Partial title in French") label_class='d-block'%}
+                    <p>{{ education_group_year.titles.partial_title_fr | default_if_none:'-' }}</p>
+                </div>
+            </div>
+            <br>
+        {% endif %}
+        <div class="row">
+            <div class="col-md-12">
+                {% bootstrap_label _("Title in English") label_class='d-block'%}
+                <p>{{ node.group_title_en }}</p>
+            </div>
+        </div>
+        <br>
+        {% if education_group_year.is_finality %}
+            <div class="row">
+                <div class="col-md-12">
+                    {% bootstrap_label _("Partial title in English") label_class='d-block'%}
+                    <p>{{ education_group_year.titles.partial_title_en | default_if_none:'-' }}</p>
+                </div>
+            </div>
+            <br>
+        {% endif %}
+        <div class="row">
+            <div id="keywords" class="col-md-12">
+                {% bootstrap_label _("Keywords") label_class='d-block'%}
+                <p>{{ education_group_year.keywords }}</p>
+            </div>
+        </div>
+    </div>
+</div>

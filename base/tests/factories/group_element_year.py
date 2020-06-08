@@ -32,6 +32,7 @@ import factory.fuzzy
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.utils.fuzzy import FuzzyBoolean
+from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
 
 def _generate_block_value():
@@ -57,18 +58,30 @@ class GroupElementYearFactory(factory.django.DjangoModelFactory):
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-    parent = factory.SubFactory(EducationGroupYearFactory)
-    child_branch = factory.SubFactory(EducationGroupYearFactory,
-                                      academic_year=factory.SelfAttribute("..parent.academic_year"))
+    parent_element = factory.SubFactory(ElementGroupYearFactory)
+    child_element = factory.SubFactory(ElementGroupYearFactory)
     relative_credits = factory.fuzzy.FuzzyInteger(0, 10)
-    child_leaf = None
     is_mandatory = FuzzyBoolean()
     link_type = None
     order = None
     block = factory.LazyFunction(_generate_block_value)
+    # FIXME :: DEPRECATED - Use parent_element instead
+    parent = factory.SubFactory(EducationGroupYearFactory)
+    child_branch = factory.SubFactory(
+        EducationGroupYearFactory,
+        academic_year=factory.SelfAttribute("..parent.academic_year")
+    )
+    child_leaf = None
 
 
 class GroupElementYearChildLeafFactory(GroupElementYearFactory):
+    child_element = factory.SubFactory(
+        ElementLearningUnitYearFactory,
+        learning_unit_year=factory.SelfAttribute("..child_leaf")
+    )
+    # TODO: Remove after refactoring
+    child_leaf = factory.SubFactory(
+        LearningUnitYearFactory,
+        academic_year=factory.SelfAttribute("..parent.academic_year")
+    )
     child_branch = None
-    child_leaf = factory.SubFactory(LearningUnitYearFactory,
-                                    academic_year=factory.SelfAttribute("..parent.academic_year"))

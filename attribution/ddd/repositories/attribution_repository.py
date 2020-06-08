@@ -51,5 +51,3 @@ class AttributionRepository(interface.AbstractRepository):
     @classmethod
     def get(cls, entity_id: 'AttributionIdentity') -> 'Attribution':
         raise NotImplementedError
-
-

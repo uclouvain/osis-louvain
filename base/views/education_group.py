@@ -28,6 +28,7 @@ import json
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.db.models import F
 from django.http import HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -55,59 +56,15 @@ from cms.enums import entity_name
 from cms.models import translated_text_label
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
+from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
+from education_group.views.proxy.read import Tab
 from osis_common.decorators.ajax import ajax_required
-
-
-@login_required
-@waffle_flag("education_group_update")
-@waffle_flag("education_group_administrative_data_update")
-def education_group_edit_administrative_data(request, root_id, education_group_year_id):
-    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-
-    assert_category_of_education_group_year(education_group_year, (education_group_categories.TRAINING,))
-
-    if not education_group_business.can_user_edit_administrative_data(request.user, education_group_year):
-        raise PermissionDenied(_("Only program managers of the education group OR central manager "
-                                 "linked to entity can edit."))
-
-    formset_session = AdministrativeDataFormset(
-        request.POST or None,
-        form_kwargs={'education_group_year': education_group_year}
-    )
-
-    offer_year_calendar = mdl.offer_year_calendar.search(
-        education_group_year_id=education_group_year_id,
-        academic_calendar_reference=academic_calendar_type.COURSE_ENROLLMENT
-    ).first()
-
-    course_enrollment = CourseEnrollmentForm(request.POST or None,
-                                             instance=offer_year_calendar,
-                                             education_group_yr=education_group_year)
-
-    course_enrollment_validity = course_enrollment.is_valid()
-    formset_session_validity = formset_session.is_valid()
-
-    group_to_parent = request.GET.get("group_to_parent")
-    additional_info_form = AdditionalInfoForm(
-        request.POST or None,
-        instance=education_group_year
-    )
-    if course_enrollment_validity and formset_session_validity:
-        formset_session.save()
-        course_enrollment.save()
-        additional_info_form.save()
-        messages.add_message(request, messages.SUCCESS, _('The administrative data has been successfully modified'))
-        return HttpResponseRedirect(reverse('education_group_administrative', args=[root_id, education_group_year_id]))
-
-    return render(request, "education_group/tab_edit_administrative_data.html", locals())
 
 
 def education_group_year_pedagogy_edit_post(request, education_group_year_id, root_id):
     form = EducationGroupPedagogyEditForm(request.POST)
-    redirect_url = reverse('education_group_general_informations', kwargs={
-        'root_id': root_id,
-        'education_group_year_id': education_group_year_id
-    })
+    training_identity = TrainingIdentitySearch().get_from_education_group_year_id(education_group_year_id)
+    redirect_url = _get_admission_condition_success_url(training_identity.year, training_identity.acronym)
     if form.is_valid():
         label = form.cleaned_data['label']
 
@@ -165,23 +122,32 @@ def education_group_year_pedagogy_edit_get(request, education_group_year_id):
 @login_required
 @require_http_methods(['GET', 'POST'])
 @can_change_general_information
-def education_group_year_pedagogy_edit(request, root_id, education_group_year_id):
+def education_group_year_pedagogy_edit(request, offer_id, education_group_year_id):
     if request.method == 'POST':
-        return education_group_year_pedagogy_edit_post(request, education_group_year_id, root_id)
+        return education_group_year_pedagogy_edit_post(request, education_group_year_id, offer_id)
     return education_group_year_pedagogy_edit_get(request, education_group_year_id)
 
 
 @login_required
 @can_change_admission_condition
-def education_group_year_admission_condition_remove_line(request, root_id, education_group_year_id):
+def education_group_year_admission_condition_remove_line(request, offer_id, education_group_year_id):
     admission_condition_line_id = request.GET['id']
-    admission_condition = get_object_or_404(AdmissionCondition, education_group_year__pk=education_group_year_id)
+    admission_condition = get_object_or_404(
+        AdmissionCondition.objects.annotate(
+            acronym=F('education_group_year__acronym'),
+            year=F('education_group_year__academic_year__year')
+        ),
+        education_group_year__pk=education_group_year_id
+    )
     admission_condition_line = get_object_or_404(AdmissionConditionLine,
                                                  admission_condition=admission_condition,
                                                  pk=admission_condition_line_id)
     admission_condition_line.delete()
-    return redirect(reverse('education_group_year_admission_condition_edit',
-                            kwargs={'root_id': root_id, 'education_group_year_id': education_group_year_id}))
+    return redirect(_get_admission_condition_success_url(admission_condition.year, admission_condition.acronym))
+
+
+def _get_admission_condition_success_url(year: int, acronym: str):
+    return reverse('education_group_read_proxy', args=[year, acronym]) + '?tab={}'.format(Tab.ADMISSION_CONDITION)
 
 
 def get_content_of_admission_condition_line(message, admission_condition_line, lang):
@@ -207,9 +173,8 @@ def education_group_year_admission_condition_update_line_post(request, root_id, 
     if form.is_valid():
         save_form_to_admission_condition_line(education_group_year_id, creation_mode, form)
 
-    return redirect(
-        reverse('education_group_year_admission_condition_edit', args=[root_id, education_group_year_id])
-    )
+    training_identity = TrainingIdentitySearch().get_from_education_group_year_id(education_group_year_id)
+    return redirect(_get_admission_condition_success_url(training_identity.year, training_identity.acronym))
 
 
 def save_form_to_admission_condition_line(education_group_year_id, creation_mode, form):
@@ -267,9 +232,9 @@ def education_group_year_admission_condition_update_line_get(request):
 
 @login_required
 @can_change_admission_condition
-def education_group_year_admission_condition_update_line(request, root_id, education_group_year_id):
+def education_group_year_admission_condition_update_line(request, offer_id, education_group_year_id):
     if request.method == 'POST':
-        return education_group_year_admission_condition_update_line_post(request, root_id, education_group_year_id)
+        return education_group_year_admission_condition_update_line_post(request, offer_id, education_group_year_id)
     return education_group_year_admission_condition_update_line_get(request)
 
 
@@ -286,9 +251,8 @@ def education_group_year_admission_condition_update_text_post(request, root_id, 
         setattr(admission_condition, 'text_' + section + '_en', form.cleaned_data['text_en'])
         admission_condition.save()
 
-    return redirect(
-        reverse('education_group_year_admission_condition_edit', args=[root_id, education_group_year_id])
-    )
+    training_identity = TrainingIdentitySearch().get_from_education_group_year_id(education_group_year_id)
+    return redirect(_get_admission_condition_success_url(training_identity.year, training_identity.acronym))
 
 
 def education_group_year_admission_condition_update_text_get(request, education_group_year_id):
@@ -311,35 +275,39 @@ def education_group_year_admission_condition_update_text_get(request, education_
 
 @login_required
 @can_change_admission_condition
-def education_group_year_admission_condition_update_text(request, root_id, education_group_year_id):
+def education_group_year_admission_condition_update_text(request, offer_id, education_group_year_id):
     if request.method == 'POST':
-        return education_group_year_admission_condition_update_text_post(request, root_id, education_group_year_id)
+        return education_group_year_admission_condition_update_text_post(request, offer_id, education_group_year_id)
     return education_group_year_admission_condition_update_text_get(request, education_group_year_id)
 
 
 @login_required
 @ajax_required
 @can_change_admission_condition
-def education_group_year_admission_condition_line_order(request, root_id, education_group_year_id):
+def education_group_year_admission_condition_line_order(request, offer_id, education_group_year_id):
     info = json.loads(request.body.decode('utf-8'))
 
-    admission_condition_line = get_object_or_404(AdmissionConditionLine, pk=info['record'])
+    admission_condition_line = get_object_or_404(
+        AdmissionConditionLine.objects.annotate(
+            acronym=F('admission_condition__education_group_year__acronym'),
+            year=F('admission_condition__education_group_year__academic_year__year')
+        ),
+        pk=info['record']
+    )
 
     if info['action'] == 'up':
         admission_condition_line.up()
     elif info['action'] == 'down':
         admission_condition_line.down()
 
+    success_url = _get_admission_condition_success_url(admission_condition_line.year, admission_condition_line.acronym)
     return JsonResponse({
-        'success_url': reverse('education_group_year_admission_condition_edit', kwargs={
-            'root_id': root_id,
-            'education_group_year_id': education_group_year_id
-        })
+        'success_url': success_url
     })
 
 
 @login_required
-def education_group_year_admission_condition_tab_lang_edit(request, root_id, education_group_year_id, language):
+def education_group_year_admission_condition_tab_lang_edit(request, offer_id, education_group_year_id, language):
     cache.set(get_tab_lang_keys(request.user), language, timeout=CACHE_TIMEOUT)
-    return redirect(reverse('education_group_year_admission_condition_edit',
-                            kwargs={'root_id': root_id, 'education_group_year_id': education_group_year_id}))
+    training_identity = TrainingIdentitySearch().get_from_education_group_year_id(education_group_year_id)
+    return redirect(_get_admission_condition_success_url(training_identity.year, training_identity.acronym))

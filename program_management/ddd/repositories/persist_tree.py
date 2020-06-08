@@ -28,7 +28,7 @@ from django.db import transaction
 from base.models.group_element_year import GroupElementYear
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.domain import program_tree
-from program_management.ddd.domain.node import Node, NodeEducationGroupYear, NodeLearningUnitYear
+from program_management.ddd.domain.node import Node
 from program_management.ddd.repositories import _persist_prerequisite
 
 
@@ -49,25 +49,25 @@ def __update_or_create_links(node: Node):
 
 
 def __persist_group_element_year(link):
-    # methode update_or_create doesn't work with outer-join on PostgreSQL
-    group_element_year, _ = GroupElementYear.objects.get_or_create(
-        parent_id=link.parent.pk,
-        child_branch_id=link.child.pk if isinstance(link.child, NodeEducationGroupYear) else None,
-        child_leaf_id=link.child.pk if isinstance(link.child, NodeLearningUnitYear) else None,
+    group_element_year, _ = GroupElementYear.objects.update_or_create(
+        parent_element_id=link.parent.pk,
+        child_element_id=link.child.pk,
+        defaults={
+            'relative_credits': link.relative_credits,
+            'min_credits': link.min_credits,
+            'max_credits': link.max_credits,
+            'is_mandatory': link.is_mandatory,
+            'block': link.block,
+            'access_condition': link.access_condition,
+            'comment': link.comment,
+            'comment_english': link.comment_english,
+            'own_comment': link.own_comment,
+            'quadrimester_derogation': link.quadrimester_derogation,
+            'link_type': link.link_type,
+            'order': link.order,
+
+        }
     )
-    group_element_year.relative_credits = link.relative_credits
-    group_element_year.min_credits = link.min_credits
-    group_element_year.max_credits = link.max_credits
-    group_element_year.is_mandatory = link.is_mandatory
-    group_element_year.block = link.block
-    group_element_year.access_condition = link.access_condition
-    group_element_year.comment = link.comment
-    group_element_year.comment_english = link.comment_english
-    group_element_year.own_comment = link.own_comment
-    group_element_year.quadrimester_derogation = link.quadrimester_derogation
-    group_element_year.link_type = link.link_type
-    group_element_year.order = link.order
-    group_element_year.save()
 
 
 def __delete_links(tree: program_tree.ProgramTree, node: Node):

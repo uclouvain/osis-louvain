@@ -1,0 +1,104 @@
+{% extends "education_group_app/mini_training/layout_read.html" %}
+{% load i18n bootstrap3 format static education_group group_element_year %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block details %}
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-hover">
+                <thead>
+                <tr>
+                    <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
+                    <th>{% trans 'Code' %}</th>
+                    <th>{% trans "Title" %}</th>
+                    <th>{% trans 'Cred. rel./abs.' %}</th>
+                    <th>{% trans 'Mandatory' %}</th>
+                    <th>{% trans 'Block' %}</th>
+                    <th>{% trans 'Link type' %}</th>
+                    <th>{% trans 'Comment' %}</th>
+                    <th>{% trans 'English comment' %}</th>
+                    <th style="min-width: 70px;"></th>
+                </tr>
+                </thead>
+                <tbody>
+                     {% for link in children %}
+                        <tr>
+                            <td style="width:8%">{{ link.child.title }}</td>
+                             <td>
+                                <a href="{% url 'element_identification' link.child.year link.child.code %}"
+                                   id="lnk_education_group_{{ link.child.pk }}">{{ link.child.code }}</a>
+                            </td>
+                            <td style="width:25%">
+                                {{ link.child.group_title_fr }}
+                            </td>
+                            <td style="width:6%">{{ link.relative_credits | default_if_none:'-' }}
+                                / {{ link.child.credits|floatformat:-2 | default_if_none:'-' }}</td>
+                            <td style="width:6%">{{ link.is_mandatory | yesno }}</td>
+                            <td style="width:3%">{{ link.block | default_if_none:'-' }}</td>
+                            <td style="width:6%">{{ link.link_type|default_if_none:'-' }}</td>
+                            <td style="width:20%">
+                                {% with comment=link.comment|default_if_none:'-' %}
+                                    {% if comment|length > 40 %}
+                                        <span data-toggle="tooltip" title='{{ comment }}'>
+                                            {{ comment | truncatechars:40 }}
+                                        </span>
+                                    {% else %}
+                                        {{ comment }}
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td style="width:20%">
+                                {% with comment_english=link.comment_english|default_if_none:'-' %}
+                                    {% if comment_english|length > 40 %}
+                                        <span data-toggle="tooltip" title='{{ comment_english }}'>
+                                            {{ comment_english | truncatechars:40 }}
+                                        </span>
+                                    {% else %}
+                                        {{ comment_english }}
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                            <td style="width:6%">
+                                <div class="btn-group pull-right" role="group" aria-label="actions">
+                                    {# TODO: ADD ACTION UP/DOWN/ DELETE  with service DDD (PATH + perms)  #}
+                                </div>
+                            </td>
+                        </tr>
+                        {% with nb_col_spanned=10 %}
+                            <tr>
+                                <td colspan="{{ nb_col_spanned }}" style="border-top: none;border-bottom: none;">
+                                    {% if link.own_comment %}
+                                        <label>{% trans 'Own comment' %}</label> :&nbsp;
+                                        {{ link.own_comment }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endwith %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock details %}

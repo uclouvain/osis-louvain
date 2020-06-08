@@ -46,7 +46,6 @@ from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear, Lectur
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
 from learning_unit.ddd.domain.proposal import Proposal
 from learning_unit.ddd.domain.specifications import Specifications
-from learning_unit.ddd.repository.load_achievement import load_achievements
 from learning_unit.ddd.repository.load_teaching_material import load_teaching_materials
 from osis_common.decorators.deprecated import deprecated
 
@@ -65,7 +64,7 @@ def __instanciate_volume_domain_object(learn_unit_data: dict) -> dict:
     return learn_unit_data
 
 
-@deprecated  # Please use :py:meth:`~learning_unit.ddd.repository.load_learning_unit_year.load_multiple_by_identity` instead !
+@deprecated  # Use :py:meth:`~learning_unit.ddd.repository.load_learning_unit_year.load_multiple_by_identity` instead !
 def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']:
     subquery_component = LearningComponentYear.objects.filter(
         learning_unit_year_id=OuterRef('pk')
@@ -159,7 +158,7 @@ def load_multiple(learning_unit_year_ids: List[int]) -> List['LearningUnitYear']
             **__instanciate_volume_domain_object(__convert_string_to_enum(learning_unit_data)),
             proposal=Proposal(learning_unit_data.pop('proposal_type'),
                               learning_unit_data.pop('proposal_state')),
-            achievements=load_achievements(learning_unit_data['acronym'], learning_unit_data['year']),
+            # achievements=load_achievements(learning_unit_data['acronym'], learning_unit_data['year']),
             entities=Entities(requirement_entity_acronym=learning_unit_data.pop('requirement_entity_acronym'),
                               allocation_entity_acronym=learning_unit_data.pop('allocation_entity_acronym')),
             description_fiche=DescriptionFiche(
