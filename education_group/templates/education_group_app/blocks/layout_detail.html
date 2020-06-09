@@ -66,8 +66,9 @@
                         </div>
 
                         <div class="col-md-6">
-                            {% if current_version %}
-                                <select id="slt_version" name="select_program_tree_version" class="form-control" onchange="location = this.value;">
+                            {% if current_version and versions_choices|length > 1  %}
+                                <select id="slt_version" name="select_program_tree_version" class="form-control"
+                                        onchange="location = this.value;">
                                     {% for choice in versions_choices %}
                                         <option value="{{ choice.0 }}"
                                                 {% if current_version.entity_id == choice.1 %}
