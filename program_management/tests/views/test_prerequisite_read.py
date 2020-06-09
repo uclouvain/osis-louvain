@@ -28,6 +28,7 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import GroupType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory
@@ -91,7 +92,8 @@ class TestLearningUnitPrerequisiteGroup(TestCase):
         cls.academic_year = AcademicYearFactory(current=True)
         cls.root_group = GroupYearFactory(
             academic_year=cls.academic_year,
-            education_group_type__category=Categories.GROUP.name
+            education_group_type__category=Categories.GROUP.name,
+            education_group_type__name=GroupType.COMMON_CORE.name,
         )
         cls.root_element = ElementGroupYearFactory(group_year=cls.root_group)
         cls.element_learning_unit_year = ElementLearningUnitYearFactory(

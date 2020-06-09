@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import skip
+
 from django.test import TestCase
 from mock import patch
 
@@ -38,6 +40,7 @@ from education_group.tests.factories.auth.central_manager import CentralManagerF
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 
 
+@skip("FIXME in OSIS-4723")
 class TestCanUpdateGroupElementYear(TestCase):
     @classmethod
     def setUpTestData(cls):

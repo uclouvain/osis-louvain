@@ -77,7 +77,7 @@ class LearningUnitPrerequisite(PermissionRequiredMixin, SuccessMessageMixin, Lea
 
     def _get_learning_unit_year_node(self):
         node = self.program_tree.get_node_by_id_and_type(
-            int(self.kwargs["learning_unit_year_id"]),
+            int(self.kwargs["child_element_id"]),
             NodeType.LEARNING_UNIT
         )
         if node is None:

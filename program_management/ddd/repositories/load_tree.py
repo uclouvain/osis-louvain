@@ -29,21 +29,22 @@ from typing import List, Dict, Any
 from base.models import group_element_year
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
-from osis_common.decorators.deprecated import deprecated
 from education_group.models.group_year import GroupYear
 from osis_common.decorators.deprecated import deprecated
-from program_management.ddd.business_types import *
 from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import NullPrerequisite, Prerequisite
-from program_management.ddd.domain.program_tree import ProgramTree
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionNotFoundException
+from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersion, ProgramTreeVersionNotFoundException, \
+    ProgramTreeVersionIdentity
 from program_management.ddd.repositories import load_node, load_prerequisite, \
     load_authorized_relationship
 # Typing
 from program_management.ddd.repositories.load_prerequisite import TreeRootId, NodeId
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.models.education_group_version import EducationGroupVersion
+
+from program_management.ddd.business_types import *
 
 GroupElementYearColumnName = str
 LinkKey = str  # <parent_id>_<child_id>  Example : "123_124"
@@ -258,8 +259,8 @@ def __instanciate_from_education_group_version(educ_group_version: EducationGrou
         identity,
         tree_identity,
         ProgramTreeRepository(),
-        title_en=elt.title_en,
-        title_fr=elt.title_fr,
+        title_en=educ_group_version.title_en,
+        title_fr=educ_group_version.title_fr,
     )
 
 
