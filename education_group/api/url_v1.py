@@ -68,7 +68,7 @@ urlpatterns = [
     url(r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)/', include([
         url(r'^tree$', MiniTrainingTreeView.as_view(), name=MiniTrainingTreeView.name),
         url(r'^title$', MiniTrainingTitle.as_view(), name=MiniTrainingTitle.name),
-        url(r'^versions$', MiniTrainingVersionList.as_view(), name=MiniTrainingVersionList.name)
+        url(r'^versions$', MiniTrainingVersionList.as_view(), name=MiniTrainingVersionList.name),
         url(r'^offer_roots$', OfferRoots.as_view(), name=OfferRoots.name),
     ])),
     url(
