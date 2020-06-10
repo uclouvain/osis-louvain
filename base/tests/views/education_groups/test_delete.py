@@ -72,9 +72,9 @@ class TestDeleteGroupEducationView(TestCase):
         CentralManagerFactory(person=self.person, entity=self.education_group_year1.management_entity)
         CentralManagerFactory(person=self.person, entity=self.education_group_year2.management_entity)
         self.url = reverse('delete_education_group', args=[self.education_group_year1.id,
-                                                           self.education_group_year1.education_group.id])
+                                                           self.education_group_year1.id])
         self.url2 = reverse('delete_education_group', args=[self.education_group_year2.id,
-                                                            self.education_group_year2.education_group.id])
+                                                            self.education_group_year2.id])
         self.client.force_login(user=self.person.user)
 
     def test_delete_case_user_without_permission(self):

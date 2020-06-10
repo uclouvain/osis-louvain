@@ -44,6 +44,8 @@ class TrainingFilter(filters.FilterSet):
     partial_acronym = filters.CharFilter(field_name="root_group__partial_acronym")
     title = filters.CharFilter(field_name="root_group__title")
     title_english = filters.CharFilter(field_name="root_group__title_en")
+    ares_ability = filters.NumberFilter(field_name="offer__hops__ares_ability")
+    year = filters.NumberFilter(field_name="offer__academic_year__year")
 
     class Meta:
         model = EducationGroupVersion

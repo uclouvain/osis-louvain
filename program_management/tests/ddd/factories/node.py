@@ -31,16 +31,19 @@ from base.models.enums.education_group_types import TrainingType, MiniTrainingTy
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear
 
 
+def generate_year(node):
+    return random.randint(1999, 2099)
+
+
 def generate_end_date(node):
     return node.year + 10
 
 
 class NodeFactory(factory.Factory):
-
-    node_id = factory.Sequence(lambda n: n+1)
-    code = factory.Sequence(lambda n: 'Code-%02d' % n)
+    node_id = factory.Sequence(lambda n: n + 1)
+    acronym = factory.Sequence(lambda n: 'Acrony%02d' % n)
     title = factory.fuzzy.FuzzyText(length=240)
-    year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
+    year = factory.LazyAttribute(generate_year)
     end_date = factory.LazyAttribute(generate_end_date)
 
 
@@ -50,10 +53,6 @@ class NodeEducationGroupYearFactory(NodeFactory):
         abstract = False
 
     node_type = factory.fuzzy.FuzzyChoice(TrainingType)
-    offer_title_fr = factory.fuzzy.FuzzyText(length=240)
-    offer_title_en = factory.fuzzy.FuzzyText(length=240)
-    offer_partial_title_fr = factory.fuzzy.FuzzyText(length=240)
-    offer_partial_title_en = factory.fuzzy.FuzzyText(length=240)
     children = None
 
 
@@ -64,10 +63,6 @@ class NodeGroupYearFactory(NodeFactory):
         abstract = False
 
     node_type = factory.fuzzy.FuzzyChoice(TrainingType)
-    offer_title_fr = factory.fuzzy.FuzzyText(length=240)
-    offer_title_en = factory.fuzzy.FuzzyText(length=240)
-    offer_partial_title_fr = factory.fuzzy.FuzzyText(length=240)
-    offer_partial_title_en = factory.fuzzy.FuzzyText(length=240)
     children = None
 
     class Params:
@@ -86,5 +81,3 @@ class NodeLearningUnitYearFactory(NodeFactory):
         abstract = False
 
     node_type = None
-    is_prerequisite_of = []
-    credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)

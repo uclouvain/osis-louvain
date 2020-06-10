@@ -113,7 +113,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
         )
         msg = [m.message for m in get_messages(response.wsgi_request)]
         msg_level = [m.level for m in get_messages(response.wsgi_request)]
-        self.assertEqual(len(msg), 1)
+        self.assertEqual(len(msg), 7)
         self.assertIn(messages.SUCCESS, msg_level)
 
     @mock.patch('base.business.learning_units.perms.is_eligible_for_modification_end_date')

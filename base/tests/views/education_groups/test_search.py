@@ -99,17 +99,6 @@ class TestEducationGroupSearchView(TestCase):
         cached_data = RequestCache(self.user, self.url).cached_data
         self.assertEqual(cached_data, FILTER_DATA)
 
-    def test_flag_version_program_exists(self):
-        Flag.objects.create(name='version_program')
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, 'access_denied.html')
-
-    def test_flag_version_program_not_exists(self):
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTemplateUsed(response, 'education_group/search.html')
-
 
 class TestEducationGroupDataSearchFilter(TestCase):
     """

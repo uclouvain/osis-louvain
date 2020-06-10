@@ -98,7 +98,7 @@ class Link:
         return self.child.is_learning_unit()
 
     def is_link_with_group(self):
-        return self.child.is_group()
+        return self.child.is_group_or_mini_or_training()
 
     def order_up(self):
         self.order -= 1

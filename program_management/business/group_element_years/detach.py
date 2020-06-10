@@ -107,6 +107,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
             options_to_detach += [self.education_group_year]
         return options_to_detach
 
+    # FIXME :: DEPRECATED :: use HasPrerequisiteValidator or IsPrerequisiteValidator instead
     def _check_detach_prerequisite_rules(self):
         for formation in self._parents:
             luys_inside_formation = Counter(EducationGroupHierarchy(root=formation).get_learning_unit_year_list())
@@ -149,6 +150,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
                 }
             )
 
+    # FiXME :: DEPRECATED :: Use DetachOptionValidator instead
     def _check_detach_options_rules(self):
         """
         In context of 2M when we detach an option [or group which contains option], we must ensure that
@@ -188,6 +190,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
                     )
 
 
+# FiXME :: DEPRECATED :: Use IsPrerequisiteValidator instead
 class DetachLearningUnitYearStrategy(DetachStrategy):
     def __init__(self, link: GroupElementYear):
         self.parent = link.parent

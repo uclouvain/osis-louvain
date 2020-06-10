@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import program_management.ddd.repositories.find_roots
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
@@ -33,8 +34,10 @@ from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import MiniTrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
+from education_group.api.serializers.training import TrainingListSerializer
 from education_group.api.views import utils
 from program_management.models.education_group_version import EducationGroupVersion
+from program_management.models.element import Element
 
 
 class MiniTrainingFilter(filters.FilterSet):
@@ -148,3 +151,31 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
             offer__academic_year__year=year
         )
         return egv
+
+
+class OfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
+    """
+        Return the list of offer roots for a mini training.
+    """
+    name = 'offer_roots'
+    serializer_class = TrainingListSerializer
+
+    def get_queryset(self):
+        acronym = self.kwargs['partial_acronym']
+        year = self.kwargs['year']
+        element = get_object_or_404(
+            Element.objects.all().select_related(
+                'group_year__academic_year',
+            ),
+            group_year__partial_acronym__iexact=acronym,
+            group_year__academic_year__year=year
+        )
+        root_elements = program_management.ddd.repositories.find_roots.find_roots(
+            [element],
+            as_instances=True
+        ).get(element.id, [])
+        return EducationGroupYear.objects.filter(
+            pk__in=EducationGroupVersion.objects.filter(
+                root_group__element__in=root_elements
+            ).values('offer_id')
+        ).select_related('academic_year', 'education_group_type')

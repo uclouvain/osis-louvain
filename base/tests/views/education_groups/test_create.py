@@ -160,7 +160,7 @@ class TestCreate(TestCreateMixin):
         url = self.urls_without_parent_by_category[education_group_categories.GROUP]
         response = self.client.get(url)
 
-        self.assertEquals(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertIsInstance(
             response.context["form_education_group_year"],
             GroupYearModelForm
@@ -171,7 +171,7 @@ class TestCreate(TestCreateMixin):
         url = self.urls_without_parent_by_category[education_group_categories.TRAINING]
         response = self.client.get(url)
 
-        self.assertEquals(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertIsInstance(
             response.context["form_education_group_year"],
             TrainingEducationGroupYearForm
@@ -182,7 +182,7 @@ class TestCreate(TestCreateMixin):
         url = self.urls_without_parent_by_category[education_group_categories.MINI_TRAINING]
         response = self.client.get(url)
 
-        self.assertEquals(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertIsInstance(
             response.context["form_education_group_year"],
             MiniTrainingYearModelForm

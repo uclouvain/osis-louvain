@@ -12,7 +12,7 @@ class TestFacultyManager(SimpleTestCase):
 
     def test_assert_group_name_meta_property(self):
         instance = FacultyManager()
-        self.assertEquals(instance._meta.group_name, "faculty_managers")
+        self.assertEqual(instance._meta.group_name, "faculty_managers")
 
     def test_assert_rule_sets_class_method(self):
         self.assertIsInstance(
@@ -22,14 +22,14 @@ class TestFacultyManager(SimpleTestCase):
 
     def test_get_allowed_education_group_types_one_type(self):
         faculty_manager = FacultyManager(scopes=[Scope.ALL.name])
-        self.assertEquals(
+        self.assertEqual(
             faculty_manager.get_allowed_education_group_types(),
             Scope.get_education_group_types(Scope.ALL.name)
         )
 
     def test_get_allowed_education_group_types_multiple_type_assert_union_of_both(self):
         faculty_manager = FacultyManager(scopes=[Scope.ALL.name, Scope.IUFC.name])
-        self.assertEquals(
+        self.assertEqual(
             faculty_manager.get_allowed_education_group_types(),
             Scope.get_education_group_types(Scope.ALL.name) + Scope.get_education_group_types(Scope.IUFC.name)
         )

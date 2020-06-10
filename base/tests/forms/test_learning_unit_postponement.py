@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from collections import OrderedDict
+from decimal import Decimal
 from unittest import mock
 
 from django.contrib.auth.models import Group
@@ -554,7 +555,7 @@ class TestLearningUnitPostponementFormFindConsistencyErrors(LearningUnitPostpone
                   "(%(new_value)s instead of %(current_value)s)") % {
                     'col_name': component.acronym + "-" + requirement_entity.most_recent_acronym,
                     'new_value': component.repartition_volume_requirement_entity,
-                    'current_value': "0.00"
+                    'current_value': "30.00"
                 }
             ],
         })

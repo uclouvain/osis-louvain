@@ -54,6 +54,7 @@ class LearningAchievement(AbstractAchievement):
         unique_together = ("consistency_id", "learning_unit_year", "language")
 
     def __str__(self):
+
         return u'{} - {} (order {})'.format(self.learning_unit_year, self.code_name, self.order)
 
 

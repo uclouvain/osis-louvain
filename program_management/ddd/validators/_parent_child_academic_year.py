@@ -29,7 +29,6 @@ from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.business_types import *
 
 
-# Implemented from GroupElementYear._check_same_academic_year_parent_child_branch
 class ParentChildSameAcademicYearValidator(BusinessValidator):
 
     def __init__(self, parent_node: 'Node', node_to_add: 'Node'):
@@ -40,6 +39,9 @@ class ParentChildSameAcademicYearValidator(BusinessValidator):
     def validate(self):
         if self.parent_node.year != self.node_to_add.year:
             self.add_error_message(
-                _("It is prohibited to attach a group, mini-training or training to an element of "
-                  "another academic year.")
+                _("It is prohibited to attach a %(child_node)s to an element of "
+                  "another academic year %(parent_node)s.") % {
+                    "child_node": self.node_to_add,
+                    "parent_node": self.parent_node
+                }
             )

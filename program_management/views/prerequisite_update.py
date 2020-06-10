@@ -23,67 +23,81 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
-from django.contrib.admin.utils import flatten
+from django.contrib.messages.views import SuccessMessageMixin
 from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+from django.views.generic import FormView
 
-import program_management.ddd.repositories.find_roots
-from program_management.forms.prerequisite import LearningUnitPrerequisiteForm
-from base.models import group_element_year
-from base.models.education_group_year import EducationGroupYear
-from base.models.prerequisite import Prerequisite
-from program_management.ddd.domain import node
-from program_management.views.generic import LearningUnitGenericUpdateView
+from base.ddd.utils.validation_message import MessageLevel
+from osis_role.contrib.views import PermissionRequiredMixin
+from program_management.ddd.repositories import persist_tree
+from program_management.ddd.validators._authorized_root_type_for_prerequisite import AuthorizedRootTypeForPrerequisite
+from program_management.forms.prerequisite import PrerequisiteForm
+from program_management.models.enums.node_type import NodeType
+from program_management.views.generic import LearningUnitGeneric
 
 
-class LearningUnitPrerequisite(LearningUnitGenericUpdateView):
+class LearningUnitPrerequisite(PermissionRequiredMixin, SuccessMessageMixin, LearningUnitGeneric, FormView):
     template_name = "learning_unit/tab_prerequisite_update.html"
-    form_class = LearningUnitPrerequisiteForm
+    form_class = PrerequisiteForm
+
+    permission_required = 'base.change_educationgroup'
+    raise_exception = True
+
+    def dispatch(self, request, *args, **kwargs):
+        self.check_can_update_prerequisite()
+        return super().dispatch(request, *args, **kwargs)
 
     def get_form_kwargs(self):
         form_kwargs = super().get_form_kwargs()
-        try:
-            instance = Prerequisite.objects.get(education_group_year=self.kwargs["root_id"],
-                                                learning_unit_year=self.kwargs["learning_unit_year_id"])
-        except Prerequisite.DoesNotExist:
-            instance = Prerequisite(
-                education_group_year=self.get_root(),
-                learning_unit_year=self.object
-            )
-        form_kwargs["instance"] = instance
-        form_kwargs["codes_permitted"] = self.program_tree.get_codes_permitted_as_prerequisite()
+        node = self._get_learning_unit_year_node()
+        form_kwargs["program_tree"] = self.program_tree
+        form_kwargs["node"] = node
+        form_kwargs["initial"] = {
+            "prerequisite_string": str(node.prerequisite)
+        }
         return form_kwargs
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data()
+        return {
+            **super().get_context_data(),
+            "show_prerequisites": True
+        }
 
-        learning_unit_year = context["learning_unit_year"]
-        education_group_year_root = EducationGroupYear.objects.get(id=context["root_id"])
+    def form_valid(self, form):
+        node = self._get_learning_unit_year_node()
+        messages = self.program_tree.set_prerequisite(form.cleaned_data["prerequisite_string"], node)
+        error_messages = [msg for msg in messages if msg.level == MessageLevel.ERROR]
+        if error_messages:
+            raise PermissionDenied([msg.message for msg in error_messages])
+        persist_tree.persist(self.program_tree)
+        return super().form_valid(form)
 
-        formations = program_management.ddd.repositories.find_roots.find_roots(
-            [learning_unit_year],
-            as_instances=True,
-            with_parents_of_parents=True,
+    def _get_learning_unit_year_node(self):
+        node = self.program_tree.get_node_by_id_and_type(
+            int(self.kwargs["child_element_id"]),
+            NodeType.LEARNING_UNIT
         )
+        if node is None:
+            raise Http404('No learning unit match the given query')
+        return node
 
-        formations_set = set(flatten([parents for child_id, parents in formations.items()]))
-
-        if education_group_year_root not in formations_set:
-            raise PermissionDenied(
-                _("You must be in the context of a training to modify the prerequisites to a learning unit "
-                    "(current context: %(partial_acronym)s - %(acronym)s)") % {
-                        'acronym': education_group_year_root.acronym,
-                        'partial_acronym': education_group_year_root.partial_acronym
-                    }
-            )
-
-        return context
+    #  FIXME refactor permission with new permission module
+    def check_can_update_prerequisite(self):
+        validator = AuthorizedRootTypeForPrerequisite(self.program_tree.root_node)
+        if not validator.is_valid():
+            raise PermissionDenied([msg.message for msg in validator.error_messages])
 
     def get_success_message(self, cleaned_data):
         return _("Prerequisites saved.")
 
     def get_success_url(self):
-        return reverse("learning_unit_prerequisite", args=[self.kwargs["root_id"],
-                                                           self.kwargs["learning_unit_year_id"]])
+        return reverse(
+            "learning_unit_prerequisite",
+            kwargs={
+                'root_element_id': self.kwargs["root_element_id"],
+                'child_element_id': self.kwargs["child_element_id"]
+            }
+        )

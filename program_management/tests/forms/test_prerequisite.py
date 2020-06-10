@@ -23,38 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import mock
+from django.test import SimpleTestCase
 
-from django.test import TestCase
-
-from base.models.prerequisite import Prerequisite
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.prerequisite import PrerequisiteFactory
-from program_management.forms.prerequisite import LearningUnitPrerequisiteForm
+from program_management.forms.prerequisite import PrerequisiteForm
+from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
+from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestPrerequisiteForm(TestCase):
-    def setUp(self):
-        self.luy_1 = LearningUnitYearFactory()
-        self.luy_2 = LearningUnitYearFactory()
-        self.prerequisite = PrerequisiteFactory()
-        self.codes_permitted = [self.luy_1.acronym, self.luy_2.acronym]
+class TestPrerequisiteForm(SimpleTestCase):
+    @mock.patch("program_management.forms.prerequisite.UpdatePrerequisiteValidatorList")
+    def test_is_valid_call_prerequisite_validators(self, mock_prerequisite_validator):
+        prerequisite_string = "LOSIS1452 OU LPORT5896"
+        program_tree = ProgramTreeFactory(),
+        node = NodeLearningUnitYearFactory()
 
-    def test_prerequisite_form_with_prerequisites(self):
-        form = LearningUnitPrerequisiteForm(
-            instance=self.prerequisite,
-            codes_permitted=self.codes_permitted,
-            data={"prerequisite_string": "{} ET {}".format(self.codes_permitted[0], self.codes_permitted[1])}
+        form = PrerequisiteForm(
+            program_tree,
+            node,
+            data={"prerequisite_string": prerequisite_string}
         )
-        self.assertTrue(form.is_valid())
-        form.save()
-        self.assertTrue(Prerequisite.objects.filter(pk=self.prerequisite.pk))
-
-    def test_prerequisite_form_without_prerequisites(self):
-        form = LearningUnitPrerequisiteForm(
-            instance=self.prerequisite,
-            codes_permitted=self.codes_permitted,
-            data={"prerequisite_string": ""}
-        )
-        self.assertTrue(form.is_valid())
-        form.save()
-        self.assertFalse(Prerequisite.objects.filter(pk=self.prerequisite.pk))
+        form.is_valid()
+        self.assertTrue(mock_prerequisite_validator.called)

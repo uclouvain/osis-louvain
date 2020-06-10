@@ -24,7 +24,7 @@
     * at the root of the source code of this program.  If not,
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
-<div class="panel panel-default">
+<div class="panel panel-default  {% if not current_version.is_standard %} of_unversioned_field{% endif %}">
     <div class="panel-body" id="panel_coorganization">
         <label>{% trans 'Program organized with other institutes' %}</label>
         {% if education_group_year.coorganizations %}

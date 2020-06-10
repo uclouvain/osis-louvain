@@ -33,7 +33,6 @@ from django.urls import reverse
 
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
 from base.models.enums import organization_type
-from base.models.enums.education_group_types import TrainingType
 from base.models.enums.publication_contact_type import PublicationContactType
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
@@ -41,8 +40,10 @@ from base.tests.factories.education_group_year import TrainingFactory, Education
     EducationGroupYearMasterFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.person import CentralManagerForUEFactory, PersonFactory
-from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.person import PersonFactory
+from education_group.views.proxy.read import Tab
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.element import ElementGroupYearFactory
 
 DELETE_URL_NAME = "publication_contact_delete"
 EDIT_URL_NAME = "publication_contact_edit"
@@ -57,9 +58,15 @@ class PublicationContactViewSetupTest(TestCase):
         cls.academic_year = create_current_academic_year()
         EducationGroupYearCommonFactory(academic_year=cls.academic_year)
 
-        cls.training = EducationGroupYearMasterFactory(
-            academic_year=cls.academic_year,
+        cls.training = EducationGroupYearMasterFactory(academic_year=cls.academic_year)
+        cls.training_version = EducationGroupVersionFactory(
+            offer=cls.training,
+            root_group__partial_acronym=cls.training.partial_acronym,
+            root_group__acronym=cls.training.acronym,
+            root_group__academic_year=cls.training.academic_year,
+            root_group__education_group_type=cls.training.education_group_type
         )
+        ElementGroupYearFactory(group_year=cls.training_version.root_group)
         cls.publication_contact = EducationGroupPublicationContactFactory(
             education_group_year=cls.training,
             type=PublicationContactType.ACADEMIC_RESPONSIBLE.name
@@ -197,22 +204,12 @@ class TestPublicationContactDeleteView(PublicationContactViewSetupTest):
         )
 
     def test_delete_assert_redirection(self):
-        query_dictionary = QueryDict('', mutable=True)
-        query_dictionary.update(
-            {
-                'anchor': True
-            }
-        )
-        http_referer = reverse('education_group_general_informations', args=[
-            self.training.pk,
-            self.training.pk,
-        ])
-        response_expected = '{base_url}?{querystring}'.format(
-            base_url=http_referer,
-            querystring=query_dictionary.urlencode()
+        redirect_expected = reverse(
+            'training_general_information',
+            kwargs={'year': self.training.academic_year.year, 'code': self.training.partial_acronym}
         )
         response = self.client.post(self.url_delete, follow=True)
-        self.assertRedirects(response, response_expected)
+        self.assertRedirects(response, redirect_expected)
         with self.assertRaises(EducationGroupPublicationContact.DoesNotExist):
             self.publication_contact.refresh_from_db()
 

@@ -29,7 +29,6 @@ from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.business_types import *
 
 
-#  Implemented from _check_new_attach_is_not_duplication
 class NodeDuplicationValidator(BusinessValidator):
 
     def __init__(self, parent_node: 'Node', node_to_add: 'Node'):
@@ -40,5 +39,5 @@ class NodeDuplicationValidator(BusinessValidator):
     def validate(self):
         if self.node_to_add in self.parent_node.children_as_nodes:
             self.add_error_message(
-                _("You can not add the same child several times.")
+                _("You can not add the same child %(child_node)s several times.") % {"child_node": self.node_to_add}
             )

@@ -205,7 +205,7 @@ def build_success_message(last_academic_year=None, learning_unit_year_id=None, w
         )
 
     else:
-        msg = "{}.".format(default_msg)
+        msg = "{}".format(_("The learning unit has been updated (without report)."))
 
     return msg
 

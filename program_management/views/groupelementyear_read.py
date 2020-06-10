@@ -32,10 +32,9 @@ from waffle.decorators import waffle_switch
 
 from base.forms.education_group.common import SelectLanguage
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import GroupType, AllTypes
+from base.models.enums.education_group_types import GroupType
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.document.pdf_build import render_pdf
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.ddd.repositories import load_tree
 
 CURRENT_SIZE_FOR_ANNUAL_COLUMN = 15

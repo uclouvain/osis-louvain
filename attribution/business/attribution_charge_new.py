@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import OrderedDict
+
 from django.db.models import Q, Prefetch
 
 from attribution.models import attribution_charge_new
@@ -43,7 +45,7 @@ def find_attribution_charge_new_by_learning_unit_year_as_dict(learning_unit_year
 
 
 def create_attributions_dictionary(attribution_charges):
-    attributions = {}
+    attributions = OrderedDict()
     for attribution_charge in attribution_charges:
         key = attribution_charge.attribution.id
         attribution_dict = {"person": attribution_charge.attribution.tutor.person,

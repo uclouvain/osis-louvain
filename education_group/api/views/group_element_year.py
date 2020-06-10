@@ -23,23 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.db.models import F
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
 from program_management.ddd.domain import link
 from program_management.ddd.repositories import load_tree
+from program_management.models.element import Element
 
 
 class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAPIView):
     serializer_class = EducationGroupRootNodeTreeSerializer
     filter_backends = []
     paginator = None
-    lookup_fields = ('academic_year__year', 'acronym__iexact',)
-    lookup_url_kwargs = ('year', 'acronym',)
 
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
@@ -48,11 +47,11 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
             lookup_field: self.kwargs[lookup_url_kwarg]
             for lookup_field, lookup_url_kwarg in zip(self.lookup_fields, self.lookup_url_kwargs)
         }
-        education_group_year = get_object_or_404(queryset, **filter_kwargs)
+        element = get_object_or_404(queryset, **filter_kwargs)
 
-        self.check_object_permissions(self.request, education_group_year)
+        self.check_object_permissions(self.request, element.education_group_year_obj)
 
-        tree = load_tree.load(education_group_year.id)
+        tree = load_tree.load(element.id)
         return link.factory.get_link(parent=None, child=tree.root_node)
 
 
@@ -61,9 +60,13 @@ class TrainingTreeView(EducationGroupTreeView):
         Return the tree of the training
     """
     name = 'trainings_tree'
-    queryset = EducationGroupYear.objects.filter(
-        education_group_type__category=Categories.TRAINING.name
-    )
+    lookup_fields = ('group_year__academic_year__year', 'group_year__educationgroupversion__offer__acronym__iexact',)
+    lookup_url_kwargs = ('year', 'acronym',)
+    queryset = Element.objects.filter(
+        group_year__education_group_type__category=Categories.TRAINING.name
+    ).annotate(
+        education_group_year_obj=F('group_year__educationgroupversion__offer')
+    ).select_related('education_group_year')
 
 
 class MiniTrainingTreeView(EducationGroupTreeView):
@@ -71,11 +74,13 @@ class MiniTrainingTreeView(EducationGroupTreeView):
         Return the tree of the mini-training
     """
     name = 'minitrainings_tree'
-    lookup_fields = ('academic_year__year', 'partial_acronym__iexact',)
+    lookup_fields = ('group_year__academic_year__year', 'group_year__partial_acronym__iexact',)
     lookup_url_kwargs = ('year', 'partial_acronym',)
-    queryset = EducationGroupYear.objects.filter(
-        education_group_type__category=Categories.MINI_TRAINING.name
-    )
+    queryset = Element.objects.filter(
+        group_year__education_group_type__category=Categories.MINI_TRAINING.name
+    ).annotate(
+        education_group_year_obj=F('group_year__educationgroupversion__offer')
+    ).select_related('education_group_year')
 
 
 class GroupTreeView(EducationGroupTreeView):
@@ -83,8 +88,10 @@ class GroupTreeView(EducationGroupTreeView):
         Return the tree of the group
     """
     name = 'groups_tree'
-    lookup_fields = ('academic_year__year', 'partial_acronym__iexact',)
+    lookup_fields = ('group_year__academic_year__year', 'group_year__partial_acronym__iexact',)
     lookup_url_kwargs = ('year', 'partial_acronym',)
-    queryset = EducationGroupYear.objects.filter(
-        education_group_type__category=Categories.GROUP.name
-    )
+    queryset = Element.objects.filter(
+        group_year__education_group_type__category=Categories.GROUP.name
+    ).annotate(
+        education_group_year_obj=F('group_year__educationgroupversion__offer')
+    ).select_related('education_group_year')

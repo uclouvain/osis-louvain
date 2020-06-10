@@ -48,7 +48,9 @@ class TestNodeDuplicationValidator(SimpleTestCase):
             node_to_attach
         )
         self.assertFalse(validator.is_valid())
-        expected_result = _("You can not add the same child several times.")
+        expected_result = _("You can not add the same child %(child_node)s several times.") % {
+            "child_node": node_to_attach
+        }
         self.assertEqual(expected_result, validator.error_messages[0])
 
     def test_when_node_already_exists_in_other_group_of_the_same_tree(self):

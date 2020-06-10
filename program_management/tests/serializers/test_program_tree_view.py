@@ -64,25 +64,35 @@ class TestProgramTreeViewSerializer(SimpleTestCase):
     def test_serialize_program_tree_ensure_context_have_root_keys(self, mock):
         program_tree_view_serializer(self.tree)
         context_kwarg = mock.call_args[1]['context']
-        self.assertEquals(context_kwarg['root'], self.tree.root_node)
+        self.assertEqual(context_kwarg['root'], self.tree.root_node)
 
     def test_serialize_program_tree_assert_keys_of_root_element(self):
         serialized_data = program_tree_view_serializer(self.tree)
-        expected_keys = ['text', 'icon', 'children', 'a_attr']
+        expected_keys = ['text', 'icon', 'children', 'a_attr', 'id']
 
         self.assertSetEqual(set(serialized_data.keys()), set(expected_keys))
+
+    def test_serialize_program_tree_assert_keys_of_root_element_a_attr(self):
+        serialized_data = program_tree_view_serializer(self.tree)
+        expected_keys = ['element_id', 'element_type', 'href', 'attach_url']
+
+        self.assertSetEqual(set(serialized_data["a_attr"].keys()), set(expected_keys))
 
     def test_serialize_program_tree_assert_node_child_element(self):
         serialized_data = program_tree_view_serializer(self.tree)
 
         self.assertIsInstance(serialized_data['children'], list)
-        self.assertEquals(
+        self.assertEqual(
             serialized_data['children'][0]['path'],
             "|".join([str(self.root_node.pk), str(self.common_core.pk)]),
         )
+        self.assertEqual(
+            serialized_data['children'][0]['path'],
+            serialized_data['children'][0]['id']
+        )
         expected_text = self.common_core.code + " - " + self.common_core.title
-        self.assertEquals(serialized_data['children'][0]['text'], expected_text)
-        self.assertEquals(serialized_data['children'][0]['icon'], None)
+        self.assertEqual(serialized_data['children'][0]['text'], expected_text)
+        self.assertEqual(serialized_data['children'][0]['icon'], None)
         self.assertIsInstance(serialized_data['children'][0]['children'], list)
 
     def test_serialize_program_tree_assert_keys_of_node_a_attr(self):

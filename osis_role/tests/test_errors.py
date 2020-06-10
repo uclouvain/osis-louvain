@@ -35,7 +35,7 @@ class TestGetPermissionError(SimpleTestCase):
         permission_error = "You don't have access to this feature"
         self.user._cached_error_perms = {"dummy-perm": permission_error}
 
-        self.assertEquals(errors.get_permission_error(self.user, 'dummy-perm'), permission_error)
+        self.assertEqual(errors.get_permission_error(self.user, 'dummy-perm'), permission_error)
 
 
 class TestSetPermissionError(SimpleTestCase):
@@ -46,7 +46,7 @@ class TestSetPermissionError(SimpleTestCase):
         permission_error = "You don't have access to this feature"
 
         errors.set_permission_error(self.user, 'dummy-perm', permission_error)
-        self.assertEquals(
+        self.assertEqual(
             self.user._cached_error_perms['dummy-perm'],
             permission_error
         )
@@ -81,7 +81,7 @@ class TestPredicateFailedMessageDecorator(SimpleTestCase):
             return False
 
         self.assertFalse(pred(self.user))
-        self.assertEquals(
+        self.assertEqual(
             errors.get_permission_error(self.user, 'dummy-perm'),
             "Access Denied"
         )

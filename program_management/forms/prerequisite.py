@@ -23,24 +23,19 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import re
+from typing import List
 
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from base.models import learning_unit
-from base.models import prerequisite_item
-from base.models.enums.prerequisite_operator import OR, AND
-from base.models.prerequisite import Prerequisite, prerequisite_syntax_validator, MULTIPLE_PREREQUISITES_REGEX_OR, \
-    MULTIPLE_PREREQUISITES_REGEX_AND
+from program_management.ddd.domain.node import NodeLearningUnitYear
+from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.ddd.validators.validators_by_business_action import UpdatePrerequisiteValidatorList
 
 
-class LearningUnitPrerequisiteForm(forms.ModelForm):
-    main_operator = None
-
+class PrerequisiteForm(forms.Form):
     prerequisite_string = forms.CharField(
         label=_("Prerequisite"),
-        validators=[prerequisite_syntax_validator],
         required=False,
         help_text=_(
             "<b>Syntax rules</b>:<ul><li>No double parentheses.</li><li>Valid operators are OU or ET.</li><li>The "
@@ -53,103 +48,19 @@ class LearningUnitPrerequisiteForm(forms.ModelForm):
         ),
     )
 
-    class Meta:
-        model = Prerequisite
-        fields = ()
-
-    def __init__(self, *args, codes_permitted=None, **kwargs):
+    def __init__(self, program_tree: ProgramTree, node: NodeLearningUnitYear, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['prerequisite_string'].initial = self.instance.prerequisite_string
-        self.codes_permitted = codes_permitted or []
+
+        self.program_tree = program_tree
+        self.node = node
 
     def clean_prerequisite_string(self):
-        prerequisite_string = self.cleaned_data['prerequisite_string']
-        prerequisite_string = prerequisite_string.upper()
-        self.main_operator = _detect_main_operator_in_string(prerequisite_string)
+        prerequisite_string = self.cleaned_data["prerequisite_string"]
+        validator = UpdatePrerequisiteValidatorList(prerequisite_string, self.node, self.program_tree)
+        if not validator.is_valid():
+            for error_message in validator.error_messages:
+                self.add_error("prerequisite_string", error_message.message)
+        return prerequisite_string
 
-        return self.get_grouped_items_from_string(
-            prerequisite_string=prerequisite_string,
-            main_operator=self.main_operator
-        ) if prerequisite_string else []
-
-    def save(self, commit=True):
-        grouped_items = self.cleaned_data['prerequisite_string']
-
-        self.instance.main_operator = self.main_operator or AND
-        self.instance.save()
-
-        self._delete_old_items()
-        _create_prerequisite_items(
-            grouped_items=grouped_items,
-            prerequisite=self.instance
-        )
-
-        if not grouped_items:
-            self.instance.delete()
-
-    def _delete_old_items(self):
-        items = self.instance.prerequisiteitem_set.all()
-        for item in items:
-            item.delete()
-
-    def get_grouped_items_from_string(self, prerequisite_string, main_operator):
-        main_operator_splitter = ' ET ' if main_operator == AND else ' OU '
-        secondary_operator_splitter = ' OU ' if main_operator == AND else ' ET '
-
-        groups = prerequisite_string.split(main_operator_splitter)
-
-        return [
-            self.split_group_to_learning_units(group, secondary_operator_splitter)
-            for group in groups
-        ]
-
-    def split_group_to_learning_units(self, group, operator):
-        group = _remove_parenthesis(group)
-        group = group.split(operator)
-        group_of_learning_units = []
-
-        for item in group:
-            lu = learning_unit.get_by_acronym_with_highest_academic_year(acronym=item)
-            if not lu:
-                self.add_error(
-                    'prerequisite_string',
-                    _("No match has been found for this learning unit :  %(acronym)s") % {'acronym': item}
-                )
-            elif lu == self.instance.learning_unit_year.learning_unit:
-                self.add_error(
-                    'prerequisite_string',
-                    _("A learning unit cannot be prerequisite to itself : %(acronym)s") % {'acronym': item}
-                )
-            elif item not in self.codes_permitted:
-                self.add_error(
-                    'prerequisite_string',
-                    _("The learning unit %(acronym)s is not contained inside the formation") % {'acronym': item}
-                )
-            else:
-                group_of_learning_units.append(lu)
-
-        return group_of_learning_units
-
-
-def _create_prerequisite_items(grouped_items, prerequisite):
-    for group_number, group in enumerate(grouped_items, 1):
-        for position, learning_unit in enumerate(group, 1):
-            prerequisite_item.PrerequisiteItem.objects.create(
-                prerequisite=prerequisite,
-                learning_unit=learning_unit,
-                group_number=group_number,
-                position=position,
-            )
-
-
-def _remove_parenthesis(string):
-    return re.sub('[\(\)]', "", string)
-
-
-def _detect_main_operator_in_string(prerequisite_string):
-    if re.match(MULTIPLE_PREREQUISITES_REGEX_OR, prerequisite_string):
-        return OR
-    elif re.match(MULTIPLE_PREREQUISITES_REGEX_AND, prerequisite_string):
-        return AND
-    else:
-        return None
+    def save(self, commit=False):
+        pass

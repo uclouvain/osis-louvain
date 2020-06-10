@@ -138,7 +138,7 @@ class AutomaticPostponementToN6(AutomaticPostponement):
                         self.result.append(last_object_copied)
 
             # General catch to be sure to not stop the rest of the duplication
-            except (Error, ObjectDoesNotExist, MultipleObjectsReturned, ConsistencyError):
+            except (Error, ObjectDoesNotExist, MultipleObjectsReturned, ConsistencyError) as err:
                 self.errors.append(obj)
 
     def get_object_to_copy(self, object_to_duplicate):

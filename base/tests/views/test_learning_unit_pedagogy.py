@@ -360,14 +360,13 @@ class LearningUnitPedagogyEditTestCase(TestCase):
         response = self.client.get(self.url, data={'label': 'bibliography', 'language': 'fr-be'})
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, 'learning_unit/pedagogy_edit.html')
         self.assertTemplateUsed(response, 'learning_unit/blocks/modal/modal_pedagogy_edit.html')
         self.assertEqual(response.context["cms_label_pedagogy_fr_only"], CMS_LABEL_PEDAGOGY_FR_ONLY)
         self.assertEqual(response.context["label_name"], 'bibliography')
 
     def test_learning_unit_pedagogy_edit_post(self):
         msg = self._post_learning_unit_pedagogy()
-        self.assertEqual(msg[0].get('message'), "{}.".format(_("The learning unit has been updated")))
+        self.assertEqual(msg[0].get('message'), "{}".format(_("The learning unit has been updated (without report).")))
         self.assertEqual(msg[0].get('level'), messages.SUCCESS)
 
     def test_learning_unit_pedagogy_edit_post_with_postponement(self):
@@ -432,7 +431,7 @@ class LearningUnitPedagogyEditTestCase(TestCase):
         )
         ProposalLearningUnitFactory(learning_unit_year=previous_luy)
         msg = self._post_learning_unit_pedagogy()
-        expected_message = "{}.".format(_("The learning unit has been updated"))
+        expected_message = "{}".format(_("The learning unit has been updated (without report)."))
         self.assertEqual(msg[0].get('message'), expected_message)
         self.assertEqual(msg[0].get('level'), messages.SUCCESS)
 

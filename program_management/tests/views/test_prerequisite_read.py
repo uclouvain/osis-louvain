@@ -27,36 +27,49 @@ from django.http import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.enums.education_group_categories import Categories
+from base.models.enums.education_group_types import GroupType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory, GroupFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
+from base.tests.factories.education_group_year import TrainingFactory
+from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory
 from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.prerequisite import PrerequisiteFactory
+from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
 
-class TestLearningUnitPrerequisite(TestCase):
+class TestLearningUnitPrerequisiteTraining(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = AcademicYearFactory()
-        cls.education_group_year_parents = [TrainingFactory(academic_year=cls.academic_year) for _ in range(0, 2)]
-        cls.learning_unit_year_child = LearningUnitYearFakerFactory(
-            learning_container_year__academic_year=cls.academic_year
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.offer = TrainingFactory(academic_year=cls.academic_year)
+        cls.root_group = GroupYearFactory(
+            academic_year=cls.academic_year,
+            education_group_type=cls.offer.education_group_type
         )
-        cls.group_element_years = [
-            GroupElementYearFactory(parent=cls.education_group_year_parents[i],
-                                    child_leaf=cls.learning_unit_year_child,
-                                    child_branch=None)
-            for i in range(0, 2)
-            ]
+        cls.root_element = ElementGroupYearFactory(group_year=cls.root_group)
+        cls.education_group_version = EducationGroupVersionFactory(offer=cls.offer, root_group=cls.root_group)
+
+        cls.element_learning_unit_year = ElementLearningUnitYearFactory(
+            learning_unit_year__academic_year=cls.academic_year,
+            learning_unit_year__learning_container_year__academic_year=cls.academic_year,
+        )
+        GroupElementYearChildLeafFactory(parent_element=cls.root_element, child_element=cls.element_learning_unit_year)
 
         cls.prerequisite = PrerequisiteFactory(
-            learning_unit_year=cls.learning_unit_year_child,
-            education_group_year=cls.education_group_year_parents[0]
+            learning_unit_year=cls.element_learning_unit_year.learning_unit_year,
+            education_group_version=cls.education_group_version
         )
+
         cls.person = PersonWithPermissionsFactory("view_educationgroup")
-        cls.url = reverse("learning_unit_prerequisite",
-                          args=[cls.education_group_year_parents[0].id, cls.learning_unit_year_child.id])
+        cls.url = reverse(
+            "learning_unit_prerequisite",
+            kwargs={
+                'root_element_id': cls.root_element.pk,
+                'child_element_id': cls.element_learning_unit_year.pk
+            }
+        )
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -68,48 +81,46 @@ class TestLearningUnitPrerequisite(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    def test_template_used(self):
+    def test_assert_template_used(self):
         response = self.client.get(self.url)
         self.assertTemplateUsed(response, "learning_unit/tab_prerequisite_training.html")
 
-    def test_template_used_when_root_is_not_a_training(self):
-        education_group_year_group = GroupFactory(academic_year=self.academic_year)
-        GroupElementYearFactory(parent=self.education_group_year_parents[0],
-                                child_branch=education_group_year_group)
-        GroupElementYearFactory(parent=education_group_year_group,
-                                child_leaf=self.learning_unit_year_child,
-                                child_branch=None)
 
-        url = reverse("learning_unit_prerequisite",
-                      args=[education_group_year_group.id, self.learning_unit_year_child.id])
+class TestLearningUnitPrerequisiteGroup(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.root_group = GroupYearFactory(
+            academic_year=cls.academic_year,
+            education_group_type__category=Categories.GROUP.name,
+            education_group_type__name=GroupType.COMMON_CORE.name,
+        )
+        cls.root_element = ElementGroupYearFactory(group_year=cls.root_group)
+        cls.element_learning_unit_year = ElementLearningUnitYearFactory(
+            learning_unit_year__academic_year=cls.academic_year,
+            learning_unit_year__learning_container_year__academic_year=cls.academic_year,
+        )
+        GroupElementYearChildLeafFactory(parent_element=cls.root_element, child_element=cls.element_learning_unit_year)
 
-        response = self.client.get(url)
-        self.assertTemplateUsed(response, "learning_unit/tab_prerequisite_group.html")
+        cls.person = PersonWithPermissionsFactory("view_educationgroup")
+        cls.url = reverse(
+            "learning_unit_prerequisite",
+            kwargs={
+                'root_element_id': cls.root_element.pk,
+                'child_element_id': cls.element_learning_unit_year.pk
+            }
+        )
 
-    def test_context_data(self):
+    def setUp(self):
+        self.client.force_login(self.person.user)
+
+    def test_permission_denied_when_no_permission(self):
+        person_without_permission = PersonFactory()
+        self.client.force_login(person_without_permission.user)
+
         response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-        actual_prerequisites = response.context_data["prerequisite"]
-        self.assertEqual(actual_prerequisites, self.prerequisite)
-
-    def test_context_data_when_education_group_year_root_is_not_a_training(self):
-        education_group_year_group = GroupFactory(academic_year=self.academic_year)
-        GroupElementYearFactory(parent=self.education_group_year_parents[0],
-                                child_branch=education_group_year_group)
-        GroupElementYearFactory(parent=education_group_year_group,
-                                child_leaf=self.learning_unit_year_child,
-                                child_branch=None)
-
-        url = reverse("learning_unit_prerequisite",
-                      args=[education_group_year_group.id, self.learning_unit_year_child.id])
-
-        response = self.client.get(url)
-        self.assertCountEqual(response.context_data["formations"], self.education_group_year_parents)
-
-        actual_prerequisites = next(filter(lambda egy: egy.id == self.education_group_year_parents[0].id,
-                                           response.context_data["formations"])).prerequisites
-        self.assertEqual(actual_prerequisites, [self.prerequisite])
-
-        actual_prerequisites = next(filter(lambda egy: egy.id == self.education_group_year_parents[1].id,
-                                           response.context_data["formations"])).prerequisites
-        self.assertEqual(actual_prerequisites, [])
+    def test_assert_template_used(self):
+        response = self.client.get(self.url)
+        self.assertTemplateUsed(response, "learning_unit/tab_prerequisite_group.html")
