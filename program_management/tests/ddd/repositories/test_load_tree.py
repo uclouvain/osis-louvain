@@ -64,6 +64,11 @@ class TestLoadTree(TestCase):
         cls.education_group_version = EducationGroupVersionFactory(
             root_group=cls.root_node.group_year
         )
+        cls.identity = ProgramTreeIdentity(
+            code=cls.root_node.group_year.partial_acronym,
+            year=cls.root_node.group_year.academic_year.year
+        )
+        cls.tree = ProgramTreeRepository().get(entity_id=cls.identity)
 
     def test_case_tree_root_not_exist(self):
         unknown_identity = ProgramTreeIdentity(
@@ -75,25 +80,15 @@ class TestLoadTree(TestCase):
 
     def test_fields_to_load(self):
         group_year = self.root_node.group_year
-        identity = ProgramTreeIdentity(
-            code=self.root_node.group_year.partial_acronym,
-            year=self.root_node.group_year.academic_year.year
-        )
-        tree = ProgramTreeRepository().get(entity_id=identity)
-        self.assertEqual(tree.root_node.credits, group_year.credits, "Field used to load prerequisites excel")
+        self.assertEqual(self.tree.root_node.credits, group_year.credits, "Field used to load prerequisites excel")
 
     def test_case_tree_root_with_multiple_level(self):
-        identity = ProgramTreeIdentity(
-            code=self.root_node.group_year.partial_acronym,
-            year=self.root_node.group_year.academic_year.year
-        )
-        education_group_program_tree = ProgramTreeRepository().get(entity_id=identity)
-        self.assertIsInstance(education_group_program_tree, program_tree.ProgramTree)
+        self.assertIsInstance(self.tree, program_tree.ProgramTree)
 
-        self.assertIsInstance(education_group_program_tree.root_node, node.NodeGroupYear)
-        self.assertEqual(len(education_group_program_tree.root_node.children), 1)
+        self.assertIsInstance(self.tree.root_node, node.NodeGroupYear)
+        self.assertEqual(len(self.tree.root_node.children), 1)
         self.assertEqual(
-            education_group_program_tree.root_node.children[0].child.title,
+            self.tree.root_node.children[0].child.title,
             self.link_level_1.child_element.group_year.acronym
         )
 
@@ -181,12 +176,7 @@ class TestLoadTree(TestCase):
                 self.assertEqual(leaf.proposal_type, p_type)
 
     def test_case_load_tree_leaf_node_have_no_proposal(self):
-        identity = ProgramTreeIdentity(
-            code=self.root_node.group_year.partial_acronym,
-            year=self.root_node.group_year.academic_year.year
-        )
-        education_group_program_tree = ProgramTreeRepository().get(entity_id=identity)
-        leaf = education_group_program_tree.root_node.children[0].child.children[0].child
+        leaf = self.tree.root_node.children[0].child.children[0].child
         self.assertFalse(leaf.has_proposal)
         self.assertIsNone(leaf.proposal_type)
 
