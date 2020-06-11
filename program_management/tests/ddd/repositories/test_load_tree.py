@@ -40,6 +40,7 @@ from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.domain.program_tree_version import ProgramTreeVersionNotFoundException
 from program_management.ddd.repositories import load_tree
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.models import element
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
@@ -69,22 +70,22 @@ class TestLoadTree(TestCase):
             code='blabla',
             year=2042
         )
-        with self.assertRaises(node.NodeNotFoundException):
+        with self.assertRaises(element.Element.DoesNotExist):
             ProgramTreeRepository().get(entity_id=unknown_identity)
 
     def test_fields_to_load(self):
         group_year = self.root_node.group_year
         identity = ProgramTreeIdentity(
-            code=self.root_node.code,
-            year=self.root_node.year
+            code=self.root_node.group_year.partial_acronym,
+            year=self.root_node.group_year.academic_year.year
         )
         tree = ProgramTreeRepository().get(entity_id=identity)
         self.assertEqual(tree.root_node.credits, group_year.credits, "Field used to load prerequisites excel")
 
     def test_case_tree_root_with_multiple_level(self):
         identity = ProgramTreeIdentity(
-            code=self.root_node.code,
-            year=self.root_node.year
+            code=self.root_node.group_year.partial_acronym,
+            year=self.root_node.group_year.academic_year.year
         )
         education_group_program_tree = ProgramTreeRepository().get(entity_id=identity)
         self.assertIsInstance(education_group_program_tree, program_tree.ProgramTree)
@@ -122,8 +123,8 @@ class TestLoadTree(TestCase):
         )
 
         identity = ProgramTreeIdentity(
-            code=self.root_node.code,
-            year=self.root_node.year
+            code=self.root_node.group_year.partial_acronym,
+            year=self.root_node.group_year.academic_year.year
         )
         education_group_program_tree = ProgramTreeRepository().get(entity_id=identity)
         leaf = education_group_program_tree.root_node.children[0].child.children[0].child
@@ -148,8 +149,8 @@ class TestLoadTree(TestCase):
         )
 
         identity = ProgramTreeIdentity(
-            code=self.root_node.code,
-            year=self.root_node.year
+            code=self.root_node.group_year.partial_acronym,
+            year=self.root_node.group_year.academic_year.year
         )
         education_group_program_tree = ProgramTreeRepository().get(entity_id=identity)
         leaf = education_group_program_tree.root_node.children[0].child.children[1].child
@@ -171,8 +172,8 @@ class TestLoadTree(TestCase):
                 proposal.save()
 
                 identity = ProgramTreeIdentity(
-                    code=self.root_node.code,
-                    year=self.root_node.year
+                    code=self.root_node.group_year.partial_acronym,
+                    year=self.root_node.group_year.academic_year.year
                 )
                 education_group_program_tree = ProgramTreeRepository().get(entity_id=identity)
                 leaf = education_group_program_tree.root_node.children[0].child.children[0].child
@@ -181,8 +182,8 @@ class TestLoadTree(TestCase):
 
     def test_case_load_tree_leaf_node_have_no_proposal(self):
         identity = ProgramTreeIdentity(
-            code=self.root_node.code,
-            year=self.root_node.year
+            code=self.root_node.group_year.partial_acronym,
+            year=self.root_node.group_year.academic_year.year
         )
         education_group_program_tree = ProgramTreeRepository().get(entity_id=identity)
         leaf = education_group_program_tree.root_node.children[0].child.children[0].child

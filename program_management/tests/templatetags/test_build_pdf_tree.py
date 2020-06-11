@@ -93,8 +93,8 @@ class TestBuildPDFTree(TestCase):
 
     def test_build_pdf_tree_with_mandatory(self):
         identity = ProgramTreeIdentity(
-            code=self.education_group_year_1.partial_acronym,
-            year=self.education_group_year_1.academic_year.year
+            code=self.education_group_year_1.group_year.partial_acronym,
+            year=self.education_group_year_1.group_year.academic_year.year
         )
         tree = ProgramTreeRepository().get(entity_id=identity)
         out = Template(
@@ -112,8 +112,8 @@ class TestBuildPDFTree(TestCase):
         self.group_element_year_2.save()
 
         identity = ProgramTreeIdentity(
-            code=self.education_group_year_1.partial_acronym,
-            year=self.education_group_year_1.academic_year.year
+            code=self.education_group_year_1.group_year.partial_acronym,
+            year=self.education_group_year_1.group_year.academic_year.year
         )
         tree = ProgramTreeRepository().get(entity_id=identity)
         out = Template(
