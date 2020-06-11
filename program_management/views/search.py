@@ -59,6 +59,7 @@ class EducationGroupSearch(LoginRequiredMixin, PermissionRequiredMixin, CacheFil
     permission_required = 'base.view_educationgroup'
 
     serializer_class = EducationGroupSerializer
+    cache_search = True
 
     def get_context_data(self, **kwargs):
         person = get_object_or_404(Person, user=self.request.user)

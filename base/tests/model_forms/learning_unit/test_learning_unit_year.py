@@ -47,7 +47,7 @@ from base.tests.factories.learning_container_year import LearningContainerYearFa
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import CentralManagerForUEFactory, FacultyManagerForUEFactory
+from base.tests.factories.person import CentralManagerFactory, FacultyManagerFactory
 from reference.tests.factories.language import LanguageFactory
 
 
@@ -56,8 +56,8 @@ class TestLearningUnitYearModelFormInit(TestCase):
     @classmethod
     def setUpTestData(cls):
         create_current_academic_year()
-        cls.central_manager = CentralManagerForUEFactory()
-        cls.faculty_manager = FacultyManagerForUEFactory()
+        cls.central_manager = CentralManagerFactory()
+        cls.faculty_manager = FacultyManagerFactory()
 
     def test_acronym_field_case_partim(self):
         self.form = LearningUnitYearModelForm(data=None, person=self.central_manager, subtype=PARTIM)
@@ -100,9 +100,10 @@ class TestLearningUnitYearModelFormInit(TestCase):
 
 class TestLearningUnitYearModelFormSave(TestCase):
     """Tests LearningUnitYearModelForm.save()"""
+
     def setUp(self):
-        self.central_manager = CentralManagerForUEFactory()
-        self.faculty_manager = FacultyManagerForUEFactory()
+        self.central_manager = CentralManagerFactory()
+        self.faculty_manager = FacultyManagerFactory()
         self.current_academic_year = create_current_academic_year()
 
         self.learning_container = LearningContainerFactory()

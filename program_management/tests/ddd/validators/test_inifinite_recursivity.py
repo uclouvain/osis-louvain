@@ -106,5 +106,6 @@ class TestInfiniteRecursivityLinkValidator(SimpleTestCase):
 
     def test_when_adding_node_to_himself(self):
         validator = InfiniteRecursivityLinkValidator(self.node_to_attach, self.node_to_attach)
+        error_msg = _('Cannot attach a node %(node)s to himself.') % {"node": self.node_to_attach}
         self.assertFalse(validator.is_valid())
-        self.assertEqual(_('Cannot attach a node to himself.'), validator.error_messages[0])
+        self.assertEqual(error_msg, validator.error_messages[0])

@@ -31,7 +31,7 @@
                             {% endblock form_field %}
                             <br>
                             <div class="col-md-2">
-                                <button type="submit" class="btn btn-primary" name="search-eg" title="search">
+                                <button id="btn-submit-quicksearch" type="submit" class="btn btn-primary" name="search-eg" title="search">
                                     <em class="fa fa-search"></em>
                                 </button>
                             </div>
@@ -86,8 +86,8 @@
        initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
             {{ paginator.per_page }}, "{{ request.path }}", columnDefs);
 
-        let checkUrl = "{% url 'check_education_group_attach' root_id education_group_year_id %}";
-        let attachUrl = "{% url 'group_element_year_create' root_id education_group_year_id %}";
+        let checkUrl = "{% url 'check_education_group_attach' root_id %}";
+        let attachUrl = "{% url 'tree_attach_node' root_id %}";
 
         $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
 
@@ -108,12 +108,14 @@
                 const parameters = extract_ids_and_content_type_parameters(elementsUrl);
                 const paramString = new URLSearchParams();
                 paramString.append("content_type", parameters["content_type"]);
+                paramString.append("path", "{{ node_path }}");
                 for (let index in parameters["id"]){
                     paramString.append("id", parameters["id"][index]);
                 }
 
                 $.ajax({
-                    url: `${checkUrl}?${paramString.toString()}`
+                    url: `${checkUrl}?${paramString.toString()}`,
+                    dataType: 'json'
                 }).done(function(jsonResponse){
                     const error_messages = jsonResponse["error_messages"];
                     if (error_messages.length > 0) {

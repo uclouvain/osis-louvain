@@ -24,9 +24,9 @@
  * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% url 'learning_unit_utilization' root.pk learning_unit_year.pk as url_utilization_tab %}
-{% url 'learning_unit_prerequisite' root.pk learning_unit_year.pk as url_prerequisite_tab %}
-{% url 'learning_unit_prerequisite_update' root.pk learning_unit_year.pk as url_prerequisite_update_tab %}
+{% url 'learning_unit_utilization' parent.pk node.pk as url_utilization_tab %}
+{% url 'learning_unit_prerequisite' parent.pk node.pk as url_prerequisite_tab %}
+{% url 'learning_unit_prerequisite_update' parent.pk node.pk as url_prerequisite_update_tab %}
 
 
 <ul class="nav nav-tabs" role="tablist">

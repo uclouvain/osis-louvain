@@ -1,4 +1,5 @@
 {% load bootstrap3 i18n static %}
+{% load dictionnary %}
 {% comment "License" %}
     * OSIS stands for Open Student Information System. It's an application
     * designed to manage the core business of higher education institutions,
@@ -34,39 +35,71 @@
                 {% csrf_token %}
                 {{ formset.management_form }}
                 {{ formset.media }}
-                <table class="table">
-                    <thead>
+                {% for form in formset.forms %}
+                    {% bootstrap_form_errors form %}
+                {% endfor %}
+                {% if is_parent_a_minor_major_list_choice %}
+                    <table class="table">
+                        <thead>
                         <tr>
                             <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
                             <th>{% trans 'Code' %}</th>
                             <th>{% trans 'Access condition' %}</th>
-                            <th>{% trans 'Mandatory' %}</th>
-                            <th>{% trans 'Block' %}</th>
-                            <th>{% trans 'Link type' %}</th>
-                            <th>{% trans 'Comment' %}</th>
-                            <th>{% trans 'English comment' %}</th>
                         </tr>
-                    </thead>
-                    <tbody>
+                        </thead>
+                        <tbody>
                         {% for form in formset.forms %}
                             {% if forloop.first %}
                                 {{ form.media }}
                             {% endif %}
+                            {% with nodes_by_id|get_item:form.node_id as node  %}
                             <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
                                 {{ form.id }}
-                                <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{{ form.node.acronym }}</td>
-                                <td>{{ form.node.code }}</td>
-
-                                <td>{{ form.access_condition }}</td>
-                                <td>{{ form.is_mandatory }}</td>
-                                <td style="word-wrap: break-word; min-width: 90px;max-width: 90px;">{% bootstrap_field form.block show_label=False %}</td>
-                                <td style="word-wrap: break-word; min-width: 125px;max-width: 125px;">{% bootstrap_field form.link_type show_label=False %}</td>
-                                <td>{% bootstrap_field form.comment show_label=False %}</td>
-                                <td>{% bootstrap_field form.comment_english show_label=False %}</td>
+                                <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{% if not node.is_learning_unit %}{{ node.title }}{% else %}-{% endif %}</td>
+                                <td>{{ node.code }}</td>
+                                <td>{% bootstrap_field form.access_condition %}</td>
                             </tr>
+                            {% endwith %}
                         {% endfor %}
-                    </tbody>
-                </table>
+                        </tbody>
+                    </table>
+                {% else %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>{% trans 'Acronym/Short title' context 'abbreviation' %}</th>
+                                <th>{% trans 'Code' %}</th>
+                                <th>{% trans 'Access condition' %}</th>
+                                <th>{% trans 'Mandatory' %}</th>
+                                <th>{% trans 'Block' %}</th>
+                                <th>{% trans 'Link type' %}</th>
+                                <th>{% trans 'Comment' %}</th>
+                                <th>{% trans 'English comment' %}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for form in formset.forms %}
+                                {% if forloop.first %}
+                                    {{ form.media }}
+                                {% endif %}
+                                {% with nodes_by_id|get_item:form.node_id as node  %}
+                                <tr class="link-formset" data-formset-form id="{{ form.prefix }}">
+                                    {{ form.id }}
+                                    <td style="word-wrap: break-word; min-width: 75px;max-width: 75px;">{% if not node.is_learning_unit %}{{ node.title }}{% else %}-{% endif %}</td>
+                                    <td>{{ node.code }}</td>
+
+                                    <td>{% if form.access_condition %}{% bootstrap_field form.access_condition %}{% else %}-{% endif %}</td>
+                                    <td>{{ form.is_mandatory }}</td>
+                                    <td style="word-wrap: break-word; min-width: 90px;max-width: 90px;">{% bootstrap_field form.block show_label=False %}</td>
+                                    <td style="word-wrap: break-word; min-width: 125px;max-width: 125px;">{% if form.link_type %}{% bootstrap_field form.link_type show_label=False %}{% else %}-{% endif %}</td>
+                                    <td>{% bootstrap_field form.comment show_label=False %}</td>
+                                    <td>{% bootstrap_field form.comment_english show_label=False %}</td>
+                                </tr>
+                                {% endwith %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
             </form>
 
             <script src="{% static 'js/jquery.formset.js' %}"></script>
@@ -84,7 +117,7 @@
 
         <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">{% trans "Cancel" %}</button>
-            <button type="submit" onclick="document.forms['form_attach_node'].submit();" class="btn btn-primary pull-right">
+            <button type="submit" onclick="$('#form_attach_node').submit();" class="btn btn-primary pull-right">
                 <span class="glyphicon glyphicon-floppy-save" aria-hidden="true"></span> {% trans 'Save' %}
             </button>
         </div>

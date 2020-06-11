@@ -24,6 +24,7 @@
 #
 ##############################################################################
 from collections import Counter
+from typing import List, Union, Tuple
 
 from django.db.models import Count, Q
 from django.utils.functional import cached_property
@@ -36,7 +37,11 @@ from base.models.enums.link_type import LinkTypes
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
+from program_management.ddd.domain import node
+from program_management.ddd.repositories import load_node
+from program_management.models.enums.node_type import NodeType
 
+# FIXME Replace those methods by services
 LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
 
@@ -50,6 +55,17 @@ def fetch_source_link(request_parameters, user):
             source_link = GroupElementYear.objects.select_related('parent').get(pk=selected_element['source_link_id'])
 
     return source_link
+
+
+# FIXME Migrate this method into ddd/service
+def fetch_nodes_selected(request_parameters, user) -> List[Tuple[int, NodeType]]:
+    def _convert_element_to_node_id_and_node_type(element) -> Tuple[int, NodeType]:
+        if element['modelname'] == LEARNING_UNIT_YEAR:
+            return element["id"], NodeType.LEARNING_UNIT
+        return element["id"], NodeType.EDUCATION_GROUP
+
+    selected_data = _get_elements_selected(request_parameters, user)
+    return [_convert_element_to_node_id_and_node_type(element) for element in selected_data]
 
 
 # FIXME :: DEPRECATED - Use AuthorizedRelationshipValidator from ddd instead

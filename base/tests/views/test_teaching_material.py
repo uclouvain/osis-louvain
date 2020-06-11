@@ -91,7 +91,7 @@ class TeachingMaterialCreateTestCase(TestCase):
         mock_is_linked_to_entity_charge.return_value = True
         mock_is_pedagogy_data_must_be_postponed.return_value = False
         msg = self._test_teaching_material_post()
-        self.assertEqual(msg[0].get('message'), "{}.".format(_("The learning unit has been updated")))
+        self.assertEqual(msg[0].get('message'), "{}".format(_("The learning unit has been updated (without report).")))
         self.assertEqual(msg[0].get('level'), messages.SUCCESS)
 
     @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
@@ -126,7 +126,7 @@ class TeachingMaterialCreateTestCase(TestCase):
         mock_is_linked_to_entity_charge.return_value = True
         ProposalLearningUnitFactory(learning_unit_year=self.previous_luy)
         msg = self._test_teaching_material_post()
-        expected_message = "{}.".format(_("The learning unit has been updated"))
+        expected_message = "{}".format(_("The learning unit has been updated (without report)."))
         self.assertEqual(msg[0].get('message'), expected_message)
         self.assertEqual(msg[0].get('level'), messages.SUCCESS)
 

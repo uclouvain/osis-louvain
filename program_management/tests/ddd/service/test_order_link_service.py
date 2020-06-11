@@ -54,12 +54,12 @@ class TestUpDownChildren(SimpleTestCase):
         self.mocked_persist_tree = self.persist_tree_patcher.start()
         self.addCleanup(self.persist_tree_patcher.stop)
 
-        self.load_node_education_group_year_patcher = mock.patch(
-            "program_management.ddd.repositories.load_node.load_node_education_group_year",
+        self.load_node_group_year_patcher = mock.patch(
+            "program_management.ddd.repositories.load_node.load_node_group_year",
             return_value=self.parent
         )
-        self.mocked_load_node_education_group_year = self.load_node_education_group_year_patcher.start()
-        self.addCleanup(self.mocked_load_node_education_group_year.stop)
+        self.mocked_load_node_group_year = self.load_node_group_year_patcher.start()
+        self.addCleanup(self.load_node_group_year_patcher.stop)
 
     @mock.patch("program_management.ddd.repositories.load_node.load_by_type")
     def test_do_not_modify_order_when_applying_up_on_first_element(self, mock_load_child):

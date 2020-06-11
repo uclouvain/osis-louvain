@@ -32,7 +32,7 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class DomainIscedAdmin(OsisModelAdmin):
-    list_display = ('code', 'title_fr', 'title_en', "uuid")
+    list_display = ('code', 'title_fr', 'title_en', "uuid", 'is_ares')
     search_fields = ['code', 'title_fr', 'title_en', "uuid"]
 
 
@@ -43,6 +43,7 @@ class DomainIsced(models.Model):
     code = models.CharField(max_length=10, unique=True)
     title_fr = models.CharField(max_length=255, db_index=True)
     title_en = models.CharField(max_length=255, db_index=True)
+    is_ares = models.BooleanField(default=True)
 
     def __str__(self):
         return '{} {}'.format(self.code, self.title_fr)

@@ -46,7 +46,9 @@ class TestParentIsNotLeafValidator(SimpleTestCase):
             NodeGroupYearFactory()
         )
         self.assertFalse(validator.is_valid())
-        expected_result = _("Cannot add any element to learning unit")
+        expected_result = _("Cannot add any element to learning unit %(parent_node)s") % {
+            "parent_node": self.child
+        }
         self.assertEqual(expected_result, validator.error_messages[0])
 
     def test_when_trying_to_add_leaf_to_leaf(self):
@@ -55,7 +57,9 @@ class TestParentIsNotLeafValidator(SimpleTestCase):
             NodeLearningUnitYearFactory()
         )
         self.assertFalse(validator.is_valid())
-        expected_result = _("Cannot add any element to learning unit")
+        expected_result = _("Cannot add any element to learning unit %(parent_node)s") % {
+            "parent_node": self.child
+        }
         self.assertEqual(expected_result, validator.error_messages[0])
 
     def test_when_trying_to_add_leaf_to_group(self):

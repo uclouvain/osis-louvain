@@ -124,7 +124,7 @@ MIDDLEWARE = (
 
 INTERNAL_IPS = ()
 # check if we are testing right now
-TESTING = 'test' in sys.argv
+TESTING = 'test' in sys.argv or 'behave_runner' in sys.argv[0]
 if TESTING:
     # add test packages that have specific models for tests
     INSTALLED_APPS += ('osis_common.tests', )
@@ -362,6 +362,11 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
+        'functional': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
         'send_mail': {
             'handlers': ['console'],
             'level': 'DEBUG',
@@ -404,10 +409,11 @@ ESB_REFRESH_COMMON_ADMISSION_ENDPOINT = os.environ.get('ESB_REFRESH_COMMON_ADMIS
 RELEASE_TAG = os.environ.get('RELEASE_TAG')
 
 # Selenium Testing
+FUNCTIONAL_LOGGER = "functional"
 SELENIUM_SETTINGS = {
     'WEB_BROWSER': os.environ.get('SELENIUM_WEB_BROWSER', 'FIREFOX'),
     'GECKO_DRIVER': os.environ.get('SELENIUM_GECKO_DRIVER', "geckodriver"),
-    'VIRTUAL_DISPLAY': os.environ.get('SELENIUM_VIRTUAL_DISPLAY', 'True').lower() == 'false',
+    'VIRTUAL_DISPLAY': os.environ.get('SELENIUM_VIRTUAL_DISPLAY', 'False').lower() == 'true',
     'SCREEN_WIDTH': int(os.environ.get('SELENIUM_SCREEN_WIDTH', 1920)),
     'SCREEN_HIGH': int(os.environ.get('SELENIUM_SCREEN_HIGH', 1080)),
     'TAKE_SCREEN_ON_FAILURE': os.environ.get('SELENIUM_TAKE_SCREENSHOTS', 'True').lower() == 'true',

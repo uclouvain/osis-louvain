@@ -1,0 +1,136 @@
+{% extends "education_group_app/training/layout_read.html" %}
+{% load i18n %}
+{% load format dates_from_to bootstrap3 %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block details %}
+    <div class="panel panel-default">
+        <div class="panel-body">
+            {% bootstrap_label _("Course enrollment") label_class='d-block' %}
+            <p>{{ learning_unit_enrollment_dates | dates_from_to }}</p>
+            <br>
+            <table class="table">
+                <thead>
+                <tr>
+                    <td></td>
+                    <td><label>{% trans 'Session' %} 1</label></td>
+                    <td><label>{% trans 'Session' %} 2</label></td>
+                    <td><label>{% trans 'Session' %} 3</label></td>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>{% bootstrap_label _("Exams Enrollments") label_class='d-block' %}</td>
+                    <td>{{ administrative_dates.exam_enrollments_dates.session1 | dates_from_to }}</td>
+                    <td>{{ administrative_dates.exam_enrollments_dates.session2 | dates_from_to }}</td>
+                    <td>{{ administrative_dates.exam_enrollments_dates.session3 | dates_from_to }}</td>
+                </tr>
+                <tr>
+                    <td>{% bootstrap_label _("Marks presentation") label_class='d-block' %}</td>
+                    <td>{{ administrative_dates.scores_exam_submission_dates.session1.start_date | default_if_none:'-'| date:"d/m/Y" }}</td>
+                    <td>{{ administrative_dates.scores_exam_submission_dates.session2.start_date | default_if_none:'-'| date:"d/m/Y" }}</td>
+                    <td>{{ administrative_dates.scores_exam_submission_dates.session3.start_date | default_if_none:'-'| date:"d/m/Y" }}</td>
+                </tr>
+                <tr>
+                    <td><label>{% trans 'Dissertation submission' %}</label></td>
+                    <td>{{ administrative_dates.dissertations_submission_dates.session1.start_date | default_if_none:'-' |date:"d/m/Y" }}</td>
+                    <td>{{ administrative_dates.dissertations_submission_dates.session2.start_date | default_if_none:'-' |date:"d/m/Y" }}</td>
+                    <td>{{ administrative_dates.dissertations_submission_dates.session3.start_date | default_if_none:'-' |date:"d/m/Y" }}</td>
+                </tr>
+                <tr>
+                    <td>{% bootstrap_label _("Deliberation") label_class='d-block' %}</td>
+                    <td>{{ administrative_dates.deliberations_dates.session1 | dates_from_to }}</td>
+                    <td>{{ administrative_dates.deliberations_dates.session2 | dates_from_to }}</td>
+                    <td>{{ administrative_dates.deliberations_dates.session3 | dates_from_to }}</td>
+                </tr>
+                <tr>
+                    <td>{% bootstrap_label _("Scores diffusion") label_class='d-block' %}</td>
+                    <td>{{ administrative_dates.scores_exam_diffusion_dates.session1.start_date | datetimes_at }}</td>
+                    <td>{{ administrative_dates.scores_exam_diffusion_dates.session2.start_date | datetimes_at }}</td>
+                    <td>{{ administrative_dates.scores_exam_diffusion_dates.session3.start_date | datetimes_at }}</td>
+                </tr>
+                </tbody>
+            </table>
+
+        </div>
+    </div>
+
+    <br>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">{% bootstrap_label _("Additional info") label_class='d-block' %}</div>
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-6">
+                    {% bootstrap_label _("Weighting") label_class='d-block' %}
+                    <p>{{ additional_informations.weighting | yesno | title }}</p>
+                </div>
+                <div class="col-md-6">
+                    {% bootstrap_label _("Default learning unit enrollment") label_class='d-block' %}
+                    <p>{{ additional_informations.default_learning_unit_enrollment | yesno | title }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <br>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            {% bootstrap_label _("Jury") label_class='d-block' %}
+        </div>
+        <div class="panel-body">
+            {% for mandatary in mandataries %}
+                <div class="row">
+                    <div class="col-md-4">
+                        {% bootstrap_label mandatary.function.value label_class='d-block' %}
+                        {{ mandatary.last_name | upper }}, {{ mandatary.first_name | default_if_none:'' }} {{ mandatary.middle_name | default_if_none:'' }}
+                    </div>
+                    {% if mandatary.qualification %}
+                        <div class="col-md-8">
+                            {% bootstrap_label _("Signatory qualification") label_class='d-block' %}
+                            {{ mandatary.qualification }}<br>
+                        </div>
+                    {% endif %}
+                </div>
+                <br>
+            {% endfor %}
+        </div>
+    </div>
+
+    <br>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">{% bootstrap_label _("Program managers") label_class='d-block' %}</div>
+        <div class="panel-body">
+            {% for manager in program_managers %}
+                <div class="row">
+                    <div class="col-md-6">{{ manager.person }}</div>
+                    <div class="col-md-6">{% if manager.is_main %}{% trans "Main" %}{% endif %}</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

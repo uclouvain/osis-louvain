@@ -47,22 +47,26 @@ def generate_title(group_year):
     return '{obj.group.start_year} {gen_str}'.format(obj=group_year, gen_str=string_generator()).lower()
 
 
+def generate_group(group_year):
+    return GroupFactory(start_year=group_year.academic_year)
+
+
 class GroupYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "education_group.GroupYear"
 
     partial_acronym = factory.Sequence(lambda n: 'PGy%d' % n)
-    acronym = factory.Sequence(lambda n: 'Gy %d' % n)
+    acronym = factory.Sequence(lambda n: 'Gy%d' % n)
     education_group_type = factory.SubFactory(EducationGroupTypeFactory)
     credits = factory.fuzzy.FuzzyInteger(MINIMUM_CREDITS, MAXIMUM_CREDITS)
     constraint_type = CREDITS
     min_constraint = factory.fuzzy.FuzzyInteger(1, MAXIMUM_CREDITS)
     max_constraint = factory.lazy_attribute(lambda a: a.min_constraint)
-    group = factory.SubFactory(GroupFactory)
+    group = factory.LazyAttribute(generate_group)
     title_fr = factory.LazyAttribute(generate_title)
     title_en = factory.LazyAttribute(generate_title)
     remark_fr = factory.fuzzy.FuzzyText(length=255)
     remark_en = factory.fuzzy.FuzzyText(length=255)
-    academic_year = factory.SubFactory(AcademicYearFactory, year=factory.SelfAttribute("..group.start_year.year"))
+    academic_year = factory.SubFactory(AcademicYearFactory)
     active = active_status.ACTIVE
     main_teaching_campus = factory.SubFactory(CampusFactory)

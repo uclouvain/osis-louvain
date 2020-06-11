@@ -22,6 +22,7 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from behave import *
+from behave.runner import Context
 from selenium.webdriver.common.by import By
 
 from base.business.education_groups.create import create_initial_group_element_year_structure
@@ -30,6 +31,7 @@ from base.models.education_group_type import EducationGroupType
 from base.models.entity import Entity
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.education_group_year import TrainingFactory
+from features.pages.education_group.pages import SearchEducationGroupPage, EducationGroupPage
 
 use_step_matcher("parse")
 
@@ -57,26 +59,20 @@ def step_impl(context, acronym, year):
     create_initial_group_element_year_structure([training])
 
 
-@step("Cliquer sur le sigle {acronym} dans la liste de résultats")
-def step_impl(context, acronym):
-    """
-    :type context: behave.runner.Context
-    """
-    context.current_page = context.current_page.first_row.click()
+@step("Cliquer sur le premier sigle dans la liste de résultats")
+def step_impl(context: Context):
+    page = SearchEducationGroupPage(driver=context.browser)
+    context.offer_to_delete = page.first_row.text
+    page.first_row.click()
 
 
 @step("Cliquer sur « Supprimer »")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    context.current_page.delete.click()
+def step_impl(context: Context):
+    page = EducationGroupPage(driver=context.browser)
+    page.delete.click()
 
 
-@then("Vérifier que la liste est vide.")
-def step_impl(context):
-    """
-    :type context: behave.runner.Context
-    """
-    warnings = context.current_page.find_element(By.ID, 'pnl_warning_messages').text
-    context.test.assertIn('Aucun résultat!', warnings)
+@then("Vérifier que l'offre n'apparaît plus dans la liste")
+def step_impl(context: Context):
+    page = SearchEducationGroupPage(driver=context.browser)
+    context.test.assertNotEqual(page.first_row.text, context.offer_to_delete)

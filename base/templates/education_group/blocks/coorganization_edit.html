@@ -85,6 +85,7 @@
 
 <script src="{% static 'js/jquery.formset.js' %}"></script>
 <script>
+    const can_change_coorganization = "{{ can_change_coorganization }}".toLowerCase() === 'true';
     $('.link-formset').formset({
         addText: '<span class="fas fa-plus"></span>',
         deleteText: '<span class="fas fa-trash-alt"></span>',
@@ -94,5 +95,9 @@
             var element = $(row).find("select").get(1);
             window.__dal__initialize(element);
         })
-    });
+    })
+    if(!can_change_coorganization){
+        $('.add-row').remove();
+        $('.delete-row').remove();
+    }
 </script>

@@ -43,10 +43,10 @@ class TestAddChildNode(SimpleTestCase):
         )
 
         group_year_node.add_child(learning_unit_year_node, relative_credits=5, comment='Dummy comment')
-        self.assertEquals(len(group_year_node.children), 1)
+        self.assertEqual(len(group_year_node.children), 1)
 
-        self.assertEquals(group_year_node.children[0].relative_credits, 5)
-        self.assertEquals(group_year_node.children[0].comment, 'Dummy comment')
+        self.assertEqual(group_year_node.children[0].relative_credits, 5)
+        self.assertEqual(group_year_node.children[0].comment, 'Dummy comment')
 
 
 class TestDescendentsPropertyNode(SimpleTestCase):
@@ -57,7 +57,7 @@ class TestDescendentsPropertyNode(SimpleTestCase):
 
     def test_case_no_descendents(self):
         self.assertIsInstance(self.root_node.descendents, dict)
-        self.assertEquals(self.root_node.descendents, {})
+        self.assertEqual(self.root_node.descendents, {})
 
     def test_case_all_descendents_with_path_as_key(self):
         self.subgroup_node.add_child(self.leaf)
@@ -162,6 +162,31 @@ class TestGetChildrenTypes(SimpleTestCase):
             error_msg
         )
         self.assertNotIn(link0.child.node_type, result, error_msg)
+
+
+class TestGetChildrenAndReferenceChildren(SimpleTestCase):
+    def test_when_no_children(self):
+        node = NodeGroupYearFactory()
+        self.assertEqual([], node.children_and_reference_children())
+
+    def test_get_only_children_of_reference_link(self):
+        link = LinkFactory(link_type=LinkTypes.REFERENCE)
+        LinkFactory(parent=link.child)
+        result = link.parent.children_and_reference_children()
+        self.assertListEqual(
+            link.child.children,
+            result
+        )
+
+    def test_get_only_children_of_reference_link_except_within_minor_list(self):
+        minor_list = NodeGroupYearFactory(node_type=GroupType.MINOR_LIST_CHOICE)
+        link_ref = LinkFactory(link_type=LinkTypes.REFERENCE, parent=minor_list)
+        LinkFactory(parent=link_ref.child)
+        result = link_ref.parent.get_children_and_only_reference_children_except_within_minor_list()
+        self.assertListEqual(
+            [link_ref],
+            result
+        )
 
 
 class TestGetAllChildrenAsNode(SimpleTestCase):
@@ -278,3 +303,58 @@ class TestChildren(SimpleTestCase):
             self.parent.children,
             [link0, link1, link2]
         )
+
+
+class TestDetachChild(SimpleTestCase):
+    def test_when_child_not_in_children(self):
+        link = LinkFactory()
+        unexisting_child = NodeGroupYearFactory()
+        with self.assertRaises(StopIteration):
+            link.parent.detach_child(unexisting_child)
+
+    def test_when_child_is_correctly_detached(self):
+        common_parent = NodeGroupYearFactory()
+        link1 = LinkFactory(parent=common_parent)
+        link2 = LinkFactory(parent=common_parent)
+        link3 = LinkFactory(parent=common_parent)
+
+        common_parent.detach_child(link1.child)
+
+        expected_result = [link2, link3]
+        assertion_msg = "Link {} should have been removed from children".format(link1)
+        self.assertListEqual(common_parent.children, expected_result, assertion_msg)
+
+        assertion_msg = "Link {} should have been added to deleted children".format(link1)
+        expected_result = {link1}
+        self.assertSetEqual(common_parent._deleted_children, expected_result,assertion_msg)
+
+
+class TestIsOption(SimpleTestCase):
+    def test_when_node_is_option(self):
+        node = NodeGroupYearFactory(node_type=MiniTrainingType.OPTION)
+        self.assertTrue(node.is_option())
+
+    def test_when_node_is_not_option(self):
+        node = NodeGroupYearFactory(node_type=MiniTrainingType.ACCESS_MINOR)
+        self.assertFalse(node.is_option())
+
+
+class TestGetOptionsList(SimpleTestCase):
+    def test_when_has_no_children(self):
+        node = NodeGroupYearFactory()
+        self.assertEqual(node.get_option_list(), set())
+
+    def test_when_node_is_option(self):
+        node = NodeGroupYearFactory(node_type=MiniTrainingType.OPTION)
+        self.assertEqual(node.get_option_list(), set(), "Should not contains himself in children options list")
+
+    def test_when_has_direct_child_option(self):
+        link = LinkFactory(child__node_type=MiniTrainingType.OPTION)
+        expected_result = {link.child}
+        self.assertEqual(link.parent.get_option_list(), expected_result, "Should contain direct children")
+
+    def test_when_sub_child_is_option(self):
+        link1 = LinkFactory(child__node_type=GroupType.OPTION_LIST_CHOICE)
+        link2 = LinkFactory(parent=link1.child, child__node_type=MiniTrainingType.OPTION)
+        expected_result = {link2.child}
+        self.assertEqual(link2.parent.get_option_list(), expected_result, "Should contain children of children")

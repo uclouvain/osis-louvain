@@ -1,0 +1,93 @@
+{% load i18n %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="panel-body" style="padding-top: 0px;">
+    <div class="container-fluid">
+        <hr>
+        <div class="row">
+            <div class="col-md-12">
+                <label>{% trans 'Entity' %}</label>
+                {% if can_edit_information %}
+                    {% url 'publication_contact_entity_edit' root_id=root.pk education_group_year_id=education_group_year.pk as update_url %}
+                    <a class="trigger_modal" data-url="{{ update_url }}" title={% trans 'Edit' %}>
+                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                {{ entity_contact|default_if_none:"-" }}
+            </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+            <div class="col-md-12" id="lbl_contacts_header">
+                <label>{% trans 'Contacts' %}</label>
+                {% if can_edit_information %}
+                    {% url 'publication_contact_create' root_id=root.pk education_group_year_id=education_group_year.pk as create_url %}
+                    <a title="{% trans 'Create' %}" class="trigger_modal" data-url="{{ create_url }}">
+                        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="row contacts-list">
+            <div class="col-md-12">
+                {% if academic_responsibles %}
+                    <h5>{% trans 'Academic responsible' %} : </h5>
+                    {% with contacts=academic_responsibles %}
+                        {% include "education_group_app/blocks/general_information_section_contact_ul.html" %}
+                    {% endwith %}
+                {% endif %}
+
+                {% if other_academic_responsibles %}
+                    <h5>{% trans 'Other academic responsibles' %} : </h5>
+                    {% with contacts=other_academic_responsibles %}
+                        {% include "education_group_app/blocks/general_information_section_contact_ul.html" %}
+                    {% endwith %}
+                {% endif %}
+
+                {% if jury_members %}
+                    <h5>{% trans 'Jury members' %} :</h5>
+                    {% with contacts=jury_members %}
+                        {% include "education_group_app/blocks/general_information_section_contact_ul.html" %}
+                    {% endwith %}
+                {% endif %}
+
+                {% if other_contacts %}
+                    <h5>{% trans 'Other contacts' %} :</h5>
+                    {% with contacts=other_contacts %}
+                        {% include "education_group_app/blocks/general_information_section_contact_ul.html" %}
+                    {% endwith %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>

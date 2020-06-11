@@ -28,11 +28,14 @@ from django.utils.translation import gettext_lazy as _
 
 from base.business import event_perms
 from base.business.learning_units.edition import edit_learning_unit_end_date
+from base.forms.learning_unit.learning_unit_postponement import LearningUnitPostponementForm
 from base.forms.utils.choice_field import BLANK_CHOICE_DISPLAY, NO_PLANNED_END_DISPLAY
 from base.models.academic_year import AcademicYear
+from base.models.enums import learning_unit_year_subtypes
 
 
 # TODO Convert it in ModelForm
+
 class LearningUnitEndDateForm(forms.Form):
     EMPTY_LABEL = BLANK_CHOICE_DISPLAY
     REQUIRED = True
@@ -80,8 +83,23 @@ class LearningUnitEndDateForm(forms.Form):
         return academic_years
 
     def save(self, update_learning_unit_year=True):
-        return edit_learning_unit_end_date(self.learning_unit, self.cleaned_data['academic_year'],
-                                           update_learning_unit_year)
+        learning_unit_full_instance = None
+        if self.learning_unit_year.subtype == learning_unit_year_subtypes.PARTIM:
+            learning_unit_full_instance = self.learning_unit_year.parent.learning_unit
+        postponement_form = LearningUnitPostponementForm(
+            person=self.person,
+            start_postponement=self.learning_unit_year.academic_year,
+            learning_unit_instance=self.learning_unit_year.learning_unit,
+            learning_unit_full_instance=learning_unit_full_instance,
+            external=self.learning_unit_year.is_external(),
+        )
+        if postponement_form.is_valid():
+            postponement_form.save()
+        return edit_learning_unit_end_date(
+            self.learning_unit,
+            self.cleaned_data['academic_year'],
+            update_learning_unit_year
+        )
 
 
 class LearningUnitProposalEndDateForm(LearningUnitEndDateForm):

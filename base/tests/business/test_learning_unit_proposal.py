@@ -34,12 +34,14 @@ from django.test.utils import override_settings
 from django.utils.translation import gettext_lazy as _
 from factory import fuzzy
 
+from attribution.tests.factories.tutor_application import TutorApplicationFactory
 from base import models as mdl_base
 from base.business import learning_unit_proposal as lu_proposal_business
 from base.business.learning_unit_proposal import compute_proposal_type, consolidate_proposal, modify_proposal_state, \
-    copy_learning_unit_data
+    copy_learning_unit_data, _apply_action_on_proposals
 from base.business.learning_unit_proposal import consolidate_proposals_and_send_report
-from base.business.learning_units.perms import PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES
+from base.business.learning_units.perms import PROPOSAL_CONSOLIDATION_ELIGIBLE_STATES, \
+    is_eligible_to_consolidate_proposal
 from base.models.academic_year import AcademicYear, LEARNING_UNIT_CREATION_SPAN_YEARS
 from base.models.enums import learning_component_year_type
 from base.models.enums import organization_type, proposal_type, entity_type, \
@@ -58,7 +60,7 @@ from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
 
 
 class TestLearningUnitProposalCancel(TestCase):
@@ -113,7 +115,7 @@ class TestLearningUnitProposalCancel(TestCase):
                               [])
 
     @patch("base.business.learning_units.perms.is_eligible_for_cancel_of_proposal",
-           side_effect=lambda proposal, person: True)
+           side_effect=lambda proposal, person, raise_exception: True)
     @patch('base.utils.send_mail.send_mail_cancellation_learning_unit_proposals')
     def test_cancel_proposals_of_type_suppression(self, mock_send_mail, mock_perm):
         proposal = self._create_proposal(prop_type=proposal_type.ProposalType.SUPPRESSION.name,
@@ -243,7 +245,7 @@ class TestConsolidateProposals(TestCase):
             container_year.save()
 
     @mock.patch("base.business.learning_units.perms.is_eligible_to_consolidate_proposal",
-                side_effect=lambda proposal, person: True)
+                side_effect=lambda proposal, person, raise_exception: True)
     @mock.patch("base.business.learning_unit_proposal.consolidate_proposal",
                 side_effect=lambda prop: {SUCCESS: ["msg_success"]})
     @mock.patch("base.utils.send_mail.send_mail_consolidation_learning_unit_proposal",
@@ -266,6 +268,28 @@ class TestConsolidateProposals(TestCase):
         self.assertTrue(mock_mail.called)
         self.assertTrue(mock_perm.called)
 
+    @mock.patch("base.business.learning_units.perms._has_person_the_right_to_consolidate", return_value=True)
+    @mock.patch("base.business.learning_units.perms._is_proposal_in_state_to_be_consolidated", return_value=True)
+    @mock.patch("base.business.learning_units.perms._is_attached_to_initial_or_current_requirement_entity",
+                return_value=True)
+    def test_apply_action_on_proposals_with_tutor_application(self, mock_entity, mock_state, mock_right):
+        proposal = ProposalLearningUnitFactory(type=ProposalType.SUPPRESSION.name)
+        TutorApplicationFactory(learning_container_year=proposal.learning_unit_year.learning_container_year)
+        proposals_with_results = _apply_action_on_proposals(
+            [proposal],
+            consolidate_proposal,
+            self.author,
+            is_eligible_to_consolidate_proposal
+        )
+
+        self.assertEqual(
+            proposals_with_results[0],
+            (
+                proposal,
+                {ERROR: _("This learning unit has application.")}
+            )
+        )
+
 
 def mock_message_by_level(*args, **kwargs):
     return {SUCCESS: ["this is a mock"]}
@@ -276,7 +300,7 @@ class TestConsolidateProposal(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        LanguageFactory(code='FR', name='FRENCH')
+        FrenchLanguageFactory()
 
     def test_when_proposal_is_not_accepted_nor_refused(self):
         states = (state for state, value in proposal_state.ProposalState.__members__.items()

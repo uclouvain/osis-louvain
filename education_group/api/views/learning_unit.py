@@ -23,11 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import program_management.ddd.repositories.find_roots
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
-import program_management.ddd.repositories.find_roots
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.learning_unit_year import LearningUnitYear
@@ -35,6 +35,7 @@ from base.models.prerequisite import Prerequisite
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer, \
     LearningUnitYearPrerequisitesListSerializer
 from program_management.models.education_group_version import EducationGroupVersion
+from program_management.models.element import Element
 
 
 class EducationGroupRootsFilter(filters.FilterSet):
@@ -57,20 +58,21 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
     paginator = None
 
     def get_queryset(self):
-        learning_unit_year = get_object_or_404(
-            LearningUnitYear.objects.all().select_related('academic_year'),
-            acronym=self.kwargs['acronym'].upper(),
-            academic_year__year=self.kwargs['year']
+        element = get_object_or_404(
+            Element.objects.all().select_related('learning_unit_year__academic_year'),
+            learning_unit_year__acronym=self.kwargs['acronym'].upper(),
+            learning_unit_year__academic_year__year=self.kwargs['year']
         )
-        education_group_root_ids = program_management.ddd.repositories.find_roots.find_roots(
-            [learning_unit_year],
+        root_elements = program_management.ddd.repositories.find_roots.find_roots(
+            [element],
             additional_root_categories=[GroupType.COMPLEMENTARY_MODULE],
-            exclude_root_categories=TrainingType.finality_types_enum()
-        ).get(learning_unit_year.id, [])
+            exclude_root_categories=TrainingType.finality_types_enum(),
+            as_instances=True
+        ).get(element.id, [])
 
-        return EducationGroupVersion.objects.filter(offer_id__in=education_group_root_ids).select_related(
-            'offer__education_group_type', 'offer__academic_year'
-        )
+        return EducationGroupVersion.objects.filter(
+            root_group__element__in=root_elements
+        ).select_related('offer__education_group_type', 'offer__academic_year')
 
 
 class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.ListAPIView):

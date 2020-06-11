@@ -32,6 +32,11 @@ from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView, UpdateView
+
+from base.business.education_groups.general_information_sections import CMS_LABEL_PROGRAM_AIM, \
+    CMS_LABEL_ADDITIONAL_INFORMATION
+from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
+from education_group.views.proxy.read import Tab
 from osis_role.contrib.views import PermissionRequiredMixin
 
 from base.forms.education_group.achievement import ActionForm, EducationGroupAchievementForm, \
@@ -40,7 +45,6 @@ from base.models.education_group_year import EducationGroupYear
 from base.views.common import display_error_messages
 from base.views.education_groups.achievement.common import EducationGroupAchievementMixin, \
     EducationGroupDetailedAchievementMixin
-from base.views.education_groups.achievement.detail import CMS_LABEL_PROGRAM_AIM, CMS_LABEL_ADDITIONAL_INFORMATION
 from base.views.mixins import AjaxTemplateMixin
 from cms.enums import entity_name
 from cms.models import translated_text
@@ -113,13 +117,11 @@ class EducationGroupAchievementCMS(PermissionRequiredMixin, SuccessMessageMixin,
         return super().form_valid(form)
 
     def get_success_url(self):
+        training_identity = TrainingIdentitySearch().get_from_education_group_year_id(self.kwargs['offer_id'])
         return reverse(
-            "education_group_skills_achievements",
-            args=[
-                self.kwargs['root_id'],
-                self.kwargs['education_group_year_id'],
-            ]
-        )
+            'education_group_read_proxy',
+            args=[training_identity.year, training_identity.acronym]
+        ) + '?tab={}'.format(Tab.SKILLS_ACHIEVEMENTS)
 
     def get_initial(self):
         initial = super().get_initial()

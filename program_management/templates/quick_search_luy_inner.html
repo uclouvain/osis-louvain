@@ -6,10 +6,10 @@
 {% block navbar %}
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation">
-            <a class="trigger_modal" data-url="{% url "quick_search_education_group" root_id education_group_year_id%}">{% trans 'Trainings' %}</a>
+            <a id="link-quick-search-educationgroup" class="trigger_modal" data-url="{% url "quick_search_education_group" root_id node_path%}?path={{ current_path }}">{% trans 'Trainings' %}</a>
         </li>
         <li role="presentation" class="active">
-            <a href=#">{% trans 'Learning units' %}</a>
+            <a id="link-quick-search-learningunit" href=#">{% trans 'Learning units' %}</a>
         </li>
     </ul>
 {% endblock navbar %}

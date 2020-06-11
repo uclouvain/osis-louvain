@@ -71,6 +71,7 @@ class EducationGroupRootsListSerializer(EducationGroupTitleSerializer, serialize
         )
 
 
+# TODO :: OSIS-4735
 class LearningUnitYearPrerequisitesListSerializer(serializers.ModelSerializer):
     url = TrainingHyperlinkedRelatedField(
         source='education_group_version',

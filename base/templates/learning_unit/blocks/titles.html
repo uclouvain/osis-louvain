@@ -12,7 +12,7 @@
             {% trans "Common part" %}
         </label>
         {% bootstrap_field learning_container_year_form.common_title form_group_class="form-group" show_label=False %}
-        {% if learning_unit_year.subtype == "PARTIM" %}
+        {% if learning_unit_year.subtype == "PARTIM" or partim_creation %}
             <label style="font-style:italic">{% trans "Specific complement (Partim)" %}</label>
         {% else %}
             <label style="font-style:italic">{% trans "Specific complement (Full)" %}</label>
@@ -31,7 +31,7 @@
             {% trans "Common part" %}
         </label>
         {% bootstrap_field learning_container_year_form.common_title_english form_group_class="form-group" show_label=False %}
-        {% if learning_unit_year.subtype == "PARTIM" %}
+        {% if learning_unit_year.subtype == "PARTIM" or partim_creation %}
             <label style="font-style:italic">{% trans "Specific complement (Partim)" %}</label>
         {% else %}
             <label style="font-style:italic">{% trans "Specific complement (Full)" %}</label>

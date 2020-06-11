@@ -30,7 +30,6 @@ from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.business_types import *
 
 
-# Implemented from AttachPermission._check_year_is_editable
 class MinimumEditableYearValidator(BusinessValidator):
     def __init__(self, tree: 'ProgramTree'):
         super(MinimumEditableYearValidator, self).__init__()

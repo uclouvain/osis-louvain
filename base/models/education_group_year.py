@@ -489,6 +489,7 @@ class EducationGroupYear(SerializableModel):
         on_delete=models.PROTECT,
         null=True, blank=True,
         verbose_name=_("ISCED domain"),
+        limit_choices_to={'is_ares': True},
     )
 
     management_entity = models.ForeignKey(
@@ -718,7 +719,10 @@ class EducationGroupYear(SerializableModel):
         return ""
 
     def get_absolute_url(self):
-        return reverse("education_group_read", args=[self.pk, self.pk])
+        return reverse(
+            'education_group_read_proxy',
+            args=[self.academic_year.year, self.acronym]
+        )
 
     @property
     def str_domains(self):

@@ -47,6 +47,8 @@ class TestFetchLearningUnitToPostpone(TestCase):
         LearningUnitYearFactory(
             learning_unit=self.learning_unit,
             academic_year=self.academic_years[-2],
+            learning_container_year__requirement_entity=None,
+            learning_container_year__allocation_entity=None
         )
 
         self.assertEqual(LearningUnitYear.objects.count(), 1)

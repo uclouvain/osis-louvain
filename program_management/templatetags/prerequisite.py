@@ -70,7 +70,7 @@ def _prerequisite_item_as_html(prerequisite_item: PrerequisiteItem, links: List[
         _('Cred. rel./abs.'),
         item_link.relative_credits or '-',
         item_link.child.credits.normalize()
-    )
+    ) if item_link else ""
     return "<a href='{url}' title='{title}'>{code}</a>".format(
         url=urls.reverse("learning_unit", kwargs={"acronym": prerequisite_item.code, "year": prerequisite_item.year}),
         title=title,

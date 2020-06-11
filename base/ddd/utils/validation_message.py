@@ -47,7 +47,13 @@ class BusinessValidationMessage:
             return other == self.message
         return other.message == self.message
 
+    def __hash__(self):
+        return hash(self.message + str(self.level))
+
     def __str__(self):
+        return "%(msg)s" % {'msg': self.message}
+
+    def __repr__(self):
         return "%(level)s %(msg)s" % {'level': self.level, 'msg': self.message}
 
     def is_error(self):
@@ -62,3 +68,26 @@ class BusinessValidationMessage:
     @staticmethod
     def contains_errors(messages: List['BusinessValidationMessage']) -> bool:
         return any(msg.is_error() for msg in messages)
+
+
+class BusinessValidationMessageList:
+    def __init__(self, messages: List[BusinessValidationMessage]):
+        self.messages = messages
+
+    def __eq__(self, other):
+        return self.messages == other.messages
+
+    def contains_errors(self) -> bool:
+        return bool(self.errors)
+
+    @property
+    def errors(self) -> List['BusinessValidationMessage']:
+        return [msg for msg in self.messages if msg.is_error()]
+
+    @property
+    def warnings(self) -> List['BusinessValidationMessage']:
+        return [msg for msg in self.messages if msg.is_warning()]
+
+    @property
+    def success(self) -> List['BusinessValidationMessage']:
+        return [msg for msg in self.messages if msg.is_success()]

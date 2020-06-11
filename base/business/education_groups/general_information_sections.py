@@ -63,6 +63,10 @@ ADMISSION_CONDITION = 'conditions_admission'
 CAREER_DEVELOPMENT = 'career_development'
 TUITION_FEES = 'tuition_fees'
 
+# Skills / Achievements
+CMS_LABEL_PROGRAM_AIM = 'skills_and_achievements_introduction'
+CMS_LABEL_ADDITIONAL_INFORMATION = 'skills_and_achievements_additional_text'
+
 Section = namedtuple('Section', 'title labels')
 
 SECTION_LIST = [

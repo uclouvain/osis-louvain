@@ -31,8 +31,9 @@
             <label id="label_{{ label.label }}"
                    {% if label.type == 'common' %}class="education_group_year-common italic"{% endif %}><b>{{ label.translation }}</b></label>
             {% if label.type == 'specific' and can_edit_information %}
-                <a class="pedagogy-edit-btn" href="#"
-                   data-form="{{ post_url }}?label={{ label.label }}"
+                <a class="trigger_modal"
+                   data-url="{{ post_url }}?label={{ label.label }}"
+                   data-modal_class="modal-lg"
                    title="{% trans 'Edit' %}">
                     <span class="glyphicon glyphicon-edit"
                           aria-hidden="true"></span>

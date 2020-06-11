@@ -39,10 +39,23 @@ class BusinessValidator(ABC):
 
     def __init__(self, *args, **kwargs):
         self._messages = []
+        if self.success_messages is None:
+            self.success_messages = []
+        self.success_messages = [
+            BusinessValidationMessage(msg, MessageLevel.SUCCESS) if isinstance(msg, str) else msg
+            for msg in self.success_messages
+        ]
 
     @property
     def messages(self) -> List[BusinessValidationMessage]:
-        return self._messages + (self.success_messages or [])
+        """
+        :return: All warnings and success messages if validator is valid.
+        Return only errors and warnings if validator is not valid.
+        """
+        result = self._messages
+        if not any(msg for msg in result if msg.is_error):
+            result += self.success_messages or []
+        return result
 
     @property
     def error_messages(self) -> List[BusinessValidationMessage]:
@@ -60,11 +73,21 @@ class BusinessValidator(ABC):
         return not self.error_messages
 
     def add_message(self, msg: BusinessValidationMessage):
-        assert msg.level != MessageLevel.SUCCESS, "please redefine the 'success_messages' property instead"
-        self._messages.append(msg)
+        if msg.level != MessageLevel.SUCCESS:
+            self._messages.append(msg)
 
     def add_error_message(self, msg: str):
         self._messages.append(BusinessValidationMessage(msg, level=MessageLevel.ERROR))
+
+    def add_success_message(self, msg: str):
+        self.success_messages.append(
+            BusinessValidationMessage(msg, level=MessageLevel.SUCCESS)
+        )
+
+    def add_warning_message(self, msg: str):
+        self._messages.append(
+            BusinessValidationMessage(msg, level=MessageLevel.WARNING)
+        )
 
     def add_messages(self, messages: List[BusinessValidationMessage]):
         for msg in messages:
@@ -83,7 +106,6 @@ class BusinessListValidator(BusinessValidator):
 
     def __init__(self):
         super(BusinessListValidator, self).__init__()
-        assert self.success_messages, "Please set the 'success_messages' attribute"
 
     def validate(self):
         for validator in self.validators:
