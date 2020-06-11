@@ -31,6 +31,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 class TestGroupYear(TestCase):
@@ -95,3 +96,25 @@ class TestGroupYearSave(TestCase):
             GroupYear.objects.filter(group=self.group_without_end_year,
                                      academic_year=self.academic_year_greater).exists()
         )
+
+
+class TestGroupYearVersionManager(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year_2019 = AcademicYearFactory(year=2019)
+        cls.group = GroupFactory(start_year=cls.academic_year_2019, end_year=cls.academic_year_2019)
+
+    def test_without_education_group_version(self):
+        GroupYearFactory(
+            group=self.group,
+            academic_year=self.academic_year_2019
+        )
+        self.assertListEqual(list(GroupYear.objects_version.all()), [])
+
+    def test_with_education_group_version(self):
+        group_yr_2 = GroupYearFactory(
+            group=self.group,
+            academic_year=self.academic_year_2019
+        )
+        EducationGroupVersionFactory(root_group=group_yr_2)
+        self.assertListEqual(list(GroupYear.objects_version.all()), [group_yr_2])

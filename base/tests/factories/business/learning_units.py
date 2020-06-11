@@ -49,7 +49,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory
 
 
 class LearningUnitsMixin:
@@ -111,7 +111,9 @@ class LearningUnitsMixin:
         if academic_year and container_type:
             result = LearningContainerYearFactory(
                 academic_year=academic_year,
-                container_type=container_type
+                container_type=container_type,
+                requirement_entity=None,
+                allocation_entity=None
             )
         return result
 
@@ -262,7 +264,7 @@ class GenerateContainer:
             entity.refresh_from_db()
 
     def _setup_common_data(self):
-        self.language = LanguageFactory(code='FR', name='French')
+        self.language = FrenchLanguageFactory()
         self.campus = CampusFactory(name='Louvain-la-Neuve', organization__type=organization_type.MAIN)
 
     def __iter__(self):
@@ -403,7 +405,11 @@ def _setup_learning_component_year(learning_unit_year, component_type):
         acronym=DEFAULT_ACRONYM_COMPONENT[component_type],
         learning_unit_year=learning_unit_year,
         type=component_type,
-        planned_classes=1
+        planned_classes=1,
+        hourly_volume_total_annual=30,
+        hourly_volume_partial_q1=30,
+        hourly_volume_partial_q2=0,
+        repartition_volume_requirement_entity=30,
     )
 
 

@@ -39,7 +39,7 @@ from base.models.teaching_material import TeachingMaterial
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import CentralManagerFactory
+from base.tests.factories.person import CentralManagerForUEFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.utils.get_messages import get_messages_from_response
@@ -91,7 +91,7 @@ class TeachingMaterialCreateTestCase(TestCase):
         mock_is_linked_to_entity_charge.return_value = True
         mock_is_pedagogy_data_must_be_postponed.return_value = False
         msg = self._test_teaching_material_post()
-        self.assertEqual(msg[0].get('message'), "{}.".format(_("The learning unit has been updated")))
+        self.assertEqual(msg[0].get('message'), "{}".format(_("The learning unit has been updated (without report).")))
         self.assertEqual(msg[0].get('level'), messages.SUCCESS)
 
     @mock.patch('base.models.person.Person.is_linked_to_entity_in_charge_of_learning_unit_year')
@@ -126,7 +126,7 @@ class TeachingMaterialCreateTestCase(TestCase):
         mock_is_linked_to_entity_charge.return_value = True
         ProposalLearningUnitFactory(learning_unit_year=self.previous_luy)
         msg = self._test_teaching_material_post()
-        expected_message = "{}.".format(_("The learning unit has been updated"))
+        expected_message = "{}".format(_("The learning unit has been updated (without report)."))
         self.assertEqual(msg[0].get('message'), expected_message)
         self.assertEqual(msg[0].get('level'), messages.SUCCESS)
 
@@ -256,6 +256,6 @@ class TeachingMaterialDeleteTestCase(TestCase):
 
 def _get_central_manager_person_with_permission():
     perm_codename = "can_edit_learningunit_pedagogy"
-    person = CentralManagerFactory()
+    person = CentralManagerForUEFactory()
     person.user.user_permissions.add(Permission.objects.get(codename=perm_codename))
     return person

@@ -35,7 +35,7 @@ from base.tests.factories.academic_year import AcademicYearFactory, get_current_
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.person import CentralManagerFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
 @override_flag('education_group_update', active=True)
@@ -55,7 +55,7 @@ class TestEdit(TestCase):
             parent_type=cls.education_group_year.education_group_type,
             child_type=cls.group_element_year.child_branch.education_group_type,
         )
-        cls.person = CentralManagerFactory()
+        cls.person = CentralManagerFactory(entity=cls.education_group_year.management_entity).person
         cls.url = reverse(
             "group_element_year_update",
             kwargs={

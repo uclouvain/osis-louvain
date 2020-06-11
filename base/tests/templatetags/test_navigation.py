@@ -40,6 +40,9 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.user import UserFactory
 from base.utils.cache import SearchParametersCache
 from base.views.learning_units.search.common import SearchTypes
+from education_group.models.group_year import GroupYear
+from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 class TestNavigationMixin:
@@ -75,16 +78,68 @@ class TestNavigationMixin:
                 academic_year=self.academic_year.id
             )
         )
-
-        parameters = {
-            "academic_year": "self.academic_year.id",
-            "ordering": "acronym"
-        }
+        parameters = QueryDict('academic_year={academic_year}&ordering=acronym'.format(
+            academic_year=self.academic_year.id
+        ))
         self.cache = SearchParametersCache(self.user, self.search_type)
         self.cache.set_cached_data(parameters)
 
     def tearDown(self):
         self.cache.clear()
+
+    def assertNavigationContextEquals(self, expected_context, index):
+        context = self.navigation_function(
+            self.user,
+            self.elements_sorted_by_acronym[index],
+            self.url_name
+        )
+        self.assertEqual(context["current_element"], expected_context["current_element"])
+        self.assertEqual(context["next_element_title"], expected_context["next_element_title"])
+        self.assertEqual(context["previous_element_title"], expected_context["previous_element_title"])
+        self.assertURLEqual(context["next_url"], expected_context["next_url"])
+        self.assertURLEqual(context["previous_url"], expected_context["previous_url"])
+
+
+class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
+    search_type = LearningUnitYear.__name__
+
+    @classmethod
+    def generate_elements(cls):
+        return LearningUnitYearFactory.create_batch(5, academic_year=cls.academic_year)
+
+    @property
+    def url_name(self):
+        return 'learning_unit'
+
+    def navigation_function(self, *args, **kwargs):
+        return navigation.navigation_learning_unit(*args, **kwargs)
+
+    def _get_element_url(self, query_parameters: QueryDict, index):
+        next_element = self.elements_sorted_by_acronym[index]
+
+        return reverse(self.url_name, args=[next_element.acronym, next_element.academic_year.year])
+
+    def test_filter_called_depending_on_search_type(self):
+        parameters = {
+            "academic_year": "self.academic_year.id",
+            "ordering": "acronym",
+            "search_type": SearchTypes.EXTERNAL_SEARCH.value
+        }
+        self.cache.set_cached_data(parameters)
+
+        self.filter_form_patcher = mock.patch("base.templatetags.navigation._get_learning_unit_filter_class",
+                                              return_value=LearningUnitFilter)
+        self.mocked_filter_form = self.filter_form_patcher.start()
+
+        self.navigation_function(
+            self.user,
+            self.elements_sorted_by_acronym[0],
+            self.url_name
+        )
+
+        self.assertTrue(self.mocked_filter_form.called)
+
+        self.filter_form_patcher.stop()
 
     def test_navigation_when_no_search_query(self):
         self.cache.clear()
@@ -131,77 +186,68 @@ class TestNavigationMixin:
         }
         self.assertNavigationContextEquals(expected_context, inner_element_index)
 
-    def assertNavigationContextEquals(self, expected_context, index):
-        context = self.navigation_function(
-            self.user,
-            self.elements_sorted_by_acronym[index],
-            self.url_name
-        )
-        self.assertEqual(context["current_element"], expected_context["current_element"])
-        self.assertEqual(context["next_element_title"], expected_context["next_element_title"])
-        self.assertEqual(context["previous_element_title"], expected_context["previous_element_title"])
-        self.assertURLEqual(context["next_url"], expected_context["next_url"])
-        self.assertURLEqual(context["previous_url"], expected_context["previous_url"])
 
-
-class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
-    search_type = LearningUnitYear.__name__
+class TestNavigationGroupYear(TestNavigationMixin, TestCase):
+    search_type = GroupYear.__name__
 
     @classmethod
     def generate_elements(cls):
-        return LearningUnitYearFactory.create_batch(5, academic_year=cls.academic_year)
-
-    @property
-    def url_name(self):
-        return 'learning_unit'
-
-    def navigation_function(self, *args, **kwargs):
-        return navigation.navigation_learning_unit(*args, **kwargs)
+        group_years = GroupYearFactory.create_batch(5, academic_year=cls.academic_year)
+        [EducationGroupVersionFactory(root_group=group) for group in group_years]
+        return group_years
 
     def _get_element_url(self, query_parameters: QueryDict, index):
         next_element = self.elements_sorted_by_acronym[index]
+        return reverse(self.url_name, args=[next_element.academic_year.year, next_element.partial_acronym])
 
-        return reverse(self.url_name, args=[next_element.id])
+    @property
+    def url_name(self):
+        return 'training_identification'
 
-    def test_filter_called_depending_on_search_type(self):
-        parameters = {
-            "academic_year": "self.academic_year.id",
-            "ordering": "acronym",
-            "search_type": SearchTypes.EXTERNAL_SEARCH.value
-        }
-        self.cache.set_cached_data(parameters)
+    def navigation_function(self, *args, **kwargs):
+        return navigation.navigation_group(*args, **kwargs)
 
-        self.filter_form_patcher = mock.patch("base.templatetags.navigation._get_learning_unit_filter_class",
-                                              return_value=LearningUnitFilter)
-        self.mocked_filter_form = self.filter_form_patcher.start()
+    def test_navigation_when_no_search_query(self):
+        self.cache.clear()
 
-        self.navigation_function(
+        context = self.navigation_function(
             self.user,
             self.elements_sorted_by_acronym[0],
             self.url_name
         )
 
-        self.assertTrue(self.mocked_filter_form.called)
+        expected_context = {"current_element": self.elements_sorted_by_acronym[0]}
+        self.assertDictEqual(context, expected_context)
 
-        self.filter_form_patcher.stop()
+    def test_first_element_should_not_have_previous_element(self):
+        first_element_index = 0
+        expected_context = {
+            "current_element": self.elements_sorted_by_acronym[first_element_index],
+            "next_element_title": self.elements_sorted_by_acronym[first_element_index + 1].partial_acronym,
+            "next_url": self._get_element_url(self.query_parameters, first_element_index + 1),
+            "previous_element_title": None,
+            "previous_url": None,
+        }
+        self.assertNavigationContextEquals(expected_context, first_element_index)
 
+    def test_last_element_should_not_have_next_element(self):
+        last_element_index = len(self.elements_sorted_by_acronym) - 1
+        expected_context = {
+            "current_element": self.elements_sorted_by_acronym[last_element_index],
+            "next_element_title": None,
+            "next_url": None,
+            "previous_element_title": self.elements_sorted_by_acronym[last_element_index - 1].partial_acronym,
+            "previous_url": self._get_element_url(self.query_parameters, last_element_index - 1),
+        }
+        self.assertNavigationContextEquals(expected_context, last_element_index)
 
-class TestNavigationEducationGroupYear(TestNavigationMixin, TestCase):
-    search_type = EducationGroupYear.__name__
-
-    @classmethod
-    def generate_elements(cls):
-        return EducationGroupYearFactory.create_batch(5, academic_year=cls.academic_year)
-
-    def _get_element_url(self, query_parameters: QueryDict, index):
-        next_element = self.elements_sorted_by_acronym[index]
-        return reverse(self.url_name, args=[next_element.id, next_element.id])
-
-    @property
-    def url_name(self):
-        return 'education_group_read'
-
-    def navigation_function(self, *args, **kwargs):
-        return navigation.navigation_education_group(*args, **kwargs)
-
-
+    def test_inner_element_should_have_previous_and_next_element(self):
+        inner_element_index = 2
+        expected_context = {
+            "current_element": self.elements_sorted_by_acronym[inner_element_index],
+            "next_element_title": self.elements_sorted_by_acronym[inner_element_index + 1].partial_acronym,
+            "next_url": self._get_element_url(self.query_parameters, inner_element_index + 1),
+            "previous_element_title": self.elements_sorted_by_acronym[inner_element_index - 1].partial_acronym,
+            "previous_url": self._get_element_url(self.query_parameters, inner_element_index - 1),
+        }
+        self.assertNavigationContextEquals(expected_context, inner_element_index)

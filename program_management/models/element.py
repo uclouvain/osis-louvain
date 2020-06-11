@@ -62,19 +62,19 @@ class Element(models.Model):
         verbose_name=_('education group year'),
         on_delete=models.PROTECT
     )
-    group_year = models.ForeignKey(
+    group_year = models.OneToOneField(
         'education_group.GroupYear',
         blank=True, null=True,
         verbose_name=_('group year'),
         on_delete=models.PROTECT
     )
-    learning_unit_year = models.ForeignKey(
+    learning_unit_year = models.OneToOneField(
         'base.LearningUnitYear',
         blank=True, null=True,
         verbose_name=_('learning unit year'),
         on_delete=models.PROTECT,
     )
-    learning_class_year = models.ForeignKey(
+    learning_class_year = models.OneToOneField(
         'learning_unit.LearningClassYear',
         blank=True, null=True,
         verbose_name=_('learning class year'),

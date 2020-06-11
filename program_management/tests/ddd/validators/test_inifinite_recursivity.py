@@ -29,37 +29,28 @@ from django.utils.translation import gettext as _
 
 from base.tests.factories.academic_year import AcademicYearFactory
 from program_management.ddd.domain.program_tree import build_path
-from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityValidator
+from program_management.ddd.validators._infinite_recursivity import InfiniteRecursivityTreeValidator, \
+    InfiniteRecursivityLinkValidator
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 
 
-class TestInfiniteRecursivityValidator(SimpleTestCase):
+class TestInfiniteRecursivityTreeValidator(SimpleTestCase):
 
     def setUp(self):
         self.academic_year = AcademicYearFactory.build(current=True)
 
-        self.node_to_attach = NodeGroupYearFactory(
-            year=self.academic_year.year,
-        )
+        self.node_to_attach = NodeGroupYearFactory(year=self.academic_year.year)
 
         self.tree = ProgramTreeFactory(root_node=self.node_to_attach)
 
-        self.common_core_node = NodeGroupYearFactory(
-            year=self.academic_year.year,
-        )
+        self.common_core_node = NodeGroupYearFactory(year=self.academic_year.year)
 
     def test_when_no_recursivity_found(self):
         path = build_path(self.node_to_attach)
         node_to_attach = self.common_core_node
-        validator = InfiniteRecursivityValidator(self.tree, node_to_attach, path)
+        validator = InfiniteRecursivityTreeValidator(self.tree, node_to_attach, path)
         self.assertTrue(validator.is_valid())
-
-    def test_when_adding_node_to_himself(self):
-        path = build_path(self.node_to_attach)
-        validator = InfiniteRecursivityValidator(self.tree, self.node_to_attach, path)
-        self.assertFalse(validator.is_valid())
-        self.assertEqual(_('Cannot attach a node to himself.'), validator.error_messages[0])
 
     def test_when_adding_node_as_parent_level_1(self):
         child = NodeGroupYearFactory(
@@ -68,7 +59,7 @@ class TestInfiniteRecursivityValidator(SimpleTestCase):
         self.node_to_attach.add_child(child)
 
         path = build_path(self.node_to_attach, child)
-        validator = InfiniteRecursivityValidator(self.tree, self.node_to_attach, path)
+        validator = InfiniteRecursivityTreeValidator(self.tree, self.node_to_attach, path)
 
         self.assertFalse(validator.is_valid())
         expected_message = _(
@@ -88,7 +79,7 @@ class TestInfiniteRecursivityValidator(SimpleTestCase):
         child_lvl1.add_child(child_lvl2)
 
         path = build_path(self.node_to_attach, child_lvl1, child_lvl2)
-        validator = InfiniteRecursivityValidator(self.tree, self.node_to_attach, path)
+        validator = InfiniteRecursivityTreeValidator(self.tree, self.node_to_attach, path)
 
         self.assertFalse(validator.is_valid())
         expected_message = _(
@@ -96,3 +87,25 @@ class TestInfiniteRecursivityValidator(SimpleTestCase):
             'is a parent of the node you want to attach.'
         ) % {'child': self.node_to_attach}
         self.assertEqual(expected_message, validator.error_messages[0])
+
+
+class TestInfiniteRecursivityLinkValidator(SimpleTestCase):
+    def setUp(self):
+        self.academic_year = AcademicYearFactory.build(current=True)
+
+        self.node_to_attach = NodeGroupYearFactory(year=self.academic_year.year)
+
+        self.tree = ProgramTreeFactory(root_node=self.node_to_attach)
+
+        self.common_core_node = NodeGroupYearFactory(year=self.academic_year.year)
+
+    def test_when_no_recursivity_found(self):
+        node_to_attach = self.common_core_node
+        validator = InfiniteRecursivityLinkValidator(self.node_to_attach, node_to_attach)
+        self.assertTrue(validator.is_valid())
+
+    def test_when_adding_node_to_himself(self):
+        validator = InfiniteRecursivityLinkValidator(self.node_to_attach, self.node_to_attach)
+        error_msg = _('Cannot attach a node %(node)s to himself.') % {"node": self.node_to_attach}
+        self.assertFalse(validator.is_valid())
+        self.assertEqual(error_msg, validator.error_messages[0])

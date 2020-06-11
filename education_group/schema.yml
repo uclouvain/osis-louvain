@@ -62,6 +62,16 @@ paths:
           description: ''
           type: string
       - in: query
+        name: ares_ability
+        schema:
+          description: ''
+          type: integer
+      - in: query
+        name: year
+        schema:
+          description: ''
+          type: integer
+      - in: query
         name: ordering
         schema:
           description: Which field to use when ordering the results.
@@ -77,7 +87,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfTraining'
+                $ref: '#/components/schemas/PaginatedTraining'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -115,7 +125,7 @@ paths:
         '404':
           $ref: '#/components/responses/NotFound'
       tags:
-      - trainings
+        - trainings
   /trainings/{year}/{acronym}/tree:
     get:
       description: Return the tree of the training
@@ -290,6 +300,30 @@ paths:
           $ref: '#/components/responses/NotFound'
       tags:
         - groups
+  /hops/{year}:
+    get:
+      description: Return the list of used habilitations for a given year.
+      operationId: habilitations_list
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Hops'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - habilitation_list
   /mini_trainings/:
     get:
       description: Return a list of all the mini_trainings with optional filtering.
@@ -355,7 +389,37 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfMiniTraining'
+                $ref: '#/components/schemas/PaginatedMiniTraining'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+      tags:
+        - mini_trainings
+  /mini_trainings/{year}/{partial_acronym}/offer_roots:
+    get:
+      description: Return the list of offer roots for a mini training.
+      operationId: minitrainings_offer_roots
+      parameters:
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: partial_acronym
+          required: true
+          schema:
+            description: ''
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedTraining'
         '400':
           $ref: '#/components/responses/BadRequest'
         '401':
@@ -367,18 +431,18 @@ paths:
       description: Return the detail of the mini-training
       operationId: minitrainings_read
       parameters:
-      - in: path
-        name: year
-        required: true
-        schema:
-          description: ''
-          type: string
-      - in: path
-        name: partial_acronym
-        required: true
-        schema:
-          description: ''
-          type: string
+        - in: path
+          name: year
+          required: true
+          schema:
+            description: ''
+            type: string
+        - in: path
+          name: partial_acronym
+          required: true
+          schema:
+            description: ''
+            type: string
       responses:
         '200':
           description: OK
@@ -492,10 +556,35 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
   schemas:
-    ArrayOfTraining:
-      type: array
-      items:
-        $ref: '#/components/schemas/Training'
+    Pagination:
+      type: object
+      properties:
+        count:
+          type: integer
+        next:
+          type: string
+          format: uri
+        previous:
+          type: string
+          format: uri
+    Hops:
+      type: object
+      properties:
+        count:
+          type: integer
+        ares_abilities:
+          type: array
+          items:
+            type: integer
+    PaginatedTraining:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/Training'
     Training:
       type: object
       properties:
@@ -659,6 +748,12 @@ components:
               type: string
             domain_code:
               type: string
+            ares_ability:
+              type: integer
+            ares_graca:
+              type: integer
+            ares_study:
+              type: integer
     GroupDetailed:
       type: object
       properties:
@@ -698,10 +793,15 @@ components:
           type: string
         campus:
           $ref: '#/components/schemas/Campus'
-    ArrayOfMiniTraining:
-      type: array
-      items:
-        $ref: '#/components/schemas/MiniTraining'
+    PaginatedMiniTraining:
+      allOf:
+        - $ref: '#/components/schemas/Pagination'
+        - type: object
+          properties:
+            results:
+              type: array
+              items:
+                $ref: '#/components/schemas/MiniTraining'
     MiniTraining:
       type: object
       properties:
@@ -771,6 +871,16 @@ components:
         subtype:
           $ref: '#/components/schemas/NodeSubTypeEnum'
         partial_title:
+          type: string
+        min_constraint:
+          type: integer
+          minimum: 1
+        max_constraint:
+          type: integer
+          minimum: 1
+        constraint_type:
+          $ref: '#/components/schemas/ConstraintTypeEnum'
+        remark:
           type: string
         children:
           type: array

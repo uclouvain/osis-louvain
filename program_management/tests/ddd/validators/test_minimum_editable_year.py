@@ -39,7 +39,7 @@ class TestMinimumEditableYearValidator(SimpleTestCase):
     def test_when_root_year_is_lower_than_settings(self):
         year = 2010
         tree = ProgramTreeFactory(root_node__year=year)
-        validator = MinimumEditableYearValidator(tree, NodeGroupYearFactory(), str(tree.root_node.node_id))
+        validator = MinimumEditableYearValidator(tree)
         self.assertFalse(validator.is_valid())
         expected_result = _("Cannot perform action on a education group before %(limit_year)s") % {
             "limit_year": 2019
@@ -50,12 +50,12 @@ class TestMinimumEditableYearValidator(SimpleTestCase):
     def test_when_root_year_is_equal_to_settings(self):
         year = 2019
         tree = ProgramTreeFactory(root_node__year=year)
-        validator = MinimumEditableYearValidator(tree, NodeGroupYearFactory(), str(tree.root_node.node_id))
+        validator = MinimumEditableYearValidator(tree)
         self.assertTrue(validator.is_valid())
 
     @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2019)
     def test_when_root_year_greater_than_settings(self):
         year = 2099
         tree = ProgramTreeFactory(root_node__year=year)
-        validator = MinimumEditableYearValidator(tree, NodeGroupYearFactory(), str(tree.root_node.node_id))
+        validator = MinimumEditableYearValidator(tree)
         self.assertTrue(validator.is_valid())

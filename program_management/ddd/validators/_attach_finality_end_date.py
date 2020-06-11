@@ -52,21 +52,22 @@ class AttachFinalityEndDateValidator(BusinessValidator):
 
     def validate(self):
         if self.node_to_add.is_finality() or self.tree_from_node_to_add.get_all_finalities():
-            inconsistent_nodes = self._get_acronyms_where_end_date_gte_root_end_date()
+            inconsistent_nodes = self._get_codes_where_end_date_gte_root_end_date()
             if inconsistent_nodes:
                 self.add_error_message(
                     ngettext(
-                        "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s program.",
-                        "Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s program.",
+                        "Finality \"%(code)s\" has an end date greater than %(root_code)s program.",
+                        "Finalities \"%(code)s\" have an end date greater than %(root_code)s program.",
                         len(inconsistent_nodes)
                     ) % {
-                        "acronym": ', '.join(inconsistent_nodes),
-                        "root_acronym": self.tree_2m.root_node.acronym
+                        "code": ', '.join(inconsistent_nodes),
+                        "root_code": self.tree_2m.root_node.code
                     }
                 )
 
-    def _get_acronyms_where_end_date_gte_root_end_date(self):
+    def _get_codes_where_end_date_gte_root_end_date(self):
+        root_end_date = self.tree_2m.root_node.end_date
         return [
-            finality.acronym for finality in self.tree_from_node_to_add.get_all_finalities()
-            if finality.end_date > self.tree_2m.root_node.end_date
+            finality.code for finality in self.tree_from_node_to_add.get_all_finalities()
+            if all([finality.end_date, root_end_date]) and finality.end_date > root_end_date
         ]

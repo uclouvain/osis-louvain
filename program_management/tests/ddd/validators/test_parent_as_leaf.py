@@ -27,7 +27,6 @@
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
-from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.validators._parent_as_leaf import ParentIsNotLeafValidator
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
@@ -42,32 +41,30 @@ class TestParentIsNotLeafValidator(SimpleTestCase):
         self.child = link.child
 
     def test_when_trying_to_add_node_to_leaf(self):
-        position_to_add = build_path(self.tree_with_child.root_node, self.child)
         validator = ParentIsNotLeafValidator(
-            self.tree_with_child,
-            NodeGroupYearFactory(),
-            position_to_add
+            self.child,
+            NodeGroupYearFactory()
         )
         self.assertFalse(validator.is_valid())
-        expected_result = _("Cannot add any element to learning unit")
+        expected_result = _("Cannot add any element to learning unit %(parent_node)s") % {
+            "parent_node": self.child
+        }
         self.assertEqual(expected_result, validator.error_messages[0])
 
     def test_when_trying_to_add_leaf_to_leaf(self):
-        position_to_add = build_path(self.tree_with_child.root_node, self.child)
         validator = ParentIsNotLeafValidator(
-            self.tree_with_child,
-            NodeLearningUnitYearFactory(),
-            position_to_add
+            self.child,
+            NodeLearningUnitYearFactory()
         )
         self.assertFalse(validator.is_valid())
-        expected_result = _("Cannot add any element to learning unit")
+        expected_result = _("Cannot add any element to learning unit %(parent_node)s") % {
+            "parent_node": self.child
+        }
         self.assertEqual(expected_result, validator.error_messages[0])
 
     def test_when_trying_to_add_leaf_to_group(self):
-        position_to_add = build_path(self.tree_with_child.root_node)
         validator = ParentIsNotLeafValidator(
-            self.tree_with_child,
-            NodeLearningUnitYearFactory(),
-            position_to_add
+            self.tree_with_child.root_node,
+            NodeLearningUnitYearFactory()
         )
         self.assertTrue(validator.is_valid())

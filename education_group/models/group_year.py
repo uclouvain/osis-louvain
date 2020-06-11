@@ -29,7 +29,10 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.models.campus import Campus
 from base.models.entity import Entity
+from base.models.enums import active_status
+from base.models.enums.education_group_types import GroupType
 from education_group.models.enums.constraint_type import ConstraintTypes
 from osis_common.models.osis_model_admin import OsisModelAdmin
 
@@ -38,6 +41,13 @@ class GroupYearManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().select_related(
             'group'
+        )
+
+
+class GroupYearVersionManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(educationgroupversion__isnull=False).select_related(
+            'group', 'educationgroupversion'
         )
 
 
@@ -134,7 +144,24 @@ class GroupYear(models.Model):
         on_delete=models.PROTECT
     )
 
+    main_teaching_campus = models.ForeignKey(
+        Campus,
+        blank=True,
+        null=True,
+        related_name='teaching_campus',
+        verbose_name=_("Learning location"),
+        on_delete=models.PROTECT
+    )
+
+    active = models.CharField(
+        max_length=20,
+        choices=active_status.ACTIVE_STATUS_LIST,
+        default=active_status.ACTIVE,
+        verbose_name=_('Status')
+    )
+
     objects = GroupYearManager()
+    objects_version = GroupYearVersionManager()
 
     def __str__(self):
         return "{} ({})".format(self.acronym,
@@ -151,3 +178,7 @@ class GroupYear(models.Model):
             )
 
         super().save(*args, **kwargs)
+
+    @property
+    def is_minor_major_option_list_choice(self):
+        return self.education_group_type.name in GroupType.minor_major_option_list_choice()

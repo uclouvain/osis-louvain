@@ -24,9 +24,14 @@
 #
 ##############################################################################
 from enum import Enum
+from typing import List
 
 
 class ChoiceEnum(Enum):
+    @classmethod
+    def all(cls):
+        return list(cls)
+
     @classmethod
     def choices(cls):
         return tuple((x.name, x.value) for x in cls)
@@ -38,6 +43,10 @@ class ChoiceEnum(Enum):
     @classmethod
     def get_names(cls):
         return [x.name for x in cls]
+
+    @classmethod
+    def get_values(cls):
+        return [x.value for x in cls]
 
 
 def get_verbose_field_value(instance, key):

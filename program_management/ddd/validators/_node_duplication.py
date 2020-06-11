@@ -29,17 +29,15 @@ from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.business_types import *
 
 
-#  Implemented from _check_new_attach_is_not_duplication
 class NodeDuplicationValidator(BusinessValidator):
 
-    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: str):
+    def __init__(self, parent_node: 'Node', node_to_add: 'Node'):
         super(NodeDuplicationValidator, self).__init__()
-        self.tree = tree
         self.node_to_add = node_to_add
-        self.path = path
+        self.parent_node = parent_node
 
     def validate(self):
-        if self.node_to_add in self.tree.get_node(self.path).children_as_nodes:
+        if self.node_to_add in self.parent_node.children_as_nodes:
             self.add_error_message(
-                _("You can not add the same child several times.")
+                _("You can not add the same child %(child_node)s several times.") % {"child_node": self.node_to_add}
             )

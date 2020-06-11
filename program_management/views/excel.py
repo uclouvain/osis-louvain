@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
 
 from base.models.education_group_year import EducationGroupYear
+from osis_common.decorators.download import set_download_cookie
 from osis_common.document.xls_build import CONTENT_TYPE_XLS
 from program_management.business.excel import EducationGroupYearLearningUnitsPrerequisitesToExcel, \
     EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel
@@ -37,7 +38,8 @@ from program_management.forms.custom_xls import CustomXlsForm
 
 
 @login_required
-@permission_required('base.can_access_education_group', raise_exception=True)
+@permission_required('base.view_educationgroup', raise_exception=True)
+@set_download_cookie
 def get_learning_unit_prerequisites_excel(request, education_group_year_pk):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_pk)
     excel = EducationGroupYearLearningUnitsPrerequisitesToExcel(education_group_year).to_excel()
@@ -53,7 +55,8 @@ def get_learning_unit_prerequisites_excel(request, education_group_year_pk):
 
 
 @login_required
-@permission_required('base.can_access_education_group', raise_exception=True)
+@permission_required('base.view_educationgroup', raise_exception=True)
+@set_download_cookie
 def get_learning_units_is_prerequisite_for_excel(request, education_group_year_pk):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_pk)
     excel = EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel(education_group_year).to_excel()
@@ -69,18 +72,17 @@ def get_learning_units_is_prerequisite_for_excel(request, education_group_year_p
 
 
 @login_required
-@permission_required('base.can_access_education_group', raise_exception=True)
-def get_learning_units_of_training_for_excel(request, root_id, education_group_year_pk):
-    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_pk)
-    root = get_object_or_404(EducationGroupYear, pk=root_id)
-    custom_xls_form = CustomXlsForm(
-        request.POST or None)
-    excel = EducationGroupYearLearningUnitsContainedToExcel(root, education_group_year, custom_xls_form).to_excel()
-    response = HttpResponse(excel, content_type=CONTENT_TYPE_XLS)
+@permission_required('base.view_educationgroup', raise_exception=True)
+@set_download_cookie
+def get_learning_units_of_training_for_excel(request, year, code):
+    excel = EducationGroupYearLearningUnitsContainedToExcel(CustomXlsForm(request.POST or None),
+                                                            year,
+                                                            code).to_excel()
+    response = HttpResponse(excel['workbook'], content_type=CONTENT_TYPE_XLS)
     filename = "{workbook_name}.xlsx".format(
         workbook_name=str(_("LearningUnitList-%(year)s-%(acronym)s") % {
-            "year": education_group_year.academic_year.year,
-            "acronym": education_group_year.acronym
+            "year": excel['year'],
+            "acronym": excel['title']
         })
     )
     response['Content-Disposition'] = "%s%s" % ("attachment; filename=", filename)

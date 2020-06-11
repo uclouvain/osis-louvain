@@ -30,6 +30,7 @@ from django.core.exceptions import ValidationError
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _, ngettext
 
+import program_management.ddd.repositories.find_roots
 from base.models import group_element_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
@@ -91,11 +92,9 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
 
     @cached_property
     def _parents(self):
-        return group_element_year.find_learning_unit_roots(
+        return program_management.ddd.repositories.find_roots.find_roots(
             [self.parent],
-            return_result_params={
-                'parents_as_instances': True
-            }
+            as_instances=True
         )[self.parent.pk] + [self.parent]
 
     @cached_property
@@ -108,6 +107,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
             options_to_detach += [self.education_group_year]
         return options_to_detach
 
+    # FIXME :: DEPRECATED :: use HasPrerequisiteValidator or IsPrerequisiteValidator instead
     def _check_detach_prerequisite_rules(self):
         for formation in self._parents:
             luys_inside_formation = Counter(EducationGroupHierarchy(root=formation).get_learning_unit_year_list())
@@ -150,6 +150,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
                 }
             )
 
+    # FiXME :: DEPRECATED :: Use DetachOptionValidator instead
     def _check_detach_options_rules(self):
         """
         In context of 2M when we detach an option [or group which contains option], we must ensure that
@@ -189,6 +190,7 @@ class DetachEducationGroupYearStrategy(DetachStrategy):
                     )
 
 
+# FiXME :: DEPRECATED :: Use IsPrerequisiteValidator instead
 class DetachLearningUnitYearStrategy(DetachStrategy):
     def __init__(self, link: GroupElementYear):
         self.parent = link.parent

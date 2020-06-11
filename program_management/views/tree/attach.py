@@ -23,99 +23,260 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List
+from typing import List, Tuple
 
+from django import shortcuts
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.db import transaction
-from django.forms import formset_factory
+from django.contrib.messages.views import SuccessMessageMixin
+from django.core.exceptions import PermissionDenied
+from django.forms import formset_factory, modelformset_factory
+from django.http import JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django.views.generic.base import TemplateView
+from django.views.generic import RedirectView, CreateView, FormView, TemplateView
 
 from base.ddd.utils.validation_message import BusinessValidationMessage
 from base.models.education_group_year import EducationGroupYear
+from base.models.group_element_year import GroupElementYear
+from base.models.learning_unit_year import LearningUnitYear
 from base.utils.cache import ElementCache
-from base.views.common import display_warning_messages, display_business_messages
+from base.views.common import display_warning_messages, display_error_messages
+from base.views.education_groups import perms
 from base.views.mixins import AjaxTemplateMixin
+from osis_role.contrib.views import AjaxPermissionRequiredMixin
+from osis_role.errors import get_permission_error
 from program_management.business.group_element_years import management
-from program_management.ddd.service import attach_node_service
-from program_management.forms.tree.attach import AttachNodeForm, AttachNodeFormSet
+from program_management.business.group_element_years.detach import DetachEducationGroupYearStrategy, \
+    DetachLearningUnitYearStrategy
+from program_management.business.group_element_years.management import fetch_elements_selected, fetch_source_link
+from program_management.ddd.repositories import load_node
+from program_management.ddd.service import attach_node_service, command
+from program_management.forms.tree.attach import AttachNodeFormSet, GroupElementYearForm, \
+    BaseGroupElementYearFormset, attach_form_factory, AttachToMinorMajorListChoiceForm
 from program_management.models.enums.node_type import NodeType
+from program_management.views.generic import GenericGroupElementYearMixin
 
 
-class AttachMultipleNodesView(LoginRequiredMixin, AjaxTemplateMixin, TemplateView):
+class AttachMultipleNodesView(AjaxPermissionRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, FormView):
     template_name = "tree/attach_inner.html"
+    permission_required = "base.can_attach_node"
+
+    def get_permission_object(self) -> EducationGroupYear:
+        node_to_attach_from_id = int(self.request.GET['path'].split("|")[-1])
+        return shortcuts.get_object_or_404(EducationGroupYear, pk=node_to_attach_from_id)
 
     @cached_property
-    def root_id(self):
-        _root_id, *_ = self.request.GET['to_path'].split('|', 1)
-        return _root_id
+    def nodes_to_attach(self) -> List[Tuple[int, NodeType]]:
+        return management.fetch_nodes_selected(self.request.GET, self.request.user)
 
-    @cached_property
-    def elements_to_attach(self):
-        return management.fetch_elements_selected(self.request.GET, self.request.user)
+    def get_form_class(self):
+        return formset_factory(form=attach_form_factory, formset=AttachNodeFormSet, extra=len(self.nodes_to_attach))
 
-    def get_formset_class(self):
-        return formset_factory(
-            form=AttachNodeForm,
-            formset=AttachNodeFormSet,
-            extra=len(self.elements_to_attach)
-        )
+    def get_form_kwargs(self) -> List[dict]:
+        return [self._get_form_kwargs(node_id, node_type) for node_id, node_type in self.nodes_to_attach]
 
-    def get_formset_kwargs(self):
-        formset_kwargs = []
-        for idx, element in enumerate(self.elements_to_attach):
-            formset_kwargs.append({
-                'node_id': element.pk,
-                'node_type': NodeType.EDUCATION_GROUP.name if isinstance(element, EducationGroupYear) else
-                NodeType.LEARNING_UNIT.name,
-                'to_path': self.request.GET['to_path']
-            })
-        return formset_kwargs
+    def _get_form_kwargs(
+            self,
+            node_id: int,
+            node_type: NodeType
+    ) -> dict:
+        return {
+            'node_to_attach_type': node_type,
+            'node_to_attach_id': node_id,
+            'path_of_node_to_attach_from': self.request.GET['path'],
+        }
+
+    def get_form(self, form_class=None):
+        if form_class is None:
+            form_class = self.get_form_class()
+        return form_class(form_kwargs=self.get_form_kwargs(), data=self.request.POST or None)
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        if self.elements_to_attach:
-            context_data['formset'] = kwargs.pop('formset', None) or self.get_formset_class()(
-                form_kwargs=self.get_formset_kwargs()
-            )
-        else:
+        context_data["formset"] = context_data["form"]
+        context_data["is_parent_a_minor_major_list_choice"] = self._is_parent_a_minor_major_list_choice(
+            context_data["formset"]
+        )
+        context_data["nodes_by_id"] = {node_id: load_node.load_by_type(node_type, node_id)
+                                       for node_id, node_type in self.nodes_to_attach}
+        if not self.nodes_to_attach:
             display_warning_messages(self.request, _("Please cut or copy an item before attach it"))
         return context_data
 
-    def post(self, request, *args, **kwargs):
-        formset = self.get_formset_class()(self.request.POST or None, form_kwargs=self.get_formset_kwargs())
-        if formset.is_valid():
-            return self.form_valid(formset)
-        else:
+    def form_valid(self, formset: AttachNodeFormSet):
+        messages = formset.save()
+        if BusinessValidationMessage.contains_errors(messages):
             return self.form_invalid(formset)
+        ElementCache(self.request.user).clear()
 
-    def form_valid(self, formset):
-        messages = self.__execute_attach_node(formset)
-        self.__clear_cache(messages)
-        display_business_messages(self.request, messages)
-        return redirect(
-            reverse('education_group_read', args=[self.root_id, self.root_id])
+        return super().form_valid(formset)
+
+    def _is_parent_a_minor_major_list_choice(self, formset):
+        return any(isinstance(form, AttachToMinorMajorListChoiceForm) for form in formset)
+
+    def get_success_message(self, cleaned_data):
+        return _("The content has been updated.")
+
+    def get_success_url(self):
+        return
+
+
+class AttachCheckView(LoginRequiredMixin, AjaxTemplateMixin, SuccessMessageMixin, TemplateView):
+    template_name = "tree/check_attach_inner.html"
+
+    def get(self, request, *args, **kwargs):
+        nodes_to_attach = management.fetch_nodes_selected(self.request.GET, self.request.user)
+        check_command = command.CheckAttachNodeCommand(
+            root_id=self.kwargs["root_id"],
+            path_where_to_attach=self.request.GET["path"],
+            nodes_to_attach=nodes_to_attach
+        )
+        error_messages = attach_node_service.check_attach(check_command)
+
+        if "application/json" in self.request.headers.get("Accept", ""):
+            return JsonResponse({"error_messages": [str(msg) for msg in error_messages]})
+
+        if not error_messages:
+            return redirect(
+                reverse("tree_attach_node", args=[self.kwargs["root_id"]]) + "?{}".format(self.request.GET.urlencode())
+            )
+
+        display_error_messages(self.request, error_messages)
+        return super().get(request, *args, **kwargs)
+
+
+class PasteElementFromCacheToSelectedTreeNode(GenericGroupElementYearMixin, RedirectView):
+
+    permanent = False
+    query_string = True
+
+    def get_redirect_url(self, *args, **kwargs):
+        self.pattern_name = 'group_element_year_create'
+        redirect_url = reverse("check_education_group_attach", args=[self.kwargs["root_id"]])
+        redirect_url = "{}?{}".format(redirect_url, self.request.GET.urlencode())
+
+        if not self.request.user.has_perm(self.permission_required, obj=self.education_group_year):
+            display_warning_messages(self.request, get_permission_error(self.request.user, self.permission_required))
+
+        cached_data = ElementCache(self.request.user).cached_data
+
+        if cached_data:
+
+            action_from_cache = cached_data.get('action')
+
+            if action_from_cache == ElementCache.ElementCacheAction.CUT.value:
+                kwargs['group_element_year_id'] = fetch_source_link(self.request.GET, self.request.user).id
+                self.pattern_name = 'group_element_year_move'
+            else:
+                return redirect_url
+        return super().get_redirect_url(*args, **kwargs)
+
+    def get_permission_object(self):
+        return self.education_group_year
+
+
+class CreateGroupElementYearView(GenericGroupElementYearMixin, CreateView):
+    template_name = "group_element_year/group_element_year_comment_inner.html"
+
+    def get_form_class(self):
+        elements_to_attach = fetch_elements_selected(self.request.GET, self.request.user)
+        if not elements_to_attach:
+            display_warning_messages(self.request, _("Please cut or copy an item before attach it"))
+
+        return modelformset_factory(
+            model=GroupElementYear,
+            form=GroupElementYearForm,
+            formset=BaseGroupElementYearFormset,
+            extra=len(elements_to_attach),
         )
 
-    @transaction.atomic
-    def __execute_attach_node(self, formset) -> List['BusinessValidationMessage']:
-        messages = []
-        for form in formset:
-            messages += attach_node_service.attach_node(
-                self.root_id,
-                form.node_id,
-                form.node_type,
-                form.to_path,
-                **form.cleaned_data
-            )
-        return messages
+    def get_form_kwargs(self):
+        """ For the creation, the group_element_year needs a parent and a child """
+        kwargs = super().get_form_kwargs()
 
-    def __clear_cache(self, messages):
-        if not BusinessValidationMessage.contains_errors(messages):
-            ElementCache(self.request.user).clear()
+        # Formset don't use instance parameter
+        if "instance" in kwargs:
+            del kwargs["instance"]
+        kwargs_form_kwargs = []
 
-    def form_invalid(self, formset):
-        return self.render_to_response(self.get_context_data(formset=formset))
+        children = fetch_elements_selected(self.request.GET, self.request.user)
+
+        messages = _check_attach(self.education_group_year, children)
+        if messages:
+            display_error_messages(self.request, messages)
+
+        for child in children:
+            kwargs_form_kwargs.append({
+                'parent': self.education_group_year,
+                'child_branch': child if isinstance(child, EducationGroupYear) else None,
+                'child_leaf': child if isinstance(child, LearningUnitYear) else None,
+                'empty_permitted': False
+            })
+
+        kwargs["form_kwargs"] = kwargs_form_kwargs
+        kwargs["queryset"] = GroupElementYear.objects.none()
+        return kwargs
+
+    def form_valid(self, form):
+        ElementCache(self.request.user).clear()
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['formset'] = context["form"]
+        if len(context["formset"]) > 0:
+            context['is_education_group_year_formset'] = bool(context["formset"][0].instance.child_branch)
+        context["education_group_year"] = self.education_group_year
+        return context
+
+    def get_success_message(self, cleaned_data):
+        return _("The content of %(acronym)s has been updated.") % {"acronym": self.education_group_year.verbose}
+
+    def get_success_url(self):
+        """ We'll reload the page """
+        return
+
+    def get_permission_object(self):
+        return self.education_group_year
+
+
+class MoveGroupElementYearView(CreateGroupElementYearView):
+    template_name = "group_element_year/group_element_year_comment_inner.html"
+
+    @cached_property
+    def detach_strategy(self):
+        obj = self.get_object()
+        strategy_class = DetachEducationGroupYearStrategy if obj.child_branch else DetachLearningUnitYearStrategy
+        return strategy_class(obj)
+
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+
+        try:
+            perms.can_change_education_group(self.request.user, self.get_object().parent)
+        except PermissionDenied as e:
+            msg = "{}: {}".format(str(self.get_object().parent), str(e))
+            display_warning_messages(self.request, msg)
+
+        if not self.detach_strategy.is_valid():
+            display_error_messages(self.request, self.detach_strategy.errors)
+
+        return kwargs
+
+    def form_valid(self, form):
+        self.detach_strategy.post_valid()
+        obj = self.get_object()
+        obj.delete()
+        return super().form_valid(form)
+
+
+def _check_attach(parent: EducationGroupYear, elements_to_attach):
+    children_types = NodeType.LEARNING_UNIT \
+        if elements_to_attach and isinstance(elements_to_attach[0], LearningUnitYear) else NodeType.EDUCATION_GROUP
+    return attach_node_service.check_attach_via_parent(
+        parent.pk,
+        [element.pk for element in elements_to_attach],
+        children_types
+    )

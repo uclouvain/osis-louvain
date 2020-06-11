@@ -24,51 +24,21 @@
 #
 ##############################################################################
 from django import template
-from django.core.exceptions import PermissionDenied
 
 from base.templatetags.common import ICONS
-from program_management.business.group_element_years.perms import is_eligible_to_update_group_element_year_content
+from osis_role.errors import get_permission_error
 
 register = template.Library()
 
 
-def _get_permission(context, permission):
-    permission_denied_message = ""
-    group_element_year = context.get('group')
-    person = context.get('person')
-    root = context.get("root") or context.get("parent")
-
-    try:
-        result = permission(person, group_element_year, raise_exception=True)
-
-    except PermissionDenied as e:
-        result = False
-        permission_denied_message = str(e)
-
-    return permission_denied_message, "" if result else "disabled", root
-
-
-@register.inclusion_tag("blocks/button/action_template.html", takes_context=True)
-def action_with_permission(context, title, value, url):
-    disabled, permission_denied_message = get_action_with_permission(context)
-
-    load_modal = True
-
-    if disabled:
-        title = permission_denied_message
-        load_modal = False
+@register.inclusion_tag("blocks/button/action_template.html")
+def action_with_permission(person, group, title, value, perm, url):
+    has_perm = person.user.has_perm(perm, group.parent)
 
     return {
-        'load_modal': load_modal,
-        'title': title,
-        'disabled': disabled,
+        'load_modal': has_perm,
+        'title': title if has_perm else get_permission_error(person.user, perm),
+        'disabled': '' if has_perm else 'disabled',
         'icon': ICONS[value],
         'url': url,
     }
-
-
-def get_action_with_permission(context):
-    permission_denied_message, disabled, root = _get_permission(
-        context, is_eligible_to_update_group_element_year_content
-    )
-    return disabled, permission_denied_message

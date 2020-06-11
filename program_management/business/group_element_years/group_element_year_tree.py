@@ -38,13 +38,14 @@ from base.models.enums.education_group_types import MiniTrainingType, GroupType,
 from base.models.enums.entity_type import SECTOR, FACULTY, SCHOOL, DOCTORAL_COMMISSION
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
-from base.models.group_element_year import GroupElementYear, fetch_all_group_elements_in_tree
+from base.models.group_element_year import GroupElementYear, fetch_row_sql
 from base.models.prerequisite_item import PrerequisiteItem
 from base.models.proposal_learning_unit import ProposalLearningUnit
 from program_management.business.group_element_years import attach
 from program_management.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 
 
+# TODO: Remove this class because will not be used any more !
 class EducationGroupHierarchy:
     """ Use to generate json from a list of education group years compatible with jstree """
     element_type = EDUCATION_GROUP_YEAR
@@ -176,51 +177,6 @@ class EducationGroupHierarchy:
                               'child_leaf__learningcomponentyear_set')\
             .order_by("order", "parent__partial_acronym")
 
-    def to_json(self):
-        return {
-            'id': self.path,
-            'text': self._get_acronym(),
-            'icon': self.icon,
-            'children': [child.to_json() for child in self.children],
-            'a_attr': {
-                'href': self.get_url(),
-                'root': self.root.pk,
-                'group_element_year': self.group_element_year and self.group_element_year.pk,
-                'element_id': self.education_group_year.pk,
-                'element_type': self.element_type,
-                'title': self.education_group_year.acronym,
-                'attach_url': reverse('education_group_attach', args=[self.root.pk, self.education_group_year.pk]),
-                'detach_url': reverse('group_element_year_delete', args=[
-                    self.root.pk, self.education_group_year.pk, self.group_element_year.pk
-                ]) if self.group_element_year else '#',
-                'modify_url': reverse('group_element_year_update', args=[
-                    self.root.pk, self.education_group_year.pk, self.group_element_year.pk
-                ]) if self.group_element_year else '#',
-                'attach_disabled': not self.attach_perm.is_permitted(),
-                'attach_msg': escape(self.attach_perm.errors[0]) if self.attach_perm.errors else "",
-                'detach_disabled': not self.detach_perm.is_permitted(),
-                'detach_msg': escape(self.detach_perm.errors[0]) if self.detach_perm.errors else "",
-                'modification_disabled': not self.modification_perm.is_permitted(),
-                'modification_msg': escape(self.modification_perm.errors[0]) if self.modification_perm.errors else "",
-                'search_url': self._get_search_url(),
-            },
-        }
-
-    def _get_search_url(self):
-        if attach.can_attach_learning_units(self.education_group_year):
-            return reverse('quick_search_learning_unit', args=[self.root.pk, self.education_group_year.pk])
-        return reverse('quick_search_education_group', args=[self.root.pk, self.education_group_year.pk])
-
-    def _get_acronym(self):
-        acronym = ''
-        if switch_is_active('egy_show_borrowed_classes') and self.is_borrowed():
-            acronym += '|E'
-        if acronym != '':
-            acronym += '| {}'.format(self.education_group_year.verbose)
-        else:
-            acronym = self.education_group_year.verbose
-        return acronym
-
     def to_list(self, flat=False, pruning_function=None):
         """ Generate list of group_element_year without reference link
         @:param flat: return a flat list
@@ -302,40 +258,6 @@ class EducationGroupHierarchy:
     def get_learning_unit_year_list(self):
         return [element.child_leaf for element in self.to_list(flat=True) if element.child_leaf]
 
-    def is_borrowed(self) -> bool:
-        try:
-            if isinstance(self, NodeLeafJsTree):
-                if getattr(self.learning_unit_year, 'externallearningunityear', None) and \
-                        self.learning_unit_year.externallearningunityear.mobility:
-                    return False
-                to_compare = self.learning_unit_year.requirement_entity.most_recent_acronym
-            else:
-                to_compare = self.education_group_year.management_entity.most_recent_acronym
-            case = {SCHOOL: FACULTY, DOCTORAL_COMMISSION: FACULTY}
-            entity = case.get(self.cache_entity_parent_root.entity_type, self.cache_entity_parent_root.entity_type)
-            root = get_entity_version_parent_or_itself_from_type(
-                self.cache_structure,
-                self.cache_entity_parent_root.acronym,
-                entity)
-            if not root:
-                root = get_entity_version_parent_or_itself_from_type(
-                    self.cache_structure,
-                    self.cache_entity_parent_root.acronym,
-                    SECTOR)
-            else:
-                root = self.cache_entity_parent_root
-            root_entities = get_structure_of_entity_version(self.cache_structure, root.acronym)
-            list_entities_from_root = [e for e in root_entities.get('all_children')]
-            list_entities_from_root.append(root_entities.get('entity_version'))
-            entities = get_structure_of_entity_version(self.cache_structure, to_compare)
-            list_entities_children_from_self = [e for e in entities.get('all_children', [])]
-            list_entities_children_from_self.append(entities.get('entity_version'))
-            if entities.get('entity_version') and entities.get('entity_version').entity_type != root.entity_type:
-                list_entities_children_from_self.append(entities.get('entity_version_parent'))
-            return set(list_entities_from_root) & set(list_entities_children_from_self) == set()
-        except AttributeError:
-            return False
-
     def _check_max_block(self, group_element_year_block):
         if group_element_year_block:
             block = str(group_element_year_block)[-1:]
@@ -374,102 +296,6 @@ class NodeLeafJsTree(EducationGroupHierarchy):
 
     @property
     def education_group_year(self):
-        return
-
-    def to_json(self):
-        return {
-            'id': self.path,
-            'text': self._get_acronym(),
-            'icon': self.icon,
-            'a_attr': {
-                'href': self.get_url(),
-                'root': self.root.pk,
-                'group_element_year': self.group_element_year and self.group_element_year.pk,
-                'element_id': self.learning_unit_year.pk,
-                'element_type': self.element_type,
-                'title': self._get_tooltip_text(),
-                'has_prerequisite': self.group_element_year.has_prerequisite,
-                'is_prerequisite': self.group_element_year.is_prerequisite,
-                'detach_url': reverse('group_element_year_delete', args=[
-                    self.root.pk, self.group_element_year.parent.pk, self.group_element_year.pk
-                ]) if self.group_element_year else '#',
-                'modify_url': reverse('group_element_year_update', args=[
-                    self.root.pk, self.learning_unit_year.pk, self.group_element_year.pk
-                ]) if self.group_element_year else '#',
-                'attach_disabled': not self.attach_perm.is_permitted(),
-                'attach_msg': escape(self.attach_perm.errors[0]) if self.attach_perm.errors else "",
-                'detach_disabled': not self.detach_perm.is_permitted(),
-                'detach_msg': escape(self.detach_perm.errors[0]) if self.detach_perm.errors else "",
-                'modification_disabled': not self.modification_perm.is_permitted(),
-                'modification_msg': escape(self.modification_perm.errors[0]) if self.modification_perm.errors else "",
-                'class': self._get_class()
-            },
-        }
-
-    def _get_tooltip_text(self):
-        title = self.learning_unit_year.complete_title
-        if self.group_element_year.has_prerequisite and self.group_element_year.is_prerequisite:
-            title = "%s\n%s" % (title, _("The learning unit has prerequisites and is a prerequisite"))
-        elif self.group_element_year.has_prerequisite:
-            title = "%s\n%s" % (title, _("The learning unit has prerequisites"))
-        elif self.group_element_year.is_prerequisite:
-            title = "%s\n%s" % (title, _("The learning unit is a prerequisite"))
-        return title
-
-    def _get_icon(self):
-        if self.group_element_year.has_prerequisite and self.group_element_year.is_prerequisite:
-            return "fa fa-exchange-alt"
-        elif self.group_element_year.has_prerequisite:
-            return "fa fa-arrow-left"
-        elif self.group_element_year.is_prerequisite:
-            return "fa fa-arrow-right"
-        return "far fa-file"
-
-    def _get_acronym(self) -> str:
-        """
-            When the LU year is different than its education group, we have to display the year in the title.
-        """
-        acronym = ''
-        if self.learning_unit_year.academic_year != self.root.academic_year:
-            acronym += '|{}'.format(self.learning_unit_year.academic_year.year)
-        if switch_is_active('luy_show_borrowed_classes') and self.is_borrowed():
-            acronym += '|E'
-        if switch_is_active('luy_show_service_classes') and self.learning_unit_year.is_service(self.cache_structure):
-            acronym += '|S'
-        if acronym != '':
-            acronym += '| {}'.format(self.learning_unit_year.acronym)
-        else:
-            acronym = self.learning_unit_year.acronym
-        return acronym
-
-    def _get_class(self):
-        try:
-            proposal = self.learning_unit_year.proposallearningunit
-        except ProposalLearningUnit.DoesNotExist:
-            proposal = None
-
-        class_by_proposal_type = {
-            ProposalType.CREATION.name: "proposal proposal_creation",
-            ProposalType.MODIFICATION.name: "proposal proposal_modification",
-            ProposalType.TRANSFORMATION.name: "proposal proposal_transformation",
-            ProposalType.TRANSFORMATION_AND_MODIFICATION.name: "proposal proposal_transformation_modification",
-            ProposalType.SUPPRESSION.name: "proposal proposal_suppression"
-        }
-        return class_by_proposal_type[proposal.type] if proposal else ""
-
-    def get_url(self):
-        default_url = reverse('learning_unit_utilization', args=[self.root.pk, self.learning_unit_year.pk])
-        add_to_url = ''
-        urls = {
-            'show_utilization': default_url,
-            'show_prerequisite': reverse('learning_unit_prerequisite', args=[self.root.pk, self.learning_unit_year.pk]),
-            None: default_url
-        }
-
-        return self._construct_url(add_to_url, urls)
-
-    def generate_children(self):
-        """ The leaf does not have children """
         return
 
 
@@ -556,3 +382,25 @@ class ModificationPermission(LinkActionPermission):
             self.errors.append(
                 str(_("Cannot perform modification action on root."))
             )
+
+
+#  DEPRECATED remove this function when EducationGroupHierarchy is removed
+def fetch_all_group_elements_in_tree(root: EducationGroupYear, queryset, exclude_options=False) -> dict:
+    if queryset.model != GroupElementYear:
+        raise AttributeError("The querySet arg has to be built from model {}".format(GroupElementYear))
+
+    elements = fetch_row_sql([root.id])
+
+    distinct_group_elem_ids = {elem['id'] for elem in elements}
+    queryset = queryset.filter(pk__in=distinct_group_elem_ids)
+
+    group_elems_by_parent_id = {}  # Map {<EducationGroupYear.id>: [GroupElementYear, GroupElementYear...]}
+    for group_elem_year in queryset:
+        if exclude_options and group_elem_year.child_branch and \
+                group_elem_year.child_branch.education_group_type.name == GroupType.OPTION_LIST_CHOICE.name:
+            if EducationGroupYear.hierarchy.filter(pk=group_elem_year.child_branch.pk).get_parents(). \
+                        filter(education_group_type__name__in=TrainingType.finality_types()).exists():
+                continue
+        parent_id = group_elem_year.parent_id
+        group_elems_by_parent_id.setdefault(parent_id, []).append(group_elem_year)
+    return group_elems_by_parent_id

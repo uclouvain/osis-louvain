@@ -30,7 +30,7 @@ from base.models import learning_achievement
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.business.learning_units import GenerateContainer
 from base.tests.factories.learning_achievement import LearningAchievementFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, EnglishLanguageFactory, FrenchLanguageFactory
 
 A_CODE_NAME = 'AA 1'
 A2_CODE_NAME = 'AA 2'
@@ -43,8 +43,8 @@ class LearningAchievementTest(TestCase):
         generated_container = GenerateContainer(start_year=current_academic_year, end_year=current_academic_year)
         generated_container_first_year = generated_container.generated_container_years[0]
         cls.luy = generated_container_first_year.learning_unit_year_full
-        cls.language_fr = LanguageFactory(code='FR')
-        cls.language_en = LanguageFactory(code='EN')
+        cls.language_fr = FrenchLanguageFactory()
+        cls.language_en = EnglishLanguageFactory()
 
     def test_unique(self):
         LearningAchievementFactory(consistency_id=1, learning_unit_year=self.luy, language=self.language_fr)

@@ -24,7 +24,7 @@
 #
 ##############################################################################
 
-from django.contrib.auth.models import Permission
+from django.http import HttpResponseForbidden, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -35,27 +35,30 @@ from base.models.education_group import EducationGroup
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
-from base.tests.factories.academic_year import create_current_academic_year
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group import EducationGroupFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
-from base.tests.factories.person import PersonWithPermissionsFactory
-from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.person import PersonFactory
+from base.tests.factories.user import UserFactory
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
 @override_flag('education_group_delete', active=True)
 class TestDeleteGroupEducationView(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.current_ac = create_current_academic_year()
-        cls.academic_calendar = OpenAcademicCalendarFactory(academic_year=cls.current_ac,
-                                                            data_year=cls.current_ac,
-                                                            reference=academic_calendar_type.EDUCATION_GROUP_EDITION)
+        cls.current_ac = AcademicYearFactory(current=True)
+        cls.academic_calendar = OpenAcademicCalendarFactory(
+            academic_year=cls.current_ac,
+            data_year=cls.current_ac,
+            reference=academic_calendar_type.EDUCATION_GROUP_EDITION,
+        )
 
         cls.education_group1 = EducationGroupFactory()
         cls.education_group2 = EducationGroupFactory()
-        cls.person = PersonWithPermissionsFactory("delete_educationgroup")
+        cls.person = PersonFactory()
 
     def setUp(self):
         self.education_group_year1 = EducationGroupYearFactory(
@@ -66,23 +69,24 @@ class TestDeleteGroupEducationView(TestCase):
             education_group=self.education_group2,
             academic_year=self.current_ac,
         )
-        PersonEntityFactory(person=self.person, entity=self.education_group_year1.management_entity)
-        PersonEntityFactory(person=self.person, entity=self.education_group_year2.management_entity)
-
+        CentralManagerFactory(person=self.person, entity=self.education_group_year1.management_entity)
+        CentralManagerFactory(person=self.person, entity=self.education_group_year2.management_entity)
         self.url = reverse('delete_education_group', args=[self.education_group_year1.id,
-                                                           self.education_group_year1.education_group.id])
+                                                           self.education_group_year1.id])
         self.url2 = reverse('delete_education_group', args=[self.education_group_year2.id,
-                                                            self.education_group_year2.education_group.id])
+                                                            self.education_group_year2.id])
         self.client.force_login(user=self.person.user)
 
-    def test_delete_get_permission_denied(self):
-        self.person.user.user_permissions.remove(Permission.objects.get(codename="delete_educationgroup"))
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 403)
+    def test_delete_case_user_without_permission(self):
+        user = UserFactory()
+        self.client.force_login(user)
 
-    def test_delete_get(self):
         response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_delete_get_assert_template(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
         self.assertEqual(response.context["protected_messages"], [])
         self.assertTemplateUsed(response, "education_group/delete.html")
 

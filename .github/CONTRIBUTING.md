@@ -228,3 +228,218 @@ Idéalement lorsqu'on teste une view, on doit vérifier :
 - Les redirections en cas de succès/erreurs
 - Le contenu du contexte utilisé dans le render du template
 - Les éventuels ordres de listes attendus
+
+
+
+### Domain driven design :
+
+#### Conventions générales :
+- Gestion des urls : utiliser des urls contenant clés naturelles et pas des ids de la DB. 
+Dans de rares cas plus complexes (exemple: identification d'une personne : UUID) (Attention aux données privées)
+- Tous les paramètres d'entrée et de sortie doivent être typés
+- Les fonctions qui renvoient une objet, int, str doivent être nommés "get_<sth>"
+- Les fonctions qui renvoient un booléen doivent être nommés de sorte à poser une question fermée 
+(où la réponse ne peut être que "Oui" ou "Non"). Exemples : `is_<sth>`, `has_<sth>`, `contains_<sth>`...
+- Les fonctions qui renvoient une list, set, dict :
+    - get_<nom_pluriel>() -> renvoie tout , sans filtres. Toujours avec un "s". 
+    
+    Exemple: ```def get_nodes() -> List['Node']```
+
+    - Pour les fonctions de recherche : search_<nom_pluriel>()
+    
+    Exemple: ```def search_nodes(*typed_filters) -> List['Node']```
+
+- Nommage des fonctions, fichiers **privés** (uniquement scope de la classe ou du fichier) : __function
+
+    Exemple: ```def __my_private_function(param: str) -> None```
+
+- Nommage des fonctions, fichiers **protégés** (uniquement visible / utilisable dans le package) : _function
+
+    Exemple: ```def _my_protected_function(param: str) -> None```
+
+
+
+> :information_source: **Info : Toutes les interfaces et classes abstraites réutilisables pour le DDD
+> (ValueObject, EntityObject...) sont définies [dans osis_common](https://github.com/uclouvain/osis-common/tree/master/ddd)**
+
+
+
+#### Arborescence des packages
+
+```
+django_app
+ ├─ ddd
+ |   ├─ command.py
+ |   |
+ |   ├─ domain
+ |   |   ├─ <objet_métier>.py  (Aggregate root)
+ |   |   ├─ _entity.py (protected)
+ |   |
+ |   ├─ repository
+ |   |   ├─ <objet_métier>.py
+ |   |   ├─ _<entity>.py  (protected)
+ |   |
+ |   ├─ service (application service)
+ |   |   ├─ read
+ |   |   |   ├─ <action_métier>_service.py
+ |   |   |
+ |   |   ├─ write
+ |   |       ├─ <action_métier>_service.py
+ |   |
+ |   ├─ validators
+ |       ├─ invariant_metier.py
+ |       ├─ invariant_metier_2.py
+ |
+ ├── models
+ |
+ ├── views (gestion des httpRequests)
+ |
+ ├── API
+ |   ├─ views
+```
+
+#### ddd/command.py
+- Regroupe les **objets** qui sont transmis en paramètre d'un service (ddd/service)
+- Représente une simple "dataclass" possédant des attributs primitifs
+- Ces classes sont publiques : elles sont utilisées par les views
+- Doit obligatoirement hériter de l'objet CommandRequest
+- Nommage des classes de commande : <ActionMetier>Command
+
+Exemple : 
+```python
+# command.py
+from osis_common.ddd import interface
+from program_management.ddd.business_types import Path
+
+class DetachNodeCommand(interface.CommandRequest):
+    def __init__(self, path_to_detach: Path):
+        self.path_to_detach = path_to_detach
+
+
+class AttachNodeCommand(interface.CommandRequest):
+    def __init__(self, path_to_node_to_attach: 'Path'):
+        self.path_to_node_to_attach = path_to_node_to_attach
+ 
+```
+
+#### ddd/domain
+- Regroupe les **objets** du domaine métier qui doivent obligatoirement hériter de ValueObject, Entity ou RootEntity
+- Déclare les EntityIdentity (dans le même fichier que la classe du domaine qui utilise cet EntityIdentity)
+- Les ValueObject doivent obligatoirement redéfinir les méthodes `__hash__()` et `__eq__()`
+- Seuls les AggregateRoot (interface.RootEntity) sont publiques ; les `Entity` utilisées par l'aggregat root sont `protected`
+- 1 fichier par objet du domaine métier. Nommage : <objet_métier>.py
+- Nommage des objets : ObjetMetier.
+
+Exemple :
+```python
+# ddd/domain/program_tree.py  -> Aggregate root du domaine "program_management"
+from osis_common.ddd import interface
+
+
+class ProgramTreeIdentity(interface.EntityIdentity):
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
+
+    def __hash__(self):
+        """Doit être implémenté obligatoirement pour les ValueObjects uniquement !"""
+        return hash(self.code + str(self.year))
+    
+    def __eq__(self, other):
+        """Doit être implémenté obligatoirement pour les ValueObjects uniquement !"""
+        return other.code == self.code and other.year == self.year 
+
+
+class ProgramTree(interface.RootEntity):
+    pass
+ 
+```
+```python
+# ddd/domain/_node.py  -> Une Entity "protected" du domaine "program_management"
+from osis_common.ddd import interface
+
+class Node(interface.Entity):
+    pass
+
+```
+
+
+#### ddd/repository
+
+- Regroupe les **objets** qui permettent de faire le lien entre le stockage des données et nos objets du domaine.
+- Chargée de persist / load les données (pour Osis, le stockage est fait une DB PostGres)
+- Utilisation d'une interface commune AbstractRepository
+- Les objets du repository doivent obligatoirement implémenter AbstractRepository
+- Nommage des fichiers : <objet_métier>.py
+- Nommage des objets : <ObjetMetier>Repository. 
+
+Exemple :
+```python
+# ddd/repository/program_tree.py
+from osis_common.ddd import interface
+
+class ProgramTreeRepository(interface.AbstractRepository):
+    """Chargé d'implémenter les fonctions fournies par AbstractRepository."""
+    pass
+ 
+```
+
+#### ddd/service (application service)
+
+- Regroupe les **fonctions** qui implémentent les uses cases des utilisateurs (Given when then)
+- Chargée d'orchestrer les appels vers les couches du DDD (repository, domain...) et de déclencher les événements (exemple : envoi de mail)
+- Les fonctions de service reçoivent en paramètres uniquement des objets CommandRequest ([ddd/command.py](#ddd/command.py))
+- Les services renvoient toujours un EntityIdentity ; c'est la responsabilité des views de gérer les messages de succès ;
+- Attention à séparer les services write et read !
+- Les fonctions de service sont toujours publiques
+- Nommage des fichiers : <action_metier>_service.py
+- Nommage des fonctions : <action_metier>
+
+Exemple:
+```python
+# ddd/service/detach_node_service.py
+from osis_common.ddd import interface
+
+def detach_node(command_request_params: interface.CommandRequest) -> interface.EntityIdentity:
+    # Given
+    # Appel au repository pour charger les données nécessaires
+    
+    # When
+    # Appel à l'action métier sur l'objet du domaine
+    
+    # Then
+    pass
+ 
+```
+
+#### ddd/validator
+
+- Regroupe les invariants métier (règles business)
+- Se charge de raise des BusinessException en cas d'invariant métier non respecté
+- Les messages doivent être traduits (si BusinessException s'en charge, le makemessages ne reprendra pas messages à traduire car ils seront stockés dans des variables...)
+- Doit hériter de BusinessValidator
+- Sont toujours `protected` (accessibles uniquement par le Domain)
+- 1 fichier par invariant métier
+- Nommage des fichiers : <invariant_metier>.py
+- Nommage des objets : <InvariantMetier>Validator
+
+Exemple : 
+```python
+# ddd/validator/_detach_root.py  # protected
+from osis_common.ddd import interface
+from django.utils.translation import gettext as _
+from base.ddd.utils import business_validator
+
+class DetachRootValidator(business_validator.BusinessValidator):
+
+    def __init__(self, tree: 'ProgramTree', path_to_detach: 'Path'):
+        super(DetachRootValidator, self).__init__()
+        self.path_to_detach = path_to_detach
+        self.tree = tree
+
+    def validate(self):
+        if self.tree.is_root(self.tree.get_node(self.path_to_detach)):
+            raise interface.BusinessException(_("Cannot perform detach action on root."))
+
+```
+

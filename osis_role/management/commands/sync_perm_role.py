@@ -33,8 +33,15 @@ class Command(BaseCommand):
     help = 'Synchronize all declared osis-roles with default RBAC (Role Based Access Control - groups table) ' \
            'provided by Django'
 
+    def add_arguments(self, parser):
+        # Optional argument
+        parser.add_argument('-g', '--group', type=str, help='Define group to synchronize', )
+
     def handle(self, *args, **options):
-        for role_mdl in role.role_manager.roles:
+        roles_to_sync = role.role_manager.roles if not options.get('group') else \
+            filter(lambda r: r.group_name == options.get('group'), role.role_manager.roles)
+
+        for role_mdl in roles_to_sync:
             group, _ = Group.objects.get_or_create(name=role_mdl.group_name)
 
             self._add_all_perms_to_role(role_mdl, group)
@@ -42,14 +49,23 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS('Perms-Role {} successfully synchronized'.format(role_mdl.group_name)))
 
     def _add_all_perms_to_role(self, role, group):
-        for perm_codename in role.rule_set().keys():
-            try:
-                perm = Permission.objects.get(codename=perm_codename)
-                group.permissions.add(perm)
-            except Permission.DoesNotExist:
-                warning_msg = 'Permission {} does not exist - defined in {}'.format(perm_codename, role.group_name)
-                self.stdout.write(self.style.WARNING(warning_msg))
+        perm_list = self._get_perm_obj_list(role)
+        group.permissions.add(*perm_list)
 
     def _remove_unused_perms_in_group(self, role, group):
-        permissions_to_remove = group.permissions.exclude(codename__in=role.rule_set().keys())
+        perm_list_ids = [perm.pk for perm in self._get_perm_obj_list(role)]
+        permissions_to_remove = group.permissions.exclude(pk__in=perm_list_ids)
         group.permissions.remove(*permissions_to_remove)
+
+    def _get_perm_obj_list(self, role):
+        perm_list = []
+        for perm_name in role.rule_set().keys():
+            try:
+                app_label, codename = perm_name.split('.')
+                perm_list.append(
+                    Permission.objects.get(content_type__app_label=app_label, codename=codename)
+                )
+            except Permission.DoesNotExist:
+                warning_msg = 'Permission {} does not exist - defined in {}'.format(perm_name, role.group_name)
+                self.stdout.write(self.style.WARNING(warning_msg))
+        return perm_list

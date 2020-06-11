@@ -35,7 +35,6 @@ from program_management.tests.ddd.factories.program_tree import ProgramTreeFacto
 
 class TestAttachFinalityEndDateValidator(SimpleTestCase):
 
-    @classmethod
     def setUp(self):
         self.tree_2m = ProgramTreeFactory(
             root_node__node_type=TrainingType.PGRM_MASTER_120,
@@ -66,12 +65,12 @@ class TestAttachFinalityEndDateValidator(SimpleTestCase):
         )
         self.assertFalse(validator.is_valid())
         expected_msg = ngettext(
-            "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s program.",
-            "Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s program.",
+            "Finality \"%(code)s\" has an end date greater than %(root_code)s program.",
+            "Finalities \"%(code)s\" have an end date greater than %(root_code)s program.",
             1
         ) % {
-            'acronym': self.finality_node_greater_end_date.acronym,
-            'root_acronym': self.tree_2m.root_node.acronym
+            'code': self.finality_node_greater_end_date.code,
+            'root_code': self.tree_2m.root_node.code
         }
         self.assertEqual(expected_msg, validator.error_messages[0])
 
@@ -97,17 +96,17 @@ class TestAttachFinalityEndDateValidator(SimpleTestCase):
         validator = AttachFinalityEndDateValidator(self.tree_2m, ProgramTreeFactory(root_node=node_to_attach))
         self.assertFalse(validator.is_valid())
         expected_msg = ngettext(
-            "Finality \"%(acronym)s\" has an end date greater than %(root_acronym)s program.",
-            "Finalities \"%(acronym)s\" have an end date greater than %(root_acronym)s program.",
+            "Finality \"%(code)s\" has an end date greater than %(root_code)s program.",
+            "Finalities \"%(code)s\" have an end date greater than %(root_code)s program.",
             1
         ) % {
-           'acronym': self.finality_node_greater_end_date.acronym,
-           'root_acronym': self.tree_2m.root_node.acronym
+           'code': self.finality_node_greater_end_date.code,
+           'root_code': self.tree_2m.root_node.code
         }
         self.assertEqual(expected_msg, validator.error_messages[0])
 
     def test_when_node_to_attach_contains_finality_and_end_date_equals(self):
-        node_to_attach = NodeGroupYearFactory()
+        node_to_attach = NodeGroupYearFactory(end_date=self.tree_2m.root_node.end_date)
         finality_node = NodeGroupYearFactory(
             node_type=TrainingType.MASTER_MA_120,
             end_date=self.tree_2m.root_node.end_date
