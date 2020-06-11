@@ -117,11 +117,7 @@ class TestLoadTree(TestCase):
             )
         )
 
-        identity = ProgramTreeIdentity(
-            code=self.root_node.group_year.partial_acronym,
-            year=self.root_node.group_year.academic_year.year
-        )
-        education_group_program_tree = ProgramTreeRepository().get(entity_id=identity)
+        education_group_program_tree = ProgramTreeRepository().get(entity_id=self.identity)
         leaf = education_group_program_tree.root_node.children[0].child.children[0].child
 
         self.assertIsInstance(leaf, node.NodeLearningUnitYear)
@@ -143,11 +139,7 @@ class TestLoadTree(TestCase):
             items__groups=((new_link.child_element.learning_unit_year,),)
         )
 
-        identity = ProgramTreeIdentity(
-            code=self.root_node.group_year.partial_acronym,
-            year=self.root_node.group_year.academic_year.year
-        )
-        education_group_program_tree = ProgramTreeRepository().get(entity_id=identity)
+        education_group_program_tree = ProgramTreeRepository().get(entity_id=self.identity)
         leaf = education_group_program_tree.root_node.children[0].child.children[1].child
 
         self.assertIsInstance(leaf, node.NodeLearningUnitYear)
@@ -166,11 +158,7 @@ class TestLoadTree(TestCase):
                 proposal.type = p_type
                 proposal.save()
 
-                identity = ProgramTreeIdentity(
-                    code=self.root_node.group_year.partial_acronym,
-                    year=self.root_node.group_year.academic_year.year
-                )
-                education_group_program_tree = ProgramTreeRepository().get(entity_id=identity)
+                education_group_program_tree = ProgramTreeRepository().get(entity_id=self.identity)
                 leaf = education_group_program_tree.root_node.children[0].child.children[0].child
                 self.assertTrue(leaf.has_proposal)
                 self.assertEqual(leaf.proposal_type, p_type)
@@ -195,6 +183,10 @@ class TestLoadTreesFromChildren(TestCase):
             parent_element=cls.link_level_1.child_element,
             child_element__group_year__academic_year=cls.academic_year
         )
+        cls.identity = ProgramTreeIdentity(
+            code=cls.root_node.group_year.partial_acronym,
+            year=cls.root_node.group_year.academic_year.year
+        )
 
     def test_when_bad_arg(self):
         with self.assertRaises(Exception):
@@ -212,11 +204,8 @@ class TestLoadTreesFromChildren(TestCase):
     def test_when_child_has_only_one_root_id(self):
         children_ids = [self.link_level_2.child_element_id]
         result = load_tree.load_trees_from_children(children_ids)
-        identity = ProgramTreeIdentity(
-            code=self.root_node.group_year.partial_acronym,
-            year=self.root_node.group_year.academic_year.year
-        )
-        tree = ProgramTreeRepository().get(entity_id=identity)
+
+        tree = ProgramTreeRepository().get(entity_id=self.identity)
         expected_result = [tree]
         self.assertListEqual(result, expected_result)
 
@@ -228,11 +217,7 @@ class TestLoadTreesFromChildren(TestCase):
         children_ids = [link_level_3.child_element_id]
         result = load_tree.load_trees_from_children(children_ids)
 
-        identity = ProgramTreeIdentity(
-            code=self.root_node.group_year.partial_acronym,
-            year=self.root_node.group_year.academic_year.year
-        )
-        tree = ProgramTreeRepository().get(entity_id=identity)
+        tree = ProgramTreeRepository().get(entity_id=self.identity)
         expected_result = [tree]
         self.assertListEqual(result, expected_result)
 
@@ -246,10 +231,7 @@ class TestLoadTreesFromChildren(TestCase):
 
         result = load_tree.load_trees_from_children([child_element.pk])
         repository = ProgramTreeRepository()
-        identity = ProgramTreeIdentity(
-            code=self.root_node.group_year.partial_acronym,
-            year=self.root_node.group_year.academic_year.year
-        )
+
         identity2 = ProgramTreeIdentity(
             code=root_node_2.group_year.partial_acronym,
             year=root_node_2.group_year.academic_year.year
@@ -259,7 +241,7 @@ class TestLoadTreesFromChildren(TestCase):
             year=root_node_3.group_year.academic_year.year
         )
         expected_result = [
-            repository.get(entity_id=identity),
+            repository.get(entity_id=self.identity),
             repository.get(entity_id=identity2),
             repository.get(entity_id=identity3),
         ]
