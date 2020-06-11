@@ -31,6 +31,7 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from education_group.models.group_year import GroupYear
 from osis_common.decorators.deprecated import deprecated
+from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
 from program_management.ddd.domain.link import factory as link_factory
