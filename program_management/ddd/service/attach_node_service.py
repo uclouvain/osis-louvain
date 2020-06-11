@@ -31,6 +31,7 @@ from base.models.enums.link_type import LinkTypes
 from osis_common.decorators.deprecated import deprecated
 from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_tree, persist_tree, load_node
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.service import command
 from program_management.ddd.validators import link as link_validator, _minimum_editable_year, _infinite_recursivity
 from program_management.ddd.validators._attach_finality_end_date import AttachFinalityEndDateValidator
@@ -127,7 +128,6 @@ def __validate_trees_using_node_as_reference_link(
         node_to_attach: 'Node',
         path: 'Path'
 ) -> List['BusinessValidationMessage']:
-
     error_messages = []
     child_node = tree.get_node(path)
     trees = load_tree.load_trees_from_children([child_node.node_id], link_type=LinkTypes.REFERENCE)
