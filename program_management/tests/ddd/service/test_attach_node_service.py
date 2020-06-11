@@ -103,24 +103,27 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.addCleanup(patcher_load.stop)
         self.mock_load_tress_from_children = patcher_load.start()
 
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
     @patch.object(program_tree.ProgramTree, 'attach_node')
-    def test_when_attach_node_action_is_valid(self, mock_attach_node):
+    def test_when_attach_node_action_is_valid(self, mock_attach_node, mock_get):
         validator_message = BusinessValidationMessage('Success message', level=MessageLevel.SUCCESS)
         mock_attach_node.return_value = [validator_message]
         result = attach_node_service.attach_node(self.attach_request)
         self.assertEqual(result[0], validator_message)
         self.assertEqual(len(result), 1)
 
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
     @patch.object(program_tree.ProgramTree, 'attach_node')
-    def test_when_attach_node_action_is_not_valid(self, mock_attach_node):
+    def test_when_attach_node_action_is_not_valid(self, mock_attach_node, mock_get):
         validator_message = BusinessValidationMessage('error message text', level=MessageLevel.ERROR)
         mock_attach_node.return_value = [validator_message]
         result = attach_node_service.attach_node(self.attach_request)
         self.assertEqual(result[0], validator_message)
         self.assertEqual(len(result), 1)
 
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_node_used_as_reference_is_not_valid(self, mock_load):
+    def test_when_node_used_as_reference_is_not_valid(self, mock_load, mock_get):
         link1 = LinkFactory(child=self.root_node, link_type=LinkTypes.REFERENCE)
         link2 = LinkFactory(child=self.root_node, link_type=LinkTypes.REFERENCE)
 
@@ -136,8 +139,9 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.assertEqual(result[0].message, 'error link reference')
         self.assertEqual(result[0].level, MessageLevel.ERROR)
 
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_node_used_as_reference_is_valid(self, mock_load):
+    def test_when_node_used_as_reference_is_valid(self, mock_load, mock_get):
         link1 = LinkFactory(child=self.root_node, link_type=LinkTypes.REFERENCE)
         link2 = LinkFactory(child=self.root_node, link_type=LinkTypes.REFERENCE)
 
@@ -153,14 +157,16 @@ class TestAttachNode(SimpleTestCase, ValidatorPatcherMixin):
         self.assertEqual(result[0].message, _('Success message'))
         self.assertEqual(result[0].level, MessageLevel.SUCCESS)
 
-    def test_when_commit_is_true_then_persist_modification(self):
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
+    def test_when_commit_is_true_then_persist_modification(self, mock_get):
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
         attach_request_with_commit_set_to_true = self.attach_request._replace(commit=True)
         attach_node_service.attach_node(attach_request_with_commit_set_to_true)
         self.assertTrue(self.mock_load_tress_from_children.called)
         self.assertTrue(self.mock_persist.called)
 
-    def test_when_commit_is_false_then_sould_not_persist_modification(self):
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
+    def test_when_commit_is_false_then_sould_not_persist_modification(self, mock_get):
         self.mock_validator(AttachNodeValidatorList, [_('Success message')], level=MessageLevel.SUCCESS)
         attach_node_service.attach_node(self.attach_request)
         self.assertFalse(self.mock_persist.called)
@@ -182,6 +188,7 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
         self.mock_load_tree_to_attach = patcher_load.start()
         self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=self.node_to_attach_not_finality)
 
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
     def test_when_node_to_attach_is_not_finality(self, mock_load_2m_trees):
         """Unit test only for performance"""
@@ -190,6 +197,7 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
         attach_node_service._validate_end_date_and_option_finality(self.node_to_attach_not_finality)
         self.assertFalse(mock_load_2m_trees.called)
 
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
     def test_when_end_date_of_finality_node_to_attach_is_not_valid(self, mock_load_2m_trees):
         mock_load_2m_trees.return_value = [self.tree_2m]
@@ -201,9 +209,11 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
         validator_msg = "Error end date finality message"
         self.assertEqual(result[0].message, validator_msg)
 
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_end_date_of_finality_children_of_node_to_attach_is_not_valid(self, mock_load_2m_trees):
+    def test_when_end_date_of_finality_children_of_node_to_attach_is_not_valid(self, mock_load_2m_trees, mock_get):
         mock_load_2m_trees.return_value = [self.tree_2m]
+        mock_get.return_value = self.tree_2m
         not_finality = NodeGroupYearFactory(node_type=TrainingType.AGGREGATION)
         finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
         not_finality.add_child(finality)
@@ -214,9 +224,11 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
         validator_msg = "Error end date finality message"
         self.assertEqual(result[0].message, validator_msg)
 
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_end_date_of_finality_node_to_attach_is_valid(self, mock_load_2m_trees):
+    def test_when_end_date_of_finality_node_to_attach_is_valid(self, mock_load_2m_trees, mock_get):
         mock_load_2m_trees.return_value = [self.tree_2m]
+        mock_get.return_value = self.tree_2m
         finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
         self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=finality)
         self.mock_validator(AttachFinalityEndDateValidator, [_('Success')], level=MessageLevel.SUCCESS)
@@ -224,9 +236,11 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
         result = attach_node_service._validate_end_date_and_option_finality(finality)
         self.assertEqual([], result)
 
+    @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_option_validator_not_valid(self, mock_load_2m_trees):
+    def test_when_option_validator_not_valid(self, mock_load_2m_trees, mock_get):
         mock_load_2m_trees.return_value = [self.tree_2m]
+        mock_get.return_value = self.tree_2m
         node_to_attach = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
         self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
         self.mock_validator(AttachOptionsValidator, [_('Error attach option message')])
