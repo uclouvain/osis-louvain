@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Tuple
+from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
@@ -141,7 +141,7 @@ def __validate_trees_using_node_as_reference_link(
 
 def _validate_end_date_and_option_finality(node_to_attach: 'Node') -> List['BusinessValidationMessage']:
     error_messages = []
-    tree_from_node_to_attach = load_tree.load(node_to_attach.node_id)
+    tree_from_node_to_attach = ProgramTreeRepository().get(entity_id=node_to_attach.entity_id)
     finality_ids = [n.node_id for n in tree_from_node_to_attach.get_all_finalities()]
     if node_to_attach.is_finality() or finality_ids:
         trees_2m = [

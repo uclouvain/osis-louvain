@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import mock
 from django.test import TestCase
+from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import prerequisite_operator
 from base.models.enums.link_type import LinkTypes
@@ -36,11 +36,12 @@ from base.tests.factories.prerequisite import PrerequisiteFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from program_management.ddd.domain import prerequisite
 from program_management.ddd.domain import program_tree, node
-from program_management.ddd.domain.program_tree_version import ProgramTreeVersionNotFoundException, ProgramTreeVersion
-from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionNotFoundException
 from program_management.ddd.repositories import load_tree
-from django.utils.translation import gettext_lazy as _
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
 VERSION_NAME = 'CEMS'
 EDY_ACRONYM = 'CHIM1BA'
@@ -64,17 +65,28 @@ class TestLoadTree(TestCase):
         )
 
     def test_case_tree_root_not_exist(self):
-        unknown_tree_root_id = -1
+        unknown_identity = ProgramTreeIdentity(
+            code='blabla',
+            year=2042
+        )
         with self.assertRaises(node.NodeNotFoundException):
-            load_tree.load(unknown_tree_root_id)
+            ProgramTreeRepository().get(entity_id=unknown_identity)
 
     def test_fields_to_load(self):
         group_year = self.root_node.group_year
-        tree = load_tree.load(self.root_node.pk)
+        identity = ProgramTreeIdentity(
+            code=self.root_node.code,
+            year=self.root_node.year
+        )
+        tree = ProgramTreeRepository().get(entity_id=identity)
         self.assertEqual(tree.root_node.credits, group_year.credits, "Field used to load prerequisites excel")
 
     def test_case_tree_root_with_multiple_level(self):
-        education_group_program_tree = load_tree.load(self.root_node.pk)
+        identity = ProgramTreeIdentity(
+            code=self.root_node.code,
+            year=self.root_node.year
+        )
+        education_group_program_tree = ProgramTreeRepository().get(entity_id=identity)
         self.assertIsInstance(education_group_program_tree, program_tree.ProgramTree)
 
         self.assertIsInstance(education_group_program_tree.root_node, node.NodeGroupYear)
@@ -109,7 +121,11 @@ class TestLoadTree(TestCase):
             )
         )
 
-        education_group_program_tree = load_tree.load(self.root_node.pk)
+        identity = ProgramTreeIdentity(
+            code=self.root_node.code,
+            year=self.root_node.year
+        )
+        education_group_program_tree = ProgramTreeRepository().get(entity_id=identity)
         leaf = education_group_program_tree.root_node.children[0].child.children[0].child
 
         self.assertIsInstance(leaf, node.NodeLearningUnitYear)
@@ -131,7 +147,11 @@ class TestLoadTree(TestCase):
             items__groups=((new_link.child_element.learning_unit_year,),)
         )
 
-        education_group_program_tree = load_tree.load(self.root_node.pk)
+        identity = ProgramTreeIdentity(
+            code=self.root_node.code,
+            year=self.root_node.year
+        )
+        education_group_program_tree = ProgramTreeRepository().get(entity_id=identity)
         leaf = education_group_program_tree.root_node.children[0].child.children[1].child
 
         self.assertIsInstance(leaf, node.NodeLearningUnitYear)
@@ -150,13 +170,21 @@ class TestLoadTree(TestCase):
                 proposal.type = p_type
                 proposal.save()
 
-                education_group_program_tree = load_tree.load(self.root_node.pk)
+                identity = ProgramTreeIdentity(
+                    code=self.root_node.code,
+                    year=self.root_node.year
+                )
+                education_group_program_tree = ProgramTreeRepository().get(entity_id=identity)
                 leaf = education_group_program_tree.root_node.children[0].child.children[0].child
                 self.assertTrue(leaf.has_proposal)
                 self.assertEqual(leaf.proposal_type, p_type)
 
     def test_case_load_tree_leaf_node_have_no_proposal(self):
-        education_group_program_tree = load_tree.load(self.root_node.pk)
+        identity = ProgramTreeIdentity(
+            code=self.root_node.code,
+            year=self.root_node.year
+        )
+        education_group_program_tree = ProgramTreeRepository().get(entity_id=identity)
         leaf = education_group_program_tree.root_node.children[0].child.children[0].child
         self.assertFalse(leaf.has_proposal)
         self.assertIsNone(leaf.proposal_type)
@@ -193,7 +221,12 @@ class TestLoadTreesFromChildren(TestCase):
     def test_when_child_has_only_one_root_id(self):
         children_ids = [self.link_level_2.child_element_id]
         result = load_tree.load_trees_from_children(children_ids)
-        expected_result = [load_tree.load(self.root_node.pk)]
+        identity = ProgramTreeIdentity(
+            code=self.root_node.code,
+            year=self.root_node.year
+        )
+        tree = ProgramTreeRepository().get(entity_id=identity)
+        expected_result = [tree]
         self.assertListEqual(result, expected_result)
 
     def test_when_child_is_learning_unit(self):
@@ -203,7 +236,13 @@ class TestLoadTreesFromChildren(TestCase):
         )
         children_ids = [link_level_3.child_element_id]
         result = load_tree.load_trees_from_children(children_ids)
-        expected_result = [load_tree.load(self.root_node.pk)]
+
+        identity = ProgramTreeIdentity(
+            code=self.root_node.code,
+            year=self.root_node.year
+        )
+        tree = ProgramTreeRepository().get(entity_id=identity)
+        expected_result = [tree]
         self.assertListEqual(result, expected_result)
 
     def test_when_child_has_many_root_ids(self):
@@ -215,10 +254,23 @@ class TestLoadTreesFromChildren(TestCase):
         GroupElementYearFactory(parent_element=root_node_3, child_element=child_element)
 
         result = load_tree.load_trees_from_children([child_element.pk])
+        repository = ProgramTreeRepository()
+        identity = ProgramTreeIdentity(
+            code=self.root_node.code,
+            year=self.root_node.year
+        )
+        identity2 = ProgramTreeIdentity(
+            code=root_node_2.code,
+            year=root_node_2.year
+        )
+        identity3 = ProgramTreeIdentity(
+            code=root_node_3.code,
+            year=root_node_3.year
+        )
         expected_result = [
-            load_tree.load(self.root_node.pk),
-            load_tree.load(root_node_2.pk),
-            load_tree.load(root_node_3.pk),
+            repository.get(entity_id=identity),
+            repository.get(entity_id=identity2),
+            repository.get(entity_id=identity3),
         ]
         self.assertEqual(len(result), len(expected_result))
         for tree in expected_result:
@@ -235,9 +287,18 @@ class TestLoadTreesFromChildren(TestCase):
             child_element=lvl1.parent_element
         )
         result = load_tree.load_trees_from_children([child.id])
-        expected_parent = load_tree.load(lvl2.parent_element.id)
-        self.assertNotIn(load_tree.load(lvl1.parent_element.id), result)
-        self.assertIn(expected_parent, result)
+        identity = ProgramTreeIdentity(
+            code=lvl2.parent_element.code,
+            year=lvl2.parent_element.year
+        )
+        expected_tree_parent = ProgramTreeRepository().get(entity_id=identity)
+        identity_child = ProgramTreeIdentity(
+            code=lvl1.parent_element.code,
+            year=lvl1.parent_element.year
+        )
+        tree_child = ProgramTreeRepository().get(entity_id=identity_child)
+        self.assertNotIn(tree_child, result)
+        self.assertIn(expected_tree_parent, result)
 
     def test_when_link_type_is_reference(self):
         parent_node_type_reference = ElementGroupYearFactory(group_year__academic_year=self.academic_year)
@@ -248,7 +309,12 @@ class TestLoadTreesFromChildren(TestCase):
             link_type=LinkTypes.REFERENCE.name
         )
         result = load_tree.load_trees_from_children([child.id], link_type=LinkTypes.REFERENCE)
-        expected_result = [load_tree.load(parent_node_type_reference.pk)]
+        identity = ProgramTreeIdentity(
+            code=parent_node_type_reference.code,
+            year=parent_node_type_reference.year
+        )
+        tree = ProgramTreeRepository().get(entity_id=identity)
+        expected_result = [tree]
         self.assertListEqual(result, expected_result)
 
 

@@ -31,7 +31,8 @@ from backoffice.settings.rest_framework.common_views import LanguageContextSeria
 from base.models.enums.education_group_categories import Categories
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
 from program_management.ddd.domain import link
-from program_management.ddd.repositories import load_tree
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.models.element import Element
 
 
@@ -50,7 +51,11 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
         element = get_object_or_404(queryset, **filter_kwargs)
         self.check_object_permissions(self.request, element.education_group_year_obj)
 
-        tree = load_tree.load(element.id)
+        identity = ProgramTreeIdentity(
+            code=element.group_year.partial_acronym,
+            year=element.group_year.academic_year.year
+        )
+        tree = ProgramTreeRepository().get(entity_id=identity)
         return link.factory.get_link(parent=None, child=tree.root_node)
 
 

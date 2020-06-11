@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.test import RequestFactory, SimpleTestCase
+from django.test import RequestFactory
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -39,7 +39,8 @@ from education_group.api.serializers.group_element_year import EducationGroupRoo
 from education_group.api.views.group_element_year import TrainingTreeView, GroupTreeView, MiniTrainingTreeView
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.domain.link import Link
-from program_management.ddd.repositories import load_tree
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.models.element import Element
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
@@ -162,8 +163,13 @@ class TrainingTreeViewTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         training_element = Element.objects.get(group_year__educationgroupversion__offer=self.training)
+        identity = ProgramTreeIdentity(
+            code=training_element.group_year.partial_acronym,
+            year=training_element.group_year.academic_year.year
+        )
+        tree = ProgramTreeRepository().get(entity_id=identity)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(training_element.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(self.url),
             }
@@ -249,8 +255,13 @@ class MiniTrainingTreeViewTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        identity = ProgramTreeIdentity(
+            code=self.mini_training_element.group_year.partial_acronym,
+            year=self.mini_training_element.group_year.academic_year.year
+        )
+        tree = ProgramTreeRepository().get(entity_id=identity)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(self.mini_training_element.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(self.url),
             }
@@ -330,8 +341,13 @@ class GroupTreeViewTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
+        identity = ProgramTreeIdentity(
+            code=self.element_common_core.group_year.partial_acronym,
+            year=self.element_common_core.group_year.academic_year.year
+        )
+        tree = ProgramTreeRepository().get(entity_id=identity)
         serializer = EducationGroupRootNodeTreeSerializer(
-            Link(parent=None, child=load_tree.load(self.element_common_core.id).root_node),
+            Link(parent=None, child=tree.root_node),
             context={
                 'request': RequestFactory().get(self.url),
             }

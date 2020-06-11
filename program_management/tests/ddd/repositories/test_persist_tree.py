@@ -23,8 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from unittest.mock import patch
 from unittest import mock
+from unittest.mock import patch
 
 from django.test import TestCase
 
@@ -32,7 +32,9 @@ from base.models.group_element_year import GroupElementYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear
-from program_management.ddd.repositories import persist_tree, load_tree
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.repositories import persist_tree
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.ddd.validators._authorized_relationship import DetachAuthorizedRelationshipValidator
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
@@ -78,7 +80,11 @@ class TestPersistTree(TestCase):
 
     def test_save_when_first_link_exists_and_second_one_does_not(self):
         GroupElementYearFactory(parent_element=self.root_group, child_element=self.common_core_element)
-        tree = load_tree.load(self.root_node.node_id)
+        identity = ProgramTreeIdentity(
+            code=self.root_node.code,
+            year=self.root_node.year
+        )
+        tree = ProgramTreeRepository().get(entity_id=identity)
 
         # Append UE to common core
         tree.root_node.children[0].child.add_child(self.learning_unit_year_node)
@@ -95,7 +101,11 @@ class TestPersistTree(TestCase):
     @patch("program_management.ddd.repositories.persist_tree.__persist_group_element_year")
     def test_save_when_link_has_not_changed(self, mock):
         GroupElementYearFactory(parent_element=self.root_group, child_element=self.common_core_element)
-        tree = load_tree.load(self.root_node.node_id)
+        identity = ProgramTreeIdentity(
+            code=self.root_node.code,
+            year=self.root_node.year
+        )
+        tree = ProgramTreeRepository().get(entity_id=identity)
         persist_tree.persist(tree)
         assertion_msg = "No changes made, so function GroupelementYear.save() should not have been called"
         self.assertFalse(mock.called, assertion_msg)
@@ -103,7 +113,11 @@ class TestPersistTree(TestCase):
     @patch("program_management.ddd.repositories.persist_tree.__persist_group_element_year")
     def test_save_when_link_has_changed(self, mock):
         GroupElementYearFactory(parent_element=self.root_group, child_element=self.common_core_element)
-        tree = load_tree.load(self.root_node.node_id)
+        identity = ProgramTreeIdentity(
+            code=self.root_node.code,
+            year=self.root_node.year
+        )
+        tree = ProgramTreeRepository().get(entity_id=identity)
         tree.root_node.children[0]._has_changed = True  # Made some changes
         persist_tree.persist(tree)
         assertion_msg = """
@@ -117,8 +131,8 @@ class TestPersistTree(TestCase):
         node_to_detach = self.common_core_node
         qs_link_will_be_detached = GroupElementYear.objects.filter(child_element_id=node_to_detach.pk)
         self.assertEqual(qs_link_will_be_detached.count(), 1)
-
-        tree = load_tree.load(self.root_node.node_id)
+        identity = ProgramTreeIdentity(code=self.root_node.code, year=self.root_node.year)
+        tree = ProgramTreeRepository().get(entity_id=identity)
 
         path_to_detach = "|".join([str(self.root_node.pk), str(node_to_detach.pk)])
         tree.detach_node(path_to_detach)
@@ -128,7 +142,11 @@ class TestPersistTree(TestCase):
     @patch("program_management.ddd.repositories.persist_tree.__delete_group_element_year")
     def test_delete_when_nothing_has_been_deleted(self, mock):
         GroupElementYearFactory(parent_element=self.root_group, child_element=self.common_core_element)
-        tree = load_tree.load(self.root_node.node_id)
+        identity = ProgramTreeIdentity(
+            code=self.root_node.code,
+            year=self.root_node.year
+        )
+        tree = ProgramTreeRepository().get(entity_id=identity)
         persist_tree.persist(tree)
         assertion_msg = "No changes made, so function GroupelementYear.delete() should not have been called"
         self.assertFalse(mock.called, assertion_msg)

@@ -32,7 +32,8 @@ from base.templatetags.education_group_pdf import pdf_tree_list
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from program_management.ddd.repositories import load_tree
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
 
@@ -91,7 +92,11 @@ class TestBuildPDFTree(TestCase):
             )
 
     def test_build_pdf_tree_with_mandatory(self):
-        tree = load_tree.load(self.education_group_year_1.id)
+        identity = ProgramTreeIdentity(
+            code=self.education_group_year_1.partial_acronym,
+            year=self.education_group_year_1.academic_year.year
+        )
+        tree = ProgramTreeRepository().get(entity_id=identity)
         out = Template(
             "{% load education_group_pdf %}"
             "{{ tree|pdf_tree_list }}"
@@ -106,7 +111,11 @@ class TestBuildPDFTree(TestCase):
         self.group_element_year_2.is_mandatory = False
         self.group_element_year_2.save()
 
-        tree = load_tree.load(self.education_group_year_1.id)
+        identity = ProgramTreeIdentity(
+            code=self.education_group_year_1.partial_acronym,
+            year=self.education_group_year_1.academic_year.year
+        )
+        tree = ProgramTreeRepository().get(entity_id=identity)
         out = Template(
             "{% load education_group_pdf %}"
             "{{ tree|pdf_tree_list }}"

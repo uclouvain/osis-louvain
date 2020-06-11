@@ -29,7 +29,8 @@ from rest_framework.generics import get_object_or_404
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.enums import education_group_categories
 from program_management.api.serializers.prerequisite import ProgramTreePrerequisitesSerializer
-from program_management.ddd.repositories import load_tree
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.models.education_group_version import EducationGroupVersion
 
 
@@ -66,7 +67,11 @@ class ProgramTreePrerequisites(LanguageContextSerializerMixin, generics.ListAPIV
 
     def get_serializer_context(self):
         education_group_version = self.get_object()
-        self.tree = load_tree.load(education_group_version.offer.id)
+        identity = ProgramTreeIdentity(
+            code=education_group_version.root_group.partial_acronym,
+            year=education_group_version.root_group.academic_year.year
+        )
+        self.tree = ProgramTreeRepository().get(entity_id=identity)
         serializer_context = super().get_serializer_context()
         serializer_context.update({
             'request': self.request,

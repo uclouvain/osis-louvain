@@ -35,7 +35,8 @@ from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType
 from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.document.pdf_build import render_pdf
-from program_management.ddd.repositories import load_tree
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 
 CURRENT_SIZE_FOR_ANNUAL_COLUMN = 15
 MAIN_PART_INIT_SIZE = 650
@@ -47,7 +48,11 @@ USUAL_NUMBER_OF_BLOCKS = 3
 @waffle_switch('education_group_year_generate_pdf')
 def pdf_content(request, root_id, education_group_year_id, language):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
-    tree = load_tree.load(education_group_year.id)
+    identity = ProgramTreeIdentity(
+        code=education_group_year.partial_acronym,
+        year=education_group_year.academic_year.year
+    )
+    tree = ProgramTreeRepository().get(entity_id=identity)
     tree = tree.prune(ignore_children_from={GroupType.MINOR_LIST_CHOICE})
     context = {
         'root': education_group_year,
