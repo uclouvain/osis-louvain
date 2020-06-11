@@ -39,7 +39,8 @@ from program_management.ddd.validators._authorized_relationship import DetachAut
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
 
@@ -47,7 +48,7 @@ class TestPersistTree(TestCase):
     def setUp(self):
         academic_year = AcademicYearFactory(current=True)
 
-        self.training_version = EducationGroupVersionFactory()
+        self.training_version = StandardEducationGroupVersionFactory(root_group__academic_year=academic_year)
 
         self.root_group = ElementGroupYearFactory(group_year=self.training_version.root_group)
         self.common_core_element = ElementGroupYearFactory(group_year__academic_year=academic_year)
@@ -55,9 +56,18 @@ class TestPersistTree(TestCase):
             learning_unit_year__academic_year=academic_year
         )
 
-        self.root_node = NodeGroupYear(node_id=self.root_group.pk)
-        self.common_core_node = NodeEducationGroupYear(node_id=self.common_core_element.pk)
-        self.learning_unit_year_node = NodeLearningUnitYear(node_id=self.learning_unit_year_element.pk)
+        self.root_node = NodeGroupYear(
+            node_id=self.root_group.pk,
+            code=self.root_group.group_year.partial_acronym,
+            year=academic_year.year
+        )
+        self.common_core_node = NodeEducationGroupYear(
+            node_id=self.common_core_element.pk,
+            code=self.common_core_element.group_year.partial_acronym
+        )
+        self.learning_unit_year_node = NodeLearningUnitYear(
+            node_id=self.learning_unit_year_element.pk
+        )
 
     def test_persist_tree_from_scratch(self):
         self.common_core_node.add_child(self.learning_unit_year_node)
@@ -128,13 +138,12 @@ class TestPersistTree(TestCase):
     @patch.object(DetachAuthorizedRelationshipValidator, 'validate')
     def test_delete_when_1_link_has_been_deleted(self, mock):
         GroupElementYearFactory(parent_element=self.root_group, child_element=self.common_core_element)
-        node_to_detach = self.common_core_node
-        qs_link_will_be_detached = GroupElementYear.objects.filter(child_element_id=node_to_detach.pk)
+        qs_link_will_be_detached = GroupElementYear.objects.filter(child_element_id=self.common_core_node.pk)
         self.assertEqual(qs_link_will_be_detached.count(), 1)
         identity = ProgramTreeIdentity(code=self.root_node.code, year=self.root_node.year)
         tree = ProgramTreeRepository().get(entity_id=identity)
 
-        path_to_detach = "|".join([str(self.root_node.pk), str(node_to_detach.pk)])
+        path_to_detach = "|".join([str(self.root_node.pk), str(self.common_core_node.pk)])
         tree.detach_node(path_to_detach)
         persist_tree.persist(tree)
         self.assertEqual(qs_link_will_be_detached.count(), 0)
