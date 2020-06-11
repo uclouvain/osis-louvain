@@ -190,7 +190,7 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
 
     @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_node_to_attach_is_not_finality(self, mock_load_2m_trees):
+    def test_when_node_to_attach_is_not_finality(self, mock_load_2m_trees, mock_get):
         """Unit test only for performance"""
         self.mock_validator(AttachFinalityEndDateValidator, [_('Success message')], level=MessageLevel.SUCCESS)
 
@@ -199,11 +199,13 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
 
     @patch('program_management.ddd.repositories.program_tree.ProgramTreeRepository.get')
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
-    def test_when_end_date_of_finality_node_to_attach_is_not_valid(self, mock_load_2m_trees):
+    def test_when_end_date_of_finality_node_to_attach_is_not_valid(self, mock_load_2m_trees, mock_get):
         mock_load_2m_trees.return_value = [self.tree_2m]
         node_to_attach = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
-        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=node_to_attach)
+        node_tree = ProgramTreeFactory(root_node=node_to_attach)
+        self.mock_load_tree_to_attach.return_value = node_tree
         self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
+        mock_get.return_value = node_tree
 
         result = attach_node_service._validate_end_date_and_option_finality(node_to_attach)
         validator_msg = "Error end date finality message"
@@ -213,12 +215,13 @@ class TestValidateEndDateAndOptionFinality(SimpleTestCase, ValidatorPatcherMixin
     @patch('program_management.ddd.repositories.load_tree.load_trees_from_children')
     def test_when_end_date_of_finality_children_of_node_to_attach_is_not_valid(self, mock_load_2m_trees, mock_get):
         mock_load_2m_trees.return_value = [self.tree_2m]
-        mock_get.return_value = self.tree_2m
         not_finality = NodeGroupYearFactory(node_type=TrainingType.AGGREGATION)
         finality = NodeGroupYearFactory(node_type=TrainingType.MASTER_MA_120)
         not_finality.add_child(finality)
-        self.mock_load_tree_to_attach.return_value = ProgramTreeFactory(root_node=not_finality)
+        not_finality_tree = ProgramTreeFactory(root_node=not_finality)
+        self.mock_load_tree_to_attach.return_value = not_finality_tree
         self.mock_validator(AttachFinalityEndDateValidator, [_('Error end date finality message')])
+        mock_get.return_value = not_finality_tree
 
         result = attach_node_service._validate_end_date_and_option_finality(not_finality)
         validator_msg = "Error end date finality message"
