@@ -90,13 +90,13 @@ class TestBuildPDFTree(TestCase):
                 learning_unit_year=elem_learning_unit_year.learning_unit_year,
                 type=PRACTICAL_EXERCISES
             )
-
-    def test_build_pdf_tree_with_mandatory(self):
-        identity = ProgramTreeIdentity(
+        self.identity = ProgramTreeIdentity(
             code=self.education_group_year_1.group_year.partial_acronym,
             year=self.education_group_year_1.group_year.academic_year.year
         )
-        tree = ProgramTreeRepository().get(entity_id=identity)
+
+    def test_build_pdf_tree_with_mandatory(self):
+        tree = ProgramTreeRepository().get(entity_id=self.identity)
         out = Template(
             "{% load education_group_pdf %}"
             "{{ tree|pdf_tree_list }}"
@@ -111,11 +111,7 @@ class TestBuildPDFTree(TestCase):
         self.group_element_year_2.is_mandatory = False
         self.group_element_year_2.save()
 
-        identity = ProgramTreeIdentity(
-            code=self.education_group_year_1.group_year.partial_acronym,
-            year=self.education_group_year_1.group_year.academic_year.year
-        )
-        tree = ProgramTreeRepository().get(entity_id=identity)
+        tree = ProgramTreeRepository().get(entity_id=self.identity)
         out = Template(
             "{% load education_group_pdf %}"
             "{{ tree|pdf_tree_list }}"
