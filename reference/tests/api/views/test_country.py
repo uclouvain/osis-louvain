@@ -81,25 +81,20 @@ class GetAllCountryTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        countries = Country.objects.all().order_by('name')
-        serializer = CountrySerializer(countries, many=True, context={'request': RequestFactory().get(self.url)})
-        self.assertEqual(response.data['results'], serializer.data)
+        results_sorted = sorted(response.data["results"], key=lambda obj: obj["name"])
+        self.assertListEqual(response.data["results"], results_sorted)
 
     def test_get_all_country_specify_ordering_field(self):
         ordering_managed = ['name', 'iso_code']
 
-        for order in ordering_managed:
-            query_string = {api_settings.ORDERING_PARAM: order}
-            response = self.client.get(self.url, kwargs=query_string)
-            self.assertEqual(response.status_code, status.HTTP_200_OK)
+        for order_field in ordering_managed:
+            with self.subTest(order_field=order_field):
+                query_string = {api_settings.ORDERING_PARAM: order_field}
+                response = self.client.get(self.url, kwargs=query_string)
+                self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-            countries = Country.objects.all().order_by(order)
-            serializer = CountrySerializer(
-                countries,
-                many=True,
-                context={'request': RequestFactory().get(self.url, query_string)},
-            )
-            self.assertEqual(response.data['results'], serializer.data)
+                results_sorted = sorted(response.data["results"], key=lambda obj: obj[order_field])
+                self.assertListEqual(response.data["results"], results_sorted)
 
 
 class GetCountryTestCase(APITestCase):
