@@ -99,57 +99,29 @@ class LearningUnitListTestCase(APITestCase):
 
     def test_get_results_without_filtering(self):
         response = self.client.get(self.url, {'lang': 'fr'})
-
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        qs = LearningUnitYear.objects.all().annotate_full_title().order_by('-academic_year__year', 'acronym')
-        serializer = LearningUnitSerializer(
-            qs,
-            many=True,
-            context={
-                'request': RequestFactory().get(self.url),
-                'language': settings.LANGUAGE_CODE
-            }
-        )
-        self.assertEqual(response.data['results'], serializer.data)
+        list_sorted = sorted(response.data["results"], key=lambda obj: (-obj["academic_year"], obj["acronym"]))
+        self.assertListEqual(response.data["results"], list_sorted)
 
     def test_get_only_learning_unit_with_container(self):
-        LearningUnitYearFactory(learning_container_year=None)
+        learning_unit_without_container = LearningUnitYearFactory(learning_container_year=None)
         response = self.client.get(self.url, {'lang': 'fr'})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        qs = LearningUnitYear.objects.filter(
-            learning_container_year__isnull=False
-        ).annotate_full_title().order_by('-academic_year__year', 'acronym')
-        serializer = LearningUnitSerializer(
-            qs,
-            many=True,
-            context={
-                'request': RequestFactory().get(self.url),
-                'language': settings.LANGUAGE_CODE
-            }
+        self.assertNotIn(
+            learning_unit_without_container.acronym,
+            [result["acronym"] for result in response.data['results']]
         )
-        self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_results_filter_by_academic_year(self):
         response = self.client.get(self.url, data={'year': self.academic_years[3].year})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        qs = LearningUnitYear.objects.filter(
-            pk=self.learning_unit_years[3].pk
-        ).annotate_full_title().order_by('-academic_year__year', 'acronym')
-
-        serializer = LearningUnitSerializer(
-            qs,
-            many=True,
-            context={
-                'request': RequestFactory().get(self.url),
-                'language': settings.LANGUAGE_CODE
-            }
+        self.assertSetEqual(
+            {self.academic_years[3].year},
+            {result["academic_year"] for result in response.data["results"]}
         )
-        self.assertEqual(response.data['results'], serializer.data)
 
     def test_get_results_filter_by_acronym_exact_match(self):
         expected_learning_unit_year = self.learning_unit_years[2]
@@ -157,20 +129,10 @@ class LearningUnitListTestCase(APITestCase):
         response = self.client.get(self.url, data={'acronym': expected_learning_unit_year.acronym})
 
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-        qs = LearningUnitYear.objects.filter(
-            pk=expected_learning_unit_year.pk
-        ).annotate_full_title().order_by('-academic_year__year', 'acronym')
-
-        serializer = LearningUnitSerializer(
-            qs,
-            many=True,
-            context={
-                'request': RequestFactory().get(self.url),
-                'language': settings.LANGUAGE_CODE
-            }
+        self.assertSetEqual(
+            {expected_learning_unit_year.acronym},
+            {result["acronym"] for result in response.data["results"]}
         )
-        self.assertEqual(response.data['results'], serializer.data)
 
 
 class LearningUnitDetailedTestCase(APITestCase):
