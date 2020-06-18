@@ -27,6 +27,7 @@ from ajax_select import urls as ajax_select_urls
 from django.conf import settings
 from django.conf.urls import url, include
 from django.conf.urls.static import static
+from django.urls import path
 
 import base.views.education_groups.create
 import base.views.learning_units.common
@@ -55,6 +56,7 @@ from base.views.education_groups import urls as education_groups_urls
 from base.views.filter import filter_cities_by_country, filter_campus_by_city
 from base.views.learning_units.detail import DetailLearningUnitYearView
 from base.views.learning_units.external import create as create_external
+from base.views.learning_units.pedagogy.publish import publish
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from base.views.learning_units.pedagogy.update import learning_unit_pedagogy_edit, toggle_summary_locked
 from base.views.learning_units.proposal import create, update
@@ -170,6 +172,7 @@ urlpatterns = [
             url(r'^filter_cities_by_country$', filter_cities_by_country, name="filter_cities_by_country"),
             url(r'^filter_campus_by_city$', filter_campus_by_city, name="filter_campus_by_city"),
         ])),
+        path("<str:code>/<int:year>/publish", publish, name="publish_educational_information"),
 
         url(r'^(?P<learning_unit_year_id>[0-9]+)/', include([
             url(r'^$', DetailLearningUnitYearView.as_view(), name='learning_unit'),

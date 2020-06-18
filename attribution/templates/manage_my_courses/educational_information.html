@@ -48,7 +48,7 @@
 <div class="panel panel-default">
     <div class="panel-body" id="tabs">
         <div class="pull-right">
-            <form action="TODO define url" method="post">
+            <form action="{% url "publish_educational_information" code=learning_unit_year.acronym year=learning_unit_year.academic_year.year %}" method="post">
                 {% csrf_token %}
                 <button class="btn btn-default btn-publish">
                     {% trans 'Refresh publication' %}
