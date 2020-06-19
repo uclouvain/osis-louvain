@@ -42,11 +42,11 @@ class TestAddChildNode(SimpleTestCase):
             year=2018
         )
 
-        group_year_node.add_child(learning_unit_year_node, relative_credits=5, comment='Dummy comment')
-        self.assertEqual(len(group_year_node.children), 1)
+        link_created = group_year_node.add_child(learning_unit_year_node, relative_credits=5, comment='Dummy comment')
+        self.assertIn(link_created, group_year_node.children)
 
-        self.assertEqual(group_year_node.children[0].relative_credits, 5)
-        self.assertEqual(group_year_node.children[0].comment, 'Dummy comment')
+        self.assertEqual(link_created.relative_credits, 5)
+        self.assertEqual(link_created.comment, 'Dummy comment')
 
 
 class TestDescendentsPropertyNode(SimpleTestCase):
@@ -318,15 +318,13 @@ class TestDetachChild(SimpleTestCase):
         link2 = LinkFactory(parent=common_parent)
         link3 = LinkFactory(parent=common_parent)
 
-        common_parent.detach_child(link1.child)
+        link_deleted = common_parent.detach_child(link1.child)
 
-        expected_result = [link2, link3]
         assertion_msg = "Link {} should have been removed from children".format(link1)
-        self.assertListEqual(common_parent.children, expected_result, assertion_msg)
+        self.assertNotIn(link_deleted, common_parent.children, assertion_msg)
 
         assertion_msg = "Link {} should have been added to deleted children".format(link1)
-        expected_result = {link1}
-        self.assertSetEqual(common_parent._deleted_children, expected_result,assertion_msg)
+        self.assertIn(link_deleted, common_parent._deleted_children, assertion_msg)
 
 
 class TestIsOption(SimpleTestCase):

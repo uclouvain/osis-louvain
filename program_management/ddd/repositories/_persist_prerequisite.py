@@ -42,7 +42,7 @@ def _persist(
 ) -> None:
     education_group_version_obj = EducationGroupVersion.objects.get(root_group__element__pk=node_group_year.node_id)
     learning_unit_year_obj = learning_unit_year.LearningUnitYear.objects.get(
-        id=node_learning_unit_year_obj.node_id
+        element__id=node_learning_unit_year_obj.node_id
     )
     prerequisite = node_learning_unit_year_obj.prerequisite
 

@@ -56,8 +56,11 @@
                         {# This feature is used for managing tree in education group context #}
                         {% flag "copy_education_group_to_cache" %}
                             <li {% if not "base.can_edit_learningunit" in perms %}class="disabled"{% endif %}>
-                                <a {% if "base.can_edit_learningunit" in perms %} href="#" class="copy-element"{% endif %}
-                                        data-url="{% url "copy_element" %}" data-element_id="{{ learning_unit_year.id }}" data-element_type="LEARNING_UNIT" >
+                                <a {% if "base.can_edit_learningunit" in perms %} href="#"
+                                                                                  class="copy-element"{% endif %}
+                                                                                  data-url="{% url "copy_element" %}"
+                                                                                  data-element_code="{{ learning_unit_year.acronym }}"
+                                                                                  data-element_year="{{ learning_unit_year.academic_year.year }}">
                                     {% trans 'Copy' %}
                                 </a>
                             </li>

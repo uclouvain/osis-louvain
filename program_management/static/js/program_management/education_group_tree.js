@@ -23,9 +23,9 @@ $(document).ready(function () {
 function setListenerForCopyElements() {
     $(".copy-element").click(function (event) {
         const url = event.target.dataset.url;
-        const element_id = event.target.dataset.element_id;
-        const element_type = event.target.dataset.element_type;
-        handleCopyAction(url, element_id, element_type);
+        const element_code = event.target.dataset.element_code;
+        const element_year = event.target.dataset.element_year;
+        handleCopyAction(url, element_code, element_year);
         event.preventDefault();
     });
 }
@@ -33,10 +33,10 @@ function setListenerForCopyElements() {
 function setListenerForCutElements() {
     $(".cut-element").click(function (event) {
         const url = event.target.dataset.url;
-        const element_id = event.target.dataset.element_id;
-        const element_type = event.target.dataset.element_type;
-        const link_id = event.target.dataset.link_id;
-        handleCutAction(url, element_id, element_type, link_id);
+        const element_code = event.target.dataset.element_code;
+        const element_year = event.target.dataset.element_year;
+        const path_to_detach_from = event.target.dataset.path;
+        handleCutAction(url, element_code, element_year, path_to_detach_from);
         event.preventDefault();
     });
 }
@@ -120,11 +120,11 @@ $("a[id^='quick-search']").click(function (event) {
 
 
 $("#scrollableDiv").on("scroll", function() {
-    saveScrollPosition();
+    saveScrollPosition(tree);
 });
 
-function saveScrollPosition() {
-    const rootId = $('#panel_file_tree').attr("data-rootId");
+function saveScrollPosition(tree) {
+    const rootId = tree["id"];
     const scrollPosition = $("#scrollableDiv")[0].scrollTop
     const storageValue = {}
     storageValue[rootId] = scrollPosition
@@ -132,8 +132,8 @@ function saveScrollPosition() {
 }
 
 
-function scrollToPositionSaved() {
-    const rootId = $('#panel_file_tree').attr("data-rootId");
+function scrollToPositionSaved(tree) {
+    const rootId = tree["id"];
     const storageValue = JSON.parse(localStorage.getItem('scrollpos'));
     let scrollPosition = 0;
     if (storageValue !== null && rootId in storageValue) {
@@ -156,14 +156,14 @@ function adaptTreeOnFooter() {
     }
 }
 
-function handleCutAction(cut_url, element_id, element_type, link_id) {
+function handleCutAction(cut_url, element_code, element_year, path_to_detach) {
     $.ajax({
         url: cut_url,
         dataType: 'json',
         data: {
-            'element_id': element_id,
-            'element_type': element_type,
-            'group_element_year_id': link_id
+            'element_code': element_code,
+            'element_year': element_year,
+            'path_to_detach': path_to_detach
         },
         type: 'POST',
         success: function (jsonResponse) {
@@ -172,13 +172,13 @@ function handleCutAction(cut_url, element_id, element_type, link_id) {
     });
 }
 
-function handleCopyAction(copy_url, element_id, element_type) {
+function handleCopyAction(copy_url, element_code, element_year) {
     $.ajax({
         url: copy_url,
         dataType: 'json',
         data: {
-            'element_id': element_id,
-            'element_type': element_type
+            'element_code': element_code,
+            'element_year': element_year
         },
         type: 'POST',
         success: function (jsonResponse) {
@@ -212,7 +212,7 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
             document.location.href = data.node.a_attr.href;
         });
 
-        scrollToPositionSaved();
+        scrollToPositionSaved(tree);
 
         // if the tree has never been loaded, execute close_all by default.
         if ($.vakata.storage.get(data.instance.settings.state.key) === null) {
@@ -220,21 +220,27 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
         }
     });
 
+    function generateTreeKey(tree) {
+        const treeRootId = tree["id"];
+        return `progrem_tree_state_${treeRootId}`;
+
+    }
+
     $documentTree.jstree({
-            "core": {
-                "check_callback": true,
-                "data": tree,
-            },
-            "plugins": [
-                "contextmenu",
-                // Plugin to save the state of the node (collapsed or not)
-                "state",
+        "core": {
+            "check_callback": true,
+            "data": tree,
+        },
+        "plugins": [
+            "contextmenu",
+            // Plugin to save the state of the node (collapsed or not)
+            "state",
                 "search",
             ],
             "state": {
                 // the key is important if you have multiple trees in the same domain
                 // The key includes the root_id
-                "key": "program_tree_state/" + location.pathname.split('/', 3)[2],
+                "key": generateTreeKey(tree),
                 "opened": true,
                 "selected": false,
             },
@@ -249,8 +255,7 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
                             },
                             "action": function (data) {
                                 const node_data = get_data_from_tree(data);
-                                handleCutAction(cut_element_url, node_data.element_id, node_data.element_type,
-                                    node_data.group_element_year_id)
+                                handleCutAction(cut_element_url, node_data.element_code, node_data.element_year, node_data.path)
                             }
                         },
 
@@ -258,7 +263,7 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
                             "label": gettext("Copy"),
                             "action": function (data) {
                                 const node_data = get_data_from_tree(data);
-                                handleCopyAction(copy_element_url, node_data.element_id, node_data.element_type)
+                                handleCopyAction(copy_element_url, node_data.element_code, node_data.element_year)
                             }
                         },
 
@@ -267,20 +272,20 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
                             "action": function (data) {
                                 let __ret = get_data_from_tree(data);
 
-                                $('#form-modal-ajax-content').load(__ret.attach_url, function (response, status, xhr) {
+                                $('#form-modal-ajax-content').load(__ret.paste_url, function (response, status, xhr) {
                                     if (status === "success") {
                                         $('#form-ajax-modal').modal('toggle');
                                         let form = $(this).find('form').first();
                                         formAjaxSubmit(form, '#form-ajax-modal');
                                     } else {
-                                        window.location.href = __ret.attach_url
+                                        window.location.href = __ret.paste_url
                                     }
                                 });
                             },
                             "title": $node.a_attr.attach_msg,
                             "_disabled": function (data) {
                                 let __ret = get_data_from_tree(data);
-                                return __ret.attach_url == null;
+                                return __ret.paste_url == null;
                             }
                         },
 
@@ -308,8 +313,7 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
                             "title": $node.a_attr.detach_msg,
                             "_disabled": function (data) {
                                 let __ret = get_data_from_tree(data);
-                                // tree's root and learning_unit having/being prerequisite(s) cannot be detached
-                                return __ret.detach_disabled === true;
+                                return __ret.detach_url == null;
                             }
                         },
 
@@ -333,7 +337,7 @@ function initializeJsTree($documentTree, cut_element_url, copy_element_url) {
                             "_disabled": function (data) {
                                 let __ret = get_data_from_tree(data);
                                 // tree's root cannot be edit (no link with parent...)
-                                return __ret.modification_disabled === true;
+                                return __ret.modify_url == null;
                             }
                         },
 
@@ -395,15 +399,14 @@ function get_data_from_tree(data) {
         group_element_year_id: obj.a_attr.group_element_year,
         element_id: obj.a_attr.element_id,
         element_type: obj.a_attr.element_type,
+        element_code: obj.a_attr.element_code,
+        element_year: obj.a_attr.element_year,
         has_prerequisite: obj.a_attr.has_prerequisite,
         is_prerequisite: obj.a_attr.is_prerequisite,
         view_url: obj.a_attr.href,
-        attach_url: obj.a_attr.attach_url,
+        paste_url: obj.a_attr.paste_url,
         detach_url: obj.a_attr.detach_url,
         modify_url: obj.a_attr.modify_url,
-        attach_disabled: obj.a_attr.attach_disabled,
-        detach_disabled: obj.a_attr.detach_disabled,
-        modification_disabled: obj.a_attr.modification_disabled,
         search_url: obj.a_attr.search_url,
         path: obj.a_attr.path
     };

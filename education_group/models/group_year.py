@@ -26,9 +26,11 @@
 
 from django.core.validators import MinValueValidator
 from django.db import models
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
+from base.models import entity_version
 from base.models.campus import Campus
 from base.models.entity import Entity
 from base.models.enums import active_status
@@ -59,7 +61,6 @@ class GroupYearAdmin(VersionAdmin, OsisModelAdmin):
 
 
 class GroupYear(models.Model):
-
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
 
@@ -182,3 +183,9 @@ class GroupYear(models.Model):
     @property
     def is_minor_major_option_list_choice(self):
         return self.education_group_type.name in GroupType.minor_major_option_list_choice()
+
+    @cached_property
+    def management_entity_version(self):
+        return entity_version.find_entity_version_according_academic_year(
+            self.management_entity, self.academic_year
+        )

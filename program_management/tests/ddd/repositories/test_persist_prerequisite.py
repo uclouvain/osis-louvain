@@ -39,7 +39,7 @@ from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
-from program_management.tests.factories.element import ElementGroupYearFactory
+from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
 
 class TestPersist(TestCase):
@@ -66,8 +66,10 @@ class TestPersistPrerequisite(TestCase):
         )
         self.root_node = NodeEducationGroupYearFactory(node_id=self.root_element.pk)
 
-        self.learning_unit_year = LearningUnitYearFactory(academic_year__current=True)
-        self.node = NodeLearningUnitYearFactory(node_id=self.learning_unit_year.pk)
+        self.element_learning_unit_year = ElementLearningUnitYearFactory(
+            learning_unit_year__academic_year__current=True
+        )
+        self.node = NodeLearningUnitYearFactory(node_id=self.element_learning_unit_year.pk)
 
         self.luy1 = LearningUnitYearFactory(acronym="LOSIS4525", academic_year__current=True)
         self.luy2 = LearningUnitYearFactory(acronym="MARC4123", academic_year__current=True)
@@ -122,7 +124,7 @@ class TestPersistPrerequisite(TestCase):
     def test_should_empty_existing_prerequisites(self):
         PrerequisiteFactory(
             education_group_version=self.education_group_version,
-            learning_unit_year=self.learning_unit_year,
+            learning_unit_year=self.element_learning_unit_year.learning_unit_year,
             items__groups=((self.luy1,), (self.luy2,))
         )
         self.node.prerequisite = NullPrerequisite()

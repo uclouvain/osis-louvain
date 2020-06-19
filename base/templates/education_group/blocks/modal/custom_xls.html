@@ -57,15 +57,15 @@
 <script>
 
     $('#btn_produce_xls').click(function (e) {
-        $('#modalCustomXls').modal('toggle');
+        $('#modalCustomXls').modal('hide');
     });
 
-    $("#chb_select_all_custom").click(function(){
-        var chboxes =$('input:checkbox').not(this);
+    $("#chb_select_all_custom").click(function () {
+        var chboxes = $('input:checkbox').not(this);
         var status = this.checked;
 
-        $.each(chboxes, function() {
-                $(this).prop('checked', status);
+        $.each(chboxes, function () {
+            $(this).prop('checked', status);
         });
 
     });

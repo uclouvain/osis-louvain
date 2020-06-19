@@ -909,7 +909,7 @@ msgid "Elaboration and management of the formation catalogue."
 msgstr "Elaboration et gestion du catalogue de formations."
 
 msgid "Email"
-msgstr "Email"
+msgstr "Courriel"
 
 msgid "End"
 msgstr "Fin"
@@ -3357,7 +3357,6 @@ msgstr ""
 msgid "academic events"
 msgstr "événements académiques"
 
-# TODO
 msgid "acronym rules"
 msgstr ""
 "Code composé de:\n"
@@ -3441,11 +3440,9 @@ msgstr "crédits"
 msgid "date and time"
 msgstr "Date et heure"
 
-# TODO
 msgid "date_format"
 msgstr "%d/%m/%Y"
 
-# TODO
 msgid "date_format_string"
 msgstr "d/m/Y"
 
@@ -3476,7 +3473,6 @@ msgstr "commentaire anglais"
 msgid "english help text"
 msgstr "texte d'aide en anglais"
 
-# TODO
 msgid "external acronym rules"
 msgstr ""
 "Code composé de:\n"
@@ -3494,7 +3490,6 @@ msgstr "référence de champ"
 msgid "filter by section"
 msgstr "préfiltrer par rubrique"
 
-# TODO
 msgid "format_date"
 msgstr "jj/mm/aaaa"
 
@@ -3576,7 +3571,6 @@ msgstr ""
 "le nombre de classes prévues ne peut être supérieur à 0 si le volume est "
 "égal à 0"
 
-# TODO impossible to create a key from that msgstr.
 msgid "please_enable_javascript"
 msgstr ""
 "Veuillez <a href='http://enable-javascript.com/fr/' target='_blank'>activer "

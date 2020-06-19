@@ -29,6 +29,9 @@ msgstr ""
 msgid "End year must be greater than the start year, or equal"
 msgstr ""
 
+msgid "of version"
+msgstr ""
+
 msgid "Start academic year"
 msgstr ""
 

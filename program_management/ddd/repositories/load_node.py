@@ -25,12 +25,11 @@
 ##############################################################################
 from typing import List
 
-from django.db.models import F, Value, CharField, QuerySet, Q, Case, When, IntegerField, OuterRef, Subquery
+from django.db.models import F, Value, CharField, QuerySet, Case, When, IntegerField, OuterRef, Subquery
 from django.db.models.functions import Concat
 
 from base.models.entity_version import EntityVersion
 from base.models.enums.active_status import ActiveStatusEnum
-from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import EducationGroupTypesEnum, GroupType, TrainingType, MiniTrainingType
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.schedule_type import ScheduleTypeEnum
@@ -39,6 +38,7 @@ from learning_unit.ddd.repository import load_learning_unit_year
 from program_management.ddd.domain import node
 from program_management.models import element
 from program_management.models.enums.node_type import NodeType
+from education_group.models.enums.constraint_type import ConstraintTypes
 
 
 # TODO: Depracated, must be deleted (use load method type are determined in element)
@@ -125,6 +125,8 @@ def __convert_string_to_enum(node_data: dict) -> dict:
         node_data['periodicity'] = PeriodicityEnum[node_data['periodicity']]
     if node_data.get('schedule_type'):
         node_data['schedule_type'] = ScheduleTypeEnum[node_data['schedule_type']]
+    if node_data.get('constraint_type'):
+        node_data['constraint_type'] = ConstraintTypes[node_data['constraint_type']]
     if node_data.get('offer_status'):
         node_data['offer_status'] = ActiveStatusEnum[node_data['offer_status']]
     node_data['type'] = NodeType[node_data['type']]
@@ -172,7 +174,7 @@ def __load_multiple_node_group_year(node_group_year_ids: List[int]) -> QuerySet:
         offer_partial_title_en=F('educationgroupversion__offer__partial_title_english'),
         offer_title_fr=F('educationgroupversion__offer__title'),
         offer_title_en=F('educationgroupversion__offer__title_english'),
-        offer_status=F('educationgroupversion__offer__active'),
+        offer_status=F('educationgroupversion__root_group__active'),
         schedule_type=F('educationgroupversion__offer__schedule_type'),
         keywords=F('educationgroupversion__offer__keywords'),
         group_title_fr=F('title_fr'),

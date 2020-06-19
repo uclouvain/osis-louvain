@@ -6,7 +6,10 @@
 {% block navbar %}
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation">
-            <a id="link-quick-search-educationgroup" class="trigger_modal" data-url="{% url "quick_search_education_group" root_id node_path%}?path={{ current_path }}">{% trans 'Trainings' %}</a>
+            <a id="link-quick-search-educationgroup" class="trigger_modal"
+               data-url="{% url "quick_search_education_group" year %}?{{ request.GET.urlencode }}">
+                {% trans 'Trainings' %}
+            </a>
         </li>
         <li role="presentation" class="active">
             <a id="link-quick-search-learningunit" href=#">{% trans 'Learning units' %}</a>
@@ -41,13 +44,14 @@
                 "targets": 0,
                 "data": "acronym",
                 "orderable": false,
-                "render": function(data, type, row, meta) {
+                "render": function (data, type, row, meta) {
                     let input = document.createElement("input");
                     input.type = 'checkbox';
                     input.name = 'selected-item';
                     input.value = data;
-                    // FIXME Use uuid in the future when implemented in place of data-url
                     input.setAttribute('data-url', row['osis_url']);
+                    input.setAttribute('data-code', row['acronym']);
+                    input.setAttribute('data-year', row['academic_year']);
                     input.setAttribute('data-name', `${row['academic_year']} - ${row['acronym']}`);
                     return input.outerHTML;
                 }
@@ -56,7 +60,7 @@
                 "name": "academic_year",
                 "targets": 1,
                 "data": "academic_year",
-                "render": function(data, type, row, meta){
+                "render": function (data, type, row, meta) {
                     let year = data;
                     let nextYear = data + 1;
                     return `${year}-${nextYear.toString().slice(2)}`;

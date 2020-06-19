@@ -34,6 +34,7 @@ from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from education_group.api.serializers.learning_unit import EducationGroupRootsListSerializer
 from education_group.api.serializers.learning_unit import LearningUnitYearPrerequisitesListSerializer
 from education_group.api.views.learning_unit import LearningUnitPrerequisitesList
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 class EducationGroupRootsListSerializerTestCase(TestCase):
@@ -45,14 +46,15 @@ class EducationGroupRootsListSerializerTestCase(TestCase):
             partial_acronym='LBIR1000I',
             academic_year=cls.academic_year,
         )
+        cls.version = EducationGroupVersionFactory(offer=cls.training)
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
-        cls.serializer = EducationGroupRootsListSerializer(cls.training, context={
-                'request': RequestFactory().get(url),
-                'language': settings.LANGUAGE_CODE_EN
-            })
+        cls.serializer = EducationGroupRootsListSerializer(cls.version, context={
+            'request': RequestFactory().get(url),
+            'language': settings.LANGUAGE_CODE_EN
+        })
 
     def test_contains_expected_fields(self):
         expected_fields = [
@@ -120,11 +122,11 @@ class LearningUnitYearPrerequisitesListSerializerTestCase(TestCase):
     def test_ensure_academic_year_field_is_slugified(self):
         self.assertEqual(
             self.serializer.data['academic_year'],
-            self.prerequisite.education_group_year.academic_year.year
+            self.prerequisite.education_group_version.offer.academic_year.year
         )
 
     def test_ensure_education_group_type_field_is_slugified(self):
         self.assertEqual(
             self.serializer.data['education_group_type'],
-            self.prerequisite.education_group_year.education_group_type.name
+            self.prerequisite.education_group_version.offer.education_group_type.name
         )

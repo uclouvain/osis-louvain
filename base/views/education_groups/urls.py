@@ -31,7 +31,6 @@ from base.views.education_groups.publication_contact import CreateEducationGroup
     UpdateEducationGroupPublicationContactView, EducationGroupPublicationContactDeleteView, \
     UpdateEducationGroupEntityPublicationContactView
 from base.views.education_groups.search import EducationGroupTypeAutoComplete
-from base.views.education_groups.select import copy_education_group_to_cache, copy_learning_unit_to_cache
 from base.views.education_groups.update import CertificateAimAutocomplete
 from education_group import urls as education_group_urls
 from . import search, create, update, delete
@@ -50,11 +49,6 @@ urlpatterns = [
     ),
 
     url(r'^$', search.EducationGroupSearch.as_view(), name='education_groups'),
-    url(
-        r'^select_lu/(?P<learning_unit_year_id>[0-9]+)$',
-        copy_learning_unit_to_cache,
-        name='copy_learning_unit_to_cache'
-    ),
     url(
         r'^clear_clipboard/$',
         clear_clipboard,
@@ -93,7 +87,6 @@ urlpatterns = [
         url(r'^update/$', update.update_education_group, name="update_education_group"),
         url(r'^informations/edit/$', education_group.education_group_year_pedagogy_edit,
             name="education_group_pedagogy_edit"),
-        url(r'^select/$', copy_education_group_to_cache, name='copy_education_group_to_cache'),
         url(r'^skills_achievements/', include(urlpatterns_achievement)),
 
         url(r'^admission_conditions/remove_line$',

@@ -25,23 +25,16 @@ from django.conf import settings
 from django.db.models import OuterRef, Exists
 from django.templatetags.static import static
 from django.urls import reverse
-from django.utils.html import escape
 from django.utils.translation import gettext_lazy as _
-from waffle import switch_is_active
 
 from base.business.education_groups import perms as education_group_perms
 from base.models.education_group_year import EducationGroupYear
-from base.models.entity_version import build_current_entity_version_structure_in_memory, EntityVersion, \
-    get_entity_version_parent_or_itself_from_type, get_structure_of_entity_version
+from base.models.entity_version import build_current_entity_version_structure_in_memory, EntityVersion
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import MiniTrainingType, GroupType, TrainingType
-from base.models.enums.entity_type import SECTOR, FACULTY, SCHOOL, DOCTORAL_COMMISSION
 from base.models.enums.link_type import LinkTypes
-from base.models.enums.proposal_type import ProposalType
 from base.models.group_element_year import GroupElementYear, fetch_row_sql
 from base.models.prerequisite_item import PrerequisiteItem
-from base.models.proposal_learning_unit import ProposalLearningUnit
-from program_management.business.group_element_years import attach
 from program_management.business.group_element_years.management import EDUCATION_GROUP_YEAR, LEARNING_UNIT_YEAR
 
 

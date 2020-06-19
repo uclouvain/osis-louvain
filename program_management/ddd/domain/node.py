@@ -25,7 +25,7 @@
 ##############################################################################
 from _decimal import Decimal
 from collections import OrderedDict
-from typing import List, Set, Dict
+from typing import List, Set, Dict, Optional
 
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_categories import Categories
@@ -69,7 +69,7 @@ class NodeIdentity(interface.EntityIdentity):
         return hash(self.code + str(self.year))
 
     def __eq__(self, other):
-        return self.code == other.code and self.year == other.year
+        return type(other) == type(self) and (self.code, self.year) == (other.code, other.year)
 
 
 class Node(interface.Entity):
@@ -107,7 +107,9 @@ class Node(interface.Entity):
         super(Node, self).__init__(entity_id=NodeIdentity(self.code, self.year))
 
     def __eq__(self, other):
-        return (self.node_id, self.__class__) == (other.node_id,  other.__class__)
+        if self.__class__ == other.__class__:
+            return self.node_id == other.node_id
+        return False
 
     def __hash__(self):
         return hash(self.node_id)
@@ -244,15 +246,17 @@ class Node(interface.Entity):
     def descendents(self) -> Dict['Path', 'Node']:   # TODO :: add unit tests
         return _get_descendents(self)
 
-    def add_child(self, node: 'Node', **link_attrs):
+    def add_child(self, node: 'Node', **link_attrs) -> 'Link':
         child = link_factory.get_link(parent=self, child=node, **link_attrs)
         self._children.append(child)
         child._has_changed = True
+        return child
 
-    def detach_child(self, node_to_detach: 'Node'):
+    def detach_child(self, node_to_detach: 'Node') -> 'Link':
         link_to_detach = next(link for link in self.children if link.child == node_to_detach)
         self._deleted_children.add(link_to_detach)
         self.children.remove(link_to_detach)
+        return link_to_detach
 
     def get_link(self, link_id: int) -> 'Link':
         return next((link for link in self.children if link.pk == link_id), None)

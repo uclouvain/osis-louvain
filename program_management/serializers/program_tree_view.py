@@ -25,6 +25,7 @@
 ##############################################################################
 from django.urls import reverse
 
+from base.utils.urls import reverse_with_get
 from program_management.serializers.node_view import serialize_children
 from program_management.ddd.business_types import *
 
@@ -44,9 +45,13 @@ def program_tree_view_serializer(tree: 'ProgramTree') -> dict:
             'href': reverse('element_identification', args=[tree.root_node.year, tree.root_node.code]),
             'element_id': tree.root_node.pk,
             'element_type': tree.root_node.type.name,
-            'attach_url': reverse(
-                'education_group_attach',
-                args=[tree.root_node.pk, tree.root_node.pk]
-            ) + "?path=%s" % str(tree.root_node.pk),
+            'element_code': tree.root_node.code,
+            'element_year': tree.root_node.year,
+            'paste_url': reverse_with_get('tree_paste_node', get={"path": str(tree.root_node.pk)}),
+            'search_url': reverse_with_get(
+                'quick_search_education_group',
+                args=[tree.root_node.academic_year.year],
+                get={"path": str(tree.root_node.pk)}
+            ),
         }
     }

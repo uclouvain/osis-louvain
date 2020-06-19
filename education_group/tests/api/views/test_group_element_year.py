@@ -28,7 +28,7 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from base.models.enums.education_group_categories import GROUP, MINI_TRAINING, TRAINING
+from base.models.enums.education_group_categories import GROUP, TRAINING
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, MiniTrainingFactory
@@ -42,7 +42,7 @@ from program_management.ddd.domain.link import Link
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.models.element import Element
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
 
@@ -63,7 +63,7 @@ class TrainingTreeViewTestCase(APITestCase):
             academic_year=cls.academic_year,
             education_group_type__name=TrainingType.PGRM_MASTER_120.name
         )
-        training_version = EducationGroupVersionFactory(
+        training_version = StandardEducationGroupVersionFactory(
             offer=cls.training,
             root_group__academic_year=cls.academic_year,
             root_group__education_group_type__category=TRAINING,
@@ -106,7 +106,7 @@ class TrainingTreeViewTestCase(APITestCase):
             academic_year=cls.academic_year,
             education_group_type__name=TrainingType.MASTER_MS_120.name
         )
-        training_ms_version = EducationGroupVersionFactory(
+        training_ms_version = StandardEducationGroupVersionFactory(
             offer=cls.training_ms,
             root_group__academic_year=cls.academic_year,
             root_group__education_group_type__category=TRAINING,
@@ -199,9 +199,9 @@ class MiniTrainingTreeViewTestCase(APITestCase):
             acronym="CCHOIXM60",
             academic_year=cls.academic_year
         )
-        cls.mini_training_version = EducationGroupVersionFactory(
+        cls.mini_training_version = StandardEducationGroupVersionFactory(
             offer=cls.mini_training,
-            root_group__education_group_type__category=MINI_TRAINING,
+            root_group__education_group_type=cls.mini_training.education_group_type,
             root_group__partial_acronym='LBIOL212O',
             root_group__academic_year=cls.academic_year,
         )

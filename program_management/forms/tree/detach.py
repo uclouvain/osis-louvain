@@ -24,12 +24,27 @@
 #
 ##############################################################################
 from django import forms
+from django.core.exceptions import ValidationError
 
-from program_management.ddd.service import detach_node_service
+import osis_common.ddd.interface
+from base.ddd.utils import business_validator
+from program_management.ddd import command
+from program_management.ddd.domain import link
+from program_management.ddd.service.write import detach_node_service
+from program_management.ddd.validators import _path_validator
 
 
 class DetachNodeForm(forms.Form):
-    path = forms.CharField(widget=forms.HiddenInput)
+    path = forms.CharField(widget=forms.HiddenInput, required=True)
 
-    def save(self):
-        return detach_node_service.detach_node(self.cleaned_data['path'])
+    def clean_path(self):
+        cleaned_path = self.cleaned_data.get("path")
+        try:
+            _path_validator.PathValidator(cleaned_path).validate()
+        except osis_common.ddd.interface.BusinessExceptions as business_exception:
+            raise ValidationError(business_exception.messages)
+        return cleaned_path
+
+    def save(self) -> link.LinkIdentity:
+        detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.cleaned_data["path"], commit=True)
+        return detach_node_service.detach_node(detach_node_command)

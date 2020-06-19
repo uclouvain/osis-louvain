@@ -23,14 +23,12 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
 from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
 import program_management.ddd.repositories.find_roots
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
@@ -46,7 +44,7 @@ class EducationGroupRootsFilter(filters.FilterSet):
     @staticmethod
     def filter_complementary_module(queryset, _, value):
         if value:
-            queryset = queryset.exclude(education_group_type__name=GroupType.COMPLEMENTARY_MODULE.name)
+            queryset = queryset.exclude(offer__education_group_type__name=GroupType.COMPLEMENTARY_MODULE.name)
         return queryset
 
 
@@ -71,11 +69,9 @@ class EducationGroupRootsList(LanguageContextSerializerMixin, generics.ListAPIVi
             exclude_root_categories=TrainingType.finality_types_enum(),
             as_instances=True
         ).get(element.id, [])
-        return EducationGroupYear.objects.filter(
-            pk__in=EducationGroupVersion.objects.filter(
-                root_group__element__in=root_elements
-            ).values('offer_id')
-        ).select_related('academic_year', 'education_group_type')
+        return EducationGroupVersion.objects.filter(
+            root_group__element__in=root_elements
+        ).select_related('offer__academic_year', 'offer__education_group_type')
 
 
 class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -93,9 +89,11 @@ class LearningUnitPrerequisitesList(LanguageContextSerializerMixin, generics.Lis
             acronym=self.kwargs['acronym'].upper(),
             academic_year__year=self.kwargs['year']
         )
-        return Prerequisite.objects.filter(learning_unit_year=learning_unit_year)\
-                                   .select_related(
-                                        'education_group_year__academic_year',
-                                        'education_group_year__education_group_type',
-                                        'learning_unit_year__academic_year',
-                                   ).prefetch_related('prerequisiteitem_set')
+
+        return Prerequisite.objects.filter(learning_unit_year=learning_unit_year).select_related(
+            'learning_unit_year__academic_year',
+            'education_group_version__offer__academic_year',
+            'education_group_version__offer__education_group_type'
+        ).prefetch_related(
+            'prerequisiteitem_set',
+        )

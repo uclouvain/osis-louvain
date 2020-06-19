@@ -40,14 +40,17 @@ from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
 from base.models.enums.education_group_types import GroupType
+from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.models.group_year import GroupYear
+from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.business_types import *
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.repositories import load_tree
+from program_management.ddd.service.read import element_selected_service
 from program_management.forms.custom_xls import CustomXlsForm
 from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
@@ -56,7 +59,7 @@ from program_management.serializers.program_tree_view import program_tree_view_s
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
 
-class GroupRead(PermissionRequiredMixin, TemplateView):
+class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, TemplateView):
     # PermissionRequiredMixin
     permission_required = 'base.view_educationgroup'
     raise_exception = True
@@ -114,6 +117,7 @@ class GroupRead(PermissionRequiredMixin, TemplateView):
                 self.path,
                 _get_view_name_from_tab(self.active_tab),
             ),
+            "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             "group_year": self.get_group_year()  # TODO: Should be remove and use DDD object
         }
 

@@ -1,5 +1,4 @@
-from enum import Enum
-from typing import Union
+from enum import IntEnum
 
 from django.urls import reverse
 from django.utils.functional import cached_property
@@ -12,7 +11,7 @@ from program_management.ddd.domain.service.identity_search import NodeIdentitySe
 from program_management.ddd.repositories.node import NodeRepository
 
 
-class Tab(Enum):
+class Tab(IntEnum):
     IDENTIFICATION = 0
     DIPLOMAS_CERTIFICATES = 1
     ADMINISTRATIVE_DATA = 2

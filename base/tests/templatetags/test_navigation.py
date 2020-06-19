@@ -31,11 +31,9 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.forms.learning_unit.search.simple import LearningUnitFilter
-from base.models.education_group_year import EducationGroupYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.templatetags import navigation
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.user import UserFactory
 from base.utils.cache import SearchParametersCache
@@ -47,6 +45,7 @@ from program_management.tests.factories.education_group_version import Education
 
 class TestNavigationMixin:
     search_type = "DEFINE"
+
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(current=True)
@@ -87,12 +86,20 @@ class TestNavigationMixin:
     def tearDown(self):
         self.cache.clear()
 
-    def assertNavigationContextEquals(self, expected_context, index):
-        context = self.navigation_function(
-            self.user,
-            self.elements_sorted_by_acronym[index],
-            self.url_name
-        )
+    def assertNavigationContextEquals(self, expected_context, index, group=False):
+        if group:
+            context = self.navigation_function(
+                self.user,
+                self.elements_sorted_by_acronym[index],
+                self.url_name,
+                None
+            )
+        else:
+            context = self.navigation_function(
+                self.user,
+                self.elements_sorted_by_acronym[index],
+                self.url_name
+            )
         self.assertEqual(context["current_element"], expected_context["current_element"])
         self.assertEqual(context["next_element_title"], expected_context["next_element_title"])
         self.assertEqual(context["previous_element_title"], expected_context["previous_element_title"])
@@ -134,7 +141,7 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
         self.navigation_function(
             self.user,
             self.elements_sorted_by_acronym[0],
-            self.url_name
+            self.url_name,
         )
 
         self.assertTrue(self.mocked_filter_form.called)
@@ -147,7 +154,7 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
         context = self.navigation_function(
             self.user,
             self.elements_sorted_by_acronym[0],
-            self.url_name
+            self.url_name,
         )
 
         expected_context = {"current_element": self.elements_sorted_by_acronym[0]}
@@ -189,6 +196,7 @@ class TestNavigationLearningUnitYear(TestNavigationMixin, TestCase):
 
 class TestNavigationGroupYear(TestNavigationMixin, TestCase):
     search_type = GroupYear.__name__
+    current_version_value = 9  # TODO : Devrait être un programTreeVersion
 
     @classmethod
     def generate_elements(cls):
@@ -213,7 +221,8 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
         context = self.navigation_function(
             self.user,
             self.elements_sorted_by_acronym[0],
-            self.url_name
+            self.url_name,
+            None
         )
 
         expected_context = {"current_element": self.elements_sorted_by_acronym[0]}
@@ -228,7 +237,7 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
             "previous_element_title": None,
             "previous_url": None,
         }
-        self.assertNavigationContextEquals(expected_context, first_element_index)
+        self.assertNavigationContextEquals(expected_context, first_element_index, True)
 
     def test_last_element_should_not_have_next_element(self):
         last_element_index = len(self.elements_sorted_by_acronym) - 1
@@ -238,8 +247,9 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
             "next_url": None,
             "previous_element_title": self.elements_sorted_by_acronym[last_element_index - 1].partial_acronym,
             "previous_url": self._get_element_url(self.query_parameters, last_element_index - 1),
+            "current_version": None
         }
-        self.assertNavigationContextEquals(expected_context, last_element_index)
+        self.assertNavigationContextEquals(expected_context, last_element_index, True)
 
     def test_inner_element_should_have_previous_and_next_element(self):
         inner_element_index = 2
@@ -250,4 +260,16 @@ class TestNavigationGroupYear(TestNavigationMixin, TestCase):
             "previous_element_title": self.elements_sorted_by_acronym[inner_element_index - 1].partial_acronym,
             "previous_url": self._get_element_url(self.query_parameters, inner_element_index - 1),
         }
-        self.assertNavigationContextEquals(expected_context, inner_element_index)
+        self.assertNavigationContextEquals(expected_context, inner_element_index, True)
+
+    def test_navigation_with_version(self):
+        self.cache.clear()
+
+        context = self.navigation_function(
+            self.user,
+            self.elements_sorted_by_acronym[0],
+            self.url_name,
+            self.current_version_value
+        )
+
+        self.assertEqual(context['current_version'], self.current_version_value)

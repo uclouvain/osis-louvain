@@ -22,8 +22,10 @@
 
                 <div class="panel-body" style="border-bottom: 1px solid #ddd;">
                     {# FIXME: Disable autocomplete because otherwise the aucomplete scroll of the last text input completed would appear at the top left of the screen when clicking on the checkbox #}
-                    <form method="get" id="form-modal" action="{{ request.path }}" class="stay_in_modal" style="padding-top: 10px;" autocomplete="off">
+                    <form method="get" id="form-modal" action="{{ request.path }}" class="stay_in_modal"
+                          style="padding-top: 10px;" autocomplete="off">
                         <input type="hidden" name="page" value="{{ page_obj.number }}">
+                        <input type="hidden" name="path" value="{{ request.GET.path }}">
                         <div class="row">
                             {% block form_field %}
 
@@ -31,7 +33,8 @@
                             {% endblock form_field %}
                             <br>
                             <div class="col-md-2">
-                                <button id="btn-submit-quicksearch" type="submit" class="btn btn-primary" name="search-eg" title="search">
+                                <button id="btn-submit-quicksearch" type="submit" class="btn btn-primary"
+                                        name="search-eg" title="search">
                                     <em class="fa fa-search"></em>
                                 </button>
                             </div>
@@ -77,50 +80,49 @@
 
 {% block script %}
     {# Must define column_def variable in js and also quick_search_url #}
-<script src="{% static "js/osis_datatable.js" %}"></script>
-<script>
-    $(document).ready(function()
-    {
-        document.getElementById("modal_dialog_id").classList.add("modal-lg");
+    <script src="{% static "js/osis_datatable.js" %}"></script>
+    <script>
+        $(document).ready(function () {
+            document.getElementById("modal_dialog_id").classList.add("modal-lg");
 
-       initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
-            {{ paginator.per_page }}, "{{ request.path }}", columnDefs);
+            initializeDataTable("form-modal", "table-objects", "objectQuickSearchIds", {{ page_obj.number }},
+                {{ paginator.per_page }}, "{{ request.path }}", columnDefs);
 
-        let checkUrl = "{% url 'check_education_group_attach' root_id %}";
-        let attachUrl = "{% url 'tree_attach_node' root_id %}";
+            let checkUrl = "{% url 'check_tree_paste_node' %}";
+            let attachUrl = "{% url 'tree_paste_node' %}";
 
-        $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
+            $("#button-attach").click(attachElementSelected(checkUrl, attachUrl));
 
-        $("#search-pagination li a[href]").each(function(index, paginationAnchor){
-            paginationAnchor.addEventListener('click', function submitWithPage(e){
-                e.preventDefault();
-                const paginationHref = paginationAnchor.getAttribute("href");
-                const searchParams = new URLSearchParams(paginationHref);
-                const page = searchParams.get("page");
-                $("input[name='page']").val(page);
-                $('#form-modal').submit();
+            $("#search-pagination li a[href]").each(function (index, paginationAnchor) {
+                paginationAnchor.addEventListener('click', function submitWithPage(e) {
+                    e.preventDefault();
+                    const paginationHref = paginationAnchor.getAttribute("href");
+                    const searchParams = new URLSearchParams(paginationHref);
+                    const page = searchParams.get("page");
+                    $("input[name='page']").val(page);
+                    $('#form-modal').submit();
+                });
             });
-        });
 
-        function attachElementSelected(checkUrl, attachUrl){
-            return function(){
-                const elementsUrl = $("input[name=selected-item]:checked").map(function(){return $(this).attr("data-url");}).get();
-                const parameters = extract_ids_and_content_type_parameters(elementsUrl);
-                const paramString = new URLSearchParams();
-                paramString.append("content_type", parameters["content_type"]);
-                paramString.append("path", "{{ node_path }}");
-                for (let index in parameters["id"]){
-                    paramString.append("id", parameters["id"][index]);
-                }
+            function attachElementSelected(checkUrl, attachUrl) {
+                return function () {
+                    const boxChecked = document.querySelectorAll("input[name=selected-item]:checked")
+                    const parameters = extract_ids_and_content_type_parameters(boxChecked);
+                    const paramString = new URLSearchParams();
+                    paramString.append("year", parameters["year"]);
+                    paramString.append("path", "{{ node_path }}");
+                    for (let index in parameters["codes"]) {
+                        paramString.append("codes", parameters["codes"][index]);
+                    }
 
-                $.ajax({
-                    url: `${checkUrl}?${paramString.toString()}`,
-                    dataType: 'json'
-                }).done(function(jsonResponse){
-                    const error_messages = jsonResponse["error_messages"];
-                    if (error_messages.length > 0) {
-                        const $span_messages = $("#message_info_modal");
-                        $span_messages.removeAttr("style");
+                    $.ajax({
+                        url: `${checkUrl}?${paramString.toString()}`,
+                        dataType: 'json'
+                    }).done(function (jsonResponse) {
+                        const error_messages = jsonResponse["error_messages"];
+                        if (error_messages.length > 0) {
+                            const $span_messages = $("#message_info_modal");
+                            $span_messages.removeAttr("style");
                         $span_messages.text("");
                         error_messages.forEach(function (message) {
                             $span_messages.append(`<p>${message}</p>`);
@@ -133,35 +135,29 @@
                                 formAjaxSubmit(form, '#form-ajax-modal');
                             }
                         });
+                        }
+                    });
+                };
+            }
+
+            function extract_ids_and_content_type_parameters(elements) {
+                codes = []
+                year = null;
+                elements.forEach((function (element) {
+                    codes.push(element.dataset.code);
+                    year = element.dataset.year;
+                }));
+                return {"codes": codes, "year": year};
+            }
+
+            // FIXME This method is copy pasted. Should be extracted in a common file.
+            // Also will be suppressed when we will slugify urls.
+            function getIdFromUrl(url) {
+                let split = url.split("/");
+                for (let i = split.length - 1; i--; i >= 0) {
+                    if (!isNaN(split[i])) {
+                        return parseInt(split[i]);
                     }
-                });
-            };
-        }
-
-        function extract_ids_and_content_type_parameters(urls){
-            let contentType = "";
-            if (urls.length === 0){
-                contentType = ""
-            }
-            else if (urls[0].includes("learning_units")){
-                contentType = "base_learningunityear";
-            }else if(urls[0].includes("educationgroups")){
-                contentType = "base_educationgroupyear";
-            }
-
-            let object_ids = urls.map((url) => getIdFromUrl(url).toString());
-
-            return {"id": object_ids, "content_type": contentType};
-        }
-
-        // FIXME This method is copy pasted. Should be extracted in a common file.
-        // Also will be suppressed when we will slugify urls.
-        function getIdFromUrl(url){
-            let split = url.split("/");
-            for(let i=split.length-1; i--; i >= 0){
-                if(!isNaN(split[i])){
-                    return parseInt(split[i]);
-                }
             }
             return NaN;
         }

@@ -25,6 +25,8 @@ from typing import Optional
 
 from django.utils.translation import gettext_lazy as _
 
+import osis_common.ddd.interface
+from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessValidator
 from base.models.enums import education_group_types
 from base.models.enums.link_type import LinkTypes
@@ -42,18 +44,18 @@ class AuthorizedLinkTypeValidator(BusinessValidator):
 
     def validate(self, *args, **kwargs):
         if self.node_to_add.node_type == NodeType.LEARNING_UNIT and self.link_type == LinkTypes.REFERENCE:
-            self.add_error_message(
-                _("You are not allowed to create a reference with a learning unit %(child_node)s") % {
+            raise osis_common.ddd.interface.BusinessExceptions(
+                [_("You are not allowed to create a reference with a learning unit %(child_node)s") % {
                     "child_node": self.node_to_add
-                }
+                }]
             )
 
-        if self.parent_node.node_type in education_group_types.GroupType.minor_major_list_choice_enums() and\
+        elif self.parent_node.node_type in education_group_types.GroupType.minor_major_list_choice_enums() and \
                 self.node_to_add.node_type in education_group_types.MiniTrainingType \
                 and self.link_type != LinkTypes.REFERENCE:
-            self.add_error_message(
-                _("Link type should be reference between %(parent)s and %(child)s") % {
+            raise osis_common.ddd.interface.BusinessExceptions(
+                [_("Link type should be reference between %(parent)s and %(child)s") % {
                     "parent": self.parent_node,
                     "child": self.node_to_add
-                }
+                }]
             )

@@ -31,8 +31,8 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import TemplateView
-from django.views.generic import DetailView, FormView
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
@@ -40,24 +40,39 @@ from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
 from base.utils.cache import ElementCache
-from base.views.education_groups import perms
-from base.views.mixins import RulesRequiredMixin, FlagMixin, AjaxTemplateMixin
+from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from education_group.models.group_year import GroupYear
 from osis_common.utils.models import get_object_or_none
-from osis_role.contrib.views import PermissionRequiredMixin, AjaxPermissionRequiredMixin
+from osis_role.contrib.views import AjaxPermissionRequiredMixin
 from program_management.ddd.repositories import load_tree
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers import program_tree_view
-from base.views.education_groups.select import get_clipboard_content_display
+from program_management.ddd.business_types import *
 
 NO_PREREQUISITES = TrainingType.finality_types() + [
     MiniTrainingType.OPTION.name,
     MiniTrainingType.MOBILITY_PARTNERSHIP.name,
 ] + GroupType.get_names()
 
-
 LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
+
+
+def get_clipboard_content_display(obj, action):
+    msg_template = "<strong>{clipboard_title}</strong><br>{object_str}"
+    return msg_template.format(
+        clipboard_title=_get_clipboard_title(action),
+        object_str=str(obj),
+    )
+
+
+def _get_clipboard_title(action):
+    if action == ElementCache.ElementCacheAction.CUT.value:
+        return _("Cut element")
+    elif action == ElementCache.ElementCacheAction.COPY.value:
+        return _("Copied element")
+    else:
+        return ""
 
 
 class CatalogGenericDetailView:
@@ -81,7 +96,7 @@ class CatalogGenericDetailView:
 
 
 @method_decorator(login_required, name='dispatch')
-class GenericGroupElementYearMixin(AjaxPermissionRequiredMixin, FlagMixin, SuccessMessageMixin, AjaxTemplateMixin):
+class GenericGroupElementYearMixin(FlagMixin, AjaxPermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin):
     model = GroupElementYear
     context_object_name = "group_element_year"
     pk_url_kwarg = "group_element_year_id"
@@ -98,8 +113,8 @@ class GenericGroupElementYearMixin(AjaxPermissionRequiredMixin, FlagMixin, Succe
     def get_root(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
-    def get_permission_object(self):
-        return self.get_object().parent
+    def get_permission_object(self) -> GroupYear:
+        return self.get_object().parent_element.group_year
 
 
 class LearningUnitGeneric(CatalogGenericDetailView, TemplateView):

@@ -29,7 +29,6 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearMasterFactory
@@ -42,6 +41,7 @@ from education_group.api.serializers.learning_unit import EducationGroupRootsLis
     LearningUnitYearPrerequisitesListSerializer
 from education_group.api.views.learning_unit import EducationGroupRootsList, LearningUnitPrerequisitesList
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
@@ -62,7 +62,7 @@ class FilterEducationGroupRootsTestCase(APITestCase):
             education_group_type__name=TrainingType.PGRM_MASTER_120.name,
             acronym='test2m', partial_acronym='test2m', academic_year=cls.academic_year
         )
-        StandardEducationGroupVersionFactory(root_group=cls.group, offer=cls.training)
+        cls.version = StandardEducationGroupVersionFactory(root_group=cls.group, offer=cls.training)
 
         cls.common_core = GroupYearFactory(
             education_group_type__name=GroupType.COMMON_CORE.name,
@@ -115,7 +115,7 @@ class FilterEducationGroupRootsTestCase(APITestCase):
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        education_group_roots = EducationGroupYear.objects.filter(id=self.training.id)
+        education_group_roots = EducationGroupVersion.objects.filter(offer_id=self.training.id)
 
         serializer = EducationGroupRootsListSerializer(
             education_group_roots,
@@ -134,7 +134,8 @@ class FilterEducationGroupRootsTestCase(APITestCase):
             acronym=finality_root.acronym, partial_acronym=finality_root.partial_acronym,
             academic_year=self.academic_year
         )
-        StandardEducationGroupVersionFactory(root_group=finality_root_group, offer=finality_root)
+        finality_root_version = StandardEducationGroupVersionFactory(root_group=finality_root_group,
+                                                                     offer=finality_root)
 
         finality = GroupYearFactory(
             academic_year=self.academic_year,
@@ -149,10 +150,10 @@ class FilterEducationGroupRootsTestCase(APITestCase):
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        education_group_roots = EducationGroupYear.objects.filter(id=self.training.id)
+        education_group_roots = EducationGroupVersion.objects.filter(offer_id=self.training.id)
 
         serializer = EducationGroupRootsListSerializer(
-            list(education_group_roots) + [finality_root],
+            list(education_group_roots) + [finality_root_version],
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
@@ -179,7 +180,7 @@ class EducationGroupRootsListTestCase(APITestCase):
             education_group_type__name=TrainingType.BACHELOR.name,
             acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=cls.academic_year
         )
-        StandardEducationGroupVersionFactory(root_group=cls.group, offer=cls.training)
+        cls.version = StandardEducationGroupVersionFactory(root_group=cls.group, offer=cls.training)
         cls.common_core = GroupYearFactory(
             education_group_type__name=GroupType.COMMON_CORE.name,
             academic_year=cls.academic_year
@@ -232,7 +233,7 @@ class EducationGroupRootsListTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = EducationGroupRootsListSerializer(
-            [self.training],
+            [self.version],
             many=True,
             context={
                 'request': RequestFactory().get(self.url),
@@ -252,6 +253,7 @@ class LearningUnitPrerequisitesViewTestCase(APITestCase):
             partial_acronym='LDROI1000',
             academic_year=cls.academic_year
         )
+        cls.version = StandardEducationGroupVersionFactory(offer=cls.education_group_year)
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.academic_year,
             learning_container_year__academic_year=cls.academic_year

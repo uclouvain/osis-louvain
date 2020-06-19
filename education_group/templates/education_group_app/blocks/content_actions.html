@@ -35,6 +35,6 @@
         {% csrf_token %}
         {% button_order_with_permission _("Go down") "btn_operation_down_"|addstr:group.id "down" %}
     </form>
-    {% url 'group_element_year_delete' root.pk education_group_year.pk group.pk as detach_url %}
-    {% action_with_permission person group _("Detach") "detach" "base.can_detach_node" detach_url %}
+    {% url 'tree_detach_node' root.pk as detach_url %}
+    {% action_with_permission person group _("Detach") "detach" "base.can_detach_node" detach_url|add:"?path="|add:node_path|add:"|"|addstr:group.child.id %}
 </div>

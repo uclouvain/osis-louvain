@@ -25,11 +25,12 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
-from base.ddd.utils.business_validator import BusinessValidator
+import osis_common.ddd.interface
+from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 
 
-class ParentChildSameAcademicYearValidator(BusinessValidator):
+class ParentChildSameAcademicYearValidator(business_validator.BusinessValidator):
 
     def __init__(self, parent_node: 'Node', node_to_add: 'Node'):
         super(ParentChildSameAcademicYearValidator, self).__init__()
@@ -37,11 +38,11 @@ class ParentChildSameAcademicYearValidator(BusinessValidator):
         self.parent_node = parent_node
 
     def validate(self):
-        if self.parent_node.year != self.node_to_add.year:
-            self.add_error_message(
-                _("It is prohibited to attach a %(child_node)s to an element of "
-                  "another academic year %(parent_node)s.") % {
-                    "child_node": self.node_to_add,
-                    "parent_node": self.parent_node
-                }
+        if not self.node_to_add.is_learning_unit() and self.parent_node.year != self.node_to_add.year:
+            raise osis_common.ddd.interface.BusinessExceptions(
+                [_("It is prohibited to attach a %(child_node)s to an element of "
+                   "another academic year %(parent_node)s.") % {
+                     "child_node": self.node_to_add,
+                     "parent_node": self.parent_node
+                 }]
             )

@@ -33,9 +33,10 @@ from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeGroupYearFactory
 from program_management.tests.ddd.factories.prerequisite import cast_to_prerequisite
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
 
-class TestIsPrerequisiteValidator(SimpleTestCase):
+class TestIsPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     def setUp(self):
         link = LinkFactory(parent__node_type=TrainingType.BACHELOR, child__node_type=GroupType.COMMON_CORE)
@@ -47,76 +48,61 @@ class TestIsPrerequisiteValidator(SimpleTestCase):
         )
         self.node_learning_unit = link_with_learn_unit.child
 
-    def test_when_node_to_detach_is_group_and_children_are_not_prerequisite(self):
+    def test_should_not_raise_exception_when_children_of_node_to_detach_are_not_prerequisites(self):
         node_to_detach = self.common_core
+        path_parent_of_node_to_detach = "|".join([str(self.tree.root_node.node_id)])
         LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory(is_prerequisite_of=[]))
         LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory(is_prerequisite_of=[]))
-        validator = IsPrerequisiteValidator(self.tree, node_to_detach)
-        self.assertTrue(validator.is_valid())
-        self.assertListEqual(validator.messages, [])
 
-    def test_when_node_to_detach_is_group_and_children_are_prerequisite(self):
+        validator = IsPrerequisiteValidator(self.tree, path_parent_of_node_to_detach, node_to_detach)
+        self.assertValidatorNotRaises(validator)
+
+    def test_should_raise_exception_when_children_of_node_to_detach_are_prerequisites(self):
         node_to_detach = self.common_core
+        path_parent_of_node_to_detach = "|".join([str(self.tree.root_node.node_id)])
         link = LinkFactory(parent=self.common_core, child=NodeLearningUnitYearFactory(is_prerequisite_of=[]))
         link_with_child_that_is_prerequisite = LinkFactory(
             parent=self.common_core,
             child=NodeLearningUnitYearFactory(is_prerequisite_of=[link.child])
         )
-        validator = IsPrerequisiteValidator(self.tree, node_to_detach)
-        self.assertFalse(validator.is_valid())
+
+        validator = IsPrerequisiteValidator(self.tree, path_parent_of_node_to_detach, node_to_detach)
         expected_message = _("Cannot detach education group year %(acronym)s as the following learning units "
                              "are prerequisite in %(formation)s: %(learning_units)s") % {
                                "acronym": node_to_detach.title,
                                "formation": self.tree.root_node.title,
                                "learning_units": link_with_child_that_is_prerequisite.child.code
                            }
-        self.assertListEqual(validator.messages, [expected_message])
+        self.assertValidatorRaises(validator, [expected_message])
 
-    def test_when_node_to_detach_is_prerequisite(self):
+    def test_should_raise_exception_when_node_to_detach_is_prerequisite(self):
+        path_parent_of_node_to_detach = "|".join([str(self.tree.root_node.node_id), str(self.common_core.node_id)])
         link_with_child_is_prerequisite = LinkFactory(
             parent=self.common_core,
             child=NodeLearningUnitYearFactory(is_prerequisite_of=[self.node_learning_unit])
         )
         node_to_detach = link_with_child_is_prerequisite.child
-        validator = IsPrerequisiteValidator(self.tree, node_to_detach)
-        self.assertFalse(validator.is_valid())
+
+        validator = IsPrerequisiteValidator(self.tree, path_parent_of_node_to_detach, node_to_detach)
         expected_message = _(
             "Cannot detach learning unit %(acronym)s as it has a prerequisite or it is a prerequisite.") % {
-                "acronym": node_to_detach.code
-            }
-        self.assertListEqual(validator.messages, [expected_message])
-
-    def test_when_children_of_node_to_detach_are_prerequisites(self):
-        node_to_detach = self.common_core
-        link1 = LinkFactory(
-            parent=node_to_detach,
-            child=NodeLearningUnitYearFactory(is_prerequisite_of=[self.node_learning_unit])
-        )
-        link2 = LinkFactory(parent=node_to_detach, child=NodeLearningUnitYearFactory(is_prerequisite_of=[link1.child]))
-        validator = IsPrerequisiteValidator(self.tree, node_to_detach)
-        self.assertFalse(validator.is_valid())
-        expected_message = _("Cannot detach education group year %(acronym)s as the following learning units "
-                             "are prerequisite in %(formation)s: %(learning_units)s") % {
-                               "acronym": node_to_detach.title,
-                               "formation": self.tree.root_node.title,
-                               "learning_units": ", ".join(sorted((link2.child.code, link1.child.code)))
+                               "acronym": node_to_detach.code
                            }
-        self.assertListEqual(validator.messages, [expected_message])
+        self.assertValidatorRaises(validator, [expected_message])
 
-    def test_when_child_of_node_to_detach_is_prerequisite_but_reused_in_tree(self):
-        msg = "As the node is reused somewhere else in the tree, we can detach the node without checking prerequisites"
+    def test_should_not_raise_exception_when_child_of_node_to_detach_is_prerequisite_but_reused_in_tree(self):
+        #  As the node is reused somewhere else in the tree, we can detach the node without checking prerequisites
         reused_node = NodeLearningUnitYearFactory(is_prerequisite_of=[self.node_learning_unit])
         LinkFactory(parent=self.common_core, child=reused_node)
         LinkFactory(parent=self.tree.root_node, child=reused_node)
 
         node_to_detach = self.common_core
-        validator = IsPrerequisiteValidator(self.tree, node_to_detach)
-        test = validator.is_valid()
-        self.assertTrue(test)
-        self.assertListEqual(validator.messages, [], msg)
+        path_parent_of_node_to_detach = "|".join([str(self.tree.root_node.node_id)])
+        validator = IsPrerequisiteValidator(self.tree, path_parent_of_node_to_detach, node_to_detach)
+        self.assertValidatorNotRaises(validator)
 
 
-class TestHasPrerequisiteValidator(SimpleTestCase):
+class TestHasPrerequisiteValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     def setUp(self):
         self.node_is_prerequisite = NodeLearningUnitYearFactory()
@@ -125,14 +111,15 @@ class TestHasPrerequisiteValidator(SimpleTestCase):
         node_has_prerequisite.set_prerequisite(cast_to_prerequisite(self.node_is_prerequisite))
         self.node_has_prerequisite = node_has_prerequisite
 
-    def test_when_node_to_detach_is_group_and_not_contains_prerequisites(self):
+    def test_should_not_raise_exception_when_children_of_node_to_detach_do_not_have_prerequisites(self):
         node_to_detach = NodeGroupYearFactory()
         link = LinkFactory(child=node_to_detach)
         tree = ProgramTreeFactory(root_node=link.parent)
-        validator = HasPrerequisiteValidator(tree, node_to_detach)
-        self.assertTrue(validator.is_valid())
 
-    def test_when_node_to_detach_is_group_and_contains_prerequisites(self):
+        validator = HasPrerequisiteValidator(tree, node_to_detach)
+        self.assertValidatorNotRaises(validator)
+
+    def test_should_raise_exception_when_children_of_node_to_detach_have_prerequisites(self):
         node_to_detach = NodeGroupYearFactory()
 
         link = LinkFactory(child=node_to_detach)
@@ -142,15 +129,14 @@ class TestHasPrerequisiteValidator(SimpleTestCase):
         tree = ProgramTreeFactory(root_node=link.parent)
 
         validator = HasPrerequisiteValidator(tree, node_to_detach)
-        self.assertTrue(validator.is_valid())
         expected_message = _("The prerequisites for the following learning units contained in education group year "
                              "%(acronym)s will we deleted: %(learning_units)s") % {
                                "acronym": tree.root_node.title,
                                "learning_units": self.node_has_prerequisite.code
                            }
-        self.assertListEqual([expected_message], validator.warning_messages)
+        self.assertValidatorRaises(validator, [expected_message])
 
-    def test_when_node_to_detach_is_learning_unit_and_has_prerequisite(self):
+    def test_should_raise_exception_when_node_to_detach_is_learning_unit_that_has_prerequisite(self):
         node_to_detach_has_prerequisite = self.node_has_prerequisite
 
         link = LinkFactory(child=node_to_detach_has_prerequisite)
@@ -158,15 +144,15 @@ class TestHasPrerequisiteValidator(SimpleTestCase):
         tree = ProgramTreeFactory(root_node=link.parent)
 
         validator = HasPrerequisiteValidator(tree, node_to_detach_has_prerequisite)
-        self.assertTrue(validator.is_valid())
         expected_message = _("The prerequisites for the following learning units contained in education group year "
                              "%(acronym)s will we deleted: %(learning_units)s") % {
                                "acronym": tree.root_node.title,
                                "learning_units": node_to_detach_has_prerequisite.code
                            }
-        self.assertListEqual([expected_message], validator.warning_messages)
 
-    def test_when_node_to_detach_is_learning_unit_and_has_no_prerequisite(self):
+        self.assertValidatorRaises(validator, [expected_message])
+
+    def test_should_not_raise_exception_when_node_to_detach_is_learning_unit_that_has_no_prerequisite(self):
         node_to_detach_without_prerequisite = NodeLearningUnitYearFactory()
 
         link = LinkFactory(child=node_to_detach_without_prerequisite)
@@ -174,5 +160,4 @@ class TestHasPrerequisiteValidator(SimpleTestCase):
         tree = ProgramTreeFactory(root_node=link.parent)
 
         validator = HasPrerequisiteValidator(tree, node_to_detach_without_prerequisite)
-        self.assertTrue(validator.is_valid())
-        self.assertListEqual(validator.warning_messages, [])
+        self.assertValidatorNotRaises(validator)

@@ -26,21 +26,39 @@
 
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
+from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.models.enums.node_type import NodeType
 
 
-class Link:
+class LinkIdentity(interface.EntityIdentity):
+    def __init__(self, parent_code: str, child_code: str, parent_year: int, child_year: int):
+        self.parent_code = parent_code
+        self.parent_year = parent_year
+        self.child_code = child_code
+        self.child_year = child_year
+
+    def __hash__(self):
+        return hash((self.parent_code, self.child_code, self.parent_year, self.child_year))
+
+    def __eq__(self, other):
+        if isinstance(other, LinkIdentity):
+            return (self.parent_code, self.child_code, self.parent_year, self.child_year) == \
+                   (other.parent_code, other.child_code, other.parent_year, other.child_year)
+        return False
+
+
+class Link(interface.Entity):
 
     def __init__(
-        self,
-        parent: 'Node',
-        child: 'Node',
-        pk: int = None,
-        relative_credits: int = None,
-        min_credits: int = None,
-        max_credits: int = None,
-        is_mandatory: bool = False,
+            self,
+            parent: 'Node',
+            child: 'Node',
+            pk: int = None,
+            relative_credits: int = None,
+            min_credits: int = None,
+            max_credits: int = None,
+            is_mandatory: bool = False,
         block: str = None,
         access_condition: bool = False,
         comment: str = None,
@@ -66,6 +84,10 @@ class Link:
         self.link_type = link_type
         self.order = order
         self._has_changed = False
+        if parent and child:
+            super().__init__(
+                entity_id=LinkIdentity(self.parent.code, self.child.code, self.parent.year, self.child.year)
+            )
 
     @property
     def has_changed(self):

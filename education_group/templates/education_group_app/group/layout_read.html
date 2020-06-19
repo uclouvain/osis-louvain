@@ -35,15 +35,15 @@
 {% endblock %}
 
 {% block header_content %}
-    {% navigation_group request.user group_year request.resolver_match.url_name %}
+    {% navigation_group request.user group_year request.resolver_match.url_name current_version %}
 {% endblock %}
 
 {% block tabs %}
     <ul class="nav nav-tabs" role="tablist">
-        {% for _, tab_url in tab_urls.items %}
+        {% for num_order, tab_url in tab_urls.items %}
             {% if tab_url.display %}
                 <li role="presentation" {% if tab_url.active %} class="active" {% endif %}>
-                    <a id="link_identification" href="{{ tab_url.url }}" role="tab">
+                    <a id="link_{{ num_order.value }}" href="{{ tab_url.url }}" role="tab">
                         {{ tab_url.text }}
                     </a>
                 </li>

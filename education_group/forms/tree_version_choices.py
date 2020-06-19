@@ -50,8 +50,14 @@ def get_tree_versions_choices(
             )
         )
 
-    return choices
+    return _get_ordered_version_choices(choices)
 
 
 def _get_href(node_identity: 'NodeIdentity', active_view_name: str) -> str:
     return reverse(active_view_name, args=[node_identity.year, node_identity.code])
+
+
+def _get_ordered_version_choices(versions_choices):
+    return sorted(versions_choices,
+                  key=lambda version_choice: (version_choice[1].version_name, version_choice[1].is_transition)
+                  )

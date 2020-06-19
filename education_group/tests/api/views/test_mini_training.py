@@ -40,10 +40,13 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
-from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
-from education_group.api.views.mini_training import MiniTrainingList, OfferRoots
+from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer
+from education_group.api.serializers.mini_training import MiniTrainingListSerializer
+from education_group.api.views.mini_training import MiniTrainingList
+from education_group.api.views.mini_training import OfferRoots
 from education_group.tests.factories.group_year import GroupYearFactory
-from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
 
 
@@ -53,10 +56,10 @@ class MiniTrainingTitleTestCase(APITestCase):
         anac = AcademicYearFactory()
 
         cls.egy = MiniTrainingFactory(academic_year=anac)
-
+        cls.version = EducationGroupVersionFactory(offer=cls.egy)
         cls.person = PersonFactory()
         cls.url = reverse('education_group_api_v1:minitrainingstitle_read', kwargs={
-            'partial_acronym': cls.egy.partial_acronym,
+            'partial_acronym': cls.version.root_group.partial_acronym,
             'year': cls.egy.academic_year.year
         })
 
@@ -88,7 +91,7 @@ class MiniTrainingTitleTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        serializer = EducationGroupTitleSerializer(self.egy, context={'language': settings.LANGUAGE_CODE})
+        serializer = EducationGroupTitleSerializer(self.version, context={'language': settings.LANGUAGE_CODE})
         self.assertEqual(response.data, serializer.data)
 
 
@@ -99,14 +102,26 @@ class MiniTrainingListTestCase(APITestCase):
         cls.entity_version = EntityVersionFactory(entity__organization__type=organization_type.MAIN)
 
         cls.mini_trainings = []
+        cls.versions = []
         for partial_acronym in ['LLOGO210O', 'NLOGO2101', 'WLOGO2102']:
-            cls.mini_trainings.append(
-                MiniTrainingFactory(
-                    partial_acronym=partial_acronym,
-                    academic_year=cls.academic_year,
-                    management_entity=cls.entity_version.entity,
-                )
+            offer = MiniTrainingFactory(
+                partial_acronym=partial_acronym,
+                academic_year=cls.academic_year,
+                management_entity=cls.entity_version.entity,
             )
+            mini_training = GroupYearFactory(
+                acronym=offer.acronym,
+                partial_acronym=partial_acronym,
+                academic_year=cls.academic_year,
+                management_entity=cls.entity_version.entity,
+                education_group_type=offer.education_group_type
+            )
+
+            cls.mini_trainings.append(mini_training)
+            cls.versions.append(EducationGroupVersionFactory(
+                root_group=mini_training,
+                offer=offer
+            ))
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:' + MiniTrainingList.name)
 
@@ -133,20 +148,19 @@ class MiniTrainingListTestCase(APITestCase):
         url = self.url + "?" + urllib.parse.urlencode({
             'education_group_type': [mini_training.education_group_type.name for mini_training in self.mini_trainings]
         }, doseq=True)
-
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 3)
 
     def test_get_filter_by_code(self):
         url = self.url + "?" + urllib.parse.urlencode({
-            'code': self.mini_trainings[1].partial_acronym
+            'code': self.versions[1].root_group.partial_acronym
         })
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 1)
-        self.assertEqual(response.data['results'][0]['code'], self.mini_trainings[1].partial_acronym)
+        self.assertEqual(response.data['results'][0]['code'], self.versions[1].root_group.partial_acronym)
 
     def test_get_filter_by_acronym(self):
         url = self.url + "?" + urllib.parse.urlencode({
@@ -176,18 +190,18 @@ class MiniTrainingListTestCase(APITestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['count'], 3)
-        self.assertEqual(response.data['results'][0]['code'], self.mini_trainings[2].partial_acronym)
-        self.assertEqual(response.data['results'][1]['code'], self.mini_trainings[1].partial_acronym)
-        self.assertEqual(response.data['results'][2]['code'], self.mini_trainings[0].partial_acronym)
+        self.assertEqual(response.data['results'][0]['code'], self.versions[2].root_group.partial_acronym)
+        self.assertEqual(response.data['results'][1]['code'], self.versions[1].root_group.partial_acronym)
+        self.assertEqual(response.data['results'][2]['code'], self.versions[0].root_group.partial_acronym)
 
-    def test_get_training_case_filter_lowercase_acronym(self):
+    def test_get_mini_training_case_filter_lowercase_acronym(self):
         query_string = {'partial_acronym': self.mini_trainings[1].partial_acronym.lower()}
 
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = MiniTrainingListSerializer(
-            self.mini_trainings[1],
+            self.versions[1],
             context={
                 'request': RequestFactory().get(self.url, query_string),
                 'language': settings.LANGUAGE_CODE_FR
@@ -201,10 +215,15 @@ class GetMiniTrainingTestCase(APITestCase):
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
         cls.mini_training = MiniTrainingFactory(partial_acronym='LGENR100I', academic_year=cls.academic_year)
-
+        cls.version = StandardEducationGroupVersionFactory(
+            offer=cls.mini_training,
+            root_group__academic_year=cls.academic_year,
+            root_group__education_group_type=cls.mini_training.education_group_type,
+            root_group__partial_acronym=cls.mini_training.partial_acronym
+        )
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:mini_training_read', kwargs={
-            'partial_acronym': cls.mini_training.partial_acronym,
+            'partial_acronym': cls.version.root_group.partial_acronym,
             'year': cls.academic_year.year
         })
 
@@ -229,7 +248,7 @@ class GetMiniTrainingTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = MiniTrainingDetailSerializer(
-            self.mini_training,
+            self.version,
             context={
                 'request': RequestFactory().get(self.url),
                 'language': settings.LANGUAGE_CODE_FR

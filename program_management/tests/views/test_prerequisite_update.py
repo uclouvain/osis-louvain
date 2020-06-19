@@ -28,9 +28,10 @@ from django.http import HttpResponseForbidden, HttpResponseNotFound
 from django.test import TestCase
 from django.urls import reverse
 
-from base.models.enums.education_group_types import GroupType
+from base.models.enums.education_group_types import GroupType, TrainingType
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearBachelorFactory
+from base.tests.factories.education_group_year import EducationGroupYearBachelorFactory, \
+    EducationGroupYearMasterFactory
 from base.tests.factories.group_element_year import GroupElementYearChildLeafFactory
 from base.tests.factories.person import PersonFactory
 from education_group.models.group_year import GroupYear
@@ -78,7 +79,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_not_found_when_learning_unit_not_contained_in_training(self):
-        other_education_group_year = TrainingFactory(academic_year=self.academic_year)
+        other_education_group_year = EducationGroupYearMasterFactory(academic_year=self.academic_year)
         root_element = ElementGroupYearFactory(
             group_year__academic_year=other_education_group_year.academic_year,
             group_year__education_group_type=other_education_group_year.education_group_type,

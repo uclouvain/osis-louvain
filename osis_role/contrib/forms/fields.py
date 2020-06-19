@@ -26,10 +26,8 @@
 from django import forms
 from django.utils import timezone
 
-from base.models.entity import Entity
 from base.models.entity_version import EntityVersion
-from education_group.auth.scope import Scope
-from osis_role import role
+from osis_role.contrib.helper import EntityRoleHelper
 
 
 class EntityRoleChoiceField(forms.ModelChoiceField):
@@ -50,25 +48,11 @@ class EntityRoleChoiceField(forms.ModelChoiceField):
         return self._person
 
     def get_queryset(self):
-        entities_link_to_user = self._get_entities_linked_to_user()
+        entities_link_to_user = EntityRoleHelper.get_all_entities(self._person, self._group_names)
         date = timezone.now()
         return EntityVersion.objects.current(date).filter(
             entity__in=entities_link_to_user
         ).select_related('entity__organization')
-
-    def _get_entities_linked_to_user(self):
-        role_mdls = [r for r in role.role_manager.roles if r.group_name in self.get_group_names()]
-        qs = None
-        for role_mdl in role_mdls:
-            subqs = role_mdl.objects.filter(person=self.get_person())
-            if hasattr(role_mdl, 'scopes'):
-                subqs = subqs.filter(scopes=[Scope.ALL.value])
-            subqs = subqs.values('entity_id', 'with_child')
-            if qs is None:
-                qs = subqs
-            else:
-                qs = qs.union(subqs)
-        return qs.get_entities_ids() if qs else Entity.objects.none()
 
     def label_from_instance(self, obj):
         return obj.verbose_title

@@ -600,11 +600,6 @@
                     "entitymanager"
                 ],
                 [
-                    "is_entity_manager",
-                    "base",
-                    "entitymanager"
-                ],
-                [
                     "add_entityversion",
                     "base",
                     "entityversion"
@@ -2659,69 +2654,6 @@
                     "delete_periodinternshipplaces",
                     "internship",
                     "periodinternshipplaces"
-                ]
-            ]
-        }
-    },
-    {
-        "model": "auth.group",
-        "fields": {
-            "name": "entity_managers",
-            "permissions": [
-                [
-                    "add_educationgroup",
-                    "base",
-                    "educationgroup"
-                ],
-                [
-                    "view_educationgroup",
-                    "base",
-                    "educationgroup"
-                ],
-                [
-                    "change_educationgroup",
-                    "base",
-                    "educationgroup"
-                ],
-                [
-                    "is_entity_manager",
-                    "base",
-                    "entitymanager"
-                ],
-                [
-                    "change_scoresresponsible",
-                    "assessments",
-                    "scoresencoding"
-                ],
-                [
-                    "view_scoresresponsible",
-                    "assessments",
-                    "scoresencoding"
-                ],
-                [
-                    "change_programmanager",
-                    "base",
-                    "programmanager"
-                ],
-                [
-                    "view_programmanager",
-                    "base",
-                    "programmanager"
-                ],
-                [
-                    "can_access_catalog",
-                    "base",
-                    "offer"
-                ],
-                [
-                    "is_institution_administrator",
-                    "base",
-                    "person"
-                ],
-                [
-                    "change_link_data",
-                    "base",
-                    "educationgroup"
                 ]
             ]
         }

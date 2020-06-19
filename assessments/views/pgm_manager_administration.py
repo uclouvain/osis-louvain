@@ -38,6 +38,7 @@ from django.views.generic import ListView, DeleteView, FormView
 from django.views.generic.edit import BaseUpdateView
 
 from base import models as mdl
+from base.auth.roles.entity_manager import EntityManager
 from base.models.offer_type import OfferType
 from base.models.offer_year import OfferYear
 from base.models.person import Person
@@ -280,10 +281,15 @@ def get_filter_value(request, value_name):
 
 def get_administrator_entities(a_user):
     structures = []
-    for entity_managed in mdl.entity_manager.find_by_user(a_user):
-        children_acronyms = find_values('acronym', json.dumps(entity_managed.structure.serializable_object()))
-        structures.append({'root': entity_managed.structure,
-                           'structures': mdl.structure.find_by_acronyms(children_acronyms)})
+    entity_managers = EntityManager.objects.filter(
+        person__user=a_user
+    ).select_related('structure').order_by('structure__acronym')
+    for entity_manager in entity_managers:
+        children_acronyms = find_values('acronym', json.dumps(entity_manager.structure.serializable_object()))
+        structures.append({
+            'root': entity_manager.structure,
+            'structures': mdl.structure.find_by_acronyms(children_acronyms)
+        })
     return structures
 
 

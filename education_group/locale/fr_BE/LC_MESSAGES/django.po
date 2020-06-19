@@ -28,6 +28,9 @@ msgstr "Année académique de fin"
 msgid "End year must be greater than the start year, or equal"
 msgstr "L'année de fin doit être supérieure ou égale à l'année de début "
 
+msgid "of version"
+msgstr "de la version"
+
 msgid "Start academic year"
 msgstr "Année académique de début"
 

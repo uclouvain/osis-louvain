@@ -31,7 +31,7 @@ from django.utils.translation import gettext_lazy as _
 
 from base.models.enums import link_type
 from base.models.enums.proposal_type import ProposalType
-from program_management.ddd.domain.program_tree import build_path
+from base.utils.urls import reverse_with_get
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers.node_view import _get_node_view_attribute_serializer, \
     _get_leaf_view_attribute_serializer, \
@@ -78,12 +78,12 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
         self.serialized_data = _get_node_view_attribute_serializer(self.link, '1|2|6', context=self.context)
 
     def test_serialize_node_attr_ensure_detach_url(self):
-        expected_url = reverse('tree_detach_node', args=[self.root_node.pk]) + "?path=1|2|6"
+        expected_url = reverse_with_get('tree_detach_node', args=[self.root_node.pk], get={"path": "1|2|6"})
         self.assertEqual(self.serialized_data['detach_url'], expected_url)
 
-    def test_serialize_node_attr_ensure_attach_url(self):
-        expected_url = reverse('education_group_attach', args=[self.root_node.pk, self.node_child.pk]) + "?path=1|2|6"
-        self.assertEqual(self.serialized_data['attach_url'], expected_url)
+    def test_serialize_node_attr_ensure_paste_url(self):
+        expected_url = reverse_with_get('tree_paste_node', get={"path": "1|2|6"})
+        self.assertEqual(self.serialized_data['paste_url'], expected_url)
 
     def test_serialize_node_attr_ensure_modify_url(self):
         expected_url = reverse('group_element_year_update', args=[
@@ -92,7 +92,11 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
         self.assertEqual(self.serialized_data['modify_url'], expected_url)
 
     def test_serializer_node_attr_ensure_search_url(self):
-        expected_url = reverse('quick_search_education_group', args=[self.root_node.pk, '1|2|6'])
+        expected_url = reverse_with_get(
+            'quick_search_education_group',
+            args=[self.root_node.academic_year.year],
+            get={"path": '1|2|6'}
+        )
         self.assertEqual(self.serialized_data['search_url'], expected_url)
 
     def test_serializer_node_attr_ensure_get_title(self):
@@ -100,7 +104,11 @@ class TestNodeViewAttributeSerializer(SimpleTestCase):
         self.assertEqual(self.serialized_data['title'], expected_title)
 
     def test_serializer_node_attr_ensure_get_href(self):
-        expected_url = reverse('element_identification', args=[self.link.child.year, self.link.child.code]) + "?path=1|2|6"
+        expected_url = reverse_with_get(
+            'element_identification',
+            args=[self.link.child.year, self.link.child.code],
+            get={"path": "1|2|6"}
+        )
         self.assertEqual(self.serialized_data['href'], expected_url)
 
     def test_serializer_node_attr_ensure_element_id(self):

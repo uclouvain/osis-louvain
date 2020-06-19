@@ -90,6 +90,7 @@ INSTALLED_APPS = (
     'compat',
     'hijack_admin',
     'reversion',
+    'django.contrib.gis',
 )
 
 
@@ -173,13 +174,13 @@ TEMPLATES = [
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': os.environ.get("DATABASE_NAME", 'osis_local'),
         'USER': os.environ.get("POSTGRES_USER", 'osis'),
         'PASSWORD': os.environ.get("POSTGRES_PASSWORD", 'osis'),
         'HOST': os.environ.get("POSTGRES_HOST", '127.0.0.1'),
         'PORT': os.environ.get("POSTGRES_PORT", '5432'),
-        'ATOMIC_REQUESTS':  os.environ.get('DATABASE_ATOMIC_REQUEST', 'True').lower() == 'true'
+        'ATOMIC_REQUESTS': os.environ.get('DATABASE_ATOMIC_REQUEST', 'True').lower() == 'true'
     },
 }
 

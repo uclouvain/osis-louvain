@@ -38,5 +38,5 @@ def display_version_name(tree_version_identity: 'ProgramTreeVersionIdentity'):
     if tree_version_identity:
         version_name_display = tree_version_identity.version_name or _('Standard')
         if tree_version_identity.is_transition:
-            version_name_display += " [TRANSITION]"
+            version_name_display += " [transition]"
     return version_name_display

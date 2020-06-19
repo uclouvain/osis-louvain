@@ -24,25 +24,19 @@
 #
 ##############################################################################
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.http import HttpRequest
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 from waffle.decorators import waffle_flag
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.group_element_year import GroupElementYear
-from base.models.learning_unit_year import LearningUnitYear
-from base.utils.cache import ElementCache
 from base.views.common import display_success_messages
 from base.views.education_groups import perms
-from base.views.education_groups.select import get_clipboard_content_display, build_success_json_response
 from osis_common.utils.models import get_object_or_none
-from program_management.ddd.repositories import load_tree, persist_tree
 from program_management.ddd.service import order_link_service
 from program_management.models.enums import node_type
-from program_management.models.enums.node_type import NodeType
 
 
 @login_required
@@ -80,54 +74,3 @@ def _order_content(
     return redirect(http_referer)
 
 
-@require_http_methods(['POST'])
-def copy_to_cache(request):
-    element_id = request.POST['element_id']
-    element_type = request.POST['element_type']
-
-    element = _get_concerned_object(element_id, element_type)
-
-    return _cache_object(
-        request.user,
-        None,
-        object_to_cache=element,
-        action=ElementCache.ElementCacheAction.COPY
-    )
-
-
-@require_http_methods(['POST'])
-def cut_to_cache(request):
-    group_element_year_id = request.POST['group_element_year_id']
-    element_id = request.POST['element_id']
-    element_type = request.POST['element_type']
-
-    group_element_year = get_object_or_none(GroupElementYear, pk=group_element_year_id)
-    element = _get_concerned_object(element_id, element_type)
-
-    return _cache_object(
-        request.user,
-        group_element_year,
-        object_to_cache=element,
-        action=ElementCache.ElementCacheAction.CUT
-    )
-
-
-def _get_concerned_object(element_id: int, element_type: str):
-    if element_type == NodeType.LEARNING_UNIT.name:
-        object_class = LearningUnitYear
-    else:
-        object_class = EducationGroupYear
-
-    return get_object_or_404(object_class, pk=element_id)
-
-
-def _cache_object(
-        user: User,
-        group_element_year: GroupElementYear,
-        object_to_cache,
-        action: ElementCache.ElementCacheAction
-):
-    group_element_year_pk = group_element_year.pk if group_element_year else None
-    ElementCache(user).save_element_selected(object_to_cache, source_link_id=group_element_year_pk, action=action.value)
-    success_msg = get_clipboard_content_display(object_to_cache, action.value)
-    return build_success_json_response(success_msg)

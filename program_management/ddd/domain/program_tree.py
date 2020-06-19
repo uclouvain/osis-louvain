@@ -25,21 +25,17 @@
 ##############################################################################
 import copy
 from collections import Counter
-from typing import List, Set, Tuple, Optional
+from typing import List, Set, Optional
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
-from base.models.enums.link_type import LinkTypes
 from osis_common.ddd import interface
 from osis_common.decorators.deprecated import deprecated
+from program_management.ddd import command
 from program_management.ddd.business_types import *
 from program_management.ddd.domain import prerequisite
-from program_management.ddd.service import command
-from program_management.ddd.validators._detach_root import DetachRootValidator
+from program_management.ddd.validators import validators_by_business_action
 from program_management.ddd.validators._path_validator import PathValidator
-from program_management.ddd.validators.validators_by_business_action import AttachNodeValidatorList, \
-    UpdatePrerequisiteValidatorList
-from program_management.ddd.validators.validators_by_business_action import DetachNodeValidatorList
 from program_management.models.enums import node_type
 from program_management.models.enums.node_type import NodeType
 
@@ -239,45 +235,39 @@ class ProgramTree(interface.RootEntity):
         copied_root_node = _copy(self.root_node, ignore_children_from=ignore_children_from)
         return ProgramTree(root_node=copied_root_node, authorized_relationships=self.authorized_relationships)
 
-    def attach_node(
+    def paste_node(
             self,
-            node_to_attach: 'Node',
-            path: Optional[Path],
-            attach_command: command.AttachNodeCommand
-    ) -> List['BusinessValidationMessage']:
+            node_to_paste: 'Node',
+            paste_command: command.PasteElementCommand,
+            tree_repository: 'ProgramTreeRepository'
+    ) -> 'Link':
         """
         Add a node to the tree
-        :param node_to_attach: Node to add on the tree
-        :param path: [Optional]The position where the node must be added
-        :param attach_command: an attach node command
+        :param node_to_paste: Node to paste into the tree
+        :param paste_command: a paste node command
+        :param tree_repository: a tree repository
+        :return: the created link
         """
-        parent = self.get_node(path) if path else self.root_node
-        path = path or str(self.root_node.node_id)
-        link_type = attach_command.link_type
-        block = attach_command.block
-        is_valid, messages = self.clean_attach_node(node_to_attach, path, link_type, block)
-        if is_valid:
-            parent.add_child(
-                node_to_attach,
-                access_condition=attach_command.access_condition,
-                is_mandatory=attach_command.is_mandatory,
-                block=attach_command.block,
-                link_type=attach_command.link_type,
-                comment=attach_command.comment,
-                comment_english=attach_command.comment_english,
-                relative_credits=attach_command.relative_credits
-            )
-        return messages
-
-    def clean_attach_node(
+        validator = validators_by_business_action.PasteNodeValidatorList(
             self,
-            node_to_attach: 'Node',
-            path: Path,
-            link_type: Optional[LinkTypes],
-            block: Optional[int]
-    ) -> Tuple[bool, List['BusinessValidationMessage']]:
-        validator = AttachNodeValidatorList(self, node_to_attach, path, link_type, block)
-        return validator.is_valid(), validator.messages
+            node_to_paste,
+            paste_command,
+            tree_repository
+        )
+        validator.validate()
+
+        path_to_paste_to = paste_command.path_where_to_paste
+        node_to_paste_to = self.get_node(path_to_paste_to)
+        return node_to_paste_to.add_child(
+            node_to_paste,
+            access_condition=paste_command.access_condition,
+            is_mandatory=paste_command.is_mandatory,
+            block=paste_command.block,
+            link_type=paste_command.link_type,
+            comment=paste_command.comment,
+            comment_english=paste_command.comment_english,
+            relative_credits=paste_command.relative_credits
+        )
 
     def set_prerequisite(
             self,
@@ -299,47 +289,47 @@ class ProgramTree(interface.RootEntity):
             prerequisite_expression: 'PrerequisiteExpression',
             node: 'NodeLearningUnitYear'
     ) -> (bool, List['BusinessValidationMessage']):
-        validator = UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
+        validator = validators_by_business_action.UpdatePrerequisiteValidatorList(prerequisite_expression, node, self)
         return validator.is_valid(), validator.messages
 
-    def detach_node(self, path_to_node_to_detach: Path) -> Tuple[bool, List['BusinessValidationMessage']]:
+    def detach_node(self, path_to_node_to_detach: Path, tree_repository: 'ProgramTreeRepository') -> 'Link':
         """
         Detach a node from tree
         :param path_to_node_to_detach: The path node to detach
-        :return:
+        :param tree_repository: a tree repository
+        :return: the suppressed link
         """
-        validator = PathValidator(path_to_node_to_detach)
-        if not validator.is_valid():
-            return False, validator.messages
+        PathValidator(path_to_node_to_detach).validate()
 
-        validator = DetachRootValidator(self, path_to_node_to_detach)
-        if not validator.is_valid():
-            return False, validator.messages
-
-        parent_path, *__ = path_to_node_to_detach.rsplit(PATH_SEPARATOR, 1)
-        parent = self.get_node(parent_path)
         node_to_detach = self.get_node(path_to_node_to_detach)
-        is_valid, messages = self.clean_detach_node(node_to_detach, parent_path)
-        if is_valid:
-            self.remove_prerequisites(node_to_detach)
-            parent.detach_child(node_to_detach)
-        return is_valid, messages
+        parent_path, *__ = path_to_node_to_detach.rsplit(PATH_SEPARATOR, 1)
+        validators_by_business_action.DetachNodeValidatorList(
+            self,
+            node_to_detach,
+            parent_path,
+            tree_repository
+        ).validate()
 
-    def remove_prerequisites(self, detached_node: 'Node'):
+        self.remove_prerequisites(node_to_detach, parent_path)
+        parent = self.get_node(parent_path)
+        return parent.detach_child(node_to_detach)
+
+    def __copy__(self) -> 'ProgramTree':
+        return ProgramTree(root_node=_copy(self.root_node))
+
+    def remove_prerequisites(self, detached_node: 'Node', parent_path):
+        pruned_tree = ProgramTree(root_node=_copy(self.root_node))
+        pruned_tree.get_node(parent_path).detach_child(detached_node)
+        pruned_tree_children = pruned_tree.get_all_nodes()
+
         if detached_node.is_learning_unit():
             to_remove = [detached_node] if detached_node.has_prerequisite else []
         else:
             to_remove = ProgramTree(root_node=detached_node).get_nodes_that_have_prerequisites()
-        for n in to_remove:
-            n.remove_all_prerequisite_items()
 
-    def clean_detach_node(
-            self,
-            node_to_detach: 'Node',
-            path_to_parent: Path
-    ) -> Tuple[bool, List['BusinessValidationMessage']]:
-        validator = DetachNodeValidatorList(self, node_to_detach, path_to_parent)
-        return validator.is_valid(), validator.messages
+        for n in to_remove:
+            if n not in pruned_tree_children:
+                n.remove_all_prerequisite_items()
 
 
 def _nodes_from_root(root: 'Node') -> List['Node']:

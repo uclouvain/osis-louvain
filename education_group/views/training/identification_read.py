@@ -79,7 +79,7 @@ class TrainingReadIdentification(TrainingRead):
     def get_training(self):
         try:
             return TrainingRepository.get(
-                TrainingIdentity(acronym=self.get_object().title, year=self.get_object().year)
+                self.training_identity
             )
         except TrainingNotFoundException:
             raise Http404

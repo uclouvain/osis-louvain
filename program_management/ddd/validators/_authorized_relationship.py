@@ -27,38 +27,42 @@ from collections import Counter
 
 from django.utils.translation import gettext as _
 
-from base.ddd.utils.business_validator import BusinessValidator
+import osis_common.ddd.interface
+from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 
 
-class AttachAuthorizedRelationshipValidator(BusinessValidator):
-    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', position_to_add: 'Node'):
-        super(AttachAuthorizedRelationshipValidator, self).__init__()
+class PasteAuthorizedRelationshipValidator(business_validator.BusinessValidator):
+    def __init__(self, tree: 'ProgramTree', node_to_paste: 'Node', node_to_paste_into: 'Node'):
+        super(PasteAuthorizedRelationshipValidator, self).__init__()
         self.tree = tree
-        self.node_to_add = node_to_add
-        self.parent = position_to_add
+        self.node_to_paste = node_to_paste
+        self.parent = node_to_paste_into
         self.auth_relations = tree.authorized_relationships
 
     def validate(self):
-        if not self.auth_relations.is_authorized(self.parent.node_type, self.node_to_add.node_type):
-            self.add_error_message(
+        exception_messages = []
+        if not self.auth_relations.is_authorized(self.parent.node_type, self.node_to_paste.node_type):
+            exception_messages.append(
                 _("You cannot add \"%(child)s\" of type \"%(child_types)s\" "
                   "to \"%(parent)s\" of type \"%(parent_type)s\"") % {
-                    'child': self.node_to_add,
-                    'child_types': self.node_to_add.node_type.value,
+                    'child': self.node_to_paste,
+                    'child_types': self.node_to_paste.node_type.value,
                     'parent': self.parent,
                     'parent_type': self.parent.node_type.value,
                 }
             )
-        if self.is_maximum_children_types_reached(self.parent, self.node_to_add):
-            self.add_error_message(
+        if self.is_maximum_children_types_reached(self.parent, self.node_to_paste):
+            exception_messages.append(
                 _("Cannot add \"%(child)s\" because the number of children of type(s) \"%(child_types)s\" "
                   "for \"%(parent)s\" has already reached the limit.") % {
-                    'child': self.node_to_add,
-                    'child_types': self.node_to_add.node_type.value,
+                    'child': self.node_to_paste,
+                    'child_types': self.node_to_paste.node_type.value,
                     'parent': self.parent
                 }
             )
+        if exception_messages:
+            raise osis_common.ddd.interface.BusinessExceptions(messages=exception_messages)
 
     def is_maximum_children_types_reached(self, parent_node: 'Node', child_node: 'Node'):
         if not self.auth_relations.is_authorized(parent_node.node_type, child_node.node_type):
@@ -69,7 +73,7 @@ class AttachAuthorizedRelationshipValidator(BusinessValidator):
         return current_count == relation.max_count_authorized
 
 
-class AuthorizedRelationshipLearningUnitValidator(BusinessValidator):
+class AuthorizedRelationshipLearningUnitValidator(business_validator.BusinessValidator):
     def __init__(self, tree: 'ProgramTree', node_to_attach: 'Node', position_to_attach_from: 'Node'):
         super().__init__()
         self.tree = tree
@@ -81,16 +85,16 @@ class AuthorizedRelationshipLearningUnitValidator(BusinessValidator):
                 self.position_to_attach_from.node_type,
                 self.node_to_attach.node_type
         ):
-            self.add_error_message(
-                _("You can not attach a learning unit like %(node)s to element %(parent)s of type %(type)s.") % {
+            raise osis_common.ddd.interface.BusinessExceptions(
+                [_("You can not attach a learning unit like %(node)s to element %(parent)s of type %(type)s.") % {
                     "node": self.node_to_attach,
                     "parent": self.position_to_attach_from,
                     "type": self.position_to_attach_from.node_type.value
-                }
+                }]
             )
 
 
-class DetachAuthorizedRelationshipValidator(BusinessValidator):
+class DetachAuthorizedRelationshipValidator(business_validator.BusinessValidator):
     def __init__(self, tree: 'ProgramTree', node_to_detach: 'Node', detach_from: 'Node'):
         super(DetachAuthorizedRelationshipValidator, self).__init__()
         self.node_to_detach = node_to_detach
@@ -100,16 +104,16 @@ class DetachAuthorizedRelationshipValidator(BusinessValidator):
     def validate(self):
         minimum_children_types_reached = self._get_minimum_children_types_reached(self.detach_from, self.node_to_detach)
         if minimum_children_types_reached:
-            self.add_error_message(
+            raise osis_common.ddd.interface.BusinessExceptions([
                 _("The parent must have at least one child of type(s) \"%(types)s\".") % {
                     "types": ','.join(str(node_type.value) for node_type in minimum_children_types_reached)
                 }
-            )
+            ])
 
     def _get_minimum_children_types_reached(self, parent_node: 'Node', child_node: 'Node'):
         children_types_to_check = [child_node.node_type]
         if self.tree.get_link(parent_node, child_node).is_reference():
-            children_types_to_check = [l.child.node_type for l in child_node.children]
+            children_types_to_check = [link_obj.child.node_type for link_obj in child_node.children]
 
         counter = Counter(parent_node.get_children_types(include_nodes_used_as_reference=True))
 

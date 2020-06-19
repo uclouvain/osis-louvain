@@ -41,12 +41,15 @@ from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
 from base.models.enums.education_group_types import MiniTrainingType
+from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
+from education_group.views.mixin import ElementSelectedClipBoardMixin
 from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.repositories import load_tree
+from program_management.ddd.service.read import element_selected_service
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
@@ -55,7 +58,7 @@ from program_management.serializers.program_tree_view import program_tree_view_s
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
 
-class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
+class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, TemplateView):
     # PermissionRequiredMixin
     permission_required = 'base.view_educationgroup'
     raise_exception = True
@@ -123,6 +126,7 @@ class MiniTrainingRead(PermissionRequiredMixin, TemplateView):
                 self.get_path(),
                 _get_view_name_from_tab(self.active_tab),
             ),
+            "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             # TODO: Remove when finished reoganized tempalate
             "group_year": self.get_education_group_version().root_group
         }

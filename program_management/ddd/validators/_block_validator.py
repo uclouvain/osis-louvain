@@ -25,12 +25,14 @@ import re
 from typing import Optional
 
 from django.utils.translation import gettext_lazy as _
-from base.ddd.utils.business_validator import BusinessValidator
+
+import osis_common.ddd.interface
+from base.ddd.utils import business_validator
 
 BLOCK_MAX_AUTHORIZED_VALUE = 6
 
 
-class BlockValidator(BusinessValidator):
+class BlockValidator(business_validator.BusinessValidator):
     def __init__(self, block: Optional[int]):
         super().__init__()
         self.block = block
@@ -47,4 +49,4 @@ class BlockValidator(BusinessValidator):
                 "Please register a maximum of %(max_authorized_value)s digits in ascending order, "
                 "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46"
             ) % {'max_authorized_value': BLOCK_MAX_AUTHORIZED_VALUE}
-            self.add_error_message(error_msg)
+            raise osis_common.ddd.interface.BusinessExceptions([error_msg])

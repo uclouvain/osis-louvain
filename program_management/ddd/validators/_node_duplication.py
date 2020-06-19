@@ -25,11 +25,12 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
-from base.ddd.utils.business_validator import BusinessValidator
+import osis_common.ddd.interface
+from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 
 
-class NodeDuplicationValidator(BusinessValidator):
+class NodeDuplicationValidator(business_validator.BusinessValidator):
 
     def __init__(self, parent_node: 'Node', node_to_add: 'Node'):
         super(NodeDuplicationValidator, self).__init__()
@@ -38,6 +39,6 @@ class NodeDuplicationValidator(BusinessValidator):
 
     def validate(self):
         if self.node_to_add in self.parent_node.children_as_nodes:
-            self.add_error_message(
-                _("You can not add the same child %(child_node)s several times.") % {"child_node": self.node_to_add}
+            raise osis_common.ddd.interface.BusinessExceptions(
+                [_("You can not add the same child %(child_node)s several times.") % {"child_node": self.node_to_add}]
             )

@@ -338,6 +338,10 @@ div.dataTables_wrapper div.dataTables_processing {
     display: block ! important;
 }
 
+.d-block::first-letter {
+    text-transform: uppercase;
+}
+
 .d-table {
     display: table ! important;
 }
@@ -566,11 +570,7 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .of_unversioned_field #isced_domain,
 .of_unversioned_field #internal_comment,
 .of_unversioned_field #panel_coorganization,
-.of_unversioned_field #management_entity,
-.of_unversioned_field #management_entity,
-.of_unversioned_field #start_year,
-.of_unversioned_field #end_year,
-.of_unversioned_field #teaching_campus,
+.of_unversioned_field #administration_entity,
 .of_unversioned_field #enrollment_campus,
 .of_unversioned_field #other_campus_activities,
 .of_unversioned_field #funding_can_be_funded,
@@ -582,7 +582,12 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .of_unversioned_field #hops_ares_authorization,
 .of_unversioned_field #co_graduation_inter_cfb,
 .of_unversioned_field #co_graduation_coefficient,
-.of_unversioned_field #keywords
+.of_unversioned_field #keywords,
+.of_unversioned_field #category,
+.of_unversioned_field #type_of_training,
+.of_unversioned_field #schedule_type,
+.of_unversioned_field #group_title_fr,
+.of_unversioned_field #group_title_en
 {
     color: grey;
 }

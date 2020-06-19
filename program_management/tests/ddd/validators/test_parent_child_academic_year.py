@@ -27,49 +27,37 @@
 from django.test import SimpleTestCase
 from django.utils.translation import gettext as _
 
-from program_management.ddd.domain.program_tree import build_path
 from program_management.ddd.validators._parent_child_academic_year import ParentChildSameAcademicYearValidator
-from program_management.tests.ddd.factories.node import NodeGroupYearFactory
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
 
-class TestParentChildSameAcademicYearValidator(SimpleTestCase):
-
+class TestParentChildSameAcademicYearValidator(TestValidatorValidateMixin, SimpleTestCase):
     def setUp(self):
-        self.year = 2019
-        self.tree = ProgramTreeFactory(root_node__year=self.year)
+        self.tree = ProgramTreeFactory()
 
-    def test_when_year_equals(self):
-        validator = ParentChildSameAcademicYearValidator(
-            self.tree.root_node,
-            NodeGroupYearFactory(year=self.year)
-        )
-        self.assertTrue(validator.is_valid())
+    def test_should_raise_exception_when_year_of_parent_differs_from_year_of_group_node_to_add(self):
+        nodes_to_add = [
+            NodeGroupYearFactory(year=self.tree.root_node.year - 1),
+            NodeGroupYearFactory(year=self.tree.root_node.year + 1)
+        ]
+        for node_to_add in nodes_to_add:
+            with self.subTest(base_year=self.tree.root_node.year, year=node_to_add.year):
+                expected_result = _("It is prohibited to attach a %(child_node)s to an element of "
+                                    "another academic year %(parent_node)s.") % {
+                                      "child_node": node_to_add,
+                                      "parent_node": self.tree.root_node
+                                  }
+                self.assertValidatorRaises(
+                    ParentChildSameAcademicYearValidator(self.tree.root_node, node_to_add),
+                    [expected_result]
+                )
 
-    def test_when_year_of_node_to_attach_is_lower(self):
-        node_to_add = NodeGroupYearFactory(year=self.year - 1)
-        validator = ParentChildSameAcademicYearValidator(
-            self.tree.root_node,
-            node_to_add
-        )
-        self.assertFalse(validator.is_valid())
-        expected_result = _("It is prohibited to attach a %(child_node)s to an element of "
-                            "another academic year %(parent_node)s.") % {
-            "child_node": node_to_add,
-            "parent_node": self.tree.root_node
-        }
-        self.assertEqual(expected_result, validator.error_messages[0])
+    def test_should_not_raise_exception_when_year_of_parent_differs_and_node_is_learning_unit(self):
+        node_to_paste = NodeLearningUnitYearFactory(year=self.tree.root_node.year - 1)
+        self.assertValidatorNotRaises(ParentChildSameAcademicYearValidator(self.tree.root_node, node_to_paste))
 
-    def test_when_year_of_node_to_attach_is_greater(self):
-        node_to_add = NodeGroupYearFactory(year=self.year + 1)
-        validator = ParentChildSameAcademicYearValidator(
-            self.tree.root_node,
-            node_to_add
-        )
-        self.assertFalse(validator.is_valid())
-        expected_result = _("It is prohibited to attach a %(child_node)s to an element of "
-                            "another academic year %(parent_node)s.") % {
-            "child_node": node_to_add,
-            "parent_node": self.tree.root_node
-        }
-        self.assertEqual(expected_result, validator.error_messages[0])
+    def test_should_not_raise_exception_when_year_of_parent_equals_year_of_node_to_add(self):
+        node_to_attach = NodeGroupYearFactory(year=self.tree.root_node.year)
+        self.assertValidatorNotRaises(ParentChildSameAcademicYearValidator(self.tree.root_node, node_to_attach))

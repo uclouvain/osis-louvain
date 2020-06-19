@@ -26,9 +26,9 @@
 from typing import Optional, List
 
 from osis_common.ddd import interface
-from osis_common.ddd.interface import EntityIdentity, Entity
+from osis_common.ddd.interface import Entity
 from program_management.ddd.business_types import *
-from program_management.ddd.repositories import persist_tree, load_tree
+from program_management.ddd.repositories import persist_tree, load_tree, node
 from program_management.models.element import Element
 
 
@@ -37,6 +37,12 @@ class ProgramTreeRepository(interface.AbstractRepository):
     @classmethod
     def search(cls, entity_ids: Optional[List['ProgramTreeIdentity']] = None, **kwargs) -> List[Entity]:
         raise NotImplementedError
+
+    @classmethod
+    def search_from_children(cls, node_ids: List['NodeIdentity'], **kwargs) -> List['ProgramTree']:
+        nodes = node.NodeRepository.search(entity_ids=node_ids)
+        node_db_ids = [n.node_id for n in nodes]
+        return load_tree.load_trees_from_children(node_db_ids, **kwargs)
 
     @classmethod
     def delete(cls, entity_id: 'ProgramTreeIdentity') -> None:

@@ -35,6 +35,7 @@ from base.tests.factories.academic_year import AcademicYearFactory, get_current_
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.person_entity import PersonEntityFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 
 
@@ -45,17 +46,25 @@ class TestEdit(TestCase):
         cls.academic_year = AcademicYearFactory(year=get_current_year() + 1)
         cls.next_academic_year_1 = AcademicYearFactory(year=cls.academic_year.year + 1)
         cls.next_academic_year_2 = AcademicYearFactory(year=cls.academic_year.year + 2)
-        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year,
-                                                             education_group__end_year=cls.next_academic_year_2)
-        cls.education_group_year_child = EducationGroupYearFactory(academic_year=cls.academic_year,
-                                                                   education_group__end_year=cls.next_academic_year_2)
-        cls.group_element_year = GroupElementYearFactory(parent=cls.education_group_year,
-                                                         child_branch=cls.education_group_year_child)
+        cls.education_group_year = EducationGroupYearFactory(
+            academic_year=cls.academic_year,
+            education_group__end_year=cls.next_academic_year_2
+        )
+        cls.education_group_year_child = EducationGroupYearFactory(
+            academic_year=cls.academic_year,
+            education_group__end_year=cls.next_academic_year_2
+        )
+        cls.group_element_year = GroupElementYearFactory(
+            parent=cls.education_group_year,
+            child_branch=cls.education_group_year_child
+        )
         AuthorizedRelationshipFactory(
             parent_type=cls.education_group_year.education_group_type,
             child_type=cls.group_element_year.child_branch.education_group_type,
         )
-        cls.person = CentralManagerFactory(entity=cls.education_group_year.management_entity).person
+        cls.person = CentralManagerFactory(
+            entity=cls.group_element_year.parent_element.group_year.management_entity
+        ).person
         cls.url = reverse(
             "group_element_year_update",
             kwargs={

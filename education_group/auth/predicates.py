@@ -1,11 +1,16 @@
+from typing import Union
+
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _, pgettext
 from rules import predicate
 
 from base.business.event_perms import EventPermEducationGroupEdition
 from base.models.education_group_type import EducationGroupType
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_categories import Categories
 from education_group.auth.scope import Scope
+from education_group.models.group_year import GroupYear
 from osis_role import errors
 from osis_role.errors import predicate_failed_msg, set_permission_error, get_permission_error
 
@@ -52,9 +57,13 @@ def is_not_orphan_group(self, user, education_group_year=None):
 @predicate(bind=True)
 @predicate_failed_msg(
     message=_("You cannot change/delete a education group existing before %(limit_year)s") %
-    {"limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}
+            {"limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION}
 )
-def is_education_group_year_older_or_equals_than_limit_settings_year(self, user, education_group_year=None):
+def is_education_group_year_older_or_equals_than_limit_settings_year(
+        self,
+        user: User,
+        education_group_year: Union[EducationGroupYear, GroupYear] = None
+):
     if education_group_year:
         return education_group_year.academic_year.year >= settings.YEAR_LIMIT_EDG_MODIFICATION
     return None
@@ -62,7 +71,11 @@ def is_education_group_year_older_or_equals_than_limit_settings_year(self, user,
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("The user is not allowed to create/modify this type of education group"))
-def is_education_group_type_authorized_according_to_user_scope(self, user, egy=None):
+def is_education_group_type_authorized_according_to_user_scope(
+        self,
+        user: User,
+        egy: Union[EducationGroupYear, GroupYear] = None
+):
     if egy:
         return any(
             egy.education_group_type.name in role.get_allowed_education_group_types()
@@ -74,7 +87,11 @@ def is_education_group_type_authorized_according_to_user_scope(self, user, egy=N
 
 @predicate(bind=True)
 @predicate_failed_msg(message=_("The user is not attached to the management entity"))
-def is_user_attached_to_management_entity(self, user, education_group_year=None):
+def is_user_attached_to_management_entity(
+        self,
+        user: User,
+        education_group_year: Union[EducationGroupYear, GroupYear] = None
+):
     if education_group_year:
         user_entity_ids = self.context['role_qs'].get_entities_ids()
         return education_group_year.management_entity_id in user_entity_ids

@@ -79,7 +79,7 @@ def send_mail_after_scores_submission(persons, learning_unit_name, submitted_enr
             enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-            enrollment.score_final if enrollment.score_final else '',
+            enrollment.score_final if enrollment.score_final is not None else '',
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in submitted_enrollments]
 
@@ -348,7 +348,7 @@ def send_message_after_all_encoded_by_manager(persons, enrollments, learning_uni
             enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name,
             enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name,
-            enrollment.score_final if enrollment.score_final else '',
+            enrollment.score_final if enrollment.score_final is not None else '',
             justifications[enrollment.justification_final] if enrollment.justification_final else '',
         ) for enrollment in enrollments]
 

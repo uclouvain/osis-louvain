@@ -31,8 +31,8 @@ from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
 from education_group.models.group_year import GroupYear
 from osis_common.decorators.deprecated import deprecated
-from program_management.ddd.domain.program_tree import ProgramTree, ProgramTreeIdentity
 from program_management.ddd.business_types import *
+from program_management.ddd.domain import program_tree
 from program_management.ddd.domain.education_group_version_academic_year import EducationGroupVersionAcademicYear
 from program_management.ddd.domain.link import factory as link_factory
 from program_management.ddd.domain.prerequisite import NullPrerequisite, Prerequisite
@@ -52,14 +52,14 @@ TreeStructure = List[Dict[GroupElementYearColumnName, Any]]
 @deprecated  # use ProgramTreeVersionRepository.get() instead
 def load_version(acronym: str, year: int, version_name: str, transition: bool) -> 'ProgramTreeVersion':
     try:
-        education_group_version = EducationGroupVersion.objects\
-            .filter(root_group__element__isnull=False)\
+        education_group_version = EducationGroupVersion.objects \
+            .filter(root_group__element__isnull=False) \
             .select_related('root_group__element').get(
-                offer__acronym=acronym,
-                offer__academic_year__year=year,
-                version_name=version_name,
-                is_transition=transition
-            )
+            offer__acronym=acronym,
+            offer__academic_year__year=year,
+            version_name=version_name,
+            is_transition=transition
+        )
     except EducationGroupVersion.DoesNotExist:
         raise ProgramTreeVersionNotFoundException
 
@@ -191,7 +191,7 @@ def __build_tree(
             parent_path = '|'.join(s_dict['path'].split('|')[:-1])
             structure_by_parent.setdefault(parent_path, []).append(s_dict)
     root_node.children = __build_children(str(root_node.pk), structure_by_parent, nodes, links, prerequisites)
-    tree = ProgramTree(root_node, authorized_relationships=load_authorized_relationship.load())
+    tree = program_tree.ProgramTree(root_node, authorized_relationships=load_authorized_relationship.load())
     return tree
 
 
@@ -223,13 +223,19 @@ def __build_children(
         link_node = links['_'.join([str(parent_id), str(child_node.pk)])]
         link_node.parent = nodes[parent_id]
         link_node.child = child_node
+        link_node.entity_id = LinkIdentity(
+            parent_code=link_node.parent.code,
+            child_code=link_node.child.code,
+            parent_year=link_node.parent.year,
+            child_year=link_node.child.year
+        )
         children.append(link_node)
     return children
 
 
 @deprecated  # use ProgramTreeVersionRepository.search_all_versions_from_root_node instead
 def find_all_program_tree_versions(acronym: str, year: int, load_tree: bool = True) -> List['ProgramTreeVersion']:
-    qs = EducationGroupVersion.objects.filter(offer__acronym=acronym, offer__academic_year__year=year)\
+    qs = EducationGroupVersion.objects.filter(offer__acronym=acronym, offer__academic_year__year=year) \
         .select_related('offer__academic_year', 'root_group').order_by('version_name')
 
     results = []

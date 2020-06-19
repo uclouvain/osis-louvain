@@ -56,6 +56,55 @@ class TestTrainingReadIdentification(TestCase):
         )
         ElementGroupYearFactory(group_year=cls.training_version.root_group)
         cls.url = reverse('training_identification', kwargs={'year': 2019, 'code': 'LDROI200M'})
+        cls._build_education_group_versions()
+
+    @classmethod
+    def _build_education_group_versions(cls):
+        cls.training_version_standard = EducationGroupVersionFactory(
+            offer__acronym="CRIM2M",
+            offer__partial_acronym="LCRIM200M",
+            offer__academic_year__year=2019,
+            root_group__partial_acronym="LCRIM200M",
+            root_group__academic_year__year=2019,
+            root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            version_name=''
+        )
+        ElementGroupYearFactory(group_year=cls.training_version_standard.root_group)
+        cls.training_version_standard_transition = EducationGroupVersionFactory(
+            offer__acronym="CRIM2M",
+            offer__partial_acronym="LCRIM200M",
+            offer__academic_year__year=2019,
+
+            root_group__partial_acronym="LCRIM200M1",
+            root_group__academic_year__year=2019,
+            root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            is_transition=True,
+            version_name=''
+        )
+        ElementGroupYearFactory(group_year=cls.training_version_standard_transition.root_group)
+        cls.training_version_particular_b = EducationGroupVersionFactory(
+            offer__acronym="CRIM2M",
+            offer__partial_acronym="LCRIM200M",
+            offer__academic_year__year=2019,
+
+            root_group__partial_acronym="LCRIM200M2",
+            root_group__academic_year__year=2019,
+            root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            version_name='CRIM2MB'
+        )
+        ElementGroupYearFactory(group_year=cls.training_version_particular_b.root_group)
+        cls.training_version_particular_b = EducationGroupVersionFactory(
+            offer__acronym="CRIM2M",
+            offer__partial_acronym="LCRIM200M",
+            offer__academic_year__year=2019,
+            root_group__partial_acronym="LCRIM200M3",
+            root_group__academic_year__year=2019,
+            root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+            version_name='CRIM2MA'
+        )
+        ElementGroupYearFactory(group_year=cls.training_version_particular_b.root_group)
+        cls.url_multiple_version = reverse('training_identification', kwargs={'year': 2019,
+                                                                              'code': 'LCRIM200M'})
 
     def setUp(self) -> None:
         self.client.force_login(self.person.user)
@@ -181,3 +230,25 @@ class TestTrainingReadIdentification(TestCase):
         ):
             response = self.client.get(self.url)
             self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])
+
+    def test_assert_ordered_versions_choices_on_context_data(self):
+        response = self.client.get(self.url_multiple_version)
+        standard_version = response.context['versions_choices'][0][1]
+        self.assertEqual(standard_version.version_name,
+                         '')
+        self.assertFalse(standard_version.is_transition)
+
+        transition_standard_version = response.context['versions_choices'][1][1]
+        self.assertEqual(transition_standard_version.version_name,
+                         '')
+        self.assertTrue(transition_standard_version.is_transition)
+
+        particular_a = response.context['versions_choices'][2][1]
+        self.assertEqual(particular_a.version_name,
+                         'CRIM2MA')
+        self.assertFalse(particular_a.is_transition)
+
+        particular_b = response.context['versions_choices'][3][1]
+        self.assertEqual(particular_b.version_name,
+                         'CRIM2MB')
+        self.assertFalse(particular_b.is_transition)
