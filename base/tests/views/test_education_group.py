@@ -347,7 +347,8 @@ class EducationGroupPublishViewTestCase(TestCase):
             response = request_to_call(self.url)
             self.assertEqual(response.status_code, 405)
 
-    @mock.patch("base.business.education_groups.general_information.publish", side_effect=lambda e: "portal-url")
+    @mock.patch("base.business.education_groups.general_information.publish_education_group_year",
+                side_effect=lambda e: "portal-url")
     def test_publish_case_ok_redirection_with_success_message(self, mock_publish):
         response = self.client.post(self.url)
 
@@ -358,7 +359,8 @@ class EducationGroupPublishViewTestCase(TestCase):
         self.assertIn(messages.SUCCESS, msg_level)
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
-    @mock.patch("base.business.education_groups.general_information.publish", side_effect=PublishException('error'))
+    @mock.patch("base.business.education_groups.general_information.publish_education_group_year",
+                side_effect=PublishException('error'))
     def test_publish_case_ko_redirection_with_error_message(self, mock_publish):
         response = self.client.post(self.url)
 

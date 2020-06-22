@@ -63,6 +63,13 @@ class TestPublishLearningUnit(TestCase):
         with self.assertRaises(ImproperlyConfigured):
             general_information.publish_learning_unit_year(self.learning_unit_year)
 
+    @mock.patch('requests.get', return_value=HttpResponse)
+    @mock.patch('threading.Thread')
+    def test_publish_call_seperate_thread(self, mock_thread, mock_get):
+        mock_thread.start.return_value = True
+        general_information.publish_learning_unit_year(self.learning_unit_year)
+        self.assertTrue(mock_thread.start)
+
 
 @override_settings(ESB_API_URL="api.esb.com",
                    ESB_AUTHORIZATION="Basic dummy:1234",
