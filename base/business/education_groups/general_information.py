@@ -25,6 +25,7 @@
 ##############################################################################
 import logging
 from threading import Thread
+from typing import List
 
 import requests
 from django.conf import settings
@@ -39,7 +40,7 @@ from base.models.group_element_year import find_learning_unit_roots
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
 
 
-def publish_learning_unit_year(learning_unit_year_obj: learning_unit_year.LearningUnitYear) -> None:
+def publish_learning_unit_year(learning_unit_year_obj: learning_unit_year.LearningUnitYear) -> bool:
     if not all([settings.ESB_API_URL, settings.ESB_AUTHORIZATION, settings.ESB_REFRESH_PEDAGOGY_ENDPOINT,
                 settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT,
                 settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT]):
@@ -54,9 +55,10 @@ def publish_learning_unit_year(learning_unit_year_obj: learning_unit_year.Learni
     if education_group_to_publish:
         t = Thread(target=_bulk_publish, args=([education_group_to_publish],))
         t.start()
+    return True
 
 
-def publish(education_group_year):
+def publish_education_group_year(education_group_year_obj: EducationGroupYear) -> bool:
     if not all([settings.ESB_API_URL, settings.ESB_AUTHORIZATION, settings.ESB_REFRESH_PEDAGOGY_ENDPOINT,
                 settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT,
                 settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT]):
@@ -65,25 +67,25 @@ def publish(education_group_year):
                                    'ESB_REFRESH_COMMON_ADMISSION_ENDPOINT must be set in configuration')
 
     trainings = find_learning_unit_roots(
-        [education_group_year],
+        [education_group_year_obj],
         return_result_params={
             'parents_as_instances': True
         }
-    ).get(education_group_year.pk, [])
+    ).get(education_group_year_obj.pk, [])
 
-    education_groups_to_publish = [education_group_year] + trainings \
-        if education_group_year.education_group_type.name != GroupType.COMMON_CORE.name \
+    education_groups_to_publish = [education_group_year_obj] + trainings \
+        if education_group_year_obj.education_group_type.name != GroupType.COMMON_CORE.name \
         else trainings
     t = Thread(target=_bulk_publish, args=(education_groups_to_publish,))
     t.start()
     return True
 
 
-def _bulk_publish(education_group_years):
+def _bulk_publish(education_group_years: List[EducationGroupYear]) -> List[bool]:
     return [_publish(education_group_year) for education_group_year in education_group_years]
 
 
-def _publish(education_group_year):
+def _publish(education_group_year: EducationGroupYear) -> bool:
     publish_url = _get_url_to_publish(education_group_year)
     try:
         response = requests.get(
@@ -103,7 +105,7 @@ def _publish(education_group_year):
         )
 
 
-def _get_url_to_publish(education_group_year):
+def _get_url_to_publish(education_group_year: EducationGroupYear) -> str:
     if education_group_year.is_main_common:
         endpoint = settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT.format(year=education_group_year.academic_year.year)
     elif education_group_year.is_common:
@@ -117,7 +119,7 @@ def _get_url_to_publish(education_group_year):
     return "{esb_api}/{endpoint}".format(esb_api=settings.ESB_API_URL, endpoint=endpoint)
 
 
-def _get_code_according_type(education_group_year):
+def _get_code_according_type(education_group_year: EducationGroupYear) -> str:
     code = education_group_year.acronym
     if education_group_year.is_minor:
         code = "min-{}".format(education_group_year.partial_acronym)

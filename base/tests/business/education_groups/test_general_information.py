@@ -78,13 +78,13 @@ class TestPublishGeneralInformation(TestCase):
     @override_settings(ESB_REFRESH_PEDAGOGY_ENDPOINT=None)
     def test_publish_case_missing_settings(self):
         with self.assertRaises(ImproperlyConfigured):
-            general_information.publish(self.training)
+            general_information.publish_education_group_year(self.training)
 
     @mock.patch('requests.get', return_value=HttpResponse)
     @mock.patch('threading.Thread')
     def test_publish_call_seperate_thread(self, mock_thread, mock_get):
         mock_thread.start.return_value = True
-        general_information.publish(self.training)
+        general_information.publish_education_group_year(self.training)
         self.assertTrue(mock_thread.start)
 
     @mock.patch('requests.get', return_value=HttpResponseNotFound)

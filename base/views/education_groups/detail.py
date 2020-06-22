@@ -430,7 +430,7 @@ def publish(request, education_group_year_id, root_id):
     education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
 
     try:
-        general_information.publish(education_group_year)
+        general_information.publish_education_group_year(education_group_year)
         message = _("The program %(acronym)s will be published soon") % {'acronym': education_group_year.acronym}
         display_success_messages(request, message, extra_tags='safe')
     except PublishException as e:
