@@ -35,6 +35,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from learning_unit.api.views.learning_achievement import LearningAchievementList
 from reference.models.language import FR_CODE_LANGUAGE
+from reference.tests.factories.language import FrenchLanguageFactory
 
 
 class LearningAchievementListTestCase(APITestCase):
@@ -51,7 +52,7 @@ class LearningAchievementListTestCase(APITestCase):
             cls.achievements.append(
                 LearningAchievementFactory(
                     learning_unit_year=cls.learning_unit_year,
-                    language__code=FR_CODE_LANGUAGE,
+                    language=FrenchLanguageFactory(),
                     order=index
                 )
             )

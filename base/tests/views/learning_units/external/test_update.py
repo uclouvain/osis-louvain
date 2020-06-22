@@ -38,7 +38,7 @@ from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
-from base.tests.factories.person import CentralManagerFactory
+from base.tests.factories.person import CentralManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.user import UserFactory
 from base.tests.forms.test_external_learning_unit import get_valid_external_learning_unit_form_data
@@ -50,7 +50,7 @@ class TestUpdateExternalLearningUnitView(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = UserFactory()
-        cls.person = CentralManagerFactory(
+        cls.person = CentralManagerForUEFactory(
             "can_access_learningunit", "can_edit_learningunit",
             user=cls.user
         )

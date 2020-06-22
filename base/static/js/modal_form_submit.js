@@ -49,11 +49,10 @@ var formAjaxSubmit = function (form, modal) {
     });
 };
 
-
-
-
 // CKEDITOR needs to dynamically bind the textareas during an XMLHttpRequest requests
 function bindTextArea() {
+    //clean instances before binding to avoid error on CKEDITOR.replace with same instance id
+    destroyAllInstances();
     $("textarea[data-type='ckeditortype']").each(function () {
         CKEDITOR.replace($(this).attr('id'), $(this).data('config'));
     });

@@ -25,10 +25,18 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
+
 CREDITS = "CREDITS"
 NUMBER_OF_ELEMENTS = "NUMBER_OF_ELEMENTS"
 
+# FIXME :: DEPRECATED - use ConstraintTypeEnum instead
 CONSTRAINT_TYPE = (
     (CREDITS, _("credits")),
     (NUMBER_OF_ELEMENTS, _("Number of elements")),
 )
+
+
+class ConstraintTypeEnum(ChoiceEnum):
+    CREDITS = _("credits")
+    NUMBER_OF_ELEMENTS = _("Number of elements")

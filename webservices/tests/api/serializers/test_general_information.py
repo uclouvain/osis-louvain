@@ -24,7 +24,7 @@
 #
 ##############################################################################
 import collections
-from unittest import mock
+from unittest import mock, skip
 
 from django.conf import settings
 from django.test import TestCase
@@ -154,6 +154,7 @@ def _get_mocked_sections_per_offer_type(egy, specific=None, common=None):
     }
 
 
+@skip("FIXME in OSIS-4670")
 class IntroOffersSectionTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):

@@ -34,6 +34,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
 from base import utils
+from base.models.education_group_type import EducationGroupType
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_categories import TRAINING, MINI_TRAINING, GROUP
 from base.tests.factories.academic_year import AcademicYearFactory
@@ -51,7 +52,9 @@ from education_group.tests.factories.group import GroupFactory as EducationGroup
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.forms.education_groups import GroupFilter, STANDARD, PARTICULAR
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
-    StandardTransitionEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory
+    StandardTransitionEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory, create_with_version
+from education_group.models.group_year import GroupYear
+from program_management.models.education_group_version import EducationGroupVersion
 
 URL_EDUCATION_GROUPS = "version_program"
 SEARCH_TEMPLATE = "search.html"
@@ -66,7 +69,7 @@ class TestEducationGroupSearchView(TestCase):
     def setUpTestData(cls):
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse(URL_EDUCATION_GROUPS)
 
     def setUp(self):
@@ -126,13 +129,13 @@ class TestEducationGroupDataSearchFilter(TestCase):
             management_entity=envi_entity,
             title=TITLE_EDPH2
         )
-        cls.group_year_edph2 = GroupYearFactory(
+        cls.group_year_edph2 = create_with_version(
+            cls.education_group_edph2,
             acronym='EDPH2', academic_year=cls.current_academic_year,
             partial_acronym='EDPH2_SCS',
             education_group_type=cls.type_group,
             management_entity=envi_entity,
             title_fr=TITLE_EDPH2,
-            group__start_year=cls.current_academic_year
         )
         cls.education_group_edph3 = EducationGroupYearFactory(
             acronym='EDPH3', academic_year=cls.current_academic_year,
@@ -142,39 +145,42 @@ class TestEducationGroupDataSearchFilter(TestCase):
             management_entity=envi_entity,
             title=TITLE_EDPH3
         )
-        cls.group_year_edph3 = GroupYearFactory(
+        cls.group_year_edph3 = create_with_version(
+            cls.education_group_edph3,
             acronym='EDPH3',
             academic_year=cls.current_academic_year,
             partial_acronym='EDPH3_SCS',
             education_group_type=cls.type_training,
             management_entity=envi_entity,
             title_fr=TITLE_EDPH3,
-            group__start_year=cls.current_academic_year
         )
         cls.education_group_arke2a = EducationGroupYearFactory(
-            acronym='ARKE2A', academic_year=cls.current_academic_year,
-            education_group__start_year=cls.current_academic_year,
+            acronym='ARKE2A',
+            academic_year=cls.current_academic_year,
             education_group_type=cls.type_training,
             management_entity=oph_entity
         )
-        cls.group_year_arke2a = GroupYearFactory(
-            acronym='ARKE2A', academic_year=cls.current_academic_year,
+        cls.group_year_arke2a = create_with_version(
+            cls.education_group_arke2a,
+            acronym='ARKE2A',
+            academic_year=cls.current_academic_year,
             education_group_type=cls.type_training,
             management_entity=oph_entity,
-            group__start_year=cls.current_academic_year
         )
 
         cls.education_group_hist2a = EducationGroupYearFactory(
-            acronym='HIST2A', academic_year=cls.current_academic_year,
+            acronym='HIST2A',
+            academic_year=cls.current_academic_year,
             education_group__start_year=cls.previous_academic_year,
             education_group_type=cls.type_group,
             management_entity=oph_entity
         )
-        cls.group_year_hist2a = GroupYearFactory(
-            acronym='HIST2A', academic_year=cls.current_academic_year,
+        cls.group_year_hist2a = create_with_version(
+            cls.education_group_hist2a,
+            acronym='HIST2A',
+            academic_year=cls.current_academic_year,
             education_group_type=cls.type_group,
             management_entity=oph_entity,
-            group__start_year=cls.current_academic_year
         )
 
         cls.education_group_arke2a_previous_year = EducationGroupYearFactory(
@@ -183,19 +189,18 @@ class TestEducationGroupDataSearchFilter(TestCase):
             education_group_type=cls.type_training,
             management_entity=oph_entity
         )
-        cls.group_year_arke2a_previous_year = GroupYearFactory(
+        cls.group_year_arke2a_previous_year = create_with_version(
+            cls.education_group_arke2a_previous_year,
             acronym='ARKE2A',
             academic_year=cls.previous_academic_year,
             education_group_type=cls.type_training,
             management_entity=oph_entity,
-            group__start_year=cls.previous_academic_year
         )
-
         cls.oph_entity_v = EntityVersionFactory(entity=oph_entity, parent=envi_entity, end_date=None)
         cls.envi_entity_v = EntityVersionFactory(entity=envi_entity, end_date=None)
 
         cls.user = PersonFactory().user
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.form_class = GroupFilter()._meta.form
         cls.url = reverse(URL_EDUCATION_GROUPS)
 
@@ -461,8 +466,8 @@ class TestEducationGroupTypeAutoComplete(TestCase):
         self.assertEqual(6, len(json_response["results"]))
 
     def test_with_category_set(self):
-        tuples_category_woth_expected_result = [(TRAINING, 2), (MINI_TRAINING, 3), (GROUP, 1)]
-        for category, expected_result in tuples_category_woth_expected_result:
+        tuples_category_with_expected_result = [(TRAINING, 2), (MINI_TRAINING, 3), (GROUP, 1)]
+        for category, expected_result in tuples_category_with_expected_result:
             with self.subTest(category=category):
                 response = self.client.get(self.url, data={"forward": json.dumps({"category": category})})
                 json_response = response.json()
@@ -529,7 +534,7 @@ class TestEducationGroupDataSearchFilterWithVersion(TestCase):
             offer=cls.egy)
         cls.user = UserFactory()
         cls.person = PersonFactory(user=cls.user)
-        cls.user.user_permissions.add(Permission.objects.get(codename="can_access_education_group"))
+        cls.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
         cls.url = reverse(URL_EDUCATION_GROUPS)
         cls.form_class = GroupFilter()._meta.form
 

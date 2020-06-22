@@ -31,7 +31,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import ngettext, gettext
 
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import MiniTrainingType, TrainingType
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
@@ -44,6 +43,7 @@ class AttachStrategy(metaclass=abc.ABCMeta):
         pass
 
 
+# FIXME :: DEPRECATED :: to remove - use ddd/service/attach_node instead (OSIS-4723)
 class AttachEducationGroupYearStrategy(AttachStrategy):
     def __init__(self, parent: EducationGroupYear, child: EducationGroupYear, instance=None):
         self.parent = parent
@@ -180,7 +180,3 @@ class AttachLearningUnitYearStrategy(AttachStrategy):
     def _check_new_attach_is_not_duplication(self):
         if GroupElementYear.objects.filter(parent=self.parent, child_leaf=self.child).exists():
             raise ValidationError(gettext("You can not add the same child several times."))
-
-
-def can_attach_learning_units(egy: EducationGroupYear):
-    return egy.education_group_type.category == education_group_categories.Categories.GROUP.name

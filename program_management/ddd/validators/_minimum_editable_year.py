@@ -26,22 +26,20 @@
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
-from base.ddd.utils.business_validator import BusinessValidator
+import osis_common.ddd.interface
+from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
 
 
-# Implemented from AttachPermission._check_year_is_editable
-class MinimumEditableYearValidator(BusinessValidator):
-    def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path'):
-        super(MinimumEditableYearValidator, self).__init__()
+class MinimumEditableYearValidator(business_validator.BusinessValidator):
+    def __init__(self, tree: 'ProgramTree'):
+        super().__init__()
         self.tree = tree
-        self.node_to_add = node_to_add
-        self.path = path
 
     def validate(self):
         if self.tree.root_node.year < settings.YEAR_LIMIT_EDG_MODIFICATION:
-            self.add_error_message(
-                _("Cannot perform action on a education group before %(limit_year)s") % {
+            raise osis_common.ddd.interface.BusinessExceptions(
+                [_("Cannot perform action on a education group before %(limit_year)s") % {
                     "limit_year": settings.YEAR_LIMIT_EDG_MODIFICATION
-                }
+                }]
             )

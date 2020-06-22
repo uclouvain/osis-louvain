@@ -43,11 +43,13 @@ class EntityContainerYearTest(TestCase):
         cls.academic_years = {}
         for year in [2015, 2016]:
             cls.academic_years[year] = AcademicYearFactory(year=year)
-            cls.entity_versions[year] = EntityVersionFactory(entity=cls.entity,
-                                                             parent=None,
-                                                             acronym="Entity V_{}".format(year),
-                                                             start_date=datetime.datetime(year, 1, 1),
-                                                             end_date=datetime.datetime(year, 12, 30))
+            cls.entity_versions[year] = EntityVersionFactory(
+                entity=cls.entity,
+                parent=None,
+                acronym="Entity V_{}".format(year),
+                start_date=datetime.datetime(year, 1, 1),
+                end_date=datetime.datetime(year, 12, 30)
+            )
 
     def test_find_entities_no_values(self):
         l_container_year = LearningContainerYearFactory(
@@ -56,7 +58,8 @@ class EntityContainerYearTest(TestCase):
         )
         # No link between an entity/learning_container_year, so no result
         no_entity = base.models.learning_container_year.find_last_entity_version_grouped_by_linktypes(
-            learning_container_year=l_container_year)
+            learning_container_year=l_container_year
+        )
         self.assertFalse(no_entity)
 
     def test_find_entities_with_empty_link_type(self):
@@ -66,7 +69,8 @@ class EntityContainerYearTest(TestCase):
         )
         # No link between an entity/learning_container_year, so no result
         no_entity = base.models.learning_container_year.find_last_entity_version_grouped_by_linktypes(
-            learning_container_year=l_container_year, link_type=[])
+            learning_container_year=l_container_year, link_type=[]
+        )
         self.assertFalse(no_entity)
 
     def test_find_entities(self):
@@ -79,7 +83,8 @@ class EntityContainerYearTest(TestCase):
         )
         # Find all entities
         entities = base.models.learning_container_year.find_last_entity_version_grouped_by_linktypes(
-            learning_container_year=l_container_year)
+            learning_container_year=l_container_year
+        )
         self.assertIsInstance(entities, dict)
         self.assertTrue(entity_container_year_link_type.REQUIREMENT_ENTITY in entities)
         self.assertTrue(entity_container_year_link_type.ALLOCATION_ENTITY in entities)

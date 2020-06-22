@@ -35,7 +35,7 @@ from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from base.tests.forms.test_external_learning_unit import get_valid_external_learning_unit_form_data
 from base.views.learning_units.external.create import get_external_learning_unit_creation_form
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
 
 YEAR_LIMIT_LUE_MODIFICATION = 2018
 
@@ -54,7 +54,7 @@ class TestCreateExternalLearningUnitView(TestCase):
         end_year = AcademicYearFactory(year=YEAR_LIMIT_LUE_MODIFICATION + 1)
         cls.academic_years = GenerateAcademicYear(starting_year, end_year).academic_years
         cls.academic_year = cls.academic_years[1]
-        cls.language = LanguageFactory(code='FR')
+        cls.language = FrenchLanguageFactory()
         cls.data = get_valid_external_learning_unit_form_data(cls.academic_year, cls.person)
         cls.url = reverse(get_external_learning_unit_creation_form, args=[cls.academic_year.pk])
 

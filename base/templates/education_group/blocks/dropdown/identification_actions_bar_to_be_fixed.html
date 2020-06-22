@@ -1,0 +1,145 @@
+{% load static i18n format education_group osis_role %}
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+
+<div class="dropdown {{ dropdirection }}">
+    <button id="dLabel" class="btn btn-default" type="button" data-toggle="dropdown" aria-haspopup="true"
+            aria-expanded="false">
+        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {% trans 'Actions' %}
+        <span class="caret"></span>
+    </button>
+    {# Actions still to be have to be fixed.  Fixed actions are in identifiation_actions_bar.html #}
+    <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
+        {# Create link #}
+        <li>
+            {% url 'select_education_group_type' enums.GROUP root.pk education_group_year.pk as create_group_url %}
+            {% a_tag_has_perm create_group_url _('New Education Group') 'base.add_group' user education_group_year %}
+        </li>
+        <li>
+            {% url 'select_education_group_type' enums.TRAINING root.pk education_group_year.pk as create_training_url %}
+            {% a_tag_has_perm create_training_url _('New Training') 'base.add_training' user education_group_year %}
+        </li>
+        <li>
+            {% url 'select_education_group_type' enums.MINI_TRAINING root.pk education_group_year.pk as create_mini_training_url %}
+            {% a_tag_has_perm create_mini_training_url _('New Mini-Training') 'base.add_minitraining' user education_group_year %}
+        </li>
+
+        <li class="divider"></li>
+
+        {# Cut link #} {# We cannot cut root element #}
+        {% if group_to_parent and group_to_parent != "0" %}
+            <li id='select_li'>
+                <a href="#" class="cut-element" data-url="{% url "cut_element" %}" data-element_id="{{ education_group_year.id }}" data-element_type="EDUCATION_GROUP" data-link_id="{{ group_to_parent }}">
+                    {% trans 'Cut' %}
+                </a>
+            </li>
+        {% endif %}
+
+        {# Copy link #}
+        <li id='select_li'>
+            <a href="#" class="copy-element" data-url="{% url "copy_element" %}" data-element_id="{{ education_group_year.id }}" data-element_type="EDUCATION_GROUP" >
+                {% trans 'Copy' %}
+            </a>
+        </li>
+
+        {# Paste link #}
+        <li>
+            {% url 'education_group_attach' parent.id education_group_year.id as attach_url %}
+            {#            FIXME :: fix attach #}
+{#            {% a_tag_modal_has_perm attach_url|add:"?path="|add:node_path _('Paste') 'base.can_attach_node' user education_group_year %}#}
+        </li>
+        <li class="divider"></li>
+
+
+        {# Detach link #}
+        {% if group_to_parent and group_to_parent != "0" %}    {# We cannot detach root element #}
+            <li>
+                {% url 'group_element_year_delete' parent.id education_group_year.id group_to_parent as detach_url %}
+                {% a_tag_modal_has_perm detach_url _('Detach') 'base.can_detach_node' user education_group_year %}
+            </li>
+             <li class="divider"></li>
+        {% endif %}
+
+        {# Update link #}
+        <li>
+            {% url 'update_education_group' root.pk education_group_year.pk as update_url %}
+
+            {% if offer %}
+                {% have_only_access_to_certificate_aims user education_group_year as only_certificate_aims %}
+                {% if only_certificate_aims %}
+                    {% a_tag_modal_has_perm update_url _('Modify') 'base.change_educationgroupcertificateaim' user education_group_year %}
+                {% else %}
+                    {% if tab_to_show and education_group_year.groupelementyear_set.count > 0 %}
+                        {% a_tag_has_perm update_url|add:"?tab_to_show="|add:tab_to_show _('Modify') 'base.change_educationgroup' user education_group_year %}
+                    {% else %}
+                        {% a_tag_has_perm update_url _('Modify') 'base.change_educationgroup' user education_group_year %}
+                    {% endif %}
+                {% endif %}
+            {% else %}
+                {% a_tag_has_perm update_url _('Modify') 'base.change_educationgroup' user group_year %}
+            {% endif %}
+        </li>
+
+        {# Delete link #}
+        <li>
+            {% url 'delete_education_group' root.pk education_group_year.pk as delete_url %}
+            {% a_tag_has_perm delete_url _('Delete permanently') delete_perm user education_group_year %}
+        </li>
+
+        {# Generate PDF link #}
+        <li class="divider"></li>
+        {% url 'group_content' root_id=parent.id education_group_year_id=education_group_year.id as pdf_generate_url %}
+        {% link_pdf_content_education_group pdf_generate_url %}
+
+        <li class="divider"></li>
+
+        <li>
+            {#            FIXME :: fix quick-search #}
+{#            {% url 'quick_search_education_group' root_id=parent.id node_path=node_path as search_url %}#}
+{#            {% a_tag_modal_has_perm search_url _('Search') 'base.change_link_data' user education_group_year %}#}
+        </li>
+        <li class="divider"></li>
+        <li>
+            <a href="{% url "education_group_learning_units_prerequisites" group_year.pk %}"
+                class="download">
+                <span>{% trans 'Generate xls of learning units that have prerequisites' %}</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url "education_group_learning_units_is_prerequisite_for" group_year.pk %}"
+                class="download">
+                <span>{% trans 'Generate xls of learning units that are prerequisites for' %}</span>
+            </a>
+        </li>
+        <li class="divider"></li>
+        {# The action below is fixed in identitifcation_actions_bar.html #}
+{#        <li> #}
+{#            <a href="#" data-toggle="modal" data-target="#modalCustomXls" #}
+{#               role="button" id="bt_modal_custom_xls" class="download"> #}
+{#                <span>{% trans 'Generate xls of learning units in training' %}</span> #}
+{#            </a> #}
+{#        </li> #}
+    </ul>
+</div>

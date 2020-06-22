@@ -39,7 +39,7 @@ from reference.models.country import Country
 class CoorganizationEditForm(PermissionFieldTrainingMixin, forms.ModelForm):
     country = ModelChoiceField(
         queryset=Country.objects.filter(organizationaddress__isnull=False).distinct().order_by('name'),
-        label=_("Country"),
+        label=_("Country")
     )
 
     organization = ModelChoiceField(
@@ -79,7 +79,7 @@ class CoorganizationEditForm(PermissionFieldTrainingMixin, forms.ModelForm):
             country = Country.objects.filter(organizationaddress__organization=self.instance.organization).first()
         else:
             country = Country.objects.filter(organizationaddress__isnull=False, iso_code="BE").first()
-        self.fields['country'].initial = country
+        self.fields['country'].initial = country.pk
 
     def check_unique_constraint_between_education_group_year_organization(self):
         qs = EducationGroupOrganization.objects.filter(

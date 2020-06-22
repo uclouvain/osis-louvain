@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from unittest import skip
 
 from django.http import HttpResponse
 from django.test import TestCase
@@ -37,6 +38,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFullFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 
 
+@skip("FIXME in OSIS-4746")
 class TestLearningUnitFormationsTab(TestCase):
     @classmethod
     def setUpTestData(cls):

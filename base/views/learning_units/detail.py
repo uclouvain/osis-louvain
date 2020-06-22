@@ -165,3 +165,10 @@ class DetailLearningUnitYearView(PermissionRequiredMixin, DetailView):
 
         return versions.order_by('-revision__date_created').distinct('revision__date_created'
                                                                      ).select_related('revision__user__person')
+
+
+class DetailLearningUnitYearViewBySlug(DetailLearningUnitYearView):
+    def get_object(self, queryset=None):
+        acronym = self.kwargs['acronym'].upper()
+        year = int(self.kwargs['year'])
+        return get_object_or_404(LearningUnitYear, acronym=acronym, academic_year__year=year)

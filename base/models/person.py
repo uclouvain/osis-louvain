@@ -43,7 +43,7 @@ from base.models.entity_version import find_pedagogical_entities_version, \
 from base.models.enums import person_source_type
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.groups import CENTRAL_MANAGER_GROUP, FACULTY_MANAGER_GROUP, SIC_GROUP, \
-    UE_FACULTY_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP, PROGRAM_MANAGER_GROUP
+    UE_FACULTY_MANAGER_GROUP, ADMINISTRATIVE_MANAGER_GROUP, PROGRAM_MANAGER_GROUP, UE_CENTRAL_MANAGER_GROUP
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager
 from osis_common.utils.models import get_object_or_none
 
@@ -113,7 +113,11 @@ class Person(SerializableModel):
 
     @cached_property
     def is_central_manager(self):
-        return self.user.groups.filter(name=CENTRAL_MANAGER_GROUP).exists()
+        return self.user.groups.filter(name=CENTRAL_MANAGER_GROUP).exists() or self.is_central_manager_for_ue
+
+    @cached_property
+    def is_central_manager_for_ue(self):
+        return self.user.groups.filter(name=UE_CENTRAL_MANAGER_GROUP).exists()
 
     @cached_property
     def is_faculty_manager(self):

@@ -25,13 +25,22 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
+from base.models.utils.utils import ChoiceEnum
+
 YES = "YES"
 NO = "NO"
 OPTIONAL = "OPTIONAL"
 
+# FIXME :: DEPRECATED - use ActivityPresence instead
 # TODO replace it by a boolean value.
 ACTIVITY_PRESENCES = (
     (YES, _("yes")),
     (NO, _("no")),
     (OPTIONAL, _("optional"))
 )
+
+
+class ActivityPresence(ChoiceEnum):
+    YES = _("yes")
+    NO = _("no")
+    OPTIONAL = _("optional")

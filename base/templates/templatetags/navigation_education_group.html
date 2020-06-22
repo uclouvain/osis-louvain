@@ -7,7 +7,13 @@
 {% endblock previous_element_anchor %}
 
 {% block title %}
-    <h2>{{ current_element.acronym|default_if_none:'' }} &mdash; {{ current_element.academic_year }}</h2>
+    <h2>
+        {{ current_element.acronym|default_if_none:'' }}
+        {% if current_version and not current_version.is_standard and current_version.version_name %}
+            [{{ current_version.version_name }}]
+        {% endif %}
+        &mdash; {{ current_element.academic_year }}
+    </h2>
     <h4 style="margin-top: 0;">{{ current_element.complete_title }}</h4>
 {% endblock title %}
 

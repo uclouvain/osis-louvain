@@ -110,48 +110,43 @@
                         <th colspan="2">{% trans 'Final' %}</th>
                     </tr>
                     <tr>
-                        <th>{%trans 'Training' %}</th>
-                        <th>{%trans 'Registration number' %}</th>
-                        <th>{% trans 'Lastname' %}</th>
-                        <th>{% trans 'Firstname' %}</th>
-                        <th colspan="1" style="background-color: #eaf2f8">{%trans 'Score' %}</th>
-                        <th colspan="2" style="background-color: #eaf2f8">{%trans 'Justification' %}</th>
-                        <th colspan="1" style="background-color: #fcf3cf">{%trans 'Score' %}</th>
-                        <th colspan="2" style="background-color: #fcf3cf">{%trans 'Justification' %}</th>
-                        <th colspan="1">{%trans 'Score' %}</th>
-                        <th colspan="2">{%trans 'Justification' %}</th>
+                        <th id="program">{%trans 'Training' %}</th>
+                        <th id="registration_number">{%trans 'Registration number' %}</th>
+                        <th id="lastname">{% trans 'Lastname' %}</th>
+                        <th id="firstname">{% trans 'Firstname' %}</th>
+                        <th id="score_1" colspan="1" style="background-color: #eaf2f8">{%trans 'Score' %}</th>
+                        <th id="justification_1" colspan="2" style="background-color: #eaf2f8">{%trans 'Justification' %}</th>
+                        <th id="score_2" colspan="1" style="background-color: #fcf3cf">{%trans 'Score' %}</th>
+                        <th id="justification_2" colspan="2" style="background-color: #fcf3cf">{%trans 'Justification' %}</th>
+                        <th id="score_final" colspan="1">{%trans 'Score' %}</th>
+                        <th id="justification_final" colspan="2">{%trans 'Justification' %}</th>
                     </tr>
                 </thead>
                 <tbody>
                 {% for enrollment in enrollments %}
-                    <tr style="background-color:{% include 'blocks/row_color.html' %}">
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|default_if_none:"" }}</td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name|default_if_none:"" }}</td>
-
-                        {% if is_program_manager %}
-                            <td style="background-color: #eaf2f8">
+                    <tr class="result" style="background-color:{% include 'blocks/row_color.html' %}">
+                        <td headers="program">{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
+                        <td headers="registration_number">{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
+                        <td headers="lastname">{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|default_if_none:"" }}</td>
+                        <td headers="firstname">{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name|default_if_none:"" }}</td>
+                        <td headers="score_1" style="background-color: #eaf2f8">
+                            {% if is_program_manager %}
                                 <input type="hidden" id="hdn_score_draft_{{ enrollment.id }}" value="{{ enrollment.score_final | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores }}">{{ enrollment.score_final | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores }}
-                            </td>
-                        {% else %}
-                            <td style="background-color: #eaf2f8">
+                            {% else %}
                                 <input type="hidden" id="hdn_score_draft_{{ enrollment.id }}" value="{{ enrollment.score_draft | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores }}">{{ enrollment.score_draft | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores }}
-                            </td>
-                        {% endif %}
-                        {% if is_program_manager %}
-                            <td style="background-color: #eaf2f8">
+                            {% endif %}
+                        </td>
+                        <td headers="justification_1" style="background-color: #eaf2f8">
+                            {% if is_program_manager %}
                                 <input type="hidden" id="hdn_justification_draft_{{ enrollment.id }}"
                                        value="{{ enrollment.justification_final | default_if_none:'' }}">
                                 <div id="show_justification_draft_{{ enrollment.id }}">{{ enrollment.get_justification_final_display | default_if_none:'-' }}</div>
-                            </td>
-                        {% else %}
-                            <td style="background-color: #eaf2f8">
+                            {% else %}
                                 <input type="hidden" id="hdn_justification_draft_{{ enrollment.id }}" value="{{ enrollment.justification_draft | default_if_none:'' }}">
                                 <div id="show_justification_draft_{{ enrollment.id }}">{%if enrollment.justification_draft%}{{ enrollment.justification_draft_display}}{%else%}-{%endif%}</div>
-                            </td>
-                        {% endif %}
-                        <td style="background-color: #eaf2f8">
+                            {% endif %}
+                        </td>
+                        <td headers="justification_1" style="background-color: #eaf2f8">
                             {% if is_program_manager and enrollment.to_validate_by_program_manager %}
                                 <button type="button" id="bt_take_draft_{{ enrollment.id }}" class="btn btn-default btn-sm">
                                     <span class="glyphicon glyphicon-ok" id="span_take_draft_{{ enrollment.id }}" aria-hidden="true"></span>
@@ -162,12 +157,13 @@
                                 </button>
                             {% endif %}
                         </td>
-                        <td style="background-color: #fcf3cf"><input type="hidden" id="hdn_score_reencoded_{{ enrollment.id }}" name="score_reencoded_{{ enrollment.id }}"
+                        <td headers="score_2" style="background-color: #fcf3cf">
+                            <input type="hidden" id="hdn_score_reencoded_{{ enrollment.id }}" name="score_reencoded_{{ enrollment.id }}"
                                    value="{{ enrollment.score_reencoded | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores}}">
                             {{ enrollment.score_reencoded | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores }}
                             <input type="hidden" id="hdn_score_changed_{{ enrollment.id }}" name="score_changed_{{ enrollment.id }}" value="true">
                         </td>
-                        <td style="background-color: #fcf3cf"><input type="hidden" id="hdn_justification_reencoded_{{ enrollment.id }}" name="justification_reencoded_{{ enrollment.id }}"
+                        <td headers="justification_2" style="background-color: #fcf3cf"><input type="hidden" id="hdn_justification_reencoded_{{ enrollment.id }}" name="justification_reencoded_{{ enrollment.id }}"
                                    value="{{ enrollment.justification_reencoded | default_if_none:'' }}">
                             <div id="show_justification_reencoded_{{ enrollment.id }}">
                                 {% if is_program_manager %}
@@ -177,7 +173,7 @@
                                 {% endif %}
                             </div>
                         </td>
-                        <td style="background-color: #fcf3cf">
+                        <td headers="justification_2" style="background-color: #fcf3cf">
                             {% if is_program_manager and enrollment.to_validate_by_program_manager %}
                                 <button type="button" id="bt_take_reencoded_{{ enrollment.id }}" class="btn btn-default btn-sm">
                                     <span class="glyphicon glyphicon-ok" id="span_take_reencoded_{{ enrollment.id }}" aria-hidden="true"></span>
@@ -188,57 +184,53 @@
                                 </button>
                             {% endif %}
                         </td>
-
-                        {% if is_program_manager %}
-                            <td>
+                        <td headers="score_final">
+                            {% if is_program_manager %}
                                 <input type="hidden" name="score_{{ enrollment.id }}" id="hdn_score_final_{{ enrollment.id }}"
                                 value="{% if not enrollment.to_validate_by_program_manager %}{{ enrollment.score_final | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores}}{% endif %}"/>
                                 <div id="pnl_score_final_show_{{ enrollment.id }}" style="font-weight: bold; color: blue;">
-                                {% if not enrollment.justification_final %}
-                                    {% if enrollment.score_final == enrollment.score_reencoded and enrollment.score_final != None %}
-                                        {{enrollment.score_final|score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores}}
+                                    {% if not enrollment.justification_final %}
+                                        {% if enrollment.score_final == enrollment.score_reencoded and enrollment.score_final != None %}
+                                            {{enrollment.score_final|score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores}}
+                                        {%endif%}
                                     {%endif%}
-                                {%endif%}
                                 </div>
-                            </td>
-                        {% else %}
-                            <td>
+                            {% else %}
                                 <input type="hidden" name="score_{{ enrollment.id }}" id="hdn_score_final_{{ enrollment.id }}"
                                 value="{% if not enrollment.to_validate_by_tutor %}{{ enrollment.score_draft | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores}}{% endif %}"/>
                                 <div id="pnl_score_final_show_{{ enrollment.id }}" style="font-weight: bold; color: blue;">
-                                {% if not enrollment.justification_draft %}
-                                    {% if enrollment.score_draft == enrollment.score_reencoded and enrollment.score_draft != None %}
-                                        {{enrollment.score_draft|score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores}}
+                                    {% if not enrollment.justification_draft %}
+                                        {% if enrollment.score_draft == enrollment.score_reencoded and enrollment.score_draft != None %}
+                                            {{enrollment.score_draft|score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores}}
+                                        {%endif%}
                                     {%endif%}
-                                {%endif%}
                                 </div>
-                            </td>
-                        {% endif %}
-                        {% if is_program_manager %}
-                            <td>
+
+                            {% endif %}
+                        </td>
+                        <td headers="justification_final">
+                            {% if is_program_manager %}
                                 <input type="hidden"
                                        name="justification_{{ enrollment.id }}" id="hdn_justification_final_{{ enrollment.id }}"
                                        value="{% if not enrollment.to_validate_by_program_manager %}{{enrollment.justification_final | default_if_none:''}}{%endif%}"/>
                                 <div id="pnl_justification_final_show_{{ enrollment.id }}" style="font-weight: bold; color: blue;">
-                                {% if enrollment.score_final == enrollment.score_reencoded and enrollment.justification_final == enrollment.justification_reencoded%}
-                                    {% if enrollment.justification_final %}
-                                        {% trans enrollment.justification_final %}
-                                    {% endif %}
-                                {%endif%}
+                                    {% if enrollment.score_final == enrollment.score_reencoded and enrollment.justification_final == enrollment.justification_reencoded%}
+                                        {% if enrollment.justification_final %}
+                                            {% trans enrollment.justification_final %}
+                                        {% endif %}
+                                    {%endif%}
                                 </div>
-                            </td>
-                        {% else %}
-                            <td>
+                            {% else %}
                                 <input type="hidden"
                                        name="justification_{{ enrollment.id }}" id="hdn_justification_final_{{ enrollment.id }}"
                                        value="{% if not enrollment.to_validate_by_tutor %}{{ enrollment.justification_draft | default_if_none:''}}{%endif%}"/>
                                 <div id="pnl_justification_final_show_{{ enrollment.id }}" style="font-weight: bold; color: blue;">
-                                {% if enrollment.score_draft == enrollment.score_reencoded and enrollment.justification_draft == enrollment.justification_reencoded%}
-                                    {{enrollment.justification_draft_display}}
-                                {%endif%}
+                                    {% if enrollment.score_draft == enrollment.score_reencoded and enrollment.justification_draft == enrollment.justification_reencoded%}
+                                        {{enrollment.justification_draft_display}}
+                                    {%endif%}
                                 </div>
-                            </td>
-                        {% endif %}
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>

@@ -31,13 +31,9 @@
                                 <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu">
-                                {% if perms.base.can_access_education_group %}
+                                {% if perms.base.view_educationgroup %}
                                     <li>
-                                        {% flag "version_program" %}
-                                            {% url 'version_program' as url_training %}
-                                        {% else %}
-                                            {% url 'education_groups' as url_training %}
-                                        {% endflag %}
+                                        {% url 'version_program' as url_training %}
                                         <a href="{{url_training}}" id="lnk_dropdown_educationgroups">
                                             <span class="fa fa-folder-open"></span>
                                             {% trans 'Trainings' %}
@@ -169,7 +165,7 @@
                                 <li><a href="{% url 'partnerships:list' %}"
                                        id="lnk_dropdown_partnerships">{% trans 'partnerships' %}</a></li>
                                 {% if perms.partnership.can_access_partnerships_agreements %}
-                                    <li><a href="{% url 'partnerships:list' %}?agreements=1"
+                                    <li><a href="{% url 'partnerships:agreements-list' %}"
                                            id="lnk_dropdown_agreements">{% trans 'agreements' %}</a></li>
                                 {% endif %}
                                 {% if perms.partnership.change_partnershipconfiguration %}
