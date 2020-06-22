@@ -31,11 +31,29 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.http import HttpResponse
 
+from base.models import learning_unit_year
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType, GroupType
 from base.models.group_element_year import find_learning_unit_roots
 
 logger = logging.getLogger(settings.DEFAULT_LOGGER)
+
+
+def publish_learning_unit_year(learning_unit_year_obj: learning_unit_year.LearningUnitYear) -> None:
+    if not all([settings.ESB_API_URL, settings.ESB_AUTHORIZATION, settings.ESB_REFRESH_PEDAGOGY_ENDPOINT,
+                settings.ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT,
+                settings.ESB_REFRESH_COMMON_ADMISSION_ENDPOINT]):
+        raise ImproperlyConfigured('ESB_API_URL / ESB_AUTHORIZATION / ESB_REFRESH_PEDAGOGY_ENDPOINT / '
+                                   'ESB_REFRESH_COMMON_PEDAGOGY_ENDPOINT /  '
+                                   'ESB_REFRESH_COMMON_ADMISSION_ENDPOINT must be set in configuration')
+
+    trainings = find_learning_unit_roots(
+        [learning_unit_year_obj], return_result_params={'parents_as_instances': True}
+    ).get(learning_unit_year_obj.pk, [])
+    education_group_to_publish = next((training for training in trainings), None)
+    if education_group_to_publish:
+        t = Thread(target=_bulk_publish, args=([education_group_to_publish],))
+        t.start()
 
 
 def publish(education_group_year):

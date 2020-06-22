@@ -28,6 +28,7 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
 
+from base.business.education_groups import general_information
 from base.business.education_groups.general_information import PublishException
 from base.models.learning_unit_year import LearningUnitYear
 from base.views.common import display_error_messages, display_success_messages
@@ -43,7 +44,7 @@ def publish(request, code: str, year: int):
     )
 
     try:
-        # general_information.publish(education_group_year)
+        general_information.publish_learning_unit_year(learning_unit_year)
         message = _("The learning unit %(code)s will be published soon") % {'code': learning_unit_year.acronym}
         display_success_messages(request, message, extra_tags='safe')
     except PublishException as e:
