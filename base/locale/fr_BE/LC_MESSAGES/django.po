@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-19 11:42+0100\n"
+"POT-Creation-Date: 2020-06-19 10:19+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -410,6 +410,24 @@ msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours?"
 msgid "Are you sure?"
 msgstr "Êtes-vous sûr·e?"
 
+msgid "Arrangement Jury"
+msgstr "Aménagement Jury"
+
+msgid "Arrangement additional time"
+msgstr "Aménagement Tiers-Temps"
+
+msgid "Arrangement appropriate copy"
+msgstr "Aménagement Copie adaptée"
+
+msgid "Arrangement other"
+msgstr "Aménagement autre"
+
+msgid "Arrangement specific locale"
+msgstr "Aménagement Local spécifique"
+
+msgid "Artist"
+msgstr "Artiste"
+
 msgid "As displayed on the home page"
 msgstr "Comme présenté sur la page d'accueil"
 
@@ -794,6 +812,9 @@ msgstr "Diplômes /  Certificats"
 msgid "Direct Access"
 msgstr "Accès direct"
 
+msgid "Disability"
+msgstr "HTM"
+
 msgid "Disabled"
 msgstr "Désactivé"
 
@@ -980,6 +1001,9 @@ msgstr "Entités de charges"
 
 msgid "Entity managers"
 msgstr "Gestionnaires d'entités"
+
+msgid "Entrepreneur"
+msgstr "Entreprenariat"
 
 msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
@@ -1177,8 +1201,14 @@ msgstr "Groupe"
 msgid "Groups"
 msgstr "Groupes"
 
+msgid "Guide"
+msgstr "Accompagnateur"
+
 msgid "Help"
 msgstr "Aide"
+
+msgid "High Level Promising athlete"
+msgstr "ESHN"
 
 msgid "Highlight description"
 msgstr "Description de l'événement"
@@ -1794,6 +1824,9 @@ msgstr "Bacheliers non universitaires"
 msgid "Not concerned"
 msgstr "Non concerné"
 
+msgid "Not defined"
+msgstr "Non défini"
+
 msgid "Not eligible to delete learning units"
 msgstr "Vous ne pouvez pas supprimer cette unité d'enseignement"
 
@@ -1901,6 +1934,9 @@ msgstr "Autre contact"
 msgid "Other contacts"
 msgstr "Autres contacts"
 
+msgid "Other disability"
+msgstr "Autre HTM"
+
 msgid "Other individual"
 msgstr "Autre individuel"
 
@@ -1929,8 +1965,8 @@ msgid ""
 "Part of the title which is common to the complete EU, to its partims and to "
 "its classes"
 msgstr ""
-"Partie de l’intitulé qui est commune à l’UE complète, à ses partims et à "
-"ses classes"
+"Partie de l’intitulé qui est commune à l’UE complète, à ses partims et à ses "
+"classes"
 
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
@@ -1984,6 +2020,9 @@ msgstr "Entités attachées"
 
 msgid "Person not in accordance with proposal state"
 msgstr "Vous ne pouvez pas modifier une proposition dans cet état"
+
+msgid "Person with reduced mobility"
+msgstr "PMR"
 
 msgid "Personalized access"
 msgstr "Accès personnalisé"
@@ -2157,6 +2196,9 @@ msgstr "Interdiction de supprimer une unité d'enseignement avant 2015."
 
 msgid "Prolong"
 msgstr "Prolonger"
+
+msgid "Promising athlete"
+msgstr "ES"
 
 msgid "Proposal"
 msgstr "Proposition"
@@ -2459,6 +2501,9 @@ msgstr "Complément spécifique à l'UE (partim)"
 msgid "Specifications"
 msgstr "Cahier des charges"
 
+msgid "Sport"
+msgstr ""
+
 msgid "Start"
 msgstr "Début"
 
@@ -2497,6 +2542,12 @@ msgstr "Étudiants"
 
 msgid "Sub group"
 msgstr "Sous-groupe"
+
+msgid "Sub type Disability"
+msgstr "Sous-type HTM"
+
+msgid "Sub type Sport"
+msgstr "Sous-type Sport"
 
 msgid "Subject"
 msgstr "Sujet"
@@ -3090,10 +3141,6 @@ msgstr "Mise-à-jour débloquée pour l'enseignant"
 msgid "User"
 msgstr "Utilisateur"
 
-#, python-format
-msgid "User %(person)s do not have rights on this proposal."
-msgstr "L'utilisateur %(person)s n'a pas de droits sur cette proposition."
-
 msgid "User interface language"
 msgstr "Langue de l'interface utilisateur"
 
@@ -3425,9 +3472,6 @@ msgstr "commentaire"
 
 msgid "comment (internal)"
 msgstr "commentaire (interne)"
-
-msgid "confirm"
-msgstr "confirmer"
 
 msgid "credits"
 msgstr "crédits"
