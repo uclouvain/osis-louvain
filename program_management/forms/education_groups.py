@@ -173,7 +173,7 @@ class GroupFilter(FilterSet):
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound
         if not self.data:
-            return GroupYear.objects_version.none()
+            return GroupYear.objects.none()
 
         management_entity = entity_version.EntityVersion.objects.filter(
             entity=OuterRef('management_entity'),
@@ -181,7 +181,7 @@ class GroupFilter(FilterSet):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
-        return GroupYear.objects_version.all().select_related('element', 'academic_year').annotate(
+        return GroupYear.objects.all().select_related('element', 'academic_year').annotate(
             type_ordering=Case(
                 *[When(education_group_type__name=key, then=Value(str(_(val))))
                   for i, (key, val) in enumerate(education_group_types.ALL_TYPES)],

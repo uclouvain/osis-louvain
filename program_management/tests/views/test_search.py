@@ -430,6 +430,17 @@ class TestEducationGroupDataSearchFilter(TestCase):
                                self.group_year_edph3,
                                self.group_year_arke2a_previous_year])
 
+    def test_search_groups(self):
+        response = self.client.get(self.url,
+                                   data={"category": education_group_categories.GROUP})
+
+        self.assertTemplateUsed(response, SEARCH_TEMPLATE)
+
+        context = response.context
+        self.assertIsInstance(context["form"], self.form_class)
+        self.assertCountEqual(context["object_list"],
+                              [self.group_year_hist2a, self.group_year_edph2])
+
     def test_with_multiple_criteria(self):
         response = self.client.get(
             self.url, data={
