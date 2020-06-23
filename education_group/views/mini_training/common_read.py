@@ -26,7 +26,6 @@
 import functools
 import json
 from collections import OrderedDict
-from enum import Enum
 
 from django.http import Http404
 from django.urls import reverse
@@ -41,7 +40,6 @@ from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
 from base.models.enums.education_group_types import MiniTrainingType
-from base.utils.cache import ElementCache
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.views.mixin import ElementSelectedClipBoardMixin
@@ -49,11 +47,12 @@ from education_group.views.proxy import read
 from osis_role.contrib.views import PermissionRequiredMixin
 from program_management.ddd.domain.node import NodeIdentity, NodeNotFoundException
 from program_management.ddd.repositories import load_tree
-from program_management.ddd.service.read import element_selected_service
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.models.element import Element
 from program_management.serializers.program_tree_view import program_tree_view_serializer
-
+from education_group.forms.tree_version_choices import get_tree_versions_choices
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
+from program_management.ddd.domain.service.identity_search import ProgramTreeVersionIdentitySearch
 
 Tab = read.Tab  # FIXME :: fix imports (and remove this line)
 
@@ -78,6 +77,14 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
     @cached_property
     def node_identity(self) -> 'NodeIdentity':
         return NodeIdentity(code=self.kwargs['code'], year=self.kwargs['year'])
+
+    @cached_property
+    def program_tree_version_identity(self) -> 'ProgramTreeVersionIdentity':
+        return ProgramTreeVersionIdentitySearch().get_from_node_identity(self.node_identity)
+
+    @cached_property
+    def current_version(self) -> 'ProgramTreeVersion':
+        return ProgramTreeVersionRepository.get(self.program_tree_version_identity)
 
     @functools.lru_cache()
     def get_current_academic_year(self):
@@ -127,6 +134,8 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
                 _get_view_name_from_tab(self.active_tab),
             ),
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
+            "current_version": self.current_version,
+            "versions_choices": get_tree_versions_choices(self.node_identity, _get_view_name_from_tab(self.active_tab)),
             # TODO: Remove when finished reoganized tempalate
             "group_year": self.get_education_group_version().root_group
         }

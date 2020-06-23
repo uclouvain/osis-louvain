@@ -7,7 +7,7 @@
     * The core business involves the administration of students, teachers,
     * courses, programs and so on.
     *
-    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    * Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
     *
     * This program is free software: you can redistribute it and/or modify
     * it under the terms of the GNU General Public License as published by
@@ -34,8 +34,8 @@
                             {% bootstrap_label _("Acronym/Short title") label_class='d-block'%}
                             <p>
                                 {{ node.title }}
-                                {% if not current_version.is_standard and current_version.version_name %}
-                                    [{{ current_version.version_name }}]
+                                {% if current_version.version_label != '' %}
+                                    [{{ current_version.version_label }}]
                                 {% endif %}
                             </p>
                         </div>
@@ -156,7 +156,7 @@
                     <div class="row">
                         <div class="col-md-12">
                             {% bootstrap_label _("Last year of organization") label_class='d-block'%}
-                            <p>{{ node.end_year|default:_("unspecified") }}</p>
+                            <p>{% if node.end_year %}{{ node.end_year|format_to_academic_year }}{% else %}{% trans _("unspecified") %}{% endif %}</p>
                         </div>
                     </div>
                     <br>
