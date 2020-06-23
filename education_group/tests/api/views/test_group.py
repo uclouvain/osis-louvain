@@ -30,12 +30,12 @@ from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APITestCase
 
+from base.models.enums import education_group_categories
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import GroupFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
-from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
-from education_group.api.serializers.group import GroupDetailSerializer
+from education_group.api.serializers.group import GroupDetailSerializer, GroupTitleSerializer
+from education_group.tests.factories.group_year import GroupYearFactory
 
 
 class GroupTitleTestCase(APITestCase):
@@ -43,7 +43,9 @@ class GroupTitleTestCase(APITestCase):
     def setUpTestData(cls):
         anac = AcademicYearFactory()
 
-        cls.egy = GroupFactory(academic_year=anac)
+        cls.egy = GroupYearFactory(
+            academic_year=anac,
+        )
 
         cls.person = PersonFactory()
         cls.url = reverse('education_group_api_v1:groupstitle_read', kwargs={
@@ -79,7 +81,7 @@ class GroupTitleTestCase(APITestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
-        serializer = EducationGroupTitleSerializer(self.egy, context={'language': settings.LANGUAGE_CODE})
+        serializer = GroupTitleSerializer(self.egy, context={'language': settings.LANGUAGE_CODE})
         self.assertEqual(response.data, serializer.data)
 
 
@@ -87,7 +89,10 @@ class GetGroupTestCase(APITestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2018)
-        cls.group = GroupFactory(academic_year=cls.academic_year)
+        cls.group = GroupYearFactory(
+            academic_year=cls.academic_year,
+            education_group_type__category=education_group_categories.GROUP,
+        )
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:group_read', kwargs={
             'partial_acronym': cls.group.partial_acronym,

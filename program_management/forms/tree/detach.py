@@ -24,26 +24,27 @@
 #
 ##############################################################################
 from django import forms
-from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 
-from program_management.ddd.domain import program_tree, node
-from program_management.ddd.service import detach_node_service
+import osis_common.ddd.interface
+from base.ddd.utils import business_validator
+from program_management.ddd import command
+from program_management.ddd.domain import link
+from program_management.ddd.service.write import detach_node_service
+from program_management.ddd.validators import _path_validator
 
 
 class DetachNodeForm(forms.Form):
-    path = forms.CharField(widget=forms.HiddenInput)
-
-    def __init__(self, tree: program_tree.ProgramTree, **kwargs):
-        self.tree = tree
-        super().__init__(**kwargs)
+    path = forms.CharField(widget=forms.HiddenInput, required=True)
 
     def clean_path(self):
-        path = self.cleaned_data['path']
+        cleaned_path = self.cleaned_data.get("path")
         try:
-            self.tree.get_node(path)
-        except node.NodeNotFoundException:
-            raise forms.ValidationError(_("Invalid tree path"))
-        return path
+            _path_validator.PathValidator(cleaned_path).validate()
+        except osis_common.ddd.interface.BusinessExceptions as business_exception:
+            raise ValidationError(business_exception.messages)
+        return cleaned_path
 
-    def save(self):
-        return detach_node_service.detach_node(self.tree)
+    def save(self) -> link.LinkIdentity:
+        detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.cleaned_data["path"], commit=True)
+        return detach_node_service.detach_node(detach_node_command)

@@ -29,15 +29,11 @@ from base.views.education_groups.achievement.create import CreateEducationGroupA
     CreateEducationGroupDetailedAchievement
 from base.views.education_groups.achievement.delete import DeleteEducationGroupAchievement, \
     DeleteEducationGroupDetailedAchievement
-from base.views.education_groups.achievement.detail import EducationGroupSkillsAchievements
 from base.views.education_groups.achievement.update import EducationGroupAchievementAction, \
     EducationGroupDetailedAchievementAction, UpdateEducationGroupAchievement, UpdateEducationGroupDetailedAchievement, \
     EducationGroupAchievementProgramAim, EducationGroupAchievementAdditionalInformation
 
 urlpatterns = [
-    url(r'^$',
-        EducationGroupSkillsAchievements.as_view(),
-        name='education_group_skills_achievements'),
 
     url(r'^create',
         CreateEducationGroupAchievement.as_view(),

@@ -219,6 +219,11 @@ def display_business_messages(request, messages_to_display: List['BusinessValida
     display_warning_messages(request, [m.message for m in messages_to_display if m.is_warning()], extra_tags=extra_tags)
 
 
+def display_business_warning_messages(request, messages_to_display: List['BusinessValidationMessage'], extra_tags=None):
+    warning_messages = [m for m in messages_to_display if m.is_warning()]
+    display_business_messages(request, warning_messages, extra_tags=extra_tags)
+
+
 def display_messages(request, messages_to_display, level, extra_tags=None):
     if not isinstance(messages_to_display, (tuple, list)):
         messages_to_display = [messages_to_display]

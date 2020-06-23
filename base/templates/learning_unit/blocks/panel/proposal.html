@@ -19,7 +19,7 @@
 
             {% block proposal_state %}
                 <dt>{% trans 'State' %}</dt>
-                <dd>{% trans proposal.get_state_display %}</dd><br>
+                <dd id="id_proposal_state">{% trans proposal.get_state_display %}</dd><br>
             {% endblock proposal_state %}
 
             <dt>{% trans 'Introduced by' %}</dt>

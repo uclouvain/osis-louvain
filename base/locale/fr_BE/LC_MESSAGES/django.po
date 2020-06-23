@@ -664,6 +664,9 @@ msgstr "Contacts"
 msgid "Content"
 msgstr "Contenu"
 
+msgid "Continuing education academic year linkable to admission"
+msgstr "Formation continue année académique liable aux admissions"
+
 msgid "Coordinator"
 msgstr "Coordinateur"
 
@@ -927,7 +930,7 @@ msgid "Elaboration and management of the formation catalogue."
 msgstr "Elaboration et gestion du catalogue de formations."
 
 msgid "Email"
-msgstr "Email"
+msgstr "Courriel"
 
 msgid "End"
 msgstr "Fin"
@@ -2102,7 +2105,7 @@ msgid "Prerequisite"
 msgstr "Prérequis"
 
 msgid "Prerequisites are invalid"
-msgstr "<p>Prérequis invalides</p>"
+msgstr "Prérequis invalides"
 
 msgid "President"
 msgstr "Président·e"
@@ -2878,12 +2881,12 @@ msgstr "L'utilisateur n'a pas la permission de modifier les formations."
 
 #, python-format
 msgctxt "female"
-msgid "The user has not permission to create a %(category)s."
+msgid "The user does not have permission to create a %(category)s."
 msgstr "L'utilisateur n'a pas la permission de créer une %(category)s."
 
 #, python-format
 msgctxt "male"
-msgid "The user has not permission to create a %(category)s."
+msgid "The user does not have permission to create a %(category)s."
 msgstr "L'utilisateur n'a pas la permission de créer un %(category)s."
 
 msgid "The user has not permission to create education groups."
@@ -2892,9 +2895,9 @@ msgstr "L'utilisateur n'a pas la permission de créer des formations."
 msgid "The user has not permission to delete education groups."
 msgstr "L'utilisateur n'a pas la permission de supprimer les formations."
 
-msgid "The user is not allowed to change education group content."
+msgid "The user is not allowed to change link data."
 msgstr ""
-"L'utilisateur n'a pas la permission de modifier le contenu de la formation."
+"L'utilisateur n'a pas la permission de modifier le contenu d'un lien."
 
 msgid "The user is not attached to the management entity"
 msgstr "L’utilisateur n’est pas attaché à l’entité de gestion"
@@ -2919,6 +2922,9 @@ msgid ""
 msgstr ""
 "La valeur du champ '%(field)s' différe entre l'année %(year)s - %(value)s et "
 "l'année %(next_year)s - %(next_value)s"
+
+msgid "The value of this attribute is inherited from the standard OF"
+msgstr "La valeur de ce champ est hérité de l'OF standard"
 
 msgid "The volume Q1 or Q2 must have a value but not both"
 msgstr "Le volume Q1 ou Q2 doit avoir une valeur"
@@ -3398,7 +3404,6 @@ msgstr ""
 msgid "academic events"
 msgstr "événements académiques"
 
-# TODO
 msgid "acronym rules"
 msgstr ""
 "Code composé de:\n"
@@ -3479,11 +3484,9 @@ msgstr "crédits"
 msgid "date and time"
 msgstr "Date et heure"
 
-# TODO
 msgid "date_format"
 msgstr "%d/%m/%Y"
 
-# TODO
 msgid "date_format_string"
 msgstr "d/m/Y"
 
@@ -3514,7 +3517,6 @@ msgstr "commentaire anglais"
 msgid "english help text"
 msgstr "texte d'aide en anglais"
 
-# TODO
 msgid "external acronym rules"
 msgstr ""
 "Code composé de:\n"
@@ -3532,7 +3534,6 @@ msgstr "référence de champ"
 msgid "filter by section"
 msgstr "préfiltrer par rubrique"
 
-# TODO
 msgid "format_date"
 msgstr "jj/mm/aaaa"
 
@@ -3614,7 +3615,6 @@ msgstr ""
 "le nombre de classes prévues ne peut être supérieur à 0 si le volume est "
 "égal à 0"
 
-# TODO impossible to create a key from that msgstr.
 msgid "please_enable_javascript"
 msgstr ""
 "Veuillez <a href='http://enable-javascript.com/fr/' target='_blank'>activer "

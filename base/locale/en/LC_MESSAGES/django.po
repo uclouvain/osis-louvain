@@ -635,6 +635,9 @@ msgstr ""
 msgid "Content"
 msgstr ""
 
+msgid "Continuing education academic year linkable to admission"
+msgstr ""
+
 msgid "Coordinator"
 msgstr ""
 
@@ -2747,12 +2750,12 @@ msgstr ""
 
 #, python-format
 msgctxt "female"
-msgid "The user has not permission to create a %(category)s."
+msgid "The user does not have permission to create a %(category)s."
 msgstr ""
 
 #, python-format
 msgctxt "male"
-msgid "The user has not permission to create a %(category)s."
+msgid "The user does not have permission to create a %(category)s."
 msgstr ""
 
 msgid "The user has not permission to create education groups."
@@ -2761,7 +2764,7 @@ msgstr ""
 msgid "The user has not permission to delete education groups."
 msgstr ""
 
-msgid "The user is not allowed to change education group content."
+msgid "The user is not allowed to change link data."
 msgstr ""
 
 msgid "The user is not attached to the management entity"
@@ -2781,6 +2784,9 @@ msgstr ""
 msgid ""
 "The value of field '%(field)s' is different between year %(year)s - "
 "%(value)s and year %(next_year)s - %(next_value)s"
+msgstr ""
+
+msgid "The value of this attribute is inherited from the standard OF"
 msgstr ""
 
 msgid "The volume Q1 or Q2 must have a value but not both"

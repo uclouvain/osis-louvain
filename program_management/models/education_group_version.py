@@ -56,7 +56,8 @@ class EducationGroupVersion(models.Model):
         'education_group.GroupYear',
         unique=True,
         verbose_name=_('Root group'),
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
+        related_name='educationgroupversion'
     )
     offer = models.ForeignKey(
         'base.EducationGroupYear',
@@ -66,12 +67,12 @@ class EducationGroupVersion(models.Model):
     )
     title_fr = models.CharField(
         blank=True, null=True,
-        max_length=100,
+        max_length=240,
         verbose_name=_("Title in French")
     )
     title_en = models.CharField(
         blank=True, null=True,
-        max_length=100,
+        max_length=240,
         verbose_name=_("Title in English")
     )
 

@@ -27,38 +27,55 @@ from django_filters import rest_framework as filters
 from rest_framework import generics
 from rest_framework.generics import get_object_or_404
 
+import program_management.ddd.repositories.find_roots
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from backoffice.settings.rest_framework.filters import OrderingFilterWithDefault
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import MiniTrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
+from education_group.api.serializers.training import TrainingListSerializer
+from education_group.api.views import utils
+from program_management.models.education_group_version import EducationGroupVersion
+from program_management.models.element import Element
 
 
 class MiniTrainingFilter(filters.FilterSet):
-    from_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='gte')
-    to_year = filters.NumberFilter(field_name="academic_year__year", lookup_expr='lte')
-    code = filters.CharFilter(field_name="partial_acronym", lookup_expr='icontains')
+    from_year = filters.NumberFilter(field_name="offer__academic_year__year", lookup_expr='gte')
+    to_year = filters.NumberFilter(field_name="offer__academic_year__year", lookup_expr='lte')
+    code = filters.CharFilter(field_name="root_group__partial_acronym", lookup_expr='icontains')
+    partial_acronym = filters.CharFilter(field_name="root_group__partial_acronym", lookup_expr='icontains')
     education_group_type = filters.MultipleChoiceFilter(
-        field_name='education_group_type__name',
+        field_name='offer__education_group_type__name',
         choices=MiniTrainingType.choices()
     )
+    version_type = filters.CharFilter(method='filter_version_type')
+    acronym = filters.CharFilter(field_name="offer__acronym", lookup_expr='icontains')
+    title = filters.CharFilter(field_name="root_group__title_fr", lookup_expr='icontains')
+    title_english = filters.CharFilter(field_name="root_group__title_en", lookup_expr='icontains')
 
     order_by_field = 'ordering'
     ordering = OrderingFilterWithDefault(
         fields=(
-            ('acronym', 'acronym'),
-            ('partial_acronym', 'code'),
-            ('academic_year__year', 'academic_year'),
-            ('title', 'title'),
+            ('offer__acronym', 'acronym'),
+            ('root_group__partial_acronym', 'code'),
+            ('offer__academic_year__year', 'academic_year'),
+            ('root_group__title_fr', 'title'),
         ),
-        default_ordering=('-academic_year__year', 'acronym',)
+        default_ordering=('-offer__academic_year__year', 'offer__acronym',)
     )
 
     class Meta:
-        model = EducationGroupYear
-        fields = ['acronym', 'code', 'education_group_type', 'title', 'title_english', 'from_year', 'to_year']
+        model = EducationGroupVersion
+        fields = [
+            'acronym', 'code', 'education_group_type', 'title', 'title_english',
+            'from_year', 'to_year', 'version_type',
+            'is_transition', 'version_name'
+        ]
+
+    @staticmethod
+    def filter_version_type(queryset, name, value):
+        return utils.filter_version_type(queryset, value)
 
 
 class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
@@ -66,20 +83,24 @@ class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
        Return a list of all the mini_trainings with optional filtering.
     """
     name = 'minitraining_list'
-    queryset = EducationGroupYear.objects.filter(
-        education_group_type__category=education_group_categories.MINI_TRAINING
-    ).select_related('education_group_type', 'academic_year')\
-     .prefetch_related('management_entity__entityversion_set')\
-     .exclude(
-        acronym__icontains='common',
-     )
+    queryset = EducationGroupVersion.objects.filter(
+        offer__education_group_type__category=education_group_categories.MINI_TRAINING
+    ).select_related(
+        'offer__education_group_type',
+        'offer__academic_year',
+        'root_group'
+    ).prefetch_related(
+        'offer__management_entity__entityversion_set'
+    ).exclude(
+        offer__acronym__icontains='common',
+    )
     serializer_class = MiniTrainingListSerializer
     filterset_class = MiniTrainingFilter
     search_fields = (
-        'acronym',
-        'partial_acronym',
-        'title',
-        'title_english',
+        'offer__acronym',
+        'root_group__partial_acronym',
+        'root_group__title_fr',
+        'root_group__title_en',
     )
 
 
@@ -93,20 +114,21 @@ class MiniTrainingDetail(LanguageContextSerializerMixin, generics.RetrieveAPIVie
     def get_object(self):
         partial_acronym = self.kwargs['partial_acronym']
         year = self.kwargs['year']
-        egy = get_object_or_404(
-            EducationGroupYear.objects.filter(
-                education_group_type__category=education_group_categories.MINI_TRAINING
+        egv = get_object_or_404(
+            EducationGroupVersion.objects.filter(
+                offer__education_group_type__category=education_group_categories.MINI_TRAINING
             ).select_related(
-                'education_group_type',
-                'academic_year',
-                'main_teaching_campus',
+                'offer__education_group_type',
+                'offer__academic_year',
+                'root_group__main_teaching_campus',
+                'root_group'
             ).prefetch_related(
-                'management_entity__entityversion_set',
+                'offer__management_entity__entityversion_set',
             ),
-            partial_acronym__iexact=partial_acronym,
-            academic_year__year=year
+            offer__partial_acronym__iexact=partial_acronym,
+            offer__academic_year__year=year,
         )
-        return egy
+        return egv
 
 
 class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView):
@@ -119,11 +141,38 @@ class MiniTrainingTitle(LanguageContextSerializerMixin, generics.RetrieveAPIView
     def get_object(self):
         acronym = self.kwargs['partial_acronym']
         year = self.kwargs['year']
-        egy = get_object_or_404(
-            EducationGroupYear.objects.all().select_related(
-                'academic_year',
+        egv = get_object_or_404(
+            EducationGroupVersion.objects.all().select_related(
+                'offer__academic_year',
+                'root_group'
             ),
-            partial_acronym__iexact=acronym,
-            academic_year__year=year
+            root_group__partial_acronym__iexact=acronym,
+            offer__academic_year__year=year
         )
-        return egy
+        return egv
+
+
+class OfferRoots(LanguageContextSerializerMixin, generics.ListAPIView):
+    """
+        Return the list of offer roots for a mini training.
+    """
+    name = 'offer_roots'
+    serializer_class = TrainingListSerializer
+
+    def get_queryset(self):
+        acronym = self.kwargs['partial_acronym']
+        year = self.kwargs['year']
+        element = get_object_or_404(
+            Element.objects.all().select_related(
+                'group_year__academic_year',
+            ),
+            group_year__partial_acronym__iexact=acronym,
+            group_year__academic_year__year=year
+        )
+        root_elements = program_management.ddd.repositories.find_roots.find_roots(
+            [element],
+            as_instances=True
+        ).get(element.id, [])
+        return EducationGroupVersion.objects.filter(
+            root_group__element__in=root_elements
+        ).select_related('root_group__academic_year', 'root_group__education_group_type')

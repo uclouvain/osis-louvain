@@ -39,7 +39,7 @@ from base.models.teaching_material import TeachingMaterial
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import CentralManagerFactory
+from base.tests.factories.person import CentralManagerForUEFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from base.tests.factories.utils.get_messages import get_messages_from_response
@@ -256,6 +256,6 @@ class TeachingMaterialDeleteTestCase(TestCase):
 
 def _get_central_manager_person_with_permission():
     perm_codename = "can_edit_learningunit_pedagogy"
-    person = CentralManagerFactory()
+    person = CentralManagerForUEFactory()
     person.user.user_permissions.add(Permission.objects.get(codename=perm_codename))
     return person

@@ -22,17 +22,33 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 import sys
+from importlib import import_module
 
 from behave.__main__ import main as behave_main
 from behave_django.environment import monkey_patch_behave
 from behave_django.management.commands.behave import Command as Cmd
 
-from features.db_setup import CloneExistingDatabaseTestRunner
+from features.runner import OsisRunner
 
 
 class Command(Cmd):
     def handle(self, *args, **options):
-        django_test_runner = CloneExistingDatabaseTestRunner()
+        # Check the flags
+        if options['use_existing_database'] and options['simple']:
+            self.stderr.write(self.style.WARNING(
+                '--simple flag has no effect'
+                ' together with --use-existing-database'
+            ))
+
+        # Configure django environment
+        passthru_args = ('failfast',
+                         'interactive',
+                         'keepdb',
+                         'reverse')
+        runner_args = {k: v for
+                       k, v in
+                       options.items() if k in passthru_args and v is not None}
+        django_test_runner = OsisRunner(**runner_args)
         django_test_runner.setup_test_environment()
         old_config = django_test_runner.setup_databases()
 
@@ -42,8 +58,14 @@ class Command(Cmd):
         exit_status = behave_main(args=behave_args)
 
         # Teardown django environment
+        OsisRunner.testcase_class()._flush_db()
         django_test_runner.teardown_databases(old_config)
         django_test_runner.teardown_test_environment()
 
         if exit_status != 0:
             sys.exit(exit_status)
+
+
+def import_class(path):
+    mod, cls = path.rsplit(".", 1)
+    return getattr(import_module(mod), cls)

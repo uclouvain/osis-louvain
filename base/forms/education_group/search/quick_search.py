@@ -26,13 +26,13 @@ from django.utils.translation import gettext_lazy as _, pgettext_lazy
 from django_filters import FilterSet, filters, OrderingFilter
 
 from base.models.academic_year import AcademicYear
-from base.models.education_group_year import EducationGroupYear
-from base.models.enums import education_group_categories
+from education_group.models.group_year import GroupYear
 
 
-class QuickEducationGroupYearFilter(FilterSet):
+class QuickGroupYearFilter(FilterSet):
     academic_year = filters.ModelChoiceFilter(
         queryset=AcademicYear.objects.all(),
+        to_field_name="year",
         required=False,
         label=_('Ac yr.'),
         empty_label=pgettext_lazy("plural", "All"),
@@ -52,7 +52,7 @@ class QuickEducationGroupYearFilter(FilterSet):
         label=_('Code'),
     )
     title = filters.CharFilter(
-        field_name="title",
+        field_name="title_fr",
         lookup_expr='icontains',
         max_length=255,
         required=False,
@@ -70,7 +70,7 @@ class QuickEducationGroupYearFilter(FilterSet):
     )
 
     class Meta:
-        model = EducationGroupYear
+        model = GroupYear
         fields = [
             'acronym',
             'title',
@@ -87,5 +87,5 @@ class QuickEducationGroupYearFilter(FilterSet):
     def get_queryset(self):
         # Need this close so as to return empty query by default when form is unbound
         if not self.data:
-            return EducationGroupYear.objects.none()
-        return EducationGroupYear.objects.all()
+            return GroupYear.objects.none()
+        return GroupYear.objects.all()

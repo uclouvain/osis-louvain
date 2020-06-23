@@ -34,7 +34,7 @@ from osis_role.contrib.admin import RoleModelAdmin, EntityRoleModelAdmin
 class TestRoleModelAdmin(SimpleTestCase):
     def test_ensure_list_display(self):
         expected_list_display = ('person',)
-        self.assertEquals(RoleModelAdmin.list_display, expected_list_display)
+        self.assertEqual(RoleModelAdmin.list_display, expected_list_display)
 
     def test_ensure_search_fields(self):
         expected_search_fields = ['person__first_name', 'person__last_name', ]
@@ -44,7 +44,7 @@ class TestRoleModelAdmin(SimpleTestCase):
 class TestEntityRoleModelAdmin(SimpleTestCase):
     def test_ensure_list_display(self):
         expected_list_display = ('person', 'entity', 'latest_entity_version_name', 'with_child', )
-        self.assertEquals(EntityRoleModelAdmin.list_display, expected_list_display)
+        self.assertEqual(EntityRoleModelAdmin.list_display, expected_list_display)
 
     def test_ensure_search_fields(self):
         expected_search_fields = [
@@ -60,7 +60,7 @@ class TestEntityRoleModelAdmin(SimpleTestCase):
             mock.Mock(spec=EntityRoleModelAdmin),
             mock.Mock(**{'entity': mock.PropertyMock(return_value=EntityFactory.build())})
         )
-        self.assertEquals(result_str, 'Not found')
+        self.assertEqual(result_str, 'Not found')
 
     @mock.patch('base.models.entity_version.get_last_version')
     def test_latest_entity_version_name_case_found(self, mock_get_last_version):
@@ -71,4 +71,4 @@ class TestEntityRoleModelAdmin(SimpleTestCase):
             mock.Mock(spec=EntityRoleModelAdmin),
             mock.Mock(**{'entity': mock.PropertyMock(return_value=EntityFactory.build())})
         )
-        self.assertEquals(result_str, entity_version.acronym)
+        self.assertEqual(result_str, entity_version.acronym)

@@ -1,2 +1,2 @@
-from . import attach
+from . import paste
 from . import detach

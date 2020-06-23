@@ -23,10 +23,11 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import random
 import factory.fuzzy
 
 
 class FuzzyBoolean(factory.fuzzy.BaseFuzzyAttribute):
     """Random boolean value"""
     def fuzz(self):
-        return factory.fuzzy._random.choice([True, False])
+        return random.choice([True, False])

@@ -24,7 +24,7 @@
     * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<form class="pedagogy-form" role="form" method="POST" action="{{ request.path }}" class="form">
+<form role="form" method="POST" action="{{ request.path }}" class="pedagogy-form form">
     <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">×</button>
         <h4>{{ translated_label | capfirst }}</h4>
@@ -47,21 +47,11 @@
     </div>
     <div class="modal-footer">
         <button class="btn btn-default" data-dismiss="modal">{% trans 'Cancel' %}</button>
-        <button class="btn btn-primary" type="submit">{% trans 'Save' %}</button>
+        <button class="btn btn-primary" type="submit" onclick="CKupdate();">{% trans 'Save' %}</button>
     </div>
 </form>
 
 <script>
-    $(function () {
-        var richText = $('#id_text_french');
-        var config = richText.data('config');
-        CKEDITOR.replace('id_text_french', config);
-
-        var richText = $('#id_text_english');
-        var config = richText.data('config');
-        CKEDITOR.replace('id_text_english', config);
-    });
-
     $('#modification_tabs a').click(function (e) {
         e.preventDefault();
         $(this).tab('show');

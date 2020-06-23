@@ -1,0 +1,161 @@
+{% extends "education_group_app/group/layout_read.html" %}
+{% load i18n bootstrap3 format static education_group %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block details %}
+    <div class="row">
+        <div class="col-md-7" style="margin-top: 10px">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% bootstrap_label _("Acronym/Short title") label_class='d-block'%}
+                            <p>
+                                {{ node.title }}
+                                {% if not current_version.is_standard and current_version.version_name %}
+                                    [{{ current_version.version_name }}]
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            {% bootstrap_label _("Code") label_class='d-block'%}
+                            <p>{{ node.code }}</p>
+                         </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-6">
+                            {% bootstrap_label _("Category") label_class='d-block'%}
+                            <p>{% trans 'Group' %}</p>
+                        </div>
+                        <div class="col-md-6">
+                            {% bootstrap_label _("Type of training") label_class='d-block'%}
+                            <p>{{ node.category.value }}</p>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-6">
+                           {% with label=_("credits") %}
+                            {% bootstrap_label label|capfirst label_class='d-block'%}
+                           {% endwith %}
+                           <p>{{ node.credits|default_if_none:"-" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            {% bootstrap_label _("Type of constraint") label_class='d-block'%}
+                            <p>{{ node.constraint_type.value|capfirst|default_if_none:""  }}</p>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-6">
+                           {% with label=_("minimum constraint") %}
+                            {% bootstrap_label label|capfirst label_class='d-block'%}
+                           {% endwith %}
+                           <p>{{ node.min_constraint|default_if_none:""  }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            {% with label=_("maximum constraint") %}
+                                {% bootstrap_label label|capfirst label_class='d-block'%}
+                            {% endwith %}
+                            <p>{{ node.max_constraint|default_if_none:"" }}</p>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% bootstrap_label _("Title in French") label_class='d-block'%}
+                            <p>{{ node.group_title_fr }}</p>
+                        </div>
+                    </div>
+                    {% if not current_version.is_standard or current_version.is_transition %}
+                        <br>
+                        <div class="row">
+                            <div class="col-md-12" id="version_title_fr">
+                                {% bootstrap_label _("Title in French") %} {% bootstrap_label _("of version") %}
+                                <p>{{ current_version.title_fr | default_if_none:'' }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                    <br>
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% bootstrap_label _("Title in English") label_class='d-block'%}
+                            <p>{{ node.group_title_en }}</p>
+                        </div>
+                    </div>
+                    {% if not current_version.is_standard  or current_version.is_transition %}
+                        <br>
+                        <div class="row">
+                            <div class="col-md-12" id="version_title_en">
+                                {% bootstrap_label _("Title in English") %} {% bootstrap_label _("of version") %}
+                                <p>{{ current_version.title_en | default_if_none:'' }}</p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-5" style="margin-top: 10px">
+            <div class="panel panel-default">
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% bootstrap_label _("Management entity") label_class='d-block'%}
+                            <p>{{ node.management_entity_acronym }}</p>
+                        </div>
+                    </div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% bootstrap_label _("Learning location") label_class='d-block'%}
+                            <p>{{ node.teaching_campus }} </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% include "blocks/panel/reversion.html" %}
+        </div>
+    </div>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="row">
+                <div class="col-md-12">
+                    {% bootstrap_label _("Remark") label_class='d-block' %}
+                    <p>{{ node.remark_fr }} </p>
+                </div>
+            </div>
+            <br>
+            <div class="row">
+                <div class="col-md-12">
+                    {% with label=_("remark in english") %}
+                        {% bootstrap_label label|capfirst label_class='d-block' %}
+                    {% endwith %}
+                    <p>{{ node.remark_fr }} </p>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -24,9 +24,11 @@
 #
 ##############################################################################
 import datetime
+import random
 import string
 
 import factory.fuzzy
+from django.utils import timezone
 
 from base.tests.factories.academic_calendar import AcademicCalendarFactory
 from base.tests.factories.entity import EntityFactory
@@ -46,3 +48,13 @@ class EntityCalendarFactory(factory.django.DjangoModelFactory):
     entity = factory.SubFactory(EntityFactory)
     start_date = factory.LazyAttribute(generate_start_date)
     end_date = factory.LazyAttribute(generate_end_date)
+
+    class Params:
+        open = factory.Trait(
+            start_date=factory.LazyFunction(
+                lambda: timezone.now() - timezone.timedelta(days=random.randint(1, 40))
+            ),
+            end_date=factory.LazyFunction(
+                lambda: timezone.now() + timezone.timedelta(days=random.randint(1, 40))
+            )
+        )
