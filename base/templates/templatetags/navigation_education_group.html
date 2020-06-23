@@ -9,8 +9,8 @@
 {% block title %}
     <h2>
         {{ current_element.acronym|default_if_none:'' }}
-        {% if current_version and not current_version.is_standard and current_version.version_name %}
-            [{{ current_version.version_name }}]
+        {% if current_version and current_version.version_label != '' %}
+            [{{ current_version.version_label }}]
         {% endif %}
         &mdash; {{ current_element.academic_year }}
     </h2>
