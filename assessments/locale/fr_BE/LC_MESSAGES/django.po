@@ -556,7 +556,7 @@ msgid ""
 msgstr "L'inscription à l'activité %(xls_learning_unit_acronym)s n'existe pas"
 
 msgid "The file must be a valid 'XLSX' excel file"
-msgstr "Le fichier dois être un fichier excel valide"
+msgstr "Le fichier doit être un fichier excel valide"
 
 msgid "The manager will keep the following programs : "
 msgstr "Le gestionnaire devra conserver les programmes suivant : "
