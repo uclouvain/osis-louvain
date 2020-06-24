@@ -200,7 +200,10 @@ def _annotate_with_description_fiche_specifications(original_qs1):
     original_qs = original_qs1
     qs = TranslatedText.objects.filter(
         reference=OuterRef('pk'),
-        entity=LEARNING_UNIT_YEAR)
+        entity=LEARNING_UNIT_YEAR,
+        reference_type__model='learning_unit_year',
+        reference_type__app_label='base'
+    )
 
     annotations = build_annotations(
         qs,

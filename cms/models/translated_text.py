@@ -25,6 +25,8 @@
 ##############################################################################
 from ckeditor.fields import RichTextField
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from reversion.admin import VersionAdmin
 
@@ -50,14 +52,21 @@ class TranslatedText(models.Model):
     language = models.CharField(max_length=30, null=True, choices=settings.LANGUAGES, default=settings.LANGUAGE_CODE)
     text_label = models.ForeignKey(TextLabel, blank=None, null=True, on_delete=models.CASCADE)
     entity = models.CharField(db_index=True, max_length=25, choices=ENTITY_NAME)
-    reference = models.IntegerField(db_index=True)
     text = RichTextField(null=True)
+
+    limit = models.Q(app_label='base', model='education_group_year') \
+            | models.Q(app_label='education_group', model='group_year') \
+            | models.Q(app_label='base', model='learning_unit_year')
+    # TODO: Remove null=True after script
+    reference_type = models.ForeignKey(ContentType, on_delete=models.PROTECT, limit_choices_to=limit, null=True)
+    reference = models.PositiveIntegerField()
+    reference_object = GenericForeignKey('reference_type', 'reference')
 
     def __str__(self):
         return self.entity
 
     class Meta:
-        unique_together = ('entity', 'reference', 'text_label', 'language')
+        unique_together = ('entity', 'reference_type', 'reference', 'text_label', 'language')
 
 
 def search(entity, reference, text_labels_name=None, language=None):
