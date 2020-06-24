@@ -181,6 +181,9 @@ class Node(interface.Entity):
     def get_option_list(self) -> Set['Node']:
         return {l.child for l in self.get_all_children() if l.child.is_option()}
 
+    def get_finality_list(self) -> Set['Node']:
+        return {l.child for l in self.get_all_children() if l.child.is_finality()}
+
     def get_all_children_as_nodes(
             self,
             take_only: Set[EducationGroupTypesEnum] = None,

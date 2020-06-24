@@ -132,7 +132,8 @@ class FilterEducationGroupRootsTestCase(APITestCase):
         finality_root = EducationGroupYearMasterFactory(academic_year=self.academic_year)
         finality_root_group = GroupYearFactory(
             acronym=finality_root.acronym, partial_acronym=finality_root.partial_acronym,
-            academic_year=self.academic_year
+            academic_year=self.academic_year,
+            education_group_type=finality_root.education_group_type
         )
         finality_root_version = StandardEducationGroupVersionFactory(root_group=finality_root_group, offer=finality_root)
 
