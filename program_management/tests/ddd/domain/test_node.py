@@ -356,3 +356,24 @@ class TestGetOptionsList(SimpleTestCase):
         link2 = LinkFactory(parent=link1.child, child__node_type=MiniTrainingType.OPTION)
         expected_result = {link2.child}
         self.assertEqual(link2.parent.get_option_list(), expected_result, "Should contain children of children")
+
+
+class TestGetFinalitiesList(SimpleTestCase):
+    def test_when_has_no_children(self):
+        node = NodeGroupYearFactory()
+        self.assertEqual(node.get_finality_list(), set())
+
+    def test_when_node_is_finality(self):
+        node = NodeGroupYearFactory(node_type=TrainingType.MASTER_MS_120)
+        self.assertEqual(node.get_finality_list(), set(), "Should not contains himself in children finalities list")
+
+    def test_when_has_direct_child_finality(self):
+        link = LinkFactory(child__node_type=TrainingType.MASTER_MS_120)
+        expected_result = {link.child}
+        self.assertEqual(link.parent.get_finality_list(), expected_result, "Should contain direct children")
+
+    def test_when_sub_child_is_finality(self):
+        link1 = LinkFactory(child__node_type=GroupType.FINALITY_120_LIST_CHOICE)
+        link2 = LinkFactory(parent=link1.child, child__node_type=TrainingType.MASTER_MS_120)
+        expected_result = {link2.child}
+        self.assertEqual(link2.parent.get_finality_list(), expected_result, "Should contain children of children")

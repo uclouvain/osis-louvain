@@ -34,21 +34,19 @@ from learning_unit.ddd.domain.achievement import Achievement
 
 
 def load_achievements(acronym: str, year: int) -> List['Achievement']:
-
     qs = LearningAchievement.objects.filter(
         learning_unit_year__acronym=acronym,
         learning_unit_year__academic_year__year=year)\
         .annotate(language_code=F('language__code'))\
         .values('code_name', 'text', 'language_code', 'order')\
         .order_by('order', 'language_code')
-
     return _build_achievements(qs)
 
 
 def _build_achievements(qs):
-    ue_achievements = sorted(qs, key=lambda el: el['code_name'])
+    ue_achievements = sorted(qs, key=lambda el: el['order'])
     achievements = []
-    for code_name, elements in itertools.groupby(ue_achievements, key=lambda el: el['code_name']):
+    for code_name, elements in itertools.groupby(ue_achievements, key=lambda el: el['order']):
         achievement_parameters = {'code_name': code_name}
         for achievement in elements:
             if achievement['language_code'] == settings.LANGUAGE_CODE_EN[:2].upper():

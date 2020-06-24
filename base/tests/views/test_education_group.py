@@ -25,7 +25,7 @@
 ##############################################################################
 import json
 import urllib
-from unittest import mock, skip
+from unittest import mock
 
 from django.conf import settings
 from django.contrib import messages
@@ -49,6 +49,7 @@ from base.tests.factories.person import PersonWithPermissionsFactory, PersonFact
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 
 ACCESS_DENIED = "access_denied.html"
 LOGIN_NEXT = '/login/?next={}'
@@ -157,13 +158,16 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         self.assertTrue(anchor_expected in response.url)
 
 
-@skip("FIXME in OSIS-4670")
 class EducationGroupPublishViewTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = create_current_academic_year()
         cls.training = TrainingFactory(academic_year=cls.academic_year)
-        cls.url = reverse('education_group_publish', args=(cls.training.pk, cls.training.pk))
+        cls.group = GroupYearFactory(
+            academic_year=cls.academic_year,
+            partial_acronym=cls.training.partial_acronym
+        )
+        cls.url = reverse('publish_general_information', args=(cls.academic_year.year, cls.group.partial_acronym))
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
 
     def setUp(self):

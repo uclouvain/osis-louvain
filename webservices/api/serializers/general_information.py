@@ -26,7 +26,7 @@
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Value, CharField
+from django.db.models import Value, CharField, Subquery
 from rest_framework import serializers
 
 from base.business.education_groups import general_information_sections
@@ -34,36 +34,23 @@ from base.business.education_groups.general_information_sections import \
     SKILLS_AND_ACHIEVEMENTS, ADMISSION_CONDITION, CONTACTS, CONTACT_INTRO, INTRODUCTION
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType
-from base.models.group_element_year import GroupElementYear
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
-from program_management.business.group_element_years import group_element_year_tree
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
     AdmissionConditionSectionSerializer, ContactsSectionSerializer
 
 WS_SECTIONS_TO_SKIP = [CONTACT_INTRO]
 
 
-class GeneralInformationSerializer(serializers.ModelSerializer):
+class GeneralInformationSerializer(serializers.Serializer):
     language = serializers.CharField(read_only=True)
+    acronym = serializers.CharField(source='title', read_only=True)
     year = serializers.IntegerField(source='academic_year.year', read_only=True)
-    education_group_type = serializers.CharField(source='education_group_type.name', read_only=True)
-    education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
+    education_group_type = serializers.CharField(source='node_type.name', read_only=True)
+    education_group_type_text = serializers.CharField(source='node_type.value', read_only=True)
     sections = serializers.SerializerMethodField()
-
-    class Meta:
-        model = EducationGroupYear
-
-        fields = (
-            'language',
-            'acronym',
-            'title',
-            'year',
-            'education_group_type',
-            'education_group_type_text',
-            'sections',
-        )
+    title = serializers.CharField(source='offer_title_fr', read_only=True)
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -71,16 +58,16 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         acronym = kwargs['context']['acronym'].upper()
         self.instance.language = lang
         if lang != settings.LANGUAGE_CODE_FR[:2]:
-            self.fields['title'] = serializers.CharField(source='title_english', read_only=True)
-        if self.instance.partial_acronym == acronym:
-            self.fields['acronym'] = serializers.CharField(source='partial_acronym', read_only=True)
+            self.fields['title'] = serializers.CharField(source='offer_title_en', read_only=True)
+        if self.instance.code == acronym:
+            self.fields['acronym'] = serializers.CharField(source='code', read_only=True)
 
     def get_sections(self, obj):
         datas = []
         sections = []
         language = settings.LANGUAGE_CODE_FR \
             if self.instance.language == settings.LANGUAGE_CODE_FR[:2] else self.instance.language
-        pertinent_sections = general_information_sections.SECTIONS_PER_OFFER_TYPE[obj.education_group_type.name]
+        pertinent_sections = general_information_sections.SECTIONS_PER_OFFER_TYPE[obj.node_type.name]
 
         cms_serializers = {
             SKILLS_AND_ACHIEVEMENTS: AchievementSectionSerializer,
@@ -88,11 +75,14 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             CONTACTS: ContactsSectionSerializer,
         }
         extra_intro_offers = self._get_intro_offers(obj)
-
         for specific_section in pertinent_sections['specific']:
             serializer = cms_serializers.get(specific_section)
             if serializer:
-                serializer = serializer({'id': specific_section}, context={'egy': obj, 'lang': language})
+                serializer = serializer({'id': specific_section}, context={
+                    'root_node': obj,
+                    'language': language,
+                    'offer': self.context.get('offer')
+                })
                 datas.append(serializer.data)
             elif specific_section not in WS_SECTIONS_TO_SKIP:
                 sections.append(self._get_section_cms(obj, specific_section, language))
@@ -103,15 +93,20 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
         datas += SectionSerializer(sections, many=True).data
         return datas
 
-    def _get_section_cms(self, egy, section, language):
+    def _get_section_cms(self, node, section, language):
         translated_text_label = TranslatedTextLabel.objects.get(text_label__label=section, language=language)
         translated_text = TranslatedText.objects.filter(
             text_label__label=section,
             language=language,
             entity=OFFER_YEAR,
-            reference=egy.id
+            reference=Subquery(
+                EducationGroupYear.objects.filter(
+                    academic_year__year=node.year,
+                    partial_acronym=node.code
+                ).values('id')[:1]
+            )
         ).annotate(
-            label=Value(self._get_correct_label_name(egy, section), output_field=CharField()),
+            label=Value(self._get_correct_label_name(node, section), output_field=CharField()),
             translated_label=Value(translated_text_label.label, output_field=CharField())
         )
 
@@ -119,25 +114,21 @@ class GeneralInformationSerializer(serializers.ModelSerializer):
             return translated_text.values('label', 'translated_label', 'text').get()
         except ObjectDoesNotExist:
             return {
-                'label': self._get_correct_label_name(egy, section),
+                'label': self._get_correct_label_name(node, section),
                 'translated_label': translated_text_label.label,
                 'text': None,
             }
 
     @staticmethod
-    def _get_correct_label_name(egy, section):
+    def _get_correct_label_name(node, section):
         if section == INTRODUCTION:
-            return 'intro-' + egy.partial_acronym.lower()
+            return 'intro-' + node.code.lower()
         return section
 
     @staticmethod
     def _get_intro_offers(obj):
-        hierarchy = group_element_year_tree.EducationGroupHierarchy(root=obj)
-        extra_intro_offers = hierarchy.get_finality_list() + hierarchy.get_option_list()
-        common_core = GroupElementYear.objects.select_related('child_branch').filter(
-            parent=obj,
-            child_branch__education_group_type__name=GroupType.COMMON_CORE.name
-        ).first()
-        if common_core:
-            extra_intro_offers.append(common_core.child_branch)
+        extra_intro_offers = list(obj.get_finality_list()) + list(obj.get_option_list())
+        for e in obj.children:
+            if e.child.node_type == GroupType.COMMON_CORE:
+                extra_intro_offers.append(e.child)
         return extra_intro_offers
