@@ -28,6 +28,7 @@ import itertools
 from typing import List, Dict
 
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 from django.db.models import F, Subquery, OuterRef, QuerySet, Q
 
 from attribution.ddd.repositories.attribution_repository import AttributionRepository
@@ -201,8 +202,6 @@ def _annotate_with_description_fiche_specifications(original_qs1):
     qs = TranslatedText.objects.filter(
         reference=OuterRef('pk'),
         entity=LEARNING_UNIT_YEAR,
-        reference_type__model='learning_unit_year',
-        reference_type__app_label='base'
     )
 
     annotations = build_annotations(

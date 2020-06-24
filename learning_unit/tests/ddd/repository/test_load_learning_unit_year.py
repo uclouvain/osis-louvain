@@ -26,12 +26,14 @@
 
 from typing import List
 
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.test.utils import override_settings
 
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from base.business.learning_unit import CMS_LABEL_PEDAGOGY, CMS_LABEL_PEDAGOGY_FR_AND_EN, CMS_LABEL_SPECIFICATIONS
 from base.models.enums import learning_unit_year_subtypes
+from base.models.learning_unit_year import LearningUnitYear
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -42,7 +44,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text import TranslatedTextFactoryLearningUnitYear
 from learning_unit.ddd.repository.load_learning_unit_year import load_multiple, load_multiple_by_identity
 from learning_unit.tests.ddd.factories.learning_unit_year_identity import LearningUnitYearIdentityFactory
 
@@ -54,7 +56,6 @@ class TestLoadLearningUnitVolumes(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-
         cls.l_unit_1 = LearningUnitYearFactory()
         cls.practical_volume = PracticalLearningComponentYearFactory(learning_unit_year=cls.l_unit_1,
                                                                      hourly_volume_total_annual=20,
@@ -108,7 +109,6 @@ class TestLoadLearningUnitDescriptionFiche(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-
         cls.l_unit_1 = LearningUnitYearFactory()
         dict_labels = {}
         for cms_label in CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS:
@@ -157,11 +157,12 @@ def _build_cms_translated_text(l_unit_id, dict_labels, language, cms_labels):
     for cms_label in cms_labels:
         cms_text_label = dict_labels.get(cms_label)
         translated_text_by_language.update({
-            cms_label: TranslatedTextFactory(text_label=cms_text_label,
-                                             entity=entity_name.LEARNING_UNIT_YEAR,
-                                             reference=l_unit_id,
-                                             language=language,
-                                             text="Text {} {}".format(language, cms_label))
+            cms_label: TranslatedTextFactoryLearningUnitYear(text_label=cms_text_label,
+                                                             entity=entity_name.LEARNING_UNIT_YEAR,
+                                                             reference_object=LearningUnitYear.objects.get(
+                                                                 pk=l_unit_id),
+                                                             language=language,
+                                                             text="Text {} {}".format(language, cms_label))
         })
     return translated_text_by_language
 

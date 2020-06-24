@@ -25,19 +25,41 @@
 ##############################################################################
 import factory.fuzzy
 from django.conf import settings
+from django.contrib.contenttypes.models import ContentType
 
+from base.models.education_group_year import EducationGroupYear
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from .text_label import TextLabelFactory
+from ...models.translated_text import TranslatedText
 
 
 class TranslatedTextFactory(factory.django.DjangoModelFactory):
     class Meta:
+        exclude = ['reference_object']
         model = "cms.TranslatedText"
 
     language = settings.LANGUAGE_CODE_FR  # French default
     text_label = factory.SubFactory(TextLabelFactory)
     entity = factory.fuzzy.FuzzyText(prefix="Entity ", length=15)
-    reference = factory.fuzzy.FuzzyInteger(1, 10)
+    reference = factory.SelfAttribute('reference_object.id')
+    reference_type = factory.LazyAttribute(
+        lambda o: ContentType.objects.get_for_model(o.reference_object))
     text = None
+
+
+class TranslatedTextFactoryEducationGroupYear(TranslatedTextFactory):
+    reference_object = factory.SubFactory(EducationGroupYearFactory)
+
+    class Meta:
+        model = TranslatedText
+
+
+class TranslatedTextFactoryLearningUnitYear(TranslatedTextFactory):
+    reference_object = factory.SubFactory(LearningUnitYearFactory)
+
+    class Meta:
+        model = TranslatedText
 
 
 class TranslatedTextRandomFactory(TranslatedTextFactory):
