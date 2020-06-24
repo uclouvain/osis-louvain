@@ -48,9 +48,10 @@
 <div class="panel panel-default">
     <div class="panel-body" id="tabs">
         <div class="pull-right">
-            <form action="{% url "publish_educational_information" code=learning_unit_year.acronym year=learning_unit_year.academic_year.year %}" method="post">
+            <form action="{% url "publish_educational_information" code=learning_unit_year.acronym year=learning_unit_year.academic_year.year %}"
+                  method="post">
                 {% csrf_token %}
-                <button class="btn btn-default btn-publish">
+                <button class="btn btn-default btn-publish" {% if not can_edit_information %}disabled{% endif %}>
                     {% trans 'Refresh publication' %}
                 </button>
             </form>
