@@ -1,6 +1,7 @@
 from django.contrib.contenttypes.models import ContentType
 
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums import education_group_categories
 from base.models.learning_unit_year import LearningUnitYear
 from cms.models.translated_text import TranslatedText
 from education_group.models.group_year import GroupYear
@@ -32,6 +33,10 @@ for cms in offers_cms:
         EducationGroupYear,
         id=cms.reference
     )
+    # if old data
+    # egy = EducationGroupYear.objects.get(
+    #   id=cms.reference, education_group_type__category=education_group_categories.TRAINING
+    # )
     if egy:
         cms.reference_type_id = fk_type.id
         cms.reference_object = egy
