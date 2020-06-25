@@ -26,7 +26,6 @@
 
 from typing import List
 
-from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.test.utils import override_settings
 
@@ -159,7 +158,7 @@ def _build_cms_translated_text(l_unit_id, dict_labels, language, cms_labels):
         translated_text_by_language.update({
             cms_label: TranslatedTextFactoryLearningUnitYear(text_label=cms_text_label,
                                                              entity=entity_name.LEARNING_UNIT_YEAR,
-                                                             reference_object=LearningUnitYear.objects.get(
+                                                             content_object=LearningUnitYear.objects.get(
                                                                  pk=l_unit_id),
                                                              language=language,
                                                              text="Text {} {}".format(language, cms_label))

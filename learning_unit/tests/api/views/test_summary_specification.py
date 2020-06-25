@@ -35,7 +35,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
+from cms.tests.factories.translated_text import TranslatedTextFactoryLearningUnitYear
 from learning_unit.api.views.summary_specification import LearningUnitSummarySpecification
 
 
@@ -49,8 +49,8 @@ class LearningUnitSummarySpecificationTestCase(APITestCase):
             subtype=learning_unit_year_subtypes.FULL
         )
         for label in CMS_LABEL_PEDAGOGY:
-            TranslatedTextRandomFactory(
-                reference=cls.learning_unit_year.pk,
+            TranslatedTextFactoryLearningUnitYear(
+                content_object=cls.learning_unit_year,
                 text_label__label=label,
                 language=settings.LANGUAGE_CODE_FR
             )
@@ -105,8 +105,8 @@ class LearningUnitSummarySpecificationTestCase(APITestCase):
         partims_labels = CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS
         partims_labels.remove('resume')
         for label in partims_labels:
-            TranslatedTextFactory(
-                reference=partim.pk,
+            TranslatedTextFactoryLearningUnitYear(
+                content_object=partim,
                 text_label__label=label,
                 language=settings.LANGUAGE_CODE_FR
             )
@@ -123,7 +123,7 @@ class LearningUnitSummarySpecificationTestCase(APITestCase):
         diff = set(response.data.keys()) - expected_keys
         self.assertFalse(diff)
         expected_parent_text = TranslatedText.objects.get(
-            reference=self.learning_unit_year.pk,
+            cms_luy=self.learning_unit_year,
             text_label__label='resume',
             language=settings.LANGUAGE_CODE_FR
         )
