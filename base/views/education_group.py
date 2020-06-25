@@ -59,7 +59,7 @@ def education_group_year_pedagogy_edit_post(request, education_group_year_id, ro
         text_label = TextLabel.objects.filter(label=label).first()
 
         record, created = TranslatedText.objects.get_or_create(
-            cms_offers=EducationGroupYear.objects.get(id=education_group_year_id),
+            object_id=education_group_year_id,
             entity='offer_year',
             text_label=text_label,
             language='fr-be'
@@ -68,7 +68,7 @@ def education_group_year_pedagogy_edit_post(request, education_group_year_id, ro
         record.save()
 
         record, created = TranslatedText.objects.get_or_create(
-            content_object=EducationGroupYear.objects.get(id=education_group_year_id),
+            object_id=education_group_year_id,
             entity='offer_year',
             text_label=text_label,
             language='en'
@@ -89,7 +89,7 @@ def education_group_year_pedagogy_edit_get(request, education_group_year_id):
     context['label'] = label_name
     initial_values = {'label': label_name}
     fr_text = TranslatedText.objects.filter(
-        content_object=EducationGroupYear.objects.get(id=education_group_year_id),
+        object_id=education_group_year_id,
         text_label__label=label_name,
         entity=entity_name.OFFER_YEAR,
         language='fr-be'
@@ -97,7 +97,7 @@ def education_group_year_pedagogy_edit_get(request, education_group_year_id):
     if fr_text:
         initial_values['text_french'] = fr_text.text
     en_text = TranslatedText.objects.filter(
-        reference_content_objectobject=EducationGroupYear.objects.get(id=education_group_year_id),
+        object_id=education_group_year_id,
         text_label__label=label_name,
         entity=entity_name.OFFER_YEAR,
         language='en'
