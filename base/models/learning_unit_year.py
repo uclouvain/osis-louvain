@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
@@ -244,6 +245,8 @@ class LearningUnitYear(SerializableModel):
         max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
         verbose_name=_('Periodicity')
     )
+
+    cms = GenericRelation(TranslatedText, related_query_name='cms_luy')
 
     objects = BaseLearningUnitYearManager()
     objects_with_container = LearningUnitYearWithContainerManager()

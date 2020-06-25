@@ -24,11 +24,9 @@
 #
 ##############################################################################
 import itertools
-
 from typing import List, Dict
 
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from django.db.models import F, Subquery, OuterRef, QuerySet, Q
 
 from attribution.ddd.repositories.attribution_repository import AttributionRepository
@@ -200,7 +198,7 @@ def __convert_string_to_enum(learn_unit_data: dict) -> dict:
 def _annotate_with_description_fiche_specifications(original_qs1):
     original_qs = original_qs1
     qs = TranslatedText.objects.filter(
-        reference=OuterRef('pk'),
+        cms_luy__id=OuterRef('pk'),
         entity=LEARNING_UNIT_YEAR,
     )
 
