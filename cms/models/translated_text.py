@@ -37,10 +37,10 @@ from .text_label import TextLabel
 
 class TranslatedTextAdmin(VersionAdmin, osis_model_admin.OsisModelAdmin):
     actions = None  # Remove ability to delete in Admin Interface
-    list_display = ('text_label', 'entity', 'reference', 'language', 'text')
+    list_display = ('text_label', 'entity', 'object_id', 'language', 'text')
     ordering = ('text_label',)
     list_filter = ('entity',)
-    search_fields = ['reference', 'text_label__label']
+    search_fields = ['object_id', 'text_label__label']
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -58,15 +58,15 @@ class TranslatedText(models.Model):
             | models.Q(app_label='education_group', model='group_year') \
             | models.Q(app_label='base', model='learning_unit_year')
     # TODO: Remove null=True after script
-    reference_type = models.ForeignKey(ContentType, on_delete=models.PROTECT, limit_choices_to=limit, null=True)
-    reference = models.PositiveIntegerField()
-    reference_object = GenericForeignKey('reference_type', 'reference')
+    content_type = models.ForeignKey(ContentType, on_delete=models.PROTECT, limit_choices_to=limit, null=True)
+    object_id = models.PositiveIntegerField(null=True)
+    content_object = GenericForeignKey('content_type', 'object_id')
 
     def __str__(self):
         return self.entity
 
     class Meta:
-        unique_together = ('entity', 'reference_type', 'reference', 'text_label', 'language')
+        unique_together = ('entity', 'content_type', 'object_id', 'text_label', 'language')
 
 
 def search(entity, reference, text_labels_name=None, language=None):

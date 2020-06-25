@@ -106,12 +106,12 @@ def __get_common_labels(node: NodeGroupYear) -> List[str]:
 def __get_translated_labels(reference_pk: int, labels: List[str], language_code: str):
     egy = EducationGroupYear.objects.get(id=reference_pk)
     subqstranslated_fr = TranslatedText.objects.filter(
-        reference_object=egy,
+        cms_offers=egy,
         text_label=OuterRef('pk'),
         language=settings.LANGUAGE_CODE_FR,
     ).values('text')[:1]
     subqstranslated_en = TranslatedText.objects.filter(
-        reference_object=egy,
+        cms_offers=egy,
         text_label=OuterRef('pk'),
         language=settings.LANGUAGE_CODE_EN
     ).values('text')[:1]
