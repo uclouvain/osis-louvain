@@ -47,7 +47,7 @@ class CommonTextTestCase(APITestCase):
         cls.data = {}
         for section in cls.pertinent_sections['specific']:
             tt = TranslatedTextFactory(
-                reference=cls.egy.id,
+                reference_object=cls.egy,
                 entity=OFFER_YEAR,
                 language=cls.language,
                 text_label__label=section
