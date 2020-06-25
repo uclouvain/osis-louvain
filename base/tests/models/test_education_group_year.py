@@ -551,7 +551,7 @@ class EducationGroupYearDeleteCms(TestCase):
     def setUpTestData(cls):
         cls.education_group_year = EducationGroupYearFactory()
         cls.translated_text = TranslatedTextFactory(entity=entity_name.OFFER_YEAR,
-                                                    reference=cls.education_group_year.id)
+                                                    content_object=cls.education_group_year)
 
         cls.education_group_year_no_cms = EducationGroupYearFactory()
 
@@ -559,9 +559,9 @@ class EducationGroupYearDeleteCms(TestCase):
         egy_id = self.education_group_year.id
         self.education_group_year.delete()
         self.assertCountEqual(list(TranslatedText.objects.filter(id=self.translated_text.id)), [])
-        self.assertCountEqual(list(TranslatedText.objects.filter(reference=egy_id)), [])
+        self.assertCountEqual(list(TranslatedText.objects.filter(cms_offers=self.education_group_year)), [])
 
     def test_delete_education_group_yr_without_cms(self):
         egy_id = self.education_group_year_no_cms.id
         self.education_group_year_no_cms.delete()
-        self.assertCountEqual(list(TranslatedText.objects.filter(reference=egy_id)), [])
+        self.assertCountEqual(list(TranslatedText.objects.filter(cms_offers=self.education_group_year_no_cms)), [])

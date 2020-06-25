@@ -73,7 +73,7 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
             queryset=TranslatedText.objects.filter(
                 language=settings.LANGUAGE_CODE_FR,
                 entity=LEARNING_UNIT_YEAR,
-                reference_object=learning_unit_year
+                content_object=learning_unit_year
             ),
             to_attr="text_fr"
         ),
@@ -82,7 +82,7 @@ def read_learning_unit_pedagogy(request, learning_unit_year_id, context, templat
             queryset=TranslatedText.objects.filter(
                 language=settings.LANGUAGE_CODE_EN,
                 entity=LEARNING_UNIT_YEAR,
-                reference_object=learning_unit_year
+                content_object=learning_unit_year
             ),
             to_attr="text_en"
         )

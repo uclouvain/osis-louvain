@@ -422,6 +422,7 @@ class LearningUnitYear(SerializableModel):
             return entity
 
     def clean(self):
+        print(self.academic_year)
         learning_unit_years = find_gte_year_acronym(self.academic_year, self.acronym)
 
         if getattr(self, 'learning_unit', None):
@@ -693,4 +694,4 @@ def toggle_summary_locked(learning_unit_year_id):
 
 @receiver(post_delete, sender=LearningUnitYear)
 def _learningunityear_delete(sender, instance, **kwargs):
-    TranslatedText.objects.filter(entity=LEARNING_UNIT_YEAR, reference_object=instance).delete()
+    TranslatedText.objects.filter(entity=LEARNING_UNIT_YEAR, cms_luy=instance).delete()

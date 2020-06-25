@@ -38,7 +38,6 @@ from base.business.learning_unit import CMS_LABEL_PEDAGOGY_FR_ONLY, \
 from base.business.learning_unit import CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language
 from base.business.learning_unit_xls import annotate_qs
 from base.business.xls import get_name_or_username
-from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import get_user_interface_language
 from base.models.teaching_material import TeachingMaterial
 from base.views.learning_unit import get_specifications_context
@@ -197,7 +196,7 @@ def _get_translated_labels_with_text(learning_unit_year_id, user_language):
             queryset=TranslatedText.objects.filter(
                 language=settings.LANGUAGE_CODE_FR,
                 entity=LEARNING_UNIT_YEAR,
-                reference_object=LearningUnitYear.objects.get(id=learning_unit_year_id)
+                cms_luy__id=learning_unit_year_id
             ),
             to_attr="text_fr"
         ),
@@ -206,7 +205,7 @@ def _get_translated_labels_with_text(learning_unit_year_id, user_language):
             queryset=TranslatedText.objects.filter(
                 language=settings.LANGUAGE_CODE_EN,
                 entity=LEARNING_UNIT_YEAR,
-                reference_object=LearningUnitYear.objects.get(id=learning_unit_year_id)
+                cms_luy__id=learning_unit_year_id
             ),
             to_attr="text_en"
         )

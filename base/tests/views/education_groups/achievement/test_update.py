@@ -191,7 +191,7 @@ class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementC
             text_label=self.text_label,
             language=LANGUAGE_CODE_FR,
             entity=entity_name.OFFER_YEAR,
-            reference=self.education_group_year.pk,
+            cms_offers=self.education_group_year,
             text="dummy text"
         )
 
@@ -211,7 +211,7 @@ class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementC
         # Create english version
         self.assertTrue(TranslatedText.objects.filter(
             text_label=self.text_label,
-            reference=self.education_group_year.pk,
+            cms_offers=self.education_group_year,
             language=LANGUAGE_CODE_EN,
             entity=entity_name.OFFER_YEAR,
             text=data['text_english']
@@ -246,7 +246,7 @@ class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupA
             text_label=self.text_label,
             language=LANGUAGE_CODE_FR,
             entity=entity_name.OFFER_YEAR,
-            reference=self.education_group_year.pk,
+            cms_offers=self.education_group_year,
             text="dummy text"
         )
 
@@ -266,7 +266,7 @@ class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupA
         # Create english version
         self.assertTrue(TranslatedText.objects.filter(
             text_label=self.text_label,
-            reference=self.education_group_year.pk,
+            cms_offers=self.education_group_year,
             language=LANGUAGE_CODE_EN,
             entity=entity_name.OFFER_YEAR,
             text=data['text_english']

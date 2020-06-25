@@ -50,7 +50,7 @@ class CommonText(generics.RetrieveAPIView):
             academic_year__year=self.kwargs['year']
         )
         texts = TranslatedText.objects.filter(
-            reference_object=egy,
+            content_object=egy,
             language=language if language != settings.LANGUAGE_CODE_FR[:2] else settings.LANGUAGE_CODE_FR
         ).select_related('text_label')
         common_texts = {}

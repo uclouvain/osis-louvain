@@ -72,7 +72,7 @@ class GeneralInformationSerializerTestCase(TestCase):
                 text_label__label=section
             )
             TranslatedTextFactory(
-                reference_object=cls.common_egy,
+                content_object=cls.common_egy,
                 entity=OFFER_YEAR,
                 language=cls.language,
                 text_label__label=section,
@@ -83,7 +83,7 @@ class GeneralInformationSerializerTestCase(TestCase):
                 text_label__label=section
             )
             TranslatedTextFactory(
-                reference_object=cls.egy,
+                content_object=cls.egy,
                 entity=OFFER_YEAR,
                 language=cls.language,
                 text_label__label=section
@@ -91,7 +91,7 @@ class GeneralInformationSerializerTestCase(TestCase):
         for label in [SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA]:
             TranslatedTextFactory(
                 text_label__label=label,
-                reference_object=cls.egy,
+                content_object=cls.egy,
                 entity=OFFER_YEAR,
                 language=cls.language
             )

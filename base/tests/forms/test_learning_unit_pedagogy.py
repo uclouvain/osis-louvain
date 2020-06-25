@@ -39,12 +39,13 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from cms.enums import entity_name
 from cms.tests.factories.text_label import TextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
-from reference.tests.factories.language import LanguageFactory, EnglishLanguageFactory
+from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextFactoryLearningUnitYear
+from reference.tests.factories.language import EnglishLanguageFactory
 
 
 class LearningUnitPedagogyContextMixin(TestCase):
     """"This mixin is used in this test file in order to setup an environment for testing pedagogy"""
+
     @classmethod
     def setUpTestData(cls):
         cls.language = EnglishLanguageFactory()
@@ -69,9 +70,9 @@ class LearningUnitPedagogyContextMixin(TestCase):
 class TestValidation(LearningUnitPedagogyContextMixin):
     def setUp(self):
         super().setUp()
-        self.cms_translated_text = TranslatedTextFactory(
+        self.cms_translated_text = TranslatedTextFactoryLearningUnitYear(
             entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=self.luys[self.current_ac.year - 1].id,
+            object_id=self.luys[self.current_ac.year - 1].pk,
             language='EN',
             text='Text random'
         )
@@ -94,7 +95,7 @@ class TestValidation(LearningUnitPedagogyContextMixin):
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
         mock_update_or_create.assert_called_once_with(entity=self.cms_translated_text.entity,
-                                                      reference=self.cms_translated_text.reference,
+                                                      object_id=self.cms_translated_text.object_id,
                                                       language=self.cms_translated_text.language,
                                                       text_label=self.cms_translated_text.text_label,
                                                       defaults={'text': self.cms_translated_text.text})
@@ -105,7 +106,7 @@ class TestValidation(LearningUnitPedagogyContextMixin):
         luy_in_future = self.luys[self.current_ac.year + 1]
         cms_pedagogy_future = TranslatedTextFactory(
             entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=luy_in_future.id,
+            content_object=luy_in_future,
             language='EN',
             text='Text in future'
         )
@@ -151,9 +152,9 @@ class TestLearningUnitPedagogyEditForm(LearningUnitPedagogyContextMixin):
             entity=entity_name.LEARNING_UNIT_YEAR,
             label='bibliography'
         )
-        cms_translated_text_fr = TranslatedTextFactory(
+        cms_translated_text_fr = TranslatedTextFactoryLearningUnitYear(
             entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=self.luys[self.current_ac.year].id,
+            object_id=self.luys[self.current_ac.year].pk,
             language='fr-be',
             text_label=text_label_bibliography,
             text='Some random text'
@@ -167,7 +168,7 @@ class TestLearningUnitPedagogyEditForm(LearningUnitPedagogyContextMixin):
         for language in settings.LANGUAGES:
             mock_update_or_create.assert_any_call(
                 entity=cms_translated_text_fr.entity,
-                reference=cms_translated_text_fr.reference,
+                object_id=cms_translated_text_fr.pk,
                 language=language[0],
                 text_label=cms_translated_text_fr.text_label,
                 defaults={'text': cms_translated_text_fr.text}
@@ -192,7 +193,7 @@ def _get_valid_cms_form_data(cms_translated_text):
     return {
         "trans_text": getattr(cms_translated_text, 'text'),
         "cms_id": getattr(cms_translated_text, 'id'),
-        "reference": getattr(cms_translated_text, 'reference')
+        "reference": getattr(cms_translated_text, 'object_id')
     }
 
 

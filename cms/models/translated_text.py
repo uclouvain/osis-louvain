@@ -70,7 +70,7 @@ class TranslatedText(models.Model):
 
 
 def search(entity, reference, text_labels_name=None, language=None):
-    queryset = TranslatedText.objects.filter(entity=entity, reference=reference)
+    queryset = TranslatedText.objects.filter(entity=entity, object_id=reference)
 
     if language:
         queryset = queryset.filter(language=language)
@@ -82,7 +82,7 @@ def search(entity, reference, text_labels_name=None, language=None):
 
 def get_or_create(entity, reference, text_label, language):
     translated_text, created = TranslatedText.objects.get_or_create(entity=entity,
-                                                                    reference=reference,
+                                                                    object_id=reference,
                                                                     text_label=text_label,
                                                                     language=language)
     return translated_text
