@@ -34,9 +34,6 @@
                             {% bootstrap_label _("Acronym/Short title") label_class='d-block'%}
                             <p>
                                 {{ node.title }}
-                                {% if current_version.version_label != '' %}
-                                    [{{ current_version.version_label }}]
-                                {% endif %}
                             </p>
                         </div>
                         <div class="col-md-6">
