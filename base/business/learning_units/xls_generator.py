@@ -149,7 +149,8 @@ def _get_text_wrapped_cells(count):
 def _annotate_with_pedagogy_info(learning_units):
     sq = TranslatedText.objects.filter(
         reference=OuterRef('pk'),
-        entity=LEARNING_UNIT_YEAR)
+        entity=LEARNING_UNIT_YEAR
+    )
 
     learning_units = learning_units.annotate(bibliography=Subquery(
         sq.filter(
