@@ -36,7 +36,7 @@ from base.tests.factories.education_group_year import EducationGroupYearCommonFa
     TrainingFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from cms.enums.entity_name import OFFER_YEAR
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextFactoryEducationGroupYear
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.ddd.repositories import load_tree
@@ -72,7 +72,7 @@ class GeneralInformationSerializerTestCase(TestCase):
                 text_label__label=section
             )
             TranslatedTextFactory(
-                reference=cls.common_egy.id,
+                reference_object=cls.common_egy,
                 entity=OFFER_YEAR,
                 language=cls.language,
                 text_label__label=section,
@@ -83,7 +83,7 @@ class GeneralInformationSerializerTestCase(TestCase):
                 text_label__label=section
             )
             TranslatedTextFactory(
-                reference=cls.egy.id,
+                reference_object=cls.egy,
                 entity=OFFER_YEAR,
                 language=cls.language,
                 text_label__label=section
@@ -91,7 +91,7 @@ class GeneralInformationSerializerTestCase(TestCase):
         for label in [SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA]:
             TranslatedTextFactory(
                 text_label__label=label,
-                reference=cls.egy.id,
+                reference_object=cls.egy,
                 entity=OFFER_YEAR,
                 language=cls.language
             )
@@ -235,7 +235,7 @@ class IntroOffersSectionTestCase(TestCase):
             text_label__label=INTRODUCTION,
             language=self.language,
         )
-        TranslatedTextFactory(
+        TranslatedTextFactoryEducationGroupYear(
             text_label__label=INTRODUCTION,
             language=self.language,
             entity=OFFER_YEAR,

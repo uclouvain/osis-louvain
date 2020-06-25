@@ -30,7 +30,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory,
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextRandomFactory
+from cms.tests.factories.translated_text import TranslatedTextFactoryEducationGroupYear
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from webservices import business
@@ -40,7 +40,7 @@ class EnsureKeyTestCase(TestCase):
     def test_evaluation_key(self):
         self.assertEqual(business.EVALUATION_KEY, 'evaluation')
 
-        
+
 class GetEvaluationTestCase(TestCase):
     def setUp(self):
         self.education_group_year = EducationGroupYearFactory(acronym='ACTU2M')
@@ -53,15 +53,15 @@ class GetEvaluationTestCase(TestCase):
         text_label = TextLabelFactory(entity=OFFER_YEAR, label='evaluation')
         TranslatedTextLabelFactory(text_label=text_label,
                                    language=settings.LANGUAGE_CODE_FR)
-        self.evaluation = TranslatedTextRandomFactory(text_label=text_label,
-                                                      language=settings.LANGUAGE_CODE_FR,
-                                                      reference=self.education_group_year.id,
-                                                      entity=text_label.entity)
+        self.evaluation = TranslatedTextFactoryEducationGroupYear(text_label=text_label,
+                                                                  language=settings.LANGUAGE_CODE_FR,
+                                                                  reference=self.education_group_year.id,
+                                                                  entity=text_label.entity)
 
-        self.common = TranslatedTextRandomFactory(text_label=text_label,
-                                                  language=settings.LANGUAGE_CODE_FR,
-                                                  reference=common_education_group_year.id,
-                                                  entity=text_label.entity)
+        self.common = TranslatedTextFactoryEducationGroupYear(text_label=text_label,
+                                                              language=settings.LANGUAGE_CODE_FR,
+                                                              reference=common_education_group_year.id,
+                                                              entity=text_label.entity)
 
     def test_get_evaluation_french_version(self):
         label, text = business.get_evaluation_text(self.education_group_year, settings.LANGUAGE_CODE_FR)
@@ -83,13 +83,13 @@ class GetContactsIntroTextTestCase(TestCase):
         self.cms_label_name = business.CONTACT_INTRO_KEY
 
         text_label = TextLabelFactory(entity=OFFER_YEAR, label=self.cms_label_name)
-        self.contact_intro_fr = TranslatedTextRandomFactory(
+        self.contact_intro_fr = TranslatedTextFactoryEducationGroupYear(
             text_label=text_label,
             language=settings.LANGUAGE_CODE_FR,
             reference=self.education_group_year.id,
             entity=text_label.entity
         )
-        self.contact_intro_en = TranslatedTextRandomFactory(
+        self.contact_intro_en = TranslatedTextFactoryEducationGroupYear(
             text_label=text_label,
             language=settings.LANGUAGE_CODE_EN,
             reference=self.education_group_year.id,
