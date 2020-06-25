@@ -28,7 +28,7 @@ from django.test import TestCase
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import TextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text import TranslatedTextFactoryEducationGroupYear
 
 REFERENCE = 2502
 
@@ -40,19 +40,19 @@ class TranslatedTextTest(TestCase):
         text_label_oy_2 = TextLabelFactory(order=3, label='profil', entity=entity_name.OFFER_YEAR)
         text_label_oy_3 = TextLabelFactory(order=4, label='job', entity=entity_name.OFFER_YEAR)
 
-        TranslatedTextFactory(text_label=text_label_lu_3,
-                              entity=entity_name.LEARNING_UNIT_YEAR,
-                              reference=REFERENCE)
+        TranslatedTextFactoryEducationGroupYear(text_label=text_label_lu_3,
+                                                entity=entity_name.LEARNING_UNIT_YEAR,
+                                                )
 
-        TranslatedTextFactory(text_label=text_label_oy_1,
-                              entity=entity_name.OFFER_YEAR,
-                              reference=REFERENCE)
-        TranslatedTextFactory(text_label=text_label_oy_2,
-                              entity=entity_name.OFFER_YEAR,
-                              reference=REFERENCE)
-        TranslatedTextFactory(text_label=text_label_oy_3,
-                              entity=entity_name.OFFER_YEAR,
-                              reference=REFERENCE)
+        TranslatedTextFactoryEducationGroupYear(text_label=text_label_oy_1,
+                                                entity=entity_name.OFFER_YEAR,
+                                                reference=REFERENCE)
+        TranslatedTextFactoryEducationGroupYear(text_label=text_label_oy_2,
+                                                entity=entity_name.OFFER_YEAR,
+                                                reference=REFERENCE)
+        TranslatedTextFactoryEducationGroupYear(text_label=text_label_oy_3,
+                                                entity=entity_name.OFFER_YEAR,
+                                                reference=REFERENCE)
 
         tt = TranslatedText.objects.filter(
             text_label__entity=entity_name.OFFER_YEAR,

@@ -37,7 +37,6 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from reversion.admin import VersionAdmin
 
-from program_management.ddd import repositories
 from backoffice.settings.base import LANGUAGE_CODE_EN
 from base.business.learning_container_year import get_learning_container_year_warnings
 from base.models import entity_version
@@ -55,6 +54,7 @@ from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.models.translated_text import TranslatedText
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin, SerializableModelManager, \
     SerializableQuerySet
+from program_management.ddd import repositories
 
 AUTHORIZED_REGEX_CHARS = "$*+.^"
 REGEX_ACRONYM_CHARSET = "[A-Z0-9" + AUTHORIZED_REGEX_CHARS + "]+"
@@ -689,4 +689,4 @@ def toggle_summary_locked(learning_unit_year_id):
 
 @receiver(post_delete, sender=LearningUnitYear)
 def _learningunityear_delete(sender, instance, **kwargs):
-    TranslatedText.objects.filter(entity=LEARNING_UNIT_YEAR, reference=instance.id).delete()
+    TranslatedText.objects.filter(entity=LEARNING_UNIT_YEAR, reference_object=instance).delete()

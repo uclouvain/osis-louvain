@@ -25,29 +25,17 @@
 ##############################################################################
 import json
 
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.db.models import F
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from rules.contrib.views import permission_required
-from waffle.decorators import waffle_flag
 
-from base import models as mdl
-from base.business import education_group as education_group_business
-from base.business.education_group import assert_category_of_education_group_year
 from base.forms.education_group_admission import UpdateLineForm, UpdateTextForm
 from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
-from base.forms.education_groups_administrative_data import CourseEnrollmentForm, AdministrativeDataFormset, \
-    AdditionalInfoForm
 from base.models.admission_condition import AdmissionConditionLine, AdmissionCondition
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import academic_calendar_type
-from base.models.enums import education_group_categories
 from base.models.person import get_user_interface_language
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys, CACHE_TIMEOUT
@@ -70,17 +58,21 @@ def education_group_year_pedagogy_edit_post(request, education_group_year_id, ro
 
         text_label = TextLabel.objects.filter(label=label).first()
 
-        record, created = TranslatedText.objects.get_or_create(reference=str(education_group_year_id),
-                                                               entity='offer_year',
-                                                               text_label=text_label,
-                                                               language='fr-be')
+        record, created = TranslatedText.objects.get_or_create(
+            reference_object=EducationGroupYear.objects.get(id=education_group_year_id),
+            entity='offer_year',
+            text_label=text_label,
+            language='fr-be'
+        )
         record.text = form.cleaned_data['text_french']
         record.save()
 
-        record, created = TranslatedText.objects.get_or_create(reference=str(education_group_year_id),
-                                                               entity='offer_year',
-                                                               text_label=text_label,
-                                                               language='en')
+        record, created = TranslatedText.objects.get_or_create(
+            reference_object=EducationGroupYear.objects.get(id=education_group_year_id),
+            entity='offer_year',
+            text_label=text_label,
+            language='en'
+        )
         record.text = form.cleaned_data['text_english']
         record.save()
 
@@ -96,16 +88,20 @@ def education_group_year_pedagogy_edit_get(request, education_group_year_id):
     label_name = request.GET.get('label')
     context['label'] = label_name
     initial_values = {'label': label_name}
-    fr_text = TranslatedText.objects.filter(reference=str(education_group_year_id),
-                                            text_label__label=label_name,
-                                            entity=entity_name.OFFER_YEAR,
-                                            language='fr-be').first()
+    fr_text = TranslatedText.objects.filter(
+        reference_object=EducationGroupYear.objects.get(id=education_group_year_id),
+        text_label__label=label_name,
+        entity=entity_name.OFFER_YEAR,
+        language='fr-be'
+    ).first()
     if fr_text:
         initial_values['text_french'] = fr_text.text
-    en_text = TranslatedText.objects.filter(reference=str(education_group_year_id),
-                                            text_label__label=label_name,
-                                            entity=entity_name.OFFER_YEAR,
-                                            language='en').first()
+    en_text = TranslatedText.objects.filter(
+        reference_object=EducationGroupYear.objects.get(id=education_group_year_id),
+        text_label__label=label_name,
+        entity=entity_name.OFFER_YEAR,
+        language='en'
+    ).first()
     if en_text:
         initial_values['text_english'] = en_text.text
     form = EducationGroupPedagogyEditForm(initial=initial_values)

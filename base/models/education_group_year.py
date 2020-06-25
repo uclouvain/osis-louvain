@@ -26,7 +26,6 @@
 import re
 
 from django.conf import settings
-from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, connection
@@ -1010,4 +1009,4 @@ def _find_with_learning_unit_enrollment_count(learning_unit_year):
 
 @receiver(post_delete, sender=EducationGroupYear)
 def _educationgroupyear_delete(sender, instance, **kwargs):
-    TranslatedText.objects.filter(entity=OFFER_YEAR, reference=instance.id).delete()
+    TranslatedText.objects.filter(entity=OFFER_YEAR, reference_object=instance).delete()

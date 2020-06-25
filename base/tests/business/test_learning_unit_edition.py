@@ -767,6 +767,7 @@ def _get_list_years_learning_unit(learning_unit):
 
 
 def build_list_of_cms_content_by_reference(reference):
+    # TODO: TO FIX
     return [
         (translated_text.language, translated_text.text_label, translated_text.entity, translated_text.text)
         for translated_text in TranslatedText.objects.filter(reference=reference)

@@ -250,7 +250,7 @@ def _duplicate_teaching_material(duplicated_luy):
 
 
 def _duplicate_cms_data(duplicated_luy):
-    previous_cms_data = TranslatedText.objects.filter(reference=duplicated_luy.copied_from.id)
+    previous_cms_data = TranslatedText.objects.filter(reference_object=duplicated_luy.copied_from)
     for item in previous_cms_data:
         update_related_object(item, 'reference', duplicated_luy.id)
 
@@ -645,7 +645,7 @@ def _update_descriptive_fiche(ac_year_postponement_range, lu_to_consolidate, luy
             a_text = TranslatedText.objects.filter(text_label=a_text_label,
                                                    language=code,
                                                    entity=LEARNING_UNIT_YEAR,
-                                                   reference=lu_to_consolidate.id).first()
+                                                   reference_object=lu_to_consolidate).first()
 
             cms = {"language": code,
                    "text_label": a_text_label,
