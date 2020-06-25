@@ -693,4 +693,4 @@ def toggle_summary_locked(learning_unit_year_id):
 
 @receiver(post_delete, sender=LearningUnitYear)
 def _learningunityear_delete(sender, instance, **kwargs):
-    TranslatedText.objects.filter(entity=LEARNING_UNIT_YEAR, reference_object=instance).delete()
+    TranslatedText.objects.filter(entity=LEARNING_UNIT_YEAR, content_object=instance).delete()

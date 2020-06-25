@@ -231,7 +231,7 @@ class TestReddotEducationGroupAutomaticPostponement(TestCase):
         self.assertEqual(len(postponer.result), 1)
         self.assertEqual(len(postponer.errors), 0)
         self.assertEqual(
-            TranslatedText.objects.get(entity=OFFER_YEAR, reference_object=self.current_education_group_year).text,
+            TranslatedText.objects.get(entity=OFFER_YEAR, content_object=self.current_education_group_year).text,
             "It is our choices, Harry, that show what we truly are, far more than our abilities."
         )
         self.assertTrue(EducationGroupPublicationContact.objects.filter(

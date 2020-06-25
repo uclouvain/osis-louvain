@@ -135,7 +135,7 @@ def update_future_luy(ac_year_postponement_range, luy, cms):
 
         TranslatedText.objects.update_or_create(
             entity=entity_name.LEARNING_UNIT_YEAR,
-            reference_object=next_luy,
+            content_object=next_luy,
             language=cms.get("language"),
             text_label=cms.get("text_label"),
             defaults={'text': cms.get("text")}

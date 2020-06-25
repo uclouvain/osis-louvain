@@ -122,9 +122,9 @@ class ReddotEducationGroupAutomaticPostponement(AutomaticPostponement):
 
     @staticmethod
     def _postpone_cms(old_egy, new_egy):
-        TranslatedText.objects.filter(entity=entity_name.OFFER_YEAR, reference_object=new_egy).delete()
+        TranslatedText.objects.filter(entity=entity_name.OFFER_YEAR, content_object=new_egy).delete()
 
-        for text in TranslatedText.objects.filter(entity=entity_name.OFFER_YEAR, reference_object=old_egy):
+        for text in TranslatedText.objects.filter(entity=entity_name.OFFER_YEAR, content_object=old_egy):
             update_related_object(text, "reference", str(new_egy.pk))
 
     @staticmethod

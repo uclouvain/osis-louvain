@@ -67,7 +67,7 @@ class GeneralInformationTestCase(APITestCase):
         for section in cls.pertinent_sections['common']:
             TranslatedTextLabelFactory(language=cls.language, text_label__label=section)
             TranslatedTextFactory(
-                reference_object=common_egy,
+                content_object=common_egy,
                 entity=OFFER_YEAR,
                 language=cls.language,
                 text_label__label=section
@@ -76,7 +76,7 @@ class GeneralInformationTestCase(APITestCase):
             if section != EVALUATION_KEY:
                 TranslatedTextLabelFactory(language=cls.language, text_label__label=section)
             TranslatedTextFactory(
-                reference_object=cls.egy,
+                content_object=cls.egy,
                 entity=OFFER_YEAR,
                 language=cls.language,
                 text_label__label=section
@@ -84,7 +84,7 @@ class GeneralInformationTestCase(APITestCase):
         for label in [SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA]:
             TranslatedTextFactoryEducationGroupYear(
                 text_label__label=label,
-                reference_object=cls.egy,
+                content_object=cls.egy,
                 entity=OFFER_YEAR,
                 language=cls.language
             )

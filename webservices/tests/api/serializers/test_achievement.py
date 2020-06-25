@@ -45,7 +45,7 @@ class AchievementsSerializerTestCase(TestCase):
         for label in [SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA]:
             TranslatedTextFactory(
                 text_label__label=label,
-                reference_object=cls.egy,
+                content_object=cls.egy,
                 entity=OFFER_YEAR,
                 language=cls.language
             )

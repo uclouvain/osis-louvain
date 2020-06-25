@@ -88,7 +88,7 @@ class LearningUnitPedagogyEditForm(forms.Form):
             return TranslatedText.objects.get(pk=cms_id)
         return translated_text.get_or_create(
             entity=entity_name.LEARNING_UNIT_YEAR,
-            reference_object=self.learning_unit_year,
+            content_object=self.learning_unit_year,
             language=self.language_iso,
             text_label=self.text_label
         )

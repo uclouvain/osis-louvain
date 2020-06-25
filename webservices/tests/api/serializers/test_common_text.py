@@ -43,7 +43,7 @@ class CommonTextSerializerTestCase(TestCase):
         cls.data = {}
         for section in cls.pertinent_sections['specific']:
             tt = TranslatedTextFactory(
-                reference_object=cls.egy,
+                content_object=cls.egy,
                 entity=OFFER_YEAR,
                 language=cls.language,
                 text_label__label=section

@@ -1012,4 +1012,4 @@ def _find_with_learning_unit_enrollment_count(learning_unit_year):
 
 @receiver(post_delete, sender=EducationGroupYear)
 def _educationgroupyear_delete(sender, instance, **kwargs):
-    TranslatedText.objects.filter(entity=OFFER_YEAR, reference_object=instance).delete()
+    TranslatedText.objects.filter(entity=OFFER_YEAR, content_object=instance).delete()
