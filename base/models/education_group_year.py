@@ -26,6 +26,7 @@
 import re
 
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, connection
@@ -585,6 +586,8 @@ class EducationGroupYear(SerializableModel):
         default=False,
         verbose_name=_('Linked with EPC')
     )
+
+    cms = GenericRelation(TranslatedText, related_query_name='cms_offers')
 
     class Meta:
         ordering = ("academic_year",)

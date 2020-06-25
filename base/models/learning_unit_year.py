@@ -23,7 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-
+from django.contrib.contenttypes.fields import GenericRelation
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.db import models
@@ -191,7 +191,7 @@ class BaseLearningUnitYearManager(SerializableModelManager):
 class LearningUnitYearWithContainerManager(models.Manager):
     def get_queryset(self):
         # FIXME For the moment, the learning_unit_year without container must be hide !
-        return super().get_queryset().select_related('learning_container_year')\
+        return super().get_queryset().select_related('learning_container_year') \
             .filter(learning_container_year__isnull=False)
 
 
@@ -241,8 +241,12 @@ class LearningUnitYear(SerializableModel):
 
     language = models.ForeignKey('reference.Language', null=True, verbose_name=_('Language'), on_delete=models.PROTECT)
 
-    periodicity = models.CharField(max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
-                                   verbose_name=_('Periodicity'))
+    periodicity = models.CharField(
+        max_length=20, choices=PERIODICITY_TYPES, default=ANNUAL,
+        verbose_name=_('Periodicity')
+    )
+
+    cms = GenericRelation(TranslatedText, related_query_name='cms_luy')
 
     objects = BaseLearningUnitYearManager()
     objects_with_container = LearningUnitYearWithContainerManager()
@@ -304,7 +308,7 @@ class LearningUnitYear(SerializableModel):
             complete_title = ' - '.join(filter(None, [self.learning_container_year.common_title, self.specific_title]))
         return complete_title
 
-    @property    # TODO :: move this into template tags or 'presentation' layer (not responsibility of model)
+    @property  # TODO :: move this into template tags or 'presentation' layer (not responsibility of model)
     def complete_title_english(self):
         complete_title_english = self.specific_title_english
         if self.learning_container_year:

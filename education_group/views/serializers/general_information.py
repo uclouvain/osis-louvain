@@ -26,7 +26,6 @@
 from typing import List
 
 from django.conf import settings
-from django.contrib.contenttypes.models import ContentType
 from django.db.models import OuterRef, Subquery, fields, F
 
 from base.business.education_groups import general_information_sections
@@ -106,12 +105,12 @@ def __get_common_labels(node: NodeGroupYear) -> List[str]:
 
 def __get_translated_labels(reference_pk: int, labels: List[str], language_code: str):
     subqstranslated_fr = TranslatedText.objects.filter(
-        reference=reference_pk,
+        cms_offers__id=reference_pk,
         text_label=OuterRef('pk'),
         language=settings.LANGUAGE_CODE_FR,
     ).values('text')[:1]
     subqstranslated_en = TranslatedText.objects.filter(
-        reference=reference_pk,
+        cms_offers__id=reference_pk,
         text_label=OuterRef('pk'),
         language=settings.LANGUAGE_CODE_EN
     ).values('text')[:1]

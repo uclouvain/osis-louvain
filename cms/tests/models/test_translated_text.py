@@ -42,21 +42,22 @@ class TranslatedTextTest(TestCase):
 
         TranslatedTextFactoryEducationGroupYear(text_label=text_label_lu_3,
                                                 entity=entity_name.LEARNING_UNIT_YEAR,
+                                                object_id=REFERENCE
                                                 )
 
         TranslatedTextFactoryEducationGroupYear(text_label=text_label_oy_1,
                                                 entity=entity_name.OFFER_YEAR,
-                                                reference=REFERENCE)
+                                                object_id=REFERENCE)
         TranslatedTextFactoryEducationGroupYear(text_label=text_label_oy_2,
                                                 entity=entity_name.OFFER_YEAR,
-                                                reference=REFERENCE)
+                                                object_id=REFERENCE)
         TranslatedTextFactoryEducationGroupYear(text_label=text_label_oy_3,
                                                 entity=entity_name.OFFER_YEAR,
-                                                reference=REFERENCE)
+                                                object_id=REFERENCE)
 
         tt = TranslatedText.objects.filter(
             text_label__entity=entity_name.OFFER_YEAR,
-            reference=REFERENCE
+            object_id=REFERENCE
         ).order_by('text_label__order').values_list('text_label__label', flat=True)
         self.assertEqual(
             list(tt),

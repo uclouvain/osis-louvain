@@ -66,9 +66,9 @@ def __get_achievement_formated(achievement):
 
 def get_skills_labels(node: NodeGroupYear, language_code: str):
     reference_pk = __get_reference_pk(node)
-    subqstranslated_fr = TranslatedText.objects.filter(reference=reference_pk, text_label=OuterRef('pk'),
+    subqstranslated_fr = TranslatedText.objects.filter(cms_offers__id=reference_pk, text_label=OuterRef('pk'),
                                                        language=settings.LANGUAGE_CODE_FR).values('text')[:1]
-    subqstranslated_en = TranslatedText.objects.filter(reference=reference_pk, text_label=OuterRef('pk'),
+    subqstranslated_en = TranslatedText.objects.filter(cms_offers__id=reference_pk, text_label=OuterRef('pk'),
                                                        language=settings.LANGUAGE_CODE_EN).values('text')[:1]
     subqslabel = TranslatedTextLabel.objects.filter(
         text_label=OuterRef('pk'),
