@@ -204,7 +204,7 @@ class TestReddotEducationGroupAutomaticPostponement(TestCase):
         )
 
         TranslatedTextFactory(
-            entity=OFFER_YEAR, reference=str(self.previous_education_group_year.pk),
+            entity=OFFER_YEAR, content_object=self.previous_education_group_year,
             text="It is our choices, Harry, that show what we truly are, far more than our abilities."
         )
         EducationGroupPublicationContactFactory(

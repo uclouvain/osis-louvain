@@ -61,7 +61,7 @@ class LearningUnitDescriptionFicheFilter(LearningUnitFilter):
             entity=LEARNING_UNIT_YEAR,
             text_label__label__in=CMS_LABEL_PEDAGOGY,
             changed__isnull=False,
-            reference=OuterRef('pk')
+            cms_luy=OuterRef('pk')
         ).order_by("-changed")
 
         return queryset.annotate(

@@ -63,13 +63,13 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
 
         cls.text_label = TextLabelFactory(label='dummy-label')
         cls.translated_text_in_french = TranslatedTextRandomFactory(
-            reference=str(cls.training.pk),
+            content_object=cls.training,
             entity=entity_name.OFFER_YEAR,
             text_label=cls.text_label,
             language=settings.LANGUAGE_CODE_FR,
         )
         cls.translated_text_in_english = TranslatedTextRandomFactory(
-            reference=str(cls.training.pk),
+            content_object=cls.training,
             entity=entity_name.OFFER_YEAR,
             text_label=cls.text_label,
             language=settings.LANGUAGE_CODE_EN,
@@ -239,7 +239,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
 
         cls.cms_label_for_child = TranslatedTextFactory(
             text_label__entity=entity_name.OFFER_YEAR,
-            reference=cls.education_group_child.id
+            content_object=cls.education_group_child
         )
 
         cls.person = PersonFactory()

@@ -59,7 +59,7 @@ def education_group_year_pedagogy_edit_post(request, education_group_year_id, ro
         text_label = TextLabel.objects.filter(label=label).first()
 
         record, created = TranslatedText.objects.get_or_create(
-            content_object=EducationGroupYear.objects.get(id=education_group_year_id),
+            cms_offers=EducationGroupYear.objects.get(id=education_group_year_id),
             entity='offer_year',
             text_label=text_label,
             language='fr-be'

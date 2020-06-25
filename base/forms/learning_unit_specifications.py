@@ -109,7 +109,7 @@ class LearningUnitSpecificationsEditForm(forms.Form):
                 'learning_unit__learningunityear_set'
             ).annotate(
                 min_proposal_year=Min(Subquery(proposal_years))
-            ).get(id=self.trans_text.reference)
+            ).get(id=self.trans_text.object_id)
 
             self.last_postponed_academic_year = None
             if not self.learning_unit_year.academic_year.is_past and self.postponement:
@@ -135,7 +135,7 @@ def update_future_luy(ac_year_postponement_range, luy, cms):
 
         TranslatedText.objects.update_or_create(
             entity=entity_name.LEARNING_UNIT_YEAR,
-            content_object=next_luy,
+            cms_luy__id=next_luy.id,
             language=cms.get("language"),
             text_label=cms.get("text_label"),
             defaults={'text': cms.get("text")}

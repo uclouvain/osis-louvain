@@ -39,10 +39,10 @@ class TestLearningSpecificationsForm(TestCase):
             academic_year=create_current_academic_year()
         )
         cls.laa = TranslatedTextFactory(
-            reference=cls.learning_unit_year.id
+            content_object=cls.learning_unit_year
         )
         cls.laa_en = TranslatedTextFactory(
-            reference=cls.learning_unit_year.id
+            content_object=cls.learning_unit_year
         )
 
     def test_valid_form_and_save_correctly_text(self):

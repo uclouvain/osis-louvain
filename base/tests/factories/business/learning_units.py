@@ -430,4 +430,4 @@ def _create_teaching_material_for_luy(luy, quantity=10):
 
 def _create_cms_data_for_luy(luy, quantity=10):
     for _ in range(quantity):
-        TranslatedTextFactory(reference=luy.id, text=factory.fuzzy.FuzzyText(length=255).fuzz())
+        TranslatedTextFactory(cms_luy=luy, text=factory.fuzzy.FuzzyText(length=255).fuzz())

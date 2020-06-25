@@ -196,7 +196,7 @@ def _get_translated_labels_with_text(learning_unit_year_id, user_language):
             queryset=TranslatedText.objects.filter(
                 language=settings.LANGUAGE_CODE_FR,
                 entity=LEARNING_UNIT_YEAR,
-                content_object__id=learning_unit_year_id
+                cms_luy__id=learning_unit_year_id
             ),
             to_attr="text_fr"
         ),
@@ -205,7 +205,7 @@ def _get_translated_labels_with_text(learning_unit_year_id, user_language):
             queryset=TranslatedText.objects.filter(
                 language=settings.LANGUAGE_CODE_EN,
                 entity=LEARNING_UNIT_YEAR,
-                content_object__id=learning_unit_year_id
+                cms_luy__id=learning_unit_year_id
             ),
             to_attr="text_en"
         )
