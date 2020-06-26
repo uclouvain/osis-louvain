@@ -53,7 +53,9 @@ class TrainingFilter(filters.FilterSet):
             return queryset.filter(
                 education_group_type__name__in=TrainingType.for_catalog_publication()
             )
-        return queryset
+        return queryset.exclude(
+            education_group_type__name__in=TrainingType.for_catalog_publication()
+        )
 
     @staticmethod
     def filter_with_possible_registration(queryset, _, value):
@@ -61,7 +63,9 @@ class TrainingFilter(filters.FilterSet):
             return queryset.filter(
                 education_group_type__name__in=TrainingType.with_possible_registration()
             )
-        return queryset
+        return queryset.exclude(
+            education_group_type__name__in=TrainingType.with_possible_registration()
+        )
 
 
 class TrainingList(LanguageContextSerializerMixin, generics.ListAPIView):

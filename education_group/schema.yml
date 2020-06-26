@@ -69,12 +69,12 @@ paths:
       - in: query
         name: for_catalog
         schema:
-          description: Training types useful for catalog publication
+          description: Training types useful for catalog publication if set to True
           type: boolean
       - in: query
         name: with_possible_registration
         schema:
-          description: Training types with a possible registration
+          description: Training types with a possible registration if set to True
           type: boolean
       - in: query
         name: ordering
@@ -362,7 +362,7 @@ paths:
         - in: query
           name: for_catalog
           schema:
-            description: Mini training types useful for catalog publication
+            description: Mini training types useful for catalog publication if set to True
             type: boolean
         - in: query
           name: ordering

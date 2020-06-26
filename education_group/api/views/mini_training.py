@@ -68,7 +68,9 @@ class MiniTrainingFilter(filters.FilterSet):
             return queryset.filter(
                 education_group_type__name__in=MiniTrainingType.for_catalog_publication()
             )
-        return queryset
+        return queryset.exclude(
+            education_group_type__name__in=MiniTrainingType.for_catalog_publication()
+        )
 
 
 class MiniTrainingList(LanguageContextSerializerMixin, generics.ListAPIView):
