@@ -44,7 +44,7 @@ def get_sections_of_common(year: int, language_code: str):
     reference_pk = EducationGroupYear.objects.get_common(academic_year__year=year).pk
     labels = general_information_sections.SECTIONS_PER_OFFER_TYPE['common']['specific']
 
-    translated_labels = __get_translated_labels(reference_pk, labels, language_code)
+    translated_labels = __get_translated_labels(reference_pk, labels, language_code, entity_name.OFFER_YEAR)
     sections = {}
     for section in general_information_sections.SECTION_LIST:
         for label in filter(lambda l: l in labels, section.labels):
