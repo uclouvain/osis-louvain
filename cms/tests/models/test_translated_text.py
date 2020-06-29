@@ -39,6 +39,7 @@ class TranslatedTextTest(TestCase):
         text_label_oy_1 = TextLabelFactory(order=2, label='introduction', entity=entity_name.OFFER_YEAR)
         text_label_oy_2 = TextLabelFactory(order=3, label='profil', entity=entity_name.OFFER_YEAR)
         text_label_oy_3 = TextLabelFactory(order=4, label='job', entity=entity_name.OFFER_YEAR)
+        text_label_gy_1 = TextLabelFactory(order=5, label='test', entity=entity_name.GROUP_YEAR)
 
         TranslatedTextFactory(text_label=text_label_lu_3,
                               entity=entity_name.LEARNING_UNIT_YEAR,
@@ -52,6 +53,9 @@ class TranslatedTextTest(TestCase):
                               reference=REFERENCE)
         TranslatedTextFactory(text_label=text_label_oy_3,
                               entity=entity_name.OFFER_YEAR,
+                              reference=REFERENCE)
+        TranslatedTextFactory(text_label=text_label_gy_1,
+                              entity=entity_name.GROUP_YEAR,
                               reference=REFERENCE)
 
         tt = TranslatedText.objects.filter(

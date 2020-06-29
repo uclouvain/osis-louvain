@@ -25,7 +25,10 @@
 ##############################################################################
 LEARNING_UNIT_YEAR = "learning_unit_year"
 OFFER_YEAR = "offer_year"
+GROUP_YEAR = "group_year"
 
-
-ENTITY_NAME = ((LEARNING_UNIT_YEAR, LEARNING_UNIT_YEAR),
-               (OFFER_YEAR, OFFER_YEAR))
+ENTITY_NAME = (
+    (LEARNING_UNIT_YEAR, LEARNING_UNIT_YEAR),
+    (OFFER_YEAR, OFFER_YEAR),
+    (GROUP_YEAR, GROUP_YEAR)
+)
