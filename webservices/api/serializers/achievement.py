@@ -29,7 +29,7 @@ from rest_framework import serializers
 
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
-from cms.enums.entity_name import OFFER_YEAR
+from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
 
@@ -108,7 +108,7 @@ class AchievementsSerializer(serializers.Serializer):
                     output_field=CharField()
                 )
             ).get(
-                entity=OFFER_YEAR,
+                entity=entity_name.OFFER_YEAR,
                 language=self.context['language'],
                 text_label__label=cms_type,
                 reference=offer.id

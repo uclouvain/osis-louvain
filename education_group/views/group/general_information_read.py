@@ -47,7 +47,8 @@ class GroupReadGeneralInformation(GroupRead):
             "sections": self.get_sections(),
             "update_label_url": self.get_update_label_url(),
             "publish_url": reverse('publish_general_information', args=[node.year, node.code]) +
-            "?path={}".format(self.path),
+                           "?path={}".format(self.path),
+            "path": self.path,
             "can_edit_information": self.request.user.has_perm("base.change_pedagogyinformation", self.get_group_year())
         }
 
@@ -56,4 +57,5 @@ class GroupReadGeneralInformation(GroupRead):
 
     def get_update_label_url(self):
         group_id = self.get_group_year().pk
+        # node_id = self.get_tree().
         return reverse('education_group_pedagogy_edit', args=[group_id, group_id])

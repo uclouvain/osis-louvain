@@ -28,6 +28,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics
 
 from base.business.education_groups import general_information_sections
+from education_group.models.group_year import GroupYear
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.models.education_group_version import EducationGroupVersion
@@ -42,8 +43,9 @@ class GeneralInformation(generics.RetrieveAPIView):
     serializer_class = GeneralInformationSerializer
 
     def get_object(self):
-        self.egv = get_object_or_404(
-            EducationGroupVersion.standard.select_related(
+        self.egv = None
+        try:
+            self.egv = EducationGroupVersion.standard.select_related(
                 'offer__academic_year',
                 'offer__admissioncondition',
                 'offer__education_group_type',
@@ -53,16 +55,24 @@ class GeneralInformation(generics.RetrieveAPIView):
                 'offer__educationgroupachievement_set',
                 'offer__management_entity__entityversion_set',
                 'offer__publication_contact_entity__entityversion_set'
-            ),
-            Q(offer__acronym__iexact=self.kwargs['acronym']) |
-            Q(root_group__partial_acronym__iexact=self.kwargs['acronym']),
-            offer__academic_year__year=self.kwargs['year'],
-            offer__education_group_type__name__in=general_information_sections.SECTIONS_PER_OFFER_TYPE.keys(),
-            is_transition=False
-        )
+            ).get(
+                Q(offer__acronym__iexact=self.kwargs['acronym']) |
+                Q(root_group__partial_acronym__iexact=self.kwargs['acronym']),
+                offer__academic_year__year=self.kwargs['year'],
+                offer__education_group_type__name__in=general_information_sections.SECTIONS_PER_OFFER_TYPE.keys(),
+                is_transition=False
+            )
+            self.root_group = self.egv.root_group
+        except EducationGroupVersion.DoesNotExist:
+            self.root_group = get_object_or_404(
+                GroupYear.objects.select_related('education_group_type', 'academic_year'),
+                partial_acronym__iexact=self.kwargs['acronym'],
+                academic_year__year=self.kwargs['year'],
+                education_group_type__name__in=general_information_sections.SECTIONS_PER_OFFER_TYPE.keys(),
+            )
         identity = ProgramTreeIdentity(
-            code=self.egv.root_group.partial_acronym,
-            year=self.egv.root_group.academic_year.year
+            code=self.root_group.partial_acronym,
+            year=self.root_group.academic_year.year
         )
         tree = ProgramTreeRepository.get(entity_id=identity)
         return tree.root_node
@@ -71,5 +81,5 @@ class GeneralInformation(generics.RetrieveAPIView):
         serializer_context = super().get_serializer_context()
         serializer_context['language'] = self.kwargs['language']
         serializer_context['acronym'] = self.kwargs['acronym']
-        serializer_context['offer'] = self.egv.offer
+        serializer_context['offer'] = self.egv and self.egv.offer
         return serializer_context
