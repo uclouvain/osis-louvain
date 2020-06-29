@@ -70,7 +70,7 @@ class GeneralInformationSerializer(serializers.Serializer):
         language = settings.LANGUAGE_CODE_FR \
             if self.instance.language == settings.LANGUAGE_CODE_FR[:2] else self.instance.language
         pertinent_sections = general_information_sections.SECTIONS_PER_OFFER_TYPE[obj.node_type.name]
-        reference = reference = self.__get_reference_pk(obj)
+        reference = self.__get_reference_pk(obj)
 
         cms_serializers = {
             SKILLS_AND_ACHIEVEMENTS: AchievementSectionSerializer,
@@ -98,7 +98,7 @@ class GeneralInformationSerializer(serializers.Serializer):
 
     @staticmethod
     def __get_reference_pk(node: NodeGroupYear):
-        if node.category.name in GroupType.get_names():
+        if node.node_type.name in GroupType.get_names():
             return GroupYear.objects.get(element__pk=node.pk).pk
         else:
             return EducationGroupYear.objects.get(educationgroupversion__root_group__element__pk=node.pk).pk
@@ -107,6 +107,7 @@ class GeneralInformationSerializer(serializers.Serializer):
         if reference is None:
             reference = self.__get_reference_pk(node)
         entity = entity_name.GROUP_YEAR if node.node_type.name in GroupType.get_names() else entity_name.OFFER_YEAR
+
         translated_text_label = TranslatedTextLabel.objects.get(
             text_label__label=section,
             language=language,
