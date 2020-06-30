@@ -168,17 +168,6 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
         return MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION <= self.get_object().year < \
                self.get_current_academic_year().year + 2
 
-    @functools.lru_cache()
-    def get_path(self):
-        path = self.request.GET.get('path')
-        if path is None:
-            root_element = Element.objects.get(
-                group_year__academic_year__year=self.kwargs['year'],
-                group_year__partial_acronym=self.kwargs['code']
-            )
-            path = str(root_element.pk)
-        return path
-
 
 def _get_view_name_from_tab(tab: Tab):
     return {
