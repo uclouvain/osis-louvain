@@ -43,8 +43,8 @@ from program_management.ddd.domain.node import NodeGroupYear
 def get_sections_of_common(year: int, language_code: str):
     reference_pk = EducationGroupYear.objects.get_common(academic_year__year=year).pk
     labels = general_information_sections.SECTIONS_PER_OFFER_TYPE['common']['specific']
-
-    translated_labels = __get_translated_labels(reference_pk, labels, language_code, entity_name.OFFER_YEAR)
+    empty_group_node = NodeGroupYear(node_type=GroupType.COMMON_CORE)
+    translated_labels = __get_translated_labels(reference_pk, labels, language_code, empty_group_node)
     sections = {}
     for section in general_information_sections.SECTION_LIST:
         for label in filter(lambda l: l in labels, section.labels):
@@ -54,10 +54,8 @@ def get_sections_of_common(year: int, language_code: str):
 
 
 def get_sections(node: NodeGroupYear, language_code: str):
-    entity = entity_name.GROUP_YEAR if node.node_type.name in GroupType.get_names() else entity_name.OFFER_YEAR
-
-    translated_labels = __get_specific_translated_labels(node, language_code, entity)
-    common_translated_labels = __get_common_translated_labels(node, language_code, entity)
+    translated_labels = __get_specific_translated_labels(node, language_code)
+    common_translated_labels = __get_common_translated_labels(node, language_code)
     labels = set(__get_common_labels(node) + __get_specific_labels(node))
 
     sections = {}
@@ -74,11 +72,11 @@ def get_sections(node: NodeGroupYear, language_code: str):
     return sections
 
 
-def __get_specific_translated_labels(node: NodeGroupYear, language_code: str, entity: str):
+def __get_specific_translated_labels(node: NodeGroupYear, language_code: str):
     labels = __get_specific_labels(node)
     reference_pk = __get_reference_pk(node)
 
-    return __get_translated_labels(reference_pk, labels, language_code, entity)
+    return __get_translated_labels(reference_pk, labels, language_code, node)
 
 
 def __get_reference_pk(node: NodeGroupYear):
@@ -92,11 +90,11 @@ def __get_specific_labels(node: NodeGroupYear) -> List[str]:
     return general_information_sections.SECTIONS_PER_OFFER_TYPE[node.category.name]['specific']
 
 
-def __get_common_translated_labels(node: NodeGroupYear, language_code: str, entity: str):
+def __get_common_translated_labels(node: NodeGroupYear, language_code: str):
     labels = __get_common_labels(node)
     try:
         reference_pk = EducationGroupYear.objects.get_common(academic_year__year=node.year).pk
-        translated_labels = __get_translated_labels(reference_pk, labels, language_code, entity)
+        translated_labels = __get_translated_labels(reference_pk, labels, language_code, node)
     except EducationGroupYear.DoesNotExist:
         translated_labels = {}
     return translated_labels
@@ -106,7 +104,8 @@ def __get_common_labels(node: NodeGroupYear) -> List[str]:
     return general_information_sections.SECTIONS_PER_OFFER_TYPE[node.category.name]['common']
 
 
-def __get_translated_labels(reference_pk: int, labels: List[str], language_code: str, entity: str):
+def __get_translated_labels(reference_pk: int, labels: List[str], language_code: str, node: NodeGroupYear):
+    entity = entity_name.GROUP_YEAR if node.node_type.name in GroupType.get_names() else entity_name.OFFER_YEAR
     subqstranslated_fr = TranslatedText.objects.filter(
         reference=reference_pk, text_label=OuterRef('pk'),
         language=settings.LANGUAGE_CODE_FR, entity=entity

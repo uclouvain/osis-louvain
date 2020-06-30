@@ -108,7 +108,7 @@ class TestMiniTrainingReadGeneralInformation(TestCase):
         expected_update_label_url = reverse('education_group_pedagogy_edit', args=[
             self.mini_training_version.offer_id,
             self.mini_training_version.offer_id,
-        ])
+        ]) + "?path=" + str(self.mini_training_version.root_group.element.pk)
         self.assertEqual(response.context['update_label_url'], expected_update_label_url)
         expected_publish_url = reverse(
             'publish_general_information', args=["2019", "LBIOL100P"]
