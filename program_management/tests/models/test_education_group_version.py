@@ -34,8 +34,7 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 from education_group.models.group_year import GroupYear
 from program_management.models.education_group_version import EducationGroupVersion
 from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
-    StandardEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory, \
-    StandardTransitionEducationGroupVersionFactory
+    StandardEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory
 
 
 class TestEducationGroupVersion(SimpleTestCase):
@@ -56,7 +55,7 @@ class TestEducationGroupVersion(SimpleTestCase):
         self.assertEqual(str(version), str(version.offer))
 
 
-class TestStandardEducationGroupVersionManager(TestCase):
+class TestStandardEducationGroupManager(TestCase):
 
     def setUp(self):
         self.not_standard_version = EducationGroupVersionFactory()
@@ -66,18 +65,6 @@ class TestStandardEducationGroupVersionManager(TestCase):
         result = EducationGroupVersion.standard.all()
         self.assertIn(self.standard_version, result)
         self.assertNotIn(self.not_standard_version, result)
-
-
-class TestStandardWithoutTransitionEducationGroupVersionManager(TestCase):
-
-    def setUp(self):
-        self.not_standard_transition_version = StandardTransitionEducationGroupVersionFactory()
-        self.standard_version = StandardEducationGroupVersionFactory()
-
-    def test_standard_education_group_version_manager(self):
-        result = EducationGroupVersion.standard_without_transition.all()
-        self.assertIn(self.standard_version, result)
-        self.assertNotIn(self.not_standard_transition_version, result)
 
 
 class TestEducationGroupVersionModel(TestCase):

@@ -79,6 +79,7 @@ class GeneralInformation(generics.RetrieveAPIView):
             Q(root_group__partial_acronym__iexact=self.kwargs['acronym']),
             offer__academic_year__year=self.kwargs['year'],
             offer__education_group_type__name__in=general_information_sections.SECTIONS_PER_OFFER_TYPE.keys(),
+            is_transition=False
         )
 
     def get_group(self):

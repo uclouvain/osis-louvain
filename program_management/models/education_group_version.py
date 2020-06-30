@@ -42,11 +42,6 @@ class StandardEducationGroupVersionManager(models.Manager):
         return super().get_queryset().filter(version_name='')
 
 
-class StandardWithoutTransitionEducationGroupVersionManager(StandardEducationGroupVersionManager):
-    def get_queryset(self):
-        return super().get_queryset().filter(is_transition=False)
-
-
 class EducationGroupVersion(models.Model):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
@@ -83,7 +78,6 @@ class EducationGroupVersion(models.Model):
 
     objects = models.Manager()
     standard = StandardEducationGroupVersionManager()
-    standard_without_transition = StandardWithoutTransitionEducationGroupVersionManager()
 
     def __str__(self):
         return "{} ({})".format(self.offer, self.version_name) if self.version_name else str(self.offer)
