@@ -26,7 +26,7 @@
 
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Value, CharField, Subquery
+from django.db.models import Value, CharField
 from rest_framework import serializers
 
 from base.business.education_groups import general_information_sections
@@ -34,9 +34,11 @@ from base.business.education_groups.general_information_sections import \
     SKILLS_AND_ACHIEVEMENTS, ADMISSION_CONDITION, CONTACTS, CONTACT_INTRO, INTRODUCTION
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType
-from cms.enums.entity_name import OFFER_YEAR
+from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
+from education_group.models.group_year import GroupYear
+from program_management.ddd.domain.node import NodeGroupYear
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
     AdmissionConditionSectionSerializer, ContactsSectionSerializer
 
@@ -68,6 +70,7 @@ class GeneralInformationSerializer(serializers.Serializer):
         language = settings.LANGUAGE_CODE_FR \
             if self.instance.language == settings.LANGUAGE_CODE_FR[:2] else self.instance.language
         pertinent_sections = general_information_sections.SECTIONS_PER_OFFER_TYPE[obj.node_type.name]
+        reference = self.__get_reference_pk(obj)
 
         cms_serializers = {
             SKILLS_AND_ACHIEVEMENTS: AchievementSectionSerializer,
@@ -85,7 +88,7 @@ class GeneralInformationSerializer(serializers.Serializer):
                 })
                 datas.append(serializer.data)
             elif specific_section not in WS_SECTIONS_TO_SKIP:
-                sections.append(self._get_section_cms(obj, specific_section, language))
+                sections.append(self._get_section_cms(obj, specific_section, language, reference))
 
         for offer in extra_intro_offers:
             sections.append(self._get_section_cms(offer, 'intro', language))
@@ -93,18 +96,28 @@ class GeneralInformationSerializer(serializers.Serializer):
         datas += SectionSerializer(sections, many=True).data
         return datas
 
-    def _get_section_cms(self, node, section, language):
-        translated_text_label = TranslatedTextLabel.objects.get(text_label__label=section, language=language)
+    @staticmethod
+    def __get_reference_pk(node: NodeGroupYear):
+        if node.node_type.name in GroupType.get_names():
+            return GroupYear.objects.get(element__pk=node.pk).pk
+        else:
+            return EducationGroupYear.objects.get(educationgroupversion__root_group__element__pk=node.pk).pk
+
+    def _get_section_cms(self, node, section, language, reference: int = None):
+        if reference is None:
+            reference = self.__get_reference_pk(node)
+        entity = entity_name.GROUP_YEAR if node.node_type.name in GroupType.get_names() else entity_name.OFFER_YEAR
+
+        translated_text_label = TranslatedTextLabel.objects.get(
+            text_label__label=section,
+            language=language,
+            text_label__entity=entity
+        )
         translated_text = TranslatedText.objects.filter(
             text_label__label=section,
             language=language,
-            entity=OFFER_YEAR,
-            reference=Subquery(
-                EducationGroupYear.objects.filter(
-                    academic_year__year=node.year,
-                    partial_acronym=node.code
-                ).values('id')[:1]
-            )
+            entity=entity,
+            reference=reference
         ).annotate(
             label=Value(self._get_correct_label_name(node, section), output_field=CharField()),
             translated_label=Value(translated_text_label.label, output_field=CharField())

@@ -30,6 +30,7 @@ from base.business.education_groups import general_information_sections
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType
+from cms.enums import entity_name
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
@@ -66,10 +67,14 @@ def __get_achievement_formated(achievement):
 
 def get_skills_labels(node: NodeGroupYear, language_code: str):
     reference_pk = __get_reference_pk(node)
-    subqstranslated_fr = TranslatedText.objects.filter(reference=reference_pk, text_label=OuterRef('pk'),
-                                                       language=settings.LANGUAGE_CODE_FR).values('text')[:1]
-    subqstranslated_en = TranslatedText.objects.filter(reference=reference_pk, text_label=OuterRef('pk'),
-                                                       language=settings.LANGUAGE_CODE_EN).values('text')[:1]
+    subqstranslated_fr = TranslatedText.objects.filter(
+        reference=reference_pk, text_label=OuterRef('pk'),
+        language=settings.LANGUAGE_CODE_FR, entity=entity_name.OFFER_YEAR
+    ).values('text')[:1]
+    subqstranslated_en = TranslatedText.objects.filter(
+        reference=reference_pk, text_label=OuterRef('pk'),
+        language=settings.LANGUAGE_CODE_EN, entity=entity_name.OFFER_YEAR
+    ).values('text')[:1]
     subqslabel = TranslatedTextLabel.objects.filter(
         text_label=OuterRef('pk'),
         language=language_code
@@ -81,7 +86,8 @@ def get_skills_labels(node: NodeGroupYear, language_code: str):
     ]
 
     qs = TextLabel.objects.filter(
-        label__in=label_ids
+        label__in=label_ids,
+        entity=entity_name.OFFER_YEAR
     ).annotate(
         label_id=F('label'),
         label_translated=Subquery(subqslabel, output_field=fields.CharField()),

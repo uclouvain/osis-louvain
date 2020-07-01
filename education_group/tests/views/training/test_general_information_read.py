@@ -108,7 +108,7 @@ class TestTrainingReadGeneralInformation(TestCase):
         expected_update_label_url = reverse('education_group_pedagogy_edit', args=[
             self.training_version.offer_id,
             self.training_version.offer_id,
-        ])
+        ]) + "?path=" + str(self.training_version.root_group.element.pk)
         self.assertEqual(response.context['update_label_url'], expected_update_label_url)
         expected_publish_url = reverse(
             'publish_general_information', args=["2019", "LDROI200M"]

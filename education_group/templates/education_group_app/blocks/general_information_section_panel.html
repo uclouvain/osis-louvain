@@ -31,10 +31,10 @@
         {% for label in labels %}
             <div class="row {% if label.common_label %} education_group_year-common italic {% endif %}">
                 <div class="col-md-12">
-                    <label id="label_{{ label.label_id }}"><b>{{ label.label_translated }}</b></label>
+                    <label id="label_{{ label.label_id }}"><strong>{{ label.label_translated }}</strong></label>
                     {% if can_edit_information and not label.common_label %}
                         <a class="pedagogy-edit-btn trigger_modal" data-modal_class="modal-lg"
-                           data-url="{{update_label_url}}?label={{ label.label_id }}"
+                           data-url="{{ update_label_url }}&label={{ label.label_id }}"
                            title="{% trans 'Edit' %}">
                             <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
                         </a>

@@ -32,6 +32,7 @@ from rest_framework.test import APITestCase
 
 from base.business.education_groups.general_information_sections import DETAILED_PROGRAM, \
     SKILLS_AND_ACHIEVEMENTS, COMMON_DIDACTIC_PURPOSES
+from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.education_group_year import EducationGroupYearFactory, EducationGroupYearCommonFactory
 from base.tests.factories.person import PersonFactory
 from cms.enums.entity_name import OFFER_YEAR
@@ -50,7 +51,7 @@ class GeneralInformationTestCase(APITestCase):
     def setUpTestData(cls):
         cls.person = PersonFactory()
         cls.language = settings.LANGUAGE_CODE_EN
-        cls.egy = EducationGroupYearFactory()
+        cls.egy = EducationGroupYearFactory(education_group_type__name=TrainingType.PGRM_MASTER_120.name)
         cls.group = GroupYearFactory(
             academic_year=cls.egy.academic_year,
             partial_acronym=cls.egy.partial_acronym,
@@ -65,28 +66,35 @@ class GeneralInformationTestCase(APITestCase):
             'common': [COMMON_DIDACTIC_PURPOSES, EVALUATION_KEY]
         }
         for section in cls.pertinent_sections['common']:
-            TranslatedTextLabelFactory(language=cls.language, text_label__label=section)
+            TranslatedTextLabelFactory(language=cls.language, text_label__label=section, text_label__entity=OFFER_YEAR)
             TranslatedTextFactory(
                 reference=common_egy.id,
                 entity=OFFER_YEAR,
                 language=cls.language,
-                text_label__label=section
+                text_label__label=section,
+                text_label__entity=OFFER_YEAR
             )
         for section in cls.pertinent_sections['specific']:
             if section != EVALUATION_KEY:
-                TranslatedTextLabelFactory(language=cls.language, text_label__label=section)
+                TranslatedTextLabelFactory(
+                    language=cls.language,
+                    text_label__label=section,
+                    text_label__entity=OFFER_YEAR
+                )
             TranslatedTextFactory(
                 reference=cls.egy.id,
                 entity=OFFER_YEAR,
                 language=cls.language,
-                text_label__label=section
+                text_label__label=section,
+                text_label__entity=OFFER_YEAR
             )
         for label in [SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA]:
             TranslatedTextFactory(
                 text_label__label=label,
                 reference=cls.egy.id,
                 entity=OFFER_YEAR,
-                language=cls.language
+                language=cls.language,
+                text_label__entity=OFFER_YEAR
             )
         cls.url = reverse('generalinformations_read', kwargs={
             'acronym': cls.egy.acronym,

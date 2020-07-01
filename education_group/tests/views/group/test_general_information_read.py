@@ -105,7 +105,7 @@ class TestGroupReadGeneralInformation(TestCase):
         expected_update_label_url = reverse('education_group_pedagogy_edit', args=[
             self.element_group_year.group_year_id,
             self.element_group_year.group_year_id
-        ])
+        ]) + "?path={}".format(self.element_group_year.id)
         self.assertEqual(response.context['update_label_url'], expected_update_label_url)
         expected_publish_url = reverse(
             'publish_general_information', args=["2018", "LTRONC100B"]

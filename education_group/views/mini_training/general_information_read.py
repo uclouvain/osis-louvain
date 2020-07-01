@@ -63,7 +63,7 @@ class MiniTrainingReadGeneralInformation(MiniTrainingRead):
 
     def get_update_label_url(self):
         offer_id = self.get_education_group_version().offer_id
-        return reverse('education_group_pedagogy_edit', args=[offer_id, offer_id])
+        return reverse('education_group_pedagogy_edit', args=[offer_id, offer_id]) + "?path={}".format(self.get_path())
 
     def get_sections(self):
         return serializers.general_information.get_sections(self.get_object(), self.request.LANGUAGE_CODE)

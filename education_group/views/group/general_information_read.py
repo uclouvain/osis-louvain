@@ -41,13 +41,11 @@ class GroupReadGeneralInformation(GroupRead):
         return result
 
     def get_context_data(self, **kwargs):
-        node = self.get_object()
         return {
             **super().get_context_data(**kwargs),
             "sections": self.get_sections(),
             "update_label_url": self.get_update_label_url(),
-            "publish_url": reverse('publish_general_information', args=[node.year, node.code]) +
-            "?path={}".format(self.path),
+            "publish_url": self.get_publish_url(),
             "can_edit_information": self.request.user.has_perm("base.change_pedagogyinformation", self.get_group_year())
         }
 
@@ -55,5 +53,9 @@ class GroupReadGeneralInformation(GroupRead):
         return serializers.general_information.get_sections(self.get_object(), self.request.LANGUAGE_CODE)
 
     def get_update_label_url(self):
-        offer_id = self.get_group_year().pk
-        return reverse('education_group_pedagogy_edit', args=[offer_id, offer_id])
+        group_id = self.get_group_year().pk
+        return reverse('education_group_pedagogy_edit', args=[group_id, group_id]) + "?path={}".format(self.path)
+
+    def get_publish_url(self):
+        node = self.get_object()
+        return reverse('publish_general_information', args=[node.year, node.code]) + "?path={}".format(self.path)

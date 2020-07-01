@@ -23,11 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import functools
+
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import generics
 
 from base.business.education_groups import general_information_sections
+from education_group.models.group_year import GroupYear
+from osis_common.utils.models import get_object_or_none
 from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 from program_management.ddd.repositories.program_tree import ProgramTreeRepository
 from program_management.models.education_group_version import EducationGroupVersion
@@ -42,7 +46,24 @@ class GeneralInformation(generics.RetrieveAPIView):
     serializer_class = GeneralInformationSerializer
 
     def get_object(self):
-        self.egv = get_object_or_404(
+        group = self.get_group()
+        identity = ProgramTreeIdentity(
+            code=group.partial_acronym,
+            year=group.academic_year.year
+        )
+        tree = ProgramTreeRepository.get(entity_id=identity)
+        return tree.root_node
+
+    def get_serializer_context(self):
+        serializer_context = super().get_serializer_context()
+        serializer_context['language'] = self.kwargs['language']
+        serializer_context['acronym'] = self.kwargs['acronym']
+        serializer_context['offer'] = self.get_offer()
+        return serializer_context
+
+    @functools.lru_cache()
+    def get_education_group_version(self):
+        return get_object_or_none(
             EducationGroupVersion.standard.select_related(
                 'offer__academic_year',
                 'offer__admissioncondition',
@@ -60,16 +81,18 @@ class GeneralInformation(generics.RetrieveAPIView):
             offer__education_group_type__name__in=general_information_sections.SECTIONS_PER_OFFER_TYPE.keys(),
             is_transition=False
         )
-        identity = ProgramTreeIdentity(
-            code=self.egv.root_group.partial_acronym,
-            year=self.egv.root_group.academic_year.year
-        )
-        tree = ProgramTreeRepository.get(entity_id=identity)
-        return tree.root_node
 
-    def get_serializer_context(self):
-        serializer_context = super().get_serializer_context()
-        serializer_context['language'] = self.kwargs['language']
-        serializer_context['acronym'] = self.kwargs['acronym']
-        serializer_context['offer'] = self.egv.offer
-        return serializer_context
+    def get_group(self):
+        version = self.get_education_group_version()
+        if version:
+            return version.root_group
+        return get_object_or_404(
+            GroupYear.objects.select_related('education_group_type', 'academic_year'),
+            partial_acronym__iexact=self.kwargs['acronym'],
+            academic_year__year=self.kwargs['year'],
+            education_group_type__name__in=general_information_sections.SECTIONS_PER_OFFER_TYPE.keys(),
+        )
+
+    def get_offer(self):
+        version = self.get_education_group_version()
+        return version.offer
