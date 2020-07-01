@@ -46,7 +46,6 @@ class GroupReadGeneralInformation(GroupRead):
             "sections": self.get_sections(),
             "update_label_url": self.get_update_label_url(),
             "publish_url": self.get_publish_url(),
-            "path": self.path,
             "can_edit_information": self.request.user.has_perm("base.change_pedagogyinformation", self.get_group_year())
         }
 
