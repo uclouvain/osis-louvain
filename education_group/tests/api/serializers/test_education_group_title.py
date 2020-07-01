@@ -29,6 +29,7 @@ from django.test import TestCase
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 class EducationGroupTitleSerializerTestCase(TestCase):
@@ -38,9 +39,9 @@ class EducationGroupTitleSerializerTestCase(TestCase):
         cls.education_group_year = EducationGroupYearFactory(
             academic_year=academic_year,
         )
-
+        cls.version = EducationGroupVersionFactory(offer=cls.education_group_year)
         cls.serializer = EducationGroupTitleSerializer(
-            cls.education_group_year,
+            cls.version,
             context={'language': settings.LANGUAGE_CODE_EN}
         )
 

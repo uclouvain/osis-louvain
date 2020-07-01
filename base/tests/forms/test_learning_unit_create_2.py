@@ -62,7 +62,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory
 
 
 def _instanciate_form(academic_year, person=None, post_data=None, learning_unit_instance=None, start_year=None,
@@ -79,7 +79,7 @@ def get_valid_form_data(academic_year, person, learning_unit_year=None):
     requirement_entity_version = entities['child_one_entity_version']
     organization = OrganizationFactory(type=organization_type.MAIN)
     campus = CampusFactory(organization=organization)
-    language = LanguageFactory(code='FR')
+    language = FrenchLanguageFactory()
 
     if not learning_unit_year:
         learning_container = LearningContainerFactory()
@@ -163,7 +163,7 @@ class LearningUnitFullFormContextMixin(TestCase):
     """This mixin is used in this test file in order to setup an environment for testing FULL FORM"""
     @classmethod
     def setUpTestData(cls):
-        cls.initial_language = LanguageFactory(code='FR')
+        cls.initial_language = FrenchLanguageFactory()
         cls.initial_campus = CampusFactory(name='Louvain-la-Neuve', organization__type=organization_type.MAIN)
         cls.current_academic_year = create_current_academic_year()
         # Creation of a LearningContainerYear and all related models
@@ -220,7 +220,11 @@ class TestFullFormInit(LearningUnitFullFormContextMixin):
             self.assertEqual(form.fields['academic_year'].disabled, True)
 
     def test_subtype_is_full(self):
-        learn_unit_year = LearningUnitYearFactory(subtype=learning_unit_year_subtypes.FULL)
+        learn_unit_year = LearningUnitYearFactory(
+            subtype=learning_unit_year_subtypes.FULL,
+            learning_container_year__requirement_entity=None,
+            learning_container_year__allocation_entity=None
+        )
         form = _instanciate_form(learn_unit_year.academic_year, learning_unit_instance=learn_unit_year.learning_unit)
         self.assertEqual(form.subtype, learning_unit_year_subtypes.FULL)
 

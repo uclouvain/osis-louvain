@@ -146,33 +146,33 @@
                     <table class="table table-hover">
                         <thead>
                         <tr>
-                            <th>{% trans 'Complete' %}</th>
-                            <th>{% trans 'Code' %}</th>
-                            <th>{% trans 'Learning unit' %}</th>
-                            <th>{% trans 'Scores responsible' %}</th>
-                            <th>{% trans 'Progress' %}</th>
-                            <th></th>
+                            <th id="complete">{% trans 'Complete' %}</th>
+                            <th id="code">{% trans 'Code' %}</th>
+                            <th id="title">{% trans 'Learning unit' %}</th>
+                            <th id="responsible">{% trans 'Scores responsible' %}</th>
+                            <th id="progress">{% trans 'Progress' %}</th>
+                            <th id="encode"></th>
                         </tr>
                         </thead>
                         <tbody>
 
                 {% for note_detail in notes_list %}
-                <tr>
-                    <td class="text-center">
+                <tr class="result">
+                    <td class="text-center" headers="complete">
                         {% if note_detail.exam_enrollments_encoded == note_detail.total_exam_enrollments %}
                             <span class="glyphicon glyphicon-ok" style="color: green" aria-hidden="true"></span>
                         {% else %}
                             <span class="glyphicon glyphicon-exclamation-sign" style="color: #EEA237" aria-hidden="true"></span>
                         {% endif %}
                     </td>
-                    <td>{{ note_detail.learning_unit_year_acronym }}</td>
-                    <td>
+                    <td headers="code">{{ note_detail.learning_unit_year_acronym }}</td>
+                    <td headers="title">
                         <a href="{% url 'online_encoding' note_detail.learning_unit_year_id %}?{{ request.GET.urlencode }}"
                            id="lnk_{{ note_detail.learning_unit_year_acronym }}">
                             {{ note_detail.learning_unit_year_title }}
                         </a>
                     </td>
-                    <td>
+                    <td headers="responsible">
                         {% if note_detail.score_responsibles %}
                             {{ note_detail.score_responsibles.0.person.last_name|default_if_none:"" }}
                             {{ note_detail.score_responsibles.0.person.first_name|default_if_none:"" }}
@@ -180,7 +180,7 @@
                             -
                         {% endif %}
                     </td>
-                    <td>
+                    <td headers="progress">
                         <div class="progress">
                             <div class="progress-bar {% if note_detail.progress_int == 100 %}
                                                         progress-bar-success
@@ -203,7 +203,7 @@
                             </div>
                         </div>
                     </td>
-                    <td>
+                    <td headers="encode">
                         <a class="btn btn-default"
                            href="{% url 'online_encoding_form' note_detail.learning_unit_year_id %}?{{ request.GET.urlencode }}"
                            role="button" id="lnk_encode_{{ note_detail.learning_unit_year_id }}"
@@ -275,7 +275,7 @@
                         </div>
                     </td>
                     <td>
-                        <a class="btn btn-default no_spinner"
+                        <a class="btn btn-default download"
                            href="{% url 'scores_encoding_download' note_detail.learning_unit_year_id %}"
                            role="button"
                            id="lnk_scores_encoding_download_{{note_detail.learning_unit_year_id}}"
@@ -290,7 +290,7 @@
         </div>
                 <div role="tabpanel" class="tab-pane fade" id="tab_via_paper">
             <br>
-            <a class="btn btn-default no_spinner {% if not tutor_id or tutor_id == -1 %}disabled{%endif%}"
+            <a class="btn btn-default download {% if not tutor_id or tutor_id == -1 %}disabled{%endif%}"
                href="{%if tutor_id and tutor_id != -1 and offer_year_id %}
                         {% url 'notes_printing_all' tutor_id=tutor_id offer_id=offer_year_id %}
                      {%else%}
@@ -309,16 +309,16 @@
                 <thead>
                 <tr>
                     <th>{% trans 'Complete' %}</th>
-                    <th>{% trans 'Code' %}</th>
+                    <th id="code">{% trans 'Code' %}</th>
                     <th>{% trans 'Learning unit' %}</th>
                     <th>{% trans 'Scores responsible' %}</th>
                     <th>{% trans 'Progress' %}</th>
-                    <th></th>
+                    <th id="download_action"></th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for note_detail in notes_list %}
-                <tr>
+                <tr class="result_paper">
                     <td class="text-center">
                         {% if note_detail.exam_enrollments_encoded == note_detail.total_exam_enrollments %}
                             <span class="glyphicon glyphicon-ok" style="color: green" aria-hidden="true"></span>
@@ -326,7 +326,7 @@
                             <span class="glyphicon glyphicon-exclamation-sign" style="color: #EEA237" aria-hidden="true"></span>
                         {% endif %}
                     </td>
-                    <td>{{ note_detail.learning_unit_year_acronym }}</td>
+                    <td headers="code">{{ note_detail.learning_unit_year_acronym }}</td>
                     <td><a href="{% url 'online_encoding' note_detail.learning_unit_year_id %}?{{ request.GET.urlencode }}"
                            title="{% trans 'Display scores for this learning unit' %}"
                            id="lnk_paper_encoding_messages_{{note_detail.learning_unit_year_id}}">{{ note_detail.learning_unit_year_title }}</a></td>
@@ -362,7 +362,7 @@
                         </div>
                     </td>
                     <td>
-                        <a class="btn btn-default no_spinner"
+                        <a class="btn btn-default download"
                            href="{% url 'notes_printing' note_detail.learning_unit_year_id%}"
                            role="button" id="lnk_notes_printing_{{note_detail.learning_unit_year_id}}"
                            data-toggle="tooltip" data-placement="right"

@@ -114,7 +114,8 @@ class ManageMyCoursesViewTestCase(TestCase):
             self.assertEqual(luy.academic_year.year, self.current_ac_year.year)
             self.assertFalse(error.errors)
 
-    def test_list_my_attributions_summary_editable_after_period(self):
+    @patch('base.business.event_perms.EventPerm.is_open', return_value=False)
+    def test_list_my_attributions_summary_editable_after_period(self, mock_is_open):
         self.academic_calendar.start_date = datetime.date.today() - datetime.timedelta(weeks=52)
         self.academic_calendar.end_date = datetime.date.today() - datetime.timedelta(weeks=48)
         self.academic_calendar.save()
@@ -124,8 +125,8 @@ class ManageMyCoursesViewTestCase(TestCase):
             end_date=datetime.date.today() + datetime.timedelta(weeks=52),
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
-
         response = self.client.get(self.url)
+
         self.assertTemplateUsed(response, "manage_my_courses/list_my_courses_summary_editable.html")
 
         context = response.context

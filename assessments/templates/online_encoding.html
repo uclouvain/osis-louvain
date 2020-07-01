@@ -128,14 +128,14 @@
                 {% endif %}><i class="fa fa-hashtag"></i><i class="fa fa-hashtag"></i> {% trans 'Double encoding' %}</a>
         </div>
         &nbsp;
-        <a  id="lnk_score_printing" class="btn btn-default no_spinner"
+        <a  id="lnk_score_printing" class="btn btn-default download"
             href="{% url 'notes_printing' learning_unit_year_id=learning_unit_year.id %}"
             data-toggle="tooltip" data-placement="bottom"
             title="{% trans 'Print the scores' %}"
             role="button"><span class="glyphicon glyphicon-print" aria-hidden="true"></span> {% trans 'Print' %}</a>
         &nbsp;
         <div class="btn-group" role="group" aria-label="Excel">
-            <a id="lnk_scores_excel" class="btn btn-default no_spinner"
+            <a id="lnk_scores_excel" class="btn btn-default download"
                href="{% url 'scores_encoding_download' learning_unit_year.id %}"
                role="button"
                data-toggle="tooltip" data-placement="bottom"
@@ -173,14 +173,14 @@
         <table class="table table-hover">
             <thead>
                 <tr>
-                    <th>{% trans 'Status' %}</th>
-                    <th>{% trans 'Program' %}</th>
-                    <th>{% trans 'Registration number' %}</th>
-                    <th>{% trans 'Lastname' %}</th>
-                    <th>{% trans 'Firstname' %}</th>
-                    <th>{% trans 'Score' %}</th>
-                    <th>{% trans 'Justification' %}</th>
-                    <th>{% trans 'Teacher deadline' %}</th>
+                    <th id="status">{% trans 'Status' %}</th>
+                    <th id="program">{% trans 'Program' %}</th>
+                    <th id="registration_number">{% trans 'Registration number' %}</th>
+                    <th id="lastname">{% trans 'Lastname' %}</th>
+                    <th id="firstname">{% trans 'Firstname' %}</th>
+                    <th id="score">{% trans 'Score' %}</th>
+                    <th id="justification">{% trans 'Justification' %}</th>
+                    <th id="deadline">{% trans 'Teacher deadline' %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -192,8 +192,8 @@
                                     #D3D3D3
                                {% else %}
                                     {% include 'blocks/row_color.html' %}
-                            {% endif %}">
-                        <td style="text-align:center;" id="enrollment_status_{{ enrollment.id }}">
+                            {% endif %}" class="result">
+                        <td style="text-align:center;" id="enrollment_status_{{ enrollment.id }}" headers="status">
                             {% if enrollment.deadline_reached %}
                                 <span class="glyphicon glyphicon-lock" aria-hidden="true" style="color: #8B008B;" title="{% trans 'Deadline reached' %}"></span>
                             {% elif enrollment.deadline_tutor_reached  and not is_program_manager %}
@@ -203,11 +203,11 @@
                                 <span class="glyphicon glyphicon-send" aria-hidden="true" style="color: green;" title="{% trans 'Score submitted' %}"></span>
                             {% endif %}
                         </td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|default_if_none:"" }}</td>
-                        <td>{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name|default_if_none:"" }}</td>
-                        <td id="enrollment_note_{{ enrollment.id }}">
+                        <td headers="program">{{ enrollment.learning_unit_enrollment.offer_enrollment.offer_year.acronym }}</td>
+                        <td headers="registration_number">{{ enrollment.learning_unit_enrollment.offer_enrollment.student.registration_id }}</td>
+                        <td headers="lastname">{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.last_name|default_if_none:"" }}</td>
+                        <td headers="firstname">{{ enrollment.learning_unit_enrollment.offer_enrollment.student.person.first_name|default_if_none:"" }}</td>
+                        <td id="enrollment_note_{{ enrollment.id }}" headers="score">
                             {% if is_program_manager %}
                                 {% if enrollment.score_final != None %}
                                     {{ enrollment.score_final | score_display:enrollment.learning_unit_enrollment.learning_unit_year.decimal_scores }}
@@ -224,7 +224,7 @@
                                 {% endif %}
                             {% endif%}
                         </td>
-                        <td id="enrollment_justification_{{ enrollment.id }}">
+                        <td id="enrollment_justification_{{ enrollment.id }}" headers="justification">
                             {% if is_program_manager %}
                                 {% if enrollment.justification_final %}
                                     {% trans enrollment.get_justification_final_display %}
@@ -241,7 +241,7 @@
                                 {% endif %}
                             {% endif %}
                         </td>
-                        <td>{% if enrollment.enrollment_state == 'ENROLLED' %}{{ enrollment.deadline | default_if_none:'' |date:"j/m/Y" }}{% endif %}</td>
+                        <td headers="deadline">{% if enrollment.enrollment_state == 'ENROLLED' %}{{ enrollment.deadline | default_if_none:'' |date:"j/m/Y" }}{% endif %}</td>
                     </tr>
                 {% endfor %}
             </tbody>

@@ -1,0 +1,5 @@
+{% if load_modal %}
+    <a href="#" data-toggle="tooltip" title="{{ error_msg }}" class="{{ class_a }}" data-url="{{ url }}">{{ text }}</a>
+{% else %}
+    <a href="{{ url }}" data-toggle="tooltip" title="{{ error_msg }}" class="{{ class_a }}">{{ text }}</a>
+{% endif %}

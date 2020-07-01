@@ -44,7 +44,7 @@ from base.tests.factories.academic_year import create_current_academic_year, Aca
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from base.tests.factories.person import FacultyManagerFactory
+from base.tests.factories.person import FacultyManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
@@ -91,7 +91,7 @@ class LearningUnitPedagogyTestCase(TestCase):
             learning_container_year__requirement_entity=cls.requirement_entity_version.entity
         )
         cls.url = reverse('learning_units_summary')
-        cls.faculty_person = FacultyManagerFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
+        cls.faculty_person = FacultyManagerForUEFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
         PersonEntityFactory(person=cls.faculty_person, entity=cls.requirement_entity_version.entity)
 
     def setUp(self):
@@ -201,7 +201,7 @@ class LearningUnitPedagogyExportXLSTestCase(TestCase):
         )
 
         cls.url = reverse('learning_units_summary')
-        cls.faculty_person = FacultyManagerFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
+        cls.faculty_person = FacultyManagerForUEFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
         PersonEntityFactory(person=cls.faculty_person, entity=cls.requirement_entity_version.entity)
 
         # Generate data for XLS export
@@ -342,7 +342,7 @@ class LearningUnitPedagogyEditTestCase(TestCase):
             learning_container_year__requirement_entity=cls.requirement_entity_version.entity
         )
         cls.url = reverse(learning_unit_pedagogy_edit, kwargs={'learning_unit_year_id': cls.learning_unit_year.pk})
-        cls.faculty_person = FacultyManagerFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
+        cls.faculty_person = FacultyManagerForUEFactory('can_access_learningunit', 'can_edit_learningunit_pedagogy')
         PersonEntityFactory(person=cls.faculty_person, entity=cls.requirement_entity_version.entity)
 
     def setUp(self):
@@ -360,7 +360,6 @@ class LearningUnitPedagogyEditTestCase(TestCase):
         response = self.client.get(self.url, data={'label': 'bibliography', 'language': 'fr-be'})
 
         self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTemplateUsed(response, 'learning_unit/pedagogy_edit.html')
         self.assertTemplateUsed(response, 'learning_unit/blocks/modal/modal_pedagogy_edit.html')
         self.assertEqual(response.context["cms_label_pedagogy_fr_only"], CMS_LABEL_PEDAGOGY_FR_ONLY)
         self.assertEqual(response.context["label_name"], 'bibliography')
@@ -471,7 +470,7 @@ class LearningUnitPedagogySummaryLockedTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
-        cls.faculty_person = FacultyManagerFactory('can_access_learningunit')
+        cls.faculty_person = FacultyManagerForUEFactory('can_access_learningunit')
         cls.learning_unit_year = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,
             learning_container_year__academic_year=cls.current_academic_year,

@@ -31,6 +31,7 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from education_group.models.group_year import GroupYear
 from education_group.tests.factories.group import GroupFactory
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 class TestGroupYear(TestCase):
@@ -45,7 +46,6 @@ class TestGroupYear(TestCase):
 class TestGroupYearSave(TestCase):
     @classmethod
     def setUpTestData(cls):
-
         cls.academic_year_2019 = AcademicYearFactory(year=2019)
         cls.academic_year_2023 = AcademicYearFactory(year=2023)
 
@@ -58,7 +58,6 @@ class TestGroupYearSave(TestCase):
                                                   end_year=None)
 
     def test_save_case_academic_year_less_than_start_year_error(self):
-
         with self.assertRaisesMessage(
                 AttributeError,
                 _('Please enter an academic year greater or equal to group start year.')):
@@ -72,7 +71,6 @@ class TestGroupYearSave(TestCase):
             )
 
     def test_save_case_academic_year_greater_than_end_year_error(self):
-
         with self.assertRaisesMessage(
                 AttributeError,
                 _('Please enter an academic year less or equal to group end year.')):
@@ -95,3 +93,25 @@ class TestGroupYearSave(TestCase):
             GroupYear.objects.filter(group=self.group_without_end_year,
                                      academic_year=self.academic_year_greater).exists()
         )
+
+
+class TestGroupYearVersionManager(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year_2019 = AcademicYearFactory(year=2019)
+        cls.group = GroupFactory(start_year=cls.academic_year_2019, end_year=cls.academic_year_2019)
+
+    def test_without_education_group_version(self):
+        GroupYearFactory(
+            group=self.group,
+            academic_year=self.academic_year_2019
+        )
+        self.assertListEqual(list(GroupYear.objects_version.all()), [])
+
+    def test_with_education_group_version(self):
+        group_yr_2 = GroupYearFactory(
+            group=self.group,
+            academic_year=self.academic_year_2019
+        )
+        EducationGroupVersionFactory(root_group=group_yr_2)
+        self.assertListEqual(list(GroupYear.objects_version.all()), [group_yr_2])

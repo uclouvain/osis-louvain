@@ -33,6 +33,7 @@ from base.tests.factories.education_group_year import MiniTrainingFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from education_group.api.serializers.mini_training import MiniTrainingDetailSerializer, MiniTrainingListSerializer
 from education_group.api.views.mini_training import MiniTrainingList
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 
 
 class MiniTrainingListSerializerTestCase(TestCase):
@@ -44,13 +45,12 @@ class MiniTrainingListSerializerTestCase(TestCase):
         )
 
         cls.mini_training = MiniTrainingFactory(
-            partial_acronym='LLOGO210O',
             academic_year=cls.academic_year,
             management_entity=cls.entity_version.entity,
         )
-
+        cls.version = EducationGroupVersionFactory(offer=cls.mini_training, root_group__partial_acronym='LLOGO2100')
         url = reverse('education_group_api_v1:' + MiniTrainingList.name)
-        cls.serializer = MiniTrainingListSerializer(cls.mini_training, context={
+        cls.serializer = MiniTrainingListSerializer(cls.version, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN
         })
@@ -59,6 +59,7 @@ class MiniTrainingListSerializerTestCase(TestCase):
         expected_fields = [
             'title',
             'url',
+            'version_name',
             'acronym',
             'code',
             'education_group_type',
@@ -84,7 +85,7 @@ class MiniTrainingListSerializerTestCase(TestCase):
     def test_ensure_code_is_an_alias_to_partial_acronym(self):
         self.assertEqual(
             self.serializer.data['code'],
-            self.mini_training.partial_acronym
+            self.version.root_group.partial_acronym
         )
 
 
@@ -100,11 +101,12 @@ class MiniTrainingDetailSerializerTestCase(TestCase):
             academic_year=cls.academic_year,
             management_entity=cls.entity_version.entity,
         )
+        cls.version = EducationGroupVersionFactory(offer=cls.mini_training)
         url = reverse('education_group_api_v1:mini_training_read', kwargs={
-            'partial_acronym': cls.mini_training.partial_acronym,
+            'partial_acronym': cls.version.root_group.partial_acronym,
             'year': cls.academic_year.year
         })
-        cls.serializer = MiniTrainingDetailSerializer(cls.mini_training, context={
+        cls.serializer = MiniTrainingDetailSerializer(cls.version, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_FR
         })
@@ -113,6 +115,7 @@ class MiniTrainingDetailSerializerTestCase(TestCase):
         expected_fields = [
             'title',
             'url',
+            'version_name',
             'acronym',
             'code',
             'education_group_type',

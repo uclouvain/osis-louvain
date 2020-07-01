@@ -1,6 +1,4 @@
-{% load i18n bootstrap3 %}
-{% load waffle_tags %}
-{% load feature_flag education_group %}
+{% load i18n bootstrap3 osis_role %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -26,22 +24,22 @@
  * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-{% features_or "education_group_create" as show_button %}
-{% if show_button %}
-    <button type="button" id="btn-action" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-            aria-expanded="false">
-        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {% trans 'Actions' %}
-        <span class="caret"></span>
-    </button>
-    <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
-        {% flag "education_group_create" %}
-            {% url 'select_education_group_type' enums.GROUP as create_group_url %}
-            {% url 'select_education_group_type' enums.TRAINING as create_training_url %}
-            {% url 'select_education_group_type' enums.MINI_TRAINING as create_mini_training_url %}
-
-            {% li_with_create_perm_group create_group_url _('New Education Group') %}
-            {% li_with_create_perm_training create_training_url _('New Training') %}
-            {% li_with_create_perm_mini_training create_mini_training_url _('New Mini-Training') %}
-        {% endflag %}
-    </ul>
-{% endif %}
+<button type="button" id="btn-action" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+        aria-expanded="false">
+    <span class="glyphicon glyphicon-cog" aria-hidden="true"></span> {% trans 'Actions' %}
+    <span class="caret"></span>
+</button>
+<ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
+     <li>
+        {% url 'select_education_group_type' enums.GROUP as create_group_url %}
+        {% a_tag_modal_has_perm create_group_url _('New Education Group') 'base.add_group' user %}
+     </li>
+     <li>
+        {% url 'select_education_group_type' enums.TRAINING as create_training_url %}
+        {% a_tag_modal_has_perm create_training_url _('New Training') 'base.add_training' user %}
+     </li>
+     <li>
+        {% url 'select_education_group_type' enums.MINI_TRAINING as create_mini_training_url %}
+        {% a_tag_modal_has_perm create_mini_training_url _('New Mini-Training') 'base.add_minitraining' user %}
+     </li>
+</ul>

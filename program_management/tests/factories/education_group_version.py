@@ -60,3 +60,10 @@ class StandardTransitionEducationGroupVersionFactory(EducationGroupVersionFactor
 class ParticularTransitionEducationGroupVersionFactory(EducationGroupVersionFactory):
     version_name = 'CEMS'
     is_transition = True
+
+
+def create_with_version(version_offer=None, **kwargs):
+    group_yr = GroupYearFactory(**kwargs)
+    if version_offer:
+        EducationGroupVersionFactory(offer=version_offer, root_group=group_yr)
+    return group_yr

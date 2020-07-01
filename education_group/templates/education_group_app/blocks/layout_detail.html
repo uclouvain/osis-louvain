@@ -1,0 +1,137 @@
+{% extends "education_group_app/blocks/layout.html" %}
+{% load format i18n static bootstrap3 academic_year_display version_name_display %}
+
+{% block title %}
+    <title>OSIS - {{ education_group_year.acronym }} {{ learning_unit_year.acronym }}</title>
+{% endblock %}
+{% block breadcrumb %}
+    {{ block.super }}
+    <li class="active">
+        {% if node.is_training %}
+            {{ node.title }}
+        {% else %}
+            {{ node.code }}
+        {% endif %}
+    </li>
+{% endblock %}
+
+{% block header_content %}
+    <div class="page-header">
+    {% with disabled_nav=False %}
+        {% include "education_group/blocks/header.html" %}
+    {% endwith %}
+    </div>
+{% endblock %}
+
+{% block sidebar %}
+
+    <div class="side-container" id="mySidenav">
+        <div class="sidenav panel" id="scrollableDiv">
+            <div class="panel-heading ">
+                <input class="form-control" id="search_jstree" type="text" placeholder="Search" aria-label="Search">
+            </div>
+            <div class="panel-body">
+                <div class="row" id="panel_file_tree" data-rootId= "{{ root.id }}" data-copyUrl="{% url "copy_element" %}" data-cutUrl="{% url "cut_element" %}"></div>
+            </div>
+        </div>
+        <div id="split-bar"></div>
+
+    </div>
+{% endblock %}
+
+
+{% block content %}
+
+    <div class="panel panel-default" id="panel-data">
+        <div class="panel-heading">
+            <div class="row">
+                <div class="col-md-5">
+                    <div class="row">
+                        <div class="col-md-1">
+                            <a id="btn-toggle-tree" class="btn btn-default" onclick="toggleNav()">
+                                <span class="fa fa-bars" aria-hidden="true"></span>
+                            </a>
+                        </div>
+
+                        <div class="col-md-4">
+                        {% if not node.is_learning_unit %}
+                            <select id="slt_academic_year" name="select_academic_year" class="form-control" onchange="location = this.value;">
+                                {% for choice in academic_year_choices %}
+                                    <option value="{{ choice.0 }}"
+                                            {% if request.path in choice.0|urlencode %}
+                                            selected {% endif %}>{{ choice.1 | display_as_academic_year }}</option>
+                                {% endfor %}
+                            </select>
+                        {% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            {% if current_version and versions_choices|length > 1  %}
+                                <select id="slt_version" name="select_program_tree_version" class="form-control"
+                                        onchange="location = this.value;">
+                                    {% for choice in versions_choices %}
+                                        <option value="{{ choice.0 }}"
+                                                {% if current_version.entity_id == choice.1 %}
+                                                selected {% endif %}>{{ choice.1 | display_version_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-md-7">
+                    <div class="pull-right" style="margin-right: 15px;">
+                        {% block top_action_bar %}
+                            {% include 'education_group/blocks/dropdown/identification_actions_bar.html' %}
+                        {% endblock %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <div class="panel-body" id="tabs">
+            <div class="tab-content" id="tab_content">
+                <div role="tabpanel" class="tab-pane active" id="identification">
+                    <div class="row" style="display:flex;">
+                        <div class="col-md-12" style="height: 100%;">
+                            {% block tabs %}
+                                {% include "education_group/tabs.html" %}
+                            {% endblock %}
+                            <br>
+                            {% block details %}
+                            {% endblock %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="panel-footer text-right">
+            {% block bottom_action_bar %}
+                {% include 'education_group/blocks/dropdown/identification_actions_bar.html' %}
+            {% endblock %}
+        </div>
+    </div>
+    <div id="clipboard" class="alert alert-info " role="alert" {% if not selected_element_clipboard %}hidden="hidden"{% endif %}>
+        <div style="display: inline-block;">
+            <div class="pull-right">
+                <button type="button" class="close clear-clipboard" data-url="{% url "education_group_clear_clipboard" %}"  id="clear_clipboard" data-toggle="tooltip" data-placement="right" title="{% trans "Clear clipboard" %}">
+                    <span aria-hidden="true" style="font-size: 0.8em;">&nbsp;<em class="fa fa-trash"></em></span>
+                </button>
+            </div>
+            <div id="clipboard_content" class="pull-left">
+                {{ selected_element_clipboard | safe }}
+            </div>
+        </div>
+    </div>
+    {% if education_group_year %}
+        {% include "education_group/blocks/modal/custom_xls.html" %}
+    {% endif %}
+    <script>
+        const tree = JSON.parse('{{ tree | escapejs }}');
+    </script>
+    <script type="text/javascript" src="{% static 'js/program_management/education_group_tree.js' %}">
+    </script>
+
+{% endblock content %}

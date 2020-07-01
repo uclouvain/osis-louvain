@@ -83,7 +83,7 @@ from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearFakerFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory, FacultyManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import SuperUserFactory, UserFactory
@@ -104,14 +104,14 @@ from learning_unit.api.views.learning_unit import LearningUnitFilter
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 from osis_common.document import xls_build
 from reference.tests.factories.country import CountryFactory
-from reference.tests.factories.language import LanguageFactory
+from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
 
 
 @override_flag('learning_unit_create', active=True)
 class LearningUnitViewCreateFullTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        LanguageFactory(code='FR')
+        FrenchLanguageFactory()
         cls.current_academic_year = create_current_academic_year()
         cls.url = reverse('learning_unit_create', kwargs={'academic_year_id': cls.current_academic_year.id})
         cls.user = PersonWithPermissionsFactory("can_access_learningunit", "can_create_learningunit").user
@@ -251,10 +251,12 @@ class LearningUnitViewCreatePartimTestCase(TestCase):
         cls.learning_unit_year_full = LearningUnitYearFactory(
             academic_year=cls.current_academic_year,
             learning_container_year__academic_year=cls.current_academic_year,
+            learning_container_year__requirement_entity=None,
+            learning_container_year__allocation_entity=None,
             subtype=learning_unit_year_subtypes.FULL
         )
         cls.url = reverse(create_partim_form, kwargs={'learning_unit_year_id': cls.learning_unit_year_full.id})
-        faculty_manager = FacultyManagerFactory("can_access_learningunit", "can_create_learningunit")
+        faculty_manager = FacultyManagerForUEFactory("can_access_learningunit", "can_create_learningunit")
         cls.user = faculty_manager.user
         cls.access_denied = "access_denied.html"
 
@@ -382,7 +384,7 @@ class LearningUnitViewTestCase(TestCase):
                                                     end_date=today.replace(year=today.year + 1))
 
         cls.campus = CampusFactory(organization=cls.organization, is_administration=True)
-        cls.language = LanguageFactory(code='FR')
+        cls.language = FrenchLanguageFactory()
         cls.a_superuser = SuperUserFactory()
         cls.person = PersonFactory(user=cls.a_superuser)
 
@@ -523,7 +525,7 @@ class LearningUnitViewTestCase(TestCase):
         response = self.client.get(reverse('learning_units'), data=filter_data)
 
         self.assertTemplateUsed(response, 'learning_unit/search/base.html')
-        self.assertEqual(len(response.context['page_obj']), 1)
+        self.assertEqual(len(response.context['page_obj']), 2)
 
     def test_learning_units_search_with_requirement_and_allocation_entity(self):
         self._prepare_context_learning_units_search()
@@ -658,35 +660,25 @@ class LearningUnitViewTestCase(TestCase):
 
     def _prepare_context_learning_units_search(self):
         # Create a structure [Entity / Entity version]
-        ssh_entity = EntityFactory(country=self.country)
-        ssh_entity_v = EntityVersionFactory(acronym="SSH", end_date=None, entity=ssh_entity)
+        ssh_entity_v = EntityVersionFactory(acronym="SSH", end_date=None, entity__country=self.country)
 
-        agro_entity = EntityFactory(country=self.country)
-        envi_entity = EntityFactory(country=self.country)
-        ages_entity = EntityFactory(country=self.country)
-        psp_entity = EntityFactory(country=self.country)
-        elog_entity = EntityFactory(country=self.country)
-        logo_entity = EntityFactory(country=self.country)
-        fsm_entity = EntityFactory(country=self.country)
-        agro_entity_v = EntityVersionFactory(entity=agro_entity, parent=ssh_entity_v.entity, acronym="AGRO",
+        agro_entity_v = EntityVersionFactory(entity__country=self.country, parent=ssh_entity_v.entity, acronym="AGRO",
                                              end_date=None)
-        envi_entity_v = EntityVersionFactory(entity=envi_entity, parent=agro_entity_v.entity, acronym="ENVI",
+        envi_entity_v = EntityVersionFactory(entity__country=self.country, parent=agro_entity_v.entity, acronym="ENVI",
                                              end_date=None)
-        ages_entity_v = EntityVersionFactory(entity=ages_entity, parent=agro_entity_v.entity, acronym="AGES",
+        ages_entity_v = EntityVersionFactory(entity__country=self.country, parent=agro_entity_v.entity, acronym="AGES",
                                              end_date=None)
-        psp_entity_v = EntityVersionFactory(entity=psp_entity, parent=ssh_entity_v.entity, acronym="PSP",
+        psp_entity_v = EntityVersionFactory(entity__country=self.country, parent=ssh_entity_v.entity, acronym="PSP",
                                             end_date=None, entity_type=entity_type.FACULTY)
-        fsm_entity_v = EntityVersionFactory(entity=fsm_entity, parent=ssh_entity_v.entity, acronym="FSM",
+        fsm_entity_v = EntityVersionFactory(entity__country=self.country, parent=ssh_entity_v.entity, acronym="FSM",
                                             end_date=None, entity_type=entity_type.FACULTY)
-        elog_entity_v = EntityVersionFactory(entity=elog_entity, parent=psp_entity_v.entity, acronym="ELOG",
+        elog_entity_v = EntityVersionFactory(entity__country=self.country, parent=psp_entity_v.entity, acronym="ELOG",
                                              end_date=None, entity_type=entity_type.INSTITUTE)
-        logo_entity_v = EntityVersionFactory(entity=logo_entity, parent=fsm_entity_v.entity, acronym="LOGO",
+        logo_entity_v = EntityVersionFactory(entity__country=self.country, parent=fsm_entity_v.entity, acronym="LOGO",
                                              end_date=None, entity_type=entity_type.INSTITUTE)
-        espo_entity = EntityFactory(country=self.country)
-        drt_entity = EntityFactory(country=self.country)
-        espo_entity_v = EntityVersionFactory(entity=espo_entity, parent=ssh_entity_v.entity, acronym="ESPO",
+        espo_entity_v = EntityVersionFactory(entity__country=self.country, parent=ssh_entity_v.entity, acronym="ESPO",
                                              end_date=None)
-        drt_entity_v = EntityVersionFactory(entity=drt_entity, parent=ssh_entity_v.entity, acronym="DRT",
+        drt_entity_v = EntityVersionFactory(entity__country=self.country, parent=ssh_entity_v.entity, acronym="DRT",
                                             end_date=None)
 
         # Create UE and put entity charge [AGRO]
@@ -838,8 +830,8 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_unit_specification(self):
         learning_unit_year = LearningUnitYearFactory()
-        fr = LanguageFactory(code='FR')
-        en = LanguageFactory(code='EN')
+        fr = FrenchLanguageFactory()
+        en = EnglishLanguageFactory()
         learning_unit_achievements_fr = LearningAchievementFactory(language=fr, learning_unit_year=learning_unit_year)
         learning_unit_achievements_en = LearningAchievementFactory(language=en, learning_unit_year=learning_unit_year)
 
@@ -1105,8 +1097,8 @@ class TestLearningUnitComponents(TestCase):
                           self.generated_container.generated_container_years[0].list_components)
 
             volumes = component['volumes']
-            self.assertEqual(volumes[VOLUME_Q1], None)
-            self.assertEqual(volumes[VOLUME_Q2], None)
+            self.assertEqual(volumes[VOLUME_Q1], 30)
+            self.assertEqual(volumes[VOLUME_Q2], 0)
 
     def test_tab_active_url(self):
         url = reverse("learning_unit_components", args=[self.learning_unit_year.id])
@@ -1129,9 +1121,13 @@ class TestLearningAchievements(TestCase):
             subtype=learning_unit_year_subtypes.FULL
         )
 
-        cls.code_languages = ["FR", "EN", "IT"]
-        for code_language in cls.code_languages:
-            language = LanguageFactory(code=code_language)
+        languages = [
+            FrenchLanguageFactory(),
+            EnglishLanguageFactory(),
+            LanguageFactory()
+        ]
+        cls.code_languages = [language.code for language in languages]
+        for language in languages:
             LearningAchievementFactory(language=language, learning_unit_year=cls.learning_unit_year)
 
     def test_get_achievements_group_by_language_no_achievement(self):
@@ -1353,10 +1349,22 @@ class TestLearningUnitProposalComparison(TestCase):
         self.learning_unit_year.learning_container_year.save()
         response = self.client.get(reverse(learning_unit_proposal_comparison, args=[self.learning_unit_year.pk]))
         self.assertEqual(response.context['components'][1][0], _("Practical exercises"))
-        self.assertEqual(response.context['components'][1][1][_('Volume total annual')], [20, 0])
-        self.assertEqual(response.context['components'][1][1][_('Planned classes')], [0, 1])
-        self.assertEqual(response.context['components'][1][1][_('Volume Q1')], [10, 0])
-        self.assertEqual(response.context['components'][1][1][_('Volume Q2')], [10, 0])
+        self.assertEqual(
+            response.context['components'][1][1][_('Volume total annual')],
+            [20, self.learning_component_year_practical.hourly_volume_total_annual]
+        )
+        self.assertEqual(
+            response.context['components'][1][1][_('Planned classes')],
+            [0, self.learning_component_year_practical.planned_classes]
+        )
+        self.assertEqual(
+            response.context['components'][1][1][_('Volume Q1')],
+            [10, self.learning_component_year_practical.hourly_volume_partial_q1]
+        )
+        self.assertEqual(
+            response.context['components'][1][1][_('Volume Q2')],
+            [10, self.learning_component_year_practical.hourly_volume_partial_q2]
+        )
 
     def test_learning_unit_comparison_whitout_previous_and_next(self):
         self.previous_learning_unit_year.delete()

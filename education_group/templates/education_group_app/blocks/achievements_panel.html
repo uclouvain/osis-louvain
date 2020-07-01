@@ -1,0 +1,139 @@
+{% load static %}
+{% load i18n format %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+
+<div class="panel-aims panel panel-default">
+    <div class="panel-heading">
+        <div class="row">
+             <div class="col-md-11">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% language 'fr-be' %}
+                            {% trans 'on successful completion of this program, each student is able to'|capfirst %} :
+                        {% endlanguage %}
+                    </div>
+                    <div class="col-md-6">
+                        {% language 'en' %}
+                            {% trans 'on successful completion of this program, each student is able to'|capfirst %} :
+                        {% endlanguage %}
+                    </div>
+                </div>
+             </div>
+             <div class="col-md-1">
+                <span class="glyphicon glyphicon-chevron-down collapse_span_updown pull-right"
+                      data-target="#body-achievements" data-toggle="collapse">
+                </span>
+            </div>
+        </div>
+    </div>
+    <div id="body-achievements" class="panel-body panel-collapse collapse in">
+        {% for achievement in achievements %}
+            <div class="row">
+                <div class="col-md-1">
+                    <strong>{{ achievement.code_name }}</strong>
+                    <span class="glyphicon glyphicon-chevron-right collapse_span pull-right"
+                        data-toggle="collapse" data-target="#detail_achievements_{{ forloop.counter }}">
+                    </span>
+                </div>
+                <div class="col-md-11">
+                    <div class="row" id="education_group_achievement_{{ forloop.counter }}">
+                        <div class="col-md-5">
+                            {{ achievement.text_fr | safe }}
+                        </div>
+                        <div class="col-md-5">
+                            {{ achievement.text_en | safe }}
+                        </div>
+
+                        <div class="col-md-2">
+                            {% if can_edit_information %}
+                                {# TODO: Fix URL for education group achievement  #}
+                                {% url "education_group_achievements_actions" node.pk node.pk achievement.pk as action_url %}
+                                {% url 'update_education_group_achievement' node.pk node.pk achievement.pk as update_url %}
+                                {% url 'delete_education_group_achievement' node.pk node.pk achievement.pk as delete_url %}
+                                {% include "education_group/blocks/form/achievement_action_bar.html" with obj=achievement %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <br>
+                    <!-- Detailed achievements -->
+                    <div id="detail_achievements_{{ forloop.counter }}" class="row collapse in"
+                        style="padding-left: 20px">
+                        {% for detail_achievement in achievement.detailed_achievements %}
+                             <div class="col-md-1">
+                                 <strong>{{ detail_achievement.code_name }}</strong>
+                             </div>
+                             <div class="col-md-11">
+                                <div class="row" id="education_group_detail_achievement_{{ forloop.counter }}">
+                                    <div class="col-md-5">
+                                        {{ detail_achievement.text_fr | safe }}
+                                    </div>
+
+                                    <div class="col-md-5">
+                                        {{ detail_achievement.text_en | safe }}
+                                    </div>
+
+                                    <div class="col-md-2">
+                                        {% if can_edit_information %}
+                                            {# TODO: Fix URL for detailed education group achievement  #}
+                                            {% url "education_group_detailed_achievements_actions" node.pk node.pk  achievement.pk detail_achievement.pk as action_url %}
+                                            {% url 'update_education_group_detailed_achievement' node.pk node.pk achievement.pk detail_achievement.pk as update_url %}
+                                            {% url 'delete_education_group_detailed_achievement' node.pk node.pk achievement.pk detail_achievement.pk as delete_url %}
+                                            {% include "education_group/blocks/form/achievement_action_bar.html" with obj=detail_achievement additional_class="btn-group-sm" %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                             </div>
+                        {% endfor %}
+                        {% if can_edit_information %}
+                            {# TODO: Fix URL for create detailed education group achievement  #}
+                            <button title="{% trans 'Create' %}" class="btn btn-default btn-sm trigger_modal"
+                                    data-url="{% url 'create_education_group_detailed_achievement' node.pk node.pk achievement.pk %}">
+                                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            <hr>
+        {% endfor %}
+         {% if can_edit_information %}
+             {# TODO: Fix URL for create education group achievement  #}
+            <button title="{% trans 'Create' %}" class="btn btn-default trigger_modal"
+                    data-url="{% url 'create_education_group_achievement' node.pk node.pk %}">
+                <span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            </button>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $('.collapse_span').on('click', function () {
+            $(this).toggleClass('glyphicon-chevron-right').toggleClass('glyphicon-chevron-down');
+        });
+    });
+</script>

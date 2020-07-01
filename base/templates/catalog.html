@@ -37,15 +37,11 @@
 <div class="panel panel-default">
     <div class="panel-body">
         <div class="row">
-            {%  if perms.base.can_access_education_group %}
+            {%  if perms.base.view_educationgroup %}
             <div class="col-md-1"><i class="fa fa-folder-open" style="font-size: 400%; color: #6699FF;"></i></div>
             <div class="col-md-5">
                 <h4 class="media-heading">
-                    {% flag "version_program" %}
-                        {% url 'version_program' as url_training %}
-                    {% else %}
-                        {% url 'education_groups' as url_training %}
-                    {% endflag %}
+                    {% url 'version_program' as url_training %}
                     <a href="{{url_training}}" id="lnk_education_groups">{% trans 'Trainings' %}</a>
                 </h4>
                 <p>{% trans 'Management of formations' %}</p>

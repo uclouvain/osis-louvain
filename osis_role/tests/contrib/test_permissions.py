@@ -31,7 +31,7 @@ from django.db.models import QuerySet
 from django.test import TestCase
 from rules import RuleSet
 
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from osis_role.contrib.permissions import ObjectPermissionBackend, _add_role_queryset_to_perms_context
 
@@ -106,3 +106,43 @@ class TestAddRoleQuerysetToRuleSet(TestCase):
 
         _add_role_queryset_to_perms_context(rule_set, 'perm_allowed', qs)
         self.assertTrue(rule_set.test_rule('perm_allowed', UserFactory()))
+
+    def test_ensure_perm_name_is_added_to_perms_context(self):
+        @rules.predicate(bind=True, name='ensure_role_qs_exist')
+        def ensure_perm_name_exist_fn(self, *args, **kwargs):
+            if not self.context['perm_name'] == 'perm_allowed':
+                raise Exception
+            return True
+
+        rule_set = RuleSet()
+        rule_set.add_rule('perm_allowed', ensure_perm_name_exist_fn)
+        _add_role_queryset_to_perms_context(rule_set, 'perm_allowed', QuerySet())
+        self.assertTrue(rule_set.test_rule('perm_allowed', UserFactory()))
+
+
+class TestHasModulePerms(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.group, _ = Group.objects.get_or_create(name="concrete_role")
+        cls.person = PersonWithPermissionsFactory(groups=[cls.group])
+        cls.mock_role_model = mock.Mock()
+        type(cls.mock_role_model).group_name = mock.PropertyMock(return_value=cls.group.name)
+        cls.module = 'module'
+        cls.mock_role_model.rule_set = mock.Mock(return_value=rules.RuleSet({cls.module+'.perm': rules.always_allow}))
+
+    def setUp(self):
+        patcher_role_manager = mock.patch("osis_role.role.role_manager", **{'roles': {self.mock_role_model}})
+        patcher_role_manager.start()
+        self.addCleanup(patcher_role_manager.stop)
+
+    def test_user_has_module_perms(self):
+        self.assertTrue(self.person.user.has_module_perms(self.module))
+
+    def test_user_has_not_module_perms(self):
+        self.assertFalse(self.person.user.has_module_perms('non_existing_module'))
+
+    @mock.patch('django.contrib.auth.backends.ModelBackend.has_module_perms')
+    def test_ensure_fallback_to_model_backend_has_module_perms_when_no_relevant_roles(self, mock_has_module_perms):
+        self.person.user.has_module_perms('non_existing_module')
+        self.assertTrue(mock_has_module_perms.called)

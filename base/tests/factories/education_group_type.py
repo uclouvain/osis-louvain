@@ -31,15 +31,30 @@ from factory.django import DjangoModelFactory
 from base.models.enums import education_group_categories, education_group_types
 
 
+def _external_id_generator(obj):
+    return "osis.education_group_type_{education_group_type}".format(
+        education_group_type=obj.name.lower().replace("_", "")
+    )
+
+
+def _is_learning_unit_child_allowed(obj):
+    types_for_which_learning_unit_child_is_allowed = (
+        education_group_types.GroupType.COMMON_CORE.name,
+        education_group_types.GroupType.COMPLEMENTARY_MODULE.name,
+        education_group_types.GroupType.SUB_GROUP.name
+    )
+    return obj.name in types_for_which_learning_unit_child_is_allowed
+
+
 class EducationGroupTypeFactory(DjangoModelFactory):
     class Meta:
         model = "base.EducationGroupType"
         django_get_or_create = ('name',)
 
-    external_id = factory.Sequence(lambda n: '10000000%02d' % n)
+    external_id = factory.lazy_attribute(_external_id_generator)
     category = education_group_categories.TRAINING
     name = factory.Iterator(education_group_types.TrainingType.choices(), getter=operator.itemgetter(0))
-    learning_unit_child_allowed = False
+    learning_unit_child_allowed = factory.lazy_attribute(_is_learning_unit_child_allowed)
 
     class Params:
         minitraining = factory.Trait(
@@ -51,6 +66,10 @@ class EducationGroupTypeFactory(DjangoModelFactory):
             category=education_group_categories.GROUP,
             name=factory.Iterator(education_group_types.GroupType.choices(), getter=operator.itemgetter(0))
         )
+
+
+class TrainingEducationGroupTypeFactory(EducationGroupTypeFactory):
+    pass
 
 
 class MiniTrainingEducationGroupTypeFactory(EducationGroupTypeFactory):

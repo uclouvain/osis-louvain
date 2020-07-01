@@ -38,3 +38,7 @@ class OrganizationFactory(factory.DjangoModelFactory):
     is_current_partner = True
 
     type = factory.Iterator(organization_type.ORGANIZATION_TYPE, getter=lambda c: c[0])
+
+
+class MainOrganizationFactory(OrganizationFactory):
+    type = organization_type.MAIN

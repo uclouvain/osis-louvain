@@ -36,6 +36,7 @@ from base.models.academic_year import AcademicYear
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.learning_unit_year import LearningUnitYear
+from education_group.models.group_year import GroupYear
 
 
 class EventPerm(ABC):
@@ -133,7 +134,7 @@ class EventPermOpened(EventPerm):
 
 
 class EventPermEducationGroupEdition(EventPerm):
-    model = EducationGroupYear
+    model = GroupYear
     event_reference = academic_calendar_type.EDUCATION_GROUP_EDITION
     error_msg = _("This education group is not editable during this period.")
 

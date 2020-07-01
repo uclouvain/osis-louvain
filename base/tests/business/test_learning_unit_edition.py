@@ -99,7 +99,7 @@ class TestLearningUnitEdition(TestCase, LearningUnitsMixin):
             container_type=learning_container_year_types.COURSE
         )
         cls.number_classes = 5
-        cls.entity_version = EntityVersionFactory(start_date=datetime.now(), end_date=datetime(3000, 1, 1))
+        cls.entity_version = EntityVersionFactory(start_date=datetime.now(), end_date=None)
         cls.entity = cls.entity_version.entity
 
     def test_edit_learning_unit_full_annual_end_date_gt_old_end_date_with_start_date_gt_now(self):

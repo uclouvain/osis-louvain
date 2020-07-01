@@ -26,7 +26,7 @@
 from django.test import SimpleTestCase
 
 from base.ddd.utils.business_validator import BusinessValidator
-from base.ddd.utils.validation_message import BusinessValidationMessage, MessageLevel
+from base.ddd.utils.validation_message import BusinessValidationMessage, MessageLevel, BusinessValidationMessageList
 
 
 class ValidatorTest(BusinessValidator):
@@ -56,10 +56,11 @@ class TestBusinessValidator(SimpleTestCase):
         expected_result = [
             BusinessValidationMessage("Error message", MessageLevel.ERROR),
             BusinessValidationMessage('Warning msg', MessageLevel.WARNING),
-            BusinessValidationMessage('Success msg', MessageLevel.SUCCESS)
         ]
         validator.is_valid()
         self.assertEqual(validator.messages, expected_result)
+        success_message = ValidatorTest.success_messages[0]
+        self.assertNotIn(success_message, validator.messages)
 
     def test_property_messages_when_no_success_messages_set(self):
         validator = ValidatorTest()
@@ -98,24 +99,24 @@ class TestBusinessValidator(SimpleTestCase):
         expected_result = [
             BusinessValidationMessage("Error message", MessageLevel.ERROR),
             BusinessValidationMessage('Warning msg', MessageLevel.WARNING),
-            BusinessValidationMessage('Success msg', MessageLevel.SUCCESS)
         ]
+        self.assertNotIn("Success msg", validator.messages, "Should only return warnings and success when is valid")
         self.assertEqual(validator.messages, expected_result, "Assert the validator doesn't add messages twice")
 
     def test_reset_messages_does_not_reset_success_message(self):
         validator = ValidatorTest()
-        initial_success_message = validator.success_messages[0]
+        initial_success_messages = list(validator.success_messages)
         validator._reset_messages()
         self.assertListEqual(
             validator.success_messages,
-            [initial_success_message],
+            initial_success_messages,
             "Success message is an attribute of the class ; it is a static value, it can't be removed."
         )
 
-    def test_add_message_when_arg_is_success_message(self):
+    def test_success_message_to_add_should_be_ignored(self):
         validator = ValidatorTest()
-        with self.assertRaises(AssertionError):
-            validator.add_message(BusinessValidationMessage("Success", MessageLevel.SUCCESS))
+        validator.add_message(BusinessValidationMessage("Success", MessageLevel.SUCCESS))
+        self.assertNotIn("Success", validator.messages)
 
     def test_add_message_when_arg_is_not_success_message(self):
         validator = ValidatorTest()
@@ -126,3 +127,50 @@ class TestBusinessValidator(SimpleTestCase):
         validator = ValidatorTest()
         validator.add_error_message("An error message")
         self.assertIn("An error message", validator.messages)
+
+    def test_add_success_message(self):
+        validator = ValidatorTest()
+        validator.add_success_message("test")
+        self.assertIn("test", validator.success_messages)
+
+    def test_add_warning_message(self):
+        validator = ValidatorTest()
+        validator.add_warning_message("warning msg test")
+        self.assertIn("warning msg test", validator.warning_messages)
+
+
+class TestBusinessValidationMessageList(SimpleTestCase):
+
+    def setUp(self):
+        self.error_message = BusinessValidationMessage("error message", MessageLevel.ERROR)
+        self.warning_message = BusinessValidationMessage("warning message", MessageLevel.WARNING)
+        self.success_message = BusinessValidationMessage("success message", MessageLevel.SUCCESS)
+        self.messages = [
+            self.error_message,
+            self.warning_message,
+            self.success_message,
+        ]
+
+    def test_contains_error_when_has_error(self):
+        message_list = BusinessValidationMessageList(messages=[self.error_message])
+        self.assertTrue(message_list.contains_errors())
+
+    def test_contains_error_when_has_warning(self):
+        message_list = BusinessValidationMessageList(messages=[self.warning_message])
+        self.assertFalse(message_list.contains_errors())
+
+    def test_contains_error_when_messages_is_empty(self):
+        message_list = BusinessValidationMessageList(messages=[])
+        self.assertFalse(message_list.contains_errors())
+
+    def test_errors_property(self):
+        message_list = BusinessValidationMessageList(messages=self.messages)
+        self.assertListEqual(message_list.errors, [self.error_message])
+
+    def test_warnings_property(self):
+        message_list = BusinessValidationMessageList(messages=self.messages)
+        self.assertListEqual(message_list.warnings, [self.warning_message])
+
+    def test_success_property(self):
+        message_list = BusinessValidationMessageList(messages=self.messages)
+        self.assertListEqual(message_list.success, [self.success_message])

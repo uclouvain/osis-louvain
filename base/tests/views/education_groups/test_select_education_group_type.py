@@ -72,13 +72,11 @@ class TestSelectEducationGroupTypeView(TestCase):
         cls.person = PersonFactory()
 
     def setUp(self):
-        self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch("base.business.education_groups.perms._is_eligible_to_add_education_group",
-                                       return_value=True)
+        self.perm_patcher = mock.patch("django.contrib.auth.models.User.has_perm", return_value=True)
         self.mocked_perm = self.perm_patcher.start()
+        self.addCleanup(self.perm_patcher.stop)
 
-    def tearDown(self):
-        self.perm_patcher.stop()
+        self.client.force_login(self.person.user)
 
     def test_get(self):
         response = self.client.get(

@@ -26,7 +26,7 @@
 import itertools
 from collections import namedtuple, defaultdict
 
-from django.db.models import QuerySet, Prefetch, Exists, OuterRef
+from django.db.models import QuerySet, Prefetch
 from django.utils.translation import gettext as _
 from openpyxl import Workbook
 from openpyxl.styles import Style, Border, Side, Color, PatternFill, Font
@@ -37,13 +37,14 @@ from openpyxl.writer.excel import save_virtual_workbook
 from backoffice.settings.base import LEARNING_UNIT_PORTAL_URL
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.prerequisite_operator import OR, AND
-from base.models.group_element_year import fetch_row_sql, GroupElementYear, get_all_group_elements_in_tree
+from base.models.group_element_year import GroupElementYear, fetch_row_sql
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.prerequisite import Prerequisite
 from base.models.prerequisite_item import PrerequisiteItem
 from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER_TITLES_KEY, WORKSHEET_TITLE_KEY, \
     STYLED_CELLS, STYLE_NO_GRAY
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
+from program_management.ddd.business_types import *
+from program_management.ddd.repositories import load_tree
 
 STYLE_BORDER_BOTTOM = Style(
     border=Border(
@@ -301,62 +302,23 @@ def _add_hyperlink(excel_lines, workbook: Workbook, year):
 class EducationGroupYearLearningUnitsIsPrerequisiteOfToExcel:
 
     def __init__(self, egy: EducationGroupYear):
-        self.egy = egy
-        self.hierarchy = EducationGroupHierarchy(root=self.egy)
-        self.learning_unit_years_parent = {}
-
-        for grp in self.hierarchy.included_group_element_years:
-            if not grp.child_leaf:
-                continue
-
-            self.learning_unit_years_parent.setdefault(grp.child_leaf.id, grp)
-
-    def get_queryset(self):
-        is_prerequisite = PrerequisiteItem.objects.filter(
-            learning_unit__learningunityear__id=OuterRef("child_leaf__id"),
-            prerequisite__education_group_year=self.egy.id,
-        )
-
-        return GroupElementYear.objects.all() \
-            .annotate(is_prerequisite=Exists(is_prerequisite)) \
-            .select_related('child_branch__academic_year',
-                            'child_branch__education_group_type',
-                            'child_branch__administration_entity',
-                            'child_branch__management_entity',
-                            'child_leaf__academic_year',
-                            'child_leaf__learning_container_year',
-                            'child_leaf__learning_container_year__requirement_entity',
-                            'child_leaf__learning_container_year__allocation_entity',
-                            'child_leaf__proposallearningunit',
-                            'child_leaf__externallearningunityear',
-                            'parent') \
-            .prefetch_related('child_branch__administration_entity__entityversion_set',
-                              'child_branch__management_entity__entityversion_set',
-                              'child_leaf__learning_container_year__requirement_entity__entityversion_set',
-                              'child_leaf__learning_container_year__allocation_entity__entityversion_set'
-                              ) \
-            .order_by("order", "parent__partial_acronym")
+        self.root = egy
 
     def _to_workbook(self):
-        return generate_ue_is_prerequisite_for_workbook(self.egy, self.get_queryset(), self.learning_unit_years_parent)
+        return generate_ue_is_prerequisite_for_workbook(self.root)
 
     def to_excel(self):
         return save_virtual_workbook(self._to_workbook())
 
 
-def generate_ue_is_prerequisite_for_workbook(egy: EducationGroupYear, prerequisites_qs: QuerySet,
-                                             learning_unit_years_parent):
-    worksheet_title = _("is_prerequisite_of-%(year)s-%(acronym)s") % {"year": egy.academic_year.year,
-                                                                      "acronym": egy.acronym}
+def generate_ue_is_prerequisite_for_workbook(root: EducationGroupYear):
+    worksheet_title = _("is_prerequisite_of-%(year)s-%(acronym)s") % {"year": root.academic_year.year,
+                                                                      "acronym": root.acronym}
     worksheet_title = clean_worksheet_title(worksheet_title)
     workbook = Workbook()
 
-    excel_lines = _build_excel_lines_prerequisited(
-        egy,
-        get_all_group_elements_in_tree(egy, prerequisites_qs) or {},
-        learning_unit_years_parent
-    )
-    return _get_workbook(egy, excel_lines, workbook, worksheet_title, 6)
+    excel_lines = _build_excel_lines_prerequisited(root)
+    return _get_workbook(root, excel_lines, workbook, worksheet_title, 6)
 
 
 def _get_workbook(egy, excel_lines, workbook, worksheet_title, end_column):
@@ -374,72 +336,44 @@ def _get_workbook(egy, excel_lines, workbook, worksheet_title, end_column):
     return workbook
 
 
-def _build_excel_lines_prerequisited(egy: EducationGroupYear, prerequisite_qs: QuerySet, learning_unit_years_parent):
-    content = _first_line_content(HeaderLinePrerequisiteOf(egy_acronym=egy.acronym,
-                                                           egy_title=egy.title,
+def _build_excel_lines_prerequisited(root: EducationGroupYear):
+    content = _first_line_content(HeaderLinePrerequisiteOf(egy_acronym=root.acronym,
+                                                           egy_title=root.title,
                                                            title_header=_('Title'),
                                                            credits_header=_('Cred. rel./abs.'),
                                                            block_header=_('Block'),
                                                            mandatory_header=_('Mandatory'))
                                   )
-
-    for gey in prerequisite_qs:
-        if gey.is_prerequisite:
-            luy = gey.child
+    tree = load_tree.load(root.id)
+    for child_node in tree.root_node.get_all_children_as_learning_unit_nodes():
+        if child_node.is_prerequisite:
             content.append(
-                LearningUnitYearLine(luy_acronym=luy.acronym, luy_title=luy.complete_title_i18n)
+                LearningUnitYearLine(luy_acronym=child_node.code, luy_title=child_node.title)
             )
-
-            results = PrerequisiteItem.objects.filter(learning_unit=luy.learning_unit)
-
             first = True
-
-            for result in results:
-                if result.prerequisite.learning_unit_year.academic_year == luy.academic_year \
-                        and result.prerequisite.education_group_year == egy:
+            for prerequisite_node in child_node.get_is_prerequisite_of():
+                if child_node.year == prerequisite_node.year:
                     prerequisite_line = _build_is_prerequisite_for_line(
-                        result.prerequisite.learning_unit_year,
+                        prerequisite_node,
                         first,
-                        learning_unit_years_parent
+                        tree
                     )
                     first = False
                     content.append(prerequisite_line)
     return content
 
 
-def _build_is_prerequisite_for_line(luy_item, first, learning_unit_years_parent):
+def _build_is_prerequisite_for_line(prerequisite_node: 'NodeLearningUnitYear', first, tree: 'ProgramTree'):
     text = (_("is a prerequisite of") + " :") if first else None
-
-    luy_acronym = luy_item.acronym
-    gey = learning_unit_years_parent.get(luy_item.id)
-
-    credits = _get_credits_prerequisite_of(luy_item, gey)
-    block = _get_blocks_prerequisite_of(gey)
+    first_link = tree.get_first_link_occurence_using_node(prerequisite_node)
     return PrerequisiteOfItemLine(
         text=text,
-        luy_acronym=luy_acronym,
-        luy_title=luy_item.complete_title_i18n,
-        credits=credits,
-        block=block,
-        mandatory=_("Yes") if gey.is_mandatory else _("No")
+        luy_acronym=prerequisite_node.code,
+        luy_title=prerequisite_node.title,
+        credits=first_link.relative_credits_repr,
+        block=first_link.block_repr,
+        mandatory=_("Yes") if first_link.is_mandatory else _("No")
     )
-
-
-def _get_credits_prerequisite_of(luy_item, gey):
-    if gey:
-        relative_credits = gey.relative_credits
-    else:
-        relative_credits = ''
-    return "{} / {:f}".format(relative_credits, luy_item.credits.to_integral_value())
-
-
-def _get_blocks_prerequisite_of(gey):
-    if gey:
-        block_in_array = [i for i in str(gey.block)]
-        return " ; ".join(
-            block_in_array
-        )
-    return ''
 
 
 def clean_worksheet_title(title):

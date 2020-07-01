@@ -26,7 +26,10 @@
 {% endcomment %}
 <ul class="nav nav-tabs" role="tablist">
     <li role="presentation"
-        {% if request.GET.tab_to_show == 'diplomas_certificates' and not show_diploma_tab or not request.GET.tab_to_show or request.GET.tab_to_show not in 'diplomas_certificates,content' %}class="active"{% endif %}>
+        {% if request.GET.tab_to_show == 'diplomas_certificates' and not show_diploma_tab or request.GET.tab_to_show == 'content' and not show_content_tab or not request.GET.tab_to_show or request.GET.tab_to_show not in 'diplomas_certificates,content' %}
+        class="active"
+        {% endif %}
+    >
         <a data-toggle="tab" href="#tab_identification" role="tab">
             {% trans 'Identification' %} <span id="spn_identification_errors" class="error"></span>
         </a>
@@ -41,7 +44,8 @@
         </li>
     {% endif %}
 
-    {% if education_group_year.pk and education_group_year.groupelementyear_set.count > 0 %}
+
+    {% if show_content_tab and education_group_year.pk and education_group_year.groupelementyear_set.count > 0 %}
         <li role="presentation"
             {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}class="active"{% endif %}>
             <a data-toggle="tab" href="#tab_content" role="tab" id="lnk_content">
@@ -53,7 +57,7 @@
 
 <div class="tab-content">
     <div id="tab_identification"
-         class="tab-pane {% if request.GET.tab_to_show == 'diplomas_certificates' and not show_diploma_tab or not request.GET.tab_to_show or request.GET.tab_to_show not in 'diplomas_certificates,content' %}active{% else %}fade{% endif %}">
+         class="tab-pane {% if request.GET.tab_to_show == 'diplomas_certificates' and not show_diploma_tab or request.GET.tab_to_show == 'content' and not show_content_tab or not request.GET.tab_to_show or request.GET.tab_to_show not in 'diplomas_certificates,content' %} active {% else %}fade{% endif %}">
         <div class="row">
             <div class="col-md-7">
                 <div class="panel panel-default">
@@ -212,7 +216,7 @@
         </div>
     {% endif %}
 
-    {% if education_group_year.pk and education_group_year.groupelementyear_set.count > 0 %}
+    {% if show_content_tab and education_group_year.pk and education_group_year.groupelementyear_set.count > 0 %}
         <div id="tab_content"
              class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}active{% else %}fade{% endif %}">
             {% include "education_group/blocks/form/training_tab_content.html" %}

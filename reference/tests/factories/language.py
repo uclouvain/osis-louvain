@@ -28,13 +28,28 @@ import string
 import factory.fuzzy
 from factory import DjangoModelFactory
 
+from testing.providers import Language
+
 
 class LanguageFactory(DjangoModelFactory):
     class Meta:
         model = 'reference.Language'
         django_get_or_create = ('code',)
+        exclude = ("_language", )
+
+    _language = factory.Faker("language")
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
-    code = factory.Sequence(lambda n: str(n))
-    name = factory.Sequence(lambda n: str(n))
+    code = factory.SelfAttribute("_language.code")
+    name = factory.SelfAttribute("_language.name")
     recognized = factory.Faker('boolean', chance_of_getting_true=50)
+
+
+class FrenchLanguageFactory(LanguageFactory):
+    code = "FR"
+    name = "Français"
+
+
+class EnglishLanguageFactory(LanguageFactory):
+    code = "EN"
+    name = "Anglais"

@@ -31,10 +31,11 @@ from django.views.generic.detail import SingleObjectMixin
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
 from base.models.education_group_year import EducationGroupYear
-from base.views.mixins import RulesRequiredMixin
+from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
+from education_group.views.proxy.read import Tab
 
 
-class EducationGroupAchievementMixin(RulesRequiredMixin, SingleObjectMixin):
+class EducationGroupAchievementMixin(SingleObjectMixin):
     # SingleObjectMixin
     model = EducationGroupAchievement
     context_object_name = "education_group_achievement"
@@ -42,13 +43,11 @@ class EducationGroupAchievementMixin(RulesRequiredMixin, SingleObjectMixin):
 
     def get_success_url(self):
         # Redirect to a page fragment
+        training_identity = TrainingIdentitySearch().get_from_education_group_year_id(self.kwargs['offer_id'])
         url = reverse(
-            "education_group_skills_achievements",
-            args=[
-                self.kwargs['root_id'],
-                self.kwargs['education_group_year_id'],
-            ]
-        )
+            'education_group_read_proxy',
+            args=[training_identity.year, training_identity.acronym]
+        ) + '?tab={}'.format(Tab.SKILLS_ACHIEVEMENTS)
 
         obj = getattr(self, "object", None) or self.get_object()
         if obj:
@@ -64,13 +63,6 @@ class EducationGroupAchievementMixin(RulesRequiredMixin, SingleObjectMixin):
     @cached_property
     def education_group_year(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
-
-    # RulesRequiredMixin
-    raise_exception = True
-
-    def _call_rule(self, rule):
-        """ Rules will be call with the person and the education_group_year"""
-        return rule(self.person, self.education_group_year)
 
 
 class EducationGroupDetailedAchievementMixin(EducationGroupAchievementMixin):

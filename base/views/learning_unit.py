@@ -36,6 +36,7 @@ from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _, get_language
 from django.views.decorators.http import require_http_methods
 
+import program_management.ddd.repositories.find_roots
 from base import models as mdl
 from base.business.learning_unit import get_cms_label_data, \
     get_same_container_year_components, CMS_LABEL_SPECIFICATIONS, get_achievements_group_by_language, \
@@ -79,13 +80,10 @@ def learning_unit_formations(request, learning_unit_year_id):
         "parent", "child_leaf", "parent__education_group_type"
     ).order_by('parent__partial_acronym')
     education_groups_years = [group_element_year.parent for group_element_year in group_elements_years]
-    formations_by_educ_group_year = mdl.group_element_year.find_learning_unit_roots(
+    formations_by_educ_group_year = program_management.ddd.repositories.find_roots.find_roots(
         education_groups_years,
-        return_result_params={
-            'parents_as_instances': True,
-            'with_parents_of_parents': True
-        },
-        luy=learn_unit_year
+        as_instances=True,
+        with_parents_of_parents=True
     )
     context['formations_by_educ_group_year'] = formations_by_educ_group_year
     context['group_elements_years'] = group_elements_years

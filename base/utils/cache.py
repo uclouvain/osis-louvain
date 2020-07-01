@@ -32,6 +32,8 @@ from django.conf import settings
 from django.core.cache import cache
 from django.http import QueryDict
 
+from osis_common.decorators.deprecated import deprecated
+
 CACHE_FILTER_TIMEOUT = None
 PREFIX_CACHE_KEY = 'cache_filter'
 
@@ -138,27 +140,31 @@ class ElementCache(OsisCache):
         COPY = "copy-action"
         CUT = "cut-action"
 
-    def __init__(self, user):
-        self.user = user
+    def __init__(self, user_id: int):
+        self.user_id = user_id
 
     @property
     def key(self):
-        return self.PREFIX_KEY.format(user=self.user.pk)
+        return self.PREFIX_KEY.format(user=self.user_id)
 
-    def equals(self, obj_to_compare):
+    def equals_element(self, element_code: str, element_year: int) -> bool:
         return (
             self.cached_data
-            and self.cached_data['id'] == obj_to_compare.id
-            and self.cached_data['modelname'] == obj_to_compare._meta.db_table
+            and self.cached_data['element_code'] == element_code
+            and self.cached_data['element_year'] == element_year
         )
 
     def save_element_selected(
             self,
-            obj,
-            source_link_id=None,
-            action: ElementCacheAction = ElementCacheAction.COPY.value
+            element_code: str,
+            element_year: int,
+            path_to_detach: str = None,
+            action: ElementCacheAction = ElementCacheAction.COPY
     ):
-        data_to_cache = {'id': obj.pk, 'modelname': obj._meta.db_table, 'action': action}
-        if source_link_id:
-            data_to_cache['source_link_id'] = source_link_id
+        data_to_cache = {
+            'element_code': element_code,
+            'element_year': element_year,
+            'path_to_detach': path_to_detach,
+            'action': action.value
+        }
         self.set_cached_data(data_to_cache)

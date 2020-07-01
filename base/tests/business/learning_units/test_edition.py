@@ -39,51 +39,43 @@ from base.models.enums import learning_component_year_type
 from base.models.enums import learning_unit_year_subtypes
 from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.learning_component_year import LearningComponentYear
-from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.learning_container_year import LearningContainerYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from reference.tests.factories.language import LanguageFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory, LearningUnitYearWithComponentsFactory
+from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 
 class LearningUnitEditionTestCase(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.academic_year = create_current_academic_year()
+        cls.academic_year = AcademicYearFactory(current=True)
         cls.next_academic_year = AcademicYearFactory(year=cls.academic_year.year + 1)
 
-        cls.learning_container_year = LearningContainerYearFactory(
-            academic_year=cls.academic_year,
-            common_title='common title',
-        )
-        cls.learning_unit_year = _create_learning_unit_year_with_components(cls.learning_container_year,
-                                                                            create_lecturing_component=True,
-                                                                            create_pratical_component=True)
-
         cls.entity_version = EntityVersionFactory(parent=None, end_date=None, acronym="DRT")
-        cls.entity_version.refresh_from_db()
-        cls.allocation_entity = _create_entity_container_with_components(
-            cls.learning_unit_year,
-            entity_container_year_link_type.ALLOCATION_ENTITY,
-            cls.entity_version.entity
+
+        cls.learning_unit_year = LearningUnitYearWithComponentsFactory(
+            academic_year=cls.academic_year,
+            language=EnglishLanguageFactory(),
+            learning_container_year__common_title="common title",
+            learning_container_year__requirement_entity=cls.entity_version.entity,
+            learning_container_year__additional_entity_1=EntityVersionFactory().entity,
+            lecturing_component__repartition_volume_requirement_entity=30,
+            lecturing_component__repartition_volume_additional_entity_1=10,
+            lecturing_component__hourly_volume_total_annual=40,
+            lecturing_component__hourly_volume_partial_q1=40,
+            lecturing_component__hourly_volume_partial_q2=0,
+            lecturing_component__planned_classes=1,
+            practical_component__repartition_volume_requirement_entity=10,
+            practical_component__repartition_volume_additional_entity_1=5,
+            practical_component__hourly_volume_total_annual=40,
+            practical_component__hourly_volume_partial_q1=40,
+            practical_component__hourly_volume_partial_q2=0,
+            practical_component__planned_classes=1,
         )
-        cls.requirement_entity = _create_entity_container_with_components(
-            cls.learning_unit_year,
-            entity_container_year_link_type.REQUIREMENT_ENTITY,
-            cls.entity_version.entity,
-            repartition_lecturing=Decimal(30),
-            repartition_practical_exercises=Decimal(10)
-        )
-        cls.add_requirement_entity_1 = _create_entity_container_with_components(
-            cls.learning_unit_year,
-            entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-            cls.entity_version.entity,
-            repartition_lecturing=Decimal(10),
-            repartition_practical_exercises=Decimal(5)
-        )
+        cls.learning_container_year = cls.learning_unit_year.learning_container_year
 
     def test_check_postponement_conflict_learning_unit_year_no_differences(self):
         # Copy the same learning unit + change academic year
@@ -156,7 +148,7 @@ class LearningUnitEditionTestCase(TestCase):
         # Copy the same learning unit year + change academic year, language
         another_learning_unit_year = _build_copy(self.learning_unit_year)
         another_learning_unit_year.academic_year = self.next_academic_year
-        another_learning_unit_year.language = LanguageFactory(code='FR', name='French')
+        another_learning_unit_year.language = FrenchLanguageFactory()
         another_learning_unit_year.save()
 
         error_list = business_edition._check_postponement_conflict_on_learning_unit_year(
@@ -274,25 +266,32 @@ class LearningUnitEditionTestCase(TestCase):
         self.assertIn(error_entity_not_exist, error_list)
 
     def test_check_postponement_conflict_entity_container_year_differences_found(self):
-        # Copy the same container and entities + change academic year
-        another_learning_container_year = _build_copy(self.learning_container_year)
-        another_learning_container_year.academic_year = self.next_academic_year
-
-        # Link to another entity for requirement
-        requirement_entity_version = EntityVersionFactory(parent=None, end_date=None, acronym="AREC")
-        requirement_entity_version.refresh_from_db()
-        another_learning_container_year.requirement_entity = requirement_entity_version.entity
-
-        another_learning_container_year.additional_entity_1 = None
-
-        another_learning_container_year.save()
+        next_year_learning_unit_year = LearningUnitYearWithComponentsFactory(
+            learning_unit=self.learning_unit_year.learning_unit,
+            learning_container_year__acronym=self.learning_unit_year.acronym,
+            acronym=self.learning_unit_year.acronym,
+            academic_year=self.next_academic_year,
+            lecturing_component__repartition_volume_requirement_entity=30,
+            lecturing_component__repartition_volume_additional_entity_1=10,
+            lecturing_component__hourly_volume_total_annual=40,
+            lecturing_component__hourly_volume_partial_q1=40,
+            lecturing_component__hourly_volume_partial_q2=0,
+            lecturing_component__planned_classes=1,
+            practical_component__repartition_volume_requirement_entity=10,
+            practical_component__repartition_volume_additional_entity_1=5,
+            practical_component__hourly_volume_total_annual=40,
+            practical_component__hourly_volume_partial_q1=40,
+            practical_component__hourly_volume_partial_q2=0,
+            practical_component__planned_classes=1,
+        )
 
         error_list = business_edition._check_postponement_conflict_on_entity_container_year(
-            self.learning_container_year, another_learning_container_year
+            self.learning_container_year,
+            next_year_learning_unit_year.learning_container_year
         )
 
         self.assertIsInstance(error_list, list)
-        self.assertEqual(len(error_list), 2)
+        self.assertEqual(len(error_list), 4)
 
         generic_error = "The value of field '%(field)s' is different between year %(year)s - %(value)s " \
                         "and year %(next_year)s - %(next_value)s"
@@ -300,9 +299,9 @@ class LearningUnitEditionTestCase(TestCase):
         error_requirement_entity = _(generic_error) % {
             'field': _(entity_container_year_link_type.REQUIREMENT_ENTITY.lower()),
             'year': self.learning_container_year.academic_year,
-            'value': self.requirement_entity.most_recent_acronym,
-            'next_year': another_learning_container_year.academic_year,
-            'next_value': requirement_entity_version.entity.most_recent_acronym
+            'value': self.learning_unit_year.learning_container_year.requirement_entity.most_recent_acronym,
+            'next_year': next_year_learning_unit_year.learning_container_year.academic_year,
+            'next_value': next_year_learning_unit_year.learning_container_year.requirement_entity.most_recent_acronym
         }
         self.assertIn(error_requirement_entity, error_list)
 
@@ -310,55 +309,61 @@ class LearningUnitEditionTestCase(TestCase):
         error_requirement_entity = _(generic_error) % {
             'field': _(entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1.lower()),
             'year': self.learning_container_year.academic_year,
-            'value': self.add_requirement_entity_1.most_recent_acronym,
-            'next_year': another_learning_container_year.academic_year,
+            'value': self.learning_container_year.additional_entity_1.most_recent_acronym,
+            'next_year': next_year_learning_unit_year.academic_year,
             'next_value': _('No data')
         }
         self.assertIn(error_requirement_entity, error_list)
 
     def test_check_postponement_conflict_on_volumes_case_no_diff(self):
-        # Copy the same container + change academic year
-        another_learning_container_year = _build_copy(self.learning_container_year)
-        another_learning_container_year.academic_year = self.next_academic_year
-        another_learning_container_year.save()
-
-        # Create LUY with components LECTURING / PRACTICAL EXERCICES + link to the same learning unit
-        another_learning_unit_year = _create_learning_unit_year_with_components(another_learning_container_year,
-                                                                                create_pratical_component=True,
-                                                                                create_lecturing_component=True)
-        another_learning_unit_year.learning_unit = self.learning_unit_year.learning_unit
-        another_learning_unit_year.save()
-
-        _create_entity_container_with_components(another_learning_unit_year,
-                                                 entity_container_year_link_type.ALLOCATION_ENTITY,
-                                                 self.allocation_entity)
-        _create_entity_container_with_components(another_learning_unit_year,
-                                                 entity_container_year_link_type.REQUIREMENT_ENTITY,
-                                                 self.requirement_entity,
-                                                 repartition_lecturing=30,
-                                                 repartition_practical_exercises=10)
-        _create_entity_container_with_components(another_learning_unit_year,
-                                                 entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                                                 self.add_requirement_entity_1,
-                                                 repartition_lecturing=10,
-                                                 repartition_practical_exercises=5)
-
-        error_list = business_edition._check_postponement_conflict_on_volumes(self.learning_container_year,
-                                                                              another_learning_container_year)
+        next_year_learning_unit_year = LearningUnitYearWithComponentsFactory(
+            learning_unit=self.learning_unit_year.learning_unit,
+            learning_container_year__acronym=self.learning_unit_year.acronym,
+            acronym=self.learning_unit_year.acronym,
+            academic_year=self.next_academic_year,
+            lecturing_component__repartition_volume_requirement_entity=30,
+            lecturing_component__repartition_volume_additional_entity_1=10,
+            lecturing_component__hourly_volume_total_annual=40,
+            lecturing_component__hourly_volume_partial_q1=40,
+            lecturing_component__hourly_volume_partial_q2=0,
+            lecturing_component__planned_classes=1,
+            practical_component__repartition_volume_requirement_entity=10,
+            practical_component__repartition_volume_additional_entity_1=5,
+            practical_component__hourly_volume_total_annual=40,
+            practical_component__hourly_volume_partial_q1=40,
+            practical_component__hourly_volume_partial_q2=0,
+            practical_component__planned_classes=1,
+        )
+        next_year_learning_container_year = next_year_learning_unit_year.learning_container_year
+        error_list = business_edition._check_postponement_conflict_on_volumes(
+            self.learning_container_year,
+            next_year_learning_container_year
+        )
         self.assertIsInstance(error_list, list)
         self.assertFalse(error_list)
 
     def test_check_postponement_conflict_on_volumes_multiples_differences(self):
-        # Copy the same container + change academic year
-        another_learning_container_year = _build_copy(self.learning_container_year)
-        another_learning_container_year.academic_year = self.next_academic_year
-        another_learning_container_year.save()
+        next_year_learning_unit_year = LearningUnitYearWithComponentsFactory(
+            learning_unit=self.learning_unit_year.learning_unit,
+            learning_container_year__acronym=self.learning_unit_year.acronym,
+            acronym=self.learning_unit_year.acronym,
+            academic_year=self.next_academic_year,
+            lecturing_component__hourly_volume_total_annual=Decimal(50),
+            lecturing_component__hourly_volume_partial_q1=Decimal(35),
+            lecturing_component__hourly_volume_partial_q2=Decimal(15),
+            lecturing_component__repartition_volume_requirement_entity=Decimal(30),
+            lecturing_component__repartition_volume_additional_entity_1=Decimal(20),
+            lecturing_component__planned_classes=1,
+            practical_component__hourly_volume_total_annual=Decimal(50),
+            practical_component__hourly_volume_partial_q1=Decimal(35),
+            practical_component__hourly_volume_partial_q2=Decimal(15),
+            practical_component__repartition_volume_requirement_entity=Decimal(10),
+            practical_component__repartition_volume_additional_entity_1=Decimal(10),
+            practical_component__planned_classes=1
 
-        # Create LUY with components LECTURING / PRACTICAL EXERCICES + link to the same learning unit
-        another_learning_unit_year = _create_learning_unit_year_with_components(another_learning_container_year,
-                                                                                create_pratical_component=True,
-                                                                                create_lecturing_component=True)
-        another_learning_unit_year.learning_unit = self.learning_unit_year.learning_unit
+        )
+        next_year_learning_container_year = next_year_learning_unit_year.learning_container_year
+
         LearningComponentYear.objects.filter(
             learning_unit_year=self.learning_unit_year
         ).update(
@@ -366,31 +371,11 @@ class LearningUnitEditionTestCase(TestCase):
             hourly_volume_partial_q1=Decimal(40),
             hourly_volume_partial_q2=Decimal(20)
         )
-        LearningComponentYear.objects.filter(
-            learning_unit_year=another_learning_unit_year
-        ).update(
-            hourly_volume_total_annual=Decimal(50),
-            hourly_volume_partial_q1=Decimal(35),
-            hourly_volume_partial_q2=Decimal(15)
+
+        error_list = business_edition._check_postponement_conflict_on_volumes(
+            self.learning_container_year,
+            next_year_learning_container_year
         )
-        another_learning_unit_year.save()
-
-        _create_entity_container_with_components(another_learning_unit_year,
-                                                 entity_container_year_link_type.ALLOCATION_ENTITY,
-                                                 self.allocation_entity)
-        _create_entity_container_with_components(another_learning_unit_year,
-                                                 entity_container_year_link_type.REQUIREMENT_ENTITY,
-                                                 self.requirement_entity,
-                                                 repartition_lecturing=Decimal(30),
-                                                 repartition_practical_exercises=Decimal(10))
-        _create_entity_container_with_components(another_learning_unit_year,
-                                                 entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                                                 self.add_requirement_entity_1,
-                                                 repartition_lecturing=Decimal(20),
-                                                 repartition_practical_exercises=Decimal(10))
-
-        error_list = business_edition._check_postponement_conflict_on_volumes(self.learning_container_year,
-                                                                              another_learning_container_year)
         self.assertIsInstance(error_list, list)
         self.assertEqual(len(error_list), 10)
 
@@ -407,12 +392,12 @@ class LearningUnitEditionTestCase(TestCase):
                                     "%(next_year)s - %(next_value)s") %
                                   {
                                       'field': COMPONENT_DETAILS[test.get('field')].lower(),
-                                      'acronym': another_learning_container_year.acronym,
+                                      'acronym': next_year_learning_container_year.acronym,
                                       'component_type': _(
                                           dict(COMPONENT_TYPES)[learning_component_year_type.LECTURING]),
                                       'year': self.learning_container_year.academic_year,
                                       'value': test.get('value'),
-                                      'next_year': another_learning_container_year.academic_year,
+                                      'next_year': next_year_learning_container_year.academic_year,
                                       'next_value': test.get('next_value'),
                                   })
                 self.assertIn(error_expected, error_list)
@@ -421,38 +406,31 @@ class LearningUnitEditionTestCase(TestCase):
         """ The goal of this test is to ensure that there is an error IF the learning unit year on current year have
            component LECTURING that the learning unit year on the next year doesn't have """
 
-        # Copy the same container + change academic year
-        another_learning_container_year = _build_copy(self.learning_container_year)
-        another_learning_container_year.academic_year = self.next_academic_year
-        another_learning_container_year.save()
+        next_year_learning_unit_year = LearningUnitYearWithComponentsFactory(
+            learning_unit=self.learning_unit_year.learning_unit,
+            learning_container_year__acronym=self.learning_unit_year.acronym,
+            acronym=self.learning_unit_year.acronym,
+            academic_year=self.next_academic_year,
+            lecturing_component=None,
+            practical_component__repartition_volume_requirement_entity=10,
+            practical_component__repartition_volume_additional_entity_1=5,
+            practical_component__hourly_volume_total_annual=40,
+            practical_component__hourly_volume_partial_q1=40,
+            practical_component__hourly_volume_partial_q2=0,
+            practical_component__planned_classes=1,
+        )
+        _delete_components(next_year_learning_unit_year, learning_component_year_type.LECTURING)
 
-        # Create LUY with components PRACTICAL EXERCICES + link to the same learning unit
-        another_learning_unit_year = _create_learning_unit_year_with_components(another_learning_container_year,
-                                                                                create_pratical_component=True,
-                                                                                create_lecturing_component=False)
-        another_learning_unit_year.learning_unit = self.learning_unit_year.learning_unit
-        another_learning_unit_year.save()
-
-        _create_entity_container_with_components(another_learning_unit_year,
-                                                 entity_container_year_link_type.ALLOCATION_ENTITY,
-                                                 self.allocation_entity)
-        _create_entity_container_with_components(another_learning_unit_year,
-                                                 entity_container_year_link_type.REQUIREMENT_ENTITY,
-                                                 self.requirement_entity,
-                                                 repartition_practical_exercises=10)
-        _create_entity_container_with_components(another_learning_unit_year,
-                                                 entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                                                 self.add_requirement_entity_1,
-                                                 repartition_practical_exercises=5)
-
-        error_list = business_edition._check_postponement_conflict_on_volumes(self.learning_container_year,
-                                                                              another_learning_container_year)
+        error_list = business_edition._check_postponement_conflict_on_volumes(
+            self.learning_container_year,
+            next_year_learning_unit_year.learning_container_year
+        )
         self.assertIsInstance(error_list, list)
         self.assertEqual(len(error_list), 1)
         error_expected = _("There is not %(component_type)s for the learning unit %(acronym)s - %(year)s but exist "
                            "in %(existing_year)s") % {
                              'component_type': _(learning_component_year_type.LECTURING),
-                             'acronym': self.learning_container_year.acronym,
+                             'acronym': self.learning_unit_year.acronym,
                              'year': self.next_academic_year,
                              'existing_year': self.learning_container_year.academic_year
                          }
@@ -461,44 +439,38 @@ class LearningUnitEditionTestCase(TestCase):
     def test_check_postponement_conflict_on_volumes_case_no_practical_exercise_component_current_year(self):
         """ The goal of this test is to ensure that there is an error IF the learning unit year on next year have
             component PRACTICAL EXERCISES that the learning unit year on the current year doesn't have """
+        next_year_learning_unit_year = LearningUnitYearWithComponentsFactory(
+            learning_unit=self.learning_unit_year.learning_unit,
+            learning_container_year__acronym=self.learning_unit_year.acronym,
+            acronym=self.learning_unit_year.acronym,
+            academic_year=self.next_academic_year,
+            lecturing_component__repartition_volume_requirement_entity=30,
+            lecturing_component__repartition_volume_additional_entity_1=10,
+            lecturing_component__hourly_volume_total_annual=40,
+            lecturing_component__hourly_volume_partial_q1=40,
+            lecturing_component__hourly_volume_partial_q2=0,
+            lecturing_component__planned_classes=1,
+            practical_component__repartition_volume_requirement_entity=10,
+            practical_component__repartition_volume_additional_entity_1=5,
+            practical_component__hourly_volume_total_annual=40,
+            practical_component__hourly_volume_partial_q1=40,
+            practical_component__hourly_volume_partial_q2=0,
+            practical_component__planned_classes=1,
+        )
+        next_year_learning_container_year = next_year_learning_unit_year.learning_container_year
 
-        # Copy the same container + change academic year
-        another_learning_container_year = _build_copy(self.learning_container_year)
-        another_learning_container_year.academic_year = self.next_academic_year
-        another_learning_container_year.save()
-
-        # Create LUY with components LECTURING / PRACTICAL EXERCISES + link to the same learning unit
-        another_learning_unit_year = _create_learning_unit_year_with_components(another_learning_container_year,
-                                                                                create_pratical_component=True,
-                                                                                create_lecturing_component=True)
-        another_learning_unit_year.learning_unit = self.learning_unit_year.learning_unit
-        another_learning_unit_year.save()
-
-        _create_entity_container_with_components(another_learning_unit_year,
-                                                 entity_container_year_link_type.ALLOCATION_ENTITY,
-                                                 self.allocation_entity)
-        _create_entity_container_with_components(another_learning_unit_year,
-                                                 entity_container_year_link_type.REQUIREMENT_ENTITY,
-                                                 self.requirement_entity,
-                                                 repartition_lecturing=30,
-                                                 repartition_practical_exercises=10)
-        _create_entity_container_with_components(another_learning_unit_year,
-                                                 entity_container_year_link_type.ADDITIONAL_REQUIREMENT_ENTITY_1,
-                                                 self.add_requirement_entity_1,
-                                                 repartition_lecturing=10,
-                                                 repartition_practical_exercises=5)
-
-        # REMOVE PRATICAL_EXERCICE component for current learning unit year
         _delete_components(self.learning_unit_year, learning_component_year_type.PRACTICAL_EXERCISES)
 
-        error_list = business_edition._check_postponement_conflict_on_volumes(self.learning_container_year,
-                                                                              another_learning_container_year)
+        error_list = business_edition._check_postponement_conflict_on_volumes(
+            self.learning_container_year,
+            next_year_learning_container_year
+        )
         self.assertIsInstance(error_list, list)
         self.assertEqual(len(error_list), 1)
         error_expected = _("There is not %(component_type)s for the learning unit %(acronym)s - %(year)s but exist "
                            "in %(existing_year)s") % {
                              'component_type': _(learning_component_year_type.PRACTICAL_EXERCISES),
-                             'acronym': self.learning_container_year.acronym,
+                             'acronym': self.learning_unit_year.acronym,
                              'year': self.learning_container_year.academic_year,
                              'existing_year': self.next_academic_year
                          }
@@ -549,7 +521,7 @@ def _create_learning_unit_year_with_components(l_container, create_lecturing_com
                                                create_pratical_component=True, subtype=None):
     if not subtype:
         subtype = learning_unit_year_subtypes.FULL
-    language = LanguageFactory(code='EN', name='English')
+    language = EnglishLanguageFactory()
     a_learning_unit_year = LearningUnitYearFactory(learning_container_year=l_container,
                                                    acronym=l_container.acronym,
                                                    academic_year=l_container.academic_year,

@@ -1,9 +1,9 @@
-{% extends "education_group/layout_detail.html" %}
+{% extends "education_group/../../../education_group/templates/education_group_app/blocks/layout_detail.html" %}
 {% load static getattr education_group format i18n %}
 
 {% block breadcrumb %}
     <li><a href="{% url 'catalog' %}" id="lnk_catalog">{% trans 'Formation catalogue' %}</a></li>
-    <li><a href="{% url 'education_groups' %}" id="lnk_formations">{% trans 'Trainings' %}</a></li>
+    <li><a href="{% url 'version_program' %}" id="lnk_formations">{% trans 'Trainings' %}</a></li>
     <li class="active">
         {{ learning_unit_year.acronym }}
     </li>

@@ -42,7 +42,7 @@ class TestCreateEducationGroupAchievement(TestCase):
         cls.education_group_year = EducationGroupYearFactory()
         cls.user = UserFactory()
         cls.person = PersonWithPermissionsFactory(
-            'can_access_education_group',
+            'view_educationgroup',
             'add_educationgroupachievement',
             user=cls.user
         )

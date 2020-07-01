@@ -34,13 +34,12 @@ function initializeDataTable(formId, tableId, storageKey, pageNumber, itemsPerPa
         },
         "info"  : false,
         "searching" : false,
-        'processing': true,
+        'processing': false,
         "language": {
             "oAria": {
                 "sSortAscending":  gettext("activate to sort column ascending"),
                 "sSortDescending": gettext("activate to sort column descending")
-            },
-            'processing': gettext("Loading...")
+            }
         }
     };
     return domTable.DataTable($.extend(true, {}, options, extra));

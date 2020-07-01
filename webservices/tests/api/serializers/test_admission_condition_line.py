@@ -41,7 +41,7 @@ class AdmissionConditionTextsSerializerTestCase(TestCase):
         common_egy = EducationGroupYearCommonMasterFactory(academic_year=egy.academic_year)
         AdmissionConditionFactory(education_group_year=common_egy)
         cls.serializer = AdmissionConditionTextsSerializer(cls.ac, context={
-            'lang': settings.LANGUAGE_CODE_EN,
+            'language': settings.LANGUAGE_CODE_EN,
             'section': 'personalized_access'
         })
 
@@ -58,7 +58,7 @@ class AdmissionConditionlineSerializerTestCase(TestCase):
     def setUpTestData(cls):
         cls.acl = AdmissionConditionLineFactory()
         cls.serializer = AdmissionConditionLineSerializer(cls.acl, context={
-            'lang': settings.LANGUAGE_CODE_EN,
+            'language': settings.LANGUAGE_CODE_EN,
         })
 
     def test_contains_expected_fields(self):

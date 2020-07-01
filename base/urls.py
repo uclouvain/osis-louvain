@@ -49,7 +49,7 @@ from base.views import learning_unit, offer, common, institution, organization, 
 from base.views import teaching_material
 from base.views.education_groups import urls as education_groups_urls
 from base.views.filter import filter_cities_by_country, filter_campus_by_city
-from base.views.learning_units.detail import DetailLearningUnitYearView
+from base.views.learning_units.detail import DetailLearningUnitYearView, DetailLearningUnitYearViewBySlug
 from base.views.learning_units.external import create as create_external
 from base.views.learning_units.pedagogy.publish import access_refreshed_publication
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
@@ -168,7 +168,7 @@ urlpatterns = [
             url(r'^filter_campus_by_city$', filter_campus_by_city, name="filter_campus_by_city"),
         ])),
         path("<str:code>/<int:year>/access_publication", access_refreshed_publication, name="access_publication"),
-
+        path('<str:acronym>/<int:year>', DetailLearningUnitYearViewBySlug.as_view(), name='learning_unit'),
         url(r'^(?P<learning_unit_year_id>[0-9]+)/', include([
             url(r'^$', DetailLearningUnitYearView.as_view(), name='learning_unit'),
             url(r'^formations/$', learning_unit.learning_unit_formations, name="learning_unit_formations"),

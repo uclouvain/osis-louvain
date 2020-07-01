@@ -46,7 +46,7 @@
                         {% trans 'Identification' %} <span id="spn_identification_errors" class="error"></span>
                     </a>
                 </li>
-                {% if education_group_year.pk and education_group_year.groupelementyear_set.count > 0 %}
+                {% if show_content_tab and education_group_year.pk and education_group_year.groupelementyear_set.count > 0 %}
                     <li role="presentation"
                         {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}class="active"{% endif %}>
                         <a data-toggle="tab" href="#tab_content" role="tab" id="lnk_content">
@@ -121,7 +121,7 @@
                         </div>
                     </div>
                 </div>
-                {% if education_group_year.pk and education_group_year.groupelementyear_set.count > 0 %}
+                {% if show_content_tab and education_group_year.pk and education_group_year.groupelementyear_set.count > 0 %}
                     <div id="tab_content"
                          class="tab-pane {% if request.GET.tab_to_show and request.GET.tab_to_show == 'content' %}active{% else %}fade{% endif %}">
                         {% include "education_group/blocks/form/training_tab_content.html" %}

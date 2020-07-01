@@ -51,7 +51,7 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, CentralManagerFactory
+from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from base.tests.factories.user import UserFactory, SuperUserFactory
@@ -68,7 +68,7 @@ class TestLearningUnitEditionView(TestCase, LearningUnitsMixin):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.user = UserFactory(username="YodaTheJediMaster")
-        cls.person = CentralManagerFactory(user=cls.user)
+        cls.person = CentralManagerForUEFactory(user=cls.user)
         cls.permission = Permission.objects.get(codename="can_edit_learningunit_date")
         cls.person.user.user_permissions.add(cls.permission)
         cls.setup_academic_years()
@@ -181,7 +181,7 @@ class TestEditLearningUnit(TestCase):
             campus=CampusFactory(organization=OrganizationFactory(type=organization_type.MAIN))
         )
 
-        person = CentralManagerFactory()
+        person = CentralManagerForUEFactory()
         PersonEntityFactory(
             entity=cls.requirement_entity.entity,
             person=person
@@ -316,7 +316,7 @@ class TestEditLearningUnit(TestCase):
         self.assertEqual(self.learning_unit_year.credits, credits)
         msg = [m.message for m in get_messages(response.wsgi_request)]
         msg_level = [m.level for m in get_messages(response.wsgi_request)]
-        self.assertEqual(msg[0], _('The learning unit has been updated (without report).'))
+        self.assertEqual(msg[0], _('The learning unit has been updated (with report).'))
         self.assertIn(messages.SUCCESS, msg_level)
 
     def test_valid_post_request_with_postponement(self):
@@ -414,9 +414,7 @@ class TestEditLearningUnit(TestCase):
 class TestLearningUnitVolumesManagement(TestCase):
     @classmethod
     def setUpTestData(cls):
-        start_year = AcademicYearFactory(year=get_current_year())
-        end_year = AcademicYearFactory(year=get_current_year() + 10)
-
+        start_year, end_year = AcademicYearFactory.produce_in_future(quantity=2)
         AcademicCalendarFactory(
             data_year=start_year,
             start_date=datetime.datetime(start_year.year - 2, 9, 15),
@@ -424,7 +422,7 @@ class TestLearningUnitVolumesManagement(TestCase):
             reference=LEARNING_UNIT_EDITION_FACULTY_MANAGERS
         )
 
-        cls.academic_years = GenerateAcademicYear(start_year=start_year, end_year=end_year)
+        cls.academic_years = [start_year, end_year]
         generate_learning_unit_edition_calendars(cls.academic_years)
 
         cls.generate_container = GenerateContainer(start_year=start_year, end_year=end_year)
@@ -434,7 +432,7 @@ class TestLearningUnitVolumesManagement(TestCase):
         cls.learning_unit_year = cls.generated_container_year.learning_unit_year_full
         cls.learning_unit_year_partim = cls.generated_container_year.learning_unit_year_partim
 
-        cls.person = CentralManagerFactory()
+        cls.person = CentralManagerForUEFactory()
 
         cls.url = reverse('learning_unit_volumes_management', kwargs={
             'learning_unit_year_id': cls.learning_unit_year.id,
@@ -459,27 +457,34 @@ class TestLearningUnitVolumesManagement(TestCase):
         edit_learning_unit_permission = Permission.objects.get(codename="can_edit_learningunit")
         self.person.user.user_permissions.add(edit_learning_unit_permission)
 
-    @mock.patch('base.models.program_manager.is_program_manager')
-    def test_learning_unit_volumes_management_get_full_form(self, mock_program_manager):
-        mock_program_manager.return_value = True
+    def test_should_redirect_to_login_view_when_user_not_logged(self):
+        self.client.logout()
+        response = self.client.post(self.url)
 
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    @mock.patch("base.business.learning_units.perms.is_eligible_for_modification", side_effect=lambda luy, pers: False)
+    def test_should_call_is_eligible_for_modification_permission_when_accessing_view(self, mock_permission):
+        response = self.client.post(self.url)
+
+        self.assertTrue(mock_permission.called)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+
+    def test_should_display_volumes_management_for_whole_family_when_form_type_is_full(self):
         response = self.client.get(self.url)
 
         self.assertTemplateUsed(response, 'learning_unit/volumes_management.html')
         self.assertEqual(response.context['learning_unit_year'], self.learning_unit_year)
-        for formset in response.context['formsets'].keys():
-            self.assertIn(formset, [self.learning_unit_year, self.learning_unit_year_partim])
-
-        # Check that we display only the current learning_unit_year in the volumes management page (not all the family)
-        self.assertListEqual(
-            response.context['learning_units'],
+        self.assertCountEqual(
+            list(response.context['formsets'].keys()),
+            [self.learning_unit_year, self.learning_unit_year_partim]
+        )
+        self.assertCountEqual(
+            response.context["learning_units"],
             [self.learning_unit_year, self.learning_unit_year_partim]
         )
 
-    @mock.patch('base.models.program_manager.is_program_manager')
-    def test_learning_unit_volumes_management_get_simple_form(self, mock_program_manager):
-        mock_program_manager.return_value = True
-
+    def test_should_display_volumes_management_only_for_current_learning_unit_when_form_type_is_simple(self):
         simple_url = reverse('learning_unit_volumes_management', kwargs={
             'learning_unit_year_id': self.learning_unit_year.id,
             'form_type': 'simple'
@@ -489,53 +494,43 @@ class TestLearningUnitVolumesManagement(TestCase):
 
         self.assertTemplateUsed(response, 'learning_unit/volumes_management.html')
         self.assertEqual(response.context['learning_unit_year'], self.learning_unit_year)
-        for formset in response.context['formsets'].keys():
-            self.assertIn(formset, [self.learning_unit_year, self.learning_unit_year_partim])
+        self.assertListEqual(list(response.context['formsets'].keys()), [self.learning_unit_year])
+        self.assertCountEqual(response.context["learning_units"], [self.learning_unit_year])
 
-        # Check that we display only the current learning_unit_year in the volumes management page (not all the family)
-        self.assertListEqual(response.context['learning_units'], [self.learning_unit_year])
-
-    @mock.patch('base.models.program_manager.is_program_manager')
-    def test_learning_unit_volumes_management_post_full_form(self, mock_program_manager):
-        mock_program_manager.return_value = True
-
+    def test_should_save_and_report_when_form_is_valid_and_form_type_is_full(self):
         self.data.update(self.partim_formset_data)
         response = self.client.post(self.url, data=self.data)
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.SUCCESS, msg_level)
+
+        msgs = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertListEqual(msgs, [_('The learning unit has been updated (with report).')])
         self.assertEqual(response.url, reverse(learning_unit_components, args=[self.learning_unit_year.id]))
 
         for gc in self.generate_container:
             self.check_postponement(gc.learning_component_cm_full)
 
-    @mock.patch('base.models.program_manager.is_program_manager')
-    def test_learning_unit_volumes_management_post_simple_form(self, mock_program_manager):
-        mock_program_manager.return_value = True
-
+    def test_should_save_and_report_when_form_is_valid_and_form_type_is_simple(self):
         self.data.update(self.partim_formset_data)
 
         response = self.client.post(
             reverse(
                 learning_unit_volumes_management,
-                kwargs={
-                    'learning_unit_year_id': self.learning_unit_year.id,
-                    'form_type': 'simple'
-                }
+                kwargs={'learning_unit_year_id': self.learning_unit_year.id, 'form_type': 'simple'}
             ),
             data=self.data
         )
 
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.SUCCESS, msg_level)
+        msgs = [m.message for m in get_messages(response.wsgi_request)]
+        self.assertListEqual(msgs, [_('The learning unit has been updated (with report).')])
         self.assertEqual(response.url, reverse("learning_unit", args=[self.learning_unit_year.id]))
 
         for generated_container_year in self.generate_container:
             learning_component_year = generated_container_year.learning_component_cm_full
             self.check_postponement(learning_component_year)
+
+    def test_should_set_tab_active_as_components_url_name_when_creating_context(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertEqual(response.context["tab_active"], 'learning_unit_components')
 
     def check_postponement(self, learning_component_year):
         learning_component_year.refresh_from_db()
@@ -544,76 +539,6 @@ class TestLearningUnitVolumesManagement(TestCase):
         self.assertEqual(learning_component_year.repartition_volume_requirement_entity, 1)
         self.assertEqual(learning_component_year.repartition_volume_additional_entity_1, 0.5)
         self.assertEqual(learning_component_year.repartition_volume_additional_entity_2, 0.5)
-
-    @mock.patch('base.models.program_manager.is_program_manager')
-    def test_learning_unit_volumes_management_post_wrong_data(self, mock_program_manager):
-        mock_program_manager.return_value = True
-
-        response = self.client.post(self.url, data=self.data)
-        # Volumes of partims can be greater than parent's
-        msg = [m.message for m in get_messages(response.wsgi_request)]
-        msg_level = [m.level for m in get_messages(response.wsgi_request)]
-        self.assertEqual(len(msg), 1)
-        self.assertIn(messages.SUCCESS, msg_level)
-
-    @mock.patch('base.models.program_manager.is_program_manager')
-    def test_learning_unit_volumes_management_post_wrong_data_ajax(self, mock_program_manager):
-        mock_program_manager.return_value = True
-
-        response = self.client.post(self.url, data=self.data, HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        # Volumes of partims can be greater than parent's
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-
-    def test_with_user_not_logged(self):
-        self.client.logout()
-        response = self.client.post(self.url)
-
-        self.assertRedirects(response, '/login/?next={}'.format(self.url))
-
-    def test_when_user_has_not_permission(self):
-        a_person = PersonFactory()
-        self.client.force_login(a_person.user)
-
-        response = self.client.post(self.url)
-
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, 'access_denied.html')
-
-    @mock.patch("base.business.learning_units.perms.is_eligible_for_modification", side_effect=lambda luy, pers: False)
-    def test_view_decorated_with_can_perform_learning_unit_modification_permission(self, mock_permission):
-        response = self.client.post(self.url)
-
-        self.assertTrue(mock_permission.called)
-
-        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
-        self.assertTemplateUsed(response, 'access_denied.html')
-
-    def test_get_learning_units_for_context(self):
-        self.assertListEqual(
-            _get_learning_units_for_context(self.learning_unit_year, with_family=True),
-            [self.learning_unit_year, self.learning_unit_year_partim]
-        )
-
-        self.assertListEqual(
-            _get_learning_units_for_context(self.learning_unit_year, with_family=False),
-            [self.learning_unit_year]
-        )
-
-    @mock.patch('base.models.program_manager.is_program_manager')
-    def test_tab_active_url(self, mock_program_manager):
-        mock_program_manager.return_value = True
-
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-        self.assertTrue("tab_active" in response.context)
-        self.assertEqual(response.context["tab_active"], 'learning_unit_components')
-
-        access_learning_unit_permission = Permission.objects.get(codename="can_access_learningunit")
-        self.person.user.user_permissions.add(access_learning_unit_permission)
-
-        url_tab_active = reverse(response.context["tab_active"], args=[self.learning_unit_year.id])
-        response = self.client.get(url_tab_active)
-        self.assertEqual(response.status_code, HttpResponse.status_code)
 
 
 class TestEntityAutocomplete(TestCase):

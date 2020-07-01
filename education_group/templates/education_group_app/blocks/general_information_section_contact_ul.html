@@ -1,0 +1,57 @@
+{% load i18n %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+
+<div class="list-group col-md-12">
+    {% for contact in contacts %}
+       <div class="list-group-item" style="border: none;">
+           <div class="col-md-8">
+               <strong class="list-group-item-heading">
+                  {% if contact.email %} {{ contact.email }} {% else %} {{ contact.description }} {% endif %}
+               </strong>
+               <div class="list-group-item-text">
+                     {% if contact.role_fr %} <div><em>(fr)</em> {{ contact.role_fr }} </div>{% endif %}
+                     {% if contact.role_en %} <div><em>(en)</em> {{ contact.role_en }} </div>{% endif %}
+               </div>
+           </div>
+
+           {% if can_edit_information %}
+                <div class="pull-right">
+                   {% url 'publication_contact_edit' root_id=root.pk education_group_year_id=education_group_year.pk publication_contact_id=contact.pk as update_url %}
+                   {% url 'publication_contact_delete' root_id=root.pk education_group_year_id=education_group_year.pk publication_contact_id=contact.pk as delete_url %}
+
+                   <a class="trigger_modal pull-right" style="margin-right: 15px;" data-url="{{ delete_url }}" title={% trans 'Delete' %}>
+                        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+                   </a>
+                   <a class="trigger_modal pull-right" style="margin-right: 10px;" data-url="{{ update_url }}" title={% trans 'Edit' %}>
+                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                   </a>
+                </div>
+            {% endif %}
+            <div class="clearfix"></div>
+       </div>
+    {% endfor %}
+</div>

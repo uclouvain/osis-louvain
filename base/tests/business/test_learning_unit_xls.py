@@ -36,7 +36,7 @@ from attribution.models.enums.function import Functions
 from attribution.tests.factories.attribution_charge_new import AttributionChargeNewFactory
 from attribution.tests.factories.attribution_new import AttributionNewFactory
 from base.business.learning_unit_xls import DEFAULT_LEGEND_STYLES, SPACES, PROPOSAL_LINE_STYLES, \
-    _get_significant_volume, prepare_proposal_legend_ws_data, _get_wrapped_cells, \
+    get_significant_volume, prepare_proposal_legend_ws_data, _get_wrapped_cells, \
     _get_colored_rows, _get_attribution_line, _add_training_data, \
     _get_data_part1, _get_parameters_configurable_list, WRAP_TEXT_STYLE, HEADER_PROGRAMS, XLS_DESCRIPTION, \
     _get_data_part2, annotate_qs, learning_unit_titles_part1, prepare_xls_content, _get_attribution_detail, \
@@ -254,9 +254,9 @@ class TestLearningUnitXls(TestCase):
         )
 
     def test_get_significant_volume(self):
-        self.assertEqual(_get_significant_volume(10), 10)
-        self.assertEqual(_get_significant_volume(None), '')
-        self.assertEqual(_get_significant_volume(0), '')
+        self.assertEqual(get_significant_volume(10), 10)
+        self.assertEqual(get_significant_volume(None), '')
+        self.assertEqual(get_significant_volume(0), '')
 
     def test_prepare_legend_ws_data(self):
         expected = {
@@ -430,13 +430,13 @@ class TestLearningUnitXls(TestCase):
             '',
             luy.get_periodicity_display(),
             yesno(luy.status),
-            _get_significant_volume(luy.pm_vol_tot or 0),
-            _get_significant_volume(luy.pm_vol_q1 or 0),
-            _get_significant_volume(luy.pm_vol_q2 or 0),
+            get_significant_volume(luy.pm_vol_tot or 0),
+            get_significant_volume(luy.pm_vol_q1 or 0),
+            get_significant_volume(luy.pm_vol_q2 or 0),
             luy.pm_classes or 0,
-            _get_significant_volume(luy.pp_vol_tot or 0),
-            _get_significant_volume(luy.pp_vol_q1 or 0),
-            _get_significant_volume(luy.pp_vol_q2 or 0),
+            get_significant_volume(luy.pp_vol_tot or 0),
+            get_significant_volume(luy.pp_vol_q1 or 0),
+            get_significant_volume(luy.pp_vol_q2 or 0),
             luy.pp_classes or 0,
             luy.get_quadrimester_display() or '',
             luy.get_session_display() or '',

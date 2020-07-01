@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import uuid
+
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -30,16 +32,18 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class DomainIscedAdmin(OsisModelAdmin):
-    list_display = ('code', 'title_fr', 'title_en',)
-    search_fields = ['code', 'title_fr', 'title_en']
+    list_display = ('code', 'title_fr', 'title_en', "uuid", 'is_ares')
+    search_fields = ['code', 'title_fr', 'title_en', "uuid"]
 
 
 class DomainIsced(models.Model):
     changed = models.DateTimeField(null=True, auto_now=True)
 
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
     code = models.CharField(max_length=10, unique=True)
     title_fr = models.CharField(max_length=255, db_index=True)
     title_en = models.CharField(max_length=255, db_index=True)
+    is_ares = models.BooleanField(default=True)
 
     def __str__(self):
         return '{} {}'.format(self.code, self.title_fr)

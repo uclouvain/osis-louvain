@@ -1,0 +1,149 @@
+{% load static %}
+{% load i18n bootstrap3 %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row">
+            <div id="academic_type" class="col-md-12">
+                {% bootstrap_label _("Academic type") label_class='d-block'%}
+                <p>{{ education_group_year.academic_type.value }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="duration" class="col-md-6">
+                {% bootstrap_label _("Duration") label_class='d-block'%}
+                <p>{{ education_group_year.duration }} {{ education_group_year.duration_unit.value }}</p>
+            </div>
+            <div id="internship" class="col-md-6">
+                {% bootstrap_label _("Stage") label_class='d-block'%}
+                <p>{{ education_group_year.internship.value | title }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="is_enrollment_enabled" class="col-md-6">
+                {% bootstrap_label _("Enrollment enabled") label_class='d-block'%}
+                <p>{{ education_group_year.is_enrollment_enabled | yesno | title }}</p>
+            </div>
+            <div id="has_online_re_registration" class="col-md-6">
+                {% bootstrap_label _("Web re-registration") label_class='d-block'%}
+                <p>{{ education_group_year.has_online_re_registration | yesno | title }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="has_partial_deliberation" class="col-md-6">
+                {% bootstrap_label _("Partial deliberation") label_class='d-block'%}
+                <p>{{ education_group_year.has_partial_deliberation | yesno | title }}</p>
+            </div>
+            <div id="has_admission_exam" class="col-md-6">
+                {% bootstrap_label _("Admission exam") label_class='d-block'%}
+                <p>{{ education_group_year.has_admission_exam | yesno | title }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="has_dissertation" class="col-md-12">
+                {% bootstrap_label _("Dissertation") label_class='d-block'%}
+                <p>{{ education_group_year.has_dissertation | yesno | title }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="produce_university_certificate" class="col-md-12">
+                {% bootstrap_label _("University certificate") label_class='d-block'%}
+                <p>{{ education_group_year.produce_university_certificate | yesno | title }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="decree_category" class="col-md-12">
+                {% bootstrap_label _("Decree category") label_class='d-block'%}
+                <p>{{ education_group_year.decree_category.name }} - {{ education_group_year.decree_category.value }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="rate_code" class="col-md-12">
+                {% bootstrap_label _("Rate code") label_class='d-block'%}
+                <p>{{ education_group_year.rate_code.value }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="main_language" class="col-md-12">
+                {% bootstrap_label _("Primary language") label_class='d-block'%}
+                <p>{{ education_group_year.main_language.name }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="english_activities" class="col-md-12">
+                {% bootstrap_label _("activities in English") label_class='d-block'%}
+                <p>{{ education_group_year.english_activities.value | title }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="other_language_activities" class="col-md-12">
+                {% bootstrap_label _("Other languages activities") label_class='d-block'%}
+                <p>{{ education_group_year.other_language_activities.value | title }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="main_domain" class="col-md-12">
+                {% bootstrap_label _("main domain") label_class='d-block'%}
+                <p>{{ education_group_year.main_domain }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="secondary_domains" class="col-md-12">
+                {% bootstrap_label _("secondary domains") label_class='d-block'%}
+                <br>
+                <ul>{{ education_group_year.secondary_domains | unordered_list }}</ul>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="isced_domain" class="col-md-12">
+                {% bootstrap_label _("ISCED domain") label_class='d-block'%}
+                <p>{{ education_group_year.isced_domain.code }} {{ education_group_year.isced_domain.title_fr }}</p>
+            </div>
+        </div>
+        <br>
+        <div class="row">
+            <div id="internal_comment" class="col-md-12">
+                {% bootstrap_label _("comment (internal)") label_class='d-block'%}
+                <p>{{ education_group_year.internal_comment }}</p>
+            </div>
+        </div>
+        <br>
+
+    </div>
+</div>

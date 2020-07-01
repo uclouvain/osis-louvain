@@ -27,13 +27,14 @@ from django.test import SimpleTestCase
 
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import TrainingType, GroupType
-from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipFactory
+from program_management.models.enums.node_type import NodeType
+from program_management.tests.ddd.factories.authorized_relationship import AuthorizedRelationshipObjectFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 
 
 class TestInit(SimpleTestCase):
     def test_normal_usage(self):
-        auth_relations = [AuthorizedRelationshipFactory()]
+        auth_relations = [AuthorizedRelationshipObjectFactory()]
         result = AuthorizedRelationshipList(auth_relations)
         self.assertEqual(auth_relations, result.authorized_relationships)
 
@@ -58,7 +59,7 @@ class TestInit(SimpleTestCase):
 class TestGetAuthorizedRelationship(SimpleTestCase):
 
     def setUp(self):
-        self.auth_relation = AuthorizedRelationshipFactory(
+        self.auth_relation = AuthorizedRelationshipObjectFactory(
             parent_type=TrainingType.BACHELOR, child_type=GroupType.COMMON_CORE
         )
         self.auth_relations = AuthorizedRelationshipList([self.auth_relation])
@@ -91,7 +92,7 @@ class TestGetAuthorizedRelationship(SimpleTestCase):
 class TestIsAuthorized(SimpleTestCase):
 
     def setUp(self):
-        self.auth_relation = AuthorizedRelationshipFactory(
+        self.auth_relation = AuthorizedRelationshipObjectFactory(
             parent_type=TrainingType.BACHELOR, child_type=GroupType.COMMON_CORE
         )
         self.auth_relations = AuthorizedRelationshipList([self.auth_relation])
@@ -112,7 +113,7 @@ class TestIsAuthorized(SimpleTestCase):
 class TestGetAuthorizedChildrenTypes(SimpleTestCase):
 
     def setUp(self):
-        self.auth_relation = AuthorizedRelationshipFactory(
+        self.auth_relation = AuthorizedRelationshipObjectFactory(
             parent_type=TrainingType.BACHELOR, child_type=GroupType.COMMON_CORE
         )
         self.auth_relations = AuthorizedRelationshipList([self.auth_relation])
@@ -129,6 +130,11 @@ class TestGetAuthorizedChildrenTypes(SimpleTestCase):
         result = self.auth_relations.get_authorized_children_types(parent_without_authorized_children.node_type)
         self.assertEqual(set(), result)
 
+    def test_when_child_type_unauthorized_is_learning_unit(self):
+        parent_without_authorized_children = NodeGroupYearFactory(node_type=NodeType.LEARNING_UNIT)
+        result = self.auth_relations.get_authorized_children_types(parent_without_authorized_children.node_type)
+        self.assertEqual(set(), result)
+
     def test_when_child_type_authorized(self):
         result = self.auth_relations.get_authorized_children_types(self.authorized_parent.node_type)
         expected_result = {
@@ -136,8 +142,20 @@ class TestGetAuthorizedChildrenTypes(SimpleTestCase):
         }
         self.assertSetEqual(expected_result, result)
 
+    def test_when_child_type_authorized_is_learning_unit(self):
+        another_authorized_relation = AuthorizedRelationshipObjectFactory(
+            parent_type=TrainingType.BACHELOR, child_type=NodeType.LEARNING_UNIT
+        )
+        authorized_relations = AuthorizedRelationshipList([another_authorized_relation])
+
+        result = authorized_relations.get_authorized_children_types(TrainingType.BACHELOR)
+        expected_result = {
+            NodeType.LEARNING_UNIT
+        }
+        self.assertSetEqual(expected_result, result)
+
     def test_when_multiple_children_authorized(self):
-        another_authorized_relation = AuthorizedRelationshipFactory(
+        another_authorized_relation = AuthorizedRelationshipObjectFactory(
             parent_type=TrainingType.BACHELOR, child_type=GroupType.SUB_GROUP
         )
         authorized_relations = AuthorizedRelationshipList([self.auth_relation, another_authorized_relation])

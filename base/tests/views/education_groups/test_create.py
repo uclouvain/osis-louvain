@@ -28,7 +28,7 @@ from unittest import mock
 
 from django.contrib import messages
 from django.core.exceptions import ValidationError
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
@@ -38,7 +38,7 @@ from base.forms.education_group.mini_training import MiniTrainingYearModelForm
 from base.forms.education_group.training import TrainingEducationGroupYearForm
 from base.models.enums import education_group_categories, organization_type, internship_presence
 from base.models.enums.active_status import ACTIVE
-from base.models.enums.education_group_categories import TRAINING, Categories
+from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.schedule_type import DAILY
 from base.models.exceptions import ValidationWarning
@@ -50,15 +50,16 @@ from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.organization import OrganizationFactory
-from base.tests.factories.person import PersonFactory, PersonWithPermissionsFactory
-from base.tests.factories.person_entity import PersonEntityFactory
+from base.tests.factories.person import PersonFactory
+from base.views.education_groups.create import PERMS_BY_CATEGORY
+from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from reference.tests.factories.language import LanguageFactory
 
 
 class TestCreateMixin(TestCase):
     @classmethod
     def setUpTestData(cls):
-        cls.current_academic_year = create_current_academic_year()
+        cls.current_academic_year = AcademicYearFactory(current=True)
         start_year = AcademicYearFactory(year=cls.current_academic_year.year + 1)
         end_year = AcademicYearFactory(year=cls.current_academic_year.year + 10)
         cls.generated_ac_years = GenerateAcademicYear(start_year, end_year)
@@ -79,7 +80,7 @@ class TestCreateMixin(TestCase):
         cls.entity_version = EntityVersionFactory(entity=cls.entity, entity_type=FACULTY, start_date=datetime.now())
         cls.language = LanguageFactory()
         cls.person = PersonFactory()
-        PersonEntityFactory(person=cls.person, entity=cls.entity)
+        CentralManagerFactory(person=cls.person, entity=cls.entity)
 
 
 @override_flag('education_group_create', active=True)
@@ -120,12 +121,9 @@ class TestCreate(TestCreateMixin):
 
     def setUp(self):
         self.client.force_login(self.person.user)
-        self.perm_patcher = mock.patch("base.business.education_groups.perms._is_eligible_to_add_education_group",
-                                       return_value=True)
+        self.perm_patcher = mock.patch("django.contrib.auth.models.User.has_perm", return_value=True)
         self.mocked_perm = self.perm_patcher.start()
-
-    def tearDown(self):
-        self.perm_patcher.stop()
+        self.addCleanup(self.perm_patcher.stop)
 
     def test_login_required(self):
         self.client.logout()
@@ -134,15 +132,11 @@ class TestCreate(TestCreateMixin):
                 response = self.client.get(url)
                 self.assertRedirects(response, '/login/?next={}'.format(url))
 
-    def test_permission_required(self):
+    def test_permission_required_case_user_have_perms(self):
         for category, url in self.urls_without_parent_by_category.items():
             with self.subTest(url=url):
-                education_group_type = next(eg_type for eg_type in self.education_group_types
-                                            if eg_type.category == category)
                 self.client.get(url)
-                self.mocked_perm.assert_called_with(self.person, None, Categories[category],
-                                                    education_group_type=education_group_type,
-                                                    raise_exception=True)
+                self.mocked_perm.assert_any_call(PERMS_BY_CATEGORY[category], None)
 
     def test_template_used(self):
         for category in self.test_categories:
@@ -162,32 +156,42 @@ class TestCreate(TestCreateMixin):
                 response = self.client.get(self.urls_with_parent_by_category.get(category))
                 self.assertTemplateUsed(response, self.expected_templates_by_category.get(category))
 
-    def test_response_context(self):
-        expected_forms_by_category = {
-            education_group_categories.GROUP: GroupYearModelForm,
-            education_group_categories.TRAINING: TrainingEducationGroupYearForm,
-            education_group_categories.MINI_TRAINING: MiniTrainingYearModelForm,
-        }
-        for category in self.test_categories:
-            with self.subTest(category=category):
-                response = self.client.get(self.urls_without_parent_by_category.get(category))
-                form_education_group_year = response.context["form_education_group_year"]
-                self.assertIsInstance(form_education_group_year, expected_forms_by_category.get(category))
-                if expected_forms_by_category.get(category) == education_group_categories.TRAINING:
-                    self.assertEqual(response.context["form_education_group_year"]["show_diploma_tab"], True)
-                else:
-                    self.assertFalse("show_diploma_tab" in response.context["form_education_group_year"])
+    def test_response_context_for_group(self):
+        url = self.urls_without_parent_by_category[education_group_categories.GROUP]
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertIsInstance(
+            response.context["form_education_group_year"],
+            GroupYearModelForm
+        )
+        self.assertFalse("show_diploma_tab" in response.context)
+
+    def test_response_context_for_training(self):
+        url = self.urls_without_parent_by_category[education_group_categories.TRAINING]
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertIsInstance(
+            response.context["form_education_group_year"],
+            TrainingEducationGroupYearForm
+        )
+        self.assertTrue(response.context["show_diploma_tab"])
+
+    def test_response_context_for_mini_training(self):
+        url = self.urls_without_parent_by_category[education_group_categories.MINI_TRAINING]
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertIsInstance(
+            response.context["form_education_group_year"],
+            MiniTrainingYearModelForm
+        )
+        self.assertFalse("show_diploma_tab" in response.context)
 
 
 @override_flag('education_group_create', active=True)
 class TestCreateForm(TestCreateMixin):
-    @classmethod
-    def setUpTestData(cls):
-        super().setUpTestData()
-        cls.perm_patcher = mock.patch("base.business.education_groups.perms._is_eligible_to_add_education_group",
-                                      return_value=True)
-        cls.mocked_perm = cls.perm_patcher.start()
-
     def setUp(self):
         self.client.force_login(self.person.user)
 
@@ -234,8 +238,7 @@ class TestValidateField(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory()
-
-        cls.person = PersonWithPermissionsFactory("add_educationgroup")
+        cls.person = PersonFactory()
         cls.url = reverse('validate_education_group_field', args=[TRAINING])
 
     def setUp(self):

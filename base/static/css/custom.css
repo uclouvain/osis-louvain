@@ -289,3 +289,8 @@ input[type="text"].ui-autocomplete-input:disabled ~ .results_on_deck .ui-icon {
     text-overflow: ellipsis;
     max-width: 160px;
 }
+
+.trigger_modal{
+    cursor: pointer;
+    text-decoration: none;
+}

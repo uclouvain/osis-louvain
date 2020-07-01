@@ -1,4 +1,4 @@
-{% extends "education_group/layout.html" %}
+{% extends "education_group_app/blocks/layout.html" %}
 {% load i18n %}
 {% load static bootstrap3 %}
 {% comment "License" %}
@@ -28,7 +28,7 @@
 {% block breadcrumb %}
     {{ block.super }}
     {% if parent %}
-        <li><a href="{% url 'education_group_read' parent.id parent.id %}"
+        <li><a href="{% url 'element_identification' year=parent.academic_year.year code=parent.partial_acronym %}"
                id="lnk_parent">{{ parent.partial_acronym }}</a></li>
     {% endif %}
     <li class="active">{% trans 'New Training' %}</li>

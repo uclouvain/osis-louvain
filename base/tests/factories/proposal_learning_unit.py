@@ -32,7 +32,7 @@ import factory.fuzzy
 from base.models.enums.proposal_state import ProposalState
 from base.models.enums.proposal_type import ProposalType
 from base.tests.factories.entity import EntityFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 
 
@@ -43,7 +43,7 @@ class ProposalLearningUnitFactory(factory.django.DjangoModelFactory):
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
-    learning_unit_year = factory.SubFactory(LearningUnitYearFakerFactory)
+    learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
     type = factory.Iterator(ProposalType.choices(), getter=operator.itemgetter(0))
     state = factory.Iterator(ProposalState.choices(), getter=operator.itemgetter(0))
     initial_data = {}

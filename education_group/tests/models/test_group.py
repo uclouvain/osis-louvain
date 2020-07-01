@@ -37,7 +37,7 @@ class TestGroup(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year_1 = AcademicYearFactory()
-        cls.academic_year_2 = AcademicYearFactory(year=cls.academic_year_1.year+3)
+        cls.academic_year_2 = AcademicYearFactory(year=cls.academic_year_1.year + 3)
 
     def test_most_recent_acronym_no_group_year(self):
         group = GroupFactory()

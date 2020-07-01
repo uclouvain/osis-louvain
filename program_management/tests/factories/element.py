@@ -28,7 +28,6 @@ import string
 
 import factory.fuzzy
 
-from base.tests.factories.education_group_year import EducationGroupYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
@@ -41,14 +40,10 @@ class ElementFactory(factory.DjangoModelFactory):
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))
 
-    education_group_year = None
     group_year = None
     learning_unit_year = None
     learning_class_year = None
-
-
-class ElementEducationGroupYearFactory(ElementFactory):
-    education_group_year = factory.SubFactory(EducationGroupYearFactory)
+    education_group_year = None
 
 
 class ElementGroupYearFactory(ElementFactory):

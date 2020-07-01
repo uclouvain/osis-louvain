@@ -6,10 +6,12 @@
 {% block navbar %}
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation">
-            <a class="trigger_modal" data-url="{% url "quick_search_education_group" root_id education_group_year_id%}">{% trans 'Trainings' %}</a>
+            <a id="link-quick-search-educationgroup" class="trigger_modal" data-url="{% url "quick_search_education_group" year %}?{{ request.GET.urlencode }}">
+                {% trans 'Trainings' %}
+            </a>
         </li>
         <li role="presentation" class="active">
-            <a href=#">{% trans 'Learning units' %}</a>
+            <a id="link-quick-search-learningunit" href=#">{% trans 'Learning units' %}</a>
         </li>
     </ul>
 {% endblock navbar %}
@@ -46,8 +48,9 @@
                     input.type = 'checkbox';
                     input.name = 'selected-item';
                     input.value = data;
-                    // FIXME Use uuid in the future when implemented in place of data-url
                     input.setAttribute('data-url', row['osis_url']);
+                    input.setAttribute('data-code', row['acronym']);
+                    input.setAttribute('data-year', row['academic_year']);
                     input.setAttribute('data-name', `${row['academic_year']} - ${row['acronym']}`);
                     return input.outerHTML;
                 }
