@@ -127,6 +127,17 @@ class TestCreateInitialGroupElementYearStructure(TestCase):
         self.assertEqual(child_egy.acronym, expected_acronym)
         self.assertTrue(child_egy.id)
 
+    def test_should_truncate_acronym_when_surpassing_limit_fixed_by_acronym_field(self):
+        self.egy.acronym = "THIS iS WAY TOO BIG FOR AN ACRONYM HAHA"
+        self.egy.save()
+
+        child_egy = create_initial_group_element_year_structure([self.egy])[self.egy.id][0].child_branch
+        expected_acronym = "{}{}".format(
+            self.validation_rule_title.initial_value.replace(" ", "").upper(),
+            self.egy.acronym
+        )[:EducationGroupYear._meta.get_field("acronym").max_length]
+        self.assertEqual(child_egy.acronym, expected_acronym)
+
     def test_education_group_year_children_attribute_empty_partial_acronym(self):
         """ Check if the app can handle an empty partial acronym
         TODO : Remove that test when the db will be cleaned.

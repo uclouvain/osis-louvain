@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-16 13:52+0100\n"
+"POT-Creation-Date: 2020-06-25 13:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -181,6 +181,9 @@ msgstr "Double encodage"
 msgid "Download the Excel file"
 msgstr "Télécharger le fichier Excel"
 
+msgid "Educational tutor"
+msgstr "Accompagnateur"
+
 msgid "Email"
 msgstr "Courriel"
 
@@ -207,6 +210,9 @@ msgstr "Entité"
 
 msgid "Evaluations"
 msgstr "Evaluations"
+
+msgid "Extra time (33% generally)"
+msgstr "Tiers-Temps"
 
 msgid "Fax"
 msgstr "Fax"
@@ -266,6 +272,9 @@ msgstr "Absence justifiée"
 
 msgid "LU code"
 msgstr "Code de l'UE"
+
+msgid "Large print"
+msgstr "Copie adaptée"
 
 msgid "Last synchronization"
 msgstr "Dernière synchronisation"
@@ -356,6 +365,9 @@ msgstr "Encodage en ligne"
 
 msgid "Online scores encoding"
 msgstr "Encodage en ligne des notes"
+
+msgid "Other educational facilities"
+msgstr "Autre aménagement"
 
 msgid "Other tutors"
 msgstr "Autres enseignants"
@@ -518,6 +530,9 @@ msgstr "Session"
 msgid "Session number"
 msgstr "Numéro de session"
 
+msgid "Specific room of examination"
+msgstr "Local spécifique"
+
 msgid "State"
 msgstr "Etat"
 
@@ -603,6 +618,9 @@ msgstr "Tuteurs du cours"
 
 msgid "Type"
 msgstr "Type"
+
+msgid "Type of specific profile"
+msgstr "Type PEPS"
 
 msgid "Type of training"
 msgstr "Type de formation"

@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ from osis_role.contrib.views import PermissionRequiredMixin
 class DeleteGroupEducationView(PermissionRequiredMixin, DeleteViewWithDependencies):
     # DeleteView
     model = EducationGroupYear
-    success_url = reverse_lazy('education_groups')
+    success_url = reverse_lazy('version_program')
     pk_url_kwarg = "education_group_year_id"
     template_name = "education_group/delete.html"
     context_object_name = "education_group"

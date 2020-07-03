@@ -178,6 +178,8 @@ class FilterTrainingTestCase(APITestCase):
     def setUpTestData(cls):
         cls.user = UserFactory()
         cls.url = reverse('education_group_api_v1:training-list')
+        cls.offers_by_year = {}
+        cls.standards_by_year = {}
         for year in [2018, 2019, 2020]:
             academic_year = AcademicYearFactory(year=year)
             offer1 = TrainingFactory(acronym='BIR1BA', partial_acronym='LBIR1000I', academic_year=academic_year)
@@ -186,9 +188,11 @@ class FilterTrainingTestCase(APITestCase):
             group1 = GroupYearFactory(partial_acronym=offer1.partial_acronym, academic_year=offer1.academic_year)
             group2 = GroupYearFactory(partial_acronym=offer2.partial_acronym, academic_year=offer2.academic_year)
             group3 = GroupYearFactory(partial_acronym=offer3.partial_acronym, academic_year=offer3.academic_year)
-            StandardEducationGroupVersionFactory(offer=offer1, root_group=group1)
-            StandardEducationGroupVersionFactory(offer=offer2, root_group=group2)
-            StandardEducationGroupVersionFactory(offer=offer3, root_group=group3)
+            standard1 = StandardEducationGroupVersionFactory(offer=offer1, root_group=group1)
+            standard2 = StandardEducationGroupVersionFactory(offer=offer2, root_group=group2)
+            standard3 = StandardEducationGroupVersionFactory(offer=offer3, root_group=group3)
+            cls.offers_by_year[year] = [offer1, offer2, offer3]
+            cls.standards_by_year[year] = [standard1, standard2, standard3]
         StandardTransitionEducationGroupVersionFactory()
 
     def setUp(self):
@@ -290,12 +294,35 @@ class FilterTrainingTestCase(APITestCase):
         )
         self.assertEqual(response.data['results'], serializer.data)
 
+    def test_get_training_case_filter_campus(self):
+        query_string = {'campus': self.offers_by_year[2018][2].main_teaching_campus.name}
+
+        response = self.client.get(self.url, data=query_string)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        serializer = TrainingListSerializer(
+            [self.standards_by_year[2018][2]],
+            many=True,
+            context={'request': RequestFactory().get(self.url, query_string)},
+        )
+        self.assertEqual(response.data['results'], serializer.data)
+
+    def test_get_filter_by_multiple_education_group_type(self):
+        """
+        This test ensure that multiple filtering by education_group_type will act as an OR
+        """
+        data = {'education_group_type': [training.education_group_type.name for training in self.offers_by_year[2018]]}
+
+        response = self.client.get(self.url, data=data)
+
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertEqual(response.data['count'], 3)
+
     def test_get_training_case_filter_lowercase_acronym(self):
         query_string = {'acronym': 'agro1ba'}
 
         response = self.client.get(self.url, data=query_string)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
         versions = EducationGroupVersion.objects.filter(
             offer__education_group_type__category=education_group_categories.TRAINING,
             offer__acronym__icontains='agro1ba'

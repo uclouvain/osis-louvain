@@ -82,7 +82,7 @@
                             </td>
                             <td style="width:6%">
                                 <div class="btn-group pull-right" role="group" aria-label="actions">
-                                    {# TODO: ADD ACTION UP/DOWN/ DELETE  with service DDD (PATH + perms)  #}
+                                    {% include "education_group_app/blocks/content_actions.html" with up_disabled=forloop.first down_disabled=forloop.last%}
                                 </div>
                             </td>
                         </tr>

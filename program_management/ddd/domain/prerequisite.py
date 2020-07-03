@@ -23,7 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import List, Set
 import re
 from typing import List
 
@@ -129,6 +128,9 @@ class Prerequisite:
         return str(" " + _(self.main_operator) + " ").join(
             _format_group(group).format(group) for group in self.prerequisite_item_groups
         )
+
+    def secondary_operator(self):
+        return OR if self.main_operator == AND else AND
 
 
 class NullPrerequisite(Prerequisite):

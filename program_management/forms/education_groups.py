@@ -125,7 +125,7 @@ class GroupFilter(FilterSet):
             ('acronym', 'acronym'),
             ('partial_acronym', 'code'),
             ('academic_year__year', 'academic_year'),
-            ('title_fr', 'title_fr'),
+            ('title', 'title'),
             ('type_ordering', 'type'),
             ('entity_management_version', 'management_entity')
         ),

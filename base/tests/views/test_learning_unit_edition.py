@@ -552,7 +552,8 @@ class TestEntityAutocomplete(TestCase):
             start_date=today.replace(year=1900),
             end_date=None,
             acronym="DRT",
-            entity__organization__type=ACADEMIC_PARTNER
+            entity__organization__type=ACADEMIC_PARTNER,
+            parent=None,
         )
 
     def setUp(self):
@@ -592,6 +593,7 @@ class TestEntityAutocomplete(TestCase):
                 title="{} title".format(letter),
                 entity__organization__type=ACADEMIC_PARTNER,
                 entity__country=country,
+                parent=None,
             )
         response = self.client.get(
             self.url, data={'forward': '{"country": "%s"}' % country.id}

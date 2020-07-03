@@ -5,16 +5,16 @@ from base.models.utils.utils import ChoiceEnum
 
 class PepsTypes(ChoiceEnum):
     NOT_DEFINED = _('Not defined')
-    DISABILITY = _('Disability')
+    DISABILITY = _('DDI')
     SPORT = _('Sport')
     ARTIST = _('Artist')
     ENTREPRENEUR = _('Entrepreneur')
-    ARRANGEMENT_JURY = _('Arrangement Jury')
+    ARRANGEMENT_JURY = _('Educational facilities accepted by Jury')
 
 
 class HtmSubtypes(ChoiceEnum):
     REDUCED_MOBILITY = _('Person with reduced mobility')
-    OTHER_DISABILITY = _('Other disability')
+    OTHER_DISABILITY = _('Other special needs')
 
 
 class SportSubtypes(ChoiceEnum):

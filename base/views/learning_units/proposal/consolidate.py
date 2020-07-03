@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django import http
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import ERROR
 from django.core.exceptions import PermissionDenied
@@ -42,7 +43,7 @@ from base.views.common import display_error_messages, display_messages_by_level
 @waffle_flag('learning_unit_proposal_delete')
 @login_required
 @require_POST
-def consolidate_proposal(request, learning_unit_year_id):
+def consolidate_proposal(request: http.HttpRequest, learning_unit_year_id: int):
     proposal = get_object_or_404(ProposalLearningUnit, learning_unit_year__id=learning_unit_year_id)
     user_person = get_object_or_404(Person, user=request.user)
 

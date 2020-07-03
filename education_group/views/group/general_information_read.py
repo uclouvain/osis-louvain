@@ -37,7 +37,7 @@ class GroupReadGeneralInformation(GroupRead):
     def get(self, request, *args, **kwargs):
         result = super().get(request, *args, **kwargs)
         if not self.have_general_information_tab():
-            return redirect(reverse('group_identification', kwargs=self.kwargs) + "?path={}".format(self.path))
+            return redirect(reverse('group_identification', kwargs=self.kwargs) + "?path={}".format(self.get_path()))
         return result
 
     def get_context_data(self, **kwargs):
@@ -54,8 +54,8 @@ class GroupReadGeneralInformation(GroupRead):
 
     def get_update_label_url(self):
         group_id = self.get_group_year().pk
-        return reverse('education_group_pedagogy_edit', args=[group_id, group_id]) + "?path={}".format(self.path)
+        return reverse('education_group_pedagogy_edit', args=[group_id, group_id]) + "?path={}".format(self.get_path())
 
     def get_publish_url(self):
         node = self.get_object()
-        return reverse('publish_general_information', args=[node.year, node.code]) + "?path={}".format(self.path)
+        return reverse('publish_general_information', args=[node.year, node.code]) + "?path={}".format(self.get_path())

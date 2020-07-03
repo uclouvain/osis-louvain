@@ -30,21 +30,25 @@ from django.http import HttpResponseForbidden, HttpResponse, HttpResponseNotFoun
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from education_group.ddd.domain.training import Training
 from program_management.ddd.domain.node import NodeGroupYear
 from program_management.forms.custom_xls import CustomXlsForm
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import EducationGroupVersionFactory, \
+    StandardEducationGroupVersionFactory, ParticularTransitionEducationGroupVersionFactory, \
+    StandardTransitionEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
+from education_group.views.training.common_read import Tab
 
 
 class TestTrainingReadIdentification(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
-        cls.training_version = EducationGroupVersionFactory(
+        cls.training_version = StandardEducationGroupVersionFactory(
             offer__acronym="DROI2M",
             offer__partial_acronym="LDROI200M",
             offer__academic_year__year=2019,
@@ -54,13 +58,13 @@ class TestTrainingReadIdentification(TestCase):
             root_group__academic_year__year=2019,
             root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
         )
-        ElementGroupYearFactory(group_year=cls.training_version.root_group)
+        cls.root_group_element = ElementGroupYearFactory(group_year=cls.training_version.root_group)
         cls.url = reverse('training_identification', kwargs={'year': 2019, 'code': 'LDROI200M'})
         cls._build_education_group_versions()
 
     @classmethod
     def _build_education_group_versions(cls):
-        cls.training_version_standard = EducationGroupVersionFactory(
+        cls.training_version_standard = StandardEducationGroupVersionFactory(
             offer__acronym="CRIM2M",
             offer__partial_acronym="LCRIM200M",
             offer__academic_year__year=2019,
@@ -70,7 +74,7 @@ class TestTrainingReadIdentification(TestCase):
             version_name=''
         )
         ElementGroupYearFactory(group_year=cls.training_version_standard.root_group)
-        cls.training_version_standard_transition = EducationGroupVersionFactory(
+        cls.training_version_standard_transition = StandardTransitionEducationGroupVersionFactory(
             offer__acronym="CRIM2M",
             offer__partial_acronym="LCRIM200M",
             offer__academic_year__year=2019,
@@ -252,3 +256,71 @@ class TestTrainingReadIdentification(TestCase):
         self.assertEqual(particular_b.version_name,
                          'CRIM2MB')
         self.assertFalse(particular_b.is_transition)
+
+    def test_assert_create_urls_correctly_computed(self):
+        path = "{}".format(self.root_group_element.pk)
+        expected_create_group_url = reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
+            "?path_to={}".format(path)
+        expected_create_training_url = reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
+            "?path_to={}".format(path)
+        expected_create_mini_training_url = reverse('create_element_select_type',
+                                                    kwargs={'category': Categories.MINI_TRAINING.name}) + \
+            "?path_to={}".format(path)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.context['create_group_url'], expected_create_group_url)
+        self.assertEqual(response.context['create_training_url'], expected_create_training_url)
+        self.assertEqual(response.context['create_mini_training_url'], expected_create_mini_training_url)
+
+
+class TestTrainingReadIdentificationTabs(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonWithPermissionsFactory('view_educationgroup')
+        cls.training_standard = StandardEducationGroupVersionFactory(
+            offer__acronym="CRIM2M",
+            offer__partial_acronym="LCRIM200M",
+            offer__academic_year__year=2019,
+
+            root_group__partial_acronym="LCRIM200M2",
+            root_group__academic_year__year=2019,
+            root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+        )
+        ElementGroupYearFactory(group_year=cls.training_standard.root_group)
+        cls.url_standard = reverse('training_identification', kwargs={'year': 2019,
+                                                                      'code': 'LCRIM200M2'})
+        cls.training_particular = ParticularTransitionEducationGroupVersionFactory(
+            offer__acronym="DRT2M",
+            offer__partial_acronym="LDRT200M",
+            offer__academic_year__year=2019,
+            root_group__partial_acronym="LDRT200M3",
+            root_group__academic_year__year=2019,
+            root_group__education_group_type__name=TrainingType.PGRM_MASTER_120.name,
+        )
+        ElementGroupYearFactory(group_year=cls.training_particular.root_group)
+
+        cls.url_particular = reverse('training_identification', kwargs={'year': 2019,
+                                                                        'code': 'LDRT200M3'})
+
+    def setUp(self) -> None:
+        self.client.force_login(self.person.user)
+
+    def test_assert_tabs_displayed_for_standard_version(self):
+        response = self.client.get(self.url_standard)
+
+        self.assertTrue(response.context['tab_urls'][Tab.IDENTIFICATION]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.CONTENT]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.UTILIZATION]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])
+
+    def test_assert_tabs_displayed_for_particular_version(self):
+        response = self.client.get(self.url_particular)
+
+        self.assertTrue(response.context['tab_urls'][Tab.IDENTIFICATION]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.CONTENT]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.UTILIZATION]['display'])
+        self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
+        self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
+        self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])

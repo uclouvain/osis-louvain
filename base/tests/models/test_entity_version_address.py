@@ -37,3 +37,20 @@ class EntityVersionAddressTest(TestCase):
                 "There is already an EntityVersionAddress with this entity_version_id and is_main = True"
         ):
             EntityVersionAddressFactory(is_main=True, entity_version_id=address.entity_version_id)
+
+    def test_update_address_with_same_entity_version_id_and_is_main_true(self):
+        address_1 = EntityVersionAddressFactory(is_main=True)
+        address_2 = EntityVersionAddressFactory(is_main=False, entity_version_id=address_1.entity_version_id)
+
+        with self.assertRaisesMessage(
+                AttributeError,
+                "There is already an EntityVersionAddress with this entity_version_id and is_main = True"
+        ):
+            address_2.is_main = True
+            address_2.save()
+
+    def test_update_address(self):
+        address = EntityVersionAddressFactory(is_main=True)
+        address.street_number = 17
+        address.save()
+        self.assertEquals(address.street_number, 17)

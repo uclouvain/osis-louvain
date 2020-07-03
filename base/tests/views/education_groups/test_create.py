@@ -42,7 +42,7 @@ from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.schedule_type import DAILY
 from base.models.exceptions import ValidationWarning
-from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
+from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.authorized_relationship import AuthorizedRelationshipFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear
 from base.tests.factories.education_group_type import EducationGroupTypeFactory

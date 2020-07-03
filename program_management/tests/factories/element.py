@@ -36,6 +36,7 @@ from learning_unit.tests.factories.learning_class_year import LearningClassYearF
 class ElementFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'program_management.Element'
+        django_get_or_create = ('group_year', 'learning_unit_year', 'learning_class_year')
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))

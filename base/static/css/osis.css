@@ -549,6 +549,12 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
     cursor: not-allowed;
 }
 
+.text-first-letter-capitalize:first-letter,
+.text-first-letter-capitalize::first-letter
+{
+  text-transform: capitalize;
+}
+
 .of_unversioned_field #academic_type,
 .of_unversioned_field #duration,
 .of_unversioned_field #internship,
@@ -588,4 +594,9 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .of_unversioned_field #group_title_en
 {
     color: grey;
+}
+
+.container-align-items-center {
+    display: flex;
+    align-items: center;
 }

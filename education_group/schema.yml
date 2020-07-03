@@ -47,6 +47,15 @@ paths:
           description: ''
           type: string
       - in: query
+        name: education_group_type
+        schema:
+          description: Filter result by specified training types
+          type: array
+          items:
+            type: string
+        style: form
+        explode: true
+      - in: query
         name: from_year
         schema:
           description: From which training year we want to display
@@ -58,6 +67,11 @@ paths:
           type: integer
       - in: query
         name: title_english
+        schema:
+          description: ''
+          type: string
+      - in: query
+        name: campus
         schema:
           description: ''
           type: string
@@ -490,6 +504,11 @@ paths:
               type: string
           style: form
           explode: true
+        - in: query
+          name: campus
+          schema:
+            description: ''
+            type: string
         - in: query
           name: ordering
           schema:

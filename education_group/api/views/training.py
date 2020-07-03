@@ -29,6 +29,7 @@ from rest_framework.generics import get_object_or_404
 
 from backoffice.settings.rest_framework.common_views import LanguageContextSerializerMixin
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_types import TrainingType
 from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
 from education_group.api.views import utils
@@ -39,6 +40,7 @@ class TrainingFilter(filters.FilterSet):
     from_year = filters.NumberFilter(field_name="offer__academic_year__year", lookup_expr='gte')
     to_year = filters.NumberFilter(field_name="offer__academic_year__year", lookup_expr='lte')
     in_type = filters.CharFilter(field_name="offer__education_group_type__name", lookup_expr='contains')
+    campus = filters.CharFilter(field_name='offer__main_teaching_campus__name', lookup_expr='icontains')
     version_type = filters.CharFilter(method='filter_version_type')
     acronym = filters.CharFilter(field_name="offer__acronym", lookup_expr="icontains")
     partial_acronym = filters.CharFilter(field_name="root_group__partial_acronym", lookup_expr='icontains')
@@ -46,10 +48,16 @@ class TrainingFilter(filters.FilterSet):
     title_english = filters.CharFilter(field_name="root_group__title_en", lookup_expr='icontains')
     ares_ability = filters.NumberFilter(field_name="offer__hops__ares_ability")
     year = filters.NumberFilter(field_name="offer__academic_year__year")
+    education_group_type = filters.MultipleChoiceFilter(
+        field_name='offer__education_group_type__name',
+        choices=TrainingType.choices()
+    )
 
     class Meta:
         model = EducationGroupVersion
-        fields = ['acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year']
+        fields = [
+            'acronym', 'partial_acronym', 'title', 'title_english', 'from_year', 'to_year', 'education_group_type'
+        ]
 
     @staticmethod
     def filter_version_type(queryset, name, value):

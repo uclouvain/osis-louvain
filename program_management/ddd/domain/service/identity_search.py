@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import Union
 
 from django.db.models import F
 
@@ -63,3 +64,13 @@ class NodeIdentitySearch(interface.DomainService):
         )
         if values:
             return NodeIdentity(code=values[0]['partial_acronym'], year=training_identity.year)
+
+    @classmethod
+    def get_from_element_id(cls, element_id: int) -> Union['NodeIdentity', None]:
+        try:
+            group_year = GroupYear.objects.values(
+                'partial_acronym', 'academic_year__year'
+            ).get(element__pk=element_id)
+            return NodeIdentity(code=group_year['partial_acronym'], year=group_year['academic_year__year'])
+        except GroupYear.DoesNotExist:
+            return None

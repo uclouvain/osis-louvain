@@ -120,6 +120,10 @@ class RequestCache(OsisCache):
                 new_get_request[key] = value
         return new_get_request
 
+    def get_value_cached(self, key: str):
+        cached_data = self.cached_data or {}
+        return cached_data.get(key)
+
 
 class SearchParametersCache(OsisCache):
     PREFIX_KEY = "search_"

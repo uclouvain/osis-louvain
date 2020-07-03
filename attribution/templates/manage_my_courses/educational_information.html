@@ -47,6 +47,19 @@
 
 <div class="panel panel-default">
     <div class="panel-body" id="tabs">
+        <div class="pull-right">
+            <a id="visualize_refreshed_publication_btn"
+               class="btn btn-default"
+               data-code="{{ learning_unit_year.acronym }}"
+               role="button"
+               {% if can_edit_information %}
+               href="{% url "access_publication" code=learning_unit_year.acronym year=learning_unit_year.academic_year.year %}"
+               target="_blank"
+               {% endif %}
+               {% if not can_edit_information %}disabled{% endif %}>
+                {% trans 'Refresh and visualize publication' %}
+            </a>
+        </div>
         {% include "manage_my_courses/blocks/tabs.html" %}
         <br>
         <div class="panel panel-default" style="background-color: #f5f5f5">
@@ -93,5 +106,19 @@
                 button.className = "glyphicon glyphicon-collapse-down"
             }
         }
+
+        {% if can_edit_information %}
+        function display_refresh_message() {
+            code = this.dataset.code
+            fmts = gettext('The learning unit %(code)s will be published soon.');
+            success_message = interpolate(fmts, {code: code}, true);
+            displaySuccessMessage(success_message);
+        }
+        btn_visualize_refreshed_publication = document.getElementById("visualize_refreshed_publication_btn")
+        btn_visualize_refreshed_publication.onclick = display_refresh_message;
+
+        {% endif %}
+
+
     </script>
 {% endblock %}

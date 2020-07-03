@@ -33,6 +33,9 @@ from program_management.ddd.business_types import *
 
 
 class PasteAuthorizedRelationshipValidator(business_validator.BusinessValidator):
+    # TODO: Work with tree (ProgramTree), path (str), node_to_path (Node) because
+    #       working with node_to_paste_into as instance of NODE, we can forget to load children property and
+    #       validation of is_maximum_children_types_reached is done in bad way
     def __init__(self, tree: 'ProgramTree', node_to_paste: 'Node', node_to_paste_into: 'Node'):
         super(PasteAuthorizedRelationshipValidator, self).__init__()
         self.tree = tree

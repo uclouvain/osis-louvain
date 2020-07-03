@@ -18,7 +18,7 @@ def publish(request, year, code):
     group_year = get_object_or_404(GroupYear, partial_acronym=code, academic_year__year=year)
 
     try:
-        general_information.publish(group_year)
+        general_information.publish_group_year(group_year)
         message = _("The program %(acronym)s will be published soon") % {'acronym': group_year.acronym}
         display_success_messages(request, message, extra_tags='safe')
     except PublishException as e:

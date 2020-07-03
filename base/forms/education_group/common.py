@@ -37,15 +37,14 @@ from base.models import campus, group_element_year
 from base.models.academic_year import current_academic_year
 from base.models.campus import Campus
 from base.models.education_group import EducationGroup
-from base.models.education_group_type import find_authorized_types, EducationGroupType
+from base.models.education_group_type import find_authorized_types
 from base.models.education_group_year import EducationGroupYear
 from base.models.entity_version import find_pedagogical_entities_version, get_last_version, EntityVersion
 from base.models.enums import education_group_categories, groups
-from base.models.enums.education_group_categories import Categories, TRAINING
+from base.models.enums.education_group_categories import TRAINING
 from base.models.enums.education_group_types import MiniTrainingType, GroupType
 from education_group.models.group_year import GroupYear
 from osis_role.contrib.forms.fields import EntityRoleChoiceField
-from program_management.business.group_element_years import management
 from reference.models.language import Language
 from rules_management.enums import TRAINING_PGRM_ENCODING_PERIOD, TRAINING_DAILY_MANAGEMENT, \
     MINI_TRAINING_PGRM_ENCODING_PERIOD, MINI_TRAINING_DAILY_MANAGEMENT, GROUP_PGRM_ENCODING_PERIOD, \
@@ -374,37 +373,6 @@ class CommonBaseForm:
         for form in self.forms.values():
             errors.update(form.errors)
         return errors
-
-
-class EducationGroupTypeForm(forms.Form):
-    name = EducationGroupTypeModelChoiceField(
-        EducationGroupType.objects.none(),
-        label=_("Type of training"),
-        required=True,
-    )
-
-    def __init__(self, parent, category, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.parent = parent
-        self.fields["name"].queryset = find_authorized_types(
-            category=category,
-            parents=self.parent
-        ).exclude(name__in=DISABLED_OFFER_TYPE)  # Temporary exclude Major and Mobility partnership (OSIS-2911)
-
-        self.fields["name"].label = _("Which type of %(category)s do you want to create ?") % {
-            "category": Categories[category].value
-        }
-
-    def clean_name(self):
-        education_group_type = self.cleaned_data.get("name")
-        if education_group_type:
-            if self.parent and management.is_max_child_reached(self.parent, education_group_type.name):
-                raise ValidationError(_("The number of children of type \"%(child_type)s\" for \"%(parent)s\" "
-                                        "has already reached the limit.") % {
-                    'child_type': education_group_type,
-                    'parent': self.parent
-                })
-        return education_group_type
 
 
 # TODO: Only used in program_management/ ==> Move to it ?

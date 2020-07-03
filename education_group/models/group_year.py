@@ -164,6 +164,9 @@ class GroupYear(models.Model):
     objects = GroupYearManager()
     objects_version = GroupYearVersionManager()
 
+    class Meta:
+        unique_together = ("partial_acronym", "academic_year")
+
     def __str__(self):
         return "{} ({})".format(self.acronym,
                                 self.academic_year)

@@ -279,10 +279,3 @@ def find_all_versions_academic_year(acronym: str,
     for elem in qs:
         results.append(EducationGroupVersionAcademicYear(elem.educationgroupversion))
     return results
-
-
-def load_from_year_and_code(year: int, code: str) -> 'ProgramTree':
-    obj = GroupYear.objects.get(academic_year__year=year,
-                                partial_acronym=code)
-
-    return load(obj.element.pk) if obj else None

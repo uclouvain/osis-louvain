@@ -21,12 +21,9 @@
 #  at the root of the source code of this program.  If not,
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
-from typing import List, Tuple, Optional
-
-from django.contrib.auth import models
+from typing import Optional
 
 from base.utils import cache
-from program_management.models.enums.node_type import NodeType
 
 
 def retrieve_element_selected(user_id: int) -> Optional[dict]:
