@@ -38,13 +38,14 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from cms.enums import entity_name
-from cms.tests.factories.text_label import TextLabelFactory, LearningUnitYearTextLabelFactory
+from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
-from reference.tests.factories.language import LanguageFactory, EnglishLanguageFactory
+from reference.tests.factories.language import EnglishLanguageFactory
 
 
 class LearningUnitPedagogyContextMixin(TestCase):
     """"This mixin is used in this test file in order to setup an environment for testing pedagogy"""
+
     @classmethod
     def setUpTestData(cls):
         cls.language = EnglishLanguageFactory()

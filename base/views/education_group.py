@@ -25,29 +25,17 @@
 ##############################################################################
 import json
 
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.exceptions import PermissionDenied
 from django.db.models import F
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 from django.views.decorators.http import require_http_methods
-from rules.contrib.views import permission_required
-from waffle.decorators import waffle_flag
 
-from base import models as mdl
-from base.business import education_group as education_group_business
-from base.business.education_group import assert_category_of_education_group_year
 from base.forms.education_group_admission import UpdateLineForm, UpdateTextForm
 from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
-from base.forms.education_groups_administrative_data import CourseEnrollmentForm, AdministrativeDataFormset, \
-    AdditionalInfoForm
 from base.models.admission_condition import AdmissionConditionLine, AdmissionCondition
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums import academic_calendar_type
-from base.models.enums import education_group_categories
 from base.models.enums.education_group_types import GroupType
 from base.models.person import get_user_interface_language
 from base.utils.cache import cache
@@ -61,7 +49,7 @@ from education_group.ddd.domain.service.identity_search import TrainingIdentityS
 from education_group.models.group_year import GroupYear
 from education_group.views.proxy.read import Tab
 from osis_common.decorators.ajax import ajax_required
-from program_management.ddd.domain.node import NodeGroupYear, Node
+from program_management.ddd.domain.node import Node
 from program_management.ddd.repositories import load_tree
 
 

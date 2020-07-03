@@ -54,7 +54,8 @@ class GroupReadGeneralInformation(GroupRead):
 
     def get_update_label_url(self):
         node = self.get_object()
-        return reverse('group_general_information_update', args=[node.year, node.code]) + "?path={}".format(self.get_path())
+        return reverse('group_general_information_update', args=[node.year, node.code]) + "?path={}".format(
+            self.get_path())
 
     def get_publish_url(self):
         node = self.get_object()

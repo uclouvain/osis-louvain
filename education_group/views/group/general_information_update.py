@@ -34,7 +34,6 @@ from cms.enums import entity_name
 from cms.models import translated_text_label
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
-from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
 from education_group.models.group_year import GroupYear
 from education_group.views.group.common_read import Tab, GroupRead
 

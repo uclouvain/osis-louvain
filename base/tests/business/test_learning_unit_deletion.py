@@ -54,13 +54,13 @@ from base.tests.factories.learning_component_year import LearningComponentYearFa
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollmentFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
+from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import AdministrativeManagerFactory, PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.text_label import TextLabelFactory, LearningUnitYearTextLabelFactory
+from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from learning_unit.models.learning_class_year import LearningClassYear
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory

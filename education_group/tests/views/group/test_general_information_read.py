@@ -87,7 +87,7 @@ class TestGroupReadGeneralInformation(TestCase):
         ):
             response = self.client.get(self.url)
             expected_redirect = reverse('group_identification', kwargs={'year': 2018, 'code': 'LTRONC100B'}) + \
-                "?path=" + str(self.element_group_year.pk)
+                                "?path=" + str(self.element_group_year.pk)
             self.assertRedirects(response, expected_redirect)
 
     def test_assert_template_used(self):

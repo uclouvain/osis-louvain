@@ -47,7 +47,7 @@ from base.tests.factories.education_group_year import TrainingFactory, Education
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory, PersonFactory
 from cms.enums import entity_name
-from cms.tests.factories.text_label import TextLabelFactory, OfferTextLabelFactory
+from cms.tests.factories.text_label import OfferTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory

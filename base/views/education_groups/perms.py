@@ -23,16 +23,14 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.contrib.auth.mixins import AccessMixin, ImproperlyConfigured
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
-from waffle.models import Flag
 
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import GroupType, TrainingType
+from base.models.enums.education_group_types import GroupType
 from education_group.models.group_year import GroupYear
 from osis_role.errors import get_permission_error
-from program_management.ddd.domain.node import NodeGroupYear, Node
+from program_management.ddd.domain.node import Node
 from program_management.ddd.repositories import load_tree
 
 
@@ -62,11 +60,12 @@ def can_change_general_information(view_func):
         object = get_object(node)
         # education_group_year = get_object_or_404(EducationGroupYear, pk=kwargs['education_group_year_id'])
         perm_name = 'base.change_commonpedagogyinformation' \
-            if (node.node_type.name not in GroupType.get_names() and object.is_common)  \
+            if (node.node_type.name not in GroupType.get_names() and object.is_common) \
             else 'base.change_pedagogyinformation'
         if not request.user.has_perm(perm_name, object):
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
+
     return f_can_change_general_information
 
 
@@ -78,4 +77,5 @@ def can_change_admission_condition(view_func):
         if not request.user.has_perm(perm_name, education_group_year):
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
+
     return f_can_change_admission_condition

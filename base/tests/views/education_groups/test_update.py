@@ -109,7 +109,7 @@ class TestUpdate(TestCase):
             root_group__academic_year=cls.education_group_year.academic_year,
             root_group__partial_acronym=cls.education_group_year.partial_acronym
         )
-        element = ElementFactory(group_year=version.root_group)
+        ElementFactory(group_year=version.root_group)
         cls.url = reverse(
             update_education_group,
             kwargs={"offer_id": cls.education_group_year.pk, "education_group_year_id": cls.education_group_year.id}

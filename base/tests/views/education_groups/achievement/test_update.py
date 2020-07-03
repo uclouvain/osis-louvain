@@ -39,7 +39,7 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.user import UserFactory
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.text_label import TextLabelFactory, OfferTextLabelFactory
+from cms.tests.factories.text_label import OfferTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory

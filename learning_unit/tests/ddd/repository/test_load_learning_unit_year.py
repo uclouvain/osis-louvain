@@ -41,7 +41,7 @@ from base.tests.factories.learning_component_year import LecturingLearningCompon
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.enums import entity_name
-from cms.tests.factories.text_label import TextLabelFactory, LearningUnitYearTextLabelFactory
+from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from learning_unit.ddd.repository.load_learning_unit_year import load_multiple, load_multiple_by_identity
 from learning_unit.tests.ddd.factories.learning_unit_year_identity import LearningUnitYearIdentityFactory
@@ -54,7 +54,6 @@ class TestLoadLearningUnitVolumes(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-
         cls.l_unit_1 = LearningUnitYearFactory()
         cls.practical_volume = PracticalLearningComponentYearFactory(learning_unit_year=cls.l_unit_1,
                                                                      hourly_volume_total_annual=20,
@@ -108,7 +107,6 @@ class TestLoadLearningUnitDescriptionFiche(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-
         cls.l_unit_1 = LearningUnitYearFactory()
         dict_labels = {}
         for cms_label in CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS:

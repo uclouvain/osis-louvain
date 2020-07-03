@@ -27,7 +27,7 @@ from django.test import TestCase
 
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.text_label import TextLabelFactory, OfferTextLabelFactory, GroupTextLabelFactory, \
+from cms.tests.factories.text_label import OfferTextLabelFactory, GroupTextLabelFactory, \
     LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 
