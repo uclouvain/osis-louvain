@@ -28,13 +28,11 @@ from django.db.models import OuterRef, F, Subquery, fields
 
 from base.business.education_groups import general_information_sections
 from base.models.education_group_achievement import EducationGroupAchievement
-from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import GroupType
 from cms.enums import entity_name
+from cms.models import translated_text
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
-from education_group.models.group_year import GroupYear
 from program_management.ddd.domain.node import NodeGroupYear
 
 
@@ -66,7 +64,7 @@ def __get_achievement_formated(achievement):
 
 
 def get_skills_labels(node: NodeGroupYear, language_code: str):
-    reference_pk = __get_reference_pk(node)
+    reference_pk = translated_text.get_groups_or_offers_cms_reference_object(node).pk
     subqstranslated_fr = TranslatedText.objects.filter(
         reference=reference_pk, text_label=OuterRef('pk'),
         language=settings.LANGUAGE_CODE_FR, entity=entity_name.OFFER_YEAR
@@ -104,9 +102,3 @@ def get_skills_labels(node: NodeGroupYear, language_code: str):
             labels_translated.append({'label_id': label_id, 'label_translated': '', 'text_fr': '', 'text_en': ''})
     return labels_translated
 
-
-def __get_reference_pk(node: NodeGroupYear):
-    if node.category.name in GroupType.get_names():
-        return GroupYear.objects.get(element__pk=node.pk).pk
-    else:
-        return EducationGroupYear.objects.get(educationgroupversion__root_group__element__pk=node.pk).pk

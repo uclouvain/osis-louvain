@@ -32,13 +32,10 @@ from rest_framework import serializers
 from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
     SKILLS_AND_ACHIEVEMENTS, ADMISSION_CONDITION, CONTACTS, CONTACT_INTRO, INTRODUCTION
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType
 from cms.enums import entity_name
-from cms.models.translated_text import TranslatedText
+from cms.models.translated_text import TranslatedText, get_groups_or_offers_cms_reference_object
 from cms.models.translated_text_label import TranslatedTextLabel
-from education_group.models.group_year import GroupYear
-from program_management.ddd.domain.node import NodeGroupYear
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
     AdmissionConditionSectionSerializer, ContactsSectionSerializer
 
@@ -96,16 +93,9 @@ class GeneralInformationSerializer(serializers.Serializer):
         datas += SectionSerializer(sections, many=True).data
         return datas
 
-    @staticmethod
-    def __get_reference_pk(node: NodeGroupYear):
-        if node.node_type.name in GroupType.get_names():
-            return GroupYear.objects.get(element__pk=node.pk).pk
-        else:
-            return EducationGroupYear.objects.get(educationgroupversion__root_group__element__pk=node.pk).pk
-
     def _get_section_cms(self, node, section, language, reference: int = None):
         if reference is None:
-            reference = self.__get_reference_pk(node)
+            reference = get_groups_or_offers_cms_reference_object(node).pk
         entity = entity_name.get_offers_or_groups_entity_from_node(node)
 
         translated_text_label = TranslatedTextLabel.objects.get(

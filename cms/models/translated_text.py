@@ -26,10 +26,15 @@
 from ckeditor.fields import RichTextField
 from django.conf import settings
 from django.db import models
+from django.shortcuts import get_object_or_404
 from reversion.admin import VersionAdmin
 
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import GroupType
 from cms.enums.entity_name import ENTITY_NAME
+from education_group.models.group_year import GroupYear
 from osis_common.models import osis_model_admin
+from program_management.ddd.domain.node import Node
 from .text_label import TextLabel
 
 
@@ -87,3 +92,17 @@ def update_or_create(entity, reference, text_label, language, defaults):
         language=language,
         defaults=defaults)
     return translated_text
+
+
+def get_groups_or_offers_cms_reference_object(node: Node):
+    if node.node_type.name in GroupType.get_names():
+        return get_object_or_404(
+            GroupYear,
+            element__pk=node.pk
+        )
+
+    else:
+        return get_object_or_404(
+            EducationGroupYear,
+            educationgroupversion__root_group__element__pk=node.pk
+        )

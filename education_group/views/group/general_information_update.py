@@ -23,18 +23,15 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.shortcuts import redirect, get_object_or_404
+from django.shortcuts import redirect
 from django.urls import reverse
 
 from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
-from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import GroupType
 from base.models.person import get_user_interface_language
 from cms.enums import entity_name
-from cms.models import translated_text_label
+from cms.models import translated_text_label, translated_text
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
-from education_group.models.group_year import GroupYear
 from education_group.views.group.common_read import Tab, GroupRead
 
 
@@ -85,7 +82,7 @@ class GroupUpdateGeneralInformation(GroupRead):
 
     def get_context_data(self, **kwargs):
         node = self.get_object()
-        obj = self.get_object_reference()
+        obj = translated_text.get_groups_or_offers_cms_reference_object(node)
 
         label_name = self.request.GET.get('label')
 
@@ -129,19 +126,6 @@ class GroupUpdateGeneralInformation(GroupRead):
         if en_text:
             initial_values.update({'text_english': en_text.text})
         return initial_values
-
-    def get_object_reference(self):
-        node = self.get_object()
-        if node.node_type.name in GroupType.get_names():
-            return get_object_or_404(
-                GroupYear,
-                element__pk=node.pk
-            )
-        else:
-            return get_object_or_404(
-                EducationGroupYear,
-                educationgroupversion__root_group__element__pk=node.pk
-            )
 
     def get_success_url(self):
         node = self.get_object()

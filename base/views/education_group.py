@@ -36,20 +36,17 @@ from base.forms.education_group_admission import UpdateLineForm, UpdateTextForm
 from base.forms.education_group_pedagogy_edit import EducationGroupPedagogyEditForm
 from base.models.admission_condition import AdmissionConditionLine, AdmissionCondition
 from base.models.education_group_year import EducationGroupYear
-from base.models.enums.education_group_types import GroupType
 from base.models.person import get_user_interface_language
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys, CACHE_TIMEOUT
 from base.views.education_groups.perms import can_change_admission_condition, can_change_general_information
 from cms.enums import entity_name
-from cms.models import translated_text_label
+from cms.models import translated_text_label, translated_text
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
-from education_group.models.group_year import GroupYear
 from education_group.views.proxy.read import Tab
 from osis_common.decorators.ajax import ajax_required
-from program_management.ddd.domain.node import Node
 from program_management.ddd.repositories import load_tree
 
 
@@ -83,21 +80,8 @@ def education_group_year_pedagogy_edit_post(request, node):
     return redirect(redirect_url)
 
 
-def _get_object_reference(node: Node):
-    if node.node_type.name in GroupType.get_names():
-        return get_object_or_404(
-            GroupYear,
-            element__pk=node.pk
-        )
-    else:
-        return get_object_or_404(
-            EducationGroupYear,
-            educationgroupversion__root_group__element__pk=node.pk
-        )
-
-
 def education_group_year_pedagogy_edit_get(request, node):
-    obj = _get_object_reference(node)
+    obj = translated_text.get_groups_or_offers_cms_reference_object(node)
     entity = entity_name.get_offers_or_groups_entity_from_node(node)
     context = {
         'education_group_year': obj,
