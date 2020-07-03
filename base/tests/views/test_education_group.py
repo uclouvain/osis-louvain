@@ -120,7 +120,6 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         request = response.wsgi_request
         context = response.context_data
         request.user = self.person.user
-        self.assertEqual(context['education_group_year'], self.training)
         self.assertEqual(context['label'], self.text_label.label)
 
         form = context['form']
