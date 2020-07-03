@@ -161,16 +161,16 @@ class TextLabelComplexeStructureTest(TestCase):
         self.A.refresh_from_db()
         self.C.refresh_from_db()
         self.assertEqual(self.B.parent, None)
-        self.assertEqual(self.B.order, 1)  #Root level
-        self.assertEqual(self.A.order, 2)  #Root level
+        self.assertEqual(self.B.order, 1)  # Root level
+        self.assertEqual(self.A.order, 2)  # Root level
         self.assertEqual(self.C.order, 1)
 
     def test_change_order_second_level(self):
-        self.B.order = 4  #not exist
+        self.B.order = 4  # not exist
         self.B.save()
         self.C.refresh_from_db()
-        self.assertEqual(self.B.order, 2)  #Inversion
-        self.assertEqual(self.C.order, 1)  #Inversion
+        self.assertEqual(self.B.order, 2)  # Inversion
+        self.assertEqual(self.C.order, 1)  # Inversion
 
     def test_change_on_same_level_no_change_as_result(self):
         self.E.order = 2

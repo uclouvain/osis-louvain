@@ -102,7 +102,7 @@ class TextLabel(models.Model):
 def get_highest_order(parent=None):
     """Return the highest order value in the context of parent"""
     query = TextLabel.objects.filter(parent=parent) \
-                     .aggregate(models.Max('order'))
+        .aggregate(models.Max('order'))
     return query.get('order__max', None)
 
 

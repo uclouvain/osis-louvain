@@ -106,13 +106,13 @@ class GroupUpdateGeneralInformation(GroupRead):
         }
 
     def get_translated_texts(self, obj):
-        label = self.request.GET.get('label')
-        initial_values = {'label': label}
-        initial_values.update(self._get_translated_text_from_lang(label, obj, 'fr-be'))
-        initial_values.update(self._get_translated_text_from_lang(label, obj, 'en'))
+        initial_values = {'label': self.request.GET.get('label')}
+        initial_values.update(self._get_translated_text_from_lang(obj, 'fr-be'))
+        initial_values.update(self._get_translated_text_from_lang(obj, 'en'))
         return initial_values
 
-    def _get_translated_text_from_lang(self, label, obj, lang):
+    def _get_translated_text_from_lang(self, obj, lang):
+        label = self.request.GET.get('label')
         node = self.get_object()
         entity = entity_name.get_offers_or_groups_entity_from_node(node)
         text = get_object_or_none(
