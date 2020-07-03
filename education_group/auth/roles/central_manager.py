@@ -38,9 +38,7 @@ class CentralManager(EducationGroupTypeScopeRoleMixin, osis_role_models.EntityRo
                 predicates.is_user_attached_to_management_entity &
                 predicates.is_maximum_child_not_reached_for_mini_training_category,
             'base.add_group':
-                predicates.is_user_attached_to_management_entity &
-                predicates.is_not_orphan_group &
-                predicates.is_maximum_child_not_reached_for_group_category,
+                predicates.is_user_attached_to_management_entity,
             # TODO : split in training, minitraining, group
             'base.change_educationgroup':
                 predicates.is_education_group_year_older_or_equals_than_limit_settings_year &

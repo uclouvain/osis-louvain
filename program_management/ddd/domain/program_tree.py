@@ -27,6 +27,8 @@ import copy
 from collections import Counter
 from typing import List, Set, Optional
 
+import attr
+
 from base.models.authorized_relationship import AuthorizedRelationshipList
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, GroupType
 from osis_common.ddd import interface
@@ -43,16 +45,10 @@ PATH_SEPARATOR = '|'
 Path = str  # Example : "root|node1|node2|child_leaf"
 
 
+@attr.s(frozen=True, slots=True)
 class ProgramTreeIdentity(interface.EntityIdentity):
-    def __init__(self, code: str, year: int):
-        self.code = code
-        self.year = year
-
-    def __hash__(self):
-        return hash(self.code + str(self.year))
-
-    def __eq__(self, other):
-        return self.code == other.code and self.year == other.year
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
 
 
 class ProgramTree(interface.RootEntity):
@@ -330,6 +326,23 @@ class ProgramTree(interface.RootEntity):
         for n in to_remove:
             if n not in pruned_tree_children:
                 n.remove_all_prerequisite_items()
+
+    def get_relative_credits_values(self, child_node: 'NodeIdentity'):
+        distinct_credits_repr = []
+        node = self.get_node_by_code_and_year(child_node.code, child_node.year)
+
+        for link_obj in self.get_links_using_node(node):
+            if link_obj.relative_credits_repr not in distinct_credits_repr:
+                distinct_credits_repr.append(link_obj.relative_credits_repr)
+        return " ; ".join(
+            set(["{}".format(credits) for credits in distinct_credits_repr])
+        )
+
+    def get_blocks_values(self, child_node: 'NodeIdentity'):
+        node = self.get_node_by_code_and_year(child_node.code, child_node.year)
+        return " ; ".join(
+            [str(grp.block) for grp in self.get_links_using_node(node) if grp.block]
+        )
 
 
 def _nodes_from_root(root: 'Node') -> List['Node']:

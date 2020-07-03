@@ -38,6 +38,7 @@ exrex==0.10.5
 django-autocomplete-light==3.4.1
 bleach==3.1.4
 django-cte==1.1.5
+attrs==19.3.0
 
 -r ./osis_common/requirements.txt
 -r ./internship/requirements.txt

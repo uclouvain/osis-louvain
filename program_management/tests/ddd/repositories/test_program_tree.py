@@ -76,7 +76,7 @@ class TestSearchTreesFromChildren(TestCase):
         result = program_tree.ProgramTreeRepository.search_from_children([node_identiy])
 
         self.assertCountEqual(
-            [tree.root_node.entity_id for tree in result],
+            [tree.entity_id for tree in result],
             [expected_tree_identity]
         )
 
@@ -99,6 +99,6 @@ class TestSearchTreesFromChildren(TestCase):
         result = program_tree.ProgramTreeRepository.search_from_children([node_identiy])
 
         self.assertCountEqual(
-            [tree.root_node.entity_id for tree in result],
+            [tree.entity_id for tree in result],
             expected_tree_identities
         )

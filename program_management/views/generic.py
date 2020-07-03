@@ -29,6 +29,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.messages.views import SuccessMessageMixin
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -141,7 +142,8 @@ class LearningUnitGeneric(CatalogGenericDetailView, TemplateView):
 
         context['person'] = self.get_person()
         # TODO: use DDD instead
-        context['root'] = GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
+        root = GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
+        context['root'] = root
         context['root_id'] = self.program_tree.root_node.pk
         context['parent'] = self.program_tree.root_node
         context['node'] = self.node
@@ -149,7 +151,12 @@ class LearningUnitGeneric(CatalogGenericDetailView, TemplateView):
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
         context['show_prerequisites'] = self.show_prerequisites(self.program_tree.root_node)
         context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
-
+        context['xls_ue_prerequisites'] = reverse("education_group_learning_units_prerequisites",
+                                                  args=[root.academic_year.year, root.partial_acronym]
+                                                  )
+        context['xls_ue_is_prerequisite'] = reverse("education_group_learning_units_is_prerequisite_for",
+                                                    args=[root.academic_year.year, root.partial_acronym]
+                                                    )
         # TODO: Remove when DDD is implemented on learning unit year...
         context['learning_unit_year'] = get_object_or_none(
             LearningUnitYear,

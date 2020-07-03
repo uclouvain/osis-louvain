@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+import logging
+from typing import Dict, List, Any, Iterable
 
 from django.conf import settings
 from django.db import IntegrityError, transaction, Error
@@ -45,11 +47,12 @@ from base.forms.utils.choice_field import NO_PLANNED_END_DISPLAY
 from base.models import academic_year
 from base.models.academic_year import AcademicYear, compute_max_academic_year_adjournment
 from base.models.entity import Entity
-from base.models.enums import learning_unit_year_subtypes
+from base.models.enums import learning_unit_year_subtypes, learning_component_year_type
 from base.models.enums.component_type import COMPONENT_TYPES
 from base.models.enums.entity_container_year_link_type import ENTITY_TYPE_LIST
 from base.models.enums.proposal_type import ProposalType
 from base.models.learning_achievement import LearningAchievement
+from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_container_year import LearningContainerYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.proposal_learning_unit import ProposalLearningUnit
@@ -60,6 +63,8 @@ from learning_unit.models.learning_class_year import LearningClassYear
 from osis_common.utils.numbers import normalize_fraction
 from reference.models.language import Language
 
+
+logger = logging.getLogger(settings.DEFAULT_LOGGER)
 FIELDS_TO_EXCLUDE_WITH_REPORT = ("is_vacant", "type_declaration_vacant", "attribution_procedure")
 NO_DATA = _('No data')
 
@@ -297,8 +302,11 @@ def get_next_academic_years(learning_unit_to_edit, year):
     return AcademicYear.objects.filter(year__range=(end_date, year)).order_by('year')
 
 
-# TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
-def update_learning_unit_year_with_report(luy_to_update, fields_to_update, entities_by_type_to_update, **kwargs):
+def update_learning_unit_year_with_report(
+        luy_to_update: LearningUnitYear,
+        fields_to_update: Dict[str, Any],
+        entities_by_type_to_update: Dict,
+        **kwargs) -> None:
     with_report = kwargs.get('with_report', True)
     override_postponement_consistency = kwargs.get('override_postponement_consistency', False)
     lu_to_consolidate = kwargs.get('lu_to_consolidate', None)
@@ -319,14 +327,16 @@ def update_learning_unit_year_with_report(luy_to_update, fields_to_update, entit
 
     # Show conflict error if exists
     check_postponement_conflict_report_errors(conflict_report)
-
     if lu_to_consolidate:
+        _report_volume(lu_to_consolidate, luy_to_update_list)
         postpone_teaching_materials(luy_to_update)
         _descriptive_fiche_and_achievements_update(lu_to_consolidate, luy_to_update)
 
 
 # TODO :: Use LearningUnitPostponementForm to extend/shorten a LearningUnit and remove all this code
-def get_postponement_conflict_report(luy_start, override_postponement_consistency=False):
+def get_postponement_conflict_report(
+        luy_start: LearningUnitYear,
+        override_postponement_consistency: bool = False) -> Dict[str, List[LearningUnitYear]]:
     """
     This function will return a list of learning unit year (luy_without_conflict) ( > luy_start)
     which doesn't have any conflict. If any conflict found, the variable 'errors' will store it.
@@ -352,8 +362,11 @@ def check_postponement_conflict_report_errors(conflict_report):
         )
 
 
-# FIXME should used include and not exclude
-def _update_learning_unit_year(luy_to_update, fields_to_update, with_report, entities_to_update_by_type):
+def _update_learning_unit_year(
+        luy_to_update: LearningUnitYear,
+        fields_to_update: Dict[str, Any],
+        with_report: bool,
+        entities_to_update_by_type: Dict) -> None:
     fields_to_exclude = ()
     if with_report:
         fields_to_exclude = FIELDS_TO_EXCLUDE_WITH_REPORT
@@ -376,7 +389,7 @@ def _update_learning_unit_year(luy_to_update, fields_to_update, with_report, ent
                                     exclude=fields_to_exclude + ("in_charge",))
 
 
-def _check_postponement_conflict(luy, next_luy):
+def _check_postponement_conflict(luy: LearningUnitYear, next_luy: LearningUnitYear):
     error_list = []
     lcy = luy.learning_container_year
     next_lcy = next_luy.learning_container_year
@@ -660,3 +673,41 @@ def _descriptive_fiche_and_achievements_update(proposal_learning_unit_year: Lear
         ac_year_postponement_range = get_academic_year_postponement_range(proposal_learning_unit_year)
         _update_descriptive_fiche(ac_year_postponement_range, proposal_learning_unit_year, luy_to_update)
         _update_luy_achievements_in_future(ac_year_postponement_range, proposal_learning_unit_year)
+
+
+def _report_volume(reference: LearningUnitYear, to_postpone_to: List[LearningUnitYear]) -> None:
+    try:
+        lecturing_component = LearningComponentYear.objects.get(
+            learning_unit_year=reference,
+            type=learning_component_year_type.LECTURING
+        )
+        __report_component(lecturing_component, to_postpone_to)
+    except LearningComponentYear.DoesNotExist:
+        pass
+
+    try:
+        practical_component = LearningComponentYear.objects.get(
+            learning_unit_year=reference,
+            type=learning_component_year_type.PRACTICAL_EXERCISES
+        )
+        __report_component(practical_component, to_postpone_to)
+    except LearningComponentYear.DoesNotExist:
+        pass
+
+
+def __report_component(reference: LearningComponentYear, to_postpone_to: List[LearningUnitYear]) -> None:
+    for learning_unit_year_obj in to_postpone_to:
+        LearningComponentYear.objects.update_or_create(
+            defaults={
+                "planned_classes": reference.planned_classes,
+                "hourly_volume_total_annual": reference.hourly_volume_total_annual,
+                "hourly_volume_partial_q1": reference.hourly_volume_partial_q1,
+                "hourly_volume_partial_q2": reference.hourly_volume_partial_q2,
+                "repartition_volume_requirement_entity": reference.repartition_volume_requirement_entity,
+                "repartition_volume_additional_entity_1": reference.repartition_volume_additional_entity_1,
+                "repartition_volume_additional_entity_2": reference.repartition_volume_additional_entity_2,
+            },
+            learning_unit_year=learning_unit_year_obj,
+            type=reference.type,
+        )
+

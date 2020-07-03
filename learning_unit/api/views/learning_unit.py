@@ -36,6 +36,7 @@ from learning_unit.api.serializers.learning_unit import LearningUnitDetailedSeri
 class LearningUnitFilter(filters.FilterSet):
     acronym_like = filters.CharFilter(field_name="acronym", lookup_expr='icontains')
     year = filters.NumberFilter(field_name="academic_year__year")
+    campus = filters.CharFilter(field_name='campus__name', lookup_expr='icontains')
 
     class Meta:
         model = LearningUnitYear

@@ -3522,7 +3522,7 @@
     {
         "pk": 220,
         "fields": {
-            "field_name": "acronym",
+            "field_name": "abbreviated_title",
             "context": "GROUP_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3552,7 +3552,7 @@
     {
         "pk": 222,
         "fields": {
-            "field_name": "acronym",
+            "field_name": "abbreviated_title",
             "context": "GROUP_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -3572,7 +3572,7 @@
     {
         "pk": 223,
         "fields": {
-            "field_name": "partial_acronym",
+            "field_name": "code",
             "context": "GROUP_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3602,7 +3602,7 @@
     {
         "pk": 225,
         "fields": {
-            "field_name": "partial_acronym",
+            "field_name": "code",
             "context": "GROUP_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -3614,23 +3614,6 @@
                 ],
                 [
                     "faculty_managers"
-                ]
-            ]
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
-        "pk": 226,
-        "fields": {
-            "field_name": "education_group_type",
-            "context": "GROUP_DAILY_MANAGEMENT",
-            "content_type": [
-                "base",
-                "educationgroupyear"
-            ],
-            "groups": [
-                [
-                    "central_managers"
                 ]
             ]
         },
@@ -3650,26 +3633,9 @@
         "model": "rules_management.fieldreference"
     },
     {
-        "pk": 228,
-        "fields": {
-            "field_name": "education_group_type",
-            "context": "GROUP_PGRM_ENCODING_PERIOD",
-            "content_type": [
-                "base",
-                "educationgroupyear"
-            ],
-            "groups": [
-                [
-                    "central_managers"
-                ]
-            ]
-        },
-        "model": "rules_management.fieldreference"
-    },
-    {
         "pk": 229,
         "fields": {
-            "field_name": "title",
+            "field_name": "title_fr",
             "context": "GROUP_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3699,7 +3665,7 @@
     {
         "pk": 231,
         "fields": {
-            "field_name": "title",
+            "field_name": "title_fr",
             "context": "GROUP_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -3719,7 +3685,7 @@
     {
         "pk": 232,
         "fields": {
-            "field_name": "title_english",
+            "field_name": "title_en",
             "context": "GROUP_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3749,7 +3715,7 @@
     {
         "pk": 234,
         "fields": {
-            "field_name": "title_english",
+            "field_name": "title_en",
             "context": "GROUP_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -3915,7 +3881,7 @@
     {
         "pk": 244,
         "fields": {
-            "field_name": "main_teaching_campus",
+            "field_name": "teaching_campus",
             "context": "GROUP_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3945,7 +3911,7 @@
     {
         "pk": 246,
         "fields": {
-            "field_name": "main_teaching_campus",
+            "field_name": "teaching_campus",
             "context": "GROUP_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -3965,7 +3931,7 @@
     {
         "pk": 247,
         "fields": {
-            "field_name": "remark",
+            "field_name": "remark_fr",
             "context": "GROUP_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -3995,7 +3961,7 @@
     {
         "pk": 249,
         "fields": {
-            "field_name": "remark",
+            "field_name": "remark_fr",
             "context": "GROUP_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",
@@ -4015,7 +3981,7 @@
     {
         "pk": 250,
         "fields": {
-            "field_name": "remark_english",
+            "field_name": "remark_en",
             "context": "GROUP_DAILY_MANAGEMENT",
             "content_type": [
                 "base",
@@ -4045,7 +4011,7 @@
     {
         "pk": 252,
         "fields": {
-            "field_name": "remark_english",
+            "field_name": "remark_en",
             "context": "GROUP_PGRM_ENCODING_PERIOD",
             "content_type": [
                 "base",

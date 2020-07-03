@@ -24,17 +24,34 @@
 * see http://www.gnu.org/licenses/.
 {% endcomment %}
 
-<div class="btn-group  pull-right" role="group" aria-label="actions">
-    <form id="form_up_{{ group_child.id }}" method="POST" style="display:inline;"
-          action="{% url 'group_element_year_up' root.pk group.pk %}">
+<div class="container-align-items-center" aria-label="actions">
+    <form id="form_up_{{ link.child.code }}" method="POST"
+          action="{% url 'content_up' %}">
         {% csrf_token %}
-        {% button_order_with_permission _("Go up") "btn_operation_up_"|addstr:group.id "up" %}
+        <input type="hidden" name="path" value="{{ node_path|addstr:"|"|addstr:link.child.node_id }}">
+        <button class="btn btn-link"
+                title="{% trans 'Go up' %}"
+                type="submit"
+                {% if up_disabled %}disabled{% endif %}>
+            <span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+        </button>
     </form>
-    <form id="form_down_{{ group_child.id }}" method="POST" style="display:inline;"
-          action="{% url 'group_element_year_down' root.pk group.pk %}">
+
+    <form id="form_down_{{ link.child.code }}" method="POST"
+          action="{% url 'content_down' %}">
         {% csrf_token %}
-        {% button_order_with_permission _("Go down") "btn_operation_down_"|addstr:group.id "down" %}
+        <input type="hidden" name="path" value="{{ node_path|addstr:"|"|addstr:link.child.node_id }}">
+        <button class="btn btn-link"
+                title="{% trans 'Go down' %}"
+                type="submit"
+                {% if down_disabled %}disabled{% endif %}>
+            <span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+        </button>
     </form>
-    {% url 'tree_detach_node' root.pk as detach_url %}
-    {% action_with_permission person group _("Detach") "detach" "base.can_detach_node" detach_url|add:"?path="|add:node_path|add:"|"|addstr:group.child.id %}
+
+    <a class="trigger_modal"
+       data-url="{% url 'tree_detach_node' node.node_id%}?path={{ node_path|addstr:"|"|addstr:link.child.node_id }}"
+       title="{% trans "Detach" %}" >
+        <span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+    </a>
 </div>

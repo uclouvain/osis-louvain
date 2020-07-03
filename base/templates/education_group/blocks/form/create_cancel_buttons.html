@@ -25,6 +25,6 @@
 {% if education_group_year %}
     {% url 'element_identification' year=education_group_year.academic_year.year code=education_group_year.partial_acronym as cancel_url %}
 {% else %}
-    {% url 'education_groups' as cancel_url %}
+    {% url 'version_program' as cancel_url %}
 {% endif %}
 {% include "blocks/forms/create_cancel_buttons.html" %}

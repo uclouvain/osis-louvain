@@ -30,12 +30,14 @@ from django.http import HttpResponseForbidden, HttpResponse, HttpResponseNotFoun
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import MiniTrainingType
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
 from education_group.views.mini_training.common_read import Tab
 from program_management.ddd.domain.node import NodeGroupYear
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory, \
+    ParticularTransitionEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 
@@ -43,7 +45,7 @@ class TestMiniTrainingReadIdentification(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.person = PersonWithPermissionsFactory('view_educationgroup')
-        cls.mini_training_version = EducationGroupVersionFactory(
+        cls.mini_training_version = StandardEducationGroupVersionFactory(
             offer__acronym="APPBIOL",
             offer__academic_year__year=2019,
             offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
@@ -51,7 +53,7 @@ class TestMiniTrainingReadIdentification(TestCase):
             root_group__academic_year__year=2019,
             root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
         )
-        ElementGroupYearFactory(group_year=cls.mini_training_version.root_group)
+        cls.root_group_element = ElementGroupYearFactory(group_year=cls.mini_training_version.root_group)
 
         cls.url = reverse('mini_training_identification', kwargs={'year': 2019, 'code': 'LBIOL100P'})
 
@@ -152,3 +154,68 @@ class TestMiniTrainingReadIdentification(TestCase):
         ):
             response = self.client.get(self.url)
             self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])
+
+    def test_assert_create_urls_correctly_computed(self):
+        path = "{}".format(self.root_group_element.pk)
+        expected_create_group_url = reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
+            "?path_to={}".format(path)
+        expected_create_training_url = reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
+            "?path_to={}".format(path)
+        expected_create_mini_training_url = reverse('create_element_select_type',
+                                                    kwargs={'category': Categories.MINI_TRAINING.name}) + \
+            "?path_to={}".format(path)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.context['create_group_url'], expected_create_group_url)
+        self.assertEqual(response.context['create_training_url'], expected_create_training_url)
+        self.assertEqual(response.context['create_mini_training_url'], expected_create_mini_training_url)
+
+
+class TestMiniTrainingReadIdentificationTabs(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.person = PersonWithPermissionsFactory('view_educationgroup')
+        cls.standard_mini_training_version = StandardEducationGroupVersionFactory(
+            offer__academic_year__year=2019,
+            offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
+            root_group__partial_acronym="LBIOL100P",
+            root_group__academic_year__year=2019,
+            root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
+        )
+        ElementGroupYearFactory(group_year=cls.standard_mini_training_version.root_group)
+
+        cls.url_standard = reverse('mini_training_identification', kwargs={'year': 2019, 'code': 'LBIOL100P'})
+
+        cls.non_standard_mini_training_version = ParticularTransitionEducationGroupVersionFactory(
+            offer__academic_year__year=2019,
+            offer__education_group_type__name=MiniTrainingType.DEEPENING.name,
+            root_group__partial_acronym="LDRT100P",
+            root_group__academic_year__year=2019,
+            root_group__education_group_type__name=MiniTrainingType.DEEPENING.name,
+        )
+        ElementGroupYearFactory(group_year=cls.non_standard_mini_training_version.root_group)
+
+        cls.url_non_particular = reverse('mini_training_identification', kwargs={'year': 2019, 'code': 'LDRT100P'})
+
+    def setUp(self) -> None:
+        self.client.force_login(self.person.user)
+
+    def test_assert_tabs_displayed_for_standard_version(self):
+        response = self.client.get(self.url_standard)
+
+        self.assertTrue(response.context['tab_urls'][Tab.IDENTIFICATION]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.CONTENT]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.UTILIZATION]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])
+
+    def test_assert_tabs_displayed_for_particular_version(self):
+        response = self.client.get(self.url_non_particular)
+
+        self.assertTrue(response.context['tab_urls'][Tab.IDENTIFICATION]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.CONTENT]['display'])
+        self.assertTrue(response.context['tab_urls'][Tab.UTILIZATION]['display'])
+        self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['display'])
+        self.assertFalse(response.context['tab_urls'][Tab.SKILLS_ACHIEVEMENTS]['display'])
+        self.assertFalse(response.context['tab_urls'][Tab.ADMISSION_CONDITION]['display'])

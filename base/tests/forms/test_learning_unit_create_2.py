@@ -394,7 +394,7 @@ class TestFullFormIsValid(LearningUnitFullFormContextMixin):
 
     def test_filter_additional_requirement_entity(self):
         partner = EntityVersionFactory(
-            entity__organization__is_current_partner=True,
+            parent=None,
             entity__organization__type=ACADEMIC_PARTNER
         )
         self.post_data["additional_requirement_entity_1"] = partner.id

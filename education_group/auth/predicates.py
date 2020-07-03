@@ -110,13 +110,6 @@ def is_continuing_education_group_year(self, user, education_group_year=None):
 
 
 @predicate(bind=True)
-def is_maximum_child_not_reached_for_group_category(self, user, education_group_year=None):
-    if education_group_year:
-        return _is_maximum_child_not_reached_for_category(self, user, education_group_year, Categories.GROUP.name)
-    return None
-
-
-@predicate(bind=True)
 def is_maximum_child_not_reached_for_training_category(self, user, education_group_year=None):
     if education_group_year:
         return _is_maximum_child_not_reached_for_category(self, user, education_group_year, Categories.TRAINING.name)

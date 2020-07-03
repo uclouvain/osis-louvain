@@ -54,13 +54,13 @@ from osis_common.document.xls_build import _build_worksheet, CONTENT_KEY, HEADER
     STYLED_CELLS, COLORED_ROWS, ROW_HEIGHT
 from program_management.business.excel import clean_worksheet_title
 from program_management.business.utils import html2text
-from program_management.ddd.domain.link import Link
-from program_management.ddd.domain.node import Node
-from program_management.ddd.domain.node import NodeLearningUnitYear
-from program_management.ddd.domain.program_tree import ProgramTree
 from program_management.ddd.repositories import load_tree
 from program_management.forms.custom_xls import CustomXlsForm
 from learning_unit.ddd.domain.learning_unit_year_identity import LearningUnitYearIdentity
+from program_management.ddd.business_types import *
+from program_management.ddd.domain.node import NodeLearningUnitYear
+from program_management.ddd.repositories.program_tree import ProgramTreeRepository
+from program_management.ddd.domain.program_tree import ProgramTreeIdentity
 
 ILLEGAL_CHARACTERS_RE = re.compile(r'[\000-\010]|[\013-\014]|[\016-\037]')
 
@@ -140,7 +140,7 @@ class EducationGroupYearLearningUnitsContainedToExcel:
         if custom_xls_form.node:
             self.hierarchy = load_tree.load(custom_xls_form.node)
         else:
-            self.hierarchy = load_tree.load_from_year_and_code(year, code)
+            self.hierarchy = ProgramTreeRepository.get(ProgramTreeIdentity(code, year))
 
         self.custom_xls_form = custom_xls_form
 

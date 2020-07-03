@@ -36,6 +36,7 @@ from education_group.tests.factories.group_year import GroupYearFactory
 class EducationGroupVersionFactory(factory.DjangoModelFactory):
     class Meta:
         model = 'program_management.EducationGroupVersion'
+        django_get_or_create = ('version_name', 'offer', 'is_transition')
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.today() - relativedelta(years=1), datetime.today())

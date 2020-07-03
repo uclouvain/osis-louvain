@@ -25,7 +25,9 @@
 ##############################################################################
 from _decimal import Decimal
 from collections import OrderedDict
-from typing import List, Set, Dict, Optional
+from typing import List, Set, Dict
+
+import attr
 
 from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_categories import Categories
@@ -60,16 +62,10 @@ class NodeFactory:
 factory = NodeFactory()
 
 
+@attr.s(frozen=True, slots=True)
 class NodeIdentity(interface.EntityIdentity):
-    def __init__(self, code: str, year: int):
-        self.code = code
-        self.year = year
-
-    def __hash__(self):
-        return hash(self.code + str(self.year))
-
-    def __eq__(self, other):
-        return type(other) == type(self) and (self.code, self.year) == (other.code, other.year)
+    code = attr.ib(type=str)
+    year = attr.ib(type=int)
 
 
 class Node(interface.Entity):
@@ -264,6 +260,26 @@ class Node(interface.Entity):
     def get_link(self, link_id: int) -> 'Link':
         return next((link for link in self.children if link.pk == link_id), None)
 
+    def up_child(self, node_to_up: 'Node') -> None:
+        index = self.children_as_nodes.index(node_to_up)
+
+        is_first_element = index == 0
+        if is_first_element:
+            return
+
+        self.children[index].order_up()
+        self.children[index-1].order_down()
+
+    def down_child(self, node_to_down: 'Node') -> None:
+        index = self.children_as_nodes.index(node_to_down)
+
+        is_last_element = index == len(self.children) - 1
+        if is_last_element:
+            return
+
+        self.children[index].order_down()
+        self.children[index+1].order_up()
+
 
 def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path', 'Node']:
     _descendents = OrderedDict()
@@ -397,6 +413,10 @@ class NodeLearningUnitYear(Node):
         self.volume_total_lecturing = volume_total_lecturing
         self.volume_total_practical = volume_total_practical
         self.node_type = NodeType.LEARNING_UNIT  # Used for authorized_relationship
+        self.full_title_fr = "{}{}".format(common_title_fr,
+                                           " - {}".format(specific_title_fr) if specific_title_fr else '')
+        self.full_title_en = "{}{}".format(common_title_en,
+                                           " - {}".format(specific_title_en) if specific_title_en else '')
 
     @property
     def has_prerequisite(self) -> bool:

@@ -39,7 +39,8 @@ class EntityVersionAddressFactory(factory.DjangoModelFactory):
     city = factory.Faker('city')
     street = factory.Faker('street_name')
     street_number = random.randint(1, 1000)
-    postal_code = random.randint(1000, 99999)
+    postal_code = factory.Faker('postcode')
+    state = factory.Faker('text', max_nb_chars=255)
     country = factory.SubFactory(CountryFactory)
     entity_version_id = factory.SubFactory(EntityVersionFactory)
     location = None

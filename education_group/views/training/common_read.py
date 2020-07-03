@@ -39,6 +39,7 @@ from base.business.education_groups import general_information_sections
 from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
+from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import TrainingType
 from base.views.common import display_warning_messages
 from education_group.ddd.business_types import *
@@ -130,6 +131,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             "enums": mdl.enums.education_group_categories,
             "tab_urls": self.get_tab_urls(),
             "node": self.get_object(),
+            "node_path": self.get_path(),
             "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
             "form_xls_custom": CustomXlsForm(path=self.get_path()),
             "academic_year_choices": get_academic_year_choices(
@@ -144,13 +146,37 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             # TODO: Two lines below to remove when finished reorganized templates
             "education_group_version": self.education_group_version,
             "group_year": self.education_group_version.root_group,
+            "create_group_url": self.get_create_group_url(),
+            "create_training_url": self.get_create_training_url(),
+            "create_mini_training_url": self.get_create_mini_training_url(),
+            "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
+                                            args=[self.education_group_version.root_group.academic_year.year,
+                                                  self.education_group_version.root_group.partial_acronym]
+                                            ),
+            "xls_ue_is_prerequisite": reverse("education_group_learning_units_is_prerequisite_for",
+                                              args=[self.education_group_version.root_group.academic_year.year,
+                                                    self.education_group_version.root_group.partial_acronym]
+                                              ),
         }
 
     def get_permission_object(self):
         return self.education_group_version.offer
 
+    def get_create_group_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
+               "?path_to={}".format(self.get_path())
+
+    def get_create_mini_training_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.MINI_TRAINING.name}) + \
+               "?path_to={}".format(self.get_path())
+
+    def get_create_training_url(self):
+        return reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
+               "?path_to={}".format(self.get_path())
+
     def get_tab_urls(self):
         node_identity = self.get_object().entity_id
+
         return OrderedDict({
             Tab.IDENTIFICATION: {
                 'text': _('Identification'),
@@ -161,7 +187,7 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
             Tab.DIPLOMAS_CERTIFICATES: {
                 'text': _('Diplomas /  Certificates'),
                 'active': Tab.DIPLOMAS_CERTIFICATES == self.active_tab,
-                'display': True,
+                'display': self.current_version.is_standard_version,
                 'url': get_tab_urls(Tab.DIPLOMAS_CERTIFICATES, node_identity, self.get_path()),
             },
             Tab.ADMINISTRATIVE_DATA: {
@@ -207,21 +233,24 @@ class TrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Templ
         return academic_year.starting_academic_year()
 
     def have_administrative_data_tab(self):
-        return not self.get_object().is_master_2m() and self.current_version.is_standard
+        return not self.get_object().is_master_2m() and self.current_version.is_standard_version
 
     def have_general_information_tab(self):
         node_category = self.get_object().category
-        return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
+        return self.current_version.is_standard_version and \
+            node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def have_skills_and_achievements_tab(self):
         node_category = self.get_object().category
-        return node_category.name in TrainingType.with_skills_achievements() and \
+        return self.current_version.is_standard_version and \
+            node_category.name in TrainingType.with_skills_achievements() and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def have_admission_condition_tab(self):
         node_category = self.get_object().category
-        return node_category.name in TrainingType.with_admission_condition() and \
+        return self.current_version.is_standard_version and \
+            node_category.name in TrainingType.with_admission_condition() and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def _is_general_info_and_condition_admission_in_display_range(self):

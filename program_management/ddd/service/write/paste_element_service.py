@@ -27,8 +27,6 @@ from program_management.ddd.business_types import *
 from program_management.ddd.domain import node
 from program_management.ddd.domain.program_tree import PATH_SEPARATOR
 from program_management.ddd.repositories import load_tree, persist_tree, node as node_repository, program_tree
-from program_management.ddd.service import tree_service
-from program_management.ddd.validators._detach_option_2M import DetachOptionValidator
 
 
 def paste_element(paste_command: command.PasteElementCommand) -> 'LinkIdentity':

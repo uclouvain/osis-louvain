@@ -32,22 +32,6 @@
     </button>
     {# Actions still to be have to be fixed.  Fixed actions are in identifiation_actions_bar.html #}
     <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
-        {# Create link #}
-        <li>
-            {% url 'select_education_group_type' enums.GROUP root.pk education_group_year.pk as create_group_url %}
-            {% a_tag_has_perm create_group_url _('New Education Group') 'base.add_group' user education_group_year %}
-        </li>
-        <li>
-            {% url 'select_education_group_type' enums.TRAINING root.pk education_group_year.pk as create_training_url %}
-            {% a_tag_has_perm create_training_url _('New Training') 'base.add_training' user education_group_year %}
-        </li>
-        <li>
-            {% url 'select_education_group_type' enums.MINI_TRAINING root.pk education_group_year.pk as create_mini_training_url %}
-            {% a_tag_has_perm create_mini_training_url _('New Mini-Training') 'base.add_minitraining' user education_group_year %}
-        </li>
-
-        <li class="divider"></li>
-
         {# Cut link #} {# We cannot cut root element #}
         {% if group_to_parent and group_to_parent != "0" %}
             <li id='select_li'>

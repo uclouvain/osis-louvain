@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-02-04 10:24+0100\n"
+"POT-Creation-Date: 2020-06-25 15:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -103,8 +103,8 @@ msgstr ""
 
 #, python-format
 msgid ""
-"For the academic year %(data_year)s, the summary edition period will open "
-"on %(start_date)s."
+"For the academic year %(data_year)s, the summary edition period will open on "
+"%(start_date)s."
 msgstr ""
 
 msgid "Function"
@@ -153,6 +153,9 @@ msgid "Publish application to portal"
 msgstr ""
 
 msgid "Publish attribution to portal"
+msgstr ""
+
+msgid "Refresh and visualize publication"
 msgstr ""
 
 #, python-format

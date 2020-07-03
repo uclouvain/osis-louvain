@@ -31,7 +31,8 @@ from django.forms import model_to_dict
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
-from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report
+from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report, \
+    _report_volume
 from base.forms.utils.choice_field import NO_PLANNED_END_DISPLAY
 from base.models import academic_year
 from base.models import learning_unit_year as mdl_luy
@@ -52,8 +53,10 @@ from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
-from base.tests.factories.learning_component_year import LearningComponentYearFactory
+from base.tests.factories.learning_component_year import LearningComponentYearFactory, \
+    LecturingLearningComponentYearFactory, PracticalLearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
+from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from cms.models.translated_text import TranslatedText
 from learning_unit.models.learning_class_year import LearningClassYear
@@ -1116,3 +1119,60 @@ class TestUpdateLearningUnitEntities(TestCase, LearningUnitsMixin):
         learning_container_year.refresh_from_db()
 
         self.assertEqual(learning_container_year.get_entity_from_type(entity_link_type), expected_entity)
+
+
+class TestReportVolumes(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit = LearningUnitFactory()
+        cls.academic_years = AcademicYearFactory.produce_in_future(quantity=3)
+        cls.learning_unit_years = [LearningUnitYearFactory(academic_year=acy) for acy in cls.academic_years]
+
+    def setUp(self) -> None:
+        self.lecturing_component_years = [
+            LecturingLearningComponentYearFactory(learning_unit_year=luy) for luy in self.learning_unit_years
+        ]
+        self.practical_component_years = [
+            PracticalLearningComponentYearFactory(learning_unit_year=luy) for luy in self.learning_unit_years
+        ]
+
+    def test_should_report_values_from_reference_learning_unit_year_to_others(self):
+        reference, *others = self.learning_unit_years
+
+        reference_lecturing_component = self.lecturing_component_years[0]
+        reference_lecturing_component.hourly_volume_partial_q1 = 20
+        reference_lecturing_component.hourly_volume_partial_q2 = 35
+        reference_lecturing_component.hourly_volume_total_annual = 55
+        reference_lecturing_component.save()
+
+        reference_practical_component = self.practical_component_years[0]
+        reference_practical_component.hourly_volume_partial_q1 = 18
+        reference_practical_component.hourly_volume_partial_q2 = 2
+        reference_practical_component.hourly_volume_total_annual = 20
+        reference_practical_component.save()
+
+        _report_volume(reference, others)
+
+        for lecturing_component in self.lecturing_component_years[1:]:
+            lecturing_component.refresh_from_db()
+            self.assert_component_volumes_equal(reference_lecturing_component, lecturing_component)
+
+        for practical_component in self.practical_component_years[1:]:
+            practical_component.refresh_from_db()
+            self.assert_component_volumes_equal(reference_practical_component, practical_component)
+
+    def assert_component_volumes_equal(self, first_component, second_component):
+        pertinent_fields = [
+            "planned_classes",
+            "hourly_volume_total_annual",
+            "hourly_volume_partial_q1",
+            "hourly_volume_partial_q2",
+            "repartition_volume_requirement_entity",
+            "repartition_volume_additional_entity_1",
+            "repartition_volume_additional_entity_2",
+        ]
+
+        self.assertDictEqual(
+            model_to_dict(first_component, fields=pertinent_fields),
+            model_to_dict(second_component, fields=pertinent_fields)
+        )

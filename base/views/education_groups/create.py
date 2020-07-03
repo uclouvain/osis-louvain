@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -31,9 +31,8 @@ from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import FormView
 
-from base.forms.education_group.common import EducationGroupModelForm, EducationGroupTypeForm
+from base.forms.education_group.common import EducationGroupModelForm
 from base.forms.education_group.group import GroupForm
 from base.forms.education_group.mini_training import MiniTrainingForm
 from base.forms.education_group.training import TrainingForm
@@ -45,7 +44,6 @@ from base.models.enums.education_group_types import TrainingType
 from base.models.exceptions import ValidationWarning
 from base.utils.cache import RequestCache
 from base.views.common import display_success_messages, show_error_message_for_form_invalid
-from base.views.mixins import FlagMixin, AjaxTemplateMixin
 from osis_common.decorators.ajax import ajax_required
 from osis_common.utils.models import get_object_or_none
 from osis_role import errors
@@ -69,28 +67,6 @@ PERMS_BY_CATEGORY = {
 }
 
 
-class SelectEducationGroupTypeView(FlagMixin, AjaxTemplateMixin, FormView):
-    template_name = "education_group/blocks/form/education_group_type.html"
-    form_class = EducationGroupTypeForm
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        kwargs["category"] = self.kwargs["category"]
-        kwargs["parent"] = get_object_or_404(
-            EducationGroupYear, pk=self.kwargs["parent_id"]
-        ) if self.kwargs.get("parent_id") else None
-
-        return kwargs
-
-    def form_valid(self, form):
-        # Attach education_group_type to use it in get_success_url
-        self.kwargs["education_group_type_pk"] = form.cleaned_data["name"].pk
-        return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse(create_education_group, kwargs=self.kwargs)
-
-
 # TODO: Split create into create_groups/create_training/create_minitraining
 #  in order to user decorator permission_required
 @login_required
@@ -102,7 +78,7 @@ def create_education_group(request, category, education_group_type_pk, root_id=N
     if not request.user.has_perm(perm, parent):
         raise PermissionDenied(errors.get_permission_error(request.user, perm))
 
-    request_cache = RequestCache(request.user, reverse('education_groups'))
+    request_cache = RequestCache(request.user, reverse('version_program'))
     cached_data = request_cache.cached_data or {}
     academic_year = cached_data.get('academic_year')
     if not academic_year:

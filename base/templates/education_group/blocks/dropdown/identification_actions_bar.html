@@ -33,6 +33,35 @@
 
     <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
         {# Other actions have to be fixed, look in the identifiation_actions_bar_to_be_fixed.html #}
+        {% if create_group_url %}
+            <li>
+                {% a_tag_modal_has_perm create_group_url _('New Education Group') 'base.add_group' user %}
+            </li>
+        {% endif %}
+        {% if create_training_url %}
+            <li>
+                {% a_tag_modal_has_perm create_training_url _('New Training') 'base.add_training' user %}
+            </li>
+        {% endif %}
+        {% if create_mini_training_url %}
+            <li>
+                {% a_tag_modal_has_perm create_mini_training_url _('New Mini-Training') 'base.add_minitraining' user %}
+            </li>
+        {% endif %}
+        <li class="divider"></li>
+	<li>
+            <a href="{{ xls_ue_prerequisites }}"
+                class="download">
+                <span>{% trans 'Generate xls of learning units that have prerequisites' %}</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ xls_ue_is_prerequisite }}"
+                class="download">
+                <span>{% trans 'Generate xls of learning units that are prerequisites for' %}</span>
+            </a>
+        </li>
+        <li class="divider"></li>
         <li>
             <a href="#" data-toggle="modal" data-target="#modalCustomXls"
                role="button" id="bt_modal_custom_xls" class="download">

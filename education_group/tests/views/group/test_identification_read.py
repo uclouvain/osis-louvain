@@ -28,6 +28,7 @@ from django.http import HttpResponseForbidden, HttpResponse, HttpResponseNotFoun
 from django.test import TestCase
 from django.urls import reverse
 
+from base.models.enums.education_group_categories import Categories
 from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory
 from base.tests.factories.user import UserFactory
@@ -90,3 +91,18 @@ class TestGroupReadIdentification(TestCase):
         self.assertFalse(response.context['tab_urls'][Tab.CONTENT]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.UTILIZATION]['active'])
         self.assertFalse(response.context['tab_urls'][Tab.GENERAL_INFO]['active'])
+
+    def test_assert_create_urls_correctly_computed(self):
+        path = "{}".format(self.element_group_year.pk)
+        expected_create_group_url = reverse('create_element_select_type', kwargs={'category': Categories.GROUP.name}) + \
+            "?path_to={}".format(path)
+        expected_create_training_url = reverse('create_element_select_type', kwargs={'category': Categories.TRAINING.name}) + \
+            "?path_to={}".format(path)
+        expected_create_mini_training_url = reverse('create_element_select_type',
+                                                    kwargs={'category': Categories.MINI_TRAINING.name}) + \
+            "?path_to={}".format(path)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.context['create_group_url'], expected_create_group_url)
+        self.assertEqual(response.context['create_training_url'], expected_create_training_url)
+        self.assertEqual(response.context['create_mini_training_url'], expected_create_mini_training_url)
