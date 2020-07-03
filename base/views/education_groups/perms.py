@@ -29,7 +29,11 @@ from django.shortcuts import get_object_or_404
 from waffle.models import Flag
 
 from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import GroupType, TrainingType
+from education_group.models.group_year import GroupYear
 from osis_role.errors import get_permission_error
+from program_management.ddd.domain.node import NodeGroupYear, Node
+from program_management.ddd.repositories import load_tree
 
 
 def can_change_education_group(user, education_group):
@@ -40,11 +44,27 @@ def can_change_education_group(user, education_group):
 
 
 def can_change_general_information(view_func):
+    def get_object(node: Node):
+        if node.node_type.name in GroupType.get_names():
+            return get_object_or_404(
+                GroupYear,
+                element__pk=node.pk
+            )
+        else:
+            return get_object_or_404(
+                EducationGroupYear,
+                educationgroupversion__root_group__element__pk=node.pk
+            )
+
     def f_can_change_general_information(request, *args, **kwargs):
-        education_group_year = get_object_or_404(EducationGroupYear, pk=kwargs['education_group_year_id'])
-        perm_name = 'base.change_commonpedagogyinformation' if education_group_year.is_common else \
-            'base.change_pedagogyinformation'
-        if not request.user.has_perm(perm_name, education_group_year):
+        tree = load_tree.load(kwargs['education_group_year_id'])
+        node = tree.root_node
+        object = get_object(node)
+        # education_group_year = get_object_or_404(EducationGroupYear, pk=kwargs['education_group_year_id'])
+        perm_name = 'base.change_commonpedagogyinformation' \
+            if (node.node_type.name not in GroupType.get_names() and object.is_common)  \
+            else 'base.change_pedagogyinformation'
+        if not request.user.has_perm(perm_name, object):
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
     return f_can_change_general_information

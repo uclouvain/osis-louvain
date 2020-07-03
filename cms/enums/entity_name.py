@@ -23,6 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from base.models.enums.education_group_types import GroupType
+from program_management.ddd.domain.node import Node
+
 LEARNING_UNIT_YEAR = "learning_unit_year"
 OFFER_YEAR = "offer_year"
 GROUP_YEAR = "group_year"
@@ -32,3 +35,7 @@ ENTITY_NAME = (
     (OFFER_YEAR, OFFER_YEAR),
     (GROUP_YEAR, GROUP_YEAR)
 )
+
+
+def get_offers_or_groups_entity_from_node(node: Node):
+    return GROUP_YEAR if node.node_type.name in GroupType.get_names() else OFFER_YEAR

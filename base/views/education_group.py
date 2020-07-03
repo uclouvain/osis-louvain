@@ -48,6 +48,7 @@ from base.models.admission_condition import AdmissionConditionLine, AdmissionCon
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
+from base.models.enums.education_group_types import GroupType
 from base.models.person import get_user_interface_language
 from base.utils.cache import cache
 from base.utils.cache_keys import get_tab_lang_keys, CACHE_TIMEOUT
@@ -57,28 +58,33 @@ from cms.models import translated_text_label
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
+from education_group.models.group_year import GroupYear
 from education_group.views.proxy.read import Tab
 from osis_common.decorators.ajax import ajax_required
+from program_management.ddd.domain.node import NodeGroupYear, Node
+from program_management.ddd.repositories import load_tree
 
 
-def education_group_year_pedagogy_edit_post(request, education_group_year_id, root_id):
+def education_group_year_pedagogy_edit_post(request, node):
     form = EducationGroupPedagogyEditForm(request.POST)
+    obj = _get_object_reference(node)
+    entity = entity_name.get_offers_or_groups_entity_from_node(node)
     training_identity = TrainingIdentitySearch().get_from_education_group_year_id(education_group_year_id)
     redirect_url = _get_admission_condition_success_url(training_identity.year, training_identity.acronym)
     if form.is_valid():
         label = form.cleaned_data['label']
 
-        text_label = TextLabel.objects.filter(label=label).first()
+        text_label = TextLabel.objects.filter(label=label, entity=entity).first()
 
-        record, created = TranslatedText.objects.get_or_create(reference=str(education_group_year_id),
-                                                               entity='offer_year',
+        record, created = TranslatedText.objects.get_or_create(reference=obj.pk,
+                                                               entity=entity,
                                                                text_label=text_label,
                                                                language='fr-be')
         record.text = form.cleaned_data['text_french']
         record.save()
 
-        record, created = TranslatedText.objects.get_or_create(reference=str(education_group_year_id),
-                                                               entity='offer_year',
+        record, created = TranslatedText.objects.get_or_create(reference=obj.pk,
+                                                               entity=entity,
                                                                text_label=text_label,
                                                                language='en')
         record.text = form.cleaned_data['text_english']
@@ -88,31 +94,51 @@ def education_group_year_pedagogy_edit_post(request, education_group_year_id, ro
     return redirect(redirect_url)
 
 
-def education_group_year_pedagogy_edit_get(request, education_group_year_id):
-    education_group_year = get_object_or_404(EducationGroupYear, pk=education_group_year_id)
+def _get_object_reference(node: Node):
+    if node.node_type.name in GroupType.get_names():
+        return get_object_or_404(
+            GroupYear,
+            element__pk=node.pk
+        )
+    else:
+        return get_object_or_404(
+            EducationGroupYear,
+            educationgroupversion__root_group__element__pk=node.pk
+        )
+
+
+def education_group_year_pedagogy_edit_get(request, node):
+    obj = _get_object_reference(node)
+    entity = entity_name.get_offers_or_groups_entity_from_node(node)
     context = {
-        'education_group_year': education_group_year,
+        'education_group_year': obj,
     }
     label_name = request.GET.get('label')
     context['label'] = label_name
     initial_values = {'label': label_name}
-    fr_text = TranslatedText.objects.filter(reference=str(education_group_year_id),
-                                            text_label__label=label_name,
-                                            entity=entity_name.OFFER_YEAR,
-                                            language='fr-be').first()
+    fr_text = TranslatedText.objects.filter(
+        reference=str(obj.pk),
+        text_label__label=label_name,
+        text_label__entity=entity,
+        entity=entity,
+        language='fr-be'
+    ).first()
     if fr_text:
         initial_values['text_french'] = fr_text.text
-    en_text = TranslatedText.objects.filter(reference=str(education_group_year_id),
-                                            text_label__label=label_name,
-                                            entity=entity_name.OFFER_YEAR,
-                                            language='en').first()
+    en_text = TranslatedText.objects.filter(
+        reference=str(obj.pk),
+        text_label__label=label_name,
+        text_label__entity=entity,
+        entity=entity,
+        language='en'
+    ).first()
     if en_text:
         initial_values['text_english'] = en_text.text
     form = EducationGroupPedagogyEditForm(initial=initial_values)
     context['form'] = form
     context['group_to_parent'] = request.GET.get("group_to_parent") or '0'
     context['translated_label'] = translated_text_label.get_label_translation(
-        text_entity=entity_name.OFFER_YEAR,
+        text_entity=entity,
         label=label_name,
         language=get_user_interface_language(request.user)
     )
@@ -123,9 +149,11 @@ def education_group_year_pedagogy_edit_get(request, education_group_year_id):
 @require_http_methods(['GET', 'POST'])
 @can_change_general_information
 def education_group_year_pedagogy_edit(request, offer_id, education_group_year_id):
+    tree = load_tree.load(education_group_year_id)
+    node = tree.root_node
     if request.method == 'POST':
-        return education_group_year_pedagogy_edit_post(request, education_group_year_id, offer_id)
-    return education_group_year_pedagogy_edit_get(request, education_group_year_id)
+        return education_group_year_pedagogy_edit_post(request, node)
+    return education_group_year_pedagogy_edit_get(request, node)
 
 
 @login_required

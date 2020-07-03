@@ -105,7 +105,7 @@ def __get_common_labels(node: NodeGroupYear) -> List[str]:
 
 
 def __get_translated_labels(reference_pk: int, labels: List[str], language_code: str, node: NodeGroupYear):
-    entity = entity_name.GROUP_YEAR if node.node_type.name in GroupType.get_names() else entity_name.OFFER_YEAR
+    entity = entity_name.get_offers_or_groups_entity_from_node(node)
     subqstranslated_fr = TranslatedText.objects.filter(
         reference=reference_pk, text_label=OuterRef('pk'),
         language=settings.LANGUAGE_CODE_FR, entity=entity

@@ -151,7 +151,7 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         request = RequestFactory().post(self.url, data=post_data)
 
         from base.views.education_group import education_group_year_pedagogy_edit_post
-        response = education_group_year_pedagogy_edit_post(request, self.training.pk, self.training.pk)
+        response = education_group_year_pedagogy_edit_post(request, self.training.pk)
 
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
         anchor_expected = '#section_welcome_introduction'
