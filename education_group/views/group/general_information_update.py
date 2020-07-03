@@ -140,5 +140,4 @@ class GroupUpdateGeneralInformation(GroupRead):
 
     def get_success_url(self):
         node = self.get_object()
-        obj = self.get_object_reference(node)
-        return reverse('education_group_pedagogy_edit', args=[obj.pk, node.pk])
+        return reverse('group_identification', args=[node.year, node.code]) + '?path={}'.format(self.get_path())
