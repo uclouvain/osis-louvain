@@ -27,7 +27,7 @@ import functools
 import json
 from collections import OrderedDict
 
-from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -39,7 +39,6 @@ from base.business.education_groups.general_information_sections import \
     MIN_YEAR_TO_DISPLAY_GENERAL_INFO_AND_ADMISSION_CONDITION
 from base.models import academic_year
 from base.models.enums.education_group_categories import Categories
-from base.models.enums.education_group_types import GroupType
 from base.views.common import display_warning_messages
 from education_group.forms.academic_year_choices import get_academic_year_choices
 from education_group.models.group_year import GroupYear
@@ -133,11 +132,11 @@ class GroupRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, Template
 
     @functools.lru_cache()
     def get_group_year(self):
-        try:
-            return GroupYear.objects.select_related('education_group_type', 'academic_year', 'management_entity')\
-                                .get(academic_year__year=self.kwargs['year'], partial_acronym=self.kwargs['code'])
-        except GroupYear.DoesNotExist:
-            raise Http404
+        return get_object_or_404(
+            GroupYear.objects.select_related('education_group_type', 'academic_year', 'management_entity'),
+            academic_year__year=self.kwargs['year'],
+            partial_acronym=self.kwargs['code']
+        )
 
     @functools.lru_cache()
     def get_current_academic_year(self):
