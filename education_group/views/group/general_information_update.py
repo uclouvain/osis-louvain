@@ -51,32 +51,37 @@ class GroupUpdateGeneralInformation(GroupRead):
                 reverse('group_identification', kwargs=self.kwargs) + "?path={}".format(self.get_path())
             )
         form = self.get_form_class()(request.POST)
-        node = self.get_object()
-        entity = entity_name.get_offers_or_groups_entity_from_node(node)
-        obj = self.get_object_reference()
         redirect_url = reverse('group_identification', kwargs=self.kwargs) + "?path={}".format(self.get_path())
 
         if form.is_valid():
             label = form.cleaned_data['label']
 
-            text_label = TextLabel.objects.filter(label=label, entity=entity).first()
-
-            record, created = TranslatedText.objects.get_or_create(reference=obj.pk,
-                                                                   entity=entity,
-                                                                   text_label=text_label,
-                                                                   language='fr-be')
-            record.text = form.cleaned_data['text_french']
-            record.save()
-
-            record, created = TranslatedText.objects.get_or_create(reference=obj.pk,
-                                                                   entity=entity,
-                                                                   text_label=text_label,
-                                                                   language='en')
-            record.text = form.cleaned_data['text_english']
-            record.save()
+            self.update_cms(form, label)
 
             redirect_url += "#section_{label_name}".format(label_name=label)
         return redirect(redirect_url)
+
+    def update_cms(self, form, label):
+        node = self.get_object()
+        obj = self.get_object_reference()
+        entity = entity_name.get_offers_or_groups_entity_from_node(node)
+        text_label = TextLabel.objects.filter(label=label, entity=entity).first()
+        record, created = TranslatedText.objects.get_or_create(
+            reference=obj.pk,
+            entity=entity,
+            text_label=text_label,
+            language='fr-be'
+        )
+        record.text = form.cleaned_data['text_french']
+        record.save()
+        record, created = TranslatedText.objects.get_or_create(
+            reference=obj.pk,
+            entity=entity,
+            text_label=text_label,
+            language='en'
+        )
+        record.text = form.cleaned_data['text_english']
+        record.save()
 
     def get_context_data(self, **kwargs):
         node = self.get_object()
