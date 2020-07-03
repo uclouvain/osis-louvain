@@ -23,6 +23,7 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from django.conf import settings
 from django.shortcuts import redirect
 from django.urls import reverse
 
@@ -40,7 +41,8 @@ class GroupUpdateGeneralInformation(GroupRead):
     template_name = 'education_group/blocks/modal/modal_pedagogy_edit_inner.html'
     active_tab = Tab.GENERAL_INFO
 
-    def get_form_class(self):
+    @staticmethod
+    def get_form_class():
         return EducationGroupPedagogyEditForm
 
     def post(self, request, *args, **kwargs):
@@ -61,36 +63,32 @@ class GroupUpdateGeneralInformation(GroupRead):
 
     def update_cms(self, form, label):
         node = self.get_object()
-        obj = translated_text.get_groups_or_offers_cms_reference_object(node)
         entity = entity_name.get_offers_or_groups_entity_from_node(node)
+        obj = translated_text.get_groups_or_offers_cms_reference_object(node)
         text_label = TextLabel.objects.filter(label=label, entity=entity).first()
+        for lang in [settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_FR]:
+            self._update_cms_for_specific_lang(form, obj, text_label, lang)
+
+    def _update_cms_for_specific_lang(self, form, obj, text_label, lang):
+        node = self.get_object()
+        entity = entity_name.get_offers_or_groups_entity_from_node(node)
         record, created = TranslatedText.objects.get_or_create(
             reference=obj.pk,
             entity=entity,
             text_label=text_label,
-            language='fr-be'
+            language=lang
         )
-        record.text = form.cleaned_data['text_french']
-        record.save()
-        record, created = TranslatedText.objects.get_or_create(
-            reference=obj.pk,
-            entity=entity,
-            text_label=text_label,
-            language='en'
-        )
-        record.text = form.cleaned_data['text_english']
+        record.text = form.cleaned_data['text_english' if lang == settings.LANGUAGE_CODE_EN else 'text_french']
         record.save()
 
     def get_context_data(self, **kwargs):
         node = self.get_object()
-        obj = translated_text.get_groups_or_offers_cms_reference_object(node)
 
         label_name = self.request.GET.get('label')
 
-        initial_values = self.get_translated_texts(obj)
+        initial_values = self.get_translated_texts(node)
 
         context = {
-            'education_group_year': obj,
             'label': label_name,
             'form': EducationGroupPedagogyEditForm(initial=initial_values),
             'group_to_parent': self.request.GET.get("group_to_parent") or '0',
@@ -105,10 +103,11 @@ class GroupUpdateGeneralInformation(GroupRead):
             **context
         }
 
-    def get_translated_texts(self, obj):
+    def get_translated_texts(self, node):
+        obj = translated_text.get_groups_or_offers_cms_reference_object(node)
         initial_values = {'label': self.request.GET.get('label')}
-        initial_values.update(self._get_translated_text_from_lang(obj, 'fr-be'))
-        initial_values.update(self._get_translated_text_from_lang(obj, 'en'))
+        for lang in [settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_FR]:
+            initial_values.update(self._get_translated_text_from_lang(obj, lang))
         return initial_values
 
     def _get_translated_text_from_lang(self, obj, lang):
@@ -124,7 +123,7 @@ class GroupUpdateGeneralInformation(GroupRead):
             language=lang
         )
         if text:
-            return {'text_english' if lang == 'en' else 'text_french': text.text}
+            return {'text_english' if lang == settings.LANGUAGE_CODE_EN else 'text_french': text.text}
         return {}
 
     def get_success_url(self):
