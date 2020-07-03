@@ -52,7 +52,7 @@ from program_management.ddd.repositories import load_tree
 
 def education_group_year_pedagogy_edit_post(request, node):
     form = EducationGroupPedagogyEditForm(request.POST)
-    obj = _get_object_reference(node)
+    obj = translated_text.get_groups_or_offers_cms_reference_object(node)
     entity = entity_name.get_offers_or_groups_entity_from_node(node)
     # TODO: Something to do
     training_identity = TrainingIdentitySearch().get_from_education_group_year_id(obj.id)
