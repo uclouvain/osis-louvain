@@ -60,7 +60,7 @@ class GroupUpdateGeneralInformation(GroupRead):
 
     def update_cms(self, form, label):
         node = self.get_object()
-        obj = self.get_object_reference()
+        obj = translated_text.get_groups_or_offers_cms_reference_object(node)
         entity = entity_name.get_offers_or_groups_entity_from_node(node)
         text_label = TextLabel.objects.filter(label=label, entity=entity).first()
         record, created = TranslatedText.objects.get_or_create(

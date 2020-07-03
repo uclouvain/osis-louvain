@@ -300,7 +300,7 @@ class LearningUnitYearDeletion(TestCase):
                                                                subtype=learning_unit_year_subtypes.FULL,
                                                                academic_year=learning_container_year.academic_year)
         # Create CMS data - TAB Specification
-        cms_specification_label = LearningUnitYearTextLabelFactory(abel=CMS_LABEL_SPECIFICATIONS[0])
+        cms_specification_label = LearningUnitYearTextLabelFactory(label=CMS_LABEL_SPECIFICATIONS[0])
         LearningUnitYearTranslatedTextFactory(reference=learning_unit_year_to_delete.pk,
                                               text_label=cms_specification_label,
                                               text='Specification of learning unit year')
