@@ -55,7 +55,7 @@ from base.views.learning_units.search.common import SearchTypes
 from cms.enums import entity_name
 from cms.enums.entity_name import LEARNING_UNIT_YEAR
 from cms.tests.factories.text_label import TextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text import TranslatedTextFactory, LearningUnitYearTranslatedTextFactory
 
 
 class LearningUnitPedagogyTestCase(TestCase):
@@ -346,8 +346,7 @@ class LearningUnitPedagogyEditTestCase(TestCase):
         PersonEntityFactory(person=cls.faculty_person, entity=cls.requirement_entity_version.entity)
 
     def setUp(self):
-        self.cms = TranslatedTextFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
+        self.cms = LearningUnitYearTranslatedTextFactory(
             reference=self.learning_unit_year.pk,
             language='fr-be',
             text='Some random text',

@@ -95,10 +95,9 @@ from base.views.learning_unit import learning_unit_specifications_edit
 from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.detail import SEARCH_URL_PART
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
-from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text import LearningUnitYearTranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from learning_unit.api.views.learning_unit import LearningUnitFilter
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
@@ -881,7 +880,7 @@ class LearningUnitViewTestCase(TestCase):
         a_label = 'label'
         learning_unit_year = LearningUnitYearFactory()
         text_label_lu = LearningUnitYearTextLabelFactory(order=1, label=a_label)
-        TranslatedTextFactory(text_label=text_label_lu, entity=entity_name.LEARNING_UNIT_YEAR)
+        LearningUnitYearTranslatedTextFactory(text_label=text_label_lu)
 
         response = self.client.get(
             reverse(learning_unit_specifications_edit,
@@ -982,14 +981,12 @@ class LearningUnitViewTestCase(TestCase):
         label = LearningUnitYearTextLabelFactory(label='label')
         for language in ['fr-be', 'en']:
             TranslatedTextLabelFactory(text_label=label, language=language)
-        trans_fr_be = [TranslatedTextFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
+        trans_fr_be = [LearningUnitYearTranslatedTextFactory(
             reference=luy.id,
             language='fr-be',
             text_label=label
         ) for luy in learning_unit_years]
-        trans_en = [TranslatedTextFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
+        trans_en = [LearningUnitYearTranslatedTextFactory(
             reference=luy.id,
             language='en',
             text_label=label

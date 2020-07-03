@@ -58,10 +58,9 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import AdministrativeManagerFactory, PersonWithPermissionsFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
-from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text import LearningUnitYearTranslatedTextFactory
 from learning_unit.models.learning_class_year import LearningClassYear
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 
@@ -302,16 +301,17 @@ class LearningUnitYearDeletion(TestCase):
                                                                academic_year=learning_container_year.academic_year)
         # Create CMS data - TAB Specification
         cms_specification_label = LearningUnitYearTextLabelFactory(abel=CMS_LABEL_SPECIFICATIONS[0])
-        TranslatedTextFactory(entity=entity_name.LEARNING_UNIT_YEAR, reference=learning_unit_year_to_delete.pk,
-                              text_label=cms_specification_label, text='Specification of learning unit year')
+        LearningUnitYearTranslatedTextFactory(reference=learning_unit_year_to_delete.pk,
+                                              text_label=cms_specification_label,
+                                              text='Specification of learning unit year')
         # Create CMS data - TAB Pedagogy
         cms_pedagogy_label = LearningUnitYearTextLabelFactory(label=CMS_LABEL_PEDAGOGY[0])
-        TranslatedTextFactory(entity=entity_name.LEARNING_UNIT_YEAR, reference=learning_unit_year_to_delete.pk,
-                              text_label=cms_pedagogy_label, text='Pedagogy of learning unit year')
+        LearningUnitYearTranslatedTextFactory(reference=learning_unit_year_to_delete.pk,
+                                              text_label=cms_pedagogy_label, text='Pedagogy of learning unit year')
         # Create CMS data - TAB Summary
         cms_summary_label = LearningUnitYearTextLabelFactory(label=CMS_LABEL_SUMMARY[0])
-        TranslatedTextFactory(entity=entity_name.LEARNING_UNIT_YEAR, reference=learning_unit_year_to_delete.pk,
-                              text_label=cms_summary_label, text='Summary of learning unit year')
+        LearningUnitYearTranslatedTextFactory(reference=learning_unit_year_to_delete.pk,
+                                              text_label=cms_summary_label, text='Summary of learning unit year')
 
         # Before delete, we should have 3 data in CMS
         self.assertEqual(3, TranslatedText.objects.all().count())

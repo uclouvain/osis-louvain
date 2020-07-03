@@ -27,6 +27,7 @@ import factory.fuzzy
 from django.conf import settings
 
 from .text_label import TextLabelFactory
+from ...enums import entity_name
 
 
 class TranslatedTextFactory(factory.django.DjangoModelFactory):
@@ -46,3 +47,15 @@ class TranslatedTextRandomFactory(TranslatedTextFactory):
 
 class EnglishTranslatedTextRandomFactory(TranslatedTextRandomFactory):
     language = settings.LANGUAGE_CODE_EN
+
+
+class OfferTranslatedTextFactory(TranslatedTextFactory):
+    entity = entity_name.OFFER_YEAR
+
+
+class GroupTranslatedTextFactory(TranslatedTextFactory):
+    entity = entity_name.GROUP_YEAR
+
+
+class LearningUnitYearTranslatedTextFactory(TranslatedTextFactory):
+    entity = entity_name.LEARNING_UNIT_YEAR

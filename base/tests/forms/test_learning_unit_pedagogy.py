@@ -37,9 +37,8 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
-from cms.enums import entity_name
 from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text import LearningUnitYearTranslatedTextFactory
 from reference.tests.factories.language import EnglishLanguageFactory
 
 
@@ -70,8 +69,7 @@ class LearningUnitPedagogyContextMixin(TestCase):
 class TestValidation(LearningUnitPedagogyContextMixin):
     def setUp(self):
         super().setUp()
-        self.cms_translated_text = TranslatedTextFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
+        self.cms_translated_text = LearningUnitYearTranslatedTextFactory(
             reference=self.luys[self.current_ac.year - 1].id,
             language='EN',
             text='Text random'
@@ -104,8 +102,7 @@ class TestValidation(LearningUnitPedagogyContextMixin):
     def test_save_with_postponement(self, mock_update_or_create):
         """In this test, we ensure that if we modify UE of N or N+X => The postponement until the lastest UE"""
         luy_in_future = self.luys[self.current_ac.year + 1]
-        cms_pedagogy_future = TranslatedTextFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
+        cms_pedagogy_future = LearningUnitYearTranslatedTextFactory(
             reference=luy_in_future.id,
             language='EN',
             text='Text in future'
@@ -149,8 +146,7 @@ class TestLearningUnitPedagogyEditForm(LearningUnitPedagogyContextMixin):
     def test_save_fr_bibliography_also_updates_en_bibliography(self, mock_update_or_create):
         """Ensure that if we modify bibliography in FR => bibliography in EN is updated with same text"""
         text_label_bibliography = LearningUnitYearTextLabelFactory(label='bibliography')
-        cms_translated_text_fr = TranslatedTextFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
+        cms_translated_text_fr = LearningUnitYearTranslatedTextFactory(
             reference=self.luys[self.current_ac.year].id,
             language='fr-be',
             text_label=text_label_bibliography,

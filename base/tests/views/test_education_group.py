@@ -48,7 +48,8 @@ from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory, PersonFactory
 from cms.enums import entity_name
 from cms.tests.factories.text_label import OfferTextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
+from cms.tests.factories.translated_text import TranslatedTextRandomFactory, \
+    OfferTranslatedTextFactory
 from education_group.tests.factories.group_year import GroupYearFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementFactory
@@ -233,10 +234,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         )
         GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
 
-        cls.cms_label_for_child = TranslatedTextFactory(
-            text_label__entity=entity_name.OFFER_YEAR,
-            reference=cls.education_group_child.id
-        )
+        cls.cms_label_for_child = OfferTranslatedTextFactory(reference=cls.education_group_child.id)
 
         cls.person = PersonFactory()
         cls.template_name = "education_group/tab_admission_conditions.html"

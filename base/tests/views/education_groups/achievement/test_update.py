@@ -40,7 +40,7 @@ from base.tests.factories.user import UserFactory
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import OfferTextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text import OfferTranslatedTextFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 
@@ -187,10 +187,9 @@ class TestEditEducationGroupAchievementProgramAim(TestEducationGroupAchievementC
             ]
         )
         self.text_label = OfferTextLabelFactory(label=CMS_LABEL_PROGRAM_AIM)
-        self.program_aim_french = TranslatedTextFactory(
+        self.program_aim_french = OfferTranslatedTextFactory(
             text_label=self.text_label,
             language=LANGUAGE_CODE_FR,
-            entity=entity_name.OFFER_YEAR,
             reference=self.education_group_year.pk,
             text="dummy text"
         )
@@ -242,10 +241,9 @@ class TestEditEducationGroupAchievementAdditionalInformation(TestEducationGroupA
         )
 
         self.text_label = OfferTextLabelFactory(label=CMS_LABEL_ADDITIONAL_INFORMATION)
-        self.program_aim_french = TranslatedTextFactory(
+        self.program_aim_french = OfferTranslatedTextFactory(
             text_label=self.text_label,
             language=LANGUAGE_CODE_FR,
-            entity=entity_name.OFFER_YEAR,
             reference=self.education_group_year.pk,
             text="dummy text"
         )
