@@ -60,7 +60,7 @@ from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.text_label import TextLabelFactory
+from cms.tests.factories.text_label import TextLabelFactory, LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from learning_unit.models.learning_class_year import LearningClassYear
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
@@ -301,18 +301,15 @@ class LearningUnitYearDeletion(TestCase):
                                                                subtype=learning_unit_year_subtypes.FULL,
                                                                academic_year=learning_container_year.academic_year)
         # Create CMS data - TAB Specification
-        cms_specification_label = TextLabelFactory(entity=entity_name.LEARNING_UNIT_YEAR,
-                                                   label=CMS_LABEL_SPECIFICATIONS[0])
+        cms_specification_label = LearningUnitYearTextLabelFactory(abel=CMS_LABEL_SPECIFICATIONS[0])
         TranslatedTextFactory(entity=entity_name.LEARNING_UNIT_YEAR, reference=learning_unit_year_to_delete.pk,
                               text_label=cms_specification_label, text='Specification of learning unit year')
         # Create CMS data - TAB Pedagogy
-        cms_pedagogy_label = TextLabelFactory(entity=entity_name.LEARNING_UNIT_YEAR,
-                                              label=CMS_LABEL_PEDAGOGY[0])
+        cms_pedagogy_label = LearningUnitYearTextLabelFactory(label=CMS_LABEL_PEDAGOGY[0])
         TranslatedTextFactory(entity=entity_name.LEARNING_UNIT_YEAR, reference=learning_unit_year_to_delete.pk,
                               text_label=cms_pedagogy_label, text='Pedagogy of learning unit year')
         # Create CMS data - TAB Summary
-        cms_summary_label = TextLabelFactory(entity=entity_name.LEARNING_UNIT_YEAR,
-                                             label=CMS_LABEL_SUMMARY[0])
+        cms_summary_label = LearningUnitYearTextLabelFactory(label=CMS_LABEL_SUMMARY[0])
         TranslatedTextFactory(entity=entity_name.LEARNING_UNIT_YEAR, reference=learning_unit_year_to_delete.pk,
                               text_label=cms_summary_label, text='Summary of learning unit year')
 

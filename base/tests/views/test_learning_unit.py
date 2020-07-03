@@ -97,7 +97,7 @@ from base.views.learning_units.detail import SEARCH_URL_PART
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
 from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.text_label import TextLabelFactory
+from cms.tests.factories.text_label import TextLabelFactory, LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from learning_unit.api.views.learning_unit import LearningUnitFilter
@@ -880,7 +880,7 @@ class LearningUnitViewTestCase(TestCase):
     def test_learning_unit_specifications_edit(self):
         a_label = 'label'
         learning_unit_year = LearningUnitYearFactory()
-        text_label_lu = TextLabelFactory(order=1, label=a_label, entity=entity_name.LEARNING_UNIT_YEAR)
+        text_label_lu = LearningUnitYearTextLabelFactory(order=1, label=a_label)
         TranslatedTextFactory(text_label=text_label_lu, entity=entity_name.LEARNING_UNIT_YEAR)
 
         response = self.client.get(
@@ -979,7 +979,7 @@ class LearningUnitViewTestCase(TestCase):
                 academic_year__year__lte=proposal.learning_unit_year.academic_year.year - 1
             )
         expected_postponed_luys_ids = luys.values_list('id', flat=True)
-        label = TextLabelFactory(label='label', entity=entity_name.LEARNING_UNIT_YEAR)
+        label = LearningUnitYearTextLabelFactory(label='label')
         for language in ['fr-be', 'en']:
             TranslatedTextLabelFactory(text_label=label, language=language)
         trans_fr_be = [TranslatedTextFactory(

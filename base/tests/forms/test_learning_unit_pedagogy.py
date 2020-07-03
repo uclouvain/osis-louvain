@@ -38,7 +38,7 @@ from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
 from base.tests.factories.teaching_material import TeachingMaterialFactory
 from cms.enums import entity_name
-from cms.tests.factories.text_label import TextLabelFactory
+from cms.tests.factories.text_label import TextLabelFactory, LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from reference.tests.factories.language import LanguageFactory, EnglishLanguageFactory
 
@@ -147,10 +147,7 @@ class TestLearningUnitPedagogyEditForm(LearningUnitPedagogyContextMixin):
     @patch("cms.models.translated_text.update_or_create")
     def test_save_fr_bibliography_also_updates_en_bibliography(self, mock_update_or_create):
         """Ensure that if we modify bibliography in FR => bibliography in EN is updated with same text"""
-        text_label_bibliography = TextLabelFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            label='bibliography'
-        )
+        text_label_bibliography = LearningUnitYearTextLabelFactory(label='bibliography')
         cms_translated_text_fr = TranslatedTextFactory(
             entity=entity_name.LEARNING_UNIT_YEAR,
             reference=self.luys[self.current_ac.year].id,

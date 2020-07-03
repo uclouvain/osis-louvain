@@ -41,7 +41,7 @@ from base.tests.factories.learning_component_year import LecturingLearningCompon
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.enums import entity_name
-from cms.tests.factories.text_label import TextLabelFactory
+from cms.tests.factories.text_label import TextLabelFactory, LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from learning_unit.ddd.repository.load_learning_unit_year import load_multiple, load_multiple_by_identity
 from learning_unit.tests.ddd.factories.learning_unit_year_identity import LearningUnitYearIdentityFactory
@@ -113,7 +113,7 @@ class TestLoadLearningUnitDescriptionFiche(TestCase):
         dict_labels = {}
         for cms_label in CMS_LABEL_PEDAGOGY + CMS_LABEL_SPECIFICATIONS:
             dict_labels.update(
-                {cms_label: TextLabelFactory(order=1, label=cms_label, entity=entity_name.LEARNING_UNIT_YEAR)}
+                {cms_label: LearningUnitYearTextLabelFactory(order=1, label=cms_label)}
             )
 
         cls.fr_cms_label = _build_cms_translated_text(cls.l_unit_1.id, dict_labels, LANGUAGE_FR,
