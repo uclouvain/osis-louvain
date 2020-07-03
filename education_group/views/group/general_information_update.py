@@ -33,6 +33,7 @@ from cms.models import translated_text_label, translated_text
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from education_group.views.group.common_read import Tab, GroupRead
+from osis_common.utils.models import get_object_or_none
 
 
 class GroupUpdateGeneralInformation(GroupRead):
@@ -86,7 +87,7 @@ class GroupUpdateGeneralInformation(GroupRead):
 
         label_name = self.request.GET.get('label')
 
-        initial_values = self.get_translated_texts(obj, node)
+        initial_values = self.get_translated_texts(obj)
 
         context = {
             'education_group_year': obj,
@@ -104,28 +105,27 @@ class GroupUpdateGeneralInformation(GroupRead):
             **context
         }
 
-    def get_translated_texts(self, obj, node):
-        initial_values = {'label': self.request.GET.get('label')}
-        entity = entity_name.get_offers_or_groups_entity_from_node(node)
-        fr_text = TranslatedText.objects.filter(
-            reference=str(obj.pk),
-            text_label__label=initial_values['label'],
-            text_label__entity=entity,
-            entity=entity,
-            language='fr-be'
-        ).first()
-        if fr_text:
-            initial_values.update({'text_french': fr_text.text})
-        en_text = TranslatedText.objects.filter(
-            reference=str(obj.pk),
-            text_label__label=initial_values['label'],
-            text_label__entity=entity,
-            entity=entity,
-            language='en'
-        ).first()
-        if en_text:
-            initial_values.update({'text_english': en_text.text})
+    def get_translated_texts(self, obj):
+        label = self.request.GET.get('label')
+        initial_values = {'label': label}
+        initial_values.update(self._get_translated_text_from_lang(label, obj, 'fr-be'))
+        initial_values.update(self._get_translated_text_from_lang(label, obj, 'en'))
         return initial_values
+
+    def _get_translated_text_from_lang(self, label, obj, lang):
+        node = self.get_object()
+        entity = entity_name.get_offers_or_groups_entity_from_node(node)
+        text = get_object_or_none(
+            TranslatedText.objects.select_related('text_label'),
+            reference=str(obj.pk),
+            text_label__label=label,
+            text_label__entity=entity,
+            entity=entity,
+            language=lang
+        )
+        if text:
+            return {'text_english' if lang == 'en' else 'text_french': text.text}
+        return {}
 
     def get_success_url(self):
         node = self.get_object()
