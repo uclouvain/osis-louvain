@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-19 10:19+0200\n"
+"POT-Creation-Date: 2020-06-24 10:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -576,9 +576,6 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
-msgid "Commerce partner"
-msgstr ""
-
 msgid "Common English title"
 msgstr ""
 
@@ -891,6 +888,9 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
+msgid "Embassy"
+msgstr ""
+
 msgid "End"
 msgstr ""
 
@@ -944,6 +944,9 @@ msgid "Ensure this value is less than or equal to %(limit_value)s."
 msgstr ""
 
 msgid "Enter text to search"
+msgstr ""
+
+msgid "Enterprise"
 msgstr ""
 
 msgid "Entities"
@@ -1186,6 +1189,9 @@ msgstr ""
 msgid "Home"
 msgstr ""
 
+msgid "Hospital"
+msgstr ""
+
 msgid "ISCED domain"
 msgstr "ISCED/CITE domain"
 
@@ -1216,9 +1222,6 @@ msgid "Include subordinate entities"
 msgstr ""
 
 msgid "Included in"
-msgstr ""
-
-msgid "Industrial partner"
 msgstr ""
 
 msgid "Initial data"
@@ -1253,9 +1256,6 @@ msgid "Invalid action"
 msgstr ""
 
 msgid "Invalid code"
-msgstr ""
-
-msgid "Is current partner"
 msgstr ""
 
 msgid "Is this teaching material mandatory?"
@@ -1750,6 +1750,9 @@ msgstr ""
 msgid "Non university Bachelors"
 msgstr ""
 
+msgid "Non-governmental organization"
+msgstr ""
+
 msgid "Not concerned"
 msgstr ""
 
@@ -2175,9 +2178,6 @@ msgstr ""
 msgid "Provisory"
 msgstr ""
 
-msgid "Public partner"
-msgstr ""
-
 msgid "Publication contact entity"
 msgstr ""
 
@@ -2365,9 +2365,6 @@ msgid "Separate"
 msgstr ""
 
 msgid "Service courses"
-msgstr ""
-
-msgid "Service partner"
 msgstr ""
 
 msgid "Session"

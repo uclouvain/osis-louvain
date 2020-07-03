@@ -54,7 +54,7 @@ def _generate_block_value():
 class GroupElementYearFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.GroupElementYear"
-        django_get_or_create = ('parent', 'child_branch', 'child_leaf')
+        django_get_or_create = ('parent_element', 'child_element')
 
     external_id = factory.fuzzy.FuzzyText(length=10, chars=string.digits)
     changed = factory.fuzzy.FuzzyNaiveDateTime(datetime.datetime(2016, 1, 1), datetime.datetime(2017, 3, 1))

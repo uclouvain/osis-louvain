@@ -480,6 +480,10 @@ YEAR_LIMIT_EDG_MODIFICATION = int(os.environ.get("YEAR_LIMIT_EDG_MODIFICATION", 
 STAFF_FUNDING_URL = os.environ.get('STAFF_FUNDING_URL', '')
 VIRTUAL_DESKTOP_URL = os.environ.get('VIRTUAL_DESKTOP_URL', '')
 LEARNING_UNIT_PORTAL_URL = os.environ.get('LEARNING_UNIT_PORTAL_URL', 'https://uclouvain.be/cours-{year}-{acronym}')
+LEARNING_UNIT_PORTAL_URL_WITH_UPDATED_CACHE = os.environ.get(
+    'LEARNING_UNIT_PORTAL_URL_WITH_UPDATED_CACHE',
+    'https://uclouvain.be/cours-{year}-{acronym}'
+)
 
 # SITE_ID for Django "sites framework"
 SITE_ID = os.environ.get('SITE_ID', 1)

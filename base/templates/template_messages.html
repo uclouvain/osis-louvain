@@ -26,6 +26,7 @@
 {% block messages %}
     <!-- div to display message coming from Javascript function -->
     <div id="message_info_container" class="alert alert-info" role="alert" style="visibility: hidden; display: none;"></div>
+    <div id="message_success_container" class="alert alert-success" role="alert" style="visibility: hidden; display: none;"></div>
 
     {% as_messages_success as messages_success %}
     {% if messages_success %}

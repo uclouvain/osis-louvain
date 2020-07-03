@@ -93,7 +93,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
     @functools.lru_cache()
     def get_education_group_version(self):
         try:
-            root_element_id = self.get_path().split("|")[0]
+            root_element_id = self.get_path().split("|")[-1]
             return EducationGroupVersion.objects.select_related(
                 'offer', 'root_group'
             ).get(root_group__element__pk=root_element_id)
@@ -125,6 +125,7 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "person": self.request.user.person,
             "enums": mdl.enums.education_group_categories,
             "node": self.get_object(),
+            "node_path": self.get_path(),
             "tab_urls": self.get_tab_urls(),
             "tree": json.dumps(program_tree_view_serializer(self.get_tree())),
             "education_group_version": self.get_education_group_version(),
@@ -136,8 +137,16 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
             "selected_element_clipboard": self.get_selected_element_clipboard_message(),
             "current_version": self.current_version,
             "versions_choices": get_tree_versions_choices(self.node_identity, _get_view_name_from_tab(self.active_tab)),
+            "xls_ue_prerequisites": reverse("education_group_learning_units_prerequisites",
+                                            args=[self.get_education_group_version().root_group.academic_year.year,
+                                                  self.get_education_group_version().root_group.partial_acronym]
+                                            ),
+            "xls_ue_is_prerequisite": reverse("education_group_learning_units_is_prerequisite_for",
+                                              args=[self.get_education_group_version().root_group.academic_year.year,
+                                                    self.get_education_group_version().root_group.partial_acronym]
+                                              ),
             # TODO: Remove when finished reoganized tempalate
-            "group_year": self.get_education_group_version().root_group
+            "group_year": self.get_education_group_version().root_group,
         }
 
     def get_permission_object(self):
@@ -185,17 +194,20 @@ class MiniTrainingRead(PermissionRequiredMixin, ElementSelectedClipBoardMixin, T
 
     def have_general_information_tab(self):
         node_category = self.get_object().category
-        return node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
+        return self.current_version.is_standard_version and \
+            node_category.name in general_information_sections.SECTIONS_PER_OFFER_TYPE and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def have_skills_and_achievements_tab(self):
         node_category = self.get_object().category
-        return node_category.name in MiniTrainingType.with_skills_achievements() and \
+        return self.current_version.is_standard_version and \
+            node_category.name in MiniTrainingType.with_skills_achievements() and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def have_admission_condition_tab(self):
         node_category = self.get_object().category
-        return node_category.name in MiniTrainingType.with_admission_condition() and \
+        return self.current_version.is_standard_version and \
+            node_category.name in MiniTrainingType.with_admission_condition() and \
             self._is_general_info_and_condition_admission_in_display_range
 
     def _is_general_info_and_condition_admission_in_display_range(self):

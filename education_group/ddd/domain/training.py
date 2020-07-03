@@ -26,6 +26,8 @@
 from _decimal import Decimal
 from typing import List
 
+import attr
+
 from base.models.enums.academic_type import AcademicTypes
 from base.models.enums.activity_presence import ActivityPresence
 from base.models.enums.decree_category import DecreeCategories
@@ -48,16 +50,10 @@ from education_group.ddd.domain._titles import Titles
 from osis_common.ddd import interface
 
 
+@attr.s(frozen=True, slots=True)
 class TrainingIdentity(interface.EntityIdentity):
-    def __init__(self, acronym: str, year: int):
-        self.acronym = acronym
-        self.year = year
-
-    def __hash__(self):
-        return hash(self.acronym + str(self.year))
-
-    def __eq__(self, other):
-        return self.acronym == other.acronym and self.year == other.year
+    acronym = attr.ib(type=str)
+    year = attr.ib(type=int)
 
 
 class Training(interface.RootEntity):

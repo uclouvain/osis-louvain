@@ -33,7 +33,7 @@ from base.views.education_groups.publication_contact import CreateEducationGroup
 from base.views.education_groups.search import EducationGroupTypeAutoComplete
 from base.views.education_groups.update import CertificateAimAutocomplete
 from education_group import urls as education_group_urls
-from . import search, create, update, delete
+from . import create, update, delete
 from .achievement.urls import urlpatterns as urlpatterns_achievement
 
 urlpatterns = [
@@ -48,7 +48,6 @@ urlpatterns = [
         name='education_group_type_autocomplete'
     ),
 
-    url(r'^$', search.EducationGroupSearch.as_view(), name='education_groups'),
     url(
         r'^clear_clipboard/$',
         clear_clipboard,

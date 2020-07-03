@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2017 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ import datetime
 from http import HTTPStatus
 from unittest import mock
 
-from django.http import HttpResponseForbidden, QueryDict
+from django.http import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
@@ -36,13 +36,12 @@ from base.models.enums import organization_type
 from base.models.enums.publication_contact_type import PublicationContactType
 from base.tests.factories.academic_year import create_current_academic_year
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
-from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearCommonFactory, \
+from base.tests.factories.education_group_year import EducationGroupYearCommonFactory, \
     EducationGroupYearMasterFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
-from education_group.views.proxy.read import Tab
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
 from program_management.tests.factories.element import ElementGroupYearFactory
 
 DELETE_URL_NAME = "publication_contact_delete"
@@ -59,7 +58,7 @@ class PublicationContactViewSetupTest(TestCase):
         EducationGroupYearCommonFactory(academic_year=cls.academic_year)
 
         cls.training = EducationGroupYearMasterFactory(academic_year=cls.academic_year)
-        cls.training_version = EducationGroupVersionFactory(
+        cls.training_version = StandardEducationGroupVersionFactory(
             offer=cls.training,
             root_group__partial_acronym=cls.training.partial_acronym,
             root_group__acronym=cls.training.acronym,

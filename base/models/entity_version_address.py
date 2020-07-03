@@ -31,8 +31,8 @@ from osis_common.models.osis_model_admin import OsisModelAdmin
 
 
 class EntityVersionAddressAdmin(VersionAdmin, OsisModelAdmin):
-    list_display = ('id', 'entity_version_id', 'is_main', 'country', 'city', 'postal_code',)
-    search_fields = ['city', 'street', 'postal_code', 'country', 'entity_version_id']
+    list_display = ('id', 'entity_version_id', 'is_main', 'country', 'state', 'city', 'postal_code',)
+    search_fields = ['city', 'street', 'postal_code', 'country__name', 'state', 'entity_version_id__id']
     raw_id_fields = ('country', 'entity_version_id')
     list_filter = ['is_main', 'country']
 
@@ -42,7 +42,8 @@ class EntityVersionAddress(models.Model):
     city = models.CharField(max_length=255, blank=True)
     street = models.CharField(max_length=255, blank=True)
     street_number = models.CharField(max_length=12, blank=True)
-    postal_code = models.PositiveIntegerField(blank=True, null=True)
+    postal_code = models.CharField(max_length=32, blank=True)
+    state = models.CharField(max_length=255, blank=True)
     country = models.ForeignKey('reference.Country', on_delete=models.PROTECT, blank=True, null=True)
     entity_version_id = models.ForeignKey('EntityVersion', on_delete=models.PROTECT)
     location = PointField(blank=True, null=True)
@@ -50,7 +51,7 @@ class EntityVersionAddress(models.Model):
 
     def save(self, *args, **kwargs):
         if self.is_main and EntityVersionAddress.objects.filter(
-                is_main=True, entity_version_id=self.entity_version_id).exists():
+                is_main=True, entity_version_id=self.entity_version_id).exclude(pk=self.pk).exists():
             raise AttributeError(
                 "There is already an EntityVersionAddress with this entity_version_id and is_main = True"
             )

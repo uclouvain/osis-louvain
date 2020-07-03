@@ -32,7 +32,20 @@
     </button>
 
     <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
-        {# Other actions have to be fixed, look in the identifiation_actions_bar_to_be_fixed.html #}
+         {# Other actions have to be fixed, look in the identifiation_actions_bar_to_be_fixed.html #}
+        <li>
+            <a href="{{ xls_ue_prerequisites }}"
+                class="download">
+                <span>{% trans 'Generate xls of learning units that have prerequisites' %}</span>
+            </a>
+        </li>
+        <li>
+            <a href="{{ xls_ue_is_prerequisite }}"
+                class="download">
+                <span>{% trans 'Generate xls of learning units that are prerequisites for' %}</span>
+            </a>
+        </li>
+        <li class="divider"></li>
         <li>
             <a href="#" data-toggle="modal" data-target="#modalCustomXls"
                role="button" id="bt_modal_custom_xls" class="download">

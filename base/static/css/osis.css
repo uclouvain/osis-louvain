@@ -589,3 +589,8 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 {
     color: grey;
 }
+
+.container-align-items-center {
+    display: flex;
+    align-items: center;
+}

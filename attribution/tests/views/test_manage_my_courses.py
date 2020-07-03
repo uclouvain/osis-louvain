@@ -38,13 +38,15 @@ from django.utils.translation import gettext as _
 from waffle.testutils import override_flag
 
 from attribution.tests.factories.attribution import AttributionFactory
-from attribution.views.manage_my_courses import list_my_attributions_summary_editable, view_educational_information
+from attribution.views.manage_my_courses import list_my_attributions_summary_editable, view_educational_information, \
+    _fetch_achievements_by_language
 from base.models.enums import academic_calendar_type
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
@@ -221,6 +223,21 @@ class TestViewEducationalInformation(TestCase):
         self.assertEqual(context['update_teaching_material_urlname'], 'tutor_teaching_material_edit')
         self.assertEqual(context['delete_teaching_material_urlname'], 'tutor_teaching_material_delete')
         self.assertEqual(context['update_mobility_modality_urlname'], 'tutor_mobility_modality_update')
+
+
+class TestFetchAchievement(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.learning_unit_year = LearningUnitYearFactory()
+        cls.achivement_fr = LearningAchievementFactory(language__code="FR", learning_unit_year=cls.learning_unit_year)
+        cls.achivement_en = LearningAchievementFactory(language__code="EN", learning_unit_year=cls.learning_unit_year)
+
+    def test_return_an_iterable_of_fr_and_en_achievements(self):
+        result = _fetch_achievements_by_language(self.learning_unit_year)
+        self.assertListEqual(
+            list(result),
+            list(zip([self.achivement_fr], [self.achivement_en]))
+        )
 
 
 class TestManageEducationalInformation(TestCase):

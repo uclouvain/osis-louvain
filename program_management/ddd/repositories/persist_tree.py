@@ -72,11 +72,18 @@ def __persist_group_element_year(link):
 
 def __delete_links(tree: program_tree.ProgramTree, node: Node):
     for link in node._deleted_children:
-        if link.child.is_learning_unit():
-            _persist_prerequisite._persist(tree.root_node, link.child)
+        __persist_deleted_prerequisites(tree, link.child)
         __delete_group_element_year(link)
     for link in node.children:
         __delete_links(tree, link.child)
+
+
+def __persist_deleted_prerequisites(tree: program_tree.ProgramTree, node: Node):
+    if node.is_learning_unit():
+        _persist_prerequisite._persist(tree.root_node, node)
+    else:
+        for child_node in node.get_all_children_as_learning_unit_nodes():
+            _persist_prerequisite._persist(tree.root_node, child_node)
 
 
 def __delete_group_element_year(link):

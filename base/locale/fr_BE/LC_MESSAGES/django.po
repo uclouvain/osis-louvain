@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-19 10:19+0200\n"
+"POT-Creation-Date: 2020-06-24 10:28+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -349,6 +349,9 @@ msgstr "Master complémentaire en spécialisation médicale"
 msgid "Aggregation"
 msgstr "Agrégation"
 
+msgid "Agreements"
+msgstr "Accords"
+
 msgid "Alert"
 msgstr "Alerte"
 
@@ -604,9 +607,6 @@ msgstr "Code co-diplômation intra CfB"
 
 msgid "Comment"
 msgstr "Commentaire"
-
-msgid "Commerce partner"
-msgstr "Partenaire commercial"
 
 msgid "Common English title"
 msgstr "Intitulé commun en anglais"
@@ -932,6 +932,9 @@ msgstr "Elaboration et gestion du catalogue de formations."
 msgid "Email"
 msgstr "Courriel"
 
+msgid "Embassy"
+msgstr "Ambassade"
+
 msgid "End"
 msgstr "Fin"
 
@@ -987,6 +990,9 @@ msgstr ""
 
 msgid "Enter text to search"
 msgstr "Entrez le texte à rechercher"
+
+msgid "Enterprise"
+msgstr "Entreprise"
 
 msgid "Entities"
 msgstr "Entités"
@@ -1231,6 +1237,9 @@ msgstr "Diplômés de 2° cycle non universitaire"
 msgid "Home"
 msgstr "Page d'accueil"
 
+msgid "Hospital"
+msgstr "Hôpital"
+
 msgid "ISCED domain"
 msgstr "Domaine ISCED/CITE"
 
@@ -1265,9 +1274,6 @@ msgstr "Inclure les entités subordonnées"
 msgid "Included in"
 msgstr "Inclus dans"
 
-msgid "Industrial partner"
-msgstr "Partenaire industriel"
-
 msgid "Initial data"
 msgstr "Valeur initiale"
 
@@ -1301,9 +1307,6 @@ msgstr "Action invalide"
 
 msgid "Invalid code"
 msgstr "Code non valide"
-
-msgid "Is current partner"
-msgstr ""
 
 msgid "Is this teaching material mandatory?"
 msgstr "Ce support de cours est-il obligatoire ?"
@@ -1681,6 +1684,9 @@ msgstr "Téléphone mobile (GSM)"
 msgid "Mobility"
 msgstr "Mobilité"
 
+msgid "Mobility management entities"
+msgstr "Entités de gestion mobilité"
+
 msgid "Mobility partnership"
 msgstr "Partenariat de mobilité"
 
@@ -1823,6 +1829,9 @@ msgstr "Non académique CREF"
 
 msgid "Non university Bachelors"
 msgstr "Bacheliers non universitaires"
+
+msgid "Non-governmental organization"
+msgstr "Organisation non-gouvernementale"
 
 msgid "Not concerned"
 msgstr "Non concerné"
@@ -2267,9 +2276,6 @@ msgstr "Propositions_comparaison"
 msgid "Provisory"
 msgstr "Provisoire"
 
-msgid "Public partner"
-msgstr "Partenaire public"
-
 msgid "Publication contact entity"
 msgstr "Entité de contact de publication"
 
@@ -2458,9 +2464,6 @@ msgstr "Séparer"
 
 msgid "Service courses"
 msgstr "Cours de service"
-
-msgid "Service partner"
-msgstr "Partenaire de service"
 
 msgid "Session"
 msgstr "Session"

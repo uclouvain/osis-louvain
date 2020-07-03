@@ -71,10 +71,8 @@ def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
         _post_learning_unit_pedagogy_form(request)
         return redirect(redirect_url)
 
-    context = get_common_context_learning_unit_year(
-        learning_unit_year_id,
-        get_object_or_404(Person, user=request.user)
-    )
+    context = get_common_context_learning_unit_year(get_object_or_404(Person, user=request.user), learning_unit_year_id,
+                                                    None, None)
     label_name = request.GET.get('label')
     language = request.GET.get('language')
     text_lb = TextLabel.objects.prefetch_related(

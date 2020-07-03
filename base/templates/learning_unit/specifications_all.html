@@ -179,7 +179,7 @@
                             <div class="row">
                                 <div class="col-md-6 show_collapse" id="div_cms_fr_achievement_{{ forloop.counter0 }}"
                                      aria-expanded="false">
-                                    <div class="{{ div_class }}" id="cms_text_fr_achievement_{{ forloop.counter0 }}">
+                                    <div class="{{ div_class }}" id="cms_text_fr_achievement_{{ forloop.counter0 }}" aria-expanded="false">
                                         {{ achievement.text| default_if_none:''|safe }}
                                     </div>
                                     {% if div_class %}
@@ -196,7 +196,7 @@
                                      aria-expanded="false">
                                     {% if achievement_en %}
                                         <div class="{{ div_class }}"
-                                             id="cms_text_en_achievement_{{ forloop.counter0 }}">
+                                             id="cms_text_en_achievement_{{ forloop.counter0 }}" aria-expanded="false">
                                             <a id="anchor_{{ achievement_en.id }}"></a>
                                             {{ achievement_en.text| default_if_none:''|safe }}
                                         </div>

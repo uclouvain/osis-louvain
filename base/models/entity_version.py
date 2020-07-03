@@ -42,7 +42,7 @@ from reversion.admin import VersionAdmin
 from base.models.entity import Entity
 from base.models.enums import entity_type
 from base.models.enums.entity_type import PEDAGOGICAL_ENTITY_TYPES
-from base.models.enums.organization_type import MAIN
+from base.models.enums.organization_type import ACADEMIC_PARTNER, MAIN
 from base.models.utils.func import ArrayConcat
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 from osis_common.utils.datetime import get_tzinfo
@@ -255,6 +255,19 @@ class EntityVersionQuerySet(CTEQuerySet):
         return self.filter(
             Q(entity__organization__type=MAIN),
             Q(entity_type__in=PEDAGOGICAL_ENTITY_TYPES) | Q(acronym__in=PEDAGOGICAL_ENTITY_ADDED_EXCEPTIONS),
+        )
+
+    @property
+    def of_main_organization(self):
+        return self.filter(entity__organization__type=MAIN)
+
+    @property
+    def of_active_academic_partner(self):
+        return self.filter(
+            entity__organization__type=ACADEMIC_PARTNER,
+            # The two following check for active root entity
+            parent__isnull=True,
+            end_date__isnull=True,
         )
 
 
