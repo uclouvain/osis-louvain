@@ -25,16 +25,13 @@
 ##############################################################################
 from django.test import TestCase
 
+from cms.models.translated_text import TranslatedText
 from cms.tests.factories.text_label import OfferTextLabelFactory, GroupTextLabelFactory, \
     LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import OfferTranslatedTextFactory, \
-    LearningUnitYearTranslatedTextFactory
+    LearningUnitYearTranslatedTextFactory, GroupTranslatedTextFactory
 
 REFERENCE = 2502
-
-
-class GroupTranslatedTextFactory(object):
-    pass
 
 
 class TranslatedTextTest(TestCase):
@@ -57,8 +54,9 @@ class TranslatedTextTest(TestCase):
         GroupTranslatedTextFactory(text_label=text_label_gy_1,
                                    reference=REFERENCE)
 
-        tt = OfferTranslatedTextFactory.objects.filter(
-            reference=REFERENCE
+        tt = TranslatedText.objects.filter(
+            reference=REFERENCE,
+            entity='offer_year'
         ).order_by('text_label__order').values_list('text_label__label', flat=True)
         self.assertEqual(
             list(tt),

@@ -34,6 +34,7 @@ from base.business.education_groups.general_information_sections import \
     SKILLS_AND_ACHIEVEMENTS, ADMISSION_CONDITION, CONTACTS, CONTACT_INTRO, INTRODUCTION
 from base.models.enums.education_group_types import GroupType
 from cms.enums import entity_name
+from cms.models import translated_text
 from cms.models.translated_text import TranslatedText, get_groups_or_offers_cms_reference_object
 from cms.models.translated_text_label import TranslatedTextLabel
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
@@ -67,7 +68,7 @@ class GeneralInformationSerializer(serializers.Serializer):
         language = settings.LANGUAGE_CODE_FR \
             if self.instance.language == settings.LANGUAGE_CODE_FR[:2] else self.instance.language
         pertinent_sections = general_information_sections.SECTIONS_PER_OFFER_TYPE[obj.node_type.name]
-        reference = self.__get_reference_pk(obj)
+        reference = translated_text.get_groups_or_offers_cms_reference_object(obj).pk
 
         cms_serializers = {
             SKILLS_AND_ACHIEVEMENTS: AchievementSectionSerializer,

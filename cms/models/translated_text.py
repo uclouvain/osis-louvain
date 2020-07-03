@@ -26,12 +26,14 @@
 from ckeditor.fields import RichTextField
 from django.conf import settings
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 from django.shortcuts import get_object_or_404
 from reversion.admin import VersionAdmin
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType
-from cms.enums.entity_name import ENTITY_NAME
+from cms.enums.entity_name import ENTITY_NAME, OFFER_YEAR
 from education_group.models.group_year import GroupYear
 from osis_common.models import osis_model_admin
 from program_management.ddd.domain.node import Node
@@ -106,3 +108,8 @@ def get_groups_or_offers_cms_reference_object(node: Node):
             EducationGroupYear,
             educationgroupversion__root_group__element__pk=node.pk
         )
+
+
+@receiver(post_delete, sender=EducationGroupYear)
+def _educationgroupyear_delete(sender, instance, **kwargs):
+    TranslatedText.objects.filter(entity=OFFER_YEAR, reference=instance.id).delete()

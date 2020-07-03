@@ -30,8 +30,6 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models, connection
 from django.db.models import Count, Min, When, Case, Max
-from django.db.models.signals import post_delete
-from django.dispatch.dispatcher import receiver
 from django.urls import reverse
 from django.utils import translation
 from django.utils.functional import cached_property
@@ -51,8 +49,6 @@ from base.models.enums.funding_codes import FundingCodes
 from base.models.enums.offer_enrollment_state import SUBSCRIBED, PROVISORY
 from base.models.exceptions import MaximumOneParentAllowedException, ValidationWarning
 from base.models.validation_rule import ValidationRule
-from cms.enums.entity_name import OFFER_YEAR
-from cms.models.translated_text import TranslatedText
 from osis_common.models.serializable_model import SerializableModel, SerializableModelManager, SerializableModelAdmin, \
     SerializableQuerySet
 from osis_common.utils.models import get_object_or_none
@@ -1007,6 +1003,3 @@ def _find_with_learning_unit_enrollment_count(learning_unit_year):
         .annotate(count_learning_unit_enrollments=Count('offerenrollment__learningunitenrollment')).order_by('acronym')
 
 
-@receiver(post_delete, sender=EducationGroupYear)
-def _educationgroupyear_delete(sender, instance, **kwargs):
-    TranslatedText.objects.filter(entity=OFFER_YEAR, reference=instance.id).delete()
