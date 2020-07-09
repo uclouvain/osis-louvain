@@ -103,11 +103,10 @@ def get_groups_or_offers_cms_reference_object(node: Node):
             element__pk=node.pk
         )
 
-    else:
-        return get_object_or_404(
-            EducationGroupYear,
-            educationgroupversion__root_group__element__pk=node.pk
-        )
+    return get_object_or_404(
+        EducationGroupYear,
+        educationgroupversion__root_group__element__pk=node.pk
+    )
 
 
 @receiver(post_delete, sender=EducationGroupYear)
