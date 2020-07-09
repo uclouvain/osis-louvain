@@ -70,7 +70,7 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        if self.get('tree_version'):
+        if hasattr(self, 'tree_version') and self.tree_version:
             context.update(
                 {
                     'version_name': self.tree_version.version_name,

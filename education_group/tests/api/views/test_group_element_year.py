@@ -62,13 +62,13 @@ class TrainingTreeViewTestCase(APITestCase):
             academic_year=cls.academic_year,
             education_group_type__name=TrainingType.PGRM_MASTER_120.name
         )
-        training_version = StandardEducationGroupVersionFactory(
+        cls.training_version = StandardEducationGroupVersionFactory(
             offer=cls.training,
             root_group__academic_year=cls.academic_year,
             root_group__education_group_type__category=TRAINING,
             root_group__partial_acronym='LBROI200M',
         )
-        element_training = ElementFactory(group_year=training_version.root_group)
+        element_training = ElementFactory(group_year=cls.training_version.root_group)
         cls.common_core = GroupYearFactory(
             education_group_type__category=GROUP,
             education_group_type__name=GroupType.COMMON_CORE.name,
@@ -166,6 +166,9 @@ class TrainingTreeViewTestCase(APITestCase):
             Link(parent=None, child=load_tree.load(training_element.id).root_node),
             context={
                 'request': RequestFactory().get(self.url),
+                'version_name': self.training_version.version_name,
+                'version_title_fr': self.training_version.title_fr,
+                'version_title_en': self.training_version.title_en
             }
         )
         self.assertEqual(response.data, serializer.data)
