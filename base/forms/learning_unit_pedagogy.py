@@ -86,12 +86,13 @@ class LearningUnitPedagogyEditForm(forms.Form):
         if hasattr(self, 'cleaned_data'):
             cms_id = self.cleaned_data['cms_id']
             return TranslatedText.objects.get(pk=cms_id)
-        return translated_text.get_or_create(
+        translated_text, _ = TranslatedText.objects.get_or_create(
             entity=entity_name.LEARNING_UNIT_YEAR,
             reference=self.learning_unit_year.id,
-            language=self.language_iso,
-            text_label=self.text_label
+            text_label=self.text_label,
+            language=self.language_iso
         )
+        return translated_text
 
 
 class TeachingMaterialModelForm(forms.ModelForm):

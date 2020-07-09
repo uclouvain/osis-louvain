@@ -23,6 +23,8 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from ckeditor.fields import RichTextField
 from django.conf import settings
 from django.db import models
@@ -67,7 +69,7 @@ class TranslatedText(models.Model):
         unique_together = ('entity', 'reference', 'text_label', 'language')
 
 
-def search(entity, reference, text_labels_name=None, language=None):
+def search(entity, reference: int, text_labels_name: List[str] = None, language: str = None):
     queryset = TranslatedText.objects.filter(entity=entity, reference=reference)
 
     if language:
@@ -79,10 +81,12 @@ def search(entity, reference, text_labels_name=None, language=None):
 
 
 def get_or_create(entity, reference, text_label, language):
-    translated_text, created = TranslatedText.objects.get_or_create(entity=entity,
-                                                                    reference=reference,
-                                                                    text_label=text_label,
-                                                                    language=language)
+    translated_text, _ = TranslatedText.objects.get_or_create(
+        entity=entity,
+        reference=reference,
+        text_label=text_label,
+        language=language
+    )
     return translated_text
 
 
@@ -97,15 +101,12 @@ def update_or_create(entity, reference, text_label, language, defaults):
 
 
 def get_groups_or_offers_cms_reference_object(node: Node):
-    if node.node_type.name in GroupType.get_names():
-        return get_object_or_404(
-            GroupYear,
-            element__pk=node.pk
-        )
-
+    is_group = node.node_type.name in GroupType.get_names()
+    object_model = GroupYear if is_group else EducationGroupYear
+    filter_kwargs = {'element__pk' if is_group else 'educationgroupversion__root_group__element__pk': node.pk}
     return get_object_or_404(
-        EducationGroupYear,
-        educationgroupversion__root_group__element__pk=node.pk
+        object_model,
+        **filter_kwargs
     )
 
 
