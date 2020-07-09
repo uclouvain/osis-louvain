@@ -52,7 +52,7 @@ class TestDetachNodeForm(SimpleTestCase):
         cls.tree = ProgramTree(root_node)
         super().setUpClass()
 
-    @mock.patch('program_management.ddd.service.detach_node_service.detach_node')
+    @mock.patch('program_management.ddd.service.write.detach_node_service.detach_node')
     def test_valid_form_assert_called_detach_node_service(self, mock_detach_node):
         common_core_path = "|".join([
             str(self.tree.root_node.node_id),

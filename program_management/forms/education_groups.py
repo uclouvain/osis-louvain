@@ -125,7 +125,7 @@ class GroupFilter(FilterSet):
             ('acronym', 'acronym'),
             ('partial_acronym', 'code'),
             ('academic_year__year', 'academic_year'),
-            ('title_fr', 'title_fr'),
+            ('title', 'title'),
             ('type_ordering', 'type'),
             ('entity_management_version', 'management_entity')
         ),
@@ -181,7 +181,7 @@ class GroupFilter(FilterSet):
             OuterRef('academic_year__start_date')
         ).values('acronym')[:1]
 
-        return GroupYear.objects.all().annotate(
+        return GroupYear.objects.all().select_related('element', 'academic_year').annotate(
             type_ordering=Case(
                 *[When(education_group_type__name=key, then=Value(str(_(val))))
                   for i, (key, val) in enumerate(education_group_types.ALL_TYPES)],
@@ -198,28 +198,21 @@ class GroupFilter(FilterSet):
                 output_field=CharField(),)
         ).annotate(
             complete_title_fr=Case(
-                When(
-                    Q(educationgroupversion__isnull=False),
-                    then=Case(
-                        When(Q(educationgroupversion__is_transition=True) &
-                             Q(educationgroupversion__version_name=''),
-                             then=Concat('acronym', Value('[Transition]'))),
-                        When(~Q(educationgroupversion__version_name='') &
-                             Q(educationgroupversion__is_transition=True),
-                             then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value('-Transition]'))),
-                        When(~Q(educationgroupversion__version_name='') &
-                             Q(educationgroupversion__is_transition=False),
-                             then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value(']'))),
-                        default='acronym',
-                        output_field=CharField()
-                    )
-                ),
+                When(Q(educationgroupversion__is_transition=True) &
+                     Q(educationgroupversion__version_name=''),
+                     then=Concat('acronym', Value('[Transition]'))),
+                When(~Q(educationgroupversion__version_name='') &
+                     Q(educationgroupversion__is_transition=True),
+                     then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value('-Transition]'))),
+                When(~Q(educationgroupversion__version_name='') &
+                     Q(educationgroupversion__is_transition=False),
+                     then=Concat('acronym',  Value('['), 'educationgroupversion__version_name', Value(']'))),
                 default='acronym',
                 output_field=CharField()
             )
         ).annotate(
             title=Case(
-                When(Q(educationgroupversion__isnull=False) & ~Q(educationgroupversion__title_fr=''),
+                When(Q(educationgroupversion__title_fr__isnull=False) & ~Q(educationgroupversion__title_fr=''),
                      then=Concat('title_fr', Value(' ['), 'educationgroupversion__title_fr', Value(']'))),
                 default='title_fr',
                 output_field=CharField(),)

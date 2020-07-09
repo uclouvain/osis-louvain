@@ -1,7 +1,7 @@
-{% extends "education_group/layout.html" %}
+{% extends "education_group_app/blocks/layout.html" %}
 {% load static %}
 {% load i18n bootstrap3 %}
-{% load waffle_tags %}
+{% load osis_role %}
 
 {% comment "License" %}
  * OSIS stands for Open Student Information System. It's an application
@@ -39,7 +39,22 @@
     <div class="page-header">
         <div class="row">
             <div class="col-md-12">
-                <h2>{% trans 'Trainings' %}</h2>
+                <h2 class="d-inline-block">{% trans 'Trainings' %}</h2>
+
+                <!-- Create dropdown -->
+                <div class="btn-group pull-right" style="margin-top:20px;">
+                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="glyphicon glyphicon-cog" aria-hidden="true"></span>
+                        {% trans 'Actions' %}
+                        <span class="caret"></span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
+                         <li>
+                            {% url 'create_element_select_type' enums.GROUP as create_group_url %}
+                            {% a_tag_modal_has_perm create_group_url _('New Education Group') 'base.add_group' user %}
+                         </li>
+                    </ul>
+                 </div>
             </div>
         </div>
     </div>
@@ -98,6 +113,9 @@
                 </div>
                 {% bootstrap_field form.ordering %}
                 {{ form.media }}
+                <input type="hidden" id="xls_status" name="xls_status">
+                <input type="hidden" id="xls_order_col" name="xls_order_col">
+                <input type="hidden" id="xls_order" name="xls_order">
             </form>
 
             {% include 'learning_unit/blocks/form/search_form_reset.html' %}
@@ -105,10 +123,41 @@
             <div class="row">
                 {% if object_list_count %}
                     <div class="row">
-                        <div class="col-md-12">
+                        <div class="col-md-6">
                             <strong style="margin-left:10px;color:grey;">
                                 {% blocktrans with start_index=page_obj.start_index end_index=page_obj.end_index total_counts=object_list_count %}{{ start_index }} to {{ end_index }} of {{ total_counts }} trainings{% endblocktrans %}
                             </strong>
+                        </div>
+                        <div class="col-md-6">
+                            <button id="dLabel" class="btn btn-default pull-right" type="button"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                                    style="margin-right:10px;"
+                                    title="{% trans 'Export' %}">
+                                <span class="glyphicon glyphicon-download-alt" aria-hidden="true"></span>
+                                <span class="caret"></span>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-large row text-right pull-right">
+                                <li>
+                                    <a id="btn_produce_xls"
+                                       class="no_spinner"
+                                       style="margin-right:10px;"
+                                       title="{% trans 'Produce xls with a list of trainings' %}">
+                                        &nbsp;{% trans 'List of trainings' %}
+                                    </a>
+                                </li>
+                                <li>
+                                    <a id="btn_produce_xls_administrative_data"
+                                       class="download"
+                                       style="margin-right:10px;"
+                                       title="{% trans 'Produce xls of trainings with administrative data' %}">
+                                        &nbsp;{% trans 'List of trainings with administrative data' %}
+                                    </a>
+                                </li>
+                            </ul>
+                            <form id="download_xls" action="{{ request.path }}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" id="xls_status" class="no_spinner" name="xls_status">
+                            </form>
                         </div>
                     </div>
 
@@ -156,6 +205,24 @@
 
             initializeDataTable("search_form", "table_education_groups", "educationGroupIds", {{ page_obj.number }},
             {{items_per_page}}, "{% url 'version_program' %}", columnDefs);
+        });
+        // FIXME remove xls_order_col / xls_order ==> USE ordering params
+        $("#btn_produce_xls, #btn_produce_xls_administrative_data").click(function (e) {
+
+            let table = $('#table_education_groups').DataTable();
+            let order = table.order();
+            $("#xls_order_col").val(get_ordering_column(order));
+            $("#xls_order").val(order[0][1]);
+
+            let action_value;
+            if ($(this).attr('id') === 'btn_produce_xls') {
+                action_value = 'xls';
+            } else if ( $(this).attr('id') === 'btn_produce_xls_administrative_data' ) {
+                action_value = 'xls_administrative';
+            }
+            prepare_xls(e, action_value);
+            $("#xls_order").val('');
+            $("#xls_order_col").val('');
         });
 
         // FIXME remove xls_order_col / xls_order ==> USE ordering params

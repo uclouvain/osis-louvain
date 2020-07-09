@@ -28,51 +28,63 @@ from base.models.enums.education_group_types import GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
 from program_management.ddd.validators._authorized_link_type import AuthorizedLinkTypeValidator
 from program_management.tests.ddd.factories.node import NodeLearningUnitYearFactory, NodeEducationGroupYearFactory
+from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
+from django.utils.translation import gettext_lazy as _
 
 
-class TestAuthorizedLinkTypeValidator(SimpleTestCase):
-    def test_a_reference_link_with_a_learning_unit_as_child_should_not_be_valid(self):
+class TestAuthorizedLinkTypeValidator(TestValidatorValidateMixin, SimpleTestCase):
+    def test_a_reference_link_with_a_learning_unit_as_child_should_raise_exception(self):
         parent_node = NodeEducationGroupYearFactory()
         learning_unit_node_to_add = NodeLearningUnitYearFactory()
         link_type = LinkTypes.REFERENCE
-        validator = AuthorizedLinkTypeValidator(parent_node, learning_unit_node_to_add, link_type)
-        self.assertFalse(validator.is_valid())
 
-    def test_a_none_link_type_with_a_learning_unit_as_child_should_be_valid(self):
+        self.assertValidatorRaises(
+            AuthorizedLinkTypeValidator(parent_node, learning_unit_node_to_add, link_type),
+            [_("You are not allowed to create a reference with a learning unit %(child_node)s") % {
+                "child_node": learning_unit_node_to_add
+            }]
+        )
+
+    def test_a_none_link_type_with_a_learning_unit_as_child_should_not_raise_exception(self):
         parent_node = NodeEducationGroupYearFactory()
         learning_unit_node_to_add = NodeLearningUnitYearFactory()
         link_type = None
-        validator = AuthorizedLinkTypeValidator(parent_node, learning_unit_node_to_add, link_type)
-        self.assertTrue(validator.is_valid())
 
-    def test_a_none_link_type_with_a_minor_major_list_and_a_minitraining_as_child_should_not_be_valid(self):
+        self.assertValidatorNotRaises(AuthorizedLinkTypeValidator(parent_node, learning_unit_node_to_add, link_type))
+
+    def test_a_none_link_type_with_a_minor_major_list_and_a_minitraining_as_child_should_raise_exception(self):
         minor_major_list_parent_node = NodeEducationGroupYearFactory(
             node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums())
         )
-        minitraining_child_node = NodeEducationGroupYearFactory(
-            node_type=factory.fuzzy.FuzzyChoice(MiniTrainingType)
-        )
+        minitraining_node_to_add = NodeEducationGroupYearFactory(node_type=factory.fuzzy.FuzzyChoice(MiniTrainingType))
         link_type = None
-        validator = AuthorizedLinkTypeValidator(minor_major_list_parent_node, minitraining_child_node, link_type)
-        self.assertFalse(validator.is_valid())
 
-    def test_a_reference_link_type_with_a_minor_major_list_and_a_minitraining_as_child_should_be_valid(self):
+        self.assertValidatorRaises(
+            AuthorizedLinkTypeValidator(minor_major_list_parent_node, minitraining_node_to_add, link_type),
+            [_("Link type should be reference between %(parent)s and %(child)s") % {
+                "parent": minor_major_list_parent_node,
+                "child": minitraining_node_to_add
+            }]
+        )
+
+    def test_a_reference_link_type_with_a_minor_major_list_and_a_minitraining_as_child_should_raise_exception(self):
         minor_major_list_parent_node = NodeEducationGroupYearFactory(
             node_type=factory.fuzzy.FuzzyChoice(GroupType.minor_major_list_choice_enums())
         )
-        minitraining_child_node = NodeEducationGroupYearFactory(
-            node_type=factory.fuzzy.FuzzyChoice(MiniTrainingType)
-        )
+        minitraining_child_node = NodeEducationGroupYearFactory(node_type=factory.fuzzy.FuzzyChoice(MiniTrainingType))
         link_type = LinkTypes.REFERENCE
-        validator = AuthorizedLinkTypeValidator(minor_major_list_parent_node, minitraining_child_node, link_type)
-        self.assertTrue(validator.is_valid())
 
-    def test_a_link_with_an_education_group_as_child_should_be_valid_for_other_cases(self):
+        self.assertValidatorNotRaises(
+            AuthorizedLinkTypeValidator(minor_major_list_parent_node, minitraining_child_node, link_type)
+        )
+
+    def test_a_link_with_an_education_group_as_child_should_not_raise_exception(self):
         parent_node = NodeEducationGroupYearFactory()
         education_group_node_to_add = NodeEducationGroupYearFactory()
 
         link_types = (None, LinkTypes.REFERENCE)
         for link_type in link_types:
             with self.subTest(link_type=link_type):
-                validator = AuthorizedLinkTypeValidator(parent_node, education_group_node_to_add, link_type)
-                self.assertTrue(validator.is_valid())
+                self.assertValidatorNotRaises(
+                    AuthorizedLinkTypeValidator(parent_node, education_group_node_to_add, link_type)
+                )

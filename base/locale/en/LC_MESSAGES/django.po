@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-19 11:42+0100\n"
+"POT-Creation-Date: 2020-07-01 14:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -384,6 +384,21 @@ msgstr ""
 msgid "Are you sure?"
 msgstr ""
 
+msgid "Arrangement additional time"
+msgstr ""
+
+msgid "Arrangement appropriate copy"
+msgstr ""
+
+msgid "Arrangement other"
+msgstr ""
+
+msgid "Arrangement specific locale"
+msgstr ""
+
+msgid "Artist"
+msgstr ""
+
 msgid "As displayed on the home page"
 msgstr ""
 
@@ -558,9 +573,6 @@ msgstr ""
 msgid "Comment"
 msgstr ""
 
-msgid "Commerce partner"
-msgstr ""
-
 msgid "Common English title"
 msgstr ""
 
@@ -615,6 +627,9 @@ msgid "Contacts"
 msgstr ""
 
 msgid "Content"
+msgstr ""
+
+msgid "Continuing education academic year linkable to admission"
 msgstr ""
 
 msgid "Coordinator"
@@ -677,6 +692,9 @@ msgid "Cut"
 msgstr ""
 
 msgid "Cut element"
+msgstr ""
+
+msgid "DDI"
 msgstr ""
 
 msgid "Daily"
@@ -855,6 +873,9 @@ msgstr ""
 msgid "Education_groups"
 msgstr ""
 
+msgid "Educational facilities accepted by Jury"
+msgstr ""
+
 msgid "Educational information ending"
 msgstr ""
 
@@ -865,6 +886,9 @@ msgid "Elaboration and management of the formation catalogue."
 msgstr ""
 
 msgid "Email"
+msgstr ""
+
+msgid "Embassy"
 msgstr ""
 
 msgid "End"
@@ -922,6 +946,9 @@ msgstr ""
 msgid "Enter text to search"
 msgstr ""
 
+msgid "Enterprise"
+msgstr ""
+
 msgid "Entities"
 msgstr ""
 
@@ -935,6 +962,9 @@ msgid "Entity charges"
 msgstr ""
 
 msgid "Entity managers"
+msgstr ""
+
+msgid "Entrepreneur"
 msgstr ""
 
 msgid "Error(s) in form: The modifications are not saved"
@@ -1132,7 +1162,13 @@ msgstr ""
 msgid "Groups"
 msgstr ""
 
+msgid "Guide"
+msgstr ""
+
 msgid "Help"
+msgstr ""
+
+msgid "High Level Promising athlete"
 msgstr ""
 
 msgid "Highlight description"
@@ -1151,6 +1187,9 @@ msgid "Holders of a non-University 2nd cycle degree"
 msgstr ""
 
 msgid "Home"
+msgstr ""
+
+msgid "Hospital"
 msgstr ""
 
 msgid "ISCED domain"
@@ -1185,9 +1224,6 @@ msgstr ""
 msgid "Included in"
 msgstr ""
 
-msgid "Industrial partner"
-msgstr ""
-
 msgid "Initial data"
 msgstr ""
 
@@ -1220,9 +1256,6 @@ msgid "Invalid action"
 msgstr ""
 
 msgid "Invalid code"
-msgstr ""
-
-msgid "Is current partner"
 msgstr ""
 
 msgid "Is this teaching material mandatory?"
@@ -1717,7 +1750,13 @@ msgstr ""
 msgid "Non university Bachelors"
 msgstr ""
 
+msgid "Non-governmental organization"
+msgstr ""
+
 msgid "Not concerned"
+msgstr ""
+
+msgid "Not defined"
 msgstr ""
 
 msgid "Not eligible to delete learning units"
@@ -1832,6 +1871,9 @@ msgstr ""
 msgid "Other remark (intended for publication)"
 msgstr ""
 
+msgid "Other special needs"
+msgstr ""
+
 msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr ""
 
@@ -1903,6 +1945,9 @@ msgid "Person entities"
 msgstr ""
 
 msgid "Person not in accordance with proposal state"
+msgstr ""
+
+msgid "Person with reduced mobility"
 msgstr ""
 
 msgid "Personalized access"
@@ -2068,6 +2113,9 @@ msgstr ""
 msgid "Prolong"
 msgstr ""
 
+msgid "Promising athlete"
+msgstr ""
+
 msgid "Proposal"
 msgstr ""
 
@@ -2128,9 +2176,6 @@ msgid "Proposals_comparison"
 msgstr ""
 
 msgid "Provisory"
-msgstr ""
-
-msgid "Public partner"
 msgstr ""
 
 msgid "Publication contact entity"
@@ -2322,9 +2367,6 @@ msgstr ""
 msgid "Service courses"
 msgstr ""
 
-msgid "Service partner"
-msgstr ""
-
 msgid "Session"
 msgstr ""
 
@@ -2367,6 +2409,9 @@ msgstr ""
 msgid "Specifications"
 msgstr ""
 
+msgid "Sport"
+msgstr ""
+
 msgid "Start"
 msgstr ""
 
@@ -2404,6 +2449,12 @@ msgid "Students"
 msgstr ""
 
 msgid "Sub group"
+msgstr ""
+
+msgid "Sub type Disability"
+msgstr ""
+
+msgid "Sub type Sport"
 msgstr ""
 
 msgid "Subject"
@@ -2710,7 +2761,7 @@ msgstr ""
 msgid "The user has not permission to delete education groups."
 msgstr ""
 
-msgid "The user is not allowed to change education group content."
+msgid "The user is not allowed to change link data."
 msgstr ""
 
 msgid "The user is not attached to the management entity"
@@ -2730,6 +2781,9 @@ msgstr ""
 msgid ""
 "The value of field '%(field)s' is different between year %(year)s - "
 "%(value)s and year %(next_year)s - %(next_value)s"
+msgstr ""
+
+msgid "The value of this attribute is inherited from the standard OF"
 msgstr ""
 
 msgid "The volume Q1 or Q2 must have a value but not both"
@@ -2937,10 +2991,6 @@ msgid "Update for teacher unlocked"
 msgstr ""
 
 msgid "User"
-msgstr ""
-
-#, python-format
-msgid "User %(person)s do not have rights on this proposal."
 msgstr ""
 
 msgid "User interface language"
@@ -3235,9 +3285,6 @@ msgid "comment"
 msgstr ""
 
 msgid "comment (internal)"
-msgstr ""
-
-msgid "confirm"
 msgstr ""
 
 msgid "credits"

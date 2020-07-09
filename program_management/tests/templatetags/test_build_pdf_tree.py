@@ -30,12 +30,10 @@ from base.models.enums.learning_component_year_type import LECTURING, PRACTICAL_
 from base.models.enums.learning_unit_year_periodicity import BIENNIAL_ODD, BIENNIAL_EVEN
 from base.templatetags.education_group_pdf import pdf_tree_list
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import EducationGroupYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
-from program_management.business.group_element_years.group_element_year_tree import EducationGroupHierarchy
 from program_management.ddd.repositories import load_tree
+from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
 
 def _build_correct_tree_list(tree):
@@ -45,55 +43,52 @@ def _build_correct_tree_list(tree):
 class TestBuildPDFTree(TestCase):
     def setUp(self):
         self.academic_year = AcademicYearFactory()
-        self.education_group_year_1 = EducationGroupYearFactory(credits=10, academic_year=self.academic_year)
-        self.education_group_year_2 = EducationGroupYearFactory(credits=20, academic_year=self.academic_year)
-        self.learning_unit_year_1 = LearningUnitYearFactory()
-        self.learning_unit_year_2 = LearningUnitYearFactory(periodicity=BIENNIAL_ODD)
-        self.learning_unit_year_3 = LearningUnitYearFactory(status=False)
-        self.learning_unit_year_4 = LearningUnitYearFactory(periodicity=BIENNIAL_EVEN)
-        self.group_element_year_1 = GroupElementYearFactory(parent=self.education_group_year_1,
-                                                            child_branch=self.education_group_year_2,
-                                                            is_mandatory=True)
-        self.group_element_year_2 = GroupElementYearFactory(parent=self.education_group_year_2,
-                                                            child_branch=None,
-                                                            child_leaf=self.learning_unit_year_1,
-                                                            is_mandatory=True)
-        self.group_element_year_3 = GroupElementYearFactory(parent=self.education_group_year_2,
-                                                            child_branch=None,
-                                                            child_leaf=self.learning_unit_year_2,
-                                                            is_mandatory=True)
-        self.group_element_year_4 = GroupElementYearFactory(parent=self.education_group_year_2,
-                                                            child_branch=None,
-                                                            child_leaf=self.learning_unit_year_3,
-                                                            is_mandatory=True)
-        self.learning_component_year_1 = LearningComponentYearFactory(
-            learning_unit_year=self.learning_unit_year_1,
-            type=LECTURING
+        self.education_group_year_1 = ElementGroupYearFactory(
+            group_year__credits=10,
+            group_year__academic_year=self.academic_year
         )
-        self.learning_component_year_2 = LearningComponentYearFactory(
-            learning_unit_year=self.learning_unit_year_1,
-            type=PRACTICAL_EXERCISES
+        self.education_group_year_2 = ElementGroupYearFactory(
+            group_year__credits=20,
+            group_year__academic_year=self.academic_year
         )
-        self.learning_component_year_3 = LearningComponentYearFactory(
-            learning_unit_year=self.learning_unit_year_2,
-            type=LECTURING
+        self.element_learning_unit_year_1 = ElementLearningUnitYearFactory()
+        self.element_learning_unit_year_2 = ElementLearningUnitYearFactory(learning_unit_year__periodicity=BIENNIAL_ODD)
+        self.element_learning_unit_year_3 = ElementLearningUnitYearFactory(learning_unit_year__status=False)
+        self.element_learning_unit_year_4 = ElementLearningUnitYearFactory(
+            learning_unit_year__periodicity=BIENNIAL_EVEN
         )
-        self.learning_component_year_4 = LearningComponentYearFactory(
-            learning_unit_year=self.learning_unit_year_2,
-            type=PRACTICAL_EXERCISES
+
+        self.group_element_year_1 = GroupElementYearFactory(
+            parent_element=self.education_group_year_1,
+            child_element=self.education_group_year_2,
+            is_mandatory=True
         )
-        self.learning_component_year_5 = LearningComponentYearFactory(
-            learning_unit_year=self.learning_unit_year_3,
-            type=LECTURING
+        self.group_element_year_2 = GroupElementYearChildLeafFactory(
+            parent_element=self.education_group_year_2,
+            child_element=self.element_learning_unit_year_1,
+            is_mandatory=True
         )
-        self.learning_component_year_6 = LearningComponentYearFactory(
-            learning_unit_year=self.learning_unit_year_3,
-            type=PRACTICAL_EXERCISES
+        self.group_element_year_3 = GroupElementYearChildLeafFactory(
+            parent_element=self.education_group_year_2,
+            child_element=self.element_learning_unit_year_2,
+            is_mandatory=True,
         )
-        self.learning_component_year_7 = LearningComponentYearFactory(
-            learning_unit_year=self.learning_unit_year_4,
-            type=LECTURING
+        self.group_element_year_4 = GroupElementYearChildLeafFactory(
+            parent_element=self.education_group_year_2,
+            child_element=self.element_learning_unit_year_3,
+            is_mandatory=True
         )
+
+        for elem_learning_unit_year in [ self.element_learning_unit_year_1, self.element_learning_unit_year_2,
+                                         self.element_learning_unit_year_3, self.element_learning_unit_year_4]:
+            LearningComponentYearFactory(
+                learning_unit_year=elem_learning_unit_year.learning_unit_year,
+                type=LECTURING
+            )
+            LearningComponentYearFactory(
+                learning_unit_year=elem_learning_unit_year.learning_unit_year,
+                type=PRACTICAL_EXERCISES
+            )
 
     def test_build_pdf_tree_with_mandatory(self):
         tree = load_tree.load(self.education_group_year_1.id)

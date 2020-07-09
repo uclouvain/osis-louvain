@@ -31,29 +31,23 @@ from base.views.education_groups.publication_contact import CreateEducationGroup
     UpdateEducationGroupPublicationContactView, EducationGroupPublicationContactDeleteView, \
     UpdateEducationGroupEntityPublicationContactView
 from base.views.education_groups.search import EducationGroupTypeAutoComplete
-from base.views.education_groups.select import copy_education_group_to_cache, copy_learning_unit_to_cache
 from base.views.education_groups.update import CertificateAimAutocomplete
-from . import search, create, detail, update, delete
+from education_group import urls as education_group_urls
+from . import create, update, delete
 from .achievement.urls import urlpatterns as urlpatterns_achievement
 
 urlpatterns = [
-    url(
-        r'^certificate_aim_autocomplete/$',
-        CertificateAimAutocomplete.as_view(),
-        name='certificate_aim_autocomplete',
-    ),
-    url(
-        r'^education_group_type_autocomplete/$',
+                  url(
+                      r'^certificate_aim_autocomplete/$',
+                      CertificateAimAutocomplete.as_view(),
+                      name='certificate_aim_autocomplete',
+                  ),
+                  url(
+                      r'^education_group_type_autocomplete/$',
         EducationGroupTypeAutoComplete.as_view(),
         name='education_group_type_autocomplete'
     ),
 
-    url(r'^$', search.EducationGroupSearch.as_view(), name='education_groups'),
-    url(
-        r'^select_lu/(?P<learning_unit_year_id>[0-9]+)$',
-        copy_learning_unit_to_cache,
-        name='copy_learning_unit_to_cache'
-    ),
     url(
         r'^clear_clipboard/$',
         clear_clipboard,
@@ -76,52 +70,17 @@ urlpatterns = [
             url(r'^(?P<education_group_year_pk>[0-9]+)/', create.validate_field, name='validate_education_group_field'),
         ])
     ),
+                  url(r'^(?P<offer_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
+                      url(r'^update/$', update.update_education_group, name="update_education_group"),
+                      url(r'^informations/edit/$', education_group.education_group_year_pedagogy_edit,
+                          name="education_group_pedagogy_edit"),
+                      url(r'^skills_achievements/', include(urlpatterns_achievement)),
 
+                      url(r'^admission_conditions/remove_line$',
+                          education_group.education_group_year_admission_condition_remove_line,
+                          name='education_group_year_admission_condition_remove_line'),
 
-    url(
-        r'^select_type/(?P<category>[A-Z_]+)/$',
-        create.SelectEducationGroupTypeView.as_view(),
-        name='select_education_group_type'
-    ),
-    url(
-        r'^select_type/(?P<category>[A-Z_]+)/(?P<root_id>[0-9]+)/(?P<parent_id>[0-9]+)/$',
-        create.SelectEducationGroupTypeView.as_view(),
-        name='select_education_group_type'
-    ),
-
-    url(r'^(?P<root_id>[0-9]+)/(?P<education_group_year_id>[0-9]+)/', include([
-
-        url(r'^identification/$', detail.EducationGroupRead.as_view(), name='education_group_read'),
-        url(r'^update/$', update.update_education_group, name="update_education_group"),
-        url(r'^diplomas/$', detail.EducationGroupDiplomas.as_view(),
-            name='education_group_diplomas'),
-        url(r'^informations/$', detail.EducationGroupGeneralInformation.as_view(),
-            name='education_group_general_informations'),
-        url(r'^informations/edit/$', education_group.education_group_year_pedagogy_edit,
-            name="education_group_pedagogy_edit"),
-        url(r'^informations/publish/$', detail.publish,
-            name="education_group_publish"),
-        url(r'^administrative/', include([
-            url(u'^$', detail.EducationGroupAdministrativeData.as_view(), name='education_group_administrative'),
-            url(u'^edit/$', education_group.education_group_edit_administrative_data,
-                name='education_group_edit_administrative')
-        ])),
-        url(r'^select/$', copy_education_group_to_cache, name='copy_education_group_to_cache'),
-        url(r'^content/', include([
-            url(u'^$', detail.EducationGroupContent.as_view(), name='education_group_content'),
-        ])),
-        url(r'^utilization/$', detail.EducationGroupUsing.as_view(), name='education_group_utilization'),
-
-        url(r'^skills_achievements/', include(urlpatterns_achievement)),
-
-        url(r'^admission_conditions/$',
-            detail.EducationGroupYearAdmissionCondition.as_view(),
-            name='education_group_year_admission_condition_edit'),
-        url(r'^admission_conditions/remove_line$',
-            education_group.education_group_year_admission_condition_remove_line,
-            name='education_group_year_admission_condition_remove_line'),
-
-        url(r'^admission_conditions/update_line$',
+                      url(r'^admission_conditions/update_line$',
             education_group.education_group_year_admission_condition_update_line,
             name='education_group_year_admission_condition_update_line'),
 
@@ -151,5 +110,5 @@ urlpatterns = [
                 EducationGroupPublicationContactDeleteView.as_view(),
                 name="publication_contact_delete"),
         ])),
-    ])),
-]
+                  ]))
+              ] + education_group_urls.urlpatterns

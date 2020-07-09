@@ -38,7 +38,8 @@
                 </div>
                 <div class="col-md-5">
                     {% if can_modify_prerequisite %}
-                        <a class="btn btn-default" href={% url 'learning_unit_prerequisite_update' root_id=root_id learning_unit_year_id=learning_unit_year.id %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}" role="button">
+                        <a class="btn btn-default" href="{% url 'learning_unit_prerequisite_update' root_element_id=parent.pk child_element_id=node.pk %}{% if group_to_parent %}?group_to_parent={{ group_to_parent }}{% endif %}"
+                           role="button">
                             {% trans 'Modify prerequisites' %}
                         </a>
                     {% else %}

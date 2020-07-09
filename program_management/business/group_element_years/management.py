@@ -46,55 +46,6 @@ LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
 EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
 
 
-def fetch_source_link(request_parameters, user):
-    selected_data = _get_elements_selected(request_parameters, user)
-
-    source_link = None
-    for selected_element in selected_data:
-        if selected_element.get('source_link_id'):
-            source_link = GroupElementYear.objects.select_related('parent').get(pk=selected_element['source_link_id'])
-
-    return source_link
-
-
-# FIXME Migrate this method into ddd/service
-def fetch_nodes_selected(request_parameters, user) -> List[Tuple[int, NodeType]]:
-    def _convert_element_to_node_id_and_node_type(element) -> Tuple[int, NodeType]:
-        if element['modelname'] == LEARNING_UNIT_YEAR:
-            return element["id"], NodeType.LEARNING_UNIT
-        return element["id"], NodeType.EDUCATION_GROUP
-
-    selected_data = _get_elements_selected(request_parameters, user)
-    return [_convert_element_to_node_id_and_node_type(element) for element in selected_data]
-
-
-# FIXME :: DEPRECATED - Use AuthorizedRelationshipValidator from ddd instead
-def fetch_elements_selected(request_parameters, user):
-    selected_data = _get_elements_selected(request_parameters, user)
-
-    children = []
-    for selected_element in selected_data:
-        if selected_element['modelname'] == LEARNING_UNIT_YEAR:
-            children.append(LearningUnitYear.objects.get(pk=selected_element['id']))
-        elif selected_element['modelname'] == EDUCATION_GROUP_YEAR:
-            children.append(EducationGroupYear.objects.get(pk=selected_element['id']))
-
-    return children
-
-
-def _get_elements_selected(request_parameters, user):
-    object_ids = request_parameters.getlist("id", [])
-    content_type = request_parameters.get("content_type")
-    if object_ids and content_type:
-        selected_data = [{"id": object_id, "modelname": content_type} for object_id in object_ids]
-    elif object_ids or content_type:
-        selected_data = []
-    else:
-        cached_data = ElementCache(user).cached_data
-        selected_data = [cached_data] if cached_data else []
-    return selected_data
-
-
 # FIXME :: DEPRECATED - Use AuthorizedRelationshipValidator from ddd instead
 def is_max_child_reached(parent, child_education_group_type):
     try:

@@ -151,6 +151,13 @@ function displayInfoMessage(jsonResponse, containerId) {
     message_info_container.style.visibility = "visible";
 }
 
+function displaySuccessMessage(message) {
+    let message_info_container = document.getElementById("message_success_container");
+    message_info_container.innerHTML = message;
+    message_info_container.style.display = "block";
+    message_info_container.style.visibility = "visible";
+}
+
 function collapseWarnings() {
     let collapse_warnings = $('#CollapseWarnings');
     let expand_button = $('#btn_expandButton');

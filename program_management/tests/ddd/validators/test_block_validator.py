@@ -22,32 +22,40 @@
 #  see http://www.gnu.org/licenses/.
 # ############################################################################
 from django.test import SimpleTestCase
+from django.utils.translation import gettext_lazy as _
 
 from program_management.ddd.validators import _block_validator
+from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
 
-class TestBlockValidator(SimpleTestCase):
-    def test_block_value_should_accept_none_value(self):
-        validator = _block_validator.BlockValidator(None)
-        self.assertTrue(validator.is_valid())
+class TestBlockValidator(TestValidatorValidateMixin, SimpleTestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.error_msg = _(
+            "Please register a maximum of %(max_authorized_value)s digits in ascending order, "
+            "without any duplication. Authorized values are from 1 to 6. Examples: 12, 23, 46"
+        ) % {'max_authorized_value': _block_validator.BLOCK_MAX_AUTHORIZED_VALUE}
 
-    def test_block_value_should_not_accept_number_not_comprised_between_1_and_6(self):
+    def test_when_block_value_is_none_then_should_not_raise_exception(self):
+        self.assertValidatorNotRaises(_block_validator.BlockValidator(None))
+
+    def test_should_raise_exception_when_block_value_is_composed_of_digit_not_comprised_between_1_and_6(self):
         block_inputs = [1257, 49]
         for input in block_inputs:
             with self.subTest(block=input):
-                validator = _block_validator.BlockValidator(input)
-                self.assertFalse(validator.is_valid())
+                self.assertValidatorRaises(_block_validator.BlockValidator(input), [self.error_msg])
 
-    def test_block_value_should_not_accept_sequence_of_digits_that_are_not_in_increasing_order(self):
+    def test_should_raise_exception_when_block_value_is_a_sequence_of_digits_that_are_not_in_increasing_order(self):
         block_inputs = [265, 132]
         for input in block_inputs:
             with self.subTest(block=input):
-                validator = _block_validator.BlockValidator(input)
-                self.assertFalse(validator.is_valid())
+                self.assertValidatorRaises(_block_validator.BlockValidator(input), [self.error_msg])
 
-    def test_block_value_should_accept_increasing_sequence_of_digits_comprised_between_1_and_6(self):
+    def test_should_not_raise_exception_when_block_value_is_an_increasing_sequence_of_digits_comprised_between_1_and_6(
+            self
+    ):
         block_inputs = [123456, 5, 46, 1345]
         for input in block_inputs:
             with self.subTest(block=input):
-                validator = _block_validator.BlockValidator(input)
-                self.assertTrue(validator.is_valid())
+                self.assertValidatorNotRaises(_block_validator.BlockValidator(input))

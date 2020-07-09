@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -73,20 +73,23 @@ ORGANIZATION_KEYS = ['ALLOCATION_ENTITY', 'REQUIREMENT_ENTITY',
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
-def learning_unit_formations(request, learning_unit_year_id):
-    context = get_common_context_learning_unit_year(learning_unit_year_id, get_object_or_404(Person, user=request.user))
+def learning_unit_formations(request, learning_unit_year_id=None, code=None, year=None):
+    context = get_common_context_learning_unit_year(get_object_or_404(Person, user=request.user), learning_unit_year_id,
+                                                    code, year)
     learn_unit_year = context["learning_unit_year"]
-    group_elements_years = learn_unit_year.child_leaf.select_related(
-        "parent", "child_leaf", "parent__education_group_type"
-    ).order_by('parent__partial_acronym')
-    education_groups_years = [group_element_year.parent for group_element_year in group_elements_years]
-    formations_by_educ_group_year = program_management.ddd.repositories.find_roots.find_roots(
-        education_groups_years,
-        as_instances=True,
-        with_parents_of_parents=True
-    )
-    context['formations_by_educ_group_year'] = formations_by_educ_group_year
-    context['group_elements_years'] = group_elements_years
+
+    if hasattr(learn_unit_year, 'element'):
+        group_elements_years = learn_unit_year.element.children_elements.select_related(
+            "parent_element", "child_element", "parent_element__group_year__education_group_type"
+        ).order_by('parent_element__group_year__partial_acronym')
+        education_groups_years = [group_element_year.child_element for group_element_year in group_elements_years]
+        formations_by_educ_group_year = program_management.ddd.repositories.find_roots.find_roots(
+            education_groups_years,
+            as_instances=True,
+            with_parents_of_parents=True
+        )
+        context['formations_by_educ_group_year'] = formations_by_educ_group_year
+        context['group_elements_years'] = group_elements_years
 
     context['root_formations'] = education_group_year.find_with_enrollments_count(learn_unit_year)
     context['total_formation_enrollments'] = 0
@@ -100,9 +103,9 @@ def learning_unit_formations(request, learning_unit_year_id):
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
-def learning_unit_components(request, learning_unit_year_id):
+def learning_unit_components(request, learning_unit_year_id=None, code=None, year=None):
     person = get_object_or_404(Person, user=request.user)
-    context = get_common_context_learning_unit_year(learning_unit_year_id, person)
+    context = get_common_context_learning_unit_year(person, learning_unit_year_id, code, year)
     learning_unit_year = context['learning_unit_year']
     context['warnings'] = learning_unit_year.warnings
     data_components = get_same_container_year_components(context['learning_unit_year'])
@@ -118,9 +121,9 @@ def learning_unit_components(request, learning_unit_year_id):
 
 @login_required
 @permission_required('base.can_access_learningunit', raise_exception=True)
-def learning_unit_specifications(request, learning_unit_year_id):
+def learning_unit_specifications(request, learning_unit_year_id=None, code=None, year=None):
     person = get_object_or_404(Person, user=request.user)
-    context = get_common_context_learning_unit_year(learning_unit_year_id, person)
+    context = get_common_context_learning_unit_year(person, learning_unit_year_id, code, year)
     learning_unit_year = context['learning_unit_year']
 
     context.update(get_specifications_context(learning_unit_year, request))
@@ -149,8 +152,8 @@ def learning_unit_specifications_edit(request, learning_unit_year_id):
             )
         return HttpResponse()
     else:
-        context = get_common_context_learning_unit_year(learning_unit_year_id,
-                                                        get_object_or_404(Person, user=request.user))
+        context = get_common_context_learning_unit_year(get_object_or_404(Person, user=request.user),
+                                                        learning_unit_year_id)
         label_name = request.GET.get('label')
         text_lb = TextLabel.objects.prefetch_related(
             Prefetch('translatedtextlabel_set', to_attr="translated_text_labels")
@@ -205,7 +208,7 @@ def build_success_message(last_academic_year=None, learning_unit_year_id=None, w
         )
 
     else:
-        msg = "{}.".format(default_msg)
+        msg = "{}".format(_("The learning unit has been updated (without report)."))
 
     return msg
 

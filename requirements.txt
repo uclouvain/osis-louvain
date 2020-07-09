@@ -1,5 +1,5 @@
 coverage==4.5.1
-Django==2.2.10
+Django==2.2.13
 pika==0.12.0
 openpyxl==2.3.2
 Pillow==6.2.2
@@ -38,6 +38,7 @@ exrex==0.10.5
 django-autocomplete-light==3.4.1
 bleach==3.1.4
 django-cte==1.1.5
+attrs==19.3.0
 
 -r ./osis_common/requirements.txt
 -r ./internship/requirements.txt

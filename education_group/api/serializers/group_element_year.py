@@ -51,20 +51,19 @@ class CommonNodeHyperlinkedRelatedField(serializers.HyperlinkedIdentityField):
                 'acronym': obj.child.code,
                 'year': obj.child.year,
             }
-        elif obj.is_link_with_group() and obj.child.category == Categories.TRAINING:
+        elif obj.child.is_training():
             view_name = 'education_group_api_v1:' + TrainingDetail.name
             url_kwargs = {
                 'acronym': obj.child.title,
                 'year': obj.child.year,
             }
         else:
-            view_name = {
-                Categories.GROUP: 'education_group_api_v1:' + GroupDetail.name,
-                Categories.MINI_TRAINING: 'education_group_api_v1:' + MiniTrainingDetail.name
-            }.get(obj.child.category)
+            view_name = 'education_group_api_v1:' + GroupDetail.name
+            if obj.child.is_mini_training():
+                view_name = 'education_group_api_v1:' + MiniTrainingDetail.name
             url_kwargs = {
-                'partial_acronym': obj.child.code,
                 'year': obj.child.year,
+                'partial_acronym': obj.child.code,
             }
         return reverse(view_name, kwargs=url_kwargs, request=request, format=format)
 
@@ -102,7 +101,7 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
 
 
 class EducationGroupRootNodeTreeSerializer(BaseCommonNodeTreeSerializer):
-    node_type = serializers.CharField(source='child.category.name', read_only=True)
+    node_type = serializers.SerializerMethodField(read_only=True)
     subtype = serializers.CharField(source='child.node_type.name', read_only=True)
     acronym = serializers.CharField(source='child.title', read_only=True)
     code = serializers.CharField(source='child.code', read_only=True)
@@ -111,6 +110,14 @@ class EducationGroupRootNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     min_constraint = serializers.IntegerField(source='child.min_constraint', read_only=True)
     max_constraint = serializers.IntegerField(source='child.max_constraint', read_only=True)
     constraint_type = serializers.CharField(source='child.constraint_type', read_only=True)
+
+    def get_node_type(self, obj):
+        if obj.child.is_training():
+            return NodeType.TRAINING.name
+        elif obj.child.is_mini_training():
+            return NodeType.MINI_TRAINING.name
+        else:
+            return NodeType.GROUP.name
 
     def get_remark(self, obj):
         field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
@@ -126,8 +133,7 @@ class EducationGroupRootNodeTreeSerializer(BaseCommonNodeTreeSerializer):
 
     def to_representation(self, obj):
         data = super().to_representation(obj)
-        node_type = data['node_type']
-        if node_type != NodeType.TRAINING.name or not self.instance.child.is_finality():
+        if not obj.child.is_training() or not self.instance.child.is_finality():
             data.pop('partial_title')
         return data
 

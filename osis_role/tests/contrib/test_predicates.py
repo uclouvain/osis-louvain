@@ -27,7 +27,7 @@ class TestAlwaysDenyPredicate(TestCase):
         permission_message = "Dummy message"
 
         self.assertFalse(predicates.always_deny(message=permission_message)(self.user))
-        self.assertEquals(
+        self.assertEqual(
             errors.get_permission_error(self.user, 'dummy-perm'),
             permission_message
         )

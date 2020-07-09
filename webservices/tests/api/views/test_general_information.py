@@ -37,6 +37,10 @@ from base.tests.factories.person import PersonFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
+from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.ddd.repositories import load_tree
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 from webservices.api.serializers.general_information import GeneralInformationSerializer
 from webservices.business import EVALUATION_KEY, SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
 
@@ -47,6 +51,14 @@ class GeneralInformationTestCase(APITestCase):
         cls.person = PersonFactory()
         cls.language = settings.LANGUAGE_CODE_EN
         cls.egy = EducationGroupYearFactory()
+        cls.group = GroupYearFactory(
+            academic_year=cls.egy.academic_year,
+            partial_acronym=cls.egy.partial_acronym,
+            education_group_type__name=cls.egy.education_group_type.name
+        )
+        element = ElementFactory(group_year=cls.group)
+        StandardEducationGroupVersionFactory(offer=cls.egy, root_group=cls.group)
+        cls.node = load_tree.load(element.id).root_node
         common_egy = EducationGroupYearCommonFactory(academic_year=cls.egy.academic_year)
         cls.pertinent_sections = {
             'specific': [EVALUATION_KEY, DETAILED_PROGRAM, SKILLS_AND_ACHIEVEMENTS],
@@ -118,16 +130,17 @@ class GeneralInformationTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = GeneralInformationSerializer(
-            self.egy, context={
+            self.node, context={
                 'language': self.language,
-                'acronym': self.egy.acronym
+                'acronym': self.egy.acronym,
+                'offer': self.egy
             }
         )
         self.assertEqual(response.data, serializer.data)
 
     def test_get_results_based_on_egy_with_partial_acronym(self):
         url_partial_acronym = reverse('generalinformations_read', kwargs={
-            'acronym': self.egy.partial_acronym,
+            'acronym': self.group.partial_acronym,
             'year': self.egy.academic_year.year,
             'language': self.language
         })
@@ -136,9 +149,10 @@ class GeneralInformationTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
         serializer = GeneralInformationSerializer(
-            self.egy, context={
+            self.node, context={
                 'language': self.language,
-                'acronym': self.egy.partial_acronym
+                'acronym': self.group.partial_acronym,
+                'offer': self.egy
             }
         )
         self.assertEqual(response.data, serializer.data)

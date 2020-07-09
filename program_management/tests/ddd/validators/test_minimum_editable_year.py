@@ -28,34 +28,35 @@ from django.test import SimpleTestCase
 from django.test.utils import override_settings
 from django.utils.translation import gettext as _
 
+from base.ddd.utils import business_validator
 from program_management.ddd.validators._minimum_editable_year import MinimumEditableYearValidator
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
+from program_management.tests.ddd.validators.mixins import TestValidatorValidateMixin
 
 
-class TestMinimumEditableYearValidator(SimpleTestCase):
+class TestMinimumEditableYearValidator(TestValidatorValidateMixin, SimpleTestCase):
 
     @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2019)
-    def test_when_root_year_is_lower_than_settings(self):
+    def test_shoudl_raise_exception_when_root_year_is_lower_than_settings(self):
         year = 2010
         tree = ProgramTreeFactory(root_node__year=year)
-        validator = MinimumEditableYearValidator(tree)
-        self.assertFalse(validator.is_valid())
-        expected_result = _("Cannot perform action on a education group before %(limit_year)s") % {
+        msg_expected = _("Cannot perform action on a education group before %(limit_year)s") % {
             "limit_year": 2019
         }
-        self.assertEqual(expected_result, validator.error_messages[0])
+
+        self.assertValidatorRaises(MinimumEditableYearValidator(tree), [msg_expected])
 
     @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2019)
-    def test_when_root_year_is_equal_to_settings(self):
+    def test_should_not_raise_exception_when_root_year_is_equal_to_settings(self):
         year = 2019
         tree = ProgramTreeFactory(root_node__year=year)
-        validator = MinimumEditableYearValidator(tree)
-        self.assertTrue(validator.is_valid())
+
+        self.assertValidatorNotRaises(MinimumEditableYearValidator(tree))
 
     @override_settings(YEAR_LIMIT_EDG_MODIFICATION=2019)
-    def test_when_root_year_greater_than_settings(self):
+    def test_should_not_raise_exception_when_root_year_greater_than_settings(self):
         year = 2099
         tree = ProgramTreeFactory(root_node__year=year)
-        validator = MinimumEditableYearValidator(tree)
-        self.assertTrue(validator.is_valid())
+
+        self.assertValidatorNotRaises(MinimumEditableYearValidator(tree))

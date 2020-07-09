@@ -29,6 +29,7 @@ from base.tests.factories.entity_version import EntityVersionFactory
 from base.tests.factories.person import PersonFactory
 from education_group.auth.roles.central_manager import CentralManager
 from education_group.auth.roles.faculty_manager import FacultyManager
+from education_group.auth.scope import Scope
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
 from osis_role.contrib.forms.fields import EntityRoleChoiceField
@@ -50,14 +51,23 @@ class TestEntityRoleChoiceField(TestCase):
 
     def test_case_user_are_linked_with_child_on_role(self):
         CentralManagerFactory(person=self.person, entity=self.root_entity_version.entity, with_child=True)
-        self.assertEquals(self.field_instance.get_queryset().count(), 3)
+        self.assertEqual(self.field_instance.get_queryset().count(), 3)
 
     def test_case_user_are_linked_without_child_on_role(self):
         CentralManagerFactory(person=self.person, entity=self.root_entity_version.entity, with_child=False)
-        self.assertEquals(self.field_instance.get_queryset().count(), 1)
+        self.assertEqual(self.field_instance.get_queryset().count(), 1)
 
     def test_case_user_are_linked_on_multiple_role_connected_to_fields(self):
         CentralManagerFactory(person=self.person, entity=self.root_entity_version.entity, with_child=False)
         FacultyManagerFactory(person=self.person, entity=self.entity_version_level_2.entity, with_child=True)
 
-        self.assertEquals(self.field_instance.get_queryset().count(), 2)
+        self.assertEqual(self.field_instance.get_queryset().count(), 2)
+
+    def test_case_user_has_scope_all_on_entity(self):
+        FacultyManagerFactory(person=self.person, entity=self.entity_version_level_2.entity, with_child=True)
+        self.assertEquals(self.field_instance.get_queryset().count(), 1)
+
+    def test_case_user_has_other_scope_on_entity(self):
+        entity = self.entity_version_level_2.entity
+        FacultyManagerFactory(person=self.person, scopes=[Scope.IUFC.value], entity=entity, with_child=True)
+        self.assertEquals(self.field_instance.get_queryset().count(), 0)

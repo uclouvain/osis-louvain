@@ -25,6 +25,7 @@
 ##############################################################################
 import re
 from collections import defaultdict
+from typing import List, Dict, Pattern, Tuple
 
 from django.db.models import Case, When, Value, IntegerField
 
@@ -45,7 +46,8 @@ MAX_CNUM = 999
 WIDTH_CNUM = 3
 
 
-def create_initial_group_element_year_structure(parent_egys: list):
+def create_initial_group_element_year_structure(
+        parent_egys: List[EducationGroupYear]) -> Dict[int, List[GroupElementYear]]:
     children_created = defaultdict(list)
     if not parent_egys:
         return children_created
@@ -85,7 +87,11 @@ def create_initial_group_element_year_structure(parent_egys: list):
     return children_created
 
 
-def _get_or_create_branch(child_education_group_type, title_initial_value, partial_acronym_initial_value, parent_egy):
+def _get_or_create_branch(
+        child_education_group_type: str,
+        title_initial_value: str,
+        partial_acronym_initial_value: str,
+        parent_egy: EducationGroupYear) -> GroupElementYear:
     existing_grp_ele = get_object_or_none(
         GroupElementYear,
         parent=parent_egy,
@@ -104,7 +110,7 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
     edy_acronym = "{child_title}{parent_acronym}".format(
         child_title=title_initial_value.replace(" ", "").upper(),
         parent_acronym=parent_egy.acronym
-    )
+    )[:EducationGroupYear._meta.get_field("acronym").max_length]
 
     if not previous_grp_ele:
         ed = EducationGroup.objects.filter(
@@ -115,6 +121,7 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
         else:
             child_eg = EducationGroup.objects.create(start_year=academic_year, end_year=academic_year)
     else:
+        edy_acronym = previous_grp_ele.child_branch.acronym
         child_eg = previous_grp_ele.child_branch.education_group
 
     child_egy, _ = EducationGroupYear.objects.update_or_create(
@@ -140,7 +147,10 @@ def _get_or_create_branch(child_education_group_type, title_initial_value, parti
     return gey
 
 
-def _duplicate_branch(child_education_group_type, parent_egy, last_child):
+def _duplicate_branch(
+        child_education_group_type: str,
+        parent_egy: EducationGroupYear,
+        last_child: EducationGroupYear) -> GroupElementYear:
     existing_grp_ele = get_object_or_none(
         GroupElementYear,
         parent=parent_egy,
@@ -150,7 +160,6 @@ def _duplicate_branch(child_education_group_type, parent_egy, last_child):
         return existing_grp_ele
 
     academic_year = parent_egy.academic_year
-    # child_eg = EducationGroup.objects.create(start_year=year, end_year=year)
     last_child.education_group.end_year = academic_year
     last_child.education_group.save()
 
@@ -162,7 +171,9 @@ def _duplicate_branch(child_education_group_type, parent_egy, last_child):
     return GroupElementYear.objects.create(parent=parent_egy, child_branch=child_egy)
 
 
-def _get_validation_rule(field_name, education_group_type):
+def _get_validation_rule(
+        field_name: str,
+        education_group_type: str) -> ValidationRule:
     egy_title_reference = ValidationRuleMixin._field_reference(
         EducationGroupYear,
         field_name,
@@ -171,7 +182,10 @@ def _get_validation_rule(field_name, education_group_type):
     return get_object_or_none(ValidationRule, pk=egy_title_reference)
 
 
-def _generate_child_partial_acronym(parent, child_initial_value, child_type):
+def _generate_child_partial_acronym(
+        parent: EducationGroupYear,
+        child_initial_value: str,
+        child_type: str) -> str:
     previous_grp_ele = get_object_or_none(
         GroupElementYear,
         parent__education_group=parent.education_group,
@@ -204,7 +218,9 @@ def _generate_child_partial_acronym(parent, child_initial_value, child_type):
     return partial_acronym
 
 
-def _get_cnum_subdivision(child_initial_value, reg_child_initial_value):
+def _get_cnum_subdivision(
+        child_initial_value: str,
+        reg_child_initial_value: Pattern) -> Tuple[str, str]:
     match_result = reg_child_initial_value.search(child_initial_value)
     if match_result:
         cnum, subdivision = match_result.group("cnum", "subdivision")

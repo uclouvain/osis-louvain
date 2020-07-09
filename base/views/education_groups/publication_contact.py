@@ -24,12 +24,14 @@
 #
 ##############################################################################
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import QueryDict
 from django.shortcuts import get_object_or_404
 from django.urls import reverse
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import UpdateView, CreateView, DeleteView
+
+from education_group.ddd.domain.service.identity_search import TrainingIdentitySearch
+from education_group.views.proxy.read import Tab
 from osis_role.contrib.views import PermissionRequiredMixin
 
 from base.forms.education_group.publication_contact import EducationGroupPublicationContactForm, \
@@ -55,23 +57,11 @@ class CommonEducationGroupPublicationContactView(PermissionRequiredMixin, AjaxTe
         return get_object_or_404(EducationGroupYear, pk=self.kwargs['education_group_year_id'])
 
     def get_success_url(self):
-        query_dictionary = QueryDict('', mutable=True)
-        query_dictionary.update(
-            {
-                'anchor': True
-            }
-        )
-
-        return '{base_url}?{querystring}'.format(
-            base_url=reverse(
-                'education_group_general_informations',
-                args=[
-                    self.kwargs["root_id"],
-                    self.kwargs["education_group_year_id"]
-                ]
-            ),
-            querystring=query_dictionary.urlencode()
-        )
+        training_identity = TrainingIdentitySearch().get_from_education_group_year_id(self.kwargs['offer_id'])
+        return reverse(
+            'education_group_read_proxy',
+            args=[training_identity.year, training_identity.acronym]
+        ) + '?tab={}'.format(Tab.GENERAL_INFO.value) + '&anchor=True'
 
     def get_permission_object(self):
         return self.education_group_year

@@ -42,11 +42,11 @@ class TestAddChildNode(SimpleTestCase):
             year=2018
         )
 
-        group_year_node.add_child(learning_unit_year_node, relative_credits=5, comment='Dummy comment')
-        self.assertEquals(len(group_year_node.children), 1)
+        link_created = group_year_node.add_child(learning_unit_year_node, relative_credits=5, comment='Dummy comment')
+        self.assertIn(link_created, group_year_node.children)
 
-        self.assertEquals(group_year_node.children[0].relative_credits, 5)
-        self.assertEquals(group_year_node.children[0].comment, 'Dummy comment')
+        self.assertEqual(link_created.relative_credits, 5)
+        self.assertEqual(link_created.comment, 'Dummy comment')
 
 
 class TestDescendentsPropertyNode(SimpleTestCase):
@@ -57,7 +57,7 @@ class TestDescendentsPropertyNode(SimpleTestCase):
 
     def test_case_no_descendents(self):
         self.assertIsInstance(self.root_node.descendents, dict)
-        self.assertEquals(self.root_node.descendents, {})
+        self.assertEqual(self.root_node.descendents, {})
 
     def test_case_all_descendents_with_path_as_key(self):
         self.subgroup_node.add_child(self.leaf)
@@ -318,15 +318,13 @@ class TestDetachChild(SimpleTestCase):
         link2 = LinkFactory(parent=common_parent)
         link3 = LinkFactory(parent=common_parent)
 
-        common_parent.detach_child(link1.child)
+        link_deleted = common_parent.detach_child(link1.child)
 
-        expected_result = [link2, link3]
         assertion_msg = "Link {} should have been removed from children".format(link1)
-        self.assertListEqual(common_parent.children, expected_result, assertion_msg)
+        self.assertNotIn(link_deleted, common_parent.children, assertion_msg)
 
         assertion_msg = "Link {} should have been added to deleted children".format(link1)
-        expected_result = {link1}
-        self.assertSetEqual(common_parent._deleted_children, expected_result,assertion_msg)
+        self.assertIn(link_deleted, common_parent._deleted_children, assertion_msg)
 
 
 class TestIsOption(SimpleTestCase):
@@ -358,3 +356,62 @@ class TestGetOptionsList(SimpleTestCase):
         link2 = LinkFactory(parent=link1.child, child__node_type=MiniTrainingType.OPTION)
         expected_result = {link2.child}
         self.assertEqual(link2.parent.get_option_list(), expected_result, "Should contain children of children")
+
+
+class TestUpDownChild(SimpleTestCase):
+    def setUp(self) -> None:
+        self.parent_node = NodeGroupYearFactory()
+        self.link1 = LinkFactory(parent=self.parent_node, order=0)
+        self.link2 = LinkFactory(parent=self.parent_node, order=1)
+        self.link3 = LinkFactory(parent=self.parent_node, order=2)
+
+    def test_should_not_change_order_when_applying_up_on_first_link(self):
+        self.parent_node.up_child(self.link1.child)
+
+        self.assertListEqual(
+            self.parent_node.children,
+            [self.link1, self.link2, self.link3]
+        )
+
+    def test_should_not_change_order_when_applying_down_on_last_link(self):
+        self.parent_node.down_child(self.link3.child)
+
+        self.assertListEqual(
+            self.parent_node.children,
+            [self.link1, self.link2, self.link3]
+        )
+
+    def test_should_not_change_order_when_applying_up_then_down_on_link(self):
+        self.parent_node.up_child(self.link2.child)
+
+        self.assertListEqual(
+            self.parent_node.children,
+            [self.link2, self.link1, self.link3]
+        )
+
+        self.parent_node.down_child(self.link2.child)
+        self.assertListEqual(
+            self.parent_node.children,
+            [self.link1, self.link2, self.link3]
+        )
+
+
+class TestGetFinalitiesList(SimpleTestCase):
+    def test_when_has_no_children(self):
+        node = NodeGroupYearFactory()
+        self.assertEqual(node.get_finality_list(), set())
+
+    def test_when_node_is_finality(self):
+        node = NodeGroupYearFactory(node_type=TrainingType.MASTER_MS_120)
+        self.assertEqual(node.get_finality_list(), set(), "Should not contains himself in children finalities list")
+
+    def test_when_has_direct_child_finality(self):
+        link = LinkFactory(child__node_type=TrainingType.MASTER_MS_120)
+        expected_result = {link.child}
+        self.assertEqual(link.parent.get_finality_list(), expected_result, "Should contain direct children")
+
+    def test_when_sub_child_is_finality(self):
+        link1 = LinkFactory(child__node_type=GroupType.FINALITY_120_LIST_CHOICE)
+        link2 = LinkFactory(parent=link1.child, child__node_type=TrainingType.MASTER_MS_120)
+        expected_result = {link2.child}
+        self.assertEqual(link2.parent.get_finality_list(), expected_result, "Should contain children of children")

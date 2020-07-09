@@ -366,7 +366,7 @@ class LearningUnitPedagogyEditTestCase(TestCase):
 
     def test_learning_unit_pedagogy_edit_post(self):
         msg = self._post_learning_unit_pedagogy()
-        self.assertEqual(msg[0].get('message'), "{}.".format(_("The learning unit has been updated")))
+        self.assertEqual(msg[0].get('message'), "{}".format(_("The learning unit has been updated (without report).")))
         self.assertEqual(msg[0].get('level'), messages.SUCCESS)
 
     def test_learning_unit_pedagogy_edit_post_with_postponement(self):
@@ -431,7 +431,7 @@ class LearningUnitPedagogyEditTestCase(TestCase):
         )
         ProposalLearningUnitFactory(learning_unit_year=previous_luy)
         msg = self._post_learning_unit_pedagogy()
-        expected_message = "{}.".format(_("The learning unit has been updated"))
+        expected_message = "{}".format(_("The learning unit has been updated (without report)."))
         self.assertEqual(msg[0].get('message'), expected_message)
         self.assertEqual(msg[0].get('level'), messages.SUCCESS)
 

@@ -75,6 +75,7 @@ class ScoresResponsibleSearchTestCase(TestCase):
             person=cls.tutor.person,
             structure=cls.structure,
             entity=cls.root_entity,
+            with_child=True
         )
 
         cls.learning_unit_year = LearningUnitYearFactory(

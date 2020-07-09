@@ -41,3 +41,4 @@ class TestInit(SimpleTestCase):
         self.assertEqual(obj.common_title_en, '')
         self.assertEqual(obj.specific_title_fr, '')
         self.assertEqual(obj.specific_title_en, '')
+

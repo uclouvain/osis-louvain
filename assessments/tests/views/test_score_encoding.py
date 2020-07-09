@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -69,8 +69,8 @@ class MixinSetupOnlineEncoding(AcademicYearMockMixin, SessionExamCalendarMockMix
         self.enrollments = data["exam_enrollments"]
         self.tutor = data["attribution"].tutor
         add_permission(self.tutor.person.user, "can_access_scoreencoding")
-        self.program_managers = [ProgramManagerFactory(offer_year=data["offer_years"][i]) for i in range(0,2)]
-        [add_permission(self.program_managers[i].person.user, "can_access_scoreencoding") for i in range(0,2)]
+        self.program_managers = [ProgramManagerFactory(offer_year=data["offer_years"][i]) for i in range(0, 2)]
+        [add_permission(self.program_managers[i].person.user, "can_access_scoreencoding") for i in range(0, 2)]
 
         # Mock academic_year / session_exam_calendar in order to be decouple test from system time
         self.mock_academic_year(
@@ -539,7 +539,11 @@ class UploadXLSTest(TestCase):
         from assessments.business.score_encoding_export import HEADER
         header_expected_list = [_('Academic year'), _('Session'), _('Learning unit'), _('Program'),
                                 _('Registration number'), _('Lastname'), _('Firstname'), _('Email'),
-                                _('Numbered scores'), _('Justification (A,T)'), _('End date Prof')]
+                                _('Numbered scores'), _('Justification (A,T)'), _('End date Prof'),
+                                _('Type of specific profile'), _('Extra time (33% generally)'), _('Large print'),
+                                _('Specific room of examination'), _('Other educational facilities'),
+                                _('Educational tutor'),
+                                ]
         self.assertListEqual(HEADER, header_expected_list)
 
 

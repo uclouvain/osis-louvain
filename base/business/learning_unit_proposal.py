@@ -25,6 +25,7 @@
 ##############################################################################
 import functools
 from decimal import Decimal
+from typing import List, Dict, Callable, Any, Tuple
 
 from django.contrib.messages import ERROR, SUCCESS
 from django.contrib.messages import INFO
@@ -41,7 +42,7 @@ from base.business.learning_units import perms
 from base.business.learning_units.edition import edit_learning_unit_end_date, update_learning_unit_year_with_report, \
     update_partim_acronym
 from base.business.learning_units.simple import deletion as business_deletion
-from base.models import campus
+from base.models import campus, proposal_learning_unit, person
 from base.models.academic_year import find_academic_year_by_year, AcademicYear
 from base.models.entity import find_by_id, get_by_internal_id
 from base.models.enums import entity_container_year_link_type
@@ -238,7 +239,10 @@ def cancel_proposals_and_send_report(proposals, author, research_criteria):
     )
 
 
-def consolidate_proposals_and_send_report(proposals, author, research_criteria):
+def consolidate_proposals_and_send_report(
+        proposals: List[proposal_learning_unit.ProposalLearningUnit],
+        author: person.Person,
+        research_criteria: Dict) -> Dict[str, List[str]]:
     return _apply_action_on_proposals_and_send_report(
         proposals,
         author,
@@ -251,8 +255,15 @@ def consolidate_proposals_and_send_report(proposals, author, research_criteria):
     )
 
 
-def _apply_action_on_proposals_and_send_report(proposals, author, action_method, success_msg_id, error_msg_id,
-                                               send_mail_method, research_criteria, permission_check):
+def _apply_action_on_proposals_and_send_report(
+        proposals: List[proposal_learning_unit.ProposalLearningUnit],
+        author: person.Person,
+        action_method: Callable,
+        success_msg_id: str,
+        error_msg_id: str,
+        send_mail_method: Callable[[person.Person, Any, Dict], None],
+        research_criteria: Dict,
+        permission_check: Callable) -> Dict[str, List[str]]:
     messages_by_level = {SUCCESS: [], ERROR: []}
     proposals_with_results = _apply_action_on_proposals(proposals, action_method, author, permission_check)
 
@@ -278,7 +289,12 @@ def _apply_action_on_proposals_and_send_report(proposals, author, action_method,
     return messages_by_level
 
 
-def _apply_action_on_proposals(proposals, action_method, author, permission_check):
+def _apply_action_on_proposals(
+        proposals: List[proposal_learning_unit.ProposalLearningUnit],
+        action_method: Callable,
+        author: person.Person,
+        permission_check: Callable[[proposal_learning_unit.ProposalLearningUnit, person.Person, bool], bool]
+) -> List[Tuple[proposal_learning_unit.ProposalLearningUnit, Dict]]:
     proposals_with_results = []
     for proposal in proposals:
         try:
@@ -311,7 +327,7 @@ def cancel_proposal(proposal):
     return results
 
 
-def consolidate_proposal(proposal):
+def consolidate_proposal(proposal: proposal_learning_unit.ProposalLearningUnit) -> Dict[str, List[str]]:
     results = {ERROR: [_("Proposal is neither accepted nor refused.")]}
     if proposal.state == proposal_state.ProposalState.REFUSED.name:
         results = cancel_proposal(proposal)
@@ -322,7 +338,7 @@ def consolidate_proposal(proposal):
     return results
 
 
-def _consolidate_accepted_proposal(proposal):
+def _consolidate_accepted_proposal(proposal: proposal_learning_unit.ProposalLearningUnit) -> Dict[str, List[str]]:
     if proposal.type == proposal_type.ProposalType.CREATION.name:
         return _consolidate_creation_proposal_accepted(proposal)
     elif proposal.type == proposal_type.ProposalType.SUPPRESSION.name:
@@ -349,7 +365,7 @@ def _consolidate_suppression_proposal_accepted(proposal):
     return results
 
 
-def _consolidate_modification_proposal_accepted(proposal):
+def _consolidate_modification_proposal_accepted(proposal: proposal_learning_unit.ProposalLearningUnit) -> Dict:
     update_partim_acronym(proposal.learning_unit_year.acronym, proposal.learning_unit_year)
     next_luy = proposal.learning_unit_year.get_learning_unit_next_year()
     if next_luy:

@@ -57,7 +57,7 @@ class TestCoorganizationForm(TestCase):
         )
 
         cls.root_id = cls.education_group_yr.id
-        cls.country_be = CountryFactory()
+        cls.country_be = CountryFactory(iso_code='BE', name='Belgium')
 
         cls.organization_address = OrganizationAddressFactory(country=cls.country_be)
         cls.organization = cls.organization_address.organization

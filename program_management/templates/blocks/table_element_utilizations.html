@@ -1,0 +1,48 @@
+{% load i18n static %}
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th></th>
+        <th>{% trans 'Code' %}</th>
+        <th>{% trans 'Acronym/Short title' context 'abbreviation'%}</th>
+        <th>{% trans 'Title' %}</th>
+        <th>{% trans 'Cred. rel./abs.' %}</th>
+        <th>{% trans 'Min. credits' %}</th>
+        <th>{% trans 'Max. credits' %}</th>
+        <th>{% trans 'Mandatory' %}</th>
+        <th>{% trans 'Block' %}</th>
+        <th>{% trans 'Formations' %}</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for row in utilization_rows %}
+        <tr>
+            <td> {% if row.link.is_reference %}  <img src="{% static 'img/reference.jpg' %}" > {% endif %} </td>
+            <td>
+                {% url 'element_identification' row.link.parent.year row.link.parent.code as url_parent_identification %}
+                <a href="{{ url_parent_identification }}">{{ row.link.parent.code | default_if_none:'' }}</a>
+            </td>
+            <td>{{ row.link.parent.title | default_if_none:'' }}</td>
+            <td>{{ row.link.parent.group_title_fr | default_if_none:'' }}</td>
+            <td>
+                {{ row.link.relative_credits | default_if_none:'-' }} /
+                {{ row.link.child.credits.normalize | default_if_none:'-' }}
+            </td>
+            <td>{{ row.link.min_credits | default_if_none:'-' }}</td>
+            <td>{{ row.link.max_credits | default_if_none:'-' }}</td>
+            <td>{{ row.link.is_mandatory | yesno:_("yes,no") | title }}</td>
+            <td>{{ row.link.block | default_if_none:'-' }}</td>
+            <td>
+                {% for root_node in row.root_nodes %}
+                    {# TODO: Compute URL #}
+                    {% url 'element_identification' root_node.year root_node.code as url_root_identification  %}
+                    <a href="{{ url_root_identification }}">{{ root_node.title }}</a>
+                    {% if not forloop.last %} - {% endif %}
+                {% empty %}
+                    -
+                {% endfor %}
+            </td>
+    {% endfor %}
+    </tbody>
+</table>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-03-16 13:59+0100\n"
+"POT-Creation-Date: 2020-06-25 13:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -166,6 +166,9 @@ msgstr ""
 msgid "Download the Excel file"
 msgstr ""
 
+msgid "Educational tutor"
+msgstr ""
+
 msgid "Email"
 msgstr ""
 
@@ -191,6 +194,9 @@ msgid "Entity"
 msgstr ""
 
 msgid "Evaluations"
+msgstr ""
+
+msgid "Extra time (33% generally)"
 msgstr ""
 
 msgid "Fax"
@@ -244,6 +250,9 @@ msgid "Justified absence"
 msgstr ""
 
 msgid "LU code"
+msgstr ""
+
+msgid "Large print"
 msgstr ""
 
 msgid "Last synchronization"
@@ -330,6 +339,9 @@ msgid "Online encoding"
 msgstr ""
 
 msgid "Online scores encoding"
+msgstr ""
+
+msgid "Other educational facilities"
 msgstr ""
 
 msgid "Other tutors"
@@ -487,6 +499,9 @@ msgstr "Session number"
 msgid "Session number"
 msgstr ""
 
+msgid "Specific room of examination"
+msgstr ""
+
 msgid "State"
 msgstr ""
 
@@ -564,6 +579,9 @@ msgid "Tutors of the course"
 msgstr ""
 
 msgid "Type"
+msgstr ""
+
+msgid "Type of specific profile"
 msgstr ""
 
 msgid "Type of training"

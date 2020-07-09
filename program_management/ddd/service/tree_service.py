@@ -28,10 +28,5 @@ from program_management.ddd.business_types import *
 from program_management.ddd.repositories import load_tree
 
 
-def search_trees_using_node(node_to_detach: 'Node'):
-    node_id = node_to_detach.pk
-    if node_to_detach.is_learning_unit():
-        trees = load_tree.load_trees_from_children(child_branch_ids=None, child_leaf_ids=[node_id])
-    else:
-        trees = load_tree.load_trees_from_children(child_branch_ids=[node_id], child_leaf_ids=None)
-    return trees
+def search_trees_using_node(node: 'Node'):
+    return load_tree.load_trees_from_children(child_element_ids=[node.pk])

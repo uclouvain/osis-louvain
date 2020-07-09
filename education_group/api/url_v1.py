@@ -25,6 +25,7 @@
 ##############################################################################
 from django.conf.urls import url, include
 
+from education_group.api.views.education_group_version import TrainingVersionList
 from education_group.api.views.group import GroupDetail, GroupTitle
 from education_group.api.views.group_element_year import TrainingTreeView, MiniTrainingTreeView, GroupTreeView
 from education_group.api.views.hops import HopsList
@@ -37,15 +38,28 @@ app_name = "education_group"
 urlpatterns = [
     url(r'^hops/(?P<year>[\d]{4})$', HopsList.as_view(), name=HopsList.name),
     url(r'^trainings$', TrainingList.as_view(), name=TrainingList.name),
+    url(r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[\w]{1,2}){0,2})/', include([
+        url(r'^tree$', TrainingTreeView.as_view(), name=TrainingTreeView.name),
+        url(r'^title$', TrainingTitle.as_view(), name=TrainingTitle.name),
+        url(r'^versions$', TrainingVersionList.as_view(), name=TrainingVersionList.name)
+    ])),
     url(
-        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/| ]?[a-zA-Z]{1,2})?)$',
+        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})/versions/(?P<version_name>[\w]*)$',
         TrainingDetail.as_view(),
         name=TrainingDetail.name
     ),
-    url(r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/| ]?[a-zA-Z]{1,2})?)/', include([
-        url(r'^tree$', TrainingTreeView.as_view(), name=TrainingTreeView.name),
-        url(r'^title$', TrainingTitle.as_view(), name=TrainingTitle.name),
-    ])),
+    url(
+        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[a-zA-Z]{1,2}){0,2})/versions/(?P<version_name>[\w]*)/',
+        include([
+            url(r'^tree$', TrainingTreeView.as_view(), name=TrainingTreeView.name),
+            url(r'^title$', TrainingTitle.as_view(), name=TrainingTitle.name),
+        ])
+    ),
+    url(
+        r'^trainings/(?P<year>[\d]{4})/(?P<acronym>[\w]+(?:[/ ]?[\w]{1,2}){0,2})$',
+        TrainingDetail.as_view(),
+        name=TrainingDetail.name
+    ),
     url(r'^mini_trainings$', MiniTrainingList.as_view(), name=MiniTrainingList.name),
     url(
         r'^mini_trainings/(?P<year>[\d]{4})/(?P<partial_acronym>[\w]+)$',

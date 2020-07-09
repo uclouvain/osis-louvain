@@ -181,7 +181,7 @@ def _get_parameters_configurable_list(learning_units, titles, user):
     return parameters
 
 
-def _get_significant_volume(volume):
+def get_significant_volume(volume):
     if volume and volume > 0:
         return volume
     return ''
@@ -465,11 +465,11 @@ def _get_attribution_detail(an_attribution):
 
 
 def volume_information(learning_unit_yr):
-    return [_get_significant_volume(learning_unit_yr.pm_vol_tot or 0),
-            _get_significant_volume(learning_unit_yr.pm_vol_q1 or 0),
-            _get_significant_volume(learning_unit_yr.pm_vol_q2 or 0),
+    return [get_significant_volume(learning_unit_yr.pm_vol_tot or 0),
+            get_significant_volume(learning_unit_yr.pm_vol_q1 or 0),
+            get_significant_volume(learning_unit_yr.pm_vol_q2 or 0),
             learning_unit_yr.pm_classes or 0,
-            _get_significant_volume(learning_unit_yr.pp_vol_tot or 0),
-            _get_significant_volume(learning_unit_yr.pp_vol_q1 or 0),
-            _get_significant_volume(learning_unit_yr.pp_vol_q2 or 0),
+            get_significant_volume(learning_unit_yr.pp_vol_tot or 0),
+            get_significant_volume(learning_unit_yr.pp_vol_q1 or 0),
+            get_significant_volume(learning_unit_yr.pp_vol_q2 or 0),
             learning_unit_yr.pp_classes or 0]

@@ -63,7 +63,6 @@ PERMISSIONS = (
     'can_propose_learningunit',
     'can_consolidate_learningunit_proposal',
     'add_educationgroup',
-    'delete_educationgroup',
     'change_educationgroup',
     'view_educationgroup'
 )

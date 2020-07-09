@@ -98,7 +98,6 @@ class RoleModel(models.Model, metaclass=RoleModelMeta):
 class EntityRoleModelQueryset(models.QuerySet):
     def get_entities_ids(self):
         person_entities = self.values('entity_id', 'with_child')
-
         entities_with_child = {entity['entity_id'] for entity in person_entities if entity['with_child']}
         entity_version_tree = EntityVersion.objects.get_tree(entities_with_child)
         entities_without_child = {entity['entity_id'] for entity in person_entities if not entity['with_child']}

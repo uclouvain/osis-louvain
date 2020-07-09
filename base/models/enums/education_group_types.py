@@ -189,6 +189,10 @@ class MiniTrainingType(EducationGroupTypesEnum):
             cls.FSA_SPECIALITY.name,
         ]
 
+    @classmethod
+    def with_skills_achievements(cls):
+        return cls.with_admission_condition()
+
 
 class GroupType(EducationGroupTypesEnum):
     COMMON_CORE = _("Common core")

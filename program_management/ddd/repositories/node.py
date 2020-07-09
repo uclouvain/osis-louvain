@@ -27,6 +27,7 @@ from typing import Optional, List
 
 from django.db.models import Q
 
+from base.models import group_element_year
 from osis_common.ddd import interface
 from osis_common.ddd.interface import EntityIdentity, Entity
 from program_management.ddd.business_types import *
@@ -49,7 +50,7 @@ class NodeRepository(interface.AbstractRepository):
         raise NotImplementedError
 
     @classmethod
-    def get(cls, entity_id: 'NodeIdentity') -> 'Node':
+    def get(cls, entity_id: 'NodeIdentity') -> Optional['Node']:
         search_result = cls.search(entity_ids=[entity_id])
         if search_result:
             return search_result[0]

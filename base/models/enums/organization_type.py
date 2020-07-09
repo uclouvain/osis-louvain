@@ -27,16 +27,19 @@ from django.utils.translation import gettext_lazy as _, pgettext_lazy
 
 MAIN = "MAIN"
 ACADEMIC_PARTNER = "ACADEMIC_PARTNER"
-INDUSTRIAL_PARTNER = "INDUSTRIAL_PARTNER"
-SERVICE_PARTNER = "SERVICE_PARTNER"
-COMMERCE_PARTNER = "COMMERCE_PARTNER"
-PUBLIC_PARTNER = "PUBLIC_PARTNER"
+EMBASSY = "EMBASSY"
+RESEARCH_CENTER = "RESEARCH_CENTER"
+ENTERPRISE = "ENTERPRISE"
+HOSPITAL = "HOSPITAL"
+NGO = "NGO"
+OTHER = "OTHER"
 
 ORGANIZATION_TYPE = (
     (MAIN, pgettext_lazy("female", "Main")),
     (ACADEMIC_PARTNER, _("Academic partner")),
-    (INDUSTRIAL_PARTNER, _("Industrial partner")),
-    (SERVICE_PARTNER, _("Service partner")),
-    (COMMERCE_PARTNER, _("Commerce partner")),
-    (PUBLIC_PARTNER, _("Public partner")),
+    (EMBASSY, _("Embassy")),
+    (RESEARCH_CENTER, _("Research center")),
+    (ENTERPRISE, _("Enterprise")),
+    (HOSPITAL, _("Hospital")),
+    (NGO, _("Non-governmental organization")),
 )

@@ -28,18 +28,18 @@ from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
 from base.business import event_perms
-from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.tests.factories import person as person_factory
 from base.tests.factories.academic_calendar import OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year
-from base.tests.factories.education_group_year import TrainingFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
+from education_group.models.group_year import GroupYear
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
 from education_group.tests.factories.auth.faculty_manager import FacultyManagerFactory
+from education_group.tests.factories.group_year import GroupYearFactory
 
 
-class TestEventPermEducationGroupEditionPerms(TestCase):
+class TestEventPermGroupYearEditionPerms(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
@@ -51,27 +51,27 @@ class TestEventPermEducationGroupEditionPerms(TestCase):
                                     data_year__year=cls.current_academic_year.year + 1)
 
     def test_is_open_for_spec_egy(self):
-        egy = TrainingFactory(academic_year=self.current_academic_year)
-        self.assertTrue(event_perms.EventPermEducationGroupEdition(obj=egy).is_open())
+        gy = GroupYearFactory(academic_year=self.current_academic_year)
+        self.assertTrue(event_perms.EventPermEducationGroupEdition(obj=gy).is_open())
 
     def test_is_open_other_rules(self):
         self.assertTrue(event_perms.EventPermEducationGroupEdition().is_open())
 
 
-class TestEventPermEducationGroupEditionPermsNotOpen(TestCase):
+class TestEventPermGroupYearEditionPermsNotOpen(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
 
     def test_is_not_open_for_spec_egy_without_exception_raise(self):
-        egy = TrainingFactory(academic_year=self.current_academic_year)
-        self.assertFalse(event_perms.EventPermEducationGroupEdition(obj=egy, raise_exception=False).is_open())
+        gy = GroupYearFactory(academic_year=self.current_academic_year)
+        self.assertFalse(event_perms.EventPermEducationGroupEdition(obj=gy, raise_exception=False).is_open())
 
     def test_is_not_open_for_spec_egy_with_exception_raise(self):
-        egy = TrainingFactory(academic_year=self.current_academic_year)
+        gy = GroupYearFactory(academic_year=self.current_academic_year)
         expected_exception_message = str(_("This education group is not editable during this period."))
         with self.assertRaisesMessage(PermissionDenied, expected_exception_message):
-            event_perms.EventPermEducationGroupEdition(obj=egy, raise_exception=True).is_open()
+            event_perms.EventPermEducationGroupEdition(obj=gy, raise_exception=True).is_open()
 
     def test_is_not_open_other_rules(self):
         self.assertFalse(event_perms.EventPermEducationGroupEdition().is_open())
@@ -79,12 +79,12 @@ class TestEventPermEducationGroupEditionPermsNotOpen(TestCase):
 
 class TestEventPermInit(TestCase):
     def test_init_obj_matches_model(self):
-        egy = TrainingFactory()
-        event_perms.EventPermEducationGroupEdition(obj=egy, raise_exception=False)
+        gy = GroupYearFactory()
+        event_perms.EventPermEducationGroupEdition(obj=gy, raise_exception=False)
 
     def test_init_obj_dont_match_model(self):
         luy = LearningUnitYearFactory()
-        expected_exception_message = "The provided obj must be a {}".format(EducationGroupYear.__name__)
+        expected_exception_message = "The provided obj must be a {}".format(GroupYear.__name__)
         with self.assertRaisesMessage(AttributeError, expected_exception_message):
             event_perms.EventPermEducationGroupEdition(obj=luy, raise_exception=False)
 

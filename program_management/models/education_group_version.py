@@ -56,7 +56,8 @@ class EducationGroupVersion(models.Model):
         'education_group.GroupYear',
         unique=True,
         verbose_name=_('Root group'),
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
+        related_name='educationgroupversion'
     )
     offer = models.ForeignKey(
         'base.EducationGroupYear',

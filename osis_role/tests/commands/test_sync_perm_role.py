@@ -53,12 +53,12 @@ class TestRoleModel(TestCase):
     def test_ensure_role_are_sync_with_groups_case_add_multiple_perms(self):
         self.command_instance.handle()
 
-        self.assertEquals(Group.objects.get(name=self.group.name).permissions.count(), 2)
+        self.assertEqual(Group.objects.get(name=self.group.name).permissions.count(), 2)
 
     def test_ensure_group_name_param_specified(self):
         self.command_instance.handle(group="dummy_role")
         #  Ensure concrete_role is not updated
-        self.assertEquals(Group.objects.get(name=self.group.name).permissions.count(), 0)
+        self.assertEqual(Group.objects.get(name=self.group.name).permissions.count(), 0)
 
     def test_ensure_role_are_sync_with_groups_remove_perm(self):
         permission_which_are_not_in_role = Permission.objects.get(codename='change_person')
@@ -66,5 +66,5 @@ class TestRoleModel(TestCase):
         self.command_instance.handle()
 
         qs = Group.objects.get(name=self.group.name).permissions
-        self.assertEquals(qs.count(), 2)
+        self.assertEqual(qs.count(), 2)
         self.assertFalse(qs.filter(codename='change_person').exists())

@@ -1,0 +1,66 @@
+{% extends "education_group_app/mini_training/layout_read.html" %}
+{% load i18n bootstrap3 %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block top_action_bar %}
+    {% if can_edit_information %}
+        {% include  "education_group_app/blocks/refresh_publication_button.html" %}
+    {% endif %}
+{% endblock %}
+
+{% block bottom_action_bar %}
+    {% if can_edit_information %}
+        {% include  "education_group_app/blocks/refresh_publication_button.html" %}
+    {% endif %}
+{% endblock %}
+
+
+{% block details %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel">
+                <div class="panel-body">
+                    <h3>
+                        {{ admission_requirements_label.label_translated }}
+                        {% if can_edit_information %}
+                            {% url 'education_group_year_admission_condition_update_text' mini_training.pk mini_training.pk as update_text_url %}
+                            <a href="#" role="button"
+                               class="button modify-text-btn"
+                               data-form="{{ update_text_url }}?section=free&title={{ admission_requirements_label.label_translated.split|join:"%20" }}">
+                                <span class="glyphicon glyphicon-edit" style="font-size: 16px;"
+                                      aria-hidden="true"></span>
+                            </a>
+                        {% endif %}
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-12">
+                            {% include "education_group_app/blocks/row_translation_side_by_side.html" %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock details %}

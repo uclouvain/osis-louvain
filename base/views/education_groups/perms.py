@@ -28,15 +28,14 @@ from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404
 from waffle.models import Flag
 
-from base.business.education_groups import perms as business_perms
 from base.models.education_group_year import EducationGroupYear
-from base.models.person import Person
+from osis_role.errors import get_permission_error
 
 
 def can_change_education_group(user, education_group):
-    pers = get_object_or_404(Person, user=user)
-    if not business_perms.is_eligible_to_change_education_group(pers, education_group, raise_exception=True):
-        raise PermissionDenied
+    perm = 'base.change_link_data'
+    if not user.has_perm(perm, education_group):
+        raise PermissionDenied(get_permission_error(user, perm))
     return True
 
 
@@ -60,27 +59,3 @@ def can_change_admission_condition(view_func):
             raise PermissionDenied
         return view_func(request, *args, **kwargs)
     return f_can_change_admission_condition
-
-
-class FlagNotAuthorized(AccessMixin):
-
-    flag_not_authorized = None
-
-    def get_flag_not_authorized(self):
-        if self.flag_not_authorized:
-            if isinstance(self.flag_not_authorized, str):
-                return Flag.objects.filter(name=self.flag_not_authorized).exists()
-            else:
-                raise ImproperlyConfigured(
-                    '{0} flag_not_authorized is not correctly defined'.format(self.__class__.__name__)
-                )
-
-            return False
-
-    def has_flag(self):
-        return self.get_flag_not_authorized()
-
-    def dispatch(self, request, *args, **kwargs):
-        if self.has_flag():
-            return self.handle_no_permission()
-        return super().dispatch(request, *args, **kwargs)

@@ -1,0 +1,67 @@
+{% extends "education_group_app/general_information/layout_read.html" %}
+{% comment "License" %}
+    * OSIS stands for Open Student Information System. It's an application
+    * designed to manage the core business of higher education institutions,
+    * such as universities, faculties, institutes and professional schools.
+    * The core business involves the administration of students, teachers,
+    * courses, programs and so on.
+    *
+    * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    * GNU General Public License for more details.
+    *
+    * A copy of this license - GNU General Public License - is available
+    * at the root of the source code of this program.  If not,
+    * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% block details %}
+    <div class="container-fluid">
+        <div class="row">
+            {# Backward compatibility with previous template Must be refacor #}
+            {% with root=object education_group_year=object %}
+                <!-- Message d'alerte -->
+                {% include 'education_group/blocks/admission_condition_text.html' with section_name="alert_message" text=_("Alert Message") field=admission_condition.text_alert_message field_en=admission_condition.text_alert_message_en can_edit=True %}
+                <!-- Conditions Générales -->
+                {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_cond_generales" text=_("General Conditions") field=admission_condition.text_ca_cond_generales field_en=admission_condition.text_ca_cond_generales_en can_edit=True %}
+                <!-- Maîtrise de la langue française -->
+                {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_maitrise_fr" text=_("French language proficiency examination") field=admission_condition.text_ca_maitrise_fr field_en=admission_condition.text_ca_maitrise_fr_en can_edit=True %}
+                <!-- Inscriptions en allègement  -->
+                {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_allegement" text=_("Reduction") field=admission_condition.text_ca_allegement field_en=admission_condition.text_ca_allegement_en can_edit=True %}
+                <!-- Ouverture aux adultes -->
+                {% include 'education_group/blocks/admission_condition_text.html' with section_name="ca_ouv_adultes" text=_("Opening to Adults") field=admission_condition.text_ca_ouv_adultes field_en=admission_condition.text_ca_ouv_adultes_en can_edit=True %}
+            {% endwith %}
+        </div>
+    </div>
+
+    {# TODO: Must use Ajax modal #}
+    {% if can_edit_information %}
+        <div class="modal fade" id="modify_text" role="dialog" data-backdrop="static"></div>
+    {% endif %}
+{% endblock details %}
+
+
+{# TODO: Must use Ajax modal #}
+{% block script %}
+    {% if can_edit_information %}
+        <script>
+            $('a.modify-text-btn').click(function (evt) {
+                evt.preventDefault();
+                var url = $(this).data('form');
+                var modal = $("#modify_text");
+                modal.load(url, function () {
+                    $(this).modal('show');
+                });
+                return false;
+            });
+        </script>
+    {% endif %}
+{% endblock script %}

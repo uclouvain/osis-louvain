@@ -31,7 +31,6 @@ from django.utils.translation import gettext_lazy as _
 
 from assessments.business import scores_responsible as business_scores_responsible
 from attribution.models.attribution import Attribution
-from base.business.entity import get_entities_ids
 from base.forms.learning_unit.search.simple import filter_by_entities
 from base.models.entity_version import EntityVersion
 from base.models.learning_unit_year import LearningUnitYear, LearningUnitYearQuerySet

@@ -1,0 +1,76 @@
+{% load i18n %}
+
+{% comment "License" %}
+* OSIS stands for Open Student Information System. It's an application
+* designed to manage the core business of higher education institutions,
+* such as universities, faculties, institutes and professional schools.
+* The core business involves the administration of students, teachers,
+* courses, programs and so on.
+*
+* Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+*
+* This program is free software: you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation, either version 3 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* A copy of this license - GNU General Public License - is available
+* at the root of the source code of this program.  If not,
+* see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+<div class="panel-additional-information-skills panel panel-default">
+    <div class="panel-heading">
+        <div class="row">
+            <div class="col-md-11">
+                <div class="row">
+                    <div class="col-md-6">
+                        {% language 'fr-be' %}
+                            {% trans 'additional informations'|capfirst %} :
+                        {% endlanguage %}
+                    </div>
+                    <div class="col-md-6">
+                        {% language 'en' %}
+                            {% trans 'additional informations'|capfirst %} :
+                        {% endlanguage %}
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <span class="glyphicon glyphicon-chevron-down collapse_span_updown pull-right"
+                      data-target="#body-additional-information" data-toggle="collapse">
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div id="body-additional-information" class="panel-body panel-collapse collapse in">
+        <div class="row">
+            <div class="col-md-11">
+                {% with label=additional_information_skills_label %}
+                    {% include "education_group_app/blocks/row_translation_side_by_side.html" %}
+                {% endwith %}
+            </div>
+            <div class="col-md-1">
+                {% if can_edit_information %}
+                    <a class="trigger_modal pull-right" data-url="{{ additional_information_skills_update_url }}"
+                       data-modal_class="modal-lg" title={% trans 'Edit' %}>
+                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        $('.collapse_span').on('click', function () {
+            $(this).toggleClass('glyphicon-chevron-right').toggleClass('glyphicon-chevron-down');
+        });
+    });
+</script>

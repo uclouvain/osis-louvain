@@ -338,6 +338,10 @@ div.dataTables_wrapper div.dataTables_processing {
     display: block ! important;
 }
 
+.d-block::first-letter {
+    text-transform: uppercase;
+}
+
 .d-table {
     display: table ! important;
 }
@@ -545,4 +549,54 @@ table.dataTable thead .sorting:after, table.dataTable thead .sorting_asc:after, 
 .dropdown-menu > li > a.disabled {
     color: #777;
     cursor: not-allowed;
+}
+
+.text-first-letter-capitalize:first-letter,
+.text-first-letter-capitalize::first-letter {
+    text-transform: capitalize;
+}
+
+.of_unversioned_field #academic_type,
+.of_unversioned_field #duration,
+.of_unversioned_field #internship,
+.of_unversioned_field #is_enrollment_enabled,
+.of_unversioned_field #has_online_re_registration,
+.of_unversioned_field #has_partial_deliberation,
+.of_unversioned_field #has_admission_exam,
+.of_unversioned_field #has_dissertation,
+.of_unversioned_field #produce_university_certificate,
+.of_unversioned_field #decree_category,
+.of_unversioned_field #rate_code,
+.of_unversioned_field #main_language,
+.of_unversioned_field #english_activities,
+.of_unversioned_field #other_language_activities,
+.of_unversioned_field #main_domain,
+.of_unversioned_field #secondary_domains,
+.of_unversioned_field #isced_domain,
+.of_unversioned_field #internal_comment,
+.of_unversioned_field #panel_coorganization,
+.of_unversioned_field #administration_entity,
+.of_unversioned_field #enrollment_campus,
+.of_unversioned_field #other_campus_activities,
+.of_unversioned_field #funding_can_be_funded,
+.of_unversioned_field #funding_orientation,
+.of_unversioned_field #funding_can_be_international_funded,
+.of_unversioned_field #international_funding_orientation,
+.of_unversioned_field #hops_ares_code,
+.of_unversioned_field #hops_ares_graca,
+.of_unversioned_field #hops_ares_authorization,
+.of_unversioned_field #co_graduation_inter_cfb,
+.of_unversioned_field #co_graduation_coefficient,
+.of_unversioned_field #keywords,
+.of_unversioned_field #category,
+.of_unversioned_field #type_of_training,
+.of_unversioned_field #schedule_type,
+.of_unversioned_field #group_title_fr,
+.of_unversioned_field #group_title_en {
+    color: grey;
+}
+
+.container-align-items-center {
+    display: flex;
+    align-items: center;
 }

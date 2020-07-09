@@ -38,7 +38,7 @@ class PrerequisiteItemFactory(factory.Factory):
         model = PrerequisiteItem
         abstract = False
 
-    code = factory.Sequence(lambda n: 'Code-%02d' % n)
+    code = factory.Sequence(lambda n: 'Code%02d' % n)
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
 
 

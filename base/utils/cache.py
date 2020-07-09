@@ -120,6 +120,10 @@ class RequestCache(OsisCache):
                 new_get_request[key] = value
         return new_get_request
 
+    def get_value_cached(self, key: str):
+        cached_data = self.cached_data or {}
+        return cached_data.get(key)
+
 
 class SearchParametersCache(OsisCache):
     PREFIX_KEY = "search_"
@@ -140,34 +144,31 @@ class ElementCache(OsisCache):
         COPY = "copy-action"
         CUT = "cut-action"
 
-    def __init__(self, user):
-        self.user = user
+    def __init__(self, user_id: int):
+        self.user_id = user_id
 
     @property
     def key(self):
-        return self.PREFIX_KEY.format(user=self.user.pk)
+        return self.PREFIX_KEY.format(user=self.user_id)
 
-    @deprecated  # Use equals_element instead
-    def equals(self, obj_to_compare):
+    def equals_element(self, element_code: str, element_year: int) -> bool:
         return (
-            self.cached_data
-            and self.cached_data['id'] == obj_to_compare.id
-            and self.cached_data['modelname'] == obj_to_compare._meta.db_table
-        )
-
-    def equals_element(self, element_id: int) -> bool:
-        return (
-            self.cached_data
-            and self.cached_data['id'] == element_id
+                self.cached_data
+                and self.cached_data['element_code'] == element_code
+                and self.cached_data['element_year'] == element_year
         )
 
     def save_element_selected(
             self,
-            obj,
-            source_link_id=None,
-            action: ElementCacheAction = ElementCacheAction.COPY.value
+            element_code: str,
+            element_year: int,
+            path_to_detach: str = None,
+            action: ElementCacheAction = ElementCacheAction.COPY
     ):
-        data_to_cache = {'id': obj.pk, 'modelname': obj._meta.db_table, 'action': action}
-        if source_link_id:
-            data_to_cache['source_link_id'] = source_link_id
+        data_to_cache = {
+            'element_code': element_code,
+            'element_year': element_year,
+            'path_to_detach': path_to_detach,
+            'action': action.value
+        }
         self.set_cached_data(data_to_cache)
