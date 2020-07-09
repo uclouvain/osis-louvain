@@ -35,6 +35,7 @@ from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from education_group.views.group.common_read import Tab, GroupRead
 from osis_common.utils.models import get_object_or_none
+from program_management.ddd.domain.node import Node
 
 
 class GroupUpdateGeneralInformation(GroupRead):
@@ -61,17 +62,16 @@ class GroupUpdateGeneralInformation(GroupRead):
             redirect_url += "#section_{label_name}".format(label_name=label)
         return redirect(redirect_url)
 
-    def update_cms(self, form, label):
+    def update_cms(self, form, label: str):
+        for lang in [settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_FR]:
+            self._update_cms_for_specific_lang(form, lang, label)
+
+    def _update_cms_for_specific_lang(self, form, lang: str, label: str):
         node = self.get_object()
         entity = entity_name.get_offers_or_groups_entity_from_node(node)
         obj = translated_text.get_groups_or_offers_cms_reference_object(node)
         text_label = TextLabel.objects.filter(label=label, entity=entity).first()
-        for lang in [settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_FR]:
-            self._update_cms_for_specific_lang(form, obj, text_label, lang)
 
-    def _update_cms_for_specific_lang(self, form, obj, text_label, lang):
-        node = self.get_object()
-        entity = entity_name.get_offers_or_groups_entity_from_node(node)
         record, created = TranslatedText.objects.get_or_create(
             reference=obj.pk,
             entity=entity,
@@ -103,14 +103,14 @@ class GroupUpdateGeneralInformation(GroupRead):
             **context
         }
 
-    def get_translated_texts(self, node):
-        obj = translated_text.get_groups_or_offers_cms_reference_object(node)
+    def get_translated_texts(self, node: Node):
         initial_values = {'label': self.request.GET.get('label')}
         for lang in [settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_FR]:
-            initial_values.update(self._get_translated_text_from_lang(obj, lang))
+            initial_values.update(self._get_translated_text_from_lang(node, lang))
         return initial_values
 
-    def _get_translated_text_from_lang(self, obj, lang):
+    def _get_translated_text_from_lang(self, node: Node, lang: str):
+        obj = translated_text.get_groups_or_offers_cms_reference_object(node)
         label = self.request.GET.get('label')
         node = self.get_object()
         entity = entity_name.get_offers_or_groups_entity_from_node(node)
