@@ -43,7 +43,6 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
     paginator = None
 
     def get_object(self):
-        print("START")
         queryset = self.filter_queryset(self.get_queryset())
         version_name = self.kwargs.pop('version_name', '')
         filter_kwargs = {
@@ -64,19 +63,21 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
             version_name=version_name,
             is_transition=False
         )
+
         self.tree_version = ProgramTreeVersionRepository.get(tree_version_identity)
-        tree = self.tree_version.get_tree()
+        tree = load_tree.load(element.id)
         return link.factory.get_link(parent=None, child=tree.root_node)
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context.update(
-            {
-                'version_name': self.tree_version.version_name,
-                'version_title_fr': self.tree_version.title_fr,
-                'version_title_en': self.tree_version.title_en
-            }
-        )
+        if self.get('tree_version'):
+            context.update(
+                {
+                    'version_name': self.tree_version.version_name,
+                    'version_title_fr': self.tree_version.title_fr,
+                    'version_title_en': self.tree_version.title_en,
+                }
+            )
         return context
 
 

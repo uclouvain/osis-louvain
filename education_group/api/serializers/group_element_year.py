@@ -112,7 +112,7 @@ class EducationGroupRootNodeTreeSerializer(BaseCommonNodeTreeSerializer):
 
     def get_acronym(self, obj):
         version_name = self.context.get('version_name')
-        return obj.child.title + ' [{}]'.format(version_name)
+        return obj.child.title + (' [{}]'.format(version_name) if version_name else '')
 
     @staticmethod
     def get_node_type(obj):
@@ -130,10 +130,9 @@ class EducationGroupRootNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     def get_title(self, obj):
         field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
         version_title = self.context.get('version_title' + field_suffix)
-        print(version_title)
-        print(getattr(obj.child, 'offer_title' + field_suffix))
-        return getattr(obj.child, 'offer_title' + field_suffix)
-        # + ' [{}]'.format(version_title)
+        title_suffix = ' [{}]'.format(version_title) if version_title else ''
+        title = getattr(obj.child, 'offer_title' + field_suffix)
+        return title + title_suffix if title else None
 
     def get_partial_title(self, obj):
         field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'

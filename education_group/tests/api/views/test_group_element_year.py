@@ -198,6 +198,7 @@ class MiniTrainingTreeViewTestCase(APITestCase):
             root_group__education_group_type=cls.mini_training.education_group_type,
             root_group__partial_acronym='LBIOL212O',
             root_group__academic_year=cls.academic_year,
+            is_transition=False
         )
         cls.mini_training_element = ElementFactory(group_year=cls.mini_training_version.root_group)
         cls.common_core = GroupYearFactory(
