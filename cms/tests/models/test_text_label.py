@@ -27,7 +27,9 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from cms.models import text_label
+from cms.models.text_label import TextLabel
 from cms.tests.factories.text_label import TextLabelFactory
+from osis_common.utils.models import get_object_or_none
 
 
 class TextLabelTest(TestCase):
@@ -139,7 +141,11 @@ class TextLabelTest(TestCase):
     def test_get_by_label_or_none(self):
         text_labels = text_label.TextLabel.objects.all()
         text_labels.delete()
-        self.assertIsNone(text_label.get_by_label_or_none('random'))
+        txt_label = get_object_or_none(
+            TextLabel,
+            label='random'
+        )
+        self.assertIsNone(txt_label)
 
 
 class TextLabelComplexeStructureTest(TestCase):

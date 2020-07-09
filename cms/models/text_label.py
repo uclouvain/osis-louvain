@@ -28,7 +28,6 @@ from django.db import models
 
 from cms.enums.entity_name import ENTITY_NAME
 from osis_common.models import osis_model_admin
-from osis_common.utils.models import get_object_or_none
 
 
 class TextLabelAdmin(osis_model_admin.OsisModelAdmin):
@@ -119,10 +118,3 @@ def reorganise_order(parent):
         if text_label.order != index:
             text_label.order = index
             super(TextLabel, text_label).save()
-
-
-def get_by_label_or_none(label):
-    return get_object_or_none(
-        TextLabel,
-        label=label
-    )
