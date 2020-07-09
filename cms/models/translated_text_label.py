@@ -65,7 +65,7 @@ def search(text_entity, labels=None, language=None):
     return queryset.select_related('text_label')
 
 
-def get_label_translation(text_entity, label, language):
+def get_label_translation(text_entity: str, label: str, language: str):
     translated_text_label = search(
         text_entity=text_entity,
         labels=[label],

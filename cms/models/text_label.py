@@ -28,6 +28,7 @@ from django.db import models
 
 from cms.enums.entity_name import ENTITY_NAME
 from osis_common.models import osis_model_admin
+from osis_common.utils.models import get_object_or_none
 
 
 class TextLabelAdmin(osis_model_admin.OsisModelAdmin):
@@ -113,8 +114,7 @@ def shift_text_label(parent, start_order):
 
 
 def reorganise_order(parent):
-    list_to_reorder = list(TextLabel.objects.filter(parent=parent) \
-                           .order_by('order'))
+    list_to_reorder = list(TextLabel.objects.filter(parent=parent).order_by('order'))
     for index, text_label in enumerate(list_to_reorder, 1):
         if text_label.order != index:
             text_label.order = index
@@ -122,7 +122,7 @@ def reorganise_order(parent):
 
 
 def get_by_label_or_none(label):
-    try:
-        return TextLabel.objects.get(label=label)
-    except TextLabel.DoesNotExist:
-        return None
+    return get_object_or_none(
+        TextLabel,
+        label=label
+    )

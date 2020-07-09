@@ -110,5 +110,5 @@ def get_groups_or_offers_cms_reference_object(node: Node):
 
 
 @receiver(post_delete, sender=EducationGroupYear)
-def _educationgroupyear_delete(sender, instance, **kwargs):
+def _educationgroupyear_delete(sender, instance):
     TranslatedText.objects.filter(entity=OFFER_YEAR, reference=instance.id).delete()
