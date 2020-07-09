@@ -166,7 +166,7 @@ class GroupFilter(FilterSet):
         return filter_field_by_regex(queryset, name, value)
 
     @staticmethod
-    def filter_by_transition(queryset, value):
+    def filter_by_transition(queryset, name, value):
         if not value:
             return queryset.exclude(educationgroupversion__is_transition=True)
         return queryset
