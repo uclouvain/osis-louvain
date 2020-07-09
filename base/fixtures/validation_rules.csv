@@ -1214,194 +1214,176 @@ base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_gro
 base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2M1,REQUIRED,,,,,,
 base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_2MC,REQUIRED,,,,,,
 base.validationrule,base_educationgroupyear.enrollment_campus.osis.education_group_type_ST,REQUIRED,,,,,,
-base.validationrule,GroupForm.COMMON_CORE.code                                                                        ,REQUIRED    ,100T                                                ,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Tt])$"                        ,                          ,"Code of Common core is composed of:
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_commoncore,REQUIRED,100T,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Tt])$",,"Code of Common core is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
 <li>numerical part: 3-6 numbers</li>
 <li><b>T</b></li>
 </ul>
-Examples: <i>LDRIN201T, LPSAD310T, LKINE800T</i>"                                                          ,"Code d’une Partie de base (Tronc commun) est composée de:
+Examples: <i>LDRIN201T, LPSAD310T, LKINE800T</i>","Code d’une Partie de base (Tronc commun) est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>T</b></li>
 </ul>
-Exemples: <i>LDRIN201T, LPSAD310T, LKINE800T</i>"                                                    ,Ex: LARKE100T
-base.validationrule,GroupForm.COMMON_CORE.abbreviated_title                                                           ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,Ex: TCBIOL2M
-base.validationrule,GroupForm.COMMON_CORE.title_fr                                                                    ,REQUIRED    ,Contenu:                                            ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.COMMON_CORE.teaching_campus                                                             ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.COMMON_CORE.academic_year                                                               ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.COMMON_CORE.management_entity                                                           ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.COMPLEMENTARY_MODULE.code                                                               ,REQUIRED    ,100K                                                ,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Kk])$"                        ,                          ,"Code of Complementary module is composed of:
+Exemples: <i>LDRIN201T, LPSAD310T, LKINE800T</i>",Ex: LARKE100T
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_complementarymodule,REQUIRED,100K,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Kk])$",,"Code of Complementary module is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
 <li>numerical part: 3-6 numbers</li>
 <li><b>K</b></li>
 </ul>
-Examples: <i>MAPHM280K, LDATI111K, LMATH100K</i>"                                                          ,"Code d’un Module complémentaire est composé de:
+Examples: <i>MAPHM280K, LDATI111K, LMATH100K</i>","Code d’un Module complémentaire est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>K</b></li>
 </ul>
-Exemples: <i>MAPHM280K, LDATI111K, LMATH100K</i>"                                                             ,Ex: LBIOL100K
-base.validationrule,GroupForm.COMPLEMENTARY_MODULE.abbreviated_title                                                  ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,Ex: BIOL1PM
-base.validationrule,GroupForm.COMPLEMENTARY_MODULE.title_fr                                                           ,REQUIRED    ,Enseignements supplémentaires préparatoires         ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.COMPLEMENTARY_MODULE.teaching_campus                                                    ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.COMPLEMENTARY_MODULE.academic_year                                                      ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.COMPLEMENTARY_MODULE.management_entity                                                  ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.MINOR_LIST_CHOICE.code                                                                  ,REQUIRED    ,100G                                                ,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$"                        ,                          ,"Code of Minor list choice is composed of:
+Exemples: <i>MAPHM280K, LDATI111K, LMATH100K</i>",Ex: LBIOL100K
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_minorlistchoice,REQUIRED,100G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Minor list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
 <li>numerical part: 3-6 numbers</li>
 <li><b>G</b></li>
 </ul>
-Examples: <i>LBARC913G, WFARM436G, WDENT318G</i>"                                                          ,"Code d’une Liste au choix mineures est composée de:
+Examples: <i>LBARC913G, WFARM436G, WDENT318G</i>","Code d’une Liste au choix mineures est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>G</b></li>
 </ul>
-Exemples: <i>LBARC913G, WFARM436G, WDENT318G</i>"                                                          ,Ex: LBIOL100G
-base.validationrule,GroupForm.MINOR_LIST_CHOICE.abbreviated_title                                                     ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,Ex: MINEURESBIOL1BA
-base.validationrule,GroupForm.MINOR_LIST_CHOICE.title_fr                                                              ,REQUIRED    ,Liste au choix Mineures                             ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.MINOR_LIST_CHOICE.teaching_campus                                                       ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.MINOR_LIST_CHOICE.academic_year                                                         ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.MINOR_LIST_CHOICE.management_entity                                                     ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.MAJOR_LIST_CHOICE.code                                                                  ,REQUIRED    ,200G                                                ,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$"                        ,                          ,"Code of Major list choice is composed of:
+Exemples: <i>LBARC913G, WFARM436G, WDENT318G</i>",Ex: LBIOL100G
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_majorlistchoice,REQUIRED,200G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Major list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
 <li>numerical part: 3-6 numbers</li>
 <li><b>G</b></li>
 </ul>
-Examples: <i>LMAJ400G</i>"                                                                 ,"Code d’une Liste au choix majeures est composée de:
+Examples: <i>LMAJ400G</i>","Code d’une Liste au choix majeures est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>G</b></li>
 </ul>
-Exemples: <i>LMAJ400G</i>"                                                          ,Ex: LBIOL200G
-base.validationrule,GroupForm.MAJOR_LIST_CHOICE.abbreviated_title                                                     ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,Ex: MAJEURES
-base.validationrule,GroupForm.MAJOR_LIST_CHOICE.title_fr                                                              ,REQUIRED    ,Liste au choix Majeures                             ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.MAJOR_LIST_CHOICE.teaching_campus                                                       ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.MAJOR_LIST_CHOICE.academic_year                                                         ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.MAJOR_LIST_CHOICE.management_entity                                                     ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.OPTION_LIST_CHOICE.code                                                                 ,REQUIRED    ,300G                                                ,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$"                        ,                          ,"Code of Option list choice is composed of:
+Exemples: <i>LMAJ400G</i>",Ex: LBIOL200G
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_optionlistchoice,REQUIRED,300G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Option list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
 <li>numerical part: 3-6 numbers</li>
 <li><b>G</b></li>
 </ul>
-Examples: <i>LADPU801G, MCOMM614G, LFILO922G</i>"                                                          ,"Code d’une Liste au choix Option est composée de:
+Examples: <i>LADPU801G, MCOMM614G, LFILO922G</i>","Code d’une Liste au choix Option est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>G</b></li>
 </ul>
-Exemples: <i>LADPU801G, MCOMM614G, LFILO922G</i>"                                                            ,Ex: LBIOL300G
-base.validationrule,GroupForm.OPTION_LIST_CHOICE.abbreviated_title                                                    ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,Ex: OPTIONSBIOL2M
-base.validationrule,GroupForm.OPTION_LIST_CHOICE.title_fr                                                             ,REQUIRED    ,Liste au choix Options                              ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.OPTION_LIST_CHOICE.teaching_campus                                                      ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.OPTION_LIST_CHOICE.academic_year                                                        ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.OPTION_LIST_CHOICE.management_entity                                                    ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.FINALITY_120_LIST_CHOICE.code                                                           ,REQUIRED    ,400G                                                ,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$"                        ,                          ,"Code of Finality 120 list choice  is composed of:
+Exemples: <i>LADPU801G, MCOMM614G, LFILO922G</i>",Ex: LBIOL300G
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_finality120listchoice,REQUIRED,400G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Finality 120 list choice  is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
 <li>numerical part: 3-6 numbers</li>
 <li><b>G</b></li>
 </ul>
-Examples: <i>LCHIM900G, WSBIM900G, MGESM400G</i>"                                                         ,"Code d’une Liste au choix de finalités (120) est composée de:
+Examples: <i>LCHIM900G, WSBIM900G, MGESM400G</i>","Code d’une Liste au choix de finalités (120) est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>G</b></li>
 </ul>
-Exemples: <i>LCHIM900G, WSBIM900G, MGESM400G</i>"                                                ,Ex: LBIOL400G
-base.validationrule,GroupForm.FINALITY_120_LIST_CHOICE.abbreviated_title                                              ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,Ex: FINALITESBIOL2M
-base.validationrule,GroupForm.FINALITY_120_LIST_CHOICE.title_fr                                                       ,REQUIRED    ,Liste au choix de Finalités                         ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.FINALITY_120_LIST_CHOICE.teaching_campus                                                ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.FINALITY_120_LIST_CHOICE.academic_year                                                  ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.FINALITY_120_LIST_CHOICE.management_entity                                              ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.FINALITY_180_LIST_CHOICE.code                                                           ,REQUIRED    ,400G                                                ,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$"                        ,                          ,"Code of Finality 180 list choice is composed of:
+Exemples: <i>LCHIM900G, WSBIM900G, MGESM400G</i>",Ex: LBIOL400G
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_finality180listchoice,REQUIRED,400G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Finality 180 list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
 <li>numerical part: 3-6 numbers</li>
 <li><b>G</b></li>
 </ul>
-Examples: <i>TCOMU900G, WMED900G, WMD400G</i>"                                                          ,"Code d’une Liste au choix de finalités (180) est composée de:
+Examples: <i>TCOMU900G, WMED900G, WMD400G</i>","Code d’une Liste au choix de finalités (180) est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>G</b></li>
 </ul>
-Exemples: <i>TCOMU900G, WMED900G, WMD400G</i>"                                                ,Ex: LBIOL400G
-base.validationrule,GroupForm.FINALITY_180_LIST_CHOICE.abbreviated_title                                              ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,Ex: FINALITESBIOL2M
-base.validationrule,GroupForm.FINALITY_180_LIST_CHOICE.title_fr                                                       ,REQUIRED    ,Liste au choix de Finalités                         ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.FINALITY_180_LIST_CHOICE.teaching_campus                                                ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.FINALITY_180_LIST_CHOICE.academic_year                                                  ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.FINALITY_180_LIST_CHOICE.management_entity                                              ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.code                                                   ,REQUIRED    ,500G                                                ,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$"                        ,                          ,"Code of Mobility partnership list choice is composed of:
+Exemples: <i>TCOMU900G, WMED900G, WMD400G</i>",Ex: LBIOL400G
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,500G,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Gg])$",,"Code of Mobility partnership list choice is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
 <li>numerical part: 3-6 numbers</li>
 <li><b>G</b></li>
 </ul>
-Examples: <i>LGENT500G</i>"                                                  ,"Code d’une Liste au choix partenariat mobilité est composée de:
+Examples: <i>LGENT500G</i>","Code d’une Liste au choix partenariat mobilité est composée de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>G</b></li>
 </ul>
-Exemples: <i>LGENT500G</i>"                                              ,Ex: LBIOL500G
-base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.abbreviated_title                                      ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,Ex: PARTENARIATS
-base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.title_fr                                               ,REQUIRED    ,Liste au choix Partenariat mobilité                 ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.teaching_campus                                        ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.academic_year                                          ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.MOBILITY_PARTNERSHIP_LIST_CHOICE.management_entity                                      ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.SUB_GROUP.code                                                                          ,REQUIRED    ,R                                                   ,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Rr])$"                        ,                          ,"Code of Sub group is composed of:
+Exemples: <i>LGENT500G</i>",Ex: LBIOL500G
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_subgroup,REQUIRED,R,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3,6})([Rr])$",,"Code of Sub group is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
 <li>numerical part: 3-6 numbers</li>
 <li><b>R</b></li>
 </ul>
-Examples: <i>LTEMP712R, LSPOL914R, LARKE803R</i>"                                                          ,"Code d’un Sous-groupe est composé de:
+Examples: <i>LTEMP712R, LSPOL914R, LARKE803R</i>","Code d’un Sous-groupe est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>
 <li>partie numérique: 3-6 chiffres</li>
 <li><b>R</b></li>
 </ul>
-Exemples: <i>LTEMP712R, LSPOL914R, LARKE803R</i>"                                                             ,Ex: LACTU900R
-base.validationrule,GroupForm.SUB_GROUP.abbreviated_title                                                             ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,Ex: TPCHOIX
-base.validationrule,GroupForm.SUB_GROUP.title_fr                                                                      ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.SUB_GROUP.teaching_campus                                                               ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.SUB_GROUP.academic_year                                                                 ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,GroupForm.SUB_GROUP.management_entity                                                             ,REQUIRED    ,                                                    ,                                                                         ,                          ,                                                                                                           ,                                                                                                              ,
-base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_deepening                       ,REQUIRED    ,100P                                                ,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Pp])$"                          ,                          ,"Code of Deepening is composed of:
+Exemples: <i>LTEMP712R, LSPOL914R, LARKE803R</i>",Ex: LACTU900R
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_commoncore,REQUIRED,,,,,,Ex: TCBIOL2M
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_complementarymodule,REQUIRED,,,,,,Ex: BIOL1PM
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_minorlistchoice,REQUIRED,,,,,,Ex: MINEURESBIOL1BA
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_majorlistchoice,REQUIRED,,,,,,Ex: MAJEURES
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_optionlistchoice,REQUIRED,,,,,,Ex: OPTIONSBIOL2M
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_finality120listchoice,REQUIRED,,,,,,Ex: FINALITESBIOL2M
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_finality180listchoice,REQUIRED,,,,,,Ex: FINALITESBIOL2M
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,,,,,,Ex: PARTENARIATS
+base.validationrule,base_educationgroupyear.acronym.osis.education_group_type_subgroup,REQUIRED,,,,,,Ex: TPCHOIX
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_commoncore,REQUIRED,Contenu:,,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_complementarymodule,REQUIRED,Enseignements supplémentaires préparatoires,,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_minorlistchoice,REQUIRED,Liste au choix Mineures,,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_majorlistchoice,REQUIRED,Liste au choix Majeures,,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_optionlistchoice,REQUIRED,Liste au choix Options,,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_finality120listchoice,REQUIRED,Liste au choix de Finalités,,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_finality180listchoice,REQUIRED,Liste au choix de Finalités,,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,Liste au choix Partenariat mobilité,,,,,
+base.validationrule,base_educationgroupyear.title.osis.education_group_type_subgroup,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_commoncore,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_complementarymodule,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_minorlistchoice,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_majorlistchoice,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_optionlistchoice,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_finality120listchoice,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_finality180listchoice,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_mobilitypartnershiplistchoice,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.main_teaching_campus.osis.education_group_type_subgroup,REQUIRED,,,,,,
+base.validationrule,base_educationgroupyear.partial_acronym.osis.education_group_type_deepening,REQUIRED,100P,"^([LWMBlwmb])([A-Za-z]{2,4})([0-9]{3})([Pp])$",,"Code of Deepening is composed of:
 <ul>
 <li>site: 1 letter</li>
 <li>alphabetical part: 2-4 letters</li>
 <li>numerical part: 3 numbers</li>
 <li><b>P</b></li>
 </ul>
-Examples: <i>LBIOL100P, WFARM100P, LSINF110P</i>"                                                          ,"Code d’un Approfondissement est composé de:
+Examples: <i>LBIOL100P, WFARM100P, LSINF110P</i>","Code d’un Approfondissement est composé de:
 <ul>
 <li>site: 1 lettre</li>
 <li>partie alphabétique: 2-4 lettres</li>

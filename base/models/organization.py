@@ -23,13 +23,10 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from datetime import datetime
-
 from django.db import models
-from django.db.models import F, Func, OuterRef, Q, Subquery
 from django.utils.safestring import mark_safe
+from django.utils.translation import gettext_lazy as _
 
-from base.models.entity_version import EntityVersion
 from base.models.enums import organization_type
 from osis_common.models.serializable_model import SerializableModel, SerializableModelAdmin
 
@@ -40,22 +37,6 @@ class OrganizationAdmin(SerializableModelAdmin):
     list_filter = ['type']
 
 
-class OrganizationManager(models.Manager):
-    def get_queryset(self):
-        return super().get_queryset().annotate(
-            is_current_partner=Func(
-                Subquery(
-                    EntityVersion.objects.filter(
-                        entity__organization=OuterRef('pk'),
-                        parent__isnull=True,
-                    ).order_by('-start_date').values('end_date')[:1]
-                ),
-                function='IS NULL',
-                template='%(expressions)s %(function)s',
-            ),
-        )
-
-
 class Organization(SerializableModel):
     external_id = models.CharField(max_length=100, blank=True, null=True, db_index=True)
     changed = models.DateTimeField(null=True, auto_now=True)
@@ -63,15 +44,18 @@ class Organization(SerializableModel):
     name = models.CharField(max_length=255)
     code = models.CharField(max_length=50, blank=True)
     acronym = models.CharField(max_length=20, blank=True)
+    website = models.URLField(max_length=255, blank=True)
 
     type = models.CharField(max_length=30, blank=True,
                             choices=organization_type.ORGANIZATION_TYPE,
                             default='')
 
+    start_date = models.DateTimeField(null=True)
+    end_date = models.DateTimeField(blank=True, null=True)
+
     prefix = models.CharField(max_length=30, blank=True)
     logo = models.ImageField(upload_to='organization_logos', null=True, blank=True)
-
-    objects = OrganizationManager()
+    is_current_partner = models.BooleanField(default=False, verbose_name=_("Is current partner"))
 
     def __str__(self):
         return "{}".format(self.name)
@@ -84,7 +68,7 @@ class Organization(SerializableModel):
     logo_tag.short_description = 'Logo'
 
     class Meta:
-        ordering = (F("is_current_partner").desc(), "name")
+        ordering = ("-is_current_partner", "name")
         permissions = (
             ("can_access_organization", "Can access organization"),
         )
@@ -95,40 +79,4 @@ class Organization(SerializableModel):
         qs = self.organizationaddress_set
         if qs.exists():
             return qs.first().country
-        return None
-
-    @property
-    def start_date(self):
-        # Get the earliest root entity version
-        root_entity_version = EntityVersion.objects.filter(
-            entity__organization=self.pk,
-            parent__isnull=True,
-        ).order_by('start_date').first()
-
-        if root_entity_version:
-            return root_entity_version.start_date
-        return None
-
-    @property
-    def end_date(self):
-        # Get the latest root entity version
-        root_entity_version = EntityVersion.objects.filter(
-            entity__organization=self.pk,
-            parent__isnull=True,
-        ).order_by('-start_date').first()
-        if root_entity_version:
-            return root_entity_version.end_date
-        return None
-
-    @property
-    def website(self):
-        # Get the current root entity version
-        now = datetime.now()
-        root_entity_version = EntityVersion.objects.current(now).filter(
-            entity__organization=self.pk,
-            parent__isnull=True,
-        ).order_by('-start_date').first()
-
-        if root_entity_version:
-            return root_entity_version.entity.website
         return None

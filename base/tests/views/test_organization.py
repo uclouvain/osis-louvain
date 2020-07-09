@@ -30,7 +30,6 @@ from django.test import TestCase
 from django.urls import reverse
 
 from base.models import organization_address
-from base.models.enums.organization_type import EMBASSY, ACADEMIC_PARTNER
 from base.tests.factories.campus import CampusFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.entity_version import EntityVersionFactory
@@ -83,23 +82,14 @@ class TestOrganizationAutocomplete(TestCase):
         cls.super_user = SuperUserFactory()
         cls.url = reverse("organization_autocomplete")
 
-        cls.organization = OrganizationFactory(
-            type=ACADEMIC_PARTNER,
-            name="Université de Louvain",
-        )
-        cls.organization_address = OrganizationAddressFactory(
-            organization=cls.organization,
+        cls.organization = OrganizationFactory(name="Université de Louvain")
+
+    def setUp(self):
+        self.organization_address = OrganizationAddressFactory(
+            organization=self.organization,
             country__iso_code='BE',
             is_main=True
         )
-        OrganizationAddressFactory(
-            organization__type=EMBASSY,
-            organization__name="Université de Nantes",
-            country__iso_code='FR',
-            is_main=True
-        )
-
-    def setUp(self):
         self.client.force_login(user=self.super_user)
 
     def test_when_filter_without_country_data_forwarded_result_found(self):
@@ -183,22 +173,13 @@ class TestCampusAutocomplete(TestCase):
         cls.super_user = SuperUserFactory()
         cls.url = reverse("campus-autocomplete")
 
-        cls.organization = OrganizationFactory(
-            type=ACADEMIC_PARTNER,
-            name="Université de Louvain",
-        )
+        cls.organization = OrganizationFactory(name="Université de Louvain")
         cls.organization_address = OrganizationAddressFactory(
             organization=cls.organization,
             country__iso_code='BE',
             is_main=True
         )
         cls.campus = CampusFactory(organization=cls.organization)
-        CampusFactory(organization=OrganizationAddressFactory(
-            organization__type=EMBASSY,
-            organization__name="Université de Nantes",
-            country__iso_code='FR',
-            is_main=True
-        ).organization)
 
     def setUp(self):
         self.client.force_login(user=self.super_user)

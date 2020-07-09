@@ -25,7 +25,6 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
-from base.models.utils.utils import ChoiceEnum
 
 ACTIVE = "ACTIVE"
 INACTIVE = "INACTIVE"
@@ -37,13 +36,8 @@ ACTIVE_STATUS_LIST = (
     (RE_REGISTRATION, _("Reregistration"))
 )
 
+
 ACTIVE_STATUS_LIST_FOR_FILTER = (
     (True, _("Active")),
     (False, _("Inactive")),
 )
-
-
-class ActiveStatusEnum(ChoiceEnum):
-    ACTIVE = _("Active")
-    INACTIVE = _("Inactive")
-    RE_REGISTRATION = _("Reregistration")

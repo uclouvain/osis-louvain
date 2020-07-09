@@ -26,42 +26,38 @@
 import json
 
 import mock
-from django.http import HttpResponseForbidden, HttpResponseNotFound
+from django.http import HttpResponseForbidden
 from django.test import TestCase
 from django.urls import reverse
 
 from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import GroupFactory, EducationGroupYearBachelorFactory
+from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, EducationGroupYearBachelorFactory
 from base.tests.factories.group_element_year import GroupElementYearFactory, GroupElementYearChildLeafFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFakerFactory, LearningUnitYearFactory
-from base.tests.factories.person import PersonFactory
+from base.tests.factories.person import PersonFactory, CentralManagerForUEFactory
 from base.tests.factories.person_entity import PersonEntityFactory
-from education_group.tests.factories.auth.central_manager import CentralManagerFactory
-from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
 
 class TestUpdateLearningUnitPrerequisite(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.academic_year = AcademicYearFactory(year=2020)
-        cls.element_parent = ElementGroupYearFactory(group_year__academic_year=cls.academic_year)
+        cls.education_group_year_parent = EducationGroupYearBachelorFactory(academic_year=cls.academic_year)
         cls.learning_unit_year_child = LearningUnitYearFakerFactory(
             learning_container_year__academic_year=cls.academic_year
         )
-        cls.element_child = ElementLearningUnitYearFactory(
-            learning_unit_year=cls.learning_unit_year_child
-        )
 
         GroupElementYearFactory(
-            parent_element=cls.element_parent,
-            child_element=cls.element_child,
+            parent=cls.education_group_year_parent,
             child_leaf=cls.learning_unit_year_child,
             child_branch=None
         )
-        cls.person = CentralManagerFactory(entity=cls.element_parent.group_year.management_entity).person
+        cls.person = CentralManagerForUEFactory("change_educationgroup", 'view_educationgroup')
+        PersonEntityFactory(person=cls.person,
+                            entity=cls.education_group_year_parent.management_entity)
 
         cls.url = reverse("learning_unit_prerequisite_update",
-                          args=[cls.element_parent.id, cls.element_child.id])
+                          args=[cls.education_group_year_parent.id, cls.learning_unit_year_child.id])
 
     def setUp(self):
         self.client.force_login(self.person.user)
@@ -73,28 +69,19 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
-    def test_not_found_when_learning_unit_not_contained_in_training(self):
-        other_element = ElementGroupYearFactory(
-            group_year__academic_year=self.academic_year,
-            group_year__management_entity=self.element_parent.group_year.management_entity
-        )
-        url = reverse(
-            "learning_unit_prerequisite_update",
-            args=[other_element.id, self.learning_unit_year_child.id]
-        )
+    def test_permission_denied_when_learning_unit_not_contained_in_training(self):
+        other_education_group_year = TrainingFactory(academic_year=self.academic_year)
+        url = reverse("learning_unit_prerequisite_update",
+                      args=[other_education_group_year.id, self.learning_unit_year_child.id])
+
         response = self.client.get(url)
-        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
     def test_permission_denied_when_context_not_a_formation(self):
-        group_element = ElementGroupYearFactory(
-            group_year__academic_year=self.academic_year,
-            group_year__education_group_type__group=True
-        )
-        PersonEntityFactory(person=self.person, entity=group_element.group_year.management_entity)
-        url = reverse(
-            "learning_unit_prerequisite_update",
-            args=[group_element.id, self.element_child.id]
-        )
+        group_parent = GroupFactory(academic_year=self.academic_year)
+        PersonEntityFactory(person=self.person, entity=group_parent.management_entity)
+        url = reverse("learning_unit_prerequisite_update",
+                      args=[group_parent.id, self.learning_unit_year_child.id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
 
@@ -104,19 +91,24 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
     def test_context(self):
         response = self.client.get(self.url)
+
         context = response.context
-        self.assertEqual(context['root'], self.element_parent.group_year)
+        self.assertEqual(
+            context['root'],
+            self.education_group_year_parent
+        )
+
+        tree = json.loads(context['tree'])
+        self.assertTrue(tree)
+        self.assertEqual(
+            tree['text'],
+            self.education_group_year_parent.verbose
+        )
 
     @mock.patch("program_management.ddd.repositories._persist_prerequisite.persist")
     def test_post_data_simple_prerequisite(self, mock_persist):
-        element_luy = ElementLearningUnitYearFactory(
-            learning_unit_year__acronym='LSINF1111',
-            learning_unit_year__academic_year=self.academic_year
-        )
-        GroupElementYearChildLeafFactory(
-            parent_element=self.element_parent,
-            child_element=element_luy
-        )
+        luy_1 = LearningUnitYearFactory(acronym='LSINF1111', academic_year=self.academic_year)
+        GroupElementYearChildLeafFactory(parent=self.education_group_year_parent, child_leaf=luy_1)
 
         form_data = {
             "prerequisite_string": "LSINF1111"
@@ -125,7 +117,7 @@ class TestUpdateLearningUnitPrerequisite(TestCase):
 
         redirect_url = reverse(
             "learning_unit_prerequisite",
-            args=[self.element_parent.id, self.element_child.id]
+            args=[self.education_group_year_parent.id, self.learning_unit_year_child.id]
         )
         self.assertRedirects(response, redirect_url)
 

@@ -27,18 +27,15 @@ from django.conf import settings
 from django.test import TestCase
 
 from base.models.admission_condition import AdmissionCondition
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType
 from base.tests.factories.admission_condition import AdmissionConditionFactory
 from base.tests.factories.education_group_publication_contact import EducationGroupPublicationContactFactory
 from base.tests.factories.education_group_year import EducationGroupYearFactory, \
     EducationGroupYearCommonMasterFactory, \
     TrainingFactory
-from base.tests.factories.entity import EntityFactory
-from base.tests.factories.entity_version import EntityVersionFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
-from program_management.ddd.domain.node import NodeEducationGroupYear
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from webservices.api.serializers.section import SectionSerializer, AchievementSectionSerializer, \
     AdmissionConditionSectionSerializer, ContactsSectionSerializer
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
@@ -83,10 +80,6 @@ class AchievementSectionSerializerTestCase(TestCase):
         }
         cls.language = settings.LANGUAGE_CODE_EN
         cls.egy = EducationGroupYearFactory()
-        cls.node = NodeEducationGroupYearFactory(
-            node_id=cls.egy.id,
-            node_type=cls.egy.education_group_type,
-        )
         for label in [SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA]:
             TranslatedTextFactory(
                 text_label__label=label,
@@ -95,8 +88,8 @@ class AchievementSectionSerializerTestCase(TestCase):
                 language=cls.language
             )
         cls.serializer = AchievementSectionSerializer(cls.data_to_serialize, context={
-            'egy': cls.node,
-            'language': cls.language
+            'egy': cls.egy,
+            'lang': cls.language
         })
 
     def test_contains_expected_fields(self):
@@ -120,18 +113,12 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
             acronym='ARKE2M',
             education_group_type__name=TrainingType.PGRM_MASTER_120.name
         )
-        cls.node = NodeEducationGroupYearFactory(
-            node_type=cls.egy.education_group_type,
-            code=cls.egy.partial_acronym,
-            year=cls.egy.academic_year.year
-        )
         common_egy = EducationGroupYearCommonMasterFactory(academic_year=cls.egy.academic_year)
         AdmissionConditionFactory(education_group_year=common_egy)
         AdmissionConditionFactory(education_group_year=cls.egy)
         cls.serializer = AdmissionConditionSectionSerializer(cls.data_to_serialize, context={
-            'root_node': cls.node,
-            'language': cls.language,
-            'offer': cls.egy
+            'egy': cls.egy,
+            'lang': cls.language
         })
 
     def test_contains_expected_fields(self):
@@ -143,20 +130,15 @@ class AdmissionConditionSectionSerializerTestCase(TestCase):
         self.assertListEqual(list(self.serializer.data.keys()), expected_fields)
 
     def test_ensure_get_education_group_year(self):
-        self.assertIsInstance(self.serializer.context.get('root_node'), NodeEducationGroupYear)
-        self.assertEqual(self.serializer.context.get('root_node'), self.node)
+        self.assertIsInstance(self.serializer.get_education_group_year(), EducationGroupYear)
+        self.assertEqual(self.serializer.get_education_group_year(), self.egy)
 
     def test_ensure_admission_condition_is_created_if_not_exists(self):
         training_wihtout_admission_condition = TrainingFactory(education_group_type__name=TrainingType.BACHELOR.name)
-        node = NodeEducationGroupYearFactory(
-            code=training_wihtout_admission_condition.partial_acronym,
-            year=training_wihtout_admission_condition.academic_year.year,
-            node_type=training_wihtout_admission_condition.education_group_type,
-        )
+
         serializer = AdmissionConditionSectionSerializer({}, context={
-            'root_node': node,
-            'language': self.language,
-            'offer': training_wihtout_admission_condition
+            'egy': training_wihtout_admission_condition,
+            'lang': self.language
         })
 
         new_instance = serializer.get_admission_condition()
@@ -172,22 +154,11 @@ class ContactsSectionSerializerTestCase(TestCase):
             'dummy': 'DUMMY'
         }
         cls.language = 'en'
-        management_entity = EntityFactory()
-        publication_contact_entity = EntityFactory()
-        cls.egy = EducationGroupYearFactory(
-            management_entity=management_entity,
-            publication_contact_entity=publication_contact_entity
-        )
-        cls.node = NodeEducationGroupYearFactory(
-            node_id=cls.egy.id,
-            node_type=cls.egy.education_group_type,
-        )
-        EntityVersionFactory(entity=management_entity)
-        EntityVersionFactory(entity=publication_contact_entity)
+        cls.egy = EducationGroupYearFactory()
         EducationGroupPublicationContactFactory(education_group_year=cls.egy)
         cls.serializer = ContactsSectionSerializer(cls.data_to_serialize, context={
-            'egy': cls.node,
-            'language': cls.language
+            'egy': cls.egy,
+            'lang': cls.language
         })
 
     def test_contains_expected_fields(self):

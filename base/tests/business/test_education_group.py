@@ -26,7 +26,8 @@
 import datetime
 from unittest import mock
 
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Permission, Group
+from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 from django.utils.translation import gettext_lazy as _
 
@@ -40,8 +41,7 @@ from base.business.education_group import can_user_edit_administrative_data, pre
     START_EXAM_REGISTRATION_COL, END_EXAM_REGISTRATION_COL, MARKS_PRESENTATION_COL, DISSERTATION_PRESENTATION_COL, \
     DELIBERATION_COL, SCORES_DIFFUSION_COL, SESSION_HEADERS, _get_translated_header_titles
 from base.business.education_groups.perms import get_education_group_year_eligible_management_entities
-from education_group.models.group_year import GroupYear
-
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import academic_calendar_type
 from base.models.enums import education_group_categories
 from base.models.enums import mandate_type as mandate_types
@@ -60,7 +60,6 @@ from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.session_exam_calendar import SessionExamCalendarFactory
 from base.tests.factories.user import UserFactory
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from osis_common.document import xls_build
 
 NO_SESSION_DATA = {'session1': None, 'session2': None, 'session3': None}
@@ -205,7 +204,6 @@ class EducationGroupXlsAdministrativeDataTestCase(TestCase):
                                                                education_group=cls.education_group,
                                                                weighting=True)
         cls.education_group_year_1.management_entity_version = EntityVersionFactory()
-        EducationGroupVersionFactory(offer=cls.education_group_year_1, root_group__academic_year=cls.academic_year)
 
         cls.user = UserFactory()
 
@@ -288,7 +286,7 @@ class EducationGroupXlsAdministrativeDataTestCase(TestCase):
 
     @mock.patch("osis_common.document.xls_build.generate_xls")
     def test_generate_xls_data_with_no_data(self, mock_generate_xls):
-        qs_empty = GroupYear.objects.none()
+        qs_empty = EducationGroupYear.objects.none()
         create_xls_administrative_data(self.user, qs_empty, None, {ORDER_COL: None, ORDER_DIRECTION: None})
 
         expected_argument = _generate_xls_administrative_data_build_parameter([], self.user)

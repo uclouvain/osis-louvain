@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-06-12 15:15+0200\n"
+"POT-Creation-Date: 2020-05-11 08:09+0200\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -23,8 +23,55 @@ msgid "\"%(child)s\" has been detached from \"%(parent)s\""
 msgstr "\"%(child)s\" a été retiré de \"%(parent)s\""
 
 #, python-format
-msgid "\"%(child)s\" has been pasted into \"%(parent)s\""
-msgstr "\"%(child)s\" a été collé dans \"%(parent)s\""
+msgid ""
+"%(count_elements)s OF(s) and %(count_links)s link(s) have been postponed "
+"with success."
+msgstr ""
+"%(count_elements)s OF(s) et %(count_links)s lien(s) ont été reportés avec "
+"succès."
+
+#, python-format
+msgid ""
+"%(education_group_year)s (reference link) has not been copied. Its content "
+"is empty."
+msgstr ""
+"%(education_group_year)s (lien de référence) n'a pas été encore recopié. Son "
+"contenu est encore vide."
+
+#, python-format
+msgid ""
+"%(education_group_year)s has already been copied in %(academic_year)s in "
+"another program. It may have been already modified."
+msgstr ""
+"%(education_group_year)s a déjà été recopié en  %(academic_year)s dans un "
+"autre programme. Il a peut-être déjà été modifié."
+
+#, python-format
+msgid ""
+"%(education_group_year)s is closed in %(end_year)s. This element will not be "
+"copied in %(academic_year)s."
+msgstr ""
+"%(education_group_year)s est clôturé en %(end_year)s. Cet élément n'est pas "
+"recopié en %(academic_year)s."
+
+#, python-format
+msgid ""
+"%(learning_unit_year)s is not anymore contained in "
+"%(education_group_year_root)s => the prerequisite for %(learning_unit_year)s "
+"is not copied."
+msgstr ""
+"%(learning_unit_year)s n'est plus dans %(education_group_year_root)s => le "
+"prérequis de %(learning_unit_year)s n'est pas copié."
+
+#, python-format
+msgid ""
+"%(prerequisite_item)s is not anymore contained in "
+"%(education_group_year_root)s => the prerequisite for %(learning_unit_year)s "
+"having %(prerequisite_item)s as prerequisite is not copied."
+msgstr ""
+"%(prerequisite_item)s n'est plus dans %(education_group_year_root)s => le "
+"prérequis de %(learning_unit_year)s contenant %(prerequisite_item)s n'est "
+"pas copié."
 
 #, python-format
 msgid "%(start_index)s to %(end_index)s of %(total_counts)s learning units"
@@ -112,6 +159,10 @@ msgstr "Annuel"
 msgid "Are you sure you want to detach %(acronym)s ?"
 msgstr "Êtes-vous sûr·e de vouloir retirer %(acronym)s ?"
 
+#, python-format
+msgid "Are you sure you want to postpone the content in %(root)s?"
+msgstr "Êtes-vous sûr·e de vouloir reporter le contenu dans %(root)s?"
+
 msgid ""
 "At least an education group year, a group year, a learning unit year or a "
 "learning class year has to be set"
@@ -146,6 +197,9 @@ msgstr "Interdit d'ajouter des éléments à  l'UE %(parent_node)s"
 #, python-format
 msgid "Cannot attach a node %(node)s to himself."
 msgstr "Interdit d'attacher un élément %(node)s à lui-même."
+
+msgid "Cannot attach a node to himself."
+msgstr "Interdit de retirer à cause des prérequis."
 
 msgid "Cannot detach due to prerequisites."
 msgstr "Interdit de retirer à cause des prérequis."
@@ -191,23 +245,17 @@ msgstr "Commentaire"
 msgid "Content"
 msgstr "Contenu"
 
-msgid "Copied element"
-msgstr "Elément copié"
-
 msgid "Courses not taught"
 msgstr "Activité non dispensée en"
 
 msgid "Creation"
-msgstr "Création"
+msgstr ""
 
 msgid "Cred. rel./abs."
 msgstr "Créd. rel./abs."
 
 msgid "Credits"
 msgstr "crédits"
-
-msgid "Cut element"
-msgstr "Elément coupé"
 
 msgid "Description fiche"
 msgstr ""
@@ -220,6 +268,12 @@ msgstr "Commentaire anglais"
 
 msgid "Entity"
 msgstr "Entité Resp."
+
+msgid "Error attach option message"
+msgstr ""
+
+msgid "Error end date finality message"
+msgstr ""
 
 msgid "Evaluation methods"
 msgstr "Mode d'évaluation des acquis des étudiants"
@@ -259,9 +313,6 @@ msgstr "Pour accord,"
 msgid "Formation catalogue"
 msgstr "Catalogue des formations"
 
-msgid "Formations"
-msgstr "Formations"
-
 msgid "IMPOSSIBLE TO DISPLAY BECAUSE OF AN ILLEGAL CHARACTER IN STRING"
 msgstr ""
 
@@ -272,7 +323,7 @@ msgid "Include transition"
 msgstr "Inclure transition"
 
 msgid "Invalid tree path"
-msgstr "Chemin invalide"
+msgstr ""
 
 #, python-format
 msgid ""
@@ -282,11 +333,26 @@ msgstr ""
 "Il est interdit d'attacher %(child_node)s à un élément d'une autre année "
 "académique %(parent_node)s."
 
+msgid ""
+"It is prohibited to attach a group, mini-training or training to an element "
+"of another academic year."
+msgstr ""
+
 msgid "Language"
-msgstr "Langue"
+msgstr ""
 
 msgid "Learning achievements"
 msgstr "Unités d'enseignement"
+
+#, python-format
+msgid ""
+"Learning unit %(learning_unit_year)s does not exist in %(academic_year)s => "
+"Learning unit is postponed with academic year of "
+"%(learning_unit_academic_year)s."
+msgstr ""
+"L'unité d'enseignement %(learning_unit_year)s n’existe pas en "
+"%(academic_year)s => L'unité d'enseignement est recopiée avec année de "
+"référence %(learning_unit_academic_year)s."
 
 msgid "Learning units"
 msgstr "Unités d'enseignement"
@@ -296,10 +362,10 @@ msgid "LearningUnitList-%(year)s-%(acronym)s"
 msgstr "Liste-UE-%(year)s-%(acronym)s"
 
 msgid "Lecturing planned classes"
-msgstr "Classes prévues PM"
+msgstr ""
 
 msgid "Lecturing vol."
-msgstr "Vol. PM"
+msgstr ""
 
 msgid "Legend"
 msgstr "Légende"
@@ -316,7 +382,7 @@ msgid "List UE"
 msgstr "Liste UE"
 
 msgid "List of teachers"
-msgstr "Liste des enseignants"
+msgstr ""
 
 msgid "Made in"
 msgstr "Fait à"
@@ -327,20 +393,14 @@ msgstr "Regroupement principal"
 msgid "Mandatory"
 msgstr "Obligatoire"
 
-msgid "Max. credits"
-msgstr "Max. crédits"
-
-msgid "Min. credits"
-msgstr "Min. crédits"
-
 msgid "Mobile phone"
 msgstr "Téléphone mobile (GSM)"
 
 msgid "Mobility"
-msgstr "Mobilité"
+msgstr ""
 
 msgid "Modification"
-msgstr "Modification"
+msgstr ""
 
 msgid "Modify prerequisites"
 msgstr "Modifier les prérequis"
@@ -426,23 +486,19 @@ msgid "Periodic courses taught during"
 msgstr "Activité cyclique dispensée en"
 
 msgid "Periodicity"
-msgstr "Périodicité"
-
-msgid "Please cut or copy an item before paste"
-msgstr "Veuillez copier ou couper un élément avant de le coller"
-
-#, python-format
-msgid ""
-"Please register a maximum of %(max_authorized_value)s digits in ascending "
-"order, without any duplication. Authorized values are from 1 to 6. Examples: "
-"12, 23, 46"
 msgstr ""
 
+msgid "Please cut or copy an item before attach it"
+msgstr "Veuillez copier ou couper un élément avant de le coller"
+
+msgid "Please select an item before adding it"
+msgstr "Veuillez sélectionner un élément avant de l'ajouter"
+
 msgid "Practical planned classes"
-msgstr "Classes prévues PP"
+msgstr ""
 
 msgid "Practical vol."
-msgstr "Vol. PP"
+msgstr ""
 
 msgid "Pre-condition"
 msgstr "Préalable"
@@ -468,7 +524,7 @@ msgid "Proposals"
 msgstr "Légende proposition"
 
 msgid "Quadrimester"
-msgstr "Quadrimestre"
+msgstr ""
 
 msgid "Registration ID"
 msgstr "NOMA"
@@ -495,13 +551,13 @@ msgid "Search"
 msgstr "Recherche"
 
 msgid "Session derogation"
-msgstr "Session dérogation"
+msgstr ""
 
 msgid "Specifications"
 msgstr "Utilisations"
 
 msgid "Standard"
-msgstr "Standard"
+msgstr ""
 
 msgid "Student's contact information"
 msgstr "Coordonnées de l'étudiant.e"
@@ -510,10 +566,13 @@ msgid "Student's signature"
 msgstr "Signature de l'étudiant.e"
 
 msgid "Subtype"
-msgstr "Sous-type"
+msgstr ""
 
 msgid "Success"
-msgstr "Succès"
+msgstr ""
+
+msgid "Success message"
+msgstr ""
 
 msgid "Suppression"
 msgstr ""
@@ -532,9 +591,22 @@ msgstr "%(acronym)s a été déplacé"
 msgid ""
 "The child %(child)s you want to attach is a parent of the node you want to "
 "attach."
-msgstr ""
-"L'élément %(child)s que vous voulez attachez est déjà un parent de l'élément "
+msgstr "L'élément %(child)s que vous voulez attachez est déjà un parent de l'élément "
 "auquel vous voulez rattachez."
+
+msgid "The content has already been postponed."
+msgstr "Le contenu a déjà été reporté."
+
+msgid "The content has been updated."
+msgstr "Le contenu a été mis à jour avec succès."
+
+#, python-format
+msgid "The content of %(acronym)s has been updated."
+msgstr "Le contenu de %(acronym)s a été mis à jour avec succès."
+
+msgid ""
+"The end date of the education group is smaller than the year of postponement."
+msgstr "La date de fin de la formation est plus petite que l'année de report."
 
 #, python-format
 msgid "The learning unit %(acronym)s is not contained inside the formation"
@@ -562,6 +634,16 @@ msgstr ""
 "atteint la limite maximum."
 
 #, python-format
+msgid ""
+"The option %(education_group_year_option)s is not anymore accessible in "
+"%(education_group_year_root)s in %(academic_year)s => It is retired of the "
+"finality %(education_group_year_finality)s."
+msgstr ""
+"L'option %(education_group_year_option)s  n'est plus accessible dans "
+"%(education_group_year_root)s en %(academic_year)s => elle est retirée de la "
+"finalité %(education_group_year_finality)s."
+
+#, python-format
 msgid "The parent must have at least one child of type(s) \"%(types)s\"."
 msgstr "Le parent doit au moins avoir un enfant de type(s) \"%(types)s\"."
 
@@ -585,8 +667,12 @@ msgstr ""
 msgid "The registration form is available at the Secretariat of"
 msgstr "Le formulaire d'inscription est disponible au Secrétariat de"
 
-msgid "The user is not allowed to change link data."
-msgstr "L'utilisateur n'a pas la permission de modifier le contenu d'un lien"
+msgid "The root does not exist in the next academic year."
+msgstr "La racine n'existe pas dans l'année academique suivante."
+
+msgid "The user is not allowed to change education group content."
+msgstr ""
+"L'utilisateur n'a pas la permission de modifier le contenu d'une formation"
 
 msgid "Themes discussed"
 msgstr "Thèmes abordés"
@@ -600,6 +686,9 @@ msgstr ""
 
 msgid "This form must be submitted to the secretariat of your faculty"
 msgstr "Ce formulaire doit être remis au secrétariat de votre faculté"
+
+msgid "This training has no content to postpone."
+msgstr "La formation n'a pas de contenu à reporter."
 
 msgid "Title"
 msgstr "Intitulé"
@@ -620,7 +709,7 @@ msgid "Transformation and modification"
 msgstr ""
 
 msgid "Transition"
-msgstr "Transition"
+msgstr "Inclure transition"
 
 msgid "Tutors"
 msgstr ""
@@ -632,7 +721,7 @@ msgid "Utilizations"
 msgstr "Utilisations"
 
 msgid "Version"
-msgstr "Version"
+msgstr "Sigle de la version"
 
 msgid "Version name"
 msgstr "Sigle de la version"
@@ -646,12 +735,30 @@ msgstr "Oui"
 msgid "Yes, I confirm."
 msgstr "Oui, je confirme."
 
+msgid ""
+"You are not allowed to copy the content of this kind of education group."
+msgstr ""
+"Vous n'êtes pas autorisé à copier le contenu de ce type d'organisation de "
+"formations."
+
 #, python-format
 msgid ""
 "You are not allowed to create a reference with a learning unit %(child_node)s"
 msgstr ""
 "Vous n'êtes pas autorisé.e à créer un lien de référence avec l'unité "
 "d'enseignement %(child_node)s"
+
+msgid "You are not allowed to postpone this training in the future."
+msgstr "Vous n'êtes pas autorisé.e à reporter cette formation dans le futur."
+
+msgid "You are not allowed to postpone this training in the past."
+msgstr "Vous n'êtes pas autorisé.e à reporter cette formation dans le passé."
+
+msgid "You are not eligible to detach this item"
+msgstr "Vous n'êtes pas autorisé.e à détacher cet élément"
+
+msgid "You are not eligible to update the group element year"
+msgstr "Vous n'êtes pas autorisé à mettre à jour la formation"
 
 #, python-format
 msgid "You can not add a learning unit to a %(category)s of type %(type)s."
@@ -667,13 +774,12 @@ msgstr ""
 msgid "You can not add the same child several times."
 msgstr "Vous ne pouvez pas ajouter plusieurs fois le même enfant."
 
-#, python-format
 msgid ""
 "You can not attach a learning unit like %(node)s to element %(parent)s of "
 "type %(type)s."
 msgstr ""
-"Vous ne pouvez pas ajouter une unité d'enseignement comme %(node)s à "
-"l'élément %(parent)s de type %(type)s."
+"Vous ne pouvez pas ajouter une unité d'enseignement comme %(node)s à l'élément %(parent)s de "
+"type %(type)s."
 
 #, python-format
 msgid ""
@@ -690,6 +796,10 @@ msgid ""
 msgstr ""
 "Vous ne pouvez pas ajouter \"%(child_types)s\" à \"%(parent)s\" (de type "
 "\"%(parent_type)s\")"
+
+#, python-format
+msgid "You cannot modify content for %(education_group_types)s"
+msgstr "Vous ne pouvez pas modifier le contenu pour %(education_group_types)s"
 
 #, python-format
 msgid ""
@@ -757,6 +867,3 @@ msgstr "formation"
 
 msgid "yes"
 msgstr "Oui"
-
-msgid "yes,no"
-msgstr "oui,non"

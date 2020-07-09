@@ -24,13 +24,14 @@
 #
 ##############################################################################
 import operator
+import random
 
 import factory.fuzzy
 
 from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
+from base.models.enums.proposal_type import ProposalType
 from base.models.learning_unit_year import MAXIMUM_CREDITS, MINIMUM_CREDITS
 from learning_unit.ddd.domain.learning_unit_year import LearningUnitYear
-from learning_unit.tests.ddd.factories.proposal import ProposalFactory
 
 
 def generate_end_year(node):
@@ -56,8 +57,7 @@ class LearningUnitYearFactory(factory.Factory):
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     start_year = factory.LazyAttribute(generate_start_year)
     end_year = factory.LazyAttribute(generate_end_year)
-    proposal = factory.SubFactory(ProposalFactory)
+    proposal_type = factory.Iterator(ProposalType.choices(), getter=operator.itemgetter(0))
     credits = factory.fuzzy.FuzzyDecimal(MINIMUM_CREDITS, MAXIMUM_CREDITS, precision=0)
     status = True
     periodicity = factory.Iterator(PeriodicityEnum.choices(), getter=operator.itemgetter(0))
-    achievements = []

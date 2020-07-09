@@ -32,7 +32,6 @@ from base.tests.factories.academic_year import AcademicYearFactory
 from base.tests.factories.education_group_year import TrainingFactory, EducationGroupYearBachelorFactory
 from base.tests.factories.entity_version import EntityVersionFactory
 from education_group.api.serializers.training import TrainingListSerializer, TrainingDetailSerializer
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
 from reference.tests.factories.domain import DomainFactory
 
 
@@ -50,9 +49,8 @@ class TrainingListSerializerTestCase(TestCase):
             management_entity=cls.entity_version.entity,
             administration_entity=cls.entity_version.entity,
         )
-        cls.version = EducationGroupVersionFactory(offer=cls.training)
         url = reverse('education_group_api_v1:training-list')
-        cls.serializer = TrainingListSerializer(cls.version, context={
+        cls.serializer = TrainingListSerializer(cls.training, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN
         })
@@ -61,7 +59,6 @@ class TrainingListSerializerTestCase(TestCase):
         expected_fields = [
             'title',
             'url',
-            'version_name',
             'acronym',
             'code',
             'education_group_type',
@@ -102,9 +99,9 @@ class TrainingListSerializerForMasterWithFinalityTestCase(TestCase):
             management_entity=cls.entity_version.entity,
             administration_entity=cls.entity_version.entity
         )
-        cls.version = EducationGroupVersionFactory(offer=cls.training)
+
         url = reverse('education_group_api_v1:training-list')
-        cls.serializer = TrainingListSerializer(cls.version, context={
+        cls.serializer = TrainingListSerializer(cls.training, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN
         })
@@ -113,7 +110,6 @@ class TrainingListSerializerForMasterWithFinalityTestCase(TestCase):
         expected_fields = [
             'title',
             'url',
-            'version_name',
             'acronym',
             'code',
             'education_group_type',
@@ -155,12 +151,11 @@ class TrainingDetailSerializerTestCase(TestCase):
             administration_entity=cls.entity_version.entity,
             main_domain=DomainFactory(parent=DomainFactory())
         )
-        cls.version = EducationGroupVersionFactory(offer=cls.training)
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
-        cls.serializer = TrainingDetailSerializer(cls.version, context={
+        cls.serializer = TrainingDetailSerializer(cls.training, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN
         })
@@ -169,7 +164,6 @@ class TrainingDetailSerializerTestCase(TestCase):
         expected_fields = [
             'title',
             'url',
-            'version_name',
             'acronym',
             'code',
             'education_group_type',
@@ -272,12 +266,11 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
             administration_entity=cls.entity_version.entity,
             main_domain=DomainFactory(parent=DomainFactory())
         )
-        cls.version = EducationGroupVersionFactory(offer=cls.training)
         url = reverse('education_group_api_v1:training_read', kwargs={
             'acronym': cls.training.acronym,
             'year': cls.academic_year.year
         })
-        cls.serializer = TrainingDetailSerializer(cls.version, context={
+        cls.serializer = TrainingDetailSerializer(cls.training, context={
             'request': RequestFactory().get(url),
             'language': settings.LANGUAGE_CODE_EN
         })
@@ -286,7 +279,6 @@ class TrainingDetailSerializerForMasterWithFinalityTestCase(TestCase):
         expected_fields = [
             'title',
             'url',
-            'version_name',
             'acronym',
             'code',
             'education_group_type',

@@ -26,8 +26,7 @@
 import factory.fuzzy
 
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
-from base.models.enums.learning_container_year_types import LearningContainerYearType
-from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear, Node
+from program_management.ddd.domain.node import NodeEducationGroupYear, NodeLearningUnitYear, NodeGroupYear
 
 
 def generate_end_date(node):
@@ -37,8 +36,8 @@ def generate_end_date(node):
 class NodeFactory(factory.Factory):
 
     node_id = factory.Sequence(lambda n: n+1)
-    code = factory.Sequence(lambda n: 'Code%02d' % n)
-    title = factory.Sequence(lambda n: 'Acronym%02d' % n)
+    code = factory.Sequence(lambda n: 'Code-%02d' % n)
+    title = factory.Sequence(lambda n: 'Acronym-%02d' % n)
     year = factory.fuzzy.FuzzyInteger(low=1999, high=2099)
     end_date = factory.LazyAttribute(generate_end_date)
 
@@ -67,7 +66,6 @@ class NodeGroupYearFactory(NodeFactory):
     offer_title_en = factory.fuzzy.FuzzyText(length=240)
     offer_partial_title_fr = factory.fuzzy.FuzzyText(length=240)
     offer_partial_title_en = factory.fuzzy.FuzzyText(length=240)
-    end_year = factory.SelfAttribute('.end_date')
     children = None
 
     class Params:
@@ -88,6 +86,3 @@ class NodeLearningUnitYearFactory(NodeFactory):
     node_type = None
     is_prerequisite_of = []
     credits = factory.fuzzy.FuzzyDecimal(0, 10, precision=1)
-    specific_title_en = factory.fuzzy.FuzzyText(length=240)
-    common_title_en = factory.fuzzy.FuzzyText(length=240)
-    learning_unit_type = factory.fuzzy.FuzzyChoice(LearningContainerYearType)

@@ -29,6 +29,7 @@ from rest_framework import serializers
 
 from base.models.education_group_achievement import EducationGroupAchievement
 from base.models.education_group_detailed_achievement import EducationGroupDetailedAchievement
+from base.models.education_group_year import EducationGroupYear
 from cms.enums.entity_name import OFFER_YEAR
 from cms.models.translated_text import TranslatedText
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
@@ -49,8 +50,7 @@ class DetailedAchievementSerializer(serializers.ModelSerializer):
     def get_text(self, obj):
         return _get_appropriate_text(obj, self.context)
 
-    @staticmethod
-    def get_code_name(obj):
+    def get_code_name(self, obj):
         return _get_appropriate_code_name(obj)
 
 
@@ -75,20 +75,22 @@ class AchievementSerializer(serializers.ModelSerializer):
     def get_teaser(self, obj):
         return _get_appropriate_text(obj, self.context)
 
-    @staticmethod
-    def get_code_name(obj):
+    def get_code_name(self, obj):
         return _get_appropriate_code_name(obj)
 
 
-class AchievementsSerializer(serializers.Serializer):
+class AchievementsSerializer(serializers.ModelSerializer):
     intro = serializers.SerializerMethodField()
-    blocs = serializers.SerializerMethodField()
+    blocs = AchievementSerializer(source='educationgroupachievement_set', many=True, read_only=True)
     extra = serializers.SerializerMethodField()
 
-    def get_blocs(self, obj):
-        offer = self.context.get('offer')
-        qs = offer.educationgroupachievement_set.all()
-        return AchievementSerializer(qs, many=True).data
+    class Meta:
+        model = EducationGroupYear
+        fields = (
+            'intro',
+            'blocs',
+            'extra'
+        )
 
     def get_intro(self, obj):
         return self._get_cms_achievement_data(SKILLS_AND_ACHIEVEMENTS_INTRO)
@@ -97,7 +99,6 @@ class AchievementsSerializer(serializers.Serializer):
         return self._get_cms_achievement_data(SKILLS_AND_ACHIEVEMENTS_EXTRA)
 
     def _get_cms_achievement_data(self, cms_type):
-        offer = self.context.get('offer')
         try:
             data = TranslatedText.objects.select_related(
                 'text_label'
@@ -109,9 +110,9 @@ class AchievementsSerializer(serializers.Serializer):
                 )
             ).get(
                 entity=OFFER_YEAR,
-                language=self.context['language'],
-                text_label__label=cms_type,
-                reference=offer.id
+                reference=self.instance.id,
+                language=self.context['lang'],
+                text_label__label=cms_type
             )
             return data.text_or_none
         except TranslatedText.DoesNotExist:
@@ -119,7 +120,7 @@ class AchievementsSerializer(serializers.Serializer):
 
 
 def _get_appropriate_text(eg_achievement, context):
-    if context.get('language') == settings.LANGUAGE_CODE_EN:
+    if context.get('lang') == settings.LANGUAGE_CODE_EN:
         return eg_achievement.english_text
     return eg_achievement.french_text
 

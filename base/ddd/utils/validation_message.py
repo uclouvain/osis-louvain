@@ -91,6 +91,3 @@ class BusinessValidationMessageList:
     @property
     def success(self) -> List['BusinessValidationMessage']:
         return [msg for msg in self.messages if msg.is_success()]
-
-    def __iter__(self):
-        return iter(self.messages)

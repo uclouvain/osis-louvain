@@ -6,7 +6,7 @@
 #    The core business involves the administration of students, teachers,
 #    courses, programs and so on.
 #
-#    Copyright (C) 2015-2020 Université catholique de Louvain (http://www.uclouvain.be)
+#    Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
 #
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -42,7 +42,6 @@ from base.models.learning_unit import REGEX_BY_SUBTYPE
 from base.models.learning_unit_year import LearningUnitYear
 from base.views.common import display_success_messages
 from osis_common.decorators.ajax import ajax_required
-from typing import Optional
 
 
 def show_success_learning_unit_year_creation_message(request, learning_unit_year_created):
@@ -84,7 +83,7 @@ def check_acronym(request, subtype):
 
 
 def get_learning_unit_identification_context(learning_unit_year_id, person):
-    context = get_common_context_learning_unit_year(person, learning_unit_year_id)
+    context = get_common_context_learning_unit_year(learning_unit_year_id, person)
 
     learning_unit_year = context['learning_unit_year']
     context['warnings'] = learning_unit_year.warnings
@@ -115,8 +114,7 @@ def get_learning_unit_identification_context(learning_unit_year_id, person):
     return context
 
 
-def get_common_context_learning_unit_year(person, learning_unit_year_id: Optional[int] = None,
-                                          code: Optional[str] = None, year: Optional[int] = None):
+def get_common_context_learning_unit_year(learning_unit_year_id, person):
     query_set = LearningUnitYear.objects.all().select_related(
         'learning_unit',
         'learning_container_year'
@@ -126,10 +124,7 @@ def get_common_context_learning_unit_year(person, learning_unit_year_id: Optiona
             queryset=LearningUnitYear.objects.select_related('academic_year')
         )
     )
-    if learning_unit_year_id:
-        learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
-    else:
-        learning_unit_year = query_set.get(acronym=code, academic_year__year=year)
+    learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
     return {
         'learning_unit_year': learning_unit_year,
         'current_academic_year': mdl.academic_year.starting_academic_year(),

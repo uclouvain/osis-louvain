@@ -23,9 +23,6 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import itertools
-from typing import Iterable
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, render
@@ -102,7 +99,7 @@ def list_my_attributions_summary_editable(request):
 def view_educational_information(request, learning_unit_year_id):
     context = {
         'submission_dates': find_educational_information_submission_dates_of_learning_unit_year(
-            learning_unit_year_id),
+                learning_unit_year_id),
         'create_teaching_material_urlname': 'tutor_teaching_material_create',
         'update_teaching_material_urlname': 'tutor_teaching_material_edit',
         'delete_teaching_material_urlname': 'tutor_teaching_material_delete',
@@ -112,19 +109,10 @@ def view_educational_information(request, learning_unit_year_id):
     query_set = LearningUnitYear.objects.all().select_related('learning_unit', 'learning_container_year')
     learning_unit_year = get_object_or_404(query_set, pk=learning_unit_year_id)
     context.update(get_specifications_context(learning_unit_year, request))
-
-    context["achievements"] = _fetch_achievements_by_language(learning_unit_year)
-
+    context.update(get_achievements_group_by_language(learning_unit_year))
     context.update(get_languages_settings())
     context['div_class'] = 'collapse'
     return read_learning_unit_pedagogy(request, learning_unit_year_id, context, template)
-
-
-def _fetch_achievements_by_language(learning_unit_year: LearningUnitYear) -> Iterable:
-    fr_achievement_code = "achievements_FR"
-    en_achievement_code = "achievements_EN"
-    achievements = get_achievements_group_by_language(learning_unit_year)
-    return itertools.zip_longest(achievements.get(fr_achievement_code, []), achievements.get(en_achievement_code, []))
 
 
 @login_required

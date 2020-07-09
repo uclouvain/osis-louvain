@@ -24,9 +24,11 @@
 #
 ##############################################################################
 from django import forms
+from django.db.models import Q
 from django.utils import timezone
 
 from base.models.entity_version import EntityVersion
+from base.models.enums.organization_type import MAIN, ACADEMIC_PARTNER
 
 
 class EntitiesVersionChoiceField(forms.ModelChoiceField):
@@ -47,7 +49,7 @@ class EntitiesVersionChoiceField(forms.ModelChoiceField):
 
 def find_additional_requirement_entities_choices():
     date = timezone.now()
-    return (
-            EntityVersion.objects.current(date).of_main_organization
-            | EntityVersion.objects.current(date).of_active_academic_partner
+    return EntityVersion.objects.current(date).filter(
+        Q(entity__organization__type=MAIN) |
+        (Q(entity__organization__type=ACADEMIC_PARTNER) & Q(entity__organization__is_current_partner=True))
     ).select_related('entity', 'entity__organization').order_by('acronym')

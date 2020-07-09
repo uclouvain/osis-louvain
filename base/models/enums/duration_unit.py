@@ -33,28 +33,18 @@ MONTH = "MONTH"
 WEEK = "WEEK"
 DAY = "DAY"
 
-# FIXME :: DEPRECATED -  use DurationUnitsEnum instead
 DURATION_UNIT = (
     (QUADRIMESTER, _("Quadrimester")),
     (TRIMESTER, _("Trimester")),
     (MONTH, _("Month")),
     (WEEK, _("Week")),
-    (DAY, _("Day")),
+    (DAY, _("Day"))
 )
 
 
-# FIXME :: DEPRECATED -  use DurationUnitsEnum instead
 class DurationUnits(ChoiceEnum):
     QUADRIMESTER = "QUADRIMESTER"
     TRIMESTER = "TRIMESTER"
     MONTH = "MONTH"
     WEEK = "WEEK"
     DAY = "DAY"
-
-
-class DurationUnitsEnum(ChoiceEnum):
-    QUADRIMESTER = _("Quadrimester")
-    TRIMESTER = _("Trimester")
-    MONTH = _("Month")
-    WEEK = _("Week")
-    DAY = _("Day")

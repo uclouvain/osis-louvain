@@ -25,57 +25,177 @@
 ##############################################################################
 from unittest import mock
 
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Permission
+from django.http import HttpResponseNotFound, HttpResponseForbidden, HttpResponseNotAllowed, HttpResponse
 from django.test import TestCase
 from django.urls import reverse
 from waffle.testutils import override_flag
 
-from base.tests.factories.person import CentralManagerForUEFactory
-from program_management.ddd.domain import node
-from program_management.tests.ddd.factories.commands.order_down_link_command import OrderDownLinkCommandFactory
-from program_management.tests.ddd.factories.commands.order_up_link_command import OrderUpLinkCommandFactory
-from program_management.tests.factories.element import ElementGroupYearFactory
+from base.business.education_groups.perms import is_eligible_to_change_education_group_content
+from base.models.enums.groups import PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP
+from base.templatetags.education_group import _get_permission
+from base.tests.factories.academic_year import AcademicYearFactory, create_current_academic_year
+from base.tests.factories.education_group_year import EducationGroupYearFactory
+from base.tests.factories.group_element_year import GroupElementYearFactory
+from base.tests.factories.person import CentralManagerForUEFactory, PersonWithPermissionsFactory
+from program_management.ddd.domain import link
 
 
 @override_flag('education_group_update', active=True)
 class TestUp(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
+        # Create contents of education group years [3 elements]
+        cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year,
+                                                           child_branch__academic_year=cls.academic_year)
+        cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year,
+                                                           child_branch__academic_year=cls.academic_year)
+        cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year,
+                                                           child_branch__academic_year=cls.academic_year)
+
+        cls.person = CentralManagerForUEFactory()
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
+        cls.url = reverse(
+            "group_element_year_up",
+            args=[cls.education_group_year.id, cls.group_element_year_3.id]
+        )
+        cls.post_valid_data = {}
+
     def setUp(self):
-        self.person = CentralManagerForUEFactory()
-        element_group_year = ElementGroupYearFactory()
-        self.url = reverse("content_up")
-        self.path = "19774|{}|789".format(element_group_year.id)
-        self.post_valid_data = {"path": self.path}
         self.client.force_login(self.person.user)
 
-    @mock.patch("program_management.ddd.service.write.up_link_service.up_link")
-    @mock.patch.object(User, "has_perms", return_value=True)
+    def test_up_case_user_not_logged(self):
+        self.client.logout()
+        response = self.client.post(self.url, self.post_valid_data)
+
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    @override_flag('education_group_update', active=False)
+    def test_up_case_flag_disabled(self):
+        response = self.client.post(self.url, self.post_valid_data)
+        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
+        self.assertTemplateUsed(response, "page_not_found.html")
+
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    def test_up_case_user_not_have_access(self, mock_permission):
+        mock_permission.return_value = False
+        response = self.client.post(self.url, self.post_valid_data)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, "access_denied.html")
+
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    def test_up_case_method_not_allowed(self, mock_permission):
+        mock_permission.return_value = True
+        response = self.client.get(self.url, data=self.post_valid_data)
+        self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
+
+    @mock.patch("program_management.ddd.service.order_link_service.up_link")
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
     def test_up_case_success(self, mock_permission, mock_up):
-        mock_up.return_value = node.NodeIdentity(code="CODE", year=2020)
-        http_referer = reverse('home')
+        mock_permission.return_value = True
+        http_referer = reverse(
+            'education_group_content',
+            args=[
+                self.education_group_year.id,
+                self.education_group_year.id,
+            ]
+        )
+        response = self.client.post(self.url, data=self.post_valid_data, follow=True, HTTP_REFERER=http_referer)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue(mock_up.called)
 
-        response = self.client.post(self.url, data=self.post_valid_data, HTTP_REFERER=http_referer)
-        self.assertRedirects(response, http_referer)
 
-        mock_up.assert_called_with(OrderUpLinkCommandFactory(path=self.path))
+class TestOrderingButtons(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.academic_year = AcademicYearFactory(current=True)
+        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.academic_year)
+        cls.group_element_year = GroupElementYearFactory(
+            parent=cls.education_group_year,
+            child_branch__academic_year=cls.academic_year
+        )
+
+    def test_button_order_disabled_for_program_manager(self):
+        program_manager = PersonWithPermissionsFactory(groups=(PROGRAM_MANAGER_GROUP, ))
+        context = {'person': program_manager, 'group': self.group_element_year, 'root': None}
+        self.assertEqual(_get_permission(context, is_eligible_to_change_education_group_content)[1], 'disabled')
+
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    @mock.patch("base.business.education_groups.perms._is_year_editable")
+    def test_button_order_enabled_for_person_with_both_roles(self, mock_permission, mock_year_editable):
+        mock_permission.return_value = True
+        mock_year_editable.return_value = True
+        person_with_both_roles = PersonWithPermissionsFactory(
+            'change_educationgroupcontent',
+            groups=(PROGRAM_MANAGER_GROUP, FACULTY_MANAGER_GROUP)
+        )
+        context = {'person': person_with_both_roles, 'group': self.group_element_year, 'root': None}
+        self.assertEqual(_get_permission(context, is_eligible_to_change_education_group_content)[1], '')
 
 
 @override_flag('education_group_update', active=True)
 class TestDown(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_academic_year = create_current_academic_year()
+        cls.education_group_year = EducationGroupYearFactory(academic_year=cls.current_academic_year)
+        # Create contents of education group years [3 elements]
+        cls.group_element_year_1 = GroupElementYearFactory(parent=cls.education_group_year,
+                                                           child_branch__academic_year=cls.current_academic_year)
+        cls.group_element_year_2 = GroupElementYearFactory(parent=cls.education_group_year,
+                                                           child_branch__academic_year=cls.current_academic_year)
+        cls.group_element_year_3 = GroupElementYearFactory(parent=cls.education_group_year,
+                                                           child_branch__academic_year=cls.current_academic_year)
+
+        cls.person = CentralManagerForUEFactory()
+        cls.person.user.user_permissions.add(Permission.objects.get(codename="view_educationgroup"))
+        cls.url = reverse(
+            "group_element_year_down",
+            args=[cls.education_group_year.id, cls.group_element_year_3.id]
+        )
+        cls.post_valid_data = {}
+
     def setUp(self):
-        self.person = CentralManagerForUEFactory()
-        element_group_year = ElementGroupYearFactory()
-        self.url = reverse("content_down")
-        self.path = "19774|{}|789".format(element_group_year.id)
-        self.post_valid_data = {"path": self.path}
         self.client.force_login(self.person.user)
 
-    @mock.patch("program_management.ddd.service.write.down_link_service.down_link")
-    @mock.patch.object(User, "has_perms", return_value=True)
+    def test_down_case_user_not_logged(self):
+        self.client.logout()
+        response = self.client.post(self.url, self.post_valid_data)
+
+        self.assertRedirects(response, '/login/?next={}'.format(self.url))
+
+    @override_flag('education_group_update', active=False)
+    def test_down_case_flag_disabled(self):
+        response = self.client.post(self.url, self.post_valid_data)
+        self.assertEqual(response.status_code, HttpResponseNotFound.status_code)
+        self.assertTemplateUsed(response, "page_not_found.html")
+
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    def test_down_case_user_not_have_access(self, mock_permission):
+        mock_permission.return_value = False
+        response = self.client.post(self.url, self.post_valid_data)
+        self.assertEqual(response.status_code, HttpResponseForbidden.status_code)
+        self.assertTemplateUsed(response, "access_denied.html")
+
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
+    def test_down_case_method_not_allowed(self, mock_permission):
+        mock_permission.return_value = True
+        response = self.client.get(self.url, data=self.post_valid_data)
+        self.assertEqual(response.status_code, HttpResponseNotAllowed.status_code)
+
+    @mock.patch("program_management.ddd.service.order_link_service.down_link")
+    @mock.patch("base.business.education_groups.perms.is_eligible_to_change_education_group")
     def test_down_case_success(self, mock_permission, mock_down):
-        mock_down.return_value = node.NodeIdentity(code="CODE", year=2020)
-        http_referer = reverse('home')
-
-        response = self.client.post(self.url, data=self.post_valid_data, HTTP_REFERER=http_referer)
-        self.assertRedirects(response, http_referer)
-
-        mock_down.assert_called_with(OrderDownLinkCommandFactory(path=self.path))
+        mock_permission.return_value = True
+        http_referer = reverse(
+            'education_group_content',
+            args=[
+                self.education_group_year.id,
+                self.education_group_year.id,
+            ]
+        )
+        response = self.client.post(self.url, data=self.post_valid_data, follow=True, HTTP_REFERER=http_referer)
+        self.assertEqual(response.status_code, HttpResponse.status_code)
+        self.assertTrue(mock_down.called)

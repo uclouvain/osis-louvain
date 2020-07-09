@@ -23,15 +23,20 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from collections import Counter
+from typing import List
 
 from django.utils.translation import gettext_lazy as _
 
-import osis_common.ddd.interface
-from base.ddd.utils import business_validator
 from program_management.ddd.business_types import *
+from base.ddd.utils.business_validator import BusinessValidator
 
 
-class DetachRootValidator(business_validator.BusinessValidator):
+# Implemented from GroupElementYear._check_same_academic_year_parent_child_branch
+from program_management.models.enums.node_type import NodeType
+
+
+class DetachRootValidator(BusinessValidator):
 
     def __init__(self, tree: 'ProgramTree', path_to_detach: 'Path'):
         super(DetachRootValidator, self).__init__()
@@ -40,4 +45,4 @@ class DetachRootValidator(business_validator.BusinessValidator):
 
     def validate(self):
         if self.tree.is_root(self.tree.get_node(self.path_to_detach)):
-            raise osis_common.ddd.interface.BusinessExceptions([_("Cannot perform detach action on root.")])
+            self.add_error_message(_("Cannot perform detach action on root."))

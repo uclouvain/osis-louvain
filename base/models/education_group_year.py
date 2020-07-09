@@ -719,10 +719,7 @@ class EducationGroupYear(SerializableModel):
         return ""
 
     def get_absolute_url(self):
-        return reverse(
-            'education_group_read_proxy',
-            args=[self.academic_year.year, self.acronym]
-        )
+        return reverse("education_group_read", args=[self.pk, self.pk])
 
     @property
     def str_domains(self):

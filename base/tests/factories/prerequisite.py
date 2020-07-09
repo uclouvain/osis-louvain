@@ -46,10 +46,7 @@ class PrerequisiteFactory(factory.django.DjangoModelFactory):
     learning_unit_year = factory.SubFactory(LearningUnitYearFactory)
     education_group_year = factory.SubFactory(EducationGroupYearFactory)
     main_operator = prerequisite_operator.AND
-    education_group_version = factory.SubFactory(
-        EducationGroupVersionFactory,
-        offer=factory.SelfAttribute("..education_group_year")
-    )
+    education_group_version = factory.SubFactory(EducationGroupVersionFactory)
 
     @post_generation
     def items(obj, create, extracted, groups=None, **kwargs):

@@ -25,13 +25,11 @@
 ##############################################################################
 from django.utils.translation import gettext as _
 
-import osis_common.ddd.interface
-from base.ddd.utils import business_validator
 from base.ddd.utils.business_validator import BusinessValidator
 from program_management.ddd.business_types import *
 
 
-class InfiniteRecursivityTreeValidator(business_validator.BusinessValidator):
+class InfiniteRecursivityTreeValidator(BusinessValidator):
 
     def __init__(self, tree: 'ProgramTree', node_to_add: 'Node', path: 'Path'):
         super(InfiniteRecursivityTreeValidator, self).__init__()
@@ -44,10 +42,10 @@ class InfiniteRecursivityTreeValidator(business_validator.BusinessValidator):
             error_msg = _('The child %(child)s you want to attach is a parent of the node you want to attach.') % {
                 'child': self.node_to_add
             }
-            raise osis_common.ddd.interface.BusinessExceptions([error_msg])
+            self.add_error_message(_(error_msg))
 
 
-class InfiniteRecursivityLinkValidator(business_validator.BusinessValidator):
+class InfiniteRecursivityLinkValidator(BusinessValidator):
 
     def __init__(self, parent_node: 'Node', node_to_add: 'Node'):
         super().__init__()
@@ -56,6 +54,6 @@ class InfiniteRecursivityLinkValidator(business_validator.BusinessValidator):
 
     def validate(self):
         if self.node_to_add == self.parent_node:
-            raise osis_common.ddd.interface.BusinessExceptions(
-                [_('Cannot attach a node %(node)s to himself.') % {"node": self.node_to_add}]
+            self.add_error_message(
+                _('Cannot attach a node %(node)s to himself.') % {"node": self.node_to_add}
             )

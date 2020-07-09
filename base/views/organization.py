@@ -26,7 +26,7 @@
 from dal import autocomplete
 from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
-from django.db.models import BooleanField, OuterRef, Q, Prefetch, Subquery
+from django.db.models import Q, Prefetch
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse
@@ -37,7 +37,6 @@ from django_filters.views import FilterView
 from base.forms.organization import OrganizationFilter
 from base.forms.organization_address import OrganizationAddressForm
 from base.models.campus import Campus
-from base.models.enums.organization_type import ACADEMIC_PARTNER
 from base.models.organization import Organization
 from base.models.organization_address import OrganizationAddress
 from reference.models.country import Country
@@ -122,7 +121,7 @@ def organization_address_delete(request, organization_address_id):
 
 class OrganizationAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Organization.objects.filter(type=ACADEMIC_PARTNER)
+        qs = Organization.objects.all()
 
         country = self.forwarded.get('country', None)
         if country:
@@ -152,15 +151,7 @@ class CountryAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
 
 class CampusAutocomplete(LoginRequiredMixin, autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = Campus.objects.annotate(
-            organization_is_current_partner=Subquery(
-                Organization.objects.filter(
-                    pk=OuterRef('organization_id'),
-                    type=ACADEMIC_PARTNER,
-                ).values('is_current_partner')[:1],
-                output_field=BooleanField(),
-            )
-        ).filter(organization_is_current_partner=True)
+        qs = Campus.objects.filter(organization__is_current_partner=True)
 
         country = self.forwarded.get('country_external_institution', None)
 

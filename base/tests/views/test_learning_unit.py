@@ -103,8 +103,6 @@ from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from learning_unit.api.views.learning_unit import LearningUnitFilter
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
 from osis_common.document import xls_build
-from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
-from program_management.tests.factories.element import ElementFactory
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
 
@@ -617,50 +615,22 @@ class LearningUnitViewTestCase(TestCase):
     def test_learning_unit_formation(self):
         learning_unit_year = LearningUnitYearFactory(academic_year=self.current_academic_year,
                                                      learning_container_year=self.learning_container_yr)
-        learning_unit_year_element = ElementFactory(learning_unit_year=learning_unit_year)
         educ_group_type_matching_filters = EducationGroupTypeFactory(category=education_group_categories.TRAINING)
-
-        parent_1 = EducationGroupYearFactory(partial_acronym='LMATH600R', academic_year=self.current_academic_year,
-                                             education_group_type=educ_group_type_matching_filters)
-        parent_1_version = StandardEducationGroupVersionFactory(
-            offer=parent_1,
-            root_group__academic_year=self.current_academic_year,
-            root_group__education_group_type=parent_1.education_group_type,
-            root_group__partial_acronym=parent_1.partial_acronym
-        )
         group_element1 = GroupElementYearFactory(
-            child_element=learning_unit_year_element,
-            parent_element=ElementFactory(group_year=parent_1_version.root_group),
+            child_leaf=learning_unit_year,
             child_branch=None,
-            parent=None)
-
-        parent_2 = EducationGroupYearFactory(partial_acronym='LBIOL601R', academic_year=self.current_academic_year,
-                                             education_group_type=educ_group_type_matching_filters)
-        parent_2_version = StandardEducationGroupVersionFactory(
-            offer=parent_2,
-            root_group__academic_year=self.current_academic_year,
-            root_group__education_group_type=parent_2.education_group_type,
-            root_group__partial_acronym=parent_2.partial_acronym
-        )
+            parent=EducationGroupYearFactory(partial_acronym='LMATH600R', academic_year=self.current_academic_year,
+                                             education_group_type=educ_group_type_matching_filters))
         group_element2 = GroupElementYearFactory(
-            child_element=learning_unit_year_element,
-            parent_element=ElementFactory(group_year=parent_2_version.root_group),
+            child_leaf=learning_unit_year,
             child_branch=None,
-            parent=None)
-
-        parent_3 = EducationGroupYearFactory(partial_acronym='LBIOL608R', academic_year=self.current_academic_year,
-                                             education_group_type=educ_group_type_matching_filters)
-        parent_3_version = StandardEducationGroupVersionFactory(
-            offer=parent_3,
-            root_group__academic_year=self.current_academic_year,
-            root_group__education_group_type=parent_3.education_group_type,
-            root_group__partial_acronym=parent_3.partial_acronym
-        )
+            parent=EducationGroupYearFactory(partial_acronym='LBIOL601R', academic_year=self.current_academic_year,
+                                             education_group_type=educ_group_type_matching_filters))
         group_element3 = GroupElementYearFactory(
-            child_element=learning_unit_year_element,
-            parent_element=ElementFactory(group_year=parent_3_version.root_group),
+            child_leaf=learning_unit_year,
             child_branch=None,
-            parent=None)
+            parent=EducationGroupYearFactory(partial_acronym='TMATH600R', academic_year=self.current_academic_year,
+                                             education_group_type=educ_group_type_matching_filters))
 
         response = self.client.get(reverse('learning_unit_formations', args=[learning_unit_year.id]))
         context = response.context
@@ -668,7 +638,7 @@ class LearningUnitViewTestCase(TestCase):
         self.assertTemplateUsed(response, 'learning_unit/formations.html')
         self.assertEqual(context['current_academic_year'], self.current_academic_year)
         self.assertEqual(context['learning_unit_year'], learning_unit_year)
-        expected_order = [group_element2, group_element3, group_element1]
+        expected_order = [group_element2, group_element1, group_element3]
         self._assert_group_elements_ordered_by_partial_acronym(context, expected_order)
         self.assertIn('root_formations', context)
 
@@ -1027,7 +997,6 @@ class LearningUnitViewTestCase(TestCase):
 
     def test_learning_unit(self):
         learning_unit_year = LearningUnitYearFactory()
-        ElementFactory(learning_unit_year=learning_unit_year)
         education_group_year_1 = EducationGroupYearFactory()
         education_group_year_2 = EducationGroupYearFactory()
         LearningUnitEnrollmentFactory(offer_enrollment__education_group_year=education_group_year_1,

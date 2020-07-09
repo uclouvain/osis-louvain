@@ -28,6 +28,7 @@ from django.db.models import Case, When, F, CharField
 from rest_framework import serializers
 
 from base.models.education_group_publication_contact import EducationGroupPublicationContact
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums.publication_contact_type import PublicationContactType
 from webservices.business import get_contacts_intro_text
 
@@ -46,24 +47,25 @@ class ContactSerializer(serializers.ModelSerializer):
         )
 
 
-class ContactsSerializer(serializers.Serializer):
+class ContactsSerializer(serializers.ModelSerializer):
     contacts = serializers.SerializerMethodField()
     text = serializers.SerializerMethodField()
-    entity = serializers.SerializerMethodField()
-    management_entity = serializers.SerializerMethodField()
+    entity = serializers.CharField(source='publication_contact_entity_version.acronym', read_only=True)
+    management_entity = serializers.CharField(source='management_entity_version.acronym', read_only=True)
 
-    def get_entity(self, obj):
-        offer = self.context.get('offer')
-        contact_entity = offer.publication_contact_entity_version
-        return contact_entity.acronym if contact_entity else None
+    class Meta:
+        model = EducationGroupYear
 
-    def get_management_entity(self, obj):
-        offer = self.context.get('offer')
-        return offer.management_entity_version.acronym
+        fields = (
+            'contacts',
+            'text',
+            'entity',
+            'management_entity'
+        )
 
     def get_text(self, obj):
-        text = get_contacts_intro_text(obj, self.context.get('language'))
-        return text or None
+        text = get_contacts_intro_text(obj, self.context.get('lang'))
+        return text if text else None
 
     def get_contacts(self, obj):
         contact_types = [
@@ -72,13 +74,11 @@ class ContactsSerializer(serializers.Serializer):
             (PublicationContactType.JURY_MEMBER.name, 'jury_members'),
             (PublicationContactType.OTHER_CONTACT.name, 'other_contacts')
         ]
-        lookup_field = 'role_fr' if self.context.get('language') == settings.LANGUAGE_CODE_FR else 'role_en'
+        lookup_field = 'role_fr' if self.context.get('lang') == settings.LANGUAGE_CODE_FR else 'role_en'
         lookup_expr = '__'.join([lookup_field, 'exact'])
-
-        offer = self.context.get('offer')
         datas = {
             contact_type: ContactSerializer(
-                offer.educationgrouppublicationcontact_set.filter(type=type_name).annotate(
+                obj.educationgrouppublicationcontact_set.filter(type=type_name).annotate(
                     description_or_none=Case(
                         When(description__exact='', then=None),
                         default=F('description'),

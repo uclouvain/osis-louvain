@@ -23,82 +23,25 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-import datetime
-
 from django.test import TestCase
 
 from base.models.organization import Organization
-from base.tests.factories.entity_version import EntityVersionFactory
+from base.tests.factories.organization import OrganizationFactory
 
 
 class OrganizationOrderingTest(TestCase):
     @classmethod
     def setUpTestData(cls):
-        # Should be current partner (end_date=None)
-        EntityVersionFactory(
-            entity__organization__name='A',
-            start_date=datetime.date(2015, 1, 1),
-            parent=None,
-        )
-
-        # Is not current partner (because of the end_date)
-        org_c = EntityVersionFactory(
-            entity__organization__name='C',
-            start_date=datetime.date(2015, 1, 1),
-            end_date=datetime.date(2016, 1, 1),
-            parent=None,
-        ).entity.organization
-        EntityVersionFactory(
-            entity__organization=org_c,
-            start_date=datetime.date(2012, 1, 1),
-            end_date=datetime.date(2015, 1, 1),
-            parent=None,
-        )
-
-        # Current partner again
-        cls.org_b = EntityVersionFactory(
-            entity__organization__name='B',
-            entity__website='http://foo.com',
-            start_date=datetime.date(2015, 1, 1),
-            parent=None,
-        ).entity.organization
-        EntityVersionFactory(
-            entity__organization=cls.org_b,
-            start_date=datetime.date(2013, 1, 1),
-            end_date=datetime.date(2015, 1, 1),
-            parent=None,
-        )
-
-        # Is not current partner too
-        EntityVersionFactory(
-            entity__organization__name='D',
-            start_date=datetime.date(2013, 1, 1),
-            end_date=datetime.date(2015, 1, 1),
-            parent=None,
-        )
+        organization_datas = [
+            (False, 'D'),
+            (True, 'A'),
+            (False, 'C'),
+            (True, 'B')
+        ]
+        for is_partner, name in organization_datas:
+            OrganizationFactory(is_current_partner=is_partner, name=name)
 
     def test_organization_ordering(self):
-        organizations = Organization.objects.all()
-        result = organizations.values_list('name', flat=True)
-        self.assertEqual(list(result), ['A', 'B', 'C', 'D'])
-
-        self.assertTrue(organizations[0].is_current_partner)
-        self.assertTrue(organizations[1].is_current_partner)
-        self.assertFalse(organizations[2].is_current_partner)
-        self.assertFalse(organizations[3].is_current_partner)
-
-    def test_organization_properties(self):
-        organizations = Organization.objects.all()
-
-        # Verify B properties
-        self.assertEqual(organizations[1].website, 'http://foo.com')
-        self.assertEqual(organizations[1].start_date, datetime.date(2013, 1, 1))
-        self.assertEqual(organizations[1].end_date, None)
-
-        # Verify C properties
-        self.assertEqual(organizations[2].start_date, datetime.date(2012, 1, 1))
-        self.assertEqual(organizations[2].end_date, datetime.date(2016, 1, 1))
-
-        # Verify D properties
-        self.assertEqual(organizations[3].start_date, datetime.date(2013, 1, 1))
-        self.assertEqual(organizations[3].end_date, datetime.date(2015, 1, 1))
+        expected_order = ['A', 'B', 'C', 'D']
+        result = Organization.objects.all().values_list('name', flat=True)
+        self.assertEqual(list(result), expected_order)

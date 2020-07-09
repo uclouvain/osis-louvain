@@ -23,21 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from django.utils.functional import cached_property
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.db.models import Q
+from django.shortcuts import render
+from django.utils.decorators import method_decorator
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import FormView
 
-import osis_common.ddd.interface
-from base.ddd.utils import business_validator
 from base.utils.cache import ElementCache
-from base.views.common import display_success_messages
+from base.views.common import display_business_messages
 from base.views.common import display_error_messages, display_warning_messages
 from base.views.mixins import AjaxTemplateMixin
-from program_management.ddd import command
-from program_management.ddd.domain import link
-from program_management.ddd.service.write import detach_node_service
-from program_management.ddd.service.read import detach_warning_messages_service
+from program_management.ddd.domain.program_tree import PATH_SEPARATOR
+from program_management.ddd.service import detach_node_service
 from program_management.forms.tree.detach import DetachNodeForm
+from program_management.views import perms as group_element_year_perms
 from program_management.views.generic import GenericGroupElementYearMixin
 
 
@@ -45,7 +46,13 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
     template_name = "tree/detach_confirmation_inner.html"
     form_class = DetachNodeForm
 
-    permission_required = 'base.can_detach_node'
+    raise_exception = True
+    rules = [group_element_year_perms.can_detach_group_element_year]
+
+    _object = None
+
+    def _call_rule(self, rule):
+        return rule(self.request.user, self.get_object())
 
     @property
     def parent_id(self):
@@ -63,20 +70,25 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
     def root_id(self):
         return self.path_to_detach.split('|')[0]
 
+    @property
+    def confirmation_message(self):
+        msg = "%(acronym)s" % {"acronym": self.object.child.acronym}
+        if hasattr(self.object.child, 'partial_acronym'):
+            msg = "%(partial_acronym)s - %(acronym)s" % {
+                "acronym": msg,
+                "partial_acronym": self.object.child.partial_acronym
+            }
+        return _("Are you sure you want to detach %(acronym)s ?") % {
+            "acronym": msg
+        }
+
     def get_context_data(self, **kwargs):
         context = super(DetachNodeView, self).get_context_data(**kwargs)
-        detach_node_command = command.DetachNodeCommand(path_where_to_detach=self.request.GET.get('path'), commit=False)
-        warning_messages = detach_warning_messages_service.detach_warning_messages(detach_node_command)
-        if warning_messages:
-            display_warning_messages(self.request, warning_messages)
-        try:
-            link_to_detach_id = detach_node_service.detach_node(detach_node_command)
-        except osis_common.ddd.interface.BusinessExceptions as business_exception:
-            display_error_messages(self.request, business_exception.messages)
-        else:
-            context['confirmation_message'] = _("Are you sure you want to detach %(acronym)s ?") % {
-                "acronym": link_to_detach_id.child_code
-            }
+        message_list = detach_node_service.detach_node(self.request.GET.get('path'), commit=False)
+        display_warning_messages(self.request, message_list.warnings)
+        display_error_messages(self.request, message_list.errors)
+        if not message_list.contains_errors():
+            context['confirmation_message'] = self.confirmation_message
         return context
 
     def get_initial(self):
@@ -86,38 +98,53 @@ class DetachNodeView(GenericGroupElementYearMixin, AjaxTemplateMixin, FormView):
         }
 
     def get_object(self):
-        obj = self.model.objects.get(
-            parent_element_id=self.parent_id,
-            child_element_id=self.child_id_to_detach
-        )
+        obj = self.model.objects.filter(
+            parent_id=self.parent_id
+        ).filter(
+            Q(child_branch_id=self.child_id_to_detach) | Q(child_leaf_id=self.child_id_to_detach)
+        ).get()
         return obj
 
+    @property
+    def object(self):
+        if self._object is None:
+            self._object = self.get_object()
+        return self._object
+
     def form_valid(self, form):
-        try:
-            link_entity_id = form.save()
-        except osis_common.ddd.interface.BusinessExceptions as business_exception:
-            display_error_messages(self.request, business_exception.messages)
+        message_list = form.save()
+        display_business_messages(self.request, message_list.messages)
+        if message_list.contains_errors():
             return self.form_invalid(form)
-
-        display_success_messages(
-            self.request,
-            [_("\"%(child)s\" has been detached from \"%(parent)s\"") % {
-                'child': link_entity_id.child_code,
-                'parent': link_entity_id.parent_code,
-            }]
-        )
-
-        self._remove_element_from_clipboard_if_stored(link_entity_id)
+        self._remove_element_from_clipboard_if_stored(form.cleaned_data['path'])
         return super().form_valid(form)
 
     def form_invalid(self, form):
         return super(DetachNodeView, self).form_invalid(form)
 
-    def _remove_element_from_clipboard_if_stored(self, link_entity_id: link.LinkIdentity):
+    def _remove_element_from_clipboard_if_stored(self, path: str):
         element_cache = ElementCache(self.request.user)
-        if element_cache.equals_element(link_entity_id.child_code, link_entity_id.child_year):
+        detached_element_id = int(path.split(PATH_SEPARATOR)[-1])
+        if element_cache and element_cache.equals_element(detached_element_id):
             element_cache.clear()
 
     def get_success_url(self):
         # We can just reload the page
         return
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            try:
+                for rule in self.rules:
+                    perm = rule(self.request.user, self.get_object())
+                    if not perm:
+                        break
+
+            except PermissionDenied as e:
+
+                return render(request,
+                              'education_group/blocks/modal/modal_access_denied.html',
+                              {'access_message': _('You are not eligible to detach this item')})
+
+        return super(DetachNodeView, self).dispatch(request, *args, **kwargs)

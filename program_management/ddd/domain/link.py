@@ -24,24 +24,13 @@
 #
 ##############################################################################
 
-import attr
-
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.quadrimesters import DerogationQuadrimester
-from osis_common.ddd import interface
 from program_management.ddd.business_types import *
 from program_management.models.enums.node_type import NodeType
 
 
-@attr.s(frozen=True, slots=True)
-class LinkIdentity(interface.EntityIdentity):
-    parent_code = attr.ib(type=str)
-    child_code = attr.ib(type=str)
-    parent_year = attr.ib(type=int)
-    child_year = attr.ib(type=int)
-
-
-class Link(interface.Entity):
+class Link:
 
     def __init__(
         self,
@@ -77,10 +66,6 @@ class Link(interface.Entity):
         self.link_type = link_type
         self.order = order
         self._has_changed = False
-        if parent and child:
-            super().__init__(
-                entity_id=LinkIdentity(self.parent.code, self.child.code, self.parent.year, self.child.year)
-            )
 
     @property
     def has_changed(self):
@@ -113,7 +98,7 @@ class Link(interface.Entity):
         return self.child.is_learning_unit()
 
     def is_link_with_group(self):
-        return self.child.is_group_or_mini_or_training()
+        return self.child.is_group()
 
     def order_up(self):
         self.order -= 1

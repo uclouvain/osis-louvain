@@ -30,30 +30,14 @@ from rest_framework import serializers
 from base.api.serializers.campus import CampusDetailSerializer
 from base.models.academic_year import AcademicYear
 from base.models.education_group_type import EducationGroupType
+from base.models.education_group_year import EducationGroupYear
 from base.models.enums import education_group_categories
 from education_group.api.serializers import utils
+from education_group.api.serializers.education_group_title import EducationGroupTitleSerializer
 from education_group.api.serializers.utils import GroupHyperlinkedIdentityField
-from education_group.models.group_year import GroupYear
 
 
-class GroupTitleSerializer(serializers.ModelSerializer):
-    title = serializers.SerializerMethodField()
-
-    class Meta:
-        model = GroupYear
-        fields = (
-            'title',
-        )
-
-    def get_title(self, education_group_year):
-        language = self.context.get('language')
-        return getattr(
-            education_group_year,
-            'title_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
-        )
-
-
-class GroupDetailSerializer(GroupTitleSerializer, serializers.ModelSerializer):
+class GroupDetailSerializer(EducationGroupTitleSerializer, serializers.ModelSerializer):
     url = GroupHyperlinkedIdentityField(read_only=True)
     code = serializers.CharField(source='partial_acronym', read_only=True)
     academic_year = serializers.SlugRelatedField(slug_field='year', queryset=AcademicYear.objects.all())
@@ -70,8 +54,9 @@ class GroupDetailSerializer(GroupTitleSerializer, serializers.ModelSerializer):
     education_group_type_text = serializers.CharField(source='education_group_type.get_name_display', read_only=True)
     constraint_type_text = serializers.CharField(source='get_constraint_type_display', read_only=True)
 
-    class Meta(GroupTitleSerializer.Meta):
-        fields = GroupTitleSerializer.Meta.fields + (
+    class Meta(EducationGroupTitleSerializer.Meta):
+        model = EducationGroupYear
+        fields = EducationGroupTitleSerializer.Meta.fields + (
             'url',
             'acronym',
             'code',
@@ -93,7 +78,7 @@ class GroupDetailSerializer(GroupTitleSerializer, serializers.ModelSerializer):
         language = self.context.get('language')
         return getattr(
             education_group_year,
-            'remark_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
+            'remark' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
         )
 
     @staticmethod

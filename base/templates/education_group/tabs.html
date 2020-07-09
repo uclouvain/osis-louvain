@@ -1,0 +1,100 @@
+{% load i18n %}
+
+{% comment "License" %}
+ * OSIS stands for Open Student Information System. It's an application
+ * designed to manage the core business of higher education institutions,
+ * such as universities, faculties, institutes and professional schools.
+ * The core business involves the administration of students, teachers,
+ * courses, programs and so on.
+ *
+ * Copyright (C) 2015-2019 Université catholique de Louvain (http://www.uclouvain.be)
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * A copy of this license - GNU General Public License - is available
+ * at the root of the source code of this program.  If not,
+ * see http://www.gnu.org/licenses/.
+{% endcomment %}
+
+{% url 'education_group_read' root.pk education_group_year.pk as url_identification_tab %}
+{% url 'education_group_diplomas' root.pk education_group_year.pk as url_diplomas_tab %}
+{% url 'education_group_general_informations' root.pk education_group_year.pk as url_general_informations_tab %}
+{% url 'education_group_skills_achievements' root.pk education_group_year.pk as url_skill_achievements_tab %}
+{% url 'education_group_administrative' root.pk education_group_year.pk as url_administrative_tab %}
+{% url 'education_group_content' root.pk education_group_year.pk as url_content_tab %}
+{% url 'education_group_utilization' root.pk education_group_year.pk as url_utilization_tab  %}
+{% url 'education_group_year_admission_condition_edit' root.pk education_group_year.pk as url_admission_conditions_tab %}
+
+
+<ul class="nav nav-tabs" role="tablist">
+    {% if show_identification %}
+        <li role="presentation" {% if request.path == url_identification_tab %} class="active" {% endif %}>
+            <a id="link_identification" href="{% url 'education_group_read' root.pk education_group_year.pk %}?tab_to_show=show_identification{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
+                {% trans 'Identification'%}
+            </a>
+        </li>
+    {% endif %}
+    {% if show_diploma %}
+        <li role="presentation" {% if request.path == url_diplomas_tab %} class="active" {% endif %}>
+            <a id="link_diploma" href="{% url 'education_group_diplomas' root.pk education_group_year.pk %}?tab_to_show=show_diploma{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
+                {% trans 'Diplomas /  Certificates' %}
+            </a>
+        </li>
+    {% endif %}
+    {% if show_administrative %}
+        <li role="presentation" {% if request.path == url_administrative_tab %} class="active" {% endif %}>
+            <a id="link_administrative" href="{% url 'education_group_administrative' root.pk education_group_year.pk %}?tab_to_show=show_administrative{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}"
+               role="tab">
+                {% trans 'Administrative data' %}
+            </a>
+        </li>
+    {% endif %}
+    {% if show_content %}
+        <li role="presentation" {% if request.path == url_content_tab %} class="active" {% endif %}>
+            <a id="link_content" href="{% url 'education_group_content' root.pk education_group_year.pk %}?tab_to_show=show_content{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
+                {% trans 'Content' %}
+            </a>
+        </li>
+    {% endif %}
+
+    {% if show_utilization %}
+        <li role="presentation" {% if request.path == url_utilization_tab %} class="active" {% endif %}>
+            <a id="link_utilization" href="{% url 'education_group_utilization' root.pk education_group_year.pk %}?tab_to_show=show_utilization{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
+                {% trans 'Utilizations' %}
+            </a>
+        </li>
+    {% endif %}
+
+    {% if show_general_information %}
+        <li role="presentation" {% if request.path == url_general_informations_tab %} class="active" {% endif %}>
+            <a id="link_general_information"
+               href="{% url 'education_group_general_informations' root.pk education_group_year.pk %}?tab_to_show=show_general_information{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
+                {% trans 'General informations' %}
+            </a>
+        </li>
+    {% endif %}
+    {% if show_skills_and_achievements %}
+        <li role="presentation" {% if request.path == url_skill_achievements_tab %} class="active" {% endif %}>
+            <a id="link_skill_achievements"
+               href="{% url 'education_group_skills_achievements' root.pk education_group_year.pk %}?tab_to_show=show_skills_and_achievements{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
+                {% trans 'skills and achievements'|capfirst %}
+            </a>
+        </li>
+    {% endif %}
+    {% if show_admission_conditions %}
+        <li role="presentation" {% if request.path == url_admission_conditions_tab %} class="active"{% endif %}>
+            <a id="link_content"
+               href="{% url 'education_group_year_admission_condition_edit' root.pk education_group_year.pk %}?tab_to_show=show_admission_conditions{% if group_to_parent %}&group_to_parent={{ group_to_parent }}{% endif %}" role="tab">
+                {% trans 'Conditions' %}
+            </a>
+        </li>
+    {% endif %}
+</ul>

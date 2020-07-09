@@ -57,5 +57,5 @@ class AdmissionConditionLineSerializer(DynamicLanguageFieldsModelSerializer):
         )
 
     def get_access(self, obj):
-        with translation.override(self.context.get('language')):
+        with translation.override(self.context.get('lang')):
             return obj.get_access_display()

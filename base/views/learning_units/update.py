@@ -141,7 +141,7 @@ def update_learning_unit(request, learning_unit_year_id):
 @perms.can_perform_learning_unit_modification
 def learning_unit_volumes_management(request, learning_unit_year_id, form_type):
     person = get_object_or_404(Person, user=request.user)
-    context = get_common_context_learning_unit_year(person, learning_unit_year_id)
+    context = get_common_context_learning_unit_year(learning_unit_year_id, person)
 
     context['learning_units'] = _get_learning_units_for_context(luy=context['learning_unit_year'],
                                                                 with_family=form_type == "full")
@@ -185,7 +185,7 @@ def _save_form_and_display_messages(request, form, learning_unit_year):
         records = form.save()
         display_warning_messages(request, getattr(form, 'warnings', []))
 
-        is_postponement = bool(int(request.POST.get('postponement', 1)))
+        is_postponement = bool(int(request.POST.get('postponement', 0)))
 
         if is_postponement and existing_proposal:
             display_success_messages(

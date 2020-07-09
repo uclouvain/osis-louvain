@@ -38,8 +38,6 @@ from program_management.ddd.repositories import _persist_prerequisite
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory, NodeLearningUnitYearFactory
 from program_management.tests.ddd.factories.program_tree import ProgramTreeFactory
-from program_management.tests.factories.education_group_version import EducationGroupVersionFactory
-from program_management.tests.factories.element import ElementGroupYearFactory, ElementLearningUnitYearFactory
 
 
 class TestPersist(TestCase):
@@ -59,17 +57,11 @@ class TestPersist(TestCase):
 class TestPersistPrerequisite(TestCase):
     def setUp(self):
         self.current_academic_year = AcademicYearFactory(current=True)
-        self.root_element = ElementGroupYearFactory(group_year__academic_year__current=True)
-        self.education_group_version = EducationGroupVersionFactory(
-            root_group=self.root_element.group_year,
-            offer__academic_year__current=True
-        )
-        self.root_node = NodeEducationGroupYearFactory(node_id=self.root_element.pk)
+        self.root_education_group_year = EducationGroupYearFactory(academic_year__current=True)
+        self.root_node = NodeEducationGroupYearFactory(node_id=self.root_education_group_year.pk)
 
-        self.element_learning_unit_year = ElementLearningUnitYearFactory(
-            learning_unit_year__academic_year__current=True
-        )
-        self.node = NodeLearningUnitYearFactory(node_id=self.element_learning_unit_year.pk)
+        self.learning_unit_year = LearningUnitYearFactory(academic_year__current=True)
+        self.node = NodeLearningUnitYearFactory(node_id=self.learning_unit_year.pk)
 
         self.luy1 = LearningUnitYearFactory(acronym="LOSIS4525", academic_year__current=True)
         self.luy2 = LearningUnitYearFactory(acronym="MARC4123", academic_year__current=True)
@@ -78,9 +70,7 @@ class TestPersistPrerequisite(TestCase):
         self.node.prerequisite = NullPrerequisite()
         _persist_prerequisite._persist(self.root_node, self.node)
 
-        prerequisite_obj = Prerequisite.objects.get(
-            education_group_version__root_group__element__pk=self.root_node.node_id
-        )
+        prerequisite_obj = Prerequisite.objects.get(education_group_year__id=self.root_node.node_id)
         self.assertFalse(
             PrerequisiteItem.objects.filter(prerequisite=prerequisite_obj)
         )
@@ -93,9 +83,7 @@ class TestPersistPrerequisite(TestCase):
         self.node.prerequisite = prerequisite_obj
         _persist_prerequisite._persist(self.root_node, self.node)
 
-        prerequisite_obj = Prerequisite.objects.get(
-            education_group_version__root_group__element__pk=self.root_node.node_id
-        )
+        prerequisite_obj = Prerequisite.objects.get(education_group_year__id=self.root_node.node_id)
         self.assertTrue(
             PrerequisiteItem.objects.filter(prerequisite=prerequisite_obj)
         )
@@ -116,23 +104,21 @@ class TestPersistPrerequisite(TestCase):
         _persist_prerequisite._persist(self.root_node, self.node)
 
         prerequisite_obj = Prerequisite.objects.get(
-            education_group_version__root_group__element__pk=self.root_node.node_id,
+            education_group_year__id=self.root_node.node_id,
             main_operator=prerequisite_operator.AND
         )
         self.assertTrue(prerequisite_obj)
 
     def test_should_empty_existing_prerequisites(self):
         PrerequisiteFactory(
-            education_group_version=self.education_group_version,
-            learning_unit_year=self.element_learning_unit_year.learning_unit_year,
+            education_group_year=self.root_education_group_year,
+            learning_unit_year=self.learning_unit_year,
             items__groups=((self.luy1,), (self.luy2,))
         )
         self.node.prerequisite = NullPrerequisite()
         _persist_prerequisite._persist(self.root_node, self.node)
 
-        prerequisite_obj = Prerequisite.objects.get(
-            education_group_version__root_group__element__pk=self.root_node.node_id
-        )
+        prerequisite_obj = Prerequisite.objects.get(education_group_year__id=self.root_node.node_id)
         self.assertFalse(
             PrerequisiteItem.objects.filter(prerequisite=prerequisite_obj)
         )

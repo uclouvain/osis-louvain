@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-07-01 14:44+0200\n"
+"POT-Creation-Date: 2020-03-19 11:42+0100\n"
 "PO-Revision-Date: 2019-04-15 08:35+0200\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -349,9 +349,6 @@ msgstr "Master complémentaire en spécialisation médicale"
 msgid "Aggregation"
 msgstr "Agrégation"
 
-msgid "Agreements"
-msgstr "Accords"
-
 msgid "Alert"
 msgstr "Alerte"
 
@@ -412,21 +409,6 @@ msgstr "Êtes-vous sûr·e de vouloir supprimer le support de cours?"
 
 msgid "Are you sure?"
 msgstr "Êtes-vous sûr·e?"
-
-msgid "Arrangement additional time"
-msgstr "Aménagement Tiers-Temps"
-
-msgid "Arrangement appropriate copy"
-msgstr "Aménagement Copie adaptée"
-
-msgid "Arrangement other"
-msgstr "Aménagement autre"
-
-msgid "Arrangement specific locale"
-msgstr "Aménagement Local spécifique"
-
-msgid "Artist"
-msgstr "Artiste"
 
 msgid "As displayed on the home page"
 msgstr "Comme présenté sur la page d'accueil"
@@ -605,6 +587,9 @@ msgstr "Code co-diplômation intra CfB"
 msgid "Comment"
 msgstr "Commentaire"
 
+msgid "Commerce partner"
+msgstr "Partenaire commercial"
+
 msgid "Common English title"
 msgstr "Intitulé commun en anglais"
 
@@ -660,9 +645,6 @@ msgstr "Contacts"
 
 msgid "Content"
 msgstr "Contenu"
-
-msgid "Continuing education academic year linkable to admission"
-msgstr "Formation continue année académique liable aux admissions"
 
 msgid "Coordinator"
 msgstr "Coordinateur"
@@ -730,9 +712,6 @@ msgstr "Couper"
 
 msgid "Cut element"
 msgstr "Élément coupé"
-
-msgid "DDI"
-msgstr "HTM"
 
 msgid "Daily"
 msgstr "Horaire de jour"
@@ -917,9 +896,6 @@ msgstr ""
 msgid "Education_groups"
 msgstr "Formations"
 
-msgid "Educational facilities accepted by Jury"
-msgstr "Aménagement Jury"
-
 msgid "Educational information ending"
 msgstr "Fermeture informations pédagoqiques"
 
@@ -930,10 +906,7 @@ msgid "Elaboration and management of the formation catalogue."
 msgstr "Elaboration et gestion du catalogue de formations."
 
 msgid "Email"
-msgstr "Courriel"
-
-msgid "Embassy"
-msgstr "Ambassade"
+msgstr "Email"
 
 msgid "End"
 msgstr "Fin"
@@ -991,9 +964,6 @@ msgstr ""
 msgid "Enter text to search"
 msgstr "Entrez le texte à rechercher"
 
-msgid "Enterprise"
-msgstr "Entreprise"
-
 msgid "Entities"
 msgstr "Entités"
 
@@ -1010,9 +980,6 @@ msgstr "Entités de charges"
 
 msgid "Entity managers"
 msgstr "Gestionnaires d'entités"
-
-msgid "Entrepreneur"
-msgstr "Entreprenariat"
 
 msgid "Error(s) in form: The modifications are not saved"
 msgstr ""
@@ -1210,14 +1177,8 @@ msgstr "Groupe"
 msgid "Groups"
 msgstr "Groupes"
 
-msgid "Guide"
-msgstr "Accompagnateur"
-
 msgid "Help"
 msgstr "Aide"
-
-msgid "High Level Promising athlete"
-msgstr "ESHN"
 
 msgid "Highlight description"
 msgstr "Description de l'événement"
@@ -1236,9 +1197,6 @@ msgstr "Diplômés de 2° cycle non universitaire"
 
 msgid "Home"
 msgstr "Page d'accueil"
-
-msgid "Hospital"
-msgstr "Hôpital"
 
 msgid "ISCED domain"
 msgstr "Domaine ISCED/CITE"
@@ -1274,6 +1232,9 @@ msgstr "Inclure les entités subordonnées"
 msgid "Included in"
 msgstr "Inclus dans"
 
+msgid "Industrial partner"
+msgstr "Partenaire industriel"
+
 msgid "Initial data"
 msgstr "Valeur initiale"
 
@@ -1307,6 +1268,9 @@ msgstr "Action invalide"
 
 msgid "Invalid code"
 msgstr "Code non valide"
+
+msgid "Is current partner"
+msgstr ""
 
 msgid "Is this teaching material mandatory?"
 msgstr "Ce support de cours est-il obligatoire ?"
@@ -1684,9 +1648,6 @@ msgstr "Téléphone mobile (GSM)"
 msgid "Mobility"
 msgstr "Mobilité"
 
-msgid "Mobility management entities"
-msgstr "Entités de gestion mobilité"
-
 msgid "Mobility partnership"
 msgstr "Partenariat de mobilité"
 
@@ -1830,14 +1791,8 @@ msgstr "Non académique CREF"
 msgid "Non university Bachelors"
 msgstr "Bacheliers non universitaires"
 
-msgid "Non-governmental organization"
-msgstr "Organisation non-gouvernementale"
-
 msgid "Not concerned"
 msgstr "Non concerné"
-
-msgid "Not defined"
-msgstr "Non défini"
 
 msgid "Not eligible to delete learning units"
 msgstr "Vous ne pouvez pas supprimer cette unité d'enseignement"
@@ -1955,9 +1910,6 @@ msgstr "Activités dans d'autres langues"
 msgid "Other remark (intended for publication)"
 msgstr "Autre remarque (destinée à la publication)"
 
-msgid "Other special needs"
-msgstr "Autre HTM"
-
 msgid "Others Bachelors of the French speaking Community of Belgium"
 msgstr "Autres bacheliers de la Communauté française de Belgique"
 
@@ -1977,8 +1929,8 @@ msgid ""
 "Part of the title which is common to the complete EU, to its partims and to "
 "its classes"
 msgstr ""
-"Partie de l’intitulé qui est commune à l’UE complète, à ses partims et à ses "
-"classes"
+"Partie de l’intitulé qui est commune à l’UE complète, à ses partims et à "
+"ses classes"
 
 #, python-format
 msgid "Partial acronym already exists in %(academic_year)s"
@@ -2032,9 +1984,6 @@ msgstr "Entités attachées"
 
 msgid "Person not in accordance with proposal state"
 msgstr "Vous ne pouvez pas modifier une proposition dans cet état"
-
-msgid "Person with reduced mobility"
-msgstr "PMR"
 
 msgid "Personalized access"
 msgstr "Accès personnalisé"
@@ -2209,9 +2158,6 @@ msgstr "Interdiction de supprimer une unité d'enseignement avant 2015."
 msgid "Prolong"
 msgstr "Prolonger"
 
-msgid "Promising athlete"
-msgstr "ES"
-
 msgid "Proposal"
 msgstr "Proposition"
 
@@ -2275,6 +2221,9 @@ msgstr "Propositions_comparaison"
 
 msgid "Provisory"
 msgstr "Provisoire"
+
+msgid "Public partner"
+msgstr "Partenaire public"
 
 msgid "Publication contact entity"
 msgstr "Entité de contact de publication"
@@ -2465,6 +2414,9 @@ msgstr "Séparer"
 msgid "Service courses"
 msgstr "Cours de service"
 
+msgid "Service partner"
+msgstr "Partenaire de service"
+
 msgid "Session"
 msgstr "Session"
 
@@ -2507,9 +2459,6 @@ msgstr "Complément spécifique à l'UE (partim)"
 msgid "Specifications"
 msgstr "Cahier des charges"
 
-msgid "Sport"
-msgstr ""
-
 msgid "Start"
 msgstr "Début"
 
@@ -2548,12 +2497,6 @@ msgstr "Étudiants"
 
 msgid "Sub group"
 msgstr "Sous-groupe"
-
-msgid "Sub type Disability"
-msgstr "Sous-type HTM"
-
-msgid "Sub type Sport"
-msgstr "Sous-type Sport"
 
 msgid "Subject"
 msgstr "Sujet"
@@ -2898,9 +2841,9 @@ msgstr "L'utilisateur n'a pas la permission de créer des formations."
 msgid "The user has not permission to delete education groups."
 msgstr "L'utilisateur n'a pas la permission de supprimer les formations."
 
-msgid "The user is not allowed to change link data."
+msgid "The user is not allowed to change education group content."
 msgstr ""
-"L'utilisateur n'a pas la permission de modifier le contenu d'un lien."
+"L'utilisateur n'a pas la permission de modifier le contenu de la formation."
 
 msgid "The user is not attached to the management entity"
 msgstr "L’utilisateur n’est pas attaché à l’entité de gestion"
@@ -2925,9 +2868,6 @@ msgid ""
 msgstr ""
 "La valeur du champ '%(field)s' différe entre l'année %(year)s - %(value)s et "
 "l'année %(next_year)s - %(next_value)s"
-
-msgid "The value of this attribute is inherited from the standard OF"
-msgstr "La valeur de ce champ est hérité de l'OF standard"
 
 msgid "The volume Q1 or Q2 must have a value but not both"
 msgstr "Le volume Q1 ou Q2 doit avoir une valeur"
@@ -3149,6 +3089,10 @@ msgstr "Mise-à-jour débloquée pour l'enseignant"
 
 msgid "User"
 msgstr "Utilisateur"
+
+#, python-format
+msgid "User %(person)s do not have rights on this proposal."
+msgstr "L'utilisateur %(person)s n'a pas de droits sur cette proposition."
 
 msgid "User interface language"
 msgstr "Langue de l'interface utilisateur"
@@ -3407,6 +3351,7 @@ msgstr ""
 msgid "academic events"
 msgstr "événements académiques"
 
+# TODO
 msgid "acronym rules"
 msgstr ""
 "Code composé de:\n"
@@ -3481,15 +3426,20 @@ msgstr "commentaire"
 msgid "comment (internal)"
 msgstr "commentaire (interne)"
 
+msgid "confirm"
+msgstr "confirmer"
+
 msgid "credits"
 msgstr "crédits"
 
 msgid "date and time"
 msgstr "Date et heure"
 
+# TODO
 msgid "date_format"
 msgstr "%d/%m/%Y"
 
+# TODO
 msgid "date_format_string"
 msgstr "d/m/Y"
 
@@ -3520,6 +3470,7 @@ msgstr "commentaire anglais"
 msgid "english help text"
 msgstr "texte d'aide en anglais"
 
+# TODO
 msgid "external acronym rules"
 msgstr ""
 "Code composé de:\n"
@@ -3537,6 +3488,7 @@ msgstr "référence de champ"
 msgid "filter by section"
 msgstr "préfiltrer par rubrique"
 
+# TODO
 msgid "format_date"
 msgstr "jj/mm/aaaa"
 
@@ -3618,6 +3570,7 @@ msgstr ""
 "le nombre de classes prévues ne peut être supérieur à 0 si le volume est "
 "égal à 0"
 
+# TODO impossible to create a key from that msgstr.
 msgid "please_enable_javascript"
 msgstr ""
 "Veuillez <a href='http://enable-javascript.com/fr/' target='_blank'>activer "

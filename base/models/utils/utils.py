@@ -24,7 +24,7 @@
 #
 ##############################################################################
 from enum import Enum
-from typing import List, Dict
+from typing import List
 
 
 class ChoiceEnum(Enum):
@@ -47,9 +47,6 @@ class ChoiceEnum(Enum):
     @classmethod
     def get_values(cls):
         return [x.value for x in cls]
-
-    def __deepcopy__(self, memodict: Dict = None) -> 'ChoiceEnum':
-        return self
 
 
 def get_verbose_field_value(instance, key):

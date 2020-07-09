@@ -25,13 +25,15 @@
 ##############################################################################
 import factory
 
+from base.tests.factories.entity import EntityFactory
+from base.tests.factories.person import PersonFactory
 from base.tests.factories.structure import StructureFactory
-from osis_role.contrib.tests.factories import EntityModelFactory
 
 
-class EntityManagerFactory(EntityModelFactory):
+class EntityManagerFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = "base.EntityManager"
-        django_get_or_create = ('person', 'entity',)
 
+    person = factory.SubFactory(PersonFactory)
     structure = factory.SubFactory(StructureFactory)
+    entity = factory.SubFactory(EntityFactory)

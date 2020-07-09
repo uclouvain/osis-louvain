@@ -31,7 +31,6 @@ from base.tests.factories.education_group_detailed_achievement import EducationG
 from base.tests.factories.education_group_year import EducationGroupYearFactory
 from cms.enums.entity_name import OFFER_YEAR
 from cms.tests.factories.translated_text import TranslatedTextFactory
-from program_management.tests.ddd.factories.node import NodeEducationGroupYearFactory
 from webservices.api.serializers.achievement import AchievementSerializer, AchievementsSerializer, \
     DetailedAchievementSerializer
 from webservices.business import SKILLS_AND_ACHIEVEMENTS_INTRO, SKILLS_AND_ACHIEVEMENTS_EXTRA
@@ -49,8 +48,7 @@ class AchievementsSerializerTestCase(TestCase):
                 entity=OFFER_YEAR,
                 language=cls.language
             )
-        cls.node = NodeEducationGroupYearFactory(node_id=cls.egy.id)
-        cls.serializer = AchievementsSerializer(cls.node, context={'language': cls.language, 'offer': cls.egy})
+        cls.serializer = AchievementsSerializer(cls.egy, context={'lang': cls.language})
 
     def test_contains_expected_fields(self):
         expected_fields = [

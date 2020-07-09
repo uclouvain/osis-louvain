@@ -38,15 +38,13 @@ from django.utils.translation import gettext as _
 from waffle.testutils import override_flag
 
 from attribution.tests.factories.attribution import AttributionFactory
-from attribution.views.manage_my_courses import list_my_attributions_summary_editable, view_educational_information, \
-    _fetch_achievements_by_language
+from attribution.views.manage_my_courses import list_my_attributions_summary_editable, view_educational_information
 from base.models.enums import academic_calendar_type
 from base.models.enums.entity_type import FACULTY
 from base.models.enums.learning_unit_year_subtypes import FULL
 from base.tests.factories.academic_calendar import AcademicCalendarFactory, OpenAcademicCalendarFactory
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.entity_version import EntityVersionFactory
-from base.tests.factories.learning_achievement import LearningAchievementFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.person import PersonFactory
@@ -116,8 +114,7 @@ class ManageMyCoursesViewTestCase(TestCase):
             self.assertEqual(luy.academic_year.year, self.current_ac_year.year)
             self.assertFalse(error.errors)
 
-    @patch('base.business.event_perms.EventPerm.is_open', return_value=False)
-    def test_list_my_attributions_summary_editable_after_period(self, mock_is_open):
+    def test_list_my_attributions_summary_editable_after_period(self):
         self.academic_calendar.start_date = datetime.date.today() - datetime.timedelta(weeks=52)
         self.academic_calendar.end_date = datetime.date.today() - datetime.timedelta(weeks=48)
         self.academic_calendar.save()
@@ -127,8 +124,8 @@ class ManageMyCoursesViewTestCase(TestCase):
             end_date=datetime.date.today() + datetime.timedelta(weeks=52),
             reference=academic_calendar_type.SUMMARY_COURSE_SUBMISSION
         )
-        response = self.client.get(self.url)
 
+        response = self.client.get(self.url)
         self.assertTemplateUsed(response, "manage_my_courses/list_my_courses_summary_editable.html")
 
         context = response.context
@@ -223,21 +220,6 @@ class TestViewEducationalInformation(TestCase):
         self.assertEqual(context['update_teaching_material_urlname'], 'tutor_teaching_material_edit')
         self.assertEqual(context['delete_teaching_material_urlname'], 'tutor_teaching_material_delete')
         self.assertEqual(context['update_mobility_modality_urlname'], 'tutor_mobility_modality_update')
-
-
-class TestFetchAchievement(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        cls.learning_unit_year = LearningUnitYearFactory()
-        cls.achivement_fr = LearningAchievementFactory(language__code="FR", learning_unit_year=cls.learning_unit_year)
-        cls.achivement_en = LearningAchievementFactory(language__code="EN", learning_unit_year=cls.learning_unit_year)
-
-    def test_return_an_iterable_of_fr_and_en_achievements(self):
-        result = _fetch_achievements_by_language(self.learning_unit_year)
-        self.assertListEqual(
-            list(result),
-            list(zip([self.achivement_fr], [self.achivement_en]))
-        )
 
 
 class TestManageEducationalInformation(TestCase):

@@ -25,9 +25,7 @@
 ##############################################################################
 from django.utils.translation import gettext_lazy as _
 
-from base.models.utils.utils import ChoiceEnum
 
-# FIXME :: DEPRECATED - use InternshipPresence() instead
 YES = "YES"
 NO = "NO"
 OPTIONAL = "OPTIONAL"
@@ -37,9 +35,3 @@ INTERNSHIP_PRESENCE = (
     (NO, _("no")),
     (OPTIONAL, _("optional"))
 )
-
-
-class InternshipPresence(ChoiceEnum):
-    YES = _("yes")
-    NO = _("no")
-    OPTIONAL = _("optional")

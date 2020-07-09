@@ -27,9 +27,6 @@ from _decimal import Decimal
 from collections import OrderedDict
 from typing import List, Set, Dict
 
-import attr
-
-from base.models.enums.active_status import ActiveStatusEnum
 from base.models.enums.education_group_categories import Categories
 from base.models.enums.education_group_types import EducationGroupTypesEnum, TrainingType, MiniTrainingType, GroupType
 from base.models.enums.learning_container_year_types import LearningContainerYearType
@@ -37,7 +34,6 @@ from base.models.enums.learning_unit_year_periodicity import PeriodicityEnum
 from base.models.enums.link_type import LinkTypes
 from base.models.enums.proposal_type import ProposalType
 from base.models.enums.quadrimesters import DerogationQuadrimester
-from base.models.enums.schedule_type import ScheduleTypeEnum
 from education_group.models.enums.constraint_type import ConstraintTypes
 from osis_common.ddd import interface
 from program_management.ddd.business_types import *
@@ -62,10 +58,16 @@ class NodeFactory:
 factory = NodeFactory()
 
 
-@attr.s(frozen=True, slots=True)
 class NodeIdentity(interface.EntityIdentity):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
+
+    def __hash__(self):
+        return hash(self.code + str(self.year))
+
+    def __eq__(self, other):
+        return self.code == other.code and self.year == other.year
 
 
 class Node(interface.Entity):
@@ -103,9 +105,7 @@ class Node(interface.Entity):
         super(Node, self).__init__(entity_id=NodeIdentity(self.code, self.year))
 
     def __eq__(self, other):
-        if self.__class__ == other.__class__:
-            return self.node_id == other.node_id
-        return False
+        return (self.node_id, self.__class__) == (other.node_id,  other.__class__)
 
     def __hash__(self):
         return hash(self.node_id)
@@ -138,7 +138,7 @@ class Node(interface.Entity):
     def is_learning_unit(self):
         return self.type == NodeType.LEARNING_UNIT
 
-    def is_group_or_mini_or_training(self):
+    def is_group(self):
         return self.type == NodeType.GROUP or self.type == NodeType.EDUCATION_GROUP
 
     def is_finality(self) -> bool:
@@ -152,12 +152,6 @@ class Node(interface.Entity):
 
     def is_training(self) -> bool:
         return self.node_type in TrainingType.all()
-
-    def is_mini_training(self) -> bool:
-        return self.node_type in MiniTrainingType.all()
-
-    def is_group(self) -> bool:
-        return self.node_type in GroupType.all()
 
     def is_minor_major_list_choice(self) -> bool:
         return self.node_type in GroupType.minor_major_list_choice_enums()
@@ -176,9 +170,6 @@ class Node(interface.Entity):
 
     def get_option_list(self) -> Set['Node']:
         return {l.child for l in self.get_all_children() if l.child.is_option()}
-
-    def get_finality_list(self) -> Set['Node']:
-        return {l.child for l in self.get_all_children() if l.child.is_finality()}
 
     def get_all_children_as_nodes(
             self,
@@ -245,40 +236,18 @@ class Node(interface.Entity):
     def descendents(self) -> Dict['Path', 'Node']:   # TODO :: add unit tests
         return _get_descendents(self)
 
-    def add_child(self, node: 'Node', **link_attrs) -> 'Link':
+    def add_child(self, node: 'Node', **link_attrs):
         child = link_factory.get_link(parent=self, child=node, **link_attrs)
         self._children.append(child)
         child._has_changed = True
-        return child
 
-    def detach_child(self, node_to_detach: 'Node') -> 'Link':
+    def detach_child(self, node_to_detach: 'Node'):
         link_to_detach = next(link for link in self.children if link.child == node_to_detach)
         self._deleted_children.add(link_to_detach)
         self.children.remove(link_to_detach)
-        return link_to_detach
 
     def get_link(self, link_id: int) -> 'Link':
         return next((link for link in self.children if link.pk == link_id), None)
-
-    def up_child(self, node_to_up: 'Node') -> None:
-        index = self.children_as_nodes.index(node_to_up)
-
-        is_first_element = index == 0
-        if is_first_element:
-            return
-
-        self.children[index].order_up()
-        self.children[index-1].order_down()
-
-    def down_child(self, node_to_down: 'Node') -> None:
-        index = self.children_as_nodes.index(node_to_down)
-
-        is_last_element = index == len(self.children) - 1
-        if is_last_element:
-            return
-
-        self.children[index].order_down()
-        self.children[index+1].order_up()
 
 
 def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path', 'Node']:
@@ -295,7 +264,6 @@ def _get_descendents(root_node: Node, current_path: 'Path' = None) -> Dict['Path
     return _descendents
 
 
-# TODO: Remove this class because unused when migration is done
 class NodeEducationGroupYear(Node):
 
     type = NodeType.EDUCATION_GROUP
@@ -338,20 +306,11 @@ class NodeGroupYear(Node):
         max_constraint: int = None,
         remark_fr: str = None,
         remark_en: str = None,
-        start_year: int = None,
-        end_year: int = None,
         offer_title_fr: str = None,
         offer_title_en: str = None,
-        group_title_fr: str = None,
-        group_title_en: str = None,
         offer_partial_title_fr: str = None,
         offer_partial_title_en: str = None,
-        category: GroupType = None,
-        management_entity_acronym: str = None,
-        teaching_campus: str = None,
-        schedule_type: ScheduleTypeEnum = None,
-        offer_status: ActiveStatusEnum = None,
-        keywords: str = None,
+        category: Categories = None,
         **kwargs
     ):
         super().__init__(**kwargs)
@@ -360,20 +319,11 @@ class NodeGroupYear(Node):
         self.max_constraint = max_constraint
         self.remark_fr = remark_fr
         self.remark_en = remark_en
-        self.start_year = start_year
-        self.end_date = end_year
         self.offer_title_fr = offer_title_fr
         self.offer_title_en = offer_title_en
-        self.group_title_fr = group_title_fr
-        self.group_title_en = group_title_en
         self.offer_partial_title_fr = offer_partial_title_fr
         self.offer_partial_title_en = offer_partial_title_en
-        self.offer_status = offer_status
-        self.schedule_type = schedule_type
-        self.keywords = keywords
         self.category = category
-        self.management_entity_acronym = management_entity_acronym
-        self.teaching_campus = teaching_campus
 
 
 class NodeLearningUnitYear(Node):
@@ -413,10 +363,6 @@ class NodeLearningUnitYear(Node):
         self.volume_total_lecturing = volume_total_lecturing
         self.volume_total_practical = volume_total_practical
         self.node_type = NodeType.LEARNING_UNIT  # Used for authorized_relationship
-        self.full_title_fr = "{}{}".format(common_title_fr,
-                                           " - {}".format(specific_title_fr) if specific_title_fr else '')
-        self.full_title_en = "{}{}".format(common_title_en,
-                                           " - {}".format(specific_title_en) if specific_title_en else '')
 
     @property
     def has_prerequisite(self) -> bool:

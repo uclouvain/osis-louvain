@@ -71,8 +71,10 @@ def edit_learning_unit_pedagogy(request, learning_unit_year_id, redirect_url):
         _post_learning_unit_pedagogy_form(request)
         return redirect(redirect_url)
 
-    context = get_common_context_learning_unit_year(get_object_or_404(Person, user=request.user), learning_unit_year_id,
-                                                    None, None)
+    context = get_common_context_learning_unit_year(
+        learning_unit_year_id,
+        get_object_or_404(Person, user=request.user)
+    )
     label_name = request.GET.get('label')
     language = request.GET.get('language')
     text_lb = TextLabel.objects.prefetch_related(
@@ -103,19 +105,19 @@ def _post_learning_unit_pedagogy_form(request):
 
 
 def build_success_message(last_luy_reported, luy):
-    default_message = _("The learning unit has been updated (without report).")
+    default_message = _("The learning unit has been updated")
     proposal = ProposalLearningUnit.objects.filter(learning_unit_year__learning_unit=luy.learning_unit).first()
 
     if last_luy_reported and is_pedagogy_data_must_be_postponed(luy):
         msg = "{} {}.".format(
-            _("The learning unit has been updated"),
+            default_message,
             _("and postponed until %(year)s") % {
                 "year": last_luy_reported.academic_year
             }
         )
     elif proposal and learning_unit.proposal_is_on_same_year(proposal=proposal, base_luy=luy):
         msg = "{}. {}.".format(
-            _("The learning unit has been updated"),
+            default_message,
             _("The learning unit is in proposal, the report from %(proposal_year)s will be done at "
               "consolidation") % {
                 'proposal_year': proposal.learning_unit_year.academic_year
@@ -123,12 +125,12 @@ def build_success_message(last_luy_reported, luy):
         )
     elif proposal and learning_unit.proposal_is_on_future_year(proposal=proposal, base_luy=luy):
         msg = "{} ({}).".format(
-            _("The learning unit has been updated"),
+            default_message,
             _("the report has not been done from %(proposal_year)s because the LU is in proposal") % {
                 'proposal_year': proposal.learning_unit_year.academic_year
             }
         )
     else:
-        msg = "{}".format(default_message)
+        msg = "{}.".format(default_message)
 
     return msg

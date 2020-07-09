@@ -75,6 +75,5 @@ class TestEducationGroupVersionModel(TestCase):
     def test_unique(self):
         particular_version = ParticularTransitionEducationGroupVersionFactory(version_name='CEMSS', offer=self.offer_1)
         with self.assertRaises(IntegrityError):
-            ParticularTransitionEducationGroupVersionFactory\
-                ._get_manager(EducationGroupVersion)\
-                .create(version_name=particular_version.version_name, is_transition=True, offer=self.offer_1)
+            ParticularTransitionEducationGroupVersionFactory(version_name=particular_version.version_name,
+                                                             offer=self.offer_1)

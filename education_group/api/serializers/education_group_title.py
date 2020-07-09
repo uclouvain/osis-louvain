@@ -26,21 +26,21 @@
 from django.conf import settings
 from rest_framework import serializers
 
-from program_management.models.education_group_version import EducationGroupVersion
+from base.models.education_group_year import EducationGroupYear
 
 
 class EducationGroupTitleSerializer(serializers.ModelSerializer):
     title = serializers.SerializerMethodField()
 
     class Meta:
-        model = EducationGroupVersion
+        model = EducationGroupYear
         fields = (
             'title',
         )
 
-    def get_title(self, version):
+    def get_title(self, education_group_year):
         language = self.context.get('language')
         return getattr(
-            version.root_group,
-            'title_' + ('en' if language and language not in settings.LANGUAGE_CODE_FR else 'fr')
+            education_group_year,
+            'title' + ('_english' if language and language not in settings.LANGUAGE_CODE_FR else '')
         )

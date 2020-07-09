@@ -23,12 +23,9 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
-from typing import Dict
-
 from django.contrib.auth.models import Permission, Group
 from django.core.exceptions import ImproperlyConfigured
 from django.db.models import Prefetch
-from django.db.models.query import QuerySet
 from django.utils.translation import gettext_lazy as _
 
 from rules_management.models import FieldReference
@@ -63,16 +60,13 @@ class PermissionFieldMixin(ModelFormMixin):
             self.context = kwargs.pop("context")
 
         super().__init__(*args, **kwargs)
-        if not self.user.is_superuser:
-            self._disable_form_fields()
 
-    def _disable_form_fields(self):
-        for field_ref in self.get_permission_field_queryset():
+        for field_ref in self.get_queryset():
             field_name = field_ref.field_name
             if field_name in self.fields and not self.check_user_permission(field_ref):
                 self.disable_field(field_name)
 
-    def check_user_permission(self, field_reference) -> bool:
+    def check_user_permission(self, field_reference):
         if field_reference.user_groups:
             # Check at group level
             return True
@@ -81,7 +75,7 @@ class PermissionFieldMixin(ModelFormMixin):
             return True
         return False
 
-    def _check_at_permissions_level(self, field_reference) -> bool:
+    def _check_at_permissions_level(self, field_reference):
         for perm in field_reference.permissions.all():
             app_label = perm.content_type.app_label
             codename = perm.codename
@@ -89,25 +83,18 @@ class PermissionFieldMixin(ModelFormMixin):
                 return True
         return False
 
-    def get_permission_field_queryset(self) -> QuerySet:
+    def get_queryset(self):
+        context = self.get_context()
         return self.model_permission.objects.filter(
-            **self.get_model_permission_filter_kwargs()
+            content_type__app_label=self._meta.model._meta.app_label,
+            content_type__model=self._meta.model._meta.model_name,
+            context=context,
         ).prefetch_related(
             Prefetch('permissions', queryset=Permission.objects.select_related('content_type')),
             Prefetch('groups', queryset=Group.objects.filter(user=self.user), to_attr="user_groups")
         )
 
-    def get_model_permission_filter_kwargs(self) -> Dict:
-        """
-        Can be override to filter in other way that on model provided in Meta of ModelForm
-        """
-        return {
-            'content_type__app_label': self._meta.model._meta.app_label,
-            'content_type__model': self._meta.model._meta.model_name,
-            'context': self.get_context()
-        }
-
-    def get_context(self) -> str:
+    def get_context(self):
         """
         Can be override to use a specific context according to business
         :return: self.context

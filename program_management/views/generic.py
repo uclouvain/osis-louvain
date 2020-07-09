@@ -26,29 +26,24 @@
 import json
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.contrib.messages.views import SuccessMessageMixin
-from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
-from django.views.generic import TemplateView
+from django.views.generic import UpdateView, DetailView, FormView
 
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import TrainingType, MiniTrainingType, GroupType
 from base.models.group_element_year import GroupElementYear
 from base.models.learning_unit_year import LearningUnitYear
 from base.models.person import Person
-from base.utils.cache import ElementCache
-from base.views.mixins import FlagMixin, AjaxTemplateMixin
-from education_group.models.group_year import GroupYear
-from osis_common.utils.models import get_object_or_none
-from osis_role.contrib.views import AjaxPermissionRequiredMixin
+from base.views.education_groups import perms
+from base.views.education_groups.detail import CatalogGenericDetailView
+from base.views.mixins import RulesRequiredMixin, FlagMixin, AjaxTemplateMixin
 from program_management.ddd.repositories import load_tree
 from program_management.models.enums.node_type import NodeType
 from program_management.serializers import program_tree_view
-from program_management.ddd.business_types import *
 
 NO_PREREQUISITES = TrainingType.finality_types() + [
     MiniTrainingType.OPTION.name,
@@ -56,49 +51,8 @@ NO_PREREQUISITES = TrainingType.finality_types() + [
 ] + GroupType.get_names()
 
 
-LEARNING_UNIT_YEAR = LearningUnitYear._meta.db_table
-EDUCATION_GROUP_YEAR = EducationGroupYear._meta.db_table
-
-
-def get_clipboard_content_display(obj, action):
-    msg_template = "<strong>{clipboard_title}</strong><br>{object_str}"
-    return msg_template.format(
-        clipboard_title=_get_clipboard_title(action),
-        object_str=str(obj),
-    )
-
-
-def _get_clipboard_title(action):
-    if action == ElementCache.ElementCacheAction.CUT.value:
-        return _("Cut element")
-    elif action == ElementCache.ElementCacheAction.COPY.value:
-        return _("Copied element")
-    else:
-        return ""
-
-
-class CatalogGenericDetailView:
-    def get_selected_element_for_clipboard(self):
-        cached_data = ElementCache(self.request.user).cached_data
-        if cached_data:
-            obj = self._get_instance_object_from_cache(cached_data)
-            return get_clipboard_content_display(obj, cached_data['action'])
-        return None
-
-    @staticmethod
-    def _get_instance_object_from_cache(cached_data):
-        model_name = cached_data.get('modelname')
-        cached_obj_id = cached_data.get('id')
-        obj = None
-        if model_name == LEARNING_UNIT_YEAR:
-            obj = LearningUnitYear.objects.get(id=cached_obj_id)
-        elif model_name == EDUCATION_GROUP_YEAR:
-            obj = EducationGroupYear.objects.get(id=cached_obj_id)
-        return obj
-
-
 @method_decorator(login_required, name='dispatch')
-class GenericGroupElementYearMixin(FlagMixin, AjaxPermissionRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin):
+class GenericGroupElementYearMixin(FlagMixin, RulesRequiredMixin, SuccessMessageMixin, AjaxTemplateMixin):
     model = GroupElementYear
     context_object_name = "group_element_year"
     pk_url_kwarg = "group_element_year_id"
@@ -106,7 +60,18 @@ class GenericGroupElementYearMixin(FlagMixin, AjaxPermissionRequiredMixin, Succe
     # FlagMixin
     flag = "education_group_update"
 
-    permission_required = 'base.change_link_data'
+    # RulesRequiredMixin
+    raise_exception = True
+    rules = [perms.can_change_education_group]
+
+    def _call_rule(self, rule):
+        """ The permission is computed from the education_group_year """
+        return rule(self.request.user, self.education_group_year)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['root'] = self.kwargs["root_id"]
+        return context
 
     @property
     def education_group_year(self):
@@ -115,57 +80,81 @@ class GenericGroupElementYearMixin(FlagMixin, AjaxPermissionRequiredMixin, Succe
     def get_root(self):
         return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
-    def get_permission_object(self) -> GroupYear:
-        return self.get_object().parent_element.group_year
 
+@method_decorator(login_required, name='dispatch')
+class LearningUnitGenericUpdateView(RulesRequiredMixin, SuccessMessageMixin, FormView):
+    model = LearningUnitYear
+    context_object_name = "learning_unit_year"
+    pk_url_kwarg = 'learning_unit_year_id'
 
-class LearningUnitGeneric(CatalogGenericDetailView, TemplateView):
+    raise_exception = True
+    rules = [perms.can_change_education_group]
+
+    def _call_rule(self, rule):
+        return rule(self.request.user, self.get_root())
+
     def get_person(self):
         return get_object_or_404(Person, user=self.request.user)
 
-    @cached_property
-    def program_tree(self):
-        return load_tree.load(int(self.kwargs['root_element_id']))
+    def get_root(self):
+        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
 
     @cached_property
-    def node(self):
-        node = self.program_tree.get_node_by_id_and_type(
-            int(self.kwargs['child_element_id']),
-            NodeType.LEARNING_UNIT
-        )
-        if node is None:
-            raise Http404
-        return node
+    def program_tree(self):
+        return load_tree.load(self.get_root().id)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
+        root = self.get_root()
+        serialized_data = program_tree_view.program_tree_view_serializer(self.program_tree)
+
         context['person'] = self.get_person()
-        # TODO: use DDD instead
-        root = GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
+        context['learning_unit_year'] = LearningUnitYear.objects.get(id=self.kwargs["learning_unit_year_id"])
         context['root'] = root
-        context['root_id'] = self.program_tree.root_node.pk
-        context['parent'] = self.program_tree.root_node
-        context['node'] = self.node
-        context['tree'] = json.dumps(program_tree_view.program_tree_view_serializer(self.program_tree))
+        context['root_id'] = self.kwargs.get("root_id")
+        context['parent'] = root
+        context['tree'] = json.dumps(serialized_data)
+
         context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
-        context['show_prerequisites'] = self.show_prerequisites(self.program_tree.root_node)
-        context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
-        context['xls_ue_prerequisites'] = reverse("education_group_learning_units_prerequisites",
-                                                  args=[root.academic_year.year, root.partial_acronym]
-                                                  )
-        context['xls_ue_is_prerequisite'] = reverse("education_group_learning_units_is_prerequisite_for",
-                                                    args=[root.academic_year.year, root.partial_acronym]
-                                                    )
-        # TODO: Remove when DDD is implemented on learning unit year...
-        context['learning_unit_year'] = get_object_or_none(
-            LearningUnitYear,
-            element__pk=self.kwargs['child_element_id']
-        )
         return context
 
-    def show_prerequisites(self, root_node: 'NodeGroupYear'):
-        return root_node.node_type not in NO_PREREQUISITES
 
-    def get_permission_object(self):
-        return GroupYear.objects.get(element__pk=self.program_tree.root_node.pk)
+@method_decorator(login_required, name='dispatch')
+class LearningUnitGenericDetailView(PermissionRequiredMixin, DetailView, CatalogGenericDetailView):
+    model = LearningUnitYear
+    context_object_name = "learning_unit_year"
+    pk_url_kwarg = 'learning_unit_year_id'
+
+    permission_required = 'base.view_educationgroup'
+    raise_exception = True
+
+    def get_person(self):
+        return get_object_or_404(Person, user=self.request.user)
+
+    def get_root(self):
+        return get_object_or_404(EducationGroupYear, pk=self.kwargs.get("root_id"))
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        root = self.get_root()
+
+        self.program_tree = load_tree.load(root.id)
+        serialized_data = program_tree_view.program_tree_view_serializer(self.program_tree)
+
+        node = self.program_tree.get_node_by_id_and_type(self.object.id, NodeType.LEARNING_UNIT)
+
+        context['person'] = self.get_person()
+        context['root'] = root
+        context['root_id'] = root.pk
+        context['parent'] = root
+        context['tree'] = json.dumps(serialized_data)
+        context['node'] = node
+        context['group_to_parent'] = self.request.GET.get("group_to_parent") or '0'
+        context['show_prerequisites'] = self.show_prerequisites(root)
+        context['selected_element_clipboard'] = self.get_selected_element_for_clipboard()
+        return context
+
+    def show_prerequisites(self, education_group_year):
+        return education_group_year.education_group_type.name not in NO_PREREQUISITES

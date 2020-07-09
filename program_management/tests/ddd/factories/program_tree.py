@@ -25,15 +25,15 @@
 ##############################################################################
 import factory.fuzzy
 
-from program_management.ddd.domain import program_tree
-from program_management.tests.ddd.factories import node
+from program_management.ddd.domain.program_tree import ProgramTree
+from program_management.tests.ddd.factories.node import NodeGroupYearFactory
 
 
 class ProgramTreeFactory(factory.Factory):
 
     class Meta:
-        model = program_tree.ProgramTree
+        model = ProgramTree
         abstract = False
 
-    root_node = factory.SubFactory(node.NodeGroupYearFactory)
+    root_node = factory.SubFactory(NodeGroupYearFactory)
     authorized_relationships = None

@@ -49,11 +49,6 @@ paths:
         name: lang
         schema:
           type: string
-      - in: query
-        name: campus
-        schema:
-          description: ''
-          type: string
       responses:
         '200':
           description: OK

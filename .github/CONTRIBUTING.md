@@ -256,7 +256,6 @@ Dans de rares cas plus complexes (exemple: identification d'une personne : UUID)
 - Nommage des fonctions, fichiers **protégés** (uniquement visible / utilisable dans le package) : _function
 
     Exemple: ```def _my_protected_function(param: str) -> None```
- - Implémentation des Value Objects en utilisant la librairie **attrs** en définissant la classe comme étant frozen (immutable) et faisant usage de slots.
 
 
 
@@ -309,20 +308,17 @@ django_app
 Exemple : 
 ```python
 # command.py
-import attr
-
 from osis_common.ddd import interface
 from program_management.ddd.business_types import Path
 
-
-@attr.s(frozen=True, slots=True)
 class DetachNodeCommand(interface.CommandRequest):
-    path_to_detach = attr.ib(type=Path)
+    def __init__(self, path_to_detach: Path):
+        self.path_to_detach = path_to_detach
 
 
-@attr.s(frozen=True, slots=True)
 class AttachNodeCommand(interface.CommandRequest):
-    path_to_node_to_attach = attr.ib(type=Path)
+    def __init__(self, path_to_node_to_attach: 'Path'):
+        self.path_to_node_to_attach = path_to_node_to_attach
  
 ```
 
@@ -337,15 +333,22 @@ class AttachNodeCommand(interface.CommandRequest):
 Exemple :
 ```python
 # ddd/domain/program_tree.py  -> Aggregate root du domaine "program_management"
-import attr
-
 from osis_common.ddd import interface
 
 
-@attr.s(frozen=True, slots=True)
 class ProgramTreeIdentity(interface.EntityIdentity):
-    code = attr.ib(type=str)
-    year = attr.ib(type=int)
+    def __init__(self, code: str, year: int):
+        self.code = code
+        self.year = year
+
+    def __hash__(self):
+        """Doit être implémenté obligatoirement pour les ValueObjects uniquement !"""
+        return hash(self.code + str(self.year))
+    
+    def __eq__(self, other):
+        """Doit être implémenté obligatoirement pour les ValueObjects uniquement !"""
+        return other.code == self.code and other.year == self.year 
+
 
 class ProgramTree(interface.RootEntity):
     pass
