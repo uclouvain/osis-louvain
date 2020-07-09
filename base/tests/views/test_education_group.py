@@ -380,7 +380,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         }
         request = RequestFactory().post('/', form)
         response = education_group_year_admission_condition_update_line_post(request,
-                                                                             self.education_group_parent.id,
                                                                              self.education_group_child.id)
         # the form is not called because this one is not valid
         mock_save_form.not_called()
@@ -401,7 +400,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         }
         request = RequestFactory().post('/', form)
         response = education_group_year_admission_condition_update_line_post(request,
-                                                                             self.education_group_parent.id,
                                                                              self.education_group_child.id)
 
         education_group_id, creation_mode, unused = mock_save_form.call_args[0]
@@ -427,7 +425,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         request = RequestFactory().post('/', form)
         education_group_year_admission_condition_update_line_post(
             request,
-            self.education_group_parent.id,
             self.education_group_child.id
         )
 
@@ -534,7 +531,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         from base.views.education_group import education_group_year_admission_condition_update_text_post
         response = education_group_year_admission_condition_update_text_post(
             request,
-            self.education_group_parent.id,
             self.education_group_child.id,
         )
 
@@ -554,7 +550,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         from base.views.education_group import education_group_year_admission_condition_update_text_post
         response = education_group_year_admission_condition_update_text_post(
             request,
-            self.education_group_parent.id,
             self.education_group_child.id,
         )
 

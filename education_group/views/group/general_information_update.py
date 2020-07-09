@@ -62,11 +62,11 @@ class GroupUpdateGeneralInformation(GroupRead):
             redirect_url += "#section_{label_name}".format(label_name=label)
         return redirect(redirect_url)
 
-    def update_cms(self, form, label: str):
+    def update_cms(self, form: EducationGroupPedagogyEditForm, label: str):
         for lang in [settings.LANGUAGE_CODE_EN, settings.LANGUAGE_CODE_FR]:
             self._update_cms_for_specific_lang(form, lang, label)
 
-    def _update_cms_for_specific_lang(self, form, lang: str, label: str):
+    def _update_cms_for_specific_lang(self, form: EducationGroupPedagogyEditForm, lang: str, label: str):
         node = self.get_object()
         entity = entity_name.get_offers_or_groups_entity_from_node(node)
         obj = translated_text.get_groups_or_offers_cms_reference_object(node)

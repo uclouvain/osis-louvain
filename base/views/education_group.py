@@ -151,7 +151,7 @@ def _get_admission_condition_success_url(year: int, acronym: str):
     return reverse('education_group_read_proxy', args=[year, acronym]) + '?tab={}'.format(Tab.ADMISSION_CONDITION)
 
 
-def get_content_of_admission_condition_line(message, admission_condition_line: AdmissionConditionLine, lang: str):
+def get_content_of_admission_condition_line(message: str, admission_condition_line: AdmissionConditionLine, lang: str):
     return {
         'message': message,
         'section': admission_condition_line.section,
@@ -163,7 +163,7 @@ def get_content_of_admission_condition_line(message, admission_condition_line: A
     }
 
 
-def education_group_year_admission_condition_update_line_post(request, root_id: int, education_group_year_id: int):
+def education_group_year_admission_condition_update_line_post(request, education_group_year_id: int):
     creation_mode = request.POST.get('admission_condition_line') == ''
     if creation_mode:
         # bypass the validation of the form
@@ -178,7 +178,7 @@ def education_group_year_admission_condition_update_line_post(request, root_id: 
     return redirect(_get_admission_condition_success_url(training_identity.year, training_identity.acronym))
 
 
-def save_form_to_admission_condition_line(education_group_year_id: int, creation_mode, form):
+def save_form_to_admission_condition_line(education_group_year_id: int, creation_mode: bool, form: UpdateLineForm):
     admission_condition_line_id = form.cleaned_data['admission_condition_line']
     language = form.cleaned_data['language']
     lang = '' if language == 'fr-be' else '_en'
@@ -235,11 +235,11 @@ def education_group_year_admission_condition_update_line_get(request):
 @can_change_admission_condition
 def education_group_year_admission_condition_update_line(request, offer_id: int, education_group_year_id: int):
     if request.method == 'POST':
-        return education_group_year_admission_condition_update_line_post(request, offer_id, education_group_year_id)
+        return education_group_year_admission_condition_update_line_post(request, education_group_year_id)
     return education_group_year_admission_condition_update_line_get(request)
 
 
-def education_group_year_admission_condition_update_text_post(request, root_id: int, education_group_year_id: int):
+def education_group_year_admission_condition_update_text_post(request, education_group_year_id: int):
     form = UpdateTextForm(request.POST)
 
     if form.is_valid():
@@ -278,7 +278,7 @@ def education_group_year_admission_condition_update_text_get(request, education_
 @can_change_admission_condition
 def education_group_year_admission_condition_update_text(request, offer_id: int, education_group_year_id: int):
     if request.method == 'POST':
-        return education_group_year_admission_condition_update_text_post(request, offer_id, education_group_year_id)
+        return education_group_year_admission_condition_update_text_post(request, education_group_year_id)
     return education_group_year_admission_condition_update_text_get(request, education_group_year_id)
 
 
