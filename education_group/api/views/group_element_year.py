@@ -31,7 +31,9 @@ from backoffice.settings.rest_framework.common_views import LanguageContextSeria
 from base.models.enums.education_group_categories import Categories
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
 from program_management.ddd.domain import link
+from program_management.ddd.domain.program_tree_version import ProgramTreeVersionIdentity
 from program_management.ddd.repositories import load_tree
+from program_management.ddd.repositories.program_tree_version import ProgramTreeVersionRepository
 from program_management.models.element import Element
 
 
@@ -41,6 +43,7 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
     paginator = None
 
     def get_object(self):
+        print("START")
         queryset = self.filter_queryset(self.get_queryset())
         version_name = self.kwargs.pop('version_name', '')
         filter_kwargs = {
@@ -55,8 +58,26 @@ class EducationGroupTreeView(LanguageContextSerializerMixin, generics.RetrieveAP
         )
         self.check_object_permissions(self.request, element.education_group_year_obj)
 
-        tree = load_tree.load(element.id)
+        tree_version_identity = ProgramTreeVersionIdentity(
+            offer_acronym=self.kwargs.get('acronym') or self.kwargs.get('partial_acronym'),
+            year=self.kwargs['year'],
+            version_name=version_name,
+            is_transition=False
+        )
+        self.tree_version = ProgramTreeVersionRepository.get(tree_version_identity)
+        tree = self.tree_version.get_tree()
         return link.factory.get_link(parent=None, child=tree.root_node)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update(
+            {
+                'version_name': self.tree_version.version_name,
+                'version_title_fr': self.tree_version.title_fr,
+                'version_title_en': self.tree_version.title_en
+            }
+        )
+        return context
 
 
 class TrainingTreeView(EducationGroupTreeView):

@@ -27,7 +27,6 @@ from django.conf import settings
 from rest_framework import serializers
 from rest_framework.reverse import reverse
 
-from base.models.enums.education_group_categories import Categories
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.mini_training import MiniTrainingDetail
 from education_group.api.views.training import TrainingDetail
@@ -103,7 +102,7 @@ class CommonNodeTreeSerializer(BaseCommonNodeTreeSerializer):
 class EducationGroupRootNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     node_type = serializers.SerializerMethodField(read_only=True)
     subtype = serializers.CharField(source='child.node_type.name', read_only=True)
-    acronym = serializers.CharField(source='child.title', read_only=True)
+    acronym = serializers.SerializerMethodField(read_only=True)
     code = serializers.CharField(source='child.code', read_only=True)
     remark = serializers.SerializerMethodField()
     partial_title = serializers.SerializerMethodField()
@@ -111,7 +110,12 @@ class EducationGroupRootNodeTreeSerializer(BaseCommonNodeTreeSerializer):
     max_constraint = serializers.IntegerField(source='child.max_constraint', read_only=True)
     constraint_type = serializers.CharField(source='child.constraint_type', read_only=True)
 
-    def get_node_type(self, obj):
+    def get_acronym(self, obj):
+        version_name = self.context.get('version_name')
+        return obj.child.title + ' [{}]'.format(version_name)
+
+    @staticmethod
+    def get_node_type(obj):
         if obj.child.is_training():
             return NodeType.TRAINING.name
         elif obj.child.is_mini_training():
@@ -125,7 +129,11 @@ class EducationGroupRootNodeTreeSerializer(BaseCommonNodeTreeSerializer):
 
     def get_title(self, obj):
         field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
+        version_title = self.context.get('version_title' + field_suffix)
+        print(version_title)
+        print(getattr(obj.child, 'offer_title' + field_suffix))
         return getattr(obj.child, 'offer_title' + field_suffix)
+        # + ' [{}]'.format(version_title)
 
     def get_partial_title(self, obj):
         field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
