@@ -54,9 +54,8 @@ def education_group_year_pedagogy_edit_post(request, node):
     form = EducationGroupPedagogyEditForm(request.POST)
     obj = translated_text.get_groups_or_offers_cms_reference_object(node)
     entity = entity_name.get_offers_or_groups_entity_from_node(node)
-    # TODO: Something to do
-    training_identity = TrainingIdentitySearch().get_from_education_group_year_id(obj.id)
-    redirect_url = _get_admission_condition_success_url(training_identity.year, training_identity.acronym)
+
+    redirect_url = _get_admission_condition_success_url(node.year, node.title)
     if form.is_valid():
         label = form.cleaned_data['label']
 
