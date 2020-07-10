@@ -39,3 +39,15 @@ class TextLabelFactory(factory.django.DjangoModelFactory):
     label = factory.fuzzy.FuzzyText(prefix="Label ", length=20)
     order = factory.fuzzy.FuzzyInteger(1, 10)
     published = factory.Iterator([True, False])
+
+
+class OfferTextLabelFactory(TextLabelFactory):
+    entity = entity_name.OFFER_YEAR
+
+
+class GroupTextLabelFactory(TextLabelFactory):
+    entity = entity_name.GROUP_YEAR
+
+
+class LearningUnitYearTextLabelFactory(TextLabelFactory):
+    entity = entity_name.LEARNING_UNIT_YEAR

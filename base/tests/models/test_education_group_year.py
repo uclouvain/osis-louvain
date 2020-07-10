@@ -44,9 +44,8 @@ from base.tests.factories.learning_unit_enrollment import LearningUnitEnrollment
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from base.tests.factories.offer_enrollment import OfferEnrollmentFactory
 from base.tests.factories.offer_year import OfferYearFactory
-from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text import OfferTranslatedTextFactory
 
 
 class EducationGroupYearTest(TestCase):
@@ -550,8 +549,7 @@ class EducationGroupYearDeleteCms(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.education_group_year = EducationGroupYearFactory()
-        cls.translated_text = TranslatedTextFactory(entity=entity_name.OFFER_YEAR,
-                                                    reference=cls.education_group_year.id)
+        cls.translated_text = OfferTranslatedTextFactory(reference=cls.education_group_year.id)
 
         cls.education_group_year_no_cms = EducationGroupYearFactory()
 

@@ -47,9 +47,12 @@ from base.tests.factories.education_group_year import TrainingFactory, Education
 from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.person import PersonWithPermissionsFactory, PersonFactory
 from cms.enums import entity_name
-from cms.tests.factories.text_label import TextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory, TranslatedTextRandomFactory
+from cms.tests.factories.text_label import OfferTextLabelFactory
+from cms.tests.factories.translated_text import TranslatedTextRandomFactory, \
+    OfferTranslatedTextFactory
 from education_group.tests.factories.group_year import GroupYearFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 
 ACCESS_DENIED = "access_denied.html"
 LOGIN_NEXT = '/login/?next={}'
@@ -60,8 +63,14 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
     def setUpTestData(cls):
         cls.current_academic_year = create_current_academic_year()
         cls.training = TrainingFactory(academic_year=cls.current_academic_year)
-
-        cls.text_label = TextLabelFactory(label='dummy-label')
+        version = StandardEducationGroupVersionFactory(
+            offer=cls.training,
+            root_group__academic_year=cls.current_academic_year,
+            root_group__education_group_type=cls.training.education_group_type,
+            root_group__partial_acronym=cls.training.partial_acronym
+        )
+        element = ElementFactory(group_year=version.root_group)
+        cls.text_label = OfferTextLabelFactory(label='dummy-label')
         cls.translated_text_in_french = TranslatedTextRandomFactory(
             reference=str(cls.training.pk),
             entity=entity_name.OFFER_YEAR,
@@ -75,7 +84,10 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
             language=settings.LANGUAGE_CODE_EN,
         )
         cls.person = PersonFactory()
-        cls.url = reverse("education_group_pedagogy_edit", args=[cls.training.pk, cls.training.pk])
+        cls.url = reverse("group_general_information_update", args=[
+            element.group_year.academic_year.year,
+            element.group_year.partial_acronym
+        ])
 
     def setUp(self):
         self.perm_patcher = mock.patch("django.contrib.auth.models.User.has_perm", return_value=True)
@@ -98,26 +110,16 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         self.assertFalse(mock_edit_post.called)
         self.assertFalse(mock_edit_get.called)
 
-    @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_get',
-                side_effect=lambda *args, **kwargs: HttpResponse())
-    @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_post')
-    def test_get_pedagogy_info_case_user_with_permission(self, mock_edit_post, mock_edit_get):
+    def test_get_pedagogy_info_case_user_with_permission(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, HttpResponse.status_code)
 
-        self.assertFalse(mock_edit_post.called)
-        self.assertTrue(mock_edit_get.called)
-
     @mock.patch('base.views.education_group.render')
     def test_get_pedagogy_info_ensure_context_data(self, mock_render):
-        request = RequestFactory().get(self.url, data={'label': self.text_label.label})
+        response = self.client.get(self.url, data={'label': self.text_label.label})
+        request = response.wsgi_request
+        context = response.context_data
         request.user = self.person.user
-
-        from base.views.education_group import education_group_year_pedagogy_edit_get
-        education_group_year_pedagogy_edit_get(request, self.training.pk)
-
-        request, template, context = mock_render.call_args[0]
-        self.assertEqual(context['education_group_year'], self.training)
         self.assertEqual(context['label'], self.text_label.label)
 
         form = context['form']
@@ -136,22 +138,14 @@ class EducationGroupPedagogyUpdateViewTestCase(TestCase):
         self.assertFalse(mock_edit_post.called)
         self.assertFalse(mock_edit_get.called)
 
-    @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_get')
-    @mock.patch('base.views.education_group.education_group_year_pedagogy_edit_post',
-                side_effect=lambda *args, **kwargs: HttpResponse())
-    def test_post_pedagogy_info_case_user_with_permission(self, mock_edit_post, mock_edit_get):
+    def test_post_pedagogy_info_case_user_with_permission(self):
         response = self.client.post(self.url, data={})
-        self.assertEqual(response.status_code, HttpResponse.status_code)
-
-        self.assertTrue(mock_edit_post.called)
-        self.assertFalse(mock_edit_get.called)
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
 
     def test_education_group_year_pedagogy_edit_post(self):
         post_data = {'label': 'welcome_introduction', 'text_french': 'Salut', 'text_english': 'Hello'}
-        request = RequestFactory().post(self.url, data=post_data)
 
-        from base.views.education_group import education_group_year_pedagogy_edit_post
-        response = education_group_year_pedagogy_edit_post(request, self.training.pk, self.training.pk)
+        response = self.client.post(self.url, data=post_data)
 
         self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
         anchor_expected = '#section_welcome_introduction'
@@ -239,10 +233,7 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         )
         GroupElementYearFactory(parent=cls.education_group_parent, child_branch=cls.education_group_child)
 
-        cls.cms_label_for_child = TranslatedTextFactory(
-            text_label__entity=entity_name.OFFER_YEAR,
-            reference=cls.education_group_child.id
-        )
+        cls.cms_label_for_child = OfferTranslatedTextFactory(reference=cls.education_group_child.id)
 
         cls.person = PersonFactory()
         cls.template_name = "education_group/tab_admission_conditions.html"
@@ -389,7 +380,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         }
         request = RequestFactory().post('/', form)
         response = education_group_year_admission_condition_update_line_post(request,
-                                                                             self.education_group_parent.id,
                                                                              self.education_group_child.id)
         # the form is not called because this one is not valid
         mock_save_form.not_called()
@@ -410,7 +400,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         }
         request = RequestFactory().post('/', form)
         response = education_group_year_admission_condition_update_line_post(request,
-                                                                             self.education_group_parent.id,
                                                                              self.education_group_child.id)
 
         education_group_id, creation_mode, unused = mock_save_form.call_args[0]
@@ -436,7 +425,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         request = RequestFactory().post('/', form)
         education_group_year_admission_condition_update_line_post(
             request,
-            self.education_group_parent.id,
             self.education_group_child.id
         )
 
@@ -543,7 +531,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         from base.views.education_group import education_group_year_admission_condition_update_text_post
         response = education_group_year_admission_condition_update_text_post(
             request,
-            self.education_group_parent.id,
             self.education_group_child.id,
         )
 
@@ -563,7 +550,6 @@ class AdmissionConditionEducationGroupYearTest(TestCase):
         from base.views.education_group import education_group_year_admission_condition_update_text_post
         response = education_group_year_admission_condition_update_text_post(
             request,
-            self.education_group_parent.id,
             self.education_group_child.id,
         )
 

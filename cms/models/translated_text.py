@@ -23,13 +23,22 @@
 #    see http://www.gnu.org/licenses/.
 #
 ##############################################################################
+from typing import List
+
 from ckeditor.fields import RichTextField
 from django.conf import settings
 from django.db import models
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
+from django.shortcuts import get_object_or_404
 from reversion.admin import VersionAdmin
 
-from cms.enums.entity_name import ENTITY_NAME
+from base.models.education_group_year import EducationGroupYear
+from base.models.enums.education_group_types import GroupType
+from cms.enums.entity_name import ENTITY_NAME, OFFER_YEAR
+from education_group.models.group_year import GroupYear
 from osis_common.models import osis_model_admin
+from program_management.ddd.domain.node import Node
 from .text_label import TextLabel
 
 
@@ -60,7 +69,7 @@ class TranslatedText(models.Model):
         unique_together = ('entity', 'reference', 'text_label', 'language')
 
 
-def search(entity, reference, text_labels_name=None, language=None):
+def search(entity, reference: int, text_labels_name: List[str] = None, language: str = None):
     queryset = TranslatedText.objects.filter(entity=entity, reference=reference)
 
     if language:
@@ -72,10 +81,12 @@ def search(entity, reference, text_labels_name=None, language=None):
 
 
 def get_or_create(entity, reference, text_label, language):
-    translated_text, created = TranslatedText.objects.get_or_create(entity=entity,
-                                                                    reference=reference,
-                                                                    text_label=text_label,
-                                                                    language=language)
+    translated_text, _ = TranslatedText.objects.get_or_create(
+        entity=entity,
+        reference=reference,
+        text_label=text_label,
+        language=language
+    )
     return translated_text
 
 
@@ -87,3 +98,18 @@ def update_or_create(entity, reference, text_label, language, defaults):
         language=language,
         defaults=defaults)
     return translated_text
+
+
+def get_groups_or_offers_cms_reference_object(node: Node):
+    is_group = node.node_type.name in GroupType.get_names()
+    object_model = GroupYear if is_group else EducationGroupYear
+    filter_kwargs = {'element__pk' if is_group else 'educationgroupversion__root_group__element__pk': node.pk}
+    return get_object_or_404(
+        object_model,
+        **filter_kwargs
+    )
+
+
+@receiver(post_delete, sender=EducationGroupYear)
+def _educationgroupyear_delete(sender, instance, **kwargs):
+    TranslatedText.objects.filter(entity=OFFER_YEAR, reference=instance.id).delete()

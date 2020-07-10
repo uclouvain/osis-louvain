@@ -95,10 +95,9 @@ from base.views.learning_unit import learning_unit_specifications_edit
 from base.views.learning_units.create import create_partim_form
 from base.views.learning_units.detail import SEARCH_URL_PART
 from base.views.learning_units.pedagogy.read import learning_unit_pedagogy
-from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.text_label import TextLabelFactory
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
+from cms.tests.factories.translated_text import LearningUnitYearTranslatedTextFactory
 from cms.tests.factories.translated_text_label import TranslatedTextLabelFactory
 from learning_unit.api.views.learning_unit import LearningUnitFilter
 from learning_unit.tests.factories.learning_class_year import LearningClassYearFactory
@@ -880,8 +879,8 @@ class LearningUnitViewTestCase(TestCase):
     def test_learning_unit_specifications_edit(self):
         a_label = 'label'
         learning_unit_year = LearningUnitYearFactory()
-        text_label_lu = TextLabelFactory(order=1, label=a_label, entity=entity_name.LEARNING_UNIT_YEAR)
-        TranslatedTextFactory(text_label=text_label_lu, entity=entity_name.LEARNING_UNIT_YEAR)
+        text_label_lu = LearningUnitYearTextLabelFactory(order=1, label=a_label)
+        LearningUnitYearTranslatedTextFactory(text_label=text_label_lu)
 
         response = self.client.get(
             reverse(learning_unit_specifications_edit,
@@ -979,17 +978,15 @@ class LearningUnitViewTestCase(TestCase):
                 academic_year__year__lte=proposal.learning_unit_year.academic_year.year - 1
             )
         expected_postponed_luys_ids = luys.values_list('id', flat=True)
-        label = TextLabelFactory(label='label', entity=entity_name.LEARNING_UNIT_YEAR)
+        label = LearningUnitYearTextLabelFactory(label='label')
         for language in ['fr-be', 'en']:
             TranslatedTextLabelFactory(text_label=label, language=language)
-        trans_fr_be = [TranslatedTextFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
+        trans_fr_be = [LearningUnitYearTranslatedTextFactory(
             reference=luy.id,
             language='fr-be',
             text_label=label
         ) for luy in learning_unit_years]
-        trans_en = [TranslatedTextFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
+        trans_en = [LearningUnitYearTranslatedTextFactory(
             reference=luy.id,
             language='en',
             text_label=label

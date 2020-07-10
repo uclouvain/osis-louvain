@@ -49,9 +49,9 @@ from base.tests.factories.person import PersonFactory
 from base.tests.factories.person_entity import PersonEntityFactory
 from base.tests.factories.proposal_learning_unit import ProposalLearningUnitFactory
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.text_label import TextLabelFactory
+from cms.tests.factories.text_label import LearningUnitYearTextLabelFactory
 from cms.tests.factories.translated_text import TranslatedTextFactory
-from reference.tests.factories.language import LanguageFactory, FrenchLanguageFactory, EnglishLanguageFactory
+from reference.tests.factories.language import FrenchLanguageFactory, EnglishLanguageFactory
 
 NEW_TEXT = "new text begins in  {}"
 EN_CODE_LANGUAGE = 'EN'
@@ -229,10 +229,7 @@ class TestConsolidateReportForCmsLearningUnitAchievement(TestCase):
         concerned_cms_labels = CMS_LABEL_PEDAGOGY_FR_AND_EN + CMS_LABEL_PEDAGOGY_FR_ONLY +\
             CMS_LABEL_SPECIFICATIONS + CMS_LABEL_SUMMARY
 
-        self.text_label = TextLabelFactory(
-            label=random.choice(concerned_cms_labels),
-            entity='learning_unit_year'
-        )
+        self.text_label = LearningUnitYearTextLabelFactory(label=random.choice(concerned_cms_labels))
 
         while year <= current_year + 6:
             ay = AcademicYearFactory(year=year)

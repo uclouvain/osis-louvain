@@ -27,7 +27,9 @@ from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from cms.models import text_label
+from cms.models.text_label import TextLabel
 from cms.tests.factories.text_label import TextLabelFactory
+from osis_common.utils.models import get_object_or_none
 
 
 class TextLabelTest(TestCase):
@@ -139,7 +141,11 @@ class TextLabelTest(TestCase):
     def test_get_by_label_or_none(self):
         text_labels = text_label.TextLabel.objects.all()
         text_labels.delete()
-        self.assertIsNone(text_label.get_by_label_or_none('random'))
+        txt_label = get_object_or_none(
+            TextLabel,
+            label='random'
+        )
+        self.assertIsNone(txt_label)
 
 
 class TextLabelComplexeStructureTest(TestCase):
@@ -161,16 +167,16 @@ class TextLabelComplexeStructureTest(TestCase):
         self.A.refresh_from_db()
         self.C.refresh_from_db()
         self.assertEqual(self.B.parent, None)
-        self.assertEqual(self.B.order, 1)  #Root level
-        self.assertEqual(self.A.order, 2)  #Root level
+        self.assertEqual(self.B.order, 1)  # Root level
+        self.assertEqual(self.A.order, 2)  # Root level
         self.assertEqual(self.C.order, 1)
 
     def test_change_order_second_level(self):
-        self.B.order = 4  #not exist
+        self.B.order = 4  # not exist
         self.B.save()
         self.C.refresh_from_db()
-        self.assertEqual(self.B.order, 2)  #Inversion
-        self.assertEqual(self.C.order, 1)  #Inversion
+        self.assertEqual(self.B.order, 2)  # Inversion
+        self.assertEqual(self.C.order, 1)  # Inversion
 
     def test_change_on_same_level_no_change_as_result(self):
         self.E.order = 2

@@ -33,10 +33,10 @@ from base.models.education_group_publication_contact import EducationGroupPublic
 from base.models.education_group_year import EducationGroupYear
 from base.models.enums.education_group_types import GroupType
 from cms.enums import entity_name
+from cms.models import translated_text
 from cms.models.text_label import TextLabel
 from cms.models.translated_text import TranslatedText
 from cms.models.translated_text_label import TranslatedTextLabel
-from education_group.models.group_year import GroupYear
 from program_management.ddd.domain.node import NodeGroupYear
 
 
@@ -74,16 +74,9 @@ def get_sections(node: NodeGroupYear, language_code: str):
 
 def __get_specific_translated_labels(node: NodeGroupYear, language_code: str):
     labels = __get_specific_labels(node)
-    reference_pk = __get_reference_pk(node)
+    reference_pk = translated_text.get_groups_or_offers_cms_reference_object(node).pk
 
     return __get_translated_labels(reference_pk, labels, language_code, node)
-
-
-def __get_reference_pk(node: NodeGroupYear):
-    if node.category.name in GroupType.get_names():
-        return GroupYear.objects.get(element__pk=node.pk).pk
-    else:
-        return EducationGroupYear.objects.get(educationgroupversion__root_group__element__pk=node.pk).pk
 
 
 def __get_specific_labels(node: NodeGroupYear) -> List[str]:
@@ -105,7 +98,7 @@ def __get_common_labels(node: NodeGroupYear) -> List[str]:
 
 
 def __get_translated_labels(reference_pk: int, labels: List[str], language_code: str, node: NodeGroupYear):
-    entity = entity_name.GROUP_YEAR if node.node_type.name in GroupType.get_names() else entity_name.OFFER_YEAR
+    entity = entity_name.get_offers_or_groups_entity_from_node(node)
     subqstranslated_fr = TranslatedText.objects.filter(
         reference=reference_pk, text_label=OuterRef('pk'),
         language=settings.LANGUAGE_CODE_FR, entity=entity

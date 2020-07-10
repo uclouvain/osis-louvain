@@ -53,8 +53,9 @@ class GroupReadGeneralInformation(GroupRead):
         return serializers.general_information.get_sections(self.get_object(), self.request.LANGUAGE_CODE)
 
     def get_update_label_url(self):
-        group_id = self.get_group_year().pk
-        return reverse('education_group_pedagogy_edit', args=[group_id, group_id]) + "?path={}".format(self.get_path())
+        node = self.get_object()
+        return reverse('group_general_information_update', args=[node.year, node.code]) + "?path={}".format(
+            self.get_path())
 
     def get_publish_url(self):
         node = self.get_object()

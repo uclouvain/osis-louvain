@@ -45,20 +45,16 @@ from base.models.learning_component_year import LearningComponentYear
 from base.models.learning_unit_year import find_learning_unit_years_by_academic_year_tutor_attributions
 from base.tests.factories.academic_year import create_current_academic_year, AcademicYearFactory
 from base.tests.factories.business.learning_units import GenerateAcademicYear, GenerateContainer
-from base.tests.factories.education_group_type import GroupEducationGroupTypeFactory
 from base.tests.factories.entity import EntityFactory
 from base.tests.factories.external_learning_unit_year import ExternalLearningUnitYearFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
 from base.tests.factories.learning_component_year import LearningComponentYearFactory, \
     LecturingLearningComponentYearFactory
 from base.tests.factories.learning_container_year import LearningContainerYearFactory
 from base.tests.factories.learning_unit import LearningUnitFactory
 from base.tests.factories.learning_unit_year import LearningUnitYearFactory, create_learning_units_year
-from base.tests.factories.prerequisite_item import PrerequisiteItemFactory
 from base.tests.factories.tutor import TutorFactory
-from cms.enums import entity_name
 from cms.models.translated_text import TranslatedText
-from cms.tests.factories.translated_text import TranslatedTextFactory
+from cms.tests.factories.translated_text import LearningUnitYearTranslatedTextFactory
 
 
 class LearningUnitYearTest(TestCase):
@@ -892,10 +888,7 @@ class LearningUnitYearDeleteCms(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.learning_unit_year = LearningUnitYearFactory()
-        cls.translated_text = TranslatedTextFactory(
-            entity=entity_name.LEARNING_UNIT_YEAR,
-            reference=cls.learning_unit_year.id
-        )
+        cls.translated_text = LearningUnitYearTranslatedTextFactory(reference=cls.learning_unit_year.id)
 
         cls.learning_unit_year_no_cms = LearningUnitYearFactory()
 

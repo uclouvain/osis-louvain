@@ -62,6 +62,8 @@ from base.tests.factories.program_manager import ProgramManagerFactory
 from base.tests.factories.user import SuperUserFactory
 from base.views.education_groups.update import _get_success_redirect_url, update_education_group
 from education_group.tests.factories.auth.central_manager import CentralManagerFactory
+from program_management.tests.factories.education_group_version import StandardEducationGroupVersionFactory
+from program_management.tests.factories.element import ElementFactory
 from reference.tests.factories.country import CountryFactory
 from reference.tests.factories.domain import DomainFactory
 from reference.tests.factories.domain_isced import DomainIscedFactory
@@ -101,10 +103,16 @@ class TestUpdate(TestCase):
             parent_type=cls.education_group_year.education_group_type,
             child_type=cls.education_group_year.education_group_type
         )
-
+        version = StandardEducationGroupVersionFactory(
+            offer=cls.education_group_year,
+            root_group__education_group_type=cls.education_group_year.education_group_type,
+            root_group__academic_year=cls.education_group_year.academic_year,
+            root_group__partial_acronym=cls.education_group_year.partial_acronym
+        )
+        ElementFactory(group_year=version.root_group)
         cls.url = reverse(
             update_education_group,
-            kwargs={"offer_id": cls.education_group_year.pk, "education_group_year_id": cls.education_group_year.pk}
+            kwargs={"offer_id": cls.education_group_year.pk, "education_group_year_id": cls.education_group_year.id}
         )
         cls.person = PersonFactory()
         CentralManagerFactory(person=cls.person, entity=cls.education_group_year.management_entity)

@@ -165,7 +165,8 @@ class GroupFilter(FilterSet):
     def filter_education_group_year_field(queryset, name, value):
         return filter_field_by_regex(queryset, name, value)
 
-    def filter_by_transition(self, queryset, name, value):
+    @staticmethod
+    def filter_by_transition(queryset, name, value):
         if not value:
             return queryset.exclude(educationgroupversion__is_transition=True)
         return queryset
@@ -223,4 +224,3 @@ class GroupFilter(FilterSet):
         qs = super().filter_queryset(queryset)
         order_fields = qs.query.order_by + ('id', )
         return qs.order_by(*order_fields)
-
