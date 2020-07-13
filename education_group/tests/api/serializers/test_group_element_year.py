@@ -26,15 +26,11 @@
 from unittest import skip
 
 from django.conf import settings
-from django.test import TestCase, RequestFactory, SimpleTestCase
+from django.test import RequestFactory, SimpleTestCase
 from rest_framework.reverse import reverse
 
 from base.models.enums.education_group_types import TrainingType, GroupType, MiniTrainingType
 from base.models.enums.link_type import LinkTypes
-from base.tests.factories.academic_year import AcademicYearFactory
-from base.tests.factories.education_group_year import TrainingFactory, GroupFactory, MiniTrainingFactory
-from base.tests.factories.group_element_year import GroupElementYearFactory
-from base.tests.factories.learning_unit_year import LearningUnitYearFactory
 from education_group.api.serializers.group_element_year import EducationGroupRootNodeTreeSerializer
 from education_group.api.views.group import GroupDetail
 from education_group.api.views.group_element_year import TrainingTreeView, GroupTreeView
@@ -42,10 +38,9 @@ from education_group.api.views.training import TrainingDetail
 from education_group.enums.node_type import NodeType
 from learning_unit.api.views.learning_unit import LearningUnitDetailed
 from program_management.ddd.domain.link import Link
-from program_management.ddd.repositories import load_tree
 from program_management.tests.ddd.factories.link import LinkFactory
 from program_management.tests.ddd.factories.node import NodeGroupYearFactory, NodeLearningUnitYearFactory
-from program_management.tests.ddd.factories.prerequisite import PrerequisiteItemFactory, PrerequisiteFactory
+from program_management.tests.ddd.factories.prerequisite import PrerequisiteFactory
 
 
 class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
@@ -340,7 +335,7 @@ class EducationGroupRootNodeTreeSerializerTestCase(SimpleTestCase):
 
     def test_ensure_title_is_related_to_instance_and_language_of_serializer(self):
         self.assertIn(self.serializer.data['title'], self.training.offer_title_en)
-        self.assertEqual(self.serializer.data['children'][0]['title'], self.common_core.offer_title_en)
+        self.assertEqual(self.serializer.data['children'][0]['title'], self.common_core.group_title_en)
         self.assertEqual(
             self.serializer.data['children'][0]['children'][0]['title'],
             self.learning_unit_year.common_title_en + (self.learning_unit_year.specific_title_en or ''),
