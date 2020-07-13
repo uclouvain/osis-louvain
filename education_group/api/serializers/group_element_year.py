@@ -124,8 +124,9 @@ class EducationGroupCommonNodeTreeSerializer(serializers.Serializer):
         return getattr(obj.child, 'remark' + field_suffix)
 
     def get_title(self, obj):
-        field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
-        return getattr(obj.child, 'offer_title' + field_suffix)
+        field_suffix = 'en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else 'fr'
+        field_prefix = 'offer' if obj.child.is_training() else 'group'
+        return getattr(obj.child, '{}_title_{}'.format(field_prefix, field_suffix))
 
     def get_partial_title(self, obj):
         field_suffix = '_en' if self.context.get('language') == settings.LANGUAGE_CODE_EN else '_fr'
